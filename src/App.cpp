@@ -12,11 +12,16 @@ int main( void )
 	enum {recipe, null, source, sink};
 	FacFactory fFactory;
 	
-	Facility *rFac = fFactory.Create( recipe );
-	Facility *nFac = fFactory.Create( null );
+	Facility *rFac  = fFactory.Create( recipe );
+	Facility *nFac  = fFactory.Create( null );
+	Facility *soFac = fFactory.Create( source );
+	Facility *siFac = fFactory.Create( sink );
 	
 	rFac->printMyName();
 	nFac->printMyName();
+	soFac->printMyName();
+	siFac->printMyName();
+
 /*
     MyCreator mCreator;
 

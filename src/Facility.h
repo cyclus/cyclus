@@ -15,9 +15,6 @@
 class Facility
 {
 public:
-	//Facility();
-	//~Facility();
-	enum{ recipe, null, source, sink };
 	virtual void printMyName();
 };
 #endif
