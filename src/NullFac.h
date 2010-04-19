@@ -1,6 +1,8 @@
 #if !defined(_NULLFAC)
 #define _NULLFAC
 #include <iostream>
+#include"Facility.h"
+#include"FacFactory.h"
 
 using namespace std;
 

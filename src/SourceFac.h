@@ -1,6 +1,8 @@
 #if !defined(_SOURCEFAC)
 #define _SOURCEFAC
 #include <iostream>
+#include"Facility.h"
+#include"FacFactory.h"
 
 using namespace std;
 

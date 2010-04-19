@@ -1,6 +1,8 @@
 #if !defined(_SINKFAC)
 #define _SINKFAC
 #include <iostream>
+#include "Facility.h"
+#include "FacFactory.h"
 
 using namespace std;
 

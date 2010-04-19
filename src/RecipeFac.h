@@ -1,6 +1,8 @@
 #if !defined(_RECIPEFAC)
 #define _RECIPEFAC
 #include <iostream>
+#include"Facility.h"
+#include"FacFactory.h"
 
 	using namespace std;
 

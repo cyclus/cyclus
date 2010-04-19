@@ -1,5 +1,4 @@
 #include <iostream>
-#include "Facility.h"
 #include "NullFac.h"
 
 void NullFac::printMyName() 
@@ -7,5 +6,9 @@ void NullFac::printMyName()
 	cout << "My Name : Null Fac "<< endl;
 };
 
+
+namespace {
+     FacFactoryConcrete<NullFac> theCreator("null");
+}
 
 

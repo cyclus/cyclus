@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Facility.h"
 #include "SourceFac.h"
+
 
 void SourceFac::printMyName() 
 { 
@@ -8,4 +8,8 @@ void SourceFac::printMyName()
 };
 
 
+
+namespace {
+     FacFactoryConcrete<SourceFac> theCreator("source");
+}
 

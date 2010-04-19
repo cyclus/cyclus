@@ -1,8 +1,10 @@
 #if !defined(_FACILITY)
 #define _FACILITY
 #include <iostream>
+#include <map>
+#include <string>
 
-	using namespace std;
+using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
@@ -16,7 +18,9 @@ class Facility
 {
 public:
 	virtual void printMyName();
+	virtual ~Facility(){}
 };
+
 #endif
 
 

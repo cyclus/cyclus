@@ -9,30 +9,24 @@ using namespace std;
 //-----------------------------------------------------------------------------
 int main( void )
 {
-	enum {recipe, null, source, sink};
-	FacFactory fFactory;
-	
-	Facility *rFac  = fFactory.Create( recipe );
-	Facility *nFac  = fFactory.Create( null );
-	Facility *soFac = fFactory.Create( source );
-	Facility *siFac = fFactory.Create( sink );
-	
+	// Ask the FacFactory map for pointers to subtype constructors
+	FacFactory *recipeCreator = get_fac_map()[ "recipe" ];
+	FacFactory *nullCreator   = get_fac_map()[ "null"   ];
+	FacFactory *sourceCreator = get_fac_map()[ "source" ];
+	FacFactory *sinkCreator   = get_fac_map()[ "sink"   ];
+
+	// Get a pointer to a new instance 
+	// of the named Facility subtype
+	Facility *rFac  = recipeCreator->Create(); 
+	Facility *nFac  = nullCreator->Create(); 
+	Facility *soFac = sourceCreator->Create();
+	Facility *siFac = sinkCreator->Create();   
+
+	// and call its name printing function
 	rFac->printMyName();
 	nFac->printMyName();
 	soFac->printMyName();
 	siFac->printMyName();
 
-/*
-    MyCreator mCreator;
-
-    Facility *rMFac = mCreator.Create( recipe );
-    Facility *nMFac = mCreator.Create( null );
-    Facility *bMFac = mCreator.Create( bu );
-
-
-    rMFac->printMyName();
-    nMFac->printMyName();
-    bMFac->printMyName();
-*/
 		return 0;
 }
