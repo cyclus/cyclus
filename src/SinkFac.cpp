@@ -9,6 +9,6 @@ void SinkFac::printMyName()
 };
 
 namespace {
-     FacFactoryConcrete<SinkFac> theCreator("sink");
+     FacFactoryConcrete<SinkFac> facType("sink");
 }
 

@@ -8,6 +8,6 @@ void RecipeFac::printMyName()
 };
 
 namespace {
-     FacFactoryConcrete<RecipeFac> theCreator("recipe");
+     FacFactoryConcrete<RecipeFac> facType("recipe");
 }
 

@@ -1,10 +1,6 @@
 #include <iostream>
 #include "FacFactory.h"
 #include "Facility.h"
-#include "NullFac.h"
-#include "RecipeFac.h"
-#include "SourceFac.h"
-#include "SinkFac.h"
 
 using namespace std;
 

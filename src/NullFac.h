@@ -4,6 +4,7 @@
 #include"Facility.h"
 #include"FacFactory.h"
 
+
 using namespace std;
 
 //-----------------------------------------------------------------------------
@@ -23,6 +24,29 @@ using namespace std;
 class NullFac : public Facility  
 {
 public:
+
+	/**
+	 * prints the name of this facType
+	 *
+	 */
 	virtual void printMyName();
+
+	/**
+	 * Constructs a NullFac with no specified data.
+	 * 
+	 */
+	NullFac();
+
+	/**
+	 * Constructs a NullFac with specified data.
+	 *
+	 * @param a is a double
+	 * @param b is a double
+	 * 
+	 */
+	NullFac(double a, double b);
+
+protected: 
+	double bob;
 };
 #endif

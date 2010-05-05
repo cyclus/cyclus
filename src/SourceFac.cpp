@@ -10,6 +10,6 @@ void SourceFac::printMyName()
 
 
 namespace {
-     FacFactoryConcrete<SourceFac> theCreator("source");
+     FacFactoryConcrete<SourceFac> facType("source");
 }
 
