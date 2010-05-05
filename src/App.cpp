@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Facility.h"
 #include "FacFactory.h"
+#include "Market.h"
+#include "MktFactory.h"
 
 using namespace std;
 
@@ -17,6 +19,7 @@ int main( void )
 	FacFactory *nullCreator2  = get_fac_map()[ "null2"  ];
 	FacFactory *sourceCreator = get_fac_map()[ "source" ];
 	FacFactory *sinkCreator   = get_fac_map()[ "sink"   ];
+	MktFactory *netFlowCreator= get_mkt_map()[ "netFlow"   ];
 
 	// Get a pointer to a new instance 
 	// of the named Facility subtype
@@ -25,6 +28,7 @@ int main( void )
 	Facility *nFac2 = nullCreator2->Create(); 
 	Facility *soFac = sourceCreator->Create();
 	Facility *siFac = sinkCreator->Create();   
+	Market  *mktFac = netFlowCreator->Create();   
 
 	// and call its name printing function
 	rFac->printMyName();
@@ -32,6 +36,7 @@ int main( void )
 	nFac2->printMyName();
 	soFac->printMyName();
 	siFac->printMyName();
+	mktFac->printMyName();
 
 		return 0;
 }
