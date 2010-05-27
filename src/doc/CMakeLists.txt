@@ -1,15 +1,9 @@
-# $Id: CMakeLists.txt,v 1.14 2006/07/12 14:53:31 ppoilbarbe Exp $
-# $Name:  $
-#
 # Build file for CMake in order to generate the documentation.
-#
-
-#OPTION(CYCLUS_DOC_CREATE_PDF "Create PDF reference manual" ON)
-
 
 # ---------------------------------
-# Cmake modules needed
+# Check for Doxygen
 # ---------------------------------
+
 IF (DOXYGEN_FOUND)
 	SET(DOXYGEN_SOURCE_DIR ${CYCLUS_SRC_DIR})
   SET(DOXYGEN_INPUT ${DOC_INPUT_DIR}/doxygen.conf)
@@ -23,6 +17,9 @@ IF (DOXYGEN_FOUND)
 		SET(DOXYGEN_HTMLHELP NO)
 	ENDIF (HTML_HELP_COMPILER)
 
+  # ----------------------------------------------------------------------
+	# Some doxyfile settings to be configured into the template doxy.conf.in
+  # ----------------------------------------------------------------------
 	SET(DOXYGEN_LATEX NO)
 	SET(DOXYGEN_PDFLATEX NO)
 	SET(DOXYGEN_PDF_HYPERLINKS NO)
@@ -44,13 +41,6 @@ IF (DOXYGEN_FOUND)
 	
 	CONFIGURE_FILE(${DOC_INPUT_DIR}/doxy.conf.in ${DOC_INPUT_DIR}/doxygen.conf)
 	
-	#	SET(HTML_TARGET ${DOXYGEN_OUTPUT})
-	#ADD_CUSTOM_TARGET(${HTML_TARGET} ALL
-	#	      ${DOXYGEN} ${DOC_DIR}/doxygen.conf
-	#		      DEPENDS ${DOC_DIR}/doxygen.conf)
-
-MESSAGE(STATUS "html should be created in" "${DOC_OUTPUT_DIR}")
-
 
 IF (WIN32)
   SET(DOXYGEN_GENERATE_MAN NO)
@@ -62,8 +52,6 @@ ELSE (WIN32)
   SET(DOXYGEN_GENERATE_MAN YES)
   SET(HHC_PROGRAM)
 ENDIF (WIN32)
-
-
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${DOXYGEN_OUTPUT}
