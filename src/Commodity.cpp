@@ -1,26 +1,24 @@
-// UseMatLib.h contains all of the declarations needed to use a specific
-// Matrix and/or Vector library in place of the default librares for the
-// decay calculations performed on a Material object.
+// Commodity.cpp
+#include <string>
+#include "Commodity.h"
 
-#ifndef USEMATLIB_H
-#define USEMATLIB_H
+//using namespace std;
 
-// To change the matrix library used:
-//
-//      #include "<Matrix Library>"
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity::Commodity(int ID, string name, Market* mkt, bool fissile, bool sepMat){
+	myID = ID;
+	nextID = ID +1;
+	myName = name;
+  isFissile = fissile;
+	isSepMat = sepMat;
+	marketPtr = mkt;
+};
 
-#include "LMatrix.h"          
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity::~Commodity(){
+	// Delete any commodity data members that remain even when 
+	// we go out of Commodity scope... unless you want to write 
+	// that info to the database.
+};
 
-// To change the matrix type: 
-//
-//      typedef <Matrix Type> Matrix;
 
-typedef LMatrix Matrix;
-
-// To change the vector type:
-//
-//      typedef <Vector Type> Vector;
-
-typedef LMatrix Vector;
-
-#endif
