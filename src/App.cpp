@@ -31,6 +31,7 @@ int main( void )
 	Market  *mktFac = netFlowCreator->Create();   
 
 	// and call its name printing function
+	// to test whether everything was instantiated properly 
 	rFac->printMyName();
 	nFac->printMyName();
 	nFac2->printMyName();

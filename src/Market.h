@@ -17,8 +17,27 @@ using namespace std;
 class Market
 {
 public:
+	/**
+	 * Markets should be able to return pointers to themselves. 
+	 */
+	Market* getName;
+
+	/**
+	 * Every market should be able to write its name.
+	 */
 	virtual void printMyName();
-	virtual ~Market(){}
+
+	/**
+	 * Markets should not be indestructible.
+	 */
+	virtual ~Market();
+
+protected:
+	/**
+	 * Markets need names
+	 */
+	string myName;
+
 };
 
 #endif

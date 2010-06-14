@@ -1,4 +1,6 @@
 #include <iostream>
+#include <map>
+#include <string>
 #include "NullFac.h"
 
 void NullFac::printMyName() 
@@ -33,6 +35,10 @@ namespace {
     }
   }facType;
 
+/**
+ * This is how we overload constructors when we would like to put them
+ * in the nickname to pointer map in the anonymous namespace
+ */
   class nullCreator2 : public FacFactory
   {
 		public:
@@ -49,10 +55,18 @@ namespace {
     }
   }facType2;
 
+	/**
+	 * This is a test of material mapping in the anonymous namespace. 
+	 * I don't think it's quite right
+	 * so I'm going to leave it commented
+	class NullFac : public Material
+	{
+		public:
+			get_com_map()[1]="null";
+	}myFeed;
+	*/
+
 }
 
-//namespace {
-//     FacFactoryConcrete<NullFac> facType("null");
-//}
 
 

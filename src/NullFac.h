@@ -18,7 +18,6 @@ using namespace std;
  * way whatsoever. With some decay it could be useful in representing cooling
  * pads, but why else would we need this object?
  *
- * This is all our factory really knows about the products it's creating
 */
 //-----------------------------------------------------------------------------
 class NullFac : public Facility  
