@@ -128,29 +128,12 @@ typedef map<int, pair<int, int> > FacHistory;
 #define OTHER_TC 430989 // "other": technetium
 
 /**
- * A structure to specify what kind of commodity a Material is. "all" 
- * and "fissile" are reserved for when we need to refer to multiple types of 
- * Material. They should not be assigned to actual Material objects.
- */
-struct Commodity {
-	static int nextID;
-	CommodType name;
-	ComID ID;
-	Market* marketPtr;
-	bool treatmentA;
-	bool treatmentB;
-	} cake, uUF6, eUF6, dUF6, eUoxFuel, uUoxFuel, moxFuel, truFuel, 
-									 fuel, usedFuel, waste, sepU, sepPuPlus, sepMAct1, sepMAct2, 
-									 sepFP, sepCsSr, sepI, sepTc, sepFGas, sepMox, fissile, all, 
-									 none;	
-
-/**
  * A map of commodity types being used in this simulation. 
  * This will hopefully replace the above enumeration in a more extensible fasion.
  * The keys to this map are ComIDs, which are typedef string
  * The elements are the Commodity data structures themselves.
  */
-map<CommodType, Commodity> CommodityMap
+map<CommodType, Commodity*> CommodityMap
 /**
  * The parent class for all materials (fuel assemblies, etc.).
  */
