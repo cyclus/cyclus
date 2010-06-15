@@ -1,18 +1,35 @@
 // Commodity.cpp
 #include <string>
 #include "Commodity.h"
+#include "GenException.h"
 
 //using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity(int ID, string name, Market* mkt, bool fissile, bool sepMat){
+Commodity::Commodity(string name, int ID, Market* mkt, bool fissile, bool sepMat){
 	myID = ID;
 	nextID = ID +1;
 	myName = name;
   isFissile = fissile;
 	isSepMat = sepMat;
-	marketPtr = mkt;
+	myMarket = mkt;
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const string Commodity::getName() const
+{
+	return myName;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Commodity::getSN() const
+{
+	return myID;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market* Commodity::getMarket()
+{
+	return myMarket;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::~Commodity(){

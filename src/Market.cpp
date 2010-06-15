@@ -1,6 +1,7 @@
 // Market.cpp
 #include "Market.h"
 #include "Commodity.h"
+#include "GenException.h"
 
 using namespace std;
 
@@ -10,25 +11,26 @@ void Market::printMyName(){
 };
 
 
-Market::Market(MarketType type, string mktName, int SN) : 
-	myType(type), name(mktName), ID(SN)
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market::Market(string mktName, int SN) : 
+	myName(mktName), myID(SN)
 {
 
 	myCommods = vector<Commodity*>();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Market::addCommod(string s, int SN, Market* mkt, bool fissile, bool sepMat)
+void Market::addCommod(string s, int SN, bool fissile, bool sepMat)
 {
 	Commodity* newCommod = new Commodity(s, SN, this, fissile, sepMat);
 	myCommods.push_back(newCommod);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Market::addCommod(Commod* c)
+void Market::addCommod(Commodity* c)
 {
 	myCommods.push_back(c);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Region::getInst(int SN)
+Commodity* Market::getCommod(int SN)
 {
 	vector<Commodity*>::iterator iter;
 	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
@@ -43,4 +45,3 @@ pair<vector<Commodity*>::iterator, vector<Commodity*>::iterator> Market::getComm
 	return make_pair(myCommods.begin(), myCommods.end());
 }
 
-}
