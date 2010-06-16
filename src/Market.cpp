@@ -6,10 +6,15 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ Market::Market()
+{
+	GenException("Do not use the default Market constructor!!");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Market::printMyName(){
 	cout << "this is the printMyName function in Market.cpp"<<endl; 
-};
-
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Market::Market(string mktName, int SN) : 
@@ -45,3 +50,9 @@ pair<vector<Commodity*>::iterator, vector<Commodity*>::iterator> Market::getComm
 	return make_pair(myCommods.begin(), myCommods.end());
 }
 
+Market::~Market()
+{
+	// This destructor doesn't do anything. 
+	// It should delete any data allocated by this class
+	// if there ever is any. 
+}

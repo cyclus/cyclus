@@ -8,7 +8,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Facility::Facility()
 {
-	throw GenException("Don't use default Facility Constructor!");
+	cout << "Used default Facility Constructor!"<< endl;
 }
 
 Facility::Facility(string name, int SN, int dur, int time,

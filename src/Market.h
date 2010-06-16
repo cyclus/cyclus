@@ -1,4 +1,3 @@
-
 #if !defined(_MARKET)
 #define _MARKET
 #include <iostream>
