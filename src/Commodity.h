@@ -19,7 +19,7 @@ public:
 	 * @param fissile indicates whether or not this is a potential fuel.
 	 * @param sepMat indicates whether or not this is a separated stream
 	 */
-	Commodity(string name, int ID, Market* mkt, bool fissile, bool sepMat);	
+	Commodity(string name, Market* mkt, bool fissile, bool sepMat);	
 
 	/**
 	 * Returns this Commodity's name.
@@ -34,6 +34,25 @@ public:
 	 * @return the ID number
 	 */
 	virtual int getSN() const;
+
+	/**
+	 * advances the commodity serialization
+	 */
+	static int nextCommodID();
+
+	/**
+	 * Returns whether this Commodity is fissile.
+	 *
+	 * @return isFissle boolean
+	 */
+	virtual bool isFissile() const;
+	
+	/**
+	 * Returns whether this Commodity is separated material.
+	 *
+	 * @return isSepMat boolean
+	 */
+	virtual bool isSepMat() const;
 	
 	/**
 	 * Returns a pointer to this Commodity's Market.
@@ -70,17 +89,17 @@ private:
 	 * traded between offering and requesting facilities at each timestep.
 	 */
 	Market* myMarket;
-	
+
 	/**
 	 * True if this commodity is a fissile material (e.g. eUF6, pwrFuel, etc.). 
 	 * A value must be given. All commodities are either fissile or non-fissile. 
 	 */
-	bool isFissile;
+	bool fissile;
 
 	/**
 	 * True if this commodity is a separated stream (e.g. sepU, sepTc, etc.).
 	 */
-	bool isSepMat;
+	bool sepMat;
 	
 };
 #endif

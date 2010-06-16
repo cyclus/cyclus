@@ -5,6 +5,8 @@
 #include <math.h>
 #include <sstream>
 #include <fstream>
+#include "GenException.h"
+#include "UniformTaylor.h"
 
 // Static variables to be initialized.
 ParentMap Material::parent = ParentMap();
@@ -20,112 +22,12 @@ map<Spectrum, map<Iso, double> > Material::avgNus =
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material::Material() 
 {
-  throw MatException("Don't use default Material constructor!");
+  throw GenException("Don't use default Material constructor!");
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material::Material(map<Iso, NumDens> comp, ChemForm form, Commodity commod) 
+Material::Material(map<Iso, NumDens> comp, ChemForm form, Commodity* commod) 
   : myForm(form), myType(commod)
 {
-  if (all == commod)
-    throw MatException("Commodity type 'all' cannot be assigned to Materials");
-
-  if (fissile == commod)
-    throw MatException("Commodity type 'fissile' cannot be assigned to Materials");
-
-  ID = BI->assignMaterialSN();
-
-  compHist[TI->getTime()] = comp;
-  facHist = FacHistory();
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*
-Material::Material(Commodity commod, double amount, double par)
-{
-  if (all == commod)
-    throw MatException("Commodity type 'all' cannot be assigned to Materials");
-
-  if (fissile == commod)
-    throw MatException("Commodity type 'fissile' cannot be assigned to Materials");
-
-  myType = commod;
-  ID = BI->assignMaterialSN();
-  facHist = FacHistory();
-  map<Iso, NumDens> comp = map<Iso, NumDens>();
-
-  // Populate the composition vector as appropriate for the given Commodity:
-  switch (commod) {
-
-    double grams92;
-    double grams16;
-    NumDens nd235;
-    NumDens nd238;
-    NumDens nd16;
-    NumDens nd19;
-
-  case cake:
-
-    myForm = sol;
-
-    // Need "amount" tons of U and the rest oxygen. The stoich isn't 
-    // constant/stable, so we have to do the calculation in terms of masses.
-    grams92 = amount * 1E6;
-    grams16 = amount / par // total mass
-      * 1E6 * (1 - par); // times fraction of oxygen
-    nd235 = grams92 * WF_235 * AV_NUM / 235;
-    nd238 = grams92 * WF_238 * AV_NUM / 238;
-    nd16 = grams16 * AV_NUM / MW_O;
-                
-
-    comp[ 80160] = nd16;
-    comp[922350] = nd235;
-    comp[922380] = nd238;
-
-    break;
-
-  case uUF6:
-
-    myForm = gas;
-
-    grams92 = amount * 1E6;
-    nd235 = grams92 * WF_235 * AV_NUM / 235;
-    nd238 = grams92 * WF_238 * AV_NUM / 238;
-
-    // The stoich for this one's easy:
-    nd19 = (nd235 + nd238) * 6;
-
-    comp[922350] = nd235;
-    comp[922380] = nd238;
-    comp[ 90190] = nd19;
-
-    break;
-
-  case dUF6: // no "break;"--we want the same behavior for both
-  case eUF6:
-
-    myForm = gas;
-
-    grams92 = amount * 1E6;
-    nd235 = grams92 * par * AV_NUM / 235;
-    nd238 = grams92 * (1 - par) * AV_NUM / 238;
-
-    // The stoich for this one's easy:
-    nd19 = (nd235 + nd238) * 6;
-
-    comp[922350] = nd235;
-    comp[922380] = nd238;
-    comp[ 90190] = nd19;
-
-    break;
-
-  default:
-
-    throw MatException("No parametric constructor defined for given Commodity");
-
-    break;
-
-  }
-  compHist[TI->getTime()] = comp;
-	*/
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material::~Material()
@@ -177,7 +79,7 @@ void Material::changeComp(Iso tope, NumDens change, int time)
   }
 
   if (this->isNeg(tope))
-    throw MatException("Tried to make isotope composition negative.");
+    throw GenException("Tried to make isotope composition negative.");
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -249,7 +151,7 @@ const long Material::getSN() const
   return ID;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity Material::getCommod() const
+Commodity* Material::getCommod() const
 {
   return myType;
 }
@@ -268,8 +170,8 @@ void Material::logTrans(int time, int fromFac, int toFac)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::writeHist()
 {
-  map<int, long> compIDs = BI->writeMatCompHist(compHist, ID);
-  BI->writeMatFacHist(facHist, ID, compIDs);
+//  map<int, long> compIDs = BI->writeMatCompHist(compHist, ID);
+//  BI->writeMatFacHist(facHist, ID, compIDs);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::absorb(Material* matToAdd)
@@ -337,16 +239,13 @@ const double Material::getIsoMass(Iso tope) const
   return Material::getIsoMass(tope, currComp);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::changeCommod(Commodity newCommod)
+void Material::changeCommod(Commodity* newCommod)
 {
   if (newCommod == myType)
-    throw MatException("Tried to change Commodity type to the current type.");
+    throw GenException("Tried to change Commodity type to the current type.");
 
-  if (all == newCommod)
-    throw MatException("Commodity type 'all' cannot be assigned to Materials");
-
-  if (fissile == newCommod)
-    throw MatException("Commodity type 'fissile' cannot be assigned to Materials");
+  if (newCommod->isFissile())
+    throw GenException("Commodity type 'fissile' cannot be assigned to Materials");
 
   myType = newCommod;
 }
@@ -358,7 +257,6 @@ void Material::changeChemForm(ChemForm newForm)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Material::getAtomicNum(Iso tope)
 {
-	// KDHFLAG OTHER_ISOS is a terrible way to do what it does. 
   // Let our dummy codes through.
   switch(tope) {
   case OTHER_FP :
@@ -376,7 +274,7 @@ int Material::getAtomicNum(Iso tope)
 
   // Make sure the number's in a reasonable range.
   if (tope < 10010 || tope > 1182949)
-    throw MatException("Tried to get atomic number of invalid isotope");
+    throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the atomic number and return.
   return tope / 10000; // integer division
@@ -401,30 +299,10 @@ int Material::getMassNum(Iso tope)
 
   // Make sure the number's in a reasonable range.
   if (tope < 10010 || tope > 1182949)
-    throw MatException("Tried to get atomic number of invalid isotope");
+    throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the mass number and return.
   return (tope / 10) % 1000;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Material::toString()
-{
-  map<Iso, NumDens> currComp = this->getComp();
-  map<Iso, NumDens>::iterator iter;
-  string strRep = "";
-
-  // Iterate over the composition.
-  for (iter = currComp.begin(); iter != currComp.end(); iter++) {
-
-    // Convert the composition info to a string.
-    ostringstream sIso, sNd;
-    sIso << iter->first;
-    sNd << iter->second;
-    string iso = sIso.str();
-    string nd = sNd.str();
-    strRep = strRep + iso + " : " + nd + "\n";
-  }
-  return strRep; 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getEltMass(int elt, const map<Iso, NumDens>& comp)
@@ -504,27 +382,6 @@ double Material::getTotNumDens(const map<Iso, NumDens>& comp)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// This section is being removed in order to decouple genius
-// from gdbPrint
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//
-// ostream& operator<<(ostream &os, const Material& m)
-//{
-//  CompHistory::const_reverse_iterator i = m.compHist.rbegin();
-//  os << "Material " << m.getSN() << " (" 
-//     << Material::unEnumerateCommod(m.getCommod())  << ")" << endl 
-//     << "... = Total mass = " << m.getTotMass() << endl
-//     << "... = U mass = " << m.getEltMass(92) << endl
-//     << "... = Isotopic vector: " << i->second;
-//  return os;
-//}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//ostream& operator<<(ostream &os, const Material* m)
-//{
-//  os << *m;
-//  return os;
-//}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isNeg(Iso tope) const
 {
   if (this->getComp(tope) == 0)
@@ -538,24 +395,6 @@ const bool Material::isZero(Iso tope) const
 {
   NumDens nd_eps = AV_NUM / Material::getMassNum(tope) * eps * 1e6; 
   return fabs(this->getComp(tope)) < nd_eps;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Material::unEnumerateCommod(Commodity* commod)
-{
-	// KDHFLAG a new facility type may want alternative commodities
-	// KDHFLAG ... new tradables even.
-
-  string toRet = "";
-	toRet = commod.myName;
-  }
-
-  return toRet;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Material::enumerateCommod(string s)
-{
-	Commodity* toRet = 0;
-	toRet = 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Material::containsActinides()
@@ -626,7 +465,7 @@ void Material::loadDecayInfo()
     
     // checks to see if there are isotopes in 'decayInfo.dat'
     if ( decayInfo.eof() ) {
-      throw MatException("There are no isotopes in the 'decayInfo.dat' file");
+      throw GenException("There are no isotopes in the 'decayInfo.dat' file");
     }
     
     // processes 'decayInfo.dat'
@@ -649,7 +488,7 @@ void Material::loadDecayInfo()
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
-              throw MatException("A duplicate daughter isotope was found in decayInfo.dat");
+              throw GenException("A duplicate daughter isotope was found in decayInfo.dat");
             } 
           }
 
@@ -660,7 +499,7 @@ void Material::loadDecayInfo()
         ++jcol; // set next column
       }
       else {
-        throw MatException("A duplicate parent isotope was found in 'decayInfo.dat'");
+        throw GenException("A duplicate parent isotope was found in 'decayInfo.dat'");
       }
       decayInfo >> iso; // get next parent
     } 
@@ -668,7 +507,7 @@ void Material::loadDecayInfo()
     makeDecayMatrix();
   }   
   else {
-    throw MatException("The file 'decayInfo.dat' does not exist");
+    throw GenException("The file 'decayInfo.dat' does not exist");
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -768,7 +607,7 @@ map<Iso, NumDens> Material::makeCompMap(const Vector & compVector)
         compMap.insert( make_pair(iso, numDens) );
     }
     else {
-      throw MatException("Decay Error - invalid Vector position");
+      throw GenException("Decay Error - invalid Vector position");
     }
 
     ++parent_iter; // get next parent
@@ -798,7 +637,7 @@ void Material::decay(double months)
     this->changeComp(newComp,time);
   }
   catch ( string e ) {
-    throw MatException(e);
+    throw GenException(e);
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -879,7 +718,7 @@ void Material::initAvgCapXSects(Spectrum s)
     break;
 
   default :
-    throw MatException("Error, requested average sigma_gamma for unsupported spectrum");
+    throw GenException("Error, requested average sigma_gamma for unsupported spectrum");
   }
 
   avgCapXSects.insert(make_pair(s, spectCapXSects));
@@ -952,7 +791,7 @@ void Material::initAvgFisXSects(Spectrum s)
     break;
 
   default :
-    throw MatException("Error, requested average sigma_fission for unsupported spectrum");
+    throw GenException("Error, requested average sigma_fission for unsupported spectrum");
   }
 
   avgFisXSects.insert(make_pair(s, spectFisXSects));
@@ -995,7 +834,7 @@ void Material::initAvgNus(Spectrum s)
     break;
 
   default :
-    throw MatException("Error, requested average nus for unsupported spectrum");
+    throw GenException("Error, requested average nus for unsupported spectrum");
   }
 
   avgNus.insert(make_pair(s, spectNus));
@@ -1004,7 +843,7 @@ void Material::initAvgNus(Spectrum s)
 const map<Iso, double>& Material::getAvgCapXSects(Spectrum s)
 {
   if (avgCapXSects.find(s) == avgCapXSects.end())
-    throw MatException("Error, requested average capture cross sections for unsupported spectrum.");
+    throw GenException("Error, requested average capture cross sections for unsupported spectrum.");
 
   return avgCapXSects[s];
 }
@@ -1012,7 +851,7 @@ const map<Iso, double>& Material::getAvgCapXSects(Spectrum s)
 const map<Iso, double>& Material::getAvgFisXSects(Spectrum s)
 {
   if (avgFisXSects.find(s) == avgFisXSects.end())
-    throw MatException("Error, requested average fission cross sections for unsupported spectrum.");
+    throw GenException("Error, requested average fission cross sections for unsupported spectrum.");
 
   return avgFisXSects[s];
 }
@@ -1020,7 +859,7 @@ const map<Iso, double>& Material::getAvgFisXSects(Spectrum s)
 const map<Iso, double>& Material::getAvgNus(Spectrum s)
 {
   if (avgNus.find(s) == avgNus.end())
-    throw MatException("Error, requested average nu values for unsupported spectrum.");
+    throw GenException("Error, requested average nu values for unsupported spectrum.");
 
   return avgNus[s];
 }

@@ -10,7 +10,6 @@
 
 #include "Commodity.h"
 #include "UseMatrixLib.h"
-#include "streamOps.hpp"
 
 using namespace std;
 
@@ -41,14 +40,9 @@ typedef int Iso;
 typedef int Elt;
 
 /**
- * The name of a commodity in the CommodityMap
- */
-typedef string CommodType;
-
-/**
  * The ID of a commodity in the CommodityMap
  */
-typedef int ComID;
+typedef int CommodID;
 
 /**
  * A double type to represent a number density (of a particular isotope).
@@ -97,6 +91,14 @@ typedef map<int, map<Iso, NumDens> > CompHistory;
  */
 typedef map<int, pair<int, int> > FacHistory;
 
+/**
+ * A map of commodity types being used in this simulation. 
+ * This will hopefully replace the above enumeration in a more extensible fasion.
+ * The keys to this map are ComIDs, which are typedef string
+ * The elements are the Commodity data structures themselves.
+ */
+typedef map<CommodID, Commodity*> CommodityMap;
+
 // Define some macros for common constants we'll need.
 
 #define AV_NUM 6.02E23 // Avagadro's number
@@ -127,18 +129,13 @@ typedef map<int, pair<int, int> > FacHistory;
 #define OTHER_I 531279 // "other" : iodine
 #define OTHER_TC 430989 // "other": technetium
 
-/**
- * A map of commodity types being used in this simulation. 
- * This will hopefully replace the above enumeration in a more extensible fasion.
- * The keys to this map are ComIDs, which are typedef string
- * The elements are the Commodity data structures themselves.
- */
-map<CommodType, Commodity*> CommodityMap
+
 /**
  * The parent class for all materials (fuel assemblies, etc.).
  */
 class Material 
 {
+
 private:
 
 	/**
@@ -208,7 +205,7 @@ protected:
 	/**
 	 * The Commodity type of this Material.
 	 */
-	Commodity myType;
+	Commodity* myType;
 	
 	/**
 	 * The composition history of this Material, in the form of a map whose
@@ -287,7 +284,7 @@ public:
 	 * @param form the chemical form of this Material
 	 * @param commod the Commodity type being created
 	 */
-	Material(map<Iso, NumDens> comp, ChemForm form, Commodity commod);
+	Material(map<Iso, NumDens> comp, ChemForm form, Commodity* commod);
 
 	/**
 	 * Constructs a Material of the given Commodity type and amount. What 
@@ -301,7 +298,7 @@ public:
 	 * @param amount some measure of the quantity being created
 	 * @param par some other paramater necessary for getting the stoich right
 	 */
-	Material(Commodity commod, double amount, double par);
+	Material(Commodity* commod, double amount, double par);
 
 	/**
 	 * Destroys this Material (virtual destructor).
@@ -406,7 +403,7 @@ public:
 	 *
 	 * @return the Commodity type
 	 */
-	virtual Commodity getCommod() const;
+	virtual Commodity* getCommod() const;
 
 	/**
 	 * Returns this Material's ChemForm type.
@@ -454,7 +451,7 @@ public:
 	 * 
 	 * @param newCommod the new Commodity type
 	 */
-	virtual void changeCommod(Commodity newCommod);
+	virtual void changeCommod(Commodity* newCommod);
 
 	/**
 	 * Changes the chemical form of this Material. Throws an excpetion if 
@@ -463,13 +460,6 @@ public:
 	 * @param newForm the new ChemForm type
 	 */
 	virtual void changeChemForm(ChemForm newForm);
-
-	/**
-	 * Returns a string representation of this Material object.
-	 *
-	 * @return the string representation
-	 */
-	virtual string toString();
 
 	/**
 	 * Returns the atomic number of the isotope with the given identifier.
@@ -552,7 +542,7 @@ public:
 	 * @param commod the Commodity to un-enumerate
 	 * @return the string representation
 	 */
-	static string unEnumerateCommod(Commodity commod);
+//	static string unEnumerateCommod(Commodity commod);
 
 	/**
 	 * Returns the Commodity enumeration of the given string.
@@ -560,7 +550,7 @@ public:
 	 * @param s the string representation of the Commodity
 	 * @return the corresponding Commodity
 	 */
-	static Commodity enumerateCommod(string s);
+//	static Commodity enumerateCommod(string s);
 
 	/**
 	 * Returns true if this Material object contains appreciable (> eps) 

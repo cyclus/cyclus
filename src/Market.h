@@ -1,3 +1,4 @@
+
 #if !defined(_MARKET)
 #define _MARKET
 #include <iostream>
@@ -21,6 +22,11 @@ class Market
 {
 public:
 	/**
+	 * Constructor for the Market Class
+	 */
+	Market();
+
+	/**
 	 * Constructs a market that trades some set of commodities.
 	 *
 	 * @param name is the market's name, a string
@@ -36,7 +42,7 @@ public:
 	 * @param fissile is true if the commodity is a fissile one
 	 * @param sepMat is true if the commodity is separated spent fuel
 	 */
-	void addCommod(string name, int ID, bool fissile, bool sepMat);
+	void addCommod(string name, bool fissile, bool sepMat);
 
 	/**
 	 * Adds the given pre-constructed Commodity to this Market.

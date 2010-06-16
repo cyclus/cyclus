@@ -7,9 +7,9 @@ SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR})
 
 # Add any new source files to this list.
 SET( CYCLUS_SRC App.cpp Commodity.cpp Facility.cpp 
-FacFactory.cpp GenException.h LMatrix.cpp Market.cpp Material.cpp 
+FacFactory.cpp GenException.cpp LMatrix.cpp Market.cpp Material.cpp 
 MktFactory.cpp NetFlowMkt.cpp NullFac.cpp RecipeFac.cpp SinkFac.cpp
-SourceFac.cpp)
+SourceFac.cpp Timer.cpp)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)

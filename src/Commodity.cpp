@@ -6,12 +6,11 @@
 //using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity(string name, int ID, Market* mkt, bool fissile, bool sepMat){
-	myID = ID;
-	nextID = ID +1;
+Commodity::Commodity(string name, Market* mkt, bool fiss, bool sep){
+	myID = nextID;
 	myName = name;
-  isFissile = fissile;
-	isSepMat = sepMat;
+  fissile = fiss;
+	sepMat = sep;
 	myMarket = mkt;
 };
 
@@ -26,6 +25,16 @@ int Commodity::getSN() const
 	return myID;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Commodity::isFissile() const
+{
+	return fissile;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Commodity::isSepMat() const
+{
+	return sepMat;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Market* Commodity::getMarket()
 {
 	return myMarket;
@@ -36,6 +45,15 @@ Commodity::~Commodity(){
 	// Delete any commodity data members that remain even when 
 	// we go out of Commodity scope... unless you want to write 
 	// that info to the database.
-};
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Commodity::nextCommodID()
+{
+	nextID++;
+	return nextID;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+int Commodity::nextID = 0;
+// Initialize the commodity ID serialization
 

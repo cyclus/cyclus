@@ -98,57 +98,9 @@ public:
 	deque<Material*> wastes;
 
 	/**
-	 * The capacity factor for this Facility, i.e., the fraction of the 
-	 * time this Facility operates. For early implementations, we probably  
-	 * won't use this field--it will be calculated as an objective 
-	 * function.
-	 */ 
-	double capFactor; // between 0 and 1
-
-	/**
 	 * The duration of the simulation this Facility is taking part in.
 	 */
 	int simDur;
-
-	/**
-	 * The total mass flow required to process all outstanding orders this 
-	 * Facility has already committed to. Units are tons, sometimes of 
-	 * uranium and sometimes of certain isotopes. For Enrichment, they're 
-	 * tons U SWU. For Fuel Fab, they're tons U.
-	 */
-	double outstMF;
-
-	/**
-	 * A map whose keys are times at which this Facility ordered Material 
-	 * for a given order and the values are the orders themselves.
-	 */
-//	multimap<int, Message*> ordersWaiting;
-
-	/**
-	 * A map whose keys are times at which this Facility will finish 
-	 * executing a given order and the values are pairs comprising the orders 
-	 * themselves and the Materials each is to be made with.
-	 */
-//	ProcessLine ordersExecuting;
-	
-	/**
-	 * Returns some measure of the Material currently in the stocks, less 
-	 * any Matieral that's already been earmarked. Default metric is mass of 
-	 * uranium (in tons); otherwise overwrite this function.
-	 *
-	 * @return the measure of Material in stock
-	 */
-	virtual double checkStocks();
-
-	/**
-	 * Returns some measure of the Material currently in the inventory, less 
-	 * any Material that's already been earmarked. Default metric is the of 
-	 * uranium (in tons); otherwise overwrite this function.
-	 *
-	 * @return the measure of Material in inventory
-	 */
-	virtual double checkInventory();
-
 	/**
 	 * Returns true if the given Material object can be used to fill the given 
 	 * order, false otherwise.
@@ -167,6 +119,10 @@ public:
 	virtual void beginCycle(int time);
 
 public:
+	/**
+	 * Constructor for a generic Facility
+	 */
+	Facility();
 		
 	/**
 	 * Constructs a Facility with the specified parameters.
@@ -194,9 +150,8 @@ public:
 	 * @param feeds a list of Commodity type(s) this Facility uses as raw material
 	 * @param prods a list of Commoidty type(s) this Facility produces
 	 */
-	Facility(int sCon, int sOp, string name, int SN, int dur,  
-					 double capFac, int time, int cycle, 
-					 list<Commodity*> feeds, list<Commodity*> prods);
+	Facility(string name, int SN, int dur,  
+					 int time, int cycle, list<Commodity*> feeds, list<Commodity*> prods);
 
 	/**
 	 * Returns the name of this Facility.
@@ -211,21 +166,6 @@ public:
 	 * @return the ID number of this Faciility
 	 */
 	virtual int getSN() const;
-		
-	/**
-	 * Returns the capacity of this Facility (units vary).
-	 *
-	 * @return the capacity of this Facility
-	 */
-	double getCapacity() const;
-
-	/**
-	 * Returns the date (a simulation time, in months) on which this 
-	 * Facility started operation.
-	 *
-	 * @return the operation start date
-	 */
-	int getStartOp() const;
 		
 	/**
 	 * Handles this Facility's monthly tick tasks.
@@ -247,22 +187,14 @@ public:
 	virtual ~Facility();
 
 	/**
-	 * Returns this Facility's inventory.
-	 *
-	 * @return the inventory queue
-	 */
-	deque<Material*>* getInventory();
-
-	/**
 	 * Sends the given Material to the given Communicator. This includes logging of 
 	 * the transfer, so be sure to use it rather than calling receiveMaterial 
 	 * directly.
 	 *
 	 * @param mat the Material to be sent
-	 * @param rec the receiver of the given Material
 	 * @param time the current time
 	 */
-	//virtual void sendMaterial(Material* mat, Communicator* rec, int time);
+	virtual void sendMaterial(Material* mat, int time);
 
 	/**
 	 * Receives the given Material. The default behavior is to 
@@ -295,17 +227,6 @@ public:
 	 * @param time the current time
 	 */
 	virtual void handleEnd(int time);
-
-	/**
-	 * Checks to see if the given candidate Material can be used for enrichment
-	 * of any of the ordersWaiting for Material. If so, returns 
-	 * an iterator pointing to that item. If not, returns an iterator just past 
-	 * the last element.
-	 *
-	 * @param candMat the candidate material
-	 * @return the iterator
-	 */
-//	virtual multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
 
 	/**
 	 * Via some process, decides what type of Commodity to request right now.

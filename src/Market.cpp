@@ -19,9 +19,9 @@ Market::Market(string mktName, int SN) :
 	myCommods = vector<Commodity*>();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Market::addCommod(string s, int SN, bool fissile, bool sepMat)
+void Market::addCommod(string s, bool fissile, bool sepMat)
 {
-	Commodity* newCommod = new Commodity(s, SN, this, fissile, sepMat);
+	Commodity* newCommod = new Commodity(s, this, fissile, sepMat);
 	myCommods.push_back(newCommod);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
