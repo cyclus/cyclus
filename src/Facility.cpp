@@ -11,6 +11,7 @@ Facility::Facility()
 	cout << "Used default Facility Constructor!"<< endl;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Facility::Facility(string name, int SN, int dur, int time,
 		int cycle, list<Commodity*> feeds, list<Commodity*> prods)
 {

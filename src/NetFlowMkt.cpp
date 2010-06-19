@@ -1,6 +1,9 @@
+// NetFlowMkt.cpp
+// Implements the NetFlowMkt class
 #include <iostream>
 #include "NetFlowMkt.h"
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void NetFlowMkt::printMyName() 
 { 
 	cout << "My Name : NetFlowMkt and bob is "<< bob << endl;
@@ -19,6 +22,7 @@ NetFlowMkt::NetFlowMkt(double a, double b) : Market()
 	bob = a+b;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 namespace {
   class netFlowCreator : public MktFactory
   {
@@ -33,6 +37,7 @@ namespace {
     }
   }mktType;
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   class netFlowCreator2 : public MktFactory
   {
 		public:
@@ -50,9 +55,4 @@ namespace {
   }mktType2;
 
 }
-
-//namespace {
-//     MktFactoryConcrete<NetFlowMkt> facType("null");
-//}
-
 

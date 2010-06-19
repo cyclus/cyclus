@@ -9,7 +9,7 @@
 #include <queue>
 #include <vector>
 #include <list>
-//#include "Commodity.h"
+#include "Commodity.h"
 
 using namespace std;
 
@@ -101,15 +101,6 @@ public:
 	 * The duration of the simulation this Facility is taking part in.
 	 */
 	int simDur;
-	/**
-	 * Returns true if the given Material object can be used to fill the given 
-	 * order, false otherwise.
-	 *
-	 * @param candMat the candidate Material object
-	 * @param order the order we're trying to fill
-	 * @return true iff they're compatible
-	 */
-//	virtual bool areCompat(Material* candMat, Message* order);
 
 	/**
 	 * Begin's this Facility's next operation cycle.
@@ -128,8 +119,7 @@ public:
 	 * Constructs a Facility with the specified parameters.
 	 *
 	 * @param start the startup date (a simulation time, in months)
-	 * @param i a pointer to this Facility's Institution
-	 * @param s a string representatino of this Facility's name
+	 * @param s a string representation of this Facility's name
 	 * @param SN the ID number for this Facility 
 	 * @param dur this simulation's duration
 	 */
@@ -138,13 +128,9 @@ public:
 	/**
 	 * Constructs a Facility with the specified data.
 	 *
-	 * @param sCon the time construction started on this Facility
-	 * @param sOp the time operation started on this Facility
-	 * @param i a pointer to the Institution this Reactor belongs to.
-	 * @param name this Reactor's name
-	 * @param SN the ID number for this Reactor
+	 * @param name this Facility's name
+	 * @param SN the ID number for this Facility
 	 * @param dur this simulation's duration
-	 * @param capFac the current capacity factor of this Reactor
 	 * @param time the current time
 	 * @param cycle the cycle/process time for this Facility.
 	 * @param feeds a list of Commodity type(s) this Facility uses as raw material

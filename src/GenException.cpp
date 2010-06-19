@@ -1,16 +1,17 @@
 // GenException.cpp
+// Implements the GenException class
 #include "GenException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException()
 {
-	myMessage = "\nGENIUS exception";
+	myMessage = "\ncyclus exception";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException(string msg)
 {
-	string def = "\nGENIUS exception: ";
+	string def = "\ncyclus exception: ";
 	myMessage = def + msg;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

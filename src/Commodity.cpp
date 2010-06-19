@@ -1,9 +1,9 @@
 // Commodity.cpp
+// Implements the Commodity Class
 #include <string>
 #include "Commodity.h"
 #include "GenException.h"
 
-//using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity(string name, Market* mkt, bool fiss, bool sep){

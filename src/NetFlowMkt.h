@@ -7,8 +7,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
-/*
+/**
  * The NetFlowMkt class inherits from the Market class and is instantiated by
  * the MktFactory class. 
  * 
@@ -20,7 +19,6 @@ using namespace std;
  *
  * This is all our factory really knows about the products it's creating
 */
-//-----------------------------------------------------------------------------
 class NetFlowMkt : public Market  
 {
 public:
@@ -39,14 +37,17 @@ public:
 
 	/**
 	 * Constructs a NetFlowMkt with specified data.
+	 * and currently prints the sum.
 	 *
 	 * @param a is a double
 	 * @param b is a double
-	 * 
 	 */
 	NetFlowMkt(double a, double b);
 
 protected: 
+	/**
+	 * is the sum of a and b, a dummy variable for now.
+	 */
 	double bob;
 };
 #endif

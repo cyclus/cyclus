@@ -1,3 +1,4 @@
+// SourceFac.h
 #if !defined(_SOURCEFAC)
 #define _SOURCEFAC
 #include <iostream>
@@ -6,8 +7,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
-/*
+/**
  * The SourceFac class inherits from the Facility class and is instantiated
  * by the FacFactory class. 
  *
@@ -18,10 +18,12 @@ using namespace std;
  * A mine might be a member of the SourceFac class.
  *
 */
-//-----------------------------------------------------------------------------
 class SourceFac : public Facility 
 {
 public:
+	/**
+	 * Every facility sould be able to print its own name.
+	 */
 	virtual void printMyName();
 };
 #endif

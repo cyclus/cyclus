@@ -28,6 +28,7 @@ Material::Material()
 Material::Material(map<Iso, NumDens> comp, ChemForm form, Commodity* commod) 
   : myForm(form), myType(commod)
 {
+  compHist[TI->getTime()] = comp;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material::~Material()
@@ -90,7 +91,10 @@ void Material::changeComp(map<Iso, NumDens> newComp, int time)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const map<Iso, NumDens> Material::getComp() const
 {
+	// Assign a reverse iterator for the compHist map.
   CompHistory::const_reverse_iterator it = compHist.rbegin();
+	// Return the second to the last entry.
+	//  (the last entry is a length)
   return it->second;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

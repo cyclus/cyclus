@@ -14,7 +14,6 @@ public:
 	 * Constructs a new commodity object 
 	 *
 	 * @param name is the commodity name, (ore, UF6, moxFuel, waste, etc... )
-	 * @param ID is the commodity ID, like a serial number
 	 * @param mkt is a pointer to the market on which this commodity is traded.
 	 * @param fissile indicates whether or not this is a potential fuel.
 	 * @param sepMat indicates whether or not this is a separated stream

@@ -1,3 +1,4 @@
+// RecipeFac.h
 #if !defined(_RECIPEFAC)
 #define _RECIPEFAC
 #include <iostream>
@@ -6,8 +7,7 @@
 
 	using namespace std;
 
-//-----------------------------------------------------------------------------
-/*
+/**
  * The RecipeFac inherits from the Facility class and is instantiated by
  * the FacFactory class. 
  *
@@ -21,10 +21,12 @@
  * That output commodity will then be offered to the market associated with
  * that commodity.
 */
-//-----------------------------------------------------------------------------
 class RecipeFac : public Facility 
 {
 public:
+	/**
+	 * Every facility should be able to write its name.
+	 */
 	virtual void printMyName();
 };
 #endif

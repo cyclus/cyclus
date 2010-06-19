@@ -172,7 +172,7 @@ private:
 	 * Initializes averaged fission cross section for the given
 	 * spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 */
 	static void initAvgFisXSects(Spectrum s);
 
@@ -180,14 +180,14 @@ private:
 	 * Initializes averaged capture cross section for the given
 	 * spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 */
 	static void initAvgCapXSects(Spectrum s);
 
 	/**
 	 * Initializes averaged nu values for the given spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 */
 	static void initAvgNus(Spectrum s);
 protected: 
@@ -537,22 +537,6 @@ public:
 	friend ostream& operator<<(ostream &os, const Material* m);
 
 	/**
-	 * Returns a stringized version of the given Commodity enumeration.
-	 *
-	 * @param commod the Commodity to un-enumerate
-	 * @return the string representation
-	 */
-//	static string unEnumerateCommod(Commodity commod);
-
-	/**
-	 * Returns the Commodity enumeration of the given string.
-	 *
-	 * @param s the string representation of the Commodity
-	 * @return the corresponding Commodity
-	 */
-//	static Commodity enumerateCommod(string s);
-
-	/**
 	 * Returns true if this Material object contains appreciable (> eps) 
 	 * actinides, false otherwise.
 	 *
@@ -613,7 +597,7 @@ public:
 	 * Returns the averaged fission cross sections for the given
 	 * spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 * @return the capture cross-section data
 	 */
 	static const map<Iso, double>& getAvgFisXSects(Spectrum s = thermal);
@@ -622,7 +606,7 @@ public:
 	 * Returns the averaged capture cross section for the given
 	 * spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 * @return the fission cross-section data
 	 */
 	static const map<Iso, double>& getAvgCapXSects(Spectrum s = thermal);
@@ -630,7 +614,7 @@ public:
 	/**
 	 * Returns the averaged nu values for the given spectrum.
 	 *
-	 * @param the spectrum we want to average over
+	 * @param s the spectrum we want to average over
 	 * @return the nu value data
 	 */
 	static const map<Iso, double>& getAvgNus(Spectrum s = thermal);
@@ -639,8 +623,8 @@ public:
 	 * This function handles assigning a neutronics-based weighting
 	 * for a given lot of fuel.
 	 *
-	 * @param the recipe
-	 * @param the spectrum we'll average over
+	 * @param &comp the recipe
+	 * @param s the spectrum we'll average over
 	 * @return the weighting value
 	 */
 	static double computeNeutWeight(const map<Iso, NumDens> &comp, 
@@ -649,7 +633,7 @@ public:
 	/**
 	 * Assigns a neutronics-based weighting for this Material object.
 	 *
-	 * @param the spectrum we'll average over
+	 * @param s the spectrum we'll average over
 	 * @return the weighting value
 	 */
 

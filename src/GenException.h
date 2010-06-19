@@ -8,7 +8,7 @@
 using namespace std;
 
 /**
- * An exception parent class for GENIUS-specific Exceptions.
+ * An exception parent class for general exceptions.
  */
 class GenException: public exception
 {

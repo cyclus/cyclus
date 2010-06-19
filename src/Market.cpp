@@ -1,4 +1,5 @@
 // Market.cpp
+// Implements the Market Class
 #include "Market.h"
 #include "Commodity.h"
 #include "GenException.h"
@@ -8,7 +9,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  Market::Market()
 {
-	GenException("Do not use the default Market constructor!!");
+	cout << "Used the default Market constructor!!"<< endl;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,8 +1,11 @@
+// NullFac.cpp
+// Implements the NullFac class
 #include <iostream>
 #include <map>
 #include <string>
 #include "NullFac.h"
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void NullFac::printMyName() 
 { 
 	cout << "My Name : Null Fac and bob is "<< bob << endl;
@@ -21,6 +24,7 @@ NullFac::NullFac(double a, double b) : Facility()
 	bob = a+b;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 namespace {
   class nullCreator : public FacFactory
   {
@@ -35,10 +39,10 @@ namespace {
     }
   }facType;
 
-/**
- * This is how we overload constructors when we would like to put them
- * in the nickname to pointer map in the anonymous namespace
- */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// This is how we overload constructors when we would like to put them
+// in the nickname to pointer map in the anonymous namespace
+
   class nullCreator2 : public FacFactory
   {
 		public:
@@ -49,22 +53,12 @@ namespace {
     virtual Facility * Create()const
     {
 			double a,b;
-			cout << "\n" << "give me an a: "; cin >> a; 
-			cout << "\n" << "give me a b: "; cin >> b; 
+			cout << "\n" << "give me a number: "; cin >> a; 
+			cout << "\n" << "give me another one and I'll add them: "; cin >> b; 
 			return new NullFac(a,b);
     }
   }facType2;
 
-	/**
-	 * This is a test of material mapping in the anonymous namespace. 
-	 * I don't think it's quite right
-	 * so I'm going to leave it commented
-	class NullFac : public Material
-	{
-		public:
-			get_com_map()[1]="null";
-	}myFeed;
-	*/
 
 }
 

@@ -1,3 +1,4 @@
+// Market.h
 #if !defined(_MARKET)
 #define _MARKET
 #include <iostream>
@@ -37,7 +38,6 @@ public:
 	 * Adds a commodity with the specfied parameters to this Market
 	 *
 	 * @param name is the commodity name
-	 * @param ID is the commodity ID
 	 * @param fissile is true if the commodity is a fissile one
 	 * @param sepMat is true if the commodity is separated spent fuel
 	 */

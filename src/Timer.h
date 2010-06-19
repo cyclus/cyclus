@@ -1,5 +1,4 @@
 // Timer.h
-
 #if !defined(_TIMER)
 # define _TIMER
 
