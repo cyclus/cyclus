@@ -1,17 +1,19 @@
 // Commodity.cpp
 // Implements the Commodity Class
 #include <string>
+#include "Logician.h"
 #include "Commodity.h"
 #include "GenException.h"
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity(string name, Market* mkt, bool fiss, bool sep){
-	myID = nextID;
+	myID = this->getNextID();
 	myName = name;
   fissile = fiss;
 	sepMat = sep;
 	myMarket = mkt;
+	myMarket->addCommod(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,7 +49,7 @@ Commodity::~Commodity(){
 	// that info to the database.
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Commodity::nextCommodID()
+int Commodity::getNextID()
 {
 	nextID++;
 	return nextID;

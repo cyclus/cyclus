@@ -30,19 +30,13 @@ public:
 	virtual void printMyName();
 
 	/**
-	 * Constructs a NetFlowMkt with no specified data.
-	 * 
-	 */
-	NetFlowMkt();
-
-	/**
 	 * Constructs a NetFlowMkt with specified data.
 	 * and currently prints the sum.
 	 *
-	 * @param a is a double
-	 * @param b is a double
+	 * @param name is a string, the name of the market
+	 * @param SN is an int, the serial number of the market
 	 */
-	NetFlowMkt(double a, double b);
+	NetFlowMkt(string name, int SN);
 
 protected: 
 	/**

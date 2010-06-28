@@ -25,89 +25,6 @@ class Commodity;
 //-----------------------------------------------------------------------------
 class Facility
 {
-public:	
-	/** 
-	 * Initially, these facilities only know how to print their names
-	 */
-	virtual void printMyName();
-	
-	
-	protected: 
-		
-	/**
-	 * The name for this Facility. The name should be either the 
-	 * real-world name of the Facility if it models an existing one, or 
-	 * facilityTypeX, where "facilityType" is a string representation of 
-	 * the Facility's class (the most specialized class that applies) and 
-	 * X is a serial number assigned by the BookKeeper (and reflecting the 
-	 * order of construction).
-	 */
-	string name;
-		
-	/**
-	 * The ID number for this Facility.
-	 */
-	int ID;
-		
-	/**
-	 * The date (simulation time, in months) on which construction began
-	 * for this Facility.
-	 */
-	int startConstr; 
-		
-	/**
-	 * The date (simulation time, in months) on which operation began for 
-	 * this Facility.
-	 */ 
-	int startOp;
-
-	/**
-	 * A collection  that holds the "product" Material this Facility has on 
-	 * hand to send to others. For instance, a Reactor's inventory is its 
-	 * collection of old fuel assemblies that have come out of the core.
-	 *
-	 * @see stocks
-	 * @see waste
-	 */ 
-	deque<Material*> inventory;
-
-	/** 
-	 * A collection of Material objects that in some sense represents "raw 
-	 * materials" that this Facility uses to make useful products. Not to be 
-	 * confused with inventory, although there's problably some gray area.
-	 * Example: a Conversion Facility should keep yellowcake in its stocks
-	 * and (unenriched) UF6 in its inventory.
-	 *
-	 * @see inventory
-	 * @see waste
-	 */
-	deque<Material*> stocks;
-
-	/** 
-	 * A collection of Material objects that represents waste sitting around 
-	 * at a Facility. Going to have to work out as we go when certain Materials 
-	 * (mostly spent fuel), should go here or in the inventory. I think under 
-	 * the materials routing problem LP-formulations we've discussed, anything 
-	 * that's potentially repository-bound, including spent fuel, should 
-	 * probably be stored and treated as "waste" rather than another commodity, 
-	 * and therefore should be stored here.
-	 *
-	 * @see inventory
-	 * @see stocks
-	 */
-	deque<Material*> wastes;
-
-	/**
-	 * The duration of the simulation this Facility is taking part in.
-	 */
-	int simDur;
-
-	/**
-	 * Begin's this Facility's next operation cycle.
-	 *
-	 * @param time the current time
-	 */
-	virtual void beginCycle(int time);
 
 public:
 	/**
@@ -139,6 +56,11 @@ public:
 	Facility(string name, int SN, int dur,  
 					 int time, int cycle, list<Commodity*> feeds, list<Commodity*> prods);
 
+	/** 
+	 * Initially, these facilities only know how to print their names
+	 */
+	virtual void printMyName();
+	
 	/**
 	 * Returns the name of this Facility.
 	 *
@@ -233,6 +155,97 @@ public:
 	 */
 	virtual void decommission();
 
+	/**
+	 * Advances the nextID facility ID number.
+	 */
+	static int getNextID();
+
+protected: 
+		
+	/**
+	 * The name for this Facility.  
+	 */
+	string name;
+		
+	/**
+	 * The ID number for this Facility.
+	 */
+	int ID;
+		
+	/**
+	 * The ID number for the next Facility.
+	 */
+	static int nextID;
+
+	/**
+	 * The date (simulation time, in months) on which construction began
+	 * for this Facility.
+	 */
+	int startConstr; 
+		
+	/**
+	 * The date (simulation time, in months) on which operation began for 
+	 * this Facility.
+	 */ 
+	int startOp;
+
+	/**
+	 * A collection  that holds the "product" Material this Facility has on 
+	 * hand to send to others. For instance, a Reactor's inventory is its 
+	 * collection of old fuel assemblies that have come out of the core.
+	 *
+	 * @see stocks
+	 * @see waste
+	 */ 
+	deque<Material*> inventory;
+
+	/** 
+	 * A collection of Material objects that in some sense represents "raw 
+	 * materials" that this Facility uses to make useful products. Not to be 
+	 * confused with inventory, although there's problably some gray area.
+	 * Example: a Conversion Facility should keep yellowcake in its stocks
+	 * and (unenriched) UF6 in its inventory.
+	 *
+	 * @see inventory
+	 * @see waste
+	 */
+	deque<Material*> stocks;
+
+	/** 
+	 * A collection of Material objects that represents waste sitting around 
+	 * at a Facility. Going to have to work out as we go when certain Materials 
+	 * (mostly spent fuel), should go here or in the inventory. I think under 
+	 * the materials routing problem LP-formulations we've discussed, anything 
+	 * that's potentially repository-bound, including spent fuel, should 
+	 * probably be stored and treated as "waste" rather than another commodity, 
+	 * and therefore should be stored here.
+	 *
+	 * @see inventory
+	 * @see stocks
+	 */
+	deque<Material*> wastes;
+
+	/**
+	 * Feed Commodities
+	 */
+	list<Commodity*> feeds;
+	
+	/**
+	 * Product Commodities
+	 */
+	list<Commodity*> prods;
+
+	/**
+	 * The duration of the simulation this Facility is taking part in.
+	 */
+	int simDur;
+
+	/**
+	 * Begin's this Facility's next operation cycle.
+	 *
+	 * @param time the current time
+	 */
+	virtual void beginCycle(int time);
 
 };
 

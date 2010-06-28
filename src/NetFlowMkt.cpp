@@ -2,25 +2,22 @@
 // Implements the NetFlowMkt class
 #include <iostream>
 #include "NetFlowMkt.h"
+#include "InputDB.h"
+
+using namespace std;
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+NetFlowMkt::NetFlowMkt(string name, int SN) : Market(name, SN)
+{	
+	this->registerMkt();
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void NetFlowMkt::printMyName() 
 { 
-	cout << "My Name : NetFlowMkt and bob is "<< bob << endl;
-};
-
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-NetFlowMkt::NetFlowMkt() : Market()
-{	
-	bob = 0;
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-NetFlowMkt::NetFlowMkt(double a, double b) : Market()
-{	
-	bob = a+b;
-};
+	cout << "My Name : NetFlowMkt" << endl;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 namespace {
@@ -33,26 +30,11 @@ namespace {
 		 }
     virtual Market * Create()const
     {
-			return new NetFlowMkt();
+			int myID = Market::getNextID();
+			string myName = INDB->getMktName(myID);
+			return new NetFlowMkt(myName, myID);
     }
   }mktType;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  class netFlowCreator2 : public MktFactory
-  {
-		public:
-     netFlowCreator2()
-     {
-        get_mkt_map()["netFlow2"]=this;
-		 }
-    virtual Market * Create()const
-    {
-			double a,b;
-			cout << "\n" << "give me an a: "; cin >> a; 
-			cout << "\n" << "give me a b: "; cin >> b; 
-			return new NetFlowMkt(a,b);
-    }
-  }mktType2;
 
 }
 

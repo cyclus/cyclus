@@ -37,19 +37,19 @@ public:
 	/**
 	 * advances the commodity serialization
 	 */
-	static int nextCommodID();
+	static int getNextID();
 
 	/**
 	 * Returns whether this Commodity is fissile.
 	 *
-	 * @return isFissle boolean
+	 * @return fissle boolean
 	 */
 	virtual bool isFissile() const;
 	
 	/**
 	 * Returns whether this Commodity is separated material.
 	 *
-	 * @return isSepMat boolean
+	 * @return sepMat boolean
 	 */
 	virtual bool isSepMat() const;
 	

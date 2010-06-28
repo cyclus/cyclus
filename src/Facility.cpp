@@ -28,6 +28,13 @@ Facility::Facility(string name, int SN, int dur, int time,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Facility::getNextID()
+{
+	nextID++;
+	return nextID;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Facility::beginCycle(int time)
 {
 }
@@ -47,7 +54,6 @@ int Facility::getSN() const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Facility::handleTick(int)
 {
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,3 +106,8 @@ void Facility::printMyName()
 Facility::~Facility()
 {
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Initialize the Facility nextID to zero.
+int Facility::nextID = 0;
+

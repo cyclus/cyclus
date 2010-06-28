@@ -35,6 +35,23 @@ public:
 	Market(string name, int ID);
 
 	/**
+	 * Returns the market's name.
+	 */
+	string getName();
+
+	/**
+	 * Returns the market's serial number.
+	 */
+	int getSN();
+
+	/**
+	 * Registers a market to the market map.
+	 * The map has keys which are pointers to Commodity objects
+	 * and values which are pointers to Markets!
+	 */
+	void registerMkt();
+
+	/**
 	 * Adds a commodity with the specfied parameters to this Market
 	 *
 	 * @param name is the commodity name
@@ -68,11 +85,6 @@ public:
 	 */
 	Commodity* getCommod(string name);
 
-		
-	/**
-	 * Markets should be able to return pointers to themselves. 
-	 */	
-		Market* getName;
 
 	/**
 	 * Every market should be able to write its name.
@@ -87,6 +99,10 @@ public:
 	 */
 	pair<vector<Commodity*>::iterator , vector<Commodity*>::iterator> getCommods();
 
+	/**
+	 * Advances the Market nextID.
+	 */
+	static int getNextID();
 
 	/**
 	 * Markets should not be indestructible.
@@ -97,12 +113,17 @@ protected:
 	/**
 	 * Markets need names for reference
 	 */
-	string myName;
+	string name;
 
 	/**
 	 * Markets need serial numbers for serialization
 	 */
-	int myID;
+	int ID;
+
+	/**
+	 * Gives the next available market ID
+	 */
+	static int nextID;
 
 	/**
 	 * A vector of pointers to the Commodities traded in this Market. (The 

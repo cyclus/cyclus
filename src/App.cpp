@@ -6,6 +6,8 @@
 #include "Market.h"
 #include "MktFactory.h"
 #include "Timer.h"
+#include "Logician.h"
+#include "InputDB.h"
 
 using namespace std;
 
@@ -99,22 +101,27 @@ int main(int argc, char* argv[])
 		Facility *nFac2 = nullCreator2->Create(); 
 		Facility *soFac = sourceCreator->Create();
 		Facility *siFac = sinkCreator->Create();   
-		Market  *mktFac = netFlowCreator->Create();   
+		Market  *netMkt = netFlowCreator->Create();   
 
 		// and call its name printing function
 		// to test whether everything was instantiated properly 
 		rFac->printMyName();
+		rFac->handleTick(TI->getTime());
 		nFac->printMyName();	
 		nFac2->printMyName();
 		soFac->printMyName();
 		siFac->printMyName();
-		mktFac->printMyName();
+		netMkt->printMyName();
 
 		// Create a Commodity
-		Commodity* tester = new Commodity("tester", mktFac, 0, 0);
+		Commodity* tester = new Commodity("tester", netMkt, 0, 0);
 
 		cout << "The Tester commodity has the nickname " << tester->getName() << endl;
+
+
 		
 		delete TI;
+		delete LI;
+		delete INDB;
 		return 0;
 }
