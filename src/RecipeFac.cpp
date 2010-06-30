@@ -11,11 +11,13 @@ RecipeFac::RecipeFac()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RecipeFac::RecipeFac(string name, deque<Material*> inRecs, deque<Material*> outRecs): Facility() 
-{
-	name = name;
-	inventory = inRecs;
-	stocks = outRecs;
+RecipeFac::RecipeFac(string name, int SN, map<Iso, NumDens> inVec, map<Iso, NumDens> outVec, list<Commodity*> inCommods, list<Commodity*> outCommods): Facility(name, SN, inCommods, outCommods) 
+{	
+	this->name = name;
+	map<Iso, NumDens> inRecs = map<Iso, NumDens>(); 
+	map<Iso, NumDens> outRecs = map<Iso, NumDens>(); 
+	inRecs = inVec;
+	outRecs = outVec;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,14 +58,14 @@ namespace {
 				string myName = INDB->getFacName(facID);
 
 				// grab some test recipes from the fake input database
-				deque<Material*> myInRecs = INDB->getInRecs(facID);
-				deque<Material*> myOutRecs = INDB->getOutRecs(facID);
+				map<Iso, NumDens> myInRecs = INDB->getInRecs(facID);
+				map<Iso, NumDens> myOutRecs = INDB->getOutRecs(facID);
 
 				// grab some test commodities from the fake input database
-				// list<Commodity*> myFeeds = INDB->getFeeds(facID);
-				// list<Commodity*> myProds = INDB->getProds(facID);
+				list<Commodity*> myFeeds = INDB->getFeeds(facID);
+				list<Commodity*> myProds = INDB->getProds(facID);
 
-				return new RecipeFac(myName, myInRecs, myOutRecs);
+				return new RecipeFac(myName, facID, myInRecs, myOutRecs, myFeeds, myProds);
 			}
 	}facType;
 }

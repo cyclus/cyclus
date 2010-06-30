@@ -5,6 +5,7 @@
 #include "Logician.h"
 #include "MktFactory.h"
 #include "GenException.h"
+#include "Material.h"
 #include <iostream>
 
 InputDB* InputDB::_instance = 0;
@@ -38,31 +39,40 @@ string InputDB::getMktName(int ID) {
 	return testName;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-deque<Material*> InputDB::getInRecs(int ID) 
+map<Iso, NumDens> InputDB::getInRecs(int ID) 
 {
 	// This defines a test recipe input for the fake recipeFac we're creating
 	// Make a test composition
 	map<Iso, NumDens> testInComp= map<Iso,NumDens>(); 
 	testInComp[922350]=6.51e27;
 	testInComp[922380]=1.947e29;
+
+	return testInComp;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market* InputDB::getInMkt(int ID){
 	// Make a test market
 	MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
 	Market *testInMkt = netFlowCreator->Create();
+
+	return testInMkt;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+list<Commodity*> InputDB::getFeeds(int ID){
+	// You need a market to make a commodity
+	Market* testInMkt = getInMkt(ID);
 	// Make a test commodity
 	Commodity* testInCommod = new Commodity("testInCommod", testInMkt, 0, 0);
-	// Finally, make a test material
-	Material* thisMat = new Material(testInComp, sol, testInCommod);  
-	// Put the test material in a list. 
-	// It's the only member of the list
-	deque<Material*> testInCompList;
-	testInCompList = deque<Material*>(); 
-	testInCompList.push_back(thisMat);
-
-	return testInCompList;
+	// Make a list to hold this commodity
+	list<Commodity*> inCommodList = list<Commodity*>();
+	// Put the commodity in the list
+	inCommodList.push_back(testInCommod);
+	
+	return inCommodList;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-deque<Material*> InputDB::getOutRecs(int ID) {
+map<Iso, NumDens> InputDB::getOutRecs(int ID) {
 	// This defines a test recipe output for the fake recipeFac we're creating
 	// Make a test composition
 	// We'll pretend that this recipe facility transmutes 
@@ -71,20 +81,29 @@ deque<Material*> InputDB::getOutRecs(int ID) {
 	testOutComp[922350]=3.255e27; 
 	testOutComp[922380]=1.947e29;
 	testOutComp[942390]=3.255e27;
+
+	return testOutComp;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market* InputDB::getOutMkt(int ID){
 	// Make a test market
 	MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
 	Market *testOutMkt = netFlowCreator->Create();
+
+	return testOutMkt;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+list<Commodity*> InputDB::getProds(int ID){
+	// You need a market to make a commodity
+	Market* testOutMkt = getOutMkt(ID);
 	// Make a test commodity
 	Commodity* testOutCommod = new Commodity("testOutCommod", testOutMkt, 0, 0);
-	// Finally, make a test material
-	Material* thisMat = new Material(testOutComp, sol, testOutCommod);  
-	// Put the test material in a list. 
-	// It's the only member of the list
-	deque<Material*> testOutCompList;
-	testOutCompList = deque<Material*>(); 
-	testOutCompList.push_back(thisMat);
+	// Make a list to hold this commodity
+	list<Commodity*> outCommodList = list<Commodity*>();
+	// Put the commodity in the list
+	outCommodList.push_back(testOutCommod);
 
-	return testOutCompList;
+	return outCommodList;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputDB::InputDB() 

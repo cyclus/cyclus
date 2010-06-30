@@ -64,37 +64,51 @@ public:
 	string getMktName(int mktID);
 
 	/**
-	 * Returns a deque of input recipes for the facility with ID facID.
+	 * Returns a mapped input recipe for the facility with ID facID.
 	 *
 	 * @param facID is the facility ID
 	 * @return inRecs
 	 */
-	deque<Material*> getInRecs(int facID);
-
+	map<Iso, NumDens> getInRecs(int facID);	
 	/**
-	 * Returns a deque of output recipes for the facility with facID ID.
+	 * Returns a mapped of output recipe for the facility with facID ID.
 	 *
 	 * @param facID is the facility ID
 	 * @return outRecs
 	 */
-	deque<Material*> getOutRecs(int facID);
+	map<Iso, NumDens> getOutRecs(int facID);
 
 	/**
-	 * Returns a feed commodities for the facility with facID ID.
+	 * Returns a list of input commodities for the facility with facID ID.
 	 *
-	 * @param ID is the facID
+	 * @param facID is the facility ID
 	 * @return feeds
 	 */
 	list<Commodity*> getFeeds(int ID);
 
 	/**
-	 * Returns a feed commodities for the facility with facID ID.
+	 * Returns a list of output commodities for the facility with facID ID.
 	 *
-	 * @param ID is the facID
-	 * @return feeds
+	 * @param facID is the facility ID
+	 * @return prods
 	 */
 	list<Commodity*> getProds(int ID);
 
+	/**
+	 * Returns a feeds market for the facilty with facID ID.
+	 *
+	 * @param facID is the facility ID
+	 * @return inMarket
+	 **/
+	Market*getInMkt(int ID);
+
+	/**
+	 * Returns a prods market for the facilty with facID ID.
+	 *
+	 * @param facID is the facility ID
+	 * @return inMarket
+	 **/
+	Market*getOutMkt(int ID);
 
 	/**
 	 * Converts the given date into a GENIUS time.

@@ -38,10 +38,13 @@ public:
 	 * Constructs a recipe-model facility with the following parameters:
 	 *
 	 * @param name is the facility's name, a string. 
+	 * @param SN is the facility's ID number, an integer. 
 	 * @param inRecs are the one or more recipes the facility receives. 
 	 * @param outRecs are the one or more recipes the facility produces.
+	 * @param inCommods are the one or more commodities this facility receives.
+	 * @param inCommods are the one or more commodities this facility produces.
 	 */
-	RecipeFac(string name, deque<Material*> inRecs, deque<Material*> outRecs);
+	RecipeFac(string name, int SN, map<Iso, NumDens> inRecs, map<Iso, NumDens> outRecs, list<Commodity*> inCommods, list<Commodity*> outCommods);
 
 	/**
 	 * This process occurs at each timestep.
@@ -52,12 +55,12 @@ protected:
 	/**
 	 * The one or more recipes this facility receives.
 	 */
-	list< Material* > inRecs;
+	map<Iso, NumDens > inRecs;
 
 	/**
 	 * The one or more recipes this facility produces.
 	 */
-	list< Material* > outRecs;
+	map<Iso, NumDens> outRecs;
 
 };
 

@@ -12,19 +12,16 @@ Facility::Facility()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Facility::Facility(string name, int SN, int dur, int time,
-		int cycle, list<Commodity*> feeds, list<Commodity*> prods)
+Facility::Facility(string name, int SN, list<Commodity*> feeds, list<Commodity*> prods)
 {
   
 	this->name = name;
 	ID = SN;
-	simDur = dur;
 	inventory = deque<Material*>();
 	stocks = deque<Material*>();
 	wastes = deque<Material*>();
 	list<Commodity*> stockCommods = feeds;
 	list<Commodity*> invCommods = prods;
-	int logSize = simDur;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

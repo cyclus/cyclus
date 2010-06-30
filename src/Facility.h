@@ -33,28 +33,14 @@ public:
 	Facility();
 		
 	/**
-	 * Constructs a Facility with the specified parameters.
-	 *
-	 * @param start the startup date (a simulation time, in months)
-	 * @param s a string representation of this Facility's name
-	 * @param SN the ID number for this Facility 
-	 * @param dur this simulation's duration
-	 */
-	Facility(int start, string s, int SN, int dur);
-		
-	/**
 	 * Constructs a Facility with the specified data.
 	 *
 	 * @param name this Facility's name
 	 * @param SN the ID number for this Facility
-	 * @param dur this simulation's duration
-	 * @param time the current time
-	 * @param cycle the cycle/process time for this Facility.
 	 * @param feeds a list of Commodity type(s) this Facility uses as raw material
 	 * @param prods a list of Commoidty type(s) this Facility produces
 	 */
-	Facility(string name, int SN, int dur,  
-					 int time, int cycle, list<Commodity*> feeds, list<Commodity*> prods);
+	Facility(string name, int SN, list<Commodity*> feeds, list<Commodity*> prods);
 
 	/** 
 	 * Initially, these facilities only know how to print their names
