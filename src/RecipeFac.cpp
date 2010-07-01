@@ -2,6 +2,7 @@
 // This implements the RecipeFac class. 
 #include <iostream>
 #include "InputDB.h"
+#include "Inst.h"
 #include "RecipeFac.h"
 #include "MktFactory.h"
 
@@ -11,7 +12,8 @@ RecipeFac::RecipeFac()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RecipeFac::RecipeFac(string name, int SN, map<Iso, NumDens> inVec, map<Iso, NumDens> outVec, list<Commodity*> inCommods, list<Commodity*> outCommods): Facility(name, SN, inCommods, outCommods) 
+RecipeFac::RecipeFac(string name, Inst* i, int SN, map<Iso, NumDens> inVec, map<Iso, NumDens> outVec, 
+		list<Commodity*> inCommods, list<Commodity*> outCommods): Facility(name, i, SN, inCommods, outCommods) 
 {	
 	this->name = name;
 	map<Iso, NumDens> inRecs = map<Iso, NumDens>(); 
@@ -54,7 +56,13 @@ namespace {
 			}
 			virtual Facility * Create()const
 			{
+				// get the next ID number
 				int facID = Facility::getNextID();
+
+				// grab a test institution from the fake input database
+				Inst* myInst = INDB->getInst(facID);
+
+				// grab a test name from the fake input database
 				string myName = INDB->getFacName(facID);
 
 				// grab some test recipes from the fake input database
@@ -65,7 +73,8 @@ namespace {
 				list<Commodity*> myFeeds = INDB->getFeeds(facID);
 				list<Commodity*> myProds = INDB->getProds(facID);
 
-				return new RecipeFac(myName, facID, myInRecs, myOutRecs, myFeeds, myProds);
+
+				return new RecipeFac(myName, myInst, facID, myInRecs, myOutRecs, myFeeds, myProds);
 			}
 	}facType;
 }

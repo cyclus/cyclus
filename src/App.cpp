@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 		FacFactory *nullCreator2  = get_fac_map()[ "null2"  ];
 		FacFactory *sourceCreator = get_fac_map()[ "source" ];
 		FacFactory *sinkCreator   = get_fac_map()[ "sink"   ];
-		MktFactory *netFlowCreator= get_mkt_map()[ "netFlow"   ];
+		MktFactory *netFlowCreator= get_mkt_map()[ "netFlow"];
 
 		// Get a pointer to a new instance 
 		// of the named Facility subtype

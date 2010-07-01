@@ -2,6 +2,7 @@
 // Implements the Facility class
 #include "Facility.h"
 #include "GenException.h"
+#include "Inst.h"
 
 using namespace std;
 
@@ -12,10 +13,11 @@ Facility::Facility()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Facility::Facility(string name, int SN, list<Commodity*> feeds, list<Commodity*> prods)
+Facility::Facility(string name, Inst* i, int SN, list<Commodity*> feeds, list<Commodity*> prods)
 {
   
 	this->name = name;
+	myInst = i;
 	ID = SN;
 	inventory = deque<Material*>();
 	stocks = deque<Material*>();

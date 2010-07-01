@@ -28,8 +28,32 @@ int InputDB::getFacID() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Region* InputDB::getRegion(int ID){
+	RegionType testType = FC;
+	string testName = "TestRegion";
+	int testID = 1;
+	int testDur = 1;
+	Region* testRegion = new Region(testType, testName, testID, testDur);
+	
+	return testRegion;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Inst* InputDB::getInst(int ID) {
+	string testName = "TestInst";
+	int testID = 1; 
+	Region* testRegion = getRegion(ID); 
+	double testPhi = 1.0; 
+	int testDur = 1;
+	Inst* testInst = new Inst(testName, testID, testRegion, testPhi, testDur);
+
+	return testInst;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string InputDB::getFacName(int ID) {
 	string testName = "Reactor";
+
 	return testName;
 }
 

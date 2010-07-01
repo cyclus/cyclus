@@ -5,6 +5,8 @@
 #include <queue>
 #include <list>
 #include "Material.h"
+#include "Region.h"
+#include "Inst.h"
 
 #define INDB InputDB::Instance()
 
@@ -46,6 +48,22 @@ public:
 	 * @return ID 
 	 */
 	int getFacID();
+
+	/**
+	 * Returns a test region object for the facility with ID=facID
+	 *
+	 * @param facID is the facility ID
+	 * @return testRegion
+	 */
+	Region* getRegion(int facID);
+
+	/**
+	 * Returns a test Institution object for the facility with ID=facID
+	 *
+	 * @param facID is the facility ID
+	 * @return testInst
+	 */
+	Inst* getInst(int facID);
 
 	/**
 	 * Returns a test name for the facility with ID=facID.

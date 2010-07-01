@@ -15,6 +15,7 @@ using namespace std;
 
 class Material;
 class Commodity;
+class Inst;
 //-----------------------------------------------------------------------------
 /*
  * The Facility class is the abstract class used by all objects that our 
@@ -36,11 +37,12 @@ public:
 	 * Constructs a Facility with the specified data.
 	 *
 	 * @param name this Facility's name
+	 * @param i is the Institution to which this Facility belongs
 	 * @param SN the ID number for this Facility
 	 * @param feeds a list of Commodity type(s) this Facility uses as raw material
 	 * @param prods a list of Commoidty type(s) this Facility produces
 	 */
-	Facility(string name, int SN, list<Commodity*> feeds, list<Commodity*> prods);
+	Facility(string name, Inst* i, int SN, list<Commodity*> feeds, list<Commodity*> prods);
 
 	/** 
 	 * Initially, these facilities only know how to print their names
@@ -60,6 +62,13 @@ public:
 	 * @return the ID number of this Faciility
 	 */
 	virtual int getSN() const;
+		
+	/**
+	 * Returns a pointer to this Facility's owner Institution.
+	 *
+	 * @return the pointer to this Facility's owner
+	 */
+	Inst* getInst();	
 		
 	/**
 	 * Handles this Facility's monthly tick tasks.
@@ -175,6 +184,7 @@ protected:
 	 */ 
 	int startOp;
 
+
 	/**
 	 * A collection  that holds the "product" Material this Facility has on 
 	 * hand to send to others. For instance, a Reactor's inventory is its 
@@ -184,6 +194,12 @@ protected:
 	 * @see waste
 	 */ 
 	deque<Material*> inventory;
+
+	/**
+	 * The Institution to which this Facility belongs (for instance, a 
+	 * utility or government entity).
+	 */ 
+	Inst* myInst;
 
 	/** 
 	 * A collection of Material objects that in some sense represents "raw 
