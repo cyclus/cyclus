@@ -13,13 +13,52 @@ public:
 	/**
 	 * Constructs a new commodity object 
 	 *
-	 * @param ID is the commodity ID, like a serial number
 	 * @param name is the commodity name, (ore, UF6, moxFuel, waste, etc... )
 	 * @param mkt is a pointer to the market on which this commodity is traded.
 	 * @param fissile indicates whether or not this is a potential fuel.
 	 * @param sepMat indicates whether or not this is a separated stream
 	 */
-	Commodity(int ID, string name, Market* mkt, bool fissile, bool sepMat);	
+	Commodity(string name, Market* mkt, bool fissile, bool sepMat);	
+
+	/**
+	 * Returns this Commodity's name.
+	 *
+	 * @return the name
+	 */
+	virtual const string getName() const;
+
+	/**
+	 * Returns this Commodity's ID number.
+	 *
+	 * @return the ID number
+	 */
+	virtual int getSN() const;
+
+	/**
+	 * advances the commodity serialization
+	 */
+	static int getNextID();
+
+	/**
+	 * Returns whether this Commodity is fissile.
+	 *
+	 * @return fissle boolean
+	 */
+	virtual bool isFissile() const;
+	
+	/**
+	 * Returns whether this Commodity is separated material.
+	 *
+	 * @return sepMat boolean
+	 */
+	virtual bool isSepMat() const;
+	
+	/**
+	 * Returns a pointer to this Commodity's Market.
+	 *
+	 * @return the pointer to the Market
+	 */
+	Market* getMarket();
 
 	/**
 	 * Virtual Commodity destructor.
@@ -48,18 +87,18 @@ private:
 	 * Each commodity should be associated with a market on which it will be
 	 * traded between offering and requesting facilities at each timestep.
 	 */
-	Market* marketPtr;
-	
+	Market* myMarket;
+
 	/**
 	 * True if this commodity is a fissile material (e.g. eUF6, pwrFuel, etc.). 
 	 * A value must be given. All commodities are either fissile or non-fissile. 
 	 */
-	bool isFissile;
+	bool fissile;
 
 	/**
 	 * True if this commodity is a separated stream (e.g. sepU, sepTc, etc.).
 	 */
-	bool isSepMat;
+	bool sepMat;
 	
 };
 #endif

@@ -1,5 +1,4 @@
 // Timer.h
-
 #if !defined(_TIMER)
 # define _TIMER
 
@@ -9,7 +8,7 @@
 
 using namespace std;
 
-class Manager;
+//class Manager;
 
 /**
  * A (singleton) timer to control a simulation with a one-month time step.
@@ -21,7 +20,7 @@ private:
 	/**
 	 * The Manager for which this Timer is keeping time.
 	 */
-	Manager* myManager;
+//	Manager* myManager;
 		
 	/**
 	 * A pointer to this Timer once it has been initialized.

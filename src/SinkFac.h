@@ -1,3 +1,4 @@
+// SinkFac.h
 #if !defined(_SINKFAC)
 #define _SINKFAC
 #include <iostream>
@@ -6,8 +7,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
-/*
+/**
  * The SinkFac class inherits from the Facility class and is instantiated
  * by the FacFactory class. 
  *
@@ -18,10 +18,12 @@ using namespace std;
  * A repository might be a member of the SinkFac class.
  *
 */
-//-----------------------------------------------------------------------------
 class SinkFac : public Facility 
 {
 public:
+	/** 
+	 * All facilities should be able to write their own names
+	 */
 	virtual void printMyName();
 };
 #endif

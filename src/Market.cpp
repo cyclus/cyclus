@@ -1,40 +1,95 @@
 // Market.cpp
+// Implements the Market Class
 #include "Market.h"
 #include "Commodity.h"
+#include "GenException.h"
+#include "Logician.h"
 
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ Market::Market()
+{
+	cout << "Used the default Market constructor!!"<< endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Market::printMyName(){
 	cout << "this is the printMyName function in Market.cpp"<<endl; 
-};
+}
 
-
-Market::Market(MarketType type, string mktName, int SN) : 
-	myType(type), name(mktName), ID(SN)
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market::Market(string mktName, int SN) : 
+	name(mktName), ID(SN)
 {
-
 	myCommods = vector<Commodity*>();
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Market::addCommod(string s, int SN, Market* mkt, bool fissile, bool sepMat)
+string Market::getName()
 {
-	Commodity* newCommod = new Commodity(s, SN, this, fissile, sepMat);
+	return name;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Market::getSN()
+{
+	return ID;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Market::getNextID()
+{
+	nextID++;
+	return nextID;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Market::registerMkt()
+{
+	// for each commodity traded on the market,
+	vector<Commodity*>::iterator iter;
+	for(iter = myCommods.begin(); iter!=myCommods.end(); iter++)
+	{
+		// insert a key value pair into the map.
+		LI->mktMap.insert(make_pair(*iter, this));
+	}
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Market::addCommod(string s, bool fissile, bool sepMat)
+{
+	Commodity* newCommod = new Commodity(s, this, fissile, sepMat);
 	myCommods.push_back(newCommod);
+	// add this commod into the mktMap.
+	LI->mktMap.insert(make_pair(newCommod, this));
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Market::addCommod(Commod* c)
+void Market::addCommod(Commodity* c)
 {
+	// add this Commodity to the list of myCommods
 	myCommods.push_back(c);
+	// add this Commodity to the mktMap
+	LI->mktMap.insert(make_pair(c, this));
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Region::getInst(int SN)
+Commodity* Market::getCommod(int SN)
 {
 	vector<Commodity*>::iterator iter;
 	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
 		if ((*iter)->getSN() == SN)
 			return *iter;
-	throw GenException("Error: tried to access Inst not present in this Region");
+	throw GenException("Error: tried to access Commodity not traded on this Market");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity* Market::getCommod(string name)
+{
+	vector<Commodity*>::iterator iter;
+	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
+		if ((*iter)->getName() == name)
+			return *iter;
+	throw GenException("Error: tried to access Commodity not traded on this Market");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,4 +98,15 @@ pair<vector<Commodity*>::iterator, vector<Commodity*>::iterator> Market::getComm
 	return make_pair(myCommods.begin(), myCommods.end());
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market::~Market()
+{
+	// This destructor doesn't do anything. 
+	// It should delete any data allocated by this class
+	// particularly the commodities in the myCommods list 
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Market::nextID = 0;
+// Initializes the Market nextID to 0.
+

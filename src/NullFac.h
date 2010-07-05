@@ -1,3 +1,4 @@
+// NullFac.h
 #if !defined(_NULLFAC)
 #define _NULLFAC
 #include <iostream>
@@ -7,7 +8,6 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
 /*
  * The NullFac class inherits from the Facility class and is instantiated by
  * the FacFactory class. 
@@ -19,7 +19,6 @@ using namespace std;
  * pads, but why else would we need this object?
  *
 */
-//-----------------------------------------------------------------------------
 class NullFac : public Facility  
 {
 public:

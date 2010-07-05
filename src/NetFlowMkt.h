@@ -7,8 +7,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
-/*
+/**
  * The NetFlowMkt class inherits from the Market class and is instantiated by
  * the MktFactory class. 
  * 
@@ -20,7 +19,6 @@ using namespace std;
  *
  * This is all our factory really knows about the products it's creating
 */
-//-----------------------------------------------------------------------------
 class NetFlowMkt : public Market  
 {
 public:
@@ -32,21 +30,18 @@ public:
 	virtual void printMyName();
 
 	/**
-	 * Constructs a NetFlowMkt with no specified data.
-	 * 
-	 */
-	NetFlowMkt();
-
-	/**
 	 * Constructs a NetFlowMkt with specified data.
+	 * and currently prints the sum.
 	 *
-	 * @param a is a double
-	 * @param b is a double
-	 * 
+	 * @param name is a string, the name of the market
+	 * @param SN is an int, the serial number of the market
 	 */
-	NetFlowMkt(double a, double b);
+	NetFlowMkt(string name, int SN);
 
 protected: 
+	/**
+	 * is the sum of a and b, a dummy variable for now.
+	 */
 	double bob;
 };
 #endif
