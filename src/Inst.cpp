@@ -96,16 +96,16 @@ vector<double>* Inst::getChargeRateLog() {
 	return &chargeRateLog;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*
- * Let's not figure out the message class tonight.
- *
- * void Inst::receiveMessage(Message* theMessage) {
+void Inst::receiveMessage(Message* theMessage) {
 	Communicator* sender = theMessage->getSender();
 	Communicator* me = (Communicator*) this;
+	// placeholder in case this institution sends a message.
 	if (&sender == &me)
-		;// placeholder!!
+		;
+	// if the message is going up, send it to the Region.
 	else if (theMessage->getDir() == up)
 		myRegion->receiveMessage(theMessage);
+	// if the message is going down, send it to the Facilities owned by this Inst.
 	else {
 		vector<Facility*>::iterator iter;
 		iter = myFacs.begin();
@@ -115,7 +115,6 @@ vector<double>* Inst::getChargeRateLog() {
 		}
 	}
 }
-*/
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Inst::~Inst()
 {

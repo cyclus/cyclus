@@ -5,7 +5,7 @@
 #include "Facility.h"
 #include "Logician.h"
 #include "Inst.h"
-// #include "Message.h"
+#include "Message.h"
 #include "GenException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,6 +64,7 @@ double Region::getDemand(int time)
 {
 	return demand[time];
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Region::handleTick(int time) {
 
@@ -92,14 +93,16 @@ vector<double>* Region::getDemand() {
 	return &demand;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*
- * void Region::receiveMessage(Message* theMessage) {
+void Region::receiveMessage(Message* theMessage) {
 	Communicator* sender = theMessage->getSender();
 	Communicator* me = (Communicator*) this;
+	// placeholder in case messages are sent by this region.
 	if (&sender == &me)
-		; // placeholder!!
+		;
+	// if the message is going up, send it to the logician
 	else if (theMessage->getDir() == up)
-		MI->receiveMessage(theMessage);
+		LI->receiveMessage(theMessage);
+	// if the message is going down, pass it down to your insts.
 	else {
 		vector<Inst*>::iterator iter;
 		iter = myInsts.begin();
@@ -109,12 +112,10 @@ vector<double>* Region::getDemand() {
 		}
 	}
 }
-*/
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RegionType Region::getType()
 {
-
-	// KDHFLAG what is the need for fuel cycle and non fuel cycle types? 
 
 	return myType;
 }

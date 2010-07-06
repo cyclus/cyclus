@@ -3,6 +3,7 @@
 # define _LOGICIAN
 
 #include "Facility.h"
+#include "Communicator.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -19,7 +20,7 @@ class Market;
  * A (singleton) simulation logician class. This class sends tick messages and 
  * collects and processes requests from simulation objects. 
  */
-class Logician
+class Logician : public Communicator
 {
 
 public:
@@ -161,6 +162,13 @@ public:
 	 * @param time the current time
 	 */
 	void handleEnd(int time);
+
+	/**
+	 * Receives a message passed up to it from a region.
+	 *
+	 * @param theMessage is a pointer to the Message object
+	 */
+	virtual void receiveMessage(Message* theMessage);
 
 	/**
 	 * (Recursively) deletes this Logician (and the objects it manages).

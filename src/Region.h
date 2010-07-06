@@ -1,7 +1,7 @@
 // Region.h
 #if !defined(_REGION)
 #define _REGION
-//#include "Communicator.h"
+#include "Communicator.h"
 #include <iostream>
 #include <string>
 #include <map>
@@ -21,8 +21,7 @@ class Inst;
  * An area in which there is some demand for nuclear power and some Facilities,
  * Institutions, etc. 
  */
-class Region 
-//: public Communicator 
+class Region : public Communicator 
 {
 	
 private: 
@@ -205,10 +204,9 @@ public:
 	 *
 	 * @param theMessage the Message being received
 	 * 
-	 *
-	 *
+	 */
+	 
 	virtual void receiveMessage(Message* theMessage);
-**/
 
 	/**
 	 * (Recursively) deletes this Region (and its Institutions).

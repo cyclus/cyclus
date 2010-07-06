@@ -114,6 +114,26 @@ pair<vector<Market*>::iterator, vector<Market*>::iterator> Logician::getMarkets(
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::receiveMessage(Message* theMessage)
+{
+	string msgDir = theMessage->Message::unEnumerateDir();
+	double msgAmount = theMessage->Message::getAmount();
+	double msgPrice = theMessage->Message::getPrice();
+	Commodity* msgCommod = theMessage->Message::getCommod();
+	string strCommod = msgCommod->getName();
+	int msgFacID = theMessage->Message::getFacID();
+
+	cout << " -------------MessageTest ------------" << endl;
+	cout << "The Logician has received a message" << endl;
+	cout << "  Its direction is : " << msgDir << endl;
+	cout << "  The amount requested/offered is : " << msgAmount << endl;
+	cout << "  Its price is : " << msgPrice << endl;
+	cout << "  Its commodity is : " << strCommod << endl;
+	cout << "  It originated from Facility : " << msgFacID << endl;
+	cout << "--------------------------------------" << endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::~Logician()
 {
 }

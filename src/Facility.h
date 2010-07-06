@@ -10,6 +10,7 @@
 #include <vector>
 #include <list>
 #include "Commodity.h"
+#include "Communicator.h"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ class Inst;
  * This is all our factory really knows about the products it's creating
 */
 //-----------------------------------------------------------------------------
-class Facility
+class Facility : public Communicator
 {
 
 public:
@@ -95,9 +96,10 @@ public:
 	 * directly.
 	 *
 	 * @param mat the Material to be sent
+	 * @param rec the Communicator receiving the material
 	 * @param time the current time
 	 */
-	virtual void sendMaterial(Material* mat, int time);
+	virtual void sendMaterial(Material* mat, Communicator* rec, int time);
 
 	/**
 	 * Receives the given Material. The default behavior is to 

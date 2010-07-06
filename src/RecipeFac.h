@@ -43,7 +43,7 @@ public:
 	 * @param inRecs are the one or more recipes the facility receives. 
 	 * @param outRecs are the one or more recipes the facility produces.
 	 * @param inCommods are the one or more commodities this facility receives.
-	 * @param inCommods are the one or more commodities this facility produces.
+	 * @param outCommods are the one or more commodities this facility produces.
 	 */
 	RecipeFac(string name, Inst* i, int SN, map<Iso, NumDens> inRecs,
 			map<Iso, NumDens> outRecs, list<Commodity*> inCommods, list<Commodity*> outCommods);

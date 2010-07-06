@@ -43,6 +43,10 @@ void RecipeFac::handleTick(int time)
 	// Test the time
 	cout << "The time is now" << time << endl;
 	// add the commodity to the commodity map?
+	
+	// Send a message
+	double myRequest = 2.0; //tons? 
+	myInst->receiveMessage(writeMessage(up, recTest, 0 - myRequest, 0, this->getSN()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

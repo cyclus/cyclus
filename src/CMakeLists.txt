@@ -6,9 +6,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR})
 
 # Add any new source files to this list.
-SET( CYCLUS_SRC App.cpp Commodity.cpp Facility.cpp 
+SET( CYCLUS_SRC App.cpp Commodity.cpp Communicator.cpp Facility.cpp 
 FacFactory.cpp GenException.cpp InputDB.cpp Inst.cpp LMatrix.cpp Logician.cpp
-Market.cpp Material.cpp MktFactory.cpp NetFlowMkt.cpp NullFac.cpp 
+Market.cpp Material.cpp Message.cpp MktFactory.cpp NetFlowMkt.cpp NullFac.cpp 
 RecipeFac.cpp Region.cpp SinkFac.cpp SourceFac.cpp Timer.cpp UniformTaylor.cpp)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)

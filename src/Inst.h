@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
-// #include "Communicator.h"
+#include "Communicator.h"
 
 using namespace std;
 
@@ -15,8 +15,7 @@ class Facility;
 /**
  * An Institution class for agencies, corporations, and the like.
  */
-class Inst 
-//: public Communicator
+class Inst : public Communicator
 {
 private:
 	
@@ -164,10 +163,8 @@ public:
 	 * addressed to this Inst and forwarding it on appropriately if not.
 	 *
 	 * @param theMessage the Message being received
-	 * 
-	 *
+	 */
 	virtual void receiveMessage(Message* theMessage);
-**/
 
 	/**
 	 * (Recursively) deletes this Institution and its Facilities.

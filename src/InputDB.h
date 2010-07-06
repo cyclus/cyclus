@@ -50,20 +50,20 @@ public:
 	int getFacID();
 
 	/**
-	 * Returns a test region object for the facility with ID=facID
+	 * Returns a test region object for the facility facID = ID
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return testRegion
 	 */
-	Region* getRegion(int facID);
+	Region* getRegion(int ID);
 
 	/**
-	 * Returns a test Institution object for the facility with ID=facID
+	 * Returns a test Institution object for the facility with facID = ID
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return testInst
 	 */
-	Inst* getInst(int facID);
+	Inst* getInst(int ID);
 
 	/**
 	 * Returns a test name for the facility with ID=facID.
@@ -91,15 +91,15 @@ public:
 	/**
 	 * Returns a mapped of output recipe for the facility with facID ID.
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return outRecs
 	 */
-	map<Iso, NumDens> getOutRecs(int facID);
+	map<Iso, NumDens> getOutRecs(int ID);
 
 	/**
 	 * Returns a list of input commodities for the facility with facID ID.
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return feeds
 	 */
 	list<Commodity*> getFeeds(int ID);
@@ -107,7 +107,7 @@ public:
 	/**
 	 * Returns a list of output commodities for the facility with facID ID.
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return prods
 	 */
 	list<Commodity*> getProds(int ID);
@@ -115,7 +115,7 @@ public:
 	/**
 	 * Returns a feeds market for the facilty with facID ID.
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return inMarket
 	 **/
 	Market*getInMkt(int ID);
@@ -123,7 +123,7 @@ public:
 	/**
 	 * Returns a prods market for the facilty with facID ID.
 	 *
-	 * @param facID is the facility ID
+	 * @param ID is the facility ID
 	 * @return inMarket
 	 **/
 	Market*getOutMkt(int ID);
