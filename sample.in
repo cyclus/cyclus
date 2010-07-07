@@ -1,0 +1,7 @@
+Market uo2market StubMarket
+Market snfMarket StubMarket
+Facility reactorA StubFacility
+Facility reactorB StubFacility
+Region Canada StubRegion
+Region USA StubRegion
+end
