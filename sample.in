@@ -1,7 +1,15 @@
-Market uo2market StubMarket
-Market snfMarket StubMarket
-Facility reactorA StubFacility
-Facility reactorB StubFacility
-Region Canada StubRegion
-Region USA StubRegion
+Market uo2market StubMarket Commodity uo2
+Market snfMarket StubMarket Commodity snf
+Facility reactorA StubFacility InCommodity uo2 OutCommodity snf
+Facility reactorB StubFacility InCommodity uo2 OutCommodity snf
+Region Canada StubRegion AllowedFacility reactorA
+Region USA StubRegion AllowedFacility reactorB
+Junk
+Recipe fresh_50GWd mass 3 1000
+    92235 0.05
+    92238 0.95
+     8016 0.13
+Recipe water atom 2 1e25
+    1001 2
+    8016 1
 end

@@ -23,43 +23,30 @@ int main(int argc, char* argv[])
     //  * get market model name
     //  * search cache for market methods
     //     * if not found load market
-    string keyword, modelName, modelImpl;
+    string keyword, name, modelImpl;
     cin >> keyword;
     while (keyword != "end")
     {
 	if ( "Market" == keyword )
 	{
-	    cin >> modelName >> modelImpl;
-	    mdl_ctor* model_creator = Model::load(keyword,modelImpl);
-	    
-	    Model* model = model_creator(modelName);
-	    
-	    LI->addMarket(model);
+	    LI->addMarket(Model::create(keyword,cin));
+
 	}
 	else if ( "Facility" == keyword )
 	{
-	    cin >> modelName >> modelImpl;
-	    mdl_ctor* model_creator = Model::load(keyword,modelImpl);
-	    
-	    Model* model = model_creator(modelName);
-	    
-	    LI->addFacility(model);
+	    LI->addFacility(Model::create(keyword,cin));
 	}
 	else if ( "Region" == keyword )
 	{
-	    cin >> modelName >> modelImpl;
-	    mdl_ctor* model_creator = Model::load(keyword,modelImpl);
-	    
-	    Model* model = model_creator(modelName);
-	    
-	    LI->addRegion(model);
+	    LI->addRegion(Model::create(keyword,cin));
 	}
 	else if ( "Recipe" == keyword )
 	{
-	    LI->addRecipe(new Material(cin));
+	    cin >> name;
+	    LI->addRecipe(name,new Material(cin));
 	}
 	else
-	    cerr << "Model type: " << keyword << " is not supported at this time." << endl;
+	    cerr << "Keyword: " << keyword << " is not supported at this time." << endl;
 	cin >> keyword;
     }
 
@@ -69,6 +56,8 @@ int main(int argc, char* argv[])
     LI->printFacilities();
     cout << "Here is a list of " << LI->getNumRegions() << " regions:" << endl;
     LI->printRegions();
+    cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
+    LI->printRecipes();
 
 
 

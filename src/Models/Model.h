@@ -11,7 +11,7 @@ using namespace std;
 
 class Model;
 
-typedef Model* mdl_ctor(string);
+typedef Model* mdl_ctor(string,istream&);
 typedef void mdl_dtor(Model*);
 
 
@@ -31,6 +31,12 @@ class Model
 public:
     /// Add a model to the simulation
     static mdl_ctor* load(string model_type,string model_name);
+
+    /// Create a model for use in the simulation
+    static Model* create(string model_type, istream &input);
+
+    /// Destroy a model cleanly
+    static void* destroy(Model* model);
     
     /// Constructor for the Model Class
     Model() {};
@@ -43,6 +49,9 @@ public:
 
     /// get model instance SN
     const int getSN() const { return ID; };
+
+    /// get model implementation name
+    virtual const string getModelName() = 0;
 
     /// every model should be able to print a verbose description
     virtual void print() = 0;

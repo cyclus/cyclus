@@ -47,6 +47,30 @@ mdl_ctor* Model::load(string model_type,string model_name)
 	new_model = create_map[model_name];
     }
 
-
     return new_model;
+}
+
+
+Model* Model::create(string model_type,istream &input)
+{
+    string name, modelImpl;
+
+    input >> name >> modelImpl;
+
+    mdl_ctor* model_creator = load(model_type,modelImpl);
+
+    Model* model = model_creator(name,input);
+
+    return model;
+}
+
+void* Model::destroy(Model* model)
+{
+
+    mdl_dtor* model_destructor = destroy_map[model->getModelName()];
+
+    model_destructor(model);
+
+    return model;
+
 }

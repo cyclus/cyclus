@@ -7,6 +7,9 @@
 
 using namespace std;
 
+/// forward declaration to resolve recursion
+class Commodity;
+
 //-----------------------------------------------------------------------------
 /*
  * The MarketModel class is the abstract class/interface used by all market models
@@ -30,10 +33,19 @@ public:
     
     // every model should be able to print a verbose description
     virtual void print() = 0;
-    
+
+    /// get model implementation name
+    virtual const string getModelName() = 0;
+
+    /// every market should provide its commodity
+    Commodity* getCommidity() { return commodity; } ;
+
 protected:
     /// Stores next available market ID
     static int nextID;
+
+    /// every market has a commodity
+    Commodity* commodity;
     
 };
 

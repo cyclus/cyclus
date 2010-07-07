@@ -27,6 +27,8 @@ public:
          StubMarket(string market_name)
 	     : MarketModel(market_name) {};
 
+	StubMarket(string market_name, istream &input);
+
         ~StubMarket() {};
 
 	/**
@@ -35,14 +37,17 @@ public:
 	 */
 	virtual void print();
 
+    /// get model implementation name
+    virtual const string getModelName() { return "StubMarket"; };
+
 protected: 
 
 
 
 };
 
-extern "C" Model* construct(string market_name) {
-    return new StubMarket(market_name);
+extern "C" Model* construct(string market_name,istream &input) {
+    return new StubMarket(market_name,input);
 }
 
 extern "C" void destruct(Model* p) {

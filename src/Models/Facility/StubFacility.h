@@ -23,21 +23,28 @@ public:
      * 
      */
     StubFacility() {};
-
+    
+    /// constructor to make an empty instance of this model
     StubFacility(string facility_name)
 	: FacilityModel(facility_name) {};
-    
+
+    /// constructor to build an instance based on input
+    StubFacility(string facility_name,istream &input);
+
     /**
      * prints the name of this facType
      *
      */
     virtual void print();
 
+    /// get model implementation name
+    virtual const string getModelName() { return "StubFacility"; };
+
 protected: 
 };
 
-extern "C" Model* construct(string facility_name) {
-    return new StubFacility(facility_name);
+extern "C" Model* construct(string facility_name,istream &input) {
+    return new StubFacility(facility_name,input);
 }
 
 extern "C" void destruct(Model* p) {

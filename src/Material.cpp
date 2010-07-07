@@ -32,7 +32,7 @@ void Material::rationalize_A2M()
 	total_mass += mass_comp[(*entry).first];
     }
 
-    total_mass *= total_atoms;
+    total_mass *= total_atoms/AVOGADRO;
 
     normalize(mass_comp);
 
@@ -50,7 +50,7 @@ void Material::rationalize_M2A()
 	total_atoms += atom_comp[(*entry).first];
     }
 
-    total_atoms *= total_mass;
+    total_atoms *= total_mass*AVOGADRO;
 
     normalize(atom_comp);
 
@@ -60,13 +60,11 @@ Material::Material(istream &input)
 {
 
     string comp_type;
-    bool atomComp = true;
     int numIsos;
     Iso isotope;
-    double sum_total_comp, entry;
 
     input >> comp_type >> numIsos;
-    
+
     CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
     double &read_total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
 
@@ -74,8 +72,8 @@ Material::Material(istream &input)
     
     for (int isoNum=0; isoNum<numIsos; isoNum++)
     {
-	input >> isotope >> entry;
-	comp_map[isotope] = entry;
+        input >> isotope;
+	input >> comp_map[isotope];
     }
 
     normalize(comp_map);

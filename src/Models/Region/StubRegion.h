@@ -26,18 +26,23 @@ public:
 
     StubRegion(string region_name)
 	: RegionModel(region_name) {};
-    
+ 
+    StubRegion(string region_name, istream &input);
+   
     /**
      * prints the name of this facType
      *
      */
     virtual void print();
 
+    /// get model implementation name
+    virtual const string getModelName() { return "StubRegion"; };
+
 protected: 
 };
 
-extern "C" Model* construct(string region_name) {
-    return new StubRegion(region_name);
+extern "C" Model* construct(string region_name,istream &input) {
+    return new StubRegion(region_name,input);
 }
 
 extern "C" void destruct(Model* p) {

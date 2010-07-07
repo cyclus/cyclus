@@ -31,9 +31,15 @@ public:
     // every model should be able to print a verbose description
     virtual void print() = 0;
     
-private: 
+    /// get model implementation name
+    virtual const string getModelName() = 0;
+
+protected:
     /// Stores next available region ID
     static int nextID;
+
+    /// every region has a list of allowed facilities
+    vector<Model*> allowedFacilities;
 
 };
 

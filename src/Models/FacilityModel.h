@@ -2,8 +2,10 @@
 #if !defined(_FACILITYMODEL_H)
 #define _FACILITYMODEL_H
 #include <string>
+#include <vector>
 
 #include "Model.h"
+#include "Commodity.h"
 
 using namespace std;
 
@@ -31,9 +33,18 @@ public:
     // every model should be able to print a verbose description
     virtual void print() = 0;
     
+    /// get model implementation name
+    virtual const string getModelName() = 0;
+
 protected: 
     /// Stores the next available facility ID
     static int nextID;
+
+    /// all facilities must have at least one input commodity
+    vector<Commodity*> in_commods;
+
+    /// all facilities must have at least one output commodity
+    vector<Commodity*> out_commods;
     
 };
 

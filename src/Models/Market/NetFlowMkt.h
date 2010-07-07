@@ -27,6 +27,8 @@ public:
          NetFlowMkt(string market_name)
 	     : MarketModel(market_name) {};
 
+	NetFlowMkt(string market_name, istream &input);
+
         ~NetFlowMkt() {};
 
 	/**
@@ -35,14 +37,17 @@ public:
 	 */
 	virtual void print();
 
+    /// get model implementation name
+    virtual const string getModelName() { return "NetFlowMkt"; };
+
 protected: 
 
 
 
 };
 
-extern "C" Model* construct(string market_name) {
-    return new NetFlowMkt(market_name);
+extern "C" Model* construct(string market_name,istream &input) {
+    return new NetFlowMkt(market_name, input);
 }
 
 extern "C" void destruct(Model* p) {

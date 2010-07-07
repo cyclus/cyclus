@@ -13,6 +13,7 @@ SET( CYCLUS_SRC
      App.cpp 
      Logician.cpp
      Material.cpp
+     Commodity.cpp
      Utility/GenException.cpp 
      Models/Model.cpp 
         Models/MarketModel.cpp 

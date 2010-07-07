@@ -6,56 +6,20 @@
 #include "GenException.h"
 
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity(string name, Market* mkt, bool fiss, bool sep){
-	myID = this->getNextID();
-	myName = name;
-  fissile = fiss;
-	sepMat = sep;
-	myMarket = mkt;
-	myMarket->addCommod(this);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const string Commodity::getName() const
+Commodity::Commodity(string commod_name, Model* my_market, istream &input)
+    : name(commod_name), market(my_market)
 {
-	return myName;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Commodity::getSN() const
-{
-	return myID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Commodity::isFissile() const
-{
-	return fissile;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Commodity::isSepMat() const
-{
-	return sepMat;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market* Commodity::getMarket()
-{
-	return myMarket;
+    ID = nextID++;
+    
+    /// for now commodities have no input
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::~Commodity(){
 	// Delete any commodity data members that remain even when 
 	// we go out of Commodity scope... unless you want to write 
 	// that info to the database.
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Commodity::getNextID()
-{
-	nextID++;
-	return nextID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+/// Initialize the commodity ID serialization
 int Commodity::nextID = 0;
-// Initialize the commodity ID serialization
 

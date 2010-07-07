@@ -31,7 +31,10 @@ public:
     
     // every model should be able to print a verbose description
     virtual void print() = 0;
-    
+
+    /// get model implementation name
+    virtual const string getModelName() = 0;
+
 protected: 
     /// Stores the next available stub ID
     static int nextID;

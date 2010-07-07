@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "Material.h"
+#include "Commodity.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -15,7 +16,8 @@
 using namespace std;
 
 typedef vector<Model*> ModelList;
-typedef vector<Material*> MaterialList;
+typedef map<string,Material*> RecipeList;
+typedef map<string,Commodity*> CommodityList;
 
 /**
  * A (singleton) simulation logician class. This class sends tick messages and 
@@ -39,7 +41,13 @@ private:
 	ModelList facilities, markets, regions;
 
 	/// list of material templates
-	MaterialList recipes;
+	RecipeList recipes;
+
+	/// list of commodities
+	CommodityList commodities;
+
+	/// map commodities to markets
+	map<Commodity*, Model*> commodity_market_map;
 
 	/**
 	 * (Recursively) deletes this Logician (and the objects it manages).
@@ -99,9 +107,19 @@ public:
 	void printMarkets()                 { printModelList(markets); };
 	/// get number of markets
 	int getNumMarkets()                 { return markets.size(); }
-	/// get a pointer to the market based on its ID number
+	/// get a pointer to a market based on its ID number
 	Model* getMarketByID(int ID)        { return markets[ID]; }
+	/// get a pointer to a market based on its name
 	Model* getMarketByName(string name) { return getModelByName(markets,name); }
+	/// get a pointer to a market based on its commodity name
+	Model* getMarketByCommodity(string commodity_name) 
+               { return commodity_market_map[getCommodity(commodity_name)]; };
+	/// get a pointer to a market based on its commodity pointer
+	Model* getMarketByCommodity(Commodity* commod) 
+               { return commodity_market_map[commod]; } ;
+	/// register a commodity with a market
+	void   registerCommodityMarket(Commodity* commod, Model* market)
+	       { commodity_market_map[commod] = market; } ;
 	
 	/// add a region to the list
 	void addRegion(Model* new_region)   { regions.push_back(new_region); }
@@ -109,12 +127,28 @@ public:
 	void printRegions()                 { printModelList(regions); };
 	/// get number of regions
 	int getNumRegions()                 { return regions.size(); }
-	/// get a pointer to the region based on its ID number
+	/// get a pointer to a region based on its ID number
 	Model* getRegionByID(int ID)        { return regions[ID]; }
+	/// get a pointer to a region based on its name
 	Model* getRegionByName(string name) { return getModelByName(regions,name); }
 
-	/// add a material to the list
-	void addRecipe(Material* new_mat) { recipes.push_back(new_mat); };
+	/// add a recipe to the list
+	void addRecipe(string recipe_name,Material* new_mat) { recipes[recipe_name] = new_mat; };
+	/// print list of recipes
+	void printRecipes();
+	/// get number or recipes
+	int getNumRecipes()                                  { return recipes.size(); }
+	/// get a pointer to the recipe based on its name
+	Material* getRecipe(string name)                     { return recipes[name]; } 
+	
+	/// add a commodity to the list
+	Commodity* addCommodity(string commodity_name, Commodity* new_comm) { commodities[commodity_name] = new_comm; };
+	/// add a commodity if it doesn't already exist
+	Commodity* addCommodity(string commodity_name, istream &input, Model* model = NULL);
+	/// get number or commodities
+	int getNumCommodities()                              { return commodities.size(); }
+	/// get a pointer to the recipe based on its name
+	Commodity* getCommodity(string name)                 { return commodities[name]; } 
 
 
 };
