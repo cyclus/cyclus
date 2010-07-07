@@ -10,16 +10,39 @@ using namespace std;
 
 class Commodity;
 
-//-----------------------------------------------------------------------------
-/* The Market Class.
+/**
+ * The Market Class.
+ *
  * The Market class is the abstract class used by all objects that our 
  * factory will be responsible for creating, or manufacturing. 
  *
  * This is all our factory really knows about the products it's creating
  */
-//-----------------------------------------------------------------------------
 class Market
 {
+protected:
+	/**
+	 * Gives the next available market ID
+	 */
+	static int nextID;
+
+	/**
+	 * Markets need names for reference
+	 */
+	string name;
+
+	/**
+	 * Markets need serial numbers for serialization
+	 */
+	int ID;
+
+	/**
+	 * A vector of pointers to the Commodities traded in this Market. (The 
+	 * Commodities themselves will reside, from a memory standpoint, in the 
+	 * Manager's allCommods data vector.)
+	 */
+	vector<Commodity*> myCommods;
+
 public:
 	/**
 	 * Constructor for the Market Class
@@ -35,6 +58,21 @@ public:
 	Market(string name, int ID);
 
 	/**
+	 * Markets should not be indestructible.
+	 */
+	virtual ~Market();
+
+	/**
+	 * Every market should be able to write its name.
+	 */
+	virtual void printMyName();
+
+	/**
+	 * Advances the Market nextID.
+	 */
+	static int getNextID();
+
+	/**
 	 * Returns the market's name.
 	 */
 	string getName();
@@ -43,6 +81,24 @@ public:
 	 * Returns the market's serial number.
 	 */
 	int getSN();
+		
+	/**
+	 * Returns a pointer to the Commodity with the given ID number, if it 
+	 * is traded on this Market. Throws a GenException otherwise.
+	 *
+	 * @param SN the ID number of the Commodity being sought
+	 * @return a pointer to it, if it's traded on this Market
+	 */
+	Commodity* getCommod(int SN);
+
+	/**
+	 * Returns a pointer to the Commodity with the given name, if it 
+	 * is traded on this Market. Throws a GenException otherwise.
+	 *
+	 * @param name the name of the Commodity being sought
+	 * @return a pointer to it, if it's traded on this Market
+	 */
+	Commodity* getCommod(string name);
 
 	/**
 	 * Registers a market to the market map.
@@ -66,71 +122,15 @@ public:
 	 * @param commod is the Commodity to add
 	 */
 	void addCommod(Commodity* commod);
-		
+
 	/**
-	 * Returns a pointer to the Commodity with the given ID number, if it 
-	 * is traded on this Market. Throws a GenException otherwise.
 	 *
-	 * @param SN the ID number of the Commodity being sought
-	 * @return a pointer to it, if it's traded on this Market
-	 */
-	Commodity* getCommod(int SN);
-
-	/**
-	 * Returns a pointer to the Commodity with the given name, if it 
-	 * is traded on this Market. Throws a GenException otherwise.
-	 *
-	 * @param name the name of the Commodity being sought
-	 * @return a pointer to it, if it's traded on this Market
-	 */
-	Commodity* getCommod(string name);
-
-
-	/**
-	 * Every market should be able to write its name.
-	 */
-	virtual void printMyName();
-
-	/**
 	 * Returns the begin() and end() iterators over the
 	 * Commodities in this Market.
 	 *
 	 * @return the pair of iterators
 	 */
 	pair<vector<Commodity*>::iterator , vector<Commodity*>::iterator> getCommods();
-
-	/**
-	 * Advances the Market nextID.
-	 */
-	static int getNextID();
-
-	/**
-	 * Markets should not be indestructible.
-	 */
-	virtual ~Market();
-
-protected:
-	/**
-	 * Markets need names for reference
-	 */
-	string name;
-
-	/**
-	 * Markets need serial numbers for serialization
-	 */
-	int ID;
-
-	/**
-	 * Gives the next available market ID
-	 */
-	static int nextID;
-
-	/**
-	 * A vector of pointers to the Commodities traded in this Market. (The 
-	 * Commodities themselves will reside, from a memory standpoint, in the 
-	 * Manager's allCommods data vector.)
-	 */
-	vector<Commodity*> myCommods;
 
 };
 

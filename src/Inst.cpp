@@ -17,6 +17,60 @@ Inst::Inst(string s, int SN, Region* reg, double phi,int dur)
 	chargeRateLog = vector<double>(dur, 0.0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Inst::~Inst()
+{
+	// Delete the Facilities.
+	while(!myFacs.empty()) {
+		Facility* f = myFacs.back();
+		myFacs.pop_back();
+		delete f;
+	}
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const string Inst::getName() const
+{
+	return name;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Inst::getSN() const
+{
+	return ID;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Inst::receiveMessage(Message* theMessage) {
+	Communicator* sender = theMessage->getSender();
+	Communicator* me = (Communicator*) this;
+	// placeholder in case this institution sends a message.
+	if (&sender == &me)
+		;
+	// if the message is going up, send it to the Region.
+	else if (theMessage->getDir() == up)
+		myRegion->receiveMessage(theMessage);
+	// if the message is going down, send it to the Facilities owned by this Inst.
+	else {
+		vector<Facility*>::iterator iter;
+		iter = myFacs.begin();
+		while (iter != myFacs.end()) {
+			(*iter)->receiveMessage(theMessage);
+			iter ++;
+		}
+	}
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Facility* Inst::getFac(int SN)
+{
+	vector<Facility*>::iterator iter;
+	for (iter = myFacs.begin(); iter != myFacs.end(); iter ++)
+		if ((*iter)->getSN() == SN)
+			return *iter;
+	throw GenException("Error: tried to access Fac not present in this Inst");
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Region* Inst::getRegion()
+{
+	return myRegion;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Inst::buildFac(string facModel, int time)
 {	
 	// Declare a pointer to the constructor
@@ -30,28 +84,14 @@ void Inst::buildFac(string facModel, int time)
 	myFacs.push_back(newFac);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Facility* Inst::getFac(int SN)
+void Inst::addFac(Facility* f)
 {
-	vector<Facility*>::iterator iter;
-	for (iter = myFacs.begin(); iter != myFacs.end(); iter ++)
-		if ((*iter)->getSN() == SN)
-			return *iter;
-	throw GenException("Error: tried to access Fac not present in this Inst");
+	myFacs.push_back(f);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const string Inst::getName() const
+void Inst::setBuild(string facModel, vector<int> v)
 {
-	return name;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Inst::getSN() const
-{
-	return ID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Region* Inst::getRegion()
-{
-	return myRegion;
+	build[facModel] = v;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Inst::handleTick(int time)
@@ -96,36 +136,6 @@ vector<double>* Inst::getChargeRateLog() {
 	return &chargeRateLog;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Inst::receiveMessage(Message* theMessage) {
-	Communicator* sender = theMessage->getSender();
-	Communicator* me = (Communicator*) this;
-	// placeholder in case this institution sends a message.
-	if (&sender == &me)
-		;
-	// if the message is going up, send it to the Region.
-	else if (theMessage->getDir() == up)
-		myRegion->receiveMessage(theMessage);
-	// if the message is going down, send it to the Facilities owned by this Inst.
-	else {
-		vector<Facility*>::iterator iter;
-		iter = myFacs.begin();
-		while (iter != myFacs.end()) {
-			(*iter)->receiveMessage(theMessage);
-			iter ++;
-		}
-	}
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Inst::~Inst()
-{
-	// Delete the Facilities.
-	while(!myFacs.empty()) {
-		Facility* f = myFacs.back();
-		myFacs.pop_back();
-		delete f;
-	}
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Inst::handleEnd(int time)
 {
 	// Perform any Institution-level end-of-simulation bookkeeping.
@@ -140,16 +150,6 @@ void Inst::handleEnd(int time)
 		(*iter)->handleEnd(time);
 		iter ++;
 	}
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Inst::addFac(Facility* f)
-{
-	myFacs.push_back(f);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Inst::setBuild(string facModel, vector<int> v)
-{
-	build[facModel] = v;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ostream& operator<<(ostream &os, const Inst& i)

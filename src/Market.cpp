@@ -8,9 +8,28 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Initializes the Market nextID to 0.
+int Market::nextID = 0;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  Market::Market()
 {
 	cout << "Used the default Market constructor!!"<< endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market::Market(string mktName, int SN) : 
+	name(mktName), ID(SN)
+{
+	myCommods = vector<Commodity*>();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market::~Market()
+{
+	// This destructor doesn't do anything. 
+	// It should delete any data allocated by this class
+	// particularly the commodities in the myCommods list 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -19,10 +38,10 @@ void Market::printMyName(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market::Market(string mktName, int SN) : 
-	name(mktName), ID(SN)
+int Market::getNextID()
 {
-	myCommods = vector<Commodity*>();
+	nextID++;
+	return nextID;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,10 +57,23 @@ int Market::getSN()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Market::getNextID()
+Commodity* Market::getCommod(int SN)
 {
-	nextID++;
-	return nextID;
+	vector<Commodity*>::iterator iter;
+	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
+		if ((*iter)->getSN() == SN)
+			return *iter;
+	throw GenException("Error: tried to access Commodity not traded on this Market");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity* Market::getCommod(string name)
+{
+	vector<Commodity*>::iterator iter;
+	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
+		if ((*iter)->getName() == name)
+			return *iter;
+	throw GenException("Error: tried to access Commodity not traded on this Market");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,40 +105,10 @@ void Market::addCommod(Commodity* c)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Market::getCommod(int SN)
-{
-	vector<Commodity*>::iterator iter;
-	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
-		if ((*iter)->getSN() == SN)
-			return *iter;
-	throw GenException("Error: tried to access Commodity not traded on this Market");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Market::getCommod(string name)
-{
-	vector<Commodity*>::iterator iter;
-	for(iter = myCommods.begin(); iter != myCommods.end(); iter ++)
-		if ((*iter)->getName() == name)
-			return *iter;
-	throw GenException("Error: tried to access Commodity not traded on this Market");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 pair<vector<Commodity*>::iterator, vector<Commodity*>::iterator> Market::getCommods()
 {
 	return make_pair(myCommods.begin(), myCommods.end());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market::~Market()
-{
-	// This destructor doesn't do anything. 
-	// It should delete any data allocated by this class
-	// particularly the commodities in the myCommods list 
-}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Market::nextID = 0;
-// Initializes the Market nextID to 0.
 

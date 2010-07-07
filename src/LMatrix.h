@@ -13,48 +13,140 @@ using namespace std;
 
 class LMatrix {
 
-  // friend arithmetic operators involving a scalar k and matrix A
-  friend LMatrix operator*(const long double k, const LMatrix & A);  // k * A
-  friend LMatrix operator*(const LMatrix & A, const long double k);  // A * k
-  friend LMatrix operator^(const LMatrix & A, const int k);     // A^k
+	/**
+	 * friend arithmetic operator multiplying a scalar k and matrix A
+	 * (k * A)
+	 */
+  friend LMatrix operator*(const long double k, const LMatrix & A); 
 
-  public:
-    // constructors
-    LMatrix();              // constructs a 1x1 matrix of zeroes
-    LMatrix(int n, int m);  // constructs an nxm matrix of zeroes
+	/**
+	 * friend arithmetic operator multiplying a scalar k and matrix A
+	 * (A * k)
+	 */
+  friend LMatrix operator*(const LMatrix & A, const long double k);  
+
+	/**
+	 * friend arithmetic operator raising a matrix A to the scalar k
+	 * ( A^k )
+	 */
+  friend LMatrix operator^(const LMatrix & A, const int k);     
+
+public:
+	/**
+	 * Default LMatrix Constructor constructs a 1x1 matrix of zeroes
+	 */
+	LMatrix();
+
+	/**
+	 * LMatrix Constructor constructs an nxm matrix of zeroes
+	 */
+	LMatrix(int n, int m);
     
-    // member access functions
-    int numRows() const;                    // returns number of rows
-    int numCols() const;                    // returns number of columns
-    const long double & operator()(int i, int j) const;  // returns the element aij
+	/**
+	 * Data access function returning the number of rows
+	 *
+	 * @return rows
+	 */
+	int numRows() const;                   
+    
+	/**
+	 * Data access function returning the number of rows
+	 *
+	 * @return cols
+	 */
+	int numCols() const;                    
+    
+	/**
+	 * Data access function returning the element aij
+	 */
+	const long double & operator()(int i, int j) const; 
 
-    // population functions
-    void setElement(int i, int j, long double aij);  // sets value of element aij
-    long double & operator()(int i, int j);  // sets value of element A(i,j)
-    void addRow(vector<long double> row);  // adds a row at the end of the Matrix
+	/**
+	 * Population Function
+	 * sets value of element aij
+	 *
+	 * @param i row
+	 * @param j column
+	 * @param aij value of element
+	 */
+	void setElement(int i, int j, long double aij); 
 
-    // other member functions
-    void print() const;  // prints the matrix
+	/**
+	 * sets value of element A(i,j)
+	 *
+	 * @param i row
+	 * @param j column
+	 */
+	long double & operator()(int i, int j);  // sets value of element A(i,j)
 
-    // assignment operators for matrix objects
-    const LMatrix & operator=(const LMatrix & rhs);
-    const LMatrix & operator+=(const LMatrix & rhs);
-    const LMatrix & operator-=(const LMatrix & rhs);
-    const LMatrix & operator*=(const LMatrix & rhs);
+	/**
+	 * adds a row at the end of the Matrix
+	 *
+	 * @param row is the row to add
+	 */
+	void addRow(vector<long double> row); 
+	
+	/**
+	 * Prints the matrix
+	 */
+	void print() const;
 
-  private:
-    vector< vector<long double> > M;  // 2D vector containing matrix elements
-    int rows;                    // number of rows
-    int cols;                    // number of columns
+	/**
+	 * equals assignment operator for matrix objects
+	 */
+   const LMatrix & operator=(const LMatrix & rhs);
+		
+	/**
+	 * addition assignment operator for matrix objects
+	 */
+   const LMatrix & operator+=(const LMatrix & rhs);
+
+	/**
+	 * subtraction assignment operator for matrix objects
+	 */
+   const LMatrix & operator-=(const LMatrix & rhs);
+
+	/**
+	 * multiplication assignment operator for matrix objects
+	 */
+   const LMatrix & operator*=(const LMatrix & rhs);
+
+private:
+	 /**
+		* 2D vector containing matrix elements
+		*/
+   vector< vector<long double> > M; 
+	 
+	 /**
+		 * number of rows
+		 */
+	 int rows;          
+
+	 /**
+		* number of columns
+		*/
+   int cols;                   
 
 };
 
-// arithmetic operators for matrix objects A and B
+/**
+ * addition operator for matrix objects A and B
+ */
 LMatrix operator+(const LMatrix & lhs, const LMatrix & rhs);  // A + B
+
+/**
+ * subtraction operator for matrix objects A and B
+ */
 LMatrix operator-(const LMatrix & lhs, const LMatrix & rhs);  // A - B
+
+/**
+ * multiplication operator for matrix objects A and B
+ */
 LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs);  // A * B
 
-// non-member functions
-LMatrix identity(int n);  // creates an nxn identity matrix
+/*
+ * non-member function which creates an nxn identity matrix
+ */
+LMatrix identity(int n);  
 
 #endif

@@ -9,62 +9,6 @@ using namespace std;
 
 class Commodity
 {
-public:
-	/**
-	 * Constructs a new commodity object 
-	 *
-	 * @param name is the commodity name, (ore, UF6, moxFuel, waste, etc... )
-	 * @param mkt is a pointer to the market on which this commodity is traded.
-	 * @param fissile indicates whether or not this is a potential fuel.
-	 * @param sepMat indicates whether or not this is a separated stream
-	 */
-	Commodity(string name, Market* mkt, bool fissile, bool sepMat);	
-
-	/**
-	 * Returns this Commodity's name.
-	 *
-	 * @return the name
-	 */
-	virtual const string getName() const;
-
-	/**
-	 * Returns this Commodity's ID number.
-	 *
-	 * @return the ID number
-	 */
-	virtual int getSN() const;
-
-	/**
-	 * advances the commodity serialization
-	 */
-	static int getNextID();
-
-	/**
-	 * Returns whether this Commodity is fissile.
-	 *
-	 * @return fissle boolean
-	 */
-	virtual bool isFissile() const;
-	
-	/**
-	 * Returns whether this Commodity is separated material.
-	 *
-	 * @return sepMat boolean
-	 */
-	virtual bool isSepMat() const;
-	
-	/**
-	 * Returns a pointer to this Commodity's Market.
-	 *
-	 * @return the pointer to the Market
-	 */
-	Market* getMarket();
-
-	/**
-	 * Virtual Commodity destructor.
-	 */
-	virtual ~Commodity();
-
 private:
 	/**
 	 * This gives the next available ID number, for serialization of 
@@ -100,5 +44,61 @@ private:
 	 */
 	bool sepMat;
 	
+public:
+	/**
+	 * Constructs a new commodity object 
+	 *
+	 * @param name is the commodity name, (ore, UF6, moxFuel, waste, etc... )
+	 * @param mkt is a pointer to the market on which this commodity is traded.
+	 * @param fissile indicates whether or not this is a potential fuel.
+	 * @param sepMat indicates whether or not this is a separated stream
+	 */
+	Commodity(string name, Market* mkt, bool fissile, bool sepMat);	
+
+	/**
+	 * Virtual Commodity destructor.
+	 */
+	virtual ~Commodity();
+
+	/**
+	 * Returns this Commodity's name.
+	 *
+	 * @return the name
+	 */
+	virtual const string getName() const;
+
+	/**
+	 * Returns this Commodity's ID number.
+	 *
+	 * @return the ID number
+	 */
+	virtual int getSN() const;
+
+	/**
+	 * Returns whether this Commodity is fissile.
+	 *
+	 * @return fissle boolean
+	 */
+	virtual bool isFissile() const;
+
+	/**
+	 * Returns whether this Commodity is separated material.
+	 *
+	 * @return sepMat boolean
+	 */
+	virtual bool isSepMat() const;
+	
+	/**
+	 * advances the commodity serialization
+	 */
+	static int getNextID();
+
+	/**
+	 * Returns a pointer to this Commodity's Market.
+	 *
+	 * @return the pointer to the Market
+	 */
+	Market* getMarket();
+
 };
 #endif

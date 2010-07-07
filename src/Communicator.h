@@ -2,7 +2,7 @@
 // An abstract class for deriving simulation entities that can communicate.
 
 #if !defined(_COMMUNICATOR)
-# define _COMMUNICATOR
+#define _COMMUNICATOR
 #include <iostream>
 #include <string>
 #include "Message.h"
@@ -35,6 +35,54 @@ class Communicator {
 		Commodity* commod, double amount, double price, int theFac);
 
 	public:
+
+	/**
+	 * Destroys this Communicator.
+	 */
+	virtual ~Communicator();
+
+	/**
+	 * Equality operator for Communicators. It's sufficient to test whether 
+	 * they have the same ID number and same type and return true iff so.
+	 */
+	virtual bool equals(Communicator const * rhs) const;
+
+	/**
+	 * Returns the name of this Communicator. Actually, this version just 
+	 * throws an exception, since the name needs to be returned by the child.
+	 *
+	 * @return the name of this Communicator
+	 */
+	virtual const string getName() const;
+
+	/**
+	 * Returns the ID number for this Communicator. Derived classes should 
+	 * override this function.
+	 *
+	 * @return this Communicator's ID number.
+	 */
+	virtual int getSN() const;
+
+	/**
+	 * Subset operator for Communicators. 
+	 */
+	virtual bool isSubsetOf(Communicator const * rhs) const;
+
+	/**
+	 * Superset operator for Communicators.
+	 */
+	virtual bool isSupersetOf(Communicator const * rhs) const;
+
+	/**
+	 * Proper subset operator for Communicators. 
+	 */
+	virtual bool isStrictSubsetOf(Communicator const * rhs) const;
+
+	/**
+	 * Proper superset operator for Communicators.
+	 */
+	virtual bool isStrictSupersetOf(Communicator const * rhs) const;
+
 	/**
 	 * Receives and possibly handles a Message.
 	 *
@@ -71,53 +119,6 @@ class Communicator {
 	 * @param time the current time
 	 */
 	virtual void receiveMaterial(Material* mat, int time);
-
-	/**
-	 * Destroys this Communicator.
-	 */
-	virtual ~Communicator();
-
-	/**
-	 * Returns the name of this Communicator. Actually, this version just 
-	 * throws an exception, since the name needs to be returned by the child.
-	 *
-	 * @return the name of this Communicator
-	 */
-	virtual const string getName() const;
-
-	/**
-	 * Returns the ID number for this Communicator. Derived classes should 
-	 * override this function.
-	 *
-	 * @return this Communicator's ID number.
-	 */
-	virtual int getSN() const;
-
-	/**
-	 * Equality operator for Communicators. It's sufficient to test whether 
-	 * they have the same ID number and same type and return true iff so.
-	 */
-	virtual bool equals(Communicator const * rhs) const;
-
-	/**
-	 * Subset operator for Communicators. 
-	 */
-	virtual bool isSubsetOf(Communicator const * rhs) const;
-
-	/**
-	 * Superset operator for Communicators.
-	 */
-	virtual bool isSupersetOf(Communicator const * rhs) const;
-
-	/**
-	 * Proper subset operator for Communicators. 
-	 */
-	virtual bool isStrictSubsetOf(Communicator const * rhs) const;
-
-	/**
-	 * Proper superset operator for Communicators.
-	 */
-	virtual bool isStrictSupersetOf(Communicator const * rhs) const;
 
 	/**
 	 * Turns the given string into the corresponding member of the 

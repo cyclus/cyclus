@@ -37,6 +37,7 @@
 
 using namespace std;
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // constructs a 1x1 matrix of zeroes
 
 LMatrix::LMatrix() {
@@ -46,6 +47,8 @@ LMatrix::LMatrix() {
   M.push_back(element);       // adds element to the matrix
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // constructs an nxm matrix of zeroes
 
 LMatrix::LMatrix(int n, int m) {
@@ -55,18 +58,21 @@ LMatrix::LMatrix(int n, int m) {
   M.assign(n,row);              // adds n rows to the matrix
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // returns the number of rows n in the matrix
 
 int LMatrix::numRows() const {
   return rows;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // returns the number of columns m in the matrix
 
 int LMatrix::numCols() const {
   return cols;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the () operator so that A(i,j) will return a reference to 
 // the element aij
 
@@ -74,18 +80,21 @@ const long double & LMatrix::operator()(int i, int j) const {
   return M.at(i-1).at(j-1);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // sets the value for the element aij at row i and column j
 
 void LMatrix::setElement(int i, int j, long double aij) {
   M.at(i-1).at(j-1) = aij; 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the () operator so that A(i,j) will write the element aij
 
 long double & LMatrix::operator()(int i, int j) {
   return M.at(i-1).at(j-1);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // adds a row at the end of the Matrix if it contains the same number of
 // elements as the number of columns in the Matrix
 void LMatrix::addRow(vector<long double> row) {
@@ -96,6 +105,7 @@ void LMatrix::addRow(vector<long double> row) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // prints the matrix to standard output
 
 void LMatrix::print() const {
@@ -122,6 +132,7 @@ void LMatrix::print() const {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the assignment operator "A = B" for matrix objects
 
 const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
@@ -148,6 +159,7 @@ const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the assignment operator "A = A + B" for matrix objects
 // Note: if the matrix dimensions do not match, then A is returned unchanged
 
@@ -164,6 +176,7 @@ const LMatrix & LMatrix::operator+=(const LMatrix & rhs) {
   return *this;  // returns the new matrix "A = A + B"
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the assignment operator "A = A - B" for matrix objects
 // Note: if the matrix dimensions do not match, then A is returned unchanged
 
@@ -180,6 +193,7 @@ const LMatrix & LMatrix::operator-=(const LMatrix & rhs) {
   return *this;  // returns the new matrix "A = A - B"
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the assignment operator "A = A * B" for matrix objects
 //
 // Note: This function will perform matrix multiplication only if the number
@@ -219,6 +233,7 @@ const LMatrix & LMatrix::operator*=(const LMatrix & rhs) {
   return *this;  // returns the new matrix "A = A * B"
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the arithmetic operator "A + B" for matrix objects
 
 LMatrix operator+(const LMatrix & lhs, const LMatrix & rhs) {
@@ -227,6 +242,7 @@ LMatrix operator+(const LMatrix & lhs, const LMatrix & rhs) {
   return ans;  // returns the resulting matrix A + B
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the arithmetic operator "A - B" for matrix objects
 
 LMatrix operator-(const LMatrix & lhs, const LMatrix & rhs) {
@@ -235,6 +251,7 @@ LMatrix operator-(const LMatrix & lhs, const LMatrix & rhs) {
   return ans;  // returns the resulting matrix A - B
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // overloads the arithmetic operator "A * B" for matrix objects
 
 LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs) {
@@ -243,6 +260,7 @@ LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs) {
   return ans;  // returns the resulting matrix A * B
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // friend of the Matrix class that performs scalar multiplication k * A
 
 LMatrix operator*(const long double k, const LMatrix & A) {
@@ -260,6 +278,7 @@ LMatrix operator*(const long double k, const LMatrix & A) {
   return ans;  // returns the resulting matrix k * A
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // friend of the Matrix class that performs scalar multiplication A * k
 
 LMatrix operator*(const LMatrix & A, const long double k) {
@@ -277,6 +296,7 @@ LMatrix operator*(const LMatrix & A, const long double k) {
   return ans;  // returns the resulting matrix A * k
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // friend of the Matrix class that calculates powers of a square matrix A ^ k
 // Note: if the matrix is not square, then A is returned unchanged
 
@@ -293,6 +313,7 @@ LMatrix operator^(const LMatrix & A, const int k) {
   return ans;  // returns the resulting matrix A ^ k
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // creates and returns an nxn identity matrix I
 
 LMatrix identity(int n) {

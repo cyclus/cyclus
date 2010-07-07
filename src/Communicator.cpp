@@ -17,61 +17,9 @@ Message* Communicator::writeMessage(MessageDir dir, Commodity* commod, double
 	return new Message(dir, commod, amount, price, me, receiver, theFac); 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::receiveMessage(Message* theMessage) 
-{
-	throw GenException
-		("Class receiving Message didn't override receiveMessage()");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::executeOrder(Message* needsMat, Message* hasMat, int time)
-{
-	throw GenException("Class executing order didn't override executeOrder()");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::sendMaterial(Material* mat, Communicator* rec, int time)
-{
-	throw GenException("Class sending Material didn't override sendMaterial()");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::receiveMaterial(Material* mat, int time)
-{
-	throw GenException
-		("Class receiving Material didn't override receiveMaterial()");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator::~Communicator()
 {
 
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const string Communicator::getName() const
-{
-	throw GenException("Tried to get name of a Communicator that doesn't overwrite getName()");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Communicator::getSN() const
-{
-	// It's (apparently) possible that this Communicator doesn't know it's 
-	// something more than a Communicator (i.e., sometimes overridden versions of 
-	// this function don't get called).
-	// KDHFLAG ^^^ I don't understand the implications of this comment. 
-	// KDHFLAG ... Does the code below fix it? 
-	const Communicator* thisp = (Communicator*) this;
-	if (dynamic_cast<const Region*>(thisp)) {
-		const Region* r = (const Region*) thisp;
-		return r->getSN();
-	}
-	if (dynamic_cast<const Inst*>(thisp)) {
-		const Inst* r = (const Inst*) thisp;
-		return r->getSN();
-	}
-	if (dynamic_cast<const Facility*>(thisp)) {
-		const Facility* r = (const Facility*) thisp;
-		return r->getSN();
-	}
-
-	throw GenException("Tried to get ID number of a class that doesn't override getSN()");
-	return -1;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Communicator::equals(Communicator const * rhs) const
@@ -103,6 +51,36 @@ bool Communicator::equals(Communicator const * rhs) const
 	// lhs == rhs == the Logician because Logician doesn't override getSN(), so 
 	// we would have thrown an exception already.
 	return false;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const string Communicator::getName() const
+{
+	throw GenException("Tried to get name of a Communicator that doesn't overwrite getName()");
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Communicator::getSN() const
+{
+	// It's (apparently) possible that this Communicator doesn't know it's 
+	// something more than a Communicator (i.e., sometimes overridden versions of 
+	// this function don't get called).
+	// KDHFLAG ^^^ I don't understand the implications of this comment. 
+	// KDHFLAG ... Does the code below fix it? 
+	const Communicator* thisp = (Communicator*) this;
+	if (dynamic_cast<const Region*>(thisp)) {
+		const Region* r = (const Region*) thisp;
+		return r->getSN();
+	}
+	if (dynamic_cast<const Inst*>(thisp)) {
+		const Inst* r = (const Inst*) thisp;
+		return r->getSN();
+	}
+	if (dynamic_cast<const Facility*>(thisp)) {
+		const Facility* r = (const Facility*) thisp;
+		return r->getSN();
+	}
+
+	throw GenException("Tried to get ID number of a class that doesn't override getSN()");
+	return -1;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Communicator::isSubsetOf(Communicator const * rhs) const
@@ -253,6 +231,28 @@ bool Communicator::isStrictSupersetOf(Communicator const * rhs) const
 	// F > I: never possible
 	// F > F: never possible (by def. of proper subset)
 	return false;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::receiveMessage(Message* theMessage) 
+{
+	throw GenException
+		("Class receiving Message didn't override receiveMessage()");
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::executeOrder(Message* needsMat, Message* hasMat, int time)
+{
+	throw GenException("Class executing order didn't override executeOrder()");
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::sendMaterial(Material* mat, Communicator* rec, int time)
+{
+	throw GenException("Class sending Material didn't override sendMaterial()");
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::receiveMaterial(Material* mat, int time)
+{
+	throw GenException
+		("Class receiving Material didn't override receiveMaterial()");
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ostream& operator<<(ostream &os, const Communicator& c)

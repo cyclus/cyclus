@@ -7,6 +7,16 @@
 
 using namespace std;
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Facility::beginCycle(int time)
+{
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Initialize the Facility nextID to zero.
+int Facility::nextID = 0;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Facility::Facility()
 {
@@ -28,6 +38,11 @@ Facility::Facility(string name, Inst* i, int SN, list<Commodity*> feeds, list<Co
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Facility::~Facility()
+{
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Facility::getNextID()
 {
 	nextID++;
@@ -35,8 +50,8 @@ int Facility::getNextID()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Facility::beginCycle(int time)
-{
+void Facility::printMyName()
+{cout << "this is the printMyName function in Facility.cpp"<<endl; 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,18 +131,4 @@ void Facility::decommission()
 {
 }
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Facility::printMyName()
-{cout << "this is the printMyName function in Facility.cpp"<<endl; 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Facility::~Facility()
-{
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Initialize the Facility nextID to zero.
-int Facility::nextID = 0;
 

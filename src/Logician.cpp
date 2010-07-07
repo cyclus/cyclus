@@ -10,16 +10,7 @@
 
 
 Logician* Logician::_instance = 0;
-//MarketMap Logician::mktMap = MarketMap();
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Logician* Logician::Instance() {
-	// If we haven't created a Logician yet, create and return it.
-	if (0 == _instance)
-		_instance = new Logician();
-	
-	return _instance;
-}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::Logician() {
 	facilities = vector<Facility*>();
@@ -28,91 +19,9 @@ Logician::Logician() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::handleTick(int time) {
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::handleTock(int time) {
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Logician::getNumFacs() const
+Logician::~Logician()
 {
-	return facilities.size();
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Logician::getNumMarkets() const
-{
-	return markets.size();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::setSimDur(int numMonths) {
-	simDur = numMonths;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Facility* Logician::getFacility(int ID)
-{
-	// Iterate through the vector of Facilities and return a pointer to the 
-	// one with the given ID, if it exists.
-	vector<Facility*>::iterator iter;
-	for (iter = facilities.begin(); iter != facilities.end(); iter ++)
-		if ((*iter)->getSN() == ID)
-			return *iter;
-
-	throw GenException("Error: tried to get Facility that didn't exist.");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//
-Facility* Logician::getFacility(string name)
-{
-	// Iterate through the vector of Facilities and return a pointer to the 
-	// one with the given ID, if it exists.
-	vector<Facility*>::iterator iter;
-	for (iter = facilities.begin(); iter != facilities.end(); iter ++)
-		if ((*iter)->getName() == name)
-			return *iter;
-
-	throw GenException("Error: tried to get Facility that didn't exist.");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pair<vector<Facility*>::iterator, vector<Facility*>::iterator> Logician::getFacilities()
-{
-	return make_pair(facilities.begin(), facilities.end());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market* Logician::getMarket(int ID)
-{
-	// Iterate through the vector of Markets and return a pointer to the 
-	// one with the given ID, if it exists.
-	vector<Market*>::iterator iter;
-	for (iter = markets.begin(); iter != markets.end(); iter ++)
-		if ((*iter)->getSN() == ID)
-			return *iter;
-
-	throw GenException("Error: tried to get Market that didn't exist.");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market* Logician::getMarket(string name)
-{
-	// Iterate through the vector of Markets and return a pointer to the 
-	// one with the given ID, if it exists.
-	vector<Market*>::iterator iter;
-	for (iter = markets.begin(); iter != markets.end(); iter ++)
-		if ((*iter)->getName() == name)
-			return *iter;
-
-	throw GenException("Error: tried to get Market that didn't exist.");
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pair<vector<Market*>::iterator, vector<Market*>::iterator> Logician::getMarkets()
-{
-	return make_pair(markets.begin(), markets.end());
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::receiveMessage(Message* theMessage)
 {
@@ -134,18 +43,78 @@ void Logician::receiveMessage(Message* theMessage)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Logician::~Logician()
-{
+Logician* Logician::Instance() {
+	// If we haven't created a Logician yet, create and return it.
+	if (0 == _instance)
+		_instance = new Logician();
+	
+	return _instance;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::handleEnd(int time)
+int Logician::getNumFacs() const
 {
-	// Perform any final logician tasks.
-
-	cout << "Simulation complete (or aborted): "
-			 << "recording final state of system." << endl;
-
+	return facilities.size();
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Logician::getNumMarkets() const
+{
+	return markets.size();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Facility* Logician::getFacility(int ID)
+{
+	// Iterate through the vector of Facilities and return a pointer to the 
+	// one with the given ID, if it exists.
+	vector<Facility*>::iterator iter;
+	for (iter = facilities.begin(); iter != facilities.end(); iter ++)
+		if ((*iter)->getSN() == ID)
+			return *iter;
+
+	throw GenException("Error: tried to get Facility that didn't exist.");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Facility* Logician::getFacility(string name)
+{
+	// Iterate through the vector of Facilities and return a pointer to the 
+	// one with the given ID, if it exists.
+	vector<Facility*>::iterator iter;
+	for (iter = facilities.begin(); iter != facilities.end(); iter ++)
+		if ((*iter)->getName() == name)
+			return *iter;
+
+	throw GenException("Error: tried to get Facility that didn't exist.");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market* Logician::getMarket(int ID)
+{
+	// Iterate through the vector of Markets and return a pointer to the 
+	// one with the given ID, if it exists.
+	vector<Market*>::iterator iter;
+	for (iter = markets.begin(); iter != markets.end(); iter ++)
+		if ((*iter)->getSN() == ID)
+			return *iter;
+
+	throw GenException("Error: tried to get Market that didn't exist.");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Market* Logician::getMarket(string name)
+{
+	// Iterate through the vector of Markets and return a pointer to the 
+	// one with the given ID, if it exists.
+	vector<Market*>::iterator iter;
+	for (iter = markets.begin(); iter != markets.end(); iter ++)
+		if ((*iter)->getName() == name)
+			return *iter;
+
+	throw GenException("Error: tried to get Market that didn't exist.");
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Logician::getCommod(int ID)
 {
@@ -162,6 +131,7 @@ Commodity* Logician::getCommod(int ID)
 	// If we didn't find it, throw a GenException of our own.
 	throw GenException("Error: tried to access Commodity not loaded in the Logician.");
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Logician::getCommod(string name)
 {
@@ -177,4 +147,43 @@ Commodity* Logician::getCommod(string name)
 
 	// If we didn't find it, throw a GenException of our own.
 	throw GenException("Error: tried to access Commodity not loaded in the Logician.");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::setSimDur(int numMonths) {
+	simDur = numMonths;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::addMarket(Market* newcomer){
+	markets.push_back(newcomer);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::handleTick(int time) {
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::handleTock(int time) {
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::handleEnd(int time)
+{
+	// Perform any final logician tasks.
+
+	cout << "Simulation complete (or aborted): "
+			 << "recording final state of system." << endl;
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+pair<vector<Facility*>::iterator, vector<Facility*>::iterator> Logician::getFacilities()
+{
+	return make_pair(facilities.begin(), facilities.end());
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+pair<vector<Market*>::iterator, vector<Market*>::iterator> Logician::getMarkets()
+{
+	return make_pair(markets.begin(), markets.end());
 }
