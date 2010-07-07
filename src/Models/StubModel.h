@@ -1,6 +1,6 @@
 // StubModel.h
-#if !defined(_FACILITY_H)
-#define _FACILITY_H
+#if !defined(_STUBMODEL_H)
+#define _STUBMODEL_H
 #include <string>
 
 #include "Model.h"
@@ -9,7 +9,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
- * The StubModel class is the abstract class/interface used by all facility models
+ * The StubModel class is the abstract class/interface used by all stub models
  * 
  * This StubModel is intended as a skeleton to guide the implementation of new
  * Models.
@@ -23,8 +23,8 @@ public:
     StubModel() { ID = nextID++; };
 		
     /// name constructor for StubModel Class
-    StubModel(string facility_name)
-        { name = facility_name; ID = nextID++; };
+    StubModel(string stub_name)
+        { name = stub_name; ID = nextID++; };
 
     /// ever model should be destructable
     virtual ~StubModel() = {};
