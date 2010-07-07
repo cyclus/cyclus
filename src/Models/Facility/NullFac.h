@@ -2,8 +2,7 @@
 #if !defined(_NULLFAC)
 #define _NULLFAC
 #include <iostream>
-#include"Facility.h"
-#include"FacFactory.h"
+#include "Facility.h"
 
 
 using namespace std;
@@ -22,13 +21,6 @@ using namespace std;
 class NullFac : public Facility  
 {
 public:
-
-	/**
-	 * prints the name of this facType
-	 *
-	 */
-	virtual void printMyName();
-
 	/**
 	 * Constructs a NullFac with no specified data.
 	 * 
@@ -44,7 +36,21 @@ public:
 	 */
 	NullFac(double a, double b);
 
+	/**
+	 * prints the name of this facType
+	 *
+	 */
+	virtual void printMyName();
+
 protected: 
 	double bob;
 };
+
+extern "C" Facility* construct() {
+    return new NullFac;
+}
+
+extern "C" void destruct(Facility* p) {
+    delete p;
+}
 #endif

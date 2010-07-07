@@ -26,4 +26,14 @@ public:
 	 */
 	virtual void printMyName();
 };
+
+extern "C" Facility* construct() {
+    return new NullFac;
+}
+
+extern "C" void destruct(Facility* p) {
+    delete p;
+}
+
+
 #endif

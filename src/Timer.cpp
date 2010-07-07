@@ -8,27 +8,6 @@
 Timer* Timer::_instance = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::runSim()
-{
-	for (int i = time; i < simDur; i++) {
-		
-		// Give a status report, periodically.
-		if (i % 10 == 0)
-		 	cout << "Current time: " << i << endl;
-
-		// Tell the manager to handle this month.
-//		myManager->handleTick(time);
-//		myManager->handleTock(time);
-			
-		// Increment the time.
-		time ++;
-	}
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::getTime() {
-	return time;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer* Timer::Instance() 
 {
 	// If we haven't created a Timer yet, create it, and then and return it
@@ -39,6 +18,7 @@ Timer* Timer::Instance()
 
 	return _instance;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::initialize(int dur, int m0, int y0, int start) {
 
@@ -59,6 +39,28 @@ void Timer::initialize(int dur, int m0, int y0, int start) {
 	simDur = dur;
 //	myManager = MI;
 //	myManager->setSimDur(simDur);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::runSim()
+{
+	for (int i = time; i < simDur; i++) {
+		
+		// Give a status report, periodically.
+		if (i % 10 == 0)
+		 	cout << "Current time: " << i << endl;
+
+		// Tell the manager to handle this month.
+//		myManager->handleTick(time);
+//		myManager->handleTock(time);
+			
+		// Increment the time.
+		time ++;
+	}
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Timer::getTime() {
+	return time;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getSimDur() {

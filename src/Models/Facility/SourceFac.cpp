@@ -10,8 +10,4 @@ void SourceFac::printMyName()
 };
 
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-namespace {
-     FacFactoryConcrete<SourceFac> facType("source");
-}
 
