@@ -1,0 +1,44 @@
+<Market name="uo2Market" model="StubMarket">
+   <Commodity name="uo2" />
+   <StubMarketParameters>
+   </StubMarketParameters>
+</Market>
+<Market name="snfMarket" model="StubMarket">
+   <Commodity name="snf" />
+   <StubMarketParameters>
+   </StubMarketParameters>
+</Market>
+
+<Facility name="reactorA" model="StubFacility">
+   <Commodity direction="in" name="uo2" />
+   <Commodity direction="out" name="snf" />
+   <StubFacilityParameters>
+   </StubFacilityParameters>
+</Facility>
+<Facility name="reactorB" model="StubFacility">
+   <Commodity direction="in" name="uo2" />
+   <Commodity direction="out" name="snf" />
+   <StubFacilityParameters>
+   </StubFacilityParameters>
+</Facility>
+
+<Region name="Canada" model="StubRegion">
+    <Facility name="reactorA" />
+    <StubRegionParameters>
+    </StubRegionParameters>
+</Region>
+<Region name="USA" model="StubRegion">
+    <Facility name="reactorB" />
+    <StubRegionParameters>
+    </StubRegionParameters>
+</Region>
+
+<Recipe name="fresh_50GWd" type="mass" total=1000>
+   <Isotope id=92235 comp=0.05>
+   <Isotope id=92235 comp=0.95>
+   <Isotope id=92235 comp=0.13>
+</Recipe>
+<Recipe name="water" type="atom" total=1e25>
+   <Isotope id=1001  comp=2>
+   <Isotope id=8016  comp=1>
+</Recipe>
