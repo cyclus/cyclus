@@ -1,0 +1,172 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+  <element name="Simulation">
+
+    <oneOrMore>
+    <ref name="Commodity"/>
+    </oneOrMore>
+  
+    <oneOrMore>
+    <ref name="Market"/>
+    </oneOrMore>
+      
+    <oneOrMore>
+    <ref name="Facility"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="Region"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="Recipe"/>
+    </oneOrMore>
+  </element>
+  </start>
+
+  <!-- Begin Section For COMMODITIES -->
+  <define name="Commodity">
+    <element name="Commodity">
+      <attribute name="name">
+        <text/>
+      </attribute>
+    </element>
+  </define>
+  <!-- End Section For COMMODITIES -->
+
+  <!-- Begin Section For MARKETS-->
+  <define name="Market">
+    <element name="Market">
+      <attribute name="name">
+        <text/>
+      </attribute>
+      <attribute name="model">
+        <text/>
+      </attribute>
+      <element name="Commodity">
+        <attribute name="name">
+          <text/>
+        </attribute>
+      </element>
+      <choice>
+        <ref name="StubMarketParameters"/>
+        <!-- INSERT ref TO NEW MARKETMODEL PARAMETER SETS HERE -->
+      </choice>
+    </element>
+  </define>
+
+  <define name="StubMarketParameters">
+     <element name="StubMarketParameters">
+        <text/>
+     </element>
+  </define>
+
+  <!-- INSERT NEW MARKETMODEL PARAMETER SETS HERE -->
+
+  <!-- End Section For MARKETS-->
+
+  <!-- Begin Section For FACILITIES -->
+  <define name="Facility">
+    <element name="Facility">
+      <attribute name="name">
+        <text/>
+      </attribute>
+      <attribute name="model">
+        <text/>
+     </attribute>
+     <oneOrMore>
+      <element name="InCommodity">
+        <attribute name="name">
+           <text/>
+        </attribute>
+      </element>
+      </oneOrMore>
+      <oneOrMore>
+      <element name="OutCommodity">
+        <attribute name="name">
+          <text/>
+        </attribute>
+      </element>
+      </oneOrMore>
+      <choice>
+        <ref name="StubFacilityParameters"/>
+        <!-- INSERT ref TO NEW FACILITYMODEL PARAMETER SETS HERE -->
+      </choice>
+    </element>
+  </define>
+
+  <define name="StubFacilityParameters">
+     <element name="StubFacilityParameters">
+        <text/>
+     </element>
+  </define>
+
+  <!-- INSERT NEW FACILITYMODEL PARAMETER SETS HERE -->
+
+  <!-- End Section For FACILITIES -->
+
+
+  <!-- Begin Section For REGIONS -->
+  <define name="Region">
+    <element name="Region">
+      <attribute name="name">
+         <text/>
+      </attribute>
+      <attribute name="model">
+        <text/>
+      </attribute>
+      <oneOrMore>
+      <element name="AllowedFacility">
+        <attribute name="name">
+          <text/>
+        </attribute>
+      </element>
+      </oneOrMore>
+      <choice>
+        <ref name="StubRegionParameters"/>
+        <!-- INSERT ref TO NEW FACILITYMODEL PARAMETER SETS HERE -->
+      </choice>
+    </element>
+  </define>
+
+  <define name="StubRegionParameters">
+     <element name="StubRegionParameters">
+         <text/>
+    </element>
+  </define>
+
+  <!-- INSERT NEW REGIONMODEL PARAMETER SETS HERE -->
+
+  <!-- End Section For REGIONS -->
+
+
+  <!-- Begin Section For RECIPES -->
+  <define name="Recipe">
+    <element name="Recipe">
+      <attribute name="name">
+        <text/>
+      </attribute>
+        <attribute name="type">
+          <text/>
+        </attribute>
+        <attribute name="total">
+          <text/>
+        </attribute>
+      <oneOrMore>
+      <element name="Isotope">
+        <attribute name="id">
+          <text/>
+        </attribute>
+        <attribute name="comp">
+          <text/>
+        </attribute>
+      </element>
+      </oneOrMore>
+    </element>
+  </define>
+  <!-- End Section For RECIPES -->
+
+</grammar>
+
+
+    

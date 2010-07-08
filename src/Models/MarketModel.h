@@ -30,6 +30,9 @@ public:
     /// Default constructor for the MarketModel Class
     MarketModel() { ID = nextID++; };
     
+    /// constructor that loads common elements from XML
+    MarketModel(xmlNodePtr cur);
+
     /// MarketModels should not be indestructible.
     virtual ~MarketModel() {};
     

@@ -10,17 +10,22 @@
 
 
 StubMarket::StubMarket(xmlNodePtr cur)
-    : MarketModel() // assign ID & increment
+    : MarketModel(cur) // assign ID & increment
 {
-    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
+    xmlNodeSetPtr nodes = XMLinput->get_elements(cur,"StubMarketParameters");
+    
+    if (nodes->nodeNr != 1)
+	throw GenException("Must be exactly 1 set of StubMarketParameters.");
 
-    /// skip the rest for now
+    /// process parameters
+    
 }
 
 void StubMarket::print() 
 { 
     cout << "This is a StubMarket model with name " << name 
-	 << " and ID: " << ID << endl;
+	 << " and ID: " << ID << " and trading commodity " 
+	 << commodity->getName() << endl;
 }
 
 
