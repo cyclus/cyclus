@@ -4,33 +4,24 @@
 
 #include "StubRegion.h"
 
-#include "GenException.h"
 #include "Logician.h"
+#include "GenException.h"
+#include "InputXML.h"
 
-StubRegion::StubRegion(string region_name, istream &input)
-    : RegionModel(region_name)
+
+StubRegion::StubRegion(xmlNodePtr cur)
+    : RegionModel() // assign & incrememt ID
 {
 
-    string token;
+    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
 
-    input >> token;
-
-    if (token != "AllowedFacility")
-	throw GenException("Need to define allowed facilities for this region.");
-
-    input >> token;
-
-    Model* new_facility = LI->getFacilityByName(token);
-
-    if (NULL != new_facility)
-	allowedFacilities.push_back(new_facility);
-
+    /// skip rest for now
 }
 
 void StubRegion::print() 
 { 
     cout << "This is a StubRegion model with name " << name 
-	 << " and ID: " << ID << " with allowed facility " << allowedFacilities[0]->getName() <<  endl;
+	 << " and ID: " << ID << endl;
 };
 
 

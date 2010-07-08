@@ -133,7 +133,7 @@ public:
 	Model* getRegionByName(string name) { return getModelByName(regions,name); }
 
 	/// add a recipe to the list
-	void addRecipe(string recipe_name,Material* new_mat) { recipes[recipe_name] = new_mat; };
+	void addRecipe(string name, Material* new_mat) { recipes[name] = new_mat; };
 	/// print list of recipes
 	void printRecipes();
 	/// get number or recipes
@@ -142,9 +142,7 @@ public:
 	Material* getRecipe(string name)                     { return recipes[name]; } 
 	
 	/// add a commodity to the list
-	Commodity* addCommodity(string commodity_name, Commodity* new_comm) { commodities[commodity_name] = new_comm; };
-	/// add a commodity if it doesn't already exist
-	Commodity* addCommodity(string commodity_name, istream &input, Model* model = NULL);
+	void addCommodity(Commodity* new_commod) { commodities[new_commod->getName()] = new_commod; } ;
 	/// get number or commodities
 	int getNumCommodities()                              { return commodities.size(); }
 	/// get a pointer to the recipe based on its name

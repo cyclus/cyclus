@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}/Utility")
 # Add any new source files to this list.
 SET( CYCLUS_SRC 
      App.cpp 
+     InputXML.cpp
      Logician.cpp
      Material.cpp
      Commodity.cpp
@@ -37,4 +38,4 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl )
+TARGET_LINK_LIBRARIES( cyclus dl xml2)

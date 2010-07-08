@@ -5,6 +5,28 @@ using namespace std;
 
 #include "Material.h"
 
+#include "Logician.h"
+#include "GenException.h"
+
+Material::Material(xmlNodePtr node)
+{
+
+    /// nothing to do yet
+}
+
+void Material::load_recipes()
+{
+
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Recipe");
+    
+    if (!nodes)
+	throw GenException("No Recipes defined in this simulation.");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	LI->addRecipe((const char*)xmlGetProp(nodes->nodeTab[i], (const xmlChar*)"name"), 
+		      new Material(nodes->nodeTab[i]));
+
+}
 
 void Material::normalize(CompMap &comp_map)
 {
@@ -56,6 +78,7 @@ void Material::rationalize_M2A()
 
 }
 
+/*
 Material::Material(istream &input)
 {
 
@@ -84,6 +107,7 @@ Material::Material(istream &input)
 	rationalize_A2M();
 
 }
+*/
 
 void Material::printComp(string header, CompMap comp_map)
 {

@@ -6,12 +6,13 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <libxml/tree.h>
 
 using namespace std;
 
 class Model;
 
-typedef Model* mdl_ctor(string,istream&);
+typedef Model* mdl_ctor(xmlNodePtr);
 typedef void mdl_dtor(Model*);
 
 
@@ -33,7 +34,7 @@ public:
     static mdl_ctor* load(string model_type,string model_name);
 
     /// Create a model for use in the simulation
-    static Model* create(string model_type, istream &input);
+    static Model* create(string model_type, xmlNodePtr cur);
 
     /// Destroy a model cleanly
     static void* destroy(Model* model);
@@ -55,7 +56,11 @@ public:
 
     /// every model should be able to print a verbose description
     virtual void print() = 0;
-    
+
+    static void load_markets();
+    static void load_facilities();
+    static void load_regions();
+
 protected:
     /// every instance of a model should have a name
     string name;

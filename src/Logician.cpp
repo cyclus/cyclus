@@ -41,17 +41,5 @@ void Logician::printRecipes()
     }
 }
 
-Commodity* Logician::addCommodity(string name, istream &input, Model* model)
-{
- 
-    if (commodities.find(name) == commodities.end())
-	commodities[name] = new Commodity(name,model,input);
-    else if (model != NULL && model !=  commodity_market_map[commodities[name]] )
-	throw GenException("Trying to add a new market to this commodity.");
 
-    commodity_market_map[commodities[name]] = model;
-
-    return commodities[name];
-
-}
 

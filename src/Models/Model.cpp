@@ -2,7 +2,10 @@
 // Implements the Model Class
 
 #include "Model.h"
+
 #include "GenException.h"
+#include "InputXML.h"
+#include "Logician.h"
 
 #include <dlfcn.h>
 
@@ -51,15 +54,14 @@ mdl_ctor* Model::load(string model_type,string model_name)
 }
 
 
-Model* Model::create(string model_type,istream &input)
+Model* Model::create(string model_type,xmlNodePtr cur)
 {
-    string name, modelImpl;
-
-    input >> name >> modelImpl;
+    string name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
+    string modelImpl = (const char*)xmlGetProp(cur, (const xmlChar*)"model");
 
     mdl_ctor* model_creator = load(model_type,modelImpl);
 
-    Model* model = model_creator(name,input);
+    Model* model = model_creator(cur);
 
     return model;
 }
@@ -74,3 +76,40 @@ void* Model::destroy(Model* model)
     return model;
 
 }
+
+void Model::load_markets()
+{
+
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Market");
+    
+    if (!nodes)
+	throw GenException("No Markets defined in this simulation.");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	LI->addMarket(create("Market",nodes->nodeTab[i]));
+}
+
+void Model::load_facilities()
+{
+
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Facility");
+    
+    if (!nodes)
+	throw GenException("No Facilities defined in this simulation.");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	LI->addFacility(create("Facility",nodes->nodeTab[i]));
+}
+
+void Model::load_regions()
+{
+
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Region");
+    
+    if (!nodes)
+	throw GenException("No Regions defined in this simulation.");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	LI->addRegion(create("Region",nodes->nodeTab[i]));
+}
+

@@ -2,10 +2,8 @@
 #if !defined(_STUBREGION_H)
 #define _STUBREGION_H
 #include <iostream>
+
 #include "RegionModel.h"
-
-
-using namespace std;
 
 /**
  * The StubRegion class inherits from the RegionModel class and is dynamically
@@ -17,35 +15,47 @@ using namespace std;
  */
 class StubRegion : public RegionModel  
 {
-public:
-    /**
-     * Constructs a StubRegion with no specified data.
-     * 
-     */
-    StubRegion() {};
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
-    StubRegion(string region_name)
-	: RegionModel(region_name) {};
- 
-    StubRegion(string region_name, istream &input);
+public:
+    StubRegion() {};
+    
+    StubRegion(xmlNodePtr cur);
+    
+    ~StubRegion() {};
    
-    /**
-     * prints the name of this facType
-     *
-     */
     virtual void print();
 
     /// get model implementation name
     virtual const string getModelName() { return "StubRegion"; };
 
-protected: 
+/* ------------------- */ 
+
+/* --------------------
+ * all REGIONMODEL classes have these members
+ * --------------------
+ */
+
+/* ------------------- */ 
+
 };
 
-extern "C" Model* construct(string region_name,istream &input) {
-    return new StubRegion(region_name,input);
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* construct(xmlNodePtr cur) {
+    return new StubRegion(cur);
 }
 
 extern "C" void destruct(Model* p) {
     delete p;
 }
+
+/* -------------------- */
+
 #endif

@@ -3,6 +3,9 @@
 #define _COMMODITY_H
 #include <string>
 
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+
 #include "Model.h"
 
 using namespace std;
@@ -11,10 +14,12 @@ class Commodity
 {
 public:
     /// construct new commodities from the input stream
-    Commodity(string commod_name,Model* my_market,istream &input);
+    Commodity(xmlNodePtr node);
     
     ~Commodity();
     
+    static void load_commodities();
+
     /// get the commodity name
     const string getName() const { return name;};
     

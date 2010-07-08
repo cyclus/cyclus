@@ -3,9 +3,13 @@
 #define _STUBMODEL_H
 #include <string>
 
+
 #include "Model.h"
 
 using namespace std;
+
+
+
 
 //-----------------------------------------------------------------------------
 /*
@@ -17,15 +21,15 @@ using namespace std;
 //-----------------------------------------------------------------------------
 class StubModel : public Model
 {
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
 public:
     /// Default constructor for StubModel Class
     StubModel() { ID = nextID++; };
 		
-    /// name constructor for StubModel Class
-    StubModel(string stub_name)
-        { name = stub_name; ID = nextID++; };
-
     /// ever model should be destructable
     virtual ~StubModel() = {};
     
@@ -38,7 +42,15 @@ public:
 protected: 
     /// Stores the next available stub ID
     static int nextID;
+/* ------------------- */ 
 
+
+/* --------------------
+ * all STUBMODEL classes have these members
+ * --------------------
+ */
+
+/* ------------------- */ 
     
 };
 

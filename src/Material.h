@@ -4,6 +4,8 @@
 
 #include <map>
 
+#include "InputXML.h"
+
 using namespace std;
 
 /// type definition for isotopes
@@ -33,6 +35,28 @@ typedef map<int,double> CompMap;
 
 class Material {
 
+public:
+    
+    /// default constructor
+    Material() : atomEqualsMass(true), total_mass(0), total_atoms(0) {};
+
+    /// primary constructor reads input from XML node
+    Material(xmlNodePtr node);
+
+    ~Material() {};
+
+    static void load_recipes();
+    
+    /// standard verbose printer includes both an atom and mass composition output
+    void print() {
+        printComp("Atom composition:", atom_comp); 
+	cout << "Total atoms: " << total_atoms << endl;
+	printComp("Mass composition:", mass_comp);
+	cout << "Total mass: " << total_mass << endl;
+        }
+
+    /// verbose printer for a single type of composition
+    void printComp(string header, CompMap comp_map);
 private:
 
         /// map isotopes to number of atoms
@@ -63,24 +87,6 @@ private:
     /// convert mass composition into a consitent atom composition
     void rationalize_M2A();
 
-public:
-    
-    /// default constructor
-    Material() : atomEqualsMass(true), total_mass(0), total_atoms(0) {};
-
-    /// primary constructor reads input from istream
-    Material(istream &input);
-    
-    /// standard verbose printer includes both an atom and mass composition output
-    void print() {
-        printComp("Atom composition:", atom_comp); 
-	cout << "Total atoms: " << total_atoms << endl;
-	printComp("Mass composition:", mass_comp);
-	cout << "Total mass: " << total_mass << endl;
-        }
-
-    /// verbose printer for a single type of composition
-    void printComp(string header, CompMap comp_map);
     
 };
 

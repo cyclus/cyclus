@@ -2,10 +2,8 @@
 #if !defined(_STUBFACILITY_H)
 #define _STUBFACILITY_H
 #include <iostream>
+
 #include "FacilityModel.h"
-
-
-using namespace std;
 
 /**
  * The StubFacility class inherits from the FacilityModel class and is dynamically
@@ -17,37 +15,48 @@ using namespace std;
  */
 class StubFacility : public FacilityModel  
 {
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
 public:
-    /**
-     * Constructs a StubFacility with no specified data.
-     * 
-     */
     StubFacility() {};
     
-    /// constructor to make an empty instance of this model
-    StubFacility(string facility_name)
-	: FacilityModel(facility_name) {};
+    StubFacility(xmlNodePtr cur);
 
-    /// constructor to build an instance based on input
-    StubFacility(string facility_name,istream &input);
+    ~StubFacility() {};
 
-    /**
-     * prints the name of this facType
-     *
-     */
     virtual void print();
 
     /// get model implementation name
     virtual const string getModelName() { return "StubFacility"; };
 
-protected: 
+/* ------------------- */ 
+
+/* --------------------
+ * all FACILITYMODEL classes have these members
+ * --------------------
+ */
+
+
+
+/* ------------------- */ 
 };
 
-extern "C" Model* construct(string facility_name,istream &input) {
-    return new StubFacility(facility_name,input);
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* construct(xmlNodePtr cur) {
+    return new StubFacility(cur);
 }
 
 extern "C" void destruct(Model* p) {
     delete p;
 }
+
+/* ------------------- */ 
+
 #endif

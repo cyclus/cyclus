@@ -1,35 +1,26 @@
 // StubMarket.cpp
 // Implements the StubMarket class
 #include <iostream>
+
 #include "StubMarket.h"
+
 #include "Logician.h"
 #include "GenException.h"
+#include "InputXML.h"
 
-using namespace std;
 
-
-StubMarket::StubMarket(string market_name, istream &input)
-    : MarketModel(market_name)
+StubMarket::StubMarket(xmlNodePtr cur)
+    : MarketModel() // assign ID & increment
 {
+    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
 
-    string keyword;
-
-    /// all markets need a commodity
-    input >> keyword;
-
-    if (keyword != "Commodity")
-	throw GenException("Missing commodity in market");
-    
-    input >> keyword;
-
-    commodity = LI->addCommodity(keyword,input,this);
-
+    /// skip the rest for now
 }
 
 void StubMarket::print() 
 { 
     cout << "This is a StubMarket model with name " << name 
-	 << " and ID: " << ID << " that trades commodity " << commodity->getName() << endl;
+	 << " and ID: " << ID << endl;
 }
 
 

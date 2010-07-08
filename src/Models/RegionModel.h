@@ -3,13 +3,18 @@
 #define _REGIONMODEL_H
 #include <string>
 
+
 #include "Model.h"
 
 using namespace std;
 
+
+
+
 //-----------------------------------------------------------------------------
 /*
- * The RegionModel class is the abstract class/interface used by all region models
+ * The RegionModel class is the abstract class/interface used by all region
+ * models
  * 
  * This is all that is known externally about Regions
  */
@@ -17,13 +22,13 @@ using namespace std;
 class RegionModel : public Model
 {
 	
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 public:
     /// Default constructor for RegionModel Class
     RegionModel() { ID = nextID++; };
-
-    /// name constructor for RegionModel Class
-    RegionModel(string region_name)
-        { name = region_name; ID = nextID++; };
 
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};
@@ -37,9 +42,17 @@ public:
 protected:
     /// Stores next available region ID
     static int nextID;
+/* ------------------- */ 
 
+
+/* --------------------
+ * all REGIONMODEL classes have these members
+ * --------------------
+ */
+protected:
     /// every region has a list of allowed facilities
     vector<Model*> allowedFacilities;
+/* -------------------- */
 
 };
 

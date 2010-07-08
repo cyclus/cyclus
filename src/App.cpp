@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "Logician.h"
+#include "InputXML.h"
 
 using namespace std;
 
@@ -23,32 +24,13 @@ int main(int argc, char* argv[])
     //  * get market model name
     //  * search cache for market methods
     //     * if not found load market
-    string keyword, name, modelImpl;
-    cin >> keyword;
-    while (keyword != "end")
-    {
-	if ( "Market" == keyword )
-	{
-	    LI->addMarket(Model::create(keyword,cin));
+    XMLinput->load_file(argv[1]);
 
-	}
-	else if ( "Facility" == keyword )
-	{
-	    LI->addFacility(Model::create(keyword,cin));
-	}
-	else if ( "Region" == keyword )
-	{
-	    LI->addRegion(Model::create(keyword,cin));
-	}
-	else if ( "Recipe" == keyword )
-	{
-	    cin >> name;
-	    LI->addRecipe(name,new Material(cin));
-	}
-	else
-	    cerr << "Keyword: " << keyword << " is not supported at this time." << endl;
-	cin >> keyword;
-    }
+    // get commodities
+    
+    // get markets
+    // 
+
 
     cout << "Here is a list of " << LI->getNumMarkets() << " markets:" << endl;
     LI->printMarkets();
