@@ -10,10 +10,9 @@
 
 
 StubRegion::StubRegion(xmlNodePtr cur)
-    : RegionModel() // assign & incrememt ID
+    : RegionModel(cur) // assign & incrememt ID
 {
 
-    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
 
     /// skip rest for now
 }

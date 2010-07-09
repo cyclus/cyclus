@@ -30,6 +30,9 @@ public:
     /// Default constructor for RegionModel Class
     RegionModel() { ID = nextID++; };
 
+    /// Constructor based on XML node
+    RegionModel(xmlNodePtr cur);
+
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};
     

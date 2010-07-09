@@ -52,6 +52,10 @@ public:
 
     /// get nodes that match absolute path
     xmlNodeSetPtr get_elements(const char* expression);
+    /// get the contents of the single element with this expression
+    const char* get_child_content(xmlNodePtr cur,const char* expression);
+    /// get the name of the single element with this expression
+    const char* get_child_name(xmlNodePtr cur,const char* expression);
     /// get nodes that match relative path
     xmlNodeSetPtr get_elements(xmlNodePtr cur,const char* expression);
 

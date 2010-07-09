@@ -13,11 +13,12 @@
 /// Initialize the commodity ID serialization
 int Commodity::nextID = 0;
 
-Commodity::Commodity(xmlNodePtr node)
+Commodity::Commodity(xmlNodePtr cur)
 {
     ID = nextID++;
 
-    name = (const char*)xmlGetProp(node, (const xmlChar*)"name");
+    name = XMLinput->get_child_content(cur,"name");
+
     market = NULL;
 
 }
@@ -30,7 +31,7 @@ Commodity::~Commodity(){
 
 void Commodity::load_commodities()
 {
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Commodity");
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/commodity");
     
     if (!nodes)
 	throw GenException("No Commodities defined in this simulation.");

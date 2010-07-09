@@ -14,7 +14,7 @@ class Commodity
 {
 public:
     /// construct new commodities from the input stream
-    Commodity(xmlNodePtr node);
+    Commodity(xmlNodePtr cur);
     
     ~Commodity();
     

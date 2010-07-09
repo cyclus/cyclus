@@ -9,9 +9,8 @@
 #include "InputXML.h"
 
 StubFacility::StubFacility(xmlNodePtr cur)
-    : FacilityModel() // assign ID & increment
+    : FacilityModel(cur) // assign ID & increment
 {
-    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
 
     /// skip the rest for now
 }

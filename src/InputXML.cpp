@@ -42,7 +42,7 @@ void InputXML::load_file(const char* filename)
     if (xmlRelaxNGValidateDoc(vctxt,doc))
 	throw GenException("Invalid XML file.");
     else
-	cerr << "VALID!!" << endl;
+	cerr << "Input file is valid!!" << endl;
 
     Commodity::load_commodities();
 
@@ -72,6 +72,42 @@ xmlNodeSetPtr InputXML::get_elements(const char* expression)
 
     return xpathObj->nodesetval;
 
+
+    // when and how to cleanup memory allocation?
+
+}
+
+const char* InputXML::get_child_content(xmlNodePtr cur,const char* expression)
+{
+
+    xpathCtx->node = cur;
+    
+    /* Evaluate xpath expression */
+    xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtx);
+    if(xpathObj == NULL) {
+        fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
+        xmlXPathFreeContext(xpathCtx); 
+    }
+
+    return (const char*)(xpathObj->nodesetval->nodeTab[0]->children->content);
+
+    // when and how to cleanup memory allocation?
+
+}
+
+const char* InputXML::get_child_name(xmlNodePtr cur,const char* expression)
+{
+
+    xpathCtx->node = cur;
+    
+    /* Evaluate xpath expression */
+    xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtx);
+    if(xpathObj == NULL) {
+        fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
+        xmlXPathFreeContext(xpathCtx); 
+    }
+
+    return (const char*)(xpathObj->nodesetval->nodeTab[0]->name);
 
     // when and how to cleanup memory allocation?
 

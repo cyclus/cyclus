@@ -29,6 +29,9 @@ class FacilityModel : public Model
 public:
     /// Default constructor for FacilityModel Class
     FacilityModel() { ID = nextID++; };
+
+    /// Constructor based on XML node
+    FacilityModel(xmlNodePtr cur);
 		
     /// ever model should be destructable
     virtual ~FacilityModel() {};

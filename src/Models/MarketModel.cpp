@@ -19,19 +19,12 @@ MarketModel::MarketModel(xmlNodePtr cur)
 {
     ID = nextID++;
 
-    name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
+    name = XMLinput->get_child_content(cur,"name");
 
     /// all markets require commodities
-
-    xmlNodeSetPtr nodes = XMLinput->get_elements(cur,"Commodity");
-
-    if (nodes->nodeNr != 1)
-	throw GenException("Must be exactly 1 Commodity per Market, found ");
-    
-    string commod_name = (const char*)xmlGetProp(nodes->nodeTab[0], 
-						 (const xmlChar*)"name");
-
+    string commod_name = XMLinput->get_child_content(cur,"mktcommodity");
     commodity = LI->getCommodity(commod_name);
+    commodity->setMarket(this);
 }
 
 

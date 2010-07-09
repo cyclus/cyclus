@@ -56,8 +56,8 @@ mdl_ctor* Model::load(string model_type,string model_name)
 
 Model* Model::create(string model_type,xmlNodePtr cur)
 {
-    string name = (const char*)xmlGetProp(cur, (const xmlChar*)"name");
-    string modelImpl = (const char*)xmlGetProp(cur, (const xmlChar*)"model");
+    string name = XMLinput->get_child_content(cur, "name");
+    string modelImpl = XMLinput->get_child_name(cur, "model/*");
 
     mdl_ctor* model_creator = load(model_type,modelImpl);
 
@@ -80,7 +80,7 @@ void* Model::destroy(Model* model)
 void Model::load_markets()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Market");
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/market");
     
     if (!nodes)
 	throw GenException("No Markets defined in this simulation.");
@@ -92,7 +92,7 @@ void Model::load_markets()
 void Model::load_facilities()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Facility");
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/facility");
     
     if (!nodes)
 	throw GenException("No Facilities defined in this simulation.");
@@ -104,7 +104,7 @@ void Model::load_facilities()
 void Model::load_regions()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Region");
+    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/region");
     
     if (!nodes)
 	throw GenException("No Regions defined in this simulation.");
