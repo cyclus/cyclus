@@ -46,7 +46,6 @@ public:
     ~Material() {};
 
     static void load_XML_recipes();
-    static void load_recipebook(string filename, string format);
     static void setNS(string new_ns) { cur_ns = new_ns; };
     
     /// standard verbose printer includes both an atom and mass composition output
@@ -63,6 +62,8 @@ public:
 private:
     static string cur_ns;
     static stack<string> ns_stack;
+
+    static void load_recipebook(string filename, string ns, string format);
 
         /// map isotopes to number of atoms
     CompMap atom_comp, 

@@ -6,10 +6,6 @@
       <text/>
     </element>
 
-    <element name="namespace">
-      <text/>
-    </element>
-
     <oneOrMore>
     <ref name="recipe"/>
     </oneOrMore>

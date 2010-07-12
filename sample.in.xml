@@ -113,6 +113,7 @@
 
 <recipebook>
    <filename>sample.recipebook.xml</filename>
+   <namespace>sample</namespace>
    <format>xml</format>
 </recipebook>
 

@@ -234,6 +234,10 @@
         <text/>
       </element>
 
+      <element name="namespace">
+        <text/>
+      </element>
+
       <element name="format">
         <text/>
       </element>

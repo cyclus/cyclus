@@ -98,8 +98,6 @@ void InputXML::load_recipebook(string filename)
     recipebook.doc = validate_file(&recipebook);
     recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
-    Material::setNS(get_xpath_content("/recipebook/namespace"));
-
     Material::load_XML_recipes();
 
     // get rid of recipebook, freeing memory

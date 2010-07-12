@@ -2,7 +2,6 @@
 
 <recipebook>
 <name>Sample XML Recipebook</name>
-<namespace>sample</namespace>
 
 <recipe>
    <name>fresh_50gwd</name>

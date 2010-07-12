@@ -8,7 +8,7 @@ using namespace std;
 #include "Logician.h"
 #include "GenException.h"
 
-string Material::cur_ns = "base";
+string Material::cur_ns = "";
 stack<string> Material::ns_stack;
 
 Material::Material(xmlNodePtr cur)
@@ -44,7 +44,7 @@ void Material::load_XML_recipes()
     xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
     
     for (int i=0;i<nodes->nodeNr;i++)
-	LI->addRecipe(cur_ns + ":"+ XMLinput->get_xpath_content(nodes->nodeTab[i], "name"),
+	LI->addRecipe(cur_ns + XMLinput->get_xpath_content(nodes->nodeTab[i], "name"),
 		      new Material(nodes->nodeTab[i]));
 
     /// load recipes from databases
@@ -52,13 +52,16 @@ void Material::load_XML_recipes()
 
     for (int i=0;i<nodes->nodeNr;i++)
 	load_recipebook(XMLinput->get_xpath_content(nodes->nodeTab[i], "filename"),
+			XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
 			XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
 
 }
 
-void Material::load_recipebook(string filename, string format)
+void Material::load_recipebook(string filename, string ns, string format)
 {
     ns_stack.push(cur_ns);
+
+    cur_ns = ns + ":";
 
     if ("xml" == format)
 	XMLinput->load_recipebook(filename);
