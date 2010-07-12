@@ -2,7 +2,7 @@
 #if !defined(_REGIONMODEL_H)
 #define _REGIONMODEL_H
 #include <string>
-
+#include <set>
 
 #include "Model.h"
 
@@ -52,9 +52,17 @@ protected:
  * all REGIONMODEL classes have these members
  * --------------------
  */
+public:
+    void addInstitution(Model* new_inst) { institutions.push_back(new_inst); };
+    bool isAllowedFacility(Model* test_fac) 
+    { return ( allowedFacilities.find(test_fac) != allowedFacilities.end() ); } ;
+
 protected:
     /// every region has a list of allowed facilities
-    vector<Model*> allowedFacilities;
+    set<Model*> allowedFacilities;
+
+    /// every region has a list of institutions
+    vector<Model*> institutions;
 /* -------------------- */
 
 };

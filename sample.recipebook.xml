@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<recipebook>
+<name>Sample XML Recipebook</name>
+<namespace>sample</namespace>
+
+<recipe>
+   <name>fresh_50gwd</name>
+   <basis>mass</basis>
+   <total>1000</total>
+   <isotope>
+     <id>92235</id><comp>0.05</comp>
+   </isotope>
+   <isotope>
+      <id>92238</id><comp>0.95</comp>
+   </isotope>
+   <isotope>
+      <id>08016</id><comp>0.13</comp>
+   </isotope>
+</recipe>
+
+<recipe>
+   <name>water</name>
+   <basis>atom</basis>
+   <total>1e25</total>
+   <isotope>
+     <id>1001</id><comp>2</comp>
+   </isotope>
+   <isotope>
+      <id>8016</id><comp>1</comp>
+   </isotope>
+</recipe>
+
+</recipebook>
+

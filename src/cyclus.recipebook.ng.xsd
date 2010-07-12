@@ -1,0 +1,55 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+  <element name="recipebook">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <element name="namespace">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="recipe"/>
+    </oneOrMore>
+
+  </element>
+  </start>
+
+  <!-- begin section for recipes -->
+  <define name="recipe">
+    <element name="recipe">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="basis">
+        <text/>
+      </element>
+
+      <element name="total">
+        <text/>
+      </element>
+
+      <oneOrMore>
+      <element name="isotope">
+        <element name="id">
+          <text/>
+        </element>
+        <element name="comp">
+          <text/>
+        </element>
+      </element>
+      </oneOrMore>
+
+    </element>
+  </define>
+
+  <!-- end section for recipes -->
+
+</grammar>
+
+
+    

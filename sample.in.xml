@@ -52,6 +52,17 @@
       <StubRegion>
       </StubRegion>
     </model>
+    <institution>
+      <name>OPD</name>
+      <model>
+        <StubInst>
+          <deploy>
+            <name>HWR</name>
+            <start>1</start>
+          </deploy>
+        </StubInst>
+      </model>
+    </institution>
 </region>
 <region>
     <name>USA</name>
@@ -60,6 +71,17 @@
       <StubRegion>
       </StubRegion>
     </model>
+    <institution>
+      <name>Exelon</name>
+      <model>
+        <StubInst>
+          <deploy>
+            <name>LWR</name>
+            <start>1</start>
+          </deploy>
+        </StubInst>
+      </model>
+    </institution>
 </region>
 
 <recipe>
@@ -76,6 +98,7 @@
       <id>08016</id><comp>0.13</comp>
    </isotope>
 </recipe>
+
 <recipe>
    <name>water</name>
    <basis>atom</basis>
@@ -87,4 +110,11 @@
       <id>8016</id><comp>1</comp>
    </isotope>
 </recipe>
+
+<recipebook>
+   <filename>sample.recipebook.xml</filename>
+   <format>xml</format>
+</recipebook>
+
+
 </simulation>

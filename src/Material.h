@@ -41,11 +41,13 @@ public:
     Material() : atomEqualsMass(true), total_mass(0), total_atoms(0) {};
 
     /// primary constructor reads input from XML node
-    Material(xmlNodePtr node);
+    Material(xmlNodePtr cur);
 
     ~Material() {};
 
-    static void load_recipes();
+    static void load_XML_recipes();
+    static void load_recipebook(string filename, string format);
+    static void setNS(string new_ns) { cur_ns = new_ns; };
     
     /// standard verbose printer includes both an atom and mass composition output
     void print() {
@@ -57,7 +59,10 @@ public:
 
     /// verbose printer for a single type of composition
     void printComp(string header, CompMap comp_map);
+
 private:
+    static string cur_ns;
+    static stack<string> ns_stack;
 
         /// map isotopes to number of atoms
     CompMap atom_comp, 

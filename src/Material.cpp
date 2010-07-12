@@ -8,25 +8,67 @@ using namespace std;
 #include "Logician.h"
 #include "GenException.h"
 
-Material::Material(xmlNodePtr node)
-{
+string Material::cur_ns = "base";
+stack<string> Material::ns_stack;
 
-    /// nothing to do yet
+Material::Material(xmlNodePtr cur)
+{
+    
+    string comp_type = XMLinput->get_xpath_content(cur,"basis");
+    CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
+    double &read_total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
+
+    read_total_comp = atof(XMLinput->get_xpath_content(cur,"total"));
+
+    xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+
+    for (int i=0;i<isotopes->nodeNr;i++)
+    {
+	xmlNodePtr iso_node = isotopes->nodeTab[i];
+	Iso isotope = atoi(XMLinput->get_xpath_content(iso_node,"id"));
+	comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
+    }
+    
+    normalize(comp_map);
+
+    if ( "atom" != comp_type)
+	rationalize_M2A();
+    else
+	rationalize_A2M();
 }
 
-void Material::load_recipes()
+void Material::load_XML_recipes()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/Simulation/Recipe");
-    
-    if (!nodes)
-	throw GenException("No Recipes defined in this simulation.");
+    /// load recipes from file
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
     
     for (int i=0;i<nodes->nodeNr;i++)
-	LI->addRecipe((const char*)xmlGetProp(nodes->nodeTab[i], (const xmlChar*)"name"), 
+	LI->addRecipe(cur_ns + ":"+ XMLinput->get_xpath_content(nodes->nodeTab[i], "name"),
 		      new Material(nodes->nodeTab[i]));
 
+    /// load recipes from databases
+    nodes = XMLinput->get_xpath_elements("/simulation/recipebook");
+
+    for (int i=0;i<nodes->nodeNr;i++)
+	load_recipebook(XMLinput->get_xpath_content(nodes->nodeTab[i], "filename"),
+			XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
+
 }
+
+void Material::load_recipebook(string filename, string format)
+{
+    ns_stack.push(cur_ns);
+
+    if ("xml" == format)
+	XMLinput->load_recipebook(filename);
+    else
+	throw GenException("That is not a supported recipe list format.");
+
+    cur_ns = ns_stack.top();
+    ns_stack.pop();
+}
+
 
 void Material::normalize(CompMap &comp_map)
 {
@@ -78,36 +120,6 @@ void Material::rationalize_M2A()
 
 }
 
-/*
-Material::Material(istream &input)
-{
-
-    string comp_type;
-    int numIsos;
-    Iso isotope;
-
-    input >> comp_type >> numIsos;
-
-    CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
-    double &read_total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
-
-    input >> read_total_comp;
-    
-    for (int isoNum=0; isoNum<numIsos; isoNum++)
-    {
-        input >> isotope;
-	input >> comp_map[isotope];
-    }
-
-    normalize(comp_map);
-
-    if ( "atom" != comp_type)
-	rationalize_M2A();
-    else
-	rationalize_A2M();
-
-}
-*/
 
 void Material::printComp(string header, CompMap comp_map)
 {

@@ -7,6 +7,8 @@
 #include "InputXML.h"
 #include "Logician.h"
 
+#include "RegionModel.h"
+
 #include <dlfcn.h>
 
 
@@ -56,8 +58,8 @@ mdl_ctor* Model::load(string model_type,string model_name)
 
 Model* Model::create(string model_type,xmlNodePtr cur)
 {
-    string name = XMLinput->get_child_content(cur, "name");
-    string modelImpl = XMLinput->get_child_name(cur, "model/*");
+    string name = XMLinput->get_xpath_content(cur, "name");
+    string modelImpl = XMLinput->get_xpath_name(cur, "model/*");
 
     mdl_ctor* model_creator = load(model_type,modelImpl);
 
@@ -80,10 +82,7 @@ void* Model::destroy(Model* model)
 void Model::load_markets()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/market");
-    
-    if (!nodes)
-	throw GenException("No Markets defined in this simulation.");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/market");
     
     for (int i=0;i<nodes->nodeNr;i++)
 	LI->addMarket(create("Market",nodes->nodeTab[i]));
@@ -92,10 +91,7 @@ void Model::load_markets()
 void Model::load_facilities()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/facility");
-    
-    if (!nodes)
-	throw GenException("No Facilities defined in this simulation.");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/facility");
     
     for (int i=0;i<nodes->nodeNr;i++)
 	LI->addFacility(create("Facility",nodes->nodeTab[i]));
@@ -104,12 +100,20 @@ void Model::load_facilities()
 void Model::load_regions()
 {
 
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/region");
-    
-    if (!nodes)
-	throw GenException("No Regions defined in this simulation.");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region");
     
     for (int i=0;i<nodes->nodeNr;i++)
 	LI->addRegion(create("Region",nodes->nodeTab[i]));
 }
 
+void Model::load_institutions()
+{
+
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	create("Inst",nodes->nodeTab[i]);
+ 
+   
+   
+}

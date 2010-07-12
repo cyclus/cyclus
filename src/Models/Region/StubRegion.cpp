@@ -21,6 +21,11 @@ void StubRegion::print()
 { 
     cout << "This is a StubRegion model with name " << name 
 	 << " and ID: " << ID << endl;
+
+    for(vector<Model*>::iterator inst=institutions.begin();
+	inst != institutions.end();
+	inst++)
+	(*inst)->print();
 };
 
 

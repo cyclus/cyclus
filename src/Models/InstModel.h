@@ -1,10 +1,12 @@
-// StubModel.h
-#if !defined(_STUBMODEL_H)
-#define _STUBMODEL_H
+// InstModel.h
+#if !defined(_INSTMODEL_H)
+#define _INSTMODEL_H
 #include <string>
 
 
 #include "Model.h"
+
+#include "RegionModel.h"
 
 using namespace std;
 
@@ -13,28 +15,28 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
- * The StubModel class is the abstract class/interface used by all stub models
+ * The InstModel class is the abstract class/interface used by all institution models
  * 
- * This StubModel is intended as a skeleton to guide the implementation of new
+ * This InstModel is intended as a skeleton to guide the implementation of new
  * Models.
  */
 //-----------------------------------------------------------------------------
-class StubModel : public Model
+class InstModel : public Model
 {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
 public:
-    /// Default constructor for StubModel Class
-    StubModel() { ID = nextID++; };
+    /// Default constructor for InstModel Class
+    InstModel() { ID = nextID++; };
 
     /// constructor that loads common elements from XML
-    StubModel(xmlNodePtr cur);
+    InstModel(xmlNodePtr cur);
 		
-    /// every model should be destructable
-    virtual ~StubModel() {};
+    /// ever model should be destructable
+    virtual ~InstModel() {};
     
     // every model should be able to print a verbose description
     virtual void print() = 0;
@@ -43,15 +45,21 @@ public:
     virtual const string getModelName() = 0;
 
 protected: 
-    /// Stores the next available stub ID
+    /// Stores the next available institution ID
     static int nextID;
 /* ------------------- */ 
 
 
 /* --------------------
- * all STUBMODEL classes have these members
+ * all INSTMODEL classes have these members
  * --------------------
  */
+
+public:
+    void setRegion(Model* my_region) { region = my_region; };
+
+protected:
+    Model* region;
 
 /* ------------------- */ 
     

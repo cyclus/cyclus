@@ -8,7 +8,7 @@
 #include "Logician.h"
 
 /* --------------------
- * all MODEL classes have these public members
+ * all MODEL classes have these members
  * --------------------
  */
 
@@ -17,18 +17,29 @@ int MarketModel::nextID = 0;
 
 MarketModel::MarketModel(xmlNodePtr cur)
 {
+    /** 
+     *  Generic initialization for Models
+     */
+
     ID = nextID++;
 
-    name = XMLinput->get_child_content(cur,"name");
+    name = XMLinput->get_xpath_content(cur,"name");
+
+     /** 
+     *  Specific initialization for MarketModels
+     */
 
     /// all markets require commodities
-    string commod_name = XMLinput->get_child_content(cur,"mktcommodity");
+    string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
     commodity = LI->getCommodity(commod_name);
+    if (NULL == commodity)
+	throw GenException("That market commodity does not exist.");
+
     commodity->setMarket(this);
 }
 
 
 /* --------------------
- * all MARKETMODEL classes have these protected members
+ * all MARKETMODEL classes have these members
  * --------------------
  */

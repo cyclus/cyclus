@@ -7,7 +7,7 @@
 #include "Logician.h"
 
 /* --------------------
- * all MODEL classes have these public members
+ * all MODEL classes have these members
  * --------------------
  */
 
@@ -16,14 +16,22 @@ int FacilityModel::nextID = 0;
 
 FacilityModel::FacilityModel(xmlNodePtr cur)
 {
+    /** 
+     *  Generic initialization for Models
+     */
+
     ID = nextID++;
 
-    name = XMLinput->get_child_content(cur,"name");
+    name = XMLinput->get_xpath_content(cur,"name");
+
+    /** 
+     *  Specific initialization for FacilityModels
+     */
 
     /// all facilities require commodities - possibly many
     string commod_name;
     Commodity* new_commod;
-    xmlNodeSetPtr nodes = XMLinput->get_elements(cur,"incommodity");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
 
     for (int i=0;i<nodes->nodeNr;i++)
     {
@@ -34,7 +42,7 @@ FacilityModel::FacilityModel(xmlNodePtr cur)
 	in_commods.push_back(new_commod);
     }
 
-    nodes = XMLinput->get_elements(cur,"outcommodity");
+    nodes = XMLinput->get_xpath_elements(cur,"outcommodity");
 
     for (int i=0;i<nodes->nodeNr;i++)
     {
@@ -49,6 +57,8 @@ FacilityModel::FacilityModel(xmlNodePtr cur)
 
 
 /* --------------------
- * all FACILITYMODEL classes have these protected members
+ * all FACILITYMODEL classes have these members
  * --------------------
  */
+
+

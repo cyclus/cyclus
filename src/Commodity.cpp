@@ -17,7 +17,7 @@ Commodity::Commodity(xmlNodePtr cur)
 {
     ID = nextID++;
 
-    name = XMLinput->get_child_content(cur,"name");
+    name = XMLinput->get_xpath_content(cur,"name");
 
     market = NULL;
 
@@ -31,7 +31,7 @@ Commodity::~Commodity(){
 
 void Commodity::load_commodities()
 {
-    xmlNodeSetPtr nodes = XMLinput->get_elements("/simulation/commodity");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/commodity");
     
     if (!nodes)
 	throw GenException("No Commodities defined in this simulation.");

@@ -60,6 +60,7 @@ public:
     static void load_markets();
     static void load_facilities();
     static void load_regions();
+    static void load_institutions();
 
 protected:
     /// every instance of a model should have a name

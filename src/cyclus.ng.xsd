@@ -19,7 +19,10 @@
     </oneOrMore>
 
     <oneOrMore>
+    <choice>
     <ref name="recipe"/>
+    <ref name="recipebook"/>
+    </choice>
     </oneOrMore>
   </element>
   </start>
@@ -51,7 +54,7 @@
       <element name="model">
       <choice>
         <ref name="StubMarket"/>
-        <!-- insert ref to new marketmodel parameter sets here -->
+        <!-- insert ref to new MarketModels  here -->
       </choice>
       </element>
 
@@ -64,7 +67,7 @@
      </element>
   </define>
 
-  <!-- insert new marketmodel parameter sets here -->
+  <!-- insert new MarketModel parameter sets here -->
 
   <!-- end section for markets-->
 
@@ -91,7 +94,7 @@
       <element name="model">
       <choice>
         <ref name="StubFacility"/>
-        <!-- insert ref to new facilitymodel parameter sets here -->
+        <!-- insert ref to new FacilityModels here -->
       </choice>
       </element>
 
@@ -104,7 +107,7 @@
      </element>
   </define>
 
-  <!-- insert new facilitymodel parameter sets here -->
+  <!-- insert new FacilityModel parameter sets here -->
 
   <!-- end section for facilities -->
 
@@ -126,9 +129,13 @@
       <element name="model">
       <choice>
         <ref name="StubRegion"/>
-        <!-- insert ref to new facilitymodel parameter sets here -->
+        <!-- insert ref to new RegionModels here -->
       </choice>
       </element>
+
+      <oneOrMore>
+      <ref name="institution" />
+      </oneOrMore>
 
     </element>
   </define>
@@ -139,9 +146,55 @@
      </element>
   </define>
 
-  <!-- insert new regionmodel parameter sets here -->
+  <!-- insert new RegionModel parameter sets here -->
 
   <!-- end section for regions -->
+
+  <!-- begin section for institutions -->
+  <define name="institution">
+    <element name="institution">
+
+      <element name="name">
+         <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        <ref name="StubInst"/>
+        <!-- insert ref to new InstModels here -->
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="StubInst">
+    <element name="StubInst">
+
+      <oneOrMore>
+      <ref name="deploy"/>
+      </oneOrMore>       
+
+    </element>
+  </define>
+
+  <define name="deploy">
+    <element name="deploy">
+
+      <element name="name">
+        <text/>
+      </element>   
+
+      <element name="start">
+        <text/>
+      </element>
+ 
+    </element>
+  </define>
+
+  <!-- insert new InstModel parameter sets here -->
+
+  <!-- end section for institutions -->
 
 
   <!-- begin section for recipes -->
@@ -170,6 +223,20 @@
         </element>
       </element>
       </oneOrMore>
+
+    </element>
+  </define>
+
+  <define name="recipebook">
+    <element name="recipebook">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
 
     </element>
   </define>

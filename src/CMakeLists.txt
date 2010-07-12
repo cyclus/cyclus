@@ -17,9 +17,11 @@ SET( CYCLUS_SRC
      Commodity.cpp
      Utility/GenException.cpp 
      Models/Model.cpp 
+        Models/StubModel.cpp 
         Models/MarketModel.cpp 
         Models/FacilityModel.cpp 
-	Models/RegionModel.cpp)
+	Models/RegionModel.cpp
+	Models/InstModel.cpp)
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)

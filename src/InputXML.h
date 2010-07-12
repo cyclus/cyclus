@@ -3,6 +3,7 @@
 #define _INPUTXML_H
 
 #include <string>
+#include <stack>
 
 using namespace std;
 
@@ -27,37 +28,46 @@ private:
     /// default destructor
     ~InputXML() {};
 
-    /// document tree populated by parser
-    xmlDocPtr doc;
+    struct xmlFileInfo {
+	string filename;    /// filename currently being processed
+	string* schema;
+	xmlDocPtr doc;    /// XML doc ptr for input file
+	xmlXPathContextPtr xpathCtxt; /// XML XPath search context
+    } *curFilePtr;
+
+    stack<xmlFileInfo*> fileStack;
+
+    xmlDocPtr validate_file(xmlFileInfo *fileInfo);
+
+    static string main_schema;
+    static string recipebook_schema;
     
-    /// parser context for validation
-    xmlRelaxNGParserCtxtPtr ctxt;
-
-    /// XPath context for searching
-    xmlXPathContextPtr xpathCtx; 
-
-    /// XPath object - results of searching
-    xmlXPathObjectPtr xpathObj; 
-
-    /// filename currently being processed
-    string xmlFilename;
-
+    
 public:
-
+    
     /// method to return a pointer to the only instance
     static InputXML* Instance();
-
-    void load_file_valid(const char* filename) {};
-    void load_file(const char* filename);
-
+    
+    void load_file(string filename);
+    void load_recipebook(string filename);
+    
     /// get nodes that match absolute path
-    xmlNodeSetPtr get_elements(const char* expression);
+    xmlNodeSetPtr get_xpath_elements(const char* expression)
+    {
+	return get_xpath_elements(curFilePtr->doc->children,expression);
+    };
+    const char* get_xpath_content(const char* expression)
+    {
+	return get_xpath_content(curFilePtr->doc->children,expression);
+    };
+
+
     /// get the contents of the single element with this expression
-    const char* get_child_content(xmlNodePtr cur,const char* expression);
+    const char* get_xpath_content(xmlNodePtr cur,const char* expression);
     /// get the name of the single element with this expression
-    const char* get_child_name(xmlNodePtr cur,const char* expression);
+    const char* get_xpath_name(xmlNodePtr cur,const char* expression);
     /// get nodes that match relative path
-    xmlNodeSetPtr get_elements(xmlNodePtr cur,const char* expression);
+    xmlNodeSetPtr get_xpath_elements(xmlNodePtr cur,const char* expression);
 
 };
 

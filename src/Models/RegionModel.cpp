@@ -8,7 +8,7 @@
 #include "InputXML.h"
 
 /* --------------------
- * all MODEL classes have these public members
+ * all MODEL classes have these members
  * --------------------
  */
 
@@ -17,14 +17,23 @@ int RegionModel::nextID = 0;
 
 RegionModel::RegionModel(xmlNodePtr cur)
 {
+    /** 
+     *  Generic initialization for Models
+     */
+
     ID = nextID++;
 
-    name = XMLinput->get_child_content(cur,"name");
+    name = XMLinput->get_xpath_content(cur,"name");
+
+    /** 
+     *  Specific initialization for RegionModels
+     */
 
     /// all regions require allowed facilities - possibly many
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
+
     string fac_name;
     Model* new_fac;
-    xmlNodeSetPtr nodes = XMLinput->get_elements(cur,"allowedfacility");
 
     for (int i=0;i<nodes->nodeNr;i++)
     {
@@ -32,12 +41,12 @@ RegionModel::RegionModel(xmlNodePtr cur)
 	new_fac = LI->getFacilityByName(fac_name);
 	if (NULL == new_fac)
 	    throw GenException("That allowed facility doesn't exist.");
-	allowedFacilities.push_back(new_fac);
+	allowedFacilities.insert(new_fac);
     }
-
+    
 }
 
 /* --------------------
- * all REGIONMODEL classes have these protected members
+ * all REGIONMODEL classes have these members
  * --------------------
  */
