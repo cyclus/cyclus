@@ -16,9 +16,9 @@ Material::Material(xmlNodePtr cur)
     
     string comp_type = XMLinput->get_xpath_content(cur,"basis");
     CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
-    double &read_total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
+    double &total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
 
-    read_total_comp = atof(XMLinput->get_xpath_content(cur,"total"));
+    total_comp = 1;
 
     xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 

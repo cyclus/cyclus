@@ -161,6 +161,7 @@
       <element name="model">
       <choice>
         <ref name="StubInst"/>
+        <ref name="DeployInst"/>
         <!-- insert ref to new InstModels here -->
       </choice>
       </element>
@@ -168,8 +169,16 @@
     </element>
   </define>
 
+
   <define name="StubInst">
     <element name="StubInst">
+      <text/>
+    </element>
+  </define>
+
+
+  <define name="DeployInst">
+    <element name="DeployInst">
 
       <oneOrMore>
       <ref name="deploy"/>
@@ -206,10 +215,6 @@
       </element>
 
       <element name="basis">
-        <text/>
-      </element>
-
-      <element name="total">
         <text/>
       </element>
 

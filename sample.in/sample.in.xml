@@ -56,10 +56,6 @@
       <name>OPD</name>
       <model>
         <StubInst>
-          <deploy>
-            <name>HWR</name>
-            <start>1</start>
-          </deploy>
         </StubInst>
       </model>
     </institution>
@@ -74,12 +70,12 @@
     <institution>
       <name>Exelon</name>
       <model>
-        <StubInst>
+        <DeployInst>
           <deploy>
             <name>LWR</name>
             <start>1</start>
           </deploy>
-        </StubInst>
+        </DeployInst>
       </model>
     </institution>
 </region>
@@ -87,7 +83,6 @@
 <recipe>
    <name>fresh_50gwd</name>
    <basis>mass</basis>
-   <total>1000</total>
    <isotope>
      <id>92235</id><comp>0.05</comp>
    </isotope>
@@ -102,7 +97,6 @@
 <recipe>
    <name>water</name>
    <basis>atom</basis>
-   <total>1e25</total>
    <isotope>
      <id>1001</id><comp>2</comp>
    </isotope>

@@ -1,19 +1,19 @@
-// StubInst.h
-#if !defined(_STUBINST_H)
-#define _STUBINST_H
+// Deployinst.h
+#if !defined(_DEPLOYINST_H)
+#define _DEPLOYINST_H
 #include <iostream>
 
 #include "InstModel.h"
 
 /**
- * The StubInst class inherits from the InstModel class and is dynamically
+ * The DeployInst class inherits from the InstModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This model will do nothing. This InstModel is intended as a skeleton to guide
- * the implementation of new InstModel models. 
+ * This model implements a simple institution model that deploys specific
+ * facilities as defined explicitly in the input file.
  *
  */
-class StubInst : public InstModel  
+class DeployInst : public InstModel  
 {
 /* --------------------
  * all MODEL classes have these members
@@ -21,16 +21,16 @@ class StubInst : public InstModel
  */
 
 public:
-    StubInst() {};
+    DeployInst() {};
     
-    StubInst(xmlNodePtr cur);
+    DeployInst(xmlNodePtr cur);
     
-    ~StubInst() {};
+    ~DeployInst() {};
    
     virtual void print();
 
     /// get model implementation name
-    virtual const string getModelName() { return "StubInst"; };
+    virtual const string getModelName() { return "DeployInst"; };
 
 /* ------------------- */ 
 
@@ -47,6 +47,7 @@ public:
  */
 
 protected:
+    map<int,Model*> deployment_map;
 
 /* ------------------- */ 
 
@@ -59,7 +60,7 @@ protected:
  */
 
 extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubInst(cur);
+    return new DeployInst(cur);
 }
 
 extern "C" void destruct(Model* p) {

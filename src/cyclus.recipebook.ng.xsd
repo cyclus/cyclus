@@ -25,10 +25,6 @@
         <text/>
       </element>
 
-      <element name="total">
-        <text/>
-      </element>
-
       <oneOrMore>
       <element name="isotope">
         <element name="id">
