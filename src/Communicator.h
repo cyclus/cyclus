@@ -5,7 +5,9 @@
 #define _COMMUNICATOR
 #include <iostream>
 #include <string>
+
 #include "Message.h"
+#include "Material.h"
 
 using namespace std;
 

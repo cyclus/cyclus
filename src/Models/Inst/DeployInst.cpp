@@ -23,10 +23,15 @@ DeployInst::DeployInst(xmlNodePtr cur)
 	Model* facility = LI->getFacilityByName(fac_name);
 
 	if (NULL == facility)
-	    throw GenException("That facility is not defined in this problem.");
+	    throw GenException("Facility '" 
+			       + fac_name 
+			       + "' is not defined in this problem.");
 
 	if (!((RegionModel*)region)->isAllowedFacility(facility))
-	    throw GenException("That is not an allowed facility for this region.");
+	    throw GenException("Facility '" 
+			       + fac_name 
+			       + "' is not an allowed facility for region '" 
+			       + region->getName() +"'.");
 
 	int start_month = atoi(XMLinput->get_xpath_content(deploy,"start"));
 

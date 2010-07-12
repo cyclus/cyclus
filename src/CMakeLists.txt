@@ -15,6 +15,8 @@ SET( CYCLUS_SRC
      Logician.cpp
      Material.cpp
      Commodity.cpp
+#     Message.cpp
+#     Communicator.cpp
      Utility/GenException.cpp 
      Models/Model.cpp 
         Models/StubModel.cpp 

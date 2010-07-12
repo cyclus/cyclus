@@ -27,24 +27,13 @@ mdl_ctor* Model::load(string model_type,string model_name)
     if (create_map.find(model_name) == create_map.end()) {
 	
 	void* model = dlopen(model_name.c_str(),RTLD_LAZY);
-	if (!model) {
-	    string error_string = "Unable to load model: ";
-	    error_string += dlerror();
-	    throw GenException(error_string);
-	}
+	if (!model) throw GenException((string)"Unable to load model: " + dlerror() );
 
 	new_model = (mdl_ctor*) dlsym(model,"construct");
-	if (!new_model) {
-	    string error_string = "Unable to load model create symbol: ";
-	    error_string += dlerror();
-	    throw GenException(error_string);
-	}
+	if (!new_model) throw GenException((string)"Unable to load model's create symbol: " + dlerror() );
+
 	mdl_dtor* del_model = (mdl_dtor*) dlsym(model,"destruct");
-	if (!del_model) {
-	    string error_string = "Unable to load model delete symbol: ";
-	    error_string += dlerror();
-	    throw GenException(error_string);
-	}
+	if (!del_model) throw GenException((string)"Unable to load model delete symbol: " + dlerror()  );
 	
 	create_map[model_name] = new_model;
 	destroy_map[model_name] = del_model;

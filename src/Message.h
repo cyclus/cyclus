@@ -4,7 +4,7 @@
 #if !defined(_MESSAGE)
 # define _MESSAGE
 
-#include "Material.h"
+#include "Commodity.h"
 
 class Communicator;
 

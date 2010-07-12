@@ -25,11 +25,9 @@ InputXML* InputXML::Instance() {
 
 xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 {
-    string err_msg;
-
     xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
     if (NULL == ctxt)
-	throw GenException("Failed to generate parser.");
+	throw GenException("Failed to generate parser from schema: " + *(fileInfo->schema));
 
     xmlRelaxNGPtr schema = xmlRelaxNGParse(ctxt);
 
@@ -37,13 +35,14 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 
     xmlDocPtr doc = xmlReadFile(fileInfo->filename.c_str(), NULL,0);
     if (NULL == doc) {
-	err_msg = "Failed to parse ";
-	err_msg += fileInfo->filename;
-	throw GenException(err_msg);
+	throw GenException("Failed to parse: " + fileInfo->filename);
     }
 
     if (xmlRelaxNGValidateDoc(vctxt,doc))
-	throw GenException("Invalid XML file.");
+	throw GenException("Invalid XML file; file: " 
+			   + fileInfo->filename 
+			   + " does not valiudate against schema " 
+			   + *(fileInfo->schema));
     else
 	cerr << "File " << fileInfo->filename << " is valid against schema "
 	     << *(fileInfo->schema) << endl;

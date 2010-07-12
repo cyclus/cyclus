@@ -40,7 +40,7 @@ RegionModel::RegionModel(xmlNodePtr cur)
 	fac_name = (const char*)nodes->nodeTab[i]->children->content;
 	new_fac = LI->getFacilityByName(fac_name);
 	if (NULL == new_fac)
-	    throw GenException("That allowed facility doesn't exist.");
+	    throw GenException("Facility " + fac_name + " is not defined in this simulation.");
 	allowedFacilities.insert(new_fac);
     }
     

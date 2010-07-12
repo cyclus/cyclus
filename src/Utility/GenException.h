@@ -3,9 +3,13 @@
 #if !defined(_GEN_EXCEPTION)
 #define _GEN_EXCEPTION
 #include <iostream>
+#include <sstream>
 #include <exception>
 #include <string>
+#include <vector>
+
 using namespace std;
+
 
 /**
  * An exception parent class for general exceptions.
@@ -19,6 +23,8 @@ protected:
 	 * The message associated with this exception.
 	 */
 	string myMessage;
+
+	static string prepend;
 
 public:
 

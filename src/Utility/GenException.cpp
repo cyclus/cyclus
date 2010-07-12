@@ -2,17 +2,23 @@
 // Implements the GenException class
 #include "GenException.h"
 
+string itoa(int i)    { stringstream out; out << i; return out.str(); };
+string dtoa(double d) { stringstream out; out << d; return out.str(); };
+
+
+
+string GenException::prepend = "cyclus exception";
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException()
 {
-	myMessage = "\ncyclus exception";
+	myMessage = prepend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException(string msg)
 {
-	string def = "\ncyclus exception: ";
-	myMessage = def + msg;
+	myMessage = prepend + ": " + msg;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* GenException::what() const throw()

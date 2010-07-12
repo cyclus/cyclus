@@ -38,7 +38,9 @@ FacilityModel::FacilityModel(xmlNodePtr cur)
 	commod_name = (const char*)nodes->nodeTab[i]->children->content;
 	new_commod = LI->getCommodity(commod_name);
 	if (NULL == new_commod)
-	    throw GenException("That input commodity doesn't exist.");
+	    throw GenException("Input commodity '" + commod_name 
+			       + "' does not exist for facility '" + getName() 
+			       + "'.");
 	in_commods.push_back(new_commod);
     }
 
@@ -49,7 +51,9 @@ FacilityModel::FacilityModel(xmlNodePtr cur)
 	commod_name = (const char*)nodes->nodeTab[i]->children->content;
 	new_commod = LI->getCommodity(commod_name);
 	if (NULL == new_commod)
-	    throw GenException("That output commodity doesn't exist.");
+	    throw GenException("Output commodity '" + commod_name 
+			       + "' does not exist for facility '" + getName() 
+			       + "'.");
 	out_commods.push_back(new_commod);
     }
 	

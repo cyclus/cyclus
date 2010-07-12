@@ -66,7 +66,7 @@ void Material::load_recipebook(string filename, string ns, string format)
     if ("xml" == format)
 	XMLinput->load_recipebook(filename);
     else
-	throw GenException("That is not a supported recipe list format.");
+	throw GenException(format + "is not a supported recipebook format.");
 
     cur_ns = ns_stack.top();
     ns_stack.pop();
