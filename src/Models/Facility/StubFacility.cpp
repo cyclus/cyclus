@@ -12,7 +12,43 @@ StubFacility::StubFacility(xmlNodePtr cur)
     : FacilityModel(cur) // assign ID & increment
 {
 
-    /// skip the rest for now
+    /** 
+     *  Allow a Stub Facility to have many input/output commodities
+     */
+
+    /// move XML pointer to current model
+    cur = XMLinput->get_xpath_element(cur,"model/StubFacility");
+
+    /// all facilities require commodities - possibly many
+    string commod_name;
+    Commodity* new_commod;
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
+
+    for (int i=0;i<nodes->nodeNr;i++)
+    {
+	commod_name = (const char*)nodes->nodeTab[i]->children->content;
+	new_commod = LI->getCommodity(commod_name);
+	if (NULL == new_commod)
+	    throw GenException("Input commodity '" + commod_name 
+			       + "' does not exist for facility '" + getName() 
+			       + "'.");
+	in_commods.push_back(new_commod);
+    }
+
+    nodes = XMLinput->get_xpath_elements(cur,"outcommodity");
+
+    for (int i=0;i<nodes->nodeNr;i++)
+    {
+	commod_name = (const char*)nodes->nodeTab[i]->children->content;
+	new_commod = LI->getCommodity(commod_name);
+	if (NULL == new_commod)
+	    throw GenException("Output commodity '" + commod_name 
+			       + "' does not exist for facility '" + getName() 
+			       + "'.");
+	out_commods.push_back(new_commod);
+    }
+	
+
 }
 
 

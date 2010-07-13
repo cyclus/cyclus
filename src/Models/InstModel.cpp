@@ -25,19 +25,20 @@ InstModel::InstModel(xmlNodePtr cur)
 
     name = XMLinput->get_xpath_content(cur,"name");
 
-    /// determine the parent from the XML input
-    string region_name = XMLinput->get_xpath_content(cur,"../name");
-    region = LI->getRegionByName(region_name);
-    
-    ((RegionModel*)region)->addInstitution(this);
-	
+    /** 
+     * Generic initialization for Communicators
+     */
+    commType = MarketComm;
 
     /** 
      *  Specific initialization for InstModels
      */
 
+   /// determine the parent from the XML input
+    string region_name = XMLinput->get_xpath_content(cur,"../name");
+    region = LI->getRegionByName(region_name);
     
-
-    
+    ((RegionModel*)region)->addInstitution(this);
+	
 
 }

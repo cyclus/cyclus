@@ -1,19 +1,20 @@
-// StubFacility.h
-#if !defined(_STUBFACILITY_H)
-#define _STUBFACILITY_H
+// NullFacility.h
+#if !defined(_NULLFACILITY_H)
+#define _NULLFACILITY_H
 #include <iostream>
+#include <queue>
 
 #include "FacilityModel.h"
 
 /**
- * The StubFacility class inherits from the FacilityModel class and is dynamically
+ * The NullFacility class inherits from the FacilityModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This facility will do nothing. This FacilityModel is intended as a skeleton to guide
- * the implementation of new FacilityModel models. 
+ * This facility model does very little.  New material is added to queue inventory
+ * and old material is removed from the same queue inventory.
  *
  */
-class StubFacility : public FacilityModel  
+class NullFacility : public FacilityModel  
 {
 /* --------------------
  * all MODEL classes have these members
@@ -21,16 +22,16 @@ class StubFacility : public FacilityModel
  */
 
 public:
-    StubFacility() {};
+    NullFacility() {};
     
-    StubFacility(xmlNodePtr cur);
+    NullFacility(xmlNodePtr cur);
 
-    ~StubFacility() {};
+    ~NullFacility() {};
 
     virtual void print();
 
     /// get model implementation name
-    virtual const string getModelName() { return "StubFacility"; };
+    virtual const string getModelName() { return "NullFacility"; };
 
 /* ------------------- */ 
 
@@ -40,7 +41,7 @@ public:
  */
 public:
     /// simply ignore incoming offers/requests
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+    virtual void receiveOfferRequest(OfferRequest* msg);
 
 /* -------------------- */
 
@@ -51,10 +52,10 @@ public:
 
 public:
     /// simply do nothing when sending a shipment
-    virtual void sendMaterial(Transaction trans, Communicator* receiver) {};
+    virtual void sendMaterial(Transaction trans, Communicator* receiver);
     
     /// simply do nothing when receiving a shipment
-    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
+    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
 
 /* ------------------- */ 
@@ -66,10 +67,18 @@ public:
 
 protected:
     /// all facilities must have at least one input commodity
-    vector<Commodity*> in_commods;
+    Commodity* in_commod;
 
     /// all facilities must have at least one output commodity
-    vector<Commodity*> out_commods;
+    Commodity* out_commod;
+
+    queue<Material*> active_inventory, used_inventory;
+
+    int residence_time;
+    int inventory_size;
+
+    Material* in_recipe;
+    Material* out_recipe;
 
 /* ------------------- */ 
 
@@ -81,7 +90,7 @@ protected:
  */
 
 extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubFacility(cur);
+    return new NullFacility(cur);
 }
 
 extern "C" void destruct(Model* p) {

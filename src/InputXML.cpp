@@ -1,6 +1,7 @@
 // InputXML.cpp
 // Implements XML input handling class
 #include <iostream>
+#include <sys/stat.h>
 
 #include "InputXML.h"
 
@@ -13,6 +14,39 @@ InputXML* InputXML::_instance = 0;
 string InputXML::main_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.ng.xsd";
 string InputXML::recipebook_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.recipebook.ng.xsd";
 
+/// implement a searchpath paradigm
+string searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)
+{
+  struct stat stat_info;
+  int stat_result = -1;
+  string::size_type begin = 0;
+  string::size_type end = 0;
+  string searchFilename;
+  
+  string searchPath = "./";  // initialize search path with current directory
+  
+  if (inputPath.size() > 0)
+      searchPath += ":" + inputPath;
+  if (envPath.size() > 0)
+      searchPath += ":" + envPath;
+  if (builtinPath.size() > 0)
+      searchPath += ":" + builtinPath + ":";
+
+  while (stat_result != 0 && begin < searchPath.length())
+  {
+      end = searchPath.find(":",begin);
+      string thisDir = searchPath.substr(begin,end-begin);
+      if (thisDir[thisDir.length()-1] != '/')
+	  thisDir += "/";
+      searchFilename = thisDir +  filename;
+      
+      stat_result = stat(searchFilename.c_str(),&stat_info);
+      begin = end + 1;
+  }
+  
+  return strdup(searchFilename.c_str());
+
+}
 
 InputXML* InputXML::Instance() {
 
@@ -124,6 +158,25 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression
 
     return xpathObj->nodesetval;
 
+
+    // when and how to cleanup memory allocation?
+
+}
+
+xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression)
+{
+
+    xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
+    xpathCtxt->node = cur;
+    
+    /* Evaluate xpath expression */
+    xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
+    if(xpathObj == NULL) {
+        fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
+        xmlXPathFreeContext(xpathCtxt); 
+    }
+
+    return xpathObj->nodesetval->nodeTab[0];
 
     // when and how to cleanup memory allocation?
 

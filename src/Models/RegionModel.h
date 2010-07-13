@@ -5,6 +5,7 @@
 #include <set>
 
 #include "Model.h"
+#include "Communicator.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ using namespace std;
  * This is all that is known externally about Regions
  */
 //-----------------------------------------------------------------------------
-class RegionModel : public Model
+class RegionModel : public Model, public Communicator
 {
 	
 /* --------------------
@@ -45,6 +46,20 @@ public:
 protected:
     /// Stores next available region ID
     static int nextID;
+/* ------------------- */ 
+
+
+/* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+public:
+    /// default RegionModel receiver has no default behavior
+    virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+
+protected:
+
+
 /* ------------------- */ 
 
 

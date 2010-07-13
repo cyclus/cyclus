@@ -1,19 +1,19 @@
-// StubRegion.h
-#if !defined(_STUBREGION_H)
-#define _STUBREGION_H
+// StubStubComm.h
+#if !defined(_STUBSTUBCOMM_H)
+#define _STUBSTUBCOMM_H
 #include <iostream>
 
-#include "RegionModel.h"
+#include "StubCommModel.h"
 
 /**
- * The StubRegion class inherits from the RegionModel class and is dynamically
+ * The StubStubComm class inherits from the StubModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This region will do nothing. This RegionModel is intended as a skeleton to guide
- * the implementation of new RegionModel models. 
+ * This model will do nothing. This StubCommModel is intended as a skeleton to guide
+ * the implementation of new StubComm models. 
  *
  */
-class StubRegion : public RegionModel  
+class StubStubComm : public StubCommModel  
 {
 /* --------------------
  * all MODEL classes have these members
@@ -21,16 +21,16 @@ class StubRegion : public RegionModel
  */
 
 public:
-    StubRegion() {};
+    StubStubComm() {};
     
-    StubRegion(xmlNodePtr cur);
+    StubStubComm(xmlNodePtr cur);
     
-    ~StubRegion() {};
+    ~StubStubComm() {};
    
     virtual void print();
 
     /// get model implementation name
-    virtual const string getModelName() { return "StubRegion"; };
+    virtual const string getModelName() { return "StubStubComm"; };
 
 /* ------------------- */ 
 
@@ -39,16 +39,17 @@ public:
  * --------------------
  */
 public:
-    /// default RegionModel receiver ignores incoming offers/requests
+    /// Simply ingore incoming messages
+    virtual void sendOfferRequest();
     virtual void receiveOfferRequest(OfferRequest* msg) {};
-    
-protected:
+    virtual void transmitOfferRequest(OfferRequest* msg) ;
 
+protected:
 
 /* -------------------- */
 
 /* --------------------
- * all REGIONMODEL classes have these members
+ * all STUBCOMMMODEL classes have these members
  * --------------------
  */
 
@@ -62,7 +63,7 @@ protected:
  */
 
 extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubRegion(cur);
+    return new StubStubComm(cur);
 }
 
 extern "C" void destruct(Model* p) {

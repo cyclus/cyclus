@@ -18,7 +18,9 @@ Material::Material(xmlNodePtr cur)
     CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
     double &total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
 
-    total_comp = 1;
+    units = XMLinput->get_xpath_content(cur,"unit");
+    
+    total_comp = atoi(XMLinput->get_xpath_content(cur,"total"));
 
     xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
@@ -36,6 +38,7 @@ Material::Material(xmlNodePtr cur)
     else
 	rationalize_A2M();
 }
+
 
 void Material::load_XML_recipes()
 {
@@ -127,11 +130,11 @@ void Material::rationalize_M2A()
 void Material::printComp(string header, CompMap comp_map)
 {
 
-    cout << header << endl;
+    cout << "\t" << header << endl;
     for (CompMap::iterator iso = comp_map.begin();
 	 iso != comp_map.end();
 	 iso++)
-	cout << (*iso).first << " : " <<  (*iso).second << endl;
+	cout << "\t" << (*iso).first << " : " <<  (*iso).second << endl;
     
 }
 

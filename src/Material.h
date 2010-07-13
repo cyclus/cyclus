@@ -51,9 +51,11 @@ public:
     /// standard verbose printer includes both an atom and mass composition output
     void print() {
         printComp("Atom composition:", atom_comp); 
-	cout << "Total atoms: " << total_atoms << endl;
+	cout << "\tTotal atoms: " << total_atoms 
+	    << " per " << units << endl;
 	printComp("Mass composition:", mass_comp);
-	cout << "Total mass: " << total_mass << endl;
+	cout << "\tTotal mass: " << total_mass 
+	     << " kg per " << units << endl;
         }
 
     /// verbose printer for a single type of composition
@@ -69,13 +71,14 @@ private:
     CompMap atom_comp, 
 	/// map isotope to mass
 	mass_comp;
-    /// total mass of this material object
+    /// total mass of this material object PER UNIT
     Mass total_mass;
-    /// total number of atoms in this material object
+    /// total number of atoms in this material object PER UNIT
     Atoms total_atoms;
     /// keep track of whether or not the mass & atom count is still consistent
     bool atomEqualsMass;
-    
+    /// units for this material
+    string units;
     
     /// get the atomic number of an isotope
     double getZ(Iso isotope) { return isotope/10/1000; };

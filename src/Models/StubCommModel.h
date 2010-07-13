@@ -1,12 +1,11 @@
-// InstModel.h
-#if !defined(_INSTMODEL_H)
-#define _INSTMODEL_H
+// StubCommModel.h
+#if !defined(_STUBCOMMMODEL_H)
+#define _STUBCOMMMODEL_H
 #include <string>
 
 
 #include "Model.h"
 #include "Communicator.h"
-#include "RegionModel.h"
 
 using namespace std;
 
@@ -15,28 +14,28 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
- * The InstModel class is the abstract class/interface used by all institution models
+ * The StubCommModel class is the abstract class/interface used by all stub models
  * 
- * This InstModel is intended as a skeleton to guide the implementation of new
+ * This StubCommModel is intended as a skeleton to guide the implementation of new
  * Models.
  */
 //-----------------------------------------------------------------------------
-class InstModel : public Model, public Communicator
+class StubCommModel : public Model, public Communicator
 {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 public:
-    /// Default constructor for InstModel Class
-    InstModel() { ID = nextID++; };
+    /// Default constructor for StubCommModel Class
+    StubCommModel() { ID = nextID++; };
 
     /// constructor that loads common elements from XML
-    InstModel(xmlNodePtr cur);
+    StubCommModel(xmlNodePtr cur);
 		
-    /// ever model should be destructable
-    virtual ~InstModel() {};
+    /// every model should be destructable
+    virtual ~StubCommModel() {};
     
     // every model should be able to print a verbose description
     virtual void print() = 0;
@@ -45,7 +44,7 @@ public:
     virtual const string getModelName() = 0;
 
 protected: 
-    /// Stores the next available institution ID
+    /// Stores the next available stub ID
     static int nextID;
 /* ------------------- */ 
 
@@ -55,23 +54,19 @@ protected:
  * --------------------
  */
 public:
-    /// default InstModel receiver has no default behavior
+    /// No default STUBCOMMMODEL message receiver.
     virtual void receiveOfferRequest(OfferRequest* msg) = 0;
 
 protected:
 
 
 /* ------------------- */ 
+
+
 /* --------------------
- * all INSTMODEL classes have these members
+ * all STUBCOMMMODEL classes have these members
  * --------------------
  */
-
-public:
-    void setRegion(Model* my_region) { region = my_region; };
-
-protected:
-    Model* region;
 
 /* ------------------- */ 
     

@@ -54,6 +54,7 @@
       <element name="model">
       <choice>
         <ref name="StubMarket"/>
+        <ref name="GreedyMarket"/>
         <!-- insert ref to new MarketModels  here -->
       </choice>
       </element>
@@ -63,6 +64,12 @@
 
   <define name="StubMarket">
      <element name="StubMarket">
+        <text />
+     </element>
+  </define>
+
+  <define name="GreedyMarket">
+     <element name="GreedyMarket">
         <text />
      </element>
   </define>
@@ -79,21 +86,10 @@
         <text/>
       </element>
 
-      <oneOrMore>
-      <element name="incommodity">
-          <text/>
-      </element>
-      </oneOrMore>
-
-      <oneOrMore>
-      <element name="outcommodity">
-         <text/>
-      </element>
-      </oneOrMore>
-
       <element name="model">
       <choice>
         <ref name="StubFacility"/>
+        <ref name="NullFacility"/>
         <!-- insert ref to new FacilityModels here -->
       </choice>
       </element>
@@ -102,9 +98,34 @@
   </define>
 
   <define name="StubFacility">
-     <element name="StubFacility">
-        <text/>
+     <element name="StubFacility"> 
+      <oneOrMore>
+        <ref name="incommodity"/>
+      </oneOrMore>
+
+      <oneOrMore>
+        <ref name="outcommodity"/>
+      </oneOrMore>
      </element>
+  </define>
+
+  <define name="NullFacility">
+     <element name="NullFacility"> 
+        <ref name="incommodity"/>
+        <ref name="outcommodity"/>
+     </element>
+  </define>
+
+  <define name="incommodity">
+      <element name="incommodity">
+          <text/>
+      </element>
+  </define>
+
+  <define name="outcommodity">
+      <element name="outcommodity">
+         <text/>
+      </element>
   </define>
 
   <!-- insert new FacilityModel parameter sets here -->
@@ -215,6 +236,14 @@
       </element>
 
       <element name="basis">
+        <text/>
+      </element>
+
+      <element name="unit">
+        <text/>
+      </element>
+
+      <element name="total">
         <text/>
       </element>
 

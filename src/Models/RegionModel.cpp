@@ -26,6 +26,11 @@ RegionModel::RegionModel(xmlNodePtr cur)
     name = XMLinput->get_xpath_content(cur,"name");
 
     /** 
+     * Generic initialization for Communicators
+     */
+    commType = MarketComm;
+
+    /** 
      *  Specific initialization for RegionModels
      */
 

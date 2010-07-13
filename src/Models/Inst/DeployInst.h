@@ -35,6 +35,19 @@ public:
 /* ------------------- */ 
 
 /* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+public:
+    /// simply ignore incoming offers/requests.
+    virtual void receiveOfferRequest(OfferRequest* msg) {};
+
+protected:
+
+
+/* -------------------- */
+
+/* --------------------
  * all INSTMODEL classes have these members
  * --------------------
  */

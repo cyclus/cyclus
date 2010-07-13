@@ -35,9 +35,25 @@ public:
 /* -------------------- */
 
 /* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+
+/* -------------------- */
+
+/* --------------------
  * all MARKETMODEL classes have these members
  * --------------------
  */
+    /// Resolve requests with offers
+    /**
+     *  Primary funcation of a Market is to resolve the set of 
+     *  requests with the set of offers.
+     *
+     *  In this stub - do nothing!
+     */
+    virtual void resolve() {};
+
 
 /* -------------------- */
 

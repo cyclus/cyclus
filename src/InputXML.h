@@ -52,13 +52,17 @@ public:
     void load_recipebook(string filename);
     
     /// get nodes that match absolute path
+    const char* get_xpath_content(const char* expression)
+    {
+	return get_xpath_content(curFilePtr->doc->children,expression);
+    };
     xmlNodeSetPtr get_xpath_elements(const char* expression)
     {
 	return get_xpath_elements(curFilePtr->doc->children,expression);
     };
-    const char* get_xpath_content(const char* expression)
+    xmlNodePtr get_xpath_element(const char* expression)
     {
-	return get_xpath_content(curFilePtr->doc->children,expression);
+	return get_xpath_element(curFilePtr->doc->children,expression);
     };
 
 
@@ -68,6 +72,8 @@ public:
     const char* get_xpath_name(xmlNodePtr cur,const char* expression);
     /// get nodes that match relative path
     xmlNodeSetPtr get_xpath_elements(xmlNodePtr cur,const char* expression);
+    /// get a single node that matches the relative path
+    xmlNodePtr get_xpath_element(xmlNodePtr cur, const char* expression);
 
 };
 

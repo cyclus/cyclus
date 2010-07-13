@@ -25,6 +25,11 @@ MarketModel::MarketModel(xmlNodePtr cur)
 
     name = XMLinput->get_xpath_content(cur,"name");
 
+    /** 
+     * Generic initialization for Communicators
+     */
+    commType = MarketComm;
+
      /** 
      *  Specific initialization for MarketModels
      */
@@ -42,6 +47,24 @@ MarketModel::MarketModel(xmlNodePtr cur)
 
 
 /* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+
+
+/* --------------------
  * all MARKETMODEL classes have these members
  * --------------------
  */
+
+void MarketModel::executeOrderQueue()
+{
+
+    while( orders.size() > 0)
+    {
+	(*orders.begin())->execute();
+	orders.pop_front();
+    }
+
+
+}

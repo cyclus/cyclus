@@ -1,102 +1,46 @@
 // Message.cpp
-// Implements the Message class.
+// Implements the Message classes.
 
 #include "Message.h"
+
 #include "Communicator.h"
+#include "FacilityModel.h"
+
 #include "GenException.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(MessageDir dir, Commodity* commod, double amount, double price,
-		 Communicator* toSend, Communicator* toReceive, int ID) 
+OfferRequest::OfferRequest(Communicator* sender)
 {
-	myCommod = commod;
-	myAmount = amount; 
-	myPrice = price;
-	sender = toSend;
-	receiver = toReceive;
-	myDir = dir;
-	facID = ID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message* Message::clone() const
-{
-	return new Message(myDir, myCommod, myAmount, myPrice, sender, receiver,
-										 facID);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getSender() const {
-	return sender;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getReceiver() const {
-return receiver;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MessageDir Message::getDir() const {
-	return myDir;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Message::getCommod() const {
-	return myCommod;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::getAmount() const {
-	return myAmount;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setAmount(double newAmount) 
-{
-	myAmount = newAmount;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::getPrice() const {
-	return myPrice;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Message::getFacID() const
-{
-	return facID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::reverseDirection()
-{
-	if (down == myDir)
-		myDir = up; 
-	else
-		myDir = down;
-		// Speaking of "getting up" or "getting down," check out
-		// "National Funk Congress Deadlocked On Get Up/Get Down Issue,"
-		// The Onion (1999, October 27), 35(39).
-}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Message::unEnumerateDir(){
-	string toRet;
-	if (up == myDir)
-		toRet = "up";
-	else if (down == myDir)
-		toRet = "down";
-	else
-		throw GenException("Attempted to send a message neither up nor down.");
+    msgPath.sndr = sender;
 
-	return toRet;
+    msgPath.rcvr 
+	= msgPath.mkt 
+	= msgPath.reg 
+	= msgPath.inst 
+	= msgPath.fac = NULL;
+
+    switch (sender->getCommType())
+    {
+	case FacilityComm:
+	    msgPath.fac = sender;
+	    break;
+	case InstComm:
+	    msgPath.inst = sender;
+	    break;
+	case RegionComm:
+	    msgPath.reg = sender;
+	    break;
+	case MarketComm:
+	    msgPath.mkt = sender;
+	    break;
+    }
+
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ostream& operator<<(ostream &os, const Message& m)
+    
+void Shipment::execute()
 {
-	string commod = (m.myCommod)->getName();
-	os << "Message" << endl 
-		 << "... = sender = " << m.sender->getName() << endl
-		 << "... = myCommodity = " <<  commod.c_str() << endl
-		 << "... = myAmount = " << m.myAmount << endl;
-
-	return os;
+    if (shipPath.shipper->getCommType() == FacilityComm)
+	((FacilityModel*)shipPath.shipper)->sendMaterial(trans,shipPath.receiver);
+    else
+	throw GenException("Only FaciliyModels can send material.");
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ostream& operator<<(ostream &os, const Message* m)
-{
-	os << *m;
-	return os;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

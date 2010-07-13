@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Model.h"
+#include "Communicator.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ class Commodity;
  * This is all that is known externally about facilities
 */
 //-----------------------------------------------------------------------------
-class FacilityModel : public Model
+class FacilityModel : public Model, public Communicator
 {
 /* --------------------
  * all MODEL classes have these members
@@ -47,17 +48,43 @@ protected:
     static int nextID;
 /* ------------------- */ 
 
+/* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+public:
+    /**
+     *  There is no default FacilityModel receiver 
+     *
+     *  Each derived class must implement an offer/request receiver
+     */ 
+    virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+
+protected:
+
+
+/* ------------------- */ 
+
 
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-protected:
-    /// all facilities must have at least one input commodity
-    vector<Commodity*> in_commods;
+public:
+    /**
+     *  There is no default FacilityModel shipment sender
+     *
+     *  Each derived class must implement a shipment sender
+     */ 
+    virtual void sendMaterial(Transaction trans, Communicator* receiver) = 0;
+    /**
+     *  There is no default FacilityModel shipment receiver 
+     *
+     *  Each derived class must implement an shipment receiver
+     */ 
+    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) = 0;
+    
 
-    /// all facilities must have at least one output commodity
-    vector<Commodity*> out_commods;
 /* ------------------- */ 
     
 };

@@ -6,6 +6,8 @@
 <recipe>
    <name>fresh_50gwd</name>
    <basis>mass</basis>
+   <unit>assembly</unit>
+   <total>1000</total>
    <isotope>
      <id>92235</id><comp>0.05</comp>
    </isotope>
@@ -20,6 +22,8 @@
 <recipe>
    <name>spent_50gwd</name>
    <basis>mass</basis>
+   <unit>assembly</unit>
+   <total>1000</total>
    <isotope>
      <id>92235</id><comp>0.01</comp>
    </isotope>

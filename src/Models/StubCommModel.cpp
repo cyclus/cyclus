@@ -1,20 +1,22 @@
-// FacilityModel.cpp
-// Implements the FacilityModel class
+// StubCommModel.cpp
+// Implements the StubCommModel class
 
-#include "FacilityModel.h"
-#include "InputXML.h"
+#include "StubCommModel.h"
+
+
 #include "GenException.h"
 #include "Logician.h"
+#include "InputXML.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
-// Initialize the FacilityModel nextID to zero.
-int FacilityModel::nextID = 0;
+// Initialize the StubCommModel nextID to zero.
+int StubCommModel::nextID = 0;
 
-FacilityModel::FacilityModel(xmlNodePtr cur)
+StubCommModel::StubCommModel(xmlNodePtr cur)
 {
     /** 
      *  Generic initialization for Models
@@ -29,12 +31,8 @@ FacilityModel::FacilityModel(xmlNodePtr cur)
      */
     commType = MarketComm;
 
+    /** 
+     *  Specific initialization for StubCommModels
+     */
+
 }
-
-
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
-
-
