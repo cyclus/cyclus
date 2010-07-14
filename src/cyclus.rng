@@ -6,6 +6,8 @@
 
   <element name="simulation">
 
+    <interleave>
+
     <oneOrMore>
     <ref name="commodity"/>
     </oneOrMore>
@@ -31,6 +33,9 @@
     <ref name="recipebook"/>
     </choice>
     </oneOrMore>
+    
+    </interleave>
+
   </element>
 
   <!-- top level for a RECIPEBOOK input -->
