@@ -45,7 +45,7 @@ public:
 
     ~Material() {};
 
-    static void load_XML_recipes();
+    static void load_recipes();
     static void setNS(string new_ns) { cur_ns = new_ns; };
     
     /// standard verbose printer includes both an atom and mass composition output

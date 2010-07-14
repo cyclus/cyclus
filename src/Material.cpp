@@ -42,7 +42,7 @@ Material::Material(xmlNodePtr cur)
 }
 
 
-void Material::load_XML_recipes()
+void Material::load_recipes()
 {
 
     /// load recipes from file

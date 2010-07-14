@@ -50,6 +50,7 @@ public:
     
     void load_file(string filename);
     void load_recipebook(string filename);
+    void load_facilitycatalog(string filename);
     
     /// get nodes that match absolute path
     const char* get_xpath_content(const char* expression)

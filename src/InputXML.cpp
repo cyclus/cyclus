@@ -11,8 +11,7 @@
 
 InputXML* InputXML::_instance = 0;
 
-string InputXML::main_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.ng.xsd";
-string InputXML::recipebook_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.recipebook.ng.xsd";
+string InputXML::main_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.rng";
 
 /// implement a searchpath paradigm
 string searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)
@@ -106,7 +105,7 @@ void InputXML::load_file(string filename)
     
     Commodity::load_commodities();
 
-    Material::load_XML_recipes();
+    Material::load_recipes();
     
     Model::load_markets();
     Model::load_facilities();
@@ -128,11 +127,11 @@ void InputXML::load_recipebook(string filename)
     xmlFileInfo &recipebook = *curFilePtr;
 
     recipebook.filename = filename;
-    recipebook.schema = &recipebook_schema;
+    recipebook.schema = &main_schema;
     recipebook.doc = validate_file(&recipebook);
     recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
-    Material::load_XML_recipes();
+    Material::load_recipes();
 
     // get rid of recipebook, freeing memory
     delete curFilePtr;
@@ -143,6 +142,32 @@ void InputXML::load_recipebook(string filename)
 
 
 }
+
+void InputXML::load_facilitycatalog(string filename)
+{
+    /// store parent file info
+    fileStack.push(curFilePtr);
+
+    curFilePtr = new xmlFileInfo;
+    xmlFileInfo &facilitycatalog = *curFilePtr;
+
+    facilitycatalog.filename = filename;
+    facilitycatalog.schema = &main_schema;
+    facilitycatalog.doc = validate_file(&facilitycatalog);
+    facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
+
+    /// load here???
+
+    // get rid of facilitycatalog, freeing memory
+    delete curFilePtr;
+
+    /// restore parent file info
+    curFilePtr = fileStack.top();
+    fileStack.pop();
+
+
+}
+
 
 xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression)
 {
