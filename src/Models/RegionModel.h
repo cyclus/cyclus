@@ -29,19 +29,18 @@ class RegionModel : public Model, public Communicator
  */
 public:
     /// Default constructor for RegionModel Class
-    RegionModel() { ID = nextID++; };
-
-    /// Constructor based on XML node
-    RegionModel(xmlNodePtr cur);
+    RegionModel() { ID = nextID++; model_type="Region"; commType=RegionComm; };
 
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};
     
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur);
+    // every model needs a method to copy one object to another
+    virtual void copy(RegionModel* src);
+
     // every model should be able to print a verbose description
-    virtual void print() = 0;
-    
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    virtual void print();
 
 protected:
     /// Stores next available region ID
@@ -54,8 +53,8 @@ protected:
  * --------------------
  */
 public:
-    /// default RegionModel receiver has no default behavior
-    virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+    /// default RegionModel receiver is to ignore messages
+    virtual void receiveOfferRequest(OfferRequest* msg) {};
 
 protected:
 

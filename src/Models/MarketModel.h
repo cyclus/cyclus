@@ -7,7 +7,6 @@
 
 #include "Model.h"
 #include "Communicator.h"
-#include "GenException.h"
 
 using namespace std;
 
@@ -31,19 +30,18 @@ class MarketModel : public Model, public Communicator
 
 public:
     /// Default constructor for the MarketModel Class
-    MarketModel() { ID = nextID++; };
+    MarketModel() { ID = nextID++; model_type="Market"; commType=MarketComm; };
     
-    /// constructor that loads common elements from XML
-    MarketModel(xmlNodePtr cur);
-
     /// MarketModels should not be indestructible.
     virtual ~MarketModel() {};
     
-    // every model should be able to print a verbose description
-    virtual void print() = 0;
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur);
+    // every model needs a method to copy one object to another
+    virtual void copy(MarketModel* src);
 
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    // every model should be able to print a verbose description
+    virtual void print();
 
 protected:
     /// Stores next available market ID

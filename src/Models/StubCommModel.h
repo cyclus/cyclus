@@ -29,19 +29,19 @@ class StubCommModel : public Model, public Communicator
 
 public:
     /// Default constructor for StubCommModel Class
-    StubCommModel() { ID = nextID++; };
+    StubCommModel() { ID = nextID++; model_type="StubComm"; commType=StubComm; };
 
-    /// constructor that loads common elements from XML
-    StubCommModel(xmlNodePtr cur);
-		
     /// every model should be destructable
     virtual ~StubCommModel() {};
     
-    // every model should be able to print a verbose description
-    virtual void print() = 0;
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur)     { Model::init(cur); } ;
+    // every model needs a method to copy one object to another
+    virtual void copy(StubCommModel* src) { Model::copy(src); 
+                                            Communicator:copy(src); };
 
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    // every model should be able to print a verbose description
+    virtual void print()              { Model::print(); cout << endl; } ;
 
 protected: 
     /// Stores the next available stub ID

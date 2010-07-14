@@ -12,7 +12,7 @@ using namespace std;
 
 class Model;
 
-typedef Model* mdl_ctor(xmlNodePtr);
+typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
 
 
@@ -36,9 +36,18 @@ public:
     /// Create a model for use in the simulation
     static Model* create(string model_type, xmlNodePtr cur);
 
+    /// Create a new mode object based on an existing one
+    static Model* create(Model* src);
+
     /// Destroy a model cleanly
     static void* destroy(Model* model);
     
+    /// every model needs an init method
+    virtual void init(xmlNodePtr cur);
+
+    /// every model needs a copy method
+    virtual void copy(Model* src);
+
     /// Constructor for the Model Class
     Model() {};
 
@@ -52,10 +61,10 @@ public:
     const int getSN() const { return ID; };
 
     /// get model implementation name
-    virtual const string getModelName() = 0;
+    const string getModelName() { return modelImpl; };
 
     /// every model should be able to print a verbose description
-    virtual void print() = 0;
+    virtual void print();
 
     static void load_markets();
     static void load_facilities();
@@ -65,6 +74,12 @@ public:
 protected:
     /// every instance of a model should have a name
     string name;
+
+    /// every instance of a model should know its type
+    string model_type;
+
+    /// every instance of a model should know its implementation
+    string modelImpl;
 
     /// every instance of a model will have a serialized ID
     int ID;

@@ -1,19 +1,19 @@
-// StubFacility.h
-#if !defined(_STUBFACILITY_H)
-#define _STUBFACILITY_H
+// SourceFacility.h
+#if !defined(_SOURCEFACILITY_H)
+#define _SOURCEFACILITY_H
 #include <iostream>
 
 #include "FacilityModel.h"
 
 /**
- * The StubFacility class inherits from the FacilityModel class and is dynamically
+ * The SourceFacility class inherits from the FacilityModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This facility will do nothing. This FacilityModel is intended as a skeleton to guide
- * the implementation of new FacilityModel models. 
+ * This FacilityModel will provide a simple source of some capacity (possibly infinite)
+ * of some Commodity/Recipe
  *
  */
-class StubFacility : public FacilityModel  
+class SourceFacility : public FacilityModel  
 {
 /* --------------------
  * all MODEL classes have these members
@@ -21,15 +21,15 @@ class StubFacility : public FacilityModel
  */
 
 public:
-    StubFacility() {};
+    SourceFacility() {};
     
-    ~StubFacility() {};
+    ~SourceFacility() {};
 
     // different ways to populate an object after creation
     /// initialize an object from XML input
     virtual void init(xmlNodePtr cur);
     /// initialize an object by copying another
-    virtual void copy(StubFacility* src);
+    virtual void copy(SourceFacility* src);
 
     virtual void print();
 
@@ -66,11 +66,20 @@ public:
  */
 
 protected:
-    /// all facilities must have at least one input commodity
-    vector<Commodity*> in_commods;
+    /// this facility has only one output commodity
+    Commodity* out_commod;
+    
+    /// this facility has a specific recipe for its output
+    Material* recipe;
+    
+    /// this facility has a specific capcity
+    /**
+     *  The capacity is defined in terms of the number of units of the recipe
+     *  that can be provided each time step.  A very large number can be
+     *  provided to represent infinte capacity.
+     */
+    double capacity;
 
-    /// all facilities must have at least one output commodity
-    vector<Commodity*> out_commods;
 
 /* ------------------- */ 
 
@@ -82,7 +91,7 @@ protected:
  */
 
 extern "C" Model* construct() {
-    return new StubFacility();
+    return new SourceFacility();
 }
 
 extern "C" void destruct(Model* p) {

@@ -29,19 +29,18 @@ class FacilityModel : public Model, public Communicator
 
 public:
     /// Default constructor for FacilityModel Class
-    FacilityModel() { ID = nextID++; };
+    FacilityModel() { ID = nextID++; model_type="Facility"; commType=FacilityComm; };
 
-    /// Constructor based on XML node
-    FacilityModel(xmlNodePtr cur);
-		
     /// ever model should be destructable
     virtual ~FacilityModel() {};
     
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur);
+    // every model needs a method to copy one object to another
+    virtual void copy(FacilityModel* src);
+
     // every model should be able to print a verbose description
-    virtual void print() = 0;
-    
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    virtual void print()              { Model::print(); };
 
 protected: 
     /// Stores the next available facility ID
@@ -70,7 +69,15 @@ protected:
  * all FACILITYMODEL classes have these members
  * --------------------
  */
+protected:
+    /// each instance of a facility needs a name
+    string fac_name;
+
 public:
+
+    void setFacName(string facName) { fac_name = facName; };
+    string getFacName() { return fac_name; };
+
     /**
      *  There is no default FacilityModel shipment sender
      *

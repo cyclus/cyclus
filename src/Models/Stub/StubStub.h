@@ -23,14 +23,15 @@ class StubStub : public StubModel
 public:
     StubStub() {};
     
-    StubStub(xmlNodePtr cur);
-    
     ~StubStub() {};
    
-    virtual void print();
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur) { StubModel::init(cur); };
+    /// initialize an object by copying another
+    virtual void copy(StubStub* src)  { StubModel::copy(src); } ;
 
-    /// get model implementation name
-    virtual const string getModelName() { return "StubStub"; };
+    virtual void print()              { StubModel::print();   } ;
 
 /* ------------------- */ 
 
@@ -48,8 +49,8 @@ public:
  * --------------------
  */
 
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubStub(cur);
+extern "C" Model* construct() {
+    return new StubStub();
 }
 
 extern "C" void destruct(Model* p) {

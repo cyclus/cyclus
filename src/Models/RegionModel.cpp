@@ -3,10 +3,6 @@
 
 #include "RegionModel.h"
 
-#include "GenException.h"
-#include "Logician.h"
-#include "InputXML.h"
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -15,20 +11,14 @@
 // Initialize the RegionModel nextID to zero.
 int RegionModel::nextID = 0;
 
-RegionModel::RegionModel(xmlNodePtr cur)
+#include "GenException.h"
+#include "Logician.h"
+#include "InputXML.h"
+
+void RegionModel::init(xmlNodePtr cur)
 {
-    /** 
-     *  Generic initialization for Models
-     */
 
-    ID = nextID++;
-
-    name = XMLinput->get_xpath_content(cur,"name");
-
-    /** 
-     * Generic initialization for Communicators
-     */
-    commType = MarketComm;
+    Model::init(cur);
 
     /** 
      *  Specific initialization for RegionModels
@@ -39,7 +29,7 @@ RegionModel::RegionModel(xmlNodePtr cur)
 
     string fac_name;
     Model* new_fac;
-
+    
     for (int i=0;i<nodes->nodeNr;i++)
     {
 	fac_name = (const char*)nodes->nodeTab[i]->children->content;
@@ -48,6 +38,43 @@ RegionModel::RegionModel(xmlNodePtr cur)
 	    throw GenException("Facility " + fac_name + " is not defined in this simulation.");
 	allowedFacilities.insert(new_fac);
     }
+    
+}
+
+void RegionModel::copy(RegionModel* src)
+{
+    Model::copy(src);
+    Communicator::copy(src);
+
+    /** 
+     *  Specific initialization for RegionModels
+     */
+
+    allowedFacilities = src->allowedFacilities;
+    
+    // don't copy institutions!
+
+}
+    
+
+void RegionModel::print()
+{
+
+    Model::print();
+
+    cout << "allows facilities " ;
+
+    for(set<Model*>::iterator fac=allowedFacilities.begin();
+	fac != allowedFacilities.end();
+	fac++)
+	cout << (fac == allowedFacilities.begin() ? "{" : ", " )
+	     << (*fac)->getName();
+
+    cout << "} and has the following institutions:" << endl;
+    for(vector<Model*>::iterator inst=institutions.begin();
+	inst != institutions.end();
+	inst++)
+	(*inst)->print();
     
 }
 

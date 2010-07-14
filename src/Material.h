@@ -61,6 +61,9 @@ public:
     /// verbose printer for a single type of composition
     void printComp(string header, CompMap comp_map);
 
+    string getName() { return recipeName; };
+    string getUnits() { return units; };
+
 private:
     static string cur_ns;
     static stack<string> ns_stack;
@@ -79,6 +82,8 @@ private:
     bool atomEqualsMass;
     /// units for this material
     string units;
+    /// name of this recipe
+    string recipeName;
     
     /// get the atomic number of an isotope
     double getZ(Iso isotope) { return isotope/10/1000; };

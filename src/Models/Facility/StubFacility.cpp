@@ -8,9 +8,9 @@
 #include "GenException.h"
 #include "InputXML.h"
 
-StubFacility::StubFacility(xmlNodePtr cur)
-    : FacilityModel(cur) // assign ID & increment
+void StubFacility::init(xmlNodePtr cur)
 {
+    FacilityModel::init(cur);
 
     /** 
      *  Allow a Stub Facility to have many input/output commodities
@@ -51,23 +51,33 @@ StubFacility::StubFacility(xmlNodePtr cur)
 
 }
 
+void StubFacility::copy(StubFacility* src)
+{
+    FacilityModel::copy(src);
+
+    in_commods = src->in_commods;
+    out_commods = src->out_commods;	
+}
 
 void StubFacility::print() 
 { 
-    cout << "This is a StubFacility model with name " << name 
-	 << " and ID: " << ID << " that converts commodities {";
+    FacilityModel::print();
+
+    cout << "converts commodities ";
     for (vector<Commodity*>::iterator commod=in_commods.begin();
- 	 commod != in_commods.end();)
+ 	 commod != in_commods.end();
+	 commod++)
     {
+	cout << (commod == in_commods.begin() ? "{" : ", " );
 	cout << (*commod)->getName();
-	cout << (++commod != in_commods.end() ? "," : "" );
     }
-    cout << "} into commodities {";
+    cout << "} into commodities ";
     for (vector<Commodity*>::iterator commod=out_commods.begin();
-	 commod != out_commods.end();)
+	 commod != out_commods.end();
+	 commod++)
     {
+	cout << (commod == out_commods.begin() ? "{" : ", " );
 	cout << (*commod)->getName();
-	cout << (++commod != out_commods.end() ? "," : "" );
     }
     cout << "}" << endl;
     

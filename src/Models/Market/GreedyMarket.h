@@ -25,14 +25,15 @@ class GreedyMarket : public MarketModel
 public:
     GreedyMarket() {};
     
-    GreedyMarket(xmlNodePtr cur);
-    
     ~GreedyMarket() {};
     
-    virtual void print();
-    
-    /// get model implementation name
-    virtual const string getModelName() { return "GreedyMarket"; };
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur)    { MarketModel::init(cur); };
+    /// initialize an object by copying another
+    virtual void copy(GreedyMarket* src) { MarketModel::copy(src); } ;
+
+    virtual void print()                 { MarketModel::print();   } ;
 
 /* -------------------- */
 
@@ -80,8 +81,8 @@ private:
  * all MODEL classes have these members
  * --------------------
  */
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new GreedyMarket(cur);
+extern "C" Model* construct() {
+    return new GreedyMarket();
 }
 
 extern "C" void destruct(Model* p) {

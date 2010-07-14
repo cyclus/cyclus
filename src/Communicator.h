@@ -25,6 +25,8 @@ class Communicator {
     
 protected:
 
+    virtual void copy(Communicator* src) { commType = src->commType; };
+
     CommunicatorType commType;
 
 public:

@@ -90,6 +90,7 @@
       <choice>
         <ref name="StubFacility"/>
         <ref name="NullFacility"/>
+        <ref name="SourceFacility"/>
         <!-- insert ref to new FacilityModels here -->
       </choice>
       </element>
@@ -113,6 +114,22 @@
      <element name="NullFacility"> 
         <ref name="incommodity"/>
         <ref name="outcommodity"/>
+     </element>
+  </define>
+
+  <define name="SourceFacility">
+     <element name="SourceFacility"> 
+
+        <ref name="outcommodity"/>
+	
+        <element name="capacity">
+          <text/>
+	</element>
+
+	<element name="recipe">
+          <text/>
+        </element>
+
      </element>
   </define>
 
@@ -182,6 +199,7 @@
       <element name="model">
       <choice>
         <ref name="StubInst"/>
+        <ref name="FixedInst"/>
         <ref name="DeployInst"/>
         <!-- insert ref to new InstModels here -->
       </choice>
@@ -197,6 +215,22 @@
     </element>
   </define>
 
+  <define name="FixedInst">
+    <element name="FixedInst">
+
+      <oneOrMore>
+        <element name="facility">
+          <element name="type">
+            <text/>
+          </element>
+          <element name="name">
+            <text/>
+          </element>
+        </element>
+      </oneOrMore>       
+
+    </element>
+  </define>
 
   <define name="DeployInst">
     <element name="DeployInst">
@@ -208,8 +242,13 @@
     </element>
   </define>
 
+
   <define name="deploy">
     <element name="deploy">
+
+      <element name="type">
+        <text/>
+      </element>   
 
       <element name="name">
         <text/>

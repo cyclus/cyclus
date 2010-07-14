@@ -23,14 +23,15 @@ class DeployInst : public InstModel
 public:
     DeployInst() {};
     
-    DeployInst(xmlNodePtr cur);
-    
     ~DeployInst() {};
    
-    virtual void print();
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur);
+    /// initialize an object by copying another
+    virtual void copy(DeployInst* src);
 
-    /// get model implementation name
-    virtual const string getModelName() { return "DeployInst"; };
+    virtual void print();
 
 /* ------------------- */ 
 
@@ -72,8 +73,8 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new DeployInst(cur);
+extern "C" Model* construct() {
+    return new DeployInst();
 }
 
 extern "C" void destruct(Model* p) {

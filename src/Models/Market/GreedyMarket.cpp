@@ -9,21 +9,6 @@
 #include "InputXML.h"
 
 
-GreedyMarket::GreedyMarket(xmlNodePtr cur)
-    : MarketModel(cur) // assign ID & increment
-{
-
-    /// process parameters
-    
-}
-
-void GreedyMarket::print() 
-{ 
-    cout << "This is a GreedyMarket model with name " << name 
-	 << " and ID: " << ID << " and trading commodity " 
-	 << commodity->getName() << endl;
-}
-
 void GreedyMarket::receiveOfferRequest(OfferRequest *msg)
 {
 

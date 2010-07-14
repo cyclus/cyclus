@@ -23,14 +23,15 @@ class StubStubComm : public StubCommModel
 public:
     StubStubComm() {};
     
-    StubStubComm(xmlNodePtr cur);
-    
     ~StubStubComm() {};
    
-    virtual void print();
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur)    { StubCommModel::init(cur); };
+    /// initialize an object by copying another
+    virtual void copy(StubStubComm* src) { StubCommModel::copy(src); } ;
 
-    /// get model implementation name
-    virtual const string getModelName() { return "StubStubComm"; };
+    virtual void print()                 { StubCommModel::print();   } ;
 
 /* ------------------- */ 
 
@@ -39,10 +40,11 @@ public:
  * --------------------
  */
 public:
+    /// never generate any messages
+    virtual void sendOfferRequest() {};
     /// Simply ingore incoming messages
-    virtual void sendOfferRequest();
     virtual void receiveOfferRequest(OfferRequest* msg) {};
-    virtual void transmitOfferRequest(OfferRequest* msg) ;
+
 
 protected:
 
@@ -62,8 +64,8 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubStubComm(cur);
+extern "C" Model* construct() {
+    return new StubStubComm();
 }
 
 extern "C" void destruct(Model* p) {

@@ -23,14 +23,15 @@ class StubRegion : public RegionModel
 public:
     StubRegion() {};
     
-    StubRegion(xmlNodePtr cur);
-    
     ~StubRegion() {};
    
-    virtual void print();
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur)  { RegionModel::init(cur); };
+    /// initialize an object by copying another
+    virtual void copy(StubRegion* src) { RegionModel::copy(src); } ;
 
-    /// get model implementation name
-    virtual const string getModelName() { return "StubRegion"; };
+    virtual void print()               { RegionModel::print();   } ;
 
 /* ------------------- */ 
 
@@ -39,8 +40,6 @@ public:
  * --------------------
  */
 public:
-    /// default RegionModel receiver ignores incoming offers/requests
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
     
 protected:
 
@@ -61,8 +60,8 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubRegion(cur);
+extern "C" Model* construct() {
+    return new StubRegion();
 }
 
 extern "C" void destruct(Model* p) {

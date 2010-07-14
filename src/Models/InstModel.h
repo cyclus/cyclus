@@ -30,19 +30,18 @@ class InstModel : public Model, public Communicator
  */
 public:
     /// Default constructor for InstModel Class
-    InstModel() { ID = nextID++; };
+    InstModel() { ID = nextID++; model_type="Inst"; commType=InstComm; };
 
-    /// constructor that loads common elements from XML
-    InstModel(xmlNodePtr cur);
-		
     /// ever model should be destructable
     virtual ~InstModel() {};
     
-    // every model should be able to print a verbose description
-    virtual void print() = 0;
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur);
+    // every model needs a method to copy one object to another
+    virtual void copy(InstModel* src);
 
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    // every model should be able to print a verbose description
+    virtual void print();
 
 protected: 
     /// Stores the next available institution ID

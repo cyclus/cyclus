@@ -24,14 +24,15 @@ class NullFacility : public FacilityModel
 public:
     NullFacility() {};
     
-    NullFacility(xmlNodePtr cur);
-
     ~NullFacility() {};
 
-    virtual void print();
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur);
+    /// initialize an object by copying another
+    virtual void copy(NullFacility* src);
 
-    /// get model implementation name
-    virtual const string getModelName() { return "NullFacility"; };
+    virtual void print();
 
 /* ------------------- */ 
 
@@ -89,8 +90,8 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new NullFacility(cur);
+extern "C" Model* construct() {
+    return new NullFacility();
 }
 
 extern "C" void destruct(Model* p) {

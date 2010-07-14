@@ -105,13 +105,14 @@ void InputXML::load_file(string filename)
     }
     
     Commodity::load_commodities();
+
+    Material::load_XML_recipes();
     
     Model::load_markets();
     Model::load_facilities();
     Model::load_regions();
     Model::load_institutions();
 
-    Material::load_XML_recipes();
 
     // delete/free mem
 

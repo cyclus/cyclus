@@ -3,10 +3,6 @@
 
 #include "MarketModel.h"
 
-#include "InputXML.h"
-#include "GenException.h"
-#include "Logician.h"
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -15,22 +11,15 @@
 // Initializes the MarketModel nextID to 0.
 int MarketModel::nextID = 0;
 
-MarketModel::MarketModel(xmlNodePtr cur)
+#include "InputXML.h"
+#include "GenException.h"
+#include "Logician.h"
+
+void MarketModel::init(xmlNodePtr cur)
 {
+    Model::init(cur);
+    
     /** 
-     *  Generic initialization for Models
-     */
-
-    ID = nextID++;
-
-    name = XMLinput->get_xpath_content(cur,"name");
-
-    /** 
-     * Generic initialization for Communicators
-     */
-    commType = MarketComm;
-
-     /** 
      *  Specific initialization for MarketModels
      */
 
@@ -41,9 +30,32 @@ MarketModel::MarketModel(xmlNodePtr cur)
 	throw GenException("Market commodity '" + commod_name 
 			   + "' does not exist for market '" + getName() 
 			   + "'.");
-
+    
     commodity->setMarket(this);
 }
+
+void MarketModel::copy(MarketModel* src)
+{
+    Model::copy(src);
+    Communicator::copy(src);
+
+     /** 
+     *  Specific initialization for MarketModels
+     */
+
+    commodity = src->commodity;
+
+}
+
+
+void MarketModel::print()              
+{ 
+    Model::print(); 
+
+    cout << "trades commodity " 
+	 << commodity->getName() << endl;
+
+} ;
 
 
 /* --------------------

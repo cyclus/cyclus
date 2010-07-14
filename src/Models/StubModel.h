@@ -6,6 +6,7 @@
 
 #include "Model.h"
 
+
 using namespace std;
 
 
@@ -28,19 +29,18 @@ class StubModel : public Model
 
 public:
     /// Default constructor for StubModel Class
-    StubModel() { ID = nextID++; };
+    StubModel() { ID = nextID++; model_type="Stub"; };
 
-    /// constructor that loads common elements from XML
-    StubModel(xmlNodePtr cur);
-		
     /// every model should be destructable
     virtual ~StubModel() {};
     
-    // every model should be able to print a verbose description
-    virtual void print() = 0;
+    // every model needs a method to initialize from XML
+    virtual void init(xmlNodePtr cur) { Model::init(cur); } ;
+    // every model needs a method to copy one object to another
+    virtual void copy(StubModel* src) { Model::copy(src); } ;
 
-    /// get model implementation name
-    virtual const string getModelName() = 0;
+    // every model should be able to print a verbose description
+    virtual void print() { Model::print(); cout << endl; } ;
 
 protected: 
     /// Stores the next available stub ID

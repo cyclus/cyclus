@@ -14,6 +14,8 @@ stack<string> Material::ns_stack;
 Material::Material(xmlNodePtr cur)
 {
     
+    recipeName = XMLinput->get_xpath_content(cur,"name");
+
     string comp_type = XMLinput->get_xpath_content(cur,"basis");
     CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
     double &total_comp = ( "atom" != comp_type ? total_mass : total_atoms);

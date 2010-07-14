@@ -23,14 +23,15 @@ class StubMarket : public MarketModel
 public:
     StubMarket() {};
     
-    StubMarket(xmlNodePtr cur);
-    
     ~StubMarket() {};
     
-    virtual void print();
-    
-    /// get model implementation name
-    virtual const string getModelName() { return "StubMarket"; };
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur) { MarketModel::init(cur); };
+    /// initialize an object by copying another
+    virtual void copy(StubMarket* src){ MarketModel::copy(src); } ;
+
+    virtual void print()              { MarketModel::print();   } ;
 
 /* -------------------- */
 
@@ -70,8 +71,8 @@ public:
  * all MODEL classes have these members
  * --------------------
  */
-extern "C" Model* construct(xmlNodePtr cur) {
-    return new StubMarket(cur);
+extern "C" Model* construct() {
+    return new StubMarket();
 }
 
 extern "C" void destruct(Model* p) {

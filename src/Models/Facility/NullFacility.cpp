@@ -8,9 +8,10 @@
 #include "GenException.h"
 #include "InputXML.h"
 
-NullFacility::NullFacility(xmlNodePtr cur)
-    : FacilityModel(cur) // assign ID & increment
+void NullFacility::init(xmlNodePtr cur)
 {
+
+    FacilityModel::init(cur);
 
     in_commod = out_commod = NULL;
 
@@ -31,17 +32,28 @@ NullFacility::NullFacility(xmlNodePtr cur)
     commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
     out_commod = LI->getCommodity(commod_name);
     if (NULL == out_commod)
-	throw GenException("Input commodity '" + commod_name 
+	throw GenException("Output commodity '" + commod_name 
 			   + "' does not exist for facility '" + getName() 
 			   + "'.");
     
 }
 
+void NullFacility::copy(NullFacility* src)
+{
+
+    FacilityModel::copy(src);
+
+    in_commod = src->in_commod;
+    out_commod = src->out_commod;
+
+}
+
 
 void NullFacility::print() 
 { 
-    cout << "This is a NullFacility model with name " << name 
-	 << " and ID: " << ID << " that converts commodity {"
+    FacilityModel::print();
+
+    cout << "converts commodity {"
 	 << in_commod->getName()
 	 << "} into commodity {"
 	 << out_commod->getName()

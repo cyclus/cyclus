@@ -2,9 +2,6 @@
 // Implements the FacilityModel class
 
 #include "FacilityModel.h"
-#include "InputXML.h"
-#include "GenException.h"
-#include "Logician.h"
 
 /* --------------------
  * all MODEL classes have these members
@@ -14,27 +11,27 @@
 // Initialize the FacilityModel nextID to zero.
 int FacilityModel::nextID = 0;
 
-FacilityModel::FacilityModel(xmlNodePtr cur)
-{
-    /** 
-     *  Generic initialization for Models
-     */
-
-    ID = nextID++;
-
-    name = XMLinput->get_xpath_content(cur,"name");
-
-    /** 
-     * Generic initialization for Communicators
-     */
-    commType = MarketComm;
-
-}
-
-
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
 
+void FacilityModel::init(xmlNodePtr cur)
+{
+    Model::init(cur);
 
+    /** 
+     *  Specific initialization for FacilityModels
+     */
+
+    fac_name = "";
+} 
+
+void FacilityModel::copy(FacilityModel* src)
+{ 
+    Model::copy(src); 
+    Communicator::copy(src); 
+
+    // don't copy fac_name to new instance
+    fac_name = "";
+};
