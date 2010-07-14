@@ -1,5 +1,9 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0">
   <start>
+  <choice>
+
+  <!-- top level for a SIMULATION input -->
+
   <element name="simulation">
 
     <oneOrMore>
@@ -11,7 +15,10 @@
     </oneOrMore>
       
     <oneOrMore>
+    <choice>
     <ref name="facility"/>
+    <ref name="facilitycatalog"/>
+    </choice>
     </oneOrMore>
 
     <oneOrMore>
@@ -25,6 +32,36 @@
     </choice>
     </oneOrMore>
   </element>
+
+  <!-- top level for a RECIPEBOOK input -->
+
+  <element name="recipebook">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="recipe"/>
+    </oneOrMore>
+
+  </element>
+
+  <!-- top level for a FACILITYCATALOG input -->
+
+  <element name="facilitycatalog">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="facility"/>
+    </oneOrMore>
+
+  </element>
+
+  </choice>
   </start>
 
   <!-- begin section for commodities -->
@@ -98,6 +135,24 @@
     </element>
   </define>
 
+  <define name="facilitycatalog">
+    <element name="facilitycatalog">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="namespace">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+
   <define name="StubFacility">
      <element name="StubFacility"> 
       <oneOrMore>
@@ -144,6 +199,8 @@
          <text/>
       </element>
   </define>
+
+
 
   <!-- insert new FacilityModel parameter sets here -->
 
