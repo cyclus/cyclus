@@ -136,7 +136,7 @@ void Model::load_facilitycatalog(string filename, string ns, string format)
     else
 	throw GenException(format + "is not a supported facilitycatalog format.");
 
-    XMLinput->stripCurNS(ns);
+    XMLinput->stripCurNS();
 }
 
 void Model::load_regions()

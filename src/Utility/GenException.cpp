@@ -1,5 +1,7 @@
 // GenException.cpp
 // Implements the GenException class
+#include <sstream>
+
 #include "GenException.h"
 
 string itoa(int i)    { stringstream out; out << i; return out.str(); };

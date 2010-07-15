@@ -69,7 +69,7 @@ void Material::load_recipebook(string filename, string ns, string format)
     else
 	throw GenException(format + "is not a supported recipebook format.");
 
-    XMLinput->stripCurNS(ns);
+    XMLinput->stripCurNS();
 }
 
 

@@ -93,7 +93,7 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 
 }
 
-void InputXML::stripCurNS(string ns)
+void InputXML::stripCurNS()
 {
 
     if ("" == cur_ns)

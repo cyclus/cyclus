@@ -3,25 +3,12 @@
 
 #include "Communicator.h"
 
-/**
- * Default implementation of sendOfferRequest.
- *
- * Generates a new, empty OfferRequest and sends it up the chain.
- *
- */
 void Communicator::sendOfferRequest()
 {
     OfferRequest *msg = new OfferRequest(this);
-    
+
     transmitOfferRequest(msg);
 }
-
-/**
- * Default implementation of receiveOfferRequest.
- *
- * ignores OfferRequest!
- *
- */
 
 void Communicator::transmitOfferRequest(OfferRequest* msg)
 {
