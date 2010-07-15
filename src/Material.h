@@ -46,7 +46,6 @@ public:
     ~Material() {};
 
     static void load_recipes();
-    static void setNS(string new_ns) { cur_ns = new_ns; };
     
     /// standard verbose printer includes both an atom and mass composition output
     void print() {
@@ -65,8 +64,6 @@ public:
     string getUnits() { return units; };
 
 private:
-    static string cur_ns;
-    static stack<string> ns_stack;
 
     static void load_recipebook(string filename, string ns, string format);
 

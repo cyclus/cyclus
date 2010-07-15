@@ -4,23 +4,28 @@
 	<commodity>
 		<name>uo2</name>
 	</commodity>
+
+        <market>
+	        <name>uo2market</name>
+                <mktcommodity>uo2</mktcommodity>
+	        <model>
+		        <StubMarket/>
+	        </model>
+        </market>
+
 	<commodity>
 		<name>snf</name>
 	</commodity>
+
 	<market>
-		<name>uo2market</name>
-		<mktcommodity>uo2</mktcommodity>
-		<model>
-			<StubMarket/>
-		</model>
-	</market>
-	<market>
-		<name>snfmarket</name>
-		<mktcommodity>snf</mktcommodity>
-		<model>
-			<GreedyMarket/>
-		</model>
-	</market>
+	        <name>snfmarket</name>
+                <mktcommodity>snf</mktcommodity>
+	        <model>
+		        <GreedyMarket/>
+	        </model>
+        </market>
+
+
 	<facility>
 		<name>LWR</name>
 		<model>
@@ -32,6 +37,7 @@
 			</StubFacility>
 		</model>
 	</facility>
+
 	<facility>
 		<name>HWR</name>
 		<model>
@@ -41,6 +47,7 @@
 			</NullFacility>
 		</model>
 	</facility>
+
 	<facility>
 		<name>FuelFab</name>
 		<model>
@@ -51,9 +58,17 @@
 			</SourceFacility>
 		</model>
 	</facility>
+
+	<facilitycatalog>
+		<filename>sample.facilitycatalog.xml</filename>
+		<namespace>sample</namespace>
+		<format>xml</format>
+	</facilitycatalog>
+
 	<region>
 		<name>canada</name>
 		<allowedfacility>HWR</allowedfacility>
+		<allowedfacility>sample:HWR</allowedfacility>
 		<model>
 			<StubRegion/>
 		</model>
@@ -64,6 +79,7 @@
 			</model>
 		</institution>
 	</region>
+
 	<region>
 		<name>USA</name>
 		<allowedfacility>LWR</allowedfacility>

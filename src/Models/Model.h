@@ -68,6 +68,7 @@ public:
 
     static void load_markets();
     static void load_facilities();
+    static void load_facilitycatalog(string filename, string ns, string format);
     static void load_regions();
     static void load_institutions();
 

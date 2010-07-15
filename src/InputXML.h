@@ -23,7 +23,7 @@ private:
     static InputXML* _instance;
 
     /// default constructor
-    InputXML() {};
+    InputXML();
 
     /// default destructor
     ~InputXML() {};
@@ -36,6 +36,7 @@ private:
     } *curFilePtr;
 
     stack<xmlFileInfo*> fileStack;
+    string cur_ns;
 
     xmlDocPtr validate_file(xmlFileInfo *fileInfo);
 
@@ -48,6 +49,10 @@ public:
     /// method to return a pointer to the only instance
     static InputXML* Instance();
     
+    string getCurNS() { return cur_ns; };
+    void extendCurNS(string ns) { cur_ns += ns + ":"; };
+    void stripCurNS(string ns);
+
     void load_file(string filename);
     void load_recipebook(string filename);
     void load_facilitycatalog(string filename);

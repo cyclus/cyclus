@@ -47,6 +47,13 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
 
 }
 
+InputXML::InputXML()
+{
+
+    cur_ns = "";
+
+}
+
 InputXML* InputXML::Instance() {
 
     if (0 == _instance)
@@ -85,6 +92,26 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
     return doc;
 
 }
+
+void InputXML::stripCurNS(string ns)
+{
+
+    if ("" == cur_ns)
+	throw GenException("Unable to strip tokens from an empty namespace.");
+
+    string::iterator pos = cur_ns.end();
+    cur_ns.erase(--pos);
+
+    size_t delimeter_pos = cur_ns.rfind(':');
+
+    if (string::npos != delimeter_pos)
+	cur_ns.erase(delimeter_pos);
+    else
+	cur_ns.erase();
+
+
+}
+
 
 
 void InputXML::load_file(string filename)
@@ -157,6 +184,7 @@ void InputXML::load_facilitycatalog(string filename)
     facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
 
     /// load here???
+    Model::load_facilities();
 
     // get rid of facilitycatalog, freeing memory
     delete curFilePtr;

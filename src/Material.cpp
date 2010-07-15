@@ -8,8 +8,6 @@ using namespace std;
 #include "Logician.h"
 #include "GenException.h"
 
-string Material::cur_ns = "";
-stack<string> Material::ns_stack;
 
 Material::Material(xmlNodePtr cur)
 {
@@ -49,11 +47,11 @@ void Material::load_recipes()
     xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
     
     for (int i=0;i<nodes->nodeNr;i++)
-	LI->addRecipe(cur_ns + XMLinput->get_xpath_content(nodes->nodeTab[i], "name"),
+	LI->addRecipe(XMLinput->getCurNS() + XMLinput->get_xpath_content(nodes->nodeTab[i], "name"),
 		      new Material(nodes->nodeTab[i]));
 
     /// load recipes from databases
-    nodes = XMLinput->get_xpath_elements("/simulation/recipebook");
+    nodes = XMLinput->get_xpath_elements("/*/recipebook");
 
     for (int i=0;i<nodes->nodeNr;i++)
 	load_recipebook(XMLinput->get_xpath_content(nodes->nodeTab[i], "filename"),
@@ -64,17 +62,14 @@ void Material::load_recipes()
 
 void Material::load_recipebook(string filename, string ns, string format)
 {
-    ns_stack.push(cur_ns);
-
-    cur_ns = ns + ":";
+    XMLinput->extendCurNS(ns);
 
     if ("xml" == format)
 	XMLinput->load_recipebook(filename);
     else
 	throw GenException(format + "is not a supported recipebook format.");
 
-    cur_ns = ns_stack.top();
-    ns_stack.pop();
+    XMLinput->stripCurNS(ns);
 }
 
 
