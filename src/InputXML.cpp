@@ -1,6 +1,7 @@
 // InputXML.cpp
 // Implements XML input handling class
 #include <iostream>
+#include <string.h>
 #include <sys/stat.h>
 
 #include "InputXML.h"
@@ -10,8 +11,6 @@
 #include "Model.h"
 
 InputXML* InputXML::_instance = 0;
-
-string InputXML::main_schema = "file:///media/CYCLUS-DEV/cyclus/gc-full/branches/paul-branch/src/cyclus.rng";
 
 /// implement a searchpath paradigm
 string searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)
@@ -42,10 +41,11 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
       stat_result = stat(searchFilename.c_str(),&stat_info);
       begin = end + 1;
   }
-  
+
   return strdup(searchFilename.c_str());
 
 }
+string InputXML::main_schema = searchPathForFile("cyclus.rng", "../src/","","");
 
 InputXML::InputXML()
 {
@@ -65,27 +65,27 @@ InputXML* InputXML::Instance() {
 
 xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 {
-    xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
-    if (NULL == ctxt)
-	throw GenException("Failed to generate parser from schema: " + *(fileInfo->schema));
+	xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
+	if (NULL == ctxt)
+		throw GenException("Failed to generate parser from schema: " + *(fileInfo->schema));
 
     xmlRelaxNGPtr schema = xmlRelaxNGParse(ctxt);
 
     xmlRelaxNGValidCtxtPtr vctxt = xmlRelaxNGNewValidCtxt(schema);
 
     xmlDocPtr doc = xmlReadFile(fileInfo->filename.c_str(), NULL,0);
-    if (NULL == doc) {
-	throw GenException("Failed to parse: " + fileInfo->filename);
-    }
+		if (NULL == doc) {
+			throw GenException("Failed to parse: " + fileInfo->filename);
+		}
 
-    if (xmlRelaxNGValidateDoc(vctxt,doc))
-	throw GenException("Invalid XML file; file: " 
-			   + fileInfo->filename 
-			   + " does not valiudate against schema " 
-			   + *(fileInfo->schema));
-    else
-	cerr << "File " << fileInfo->filename << " is valid against schema "
-	     << *(fileInfo->schema) << endl;
+		if (xmlRelaxNGValidateDoc(vctxt,doc))
+			throw GenException("Invalid XML file; file: "    
+					+ fileInfo->filename 
+					+ " does not valiudate against schema " 
+					+ *(fileInfo->schema));
+		else
+			cerr << "File " << fileInfo->filename << " is valid against schema "
+				<< *(fileInfo->schema) << endl;
 
     /// free up some data
 
