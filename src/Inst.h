@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Communicator.h"
+// #include "Communicator.h"
 
 using namespace std;
 
@@ -15,7 +15,8 @@ class Facility;
 /**
  * An Institution class for agencies, corporations, and the like.
  */
-class Inst : public Communicator
+class Inst 
+//: public Communicator
 {
 private:
 	
@@ -80,49 +81,7 @@ public:
 	 * @param dur this simulation's duration
 	 */
 	Inst(string s, int SN, Region* reg, double phi, int dur);
-
-	/**
-	 * (Recursively) deletes this Institution and its Facilities.
-	 */
-	virtual ~Inst();
 	
-	/**
-	 * Returns this Institution's name.
-	 *
-	 * @return the name
-	 */
-	virtual const string getName() const;
-
-	/**
-	 * Returns this Institution's ID number.
-	 *
-	 * @return the ID number
-	 */
-	virtual int getSN() const;
-
-	/**
-	 * Receives the given Message, handling it if the Message is 
-	 * addressed to this Inst and forwarding it on appropriately if not.
-	 *
-	 * @param theMessage the Message being received
-	 */
-	virtual void receiveMessage(Message* theMessage);
-
-	/**
-	 * Returns a pointer to the Facility with the given ID number, if it's owned 
-	 * by this Inst. Throws a FacException otherwise.
-	 *
-	 * @param SN the Facility in question's ID number
-	 * @return the Facility in question
-	 */
-	Facility* getFac(int SN);
-	
-	/**
-	 * Returns a pointer to this Institution's Region.
-	 *
-	 * @return the pointer to the Region
-	 */
-	Region* getRegion();
 	/**
 	 * Builds a new Facility of type specified by facType.
 	 *
@@ -138,6 +97,36 @@ public:
 	 * @param f the Facility to add
 	 */
 	void addFac(Facility* f);
+
+	/**
+	 * Returns a pointer to the Facility with the given ID number, if it's owned 
+	 * by this Inst. Throws a FacException otherwise.
+	 *
+	 * @param SN the Facility in question's ID number
+	 * @return the Facility in question
+	 */
+	Facility* getFac(int SN);
+	
+	/**
+	 * Returns this Institution's name.
+	 *
+	 * @return the name
+	 */
+	virtual const string getName() const;
+
+	/**
+	 * Returns this Institution's ID number.
+	 *
+	 * @return the ID number
+	 */
+	virtual int getSN() const;
+	
+	/**
+	 * Returns a pointer to this Institution's Region.
+	 *
+	 * @return the pointer to the Region
+	 */
+	Region* getRegion();
 	
 	/**
 	 * Sets the given build information for the given FacType and SubType 
@@ -169,7 +158,22 @@ public:
 	 * @return the fixed charge rate log
 	 */
 	vector<double>* getChargeRateLog();
-	
+
+/**
+	 * Receives the given Message, handling it if the Message is 
+	 * addressed to this Inst and forwarding it on appropriately if not.
+	 *
+	 * @param theMessage the Message being received
+	 * 
+	 *
+	virtual void receiveMessage(Message* theMessage);
+**/
+
+	/**
+	 * (Recursively) deletes this Institution and its Facilities.
+	 */
+	virtual ~Inst();
+
 	/**
 	 * Performs any final tasks that must be completed at the end of the 
 	 * simulation, including passing the word to the Facs to do the same.

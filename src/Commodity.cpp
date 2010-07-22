@@ -1,61 +1,33 @@
 // Commodity.cpp
 // Implements the Commodity Class
 #include <string>
-#include "Logician.h"
+
 #include "Commodity.h"
+
+#include "Logician.h"
 #include "GenException.h"
+#include "InputXML.h"
 
-
-// Initialize the commodity ID serialization
+/**
+ *  Initialize the Commodity ID serialization
+ */
 int Commodity::nextID = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity(string name, Market* mkt, bool fiss, bool sep){
-	myID = this->getNextID();
-	myName = name;
-  fissile = fiss;
-	sepMat = sep;
-	myMarket = mkt;
-	myMarket->addCommod(this);
-};
+Commodity::Commodity(xmlNodePtr cur)
+{
+    ID = nextID++;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::~Commodity(){
-	// Delete any commodity data members that remain even when 
-	// we go out of Commodity scope... unless you want to write 
-	// that info to the database.
+    name = XMLinput->get_xpath_content(cur,"name");
+
+    market = NULL;
+
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const string Commodity::getName() const
+void Commodity::load_commodities()
 {
-	return myName;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Commodity::getSN() const
-{
-	return myID;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Commodity::isFissile() const
-{
-	return fissile;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Commodity::isSepMat() const
-{
-	return sepMat;
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/commodity");
+    
+    for (int i=0;i<nodes->nodeNr;i++)
+	LI->addCommodity(new Commodity(nodes->nodeTab[i]));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Commodity::getNextID()
-{
-	nextID++;
-	return nextID;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Market* Commodity::getMarket()
-{
-	return myMarket;
-}

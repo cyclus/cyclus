@@ -4,12 +4,30 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR})
+INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}")
+INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}/Models")
+INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}/Utility")
 
 # Add any new source files to this list.
-SET( CYCLUS_SRC App.cpp Commodity.cpp Communicator.cpp Facility.cpp 
-FacFactory.cpp GenException.cpp InputDB.cpp Inst.cpp LMatrix.cpp Logician.cpp
-Market.cpp Material.cpp Message.cpp MktFactory.cpp NetFlowMkt.cpp NullFac.cpp 
-RecipeFac.cpp Region.cpp SinkFac.cpp SourceFac.cpp Timer.cpp UniformTaylor.cpp)
+SET( CYCLUS_SRC 
+     App.cpp 
+     InputXML.cpp
+     Logician.cpp
+     Material.cpp
+     Commodity.cpp
+     Message.cpp
+     Communicator.cpp
+     Utility/GenException.cpp 
+     Models/Model.cpp 
+        Models/StubModel.cpp 
+        Models/StubCommModel.cpp 
+        Models/MarketModel.cpp 
+        Models/FacilityModel.cpp 
+	Models/RegionModel.cpp
+	Models/InstModel.cpp)
+
+# Add subdirs and build for the models
+ADD_SUBDIRECTORY(Models)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -25,3 +43,4 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
+TARGET_LINK_LIBRARIES( cyclus dl xml2)

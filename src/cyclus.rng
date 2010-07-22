@@ -1,0 +1,387 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+  <choice>
+
+  <!-- top level for a SIMULATION input -->
+
+  <element name="simulation">
+
+    <interleave>
+
+    <oneOrMore>
+    <ref name="commodity"/>
+    </oneOrMore>
+  
+    <oneOrMore>
+    <ref name="market"/>
+    </oneOrMore>
+      
+    <oneOrMore>
+    <choice>
+    <ref name="facility"/>
+    <ref name="facilitycatalog"/>
+    </choice>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="region"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <choice>
+    <ref name="recipe"/>
+    <ref name="recipebook"/>
+    </choice>
+    </oneOrMore>
+    
+    </interleave>
+
+  </element>
+
+  <!-- top level for a RECIPEBOOK input -->
+
+  <element name="recipebook">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="recipe"/>
+    </oneOrMore>
+
+  </element>
+
+  <!-- top level for a FACILITYCATALOG input -->
+
+  <element name="facilitycatalog">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="facility"/>
+    </oneOrMore>
+
+  </element>
+
+  </choice>
+  </start>
+
+  <!-- begin section for commodities -->
+  <define name="commodity">
+    <element name="commodity">
+
+      <element name="name">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+  <!-- end section for commodities -->
+
+  <!-- begin section for markets-->
+  <define name="market">
+    <element name="market">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="mktcommodity">
+        <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        <ref name="StubMarket"/>
+        <ref name="GreedyMarket"/>
+        <!-- insert ref to new MarketModels  here -->
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="StubMarket">
+     <element name="StubMarket">
+        <text />
+     </element>
+  </define>
+
+  <define name="GreedyMarket">
+     <element name="GreedyMarket">
+        <text />
+     </element>
+  </define>
+
+  <!-- insert new MarketModel parameter sets here -->
+
+  <!-- end section for markets-->
+
+  <!-- begin section for facilities -->
+  <define name="facility">
+    <element name="facility">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        <ref name="StubFacility"/>
+        <ref name="NullFacility"/>
+        <ref name="SourceFacility"/>
+        <!-- insert ref to new FacilityModels here -->
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="facilitycatalog">
+    <element name="facilitycatalog">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="namespace">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="StubFacility">
+     <element name="StubFacility"> 
+      <oneOrMore>
+        <ref name="incommodity"/>
+      </oneOrMore>
+
+      <oneOrMore>
+        <ref name="outcommodity"/>
+      </oneOrMore>
+     </element>
+  </define>
+
+  <define name="NullFacility">
+     <element name="NullFacility"> 
+        <ref name="incommodity"/>
+        <ref name="outcommodity"/>
+     </element>
+  </define>
+
+  <define name="SourceFacility">
+     <element name="SourceFacility"> 
+
+        <ref name="outcommodity"/>
+	
+        <element name="capacity">
+          <text/>
+	</element>
+
+	<element name="recipe">
+          <text/>
+        </element>
+
+     </element>
+  </define>
+
+  <define name="incommodity">
+      <element name="incommodity">
+          <text/>
+      </element>
+  </define>
+
+  <define name="outcommodity">
+      <element name="outcommodity">
+         <text/>
+      </element>
+  </define>
+
+
+
+  <!-- insert new FacilityModel parameter sets here -->
+
+  <!-- end section for facilities -->
+
+
+  <!-- begin section for regions -->
+  <define name="region">
+    <element name="region">
+
+      <element name="name">
+         <text/>
+      </element>
+
+      <oneOrMore>
+      <element name="allowedfacility">
+          <text/>
+      </element>
+      </oneOrMore>
+
+      <element name="model">
+      <choice>
+        <ref name="StubRegion"/>
+        <!-- insert ref to new RegionModels here -->
+      </choice>
+      </element>
+
+      <oneOrMore>
+      <ref name="institution" />
+      </oneOrMore>
+
+    </element>
+  </define>
+
+  <define name="StubRegion">
+     <element name="StubRegion">
+        <text/>
+     </element>
+  </define>
+
+  <!-- insert new RegionModel parameter sets here -->
+
+  <!-- end section for regions -->
+
+  <!-- begin section for institutions -->
+  <define name="institution">
+    <element name="institution">
+
+      <element name="name">
+         <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        <ref name="StubInst"/>
+        <ref name="FixedInst"/>
+        <ref name="DeployInst"/>
+        <!-- insert ref to new InstModels here -->
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+
+  <define name="StubInst">
+    <element name="StubInst">
+      <text/>
+    </element>
+  </define>
+
+  <define name="FixedInst">
+    <element name="FixedInst">
+
+      <oneOrMore>
+        <element name="facility">
+          <element name="type">
+            <text/>
+          </element>
+          <element name="name">
+            <text/>
+          </element>
+        </element>
+      </oneOrMore>       
+
+    </element>
+  </define>
+
+  <define name="DeployInst">
+    <element name="DeployInst">
+
+      <oneOrMore>
+      <ref name="deploy"/>
+      </oneOrMore>       
+
+    </element>
+  </define>
+
+
+  <define name="deploy">
+    <element name="deploy">
+
+      <element name="type">
+        <text/>
+      </element>   
+
+      <element name="name">
+        <text/>
+      </element>   
+
+      <element name="start">
+        <text/>
+      </element>
+ 
+    </element>
+  </define>
+
+  <!-- insert new InstModel parameter sets here -->
+
+  <!-- end section for institutions -->
+
+
+  <!-- begin section for recipes -->
+  <define name="recipe">
+    <element name="recipe">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="basis">
+        <text/>
+      </element>
+
+      <element name="unit">
+        <text/>
+      </element>
+
+      <element name="total">
+        <text/>
+      </element>
+
+      <oneOrMore>
+      <element name="isotope">
+        <element name="id">
+          <text/>
+        </element>
+        <element name="comp">
+          <text/>
+        </element>
+      </element>
+      </oneOrMore>
+
+    </element>
+  </define>
+
+  <define name="recipebook">
+    <element name="recipebook">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="namespace">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+  <!-- end section for recipes -->
+
+</grammar>
+
+
+    

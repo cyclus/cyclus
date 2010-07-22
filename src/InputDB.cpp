@@ -3,7 +3,6 @@
 
 #include "InputDB.h"
 #include "Logician.h"
-#include "MktFactory.h"
 #include "GenException.h"
 #include "Material.h"
 #include <iostream>
@@ -76,10 +75,10 @@ map<Iso, NumDens> InputDB::getInRecs(int ID)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Market* InputDB::getInMkt(int ID){
 	// Make a test market
-	MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
-	Market *testInMkt = netFlowCreator->Create();
+	// MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
+	// Market *testInMkt = netFlowCreator->Create();
 
-	return testInMkt;
+    return NULL; // testInMkt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 list<Commodity*> InputDB::getFeeds(int ID){
@@ -111,10 +110,10 @@ map<Iso, NumDens> InputDB::getOutRecs(int ID) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Market* InputDB::getOutMkt(int ID){
 	// Make a test market
-	MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
-	Market *testOutMkt = netFlowCreator->Create();
+	// MktFactory *netFlowCreator = get_mkt_map()["netFlow"];
+	// Market *testOutMkt = netFlowCreator->Create();
 
-	return testOutMkt;
+    return NULL; //testOutMkt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 list<Commodity*> InputDB::getProds(int ID){
