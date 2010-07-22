@@ -191,7 +191,51 @@ private:
 	 */
 	static void initAvgNus(Spectrum s);
 protected: 
-		
+
+	/**
+	 * Builds the decay matrix needed for the decay calculations from the parent
+	 * and daughters map variables.  The resulting matrix is stored in the static
+	 * variable decayMatrix.
+	 */
+	static void makeDecayMatrix();
+
+	/**
+	 * Converts the given mathematical Vector representation of the Material's 
+	 * isotopic composition back into the map representation.
+	 *
+	 * @param compVector the mathematical Vector
+	 *
+	 * @return the composition map
+	 */
+	static map<Iso, NumDens> makeCompMap(const Vector & compVector);
+
+	/**
+	 * Returns true if the given isotope's number density is for some reason 
+	 * negative, false otherwise. We define number densities that are negative by 
+	 * less than the conservation of mass tolerance as positive.
+	 *
+	 * @param tope the isotope in question
+	 * @return true iff nd(tope) < 0
+	 */
+	const bool isNeg(Iso tope) const;
+
+	/**
+	 * Returns true if the given isotope's number density is less than the 
+	 * conservation of mass tolerance.
+	 *
+	 * @param tope the isotope in question
+	 * @return true iff nd(tope) == 0
+	 */
+	const bool isZero(Iso tope) const;
+
+	/**
+	 * Returns a mathematical Vector representation of the Material's current
+	 * composition map.
+	 *
+	 * @return the mathematical Vector 
+	 */
+	Vector makeCompVector() const;
+
 	/**
 	 * The serial number for this Material.
 	 */
@@ -224,49 +268,6 @@ protected:
 	 */
 	FacHistory facHist;
 
-	/**
-	 * Returns true if the given isotope's number density is for some reason 
-	 * negative, false otherwise. We define number densities that are negative by 
-	 * less than the conservation of mass tolerance as positive.
-	 *
-	 * @param tope the isotope in question
-	 * @return true iff nd(tope) < 0
-	 */
-	const bool isNeg(Iso tope) const;
-
-	/**
-	 * Returns true if the given isotope's number density is less than the 
-	 * conservation of mass tolerance.
-	 *
-	 * @param tope the isotope in question
-	 * @return true iff nd(tope) == 0
-	 */
-	const bool isZero(Iso tope) const;
-
-	/**
-	 * Builds the decay matrix needed for the decay calculations from the parent
-	 * and daughters map variables.  The resulting matrix is stored in the static
-	 * variable decayMatrix.
-	 */
-	static void makeDecayMatrix();
-	
-	/**
-	 * Returns a mathematical Vector representation of the Material's current
-	 * composition map.
-	 *
-	 * @return the mathematical Vector 
-	 */
-	Vector makeCompVector() const;
-
-	/**
-	 * Converts the given mathematical Vector representation of the Material's 
-	 * isotopic composition back into the map representation.
-	 *
-	 * @param compVector the mathematical Vector
-	 * @return the composition map
-	 */
-	static map<Iso, NumDens> makeCompMap(const Vector & compVector);
-
 public:
 		
 	/**
@@ -285,20 +286,6 @@ public:
 	 * @param commod the Commodity type being created
 	 */
 	Material(map<Iso, NumDens> comp, ChemForm form, Commodity* commod);
-
-	/**
-	 * Constructs a Material of the given Commodity type and amount. What 
-	 * "amount" and "par" mean varies by Commodity type:
-	 *
-	 * cake:  amount --  metric ton U, par -- weight fraction U
-	 * uUF6:  amount --  metric ton U, par -- N/A
-	 * eUF6:  amount --  metric ton U, par -- U-235 enrichment (betw 0 and 1)
-	 *
-	 * @param commod the type of Commodity being created
-	 * @param amount some measure of the quantity being created
-	 * @param par some other paramater necessary for getting the stoich right
-	 */
-	Material(Commodity* commod, double amount, double par);
 
 	/**
 	 * Destroys this Material (virtual destructor).
@@ -413,6 +400,22 @@ public:
 	virtual ChemForm getForm() const;
 
 	/**
+	 * Returns true if this Material object contains appreciable (> eps) 
+	 * actinides, false otherwise.
+	 *
+	 * @return true iff this Material contains appreciable actinides
+	 */
+	virtual bool containsActinides();
+
+	/**
+	 * Returns true if this Material object contains appreciable (> eps) 
+	 * fission products (defined Zn through Lu), false otherwise.
+	 *
+	 * @return true iff this Material contains appreciable fission products
+	 */
+	virtual bool containsFissionProducts();
+
+	/**
 	 * Logs a transfer of this Material between two Facilities.
 	 *
 	 * @param time the current time
@@ -460,6 +463,24 @@ public:
 	 * @param newForm the new ChemForm type
 	 */
 	virtual void changeChemForm(ChemForm newForm);
+
+	/**
+	 * Extracts a Material object of the given mass from this Material. The 
+	 * stoichiometry of the new Material object is the same as the parent (i.e., 
+	 * isotope ratios are held constant).
+	 *
+	 * @param mass the mass to extract
+	 * @return the new Material object
+	 */
+	virtual Material* extractMass(double mass);
+
+	/**
+	 * Assigns a neutronics-based weighting for this Material object.
+	 *
+	 * @param s the spectrum we'll average over
+	 * @return the weighting value
+	 */
+	virtual double computeNeutWeight(Spectrum s = thermal) const;
 
 	/**
 	 * Returns the atomic number of the isotope with the given identifier.
@@ -511,7 +532,6 @@ public:
 	 */
 	static double getTotNumDens(const map<Iso, NumDens>& comp);
 
-
 	/**
 	 * Like the other getFracComp, except it's a static function that works on a 
 	 * composition vector you give it rather than on the composition of a 
@@ -525,42 +545,6 @@ public:
 	 */
 	static map<Iso, NumDens> getFracComp(double frac, 
 																						 const map<Iso, NumDens>& comp);
-
-	/**
-	 * Insertion stream operator for a Material.
-	 */
-	friend ostream& operator<<(ostream &os, const Material& m);
-
-	/**
-	 * Insertion stream operator for a pointer to a Material.
-	 */
-	friend ostream& operator<<(ostream &os, const Material* m);
-
-	/**
-	 * Returns true if this Material object contains appreciable (> eps) 
-	 * actinides, false otherwise.
-	 *
-	 * @return true iff this Material contains appreciable actinides
-	 */
-	virtual bool containsActinides();
-
-	/**
-	 * Returns true if this Material object contains appreciable (> eps) 
-	 * fission products (defined Zn through Lu), false otherwise.
-	 *
-	 * @return true iff this Material contains appreciable fission products
-	 */
-	virtual bool containsFissionProducts();
-
-	/**
-	 * Extracts a Material object of the given mass from this Material. The 
-	 * stoichiometry of the new Material object is the same as the parent (i.e., 
-	 * isotope ratios are held constant).
-	 *
-	 * @param mass the mass to extract
-	 * @return the new Material object
-	 */
-	virtual Material* extractMass(double mass);
 
 	/**
 	 * Returns the given composition map with the number densities converted to 
@@ -578,21 +562,6 @@ public:
 	 */
 	static void loadDecayInfo();
 	
-	/**
-	 * Decays this Material object for the given number of months and updates
-	 * its composition map with the new number densities.
-	 *
-	 * @param months the number of months to decay
-	 */
-	void decay(double months);
-
-	/**
-	 * Decays this Material object for however many months have passed since the 
-	 * last entry in the material history.
-	 *
-	 */
-	void decay();
-
 	/**
 	 * Returns the averaged fission cross sections for the given
 	 * spectrum.
@@ -629,16 +598,30 @@ public:
 	 */
 	static double computeNeutWeight(const map<Iso, NumDens> &comp, 
 																 Spectrum s = thermal);
+	/**
+	 * Decays this Material object for the given number of months and updates
+	 * its composition map with the new number densities.
+	 *
+	 * @param months the number of months to decay
+	 */
+	void decay(double months);
 
 	/**
-	 * Assigns a neutronics-based weighting for this Material object.
+	 * Decays this Material object for however many months have passed since the 
+	 * last entry in the material history.
 	 *
-	 * @param s the spectrum we'll average over
-	 * @return the weighting value
 	 */
+	void decay();
 
-	virtual double computeNeutWeight(Spectrum s = thermal) const;
+	/**
+	 * Insertion stream operator for a Material.
+	 */
+	friend ostream& operator<<(ostream &os, const Material& m);
 
+	/**
+	 * Insertion stream operator for a pointer to a Material.
+	 */
+	friend ostream& operator<<(ostream &os, const Material* m);
 
 };
 #endif

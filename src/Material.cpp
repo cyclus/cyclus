@@ -98,19 +98,6 @@ const map<Iso, NumDens> Material::getComp() const
   return it->second;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const NumDens Material::getComp(Iso tope) const
-{
-  map<Iso, NumDens> currComp = this->getComp();
-
-  // If the isotope isn't currently present, return 0. Else return the 
-  // isotope's current number density.
-  if (currComp.find(tope) == currComp.end()) {
-    return 0;
-  }
-  else
-    return currComp[tope];
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const map<Iso, NumDens> Material::getFracComp(double frac) const
 {
   // Create a new composition object.
@@ -127,6 +114,19 @@ const map<Iso, NumDens> Material::getFracComp(double frac) const
   }
 
   return newComp;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const NumDens Material::getComp(Iso tope) const
+{
+  map<Iso, NumDens> currComp = this->getComp();
+
+  // If the isotope isn't currently present, return 0. Else return the 
+  // isotope's current number density.
+  if (currComp.find(tope) == currComp.end()) {
+    return 0;
+  }
+  else
+    return currComp[tope];
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getEltComp(int elt) const
@@ -150,6 +150,30 @@ const double Material::getEltComp(int elt) const
   return nd;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getTotMass() const
+{
+  map<Iso, NumDens> comp = this->getComp();
+  return Material::getTotMass(comp);
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getTotNumDens() const
+{
+  map<Iso, NumDens> comp = this->getComp();
+  return Material::getTotNumDens(comp);
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getEltMass(int elt) const
+{
+  map<Iso, NumDens> currComp = this->getComp();
+  return Material::getEltMass(elt, currComp);
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getIsoMass(Iso tope) const
+{
+  map<Iso, NumDens> currComp = this->getComp();
+  return Material::getIsoMass(tope, currComp);
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const long Material::getSN() const
 {
   return ID;
@@ -158,6 +182,40 @@ const long Material::getSN() const
 Commodity* Material::getCommod() const
 {
   return myType;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ChemForm Material::getForm() const
+{
+  return myForm;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Material::containsActinides()
+{
+  int act = 89;
+  int lawr = 103;
+
+  // Check for actinides; return true if we've got some.
+  for (int elt = act; elt <= lawr; elt++)
+    if (this->getEltMass(elt) > eps)
+      return true;
+
+  // Else return false.
+  return false;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Material::containsFissionProducts()
+{
+  int zn = 30;
+  int lu = 71;
+
+  // Check for fission products; return true if we've got some.
+  for (int elt = zn; elt <= lu; elt++)
+    if (this->getEltMass(elt) > eps)
+      return true;
+
+  // Else return false.
+  return false;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::logTrans(int time, int fromFac, int toFac)
@@ -217,30 +275,6 @@ void Material::extract(Material* matToRem)
     this->changeComp(isoToRem, ndToRem, TI->getTime());
     iter ++;
   }
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double Material::getTotMass() const
-{
-  map<Iso, NumDens> comp = this->getComp();
-  return Material::getTotMass(comp);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double Material::getTotNumDens() const
-{
-  map<Iso, NumDens> comp = this->getComp();
-  return Material::getTotNumDens(comp);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double Material::getEltMass(int elt) const
-{
-  map<Iso, NumDens> currComp = this->getComp();
-  return Material::getEltMass(elt, currComp);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double Material::getIsoMass(Iso tope) const
-{
-  map<Iso, NumDens> currComp = this->getComp();
-  return Material::getIsoMass(tope, currComp);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::changeCommod(Commodity* newCommod)
@@ -341,24 +375,6 @@ double Material::getIsoMass(Iso tope, const map<Iso, NumDens>& comp)
   return mass;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, NumDens> Material::getFracComp(double frac, 
-					const map<Iso, NumDens>& comp)
-{
-  // Create a new composition object.
-  map<Iso, NumDens> newComp;
-
-  // Iterate through the composition vector and add to the new object 
-  // the specified fraction of each isotope.
-  map<Iso, NumDens>::const_iterator iter = comp.begin();
-
-  while (iter != comp.end()) {
-    newComp[iter->first] = iter->second * frac;
-    iter ++;
-  }
-
-  return newComp;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotMass(const map<Iso, NumDens>& comp)
 {
   // Sum the masses of the isotopes.
@@ -386,6 +402,24 @@ double Material::getTotNumDens(const map<Iso, NumDens>& comp)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, NumDens> Material::getFracComp(double frac, 
+					const map<Iso, NumDens>& comp)
+{
+  // Create a new composition object.
+  map<Iso, NumDens> newComp;
+
+  // Iterate through the composition vector and add to the new object 
+  // the specified fraction of each isotope.
+  map<Iso, NumDens>::const_iterator iter = comp.begin();
+
+  while (iter != comp.end()) {
+    newComp[iter->first] = iter->second * frac;
+    iter ++;
+  }
+
+  return newComp;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isNeg(Iso tope) const
 {
   if (this->getComp(tope) == 0)
@@ -399,39 +433,6 @@ const bool Material::isZero(Iso tope) const
 {
   NumDens nd_eps = AV_NUM / Material::getMassNum(tope) * eps * 1e6; 
   return fabs(this->getComp(tope)) < nd_eps;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Material::containsActinides()
-{
-  int act = 89;
-  int lawr = 103;
-
-  // Check for actinides; return true if we've got some.
-  for (int elt = act; elt <= lawr; elt++)
-    if (this->getEltMass(elt) > eps)
-      return true;
-
-  // Else return false.
-  return false;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Material::containsFissionProducts()
-{
-  int zn = 30;
-  int lu = 71;
-
-  // Check for fission products; return true if we've got some.
-  for (int elt = zn; elt <= lu; elt++)
-    if (this->getEltMass(elt) > eps)
-      return true;
-
-  // Else return false.
-  return false;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ChemForm Material::getForm() const
-{
-  return myForm;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extractMass(double mass)
