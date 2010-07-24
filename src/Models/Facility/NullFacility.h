@@ -22,17 +22,25 @@ class NullFacility : public FacilityModel
  */
 
 public:
-    NullFacility() {};
-    
-    ~NullFacility() {};
+  /** 
+   * Default constructor for the NullFacility class.
+   */
+  NullFacility() {};
+  /**
+   * Destructor for the NullFacility class. 
+   * Should delete all instances of NullFacility and recursively
+   * delete all of their data.
+   */
+  ~NullFacility() {};
+  
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur);
 
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
-    /// initialize an object by copying another
-    virtual void copy(NullFacility* src);
+  /// initialize an object by copying another
+  virtual void copy(NullFacility* src);
 
-    virtual void print();
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -52,6 +60,26 @@ public:
  */
 
 public:
+    /**
+     * The NullFacility overrides the FacilityModel handleTick function.
+     * At each tick, it requests as much raw inCommod as it can process this
+     * month, offers as much outCommod as it will have in its inventory by the
+     * end of the month.
+     *
+     * @param time the time of the tick
+     */
+    virtual void handleTick(int time);
+
+    /**
+     * The NullFacility overrides the FacilityModel handleTick function.
+     * At each tick, it requests as much raw inCommod as it can process this
+     * month, offers as much outCommod as it will have in its inventory by the
+     * end of the month.
+     *
+     * @param time the time of the tick
+     */
+    virtual void handleTick(int time);
+
     /// simply do nothing when sending a shipment
     virtual void sendMaterial(Transaction trans, Communicator* receiver);
     

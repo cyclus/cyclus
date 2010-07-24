@@ -29,23 +29,23 @@ class InstModel : public Model, public Communicator
  * --------------------
  */
 public:
-    /// Default constructor for InstModel Class
-    InstModel() { ID = nextID++; model_type="Inst"; commType=InstComm; };
+  /// Default constructor for InstModel Class
+  InstModel() { ID = nextID++; model_type="Inst"; commType=InstComm; };
 
-    /// ever model should be destructable
-    virtual ~InstModel() {};
-    
-    // every model needs a method to initialize from XML
-    virtual void init(xmlNodePtr cur);
-    // every model needs a method to copy one object to another
-    virtual void copy(InstModel* src);
+  /// ever model should be destructable
+  virtual ~InstModel() {};
+  
+  // every model needs a method to initialize from XML
+  virtual void init(xmlNodePtr cur);
+  // every model needs a method to copy one object to another
+  virtual void copy(InstModel* src);
 
-    // every model should be able to print a verbose description
-    virtual void print();
+  // every model should be able to print a verbose description
+  virtual void print();
 
 protected: 
-    /// Stores the next available institution ID
-    static int nextID;
+  /// Stores the next available institution ID
+  static int nextID;
 /* ------------------- */ 
 
 
@@ -54,8 +54,8 @@ protected:
  * --------------------
  */
 public:
-    /// default InstModel receiver has no default behavior
-    virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+  /// default InstModel receiver has no default behavior
+  virtual void receiveOfferRequest(OfferRequest* msg) = 0;
 
 protected:
 
@@ -67,13 +67,13 @@ protected:
  */
 
 public:
-    void setRegion(Model* my_region) { region = my_region; };
+  void setRegion(Model* my_region) { region = my_region; };
 
 protected:
-    Model* region;
+  Model* region;
 
 /* ------------------- */ 
-    
+  
 };
 
 #endif

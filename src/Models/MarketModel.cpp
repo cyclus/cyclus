@@ -17,43 +17,43 @@ int MarketModel::nextID = 0;
 
 void MarketModel::init(xmlNodePtr cur)
 {
-    Model::init(cur);
-    
-    /** 
-     *  Specific initialization for MarketModels
-     */
+  Model::init(cur);
+  
+  /** 
+   *  Specific initialization for MarketModels
+   */
 
-    /// all markets require commodities
-    string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
-    commodity = LI->getCommodity(commod_name);
-    if (NULL == commodity)
-	throw GenException("Market commodity '" + commod_name 
-			   + "' does not exist for market '" + getName() 
-			   + "'.");
-    
-    commodity->setMarket(this);
+  /// all markets require commodities
+  string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
+  commodity = LI->getCommodity(commod_name);
+  if (NULL == commodity)
+    throw GenException("Market commodity '" + commod_name 
+        + "' does not exist for market '" + getName() 
+        + "'.");
+  
+  commodity->setMarket(this);
 }
 
 void MarketModel::copy(MarketModel* src)
 {
-    Model::copy(src);
-    Communicator::copy(src);
+  Model::copy(src);
+  Communicator::copy(src);
 
-     /** 
-     *  Specific initialization for MarketModels
-     */
+   /** 
+   *  Specific initialization for MarketModels
+   */
 
-    commodity = src->commodity;
+  commodity = src->commodity;
 
 }
 
 
 void MarketModel::print()              
 { 
-    Model::print(); 
+  Model::print(); 
 
-    cout << "trades commodity " 
-	 << commodity->getName() << endl;
+  cout << "trades commodity " 
+      << commodity->getName() << endl;
 
 } ;
 
@@ -72,11 +72,11 @@ void MarketModel::print()
 void MarketModel::executeOrderQueue()
 {
 
-    while( orders.size() > 0)
-    {
-	(*orders.begin())->execute();
-	orders.pop_front();
-    }
+  while( orders.size() > 0)
+  {
+    (*orders.begin())->execute();
+    orders.pop_front();
+  }
 
 
 }

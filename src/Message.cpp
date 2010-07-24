@@ -11,36 +11,35 @@
 OfferRequest::OfferRequest(Communicator* sender)
 {
 
-    msgPath.sndr = sender;
+  msgPath.sndr = sender;
 
-    msgPath.rcvr 
-	= msgPath.mkt 
-	= msgPath.reg 
-	= msgPath.inst 
-	= msgPath.fac = NULL;
+  msgPath.rcvr 
+      = msgPath.mkt 
+      = msgPath.reg 
+      = msgPath.inst 
+      = msgPath.fac = NULL;
 
-    switch (sender->getCommType())
-    {
-	case FacilityComm:
-	    msgPath.fac = sender;
-	    break;
-	case InstComm:
-	    msgPath.inst = sender;
-	    break;
-	case RegionComm:
-	    msgPath.reg = sender;
-	    break;
-	case MarketComm:
-	    msgPath.mkt = sender;
-	    break;
-    }
-
+  switch (sender->getCommType())
+  {
+    case FacilityComm:
+      msgPath.fac = sender;
+      break;
+    case InstComm:
+      msgPath.inst = sender;
+      break;
+    case RegionComm:
+      msgPath.reg = sender;
+      break;
+    case MarketComm:
+      msgPath.mkt = sender;
+      break;
+  }
 }
-    
+  
 void Shipment::execute()
 {
-    if (shipPath.shipper->getCommType() == FacilityComm)
-	((FacilityModel*)shipPath.shipper)->sendMaterial(trans,shipPath.receiver);
-    else
-	throw GenException("Only FaciliyModels can send material.");
+  if (shipPath.shipper->getCommType() == FacilityComm)
+    ((FacilityModel*)shipPath.shipper)->sendMaterial(trans,shipPath.receiver);
+  else
+    throw GenException("Only FaciliyModels can send material.");
 }

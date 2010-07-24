@@ -29,23 +29,23 @@ class MarketModel : public Model, public Communicator
  */
 
 public:
-    /// Default constructor for the MarketModel Class
-    MarketModel() { ID = nextID++; model_type="Market"; commType=MarketComm; };
-    
-    /// MarketModels should not be indestructible.
-    virtual ~MarketModel() {};
-    
-    // every model needs a method to initialize from XML
-    virtual void init(xmlNodePtr cur);
-    // every model needs a method to copy one object to another
-    virtual void copy(MarketModel* src);
+  /// Default constructor for the MarketModel Class
+  MarketModel() { ID = nextID++; model_type="Market"; commType=MarketComm; };
+  
+  /// MarketModels should not be indestructible.
+  virtual ~MarketModel() {};
+  
+  // every model needs a method to initialize from XML
+  virtual void init(xmlNodePtr cur);
+  // every model needs a method to copy one object to another
+  virtual void copy(MarketModel* src);
 
-    // every model should be able to print a verbose description
-    virtual void print();
+  // every model should be able to print a verbose description
+  virtual void print();
 
 protected:
-    /// Stores next available market ID
-    static int nextID;
+  /// Stores next available market ID
+  static int nextID;
 /* ------------------- */ 
 
 /* --------------------
@@ -53,9 +53,9 @@ protected:
  * --------------------
  */
 public:
-    /// default MarketModel receiver simply logs the offer/request
-    virtual void receiveOfferRequest(OfferRequest* msg) 
-         { messages.insert(msg); };
+  /// default MarketModel receiver simply logs the offer/request
+  virtual void receiveOfferRequest(OfferRequest* msg) 
+  { messages.insert(msg); };
 
 protected:
 
@@ -68,39 +68,39 @@ protected:
  * --------------------
  */
 public:
-    /// every market should provide its commodity
-    Commodity* getCommodity() { return commodity; } ;
+  /// every market should provide its commodity
+  Commodity* getCommodity() { return commodity; } ;
 
-    // Primary MarketModel methods
+  // Primary MarketModel methods
 
-    /// Resolve requests with offers
-    /**
-     *  Primary funcation of a Market is to resolve the set of 
-     *  requests with the set of offers.
-     */
-    virtual void resolve() = 0;
+  /// Resolve requests with offers
+  /**
+   *  Primary funcation of a Market is to resolve the set of 
+   *  requests with the set of offers.
+   */
+  virtual void resolve() = 0;
 
-    /// Execute list of shipments
-    /**
-     *  Once market is resolved, go through the deque/queue and 
-     *  execute the shipments.
-     */
-    virtual void executeOrderQueue();
+  /// Execute list of shipments
+  /**
+   *  Once market is resolved, go through the deque/queue and 
+   *  execute the shipments.
+   */
+  virtual void executeOrderQueue();
 
 protected: 
-    /// every market has a commodity
-    Commodity* commodity;
+  /// every market has a commodity
+  Commodity* commodity;
 
-    /// every market collects offers & requests
-    set<OfferRequest*> messages;
+  /// every market collects offers & requests
+  set<OfferRequest*> messages;
 
-    /// every market generates a set of orders
-    deque<Shipment*> orders;
-    int firmOrders;
-    
+  /// every market generates a set of orders
+  deque<Shipment*> orders;
+  int firmOrders;
+  
 
 /* ------------------- */ 
-    
+  
 };
 
 #endif

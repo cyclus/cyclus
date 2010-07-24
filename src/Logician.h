@@ -50,7 +50,7 @@ private:
 	map<Commodity*, Model*> commodity_market_map;
 
 	/**
-	 * (Recursively) deletes this Logician (and the objects it manages).
+	 * (Recursively) deletes this Logician (and the objects it oversees).
 	 */
 	~Logician() {};
 
@@ -78,10 +78,10 @@ public:
 	 *
 	 * @param list list to print
 	 */
-	void printModelList(ModelList list)
-	{for (ModelList::iterator model = list.begin();
-	      model != list.end();
-	      model++) (*model)->print();
+	void printModelList(ModelList list)	
+  {for (ModelList::iterator model = list.begin();
+        model != list.end();
+        model++) (*model)->print();
 	}
 	/* 
 	 * Search a list of models for a particular name
