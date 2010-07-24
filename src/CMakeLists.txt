@@ -23,8 +23,8 @@ SET( CYCLUS_SRC
         Models/StubCommModel.cpp 
         Models/MarketModel.cpp 
         Models/FacilityModel.cpp 
-	Models/RegionModel.cpp
-	Models/InstModel.cpp)
+				Models/RegionModel.cpp
+				Models/InstModel.cpp)
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
