@@ -21,27 +21,40 @@ class SourceFacility : public FacilityModel
  */
 
 public:
-    SourceFacility() {};
-    
-    ~SourceFacility() {};
+  /**
+   * Default Constructor for the SourceFacility class
+   */
+  SourceFacility() {};
+  
+  /**
+   * Destructor for the SourceFacility class
+   */
+  ~SourceFacility() {};
 
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
-    /// initialize an object by copying another
-    virtual void copy(SourceFacility* src);
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur);
 
-    virtual void print();
+  /// initialize an object by copying another
+  virtual void copy(SourceFacility* src);
+
+  /**
+   * Print information about this model
+   */
+  virtual void print();
 
 /* ------------------- */ 
 
 /* --------------------
  * all COMMUNICATOR classes have these members
- * --------------------
+ * ------------------
  */
 public:
-    /// simply ignore incoming offers/requests
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+  /**
+   * A facility should not receive offers or requests directly.
+   * Throw an exception
+   */
+  virtual void receiveOfferRequest(OfferRequest* msg);
 
 /* -------------------- */
 
@@ -51,11 +64,21 @@ public:
  */
 
 public:
-    /// simply do nothing when sending a shipment
-    virtual void sendMaterial(Transaction trans, Communicator* receiver) {};
-    
-    /// simply do nothing when receiving a shipment
-    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
+  /**
+   * Sends material from this facility's inventory to another facility.
+   *
+   * @param trans is the transaction object representing the order
+   * @param receiver is the communicator that the transaction is sent to next
+   */
+  virtual void sendMaterial(Transaction trans, Communicator* receiver);
+  
+  /**
+   * Receives material sent from another facility.
+   *
+   * @param trans is the transaction object representing the order
+   * @param receiver is the set of materials to be received.
+   */
+  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
 
 /* ------------------- */ 
@@ -66,19 +89,22 @@ public:
  */
 
 protected:
-    /// this facility has only one output commodity
-    Commodity* out_commod;
-    
-    /// this facility has a specific recipe for its output
-    Material* recipe;
-    
-    /// this facility has a specific capcity
-    /**
-     *  The capacity is defined in terms of the number of units of the recipe
-     *  that can be provided each time step.  A very large number can be
-     *  provided to represent infinte capacity.
-     */
-    double capacity;
+  /**
+   * This facility has only one output commodity
+   */
+  Commodity* out_commod;
+  
+  /**
+   * This facility has a specific recipe for its output
+   */
+  Material* recipe;
+  
+  /**
+   *  The capacity is defined in terms of the number of units of the recipe
+   *  that can be provided each time step.  A very large number can be
+   *  provided to represent infinte capacity.
+   */
+  double capacity;
 
 
 /* ------------------- */ 
@@ -91,11 +117,11 @@ protected:
  */
 
 extern "C" Model* construct() {
-    return new SourceFacility();
+  return new SourceFacility();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* ------------------- */ 

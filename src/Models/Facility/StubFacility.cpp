@@ -8,6 +8,7 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::init(xmlNodePtr cur)
 {
     FacilityModel::init(cur);
@@ -51,6 +52,7 @@ void StubFacility::init(xmlNodePtr cur)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::copy(StubFacility* src)
 {
     FacilityModel::copy(src);
@@ -59,6 +61,7 @@ void StubFacility::copy(StubFacility* src)
     out_commods = src->out_commods;	
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::print() 
 { 
     FacilityModel::print();
@@ -82,9 +85,6 @@ void StubFacility::print()
     cout << "}" << endl;
     
 };
-
-
-
 
 
 

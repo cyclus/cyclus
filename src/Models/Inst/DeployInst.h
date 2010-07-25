@@ -21,17 +21,24 @@ class DeployInst : public InstModel
  */
 
 public:
-    DeployInst() {};
-    
-    ~DeployInst() {};
-   
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
-    /// initialize an object by copying another
-    virtual void copy(DeployInst* src);
+  /**
+   * Default constructor
+   */
+  DeployInst() {};
 
-    virtual void print();
+  /**
+   * Destructor
+   */
+  ~DeployInst() {};
+   
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur);
+
+  /// initialize an object by copying another
+  virtual void copy(DeployInst* src);
+
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -40,8 +47,8 @@ public:
  * --------------------
  */
 public:
-    /// simply ignore incoming offers/requests.
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+  /// simply ignore incoming offers/requests.
+  virtual void receiveOfferRequest(OfferRequest* msg) {};
 
 protected:
 
@@ -61,7 +68,7 @@ protected:
  */
 
 protected:
-    map<int,Model*> deployment_map;
+  map<int,Model*> deployment_map;
 
 /* ------------------- */ 
 
@@ -74,11 +81,11 @@ protected:
  */
 
 extern "C" Model* construct() {
-    return new DeployInst();
+  return new DeployInst();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* -------------------- */

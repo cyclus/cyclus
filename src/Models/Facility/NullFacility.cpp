@@ -63,18 +63,48 @@ void NullFacility::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveOfferRequest(OfferRequest* msg)
 {
+  throw GenException("Facilities do not receive offers/requests directly.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::sendMaterial(Transaction trans, Communicator* receiver)
 {
+  // create a Transaction object
+    // it should be of out_commod Commodity type
+    // it should be of the same size, recipe, etc. as the matched order
+  // send it up to your institution
+  // delete the transaction amount from the inventory
+  // record this action
 }
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {
+  // interperet the Transaction information
+  // add the material object(s) from the manifest to the stocks
+  // record this action
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::handleTick(int time)
+{
+  // find out how much this NullFacility needs to request
+    // it will be Capacity - Stocks (or stocklimit - stocks ?)
+  // request it
 
+  // find out how much this NullFacility can offer
+    // it will be Inventory + SpotCapacity 
+  // offer it
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::handleTock(int time)
+{
+  // at rate allowed by capacity, convert material in Stocks to out_commod type
+  // move converted material into Inventory
 
+  // receive information about matched orders from the Market?
+    // fill them by sending/receiving material  
+
+  // record these actions
+}
 

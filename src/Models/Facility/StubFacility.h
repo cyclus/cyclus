@@ -21,17 +21,19 @@ class StubFacility : public FacilityModel
  */
 
 public:
-    StubFacility() {};
-    
-    ~StubFacility() {};
+  
+  StubFacility() {};
+  
+  ~StubFacility() {};
 
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
-    /// initialize an object by copying another
-    virtual void copy(StubFacility* src);
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur);
 
-    virtual void print();
+  /// initialize an object by copying another
+  virtual void copy(StubFacility* src);
+
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -40,8 +42,8 @@ public:
  * --------------------
  */
 public:
-    /// simply ignore incoming offers/requests
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+  /// simply ignore incoming offers/requests
+  virtual void receiveOfferRequest(OfferRequest* msg) {};
 
 /* -------------------- */
 
@@ -51,11 +53,11 @@ public:
  */
 
 public:
-    /// simply do nothing when sending a shipment
-    virtual void sendMaterial(Transaction trans, Communicator* receiver) {};
-    
-    /// simply do nothing when receiving a shipment
-    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
+  /// simply do nothing when sending a shipment
+  virtual void sendMaterial(Transaction trans, Communicator* receiver) {};
+  
+  /// simply do nothing when receiving a shipment
+  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
 
 
 /* ------------------- */ 
@@ -66,11 +68,11 @@ public:
  */
 
 protected:
-    /// all facilities must have at least one input commodity
-    vector<Commodity*> in_commods;
+  /// all facilities must have at least one input commodity
+  vector<Commodity*> in_commods;
 
-    /// all facilities must have at least one output commodity
-    vector<Commodity*> out_commods;
+  /// all facilities must have at least one output commodity
+  vector<Commodity*> out_commods;
 
 /* ------------------- */ 
 
@@ -82,11 +84,11 @@ protected:
  */
 
 extern "C" Model* construct() {
-    return new StubFacility();
+  return new StubFacility();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* ------------------- */ 

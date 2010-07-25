@@ -21,17 +21,27 @@ class StubMarket : public MarketModel
  */
 
 public:
-    StubMarket() {};
-    
-    ~StubMarket() {};
-    
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur) { MarketModel::init(cur); };
-    /// initialize an object by copying another
-    virtual void copy(StubMarket* src){ MarketModel::copy(src); } ;
+  /**
+   * Default constructor
+   */
+  StubMarket() {};
+  
+  /**
+   * Default destructor
+   */
+  ~StubMarket() {};
+  
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur) { MarketModel::init(cur); };
 
-    virtual void print()              { MarketModel::print();   } ;
+  /// initialize an object by copying another
+  virtual void copy(StubMarket* src){ MarketModel::copy(src); } ;
+
+  /**
+   * Print information about this model.
+   */
+  virtual void print()      { MarketModel::print();   } ;
 
 /* -------------------- */
 
@@ -46,14 +56,14 @@ public:
  * all MARKETMODEL classes have these members
  * --------------------
  */
-    /// Resolve requests with offers
-    /**
-     *  Primary funcation of a Market is to resolve the set of 
-     *  requests with the set of offers.
-     *
-     *  In this stub - do nothing!
-     */
-    virtual void resolve() {};
+  /// Resolve requests with offers
+  /**
+   *  Primary funcation of a Market is to resolve the set of 
+   *  requests with the set of offers.
+   *
+   *  In this stub - do nothing!
+   */
+  virtual void resolve() {};
 
 
 /* -------------------- */
@@ -72,11 +82,11 @@ public:
  * --------------------
  */
 extern "C" Model* construct() {
-    return new StubMarket();
+  return new StubMarket();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* -------------------- */

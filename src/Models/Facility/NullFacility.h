@@ -26,10 +26,9 @@ public:
    * Default constructor for the NullFacility class.
    */
   NullFacility() {};
+
   /**
    * Destructor for the NullFacility class. 
-   * Should delete all instances of NullFacility and recursively
-   * delete all of their data.
    */
   ~NullFacility() {};
   
@@ -40,6 +39,9 @@ public:
   /// initialize an object by copying another
   virtual void copy(NullFacility* src);
 
+  /**
+   * Print information about this model
+   */
   virtual void print();
 
 /* ------------------- */ 
@@ -48,8 +50,12 @@ public:
  * all COMMUNICATOR classes have these members
  * --------------------
  */
+
 public:
-    /// simply ignore incoming offers/requests
+  /**
+   * A facility should not receive offers or requests directly
+   * Throw an exception.
+   */
     virtual void receiveOfferRequest(OfferRequest* msg);
 
 /* -------------------- */
@@ -61,9 +67,9 @@ public:
 
 public:
     /**
-     * The NullFacility overrides the FacilityModel handleTick function.
+     * The handleTick function specific to the NullFacility.
      * At each tick, it requests as much raw inCommod as it can process this
-     * month, offers as much outCommod as it will have in its inventory by the
+     * month and offers as much outCommod as it will have in its inventory by the
      * end of the month.
      *
      * @param time the time of the tick
@@ -71,19 +77,29 @@ public:
     virtual void handleTick(int time);
 
     /**
-     * The NullFacility overrides the FacilityModel handleTick function.
-     * At each tick, it requests as much raw inCommod as it can process this
-     * month, offers as much outCommod as it will have in its inventory by the
-     * end of the month.
+     * The handleTick function specific to the NullFacility.
+     * At each tock, it processes material and handles orders, and records this
+     * month's actions.
      *
-     * @param time the time of the tick
+     * @param time the time of the tock
      */
-    virtual void handleTick(int time);
+    virtual void handleTock(int time);
 
-    /// simply do nothing when sending a shipment
+    /**
+     * This sends material up the Inst/Region/Logician line
+     * to be passed back down to the receiver
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param receiver the ultimate facility to receive this transaction
+     */
     virtual void sendMaterial(Transaction trans, Communicator* receiver);
     
-    /// simply do nothing when receiving a shipment
+    /**
+     * The facility receives the materials other facilities have sent.
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param manifest the list of material objects being received
+     */
     virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
 
@@ -95,10 +111,14 @@ public:
  */
 
 protected:
-    /// all facilities must have at least one input commodity
+    /**
+     * The NullFacility has one input commodity
+     */
     Commodity* in_commod;
 
-    /// all facilities must have at least one output commodity
+    /**
+     * The NullFacility has one output commodity
+     */
     Commodity* out_commod;
 
     queue<Material*> active_inventory, used_inventory;
