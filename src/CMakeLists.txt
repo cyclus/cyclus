@@ -29,6 +29,9 @@ SET( CYCLUS_SRC
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
 
+# Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
+SET(CMAKE_CXX_FLAGS "-I/usr/include/libxml2" )
+
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
 
