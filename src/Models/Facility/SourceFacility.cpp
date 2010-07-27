@@ -73,16 +73,3 @@ void handleTick(int time){
 void handleTock(int time){
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void sendMaterial(Transaction trans, Communicator* receiver){
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void receiveMaterial(Transaction trans, vector<Material*> manifest){
-  // The SourceFacility should never receive any material. 
-  // Freak out.
-  throw GenException("The facility " + getName() + 
-                     " is a SourceFacility and should therefore " +
-                     "never receive any material.");
-}
-

@@ -3,7 +3,7 @@ PROJECT( CYCLUS )
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 # Direct any out-of-source builds to this directory
-SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR})
+SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}")
 INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}/Models")
 INCLUDE_DIRECTORIES("${CYCLUS_SRC_DIR}/Utility")
@@ -30,7 +30,9 @@ SET( CYCLUS_SRC
 ADD_SUBDIRECTORY(Models)
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
-SET(CMAKE_CXX_FLAGS "-I/usr/include/libxml2" )
+FIND_PACKAGE( LibXml2 REQUIRED )
+INCLUDE_DIRECTORIES ("${LIBXML2_INCLUDE_DIR}")
+ADD_DEFINITIONS ("${LIBXML2_DEFINITIONS}")
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -46,4 +48,4 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl xml2)
+TARGET_LINK_LIBRARIES( cyclus dl "${LIBXML2_LIBRARIES}")

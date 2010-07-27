@@ -54,7 +54,7 @@ public:
    * A facility should not receive offers or requests directly.
    * Throw an exception
    */
-  virtual void receiveOfferRequest(OfferRequest* msg);
+  virtual void receiveOfferRequest(OfferRequest* msg){};
 
 /* -------------------- */
 
@@ -70,7 +70,7 @@ public:
    * @param trans is the transaction object representing the order
    * @param receiver is the communicator that the transaction is sent to next
    */
-  virtual void sendMaterial(Transaction trans, Communicator* receiver);
+  virtual void sendMaterial(Transaction trans, Communicator* receiver){};
   
   /**
    * Receives material sent from another facility.
@@ -78,7 +78,7 @@ public:
    * @param trans is the transaction object representing the order
    * @param receiver is the set of materials to be received.
    */
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
+  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest){};
 
 
 /* ------------------- */ 
