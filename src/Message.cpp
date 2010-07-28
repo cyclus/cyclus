@@ -7,15 +7,29 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(MessageDir dir, Commodity* commod, double amount, double price,
-		 Communicator* toSend, Communicator* toReceive, int ID) 
+		 Communicator* toSend, Communicator* toReceive) 
 {
 	myCommod = commod;
 	myAmount = amount; 
 	myPrice = price;
-	sender = toSend;
-	receiver = toReceive;
 	myDir = dir;
 	facID = ID;
+  sender = toSend;
+  recipient = toReceive;
+  
+  // if amt is positive and there is no supplier
+  // this message is an offer and 
+  // the sender is the supplier
+  if (myAmount > 0  && supplier == NULL){
+    supplier = sender;
+  }
+
+  // if amt is negative and there is no requester
+  // this message is a request and
+  // the sender is the requester
+  if (myAmount < 0 && requester == NULL){
+    requester = sender;
+  }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() const
@@ -47,6 +61,16 @@ double Message::getAmount() const {
 void Message::setAmount(double newAmount) 
 {
 	myAmount = newAmount;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setSupplier(Communicator* newSupplier) 
+{
+	supplier = newSupplier;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setRequester(Communicator* newRequester) 
+{
+	requester = newRequester;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getPrice() const {

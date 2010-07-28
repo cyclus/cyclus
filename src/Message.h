@@ -42,15 +42,19 @@ class Message {
 	 */
 	Communicator* receiver;
 
+  /**
+   * The Communicator who is the supplier in this transaction.
+   */
+  Communicator* supplier;
+
+  /**
+   * The Communicator who is the requester in this transaction.
+   */
+  Communicator* requester
+
 	/**
 	 * The amount of the specified commodity being requested or offered. 
 	 * Units vary. 
-	 *
-	 * cake -- mass of uranium (metric tons)
-	 * uUF6 -- mass of uranium (metric tons)
-	 * eUF6 -- number of batches
-	 * fuel -- number of batches (reactor), tons of uranium (fabricator)
-	 * usedFuel -- number of assemblies (for now, at least)
 	 * 
 	 * Note: positive amounts mean you want something, negative amounts 
 	 * mean you want to get rid of something.
@@ -58,15 +62,19 @@ class Message {
 	double myAmount;
 
 	/**
+	 * The minimum amount of the specified commodity being requested or offered. 
+	 * Units vary. 
+	 * 
+	 * Note: positive amounts mean you want something, negative amounts 
+	 * mean you want to get rid of something.
+	 */
+	double minAmount;
+
+
+	/**
 	 * The price of the commodity being requested or offered.
 	 */
 	double myPrice;
-
-	/**
-	 * The Facility ID for the Facility originally sending this Message, 
-	 * if applicable.
-	 */
-	int facID;
 
 	public:
 
@@ -75,20 +83,18 @@ class Message {
 	 *
 	 * @param dir the direction this Message is traveling
 	 * @param commod the Commodity being offered or requested
-	 * @param amount the amount of the given Commodity being offered or 
-	 * requested (pass the number of batches if requesting fuel)
+	 * @param amount the amount of the given Commodity being offered/requested
 	 * Note: positive amounts mean you want something, negative amounts 
 	 * mean you want to get rid of something.
+   * @param minAmt the minimum amount acceptible for this transaction
 	 * @param price the price of the Commodity
 	 * @param toSend the sender of this Message
 	 * @param toReceive the receiver of this Message, or null if the 
 	 * eventual receiver/handler is unknown to the sender
-	 * @param facID the Facility object sending this 
-	 * Message, or the Facility on whose behalf this request is being made.
 	 */
 	Message(MessageDir dir, Commodity* commod, 
-			double amount, double price, Communicator* toSend, 
-			Communicator* toReceive, int facID);
+			double amount, double minAmt, double price, Communicator* toSend, 
+			Communicator* toReceive);
 
 	/**
 	 * A copy "constructor" for this class.
@@ -110,6 +116,20 @@ class Message {
 	 * @return the receiver
 	 */
 	Communicator* getReceiver() const;
+
+	/**
+	 * Returns the supplier in this Message.
+	 *
+	 * @return the supplier
+	 */
+	Communicator* getSupplier() const;
+
+	/**
+	 * Returns the requester in this Message.
+	 *
+	 * @return the requester
+	 */
+	Communicator* getRequester() const;
 
 	/**
 	 * Returns the direction this Message is traveling.
@@ -140,19 +160,27 @@ class Message {
 	void setAmount(double newAmount);
 
 	/**
+	 * Sets the assigned supplier of the material for the 
+   * transaction in this message. 
+	 *
+	 * @param newSupplier the assigned supplier
+	 */
+	void setSupplier(double newSupplier);
+
+	/**
+   * Sets the assigned requester to receive the material
+   * for the transaction in this message.
+	 *
+	 * @param newRequester the updated requester
+	 */
+	void setRequester(double newRequester);
+
+	/**
 	 * Returns the price being requested or offered in this message.
 	 *
 	 * @return the price (in dollars)
 	 */
 	double getPrice() const;
-
-	/**
-	 * Returns the pointer to the Facility object included with this message. 
-	 * This object may be useful in describing the core we're trying to make fuel for.
-	 *
-	 * @return the facID of the Facility object
-	 */
-	int getFacID() const;
 
 	/**
 	 * Reverses the direction this Message is being sent (so, for 
@@ -168,15 +196,5 @@ class Message {
 	 */
 	string unEnumerateDir();
 
-	/**
-	 * Insertion stream operator for a Message.
-	 */
-	friend ostream& operator<<(ostream &os, const Message& m);
-
-	/**
-	 * Insertion stream operator for a pointer to a Message.
-	 */
-	friend ostream& operator<<(ostream &os, const Message* m);
-		
 };
 #endif
