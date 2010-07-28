@@ -1,10 +1,11 @@
 // Message.h
-// Message classes for inter-entity requests, instructions, etc.
+// A Message class for inter-entity requests, instructions, etc.
 
-#if !defined(_MESSAGE_H)
-# define _MESSAGE_H
+#if !defined(_MESSAGE)
+# define _MESSAGE
 
-class Commodity;
+#include "Commodity.h"
+
 class Communicator;
 
 /**
@@ -13,106 +14,224 @@ class Communicator;
  */
 enum MessageDir {up, down};
 
+/**
+ * A transaction structure to include in any message.
+ */
+
 struct Transaction
 {
   /**
    * The Commodity that is being requested or offered in this Message.
    */
-  Commodity* myCommod;
-  
+  Commodity* commod;
+
   /**
    * The amount of the specified commodity being requested or offered. 
    * Units vary. 
-   *
-   * cake -- mass of uranium (metric tons)
-   * uUF6 -- mass of uranium (metric tons)
-   * eUF6 -- number of batches
-   * fuel -- number of batches (reactor), tons of uranium (fabricator)
-   * usedFuel -- number of assemblies (for now, at least)
    * 
    * Note: positive amounts mean you want something, negative amounts 
    * mean you want to get rid of something.
    */
   double amount;
-  double minAmt;
-  
+
+  /**
+   * The minimum amount of the specified commodity being requested or offered. 
+   * Units vary. 
+   * 
+   * Note: positive amounts mean you want something, negative amounts 
+   * mean you want to get rid of something.
+   */
+  double min;
+
+
   /**
    * The price of the commodity being requested or offered.
    */
   double price;
+
+  /**
+   * The Communicator who is the supplier in this transaction.
+   */
+  Communicator* supplier;
+
+  /**
+   * The Communicator who is the requester in this transaction.
+   */
+  Communicator* requester;
 };
 
-struct RoutingSlip
-{
-  /**
-   * The direction this message is traveling (up or down the class 
-   * hierarchy).
-   */
-  MessageDir dir;
-  
-  /**
-   * The path that the message takes from one end to the other
-   */
-  Communicator *sndr, *rcvr, 
-               *mkt, *reg, *inst, *fac;
-};    
-
-struct ShippingRoute
-{
-  Communicator *shipper, *receiver;
-};
 
 /**
- * A message class for offers & requests
+ * A Message class for inter-entity communication.
  */
-class OfferRequest {
-  
-private:
-  
-  Transaction trans;
+class Message {
+  private:
+    /**
+     * The direction this message is traveling (up or down the class 
+     * hierarchy).
+     */
+    MessageDir dir;
 
-  RoutingSlip msgPath;
+    /**
+     * The Transaction this message is concerned with
+     */
+    Transaction trans;
 
-public:
-  
-  /// sample constructor sets some basic data
-  OfferRequest(Communicator* sender);
-  
-  double getAmount() { return trans.amount; };
-  double setAmount(double newAmt) { trans.amount = newAmt; };
-  double getPrice()   { return trans.price; };
-  Transaction getTrans() { return trans; };
+    /**
+     * The Communicator who sent this Message.
+     */
+    Communicator* sender;
 
-  MessageDir getDir() {return msgPath.dir; };
-  Communicator* getReceiver() { return msgPath.rcvr; };
-  Communicator* getMkt()  { return msgPath.mkt;  };
-  Communicator* getReg()  { return msgPath.reg;  };
-  Communicator* getInst() { return msgPath.inst; };
-  Communicator* getFac()  { return msgPath.fac;  };
+    /**
+     * The Communicator who will receive this Message.
+     */
+    Communicator* recipient;
 
-};
+  public:
+    /**
+     * Creates an empty message from some communicator in some direction.
+     *
+     * @param dir the direction this Message is traveling
+     * @param toSend the sender of this Message
+     */
+    Message(MessageDir dir, Communicator* toSend);
 
-/**
- * A message class for shipments
- */
+    /**
+     * Creates a message from a direction, a transaction, 
+     * a recipient, and a sender.
+     */
+    Message(MessageDir dir, Transaction trans, 
+        Communicator* toSend, Communicator* toReceive);
 
-class Shipment {
+    /**
+     * Creates a new Message with the given specs.
+     *
+     * @param dir the direction this Message is traveling
+     * @param commod the Commodity being offered or requested
+     * @param amount the amount of the given Commodity being offered/requested
+     * Note: positive amounts mean you want something, negative amounts 
+     * mean you want to get rid of something.
+     * @param minAmt the minimum amount acceptible for this transaction
+     * @param price the price of the Commodity
+     * @param toSend the sender of this Message
+     * @param toReceive the recipient of this Message, or null if the 
+     * eventual recipient/handler is unknown to the sender
+     */
+    Message(MessageDir dir, Commodity* commod, 
+        double amount, double minAmt, double price, Communicator* toSend, 
+        Communicator* toReceive);
 
-private:
-  Transaction trans;
-  
-  ShippingRoute shipPath;
+    /**
+     * A copy "constructor" for this class.
+     *
+     * @return the copy of this Message
+     */
+    Message* clone() const;
 
-public:
-  Shipment(Transaction trans, Communicator* sender, Communicator* receiver);
+    /**
+     * Returns the sender of this Message.
+     *
+     * @return the sender
+     */
+    Communicator* getSender() const;
 
-  double getAmount() { return trans.amount; };
-  double getPrice()   { return trans.price; };
+    /**
+     * Returns the recipient of this Message.
+     *
+     * @return the recipient
+     */
+    Communicator* getRecipient() const;
 
-  Communicator* getShipper()  { return shipPath.shipper;  };
-  Communicator* getReceiver() { return shipPath.receiver; };
+    /**
+     * Returns the supplier in this Message.
+     *
+     * @return the supplier
+     */
+    Communicator* getSupplier() const;
 
-  void execute();
+    /**
+     * Returns the requester in this Message.
+     *
+     * @return the requester
+     */
+    Communicator* getRequester() const;
+
+    /**
+     * Returns the direction this Message is traveling.
+     */
+    MessageDir getDir() const;
+
+    /**
+     * Returns the transaction associated with this message.
+     *
+     * @return the Transaction
+     */
+    Transaction getTrans() const;
+
+    /**
+     * Returns the Commodity requested or offered in this Message.
+     *
+     * @return the Commodity
+     */
+    Commodity* getCommod() const;
+
+    /**
+     * Returns the amount of some Commodity being requested or offered in 
+     * this message.
+     *
+     * @return the amount (units vary)
+     */
+    double getAmount() const;
+
+    /**
+     * Sets the amount of some Commondity being requested or offered in this 
+     * Message. 
+     *
+     * @param newAmount the updated amount
+     */
+    void setAmount(double newAmount);
+
+    /**
+     * Sets the assigned supplier of the material for the 
+     * transaction in this message. 
+     *
+     * @param newSupplier the assigned supplier
+     */
+    void setSupplier(Communicator* newSupplier);
+
+    /**
+     * Sets the assigned requester to receive the material
+     * for the transaction in this message.
+     *
+     * @param newRequester the updated requester
+     */
+    void setRequester(Communicator* newRequester);
+
+    /**
+     * Returns the price being requested or offered in this message.
+     *
+     * @return the price (in dollars)
+     */
+    double getPrice() const;
+
+    /**
+     * Reverses the direction this Message is being sent (so, for 
+     * instance, the Manager can forward a message back down the hierarchy 
+     * to an appropriate handler.
+     */
+    void reverseDirection();
+
+    /**
+     * unEnumerates the message direction.
+     * 
+     * @return the string associated with myDir
+     */
+    string unEnumerateDir();
+
+    /**
+     * Executes the transaction involved in the message.
+     */
+    void execute();
 
 };
 #endif

@@ -149,7 +149,6 @@ public:
    *  Uses the first XML node pointer in the XML doc pointer of the current
    *  xmlFileInfo object to call get_xpath_elements()
    *
-   *  @param cur XML node pointer from which to start the search 
    *  @param expression XPath expression that will be interpreted relative
    *  to the XML node pointer cur
    */
@@ -177,7 +176,6 @@ public:
    *  Uses the first XML node pointer in the XML doc pointer of the current
    *  xmlFileInfo object to call get_xpath_elements()
    *
-   *  @param cur XML node pointer from which to start the search 
    *  @param expression XPath expression that will be interpreted relative
    *  to the XML node pointer cur
    */

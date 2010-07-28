@@ -2,6 +2,8 @@
 #if !defined(_SOURCEFACILITY_H)
 #define _SOURCEFACILITY_H
 #include <iostream>
+#include <deque>
+#include <queue>
 
 #include "FacilityModel.h"
 
@@ -24,12 +26,12 @@ public:
   /**
    * Default Constructor for the SourceFacility class
    */
-  SourceFacility() {};
+  SourceFacility();
   
   /**
    * Destructor for the SourceFacility class
    */
-  ~SourceFacility() {};
+  ~SourceFacility();
 
   // different ways to populate an object after creation
   /// initialize an object from XML input
@@ -54,7 +56,7 @@ public:
    * A facility should not receive offers or requests directly.
    * Throw an exception
    */
-  virtual void receiveOfferRequest(OfferRequest* msg){};
+  virtual void receiveMessage(Message* msg){};
 
 /* -------------------- */
 
@@ -76,10 +78,25 @@ public:
    * Receives material sent from another facility.
    *
    * @param trans is the transaction object representing the order
-   * @param receiver is the set of materials to be received.
+   * @param manifest is the set of materials to be received.
    */
   virtual void receiveMaterial(Transaction trans, vector<Material*> manifest){};
 
+  /**
+   * Each facility is prompted to do its beginning-of-time-step
+   * stuff at the tick of the timer.
+   *
+   * @param time is the time to perform the tick
+   */
+  virtual void handleTick(int time);
+
+  /**
+   * Each facility is prompted to its end-of-time-step
+   * stuff on the tock of the timer.
+   * 
+   * @param time is the time to perform the tock
+   */
+  virtual void handleTock(int time);
 
 /* ------------------- */ 
 
@@ -105,7 +122,19 @@ protected:
    *  provided to represent infinte capacity.
    */
   double capacity;
-
+  
+	/**
+	 * A collection  that holds the "product" Material this Facility has on 
+	 * hand to send to others. For instance, a Reactor's inventory is its 
+	 * collection of old fuel assemblies that have come out of the core.
+	 *
+	 * @see stocks
+	 * @see waste
+	 */ 
+	deque<Material*> inventory;
+  
+  /// return the inventory
+  deque<Material*>* getInventory(){return &inventory;};
 
 /* ------------------- */ 
 

@@ -17,8 +17,8 @@ using namespace std;
 map<string, mdl_ctor*> Model::create_map;
 map<string, mdl_dtor*> Model::destroy_map;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mdl_ctor* Model::load(string model_type,string model_name)
 {
   mdl_ctor* new_model;
@@ -46,6 +46,7 @@ mdl_ctor* Model::load(string model_type,string model_name)
 }
 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::create(string model_type,xmlNodePtr cur)
 {
   string modelImpl = XMLinput->get_xpath_name(cur, "model/*");
@@ -59,6 +60,7 @@ Model* Model::create(string model_type,xmlNodePtr cur)
   return model;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::create(Model* src)
 {
   mdl_ctor* model_creator = load(src->model_type,src->modelImpl);
@@ -71,6 +73,7 @@ Model* Model::create(Model* src)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Model::destroy(Model* model)
 {
 
@@ -82,12 +85,14 @@ void* Model::destroy(Model* model)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur)
 {
   name = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   modelImpl = XMLinput->get_xpath_name(cur, "model/*");
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* src)
 {
   if (src->model_type != model_type && src->modelImpl != modelImpl)
@@ -101,6 +106,7 @@ void Model::copy(Model* src)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_markets()
 {
 
@@ -110,6 +116,7 @@ void Model::load_markets()
     LI->addMarket(create("Market",nodes->nodeTab[i]));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_facilities()
 {
 
@@ -127,6 +134,7 @@ void Model::load_facilities()
   
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_facilitycatalog(string filename, string ns, string format)
 {
   XMLinput->extendCurNS(ns);
@@ -139,6 +147,7 @@ void Model::load_facilitycatalog(string filename, string ns, string format)
   XMLinput->stripCurNS();
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_regions()
 {
 
@@ -148,6 +157,7 @@ void Model::load_regions()
     LI->addRegion(create("Region",nodes->nodeTab[i]));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_institutions()
 {
 
@@ -157,6 +167,7 @@ void Model::load_institutions()
     create("Inst",nodes->nodeTab[i]);   
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() 
 { 
   cout << model_type << " " << name 

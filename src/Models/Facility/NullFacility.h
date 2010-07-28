@@ -56,7 +56,7 @@ public:
    * A facility should not receive offers or requests directly
    * Throw an exception.
    */
-    virtual void receiveOfferRequest(OfferRequest* msg);
+    virtual void receiveMessage(Message* msg);
 
 /* -------------------- */
 
@@ -66,6 +66,23 @@ public:
  */
 
 public:
+    /**
+     * This sends material up the Inst/Region/Logician line
+     * to be passed back down to the receiver
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param receiver the ultimate facility to receive this transaction
+     */
+    virtual void sendMaterial(Transaction trans, Communicator* receiver);
+    
+    /**
+     * The facility receives the materials other facilities have sent.
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param manifest the list of material objects being received
+     */
+    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
+
     /**
      * The handleTick function specific to the NullFacility.
      * At each tick, it requests as much raw inCommod as it can process this
@@ -84,23 +101,6 @@ public:
      * @param time the time of the tock
      */
     virtual void handleTock(int time);
-
-    /**
-     * This sends material up the Inst/Region/Logician line
-     * to be passed back down to the receiver
-     *
-     * @param trans the Transaction object defining the order being filled
-     * @param receiver the ultimate facility to receive this transaction
-     */
-    virtual void sendMaterial(Transaction trans, Communicator* receiver);
-    
-    /**
-     * The facility receives the materials other facilities have sent.
-     *
-     * @param trans the Transaction object defining the order being filled
-     * @param manifest the list of material objects being received
-     */
-    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
 
 /* ------------------- */ 

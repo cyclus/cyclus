@@ -54,7 +54,7 @@ protected:
  */
 public:
     /// default RegionModel receiver is to ignore messages
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+    virtual void receiveMessage(Message* msg) {};
 
 protected:
 

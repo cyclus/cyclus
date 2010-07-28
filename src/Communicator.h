@@ -2,6 +2,7 @@
 #if !defined(_COMMUNICATOR_H)
 #define _COMMUNICATOR_H
 #include <string>
+#include "Material.h"
 
 using namespace std;
 
@@ -27,36 +28,28 @@ class Communicator {
   
 public:
   
+  /**
+   * Communicator Destructor.
+   */
+  virtual ~Communicator();
+
   /// Get the type of this communicator
   CommunicatorType getCommType() { return commType; };
 
   /**
    *  @brief Default (trivial) sender is implemented
    *
-   *  Generates a new, empty OfferRequest and sends it up/down the chain.
+   *  Generates a new, empty message and sends it up/down the chain.
    */
-  virtual void sendOfferRequest();
+  virtual void sendMessage();
 
   /**
    *  @brief Default (trivial) receiver is implemented to ignore messages
    *
-   *  @param msg OfferRequest message to be received
+   *  @param msg the message to be received
    */
-  virtual void receiveOfferRequest(OfferRequest* msg){};
+  virtual void receiveMessage(Message* msg);
 
-  /**
-   *  @brief Default (trivial) transmitter is implemented
-   *
-   *  For upwards traveling OfferRequest messages, the message is
-   *  transmitted untouched along the following path: 
-   *    * facility -> institution -> region -> market 
-   *
-   *  For downwards traveling message, the opposite path is taken.
-   *
-   *  @param msg OfferRequest message to be transmitted
-   *
-   */
-  virtual void transmitOfferRequest(OfferRequest* msg);
 
 protected:
 

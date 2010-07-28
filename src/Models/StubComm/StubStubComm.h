@@ -41,9 +41,9 @@ public:
  */
 public:
     /// never generate any messages
-    virtual void sendOfferRequest() {};
+    virtual void sendMessage() {};
     /// Simply ingore incoming messages
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+    virtual void receiveMessage(Message* msg) {};
 
 
 protected:

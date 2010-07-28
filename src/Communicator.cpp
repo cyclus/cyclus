@@ -1,55 +1,25 @@
 // Communicator.cpp
 // Implements the Communicator class.
-
+//
+#include "FacilityModel.h"
 #include "Communicator.h"
+#include "GenException.h"
 
-void Communicator::sendOfferRequest()
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator::~Communicator()
 {
-  OfferRequest *msg = new OfferRequest(this);
-
-  transmitOfferRequest(msg);
 }
 
-void Communicator::transmitOfferRequest(OfferRequest* msg)
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::sendMessage()
 {
-  if (msg->getReceiver() == this)
-    receiveOfferRequest(msg);
-  else
-    switch(msg->getDir())
-    {
-      case up:
-        switch(commType)
-        {
-          case FacilityComm:
-            msg->getInst()->transmitOfferRequest(msg);
-            break;
-          case InstComm:
-            msg->getReg()->transmitOfferRequest(msg);
-            break;
-          case RegionComm:
-            msg->getMkt()->receiveOfferRequest(msg);
-            break;
-          case MarketComm:
-            receiveOfferRequest(msg);
-            break;
-        }
-        break;
-      case down:
-        switch(commType)
-        {
-          case FacilityComm:
-            receiveOfferRequest(msg);
-            break;
-          case InstComm:
-            msg->getFac()->receiveOfferRequest(msg);
-            break;
-          case RegionComm:
-            msg->getInst()->transmitOfferRequest(msg);
-            break;
-          case MarketComm:
-            msg->getReg()->transmitOfferRequest(msg);
-            break;
-        }
-        break;
-    }
+  throw GenException
+    ("Sender did not override sendMessage()");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::receiveMessage(Message* msg)
+{
+  throw GenException
+    ("Recipient did not override receiveMessage()");
 }

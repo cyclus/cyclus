@@ -41,7 +41,7 @@ public:
  */
 public:
     /// simply ignore incoming offers/requests.
-    virtual void receiveOfferRequest(OfferRequest* msg) {};
+    virtual void receiveMessage(Message* msg) {};
 
 protected:
 

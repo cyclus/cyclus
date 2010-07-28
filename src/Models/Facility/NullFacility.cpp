@@ -61,7 +61,7 @@ void NullFacility::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::receiveOfferRequest(OfferRequest* msg)
+void NullFacility::receiveMessage(Message* msg)
 {
   throw GenException("Facilities do not receive offers/requests directly.");
 }
@@ -69,19 +69,19 @@ void NullFacility::receiveOfferRequest(OfferRequest* msg)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::sendMaterial(Transaction trans, Communicator* receiver)
 {
-  // create a Transaction object
+  // create an appropriate material object
     // it should be of out_commod Commodity type
-    // it should be of the same size, recipe, etc. as the matched order
-  // send it up to your institution
+    // it should be of the same size, recipe, etc. as the transaction
+  // make your institution send it
   // delete the transaction amount from the inventory
   // record this action
 }
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
+void NullFacility::receiveMaterial(Transaction trans, vector<Material*>)
 {
   // interperet the Transaction information
-  // add the material object(s) from the manifest to the stocks
+  // add the material object from the manifest to the stocks
   // record this action
 }
 

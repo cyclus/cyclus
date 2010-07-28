@@ -43,7 +43,7 @@ public:
  */
 public:
   /// simply ignore incoming offers/requests
-  virtual void receiveOfferRequest(OfferRequest* msg) {};
+  virtual void receiveMessage(Message* msg) {};
 
 /* -------------------- */
 
@@ -59,6 +59,11 @@ public:
   /// simply do nothing when receiving a shipment
   virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
 
+  /// simply do nothing on the tick
+  virtual void handleTick(int time){};
+
+  /// simply do nothing on the tock
+  virtual void handleTock(int time){};
 
 /* ------------------- */ 
 

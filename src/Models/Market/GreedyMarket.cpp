@@ -9,7 +9,7 @@
 #include "InputXML.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::receiveOfferRequest(OfferRequest *msg)
+void GreedyMarket::receiveMessage(Message *msg)
 {
   messages.insert(msg);
 
@@ -26,7 +26,7 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request)
   // send a failure message to the facility
   Transaction trans;
   trans.amount = 0;
-  orders.push_back(new Shipment(trans,NULL,(*request).second->getFac()));
+  orders.push_back(new Message(down, trans, NULL,(*request).second->getRequester()));
 
   // delete the tentative orders
   while ( orders.size() > firmOrders)
@@ -38,7 +38,7 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request)
   // put all matched offers back in the sorted list
   while (matchedOffers.size() > 0)
   {
-    OfferRequest *msg = *(matchedOffers.begin());
+    Message *msg = *(matchedOffers.begin());
     offers.insert(indexedMsg(msg->getAmount(),msg));
     matchedOffers.erase(msg);
   }
@@ -53,7 +53,7 @@ void GreedyMarket::process_request()
 
   while (matchedOffers.size() > 0)
   {
-    OfferRequest *msg = *(matchedOffers.begin());
+    Message *msg = *(matchedOffers.begin());
     messages.erase(msg);
     matchedOffers.erase(msg);
   }
@@ -64,7 +64,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 {
   sortedMsgList::iterator offer;
   double requestAmt,offerAmt;
-  OfferRequest *offerMsg, *requestMsg;
+  Message *offerMsg, *requestMsg;
 
   requestAmt = (*request).first;
   requestMsg = (*request).second;
@@ -86,9 +86,10 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // tenatively queue a new order (don't execute yet)
       matchedOffers.insert(offerMsg);
     
-      orders.push_back(new Shipment(offerMsg->getTrans(),
-                                    offerMsg->getFac(),
-                                    requestMsg->getFac()));
+      orders.push_back(new Message(down,
+          offerMsg->getTrans(),
+          offerMsg->getSupplier(),
+          requestMsg->getRequester()));
 
       requestAmt -= offerAmt;
     } 
@@ -98,20 +99,21 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // queue a new order
       offerMsg->setAmount(requestAmt);
       matchedOffers.insert(offerMsg);
-      orders.push_back(new Shipment(offerMsg->getTrans(),
-                                    offerMsg->getFac(),
-                                    requestMsg->getFac()));
+      orders.push_back(new Message(down,
+            offerMsg->getTrans(),
+            offerMsg->getSupplier(),
+            requestMsg->getRequester()));
 
       // zero out request
       requestAmt = 0;
 
       // make a new offer with reduced amount
       offerAmt -= requestAmt;
-      OfferRequest *new_offer = new OfferRequest(*offerMsg);
+      Message *new_offer = new Message(*offerMsg);
       new_offer->setAmount(-offerAmt);
 
       // call this method for consistency
-      receiveOfferRequest(new_offer);
+      receiveMessage(new_offer);
     }
   }
 

@@ -8,6 +8,22 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+SourceFacility::SourceFacility(){
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+SourceFacility::~SourceFacility(){
+  // Delete all the Material in the inventory.
+  while (!inventory.empty()) {
+    Material* m = inventory.front();
+    inventory.pop_front();
+    delete m;
+  }
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::init(xmlNodePtr cur)
 {
@@ -66,10 +82,15 @@ void SourceFacility::print()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void handleTick(int time){
+void SourceFacility::handleTick(int time){
+  // make offers
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void handleTock(int time){
+void SourceFacility::handleTock(int time){
+  // receive instructions from the market
+  // process material
+  // send material
+  // make a record of all of it
 }
 

@@ -56,9 +56,9 @@ public:
    * The market receives an offer or request that has been passed from the
    * facility to the institution to the region.
    *
-   * @param msg is a pointer to the message, an OfferRequest object
+   * @param msg is a pointer to the message, an Message object
    */
-  virtual void receiveOfferRequest(OfferRequest* msg);
+  virtual void receiveMessage(Message* msg);
 /* -------------------- */
 
 
@@ -86,13 +86,13 @@ private:
   /**
    * The messages that have been indexed
    */
-  typedef pair<double,OfferRequest*> indexedMsg;
+  typedef pair<double,Message*> indexedMsg;
 
   /**
    * The messages of both offer and request types that have been sorted
    * according to thie size.
    */
-  typedef multimap<double,OfferRequest*> sortedMsgList;
+  typedef multimap<double,Message*> sortedMsgList;
   
   /** 
    * The requests that have been sorted according to their size.
@@ -107,14 +107,14 @@ private:
   /**
    * The set of pointers to offers that have been matched.
    */
-  set<OfferRequest*> matchedOffers;
+  set<Message*> matchedOffers;
   
   /**
-   * This function adds an OfferRequest object to the list of matchedOffers
+   * This function adds an Message object to the list of matchedOffers
    *
    * @param msg a pointer to the message to add
    */
-  void add(OfferRequest* msg);
+  void add(Message* msg);
 
   /**
    * A boolean that keeps track of whether requests have been matched.

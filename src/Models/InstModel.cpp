@@ -14,6 +14,7 @@ int InstModel::nextID = 0;
 #include "Logician.h"
 #include "InputXML.h"
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur)
 {
   Model::init(cur);
@@ -30,6 +31,7 @@ void InstModel::init(xmlNodePtr cur)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::copy(InstModel* src)
 {
   Model::copy(src);
@@ -44,6 +46,7 @@ void InstModel::copy(InstModel* src)
   
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::print()
 {
   Model::print();

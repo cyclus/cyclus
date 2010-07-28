@@ -32,7 +32,7 @@ public:
   /// Default constructor for InstModel Class
   InstModel() { ID = nextID++; model_type="Inst"; commType=InstComm; };
 
-  /// ever model should be destructable
+  /// every model should be destructable
   virtual ~InstModel() {};
   
   // every model needs a method to initialize from XML
@@ -55,7 +55,7 @@ protected:
  */
 public:
   /// default InstModel receiver has no default behavior
-  virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+  virtual void receiveMessage(Message* msg) = 0;
 
 protected:
 

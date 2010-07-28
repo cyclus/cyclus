@@ -16,6 +16,7 @@ int FacilityModel::nextID = 0;
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::init(xmlNodePtr cur)
 {
   Model::init(cur);
@@ -27,6 +28,7 @@ void FacilityModel::init(xmlNodePtr cur)
   fac_name = "";
 } 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::copy(FacilityModel* src)
 { 
   Model::copy(src); 
@@ -36,16 +38,21 @@ void FacilityModel::copy(FacilityModel* src)
   fac_name = "";
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleTick(int time){
   // facilities should override this method, unless they're very naiive.
-  // generic handleTick() behavior should probably be to offer that facility's
-  // capacity worth of their output material and request their capacity worth 
-  // of their raw material.
+  // generally, a facility's handleTick() behavior should be to 
+  // offer an amount of its output material equal to its capacity 
+  // and to request an amount of raw material also equal to its capacity.
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleTock(int time){
   // facilities should override this method, unless they're very naiive.
-  // generic handleTock() behavior should probably be to execute any
-  // outstanding orders.  
+  // generally, a faility's handleTock() behavior should be to 
+  // process any orders passed down from the market, 
+  // send the appropriate materials, 
+  // receive any materials the market has found a source for, 
+  // and record all material transfers.
 }
 

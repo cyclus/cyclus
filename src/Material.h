@@ -3,6 +3,7 @@
 # define _MATERIAL_H
 
 #include <map>
+#include <iostream>
 
 #include "InputXML.h"
 

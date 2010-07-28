@@ -55,7 +55,7 @@ protected:
  */
 public:
     /// No default STUBCOMMMODEL message receiver.
-    virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+    virtual void receiveMessage(Message* msg) = 0;
 
 protected:
 

@@ -54,7 +54,7 @@ protected:
  */
 public:
   /// default MarketModel receiver simply logs the offer/request
-  virtual void receiveOfferRequest(OfferRequest* msg) 
+  virtual void receiveMessage(Message* msg) 
   { messages.insert(msg); };
 
 protected:
@@ -92,10 +92,10 @@ protected:
   Commodity* commodity;
 
   /// every market collects offers & requests
-  set<OfferRequest*> messages;
+  set<Message*> messages;
 
   /// every market generates a set of orders
-  deque<Shipment*> orders;
+  deque<Message*> orders;
   int firmOrders;
   
 

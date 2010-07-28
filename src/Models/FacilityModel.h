@@ -60,7 +60,7 @@ public:
    *
    *  Each derived class must implement an offer/request receiver
    */ 
-  virtual void receiveOfferRequest(OfferRequest* msg) = 0;
+  virtual void receiveMessage(Message* msg)=0;
 
 protected:
 
@@ -95,6 +95,25 @@ public:
   string getFacName() { return fac_name; };
 
   /**
+   * There is no default FacilityModel shipment supplier
+   * Each derived class must implement a shipment supplier
+   * 
+   * @param trans is the transaction being executed
+   * @param requester is the material requester
+   */ 
+  virtual void sendMaterial(Transaction trans, Communicator* requester) = 0;
+
+  /**
+   * There is no default FacilityModel shipment requester 
+   * Each derived class must implement a shipment requester
+   *
+   * @param mat is the transaction being executed
+   * @param  is the set of materials being received
+   *
+   */ 
+  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) = 0;
+  
+  /**
    * Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
@@ -109,21 +128,6 @@ public:
    * @param time is the time to perform the tock
    */
   virtual void handleTock(int time);
-
-  /**
-   *  There is no default FacilityModel shipment sender
-   *
-   *  Each derived class must implement a shipment sender
-   */ 
-  virtual void sendMaterial(Transaction trans, Communicator* receiver) = 0;
-
-  /**
-   *  There is no default FacilityModel shipment receiver 
-   *
-   *  Each derived class must implement an shipment receiver
-   */ 
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) = 0;
-  
 
 /* ------------------- */ 
   

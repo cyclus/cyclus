@@ -99,7 +99,7 @@ public:
   /**
    * Returns a list of input commodities for the facility with facID ID.
    *
-   * @param facID is the facility ID
+   * @param ID is the facility ID
    * @return feeds
    */
   list<Commodity*> getFeeds(int ID);
@@ -107,7 +107,7 @@ public:
   /**
    * Returns a list of output commodities for the facility with facID ID.
    *
-   * @param facID is the facility ID
+   * @param ID is the facility ID
    * @return prods
    */
   list<Commodity*> getProds(int ID);
@@ -115,7 +115,7 @@ public:
   /**
    * Returns a feeds market for the facilty with facID ID.
    *
-   * @param facID is the facility ID
+   * @param ID is the facility ID
    * @return inMarket
    **/
   Market*getInMkt(int ID);
@@ -123,7 +123,7 @@ public:
   /**
    * Returns a prods market for the facilty with facID ID.
    *
-   * @param facID is the facility ID
+   * @param ID is the facility ID
    * @return inMarket
    **/
   Market*getOutMkt(int ID);
