@@ -58,6 +58,11 @@ public:
    */
   virtual void receiveMessage(Message* msg){};
 
+  /**
+   * This faclity needs to override the sendMessage function in the
+   * communicator class.
+   */
+
 /* -------------------- */
 
 /* --------------------

@@ -121,12 +121,42 @@ protected:
      */
     Commodity* out_commod;
 
-    queue<Material*> active_inventory, used_inventory;
+    /**
+     * The NullFacility has a limit to how material it can process.
+     * Units vary. It will be in the commodity unit per month.
+     */
+    double capacity;
 
+    /**
+     * The stocks of raw material available to be processed.
+     */
+    queue<Material*> stocks;
+    
+    /**
+     * The inventory of processed material.
+     */
+    queue<Material*> inventory;
+
+    /**
+     * The time that the stock material spends in the facility.
+     */
     int residence_time;
+
+    /**
+     * The maximum size that the inventory can grow to.
+     * The NullFacility must stop processing the material in its stocks 
+     * when its inventory is full.
+     */
     int inventory_size;
 
+    /**
+     * The receipe of input materials.
+     */
     Material* in_recipe;
+
+    /**
+     * The receipe of the output material.
+     */
     Material* out_recipe;
 
 /* ------------------- */ 

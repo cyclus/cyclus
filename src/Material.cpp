@@ -9,6 +9,7 @@ using namespace std;
 #include "GenException.h"
 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(xmlNodePtr cur)
 {
   
@@ -40,6 +41,7 @@ Material::Material(xmlNodePtr cur)
 }
 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::load_recipes()
 {
 
@@ -59,7 +61,7 @@ void Material::load_recipes()
                   XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
 
 }
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::load_recipebook(string filename, string ns, string format)
 {
   XMLinput->extendCurNS(ns);
@@ -72,7 +74,7 @@ void Material::load_recipebook(string filename, string ns, string format)
   XMLinput->stripCurNS();
 }
 
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::normalize(CompMap &comp_map)
 {
   double sum_total_comp = 0;
@@ -86,6 +88,7 @@ void Material::normalize(CompMap &comp_map)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_A2M()
 {
   
@@ -104,7 +107,7 @@ void Material::rationalize_A2M()
   normalize(mass_comp);
 
 }
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_M2A()
 {
 
@@ -123,7 +126,7 @@ void Material::rationalize_M2A()
 
 }
 
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::printComp(string header, CompMap comp_map)
 {
 

@@ -67,7 +67,11 @@ protected:
  */
 
 public:
+  /// sets this institution's region
   void setRegion(Model* my_region) { region = my_region; };
+
+  /// returns this institution's region
+  RegionModel* getRegion() { return ((RegionModel*)(region)); };
 
 protected:
   Model* region;

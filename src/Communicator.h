@@ -44,12 +44,18 @@ public:
   virtual void sendMessage();
 
   /**
+   * @brief Sends a message where it needs to go.
+   *
+   * @param msg the message to send
+   */
+  virtual void sendMessage(Message* msg);
+
+  /**
    *  @brief Default (trivial) receiver is implemented to ignore messages
    *
    *  @param msg the message to be received
    */
   virtual void receiveMessage(Message* msg);
-
 
 protected:
 
@@ -58,5 +64,6 @@ protected:
 
   /// All communicators need to know what type they are
   CommunicatorType commType;
+
 };
 #endif

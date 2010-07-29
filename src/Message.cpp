@@ -4,6 +4,8 @@
 #include "Message.h"
 
 #include "FacilityModel.h"
+#include "MarketModel.h"
+#include "InstModel.h"
 #include "Communicator.h"
 #include "GenException.h"
 
@@ -22,6 +24,10 @@ Message::Message(MessageDir thisDir, Communicator* toSend)
     trans.min =
     trans.price = 0;
 
+  mkt =
+    reg =
+    inst =
+    fac = NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,6 +38,9 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
   trans = thisTrans;
   sender = toSend;
   recipient = toReceive;
+  Model* mktModel = trans.commod->getMarket();
+  mkt = ((MarketModel*)(mktModel));
+  setPath(dir, sender, recipient);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,6 +54,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, d
 	trans.price = thisPrice;
   sender = toSend;
   recipient = toReceive;
+  setPath(dir, sender, recipient);
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -86,9 +96,25 @@ Transaction Message::getTrans() const{
 Commodity* Message::getCommod() const {
 	return trans.commod;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getAmount() const {
 	return trans.amount;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::getFac() const {
+	return fac;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::getInst() const {
+	return inst;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::getReg() const {
+	return reg;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::getMkt() const {
+	return mkt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setAmount(double newAmount) 
@@ -119,6 +145,55 @@ void Message::reverseDirection()
 		// Speaking of "getting up" or "getting down," check out
 		// "National Funk Congress Deadlocked On Get Up/Get Down Issue,"
 		// The Onion (1999, October 27), 35(39).
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setPath(MessageDir dir, Communicator* sender, Communicator* recipient)
+{
+  if(dir==up)
+  {
+    switch (sender->getCommType())
+    {
+      case FacilityComm:
+        fac = sender; 
+        inst = ((FacilityModel*)(fac))->getInst();
+        reg = ((InstModel*)(inst))->getRegion();
+        break;
+      case InstComm:
+        fac = NULL;
+        inst = sender;
+        reg = ((InstModel*)(inst))->getRegion();
+        break;
+      case RegionComm:
+        reg = sender;
+        break;
+      case MarketComm:
+        throw GenException("A Market can't send a message *up* to anyone.");
+      break;
+    }
+  }
+  else if(dir==down)
+  {
+    switch (recipient->getCommType())
+    {
+      case FacilityComm:
+        fac = recipient;
+        inst = ((FacilityModel*)(fac))->getInst();
+        reg = ((InstModel*)(inst))->getRegion();
+        break;
+      case InstComm:
+        fac = NULL;
+        inst = sender;
+        reg = ((InstModel*)(inst))->getRegion();
+        break;
+      case RegionComm:
+        reg = recipient;
+        break;
+      case MarketComm:
+        throw GenException("No one can send a message *down* to a market.");
+      break;
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

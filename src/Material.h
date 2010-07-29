@@ -68,7 +68,7 @@ private:
 
   static void load_recipebook(string filename, string ns, string format);
 
-    /// map isotopes to number of atoms
+  /// map isotopes to number of atoms
   CompMap atom_comp, 
 	/// map isotope to mass
 	mass_comp;
@@ -89,13 +89,21 @@ private:
   /**
    *  This function should be replaced by a function that can
    *  lookup the exact mass of an isotope, not just its mass number
+   *
+   *  @param isotope is the isotope whose mass you'd like to know
    */
   double getA(Iso isotope) { return ((isotope/10)%1000); };
   
-  /// normalize a composition so that we have atom/mass fractions
+  /**
+   * normalize a composition so that we have atom/mass fractions
+   *
+   * @param &comp_map is the composition to normalize
+   */
   void normalize(CompMap &comp_map);
+
   /// convert an atom composition into a consitent mass composition
   void rationalize_A2M();
+
   /// convert mass composition into a consitent atom composition
   void rationalize_M2A();
  

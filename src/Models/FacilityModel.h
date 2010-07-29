@@ -6,6 +6,7 @@
 
 #include "Model.h"
 #include "Communicator.h"
+#include "InstModel.h"
 
 using namespace std;
 
@@ -73,6 +74,9 @@ protected:
  * --------------------
  */
 protected:
+  /// each facility should have an institution that manages it
+  Model* inst;
+
   /// each instance of a facility needs a name
   string fac_name;
 
@@ -93,6 +97,12 @@ public:
 
   /// Returns the facility's name
   string getFacName() { return fac_name; };
+
+  /// Sets this facility's institution 
+  void setInst(Model* my_inst) { inst = my_inst; };
+
+  /// Returns this facility's institution
+  InstModel* getInst() { return ((InstModel*)(inst)); };
 
   /**
    * There is no default FacilityModel shipment supplier

@@ -87,6 +87,26 @@ class Message {
      */
     Communicator* recipient;
 
+    /**
+     * The Market this message will pass to or from.
+     */
+    Communicator* mkt;
+
+    /**
+     * The region this messgae will pas through.
+     */
+    Communicator* reg;
+
+    /**
+     * The region this messgae will pas through.
+     */
+    Communicator* inst;
+
+    /**
+     * The region this messgae will pas through.
+     */
+    Communicator* fac;
+
   public:
     /**
      * Creates an empty message from some communicator in some direction.
@@ -184,7 +204,35 @@ class Message {
     double getAmount() const;
 
     /**
-     * Sets the amount of some Commondity being requested or offered in this 
+     * Returns the facility this message is passing to or from
+     *
+     * @return fac
+     */
+    Communicator* getFac() const;
+
+    /**
+     * Returns the institution this message is passing through
+     *
+     * @return inst
+     */
+    Communicator* getInst() const;
+
+    /**
+     * Returns the region this message is passing through
+     *
+     * @return reg
+     */
+    Communicator* getReg() const;
+
+    /**
+     * Returns the facility this message is passing to or from
+     *
+     * @return mkt
+     */
+    Communicator* getMkt() const;
+
+    /**
+     * Sets the amount of some Commodity being requested or offered in this 
      * Message. 
      *
      * @param newAmount the updated amount
@@ -220,6 +268,15 @@ class Message {
      * to an appropriate handler.
      */
     void reverseDirection();
+
+    /**
+     * Sets the path of the message using the direction, sender and recipient.
+     *
+     * @param dir the direction of the message
+     * @param sender the sender of the message
+     * @param recipient the recipient of the message
+     */
+    void setPath(MessageDir dir, Communicator* sender, Communicator* recipient);
 
     /**
      * unEnumerates the message direction.
