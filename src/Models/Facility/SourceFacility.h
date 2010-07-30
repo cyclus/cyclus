@@ -127,19 +127,36 @@ protected:
    *  provided to represent infinte capacity.
    */
   double capacity;
-  
+
+  /**
+   * The maximum size that the inventory can grow to.
+   * The NullFacility must stop processing the material in its stocks 
+   * when its inventory is full.
+   */
+  int inventory_size;
+
+  /**
+   * The price that the facility will charge for its output commodity.
+   * Units vary and are in dollars per inventory unit.
+   */
+  double commod_price;
+
 	/**
 	 * A collection  that holds the "product" Material this Facility has on 
 	 * hand to send to others. For instance, a Reactor's inventory is its 
 	 * collection of old fuel assemblies that have come out of the core.
-	 *
-	 * @see stocks
-	 * @see waste
 	 */ 
 	deque<Material*> inventory;
   
   /// return the inventory
   deque<Material*>* getInventory(){return &inventory;};
+
+  /**
+   * return the total mass of the material objects in the inventory
+   * the units vary and are associated with with material type
+   */
+  Mass checkInventory();
+
 
 /* ------------------- */ 
 

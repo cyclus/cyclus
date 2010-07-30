@@ -179,12 +179,17 @@
 
   <define name="SourceFacility">
      <element name="SourceFacility"> 
-
         <ref name="outcommodity"/>
-	
+
         <element name="capacity">
           <text/>
-	</element>
+          </element>
+        <element name="inventorysize">
+          <text/>
+          </element>
+        <element name="commodprice">
+          <text/>
+          </element>
 
 	<element name="recipe">
           <text/>

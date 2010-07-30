@@ -45,7 +45,7 @@ struct Transaction
 
 
   /**
-   * The price of the commodity being requested or offered.
+   * The price per unit of the commodity being requested or offered.
    */
   double price;
 

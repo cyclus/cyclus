@@ -18,7 +18,7 @@ typedef double Atoms;
 /// type definition for mass
 typedef double Mass;
 /// map integers to doubles: Iso => (Atoms|Mass)
-typedef map<int,double> CompMap;
+typedef map<int, double> CompMap;
 
 /// we will always need Avogadro's number somewhere
 #define AVOGADRO 6.02e23
@@ -41,11 +41,21 @@ public:
   /// default constructor
   Material() : atomEqualsMass(true), total_mass(0), total_atoms(0) {};
 
-  /// primary constructor reads input from XML node
+  /**
+   * primary constructor reads input from XML node
+   *
+   * @param cur input XML node
+   */
   Material(xmlNodePtr cur);
 
+  /** 
+   * Default destructor does nothing.
+   */
   ~Material() {};
 
+  /**
+   * loads the recipes from the input file
+   */
   static void load_recipes();
   
   /// standard verbose printer includes both an atom and mass composition output
@@ -58,11 +68,32 @@ public:
         << " kg per " << units << endl;
   }
 
-  /// verbose printer for a single type of composition
+  /**
+   * verbose printer for a single type of composition
+   *
+   * @param header is the description of the composition 
+   * @param comp_map is the map between isotopes and mass
+   */
   void printComp(string header, CompMap comp_map);
 
+  /**
+   * returns the name of the recipe
+   *
+   * @return recipeName
+   */
   string getName() { return recipeName; };
+
+  /**
+   * returns the units of the recipe, a string
+   *
+   * @return units
+   */
   string getUnits() { return units; };
+
+  /**
+   * returns the total mass of this material object PER UNIT
+   */
+  Mass getTotalMass() { return total_mass; };
 
 private:
 
@@ -70,16 +101,22 @@ private:
 
   /// map isotopes to number of atoms
   CompMap atom_comp, 
+
 	/// map isotope to mass
 	mass_comp;
+
   /// total mass of this material object PER UNIT
   Mass total_mass;
+
   /// total number of atoms in this material object PER UNIT
   Atoms total_atoms;
+
   /// keep track of whether or not the mass & atom count is still consistent
   bool atomEqualsMass;
+
   /// units for this material
   string units;
+
   /// name of this recipe
   string recipeName;
   
