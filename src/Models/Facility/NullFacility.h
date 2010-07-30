@@ -53,8 +53,7 @@ public:
 
 public:
   /**
-   * A facility should not receive offers or requests directly
-   * Throw an exception.
+   * When the facility receives a message, execute any transaction therein
    */
     virtual void receiveMessage(Message* msg);
 

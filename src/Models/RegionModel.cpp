@@ -15,6 +15,7 @@ int RegionModel::nextID = 0;
 #include "Logician.h"
 #include "InputXML.h"
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::init(xmlNodePtr cur)
 {
  
@@ -41,6 +42,7 @@ void RegionModel::init(xmlNodePtr cur)
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::copy(RegionModel* src)
 {
   Model::copy(src);
@@ -56,7 +58,7 @@ void RegionModel::copy(RegionModel* src)
 
 }
   
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::print()
 {
 

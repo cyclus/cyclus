@@ -22,17 +22,27 @@ class FixedInst : public InstModel
  */
 
 public:
-    FixedInst() {};
+  /**
+   * Default constructor for the fixed inst
+   */
+  FixedInst() {};
     
-    ~FixedInst() {};
-   
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
-    /// initialize an object by copying another
-    virtual void copy(FixedInst* src);
+  /**
+   * Default destructor for the fixed inst
+   */
+  ~FixedInst() {};
+  
+  // different ways to populate an object after creation
+  /// initialize an object from XML input
+  virtual void init(xmlNodePtr cur);
 
-    virtual void print();
+  /// initialize an object by copying another
+  virtual void copy(FixedInst* src);
+
+  /**
+   * a print function to describe a fixedInst instantiation.
+   */
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -41,8 +51,13 @@ public:
  * --------------------
  */
 public:
-    /// simply ignore incoming offers/requests.
-    virtual void receiveMessage(Message* msg) {};
+  /**
+   * The fixedInst simply passes on any offers/requests.
+   *
+   * @param msg the message to receive
+   */
+  virtual void receiveMessage(Message* msg);
+
 
 protected:
 
@@ -54,6 +69,7 @@ protected:
  * --------------------
  */
 
+
 /* ------------------- */ 
 
 /* --------------------
@@ -63,7 +79,7 @@ protected:
 
 protected:
 
-    vector<Model*> facilities;
+  vector<Model*> facilities;
 
 /* ------------------- */ 
 
