@@ -53,15 +53,9 @@ public:
  */
 public:
   /**
-   * A facility should not receive offers or requests directly.
-   * Throw an exception
+   * When this facility receives a message, execute the transaction therein.
    */
-  virtual void receiveMessage(Message* msg){};
-
-  /**
-   * This faclity needs to override the sendMessage function in the
-   * communicator class.
-   */
+  virtual void receiveMessage(Message* msg);
 
 /* -------------------- */
 

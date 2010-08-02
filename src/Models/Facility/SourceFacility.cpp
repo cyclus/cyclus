@@ -91,6 +91,12 @@ void SourceFacility::print()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SourceFacility::receiveMessage(Message* msg){
+  // decide what the transaction is asking
+  // produce the right material and send it
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTick(int time){
   // make offers
   // decide how much to offer

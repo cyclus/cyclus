@@ -66,8 +66,15 @@ void NullFacility::receiveMessage(Message* msg)
   // find out the amount of the transaction 
   Transaction trans = msg->getTrans();
   // check if you have enough in inventory to fill the order
-  // 
-  Commodity* newCommod = trans.commod;
+  Mass inv = this->checkInventory();
+  if(inv >= trans.amount){
+    // if there's enough, package the material and send it
+    
+  }
+  else if (inv < trans.amount){
+    // if not, send what you can and print a warning
+
+  }
 
 }
 

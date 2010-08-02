@@ -72,7 +72,7 @@ void FixedInst::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::receiveMessage(Message* msg){
- // The FixedInst isn't insterestedin fooling with messages.
+ // The FixedInst isn't insterested in fooling with messages.
  // Just pass them along. 
  // If it's going up, send it to the region.
  // If it's going down, send it to the fac.
