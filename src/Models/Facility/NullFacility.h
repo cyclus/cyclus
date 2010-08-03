@@ -129,12 +129,20 @@ protected:
     /**
      * The stocks of raw material available to be processed.
      */
-    queue<Material*> stocks;
+    deque<Material*> stocks;
     
     /**
      * The inventory of processed material.
      */
-    queue<Material*> inventory;
+    deque<Material*> inventory;
+
+    /**
+     * get the total mass of the stuff in the inventory
+     *
+     * @return the total mass of the materials in storage
+     */
+    Mass checkInventory();
+
 
     /**
      * The time that the stock material spends in the facility.

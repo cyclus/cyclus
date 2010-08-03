@@ -130,9 +130,10 @@
 
       <element name="model">
       <choice>
-        <ref name="StubFacility"/>
         <ref name="NullFacility"/>
+        <ref name="SinkFacility"/>
         <ref name="SourceFacility"/>
+        <ref name="StubFacility"/>
         <!-- insert ref to new FacilityModels here -->
       </choice>
       </element>
@@ -177,6 +178,23 @@
      </element>
   </define>
 
+
+  <define name="SinkFacility">
+     <element name="SinkFacility"> 
+        <ref name="incommodity"/>
+
+        <element name="capacity">
+          <text/>
+          </element>
+        <element name="inventorysize">
+          <text/>
+          </element>
+        <element name="commodprice">
+          <text/>
+          </element>
+     </element>
+  </define>
+
   <define name="SourceFacility">
      <element name="SourceFacility"> 
         <ref name="outcommodity"/>
@@ -190,10 +208,9 @@
         <element name="commodprice">
           <text/>
           </element>
-
-	<element name="recipe">
+        <element name="recipe">
           <text/>
-        </element>
+          </element>
 
      </element>
   </define>

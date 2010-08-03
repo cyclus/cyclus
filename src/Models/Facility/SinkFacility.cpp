@@ -1,4 +1,4 @@
-/// SinkFacility.cpp
+// SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
 
@@ -81,8 +81,8 @@ void SinkFacility::print()
     cout << (commod == in_commods.begin() ? "{" : ", " );
     cout << (*commod)->getName();
   }
-  cout << "} until its inventory is full at ";
-  cout << inventory_size << " [UNITS?]." << endl ;
+  cout << "} and has a max inventory of";
+  cout << inventory_size << " ." << endl ;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
