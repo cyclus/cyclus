@@ -18,6 +18,7 @@ SET( CYCLUS_SRC
      Message.cpp
      Communicator.cpp
      Utility/GenException.cpp 
+     Utility/Timer.cpp
      Models/Model.cpp 
         Models/StubModel.cpp 
         Models/StubCommModel.cpp 

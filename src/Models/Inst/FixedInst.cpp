@@ -42,7 +42,8 @@ void FixedInst::init(xmlNodePtr cur)
     Model* new_facility = Model::create(facility);
 
     ((FacilityModel*)new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
-    facilities.push_back(new_facility);
+    ((FacilityModel*)new_facility)->setInstName(this->getName());
+    this->addFacility(new_facility);
   }
 }
 

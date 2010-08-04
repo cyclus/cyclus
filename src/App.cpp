@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "Logician.h"
+#include "Timer.h"
 #include "InputXML.h"
 
 using namespace std;
@@ -29,7 +30,6 @@ int main(int argc, char* argv[])
     // get commodities
     
     // get markets
-    // 
 
 
     cout << "Here is a list of " << LI->getNumMarkets() << " markets:" << endl;
@@ -40,7 +40,9 @@ int main(int argc, char* argv[])
     LI->printRegions();
     cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
     LI->printRecipes();
-
+    
+    // Run the simulation 
+    TI->runSim();
 
 
     return 0;

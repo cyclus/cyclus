@@ -1,4 +1,4 @@
-// SinkFacility.cpp
+/// SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
 
@@ -81,8 +81,8 @@ void SinkFacility::print()
     cout << (commod == in_commods.begin() ? "{" : ", " );
     cout << (*commod)->getName();
   }
-  cout << "} and has a max inventory of";
-  cout << inventory_size << " ." << endl ;
+  cout << "} until its inventory is full at ";
+  cout << inventory_size << " [UNITS?]." << endl ;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -139,9 +139,9 @@ void SinkFacility::handleTock(int time){
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  cout << "SinkFacility ID: " << this->getSN();
-  cout << "is holding " << this->checkInventory();
-  cout << " [UNITS?] at month" << time; 
+  cout << "SinkFacility " << this->getSN();
+  cout << " is holding " << this->checkInventory();
+  cout << " material at month" << time; 
   cout << "." << endl;
 }
 

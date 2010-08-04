@@ -6,6 +6,7 @@
 
 #include "InputXML.h"
 
+#include "Timer.h"
 #include "GenException.h"
 #include "Logician.h"
 #include "Model.h"
@@ -45,7 +46,7 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
   return strdup(searchFilename.c_str());
 
 }
-string InputXML::main_schema = searchPathForFile("cyclus.rng", "../src/","","");
+string InputXML::main_schema = searchPathForFile("cyclus.rng", "../../src/","","");
 
 InputXML::InputXML()
 {
@@ -81,7 +82,7 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
   if (xmlRelaxNGValidateDoc(vctxt,doc))
     throw GenException("Invalid XML file; file: "    
       + fileInfo->filename 
-      + " does not valiudate against schema " 
+      + " does not validate against schema " 
       + *(fileInfo->schema));
   else
     cerr << "File " << fileInfo->filename << " is valid against schema "
@@ -139,6 +140,7 @@ void InputXML::load_file(string filename)
   Model::load_regions();
   Model::load_institutions();
 
+  TI->load_simulation();
 
   // delete/free mem
 

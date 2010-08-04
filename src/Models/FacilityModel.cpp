@@ -2,6 +2,7 @@
 // Implements the FacilityModel class
 
 #include "FacilityModel.h"
+#include "Logician.h"
 
 /* --------------------
  * all MODEL classes have these members
@@ -21,11 +22,13 @@ void FacilityModel::init(xmlNodePtr cur)
 {
   Model::init(cur);
 
-  /** 
-   *  Specific initialization for FacilityModels
-   */
+  // Specific initialization for FacilityModels
+  inst_name = XMLinput->get_xpath_content(cur,"/simulation/region/institution/name");
+  //this->setInst(LI->getInstByName(inst_name));
+  this->setInstName(inst_name);
+  cout << "Facility " << ID << " has just set its inst to " << inst_name << endl;
 
-  fac_name = "";
+  // fac_name = "";
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,6 +41,11 @@ void FacilityModel::copy(FacilityModel* src)
   fac_name = "";
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+InstModel* FacilityModel::getFacInst()
+{
+  return (InstModel*)(LI->getInstByName(inst_name));
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleTick(int time){
   // facilities should override this method, unless they're very naiive.

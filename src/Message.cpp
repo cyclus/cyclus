@@ -52,6 +52,8 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, d
 	trans.amount = thisAmount; 
   trans.min = minAmt;
 	trans.price = thisPrice;
+  Model* mktModel = trans.commod->getMarket();
+  mkt = ((MarketModel*)(mktModel));
   sender = toSend;
   recipient = toReceive;
   setPath(dir, sender, recipient);
@@ -156,7 +158,7 @@ void Message::setPath(MessageDir dir, Communicator* sender, Communicator* recipi
     {
       case FacilityComm:
         fac = sender; 
-        inst = ((FacilityModel*)(fac))->getInst();
+        inst = ((FacilityModel*)(fac))->getFacInst();
         reg = ((InstModel*)(inst))->getRegion();
         break;
       case InstComm:
@@ -178,7 +180,7 @@ void Message::setPath(MessageDir dir, Communicator* sender, Communicator* recipi
     {
       case FacilityComm:
         fac = recipient;
-        inst = ((FacilityModel*)(fac))->getInst();
+        inst = ((FacilityModel*)(fac))->getFacInst();
         reg = ((InstModel*)(inst))->getRegion();
         break;
       case InstComm:

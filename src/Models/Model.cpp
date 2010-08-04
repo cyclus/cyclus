@@ -110,7 +110,7 @@ void Model::copy(Model* src)
 void Model::load_markets()
 {
 
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/market");
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
   
   for (int i=0;i<nodes->nodeNr;i++)
     LI->addMarket(create("Market",nodes->nodeTab[i]));
@@ -122,8 +122,10 @@ void Model::load_facilities()
 
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/facility");
   
-  for (int i=0;i<nodes->nodeNr;i++)
-    LI->addFacility(create("Facility",nodes->nodeTab[i]));
+  for (int i=0;i<nodes->nodeNr;i++){
+    Model* thisFac = create("Facility",nodes->nodeTab[i]);
+    LI->addFacility(thisFac);
+  }
   
   nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
   
@@ -164,7 +166,7 @@ void Model::load_institutions()
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
   
   for (int i=0;i<nodes->nodeNr;i++)
-    create("Inst",nodes->nodeTab[i]);   
+    LI->addInst(create("Inst",nodes->nodeTab[i]));   
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

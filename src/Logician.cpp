@@ -1,5 +1,6 @@
 // Logician.cpp
 // Implements the Logician class.
+#include <iostream> 
 #include <math.h>
 #include "Logician.h"
 #include "GenException.h"
@@ -19,6 +20,46 @@ Logician* Logician::Instance() {
     _instance = new Logician();
   
   return _instance;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::handleTimeStep(int time)
+{
+  sendTick(time);
+  resolveMarkets();
+  sendTock(time);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::sendTick(int time)
+{
+  // tell all of the facility models to handle the tick
+  for(ModelList::iterator fac=facilities.begin();
+    fac != facilities.end(); 
+    fac++){
+    ((FacilityModel*)(*fac))->handleTick(time);
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::sendTock(int time)
+{
+  // tell all of the facility models to handle the tock
+  for(ModelList::iterator fac=facilities.begin();
+    fac != facilities.end(); 
+    fac++){
+    ((FacilityModel*)(*fac))->handleTock(time);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::resolveMarkets()
+{
+  // tell each market model to make matches and send out the orders
+  for(ModelList::iterator mkt=markets.begin();
+      mkt != markets.end();
+      mkt++){
+    ((MarketModel*)(*mkt))-> resolve();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -128,6 +169,36 @@ void Logician::  registerCommodityMarket(Commodity* commod, Model* market)
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::addInst(Model* new_inst)   
+{ 
+  insts.push_back(new_inst); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::printInsts()                 
+{ 
+  printModelList(insts); 
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Logician::getNumInsts()                 
+{ 
+  return insts.size(); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Logician::getInstByID(int ID)        
+{ 
+  return insts[ID]; 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Logician::getInstByName(string name) 
+{ 
+  return getModelByName(insts,name); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addRegion(Model* new_region)   
 { 
   regions.push_back(new_region); 
@@ -203,5 +274,4 @@ Commodity* Logician::getCommodity(string name)
 { 
   return commodities[name]; 
 } 
-
 

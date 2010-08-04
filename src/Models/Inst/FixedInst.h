@@ -58,10 +58,7 @@ public:
    */
   virtual void receiveMessage(Message* msg);
 
-
 protected:
-
-
 /* -------------------- */
 
 /* --------------------

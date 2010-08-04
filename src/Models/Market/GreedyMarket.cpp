@@ -24,9 +24,10 @@ void GreedyMarket::receiveMessage(Message *msg)
 void GreedyMarket::reject_request(sortedMsgList::iterator request)
 {
   // send a failure message to the facility
-  Transaction trans;
-  trans.amount = 0;
-  orders.push_back(new Message(down, trans, NULL,(*request).second->getRequester()));
+//  Transaction trans;
+//  trans.amount = 0;
+//  orders.push_back(new Message(down, trans, this, 
+//                               (*request).second->getRequester()));
 
   // delete the tentative orders
   while ( orders.size() > firmOrders)

@@ -73,8 +73,19 @@ public:
   /// returns this institution's region
   RegionModel* getRegion() { return ((RegionModel*)(region)); };
 
+  /// adds a facility to this model
+  void addFacility(Model* new_fac){ facilities.push_back(new_fac);};
+
 protected:
+  /**
+   * Each institution is a member of exactly one region
+   */
   Model* region;
+
+  /**
+   * Each institution keeps a list of its facilities;
+   */
+  vector<Model*> facilities;
 
 /* ------------------- */ 
   

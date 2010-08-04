@@ -9,6 +9,22 @@
     <interleave>
 
     <oneOrMore>
+    <ref name="duration"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="startmonth"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="startyear"/>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="simstart"/>
+    </oneOrMore>
+
+    <oneOrMore>
     <ref name="commodity"/>
     </oneOrMore>
   
@@ -68,6 +84,31 @@
 
   </choice>
   </start>
+
+  <!-- begin section for simulation parameters -->
+  <define name="duration">
+    <element name="duration">
+      <text/>
+    </element>
+  </define>
+
+  <define name="startmonth">
+    <element name="startmonth">
+      <text/>
+    </element>
+  </define>
+
+  <define name="startyear">
+    <element name="startyear">
+      <text/>
+    </element>
+  </define>
+
+  <define name="simstart">
+    <element name="simstart">
+      <text/>
+    </element>
+  </define>
 
   <!-- begin section for commodities -->
   <define name="commodity">

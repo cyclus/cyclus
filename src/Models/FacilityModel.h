@@ -1,4 +1,4 @@
-/// FacilityModel.h
+// FacilityModel.h
 #if !defined(_FACILITYMODEL_H)
 #define _FACILITYMODEL_H
 #include <string>
@@ -75,7 +75,8 @@ protected:
  */
 protected:
   /// each facility should have an institution that manages it
-  Model* inst;
+  //Model* inst;
+  string inst_name;
 
   /// each instance of a facility needs a name
   string fac_name;
@@ -99,10 +100,12 @@ public:
   string getFacName() { return fac_name; };
 
   /// Sets this facility's institution 
-  void setInst(Model* my_inst) { inst = my_inst; };
+  //void setInst(Model* my_inst) { inst = my_inst; };
+  /// Sets this facility's instutution as a string
+  void setInstName(string name){ inst_name = name;};
 
   /// Returns this facility's institution
-  InstModel* getInst() { return ((InstModel*)(inst)); };
+  InstModel* getFacInst();
 
   /**
    * There is no default FacilityModel shipment supplier

@@ -1,4 +1,4 @@
-// InstModel.cpp
+/// InstModel.cpp
 // Implements the InstModel class
 
 #include "InstModel.h"
@@ -26,6 +26,8 @@ void InstModel::init(xmlNodePtr cur)
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   region = LI->getRegionByName(region_name);
+  this->setRegion(region);
+  cout << "Inst " << ID << " has set its region to be " << region_name << endl;
   
   ((RegionModel*)region)->addInstitution(this);
 

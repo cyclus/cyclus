@@ -97,6 +97,8 @@ public:
    */
   virtual void handleTock(int time);
 
+protected: 
+
 /* ------------------- */ 
 
 /* --------------------

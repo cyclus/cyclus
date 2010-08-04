@@ -2,6 +2,8 @@
 #if !defined(_LOGICIAN)
 # define _LOGICIAN
 
+#include "FacilityModel.h"
+#include "MarketModel.h"
 #include "Model.h"
 #include "Material.h"
 #include "Commodity.h"
@@ -38,7 +40,7 @@ private:
 	Logician();
 
 	/// lists of models
-	ModelList facilities, markets, regions;
+	ModelList facilities, insts, regions, markets;
 
 	/// list of material templates
 	RecipeList recipes;
@@ -63,8 +65,37 @@ public:
 	 * @return a pointer to the Logician
 	 */
 	static Logician* Instance();
+
+  /**
+   * Handles all the duties of the time step (typically, a month)
+   *
+   * @param time is the simulation time step that is being handled.
+   */
+  void handleTimeStep(int time);
 		
 	/// generic routines to handle Model-based entities
+  /**
+   * sends the tick signal to all of the models
+   *
+   * @param time is the simulation time of the tick
+   */
+  void sendTick(int time);
+
+  /**
+   * sends the tock signal to all of the models
+   *
+   * @param time is the simulation time of the tock
+   */
+  void sendTock(int time);
+
+  /**
+   * sends the resolve signal to all of the market models
+   * which in turn make matches and send orders
+   *
+   * @param time is the simulation time of the tock
+   */
+  void resolveMarkets();
+
 	/* 
 	 * Generic routine to add a Model-based entity to a specific list
 	 *
@@ -163,7 +194,6 @@ public:
    * @param commod the pointer to a commodity
    */
 	Model* getMarketByCommodity(Commodity* commod); 
-                ;
 
 	/**
    * register a commodity with a market
@@ -172,8 +202,38 @@ public:
    * @param market a pointer to the market with which to register the commod.
    */
 	void   registerCommodityMarket(Commodity* commod, Model* market);
-	        ;
 	
+	/**
+   * add a inst to the list
+   *
+   * @param new_inst
+   */
+	void addInst(Model* new_inst);   
+
+	/** 
+   * print list of insts
+   */
+	void printInsts();
+
+	/**
+   * get number of insts
+   */
+	int getNumInsts();                 
+
+	/**
+   * get a pointer to an inst based on its ID number
+   *
+   * @param ID the ID number of the inst for which to return a pointer
+   */
+	Model* getInstByID(int ID);        
+
+	/**
+   * get a pointer to an inst based on its name
+   *
+   * @param name the name of the inst for which to return a pointer
+   */
+	Model* getInstByName(string name); 
+
 	/**
    * add a region to the list
    *
