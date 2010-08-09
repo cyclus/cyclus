@@ -13,21 +13,22 @@ void GreedyMarket::receiveMessage(Message *msg)
 {
   messages.insert(msg);
 
-  if (msg->getAmount() > 0)
-    requests.insert(indexedMsg(msg->getAmount(),msg));
-  else
-    offers.insert(indexedMsg(-msg->getAmount(),msg));
-
+  if (msg->getAmount() > 0){
+    offers.insert(indexedMsg(msg->getAmount(),msg));
+  }
+  else{
+    requests.insert(indexedMsg(-msg->getAmount(),msg));
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GreedyMarket::reject_request(sortedMsgList::iterator request)
 {
   // send a failure message to the facility
-//  Transaction trans;
-//  trans.amount = 0;
-//  orders.push_back(new Message(down, trans, this, 
-//                               (*request).second->getRequester()));
+  //  Transaction trans;
+  //  trans.amount = 0;
+  //  orders.push_back(new Message(down, trans, this, 
+  //                               (*request).second->getRequester()));
 
   // delete the tentative orders
   while ( orders.size() > firmOrders)
@@ -83,14 +84,19 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     // pop off this offer
     offers.erase(offer);
   
-    if (requestAmt > offerAmt) {
+    if (requestAmt > offerAmt) { 
+    
+      // put a new message in the order stack
+      // it goes down to supplier
+      offerMsg->setRequesterID(requestMsg->getRequesterID());
+      offerMsg->setDir(down);
+
       // tenatively queue a new order (don't execute yet)
       matchedOffers.insert(offerMsg);
-    
-      orders.push_back(new Message(down,
-          offerMsg->getTrans(),
-          offerMsg->getSupplier(),
-          requestMsg->getRequester()));
+
+      //Message* maybe_offer = new Message(*offerMsg);
+      //orders.push_back(maybe_offer);
+      orders.push_back(offerMsg);
 
       requestAmt -= offerAmt;
     } 
@@ -99,11 +105,13 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       // queue a new order
       offerMsg->setAmount(requestAmt);
+
       matchedOffers.insert(offerMsg);
-      orders.push_back(new Message(down,
-            offerMsg->getTrans(),
-            offerMsg->getSupplier(),
-            requestMsg->getRequester()));
+      Message* maybe_offer = new Message(*offerMsg);
+      maybe_offer->setDir(down);
+      maybe_offer->setRequesterID(requestMsg->getRequesterID());
+
+      orders.push_back(maybe_offer);
 
       // zero out request
       requestAmt = 0;
@@ -111,7 +119,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // make a new offer with reduced amount
       offerAmt -= requestAmt;
       Message *new_offer = new Message(*offerMsg);
-      new_offer->setAmount(-offerAmt);
+      new_offer->setAmount(offerAmt);
 
       // call this method for consistency
       receiveMessage(new_offer);
@@ -136,8 +144,14 @@ void GreedyMarket::resolve()
     
     if(match_request(request)) {
       process_request();
+      cout << "to: "<< (*request).second->getRequesterID() << " for  " 
+          << (*request).first << " matched."<<endl;
     } 
     else {
+      cout << "to: "<< (*request).second->getRequesterID() 
+          << " from: " << (*request).second->getSupplierID()
+          << " for  " << (*request).first 
+          << " rejected. "<<endl;
       reject_request(request);
     }
     // remove this request

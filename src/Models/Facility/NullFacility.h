@@ -137,6 +137,11 @@ protected:
     deque<Material*> inventory;
 
     /**
+     * The list of orders to process on the Tock
+     */
+    deque<Message*> ordersWaiting;
+
+    /**
      * get the total mass of the stuff in the inventory
      *
      * @return the total mass of the materials in storage

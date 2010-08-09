@@ -1,4 +1,4 @@
-/// SinkFacility.cpp
+// SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
 
@@ -51,13 +51,13 @@ void SinkFacility::init(xmlNodePtr cur)
   }
 
   // get monthly capacity
-  Mass capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
 
   // get inventory_size
-  Mass inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
 
   // get commodity price
-  double commod_price = atof(XMLinput->get_xpath_content(cur,"commodprice"));
+  commod_price = atof(XMLinput->get_xpath_content(cur,"commodprice"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -82,7 +82,7 @@ void SinkFacility::print()
     cout << (*commod)->getName();
   }
   cout << "} until its inventory is full at ";
-  cout << inventory_size << " [UNITS?]." << endl ;
+  cout << inventory_size << " units." << endl ;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -108,11 +108,12 @@ void SinkFacility::handleTick(int time){
        commod++) 
     {
       Communicator* recipient = (Communicator*)((*commod)->getMarket());
-      requestAmt = emptiness/in_commods.size();
-      Message* request = new Message(up, *commod, requestAmt, minAmt, 
+      // recall that requests have a negative amount
+      requestAmt = (emptiness/in_commods.size());
+      Message* request = new Message(up, *commod, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
-    // pass the message up to the inst
-    (request->getInst())->receiveMessage(request);
+      // pass the message up to the inst
+      (request->getInst())->receiveMessage(request);
     }
   }
   // otherwise, the upper bound is the monthly acceptance capacity, request cap.
@@ -124,7 +125,7 @@ void SinkFacility::handleTick(int time){
     {
       Communicator* recipient = (Communicator*)((*commod)->getMarket());
       requestAmt = capacity/in_commods.size();
-      Message* request = new Message(up, *commod, requestAmt, minAmt, commod_price,
+      Message* request = new Message(up, *commod, -requestAmt, minAmt, commod_price,
                           this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
@@ -141,7 +142,7 @@ void SinkFacility::handleTock(int time){
   // For now, lets just print out what we have at each timestep.
   cout << "SinkFacility " << this->getSN();
   cout << " is holding " << this->checkInventory();
-  cout << " material at month" << time; 
+  cout << " material at month " << time; 
   cout << "." << endl;
 }
 
@@ -154,7 +155,9 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-  inventory.push_back(*thisMat);
+    cout<<"Sink Facility is receiving material with mass "
+        << (*thisMat)->getTotMass() << endl;
+    inventory.push_back(*thisMat);
   }
 }
 
@@ -168,7 +171,7 @@ Mass SinkFacility::checkInventory(){
   deque<Material*>::iterator iter;
 
   for (iter = inventory.begin(); iter != inventory.end(); iter ++)
-    total += (*iter)->getTotalMass();
+    total += (*iter)->getTotMass();
 
   return total;
 }

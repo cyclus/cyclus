@@ -69,9 +69,9 @@ public:
    * Sends material from this facility's inventory to another facility.
    *
    * @param trans is the transaction object representing the order
-   * @param receiver is the communicator that the transaction is sent to next
+   * @param requester is the communicator that the transaction is sent to
    */
-  virtual void sendMaterial(Transaction trans, Communicator* receiver){};
+  virtual void sendMaterial(Transaction trans, const Communicator* requester);
   
   /**
    * Receives material sent from another facility.
@@ -146,6 +146,11 @@ protected:
   
   /// return the inventory
   deque<Material*>* getInventory(){return &inventory;};
+
+  /**
+   * A list of orders to be processed on the Tock
+   */
+  deque<Message*> ordersWaiting;
 
   /**
    * return the total mass of the material objects in the inventory

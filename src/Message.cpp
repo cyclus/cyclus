@@ -3,6 +3,7 @@
 
 #include "Message.h"
 
+#include "Logician.h"
 #include "FacilityModel.h"
 #include "MarketModel.h"
 #include "InstModel.h"
@@ -16,9 +17,10 @@ Message::Message(MessageDir thisDir, Communicator* toSend)
   sender = toSend;
 
   trans.commod = NULL;
-  recipient = 
-    trans.supplier = 
-    trans.requester = NULL;
+  recipient = NULL;
+
+  trans.supplierID =
+      trans.requesterID = NULL;
 
   trans.amount = 
     trans.min =
@@ -61,15 +63,15 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, d
   // if amt is positive and there is no supplier
   // this message is an offer and 
   // the sender is the supplier
-  if (trans.amount > 0  && trans.supplier == NULL){
-    trans.supplier = sender;
+  if (trans.amount > 0){
+    this->setSupplierID(((FacilityModel*)sender)->getSN());
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
-  if (trans.amount < 0 && trans.requester == NULL){
-    trans.requester = sender;
+  if (trans.amount < 0){
+    this->setRequesterID(((FacilityModel*)sender)->getSN());
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -84,7 +86,15 @@ Communicator* Message::getSender() const {
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getRecipient() const {
-return recipient;
+  return recipient;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Message::getSupplierID() const {
+  return trans.supplierID;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Message::getRequesterID() const {
+  return trans.requesterID;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MessageDir Message::getDir() const {
@@ -119,19 +129,24 @@ Communicator* Message::getMkt() const {
 	return mkt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setDir(MessageDir newDir) 
+{
+	dir = newDir;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setAmount(double newAmount) 
 {
 	trans.amount = newAmount;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplier(Communicator* newSupplier) 
+void Message::setSupplierID(int newID) 
 {
-	trans.supplier = newSupplier;
+	trans.supplierID = newID;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRequester(Communicator* newRequester) 
+void Message::setRequesterID(int newID) 
 {
-	trans.requester = newRequester;
+	trans.requesterID = newID;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getPrice() const {
@@ -213,8 +228,9 @@ string Message::unEnumerateDir(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute()
 {
-    if (trans.supplier->getCommType() == FacilityComm)
-	((FacilityModel*)trans.supplier)->sendMaterial(trans,trans.requester);
-    else
-	throw GenException("Only FaciliyModels can send material.");
+  FacilityModel* theFac = ((FacilityModel*)LI->getFacilityByID(trans.supplierID));
+  if (((Communicator*)theFac)->getCommType() == FacilityComm)
+    (theFac)->receiveMessage(this);
+  else
+    throw GenException("Only FacilityModels can send material.");
 } 

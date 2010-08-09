@@ -202,9 +202,7 @@
 
   <define name="StubFacility">
      <element name="StubFacility"> 
-      <oneOrMore>
         <ref name="incommodity"/>
-      </oneOrMore>
 
       <oneOrMore>
         <ref name="outcommodity"/>
@@ -222,7 +220,9 @@
 
   <define name="SinkFacility">
      <element name="SinkFacility"> 
-        <ref name="incommodity"/>
+        <oneOrMore>
+          <ref name="incommodity"/>
+        </oneOrMore>
 
         <element name="capacity">
           <text/>
@@ -238,7 +238,9 @@
 
   <define name="SourceFacility">
      <element name="SourceFacility"> 
-        <ref name="outcommodity"/>
+        <oneOrMore>
+          <ref name="outcommodity"/>
+        </oneOrMore>
 
         <element name="capacity">
           <text/>

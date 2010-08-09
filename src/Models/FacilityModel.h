@@ -114,7 +114,7 @@ public:
    * @param trans is the transaction being executed
    * @param requester is the material requester
    */ 
-  virtual void sendMaterial(Transaction trans, Communicator* requester) = 0;
+  // virtual void sendMaterial(Transaction trans, Communicator* requester) = 0;
 
   /**
    * There is no default FacilityModel shipment requester 

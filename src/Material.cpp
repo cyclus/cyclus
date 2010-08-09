@@ -5,8 +5,9 @@ using namespace std;
 
 #include "Material.h"
 
-#include "Logician.h"
 #include "GenException.h"
+#include "Logician.h"
+#include "Timer.h"
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -38,8 +39,32 @@ Material::Material(xmlNodePtr cur)
     rationalize_M2A();
   else
     rationalize_A2M();
+
+  compHist[TI->getTime()] = atom_comp ;
+  facHist = FacHistory() ;
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(CompMap comp, string mat_unit, string rec_name)
+{
+  atom_comp = comp;
+  units = mat_unit;
+  recipeName = rec_name;
+
+  total_mass=0;
+  total_atoms=0;
+
+  CompMap::iterator entry;
+  for (entry = atom_comp.begin(); entry != atom_comp.end(); entry++){
+    total_mass += (*entry).second;
+    total_atoms += 1;
+  }
+
+  compHist[TI->getTime()] = atom_comp ;
+  facHist = FacHistory() ;
+
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::load_recipes()
@@ -72,6 +97,198 @@ void Material::load_recipebook(string filename, string ns, string format)
     throw GenException(format + "is not a supported recipebook format.");
 
   XMLinput->stripCurNS();
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const bool Material::isNeg(Iso tope) const
+{
+  if (this->getComp(tope) == 0)
+    return false;
+  // KDHFLAG
+
+  Atoms atoms_eps =  AVOGADRO / Material::getMassNum(tope) * eps * 1e6; 
+  return this->getComp(tope) + atoms_eps < 0;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const bool Material::isZero(Iso tope) const
+{
+  // KDHFLAG
+
+  Atoms nd_eps =  AVOGADRO / Material::getMassNum(tope) * eps * 1e6; 
+  return fabs(this->getComp(tope)) < nd_eps;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Material::getIsoMass(Iso tope, const CompMap& comp)
+{
+  // If the given isotope is present, calculate and return its mass. 
+  // Else return 0.
+
+  CompMap::const_iterator searchIso = comp.find(tope);
+  double mass = 0;
+  if (searchIso != comp.end()) 
+    // mass = searchIso->second * Material::getMassNum(tope)/ AVOGADRO / 1e6;
+    mass = (*searchIso).second;
+  return mass;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Material::getTotMass(const CompMap& comp)
+{
+  // Sum the masses of the isotopes.
+  CompMap::const_iterator iter = comp.begin();
+  double mass = 0;
+
+  while (iter != comp.end()) {
+    mass = mass + Material::getIsoMass(iter->first, comp);
+    iter ++;
+  }
+  return mass;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::changeComp(Iso tope, Atoms change, int time)
+{
+
+  // If the composition has already changed during this timestep, we copy and 
+  // delete the current entry, modify it, and re-add. If there's no entry 
+  // for this timestep, simply copy the most recent one, edit, and add.
+  CompMap newComp;
+  if (compHist.end() != compHist.find(time)) {
+    newComp = CompMap(compHist[time]);
+    compHist.erase(time);
+  }
+  else
+    newComp = CompMap((*compHist.rbegin()).second);
+
+  // If the isotope's already in the vector, add to the amount, otherwise
+  // add a new entry.
+  if (newComp.end() != newComp.find(tope)) {
+    double oldVal = newComp[tope];
+    newComp.erase(tope);
+    newComp.insert(make_pair(tope, oldVal + change));
+  }
+  else
+    newComp.insert(make_pair(tope, change));
+
+  // Now insert the copy for the current time.
+  compHist.insert(make_pair(time, newComp));
+
+  // If there's no material of the given isotope left (w/r/t COM tolerance), 
+  // set the nd to zero. If the value is negative, throw an exception;
+  // something's gone wrong.
+  if (this->isZero(tope)) {
+    CompMap newComp = compHist[time];
+    newComp.erase(tope);
+    newComp.insert(make_pair(tope, 0));
+    compHist.insert(make_pair(time, newComp));
+  }
+
+  if (this->isNeg(tope))
+    throw GenException("Tried to make isotope composition negative.");
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const CompMap Material::getComp() const
+{
+  return atom_comp;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const CompMap Material::getFracComp(double frac) const
+{
+  // Create a new composition object.
+  CompMap newComp;
+
+  // Iterate through the current composition vector and add to the new object 
+  // the specified fraction of each isotope.
+  CompMap currComp = this->getComp();
+  CompMap::iterator iter = currComp.begin();
+
+  while (iter != currComp.end()) {
+    newComp[iter->first] = iter->second * frac;
+    iter ++;
+  }
+
+  return newComp;
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Atoms Material::getComp(Iso tope) const
+{
+  CompMap currComp = this->getComp();
+
+  // If the isotope isn't currently present, return 0. Else return the 
+  // isotope's current number density.
+  if (currComp.find(tope) == currComp.end()) {
+    return 0;
+  }
+  else
+    return currComp[tope];
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::absorb(Material* matToAdd)
+{
+  // Get the given Material's composition.
+  CompMap compToAdd = matToAdd->getComp();
+
+  // Iterate over the isotopes in the Material we're adding and add them to 
+  // this Material.
+  CompMap::iterator iter = compToAdd.begin();
+  Iso isoToAdd;
+  Atoms atomsToAdd;
+
+  while (*iter != *(compToAdd.end())) {
+    isoToAdd = iter->first;
+    atomsToAdd = iter->second;
+    this->changeComp(isoToAdd, atomsToAdd, TI->getTime());
+    iter ++;
+  }
+
+  // Delete the given Material.
+  delete matToAdd;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::extract(Material* matToRem)
+{
+  // Get the given Material's composition.
+  CompMap compToRem = matToRem->getComp();
+
+  // Iterate over the isotopes in the Material we're removing and subtract 
+  // them from this Material.
+  CompMap::iterator iter = compToRem.begin();
+  Iso isoToRem;
+  Atoms ndToRem;
+
+  while (*iter != *(compToRem.end())) {
+    isoToRem = iter->first;
+    ndToRem = 0 - iter->second;
+    this->changeComp(isoToRem, ndToRem, TI->getTime());
+    iter ++;
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Material::getMassNum(Iso tope)
+{
+  // Make sure the number's in a reasonable range.
+  if (tope < 1010 || tope > 1182949)
+    throw GenException("Tried to get atomic number of invalid isotope");
+
+  // Get the mass number and return.
+  return (tope / 10) % 1000;
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Material* Material::extractMass(double mass)
+{
+  double frac = mass / this->getTotMass();
+  CompMap comp = this->getFracComp(frac);
+  Material* newMat = new Material(comp , units, " ");
+  this->extract(newMat);
+  return newMat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

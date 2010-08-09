@@ -23,8 +23,8 @@
     <model>
       <SourceFacility>
         <outcommodity>uo2</outcommodity>
-        <capacity>1e6</capacity>
-        <inventorysize>10e6</inventorysize>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
         <recipe>fresh_50gwd</recipe>
       </SourceFacility>
@@ -36,8 +36,8 @@
     <model>
       <SinkFacility>
         <incommodity>uo2</incommodity>
-        <capacity>1e6</capacity>
-        <inventorysize>10e6</inventorysize>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
     </model>
@@ -56,7 +56,7 @@
         <FixedInst>
           <facility>
             <type>FrontEnd</type>
-            <name>Bob</name>
+            <name>FrontEnd</name>
           </facility>
           <facility>
             <type>BackEnd</type>

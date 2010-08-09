@@ -50,14 +50,14 @@ struct Transaction
   double price;
 
   /**
-   * The Communicator who is the supplier in this transaction.
+   * The ID of the Communicator who is the supplier in this transaction.
    */
-  Communicator* supplier;
+  int supplierID;
 
   /**
-   * The Communicator who is the requester in this transaction.
+   * The ID of the Communicator who is the requester in this transaction.
    */
-  Communicator* requester;
+  int requesterID;
 };
 
 
@@ -163,18 +163,18 @@ class Message {
     Communicator* getRecipient() const;
 
     /**
-     * Returns the supplier in this Message.
+     * Returns the ID of the supplier in this Message.
      *
-     * @return the supplier
+     * @return the ID of the supplier
      */
-    Communicator* getSupplier() const;
+    int getSupplierID() const;
 
     /**
      * Returns the requester in this Message.
      *
-     * @return the requester
+     * @return the ID of the requester
      */
-    Communicator* getRequester() const;
+    int getRequesterID() const;
 
     /**
      * Returns the direction this Message is traveling.
@@ -230,6 +230,13 @@ class Message {
      * @return mkt
      */
     Communicator* getMkt() const;
+    
+    /**
+     * Sets the direction of the message
+     *
+     * @param newDir is the new direction
+     */
+    void setDir(MessageDir newDir);
 
     /**
      * Sets the amount of some Commodity being requested or offered in this 
@@ -243,17 +250,17 @@ class Message {
      * Sets the assigned supplier of the material for the 
      * transaction in this message. 
      *
-     * @param newSupplier the assigned supplier
+     * @param newID the ID of the new supplier
      */
-    void setSupplier(Communicator* newSupplier);
+    void setSupplierID(int newID);
 
     /**
      * Sets the assigned requester to receive the material
      * for the transaction in this message.
      *
-     * @param newRequester the updated requester
+     * @param newID the ID of the new requester
      */
-    void setRequester(Communicator* newRequester);
+    void setRequesterID(int newID);
 
     /**
      * Returns the price being requested or offered in this message.

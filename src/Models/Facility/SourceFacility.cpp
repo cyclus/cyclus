@@ -34,6 +34,7 @@ void SourceFacility::init(xmlNodePtr cur)
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
 
+
   /// all facilities require commodities - possibly many
   string input_token;
 
@@ -92,8 +93,43 @@ void SourceFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::receiveMessage(Message* msg){
-  // decide what the transaction is asking
-  // produce the right material and send it
+
+  // is this a message from on high? 
+  if(this==msg->getRecipient() || msg->getSupplierID()==this->getSN()){
+    // file the order
+    ordersWaiting.push_front(msg);
+  }
+  else {
+    throw GenException("SourceFacility is not recipient nor supplier of msg.");
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SourceFacility::sendMaterial(Transaction trans, const Communicator* requester)
+{
+  Mass newAmt = 0;
+  CompMap newComp;
+  newComp.insert(make_pair((Iso)92235, (Atoms)0));
+  Material* newMat = new Material(newComp, recipe->getUnits(), recipe->getName());
+
+  // deque<Material*>::iterator iter;
+  // pull materials off of the inventory stack until you get the trans amount
+
+  while(trans.amount > newAmt){
+    Material* m = inventory.front();
+    if(m->getTotMass() <= (trans.amount - newAmt)){
+      newMat->absorb(m);
+      newAmt += m->getTotMass();
+    }
+    else{ 
+      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      newMat->absorb(toAbsorb);
+      newAmt += toAbsorb->getTotMass();
+    }
+  }    
+  vector<Material*> toSend;
+  toSend.push_back(newMat);
+  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -127,11 +163,31 @@ void SourceFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
-  // receive instructions from the market
-  // process material
-  // send material
-  // make a record of all of it
+  // if there's room in the inventory, process material at capacity
+  Mass emptiness = inventory_size - this->checkInventory();
+  if(capacity <= emptiness){
+    // add a material the size of the capacity to the inventory
+    // currently, this just copies the recipe, ignoring capacity.
+    // FIX IT with a new material constructor that takes a comp and a mass.
+    Material* newMat = new Material(recipe->getComp(), recipe->getUnits(), recipe->getName());
+    inventory.push_front(newMat);
+  }
+  else if (emptiness < capacity && emptiness > 0){
+    // add a material that fills the inventory
+    Material* baseMat = new Material(recipe->getComp(), recipe->getUnits(), recipe->getName());
+    Material* newMat = baseMat->extractMass(emptiness);
+    inventory.push_front(newMat);
+    delete baseMat;
+  }
+  // check what orders are waiting, 
+  // pull materials off of the inventory stack until you get the trans amount
+  while(!ordersWaiting.empty()){
+    Message* order = ordersWaiting.front();
+    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    ordersWaiting.pop_front();
+  }
 }
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Mass SourceFacility::checkInventory(){
@@ -143,7 +199,7 @@ Mass SourceFacility::checkInventory(){
 	deque<Material*>::iterator iter;
 
 	for (iter = inventory.begin(); iter != inventory.end(); iter ++)
-		total += (*iter)->getTotalMass();
+		total += (*iter)->getTotMass();
 
 	return total;
 }
