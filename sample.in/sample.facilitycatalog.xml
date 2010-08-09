@@ -8,8 +8,6 @@
   <model>
     <StubFacility>
       <incommodity>uo2</incommodity>
-      <incommodity>uo2</incommodity>
-      <outcommodity>snf</outcommodity>
       <outcommodity>snf</outcommodity>
     </StubFacility>
   </model>

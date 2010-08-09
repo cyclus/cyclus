@@ -119,20 +119,20 @@ void Model::load_markets()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_facilities()
 {
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
+  
+  for (int i=0;i<nodes->nodeNr;i++){
+    load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], "filename"),
+        XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
+        XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
+  }
 
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/facility");
+  nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++){
     Model* thisFac = create("Facility",nodes->nodeTab[i]);
     LI->addFacility(thisFac);
   }
-  
-  nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
-  
-  for (int i=0;i<nodes->nodeNr;i++)
-    load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], "filename"),
-        XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
-        XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
   
 }
 
@@ -141,8 +141,9 @@ void Model::load_facilitycatalog(string filename, string ns, string format)
 {
   XMLinput->extendCurNS(ns);
 
-  if ("xml" == format)
+  if ("xml" == format){
     XMLinput->load_facilitycatalog(filename);
+  }
   else
     throw GenException(format + "is not a supported facilitycatalog format.");
 
