@@ -17,7 +17,8 @@ Material::Material(xmlNodePtr cur)
   recipeName = XMLinput->get_xpath_content(cur,"name");
 
   string comp_type = XMLinput->get_xpath_content(cur,"basis");
-  CompMap &comp_map = ( "atom" != comp_type ? mass_comp : atom_comp );
+  CompMap &comp_map = ( "atom" != comp_type ? massHist[TI->getTime()] : 
+                       compHist[TI->getTime()]);
   double &total_comp = ( "atom" != comp_type ? total_mass : total_atoms);
 
   units = XMLinput->get_xpath_content(cur,"unit");
@@ -40,7 +41,6 @@ Material::Material(xmlNodePtr cur)
   else
     rationalize_A2M();
 
-  compHist[TI->getTime()] = atom_comp ;
   facHist = FacHistory() ;
 }
 
@@ -48,7 +48,7 @@ Material::Material(xmlNodePtr cur)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMap comp, string mat_unit, string rec_name)
 {
-  atom_comp = comp;
+  compHist[TI->getTime()] = comp;
   units = mat_unit;
   recipeName = rec_name;
 
@@ -56,12 +56,13 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
   total_atoms=0;
 
   CompMap::iterator entry;
-  for (entry = atom_comp.begin(); entry != atom_comp.end(); entry++){
+  for (entry = compHist[TI->getTime()].begin(); 
+       entry != compHist[TI->getTime()].end(); 
+       entry++){
     total_mass += (*entry).second;
     total_atoms += 1;
   }
 
-  compHist[TI->getTime()] = atom_comp ;
   facHist = FacHistory() ;
 
 }
@@ -111,10 +112,7 @@ const bool Material::isNeg(Iso tope) const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
-  // KDHFLAG
-
-  Atoms nd_eps =  AVOGADRO / Material::getMassNum(tope) * eps * 1e6; 
-  return fabs(this->getComp(tope)) < nd_eps;
+  return fabs(this->getComp(tope)) < AVOGADRO / eps;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -131,6 +129,20 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
   return mass;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Mass Material::getTotMass() const
+{
+  CompMap comp = this->getComp();
+  // Sum the masses of the isotopes.
+  CompMap::iterator iter = comp.begin();
+  double mass = 0;
+
+  while (iter != comp.end()) {
+    mass = mass + Material::getIsoMass(iter->first, comp);
+    iter ++;
+  }
+  return mass;
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotMass(const CompMap& comp)
 {
@@ -173,8 +185,7 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   compHist.insert(make_pair(time, newComp));
 
   // If there's no material of the given isotope left (w/r/t COM tolerance), 
-  // set the nd to zero. If the value is negative, throw an exception;
-  // something's gone wrong.
+  // set the nd to zero.
   if (this->isZero(tope)) {
     CompMap newComp = compHist[time];
     newComp.erase(tope);
@@ -182,6 +193,8 @@ void Material::changeComp(Iso tope, Atoms change, int time)
     compHist.insert(make_pair(time, newComp));
   }
 
+  // If the value is negative, throw an exception;
+  // something's gone wrong.
   if (this->isNeg(tope))
     throw GenException("Tried to make isotope composition negative.");
 
@@ -190,9 +203,16 @@ void Material::changeComp(Iso tope, Atoms change, int time)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const CompMap Material::getComp() const
 {
-  return atom_comp;
+  CompMap comp;
+  CompHistory::const_reverse_iterator it = compHist.rbegin();
+  if (it!=compHist.rend()){
+    comp = it->second;
+  }
+  else{
+    comp.insert(make_pair(Iso(92235),Atoms(0)));
+  }
+  return comp;
 }
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const CompMap Material::getFracComp(double frac) const
 {
@@ -235,7 +255,7 @@ void Material::absorb(Material* matToAdd)
 
   // Iterate over the isotopes in the Material we're adding and add them to 
   // this Material.
-  CompMap::iterator iter = compToAdd.begin();
+  CompMap::const_iterator iter = compToAdd.begin();
   Iso isoToAdd;
   Atoms atomsToAdd;
 
@@ -311,17 +331,17 @@ void Material::rationalize_A2M()
   
   total_mass = 0;
 
-  for(CompMap::iterator entry = atom_comp.begin();
-      entry != atom_comp.end();
+  for(CompMap::iterator entry = compHist[TI->getTime()].begin();
+      entry != compHist[TI->getTime()].end();
       entry++)
   {
-    mass_comp[(*entry).first] = (*entry).second * getA((*entry).first);
-    total_mass += mass_comp[(*entry).first];
+    massHist[TI->getTime()][(*entry).first] = (*entry).second * getA((*entry).first);
+    total_mass += massHist[TI->getTime()][(*entry).first];
   }
 
   total_mass *= total_atoms/AVOGADRO;
 
-  normalize(mass_comp);
+  normalize(massHist[TI->getTime()]);
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -329,17 +349,17 @@ void Material::rationalize_M2A()
 {
 
   total_atoms = 0;
-  for(CompMap::iterator entry = mass_comp.begin();
-      entry != mass_comp.end();
+  for(CompMap::iterator entry = massHist[TI->getTime()].begin();
+      entry != massHist[TI->getTime()].end();
       entry++)
   {
-    atom_comp[(*entry).first] = (*entry).second / getA((*entry).first);
-    total_atoms += atom_comp[(*entry).first];
+    compHist[TI->getTime()][(*entry).first] = (*entry).second / getA((*entry).first);
+    total_atoms += compHist[TI->getTime()][(*entry).first];
   }
 
   total_atoms *= total_mass*AVOGADRO;
 
-  normalize(atom_comp);
+  normalize(compHist[TI->getTime()]);
 
 }
 

@@ -115,7 +115,7 @@ public:
   /**
    * returns the total mass of this material object PER UNIT
    */
-   const Mass getTotMass() const { return total_mass; };
+  const Mass getTotMass() const;
 
   /**
    * Returns the entire (current) isotopic vector for this Material.
@@ -234,9 +234,18 @@ protected:
    * keys are integers representing the time at which this Material had a 
    * particular composition and whose values are the corresponding 
    * compositions. A composition is a map of isotopes and their 
-   * corresponding number densities.
+   * corresponding number of atoms.
    */
   CompHistory compHist;
+
+  /**
+   * The mass history of this Material, in the form of a map whose
+   * keys are integers representing the time at which this Material had a 
+   * particular composition and whose values are the corresponding mass 
+   * compositions. A composition is a map of isotopes and the corresponding
+   * masses.
+   */
+  CompHistory massHist;
     
   /**
    * The facility history of this Material. The form is a map whose keys 

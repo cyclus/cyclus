@@ -61,6 +61,9 @@ void SourceFacility::init(xmlNodePtr cur)
 
   // get commodity price 
   commod_price = atof(XMLinput->get_xpath_content(cur,"commodprice"));
+
+  inventory = deque<Material*>();
+  ordersWaiting = deque<Message*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -74,6 +77,8 @@ void SourceFacility::copy(SourceFacility* src)
   inventory_size = src->inventory_size;
   commod_price = src->commod_price;
   
+  inventory = deque<Material*>();
+  ordersWaiting = deque<Message*>();
 }
 
 
@@ -95,12 +100,12 @@ void SourceFacility::print()
 void SourceFacility::receiveMessage(Message* msg){
 
   // is this a message from on high? 
-  if(this==msg->getRecipient() || msg->getSupplierID()==this->getSN()){
+  if(msg->getSupplierID()==this->getSN()){
     // file the order
     ordersWaiting.push_front(msg);
   }
   else {
-    throw GenException("SourceFacility is not recipient nor supplier of msg.");
+    throw GenException("SourceFacility is not the supplier of this msg.");
   }
 }
 
@@ -109,6 +114,9 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
 {
   Mass newAmt = 0;
   CompMap newComp;
+  // here, I'm just initializing an empty composition so that we can add to it.
+  // This functionality should be done in the material class in a constructor
+  // instead.
   newComp.insert(make_pair((Iso)92235, (Atoms)0));
   Material* newMat = new Material(newComp, recipe->getUnits(), recipe->getName());
 
@@ -118,8 +126,11 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
   while(trans.amount > newAmt){
     Material* m = inventory.front();
     if(m->getTotMass() <= (trans.amount - newAmt)){
-      newMat->absorb(m);
       newAmt += m->getTotMass();
+      cout<<"From an inventory mat with mass: " << m->getTotMass()<<endl;
+      newMat->absorb(m);
+      cout<<"The Source Facility is making a mat with mass: " << newMat->getTotMass()<<endl;
+      inventory.pop_front();
     }
     else{ 
       Material* toAbsorb = m->extractMass(trans.amount - newAmt);
@@ -129,6 +140,7 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
   }    
   vector<Material*> toSend;
   toSend.push_back(newMat);
+  cout<<"The Source Facility is sending a mat with mass: " << newMat->getTotMass()<<endl;
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
 
@@ -196,10 +208,12 @@ Mass SourceFacility::checkInventory(){
 	// Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-	deque<Material*>::iterator iter;
 
-	for (iter = inventory.begin(); iter != inventory.end(); iter ++)
+	for (deque<Material*>::iterator iter = inventory.begin(); 
+       iter != inventory.end(); 
+       iter ++){
 		total += (*iter)->getTotMass();
+  }
 
 	return total;
 }
