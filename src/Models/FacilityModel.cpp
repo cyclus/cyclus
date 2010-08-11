@@ -23,10 +23,19 @@ void FacilityModel::init(xmlNodePtr cur)
   Model::init(cur);
 
   // Specific initialization for FacilityModels
-  inst_name = XMLinput->get_xpath_content(cur,"/simulation/region/institution/name");
-  //this->setInst(LI->getInstByName(inst_name));
-  this->setInstName(inst_name);
-  cout << "Facility " << ID << " has just set its inst to " << inst_name << endl;
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
+  
+  for (int i=0;i<nodes->nodeNr;i++){
+    inst_name = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+    this->setInstName(inst_name);
+    cout << "Facility " << ID << " has just set its inst to " << inst_name << endl;
+
+  }
+ //
+  
+ // inst_name = XMLinput->get_xpath_content(cur,"/simulation/region/institution/name");
+ // this->setInstName(inst_name);
+ // cout << "Facility " << ID << " has just set its inst to " << inst_name << endl;
 
   // fac_name = "";
 } 

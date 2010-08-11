@@ -186,7 +186,7 @@ void InputXML::load_facilitycatalog(string filename)
   facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
 
   /// load here???
-  // Model::load_facilities();
+  Model::load_facilities();
 
   // get rid of facilitycatalog, freeing memory
   delete curFilePtr;
