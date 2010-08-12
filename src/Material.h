@@ -62,13 +62,23 @@ public:
   Material(xmlNodePtr cur);
 
   /**
-   * a constructor for making a material object from scratch.
+   * a constructor for making a material object from a known composition.
    *
    * @param comp a map from isotopes to number of atoms
    * @param mat_unit the units for this material
    * @param rec_name name of this recipe
    */
   Material(CompMap comp, string mat_unit, string rec_name);
+
+  /**
+   * a constructor for making a material object from a known recipe and size.
+   *
+   * @param comp a map from isotopes to number of atoms
+   * @param mat_unit the units for this material
+   * @param rec_name name of this recipe
+   * @param scale is the size of this material
+   */
+  Material(CompMap comp, string mat_unit, string rec_name, Mass scale);
   
   /** 
    * Default destructor does nothing.
@@ -199,7 +209,6 @@ public:
    */
   virtual void extract(Material* matToRem);
 
-
   /**
    * Extracts a material object of the given mass from the material.
    * The stoichiometry of the extracted object is the same as the parent
@@ -209,6 +218,17 @@ public:
    * @return the new material object
    */
   virtual Material* extractMass(Mass extract);
+
+  /**
+   * Adds a material object of the given mass to the material.
+   * The stoichiometry of the added object is the same as the parent
+   * and the mass of the parent is altered to reflect the change. 
+   *
+   * @param add the mass to add.
+   * @return the new material object
+   */
+  virtual Material* addMass(Mass add);
+
 protected:
   /**
    * Returns true if the given isotope's number density is for some reason 

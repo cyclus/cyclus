@@ -68,6 +68,24 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(CompMap comp, string mat_unit, string rec_name, Mass scale)
+{
+  Material* newMat = new Material(comp, mat_unit, rec_name);
+  Mass diff = newMat->getTotMass() - scale;
+  if(diff = 0){
+    // do nothing, you've already created a material of the right magnitude
+  }
+  else if(diff<0){
+    newMat->extractMass(diff);
+  }
+  else if(diff>0){
+    newMat->addMass(diff);
+  }
+
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::load_recipes()
 {
 
@@ -308,6 +326,16 @@ Material* Material::extractMass(double mass)
   CompMap comp = this->getFracComp(frac);
   Material* newMat = new Material(comp , units, " ");
   this->extract(newMat);
+  return newMat;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Material* Material::addMass(double mass)
+{
+  double frac = mass / this->getTotMass();
+  CompMap comp = this->getFracComp(frac);
+  Material* newMat = new Material(comp , units, " ");
+  this->absorb(newMat);
   return newMat;
 }
 
