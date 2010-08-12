@@ -142,7 +142,7 @@ void SinkFacility::handleTock(int time){
   // For now, lets just print out what we have at each timestep.
   cout << "SinkFacility " << this->getSN();
   cout << " is holding " << this->checkInventory();
-  cout << " units of material at month " << time; 
+  cout << " units of material at the close of month " << time; 
   cout << "." << endl;
 }
 

@@ -70,6 +70,16 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)  
 {
+
+  if(size==0){
+    CompMap::iterator iter = comp.begin();
+    while(iter!=comp.end()) {
+    comp.erase(iter->first);
+    comp.insert(make_pair(iter->first, 0));
+    iter++;
+    }
+  }
+
   compHist[TI->getTime()] = comp;
   units = mat_unit;
   recipeName = rec_name;
@@ -87,15 +97,15 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)
 
   facHist = FacHistory() ;
 
-  Mass diff = this->getTotMass() - size;
+  Mass diff = (this->getTotMass() - size);
 
-  if(diff == 0){
+  if(diff == 0 && size>0){
     // do nothing, you've already created a material of the right magnitude
   }
-  else if(diff < 0){
+  else if(diff > 0 && size>0 ){
     this->extractMass(diff);
   }
-  else if(diff > 0){
+  else if(diff < 0 && size>0){
     this->addMass(diff);
   }
 

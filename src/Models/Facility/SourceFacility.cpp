@@ -117,22 +117,23 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
   // here, I'm just initializing an empty composition so that we can add to it.
   // This functionality should be done in the material class in a constructor
   // instead.
-  newComp.insert(make_pair((Iso)92235, (Atoms)0));
-  Material* newMat = new Material(newComp, recipe->getUnits(), recipe->getName());
+  Material* newMat = new Material(recipe->getComp(), 
+                                  recipe->getUnits(),
+                                  recipe->getName(), 
+                                  newAmt);
 
-  // deque<Material*>::iterator iter;
   // pull materials off of the inventory stack until you get the trans amount
 
   while(trans.amount > newAmt){
     Material* m = inventory.front();
+    // if the inventory obj isn't larger than the transaction, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
       newAmt += m->getTotMass();
-      cout<<"From an inventory mat with mass: " << m->getTotMass()<<endl;
       newMat->absorb(m);
-      cout<<"The Source Facility is making a mat with mass: " << newMat->getTotMass()<<endl;
       inventory.pop_front();
     }
     else{ 
+      // if the inventory obj is larger than the transaction, split it.
       Material* toAbsorb = m->extractMass(trans.amount - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
@@ -140,7 +141,8 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
   }    
   vector<Material*> toSend;
   toSend.push_back(newMat);
-  cout<<"The Source Facility is sending a mat with mass: " << newMat->getTotMass()<<endl;
+  cout<<"SourceFacility "<< ID
+      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
 
@@ -204,7 +206,7 @@ void SourceFacility::handleTock(int time){
   // For now, lets just print out what we have at each timestep.
   cout << "SourceFacility " << this->getSN();
   cout << " is holding " << this->checkInventory();
-  cout << " units of material at month " << time; 
+  cout << " units of material at the close of month " << time; 
   cout << "." << endl;
 
 }

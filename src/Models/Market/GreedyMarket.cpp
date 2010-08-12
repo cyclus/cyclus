@@ -94,9 +94,14 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // tenatively queue a new order (don't execute yet)
       matchedOffers.insert(offerMsg);
 
-      //Message* maybe_offer = new Message(*offerMsg);
-      //orders.push_back(maybe_offer);
       orders.push_back(offerMsg);
+
+      cout << "GreedyMarket has resolved a match from "
+          << offerMsg->getSupplierID()
+          << " to "
+          << offerMsg->getRequesterID() 
+          << " for the amount:  " 
+          << offerMsg->getAmount() << endl;
 
       requestAmt -= offerAmt;
     } 
@@ -104,14 +109,21 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // split offer
 
       // queue a new order
-      offerMsg->setAmount(requestAmt);
-
-      matchedOffers.insert(offerMsg);
       Message* maybe_offer = new Message(*offerMsg);
+      maybe_offer->setAmount(requestAmt);
       maybe_offer->setDir(down);
       maybe_offer->setRequesterID(requestMsg->getRequesterID());
 
+      matchedOffers.insert(offerMsg);
+
       orders.push_back(maybe_offer);
+
+      cout << "GreedyMarket has resolved a match from "
+          << maybe_offer->getSupplierID()
+          << " to "
+          << maybe_offer->getRequesterID() 
+          << " for the amount:  " 
+          << maybe_offer->getAmount() << endl;
 
       // zero out request
       requestAmt = 0;
@@ -144,12 +156,6 @@ void GreedyMarket::resolve()
     
     if(match_request(request)) {
       process_request();
-      cout << "GreedyMarket has resolved a match from "
-          << (*request).second->getSupplierID()
-          << " to "
-          << (*request).second->getRequesterID() 
-          << " for the amount:  " 
-          << (*request).first << endl;
     } 
     else {
       cout << "to: "<< (*request).second->getRequesterID() 

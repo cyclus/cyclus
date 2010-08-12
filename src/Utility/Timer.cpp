@@ -14,7 +14,8 @@ void Timer::runSim()
 	for (int i = time; i < simDur; i++) {
 		
 		// Give a status report, periodically.
-		if (i % 10 == 0)
+    // (monthly during testing, change to (i % 12 == 0) for annual reporting.
+		if (i % 1 == 0)
 		 	cout << "Current time: " << i << endl;
 
 		// Tell the Logician to handle this month.
