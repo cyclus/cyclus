@@ -134,8 +134,8 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
     }
     else{ 
       Material* toAbsorb = m->extractMass(trans.amount - newAmt);
-      newMat->absorb(toAbsorb);
       newAmt += toAbsorb->getTotMass();
+      newMat->absorb(toAbsorb);
     }
   }    
   vector<Material*> toSend;
@@ -179,17 +179,19 @@ void SourceFacility::handleTock(int time){
   Mass emptiness = inventory_size - this->checkInventory();
   if(capacity <= emptiness){
     // add a material the size of the capacity to the inventory
-    // currently, this just copies the recipe, ignoring capacity.
-    // FIX IT with a new material constructor that takes a comp and a mass.
-    Material* newMat = new Material(recipe->getComp(), recipe->getUnits(), recipe->getName());
+    Material* newMat = new Material(recipe->getComp(), 
+                                    recipe->getUnits(), 
+                                    recipe->getName(),
+                                    capacity);
     inventory.push_front(newMat);
   }
   else if (emptiness < capacity && emptiness > 0){
     // add a material that fills the inventory
-    Material* baseMat = new Material(recipe->getComp(), recipe->getUnits(), recipe->getName());
-    Material* newMat = baseMat->extractMass(emptiness);
+    Material* newMat = new Material(recipe->getComp(), 
+                                    recipe->getUnits(), 
+                                    recipe->getName(),
+                                    emptiness);
     inventory.push_front(newMat);
-    delete baseMat;
   }
   // check what orders are waiting, 
   // pull materials off of the inventory stack until you get the trans amount
@@ -198,6 +200,13 @@ void SourceFacility::handleTock(int time){
     sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
+  // Maybe someday it will record things.
+  // For now, lets just print out what we have at each timestep.
+  cout << "SourceFacility " << this->getSN();
+  cout << " is holding " << this->checkInventory();
+  cout << " units of material at month " << time; 
+  cout << "." << endl;
+
 }
 
 

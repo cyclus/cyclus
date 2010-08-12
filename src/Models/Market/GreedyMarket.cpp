@@ -144,13 +144,17 @@ void GreedyMarket::resolve()
     
     if(match_request(request)) {
       process_request();
-      cout << "Requester: "<< (*request).second->getRequesterID() << ". Amount:  " 
-          << (*request).first << " matched."<<endl;
+      cout << "GreedyMarket has resolved a match from "
+          << (*request).second->getSupplierID()
+          << " to "
+          << (*request).second->getRequesterID() 
+          << " for the amount:  " 
+          << (*request).first << endl;
     } 
     else {
       cout << "to: "<< (*request).second->getRequesterID() 
           << " from: " << (*request).second->getSupplierID()
-          << " for  " << (*request).first 
+          << " for the amount: " << (*request).first 
           << " rejected. "<<endl;
       reject_request(request);
     }

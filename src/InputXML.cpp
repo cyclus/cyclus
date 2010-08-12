@@ -198,7 +198,21 @@ void InputXML::load_facilitycatalog(string filename)
 
 }
 
+/*xmlNodeSetPtr InputXML::get_xpath_axes(xmlNodePtr cur,const char* expression)
+{
 
+  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
+  xpathCtxt->node = cur;
+  
+  xmlXPathObjectPtr xpathAx = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
+  if(xpathAx == NULL) {
+    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
+    xmlXPathFreeContext(xpathCtxt); 
+  }
+
+  return xpathAx->nodeaxes;
+}
+*/
 xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression)
 {
 

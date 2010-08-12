@@ -23,7 +23,7 @@
     <model>
       <SourceFacility>
         <outcommodity>uo2</outcommodity>
-        <capacity>1</capacity>
+        <capacity>5</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
         <recipe>fresh_50gwd</recipe>
