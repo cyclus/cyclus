@@ -106,7 +106,7 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)
     this->extractMass(diff);
   }
   else if(diff < 0 && size>0){
-    this->addMass(diff);
+    this->addMass(-diff);
   }
 
 }

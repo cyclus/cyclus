@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 2 SourceFacility FrontEnds, 1 SinkFacility BackEnd, and 1 GreedyMarket -->
+<!-- 2 SourceFacility FrontEnd, 2 SinkFacility BackEnds, and 1 GreedyMarket -->
 <simulation>
   <duration>10</duration>
   <startmonth>1</startmonth>
@@ -23,7 +23,7 @@
     <model>
       <SourceFacility>
         <outcommodity>uo2</outcommodity>
-        <capacity>.5</capacity>
+        <capacity>.25</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
         <recipe>fresh_50gwd</recipe>
@@ -36,7 +36,7 @@
     <model>
       <SourceFacility>
         <outcommodity>uo2</outcommodity>
-        <capacity>.5</capacity>
+        <capacity>.75</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
         <recipe>fresh_50gwd</recipe>
@@ -45,11 +45,23 @@
   </facility>
 
   <facility>
-    <name>BackEnd</name>
+    <name>BackEnd1</name>
     <model>
       <SinkFacility>
         <incommodity>uo2</incommodity>
-        <capacity>1</capacity>
+        <capacity>.5</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd2</name>
+    <model>
+      <SinkFacility>
+        <incommodity>uo2</incommodity>
+        <capacity>.5</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
@@ -60,7 +72,8 @@
     <name>oneRegion</name>
 		<allowedfacility>FrontEnd1</allowedfacility>
 		<allowedfacility>FrontEnd2</allowedfacility>
-		<allowedfacility>BackEnd</allowedfacility>
+		<allowedfacility>BackEnd1</allowedfacility>
+		<allowedfacility>BackEnd2</allowedfacility>
 		<model>
 			<NullRegion/>
 		</model>
@@ -77,8 +90,12 @@
             <name>FrontEnd2</name>
           </facility>
           <facility>
-            <type>BackEnd</type>
-            <name>BackEnd</name>
+            <type>BackEnd1</type>
+            <name>BackEnd2</name>
+          </facility>
+          <facility>
+            <type>BackEnd2</type>
+            <name>BackEnd2</name>
           </facility>
         </FixedInst>
 			</model>

@@ -113,36 +113,37 @@ void SourceFacility::receiveMessage(Message* msg){
 void SourceFacility::sendMaterial(Transaction trans, const Communicator* requester)
 {
   Mass newAmt = 0;
-  CompMap newComp;
-  // here, I'm just initializing an empty composition so that we can add to it.
-  // This functionality should be done in the material class in a constructor
-  // instead.
-  Material* newMat = new Material(recipe->getComp(), 
-                                  recipe->getUnits(),
-                                  recipe->getName(), 
-                                  newAmt);
 
   // pull materials off of the inventory stack until you get the trans amount
 
-  while(trans.amount > newAmt){
+  // start with an empty manifest
+  vector<Material*> toSend;
+
+  while(trans.amount > newAmt && !inventory.empty() ){
+    // start with an empty material
+    Material* newMat = new Material(recipe->getComp(), 
+                                  recipe->getUnits(),
+                                  recipe->getName(), 
+                                  0);
+
     Material* m = inventory.front();
-    // if the inventory obj isn't larger than the transaction, send it as is.
+    // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
       inventory.pop_front();
     }
     else{ 
-      // if the inventory obj is larger than the transaction, split it.
+      // if the inventory obj is larger than the remaining need, split it.
       Material* toAbsorb = m->extractMass(trans.amount - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
-  }    
-  vector<Material*> toSend;
-  toSend.push_back(newMat);
-  cout<<"SourceFacility "<< ID
+
+    toSend.push_back(newMat);
+    cout<<"SourceFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+  }    
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
 
@@ -178,8 +179,8 @@ void SourceFacility::handleTick(int time){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
   // if there's room in the inventory, process material at capacity
-  Mass emptiness = inventory_size - this->checkInventory();
-  if(capacity <= emptiness){
+  Mass space = inventory_size - this->checkInventory();
+  if(capacity <= space){
     // add a material the size of the capacity to the inventory
     Material* newMat = new Material(recipe->getComp(), 
                                     recipe->getUnits(), 
@@ -187,12 +188,12 @@ void SourceFacility::handleTock(int time){
                                     capacity);
     inventory.push_front(newMat);
   }
-  else if (emptiness < capacity && emptiness > 0){
+  else if (space < capacity && space > 0){
     // add a material that fills the inventory
     Material* newMat = new Material(recipe->getComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
-                                    emptiness);
+                                    space);
     inventory.push_front(newMat);
   }
   // check what orders are waiting, 

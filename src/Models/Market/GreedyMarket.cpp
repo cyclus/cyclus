@@ -85,7 +85,6 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     offers.erase(offer);
   
     if (requestAmt > offerAmt) { 
-    
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequesterID(requestMsg->getRequesterID());
@@ -125,9 +124,6 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
           << " for the amount:  " 
           << maybe_offer->getAmount() << endl;
 
-      // zero out request
-      requestAmt = 0;
-
       // make a new offer with reduced amount
       offerAmt -= requestAmt;
       Message *new_offer = new Message(*offerMsg);
@@ -135,6 +131,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       // call this method for consistency
       receiveMessage(new_offer);
+
+      // zero out request
+      requestAmt = 0;
     }
   }
 
