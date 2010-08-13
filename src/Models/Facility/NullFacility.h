@@ -72,7 +72,7 @@ public:
      * @param trans the Transaction object defining the order being filled
      * @param receiver the ultimate facility to receive this transaction
      */
-    virtual void sendMaterial(Transaction trans, Communicator* receiver);
+    virtual void sendMaterial(Transaction trans, const Communicator* receiver);
     
     /**
      * The facility receives the materials other facilities have sent.
@@ -147,6 +147,13 @@ protected:
      * @return the total mass of the materials in storage
      */
     Mass checkInventory();
+
+    /**
+     * get the total mass of the stuff in the inventory
+     *
+     * @return the total mass of the materials in storage
+     */
+    Mass checkStocks();
 
 
     /**

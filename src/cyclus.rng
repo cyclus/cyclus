@@ -214,6 +214,8 @@
      <element name="NullFacility"> 
         <ref name="incommodity"/>
         <ref name="outcommodity"/>
+        <ref name="inventorysize"/>
+        <ref name="capacity"/>
      </element>
   </define>
 
@@ -242,12 +244,14 @@
           <ref name="outcommodity"/>
         </oneOrMore>
 
-        <element name="capacity">
-          <text/>
-          </element>
-        <element name="inventorysize">
-          <text/>
-          </element>
+        <oneOrMore>
+          <ref name="capacity"/>
+        </oneOrMore>
+
+        <oneOrMore>
+          <ref name="inventorysize"/>
+        </oneOrMore>
+
         <element name="commodprice">
           <text/>
           </element>
@@ -256,6 +260,18 @@
           </element>
 
      </element>
+  </define>
+
+  <define name="capacity">
+      <element name="capacity">
+          <text/>
+      </element>
+  </define>
+
+  <define name="inventorysize">
+      <element name="inventorysize">
+          <text/>
+      </element>
   </define>
 
   <define name="incommodity">

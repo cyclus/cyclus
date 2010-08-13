@@ -8,6 +8,22 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+/*
+ * TICK
+ * send a request for your capacity minus your stocks.
+ * offer stocks + capacity
+ *
+ * TOCK
+ * process as much in stocks as your capacity will allow.
+ * send appropriate materials to fill ordersWaiting.
+ *
+ * RECIEVE MATERIAL
+ * put it in stocks
+ *
+ * SEND MATERIAL
+ * pull it from inventory
+ */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::init(xmlNodePtr cur)
 { 
@@ -35,6 +51,14 @@ void NullFacility::init(xmlNodePtr cur)
     throw GenException("Output commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
+
+  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+
+
+  inventory = deque<Material*>();
+  stocks = deque<Material*>();
+  ordersWaiting = deque<Message*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -45,7 +69,12 @@ void NullFacility::copy(NullFacility* src)
 
   in_commod = src->in_commod;
   out_commod = src->out_commod;
+  inventory_size = src->inventory_size;
+  capacity = src->capacity;
 
+  inventory = deque<Material*>();
+  stocks = deque<Material*>();
+  ordersWaiting = deque<Message*>();
 }
 
 
@@ -57,66 +86,150 @@ void NullFacility::print()
       << in_commod->getName()
       << "} into commodity {"
       << out_commod->getName()
-      << "}" << endl;
+      << "}, and has an inventory that holds " 
+      << inventory_size << " materials"
+      << endl;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveMessage(Message* msg)
 {
-  // find out the amount of the transaction 
-  Transaction trans = msg->getTrans();
-  // check if you have enough in inventory to fill the order
-  Mass inv = this->checkInventory();
-  if(inv >= trans.amount){
-    // if there's enough, package the material and send it
-    
+  // is this a message from on high? 
+  if(msg->getSupplierID()==this->getSN()){
+    // file the order
+    ordersWaiting.push_front(msg);
   }
-  else if (inv < trans.amount){
-    // if not, send what you can and print a warning
-
+  else {
+    throw GenException("NullFacility is not the supplier of this msg.");
   }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::sendMaterial(Transaction trans, Communicator* receiver)
+void NullFacility::sendMaterial(Transaction trans, const Communicator* requester)
 {
-
-  // create an appropriate material object
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
     throw GenException("NullFacility can only send out_commod materials.");
   }
 
-  // delete the transaction amount from the inventory
+  Mass newAmt = 0;
 
-  // it should be of the same size, recipe, etc. as the transaction
+  // pull materials off of the inventory stack until you get the trans amount
 
-  // push the material into a vector
+  // start with an empty manifest
+  vector<Material*> toSend;
 
-  // make the reciever receive the manifest
-  
-  // record this action
+  while(trans.amount > newAmt && !inventory.empty() ){
+    Material* m = inventory.front();
+
+    // start with an empty material
+    Material* newMat = new Material(m->getComp(), 
+                                  m->getUnits(),
+                                  m->getName(), 
+                                  0);
+
+    // if the inventory obj isn't larger than the remaining need, send it as is.
+    if(m->getTotMass() <= (trans.amount - newAmt)){
+      newAmt += m->getTotMass();
+      newMat->absorb(m);
+      inventory.pop_front();
+    }
+    else{ 
+      // if the inventory obj is larger than the remaining need, split it.
+      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      newAmt += toAbsorb->getTotMass();
+      newMat->absorb(toAbsorb);
+    }
+
+    toSend.push_back(newMat);
+    cout<<"NullFacility "<< ID
+      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+  }    
+  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
-    
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::receiveMaterial(Transaction trans, vector<Material*>)
+void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {
-  // interperet the Transaction information
-  // add the material object from the manifest to the stocks
-  // record this action
+  // grab each material object off of the manifest
+  // and move it into the stocks.
+  for (vector<Material*>::iterator thisMat=manifest.begin();
+       thisMat != manifest.end();
+       thisMat++)
+  {
+    cout<<"NullFacility " << ID << " is receiving material with mass "
+        << (*thisMat)->getTotMass() << endl;
+    stocks.push_back(*thisMat);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::handleTick(int time)
 {
-  // find out how much this NullFacility needs to request
-    // it will be Capacity - Stocks (or stocklimit - stocks ?)
-  // request it
+  // MAKE A REQUEST
+  // The null facility should ask for as much stuff as it can reasonably receive.
+  Mass requestAmt;
+  // And it can accept amounts no matter how small
+  Mass minAmt = 0;
+  // check how full its inventory is
+  Mass inv = this->checkInventory();
+  // and how much is already in its stocks
+  Mass sto = this->checkStocks(); 
+  // subtract inv and sto from inventory max size to get total empty space
+  Mass space = inventory_size - inv - sto;
+  // this will be a request for free stuff
+  double commod_price = 0;
 
-  // find out how much this NullFacility can offer
-    // it will be Inventory + SpotCapacity 
-  // offer it
+  if (space == 0){
+    // don't request anything
+  }
+  else if (space < capacity){
+    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    // if empty space is less than monthly acceptance capacity
+    requestAmt = space;
+    // recall that requests have a negative amount
+    Message* request = new Message(up, in_commod, -requestAmt, minAmt, 
+                                     commod_price, this, recipient);
+      // pass the message up to the inst
+      (request->getInst())->receiveMessage(request);
+  }
+  // otherwise, the upper bound is the monthly acceptance capacity 
+  // minus the amount in stocks.
+  else if (space >= capacity){
+    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    // if empty space is more than monthly acceptance capacity
+    requestAmt = capacity - sto;
+    // recall that requests have a negative amount
+    Message* request = new Message(up, in_commod, -requestAmt, minAmt, commod_price,
+                                   this, recipient); 
+    // pass the message up to the inst
+    (request->getInst())->receiveMessage(request);
+  }
+  
+  // MAKE OFFERS
+  // decide how much to offer
+  Mass offer_amt;
+  Mass possInv = inv+capacity;
+
+  if (possInv < inventory_size){
+    offer_amt = possInv;
+  }
+  else {
+    offer_amt = inventory_size; 
+  }
+
+  // there is no minimum amount a null facility may send
+  double min_amt = 0;
+
+  // decide what market to offer to
+  Communicator* recipient = (Communicator*)(out_commod->getMarket());
+
+  // create a message to go up to the market with these parameters
+  Message* msg = new Message(up, out_commod, offer_amt, min_amt, commod_price, 
+      this, recipient);
+
+  // send it
+  sendMessage(msg);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::handleTock(int time)
@@ -124,9 +237,72 @@ void NullFacility::handleTock(int time)
   // at rate allowed by capacity, convert material in Stocks to out_commod type
   // move converted material into Inventory
 
-  // receive information about matched orders from the Market?
-    // fill them by sending/receiving material  
+  Mass complete = 0;
 
-  // record these actions
+  while(capacity > complete && !stocks.empty() ){
+    Material* m = stocks.front();
+
+    // start with an empty material
+    Material* newMat = new Material(m->getComp(), 
+                                  m->getUnits(),
+                                  m->getName(), 
+                                  0);
+
+    // if the stocks obj isn't larger than the remaining need, send it as is.
+    if(m->getTotMass() <= (capacity - complete)){
+      complete += m->getTotMass();
+      newMat->absorb(m);
+      stocks.pop_front();
+    }
+    else{ 
+      // if the stocks obj is larger than the remaining need, split it.
+      Material* toAbsorb = m->extractMass(capacity - complete);
+      complete += toAbsorb->getTotMass();
+      newMat->absorb(toAbsorb);
+    }
+
+    inventory.push_back(newMat);
+  }    
+
+  // check what orders are waiting, 
+  while(!ordersWaiting.empty()){
+    Message* order = ordersWaiting.front();
+    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    ordersWaiting.pop_front();
+  }
+  
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Mass NullFacility::checkInventory(){
+  Mass total = 0;
+
+  // Iterate through the inventory and sum the amount of whatever
+  // material unit is in each object.
+
+  for (deque<Material*>::iterator iter = inventory.begin(); 
+       iter != inventory.end(); 
+       iter ++){
+    total += (*iter)->getTotMass();
+  }
+
+  return total;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Mass NullFacility::checkStocks(){
+  Mass total = 0;
+
+  // Iterate through the stocks and sum the amount of whatever
+  // material unit is in each object.
+
+
+  for (deque<Material*>::iterator iter = stocks.begin(); 
+       iter != stocks.end(); 
+       iter ++){
+    total += (*iter)->getTotMass();
+  }
+
+  return total;
+}
+
 

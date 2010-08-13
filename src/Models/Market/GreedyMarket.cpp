@@ -157,9 +157,8 @@ void GreedyMarket::resolve()
       process_request();
     } 
     else {
-      cout << "to: "<< (*request).second->getRequesterID() 
-          << " from: " << (*request).second->getSupplierID()
-          << " for the amount: " << (*request).first 
+      cout << "The request from Requester "<< (*request).second->getRequesterID() 
+          << " for the amount " << (*request).first 
           << " rejected. "<<endl;
       reject_request(request);
     }

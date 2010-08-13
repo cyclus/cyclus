@@ -197,7 +197,6 @@ void SourceFacility::handleTock(int time){
     inventory.push_front(newMat);
   }
   // check what orders are waiting, 
-  // pull materials off of the inventory stack until you get the trans amount
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
     sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
