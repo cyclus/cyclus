@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!-- 1 SourceFacility FrontEnd, 2 SinkFacility BackEnds, and 1 NullMarket -->
+<simulation>
+  <duration>10</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+
+	<commodity>
+		<name>uo2</name>
+	</commodity>
+
+  <market>
+    <name>uo2market</name>
+    <mktcommodity>uo2</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>uo2</outcommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>fresh_50gwd</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd1</name>
+    <model>
+      <SinkFacility>
+        <incommodity>uo2</incommodity>
+        <capacity>.5</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd2</name>
+    <model>
+      <SinkFacility>
+        <incommodity>uo2</incommodity>
+        <capacity>.75</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+	<region>
+    <name>oneRegion</name>
+		<allowedfacility>FrontEnd</allowedfacility>
+		<allowedfacility>BackEnd1</allowedfacility>
+		<allowedfacility>BackEnd2</allowedfacility>
+		<model>
+			<NullRegion/>
+		</model>
+		<institution>
+			<name>oneInst</name>
+			<model>
+        <FixedInst>
+          <facility>
+            <type>FrontEnd</type>
+            <name>FrontEnd</name>
+          </facility>
+          <facility>
+            <type>BackEnd1</type>
+            <name>BackEnd2</name>
+          </facility>
+          <facility>
+            <type>BackEnd2</type>
+            <name>BackEnd2</name>
+          </facility>
+        </FixedInst>
+			</model>
+		</institution>
+	</region>
+
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+</simulation>

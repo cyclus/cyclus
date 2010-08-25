@@ -138,6 +138,7 @@
       <choice>
         <ref name="StubMarket"/>
         <ref name="GreedyMarket"/>
+        <ref name="NullMarket"/>
         <!-- insert ref to new MarketModels  here -->
       </choice>
       </element>
@@ -153,6 +154,12 @@
 
   <define name="GreedyMarket">
      <element name="GreedyMarket">
+        <text />
+     </element>
+  </define>
+
+  <define name="NullMarket">
+     <element name="NullMarket">
         <text />
      </element>
   </define>
