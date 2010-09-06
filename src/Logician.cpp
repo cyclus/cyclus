@@ -124,6 +124,7 @@ Model* Logician::getFacilityByName(string name)
 void Logician::addMarket(Model* new_market)   
 { 
   markets.push_back(new_market); 
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,6 +168,36 @@ void Logician::  registerCommodityMarket(Commodity* commod, Model* market)
 { 
   commodity_market_map[commod] = market; 
 } 
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::addConverter(Model* new_converter)   
+{ 
+  converters.push_back(new_converter); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::printConverters()                 
+{ 
+  printModelList(converters); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Logician::getNumConverters()                 
+{ 
+  return converters.size(); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Logician::getConverterByID(int ID)        
+{ 
+  return converters[ID]; 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Logician::getConverterByName(string name) 
+{ 
+  return getModelByName(converters,name); 
+}
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addInst(Model* new_inst)   

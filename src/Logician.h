@@ -40,7 +40,7 @@ private:
 	Logician();
 
 	/// lists of models
-	ModelList facilities, insts, regions, markets;
+	ModelList facilities, insts, regions, markets, converters;
 
 	/// list of material templates
 	RecipeList recipes;
@@ -203,6 +203,37 @@ public:
    */
 	void   registerCommodityMarket(Commodity* commod, Model* market);
 	
+	/**
+   * add a converter to the list
+   *
+   * @param new_converter the converter to add to the list
+   */
+	void addConverter(Model* new_converter);   
+
+	/**
+   * print list of converters
+   */
+	void printConverters();
+
+	/**
+   * returns number of converters
+   */
+	int getNumConverters();                 
+
+	/**
+   * get a pointer to a converter based on its ID number
+   *
+   * @param ID the ID number of the converter to return
+   */
+	Model* getConverterByID(int ID);        
+
+	/**
+   * get a pointer to a converter based on its name
+   *
+   * @param name the name of the converter whose pointer to return
+   */
+	Model* getConverterByName(string name); 
+
 	/**
    * add a inst to the list
    *

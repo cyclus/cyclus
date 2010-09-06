@@ -8,6 +8,8 @@
 
 #include "InputXML.h"
 
+#define WF_U235 0.007200 // feed, natural uranium 
+
 using namespace std;
 
 /// type definition for isotopes
@@ -155,6 +157,14 @@ public:
   const virtual Atoms getComp(Iso tope) const;
 
   /**
+   * Returns the atomic number of the isotope with the given identifier.
+   *
+   * @param tope the isotope whose atomic number is being returned
+   * @return the atomic number
+   */
+  static int getAtomicNum(Iso tope);
+
+  /**
    * Returns the mass number of the isotope with the given identifier.
    *
    * @param tope the isotope whose mass number is being returned
@@ -172,6 +182,31 @@ public:
    * @param time the current time
    */
   virtual void changeComp(Iso tope, Atoms change, int time);
+
+  /**
+   * Returns the mass of the given element in this Material.
+   *
+   * @param elt the element
+   * @return the mass of the element (in tons)
+   */
+  const virtual double getEltMass(int elt) const;
+
+	/**
+	 * Returns the mass of the given element in the given composition vector.
+	 *
+	 * @param elt the atomic number of the element
+	 * @param comp the composition vector
+	 * @return the mass (in tons)
+	 */
+	static double getEltMass(int elt, const map<Iso, Atoms>& comp);
+
+	/**
+	 * Returns the mass of the given isotope in this Material.
+	 *
+	 * @param tope the isotope
+	 * @return the mass of the element (in tons)
+	 */
+	const virtual double getIsoMass(Iso tope) const;
 
   /**
    * Returns the mass of the given isotope in the given composition vector.

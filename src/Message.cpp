@@ -4,6 +4,7 @@
 #include "Message.h"
 
 #include "Logician.h"
+#include "Material.h"
 #include "FacilityModel.h"
 #include "MarketModel.h"
 #include "InstModel.h"
@@ -21,6 +22,8 @@ Message::Message(MessageDir thisDir, Communicator* toSend)
 
   trans.supplierID =
       trans.requesterID = NULL;
+
+  trans.comp.insert(make_pair(0,0));
 
   trans.amount = 
     trans.min =
@@ -47,6 +50,36 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, double minAmt, 
+    double thisPrice, Communicator* toSend, Communicator* toReceive, CompMap thisComp)
+{
+	dir = thisDir;
+	trans.commod = thisCommod;
+	trans.amount = thisAmount; 
+  trans.min = minAmt;
+	trans.price = thisPrice;
+  trans.comp = thisComp;
+  Model* mktModel = trans.commod->getMarket();
+  mkt = ((MarketModel*)(mktModel));
+  sender = toSend;
+  recipient = toReceive;
+  setPath(dir, sender, recipient);
+  
+  // if amt is positive and there is no supplier
+  // this message is an offer and 
+  // the sender is the supplier
+  if (trans.amount > 0){
+    this->setSupplierID(((FacilityModel*)sender)->getSN());
+  }
+
+  // if amt is negative and there is no requester
+  // this message is a request and
+  // the sender is the requester
+  if (trans.amount < 0){
+    this->setRequesterID(((FacilityModel*)sender)->getSN());
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, double minAmt, 
     double thisPrice, Communicator* toSend, Communicator* toReceive)
 {
 	dir = thisDir;
@@ -54,6 +87,10 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, d
 	trans.amount = thisAmount; 
   trans.min = minAmt;
 	trans.price = thisPrice;
+
+  CompMap thisComp;
+  thisComp.insert(make_pair(NULL,NULL));
+
   Model* mktModel = trans.commod->getMarket();
   mkt = ((MarketModel*)(mktModel));
   sender = toSend;
@@ -151,6 +188,14 @@ void Message::setRequesterID(int newID)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getPrice() const {
 	return trans.price;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CompMap Message::getComp() const {
+	return trans.comp;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setComp(CompMap newComp) {
+	trans.comp = newComp;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::reverseDirection()

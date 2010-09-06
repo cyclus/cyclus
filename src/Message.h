@@ -5,6 +5,7 @@
 # define _MESSAGE
 
 #include "Commodity.h"
+#include "Material.h"
 
 class Communicator;
 
@@ -43,11 +44,15 @@ struct Transaction
    */
   double min;
 
-
   /**
    * The price per unit of the commodity being requested or offered.
    */
   double price;
+
+  /**
+   * A specific composition, if this transaction requires one.
+   */
+  CompMap comp;
 
   /**
    * The ID of the Communicator who is the supplier in this transaction.
@@ -136,6 +141,25 @@ class Message {
      * @param toSend the sender of this Message
      * @param toReceive the recipient of this Message, or null if the 
      * eventual recipient/handler is unknown to the sender
+     * @param comp the specific composition of the material to be traded 
+     */
+    Message(MessageDir dir, Commodity* commod, 
+        double amount, double minAmt, double price, Communicator* toSend, 
+        Communicator* toReceive, CompMap comp);
+
+    /**
+     * Creates a new Message with the given specs.
+     *
+     * @param dir the direction this Message is traveling
+     * @param commod the Commodity being offered or requested
+     * @param amount the amount of the given Commodity being offered/requested
+     * Note: positive amounts mean you want something, negative amounts 
+     * mean you want to get rid of something.
+     * @param minAmt the minimum amount acceptible for this transaction
+     * @param price the price of the Commodity
+     * @param toSend the sender of this Message
+     * @param toReceive the recipient of this Message, or null if the 
+     * eventual recipient/handler is unknown to the sender
      */
     Message(MessageDir dir, Commodity* commod, 
         double amount, double minAmt, double price, Communicator* toSend, 
@@ -194,6 +218,13 @@ class Message {
      * @return the Commodity
      */
     Commodity* getCommod() const;
+
+    /**
+     * Sets the Commodity requested or offered in this Message.
+     *
+     * @param newCommod the Commodity
+     */
+    void setCommod(Commodity* newCommod);
 
     /**
      * Returns the amount of some Commodity being requested or offered in 
@@ -268,6 +299,20 @@ class Message {
      * @return the price (in dollars)
      */
     double getPrice() const;
+
+    /**
+     * Returns the CompMap being requested or offered in this message.
+     *
+     * @return the CompMap (map <iso, atoms>)
+     */
+    CompMap getComp() const;
+
+    /**
+     * Sets the assigned composition to a new composition
+     *
+     * @param newComp is the new composition in the transaction
+     */
+    void setComp(CompMap newComp);
 
     /**
      * Reverses the direction this Message is being sent (so, for 

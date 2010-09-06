@@ -109,6 +109,11 @@ public:
    */
   static void load_markets();
 
+  /**
+   * loads the converter models available to the simulation
+   */
+  static void load_converters();
+
   /** 
    * loads the facility models available to the simulation
    */

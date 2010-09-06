@@ -173,6 +173,40 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
     mass = (*searchIso).second;
   return mass;
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getIsoMass(Iso tope) const
+{
+  map<Iso, Atoms> currComp = this->getComp();
+  return Material::getIsoMass(tope, currComp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const double Material::getEltMass(int elt) const
+{
+  map<Iso, Atoms> currComp = this->getComp();
+  return Material::getEltMass(elt, currComp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Material::getEltMass(int elt, const map<Iso, Atoms>& comp)
+{
+  // Iterate through the current composition...
+  map<Iso, Atoms>::const_iterator iter = comp.begin();
+  double mass = 0;
+
+  while (iter != comp.end()) {
+
+    // ...get each isotope and add to the mass tally if the isotope is of the
+    // given element.
+
+    int itAN = Material::getAtomicNum(iter->first);
+    if (itAN == elt) 
+      mass = mass + getIsoMass(iter->first, comp);
+    iter ++;
+  }
+
+  return mass;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Mass Material::getTotMass() const
@@ -334,6 +368,18 @@ void Material::extract(Material* matToRem)
     iter ++;
   }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Material::getAtomicNum(Iso tope)
+{
+  // Make sure the number's in a reasonable range.
+  if (tope < 1010 || tope > 1182949)
+    throw GenException("Tried to get atomic number of invalid isotope");
+
+  // Get the atomic number and return.
+  return tope / 10000; // integer division
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Material::getMassNum(Iso tope)
 {
@@ -344,7 +390,6 @@ int Material::getMassNum(Iso tope)
   // Get the mass number and return.
   return (tope / 10) % 1000;
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extractMass(double mass)

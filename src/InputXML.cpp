@@ -135,6 +135,7 @@ void InputXML::load_file(string filename)
 
   Material::load_recipes();
   
+  Model::load_converters();
   Model::load_markets();
   Model::load_facilities();
   Model::load_regions();
