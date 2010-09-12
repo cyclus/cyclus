@@ -21,19 +21,34 @@ class StubFacility : public FacilityModel
  */
 
 public:
-  
-  StubFacility() {};
-  
-  ~StubFacility() {};
+  /**
+   * Default constructor for StubFacility Class
+   */
+  StubFacility();
 
-  // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   * every model should be destructable
+   */
+  ~StubFacility();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
   virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
+   */
+  virtual void copy(StubFacility* src) ;
 
-  /// initialize an object by copying another
-  virtual void copy(StubFacility* src);
-
-  virtual void print();
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
 
 /* ------------------- */ 
 
@@ -42,8 +57,15 @@ public:
  * --------------------
  */
 public:
-  /// simply ignore incoming offers/requests
-  virtual void receiveMessage(Message* msg) {};
+   /**
+    * The StubFacility should never generate any messages
+    */
+    virtual void sendMessage();
+
+    /**
+     * The StubFacility should ignore incoming messages
+     */
+    virtual void receiveMessage(Message* msg);
 
 /* -------------------- */
 
@@ -53,17 +75,38 @@ public:
  */
 
 public:
-  /// simply do nothing when sending a shipment
-  virtual void sendMaterial(Transaction trans, Communicator* receiver) {};
-  
-  /// simply do nothing when receiving a shipment
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) {};
+    /**
+     * This sends material up the Inst/Region/Logician line
+     * to be passed back down to the receiver
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param receiver the ultimate facility to receive this transaction
+     */
+    virtual void sendMaterial(Transaction trans, const Communicator* receiver);
+    
+    /**
+     * The facility receives the materials other facilities have sent.
+     *
+     * @param trans the Transaction object defining the order being filled
+     * @param manifest the list of material objects being received
+     */
+    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
-  /// simply do nothing on the tick
-  virtual void handleTick(int time){};
+    /**
+     * The handleTick function specific to the StubFacility.
+     *
+     * @param time the time of the tick
+     */
+    virtual void handleTick(int time);
 
-  /// simply do nothing on the tock
-  virtual void handleTock(int time){};
+    /**
+     * The handleTick function specific to the StubFacility.
+     *
+     * @param time the time of the tock
+     */
+    virtual void handleTock(int time);
+
+protected:
 
 /* ------------------- */ 
 
@@ -71,13 +114,6 @@ public:
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-
-protected:
-  /// all facilities must have at least one input commodity
-  vector<Commodity*> in_commods;
-
-  /// all facilities must have at least one output commodity
-  vector<Commodity*> out_commods;
 
 /* ------------------- */ 
 

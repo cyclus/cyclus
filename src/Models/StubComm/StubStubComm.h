@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "StubCommModel.h"
-
 /**
  * The StubStubComm class inherits from the StubModel class and is dynamically
  * loaded by the Model class when requested.
@@ -21,17 +20,34 @@ class StubStubComm : public StubCommModel
  */
 
 public:
-    StubStubComm() {};
-    
-    ~StubStubComm() {};
-   
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur)    { StubCommModel::init(cur); };
-    /// initialize an object by copying another
-    virtual void copy(StubStubComm* src) { StubCommModel::copy(src); } ;
+  /**
+   * Default constructor for StubStub Class
+   */
+  StubStubComm();
 
-    virtual void print()                 { StubCommModel::print();   } ;
+  /**
+   * every model should be destructable
+   */
+  ~StubStubComm();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
+  virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
+   */
+  virtual void copy(StubStubComm* src) ;
+
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
 
 /* ------------------- */ 
 
@@ -40,11 +56,15 @@ public:
  * --------------------
  */
 public:
-    /// never generate any messages
-    virtual void sendMessage() {};
-    /// Simply ingore incoming messages
-    virtual void receiveMessage(Message* msg) {};
+   /**
+    * The StubStubComm should never generate any messages
+    */
+    virtual void sendMessage();
 
+    /**
+     * The StubStubComm should ignore incoming messages
+     */
+    virtual void receiveMessage(Message* msg);
 
 protected:
 

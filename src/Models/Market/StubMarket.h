@@ -22,33 +22,52 @@ class StubMarket : public MarketModel
 
 public:
   /**
-   * Default constructor
+   * Default constructor for StubMarket Class
    */
-  StubMarket() {};
-  
-  /**
-   * Default destructor
-   */
-  ~StubMarket() {};
-  
-  // different ways to populate an object after creation
-  /// initialize an object from XML input
-  virtual void init(xmlNodePtr cur) { MarketModel::init(cur); };
-
-  /// initialize an object by copying another
-  virtual void copy(StubMarket* src){ MarketModel::copy(src); } ;
+  StubMarket();
 
   /**
-   * Print information about this model.
+   * every model should be destructable
    */
-  virtual void print()      { MarketModel::print();   } ;
+  ~StubMarket();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
+  virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
+   */
+  virtual void copy(StubMarket* src) ;
 
-/* -------------------- */
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
+
+/* ------------------- */ 
 
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
+public:
+   /**
+    * The StubMarket should never generate any messages
+    */
+    virtual void sendMessage();
+
+    /**
+     * The StubMarket should ignore incoming messages
+     */
+    virtual void receiveMessage(Message* msg);
+
+protected:
 
 /* -------------------- */
 
@@ -56,6 +75,7 @@ public:
  * all MARKETMODEL classes have these members
  * --------------------
  */
+
   /// Resolve requests with offers
   /**
    *  Primary funcation of a Market is to resolve the set of 
@@ -63,7 +83,7 @@ public:
    *
    *  In this stub - do nothing!
    */
-  virtual void resolve() {};
+  virtual void resolve();
 
 
 /* -------------------- */

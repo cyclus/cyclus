@@ -22,28 +22,35 @@ class StubConverter : public ConverterModel
  */
 
 public:
-  /** 
-   * Default constructor for the StubConverter class.
+   /**
+   * Default constructor for StubConverter Class
    */
-  StubConverter() {};
+  StubConverter();
 
   /**
-   * Destructor for the StubConverter class. 
+   * every model should be destructable
    */
-  ~StubConverter() {};
-  
-  // different ways to populate an object after creation
-  /// initialize an object from XML input
+  ~StubConverter();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
   virtual void init(xmlNodePtr cur);
-
-  /// initialize an object by copying another
-  virtual void copy(StubConverter* src);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubConverter to copy
+   */
+  virtual void copy(StubConverter* src) ;
 
   /**
-   * Print information about this model
+   * every model should be able to print a verbose description
    */
-  virtual void print();
-
+   virtual void print();
+ 
 /* ------------------- */ 
 
 /* --------------------

@@ -92,7 +92,6 @@ public:
    * sends the resolve signal to all of the market models
    * which in turn make matches and send orders
    *
-   * @param time is the simulation time of the tock
    */
   void resolveMarkets();
 

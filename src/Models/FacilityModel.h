@@ -96,32 +96,33 @@ public:
    */
   void setFacName(string facName) { fac_name = facName; };
 
-  /// Returns the facility's name
+  /**
+   * Returns the facility's name
+   *
+   * @return fac_name the name of this facility, a string
+   */
   string getFacName() { return fac_name; };
 
-  /// Sets this facility's institution 
-  //void setInst(Model* my_inst) { inst = my_inst; };
-  /// Sets this facility's instutution as a string
+  /**
+   * Sets this facility's instutution name 
+   *
+   * @param name the name of the institution associated with this facility.
+   */
   void setInstName(string name){ inst_name = name;};
 
-  /// Returns this facility's institution
-  InstModel* getFacInst();
-
   /**
-   * There is no default FacilityModel shipment supplier
-   * Each derived class must implement a shipment supplier
-   * 
-   * @param trans is the transaction being executed
-   * @param requester is the material requester
-   */ 
-  // virtual void sendMaterial(Transaction trans, Communicator* requester) = 0;
+   * Returns this facility's institution
+   *
+   * @return the institution assosicated with this facility
+   */
+  InstModel* getFacInst();
 
   /**
    * There is no default FacilityModel shipment requester 
    * Each derived class must implement a shipment requester
    *
-   * @param mat is the transaction being executed
-   * @param  is the set of materials being received
+   * @param trans is the transaction being executed
+   * @param manifest is the set of materials being received
    *
    */ 
   virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) = 0;

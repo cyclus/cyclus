@@ -6,10 +6,10 @@
 #include "StubModel.h"
 
 /**
- * The StubStub class inherits from the StubModel class and is dynamically
+ * The StubStub class inherits from the StubStub class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This model will do nothing. This StubModel is intended as a skeleton to guide
+ * This model will do nothing. This StubStub is intended as a skeleton to guide
  * the implementation of new StubStub models. 
  *
  */
@@ -21,17 +21,34 @@ class StubStub : public StubModel
  */
 
 public:
-    StubStub() {};
-    
-    ~StubStub() {};
-   
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur) { StubModel::init(cur); };
-    /// initialize an object by copying another
-    virtual void copy(StubStub* src)  { StubModel::copy(src); } ;
+  /**
+   * Default constructor for StubStub Class
+   */
+  StubStub();
 
-    virtual void print()              { StubModel::print();   } ;
+  /**
+   * every model should be destructable
+   */
+  ~StubStub();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
+  virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
+   */
+  virtual void copy(StubStub* src) ;
+
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
 
 /* ------------------- */ 
 

@@ -84,6 +84,22 @@ public:
    */
   virtual Message* convert(Message* convMsg, Message* refMsg); 
 
+    /**
+   * Each converter may be prompted to do its beginning-of-time-step
+   * stuff at the tick of the timer.
+   *
+   * @param time is the time to perform the tick
+   */
+  virtual void handleTick(int time);
+
+  /**
+   * Each converter may be prompted to its end-of-time-step
+   * stuff on the tock of the timer.
+   * 
+   * @param time is the time to perform the tock
+   */
+  virtual void handleTock(int time);
+
 /* ------------------- */ 
   
 };

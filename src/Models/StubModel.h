@@ -28,23 +28,41 @@ class StubModel : public Model
  */
 
 public:
-    /// Default constructor for StubModel Class
-    StubModel() { ID = nextID++; model_type="Stub"; };
+  /**
+   * Default constructor for StubModel Class
+   */
+  StubModel();
 
-    /// every model should be destructable
-    virtual ~StubModel() {};
+  /**
+   * every model should be destructable
+   */
+  virtual ~StubModel();
     
-    // every model needs a method to initialize from XML
-    virtual void init(xmlNodePtr cur) { Model::init(cur); } ;
-    // every model needs a method to copy one object to another
-    virtual void copy(StubModel* src) { Model::copy(src); } ;
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
+  virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubModel to copy
+   */
+  virtual void copy(StubModel* src) ;
 
-    // every model should be able to print a verbose description
-    virtual void print() { Model::print(); cout << endl; } ;
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
 
 protected: 
-    /// Stores the next available stub ID
-    static int nextID;
+   /** 
+    * Stores the next available stub ID
+    */ 
+   static int nextID;
+
 /* ------------------- */ 
 
 

@@ -21,17 +21,34 @@ class StubRegion : public RegionModel
  */
 
 public:
-    StubRegion() {};
-    
-    ~StubRegion() {};
-   
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur)  { RegionModel::init(cur); };
-    /// initialize an object by copying another
-    virtual void copy(StubRegion* src) { RegionModel::copy(src); } ;
+  /**
+   * Default constructor for StubStub Class
+   */
+  StubRegion();
 
-    virtual void print()               { RegionModel::print();   } ;
+  /**
+   * every model should be destructable
+   */
+  ~StubRegion();
+    
+  /**
+   * every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
+   */
+  virtual void init(xmlNodePtr cur);
+  
+  /**
+   * every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
+   */
+  virtual void copy(StubRegion* src) ;
+
+  /**
+   * every model should be able to print a verbose description
+   */
+   virtual void print();
 
 /* ------------------- */ 
 
@@ -40,9 +57,17 @@ public:
  * --------------------
  */
 public:
-    
-protected:
+   /**
+    * The StubRegion should never generate any messages
+    */
+    virtual void sendMessage();
 
+    /**
+     * The StubRegion should ignore incoming messages
+     */
+    virtual void receiveMessage(Message* msg);
+
+protected:
 
 /* -------------------- */
 

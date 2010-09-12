@@ -8,30 +8,37 @@
 #include "GenException.h"
 #include "InputXML.h"
 
-/*
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
  */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+StubConverter::StubConverter() {};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubConverter::init(xmlNodePtr cur)
-{ 
-  ConverterModel::init(cur);
-}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+StubConverter::~StubConverter() {};
+    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubConverter::init(xmlNodePtr cur) { 
+  ConverterModel::init(cur); 
+};
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubConverter::copy(StubConverter* src) { 
+  ConverterModel::copy(src); 
+};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void StubConverter::copy(StubConverter* src)
-{
-  ConverterModel::copy(src);
-}
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubConverter::print() 
-{ 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubConverter::print() { 
   ConverterModel::print(); 
 };
 
+/* --------------------
+ * all CONVERTERMODEL classes have these members
+ * --------------------
+ */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-
 void StubConverter::handleTick(int time)
 {
   // The StubConverter isn't terribly interested in the tick.
