@@ -52,10 +52,11 @@ void SWUeUF6Converter::copy(SWUeUF6Converter* src)
 void SWUeUF6Converter::print() 
 { 
   ConverterModel::print(); 
-  cout << "converts commodity {"
+  cout << "converts offers of commodity {"
       << in_commod->getName()
-      << "} into commodity {"
+      << "} into offers of commodity {"
       << out_commod->getName()
+      << "}."
       << endl;
 };
 
@@ -90,7 +91,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   CompMap comp;
 
   // determine which direction we're converting
-  if (in_commod == LI->getCommodity("SWU") &&
+  if (in_commod == LI->getCommodity("SWUs") &&
       out_commod == LI->getCommodity("eUF6")){
     // the enricher is the supplier in the convMsg
     enrID = convMsg->getSupplierID();
@@ -103,7 +104,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   }
 
   else if (in_commod == LI->getCommodity("eUF6") &&
-      out_commod == LI->getCommodity("SWU")){ 
+      out_commod == LI->getCommodity("SWUs")){ 
     // the enricher is the supplier in the refMsg
     enrID = refMsg->getSupplierID();
     castEnr = dynamic_cast<Model*>(LI->getFacilityByID(enrID));
@@ -137,7 +138,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     toRet = convMsg->clone();
     toRet->setAmount(massProdU); 
   }
-  else if(out_commod == LI->getCommodity("SWU")){
+  else if(out_commod == LI->getCommodity("SWUs")){
     toRet = convMsg->clone();
     toRet->setAmount(SWUs); 
   }

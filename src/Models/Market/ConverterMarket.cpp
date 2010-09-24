@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "ConverterMarket.h"
+#include "ConverterModel.h"
 
 #include "Logician.h"
 #include "GenException.h"
@@ -10,15 +11,30 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::init(xmlNodePtr cur)
 { 
-  MarketModel::init(cur);
-  // The commodity initialized as the mktcommodity is the request commodity.
+  MarketModel::init(cur);  /// get facility list
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/ConverterMarket/converter");
   
+  xmlNodePtr conv_node = nodes->nodeTab[0];
+  conv_name = XMLinput->get_xpath_content(conv_node,"type");
+  
+  Model* converter = NULL; 
+  converter = LI->getConverterByName(conv_name);
+
+  if (NULL == converter){
+    throw GenException("Converter '" 
+        + conv_name 
+        + "' is not defined in this problem.");
+    }
+  Model* new_converter = Model::create(converter);
+
+  // The commodity initialized as the mktcommodity is the request commodity.
+
   offer_commod = NULL; 
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
-  commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
+  string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
   offer_commod = LI->getCommodity(commod_name);
   if (NULL == offer_commod)
     throw GenException("Offer commodity '" + commod_name 
@@ -36,13 +52,6 @@ void ConverterMarket::init(xmlNodePtr cur)
   
   req_commod->setMarket(this);
 
-  converter_name = XMLinput->get_xpath_content(cur, "converter");
-  converter = LI->getConverter(converter_name);
-  if (NULL == converter_name)
-    throw GenException("Converter sub-model'" + converter_name 
-                       + "' does not exist for converter market '" + getName() 
-                       + "'."); 
-  
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::copy(ConverterMarket* src)
@@ -52,7 +61,7 @@ void ConverterMarket::copy(ConverterMarket* src)
   offer_commod->setMarket(this);
   req_commod = src->req_commod;
   req_commod->setMarket(this);
-  converter = src->getConverter();
+  conv_name = src->conv_name;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::print()
@@ -64,6 +73,21 @@ void ConverterMarket::print()
       << req_commod->getName()
       << "}. "
       << endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ConverterModel* ConverterMarket::getConverter()
+{
+  Model* converter = NULL;
+  converter = LI->getConverterByName(conv_name);
+
+  if (NULL == converter){
+    throw GenException("Converter '" 
+        + conv_name 
+        + "' is not defined in this problem.");
+    }
+
+  return ((ConverterModel*)converter);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void ConverterMarket::receiveMessage(Message *msg)
@@ -135,7 +159,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
     // get a new offer
     offer = offers.end();
     offer--;
-    offerMsg = converter->convert((*offer).second, (*request).second, commodity);
+    offerMsg = (this->getConverter())->convert((*offer).second, (*request).second);
     offerAmt = offerMsg->getAmount();
 
     // pop off this offer

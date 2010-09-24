@@ -122,8 +122,9 @@ void Model::load_converters()
 
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
   
-  for (int i=0;i<nodes->nodeNr;i++)
+  for (int i=0;i<nodes->nodeNr;i++){
     LI->addConverter(create("Converter",nodes->nodeTab[i]));
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

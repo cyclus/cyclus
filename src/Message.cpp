@@ -145,6 +145,11 @@ Transaction Message::getTrans() const{
 Commodity* Message::getCommod() const {
 	return trans.commod;
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setCommod(Commodity* newCommod) 
+{
+	trans.commod = newCommod;
+}
 //- - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getAmount() const {
 	return trans.amount;

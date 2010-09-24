@@ -6,6 +6,7 @@
 #include <deque>
 
 #include "MarketModel.h"
+#include "ConverterModel.h"
 
 /**
  * The ConverterMarket class inherits from the MarketModel class and is dynamically
@@ -81,6 +82,13 @@ public:
  */
 
 /* -------------------- */
+public:
+  /**
+   * Returns a pointer to the converter model this market relies on.
+   * 
+   * @return converter
+   */
+  ConverterModel* getConverter();
 
 private:
   /**
@@ -132,6 +140,21 @@ private:
    * This function processes the information in a request.
    */
   void process_request();
+
+  /**
+   * The commodity for which the market receives offers
+   */
+  Commodity* offer_commod;
+
+  /**
+   * The commodity for which the market receives requests
+   */
+  Commodity* req_commod;
+
+  /**
+   * The name of the converter model that this market relies on to make conversions.
+   */
+  string conv_name;
 
 };
 

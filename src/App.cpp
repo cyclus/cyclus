@@ -32,6 +32,8 @@ int main(int argc, char* argv[])
     // get markets
 
 
+    cout << "Here is a list of " << LI->getNumConverters() << " converters:" << endl;
+    LI->printConverters();
     cout << "Here is a list of " << LI->getNumMarkets() << " markets:" << endl;
     LI->printMarkets();
     cout << "Here is a list of " << LI->getNumFacilities() << " facilities:" << endl;

@@ -45,16 +45,7 @@ public:
 
 /* ------------------- */ 
 
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-
 public:
-  /**
-   * When the converter receives a message, execute any transaction therein
-   */
-    virtual void receiveMessage(Message* msg);
 
 /* -------------------- */
 
