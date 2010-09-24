@@ -122,15 +122,19 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
           << " for the amount:  " 
           << maybe_offer->getAmount() << endl;
 
-      // make a new offer with reduced amount
+      // reduce the offer amount
       offerAmt -= requestAmt;
-      Message *new_offer = new Message(*offerMsg);
-      new_offer->setAmount(offerAmt);
 
+      // if the residual is above threshold,
+      // make a new offer with reduced amount
+
+      if(offerAmt > eps){
+        Message *new_offer = new Message(*offerMsg);
+        new_offer->setAmount(offerAmt);
+        // call this method for consistency
+        receiveMessage(new_offer);
+      }
       
-      // call this method for consistency
-      receiveMessage(new_offer);
-
       // zero out request
       requestAmt = 0;
 

@@ -198,21 +198,26 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
       orders.push_back(maybe_offer);
 
-      cout << "ConverterMarket has resolved a match from "
+      cout << "ConverterMarket has resolved a partial match from "
           << maybe_offer->getSupplierID()
           << " to "
           << maybe_offer->getRequesterID() 
           << " for the amount:  " 
           << maybe_offer->getAmount() << endl;
 
-      // make a new offer with reduced amount
+      // reduce the offer amount
       offerAmt -= requestAmt;
-      Message *new_offer = new Message(*offerMsg);
-      new_offer->setAmount(offerAmt);
 
-      // call this method for consistency
-      receiveMessage(new_offer);
+      // if the residual is above threshold,
+      // make a new offer with reduced amount
 
+      if(offerAmt > eps){
+        Message *new_offer = new Message(*offerMsg);
+        new_offer->setAmount(offerAmt);
+        // call this method for consistency
+        receiveMessage(new_offer);
+      }
+      
       // zero out request
       requestAmt = 0;
     }
@@ -240,7 +245,7 @@ void ConverterMarket::resolve()
     else {
       cout << "The request from Requester "<< (*request).second->getRequesterID() 
           << " for the amount " << (*request).first 
-          << " rejected. "<<endl;
+          << " rejected by the ConverterMarket. "<<endl;
       reject_request(request);
     }
     // remove this request

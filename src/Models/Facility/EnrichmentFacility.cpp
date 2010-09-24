@@ -267,7 +267,7 @@ Mass EnrichmentFacility::checkStocks(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::makeRequests(){
-  // The enrichment facility should ask for as much feed as it is 
+  // The enrichment facility should ask for at least as much feed as it is 
   // already committed to using this month.
   Mass requestAmt;
   // In a constrained market, it happily accepts amounts no matter how small

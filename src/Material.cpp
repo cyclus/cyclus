@@ -157,7 +157,7 @@ const bool Material::isNeg(Iso tope) const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
-  return fabs(this->getComp(tope)) < AVOGADRO / eps;
+  return fabs(this->getComp(tope)) < eps;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
