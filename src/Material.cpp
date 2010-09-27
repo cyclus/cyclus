@@ -11,6 +11,11 @@ using namespace std;
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(): atomEqualsMass(true), total_mass(0), total_atoms(0) 
+{
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(xmlNodePtr cur)
 {
   
@@ -463,6 +468,17 @@ void Material::rationalize_M2A()
 
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void Material::print(){
+    printComp("Atom composition:", atom_comp);
+    cout << "\tTotal atoms: " << total_atoms 
+        << " per " << units << endl;
+    printComp("Mass composition:", mass_comp);
+    cout << "\tTotal mass: " << total_mass 
+        << " kg per " << units << endl;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::printComp(string header, CompMap comp_map)
 {
@@ -474,4 +490,5 @@ void Material::printComp(string header, CompMap comp_map)
   cout << "\t" << (*iso).first << " : " <<  (*iso).second << endl;
   
 }
+
 

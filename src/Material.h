@@ -12,16 +12,31 @@
 
 using namespace std;
 
-/// type definition for isotopes
+/**
+ * type definition for isotopes
+ */
 typedef int Iso;
-/// type definition for elements
+
+/**
+ * type definition for elements
+ */
 typedef int Elt;
-/// type definition for atom count
+
+/**
+ * type definition for atom count
+ */
 typedef double Atoms;
-/// type definition for mass
+
+/**
+ * type definition for mass
+ */
 typedef double Mass;
-/// map integers to doubles: Iso => (Atoms|Mass)
-typedef map<Iso, Atoms> CompMap;
+
+/**
+ * map integers to doubles: Iso => (Atoms|Mass)
+ */
+typedef map<Iso, double> CompMap;
+
 /**
  * A map for storing the composition history of a material.
  */
@@ -32,13 +47,18 @@ typedef map<int, map<Iso, Atoms> > CompHistory;
  */
 typedef map<int, pair<int, int> > FacHistory;
 
-
-/// we will always need Avogadro's number somewhere
+/**
+ * we will always need Avogadro's number somewhere
+ */
 #define AVOGADRO 6.02e23
-/// we should define this material mass threshold as a simulation parameter
+
+/**
+ * we should define this numerical threshold as a simulation parameter
+ * its units are kg.
+ */
 #define eps 1e-6
 
-/*! 
+/** 
  * Class Material the object used to transact material objects around the system.
  * 
  * This class keeps track of the isotopic composition of a material using both
@@ -48,13 +68,14 @@ typedef map<int, pair<int, int> > FacHistory;
  * It is an important goal (requirement) that all material objects maintain an
  * account of the atoms that is consistent with the account of the mass.
  */
-
 class Material {
 
 public:
   
-  /// default constructor
-  Material() : atomEqualsMass(true), total_mass(0), total_atoms(0) {};
+  /**
+   * Default constructor for the material class. Creates an empty material.
+   */
+  Material(); 
 
   /**
    * primary constructor reads input from XML node
@@ -92,20 +113,15 @@ public:
    */
   static void load_recipes();
   
-  /// standard verbose printer includes both an atom and mass composition output
-  void print() {
-    printComp("Atom composition:", atom_comp);
-    cout << "\tTotal atoms: " << total_atoms 
-        << " per " << units << endl;
-    printComp("Mass composition:", mass_comp);
-    cout << "\tTotal mass: " << total_mass 
-        << " kg per " << units << endl;
-  }
-
+  /**
+   * standard verbose printer includes both an atom and mass composition output
+   */
+  void print(); 
+    
   /**
    * verbose printer for a single type of composition
    *
-   * @param header is the description of the composition 
+   * @param header is the description to precede the composition 
    * @param comp_map is the map between isotopes and mass
    */
   void printComp(string header, CompMap comp_map);
@@ -128,6 +144,14 @@ public:
    * returns the total mass of this material object PER UNIT
    */
   const Mass getTotMass() const;
+
+  /**
+   * Returns the total mass of the given composition vector.
+   * 
+   * @param comp the composition vector
+   * @return the mass (in tons)
+   */
+  static double getTotMass(const CompMap& comp);
 
   /**
    * Returns the entire (current) isotopic vector for this Material.
@@ -216,14 +240,6 @@ public:
    * @return the mass (in tons)
    */
   static double getIsoMass(Iso tope, const CompMap& comp);
-
-  /**
-   * Returns the total mass of the given composition vector.
-   * 
-   * @param comp the composition vector
-   * @return the mass (in tons)
-   */
-  static double getTotMass(const CompMap& comp);
  
   /**
    * Absorbs the contents of the given Material into this Material and deletes 
@@ -314,11 +330,15 @@ private:
 
   static void load_recipebook(string filename, string ns, string format);
 
-  /// map isotopes to number of atoms
-  CompMap atom_comp, 
+  /**
+  * Maps isotopes to number of atoms
+  */
+  CompMap atom_comp; 
 
-	/// map isotope to mass
-	mass_comp;
+	/**
+   * Maps isotopes to mass
+   */
+	CompMap mass_comp;
 
   /// total mass of this material object PER UNIT
   Mass total_mass;
