@@ -340,31 +340,47 @@ private:
    */
 	CompMap mass_comp;
 
-  /// total mass of this material object PER UNIT
+  /**
+   * total mass of this material object PER UNIT
+   */
   Mass total_mass;
 
-  /// total number of atoms in this material object PER UNIT
+  /**
+   * total number of atoms in this material object PER UNIT
+   */
   Atoms total_atoms;
 
-  /// keep track of whether or not the mass & atom count is still consistent
+  /**
+   * Keeps track of whether or not the mass & atom count is still consistent
+   */
   bool atomEqualsMass;
 
-  /// units for this material
+  /**
+   * units for this material
+   */
   string units;
 
-  /// name of this recipe
+  /*
+   * name of this recipe
+   */
   string recipeName;
   
-  /// get the atomic number of an isotope
+  /**
+   * get the atomic number of an isotope
+   */
   double getZ(Iso isotope) { return isotope/10/1000; };
-  /// get the mass number of an isotope
+  
+  /**
+   * get the mass number of an isotope
+   */
+
   /**
    *  This function should be replaced by a function that can
    *  lookup the exact mass of an isotope, not just its mass number
    *
    *  @param isotope is the isotope whose mass you'd like to know
    */
-  double getA(Iso isotope) { return ((isotope/10)%1000); };
+  double getIsoMass(Iso isotope) { return ((isotope/10)%1000); };
   
   /**
    * normalize a composition so that we have atom/mass fractions
@@ -373,10 +389,14 @@ private:
    */
   void normalize(CompMap &comp_map);
 
-  /// convert an atom composition into a consitent mass composition
+  /**
+   * convert an atom composition into a consitent mass composition
+   */
   void rationalize_A2M();
 
-  /// convert mass composition into a consitent atom composition
+  /**
+   * convert mass composition into a consitent atom composition
+   */
   void rationalize_M2A();
  
 };

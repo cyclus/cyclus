@@ -18,6 +18,7 @@ SET( CYCLUS_SRC
      Message.cpp
      Communicator.cpp
      Utility/GenException.cpp 
+     Utility/MassTable.cpp 
      Utility/Timer.cpp
      Models/Model.cpp 
         Models/StubModel.cpp 
@@ -28,13 +29,23 @@ SET( CYCLUS_SRC
 				Models/RegionModel.cpp
 				Models/InstModel.cpp)
 
+set ( CMAKE_MODULE_PATH "/usr/share/cmake-2.6/Modules/" )
+set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
+
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
-INCLUDE_DIRECTORIES ("${LIBXML2_INCLUDE_DIR}")
-ADD_DEFINITIONS ("${LIBXML2_DEFINITIONS}")
+INCLUDE_DIRECTORIES (${LIBXML2_INCLUDE_DIR})
+ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
+set(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+
+# Include the HDF5 library
+FIND_PACKAGE( HDF5 COMPONENTS CXX )
+INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIRS})
+ADD_DEFINITIONS(${HDF5_DEFINITIONS})
+set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -50,4 +61,4 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl "${LIBXML2_LIBRARIES}")
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)

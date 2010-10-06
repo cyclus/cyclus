@@ -143,6 +143,7 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
     toSend.push_back(newMat);
     cout<<"SourceFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    (newMat)->print();
   }    
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
@@ -186,6 +187,8 @@ void SourceFacility::handleTock(int time){
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     capacity);
+    cout<<"The source facility, handling the tock, has created a material:"<<endl;
+    newMat->print();
     inventory.push_front(newMat);
   }
   else if (space < capacity && space > 0){
@@ -194,6 +197,8 @@ void SourceFacility::handleTock(int time){
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     space);
+    cout<<"The source facility, handling the tock, has created a material:"<<endl;
+    newMat->print();
     inventory.push_front(newMat);
   }
   // check what orders are waiting, 

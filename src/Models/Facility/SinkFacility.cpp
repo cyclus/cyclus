@@ -157,6 +157,7 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
   {
     cout<<"SinkFacility " << ID << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
+    (*thisMat)->print();
     inventory.push_back(*thisMat);
   }
 }
