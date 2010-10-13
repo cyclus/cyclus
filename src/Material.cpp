@@ -5,6 +5,7 @@ using namespace std;
 
 #include "Material.h"
 
+#include "Utility/MassTable.h"
 #include "GenException.h"
 #include "Logician.h"
 #include "Timer.h"
@@ -382,7 +383,7 @@ int Material::getAtomicNum(Iso tope)
     throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the atomic number and return.
-  return tope / 10000; // integer division
+  return tope / 1000; // integer division
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -393,7 +394,8 @@ int Material::getMassNum(Iso tope)
     throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the mass number and return.
-  return (tope / 10) % 1000;
+  // % 1000 means "modulo 1000"
+  return (tope) % 1000;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -421,7 +423,6 @@ void Material::normalize(CompMap &comp_map)
 {
   double sum_total_comp = 0;
   CompMap::iterator entry;
-
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
     sum_total_comp += (*entry).second;
 
