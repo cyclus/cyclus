@@ -21,7 +21,15 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
   string::size_type begin = 0;
   string::size_type end = 0;
   string searchFilename;
-  
+ 
+  if (getenv("CYCLUS_SRC_DIR")!=NULL){
+    inputPath = getenv("CYCLUS_SRC_DIR");
+  }
+
+  if (getenv("PATH")!=NULL){
+    envPath = getenv("PATH");
+  }
+
   string searchPath = "./";  // initialize search path with this directory
   
   if (inputPath.size() > 0)
@@ -35,8 +43,9 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
   {
     end = searchPath.find(":",begin);
     string thisDir = searchPath.substr(begin,end-begin);
-    if (thisDir[thisDir.length()-1] != '/')
-  thisDir += "/";
+    if (thisDir[thisDir.length()-1] != '/'){
+      thisDir += "/";
+    }
     searchFilename = thisDir +  filename;
     
     stat_result = stat(searchFilename.c_str(),&stat_info);
@@ -47,7 +56,7 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
 
 }
 
-string InputXML::main_schema = searchPathForFile("cyclus.rng","", getenv("CYCLUS_SRC_DIR"), getenv("PATH"));
+string InputXML::main_schema = searchPathForFile("cyclus.rng","./../../src/","","");
 
 InputXML::InputXML()
 {
