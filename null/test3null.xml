@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- 1 SourceFacility FrontEnd, 2 SinkFacility BackEnds, and 1 NullMarket -->
 <simulation>
-  <duration>10</duration>
+  <duration>1200</duration>
   <startmonth>1</startmonth>
   <startyear>2000</startyear>
   <simstart>0</simstart>

@@ -441,7 +441,7 @@ void Material::rationalize_A2M()
       entry != compHist[TI->getTime()].end();
       entry++)
   {
-    massHist[TI->getTime()][(*entry).first] = (*entry).second * getIsoMass((*entry).first);
+    massHist[TI->getTime()][(*entry).first] = (*entry).second * getMassNum((double)(*entry).first);
     total_mass += massHist[TI->getTime()][(*entry).first];
   }
 
@@ -459,7 +459,7 @@ void Material::rationalize_M2A()
       entry != massHist[TI->getTime()].end();
       entry++)
   {
-    compHist[TI->getTime()][(*entry).first] = (*entry).second / getIsoMass((*entry).first);
+    compHist[TI->getTime()][(*entry).first] = (*entry).second / getMassNum((double)(*entry).first);
     total_atoms += compHist[TI->getTime()][(*entry).first];
   }
 

@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!-- 1 SourceFacility FrontEnd, 1 EnrichmentFacility Enrichment, 1 SinkFacility BackEnd -->
+<!-- 1 SWUeUF6Converter, 1 ConverterMarket, and 1 NullMarket -->
+<!-- This test investigates the functionality of the Enrichment Facility -->
+<simulation>
+  <duration>10</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+
+	<commodity>
+		<name>uUF6</name>
+	</commodity>
+
+	<commodity>
+		<name>eUF6</name>
+	</commodity>
+
+	<commodity>
+		<name>SWUs</name>
+	</commodity>
+
+  <market>
+    <name>uUF6market</name>
+    <mktcommodity>uUF6</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>SWUmarket</name>
+    <mktcommodity>eUF6</mktcommodity>
+    <model>
+      <ConverterMarket>
+        <offercommodity>SWUs</offercommodity>
+        <reqcommodity>eUF6</reqcommodity>
+        <converter>
+          <type>SWUeUF6Converter</type>
+          <name>SWUeUF6Converter</name>
+        </converter>
+      </ConverterMarket>
+    </model>
+  </market>
+
+  <converter>
+    <name>SWUeUF6Converter</name>
+    <model>
+      <SWUeUF6Converter>
+        <incommodity>SWUs</incommodity>
+        <outcommodity>eUF6</outcommodity>
+      </SWUeUF6Converter>
+    </model>
+  </converter>
+
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>uUF6</outcommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>natU</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>Enrichment</name>
+    <model>
+      <EnrichmentFacility>
+        <incommodity>uUF6</incommodity>
+        <outcommodity>eUF6</outcommodity>
+        <inventorysize>1e4</inventorysize>
+        <capacity>1</capacity>
+        <tailsassay>0</tailsassay>
+      </EnrichmentFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd</name>
+    <model>
+      <SinkFacility>
+        <incommodity>eUF6</incommodity>
+        <capacity>5</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+	<region>
+    <name>oneRegion</name>
+		<allowedfacility>FrontEnd</allowedfacility>
+		<allowedfacility>Enrichment</allowedfacility>
+		<allowedfacility>BackEnd</allowedfacility>
+		<model>
+			<NullRegion/>
+		</model>
+		<institution>
+			<name>oneInst</name>
+			<model>
+        <FixedInst>
+          <facility>
+            <type>FrontEnd</type>
+            <name>FrontEnd</name>
+          </facility>
+          <facility>
+            <type>BackEnd</type>
+            <name>BackEnd</name>
+          </facility>
+          <facility>
+            <type>Enrichment</type>
+            <name>Enrichment</name>
+          </facility>
+        </FixedInst>
+			</model>
+		</institution>
+	</region>
+
+  <recipe>
+    <name>natU</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.00711</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.99283</comp>
+    </isotope>
+    <isotope>
+      <id>92234</id>
+      <comp>0.00006</comp>
+    </isotope>
+  </recipe>
+
+</simulation>

@@ -1,6 +1,6 @@
 // Logician.h
 #if !defined(_LOGICIAN)
-# define _LOGICIAN
+#define _LOGICIAN
 
 #include "FacilityModel.h"
 #include "MarketModel.h"

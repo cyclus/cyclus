@@ -1,6 +1,6 @@
 // Material.h
 #if !defined(_MATERIAL_H)
-# define _MATERIAL_H
+#define _MATERIAL_H
 
 #include <map>
 #include <iostream>
@@ -364,23 +364,6 @@ private:
    * name of this recipe
    */
   string recipeName;
-  
-  /**
-   * get the atomic number of an isotope
-   */
-  double getZ(Iso isotope) { return isotope/10/1000; };
-  
-  /**
-   * get the mass number of an isotope
-   */
-
-  /**
-   *  This function should be replaced by a function that can
-   *  lookup the exact mass of an isotope, not just its mass number
-   *
-   *  @param isotope is the isotope whose mass you'd like to know
-   */
-  double getIsoMass(Iso isotope) { return ((isotope/10)%1000); };
   
   /**
    * normalize a composition so that we have atom/mass fractions

@@ -2,7 +2,7 @@
 // A Message class for inter-entity requests, instructions, etc.
 
 #if !defined(_MESSAGE)
-# define _MESSAGE
+#define _MESSAGE
 
 #include "Commodity.h"
 #include "Material.h"
