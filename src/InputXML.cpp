@@ -47,7 +47,7 @@ string searchPathForFile(string filename, string inputPath, string envPath, stri
 
 }
 
-string InputXML::main_schema = searchPathForFile("cyclus.rng", "../../src", getenv("CYCLUS_SRC_DIR"), getenv("PATH"));
+string InputXML::main_schema = searchPathForFile("cyclus.rng","", getenv("CYCLUS_SRC_DIR"), getenv("PATH"));
 
 InputXML::InputXML()
 {
