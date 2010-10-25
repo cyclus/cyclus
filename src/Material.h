@@ -331,16 +331,6 @@ private:
   static void load_recipebook(string filename, string ns, string format);
 
   /**
-  * Maps isotopes to number of atoms
-  */
-  CompMap atom_comp; 
-
-	/**
-   * Maps isotopes to mass
-   */
-	CompMap mass_comp;
-
-  /**
    * total mass of this material object PER UNIT
    */
   Mass total_mass;

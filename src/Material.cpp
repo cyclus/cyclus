@@ -472,10 +472,10 @@ void Material::rationalize_M2A()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print(){
-    printComp("Atom composition:", atom_comp);
+    printComp("Atom composition:", compHist[TI->getTime()]);
     cout << "\tTotal atoms: " << total_atoms 
         << " per " << units << endl;
-    printComp("Mass composition:", mass_comp);
+    printComp("Mass composition:", massHist[TI->getTime()]);
     cout << "\tTotal mass: " << total_mass 
         << " kg per " << units << endl;
 }
