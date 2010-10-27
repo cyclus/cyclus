@@ -57,8 +57,8 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
   units = mat_unit;
   recipeName = rec_name;
 
-  total_mass=0;
-  total_atoms=0;
+  //total_mass=0;
+  //total_atoms=0;
   
   compHist[TI->getTime()] = comp;
   rationalize_A2M();
@@ -86,9 +86,11 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)
   compHist[TI->getTime()] = comp;
   units = mat_unit;
   recipeName = rec_name;
+  rationalize_A2M();
 
-  total_mass=0;
-  total_atoms=0;
+  // KDHFLAG setting these to zero totally necessary? 
+  //total_mass=0;
+  //total_atoms=0;
 
   facHist = FacHistory() ;
 
@@ -104,7 +106,8 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)
     this->addMass(-diff);
   }
 
-  rationalize_A2M();
+  total_mass=this->getTotMass();
+  total_atoms=this->getTotAtoms();
 
 }
 
@@ -251,7 +254,7 @@ const Atoms Material::getTotAtoms() const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotAtoms(const CompMap& comp)
 {
-  // Sum the atomses of the isotopes.
+  // Sum the atoms of the isotopes.
   CompMap::const_iterator iter = comp.begin();
   double atoms = 0;
 
@@ -302,6 +305,8 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   // something's gone wrong.
   if (this->isNeg(tope))
     throw GenException("Tried to make isotope composition negative.");
+
+  rationalize_A2M();
 
 }
 
@@ -467,7 +472,7 @@ void Material::normalize(CompMap &comp_map)
 void Material::rationalize_A2M()
 {
   
-  total_mass = 0;
+  //total_mass = 0;
 
   for(CompMap::iterator entry = compHist[TI->getTime()].begin();
       entry != compHist[TI->getTime()].end();
@@ -482,7 +487,7 @@ void Material::rationalize_A2M()
 void Material::rationalize_M2A()
 {
 
-  total_atoms = 0;
+  //total_atoms = 0;
   for(CompMap::iterator entry = massHist[TI->getTime()].begin();
       entry != massHist[TI->getTime()].end();
       entry++)
