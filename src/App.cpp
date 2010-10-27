@@ -15,6 +15,13 @@ using namespace std;
 //-----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+    // announce yourself
+    cout << "|--------------------------------------------|" << endl;
+    cout << "|                  Cyclus                    |" << endl;
+    cout << "|       a nuclear fuel cycle simulator       |" << endl;
+    cout << "|  from the University of Wisconsin-Madison  |" << endl;
+    cout << "|--------------------------------------------|" << endl;
+
     // read input file
 
     // setup simulation

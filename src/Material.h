@@ -43,6 +43,11 @@ typedef map<Iso, double> CompMap;
 typedef map<int, map<Iso, Atoms> > CompHistory;
 
 /**
+ * A map for storing the mass history of a material.
+ */
+typedef map<int, map<Iso, Mass> > MassHistory;
+
+/**
  * A map for storing the facility history of a material.
  */
 typedef map<int, pair<int, int> > FacHistory;
@@ -154,12 +159,34 @@ public:
   static double getTotMass(const CompMap& comp);
 
   /**
+   * returns the total atoms in this material object 
+   */
+  const Mass getTotAtoms() const;
+
+  /**
+   * Returns the total atoms in the given composition vector.
+   * 
+   * @param comp the composition vector
+   * @return the total atoms
+   */
+  static double getTotAtoms(const CompMap& comp);
+
+  /**
    * Returns the entire (current) isotopic vector for this Material.
    *
    * @return the current composition
    */
   virtual const CompMap getComp() const;
 
+  /**
+   * Returns the mass of the given isotope in the given composition vector.
+   *
+   * @param tope the atomic number of the element
+   * @param comp the composition vector
+   * @return the number of atoms
+   */
+  static double getComp(Iso tope, const CompMap& comp);
+ 
   /**
    * Returns an isotopic vector corresponding to the given fraction of this 
    * Material's current composition.
@@ -316,7 +343,7 @@ protected:
    * compositions. A composition is a map of isotopes and the corresponding
    * masses.
    */
-  CompHistory massHist;
+  MassHistory massHist;
     
   /**
    * The facility history of this Material. The form is a map whose keys 
