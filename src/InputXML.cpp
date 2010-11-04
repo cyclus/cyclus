@@ -7,57 +7,17 @@
 #include "InputXML.h"
 
 #include "Timer.h"
+#include "Env.h"
 #include "GenException.h"
 #include "Logician.h"
 #include "Model.h"
 
 InputXML* InputXML::_instance = 0;
 
-/// implement a searchpath paradigm
-string searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)
-{
-  struct stat stat_info;
-  int stat_result = -1;
-  string::size_type begin = 0;
-  string::size_type end = 0;
-  string searchFilename;
- 
-  if (getenv("CYCLUS_SRC_DIR")!=NULL){
-    envPath = getenv("CYCLUS_SRC_DIR");
-  }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+string InputXML::main_schema = ENV->searchPathForFile("cyclus.rng","", ENV->checkEnv("CYCLUS_SRC_DIR"),"");
 
-  if (getenv("PATH")!=NULL){
-    builtinPath = getenv("PATH");
-  }
-
-  string searchPath = "./";  // initialize search path with this directory
-  
-  if (inputPath.size() > 0)
-    searchPath += ":" + inputPath;
-  if (envPath.size() > 0)
-    searchPath += ":" + envPath;
-  if (builtinPath.size() > 0)
-    searchPath += ":" + builtinPath + ":";
-
-  while (stat_result != 0 && begin < searchPath.length())
-  {
-    end = searchPath.find(":",begin);
-    string thisDir = searchPath.substr(begin,end-begin);
-    if (thisDir[thisDir.length()-1] != '/'){ 
-      thisDir += "/";
-    }
-    searchFilename = thisDir +  filename;
-    
-    stat_result = stat(searchFilename.c_str(),&stat_info);
-    begin = end + 1;
-  }
-
-  return strdup(searchFilename.c_str());
-
-}
-
-string InputXML::main_schema = searchPathForFile("cyclus.rng","","","");
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML::InputXML()
 {
 
@@ -65,6 +25,7 @@ InputXML::InputXML()
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML* InputXML::Instance() {
 
   if (0 == _instance)
@@ -74,6 +35,7 @@ InputXML* InputXML::Instance() {
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 {
   xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
@@ -104,6 +66,7 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::stripCurNS()
 {
 
@@ -125,6 +88,7 @@ void InputXML::stripCurNS()
 
 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_file(string filename)
 {
   curFilePtr = new xmlFileInfo;
@@ -158,6 +122,7 @@ void InputXML::load_file(string filename)
 }
 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_recipebook(string filename)
 {
   /// store parent file info
@@ -183,6 +148,7 @@ void InputXML::load_recipebook(string filename)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_facilitycatalog(string filename)
 {
   /// store parent file info
@@ -209,6 +175,7 @@ void InputXML::load_facilitycatalog(string filename)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*xmlNodeSetPtr InputXML::get_xpath_axes(xmlNodePtr cur,const char* expression)
 {
 
@@ -244,6 +211,7 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression)
 {
 
@@ -282,6 +250,7 @@ const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression)
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* InputXML::get_xpath_name(xmlNodePtr cur,const char* expression)
 {
 

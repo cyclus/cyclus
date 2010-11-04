@@ -20,6 +20,7 @@ SET( CYCLUS_SRC
      Utility/GenException.cpp 
      Utility/MassTable.cpp 
      Utility/Timer.cpp
+     Utility/Env.cpp
      Models/Model.cpp 
         Models/StubModel.cpp 
         Models/StubCommModel.cpp 
