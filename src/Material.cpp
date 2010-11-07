@@ -37,10 +37,9 @@ Material::Material(xmlNodePtr cur)
   {
     xmlNodePtr iso_node = isotopes->nodeTab[i];
     Iso isotope = atoi(XMLinput->get_xpath_content(iso_node,"id"));
-    comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
+    comp_map[isotope] = total_comp*atof(XMLinput->get_xpath_content(iso_node,"comp"));
   }
   
-  normalize(comp_map);
 
   if ( "atom" != comp_type)
     rationalize_M2A();
@@ -62,9 +61,9 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
   
   compHist[TI->getTime()] = comp;
   rationalize_A2M();
-
   total_atoms=this->getTotAtoms();
   total_mass=this->getTotMass();
+
 
   facHist = FacHistory() ;
 
@@ -212,16 +211,7 @@ double Material::getEltMass(int elt, const map<Iso, Atoms>& comp)
 const Mass Material::getTotMass() const
 {
   CompMap comp = this->getComp();
-  
-  // Sum the masses of the isotopes.
-  double mass = 0;
-
-  CompMap::iterator iter = comp.begin();
-  while (iter != comp.end()) {
-    mass += Material::getIsoMass(iter->first, comp);
-    iter ++;
-  }
-  return mass;
+  return Material::getTotMass(comp);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotMass(const CompMap& comp)
@@ -241,15 +231,7 @@ const Atoms Material::getTotAtoms() const
 {
   CompMap comp = this->getComp();
   
-  // Sum the atoms.
-  double atoms = 0;
-
-  CompMap::iterator iter = comp.begin();
-  while (iter != comp.end()) {
-    atoms += this->getComp(iter->first);
-    iter ++;
-  }
-  return atoms;
+  return Material::getTotAtoms(comp);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotAtoms(const CompMap& comp)
@@ -456,29 +438,15 @@ Material* Material::addMass(double mass)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::normalize(CompMap &comp_map)
-{
-  double sum_total_comp = 0;
-  CompMap::iterator entry;
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
-    sum_total_comp += (*entry).second;
-
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
-    (*entry).second /= sum_total_comp;
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_A2M()
 {
-  
-  //total_mass = 0;
-
+  // loop through each isotope in the composition for the current time.
   for(CompMap::iterator entry = compHist[TI->getTime()].begin();
       entry != compHist[TI->getTime()].end();
       entry++)
   {
-    massHist[TI->getTime()][(*entry).first] = (*entry).second * getMassNum((double)(*entry).first);
+    // multiply the number of atoms by the mass number of that isotope
+    massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first);
   }
   total_mass = this->getTotMass();
   total_atoms = this->getTotAtoms();
@@ -487,24 +455,24 @@ void Material::rationalize_A2M()
 void Material::rationalize_M2A()
 {
 
-  //total_atoms = 0;
+  total_mass = this->getTotMass();
+
   for(CompMap::iterator entry = massHist[TI->getTime()].begin();
       entry != massHist[TI->getTime()].end();
       entry++)
   {
-    compHist[TI->getTime()][(*entry).first] = (*entry).second / getMassNum((double)(*entry).first);
+    compHist[TI->getTime()][(*entry).first] = (*entry).second / getMassNum((*entry).first);
   }
 
-  total_mass = this->getTotMass();
   total_atoms = this->getTotAtoms();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print(){
     printComp("Atom composition:", compHist[TI->getTime()]);
-    cout << "\tTotal atoms: " << total_atoms 
+    cout << "\tTotal atoms: " << this->getTotAtoms() 
         << " per " << units << endl;
     printComp("Mass composition:", massHist[TI->getTime()]);
-    cout << "\tTotal mass: " << total_mass 
+    cout << "\tTotal mass: " << this->getTotMass() 
         << " kg per " << units << endl;
 }
 

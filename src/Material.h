@@ -383,13 +383,6 @@ private:
   string recipeName;
   
   /**
-   * normalize a composition so that we have atom/mass fractions
-   *
-   * @param &comp_map is the composition to normalize
-   */
-  void normalize(CompMap &comp_map);
-
-  /**
    * convert an atom composition into a consitent mass composition
    */
   void rationalize_A2M();
