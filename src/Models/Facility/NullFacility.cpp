@@ -123,7 +123,7 @@ void NullFacility::sendMaterial(Transaction trans, const Communicator* requester
     Material* m = inventory.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getComp(), 
+    Material* newMat = new Material(m->getAtomComp(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0);
@@ -243,7 +243,7 @@ void NullFacility::handleTock(int time)
     Material* m = stocks.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getComp(), 
+    Material* newMat = new Material(m->getAtomComp(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0);

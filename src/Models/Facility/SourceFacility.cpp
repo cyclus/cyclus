@@ -121,7 +121,7 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
 
   while(trans.amount > newAmt && !inventory.empty() ){
     // start with an empty material
-    Material* newMat = new Material(recipe->getComp(), 
+    Material* newMat = new Material(recipe->getAtomComp(), 
                                   recipe->getUnits(),
                                   recipe->getName(), 
                                   0);
@@ -183,7 +183,7 @@ void SourceFacility::handleTock(int time){
   Mass space = inventory_size - this->checkInventory();
   if(capacity <= space){
     // add a material the size of the capacity to the inventory
-    Material* newMat = new Material(recipe->getComp(), 
+    Material* newMat = new Material(recipe->getAtomComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     capacity);
@@ -193,7 +193,7 @@ void SourceFacility::handleTock(int time){
   }
   else if (space < capacity && space > 0){
     // add a material that fills the inventory
-    Material* newMat = new Material(recipe->getComp(), 
+    Material* newMat = new Material(recipe->getAtomComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     space);
