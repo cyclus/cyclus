@@ -186,7 +186,7 @@ void SourceFacility::handleTock(int time){
     Material* newMat = new Material(recipe->getAtomComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
-                                    capacity);
+                                    capacity*(recipe->getTotMass()));
     cout<<"The source facility, handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);

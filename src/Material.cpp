@@ -149,7 +149,7 @@ const bool Material::isNeg(Iso tope) const
   if (this->getAtomComp(tope) == 0)
     return false;
 
-  // KDHFLAG Check if this is the right use of epsilon... 
+  // KDHFLAG atoms/mol / grams/mol * eps * grams/ton = atoms/ton * eps 
   Atoms atoms_eps =  AVOGADRO / Material::getMassNum(tope) * eps * 1e6; 
   return this->getAtomComp(tope) + atoms_eps < 0;
 }
@@ -516,7 +516,7 @@ void Material::rationalize_A2M()
       entry++)
   {
     // multiply the number of atoms by the mass number of that isotope
-    massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first);
+    massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first)/AVOGADRO;
   }
   total_mass = this->getTotMass();
   total_atoms = this->getTotAtoms();
@@ -531,7 +531,7 @@ void Material::rationalize_M2A()
       entry != massHist[TI->getTime()].end();
       entry++)
   {
-    compHist[TI->getTime()][(*entry).first] = (*entry).second / getMassNum((*entry).first);
+    compHist[TI->getTime()][(*entry).first] = AVOGADRO*(*entry).second / getMassNum((*entry).first);
   }
 
   total_atoms = this->getTotAtoms();
