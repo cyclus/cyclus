@@ -172,36 +172,20 @@ public:
   static double getTotAtoms(const CompMap& comp);
 
   /**
-   * Returns the entire (current) mass isotopic vector for this Material.
+   * Returns the entire (current) isotopic vector for this Material.
    *
-   * @return the current mass composition
+   * @return the current composition
    */
-  virtual const CompMap getMassComp() const;
+  virtual const CompMap getComp() const;
 
   /**
    * Returns the mass of the given isotope in the given composition vector.
    *
-   * @param tope the isotope ID number of the element
-   * @param comp the composition vector
-   * @return the mass
-   */
-  static double getMassComp(Iso tope, const CompMap& comp);
-
-  /**
-   * Returns the entire (current) isotopic vector for this Material.
-   *
-   * @return the current atomic composition
-   */
-  virtual const CompMap getAtomComp() const;
-
-  /**
-   * Returns the number of atoms of the isotope in the composition vector.
-   *
-   * @param tope the isotope ID number of the element
+   * @param tope the atomic number of the element
    * @param comp the composition vector
    * @return the number of atoms
    */
-  static double getAtomComp(Iso tope, const CompMap& comp);
+  static double getComp(Iso tope, const CompMap& comp);
  
   /**
    * Returns an isotopic vector corresponding to the given fraction of this 
@@ -221,7 +205,7 @@ public:
    * @param tope the isotope whose number density will be returned
    * @return the number density of the given isotope, or zero
    */
-  const virtual Atoms getAtomComp(Iso tope) const;
+  const virtual Atoms getComp(Iso tope) const;
 
   /**
    * Returns the atomic number of the isotope with the given identifier.
@@ -243,21 +227,12 @@ public:
    * Adds (or subtracts) from the number density of the given isotope by 
    * the amount.
    *
-   * @param tope the isotope whose mass we want to change
-   * @param change the mass to add (or subtract, if negative)
-   * @param time the current time
-   */
-  virtual void changeMassComp(Iso tope, Mass change, int time);
-
-  /**
-   * Adds (or subtracts) from the number density of the given isotope by 
-   * the amount.
-   *
    * @param tope the isotope whose number density we want to change
-   * @param change the number or atoms to add (or subtract, if negative)
+   * @param change if positive, the amount to add to the given isotopes 
+   * number density; if negative, the amount to subtract
    * @param time the current time
    */
-  virtual void changeAtomComp(Iso tope, Atoms change, int time);
+  virtual void changeComp(Iso tope, Atoms change, int time);
 
   /**
    * Returns the mass of the given element in this Material.

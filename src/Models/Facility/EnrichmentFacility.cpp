@@ -138,7 +138,7 @@ void EnrichmentFacility::sendMaterial(Transaction trans, const Communicator* req
     Material* m = inventory.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0);
@@ -203,7 +203,7 @@ void EnrichmentFacility::handleTock(int time)
     Material* m = stocks.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0);
@@ -374,7 +374,7 @@ void EnrichmentFacility::enrich()
 		double P = Material::getEltMass(92, compToMake);
 		double xp = Material::getIsoMass(922350, compToMake) / P;
 		double F = mat->getEltMass(92);
-		double xf = Material::getIsoMass(922350, mat->getAtomComp()) / F;
+		double xf = Material::getIsoMass(922350, mat->getComp()) / F;
 		double W = F - P;
 		double xw = (F * xf - P * xp) / W;
 
@@ -423,9 +423,9 @@ void EnrichmentFacility::enrich()
 						 - mat->getEltMass(92)) > eps)
 			throw GenException("Conservation of mass violation at Enrichment!!");
 
-		if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
-         Material::getIsoMass(922350, theTails->getAtomComp()) 
-          - Material::getIsoMass(922350, mat->getAtomComp())) > eps)
+		if (fabs(Material::getIsoMass(922350, theProd->getComp()) +
+         Material::getIsoMass(922350, theTails->getComp()) 
+          - Material::getIsoMass(922350, mat->getComp())) > eps)
 			throw GenException("Conservation of mass violation at Enrichment!!");
 
 		// Don't forget to decrement outstMF before sending.
