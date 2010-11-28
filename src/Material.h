@@ -172,6 +172,31 @@ public:
   static double getTotAtoms(const CompMap& comp);
 
   /**
+   * Returns the entire (current) mass vector for this Material.
+   *
+   * @return the current mass composition
+   */
+  virtual const CompMap getMassComp() const;
+
+  /**
+   * Returns the current mass of the given isotope, or zero if 
+   * that isotope isn't present.
+   *
+   * @param tope the isotope whose mass in the material will be returned
+   * @return the mass of the given isotope within the material, or zero
+   */
+  const virtual Mass getMassComp(Iso tope) const;
+
+  /**
+   * Returns the mass of the given isotope in the given composition vector.
+   *
+   * @param tope the atomic number of the element
+   * @param comp the composition vector
+   * @return the mass
+   */
+  static double getMassComp(Iso tope, const CompMap& comp);
+
+  /**
    * Returns the entire (current) isotopic vector for this Material.
    *
    * @return the current composition
@@ -179,7 +204,7 @@ public:
   virtual const CompMap getComp() const;
 
   /**
-   * Returns the mass of the given isotope in the given composition vector.
+   * Returns the atoms of the given isotope in the given composition vector.
    *
    * @param tope the atomic number of the element
    * @param comp the composition vector
