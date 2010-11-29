@@ -332,6 +332,13 @@ public:
    */
   virtual Material* addMass(Mass add);
 
+  /**
+   * Normalizes the composition vector it is provided.
+   * 
+   * @param comp_map the vector to normalize
+   */
+  void normalize(CompMap &comp_map);
+
 protected:
   /**
    * Returns true if the given isotope's number density is for some reason 

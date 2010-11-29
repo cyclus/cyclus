@@ -37,9 +37,10 @@ Material::Material(xmlNodePtr cur)
   {
     xmlNodePtr iso_node = isotopes->nodeTab[i];
     Iso isotope = atoi(XMLinput->get_xpath_content(iso_node,"id"));
-    comp_map[isotope] = total_comp*atof(XMLinput->get_xpath_content(iso_node,"comp"));
+    comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
   }
   
+  normalize(comp_map);
 
   if ( "atom" != comp_type)
     rationalize_M2A();
@@ -57,6 +58,8 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
   recipeName = rec_name;
   
   compHist[TI->getTime()] = comp;
+
+  normalize(compHist[TI->getTime()]);
   rationalize_A2M();
   total_atoms=this->getTotAtoms();
   total_mass=this->getTotMass();
@@ -283,6 +286,7 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   if (this->isNeg(tope))
     throw GenException("Tried to make isotope composition negative.");
 
+  normalize(compHist[time]);
   rationalize_A2M();
 
 }
@@ -471,6 +475,18 @@ Material* Material::addMass(double mass)
   this->absorb(newMat);
   return newMat;
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void Material::normalize(CompMap &comp_map)
+{
+  double sum_total_comp = 0;
+  CompMap::iterator entry;
+  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
+    sum_total_comp += (*entry).second;
+
+  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
+    (*entry).second /= sum_total_comp;
+
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_A2M()
@@ -486,6 +502,8 @@ void Material::rationalize_A2M()
     massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first)/1e3;
   }
   total_mass = this->getTotMass();
+  
+  normalize(massHist[TI->getTime()]);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_M2A()
@@ -501,6 +519,9 @@ void Material::rationalize_M2A()
   }
 
   total_atoms = this->getTotAtoms();
+  
+  normalize(compHist[TI->getTime()]);
+
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print(){
