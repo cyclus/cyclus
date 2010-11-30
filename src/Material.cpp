@@ -50,37 +50,28 @@ Material::Material(xmlNodePtr cur)
   facHist = FacHistory() ;
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(CompMap comp, string mat_unit, string rec_name)
+Material::Material(CompMap comp, string mat_unit, string rec_name, double size, Basis type)  
 {
-  units = mat_unit;
-  recipeName = rec_name;
   
-  compHist[TI->getTime()] = comp;
-
-  total_atoms = getTotAtoms(comp);
-  normalize(compHist[TI->getTime()]);
-  rationalize_A2M();
-
-  facHist = FacHistory() ;
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(CompMap comp, string mat_unit, string rec_name, Atoms size)  
-{
   units = mat_unit;
   recipeName = rec_name;
 
-  compHist[TI->getTime()] = comp;
+  CompMap &comp_map = ( atomBased != type ? massHist[TI->getTime()] : 
+                       compHist[TI->getTime()]);
+  double &total_comp = ( atomBased != type ? total_mass : total_atoms);
 
-  total_atoms = size;
-  normalize(compHist[TI->getTime()]);
-  rationalize_A2M();
+  total_comp = size;
+  comp_map = comp;
+
+  normalize(comp_map);
+
+  if ( atomBased != type)
+    rationalize_M2A();
+  else
+    rationalize_A2M();
 
   facHist = FacHistory() ;
-
 
 }
 
@@ -148,11 +139,11 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
   // Else return 0.
 
   CompMap::const_iterator searchIso = comp.find(tope);
-  double mass = 0;
+  double massToRet = 0;
 
   if (searchIso != comp.end()) 
-    mass = (*searchIso).second*Material::getMassNum(tope)/1e3;
-  return mass;
+    massToRet = (*searchIso).second*Material::getMassNum(tope)/1e3;
+  return massToRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,7 +158,7 @@ double Material::getEltMass(int elt, const map<Iso, Atoms>& comp)
 {
   // Iterate through the current composition...
   map<Iso, Atoms>::const_iterator iter = comp.begin();
-  double mass = 0;
+  double massToRet = 0;
 
   while (iter != comp.end()) {
 
@@ -176,11 +167,11 @@ double Material::getEltMass(int elt, const map<Iso, Atoms>& comp)
 
     int itAN = Material::getAtomicNum(iter->first);
     if (itAN == elt) 
-      mass = mass + getIsoMass(iter->first, comp);
+      massToRet = massToRet + getIsoMass(iter->first, comp);
     iter ++;
   }
 
-  return mass;
+  return massToRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -188,13 +179,13 @@ double Material::getTotMass(const CompMap& comp)
 {
   // Sum the masses of the isotopes.
   CompMap::const_iterator iter = comp.begin();
-  double mass = 0;
+  double massToRet = 0;
 
   while (iter != comp.end()) {
-    mass = mass + Material::getIsoMass(iter->first, comp);
+    massToRet = massToRet + Material::getIsoMass(iter->first, comp);
     iter ++;
   }
-  return mass;
+  return massToRet;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotAtoms(const CompMap& comp)
@@ -290,11 +281,11 @@ double Material::getMassComp(Iso tope, const CompMap& comp)
   // Else return 0.
 
   CompMap::const_iterator searchIso = comp.find(tope);
-  double mass = 0;
+  double massToRet = 0;
   if (searchIso != comp.end()) 
     // comp = searchIso->second * Material::getMassNum(tope)/ AVOGADRO / 1e6;
-    mass = (*searchIso).second;
-  return mass;
+    massToRet = (*searchIso).second;
+  return massToRet;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const CompMap Material::getComp() const
@@ -422,21 +413,19 @@ int Material::getMassNum(Iso tope)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::extractMass(double mass)
+Material* Material::extractMass(Mass amt)
 {
-  double frac = mass / this->getTotMass();
-  CompMap comp = this->getFracComp(frac);
-  Material* newMat = new Material(comp , units, " ");
+  CompMap comp = this->getMassComp();
+  Material* newMat = new Material(comp , units, " ", amt, massBased);
   this->extract(newMat);
   return newMat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::addMass(double mass)
+Material* Material::addMass(Mass amt)
 {
-  double frac = mass / this->getTotMass();
-  CompMap comp = this->getFracComp(frac);
-  Material* newMat = new Material(comp , units, " ");
+  CompMap comp = this->getMassComp();
+  Material* newMat = new Material(comp , units, " ",amt, massBased);
   this->absorb(newMat);
   return newMat;
 }

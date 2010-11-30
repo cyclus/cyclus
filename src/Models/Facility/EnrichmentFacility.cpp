@@ -141,7 +141,7 @@ void EnrichmentFacility::sendMaterial(Transaction trans, const Communicator* req
     Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0);
+                                  0, atomBased);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
@@ -206,7 +206,7 @@ void EnrichmentFacility::handleTock(int time)
     Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0);
+                                  0, atomBased);
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (capacity - complete)){
@@ -398,7 +398,7 @@ void EnrichmentFacility::enrich()
     pComp[ 90190] = atoms19;
 
     string pName = string("eUF6%f",xp);
-    Material* theProd = new Material(pComp, mat->getUnits(),pName);
+    Material* theProd = new Material(pComp, mat->getUnits(), pName, mat->getTotAtoms(), atomBased);
 
     // Make the tails
     CompMap wComp;
@@ -415,8 +415,9 @@ void EnrichmentFacility::enrich()
     wComp[922380] = atoms238;
     wComp[ 90190] = atoms19;
 
+    //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
     string wName = string("dUF6%f",xw);
-    Material* theTails = new Material(wComp, mat->getUnits(),wName);
+    Material* theTails = new Material(wComp, mat->getUnits(),wName, mat->getTotAtoms(), atomBased);
 
 		// CONSERVATION OF MASS CHECKS:
 		if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 

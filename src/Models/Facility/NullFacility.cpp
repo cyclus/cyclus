@@ -126,7 +126,7 @@ void NullFacility::sendMaterial(Transaction trans, const Communicator* requester
     Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0);
+                                  0, atomBased);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
@@ -246,7 +246,7 @@ void NullFacility::handleTock(int time)
     Material* newMat = new Material(m->getComp(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0);
+                                  0, atomBased);
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (capacity - complete)){

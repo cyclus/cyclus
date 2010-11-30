@@ -32,6 +32,7 @@ typedef double Atoms;
  */
 typedef double Mass;
 
+
 /**
  * map integers to doubles: Iso => (Atoms|Mass)
  */
@@ -51,6 +52,11 @@ typedef map<int, map<Iso, Mass> > MassHistory;
  * A map for storing the facility history of a material.
  */
 typedef map<int, pair<int, int> > FacHistory;
+
+/**
+ * An enumeration for different types of recipe bases
+ **/
+enum Basis {atomBased, massBased};
 
 /**
  * we will always need Avogadro's number somewhere
@@ -90,23 +96,15 @@ public:
   Material(xmlNodePtr cur);
 
   /**
-   * a constructor for making a material object from a known composition.
-   *
-   * @param comp a map from isotopes to number of atoms
-   * @param mat_unit the units for this material
-   * @param rec_name name of this recipe
-   */
-  Material(CompMap comp, string mat_unit, string rec_name);
-
-  /**
    * a constructor for making a material object from a known recipe and size.
    *
    * @param comp a map from isotopes to number of atoms
    * @param mat_unit the units for this material
    * @param rec_name name of this recipe
    * @param scale is the size of this material
+   * @param type indicates whether comp and scale are in mass or atom units
    */
-  Material(CompMap comp, string mat_unit, string rec_name, Atoms scale);
+  Material(CompMap comp, string mat_unit, string rec_name, double scale, Basis type);
   
   /** 
    * Default destructor does nothing.
