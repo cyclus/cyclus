@@ -59,51 +59,27 @@ Material::Material(CompMap comp, string mat_unit, string rec_name)
   
   compHist[TI->getTime()] = comp;
 
+  total_atoms = getTotAtoms(comp);
   normalize(compHist[TI->getTime()]);
   rationalize_A2M();
-  total_atoms=this->getTotAtoms();
-  total_mass=this->getTotMass();
-
 
   facHist = FacHistory() ;
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(CompMap comp, string mat_unit, string rec_name, Mass size)  
+Material::Material(CompMap comp, string mat_unit, string rec_name, Atoms size)  
 {
-
-  if(size==0){
-    CompMap::iterator iter = comp.begin();
-    while(iter!=comp.end()) {
-      comp.erase(iter->first);
-      comp.insert(make_pair(iter->first, 0));
-      iter++;
-    }
-  }
-
-  compHist[TI->getTime()] = comp;
   units = mat_unit;
   recipeName = rec_name;
 
-  facHist = FacHistory() ;
+  compHist[TI->getTime()] = comp;
 
-  total_mass=this->getTotMass();
-  total_atoms=this->getTotAtoms();
-
+  total_atoms = size;
+  normalize(compHist[TI->getTime()]);
   rationalize_A2M();
 
-  Mass diff = (this->getTotMass() - size);
-
-  if(diff == 0 && size>0){
-    // do nothing, you've already created a material of the right magnitude
-  }
-  else if(diff > 0 && size>0 ){
-    this->extractMass(diff);
-  }
-  else if(diff < 0 && size>0){
-    this->addMass(-diff);
-  }
+  facHist = FacHistory() ;
 
 
 }
@@ -146,21 +122,22 @@ const bool Material::isNeg(Iso tope) const
 {
   if (this->getComp(tope) == 0)
     return false;
-
-  Atoms atoms_eps =  eps *1e3 / Material::getMassNum(tope); 
+  // (kg) * (g/kg) * (atoms/g)
+  Atoms atoms_eps =  eps * 1e3 / Material::getMassNum(tope); 
   return (this->getComp(tope) + atoms_eps < 0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
-  Atoms atoms_eps =  AVOGADRO / Material::getMassNum(tope) * eps * 1e6; 
+  // (kg) * (g/kg) * (atoms/g) 
+  Atoms atoms_eps = eps * 1e3 / Material::getMassNum(tope) ; 
   return fabs(this->getComp(tope)) < atoms_eps;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getIsoMass(Iso tope) const
 {
   map<Iso, Atoms> currComp = this->getComp();
-  return Material::getIsoMass(tope, currComp);
+  return total_mass*Material::getIsoMass(tope, currComp);
 }
 
 
@@ -182,7 +159,7 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
 const double Material::getEltMass(int elt) const
 {
   map<Iso, Atoms> currComp = this->getComp();
-  return Material::getEltMass(elt, currComp);
+  return total_mass*Material::getEltMass(elt, currComp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -207,12 +184,6 @@ double Material::getEltMass(int elt, const map<Iso, Atoms>& comp)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Mass Material::getTotMass() const
-{
-  CompMap comp = this->getComp();
-  return Material::getTotMass(comp);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotMass(const CompMap& comp)
 {
   // Sum the masses of the isotopes.
@@ -224,12 +195,6 @@ double Material::getTotMass(const CompMap& comp)
     iter ++;
   }
   return mass;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Atoms Material::getTotAtoms() const
-{
-  CompMap comp = this->getComp();
-  return Material::getTotAtoms(comp);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Material::getTotAtoms(const CompMap& comp)
@@ -492,6 +457,7 @@ void Material::normalize(CompMap &comp_map)
 void Material::rationalize_A2M()
 {
   total_atoms = this->getTotAtoms();
+  total_mass = 0;
 
   // loop through each isotope in the composition for the current time.
   for(CompMap::iterator entry = compHist[TI->getTime()].begin();
@@ -500,9 +466,9 @@ void Material::rationalize_A2M()
   {
     // multiply the number of atoms by the mass number of that isotope and convert to kg
     massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first)/1e3;
+    total_mass += total_atoms*(*entry).second*getMassNum((double)(*entry).first)/1e3;
   }
-  total_mass = this->getTotMass();
-  
+
   normalize(massHist[TI->getTime()]);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -510,15 +476,15 @@ void Material::rationalize_M2A()
 {
 
   total_mass = this->getTotMass();
+  total_atoms = 0;
 
   for(CompMap::iterator entry = massHist[TI->getTime()].begin();
       entry != massHist[TI->getTime()].end();
       entry++)
   {
-    compHist[TI->getTime()][(*entry).first] = (*entry).second*1e3 / getMassNum((*entry).first);
+    compHist[TI->getTime()][(*entry).first] = (*entry).second*1e3/getMassNum((*entry).first);
+    total_atoms += total_mass*(*entry).second*1e3/getMassNum((*entry).first);
   }
-
-  total_atoms = this->getTotAtoms();
   
   normalize(compHist[TI->getTime()]);
 

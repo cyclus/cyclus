@@ -106,7 +106,7 @@ public:
    * @param rec_name name of this recipe
    * @param scale is the size of this material
    */
-  Material(CompMap comp, string mat_unit, string rec_name, Mass scale);
+  Material(CompMap comp, string mat_unit, string rec_name, Atoms scale);
   
   /** 
    * Default destructor does nothing.
@@ -148,7 +148,7 @@ public:
   /**
    * returns the total mass of this material object PER UNIT
    */
-  const Mass getTotMass() const;
+  const Mass getTotMass() const {return total_mass;};
 
   /**
    * Returns the total mass of the given composition vector.
@@ -161,7 +161,7 @@ public:
   /**
    * returns the total atoms in this material object 
    */
-  const Mass getTotAtoms() const;
+  const Atoms getTotAtoms() const {return total_atoms;};
 
   /**
    * Returns the total atoms in the given composition vector.
@@ -169,7 +169,7 @@ public:
    * @param comp the composition vector
    * @return the total atoms
    */
-  static double getTotAtoms(const CompMap& comp);
+  static Atoms getTotAtoms(const CompMap& comp);
 
   /**
    * Returns the entire (current) mass vector for this Material.
