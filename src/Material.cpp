@@ -127,7 +127,7 @@ const bool Material::isZero(Iso tope) const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getIsoMass(Iso tope) const
 {
-  map<Iso, Atoms> currComp = this->getComp();
+  map<Iso, Atoms> currComp = this->getAtomComp();
   return total_mass*Material::getIsoMass(tope, currComp);
 }
 
@@ -149,7 +149,7 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getEltMass(int elt) const
 {
-  map<Iso, Atoms> currComp = this->getComp();
+  map<Iso, Atoms> currComp = this->getAtomComp();
   return total_mass*Material::getEltMass(elt, currComp);
 }
 
@@ -283,12 +283,11 @@ double Material::getMassComp(Iso tope, const CompMap& comp)
   CompMap::const_iterator searchIso = comp.find(tope);
   double massToRet = 0;
   if (searchIso != comp.end()) 
-    // comp = searchIso->second * Material::getMassNum(tope)/ AVOGADRO / 1e6;
     massToRet = (*searchIso).second;
   return massToRet;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const CompMap Material::getComp() const
+const CompMap Material::getAtomComp() const
 {
   CompMap comp;
   CompHistory::const_reverse_iterator it = compHist.rbegin();
@@ -309,7 +308,6 @@ double Material::getComp(Iso tope, const CompMap& comp)
   CompMap::const_iterator searchIso = comp.find(tope);
   double atoms = 0;
   if (searchIso != comp.end()) 
-    // comp = searchIso->second * Material::getMassNum(tope)/ AVOGADRO / 1e6;
     atoms = (*searchIso).second;
   return atoms;
 }
@@ -321,7 +319,7 @@ const CompMap Material::getFracComp(double frac) const
 
   // Iterate through the current composition vector and add to the new object 
   // the specified fraction of each isotope.
-  CompMap currComp = this->getComp();
+  CompMap currComp = this->getAtomComp();
   CompMap::iterator iter = currComp.begin();
 
   while (iter != currComp.end()) {
@@ -335,7 +333,7 @@ const CompMap Material::getFracComp(double frac) const
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Atoms Material::getComp(Iso tope) const
 {
-  CompMap currComp = this->getComp();
+  CompMap currComp = this->getAtomComp();
 
   // If the isotope isn't currently present, return 0. Else return the 
   // isotope's current number density.
@@ -350,7 +348,7 @@ const Atoms Material::getComp(Iso tope) const
 void Material::absorb(Material* matToAdd)
 {
   // Get the given Material's composition.
-  CompMap compToAdd = matToAdd->getComp();
+  CompMap compToAdd = matToAdd->getAtomComp();
 
   // Iterate over the isotopes in the Material we're adding and add them to 
   // this Material.
@@ -373,18 +371,18 @@ void Material::absorb(Material* matToAdd)
 void Material::extract(Material* matToRem)
 {
   // Get the given Material's composition.
-  CompMap compToRem = matToRem->getComp();
+  CompMap compToRem = matToRem->getAtomComp();
 
   // Iterate over the isotopes in the Material we're removing and subtract 
   // them from this Material.
   CompMap::iterator iter = compToRem.begin();
   Iso isoToRem;
-  Atoms ndToRem;
+  Atoms aToRem;
 
   while (*iter != *(compToRem.end())) {
     isoToRem = iter->first;
-    ndToRem = 0 - iter->second;
-    this->changeComp(isoToRem, ndToRem, TI->getTime());
+    aToRem = 0 - iter->second;
+    this->changeComp(isoToRem, aToRem, TI->getTime());
     iter ++;
   }
 }

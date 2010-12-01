@@ -199,7 +199,7 @@ public:
    *
    * @return the current composition
    */
-  virtual const CompMap getComp() const;
+  virtual const CompMap getAtomComp() const;
 
   /**
    * Returns the atoms of the given isotope in the given composition vector.
