@@ -6,10 +6,12 @@
 <facility>
   <name>LWR</name>
   <model>
-    <StubFacility>
+    <NullFacility>
       <incommodity>uo2</incommodity>
       <outcommodity>snf</outcommodity>
-    </StubFacility>
+      <inventorysize>1e4</inventorysize>
+      <capacity>1e6</capacity>
+    </NullFacility>
   </model>
 </facility>
 <facility>
@@ -18,6 +20,8 @@
     <NullFacility>
       <incommodity>uo2</incommodity>
       <outcommodity>snf</outcommodity>
+      <inventorysize>1e4</inventorysize>
+      <capacity>1e6</capacity>
     </NullFacility>
 </model>
 </facility>
@@ -27,7 +31,7 @@
     <SourceFacility>
       <outcommodity>uo2</outcommodity>
       <capacity>1e6</capacity>
-      <inventorysize>10e6</inventorysize>
+      <inventorysize>1e6</inventorysize>
       <commodprice>0</commodprice>
       <recipe>fresh_50gwd</recipe>
     </SourceFacility>

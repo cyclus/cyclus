@@ -402,7 +402,7 @@ void Material::extract(Material* matToRem)
 int Material::getAtomicNum(Iso tope)
 {
   // Make sure the number's in a reasonable range.
-  if (tope < 1010 || tope > 1182949)
+  if (tope < 1001 || tope > 1182949)
     throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the atomic number and return.
@@ -413,7 +413,7 @@ int Material::getAtomicNum(Iso tope)
 int Material::getMassNum(Iso tope)
 {
   // Make sure the number's in a reasonable range.
-  if (tope < 1010 || tope > 1182949)
+  if (tope < 1001 || tope > 1182949)
     throw GenException("Tried to get atomic number of invalid isotope");
 
   // Get the mass number and return.

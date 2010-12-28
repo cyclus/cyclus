@@ -8,45 +8,48 @@
 	<commodity>
 		<name>uo2</name>
 	</commodity>
-
-        <market>
-	        <name>uo2market</name>
-                <mktcommodity>uo2</mktcommodity>
-	        <model>
-		        <StubMarket/>
-	        </model>
-        </market>
+  
+  <market>
+    <name>uo2market</name>
+    <mktcommodity>uo2</mktcommodity>
+    <model>
+      <StubMarket/>
+    </model>
+  </market>
 
 	<commodity>
 		<name>snf</name>
 	</commodity>
 
 	<market>
-	        <name>snfmarket</name>
-                <mktcommodity>snf</mktcommodity>
-	        <model>
-		        <GreedyMarket/>
-	        </model>
-        </market>
-
+    <name>snfmarket</name>
+    <mktcommodity>snf</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
 
 	<facility>
 		<name>LWR</name>
 		<model>
-			<StubFacility>
+			<NullFacility>
 				<incommodity>uo2</incommodity>
 				<outcommodity>snf</outcommodity>
-			</StubFacility>
+        <inventorysize>1e4</inventorysize>
+        <capacity>1e6</capacity>
+			</NullFacility>
 		</model>
 	</facility>
 
 	<facility>
-		<name>HWR</name>
-		<model>
-			<NullFacility>
-				<incommodity>uo2</incommodity>
-				<outcommodity>snf</outcommodity>
-			</NullFacility>
+    <name>HWR</name>
+    <model>
+      <NullFacility>
+        <incommodity>uo2</incommodity>
+        <outcommodity>snf</outcommodity>
+        <inventorysize>1e4</inventorysize>
+        <capacity>1e6</capacity>
+      </NullFacility>
 		</model>
 	</facility>
 
@@ -143,7 +146,7 @@
 			<comp>2</comp>
 		</isotope>
 		<isotope>
-			<id>8016</id>
+			<id>08016</id>
 			<comp>1</comp>
 		</isotope>
 	</recipe>
