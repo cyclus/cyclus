@@ -144,14 +144,14 @@ protected:
     /**
      * get the total mass of the stuff in the inventory
      *
-     * @return the total mass of the materials in storage
+     * @return the total mass of the processed materials in storage
      */
     Mass checkInventory();
 
     /**
-     * get the total mass of the stuff in the inventory
+     * get the total mass of the stuff in the stocks
      *
-     * @return the total mass of the materials in storage
+     * @return the total mass of the raw materials in storage
      */
     Mass checkStocks();
 
@@ -162,11 +162,11 @@ protected:
     int residence_time;
 
     /**
-     * The maximum size that the inventory can grow to.
+     * The maximum (number of commodity units?) that the inventory can grow to.
      * The NullFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    int inventory_size;
+    Mass inventory_size;
 
     /**
      * The receipe of input materials.

@@ -321,16 +321,6 @@ public:
   virtual Material* extractMass(Mass extract);
 
   /**
-   * Adds a material object of the given mass to the material.
-   * The stoichiometry of the added object is the same as the parent
-   * and the mass of the parent is altered to reflect the change. 
-   *
-   * @param add the mass to add.
-   * @return the new material object
-   */
-  virtual Material* addMass(Mass add);
-
-  /**
    * Normalizes the composition vector it is provided.
    * 
    * @param comp_map the vector to normalize

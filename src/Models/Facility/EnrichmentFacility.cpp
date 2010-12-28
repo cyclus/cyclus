@@ -138,7 +138,7 @@ void EnrichmentFacility::sendMaterial(Transaction trans, const Communicator* req
     Material* m = inventory.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0, atomBased);
@@ -203,7 +203,7 @@ void EnrichmentFacility::handleTock(int time)
     Material* m = stocks.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0, atomBased);

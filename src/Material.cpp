@@ -66,10 +66,12 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, double size, 
 
   normalize(comp_map);
 
-  if ( atomBased != type)
+  if ( massBased == type)
     rationalize_M2A();
-  else
+  else if (atomBased == type)
     rationalize_A2M();
+  else 
+    throw GenException("Type options are currently massBased or atomBased !");
 
   facHist = FacHistory() ;
 
@@ -122,7 +124,7 @@ const bool Material::isZero(Iso tope) const
 {
   // (kg) * (g/kg) * (atoms/g) 
   Atoms atoms_eps = eps * 1e3 / Material::getMassNum(tope) ; 
-  return fabs(this->getComp(tope)) < atoms_eps;
+  return (fabs(this->getComp(tope)) < atoms_eps/total_atoms);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getIsoMass(Iso tope) const
@@ -203,7 +205,6 @@ double Material::getTotAtoms(const CompMap& comp)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::changeComp(Iso tope, Atoms change, int time)
 {
-
   // If the composition has already changed during this timestep, we copy and 
   // delete the current entry, modify it, and re-add. If there's no entry 
   // for this timestep, simply copy the most recent one, edit, and add.
@@ -215,25 +216,32 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   else
     newComp = CompMap((*compHist.rbegin()).second);
 
-  // If the isotope's already in the vector, add to the amount, otherwise
-  // add a new entry.
+  // We need to normalize this number of atoms to the current recipe
+  double newVal = change;
+
+  if (total_atoms != 0) {
+    newVal = newVal/total_atoms;
+  }
+
+  // If the isotope's already in the vector, add to the amount
   if (newComp.end() != newComp.find(tope)) {
     double oldVal = newComp[tope];
     newComp.erase(tope);
-    newComp.insert(make_pair(tope, oldVal + change));
+    newComp.insert(make_pair(tope, oldVal + newVal));
   }
+  // otherwise add a new entry.
   else
-    newComp.insert(make_pair(tope, change));
+    newComp.insert(make_pair(tope, newVal));
 
   // Now insert the copy for the current time.
   compHist.insert(make_pair(time, newComp));
 
   // If there's no material of the given isotope left (w/r/t COM tolerance), 
-  // set the nd to zero.
+  // set the comp to zero.
   if (this->isZero(tope)) {
     CompMap newComp = compHist[time];
     newComp.erase(tope);
-    newComp.insert(make_pair(tope, 0));
+    //newComp.insert(make_pair(tope, 0));
     compHist.insert(make_pair(time, newComp));
   }
 
@@ -241,6 +249,8 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   // something's gone wrong.
   if (this->isNeg(tope))
     throw GenException("Tried to make isotope composition negative.");
+
+  total_atoms += change;
 
   normalize(compHist[time]);
   rationalize_A2M();
@@ -260,6 +270,7 @@ const CompMap Material::getMassComp() const
   }
   return comp;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Mass Material::getMassComp(Iso tope) const
 {
@@ -358,7 +369,7 @@ void Material::absorb(Material* matToAdd)
 
   while (*iter != *(compToAdd.end())) {
     isoToAdd = iter->first;
-    atomsToAdd = iter->second;
+    atomsToAdd = matToAdd->getTotAtoms()*iter->second;
     this->changeComp(isoToAdd, atomsToAdd, TI->getTime());
     iter ++;
   }
@@ -381,7 +392,7 @@ void Material::extract(Material* matToRem)
 
   while (*iter != *(compToRem.end())) {
     isoToRem = iter->first;
-    aToRem = 0 - iter->second;
+    aToRem = 0 - matToRem->getTotAtoms()*iter->second;
     this->changeComp(isoToRem, aToRem, TI->getTime());
     iter ++;
   }
@@ -419,24 +430,21 @@ Material* Material::extractMass(Mass amt)
   return newMat;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::addMass(Mass amt)
-{
-  CompMap comp = this->getMassComp();
-  Material* newMat = new Material(comp , units, " ",amt, massBased);
-  this->absorb(newMat);
-  return newMat;
-}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::normalize(CompMap &comp_map)
 {
   double sum_total_comp = 0;
   CompMap::iterator entry;
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
-    sum_total_comp += (*entry).second;
+  for (entry = comp_map.begin(); entry != comp_map.end(); entry++){
+    //if (this->isZero((*entry).first))
+    //  comp_map.erase((*entry).first);
+    //else
+      sum_total_comp += (*entry).second;
+  }
 
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++)
+  for (entry = comp_map.begin(); entry != comp_map.end(); entry++){
     (*entry).second /= sum_total_comp;
+  }
 
 }
 

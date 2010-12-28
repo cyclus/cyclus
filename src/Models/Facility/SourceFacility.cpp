@@ -121,10 +121,10 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
 
   while(trans.amount > newAmt && !inventory.empty() ){
     // start with an empty material
-    Material* newMat = new Material(recipe->getAtomComp(), 
+    Material* newMat = new Material(CompMap(), 
                                   recipe->getUnits(),
                                   recipe->getName(), 
-                                  0, atomBased);
+                                  0, massBased);
 
     Material* m = inventory.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
@@ -154,13 +154,13 @@ void SourceFacility::handleTick(int time){
   // decide how much to offer
   Mass offer_amt;
   Mass inv = this->checkInventory();
-  Mass possInv = inv+capacity;
+  Mass possInv = inv+capacity*recipe->getTotMass(); 
 
-  if (possInv < inventory_size){
+  if (possInv < inventory_size*recipe->getTotMass()){
     offer_amt = possInv;
   }
   else {
-    offer_amt = inventory_size; 
+    offer_amt = inventory_size*recipe->getTotMass(); 
   }
 
   // there is no minimum amount a source facility may send
@@ -180,24 +180,24 @@ void SourceFacility::handleTick(int time){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
   // if there's room in the inventory, process material at capacity
-  Mass space = inventory_size - this->checkInventory();
-  if(capacity <= space){
+  Mass space = inventory_size - this->checkInventory(); 
+  if(capacity*recipe->getTotMass() <= space){
     // add a material the size of the capacity to the inventory
-    Material* newMat = new Material(recipe->getAtomComp(), 
+    Material* newMat = new Material(recipe->getMassComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
-                                    capacity, 
-                                    atomBased);
+                                    capacity*recipe->getTotMass(), 
+                                    massBased);
     cout<<"The source facility, handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);
   }
-  else if (space < capacity && space > 0){
+  else if (space < capacity*recipe->getTotMass() && space > 0){
     // add a material that fills the inventory
-    Material* newMat = new Material(recipe->getAtomComp(), 
+    Material* newMat = new Material(recipe->getMassComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
-                                    space,
+                                    space*recipe->getTotMass(),
                                     atomBased);
     cout<<"The source facility, handling the tock, has created a material:"<<endl;
     newMat->print();

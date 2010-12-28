@@ -123,7 +123,7 @@ void NullFacility::sendMaterial(Transaction trans, const Communicator* requester
     Material* m = inventory.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0, atomBased);
@@ -209,7 +209,7 @@ void NullFacility::handleTick(int time)
   // MAKE OFFERS
   // decide how much to offer
   Mass offer_amt;
-  Mass possInv = inv+capacity;
+  Mass possInv = inv + capacity;
 
   if (possInv < inventory_size){
     offer_amt = possInv;
@@ -243,7 +243,7 @@ void NullFacility::handleTock(int time)
     Material* m = stocks.front();
 
     // start with an empty material
-    Material* newMat = new Material(m->getAtomComp(), 
+    Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
                                   0, atomBased);
