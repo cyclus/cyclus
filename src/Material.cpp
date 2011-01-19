@@ -241,7 +241,6 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   if (this->isZero(tope)) {
     CompMap newComp = compHist[time];
     newComp.erase(tope);
-    //newComp.insert(make_pair(tope, 0));
     compHist.insert(make_pair(time, newComp));
   }
 
@@ -436,9 +435,9 @@ void Material::normalize(CompMap &comp_map)
   double sum_total_comp = 0;
   CompMap::iterator entry;
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++){
-    //if (this->isZero((*entry).first))
-    //  comp_map.erase((*entry).first);
-    //else
+    if (this->isZero((*entry).first))
+      comp_map.erase((*entry).first);
+    else
       sum_total_comp += (*entry).second;
   }
 

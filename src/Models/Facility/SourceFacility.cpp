@@ -197,13 +197,14 @@ void SourceFacility::handleTock(int time){
     Material* newMat = new Material(recipe->getMassComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
-                                    space*recipe->getTotMass(),
+                                    space,
                                     atomBased);
     cout<<"The source facility, handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);
   }
-  // check what orders are waiting, 
+  // check what orders are waiting,
+  // send material if you have it now
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
     sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
