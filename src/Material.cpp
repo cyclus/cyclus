@@ -40,7 +40,7 @@ Material::Material(xmlNodePtr cur)
     comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
   }
   
-  normalize(comp_map);
+  //normalize(comp_map);
 
   if ( "atom" != comp_type)
     rationalize_M2A();
@@ -64,7 +64,7 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, double size, 
   total_comp = size;
   comp_map = comp;
 
-  normalize(comp_map);
+  //normalize(comp_map);
 
   if ( massBased == type)
     rationalize_M2A();
@@ -115,16 +115,16 @@ const bool Material::isNeg(Iso tope) const
 {
   if (this->getComp(tope) == 0)
     return false;
-  // (kg) * (g/kg) * (atoms/g)
+  // (kg) * (g/kg) * (mol/g)
   Atoms atoms_eps =  eps * 1e3 / Material::getMassNum(tope); 
   return (this->getComp(tope) + atoms_eps < 0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
-  // (kg) * (g/kg) * (atoms/g) 
+  // (kg) * (g/kg) * (mol/g) 
   Atoms atoms_eps = eps * 1e3 / Material::getMassNum(tope) ; 
-  return (fabs(this->getComp(tope)) < atoms_eps/total_atoms);
+  return (fabs(this->getComp(tope)) < atoms_eps);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getIsoMass(Iso tope) const
@@ -241,6 +241,7 @@ void Material::changeComp(Iso tope, Atoms change, int time)
   if (this->isZero(tope)) {
     CompMap newComp = compHist[time];
     newComp.erase(tope);
+    compHist.erase(time);
     compHist.insert(make_pair(time, newComp));
   }
 
@@ -251,7 +252,7 @@ void Material::changeComp(Iso tope, Atoms change, int time)
 
   total_atoms += change;
 
-  normalize(compHist[time]);
+  //normalize(compHist[time]);
   rationalize_A2M();
 
 }
@@ -435,10 +436,10 @@ void Material::normalize(CompMap &comp_map)
   double sum_total_comp = 0;
   CompMap::iterator entry;
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++){
-    if (this->isZero((*entry).first))
-      comp_map.erase((*entry).first);
-    else
-      sum_total_comp += (*entry).second;
+    //if (this->isZero((*entry).first))
+    //  comp_map.erase((*entry).first);
+    //else
+    sum_total_comp += (*entry).second;
   }
 
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++){
@@ -450,6 +451,8 @@ void Material::normalize(CompMap &comp_map)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_A2M()
 {
+  normalize(compHist[TI->getTime()]);
+
   total_atoms = this->getTotAtoms();
   total_mass = 0;
 
@@ -468,6 +471,7 @@ void Material::rationalize_A2M()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::rationalize_M2A()
 {
+  normalize(massHist[TI->getTime()]);
 
   total_mass = this->getTotMass();
   total_atoms = 0;
