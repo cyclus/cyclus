@@ -1,7 +1,8 @@
 // SeparationsFacility.h
-#if !defined(_STUBFACILITY_H)
-#define _STUBFACILITY_H
+#if !defined(_SEPARATIONSFACILITY_H)
+#define _SEPARATIONSFACILITY_H
 #include <iostream>
+#include <queue>
 
 #include "FacilityModel.h"
 
@@ -9,8 +10,8 @@
  * The SeparationsFacility class inherits from the FacilityModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This facility will do nothing. This FacilityModel is intended as a skeleton to guide
- * the implementation of new FacilityModel models. 
+ * This facility will do nothing. This FacilityModel is still under construction and just
+ * in testing phase now. 
  *
  */
 class SeparationsFacility : public FacilityModel  
@@ -24,12 +25,12 @@ public:
   /**
    * Default constructor for SeparationsFacility Class
    */
-  SeparationsFacility();
+  SeparationsFacility(){};
 
   /**
    * every model should be destructable
    */
-  ~SeparationsFacility();
+  ~SeparationsFacility() {};
     
   /**
    * every model needs a method to initialize from XML
@@ -57,14 +58,9 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The SeparationsFacility should never generate any messages
-    */
-    virtual void sendMessage();
-
-    /**
-     * The SeparationsFacility should ignore incoming messages
-     */
+  /**
+   * When the facility receives a message, execute any transaction therein
+   */
     virtual void receiveMessage(Message* msg);
 
 /* -------------------- */
@@ -92,15 +88,20 @@ public:
      */
     virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
-    /**
+		/**
      * The handleTick function specific to the SeparationsFacility.
+     * At each tick, it requests as much raw inCommod as it can process this
+     * month and offers as much outCommod as it will have in its inventory by the
+     * end of the month.
      *
      * @param time the time of the tick
      */
     virtual void handleTick(int time);
 
-    /**
+		/**
      * The handleTick function specific to the SeparationsFacility.
+     * At each tock, it processes material and handles orders, and records this
+     * month's actions.
      *
      * @param time the time of the tock
      */
@@ -114,6 +115,126 @@ protected:
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
+protected:
+    /**
+     * A typedef for the data structure representing a Facility's process
+     * line, that is, the black box materials sit in while they're being
+     * operated on.
+     */
+    typedef multimap<int, pair<Message*, Material*> > ProcessLine;
+
+    /**
+     * The SeparationsFacility has one input commodity
+     */
+    Commodity* in_commod;
+
+    /**
+     * The SeparationsFacility has one output commodity
+     */
+    Commodity* out_commod;
+
+    /**
+     * The SeparationsFacility has a limit to how material it can process.
+     * Units vary. It will be in the commodity unit per month.
+     */
+    double capacity;
+
+    /**
+     * The stocks of raw material available to be processed.
+     */
+    deque<Material*> stocks;
+    
+    /**
+     * The inventory of processed material.
+     */
+    deque<Material*> inventory;
+
+    /**
+     * The inventory of waste material.
+     */
+    deque<Material*> wastes;
+
+   	/**
+     * The total mass flow required to process all outstanding orders this 
+     * Facility has already committed to. Units are tons, sometimes of 
+     * uranium and sometimes of certain isotopes. For Enrichment, they're 
+     * tons U SWU. For Fuel Fab, they're tons U.
+     */
+    double outstMF;
+
+    /**
+     * The list of orders to process on the Tock
+     */
+    deque<Message*> ordersWaiting;
+
+    /**
+     * A map whose keys are times at which this Facility will finish 
+     * executing a given order and the values are pairs comprising the orders 
+     * themselves and the Materials each is to be made with.
+     */
+    ProcessLine ordersExecuting;
+
+    /**
+     * get the total mass of the stuff in the inventory
+     *
+     * @return the total mass of the materials in storage
+     */
+    Mass checkInventory();
+
+    /**
+     * get the total mass of the stuff in the inventory
+     *
+     * @return the total mass of the materials in storage
+     */
+    Mass checkStocks();
+    
+    /**
+     * Separates all material waiting in the ordersExecuting ProcessLine
+     */
+    void separate();
+
+    /**
+     * Makes requests according to how much spotCapacity is available.
+     */
+    void makeRequests();
+
+    /**
+     * Makes offers according to how much spotCapacity is available.
+     */
+    void makeOffers();
+
+		/**
+     * Checks to see if the given candidate Material can be used for separations
+     * of any of the ordersWaiting for Material. If so, returns 
+     * an iterator pointing to that item. If not, returns an iterator just past 
+	   * the last element.
+	   *
+	   * @param candMat the candidate material
+	   * @return the iterator
+	   */
+	  multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
+
+    /**
+     * The time that the stock material spends in the facility.
+     */
+    int residence_time;
+
+    /**
+     * The maximum size that the inventory can grow to.
+     * The SeparationsFacility must stop processing the material in its stocks 
+     * when its inventory is full.
+     */
+    int inventory_size;
+
+    /**
+     * The receipe of input materials.
+     */
+    Material* in_recipe;
+
+    /**
+     * The receipe of the output material.
+     */
+    Material* out_recipe;
 
 /* ------------------- */ 
 
