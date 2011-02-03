@@ -32,6 +32,7 @@ SET( CYCLUS_SRC
 
 set ( CMAKE_MODULE_PATH "/usr/share/cmake-2.6/Modules/" )
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
+set ( GTEST_DIR "${GTEST_DIR}")
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
@@ -63,3 +64,26 @@ ENDIF (DOXYGEN_FOUND)
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
+
+
+# For Roy, temporarily
+# This will soon be deprecated by upcoming GTEST incorporation
+ADD_EXECUTABLE( sandbox ${CYCLUS_SRC} )
+ADD_LIBRARY( SeparationsFacility MODULE Models/Facility/SeparationsFacility.cpp )
+TARGET_LINK_LIBRARIES( sandbox dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
+
+
+
+
+# Enable some testing
+#ENABLE_TESTING()
+
+# Include GTest
+#FIND_PACKAGE( GTest REQUIRED )
+
+# Alerts CMake to any tests we need to worry about
+# INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+
+# Create an executable for all the gtests
+# ADD_EXECUTABLE(  ${GTEST_BOTH_LIBRARIES} )
+# ADD_TEST(MatrixTest ${CYCLUS_SRC})
