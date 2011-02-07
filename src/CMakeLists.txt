@@ -30,9 +30,10 @@ SET( CYCLUS_SRC
 				Models/RegionModel.cpp
 				Models/InstModel.cpp)
 
-set ( CMAKE_MODULE_PATH "/usr/share/cmake-2.6/Modules/" )
+set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
-set ( GTEST_DIR "${GTEST_DIR}")
+set ( GTEST_ROOT $ENV{GTEST_ROOT})
+set ( GTEST_INCLUDE_DIR $ENV{GTEST_INCLUDE_DIR})
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
@@ -61,6 +62,19 @@ ELSE (DOXYGEN_FOUND)
 	MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
+# Enable some testing
+ENABLE_TESTING()
+
+# Include GTest
+FIND_PACKAGE( GTest REQUIRED )
+
+# Alerts CMake to any tests we need to worry about
+INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+
+# Create an executable for all the gtests
+# ADD_EXECUTABLE(  ${GTEST_BOTH_LIBRARIES} )
+# ADD_TEST(MatrixTest ${CYCLUS_SRC})
+
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
@@ -75,15 +89,3 @@ TARGET_LINK_LIBRARIES( sandbox dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
 
 
 
-# Enable some testing
-#ENABLE_TESTING()
-
-# Include GTest
-#FIND_PACKAGE( GTest REQUIRED )
-
-# Alerts CMake to any tests we need to worry about
-# INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
-
-# Create an executable for all the gtests
-# ADD_EXECUTABLE(  ${GTEST_BOTH_LIBRARIES} )
-# ADD_TEST(MatrixTest ${CYCLUS_SRC})
