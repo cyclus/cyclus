@@ -54,7 +54,7 @@ protected:
  */
 public:
     /// default RegionModel receiver is to ignore messages
-    virtual void receiveMessage(Message* msg) {};
+    virtual void receiveMessage(Message* msg);
 
     /**
      * Each region is prompted to do its beginning-of-time-step

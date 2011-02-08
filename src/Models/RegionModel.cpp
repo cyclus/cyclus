@@ -83,6 +83,28 @@ void RegionModel::print()
 }
 
 /* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void RegionModel::receiveMessage(Message* msg){
+  // Default regions aren't insterested in fooling with messages.
+  // Just pass them along. 
+  // If it's going up, send it to the market.
+  // If it's going down, send it to the inst.
+  MessageDir dir = msg->getDir();
+  if (dir == up){
+    Communicator* nextRecipient = msg->getMkt();
+    nextRecipient->receiveMessage(msg);
+  }
+  else if (dir == down){
+    Communicator* nextRecipient = msg->getInst();
+    nextRecipient->receiveMessage(msg);
+  }
+}
+
+/* --------------------
  * all REGIONMODEL classes have these members
  * --------------------
  */
+
