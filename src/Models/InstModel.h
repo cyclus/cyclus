@@ -57,6 +57,26 @@ public:
   /// default InstModel receiver has no default behavior
   virtual void receiveMessage(Message* msg) = 0;
 
+  /**
+   * Each institution is prompted to do its beginning-of-time-step
+   * stuff at the tick of the timer.
+   * Default behavior is to ignore the tick.
+   *
+   * @param time is the time to perform the tick
+   */
+  virtual void handleTick(int time){};
+
+  /**
+   * Each institution is prompted to its end-of-time-step
+   * stuff on the tock of the timer.
+   * Default behavior is to ignore the tock.
+   * 
+   * @param time is the time to perform the tock
+   */
+  virtual void handleTock(int time){};
+
+
+
 protected:
 
 

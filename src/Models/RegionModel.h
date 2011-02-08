@@ -56,6 +56,24 @@ public:
     /// default RegionModel receiver is to ignore messages
     virtual void receiveMessage(Message* msg) {};
 
+    /**
+     * Each region is prompted to do its beginning-of-time-step
+     * stuff at the tick of the timer.
+     * The default behavior is to ignore the tick.
+     *
+     * @param time is the time to perform the tick
+     */
+    virtual void handleTick(int time) {};
+
+    /**
+     * Each region is prompted to do its beginning-of-time-step
+     * stuff at the tock of the timer.
+     * The default behavior is to ignore the tock.
+     *
+     * @param time is the time to perform the tock
+     */
+    virtual void handleTock(int time) {};
+
 protected:
 
 
