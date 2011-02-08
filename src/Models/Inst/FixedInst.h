@@ -51,12 +51,6 @@ public:
  * --------------------
  */
 public:
-  /**
-   * The fixedInst simply passes on any offers/requests.
-   *
-   * @param msg the message to receive
-   */
-  virtual void receiveMessage(Message* msg);
 
 protected:
 /* -------------------- */

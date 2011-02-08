@@ -71,22 +71,5 @@ void FixedInst::print()
 };
 
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::receiveMessage(Message* msg){
- // The FixedInst isn't insterested in fooling with messages.
- // Just pass them along. 
- // If it's going up, send it to the region.
- // If it's going down, send it to the fac.
- MessageDir dir = msg->getDir();
- if (dir == up){
-   Communicator* nextRecipient = msg->getReg();
-   nextRecipient->receiveMessage(msg);
- }
- else if (dir == down){
-   Communicator* nextRecipient = msg->getFac();
-   nextRecipient->receiveMessage(msg);
- }
-
-}
 
 

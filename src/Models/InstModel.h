@@ -54,8 +54,8 @@ protected:
  * --------------------
  */
 public:
-  /// default InstModel receiver has no default behavior
-  virtual void receiveMessage(Message* msg) = 0;
+  /// default InstModel receiver is to ignore message.
+  virtual void receiveMessage(Message* msg);
 
   /**
    * Each institution is prompted to do its beginning-of-time-step

@@ -46,12 +46,6 @@ class NullRegion : public RegionModel
  * --------------------
  */
   public:
-    /**
-     * The NullRegion simply passes on any offers/requests.
-     *
-     * @param msg the message to receive
-     */
-    virtual void receiveMessage(Message* msg);
     
 protected:
 
