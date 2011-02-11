@@ -32,8 +32,11 @@ SET( CYCLUS_SRC
 
 set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
-set ( GTEST_ROOT $ENV{GTEST_ROOT})
-set ( GTEST_INCLUDE_DIR $ENV{GTEST_INCLUDE_DIR})
+
+# Be sure to clear these each time
+#set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
+#set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
+#set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
@@ -63,17 +66,23 @@ ELSE (DOXYGEN_FOUND)
 ENDIF (DOXYGEN_FOUND)
 
 # Enable some testing
-ENABLE_TESTING()
+#ENABLE_TESTING()
 
 # Include GTest
-FIND_PACKAGE( GTest REQUIRED )
+#FIND_PACKAGE( GTest REQUIRED )
 
 # Alerts CMake to any tests we need to worry about
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
 
 # Create an executable for all the gtests
-# ADD_EXECUTABLE(  ${GTEST_BOTH_LIBRARIES} )
-# ADD_TEST(MatrixTest ${CYCLUS_SRC})
+
+# Options for testing
+option ( USE_TESTING "Build testing" ON )
+if ( USE_TESTING )
+  enable_testing()
+  subdirs ( Testing )
+  include(CTest)
+endif()
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
