@@ -6,6 +6,7 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # added to ctest.
 set ( TestSource
   TruthTests.cpp
+  MaterialTests.cpp
   )
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/TestingTests)

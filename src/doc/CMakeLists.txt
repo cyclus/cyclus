@@ -63,7 +63,7 @@ ADD_CUSTOM_COMMAND(
   )
 
 
-ADD_CUSTOM_TARGET(cyclusdoc ALL DEPENDS ${DOXYGEN_OUTPUT})
+ADD_CUSTOM_TARGET(cyclusdoc DEPENDS ${DOXYGEN_OUTPUT})
 
 ADD_CUSTOM_TARGET(cyclusdoc_forced
   COMMAND ${CMAKE_COMMAND} -E echo_append "Building cyclus Documentation..."
