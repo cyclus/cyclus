@@ -7,9 +7,26 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 set ( TestSource
   TruthTests.cpp
   MaterialTests.cpp
+  ../InputXML.cpp
+  ../Logician.cpp
+     ../Material.cpp
+     ../Commodity.cpp
+     ../Message.cpp
+     ../Communicator.cpp
+     ../Utility/GenException.cpp 
+     ../Utility/Timer.cpp
+     ../Utility/Env.cpp
+     ../Models/Model.cpp 
+        ../Models/StubModel.cpp 
+        ../Models/StubCommModel.cpp 
+        ../Models/ConverterModel.cpp 
+        ../Models/MarketModel.cpp 
+        ../Models/FacilityModel.cpp 
+        ../Models/RegionModel.cpp
+        ../Models/InstModel.cpp
   )
 
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/TestingTests)
+#file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/TestingTests)
 
 # Build Google Test
 find_package(Threads)
@@ -45,7 +62,7 @@ add_executable(CyclusUnitTestDriver
   CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-target_link_libraries ( CyclusUnitTestDriver ${CYCLUS_LIBRARIES} )
+target_link_libraries ( CyclusUnitTestDriver ${CYCLUS_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
 
 # Add all the tests by parsing the source code
 # This macro searches for GoogleTest macros and adds them as test automatically
