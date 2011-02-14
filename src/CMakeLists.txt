@@ -90,12 +90,4 @@ ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
 
 
-# For Roy, temporarily
-# This will soon be deprecated by upcoming GTEST incorporation
-ADD_EXECUTABLE( sandbox ${CYCLUS_SRC} )
-ADD_LIBRARY( SeparationsFacility MODULE Models/Facility/SeparationsFacility.cpp )
-TARGET_LINK_LIBRARIES( sandbox dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
-
-
-
 

@@ -1,9 +1,9 @@
-// SeparationsFacility.cpp
-// Implements the SeparationsFacility class
+// SeparationsMatrixFacility.cpp
+// Implements the SeparationsMatrixFacility class
 #include <iostream>
 #include <deque>
 
-#include "SeparationsFacility.h"
+#include "SeparationsMatrixFacility.h"
 
 #include "Timer.h"
 #include "Logician.h"
@@ -30,15 +30,15 @@
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsFacility::init(xmlNodePtr cur)
+void SeparationsMatrixFacility::init(xmlNodePtr cur)
 {
 	FacilityModel::init(cur);
 
 	in_commod = out_commod = NULL; 
 
 	/// move XML pointer to current model
-	cur = XMLinput->get_xpath_element(cur,"model/SeparationsFacility");
-	/// initialize any SeparationsFacility-specific datamembers here
+	cur = XMLinput->get_xpath_element(cur,"model/SeparationsMatrixFacility");
+	/// initialize any SeparationsMatrixFacility-specific datamembers here
 
 	// all facilities require commodities - possibly many
   string commod_name;
@@ -72,7 +72,7 @@ void SeparationsFacility::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsFacility::copy(SeparationsFacility* src)
+void SeparationsMatrixFacility::copy(SeparationsMatrixFacility* src)
 {
 	FacilityModel::copy(src);
 
@@ -90,7 +90,7 @@ void SeparationsFacility::copy(SeparationsFacility* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsFacility::print() 
+void SeparationsMatrixFacility::print() 
 { 
 	FacilityModel::print();
   cout << "converts commodity {"
@@ -110,14 +110,14 @@ void SeparationsFacility::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 /*
-void SeparationsFacility::sendMessage() 
+void SeparationsMatrixFacility::sendMessage() 
 {
 
 };
 */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::receiveMessage(Message* msg) 
+void SeparationsMatrixFacility::receiveMessage(Message* msg) 
 {
   // is this a message from on high? 
   if(msg->getSupplierID()==this->getSN()){
@@ -136,11 +136,11 @@ void SeparationsFacility::receiveMessage(Message* msg)
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::sendMaterial(Transaction trans, const Communicator* receiver)
+void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicator* receiver)
 {
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
-    throw GenException("SeparationsFacility can only send out_commod materials.");
+    throw GenException("SeparationsMatrixFacility can only send out_commod materials.");
   }
 
   Mass newAmt = 0;
@@ -173,14 +173,14 @@ void SeparationsFacility::sendMaterial(Transaction trans, const Communicator* re
     }
 
     toSend.push_back(newMat);
-    cout<<"SeparationsFacility "<< ID
+    cout<<"SeparationsMatrixFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
 }
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
+void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -195,7 +195,7 @@ void SeparationsFacility::receiveMaterial(Transaction trans, vector<Material*> m
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::handleTick(int time)
+void SeparationsMatrixFacility::handleTick(int time)
 {
   // PROCESS ORDERS EXECUTING
   separate(); // not yet fully implemented in Separations Facility
@@ -208,7 +208,7 @@ void SeparationsFacility::handleTick(int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::handleTock(int time)
+void SeparationsMatrixFacility::handleTock(int time)
 {
   // at rate allowed by capacity, convert material in Stocks to out_commod type
   // move converted material into Inventory
@@ -249,7 +249,7 @@ void SeparationsFacility::handleTock(int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass SeparationsFacility::checkInventory(){
+Mass SeparationsMatrixFacility::checkInventory(){
   Mass total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
@@ -264,7 +264,7 @@ Mass SeparationsFacility::checkInventory(){
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass SeparationsFacility::checkStocks(){
+Mass SeparationsMatrixFacility::checkStocks(){
   Mass total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
@@ -280,7 +280,7 @@ Mass SeparationsFacility::checkStocks(){
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsFacility::makeRequests(){
+void SeparationsMatrixFacility::makeRequests(){
   // The enrichment facility should ask for at least as much feed as it is 
   // already committed to using this month.
   Mass requestAmt;
@@ -328,7 +328,7 @@ void SeparationsFacility::makeRequests(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsFacility::separate()
+void SeparationsMatrixFacility::separate()
 {
 	// Get iterators that define the boundaries of the ordersExecuting that are 
 	// currently ready.~

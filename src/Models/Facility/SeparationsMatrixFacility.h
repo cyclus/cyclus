@@ -1,4 +1,4 @@
-// SeparationsFacility.h
+// SeparationsMatrixFacility.h
 #if !defined(_SEPARATIONSFACILITY_H)
 #define _SEPARATIONSFACILITY_H
 #include <iostream>
@@ -7,14 +7,14 @@
 #include "FacilityModel.h"
 
 /**
- * The SeparationsFacility class inherits from the FacilityModel class and is dynamically
+ * The SeparationsMatrixFacility class inherits from the FacilityModel class and is dynamically
  * loaded by the Model class when requested.
  * 
  * This facility will do nothing. This FacilityModel is still under construction and just
  * in testing phase now. 
  *
  */
-class SeparationsFacility : public FacilityModel  
+class SeparationsMatrixFacility : public FacilityModel  
 {
 /* --------------------
  * all MODEL classes have these members
@@ -23,14 +23,14 @@ class SeparationsFacility : public FacilityModel
 
 public:
   /**
-   * Default constructor for SeparationsFacility Class
+   * Default constructor for SeparationsMatrixFacility Class
    */
-  SeparationsFacility(){};
+  SeparationsMatrixFacility(){};
 
   /**
    * every model should be destructable
    */
-  ~SeparationsFacility() {};
+  ~SeparationsMatrixFacility() {};
     
   /**
    * every model needs a method to initialize from XML
@@ -44,7 +44,7 @@ public:
    *
    * @param src is the StubStub to copy
    */
-  virtual void copy(SeparationsFacility* src) ;
+  virtual void copy(SeparationsMatrixFacility* src) ;
 
   /**
    * every model should be able to print a verbose description
@@ -89,7 +89,7 @@ public:
     virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
 		/**
-     * The handleTick function specific to the SeparationsFacility.
+     * The handleTick function specific to the SeparationsMatrixFacility.
      * At each tick, it requests as much raw inCommod as it can process this
      * month and offers as much outCommod as it will have in its inventory by the
      * end of the month.
@@ -99,7 +99,7 @@ public:
     virtual void handleTick(int time);
 
 		/**
-     * The handleTick function specific to the SeparationsFacility.
+     * The handleTick function specific to the SeparationsMatrixFacility.
      * At each tock, it processes material and handles orders, and records this
      * month's actions.
      *
@@ -124,17 +124,17 @@ protected:
     typedef multimap<int, pair<Message*, Material*> > ProcessLine;
 
     /**
-     * The SeparationsFacility has one input commodity
+     * The SeparationsMatrixFacility has one input commodity
      */
     Commodity* in_commod;
 
     /**
-     * The SeparationsFacility has one output commodity
+     * The SeparationsMatrixFacility has one output commodity
      */
     Commodity* out_commod;
 
     /**
-     * The SeparationsFacility has a limit to how material it can process.
+     * The SeparationsMatrixFacility has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
     double capacity;
@@ -221,7 +221,7 @@ protected:
 
     /**
      * The maximum size that the inventory can grow to.
-     * The SeparationsFacility must stop processing the material in its stocks 
+     * The SeparationsMatrixFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
     int inventory_size;
@@ -246,7 +246,7 @@ protected:
  */
 
 extern "C" Model* construct() {
-  return new SeparationsFacility();
+  return new SeparationsMatrixFacility();
 }
 
 extern "C" void destruct(Model* p) {

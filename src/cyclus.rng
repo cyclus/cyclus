@@ -214,6 +214,7 @@
       <choice>
         <ref name="EnrichmentFacility"/>
         <ref name="NullFacility"/>
+        <ref name="SeparationsMatrixFacility"/>
         <ref name="SinkFacility"/>
         <ref name="SourceFacility"/>
         <ref name="StubFacility"/>
@@ -264,6 +265,15 @@
 
   <define name="NullFacility">
      <element name="NullFacility"> 
+        <ref name="incommodity"/>
+        <ref name="outcommodity"/>
+        <ref name="inventorysize"/>
+        <ref name="capacity"/>
+     </element>
+  </define>
+
+  <define name="SeparationsMatrixFacility">
+     <element name="SeparationsMatrixFacility"> 
         <ref name="incommodity"/>
         <ref name="outcommodity"/>
         <ref name="inventorysize"/>
