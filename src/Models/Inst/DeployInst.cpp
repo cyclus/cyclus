@@ -37,18 +37,18 @@ void DeployInst::init(xmlNodePtr cur)
                          + "' is not an allowed facility for region '" 
                          + region->getName() +"'.");
     }
-    Model* new_facility = Model::create(facility);
+    //Model* new_facility = Model::create(facility);
     
-    ((FacilityModel*)new_facility)->setFacName(XMLinput->get_xpath_content(deploy,"name"));
+    //((FacilityModel*)facility)->setFacName(XMLinput->get_xpath_content(deploy,"name"));
     
     int start_month = atoi(XMLinput->get_xpath_content(deploy,"start"));
     
     if (start_month < 0){
       throw GenException("You can't deploy a facility in the past.");
     }
-    deployment_map[start_month] = new_facility;
+    deployment_map[start_month] = facility;
   }
-
+  to_build_map = deployment_map;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -57,7 +57,7 @@ void DeployInst::copy(DeployInst* src)
   InstModel::copy(src);
 
   deployment_map = src->deployment_map;
-
+  to_build_map = deployment_map;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -76,4 +76,16 @@ void DeployInst::print()
   }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void DeployInst::handleTick(int time){
+  map<int,Model*>::iterator next_build = to_build_map.begin();
+  while (time==(*next_build).first){
+    Model* new_facility = Model::create((*next_build).second);
+    //((FacilityModel*)new_facility)->setFacName(pointer, name);
+    // this->addFacility((*next_build).second);
+    to_build_map.erase(next_build);
+    next_build=to_build_map.begin();
+    LI->addFacility(new_facility);
+  };
 
+};

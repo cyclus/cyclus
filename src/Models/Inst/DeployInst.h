@@ -59,6 +59,8 @@ protected:
  * all INSTMODEL classes have these members
  * --------------------
  */
+public:
+  virtual void handleTick(int time);
 
 /* ------------------- */ 
 
@@ -69,6 +71,7 @@ protected:
 
 protected:
   map<int,Model*> deployment_map;
+  map<int,Model*> to_build_map;
 
 /* ------------------- */ 
 
