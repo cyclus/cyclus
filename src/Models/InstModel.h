@@ -96,6 +96,9 @@ public:
   /// adds a facility to this model
   void addFacility(Model* new_fac){ facilities.push_back(new_fac);};
 
+  /// reports number of facilities in this inst
+  int getNumFacilities(){ return facilities.size();};
+
 protected:
   /**
    * Each institution is a member of exactly one region
