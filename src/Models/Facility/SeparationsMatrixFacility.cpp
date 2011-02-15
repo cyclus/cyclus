@@ -107,14 +107,22 @@ void SeparationsMatrixFacility::print()
  * all COMMUNICATOR classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-/*
-void SeparationsMatrixFacility::sendMessage() 
+void SeparationsMatrixFacility::sendMessage(Message* msg) 
 {
+	// is this a message from on high? 
+  if(msg->getSupplierID()==this->getSN())
+	{
+    // file the order
+    ordersWaiting.push_front(msg);
+  }
+  else 
+	{
+    throw GenException("SeparationsMatrixFacility is not the supplier of this msg.");
+  }
+}
 
-};
-*/
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::receiveMessage(Message* msg) 
@@ -125,7 +133,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
     ordersWaiting.push_front(msg);
   }
   else {
-    throw GenException("SeparationsEnrichmentFacility is not the supplier of this msg.");
+    throw GenException("SeparationsMatrixFacility is not the supplier of this msg.");
   }
 }
 
@@ -136,7 +144,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicator* receiver)
+void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicator* requester)
 {
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
@@ -176,19 +184,31 @@ void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicat
     cout<<"SeparationsMatrixFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
+
+	cout << "Material Before Sending to Sink" << endl;
+	cout << ((FacilityModel*)(LI->getFacilityByID(trans.requesterID))) << endl;
+
+	// Current Status... I never even enter into the receiveMaterial function
+	// The Logician is being given ID of "0x31".  I have no idea what that means... is it bad?
   ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+
+	cout << "Material After Sending to Sink" << endl;
+
 }
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {
+
+	cout << "Entered the receiveMaterial file " << endl;
+
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Material*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"SeparationsEnrichmentFacility " << ID << " is receiving material with mass "
+    cout<<"SeparationsFacility " << ID << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_back(*thisMat);
   }
@@ -325,6 +345,34 @@ void SeparationsMatrixFacility::makeRequests(){
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SeparationsMatrixFacility::makeOffers()
+{
+  // decide how much to offer
+  Mass offer_amt;
+  Mass spotCapacity = capacity - outstMF;
+
+  // and offer no more than the spotCapacity allows you to produce
+    offer_amt = spotCapacity; 
+
+  // there is no minimum amount a separations facility may send
+  double min_amt = 0;
+
+  // this will be an offer for free stuff
+  // until cyclus has a working notion of default pricing for separated material
+  double commod_price = 0;
+  
+  // decide what market to offer to
+  Communicator* recipient = (Communicator*)(out_commod->getMarket());
+
+  // create a message to go up to the market with these parameters
+  Message* msg = new Message(up, out_commod, offer_amt, min_amt, commod_price, 
+      this, recipient);
+
+  // send it
+  sendMessage(msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
