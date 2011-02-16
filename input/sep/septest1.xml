@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!-- 1 A SourceFacility FrontEnd, 1 SeparationsMatrixFacility MiddleMan, --> 
+<!-- 1 SinkFacility BackEnd, and 2 GreedyMarkets A and B -->
+<simulation>
+  <duration>10</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+
+	<commodity>
+		<name>snf</name>
+	</commodity>
+
+	<commodity>
+		<name>sepsnf</name>
+	</commodity>
+
+  <market>
+    <name>snfmarket</name>
+    <mktcommodity>snf</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>sepsnfmarket</name>
+    <mktcommodity>sepsnf</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>snf</outcommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>fresh_50gwd</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>MiddleMan</name>
+    <model>
+      <SeparationsMatrixFacility>
+        <incommodity>snf</incommodity>
+        <outcommodity>sepsnf</outcommodity>
+        <inventorysize>1e4</inventorysize>
+        <capacity>1</capacity>
+      </SeparationsMatrixFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd</name>
+    <model>
+      <SinkFacility>
+        <incommodity>sepsnf</incommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+	<region>
+    <name>oneRegion</name>
+		<allowedfacility>FrontEnd</allowedfacility>
+		<allowedfacility>MiddleMan</allowedfacility>
+		<allowedfacility>BackEnd</allowedfacility>
+		<model>
+			<NullRegion/>
+		</model>
+		<institution>
+			<name>oneInst</name>
+			<model>
+        <FixedInst>
+          <facility>
+            <type>FrontEnd</type>
+            <name>FrontEnd</name>
+          </facility>
+          <facility>
+            <type>MiddleMan</type>
+            <name>MiddleMan</name>
+          </facility>
+          <facility>
+            <type>BackEnd</type>
+            <name>BackEnd</name>
+          </facility>
+        </FixedInst>
+			</model>
+		</institution>
+	</region>
+
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+</simulation>
