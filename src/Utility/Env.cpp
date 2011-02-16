@@ -57,16 +57,14 @@ string Env::searchPathForFile(string filename, string inputPath, string envPath,
     begin = end + 1;
   }
 
-  return strdup(searchFilename.c_str());
+  return searchFilename;
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Env::checkEnv(string varname){
 
   string toRet;
-  if (strlen(getenv(varname.c_str())) >0){
-      //(getenv(varname.c_str())!="")&&(getenv(varname.c_str())!=NULL)){
-    cout<<"Not throwing Exception"<<endl;
+  if ((strlen(getenv(varname.c_str()))>0)&&(getenv(varname.c_str())!=NULL)){
     toRet = getenv(varname.c_str());
   }
   else {
