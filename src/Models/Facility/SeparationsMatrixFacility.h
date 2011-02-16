@@ -63,11 +63,6 @@ public:
    */
     virtual void receiveMessage(Message* msg);
 
-  /**
-   * When the facility receives a message, execute any transaction therein
-   */
-    virtual void sendMessage(Message* msg);
-
 /* -------------------- */
 
 /* --------------------

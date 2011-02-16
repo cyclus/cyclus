@@ -100,29 +100,7 @@ void SeparationsMatrixFacility::print()
       << "}, and has an inventory that holds " 
       << inventory_size << " materials"
       << endl;
-}
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::sendMessage(Message* msg) 
-{
-	// is this a message from on high? 
-  if(msg->getSupplierID()==this->getSN())
-	{
-    // file the order
-    ordersWaiting.push_front(msg);
-  }
-  else 
-	{
-    throw GenException("SeparationsMatrixFacility is not the supplier of this msg.");
-  }
-}
-
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::receiveMessage(Message* msg) 
@@ -136,12 +114,6 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
     throw GenException("SeparationsMatrixFacility is not the supplier of this msg.");
   }
 }
-
-
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicator* requester)
