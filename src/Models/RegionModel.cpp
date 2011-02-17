@@ -103,6 +103,25 @@ void RegionModel::receiveMessage(Message* msg){
   }
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void RegionModel::handleTick(int time){
+  for(vector<Model*>::iterator inst=institutions.begin();
+      inst!=institutions.end();
+      inst++){
+    ((InstModel*)(*inst))->handleTick(time);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void RegionModel::handleTock(int time){
+  for(vector<Model*>::iterator inst=institutions.begin();
+      inst!=institutions.end();
+      inst++){
+    ((InstModel*)(*inst))->handleTock(time);
+  }
+}
+
 /* --------------------
  * all REGIONMODEL classes have these members
  * --------------------

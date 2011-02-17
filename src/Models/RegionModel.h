@@ -63,7 +63,7 @@ public:
      *
      * @param time is the time to perform the tick
      */
-    virtual void handleTick(int time) {};
+    virtual void handleTick(int time);
 
     /**
      * Each region is prompted to do its beginning-of-time-step
@@ -72,7 +72,7 @@ public:
      *
      * @param time is the time to perform the tock
      */
-    virtual void handleTock(int time) {};
+    virtual void handleTock(int time);
 
 protected:
 

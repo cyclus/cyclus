@@ -39,14 +39,6 @@ void Logician::sendTick(int time)
     reg++){
     ((RegionModel*)(*reg))->handleTick(time);
   }
-
-  // tell all of the institution models to handle the tick
-  for(ModelList::iterator inst=insts.begin();
-    inst != insts.end(); 
-    inst++){
-    ((InstModel*)(*inst))->handleTick(time);
-  }
-
   // tell all of the facility models to handle the tick
   for(ModelList::iterator fac=facilities.begin();
     fac != facilities.end(); 
@@ -62,12 +54,6 @@ void Logician::sendTock(int time)
     reg != regions.end(); 
     reg++){
     ((RegionModel*)(*reg))->handleTock(time);
-  }
-  // tell all of the institution models to handle the tock
-  for(ModelList::iterator inst=insts.begin();
-    inst != insts.end(); 
-    inst++){
-    ((InstModel*)(*inst))->handleTock(time);
   }
   // tell all of the facility models to handle the tock
   for(ModelList::iterator fac=facilities.begin();
