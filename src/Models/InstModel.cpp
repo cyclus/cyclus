@@ -77,3 +77,21 @@ void InstModel::receiveMessage(Message* msg){
   }
 }
 
+/* MATT ADDITION */
+void InstModel::handleTick(int time){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator fac=facilities.begin();
+      fac != facilities.end();
+      fac++){
+    ((FacilityModel*)(*fac))->handleTick(time);
+  }
+}
+void InstModel::handleTock(int time){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator fac=facilities.begin();
+      fac != facilities.end();
+      fac++){
+    ((FacilityModel*)(*fac))->handleTock(time);
+  }
+}
+

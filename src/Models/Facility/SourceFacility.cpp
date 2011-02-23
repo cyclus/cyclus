@@ -81,6 +81,11 @@ void SourceFacility::copy(SourceFacility* src)
   ordersWaiting = deque<Message*>();
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SourceFacility::copyFreshModel(Model* src)
+{
+  copy((SourceFacility*)(src));
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::print() 
@@ -222,17 +227,17 @@ void SourceFacility::handleTock(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Mass SourceFacility::checkInventory(){
-	Mass total = 0;
-
-	// Iterate through the inventory and sum the amount of whatever
+  Mass total = 0;
+  
+  // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
-
-
-	for (deque<Material*>::iterator iter = inventory.begin(); 
+  
+  
+  for (deque<Material*>::iterator iter = inventory.begin(); 
        iter != inventory.end(); 
        iter ++){
-		total += (*iter)->getTotMass();
+    total += (*iter)->getTotMass();
   }
-
-	return total;
+  
+  return total;
 }

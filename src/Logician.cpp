@@ -39,12 +39,6 @@ void Logician::sendTick(int time)
     reg++){
     ((RegionModel*)(*reg))->handleTick(time);
   }
-  // tell all of the facility models to handle the tick
-  for(ModelList::iterator fac=facilities.begin();
-    fac != facilities.end(); 
-    fac++){
-    ((FacilityModel*)(*fac))->handleTick(time);
-  }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::sendTock(int time)
@@ -54,12 +48,6 @@ void Logician::sendTock(int time)
     reg != regions.end(); 
     reg++){
     ((RegionModel*)(*reg))->handleTock(time);
-  }
-  // tell all of the facility models to handle the tock
-  for(ModelList::iterator fac=facilities.begin();
-    fac != facilities.end(); 
-    fac++){
-    ((FacilityModel*)(*fac))->handleTock(time);
   }
 }
 
@@ -105,7 +93,7 @@ Model* Logician::getModelByName(ModelList list, string search_name)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addFacility(Model* new_facility) 
 { 
-  facilities.push_back(new_facility); 
+   facilities.push_back(new_facility); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

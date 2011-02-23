@@ -69,6 +69,12 @@ void SinkFacility::copy(SinkFacility* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SinkFacility::copyFreshModel(Model* src)
+{
+  copy((SinkFacility*)(src));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::print() 
 { 
   FacilityModel::print();

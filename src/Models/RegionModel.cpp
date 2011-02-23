@@ -103,20 +103,20 @@ void RegionModel::receiveMessage(Message* msg){
   }
 }
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+/* MATT INPUT */
 void RegionModel::handleTick(int time){
+  // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=institutions.begin();
-      inst!=institutions.end();
+      inst != institutions.end();
       inst++){
     ((InstModel*)(*inst))->handleTick(time);
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTock(int time){
+  // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=institutions.begin();
-      inst!=institutions.end();
+      inst != institutions.end();
       inst++){
     ((InstModel*)(*inst))->handleTock(time);
   }

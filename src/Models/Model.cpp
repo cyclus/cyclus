@@ -67,7 +67,7 @@ Model* Model::create(Model* src)
   
   Model* model = model_creator();
   
-  model->copy(src);
+  model->copyFreshModel(src);
 
   return model;
 
@@ -103,7 +103,6 @@ void Model::copy(Model* src)
 
   name = src->name;
   modelImpl = src->modelImpl;
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
