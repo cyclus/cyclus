@@ -55,7 +55,7 @@ public:
   /**
    * This drills down the dependency tree to initialize all relevant parameters/containers.
    *
-   * Note that this function must be defined only in the specfici model in question and not in any 
+   * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
    *
    * @param src the pointer to the original (initialized ?) model to be copied
