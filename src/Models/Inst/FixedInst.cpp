@@ -57,6 +57,13 @@ void FixedInst::copy(FixedInst* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void FixedInst::copyFreshModel(Model* src)
+{
+
+  copy((FixedInst*)src);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::print() 
 { 
   InstModel::print();

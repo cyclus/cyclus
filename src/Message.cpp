@@ -279,7 +279,9 @@ string Message::unEnumerateDir(){
 void Message::execute()
 {
   FacilityModel* theFac = ((FacilityModel*)LI->getFacilityByID(trans.supplierID));
-  if (((Communicator*)theFac)->getCommType() == FacilityComm)
+  CommunicatorType type;
+  type = ((Communicator*)theFac)->getCommType();
+  if (type == FacilityComm)
     (theFac)->receiveMessage(this);
   else
     throw GenException("Only FacilityModels can send material.");

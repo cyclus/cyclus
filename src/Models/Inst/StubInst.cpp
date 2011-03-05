@@ -29,6 +29,11 @@ void StubInst::copy(StubInst* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubInst::copyFreshModel(Model* src) { 
+  copy((StubInst*)src); 
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::print() { 
   InstModel::print(); 
 };

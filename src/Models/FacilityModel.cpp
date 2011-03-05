@@ -40,6 +40,9 @@ void FacilityModel::copy(FacilityModel* src)
 
   // don't copy fac_name to new instance
   fac_name = "";
+
+
+  LI->addFacility(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

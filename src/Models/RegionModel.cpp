@@ -55,6 +55,7 @@ void RegionModel::copy(RegionModel* src)
   allowedFacilities = src->allowedFacilities;
   
   // don't copy institutions!
+  LI->addRegion(this);
 
 }
   

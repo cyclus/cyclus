@@ -28,6 +28,10 @@ void StubConverter::copy(StubConverter* src) {
   ConverterModel::copy(src); 
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubConverter::copyFreshModel(Model* src) { 
+  copy((StubConverter*)src); 
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubConverter::print() { 

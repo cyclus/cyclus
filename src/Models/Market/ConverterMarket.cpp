@@ -63,6 +63,13 @@ void ConverterMarket::copy(ConverterMarket* src)
   req_commod->setMarket(this);
   conv_name = src->conv_name;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void ConverterMarket::copyFreshModel(Model* src)
+{ 
+  copy((ConverterMarket*)src);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::print()
 { 

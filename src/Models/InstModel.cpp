@@ -45,7 +45,7 @@ void InstModel::copy(InstModel* src)
   
   region = src->region;
   ((RegionModel*)region)->addInstitution(this);
-  
+  LI->addInst(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

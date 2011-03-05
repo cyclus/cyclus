@@ -47,6 +47,11 @@ void SWUeUF6Converter::copy(SWUeUF6Converter* src)
   out_commod = src->out_commod;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void SWUeUF6Converter::copyFreshModel(Model* src)
+{
+  copy((SWUeUF6Converter*)src);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SWUeUF6Converter::print() 

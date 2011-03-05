@@ -25,6 +25,10 @@ void StubMarket::copy(StubMarket* src) {
   MarketModel::copy(src); 
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubMarket::copyFreshModel(Model* src){
+  copy((StubMarket*)src);
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::print() { 

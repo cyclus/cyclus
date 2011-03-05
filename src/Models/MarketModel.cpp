@@ -44,6 +44,7 @@ void MarketModel::copy(MarketModel* src)
    */
 
   commodity = src->commodity;
+  LI->addMarket(this);
 
 }
 

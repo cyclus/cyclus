@@ -40,6 +40,16 @@ public:
   /// initialize an object by copying another
   virtual void copy(GreedyMarket* src) { MarketModel::copy(src); } ;
 
+  /**
+   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   *
+   * Note that this function must be defined only in the specfici model in question and not in any 
+   * inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
+   */
+  virtual void copyFreshModel(Model* src) { copy((GreedyMarket*)src); } ;
+
   /** 
    * Prints information about this model.
    */

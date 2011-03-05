@@ -25,7 +25,7 @@ void StubCommModel::init(xmlNodePtr cur) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubCommModel::copy(StubCommModel* src) { 
   Model::copy(src);
-  Communicator:copy(src); 
+  Communicator::copy(src); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

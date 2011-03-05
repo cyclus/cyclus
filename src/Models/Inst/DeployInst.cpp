@@ -61,6 +61,12 @@ void DeployInst::copy(DeployInst* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void DeployInst::copyFreshModel(Model* src)
+{
+  copy((DeployInst*)src);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void DeployInst::print() 
 { 
   InstModel::print();
