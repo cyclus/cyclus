@@ -77,6 +77,12 @@ void NullFacility::copy(NullFacility* src)
   ordersWaiting = deque<Message*>();
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::copyFreshModel(Model* src)
+{
+  copy((NullFacility*)(src));
+}
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::print() 

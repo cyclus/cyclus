@@ -29,6 +29,7 @@ void SourceFacility::init(xmlNodePtr cur)
 {
   FacilityModel::init(cur);
 
+  cout<<"The Source Facility is being initialized"<<endl;
   out_commod = NULL;
 
   /// move XML pointer to current model

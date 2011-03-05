@@ -46,7 +46,7 @@ public:
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
-  virtual void copyFreshModel(Model* src){};
+  virtual void copyFreshModel(Model* src);
 
   /**
    * Print information about this model

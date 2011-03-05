@@ -89,6 +89,13 @@ void SeparationsMatrixFacility::copy(SeparationsMatrixFacility* src)
 	outstMF = 0;
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SeparationsMatrixFacility::copyFreshModel(Model* src)
+{
+  copy((SeparationsMatrixFacility*)(src));
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SeparationsMatrixFacility::print() 
 { 

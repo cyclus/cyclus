@@ -54,7 +54,7 @@ public:
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
-  virtual void copyFreshModel(Model* src){};
+  virtual void copyFreshModel(Model* src);
 
   /**
    * every model should be able to print a verbose description

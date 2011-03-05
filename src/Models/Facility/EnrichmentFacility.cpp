@@ -93,6 +93,13 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 }
 
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void EnrichmentFacility::copyFreshModel(Model* src)
+{
+  copy((EnrichmentFacility*)(src));
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::print() 
 { 
