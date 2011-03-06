@@ -66,6 +66,9 @@ void SinkFacility::copy(SinkFacility* src)
   FacilityModel::copy(src);
 
   in_commods = src->in_commods;
+  capacity = src->capacity;
+  inventory_size = src->inventory_size;
+  commod_price = src->commod_price;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

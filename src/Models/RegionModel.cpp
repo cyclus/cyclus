@@ -104,7 +104,6 @@ void RegionModel::receiveMessage(Message* msg){
   }
 }
 
-/* MATT INPUT */
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=institutions.begin();

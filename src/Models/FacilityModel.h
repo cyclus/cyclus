@@ -32,7 +32,7 @@ class FacilityModel : public Model, public Communicator
 
 public:
   /// Default constructor for FacilityModel Class
-  FacilityModel() { ID = nextID++; model_type="Facility"; commType=FacilityComm; cout<<"________________"<<endl;};
+  FacilityModel() { ID = nextID++; model_type="Facility"; commType=FacilityComm;};
 
   /// every model should be destructable
   virtual ~FacilityModel() {};
