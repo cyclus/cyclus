@@ -5,6 +5,9 @@
 
 #include "RegionModel.h"
 
+// We include the logician to access the region's InstModels
+#include "Logician.h"
+
 /**
  * The BuildRegion class inherits from the RegionModel class and is dynamically
  * loaded by the Model class when requested.
@@ -14,12 +17,6 @@
  */
 class BuildRegion : public RegionModel  
 {
- public:
-  /**
-   * The build function.
-   */
-  void build();
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -88,9 +85,15 @@ class BuildRegion : public RegionModel
 /* -------------------- */
 
 /* --------------------
- * all REGIONMODEL classes have these members
+ * the BuildRegion class have these members
  * --------------------
  */
+
+ public:
+  /**
+   * The build function.
+   */
+  void build(int time, InstModel* inst);
 
 /* ------------------- */ 
 
