@@ -126,4 +126,3 @@ void RegionModel::handleTock(int time){
  * all REGIONMODEL classes have these members
  * --------------------
  */
-

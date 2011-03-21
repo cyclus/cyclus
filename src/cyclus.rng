@@ -377,6 +377,7 @@
       <choice>
         <ref name="StubRegion"/>
         <ref name="NullRegion"/>
+        <ref name="BuildRegion"/>
         <!-- insert ref to new RegionModels here -->
       </choice>
       </element>
@@ -396,6 +397,12 @@
 
   <define name="NullRegion">
      <element name="NullRegion">
+        <text/>
+     </element>
+  </define>
+
+  <define name="BuildRegion">
+     <element name="BuildRegion">
         <text/>
      </element>
   </define>

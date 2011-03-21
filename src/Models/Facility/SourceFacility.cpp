@@ -174,6 +174,7 @@ void SourceFacility::handleTick(int time){
 
   // decide what market to offer to
   Communicator* recipient = (Communicator*)(out_commod->getMarket());
+  cout << "During handleTick, " << getFacName() << " offers: "<< offer_amt << "."  << endl;
 
   // create a message to go up to the market with these parameters
   Message* msg = new Message(up, out_commod, offer_amt, min_amt, commod_price, 
@@ -194,7 +195,7 @@ void SourceFacility::handleTock(int time){
                                     recipe->getName(),
                                     capacity*recipe->getTotMass(), 
                                     massBased);
-    cout<<"The source facility, handling the tock, has created a material:"<<endl;
+    cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);
   }
@@ -205,7 +206,7 @@ void SourceFacility::handleTock(int time){
                                     recipe->getName(),
                                     space,
                                     atomBased);
-    cout<<"The source facility, handling the tock, has created a material:"<<endl;
+    cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);
   }

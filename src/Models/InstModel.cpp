@@ -82,6 +82,7 @@ void InstModel::handleTick(int time){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
+    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
     ((FacilityModel*)(*fac))->handleTick(time);
   }
 }
@@ -90,6 +91,7 @@ void InstModel::handleTock(int time){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
+    cout << "Inst " << ID << " is sending handleTock to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
     ((FacilityModel*)(*fac))->handleTock(time);
   }
 }

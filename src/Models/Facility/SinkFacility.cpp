@@ -96,6 +96,7 @@ void SinkFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
+  cout << "I EXIST SAYS " << getFacName() << "." << endl;
 
   // The sink facility should ask for as much stuff as it can reasonably receive.
   Mass requestAmt;
@@ -123,6 +124,7 @@ void SinkFacility::handleTick(int time){
                                      commod_price, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
+      cout << "During handleTick, " << getFacName() << " requests: "<< requestAmt << "."  << endl;
     }
   }
   // otherwise, the upper bound is the monthly acceptance capacity, request cap.
@@ -138,6 +140,7 @@ void SinkFacility::handleTick(int time){
                           this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
+    cout << "During handleTick, " << getFacName() << " requests: " << requestAmt << "."  << endl;
     }
   }
 
