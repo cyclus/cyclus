@@ -10,23 +10,12 @@
 #include "InputXML.h"
 
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// void BuildRegion::build(int time, InstModel* inst)
-// {
-//   // Test at arbitrary time = 2
-//   if (time==2){
-//     // Build one of each allowed facility
-//     for(set<Model*>::iterator fac=this->allowedFacilities.begin();
-// 	fac != this->allowedFacilities.end();
-// 	fac++){
-// //       Model* new_facility;
-// //       new_facility->Model::copy((FacilityModel*)(*fac));
-// //       ((FacilityModel*)new_facility)->setFacName("test");
-// //       ((FacilityModel*)new_facility)->setInstName(inst->getName());
-// //       inst->addFacility(new_facility);
-//     }
-//   }
-// };
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildRegion::requestBuild(Model* fac, InstModel* inst)
+{
+  // Request a build of fac
+  inst->pleaseBuild(fac);
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BuildRegion::handleTick(int time){
@@ -34,8 +23,14 @@ void BuildRegion::handleTick(int time){
   for(vector<Model*>::iterator inst=institutions.begin();
       inst != institutions.end();
       inst++){
-    // Call build function
-    //    build(time,(InstModel*)(*inst));
+    
+    // testing at arbitrary time = 2
+    if (time==2){
+      // Call requestBuild function
+      Model* fac_to_build=LI->getFacilityByName("BackEnd");
+      requestBuild(fac_to_build,(InstModel*)(*inst));
+    }
+
     // Pass the handleTick onto each institution
     ((InstModel*)(*inst))->handleTick(time);
   }

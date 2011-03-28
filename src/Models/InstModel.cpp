@@ -2,6 +2,7 @@
 // Implements the InstModel class
 
 #include "InstModel.h"
+#include <sstream>
 
 /* --------------------
  * all MODEL classes have these members
@@ -13,6 +14,7 @@ int InstModel::nextID = 0;
 
 #include "Logician.h"
 #include "InputXML.h"
+#include "GenException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur)
@@ -56,6 +58,7 @@ void InstModel::print()
   cout << "in region " << region->getName();
 }
 
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -96,3 +99,16 @@ void InstModel::handleTock(int time){
   }
 }
 
+/* --------------------
+ * all INSTMODEL classes have these members
+ * --------------------
+ */
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::pleaseBuild(Model* fac){
+  // by defualt
+  std::stringstream ss;
+  ss << this->ID;
+  throw GenException("Institution " + ss.str()
+		     + " does not have a definied facility-building fuction.");
+}

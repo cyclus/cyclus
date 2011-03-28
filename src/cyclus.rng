@@ -424,6 +424,7 @@
         <ref name="StubInst"/>
         <ref name="FixedInst"/>
         <ref name="DeployInst"/>
+        <ref name="BuildInst"/>
         <!-- insert ref to new InstModels here -->
       </choice>
       </element>
@@ -460,6 +461,23 @@
 
       <oneOrMore>
       <ref name="deploy"/>
+      </oneOrMore>       
+
+    </element>
+  </define>
+
+  <define name="BuildInst">
+    <element name="BuildInst">
+
+      <oneOrMore>
+        <element name="facility">
+          <element name="type">
+            <text/>
+          </element>
+          <element name="name">
+            <text/>
+          </element>
+        </element>
       </oneOrMore>       
 
     </element>

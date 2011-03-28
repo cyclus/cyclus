@@ -4,6 +4,8 @@
 #include <iostream>
 
 #include "RegionModel.h"
+#include "InstModel.h"
+#include "FacilityModel.h"
 
 // We include the logician to access the region's InstModels
 #include "Logician.h"
@@ -93,7 +95,7 @@ class BuildRegion : public RegionModel
   /**
    * The build function.
    */
-  void build(int time, InstModel* inst);
+  void requestBuild(Model* fac, InstModel* inst);
 
 /* ------------------- */ 
 

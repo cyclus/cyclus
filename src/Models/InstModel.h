@@ -114,6 +114,9 @@ public:
   /// reports number of facilities in this inst
   int getNumFacilities(){ return facilities.size();};
 
+  /// attempts to build another facility of type fac
+  virtual void pleaseBuild(Model* fac);
+
 protected:
   /**
    * Each institution is a member of exactly one region
