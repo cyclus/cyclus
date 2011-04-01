@@ -15,7 +15,7 @@
 InputXML* InputXML::_instance = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string InputXML::main_schema = ENV->searchPathForFile("cyclus.rng","", ENV->checkEnv("CYCLUS_SRC_DIR"),"");
+string InputXML::main_schema = ENV->searchPathForFile("Data/cyclus.rng","","" ,"");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML::InputXML()
