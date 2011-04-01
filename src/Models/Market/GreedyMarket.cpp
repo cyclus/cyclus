@@ -106,7 +106,10 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     } 
     else {
       // split offer
-
+      if (NULL == offerMsg)
+        throw GenException("offer message does not exist in market '" 
+            + getName() + "'.");
+      
       // queue a new order
       Message* maybe_offer = new Message(*offerMsg);
       maybe_offer->setAmount(requestAmt);
