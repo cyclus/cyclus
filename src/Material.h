@@ -247,6 +247,14 @@ public:
   static int getMassNum(Iso tope);
 
   /**
+   * Returns the atomic mass of the isotope with the given identifier.
+   *
+   * @param tope the isotope whose mass is being returned
+   * @return the atomic mass (g/mol) 
+   */
+  static Mass getAtomicMass(Iso tope);
+
+  /**
    * Adds (or subtracts) from the number density of the given isotope by 
    * the amount.
    *

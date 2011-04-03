@@ -13,9 +13,10 @@ set ( TestSource
      ../Commodity.cpp
      ../Message.cpp
      ../Communicator.cpp
-     ../Utility/GenException.cpp 
-     ../Utility/Timer.cpp
      ../Utility/Env.cpp
+     ../Utility/GenException.cpp 
+     ../Utility/MassTable.cpp
+     ../Utility/Timer.cpp
      ../Models/Model.cpp 
         ../Models/StubModel.cpp 
         ../Models/StubCommModel.cpp 

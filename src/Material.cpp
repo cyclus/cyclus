@@ -4,8 +4,8 @@
 using namespace std;
 
 #include "Material.h"
+#include "MassTable.h"
 
-#include "Utility/MassTable.h"
 #include "GenException.h"
 #include "Logician.h"
 #include "Timer.h"
@@ -116,14 +116,14 @@ const bool Material::isNeg(Iso tope) const
   if (this->getComp(tope) == 0)
     return false;
   // (kg) * (g/kg) * (mol/g)
-  Atoms atoms_eps =  eps * 1e3 / Material::getMassNum(tope); 
+  Atoms atoms_eps =  eps * 1e3 / Material::getAtomicMass(tope); 
   return (this->getComp(tope) + atoms_eps < 0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
   // (kg) * (g/kg) * (mol/g) 
-  Atoms atoms_eps = eps * 1e3 / Material::getMassNum(tope) ; 
+  Atoms atoms_eps = eps * 1e3 / Material::getAtomicMass(tope) ; 
   return (fabs(this->getComp(tope)) < atoms_eps);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,9 +144,16 @@ double Material::getIsoMass(Iso tope, const CompMap& comp)
   double massToRet = 0;
 
   if (searchIso != comp.end()) 
-    massToRet = (*searchIso).second*Material::getMassNum(tope)/1e3;
+    massToRet = (*searchIso).second*Material::getAtomicMass(tope)/1e3;
   return massToRet;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Mass Material::getAtomicMass(Iso tope)
+{
+  Mass toRet = MT->getMass(tope);
+  return toRet;
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getEltMass(int elt) const
@@ -462,8 +469,8 @@ void Material::rationalize_A2M()
       entry++)
   {
     // multiply the number of atoms by the mass number of that isotope and convert to kg
-    massHist[TI->getTime()][(*entry).first] = (*entry).second*getMassNum((double)(*entry).first)/1e3;
-    total_mass += total_atoms*(*entry).second*getMassNum((double)(*entry).first)/1e3;
+    massHist[TI->getTime()][(*entry).first] = (*entry).second*getAtomicMass((double)(*entry).first)/1e3;
+    total_mass += total_atoms*(*entry).second*getAtomicMass((double)(*entry).first)/1e3;
   }
 
   normalize(massHist[TI->getTime()]);
@@ -480,8 +487,8 @@ void Material::rationalize_M2A()
       entry != massHist[TI->getTime()].end();
       entry++)
   {
-    compHist[TI->getTime()][(*entry).first] = (*entry).second*1e3/getMassNum((*entry).first);
-    total_atoms += total_mass*(*entry).second*1e3/getMassNum((*entry).first);
+    compHist[TI->getTime()][(*entry).first] = (*entry).second*1e3/getAtomicMass((*entry).first);
+    total_atoms += total_mass*(*entry).second*1e3/getAtomicMass((*entry).first);
   }
   
   normalize(compHist[TI->getTime()]);
