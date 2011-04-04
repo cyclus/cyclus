@@ -403,7 +403,25 @@
 
   <define name="BuildRegion">
      <element name="BuildRegion">
-        <text/>
+        <element name="build_schedule">	
+	   <element name="build_schedule">
+	      <oneOrMore>
+              <element name="facility">
+                 <attribute name="type">
+                    <text/>
+          	 </attribute>
+                 <attribute name="schedule"><!--
+                    <list>
+		       <oneOrMore>
+		       <data type="int"/>
+		       <data type="int"/>
+		       </oneOrMore>
+		    </list>-->
+          	 </attribute>
+              </element>
+      	      </oneOrMore>       
+	   </element>				
+	 </element>	
      </element>
   </define>
 
@@ -468,18 +486,7 @@
 
   <define name="BuildInst">
     <element name="BuildInst">
-
-      <oneOrMore>
-        <element name="facility">
-          <element name="type">
-            <text/>
-          </element>
-          <element name="name">
-            <text/>
-          </element>
-        </element>
-      </oneOrMore>       
-
+        <text/>	
     </element>
   </define>
 

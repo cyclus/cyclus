@@ -13,42 +13,6 @@
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::init(xmlNodePtr cur)
-{
-  InstModel::init(cur);
-
-  /// get facility list
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/BuildInst/facility");
-  
-  for (int i=0;i<nodes->nodeNr;i++) 
-  {
-    xmlNodePtr fac_node = nodes->nodeTab[i];
-    string fac_name = XMLinput->get_xpath_content(fac_node,"type");
-  
-    Model* facility = LI->getFacilityByName(fac_name);
-
-    if (NULL == facility){
-      throw GenException("Facility '" 
-                         + fac_name 
-                         + "' is not defined in this problem.");
-    }
-    
-    if (!((RegionModel*)region)->isAllowedFacility(facility)){
-      throw GenException("Facility '" 
-                         + fac_name 
-                         + "' is not an allowed facility for region '" 
-                         + region->getName() +"'.");
-  }
-
-    Model* new_facility = Model::create(facility);
-
-    ((FacilityModel*)new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
-    ((FacilityModel*)new_facility)->setInstName(this->getName());
-    this->addFacility(new_facility);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void BuildInst::copy(BuildInst* src)
 {
   InstModel::copy(src);
@@ -83,10 +47,13 @@ void BuildInst::print()
 void BuildInst::pleaseBuild(Model* fac)
 {
   Model* new_facility=Model::create(fac);
+  // !!! We need a way to determine the new facility's name
+  // Set the facility name
   string name = ((FacilityModel*)fac)->getFacName()+" 2";
   ((FacilityModel*)new_facility)->setFacName(name);
+  // Set the facility's parent institution
   ((FacilityModel*)new_facility)->setInstName(this->getName());
+  // Add the facility to the parent inst's list of facilities
   this->addFacility(new_facility);
-  std::cout << "INST CREATES NEW FAC " << name << std::endl;
 };
 

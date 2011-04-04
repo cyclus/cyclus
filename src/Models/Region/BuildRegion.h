@@ -1,22 +1,21 @@
-// NullRegion.h
+// BuildRegion.h
 #if !defined(_BUILDREGION_H)
 #define _BUILDREGION_H
-#include <iostream>
-
-#include "RegionModel.h"
-#include "InstModel.h"
-#include "FacilityModel.h"
-
-// We include the logician to access the region's InstModels
-#include "Logician.h"
 
 /**
  * The BuildRegion class inherits from the RegionModel class and is dynamically
  * loaded by the Model class when requested.
  * 
- * This region will build new facilities based on the build() function. 
+ * This region will build new facilities based on the pleaseBuild() function. 
  * This RegionModel never alters any messages transmitted through it or anything else. 
  */
+
+#include "RegionModel.h"
+#include "Logician.h"
+#include "GenException.h"
+#include "InputXML.h"
+
+
 class BuildRegion : public RegionModel  
 {
 /* --------------------
@@ -72,15 +71,6 @@ class BuildRegion : public RegionModel
      */
     virtual void handleTick(int time);
 
-    /**
-     * Each region is prompted to do its beginning-of-time-step
-     * stuff at the tock of the timer.
-     * The default behavior is to ignore the tock.
-     *
-     * @param time is the time to perform the tock
-     */
-    virtual void handleTock(int time);
-    
  protected:
 
 
@@ -92,11 +82,12 @@ class BuildRegion : public RegionModel
  */
 
  public:
-  /**
-   * The build function.
-   */
-  void requestBuild(Model* fac, InstModel* inst);
-
+    
+    /**
+     * The build function.
+     */
+    void requestBuild(Model* fac, InstModel* inst);
+    
 /* ------------------- */ 
 
 };

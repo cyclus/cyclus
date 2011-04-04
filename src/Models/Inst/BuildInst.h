@@ -31,10 +31,10 @@ public:
    * Default destructor for the fixed inst
    */
   ~BuildInst() {};
-  
+   
   // different ways to populate an object after creation
   /// initialize an object from XML input
-  virtual void init(xmlNodePtr cur);
+  virtual void init(xmlNodePtr cur)  { InstModel::init(cur); };
 
   /// initialize an object by copying another
   virtual void copy(BuildInst* src);
