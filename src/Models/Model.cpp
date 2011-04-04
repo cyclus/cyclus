@@ -86,10 +86,24 @@ void* Model::destroy(Model* model)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+string Model::generateHandle(){
+
+  string toRet = modelImpl ;
+
+	char SNString[100];
+	sprintf(SNString, "%d", ID); 
+
+	toRet.append(SNString);
+
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur)
 {
   name = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   modelImpl = XMLinput->get_xpath_name(cur, "model/*");
+  handle = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,6 +117,7 @@ void Model::copy(Model* src)
 
   name = src->name;
   modelImpl = src->modelImpl;
+  handle = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -186,6 +201,7 @@ void Model::print()
   cout << model_type << " " << name 
       << " (ID=" << ID
       << ", implementation = " << modelImpl 
-      << ") " ;
+      << "  handle = " << handle
+      << " ) " ;
 };
 

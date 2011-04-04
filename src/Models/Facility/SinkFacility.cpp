@@ -96,8 +96,6 @@ void SinkFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
-  cout << "I EXIST SAYS " << getFacName() << "." << endl;
-
   // The sink facility should ask for as much stuff as it can reasonably receive.
   Mass requestAmt;
   // And it can accept amounts no matter how small

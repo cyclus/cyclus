@@ -110,6 +110,11 @@ public:
   const string getModelName() { return modelImpl; };
 
   /**
+   * get model instance handle
+   */
+  const string getHandle() const { return handle; };
+
+  /**
    * every model should be able to print a verbose description
    */
   virtual void print();
@@ -149,6 +154,17 @@ public:
   static void load_institutions();
 
 protected:
+  /**
+   * every instance of a model should have a handle
+   * perhaps this is redundant with name. Discuss amongst yourselves.
+   */
+  string handle;
+
+  /**
+   * generate model handle
+   */
+  string generateHandle();
+
   /**
    * every instance of a model should have a name
    */
