@@ -276,6 +276,7 @@
      <element name="SeparationsMatrixFacility"> 
         <ref name="incommodity"/>
         <ref name="outcommodity"/>
+        <ref name="Stream"/>
         <ref name="inventorysize"/>
         <ref name="capacity"/>
      </element>
@@ -353,8 +354,6 @@
       </element>
   </define>
 
-
-
   <!-- insert new FacilityModel parameter sets here -->
 
   <!-- end section for facilities -->
@@ -403,25 +402,7 @@
 
   <define name="BuildRegion">
      <element name="BuildRegion">
-        <element name="build_schedule">	
-	   <element name="build_schedule">
-	      <oneOrMore>
-              <element name="facility">
-                 <attribute name="type">
-                    <text/>
-          	 </attribute>
-                 <attribute name="schedule"><!--
-                    <list>
-		       <oneOrMore>
-		       <data type="int"/>
-		       <data type="int"/>
-		       </oneOrMore>
-		    </list>-->
-          	 </attribute>
-              </element>
-      	      </oneOrMore>       
-	   </element>				
-	 </element>	
+        <text/>
      </element>
   </define>
 
@@ -486,7 +467,18 @@
 
   <define name="BuildInst">
     <element name="BuildInst">
-        <text/>	
+
+      <oneOrMore>
+        <element name="facility">
+          <element name="type">
+            <text/>
+          </element>
+          <element name="name">
+            <text/>
+          </element>
+        </element>
+      </oneOrMore>       
+
     </element>
   </define>
 
@@ -603,6 +595,19 @@
   </define>
   <!-- end section for recipes -->
 
+  <!-- begin section for Stream -->
+<!-- SepMatrix Stream List Arrangement Command -->
+  <define name="Stream">
+    <element name= "Stream">
+      <list>
+        <oneOrMore>
+          <data type = "integer" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+          <data type = "double" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+        </oneOrMore>
+      </list>							
+    </element>
+  </define>
+<!-- end section for Stream -->
 
 </grammar>
 

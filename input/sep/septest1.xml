@@ -50,6 +50,7 @@
       <SeparationsMatrixFacility>
         <incommodity>snf</incommodity>
         <outcommodity>sepsnf</outcommodity>
+				<newvar>sepsnf</newvar>
         <inventorysize>1e4</inventorysize>
         <capacity>1</capacity>
       </SeparationsMatrixFacility>

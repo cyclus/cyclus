@@ -63,6 +63,9 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   // get capacity
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
 
+  // get Stream
+  string streamStr = XMLinput->get_xpath_content(cur,"Stream");
+
   inventory = deque<Material*>();
   stocks = deque<Material*>();
   ordersWaiting = deque<Message*>();
@@ -89,12 +92,13 @@ void SeparationsMatrixFacility::copy(SeparationsMatrixFacility* src)
 	outstMF = 0;
 }
 
-
+// The Module below is added to match update from r240 to repository
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SeparationsMatrixFacility::copyFreshModel(Model* src)
 {
   copy((SeparationsMatrixFacility*)(src));
 }
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SeparationsMatrixFacility::print() 

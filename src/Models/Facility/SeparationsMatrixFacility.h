@@ -237,6 +237,12 @@ protected:
     int inventory_size;
 
     /**
+     * Stream of material in a list to use as Separations Guide
+		 * Contains matched set of element (integer) and sep fraction (double)
+     */
+    //struct Stream;
+
+    /**
      * The receipe of input materials.
      */
     Material* in_recipe;
