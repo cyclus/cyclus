@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "Logician.h"
+#include "BookKeeper.h"
 #include "Timer.h"
 #include "InputXML.h"
 
@@ -52,6 +53,10 @@ int main(int argc, char* argv[])
     
     // Run the simulation 
     TI->runSim();
+
+    // Create the output file and immediately close it
+    BI->closeDB();
+    
 
 
     return 0;

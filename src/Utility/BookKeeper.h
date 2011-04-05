@@ -30,16 +30,10 @@ private:
 	H5File* myDB;
 		
 	/**
-	 * Stores the local temporary filename assigned to the DB so that we can 
-	 * retrieve and move the file later.
-	 */
-	string tmpDBName;
-
-	/**
 	 * Stores the final filename we'll use for the DB, since we use it in 
 	 * multiple places and don't want there to be any ambiguity.
 	 */
-	string finDBName;
+	string dbName;
 
   /**
    * True iff the db is open.
@@ -47,12 +41,42 @@ private:
   bool dbIsOpen;
 
 protected:
-	
-	/**
-	 * The (protected) constructor for this class, which can only 
+  /**
+   * The (protected) constructor for this class, which can only 
 	 * be called indirectly by the client.
 	 */
 	BookKeeper();
+
+	/**
+	 * Opens the output database in memory space.
+	 */
+	void openDB();
+
+  /**
+   * Creates a group with a title.
+   */
+  Group* createGroup(string title);
+
+	/**
+	 * Create a property list for a dataset and set up fill values.
+	 */
+	DSetCreatPropList* createPropList(){};
+
+	/**
+	 * Creates a dataspace for the dataset in the file....
+	 */
+	DataSpace* createDataSpace(){};
+
+	/**
+	 * you'll need a dataspace... 
+	 */
+	void createDataSet(){};
+
+  /** 
+   * The default fill value is 0.
+   * Sometimes, you'll convert it to a double.
+   */
+  const static int fillvalue=0;
 
 public:
 		
@@ -72,14 +96,14 @@ public:
 	H5File* getDB();
 
 	/**
-	 * Opens the input database with the given name.
-	 */
-	void openDB(char* name);
-
-	/**
 	 * Closes the database this BookKeeper is maintaining.
 	 */
 	void closeDB();
+  
+  /**
+   * Returns whether it's open
+   */
+  bool isOpen(){return dbIsOpen;};
 
 };
 #endif
