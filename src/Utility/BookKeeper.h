@@ -15,25 +15,24 @@ using namespace H5;
 /**
  * A (singleton) class for handling I/O.
  */
-class BookKeeper 
-{
+class BookKeeper {
 private:
-	/**
-	 * A pointer to this BookKeeper once it has been initialized.
+  /**
+   * A pointer to this BookKeeper once it has been initialized.
 	 */
-	static BookKeeper* _instance;
+  static BookKeeper* _instance;
 		
-	/**
-	 * The HDF5 output database for the simulation this BookKeeper is 
-	 * responsible for.
+  /**
+   * The HDF5 output database for the simulation this BookKeeper is 
+   * responsible for.
 	 */
-	H5File* myDB;
+  H5File* myDB;
 		
-	/**
-	 * Stores the final filename we'll use for the DB, since we use it in 
-	 * multiple places and don't want there to be any ambiguity.
+  /**
+   * Stores the final filename we'll use for the DB, since we use it 
+   * in multiple places and don't want there to be any ambiguity.
 	 */
-	string dbName;
+  string dbName;
 
   /**
    * True iff the db is open.
@@ -42,63 +41,79 @@ private:
 
 protected:
   /**
-   * The (protected) constructor for this class, which can only 
-	 * be called indirectly by the client.
+   * The (protected) constructor for this class, which can only be 
+   * called indirectly by the client.
 	 */
-	BookKeeper();
+  BookKeeper();
 
-	/**
-	 * Opens the output database in memory space.
+  /**
+   * Opens the output database in memory space.
 	 */
-	void openDB();
+  void openDB();
 
   /**
    * Creates a group with a title.
    */
-  Group* createGroup(string title);
+  Group* newGroup(string title);
 
-	/**
-	 * Create a property list for a dataset and set up fill values.
+  /**
+   * Create a property list for a dataset and set up fill values.
 	 */
-	DSetCreatPropList* createPropList(){};
+  DSetCreatPropList* dsPropList(){};
 
-	/**
-	 * Creates a dataspace for the dataset in the file....
+  /**
+   * Creates a homogeneously typed dataspace for the dataset in the 
+   * file....
+   *
+   * @param grp is a pointer to the group in which this dataspace 
+   * resides?  @param name is the unique name of the dataset (check 
+   * uniqueness)
+   * (is that how dataspaces work?? need to check.
+   * @param typemap is a map from magnitude to type for each dimension
+   *
+   * @return a pointer to an H5/CPP DataSpace object in memory
 	 */
-	DataSpace* createDataSpace(){};
+  DataSpace* homoDataSpace(Group* group, string name, 
+      map< int, pair<string, PredType> > typemap);
 
-	/**
-	 * you'll need a dataspace... 
+  /**
+   * This creates a 2d dataset out of a dataspace and some data
+   *
+   * @param ds is a pointer to a dataspace object of the right 
+   * dimesions
+   * @param data is a pointer (?) to the data to put into the set 
+   *
+   * @return a pointer to an H5/CPP DataSet object in memory
 	 */
-	void createDataSet(){};
+  DataSet* fillDataSet(DataSpace* ds, vector<int> data);
 
-  /** 
-   * The default fill value is 0.
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  /** The default fill value is 0.
    * Sometimes, you'll convert it to a double.
    */
   const static int fillvalue=0;
 
 public:
 		
-	/**
-	 * Gives all simulation objects global access to the BookKeeper by 
-	 * returning a pointer to it.
+  /**
+   * Gives all simulation objects global access to the BookKeeper by 
+   * returning a pointer to it.
 	 *
-	 * @return a pointer to the BookKeeper
+   * @return a pointer to the BookKeeper
 	 */
-	static BookKeeper* Instance();
+  static BookKeeper* Instance();
 		
-	/**
-	 * Returns a handle to the database this BookKeeper is maintaining.
+  /**
+   * Returns a handle to the database this BookKeeper is maintaining.
 	 *
-	 * @return the handle to the database
+   * @return the handle to the database
 	 */
-	H5File* getDB();
+  H5File* getDB();
 
-	/**
-	 * Closes the database this BookKeeper is maintaining.
+  /**
+   * Closes the database this BookKeeper is maintaining.
 	 */
-	void closeDB();
+  void closeDB();
   
   /**
    * Returns whether it's open
