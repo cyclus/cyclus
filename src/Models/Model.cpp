@@ -77,7 +77,7 @@ Model* Model::create(Model* src)
 void* Model::destroy(Model* model)
 {
 
-  mdl_dtor* model_destructor = destroy_map[model->getModelName()];
+  mdl_dtor* model_destructor = destroy_map[model->getModelImpl()];
 
   model_destructor(model);
 

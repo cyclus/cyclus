@@ -107,7 +107,7 @@ public:
   /**
    * get model implementation name
    */
-  const string getModelName() { return modelImpl; };
+  const string getModelImpl() { return modelImpl; };
 
   /**
    * get model instance handle

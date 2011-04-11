@@ -24,18 +24,20 @@ BookKeeper::BookKeeper()
 {
   // we'd like to call the output database cyclus.h5
   dbName = "cyclus.h5";
-  const int dim1 = 1; 
-  const int dim2 = LI->getNumFacilities();;
+  const int ncols = 2; 
+  const int nrows = LI->getNumFacilities() ;
 
-  double data[dim1][dim2];
-  for (int i=0; i<dim2; i++){
-    //fac = LI->getFacilityByID[i];
-    data[0][i] = i;
+  string data[nrows][ncols];
+  Model* fac;
+  for (int i=0; i<nrows; i++){
+    fac = LI->getFacilityByID(i);
+    data[i][0] = fac->getModelImpl();
+    data[i][1] = fac->getName();
   }
 
-  hsize_t dims[1];
-  dims[0]= dim1;
-  dims[1]= dim2;
+  hsize_t dims[2];
+  dims[0]= nrows;
+  dims[1]= ncols;
   hsize_t rank = 2;
 
   try{
@@ -52,7 +54,9 @@ BookKeeper::BookKeeper()
 
     DataSpace dataspace = DataSpace(rank , dims );
 
-    DataType datatype = DataType(PredType::NATIVE_DOUBLE);
+    // create a variable length string types
+    StrType vls_type(0, H5T_VARIABLE); 
+    DataType datatype = DataType(vls_type);
 
     DataSet dataset = myDB->createDataSet("/output/test", datatype, dataspace) ; 
 
