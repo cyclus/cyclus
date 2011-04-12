@@ -36,8 +36,8 @@
     <model>
       <SinkFacility>
         <incommodity>uo2</incommodity>
-        <capacity>1</capacity>
-        <inventorysize>1e4</inventorysize>
+        <capacity>6000</capacity>
+        <inventorysize>1e6</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
     </model>
