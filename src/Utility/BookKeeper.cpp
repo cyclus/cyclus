@@ -76,9 +76,15 @@ BookKeeper::BookKeeper()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//DSetPropList* BookKeeper::dsPropList(){
-  // nothing doing
-//};
+Group* BookKeeper::newGroup(string title){
+  // nothing doing...  yet
+};
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+DataSpace* newGroup(string title){
+  // nothing doing...  yet
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DataSpace* BookKeeper::homoDataSpace(Group* grp, string name, map< int, pair< string, PredType > > typemap){
@@ -108,7 +114,7 @@ DataSpace* BookKeeper::homoDataSpace(Group* grp, string name, map< int, pair< st
   DataSpace* toRet = new DataSpace(( rank, dims[1],dims[2]));
 
   return toRet;
-}
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DataSet* BookKeeper::fillDataSet(DataSpace* ds, vector<int> data)
@@ -116,28 +122,18 @@ DataSet* BookKeeper::fillDataSet(DataSpace* ds, vector<int> data)
  // DataSet* toRet;
  // toRet = new DataSet(DataSet(PredType::NATIVE_INT));
  // toRet->write(data);
-}
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::createDB(string name)
+{
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 H5File* BookKeeper::getDB()
 {
 	return myDB;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::closeDB()
-{
-	// Try to close it.
-  try{
-    myDB->close();
-    dbIsOpen = false;
-  }
-  // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
-}
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB()
@@ -156,26 +152,97 @@ void BookKeeper::openDB()
 	
 	// Store the handle to it.
 	dbIsOpen = true;
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	DSetCreatPropList* BookKeeper::createPropList(){};
-	/**
-	 * Create a property list for a dataset and set up fill values.
-	 */
+void BookKeeper::closeDB()
+{
+	// Try to close it.
+  try{
+    myDB->close();
+    dbIsOpen = false;
+  }
+  // catch failure caused by the H5File operations
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	DataSpace* BookKeeper::createDataSpace(){};
-	/**
-	 * Creates a dataspace for the dataset in the file....
-	 */
+bool BookKeeper::isGroup(string grp)
+{
+  // nothing doing, just yet.
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	void BookKeeper::createDataSet(){};
-	/**
-	 * you'll need a dataspace... 
-	 */
+void BookKeeper::writeData(intData1d data, string dsname){ 
+};
 
-}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(intData2d data, string dsname){
+};
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(intData3d data, string dsname){
+};
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(dblData1d data, string dsname){
+};
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(dblData2d data, string dsname){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(dblData3d data, string dsname){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(strData1d data, string dsname){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(strData2d data, string dsname){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeData(strData3d data, string dsname){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, intData1d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, intData2d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, intData3d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, dblData1d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, dblData2d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, dblData3d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, strData1d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, strData2d& out_data){
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::readData(DataSpace hs, strData3d& out_data){
+};

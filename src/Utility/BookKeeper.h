@@ -12,6 +12,17 @@
 using namespace std;
 using namespace H5;
 
+
+typedef vector< int > intData1d ; 
+typedef vector< double > dblData1d ; 
+typedef vector< string > strData1d ; 
+typedef vector< vector < int > > intData2d ; 
+typedef vector< vector < double > > dblData2d ; 
+typedef vector< vector < string > > strData2d ; 
+typedef vector< vector < vector < int > > > intData3d ; 
+typedef vector< vector < vector < double > > > dblData3d ; 
+typedef vector< vector < vector < string > > > strData3d ; 
+
 /**
  * A (singleton) class for handling I/O.
  */
@@ -45,11 +56,6 @@ protected:
    * called indirectly by the client.
 	 */
   BookKeeper();
-
-  /**
-   * Opens the output database in memory space.
-	 */
-  void openDB();
 
   /**
    * Creates a group with a title.
@@ -87,7 +93,6 @@ protected:
 	 */
   DataSet* fillDataSet(DataSpace* ds, vector<int> data);
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   /** The default fill value is 0.
    * Sometimes, you'll convert it to a double.
    */
@@ -98,17 +103,30 @@ public:
   /**
    * Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
+   * Like the Highlander, there can be only one.
 	 *
    * @return a pointer to the BookKeeper
 	 */
   static BookKeeper* Instance();
 		
   /**
+   * Creates a database file with the name indicated. 
+	 *
+   * @param name is the name of the hdf5 database file. Should end in .h5
+	 */
+  void createDB(string name);
+
+  /**
    * Returns a handle to the database this BookKeeper is maintaining.
 	 *
    * @return the handle to the database
 	 */
   H5File* getDB();
+
+  /**
+   * Opens the output database in memory space.
+	 */
+  void openDB();
 
   /**
    * Closes the database this BookKeeper is maintaining.
@@ -119,6 +137,171 @@ public:
    * Returns whether it's open
    */
   bool isOpen(){return dbIsOpen;};
+
+  /**
+   * Returns whether the group exists in the database
+   *
+   * @param grp the name of the group being queried
+   */
+  bool isGroup(string grp);
+
+  /**
+   * Returns the name of the database
+   */
+  string getDBName(){return dbName;};
+
+  /**
+   * Puts a one dimensional vector of integer data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(intData1d data, string dsname);
+
+  /**
+   * Puts a one dimensional vector of integer data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(intData2d data, string dsname);
+
+  /**
+   * Puts a one dimensional vector of integer data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(intData3d data, string dsname);
+
+  /**
+   * Puts a one dimensional vector of double data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(dblData1d data, string dsname);
+
+  /**
+   * Puts a two dimensional vector of double data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(dblData2d data, string dsname);
+
+  /**
+   * Puts a three dimensional vector of double data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(dblData3d data, string dsname);
+
+  /**
+   * Puts a one dimensional vector of string data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(strData1d data, string dsname);
+
+  /**
+   * Puts a two dimensional vector of string data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(strData2d data, string dsname);
+
+  /**
+   * Puts a three dimensional vector of string data in the indicated 
+   * dataspace
+   *
+   * @param data is the data
+   * @param dspace is the dataspace
+   */
+  void writeData(strData3d data, string dsname);
+
+  /**
+   * Reads 1d integer data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, intData1d& out_data);
+
+  /**
+   * Reads 2d integer data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, intData2d& out_data);
+
+  /**
+   * Reads 3d integer data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+   void readData(DataSpace hs, intData3d& out_data);
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, dblData1d& out_data);
+
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, dblData2d& out_data);
+
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+   void readData(DataSpace hs, dblData3d& out_data);
+
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, strData1d& out_data);
+
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+  void readData(DataSpace hs, strData2d& out_data);
+
+  /**
+   * Reads data from the dataset indicated.
+   *
+   * @param hs is the hyperspace to read out
+   * @param out_data is the vector to write to
+   */
+   void readData(DataSpace hs, strData3d& out_data);
+
 
 };
 #endif

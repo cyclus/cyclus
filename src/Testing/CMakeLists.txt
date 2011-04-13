@@ -7,25 +7,26 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 set ( TestSource
   TruthTests.cpp
   MaterialTests.cpp
+  BookKeeperTests.cpp
   ../InputXML.cpp
   ../Logician.cpp
-     ../Material.cpp
-     ../Commodity.cpp
-     ../Message.cpp
-     ../Communicator.cpp
-     ../Utility/BookKeeper.cpp
-     ../Utility/Env.cpp
-     ../Utility/GenException.cpp 
-     ../Utility/MassTable.cpp
-     ../Utility/Timer.cpp
-     ../Models/Model.cpp 
-        ../Models/StubModel.cpp 
-        ../Models/StubCommModel.cpp 
-        ../Models/ConverterModel.cpp 
-        ../Models/MarketModel.cpp 
-        ../Models/FacilityModel.cpp 
-        ../Models/RegionModel.cpp
-        ../Models/InstModel.cpp
+  ../Material.cpp
+  ../Commodity.cpp
+  ../Message.cpp
+  ../Communicator.cpp
+  ../Utility/BookKeeper.cpp
+  ../Utility/Env.cpp
+  ../Utility/GenException.cpp 
+  ../Utility/MassTable.cpp
+  ../Utility/Timer.cpp
+  ../Models/Model.cpp 
+  ../Models/StubModel.cpp 
+  ../Models/StubCommModel.cpp 
+  ../Models/ConverterModel.cpp 
+  ../Models/MarketModel.cpp 
+  ../Models/FacilityModel.cpp 
+  ../Models/RegionModel.cpp
+  ../Models/InstModel.cpp
   )
 
 #file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/TestingTests)
