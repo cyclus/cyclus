@@ -3,7 +3,7 @@
 
 #include "BuildRegion.h"
 
-
+#include <sstream>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BuildRegion::populateSchedule(FILE *infile)
@@ -20,26 +20,21 @@ void BuildRegion::populateSchedule(FILE *infile)
     // Read in the facility name and number of periods during which builds occur
     fscanf(infile, "%s", fac_name);
     fscanf(infile, "%d", &n_periods);
-    map<int,int> schedule;
-
-    // ??
-    //      next_build[fac_name][i] = new int [n_periods];
+    queue <pair <int, int> > schedule;
 
     // For each building period, populate the facility's schedule
     for (j=0;j<n_periods-1;j++){
+      pair <int, int> time_step_to_build;
       int time, number;
       fscanf(infile, "%d %d", &time, &number);
-      schedule[time]=number;
-      next_build[fac_name][j]=time;
+      time_step_to_build.first = time;
+      time_step_to_build.second = number;
+      schedule.push(time_step_to_build);
     };
-    // Initialize the next_build_index
-    next_build_index[fac_name]=0;
-    build_schedule[fac_name]=schedule;
+    
+    // Populate the to_build_map for the given facility
+    to_build_map[fac_name]=schedule;
   };
-  // So, each time step, we check (for each fac) ,
-  // if (time == next_build[next_build_index[fac]]), then
-  //    build build_schedule[fac][time] # of facilities
-  //    next_build_schedule[fac]++
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -49,9 +44,9 @@ void BuildRegion::init(xmlNodePtr cur)
   RegionModel::init(cur);
 
   // Get input file
-  xmlNodeSetPtr region_node = XMLinput->get_xpath_elements(cur,"model/BuildRegion");
-  
-  string input_path = XMLinput->get_xpath_content(region_node,"input_file");
+  xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
+
+  const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
 
   FILE *input_file = fopen(input_path,"r");
 
@@ -76,51 +71,62 @@ int BuildRegion::nFacs()
   return _nFacs;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Model* BuildRegion::chooseInstToBuildFac()
+{
+  // Define the inst to build some fac
+  // By default we pick the first institution in the region's list
+  return institutions[0];
+};
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildRegion::handleTick(int time){
-  // Override RegionModel's handleTick
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
-      inst++){
+void BuildRegion::handleTick(int time)
+{
+  // Overwriting RegionModel's handleTick
+  // We loop through each facility that exists in the to_build_map
+  map <char*, queue <pair <int,int> > >::iterator fac;
+  for (fac = to_build_map.begin(); fac != to_build_map.end(); ++fac){
+    // Define a few parameters
+    bool built = false; /* !!!! This method is not full proof... what if multiple facilities need
+			 to be built and some fail and some succeed...? !!!! */
+    char* fac_name = fac->first;
+    queue<pair <int,int> > fac_build_queue = fac->second;
+    pair<int,int> next_fac_build = fac_build_queue.front();
+    int next_build_time = next_fac_build.first;
 
-    map<char*,bool> built;
-    char* keys[nFacs()];
-
-    // This region is "greedy" and simiply rifles through each institution
-    // to choose a builder
-    for (map<char*,int*>::iterator fac=next_build.begin();
-	 fac != next_build.end();
-	 fac++){
-      
-      // Initialize that the facility is not built
-      built[fac.key()]=false;
-
-      if (time == next_build[fac.key()][next_build_index[fac.key()]]){
-	// Request that this institution build this facility
-	Model* fac_to_build=LI->getFacilityByName(fac.key());
-	built[fac.key()]=requestBuild(fac_to_build1,(InstModel*)(*inst));
+    // Continue to loop until the facility is built
+    while (built!=true){
+      // If the current time = the next build time for a facility, build said facility
+      if (time == next_build_time) {
+	Model* inst;
+	Model* fac_to_build = LI->getFacilityByName(fac_name);
+	int num_facs_to_build = next_fac_build.second;
+	int i;
+	// Build the prescribed number of facilities for this time step
+	for (i=0;i!=num_facs_to_build;i++){
+	  inst = chooseInstToBuildFac();
+	  built = requestBuild(fac_to_build,(InstModel*)(inst));
+	}
       }
+      // If there is nothing to build at this time, consider 0 facilities built
       else {
-	// Nothing should be built this turn for this facility
-	built[fac.key()]=true;
+	built=true;
       }
-    }
-    
-    // Check to make sure that every facility that should have been built was.
-    // If not, throw an exception.
-    int i;
-    for (i=0;i<nFacs();i++){
-      bool test = built[keys[i]];
-      if (!test){
+      
+      // For now, catch any situation for which no facility is built.
+      // ************* This should eventually be changed
+      if (built!=true){
 	std::stringstream ss1, ss2;
-	ss1 << keys[i];
+	ss1 << fac_name;
 	ss2 << time;
 	throw GenException("Facility " + ss1.str()
 			   + " could not be built at time " + ss2.str() + ".");	
       }
-    }
-
-    // Pass the handleTick onto each institution
-    ((InstModel*)(*inst))->handleTick(time);
-  }
+      
+    } // end build loop
+    
+  } // end facility loop
+  
+  // After we finish building, call the normal handleTick for a region
+  RegionModel::handleTick(time);
 }

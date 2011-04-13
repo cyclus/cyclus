@@ -115,7 +115,7 @@ public:
   int getNumFacilities(){ return facilities.size();};
 
   /// attempts to build another facility of type fac
-  virtual void pleaseBuild(Model* fac);
+  virtual bool pleaseBuild(Model* fac);
 
 protected:
   /**

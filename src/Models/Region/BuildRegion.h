@@ -15,6 +15,8 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+#include <queue>
+#include <utility>
 
 class BuildRegion : public RegionModel  
 {
@@ -47,7 +49,7 @@ class BuildRegion : public RegionModel
    
     // different ways to populate an object after creation
     /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur)  { RegionModel::init(cur); };
+    virtual void init(xmlNodePtr cur);
 
     /// initialize an object by copying another
     virtual void copy(BuildRegion* src) { RegionModel::copy(src); } ;
@@ -98,9 +100,9 @@ class BuildRegion : public RegionModel
 
  protected:
     int _nFacs;
-    map<char*,int> next_build_index;
-    map<char*, map<int,int> > next_build;
-    map<char*, map<int,int> > build_schedule;
+    Model* chooseInstToBuildFac();
+    map <char*, queue <pair <int,int> > > to_build_map;
+    map <char*, queue <pair <int,int> > > have_built_map;
   
 /* ------------------- */ 
 

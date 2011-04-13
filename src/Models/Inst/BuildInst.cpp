@@ -56,8 +56,7 @@ bool BuildInst::pleaseBuild(Model* fac)
   // Add the facility to the parent inst's list of facilities
   this->addFacility(new_facility);
 
-  // By default, return true;
-  bool facility_built=true;
-  return facility_build;
+  // For now, by default, return true.
+  return true;
 };
 

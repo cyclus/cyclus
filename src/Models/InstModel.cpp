@@ -105,10 +105,11 @@ void InstModel::handleTock(int time){
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::pleaseBuild(Model* fac){
+bool InstModel::pleaseBuild(Model* fac){
   // by defualt
   std::stringstream ss;
   ss << this->ID;
   throw GenException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
+  return false;
 }
