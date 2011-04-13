@@ -19,6 +19,17 @@
 class BuildRegion : public RegionModel  
 {
 /* --------------------
+ * The BuildRegion has the following initial functions
+ * --------------------
+ */
+
+  private:
+    /**
+     * Populate the build schedule
+     */
+  void populateSchedule(FILE *infile);
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */
@@ -82,12 +93,15 @@ class BuildRegion : public RegionModel
  */
 
  public:
-    
-    /**
-     * The build function.
-     */
-    void requestBuild(Model* fac, InstModel* inst);
-    
+    bool requestBuild(Model* fac, InstModel* inst);
+    int nFacs();
+
+ protected:
+    int _nFacs;
+    map<char*,int> next_build_index;
+    map<char*, map<int,int> > next_build;
+    map<char*, map<int,int> > build_schedule;
+  
 /* ------------------- */ 
 
 };

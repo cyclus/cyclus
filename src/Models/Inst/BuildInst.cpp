@@ -44,7 +44,7 @@ void BuildInst::print()
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildInst::pleaseBuild(Model* fac)
+bool BuildInst::pleaseBuild(Model* fac)
 {
   Model* new_facility=Model::create(fac);
   // !!! We need a way to determine the new facility's name
@@ -55,5 +55,9 @@ void BuildInst::pleaseBuild(Model* fac)
   ((FacilityModel*)new_facility)->setInstName(this->getName());
   // Add the facility to the parent inst's list of facilities
   this->addFacility(new_facility);
+
+  // By default, return true;
+  bool facility_built=true;
+  return facility_build;
 };
 

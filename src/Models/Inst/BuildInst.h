@@ -94,7 +94,7 @@ protected:
   /**
    * The build function.
    */
-  void pleaseBuild(Model* fac);
+  bool pleaseBuild(Model* fac);
 
 /* ------------------- */ 
 

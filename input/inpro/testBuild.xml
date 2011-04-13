@@ -48,7 +48,9 @@
 		<allowedfacility>FrontEnd</allowedfacility>
 		<allowedfacility>BackEnd</allowedfacility>
 		<model>
-			<BuildRegion/>
+			<BuildRegion>
+				<input_file>/home/gidden/work/cyclus/trunk/input/inpro/build.in</input_file>
+			</BuildRegion>
 		</model>
 		<institution>
 			<name>oneInst</name>

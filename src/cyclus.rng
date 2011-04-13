@@ -402,7 +402,9 @@
 
   <define name="BuildRegion">
      <element name="BuildRegion">
-        <text/>
+        <element name="input_file">
+           <text/>
+	</element>	
      </element>
   </define>
 
