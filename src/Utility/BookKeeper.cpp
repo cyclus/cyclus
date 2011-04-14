@@ -6,6 +6,7 @@
 #include "hdf5.h"
 #include "H5Cpp.h"
 #include "H5Exception.h"
+#include "GenException.h"
 
 BookKeeper* BookKeeper::_instance = 0;
 
@@ -22,8 +23,17 @@ BookKeeper* BookKeeper::Instance()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() 
 {
-  // we'd like to call the output database cyclus.h5
-  dbName = "cyclus.h5";
+  dbIsOpen = false;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::createDB(){
+  createDB("cyclus.h5");
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::createDB(string name){
+  dbName = name;
   const int ncols = 2; 
   const int nrows = LI->getNumFacilities() ;
 
@@ -43,24 +53,12 @@ BookKeeper::BookKeeper()
   try{
     // create database. If it already exits, H5F_ACC_TRUNC erases all 
     // data previously stored in the file.
-    myDB = new H5File( dbName , H5F_ACC_TRUNC );
+    myDB = new H5File( name , H5F_ACC_TRUNC );
+    dbIsOpen = false; // use the H5 function for this.. !!! KDHFLAG
 
     // create groups for the input and output data, respectively
     Group* outGroup = new Group( myDB->createGroup("/output"));
     Group* inGroup = new Group( myDB->createGroup("/input"));
-
-    // create a basic dataset to hold model information
-    dbIsOpen = false;
-
-    DataSpace dataspace = DataSpace(rank , dims );
-
-    // create a variable length string types
-    StrType vls_type(0, H5T_VARIABLE); 
-    DataType datatype = DataType(vls_type);
-
-    DataSet dataset = myDB->createDataSet("/output/test", datatype, dataspace) ; 
-
-    dataset.write(data, datatype);
 
     delete outGroup;
     delete inGroup;
@@ -75,15 +73,27 @@ BookKeeper::BookKeeper()
   }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Group* BookKeeper::newGroup(string title){
-  // nothing doing...  yet
-};
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSpace* newGroup(string title){
-  // nothing doing...  yet
+void BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsName){
+  try{
+    // create a basic dataset to hold model information
+
+    DataSpace dataspace = DataSpace(rank , dims );
+
+    // create a variable length string types
+    // StrType vls_type(0, H5T_VARIABLE); 
+    // DataType datatype = DataType(vls_type);
+
+    DataSet dataset = myDB->createDataSet(dsName, type, dataspace) ; 
+
+    // dataset.write(data, datatype);
+
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,19 +127,6 @@ DataSpace* BookKeeper::homoDataSpace(Group* grp, string name, map< int, pair< st
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSet* BookKeeper::fillDataSet(DataSpace* ds, vector<int> data)
-{
- // DataSet* toRet;
- // toRet = new DataSet(DataSet(PredType::NATIVE_INT));
- // toRet->write(data);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::createDB(string name)
-{
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 H5File* BookKeeper::getDB()
 {
 	return myDB;
@@ -138,45 +135,62 @@ H5File* BookKeeper::getDB()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB()
 {
+  if(dbIsOpen!=true){
 	// If the database is already open, throw an exception; the caller probably 
 	// doesn't realize this.
-  try{
-    H5File* memDB = new H5File( dbName , H5F_ACC_RDWR );  
-  }
-  catch( FileIException error )
-  {
-    error.printError();
+    try{ 
+      H5File* memDB = new H5File( dbName , H5F_ACC_RDWR );  
+    }
+    catch( FileIException error )
+    {
+      error.printError();
+    }
   }
 	
-	// Create datasets to store the information we want? 
-	
-	// Store the handle to it.
 	dbIsOpen = true;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB()
 {
-	// Try to close it.
-  try{
-    myDB->close();
-    dbIsOpen = false;
+  if(dbIsOpen==true){
+    // Try to close it.
+    try{
+      this->getDB()->close();
+      dbIsOpen = false;
+    }
+    // catch failure caused by the H5File operations
+    catch( FileIException error )
+    {
+      error.printError();
+    }
   }
-  // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
+  else
+    throw GenException("Tried to close a database that was not open."); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BookKeeper::isGroup(string grp)
 {
-  // nothing doing, just yet.
+  bool toRet;
+  toRet = false;
+  hsize_t nObs = this->getDB()->getNumObjs();
+  string testname;
+  for( hsize_t i; i< nObs ; i++ ){ 
+    testname = BI->getDB()->getObjnameByIdx(i);
+    if( testname == grp )
+      toRet = true ;
+  }
+  return toRet;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(intData1d data, string dsname){ 
+  hsize_t rank=1;
+  hsize_t dims[1];
+  dims[0]= data.size();
+  DataType type = DataType(PredType::NATIVE_INT);
+  BI->createDataSet(rank, dims, type, dsname);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

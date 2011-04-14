@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
     //  * get market model name
     //  * search cache for market methods
     //     * if not found load market
-    XMLinput->load_file(argv[1]);
+    XMLinput->load_file(argv[1]); // should probably check that the file exists.
 
     // get commodities
     
@@ -54,9 +54,12 @@ int main(int argc, char* argv[])
     // Run the simulation 
     TI->runSim();
 
-    // Create the output file and immediately close it
+    // Create the output file
+    BI->createDB("cyclus.h5");
+    // open it
+    BI->openDB();
+    // close it
     BI->closeDB();
-    
 
 
     return 0;

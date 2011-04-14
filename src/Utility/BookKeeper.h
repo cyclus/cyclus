@@ -91,12 +91,6 @@ protected:
    *
    * @return a pointer to an H5/CPP DataSet object in memory
 	 */
-  DataSet* fillDataSet(DataSpace* ds, vector<int> data);
-
-  /** The default fill value is 0.
-   * Sometimes, you'll convert it to a double.
-   */
-  const static int fillvalue=0;
 
 public:
 		
@@ -110,11 +104,26 @@ public:
   static BookKeeper* Instance();
 		
   /**
+   * Creates a database file with the default name, cyclus.h5. 
+	 */
+  void createDB();
+
+  /**
    * Creates a database file with the name indicated. 
 	 *
    * @param name is the name of the hdf5 database file. Should end in .h5
 	 */
   void createDB(string name);
+
+  /**
+   * Creates a dataset with the name,type, and dimesions indicated 
+	 *
+   * @param rank is the rank of the dataset
+   * @param dims are the dimensions of the dataset 
+   * @param type is type of data to be placed in the dataspace
+   * @param name is the name of the dataset 
+	 */
+  void createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsname);
 
   /**
    * Returns a handle to the database this BookKeeper is maintaining.

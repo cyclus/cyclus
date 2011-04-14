@@ -34,18 +34,15 @@ class BookKeeperTest : public ::testing::Test {
     // this sets up the fixtures
     virtual void SetUp(){
       n=2;
-      nrows=100;
-      ncols=50;
-      nlayers=10;
+      nrows=10;
+      ncols=5;
+      nlayers=2;
       hsrows=10;
       hscols=5;
       hslayers=1;
       test_dims[0]=ncols;
       test_dims[1]=nrows;
       test_dims[2]=nlayers;
-      int test_data_int[nrows][ncols];
-      double test_data_dbl[nrows][ncols];
-      string test_data_str[nrows][ncols];
       test_filename = "testDB.h5";
       test_dsp_name = "testDSpace"; 
       test_group_name = "testGroup";
@@ -54,18 +51,32 @@ class BookKeeperTest : public ::testing::Test {
       char nbuff[16];
       sprintf( nbuff, "%i", 3*n) ;
       nstr = nbuff;
+
+      test_data_int1.resize(nrows);
+      test_data_dbl1.resize(nrows);
+      test_data_str1.resize(nrows);
+      
+      test_data_int2.resize(ncols);
+      test_data_dbl2.resize(ncols);
+      test_data_str2.resize(ncols);
+      
+      test_data_int3.resize(nlayers);
+      test_data_dbl3.resize(nlayers);
+      test_data_str3.resize(nlayers);
+
       for (int row=0; row<nrows; row++){
-        test_data_int1[row] = row;
+        test_data_int1.push_back(row);
+        test_data_dbl1[row] = row*0.1 ;
+        sprintf( buffer, "%i",row );
+        test_data_str1[row] = buffer;
         for (int col=0; col<ncols; col++){ 
-          test_data_int2[row][col] = row+col ;
-          test_data_dbl2[row][col] = row + col*0.1 ;
-          sprintf( buffer, "%i", row+col) ;
-          test_data_str2[row][col] = buffer; 
+          test_data_int2.push_back(test_data_int1) ;
+          test_data_dbl2.push_back(test_data_dbl1) ;
+          test_data_str2.push_back(test_data_str1) ; 
           for (int layer=0; layer<nlayers; layer++){ 
-            test_data_int3[row][col][layer] = row+col+layer ;
-            test_data_dbl3[row][col][layer] = row + col*0.1 + layer*0.01 ;
-            sprintf( buffer, "%i", row+col+layer) ;
-            test_data_str3[row][col][layer] = buffer; 
+            test_data_int3.push_back( test_data_int2 ) ;
+            test_data_dbl3.push_back( test_data_dbl2 ) ;
+            test_data_str3.push_back( test_data_str2 ); 
           };
         };
       };
@@ -78,10 +89,10 @@ TEST_F(BookKeeperTest, createDataBase) {
   EXPECT_EQ(       BI->getDBName(),               test_filename );
 }
 
-TEST_F(BookKeeperTest, isGroup) {
-  EXPECT_EQ(       BI->isGroup(test_group_name),           true );
-  EXPECT_EQ(       BI->isGroup(test_nonsense),            false );
-}
+//TEST_F(BookKeeperTest, isGroup) {
+  //EXPECT_EQ(       BI->isGroup(test_group_name),           true );
+ // EXPECT_EQ(       BI->isGroup(test_nonsense),            false );
+//}
 
 TEST_F(BookKeeperTest, closeDB) {
   BI->openDB();
