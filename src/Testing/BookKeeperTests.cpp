@@ -81,12 +81,13 @@ class BookKeeperTest : public ::testing::Test {
         };
       };
       BI->createDB(test_filename);
-      BI->writeData(test_data_dbl1, test_dsp_name);
+      //BI->writeData(test_data_dbl1, test_dsp_name);
     };
 };
 
 TEST_F(BookKeeperTest, createDataBase) {
   EXPECT_EQ(       BI->getDBName(),               test_filename );
+  BI->closeDB();
 }
 
 //TEST_F(BookKeeperTest, isGroup) {
@@ -94,9 +95,13 @@ TEST_F(BookKeeperTest, createDataBase) {
  // EXPECT_EQ(       BI->isGroup(test_nonsense),            false );
 //}
 
-TEST_F(BookKeeperTest, closeDB) {
-  BI->openDB();
+TEST_F(BookKeeperTest, openDB) {
+  cout << "Test " << endl;
   EXPECT_EQ(       BI->isOpen(),                           true );
+  BI->closeDB();
+}
+
+TEST_F(BookKeeperTest, closeDB){
   BI->closeDB();
   EXPECT_EQ(       BI->isOpen(),                          false );
 }

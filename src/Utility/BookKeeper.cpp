@@ -23,7 +23,6 @@ BookKeeper* BookKeeper::Instance()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() 
 {
-  dbIsOpen = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,7 +53,7 @@ void BookKeeper::createDB(string name){
     // create database. If it already exits, H5F_ACC_TRUNC erases all 
     // data previously stored in the file.
     myDB = new H5File( name , H5F_ACC_TRUNC );
-    dbIsOpen = false; // use the H5 function for this.. !!! KDHFLAG
+    dbIsOpen = true; // use the H5 function for this.. !!! KDHFLAG
 
     // create groups for the input and output data, respectively
     Group* outGroup = new Group( myDB->createGroup("/output"));
@@ -135,19 +134,19 @@ H5File* BookKeeper::getDB()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB()
 {
-  if(dbIsOpen!=true){
+  //if(dbIsOpen==false){
 	// If the database is already open, throw an exception; the caller probably 
 	// doesn't realize this.
-    try{ 
-      H5File* memDB = new H5File( dbName , H5F_ACC_RDWR );  
-    }
-    catch( FileIException error )
-    {
-      error.printError();
-    }
-  }
+  //  try{ 
+  //    this->getDB()->reOpen();  
+  //  }
+  //  catch( FileIException error )
+  //  {
+  //    error.printError();
+  //  }
+ // }
 	
-	dbIsOpen = true;
+	//dbIsOpen = true;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
