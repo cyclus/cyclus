@@ -101,8 +101,8 @@ class BuildRegion : public RegionModel
  protected:
     int _nFacs;
     Model* chooseInstToBuildFac();
-    map <char*, queue <pair <int,int> > > to_build_map;
-    map <char*, queue <pair <int,int> > > have_built_map;
+    map <string, queue <pair <int,int> > > to_build_map;
+    map <string, queue <pair <int,int> > > have_built_map;
   
 /* ------------------- */ 
 

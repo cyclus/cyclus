@@ -4,26 +4,27 @@
 #include "BuildRegion.h"
 
 #include <sstream>
+#include <iostream>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BuildRegion::populateSchedule(FILE *infile)
 {
-  int n_facs, n_periods;
+  int n_facs, n_periods=0;
   int i, j;
-  char *fac_name;
+  char fac_name[20];
 
   // Read the total number of types of facilities which will be build
   fscanf(infile, "%d", &n_facs);
 
   // For each type of facility, populate the build schedul
-  for (i=0;i<n_facs-1;i++){
+  for (i=0;i<n_facs;i++){
     // Read in the facility name and number of periods during which builds occur
     fscanf(infile, "%s", fac_name);
     fscanf(infile, "%d", &n_periods);
     queue <pair <int, int> > schedule;
 
     // For each building period, populate the facility's schedule
-    for (j=0;j<n_periods-1;j++){
+    for (j=0;j<n_periods;j++){
       pair <int, int> time_step_to_build;
       int time, number;
       fscanf(infile, "%d %d", &time, &number);
@@ -33,7 +34,8 @@ void BuildRegion::populateSchedule(FILE *infile)
     };
     
     // Populate the to_build_map for the given facility
-    to_build_map[fac_name]=schedule;
+    string fac_str (fac_name);
+    to_build_map[fac_str]=schedule;
   };
 }
 
@@ -52,6 +54,8 @@ void BuildRegion::init(xmlNodePtr cur)
 
   // Populate build schedule
   populateSchedule(input_file);
+  // Close the files that you open
+  fclose(input_file);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -84,19 +88,22 @@ void BuildRegion::handleTick(int time)
 {
   // Overwriting RegionModel's handleTick
   // We loop through each facility that exists in the to_build_map
-  map <char*, queue <pair <int,int> > >::iterator fac;
+  map <string, queue <pair <int,int> > >::iterator fac;
+
   for (fac = to_build_map.begin(); fac != to_build_map.end(); ++fac){
     // Define a few parameters
-    bool built = false; /* !!!! This method is not full proof... what if multiple facilities need
+    /* !!!! This method is not full proof... what if multiple facilities need
 			 to be built and some fail and some succeed...? !!!! */
-    char* fac_name = fac->first;
+    bool built = false; 
+    string fac_name = fac->first;
     queue<pair <int,int> > fac_build_queue = fac->second;
     pair<int,int> next_fac_build = fac_build_queue.front();
     int next_build_time = next_fac_build.first;
 
     // Continue to loop until the facility is built
     while (built!=true){
-      // If the current time = the next build time for a facility, build said facility
+      // If the current time = the next build time for a facility, 
+      // build said facility
       if (time == next_build_time) {
 	Model* inst;
 	Model* fac_to_build = LI->getFacilityByName(fac_name);
