@@ -26,11 +26,6 @@ class BookKeeperTest : public ::testing::Test {
     dblData3d test_data_dbl3, test_out_dbl3;
     strData3d test_data_str3, test_out_str3;
 
-    // dataspaces will be used for hyperspace description
-    DataSpace test_hs_int1, test_hs_dbl1, test_hs_str1,
-      test_hs_int2, test_hs_dbl2, test_hs_str2,
-      test_hs_int3, test_hs_dbl3, test_hs_str3;
-
     // this sets up the fixtures
     virtual void SetUp(){
       n=2;
@@ -81,7 +76,6 @@ class BookKeeperTest : public ::testing::Test {
         };
       };
       BI->createDB(test_filename);
-      //BI->writeData(test_data_dbl1, test_dsp_name);
     };
 };
 
@@ -96,7 +90,6 @@ TEST_F(BookKeeperTest, createDataBase) {
 //}
 
 TEST_F(BookKeeperTest, openDB) {
-  cout << "Test " << endl;
   EXPECT_EQ(       BI->isOpen(),                           true );
   BI->closeDB();
 }
@@ -106,38 +99,54 @@ TEST_F(BookKeeperTest, closeDB){
   EXPECT_EQ(       BI->isOpen(),                          false );
 }
 
-TEST_F(BookKeeperTest, ReadWriteIntegers) {
-  BI->readData(test_hs_int1, test_out_int1);
+// Integers
+TEST_F(BookKeeperTest, ReadWrite1DIntegers) {
+  BI->writeData( test_data_int1, "/output/test_int1" );
+  BI->readData( "/output/test_int1", test_out_int1);
   EXPECT_EQ(       test_out_int1[n],           test_data_int1[n] );
-  ASSERT_EQ(       test_out_int1[n],                           n ); 
-  BI->readData(test_hs_int2, test_out_int2);
+  ASSERT_EQ(       n,                           test_out_int1[n] ); 
+}
+TEST_F(BookKeeperTest, ReadWrite2DIntegers) {
+  BI->readData("test_int2", test_out_int2);
   EXPECT_EQ(       test_out_int2[n][n],     test_data_int2[n][n] );
   ASSERT_EQ(       test_out_int2[n][n],                        n ); 
-  BI->readData(test_hs_int3, test_out_int3);
+}
+TEST_F(BookKeeperTest, ReadWrite3DIntegers) {
+  BI->readData("test_int3", test_out_int3);
   EXPECT_EQ(      test_out_int3[n][n][n], test_data_int3[n][n][n]);
   ASSERT_EQ(      test_out_int3[n][n][n],                      n ); 
 }
 
-TEST_F(BookKeeperTest, ReadWriteDoubles) {
-  BI->readData(test_hs_dbl1, test_out_dbl1);
+// Doubles
+TEST_F(BookKeeperTest, ReadWrite1DDoubles) {
+  BI->readData("test_dbl1", test_out_dbl1);
   EXPECT_EQ(       test_out_dbl1[n],           test_data_dbl1[n] );
   ASSERT_NEAR(     test_out_dbl1[n],       n + 0.1*n,      0.001 );  
-  BI->readData(test_hs_dbl2, test_out_dbl2);
+}
+TEST_F(BookKeeperTest, ReadWrite2DDoubles) {
+  BI->readData("test_dbl2", test_out_dbl2);
   EXPECT_EQ(       test_out_dbl2[n][n],     test_data_dbl2[n][n] );
   ASSERT_NEAR(     test_out_dbl2[n][n],    n + 0.1*n,      0.001 );  
-  BI->readData(test_hs_dbl3, test_out_dbl3);
+}
+TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
+  BI->readData("test_dbl3", test_out_dbl3);
   EXPECT_EQ(      test_out_dbl3[n][n][n], test_data_dbl3[n][n][n]);
   ASSERT_NEAR(    test_out_dbl3[n][n][n],  n + 0.1*n,      0.001 );  
 }
 
-TEST_F(BookKeeperTest, ReadWriteStrings) {
-  BI->readData(test_hs_str1, test_out_str1);
+// Strings
+TEST_F(BookKeeperTest, ReadWrite1DStrings) {
+  BI->readData("test_str1", test_out_str1);
   EXPECT_EQ(       test_out_str1[n],           test_data_str1[n] );
   ASSERT_EQ(       test_out_str1[n],                        nstr );  
-  BI->readData(test_hs_str2, test_out_str2);
+}
+TEST_F(BookKeeperTest, ReadWrite2DStrings) {
+  BI->readData("test_str2", test_out_str2);
   EXPECT_EQ(       test_out_str2[n][n],     test_data_str2[n][n] );
   ASSERT_EQ(       test_out_str2[n][n],                     nstr );  
-  BI->readData(test_hs_str3, test_out_str3);
+}
+TEST_F(BookKeeperTest, ReadWrite3DStrings) {
+  BI->readData("test_str3", test_out_str3);
   EXPECT_EQ(      test_out_str3[n][n][n], test_data_str3[n][n][n]);
   ASSERT_EQ(      test_out_str3[n][n][n],                   nstr );  
 }

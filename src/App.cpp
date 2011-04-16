@@ -56,12 +56,7 @@ int main(int argc, char* argv[])
 
     // Create the output file
     BI->createDB("cyclus.h5");
-    cout<<BI->isOpen()<<endl;
-    // open it
-    BI->openDB();
-    // close it
     BI->closeDB();
-
 
     return 0;
 }

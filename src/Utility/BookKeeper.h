@@ -123,7 +123,7 @@ public:
    * @param type is type of data to be placed in the dataspace
    * @param name is the name of the dataset 
 	 */
-  void createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsname);
+  DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, string name);
 
   /**
    * Returns a handle to the database this BookKeeper is maintaining.
@@ -243,73 +243,73 @@ public:
   /**
    * Reads 1d integer data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the hyperspace to read out
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, intData1d& out_data);
+  void readData(string name, intData1d& out_data);
 
   /**
    * Reads 2d integer data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, intData2d& out_data);
+  void readData(string name, intData2d& out_data);
 
   /**
    * Reads 3d integer data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(DataSpace hs, intData3d& out_data);
+   void readData(string name, intData3d& out_data);
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the hyperspace to read out
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, dblData1d& out_data);
+  void readData(string name, dblData1d& out_data);
 
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, dblData2d& out_data);
+  void readData(string name, dblData2d& out_data);
 
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(DataSpace hs, dblData3d& out_data);
+   void readData(string name, dblData3d& out_data);
 
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, strData1d& out_data);
+  void readData(string name, strData1d& out_data);
 
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(DataSpace hs, strData2d& out_data);
+  void readData(string name, strData2d& out_data);
 
   /**
    * Reads data from the dataset indicated.
    *
-   * @param hs is the hyperspace to read out
+   * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(DataSpace hs, strData3d& out_data);
+   void readData(string name, strData3d& out_data);
 
 
 };
