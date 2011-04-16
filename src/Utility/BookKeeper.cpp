@@ -62,10 +62,10 @@ void BookKeeper::createDB(string name){
 DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsName){
   DataSet dataset;
   try{
-    // create a basic dataset to hold model information
-
+    // create the dataspace from rank and dimension information
     DataSpace dataspace = DataSpace(rank , dims );
 
+    // create a dataset to match the dataspace
     dataset = this->getDB()->createDataSet(dsName, type, dataspace) ; 
 
   }
@@ -211,6 +211,7 @@ void BookKeeper::writeData(intData2d data, string dsname){
   hsize_t ncols = data[0].size(); 
 
   hsize_t dims[2];
+
   dims[0]=nrows;
   dims[1]=ncols;
   hsize_t rank = 2;

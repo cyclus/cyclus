@@ -60,7 +60,7 @@ class BookKeeperTest : public ::testing::Test {
       test_data_str3.resize(nlayers);
 
       for (int row=0; row<nrows; row++){
-        test_data_int1.push_back(row);
+        test_data_int1[row]=row;
         test_data_dbl1[row] = row*0.1 ;
         sprintf( buffer, "%i",row );
         test_data_str1[row] = buffer;
@@ -103,11 +103,13 @@ TEST_F(BookKeeperTest, closeDB){
 TEST_F(BookKeeperTest, ReadWrite1DIntegers) {
   BI->writeData( test_data_int1, "/output/test_int1" );
   BI->readData( "/output/test_int1", test_out_int1);
-  EXPECT_EQ(       test_out_int1[n],           test_data_int1[n] );
+  EXPECT_EQ(       test_out_int1[n],            test_data_int1[n] );
   ASSERT_EQ(       n,                           test_out_int1[n] ); 
+  BI->closeDB();
 }
 TEST_F(BookKeeperTest, ReadWrite2DIntegers) {
-  BI->readData("test_int2", test_out_int2);
+  BI->writeData( test_data_int2, "/output/test_int2" );
+  BI->readData("/output/test_int2", test_out_int2);
   EXPECT_EQ(       test_out_int2[n][n],     test_data_int2[n][n] );
   ASSERT_EQ(       test_out_int2[n][n],                        n ); 
 }
