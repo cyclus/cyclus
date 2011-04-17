@@ -1,6 +1,7 @@
 // Model.cpp
 // Implements the Model Class
 
+#include "suffix.h"
 #include "Model.h"
 
 #include "GenException.h"
@@ -23,7 +24,7 @@ mdl_ctor* Model::load(string model_type,string model_name)
 {
   mdl_ctor* new_model;
 
-  model_name = "Models/" + model_type + "/lib" + model_name + ".so";
+  model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
 
   if (create_map.find(model_name) == create_map.end()) {
     void* model = dlopen(model_name.c_str(),RTLD_LAZY);

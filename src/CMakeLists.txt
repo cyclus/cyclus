@@ -5,6 +5,19 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 
+# This makes all the libraries build as SHARED
+SET(BUILD_SHARED_LIBS true)
+
+# This allows apple to build the libraries dynamically
+IF(APPLE)
+  set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+  set(suffix ".dylib")
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+ELSE (APPLE)
+  set(suffix ".so")
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+ENDIF(APPLE)
+
 # Includes the directories in which there are source files. 
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
@@ -38,6 +51,7 @@ SET( CYCLUS_SRC
 
 set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
+
 
 
 # Copy Data
