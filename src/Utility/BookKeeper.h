@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "boost/multi_array.hpp"
 
 #include "H5Cpp.h"
 #include "hdf5.h"
@@ -13,15 +14,34 @@ using namespace std;
 using namespace H5;
 
 
-typedef vector< int > intData1d ; 
-typedef vector< double > dblData1d ; 
-typedef vector< string > strData1d ; 
-typedef vector< vector < int > > intData2d ; 
-typedef vector< vector < double > > dblData2d ; 
-typedef vector< vector < string > > strData2d ; 
-typedef vector< vector < vector < int > > > intData3d ; 
-typedef vector< vector < vector < double > > > dblData3d ; 
-typedef vector< vector < vector < string > > > strData3d ; 
+//typedef vector< int > intData1d ; 
+//typedef vector< double > dblData1d ; 
+//typedef vector< string > strData1d ; 
+//typedef vector< vector < int > > intData2d ; 
+//typedef vector< vector < double > > dblData2d ; 
+//typedef vector< vector < string > > strData2d ; 
+//typedef vector< vector < vector < int > > > intData3d ; 
+//typedef vector< vector < vector < double > > > dblData3d ; 
+//typedef vector< vector < vector < string > > > strData3d ; 
+typedef boost::multi_array<int, 1> intData1d;
+typedef intData1d::index int1didx;
+typedef boost::multi_array<int, 2> intData2d;
+typedef intData2d::index int2didx;
+typedef boost::multi_array<int, 3> intData3d;
+typedef intData3d::index int3didx;
+typedef boost::multi_array<double, 1> dblData1d;
+typedef dblData1d::index dbl1didx;
+typedef boost::multi_array<double, 2> dblData2d;
+typedef dblData2d::index dbl2didx;
+typedef boost::multi_array<double, 3> dblData3d;
+typedef dblData3d::index dbl3didx;
+typedef boost::multi_array<string, 1> strData1d;
+typedef strData1d::index str1didx;
+typedef boost::multi_array<string, 2> strData2d;
+typedef strData2d::index str2didx;
+typedef boost::multi_array<string, 3> strData3d;
+typedef strData3d::index str3didx;
+
 
 /**
  * A (singleton) class for handling I/O.
@@ -143,6 +163,14 @@ public:
    * Returns the name of the database
    */
   string getDBName(){return dbName;};
+
+  /**
+   * Prepares the file and memory dataspaces for data to be written
+   *
+   *
+   */
+  void prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
+      DataSpace &filespace, DataSet &dataset);
 
   /**
    * Puts a one dimensional vector of integer data in the indicated 

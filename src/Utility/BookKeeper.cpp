@@ -2,6 +2,7 @@
 // Implements the BookKeeper class
 #include "BookKeeper.h"
 #include "Timer.h"
+#include "boost/multi_array.hpp"
 
 #include "hdf5.h"
 #include "H5Cpp.h"
@@ -143,6 +144,24 @@ bool BookKeeper::isGroup(string grp)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
+    DataSpace &filespace, DataSet &dataset){
+    
+    // define the dataset to match the dataspace
+    dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
+
+    // define the file dataspace to match the dataset
+    filespace = dataset.getSpace();
+  
+    // select the whole dataset as the memory dataspace
+    memspace.selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(intData1d data, string dsname){ 
   try {
     hsize_t nrows = data.size(); 
@@ -150,36 +169,35 @@ void BookKeeper::writeData(intData1d data, string dsname){
     hsize_t dims[1];
     dims[0]=nrows;
     hsize_t rank = 1;
-  
-    DataType type = DataType(PredType::NATIVE_INT);
 
     // create a memory dataspace
-    DataSpace memspace = DataSpace( rank, dims );
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
-
+    DataSpace memspace = DataSpace( rank, dims);
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace.selectAll();
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_INT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
-  
     // the data needs to be an array - is this memcpy ugly?
     double dat_array[nrows];
     memcpy( dat_array, &data[0], sizeof( int ) * data.size() );
   
     // write it
     dataset.write(dat_array, type, memspace, filespace );
+
   }
   catch( FileIException error )
   {
     error.printError();
   }
   catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
   {
     error.printError();
   }
@@ -198,31 +216,25 @@ void BookKeeper::writeData(intData2d data, string dsname){
     hsize_t dims[] = {nrows, ncols};
     hsize_t rank = 2;
     
-    DataType type = DataType(PredType::NATIVE_INT);
-
     // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
+    DataSpace memspace = DataSpace( rank, dims );
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_INT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
     // the data needs to be an array - is this memcpy ugly?
-    double dat_array[nrows][ncols];
+    int dat_array[nrows][ncols];
     for(int row=0; row<nrows; row++){
       memcpy( dat_array[row], &data[row][0], sizeof( int ) * ncols );
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
   }
   catch( FileIException error )
   {
@@ -253,25 +265,19 @@ void BookKeeper::writeData(intData3d data, string dsname){
     hsize_t dims[] = {nrows, ncols,nlayers};
     hsize_t rank = 3;
     
-    DataType type = DataType(PredType::NATIVE_INT);
-
     // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
+    DataSpace memspace = DataSpace( rank, dims );
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_INT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
     // the data needs to be an array - is this memcpy ugly?
-    double dat_array[nrows][ncols][nlayers];
+    int dat_array[nrows][ncols][nlayers];
     for(int row=0; row<nrows; row++){
       for(int col=0; col<ncols; col++){
         memcpy( dat_array[row][col], &data[row][col][0], sizeof( int ) * nlayers);
@@ -279,7 +285,7 @@ void BookKeeper::writeData(intData3d data, string dsname){
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
   }
   catch( FileIException error )
   {
@@ -307,23 +313,17 @@ void BookKeeper::writeData(dblData1d data, string dsname){
     hsize_t dims[1];
     dims[0]=nrows;
     hsize_t rank = 1;
-  
-    DataType type = DataType(PredType::NATIVE_FLOAT);
 
     // create a memory dataspace
     DataSpace memspace = DataSpace( rank, dims );
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
-
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace.selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_FLOAT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
   
     // the data needs to be an array - is this memcpy ugly?
     double dat_array[nrows];
@@ -354,24 +354,18 @@ void BookKeeper::writeData(dblData2d data, string dsname){
     
     hsize_t dims[] = {nrows, ncols};
     hsize_t rank = 2;
-    
-    DataType type = DataType(PredType::NATIVE_FLOAT);
 
     // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
+    DataSpace memspace = DataSpace( rank, dims );
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
-    
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_FLOAT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
+
     // the data needs to be an array - is this memcpy ugly?
     double dat_array[nrows][ncols];
     for(int row=0; row<nrows; row++){
@@ -379,7 +373,7 @@ void BookKeeper::writeData(dblData2d data, string dsname){
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
   }
   catch( FileIException error )
   {
@@ -408,23 +402,17 @@ void BookKeeper::writeData(dblData3d data, string dsname){
     
     hsize_t dims[] = {nrows, ncols,nlayers};
     hsize_t rank = 3;
-    
-    DataType type = DataType(PredType::NATIVE_FLOAT);
 
     // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
+    DataSpace memspace = DataSpace( rank, dims );
     // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
+    // name the type
+    DataType type = DataType(PredType::NATIVE_FLOAT);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
     // the data needs to be an array - is this memcpy ugly?
     double dat_array[nrows][ncols][nlayers];
@@ -435,7 +423,7 @@ void BookKeeper::writeData(dblData3d data, string dsname){
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
   }
   catch( FileIException error )
   {
@@ -464,28 +452,24 @@ void BookKeeper::writeData(strData1d data, string dsname){
     dims[0]=nrows;
     hsize_t rank = 1;
   
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+    // create a file dataspace 
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
     //create a variable length string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
 
-    // create a memory dataspace
-    DataSpace memspace = DataSpace( rank, dims );
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
-
-    // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace.selectAll();
-    
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
-  
-    // the data needs to be an array - is this memcpy ugly?
-    double dat_array[nrows];
-    memcpy( dat_array, &data[0], sizeof( string ) * data.size() );
+    // the data needs to be an array
+    string dat_array[nrows];
+    dat_array;
+    for(int row=0; row < nrows;row++){
+      dat_array[row]=data[row];
+    };
   
     // write it
     dataset.write(dat_array, type, memspace, filespace );
@@ -512,34 +496,30 @@ void BookKeeper::writeData(strData2d data, string dsname){
     
     hsize_t dims[] = {nrows, ncols};
     hsize_t rank = 2;
-  
+
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+    // create a file dataspace 
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
     //create a variable length string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
-
-    // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
-    // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
-    
-    // the data needs to be an array - is this memcpy ugly?
-    double dat_array[nrows][ncols];
+    // the data needs to be an array
+    string dat_array[nrows][ncols];
     for(int row=0; row<nrows; row++){
-      memcpy( dat_array[row], &data[row][0], sizeof( string ) * ncols );
+      for(int col=0; col<ncols; col++){
+        dat_array[row][col]=data[row][col];
+      };
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
+
   }
   catch( FileIException error )
   {
@@ -568,36 +548,31 @@ void BookKeeper::writeData(strData3d data, string dsname){
     
     hsize_t dims[] = {nrows, ncols,nlayers};
     hsize_t rank = 3;
-    
+
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+    // create a file dataspace 
+    DataSpace filespace;
+    // create a dataset
+    DataSet dataset;
     //create a variable length string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
-
-    // create a memory dataspace
-    DataSpace* memspace = new DataSpace(rank, dims);
-
-    // create a dataset to match the dataspace
-    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
-
-    // create a file dataspace 
-    DataSpace filespace = dataset.getSpace();
-  
-    // select the whole dataset as the memory dataspace
-    memspace->selectAll();
+    // prepare the spaces
+    this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
-    // select the whole dataset as the memory dataspace
-    filespace.selectAll();
-    
-    // the data needs to be an array - is this memcpy ugly?
-    double dat_array[nrows][ncols][nlayers];
+    // the data needs to be an array 
+    string dat_array[nrows][ncols][nlayers];
     for(int row=0; row<nrows; row++){
       for(int col=0; col<ncols; col++){
-        memcpy( dat_array[row][col], &data[row][col][0], sizeof( string ) * nlayers);
+        for(int layer=0; layer<nlayers;layer++){
+          dat_array[row][col][layer]=data[row][col][layer];
+        };
       };
     };
 
     // write it
-    dataset.write(dat_array, type, *memspace, filespace );
+    dataset.write(dat_array, type, memspace, filespace );
   }
   catch( FileIException error )
   {
@@ -736,10 +711,14 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
     };
   
     dataset.read( out_array, inttype, memspace , filespace );
-    
-    for (size_t row=0; row < dims[0]; ++row){
-      out_data.push_back(vector<int>(&out_array[row][0],&out_array[row][dims[1]])); 
+
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        out_data[row][col] = out_array[row][col];
+      };
     };
+
+    
   } 
   catch( FileIException error )
   {
@@ -814,26 +793,14 @@ void BookKeeper::readData(string dsname, intData3d& out_data){
     };
   
     dataset.read( out_array, inttype, memspace , filespace );
-    
-    intData1d vec1d;
-    vec1d.resize(dims[2]);
-    intData2d vec2d;
-    vec2d.resize(dims[1]);
-    out_data.resize(dims[0]);
 
-    for (size_t row=0; row < dims[0]; row++){
-      for (size_t col=0; col < dims[1]; col++){
-        for (size_t layer=0; layer < dims[2]; layer++){
-          vec1d[layer] = out_array[row][col][layer];
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        for(int layer=0; layer<dims[2];layer++){
+          out_data[row][col][layer] = out_array[row][col][layer];
         };
-      vec2d[col] = vec1d;
       };
     };
-
-    for (size_t row=0; row < dims[0]; row++){
-      out_data[row] = vec2d;
-    };
-
   } 
   catch( FileIException error )
   {
@@ -903,6 +870,10 @@ void BookKeeper::readData(string dsname, dblData1d& out_data){
     };
   
     dataset.read( out_array, dbltype, memspace , filespace );
+
+    for(int row=0; row<dims[0]; row++){
+      out_data[row]= out_array[row];
+    };
     
     out_data.assign(out_array, out_array + sizeof(out_array));
   } 
@@ -976,10 +947,14 @@ void BookKeeper::readData(string dsname, dblData2d& out_data){
     };
   
     dataset.read( out_array, dbltype, memspace , filespace );
-    
-    for (size_t row=0; row < dims[0]; ++row){
-      out_data.push_back(vector<double>(&out_array[row][0],&out_array[row][dims[1]])); 
+
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        out_data[row][col] = out_array[row][col];
+      };
     };
+    
+
   } 
   catch( FileIException error )
   {
@@ -1054,24 +1029,13 @@ void BookKeeper::readData(string dsname, dblData3d& out_data){
     };
   
     dataset.read( out_array, dbltype, memspace , filespace );
-    
-    dblData1d vec1d;
-    vec1d.resize(dims[2]);
-    dblData2d vec2d;
-    vec2d.resize(dims[1]);
-    out_data.resize(dims[0]);
 
-    for (size_t row=0; row < dims[0]; row++){
-      for (size_t col=0; col < dims[1]; col++){
-        for (size_t layer=0; layer < dims[2]; layer++){
-          vec1d[layer] = out_array[row][col][layer];
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        for(int layer=0; layer<dims[2];layer++){
+          out_data[row][col][layer] = out_array[row][col][layer];
         };
-      vec2d[col] = vec1d;
       };
-    };
-
-    for (size_t row=0; row < dims[0]; row++){
-      out_data[row] = vec2d;
     };
 
   } 
@@ -1139,12 +1103,15 @@ void BookKeeper::readData(string dsname, strData1d& out_data){
   
     string out_array[dims[0]];
     for (int i=0; i<dims[0]; i++){
-      out_array[i]=1;
+      out_array[i]="";
     };
   
     dataset.read( out_array, strtype, memspace , filespace );
-    
-    out_data.assign(out_array, out_array + sizeof(out_array));
+
+    for(int row=0; row<dims[0]; row++){
+      out_data[row] = out_array[row];
+    };
+
   } 
   catch( FileIException error )
   {
@@ -1210,15 +1177,18 @@ void BookKeeper::readData(string dsname, strData2d& out_data){
     string out_array[dims[0]][dims[1]];
     for (int i=0; i<dims[0]; i++){
       for (int j=0; j<dims[1]; j++){
-        out_array[i][j]=1.0;
+        out_array[i][j]="";
       };
     };
   
     dataset.read( out_array, strtype, memspace , filespace );
-    
-    for (size_t row=0; row < dims[0]; ++row){
-      out_data.push_back(vector<string>(&out_array[row][0],&out_array[row][dims[1]])); 
+
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        out_data[row][col] = out_array[row][col];
+      };
     };
+
   } 
   catch( FileIException error )
   {
@@ -1282,36 +1252,24 @@ void BookKeeper::readData(string dsname, strData3d& out_data){
     memspace.selectAll();
     filespace.selectAll();
   
-    int out_array[dims[0]][dims[1]][dims[2]];
+    string out_array[dims[0]][dims[1]][dims[2]];
     for (int i=0; i<dims[0]; i++){
       for (int j=0; j<dims[1]; j++){
         for (int k=0; k<dims[2]; k++){
-          out_array[i][j][k]=1;
+          out_array[i][j][k]="";
         };
       };
     };
   
     dataset.read( out_array, strtype, memspace , filespace );
-    
-    strData1d vec1d;
-    vec1d.resize(dims[2]);
-    strData2d vec2d;
-    vec2d.resize(dims[1]);
-    out_data.resize(dims[0]);
 
-    for (size_t row=0; row < dims[0]; row++){
-      for (size_t col=0; col < dims[1]; col++){
-        for (size_t layer=0; layer < dims[2]; layer++){
-          vec1d[layer] = out_array[row][col][layer];
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        for(int layer=0; layer<dims[2];layer++){
+          out_data[row][col][layer] = out_array[row][col][layer];
         };
-      vec2d[col] = vec1d;
       };
     };
-
-    for (size_t row=0; row < dims[0]; row++){
-      out_data[row] = vec2d;
-    };
-
   } 
   catch( FileIException error )
   {
