@@ -63,10 +63,10 @@ DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, st
   DataSet dataset;
   try{
     // create the dataspace from rank and dimension information
-    DataSpace dataspace = DataSpace(rank , dims );
+    DataSpace* dataspace = new DataSpace(rank, dims);
 
     // create a dataset to match the dataspace
-    dataset = this->getDB()->createDataSet(dsName, type, dataspace) ; 
+    dataset = this->getDB()->createDataSet(dsName, type, *dataspace) ; 
 
   }
   catch( FileIException error )
@@ -82,36 +82,6 @@ DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, st
     error.printError();
   }
   return dataset;
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSpace* BookKeeper::homoDataSpace(Group* grp, string name, map< int, pair< string, PredType > > typemap){
-
-  // each dimension needs to use it's knowledge of its predtype 
-  // to define the dataspace type
-  //
-  // this is not the same as with compound types. 
-  //
-  //
-  // the dimensions are the first entries of the map
-  vector<hsize_t> dims;
-
-  map<int,pair<string, PredType> >::const_iterator iter=typemap.begin();
-
-  int i = 0;
- 
-  while (iter != typemap.end()){
-    dims[i]=iter->first;
-    i++;
-    iter++;
-  }
-  // the length of this map is the rank
-  int rank=i;
-
-  // I'm hoping predtypes are already made explicit in the H5CPP api
-  DataSpace* toRet = new DataSpace(( rank, dims[1],dims[2]));
-
-  return toRet;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -174,313 +144,477 @@ bool BookKeeper::isGroup(string grp)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(intData1d data, string dsname){ 
-
-  hsize_t nrows = data.size(); 
-
-  hsize_t dims[1];
-  dims[0]=nrows;
-  hsize_t rank = 1;
-
-  DataType type = DataType(PredType::NATIVE_INT);
-  DataSet dataset =  this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+  try {
+    hsize_t nrows = data.size(); 
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    hsize_t dims[1];
+    dims[0]=nrows;
+    hsize_t rank = 1;
+  
+    DataType type = DataType(PredType::NATIVE_INT);
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( int ) * data.size() );
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
 
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
+
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
+  
+    // select the whole dataset as the memory dataspace
+    memspace.selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+  
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows];
+    memcpy( dat_array, &data[0], sizeof( int ) * data.size() );
+  
+    // write it
+    dataset.write(dat_array, type, memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(intData2d data, string dsname){
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols};
+    hsize_t rank = 2;
+    
+    DataType type = DataType(PredType::NATIVE_INT);
 
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  hsize_t dims[2];
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
 
-  dims[0]=nrows;
-  dims[1]=ncols;
-  hsize_t rank = 2;
-
-  DataType type = DataType(PredType::NATIVE_INT);
-  DataSet dataset =  this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols];
+    for(int row=0; row<nrows; row++){
+      memcpy( dat_array[row], &data[row][0], sizeof( int ) * ncols );
+    };
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( int ) * data.size() );
-
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
-
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(intData3d data, string dsname){
 
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
-  hsize_t nlayers = data[0][0].size(); 
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    hsize_t nlayers = data[0][0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols,nlayers};
+    hsize_t rank = 3;
+    
+    DataType type = DataType(PredType::NATIVE_INT);
 
-  hsize_t dims[3];
-  dims[0]=nrows;
-  dims[1]=ncols;
-  dims[2]=nlayers;
-  hsize_t rank = 2;
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  DataType type = DataType(PredType::NATIVE_INT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
 
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols][nlayers];
+    for(int row=0; row<nrows; row++){
+      for(int col=0; col<ncols; col++){
+        memcpy( dat_array[row][col], &data[row][col][0], sizeof( int ) * nlayers);
+      };
+    };
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( int ) * nrows * ncols * nlayers);
-
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(dblData1d data, string dsname){
-
-  hsize_t nrows = data.size(); 
-
-  hsize_t dims[2];
-  dims[0]=nrows;
-  dims[1]=1;
-  hsize_t rank = 2;
-
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+  try {
+    hsize_t nrows = data.size(); 
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    hsize_t dims[1];
+    dims[0]=nrows;
+    hsize_t rank = 1;
+  
+    DataType type = DataType(PredType::NATIVE_FLOAT);
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( double ) * nrows );
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
 
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
+
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
+  
+    // select the whole dataset as the memory dataspace
+    memspace.selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+  
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows];
+    memcpy( dat_array, &data[0], sizeof( double ) * data.size() );
+  
+    // write it
+    dataset.write(dat_array, type, memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(dblData2d data, string dsname){
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols};
+    hsize_t rank = 2;
+    
+    DataType type = DataType(PredType::NATIVE_FLOAT);
 
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  hsize_t dims[2];
-  dims[0]=nrows;
-  dims[1]=ncols;
-  hsize_t rank = 2;
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
 
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols];
+    for(int row=0; row<nrows; row++){
+      memcpy( dat_array[row], &data[row][0], sizeof( double ) * ncols );
+    };
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows][ncols];
-  memcpy( dat_array, &data[0], sizeof( double ) * nrows * ncols);
-
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
-
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(dblData3d data, string dsname){
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    hsize_t nlayers = data[0][0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols,nlayers};
+    hsize_t rank = 3;
+    
+    DataType type = DataType(PredType::NATIVE_FLOAT);
 
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
-  hsize_t nlayers = data[0][0].size(); 
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  hsize_t dims[3];
-  dims[0]=nrows;
-  dims[1]=ncols;
-  dims[2]=nlayers;
-  hsize_t rank = 3;
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
 
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols][nlayers];
+    for(int row=0; row<nrows; row++){
+      for(int col=0; col<ncols; col++){
+        memcpy( dat_array[row][col], &data[row][col][0], sizeof( double ) * nlayers);
+      };
+    };
 
-  // the data needs to be an array - is this memcpy ugly?
-  double dat_array[nrows][ncols][nlayers];
-  memcpy( dat_array, &data[0], sizeof( double ) * nrows * ncols * nlayers);
-
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(strData1d data, string dsname){
-
-  hsize_t nrows = data.size(); 
-
-  hsize_t dims[1];
-  dims[0]=nrows;
-  hsize_t rank = 1;
-
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+  try {
+    hsize_t nrows = data.size(); 
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    hsize_t dims[1];
+    dims[0]=nrows;
+    hsize_t rank = 1;
+  
+    //create a variable length string types
+    StrType vls_type(0, H5T_VARIABLE); 
+    DataType type = DataType(vls_type);
 
-  // the data needs to be an array - is this memcpy ugly?
-  string dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( string ) * nrows);
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
 
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
+
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
+  
+    // select the whole dataset as the memory dataspace
+    memspace.selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+  
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows];
+    memcpy( dat_array, &data[0], sizeof( string ) * data.size() );
+  
+    // write it
+    dataset.write(dat_array, type, memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(strData2d data, string dsname){
-
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
-
-  hsize_t dims[2];
-  dims[0]=nrows;
-  dims[1]=ncols;
-  hsize_t rank = 2;
-
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols};
+    hsize_t rank = 2;
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    //create a variable length string types
+    StrType vls_type(0, H5T_VARIABLE); 
+    DataType type = DataType(vls_type);
 
-  // the data needs to be an array - is this memcpy ugly?
-  string dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( string ) * nrows * ncols);
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
+
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
+  
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols];
+    for(int row=0; row<nrows; row++){
+      memcpy( dat_array[row], &data[row][0], sizeof( string ) * ncols );
+    };
+
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeData(strData3d data, string dsname){
+  try {
+    hsize_t nrows = data.size(); 
+    hsize_t ncols = data[0].size(); 
+    hsize_t nlayers = data[0][0].size(); 
+    
+    hsize_t dims[] = {nrows, ncols,nlayers};
+    hsize_t rank = 3;
+    
+    //create a variable length string types
+    StrType vls_type(0, H5T_VARIABLE); 
+    DataType type = DataType(vls_type);
 
-  hsize_t nrows = data.size(); 
-  hsize_t ncols = data[0].size(); 
-  hsize_t nlayers = data[0][0].size(); 
+    // create a memory dataspace
+    DataSpace* memspace = new DataSpace(rank, dims);
 
-  hsize_t dims[3];
-  dims[0]=nrows;
-  dims[1]=ncols;
-  dims[2]=nlayers;
-  hsize_t rank = 3;
+    // create a dataset to match the dataspace
+    DataSet dataset = this->getDB()->createDataSet(dsname, type, *memspace) ; 
 
-  DataType type = DataType(PredType::NATIVE_FLOAT);
-  DataSet dataset = this->createDataSet(rank, dims, type, dsname);
-
-  // create a file dataspace
-  DataSpace filespace = dataset.getSpace();
-
-  // create a memory dataspace
-  DataSpace memspace = DataSpace( rank, dims );
-
-  // select the whole dataset as the memory dataspace
-  memspace.selectAll();
+    // create a file dataspace 
+    DataSpace filespace = dataset.getSpace();
   
-  // select the whole dataset as the memory dataspace
-  filespace.selectAll();
+    // select the whole dataset as the memory dataspace
+    memspace->selectAll();
+    
+    // select the whole dataset as the memory dataspace
+    filespace.selectAll();
+    
+    // the data needs to be an array - is this memcpy ugly?
+    double dat_array[nrows][ncols][nlayers];
+    for(int row=0; row<nrows; row++){
+      for(int col=0; col<ncols; col++){
+        memcpy( dat_array[row][col], &data[row][col][0], sizeof( string ) * nlayers);
+      };
+    };
 
-  // the data needs to be an array - is this memcpy ugly?
-  string dat_array[nrows];
-  memcpy( dat_array, &data[0], sizeof( string ) * nrows * ncols * nlayers);
-
-  // write it
-  dataset.write(dat_array, type, memspace, filespace );
+    // write it
+    dataset.write(dat_array, type, *memspace, filespace );
+  }
+  catch( FileIException error )
+  {
+    error.printError();
+  }
+  catch( DataSpaceIException error )
+  {
+    error.printError();
+  }
+  catch( DataSetIException error )
+  {
+    error.printError();
+  }
+  catch( GroupIException error )
+  {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -493,11 +627,13 @@ void BookKeeper::readData(string dsname, intData1d& out_data){
     DataSet dataset = myDB->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
+
     // double check that its an integer
+    IntType inttype;
     if( type_class == H5T_INTEGER ) 
     {
       // oh good, it's an integer. Now figure out what kind.
-      IntType inttype = dataset.getIntType();
+      inttype = dataset.getIntType();
     }
     else{
       throw GenException("The dataset " + dsname + " is not of integer type");
@@ -525,7 +661,7 @@ void BookKeeper::readData(string dsname, intData1d& out_data){
       out_array[i]=1;
     };
   
-    dataset.read( out_array, PredType::NATIVE_INT, memspace , filespace );
+    dataset.read( out_array, inttype, memspace , filespace );
     
     out_data.assign(out_array, out_array + sizeof(out_array));
   } 
@@ -565,10 +701,11 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its an integer
+    IntType inttype;
     if( type_class == H5T_INTEGER ) 
     {
       // oh good, it's an integer. Now figure out what kind.
-      IntType inttype = dataset.getIntType();
+      inttype = dataset.getIntType();
     }
     else{
       throw GenException("The dataset " + dsname + " is not of integer type");
@@ -593,15 +730,15 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
   
     int out_array[dims[0]][dims[1]];
     for (int i=0; i<dims[0]; i++){
-      for (int j=0; i<dims[1]; j++){
+      for (int j=0; j<dims[1]; j++){
         out_array[i][j]=1;
       };
     };
   
-    dataset.read( out_array, PredType::NATIVE_INT, memspace , filespace );
+    dataset.read( out_array, inttype, memspace , filespace );
     
-    for (int i=0; i<dims[0]; i++){
-      out_data[i].assign(out_array[i], out_array[i] + sizeof(out_array[i]));
+    for (size_t row=0; row < dims[0]; ++row){
+      out_data.push_back(vector<int>(&out_array[row][0],&out_array[row][dims[1]])); 
     };
   } 
   catch( FileIException error )
@@ -631,28 +768,571 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, intData3d& out_data){
+
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+    // double check that its an integer
+    IntType inttype;
+    if( type_class == H5T_INTEGER ) 
+    {
+      // oh good, it's an integer. Now figure out what kind.
+      inttype = dataset.getIntType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of integer type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[3];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    int out_array[dims[0]][dims[1]][dims[2]];
+    for (int i=0; i<dims[0]; i++){
+      for (int j=0; j<dims[1]; j++){
+        for (int k=0; k<dims[2]; k++){
+          out_array[i][j][k]=1;
+        };
+      };
+    };
+  
+    dataset.read( out_array, inttype, memspace , filespace );
+    
+    intData1d vec1d;
+    vec1d.resize(dims[2]);
+    intData2d vec2d;
+    vec2d.resize(dims[1]);
+    out_data.resize(dims[0]);
+
+    for (size_t row=0; row < dims[0]; row++){
+      for (size_t col=0; col < dims[1]; col++){
+        for (size_t layer=0; layer < dims[2]; layer++){
+          vec1d[layer] = out_array[row][col][layer];
+        };
+      vec2d[col] = vec1d;
+      };
+    };
+
+    for (size_t row=0; row < dims[0]; row++){
+      out_data[row] = vec2d;
+    };
+
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, dblData1d& out_data){
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+
+    // double check that its a double
+    FloatType dbltype;
+    if( type_class == H5T_FLOAT ) 
+    {
+      // oh good, it's a double. Now figure out what kind.
+      dbltype = dataset.getFloatType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of float type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[2];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    double out_array[dims[0]];
+    for (int i=0; i<dims[0]; i++){
+      out_array[i]=1;
+    };
+  
+    dataset.read( out_array, dbltype, memspace , filespace );
+    
+    out_data.assign(out_array, out_array + sizeof(out_array));
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
+
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, dblData2d& out_data){
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+    // double check that its a double
+    FloatType dbltype;
+    if( type_class == H5T_FLOAT ) 
+    {
+      // oh good, it's a double. Now figure out what kind.
+      dbltype = dataset.getFloatType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of float type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[2];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    double out_array[dims[0]][dims[1]];
+    for (int i=0; i<dims[0]; i++){
+      for (int j=0; j<dims[1]; j++){
+        out_array[i][j]=1.0;
+      };
+    };
+  
+    dataset.read( out_array, dbltype, memspace , filespace );
+    
+    for (size_t row=0; row < dims[0]; ++row){
+      out_data.push_back(vector<double>(&out_array[row][0],&out_array[row][dims[1]])); 
+    };
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
+
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, dblData3d& out_data){
+
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+    // double check that its a double
+    FloatType dbltype;
+    if( type_class == H5T_FLOAT ) 
+    {
+      // oh good, it's a double. Now figure out what kind.
+      dbltype = dataset.getFloatType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of double type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[3];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    double out_array[dims[0]][dims[1]][dims[2]];
+    for (int i=0; i<dims[0]; i++){
+      for (int j=0; j<dims[1]; j++){
+        for (int k=0; k<dims[2]; k++){
+          out_array[i][j][k]=1.0;
+        };
+      };
+    };
+  
+    dataset.read( out_array, dbltype, memspace , filespace );
+    
+    dblData1d vec1d;
+    vec1d.resize(dims[2]);
+    dblData2d vec2d;
+    vec2d.resize(dims[1]);
+    out_data.resize(dims[0]);
+
+    for (size_t row=0; row < dims[0]; row++){
+      for (size_t col=0; col < dims[1]; col++){
+        for (size_t layer=0; layer < dims[2]; layer++){
+          vec1d[layer] = out_array[row][col][layer];
+        };
+      vec2d[col] = vec1d;
+      };
+    };
+
+    for (size_t row=0; row < dims[0]; row++){
+      out_data[row] = vec2d;
+    };
+
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, strData1d& out_data){
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+
+    // double check that its a string
+    StrType strtype;
+    if( type_class == H5T_STRING ) 
+    {
+      // oh good, it's a string. Now figure out what kind.
+      strtype = dataset.getStrType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of string type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[2];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    string out_array[dims[0]];
+    for (int i=0; i<dims[0]; i++){
+      out_array[i]=1;
+    };
+  
+    dataset.read( out_array, strtype, memspace , filespace );
+    
+    out_data.assign(out_array, out_array + sizeof(out_array));
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, strData2d& out_data){
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+    // double check that its a string
+    StrType strtype;
+    if( type_class == H5T_STRING ) 
+    {
+      // oh good, it's a string. Now figure out what kind.
+      strtype = dataset.getStrType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of string type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[2];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    string out_array[dims[0]][dims[1]];
+    for (int i=0; i<dims[0]; i++){
+      for (int j=0; j<dims[1]; j++){
+        out_array[i][j]=1.0;
+      };
+    };
+  
+    dataset.read( out_array, strtype, memspace , filespace );
+    
+    for (size_t row=0; row < dims[0]; ++row){
+      out_data.push_back(vector<string>(&out_array[row][0],&out_array[row][dims[1]])); 
+    };
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::readData(string dsname, strData3d& out_data){
+
+  try{
+    // turn off auto printing and deal with exceptions at the end
+    Exception::dontPrint();
+    // get the dataset open
+    DataSet dataset = myDB->openDataSet(dsname);
+    // get the class of the datatype used in the dataset
+    H5T_class_t type_class = dataset.getTypeClass(); 
+    // double check that its an string
+    StrType  strtype;
+    if( type_class == H5T_STRING ) 
+    {
+      // oh good, it's a string. Now figure out what kind.
+      strtype = dataset.getStrType();
+    }
+    else{
+      throw GenException("The dataset " + dsname + " is not of string type");
+    }
+  
+    // get the file dataspace
+    DataSpace filespace = dataset.getSpace();
+  
+    // find the rank
+    int rank = filespace.getSimpleExtentNdims();
+  
+    // find what the dataspace dimensions are
+    hsize_t dims[3];
+    int ndims = filespace.getSimpleExtentDims(dims, NULL);
+  
+    // create a memory dataspace
+    DataSpace memspace = DataSpace( rank, dims );
+  
+    // select everything in each dataspace
+    memspace.selectAll();
+    filespace.selectAll();
+  
+    int out_array[dims[0]][dims[1]][dims[2]];
+    for (int i=0; i<dims[0]; i++){
+      for (int j=0; j<dims[1]; j++){
+        for (int k=0; k<dims[2]; k++){
+          out_array[i][j][k]=1;
+        };
+      };
+    };
+  
+    dataset.read( out_array, strtype, memspace , filespace );
+    
+    strData1d vec1d;
+    vec1d.resize(dims[2]);
+    strData2d vec2d;
+    vec2d.resize(dims[1]);
+    out_data.resize(dims[0]);
+
+    for (size_t row=0; row < dims[0]; row++){
+      for (size_t col=0; col < dims[1]; col++){
+        for (size_t layer=0; layer < dims[2]; layer++){
+          vec1d[layer] = out_array[row][col][layer];
+        };
+      vec2d[col] = vec1d;
+      };
+    };
+
+    for (size_t row=0; row < dims[0]; row++){
+      out_data[row] = vec2d;
+    };
+
+  } 
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+ 
+  // catch failure caused by the DataSpace operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };

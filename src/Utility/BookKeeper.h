@@ -68,21 +68,6 @@ protected:
   DSetCreatPropList* dsPropList(){};
 
   /**
-   * Creates a homogeneously typed dataspace for the dataset in the 
-   * file....
-   *
-   * @param grp is a pointer to the group in which this dataspace 
-   * resides?  @param name is the unique name of the dataset (check 
-   * uniqueness)
-   * (is that how dataspaces work?? need to check.
-   * @param typemap is a map from magnitude to type for each dimension
-   *
-   * @return a pointer to an H5/CPP DataSpace object in memory
-	 */
-  DataSpace* homoDataSpace(Group* group, string name, 
-      map< int, pair<string, PredType> > typemap);
-
-  /**
    * This creates a 2d dataset out of a dataspace and some data
    *
    * @param ds is a pointer to a dataspace object of the right 
