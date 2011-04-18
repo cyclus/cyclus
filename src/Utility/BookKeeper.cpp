@@ -321,7 +321,7 @@ void BookKeeper::writeData(dblData1d data, string dsname){
     // create a dataset
     DataSet dataset;
     // name the type
-    DataType type = DataType(PredType::NATIVE_FLOAT);
+    DataType type = DataType(PredType::IEEE_F64LE);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
   
@@ -362,7 +362,7 @@ void BookKeeper::writeData(dblData2d data, string dsname){
     // create a dataset
     DataSet dataset;
     // name the type
-    DataType type = DataType(PredType::NATIVE_FLOAT);
+    DataType type = DataType(PredType::IEEE_F64LE);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
 
@@ -410,7 +410,7 @@ void BookKeeper::writeData(dblData3d data, string dsname){
     // create a dataset
     DataSet dataset;
     // name the type
-    DataType type = DataType(PredType::NATIVE_FLOAT);
+    DataType type = DataType(PredType::IEEE_F64LE);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
