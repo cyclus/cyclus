@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     TI->runSim();
 
     // Create the output file
-    BI->createDB("cyclus.h5");
+    BI->createDB();
     BI->closeDB();
 
     return 0;

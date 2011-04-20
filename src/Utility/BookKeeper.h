@@ -13,16 +13,7 @@
 using namespace std;
 using namespace H5;
 
-
-//typedef vector< int > intData1d ; 
-//typedef vector< double > dblData1d ; 
-//typedef vector< string > strData1d ; 
-//typedef vector< vector < int > > intData2d ; 
-//typedef vector< vector < double > > dblData2d ; 
-//typedef vector< vector < string > > strData2d ; 
-//typedef vector< vector < vector < int > > > intData3d ; 
-//typedef vector< vector < vector < double > > > dblData3d ; 
-//typedef vector< vector < vector < string > > > strData3d ; 
+// homogeneous boost multidimensional arrays 
 typedef boost::multi_array<int, 1> intData1d;
 typedef intData1d::index int1didx;
 typedef boost::multi_array<int, 2> intData2d;
@@ -70,32 +61,24 @@ private:
    */
   bool dbIsOpen;
 
+  /**
+   * True iff the db is open.
+   */
+  bool dbExists;
+
 protected:
   /**
    * The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
 	 */
   BookKeeper();
-
-  /**
-   * Creates a group with a title.
-   */
-  Group* newGroup(string title);
-
-  /**
-   * Create a property list for a dataset and set up fill values.
-	 */
-  DSetCreatPropList* dsPropList(){};
-
-  /**
-   * This creates a 2d dataset out of a dataspace and some data
-   *
-   * @param ds is a pointer to a dataspace object of the right 
-   * dimesions
-   * @param data is a pointer (?) to the data to put into the set 
-   *
-   * @return a pointer to an H5/CPP DataSet object in memory
-	 */
+  
+  // facility model struct
+  typedef struct facModel_t{
+    int ID;                 /**< An integer indicating the model ID >**/
+    string name;            /**< A string indicating the name of the template >**/ 
+    string modelImpl;       /**< A string indicating the model implementation >**/
+  } facModel_t;
 
 public:
 		
@@ -151,6 +134,11 @@ public:
    * Returns whether it's open
    */
   bool isOpen(){return dbIsOpen;};
+  
+  /**
+   * Returns whether it exists
+   */
+  bool exists(){return dbExists;};
 
   /**
    * Returns whether the group exists in the database
@@ -165,9 +153,18 @@ public:
   string getDBName(){return dbName;};
 
   /**
-   * Prepares the file and memory dataspaces for data to be written
-   *
-   *
+   * Write a list of the facility models in the simulation
+   */
+  void writeFacList();
+
+  /**
+   * Prepares file and memory dataspaces for homogeneous data 
+   * 
+   * @param dsname is the name of the dataset/dataspace
+   * @param type is the type of data of the homogenous dataspace
+   * @param memspace is a reference to the memory space
+   * @param filepace is a reference to the file space
+   * @param dataset is the prepared, selected dataset
    */
   void prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
       DataSpace &filespace, DataSet &dataset);
@@ -179,6 +176,7 @@ public:
    * @param data is the data
    * @param dspace is the dataspace
    */
+
   void writeData(intData1d data, string dsname);
 
   /**

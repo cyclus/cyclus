@@ -24,6 +24,8 @@ BookKeeper* BookKeeper::Instance()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() 
 {
+  dbIsOpen = false;
+  dbExists = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +42,7 @@ void BookKeeper::createDB(string name){
     // data previously stored in the file.
     myDB = new H5File( name , H5F_ACC_TRUNC );
     dbIsOpen = true; // use the H5 function for this.. !!! KDHFLAG
+    dbExists = true;
 
     // create groups for the input and output data, respectively
     Group* outGroup = new Group( myDB->createGroup("/output"));
@@ -94,19 +97,18 @@ H5File* BookKeeper::getDB()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB()
 {
-  //if(dbIsOpen==false){
-	// If the database is already open, throw an exception; the caller probably 
-	// doesn't realize this.
-  //  try{ 
-  //    this->getDB()->reOpen();  
-  //  }
-  //  catch( FileIException error )
-  //  {
-  //    error.printError();
-  //  }
- // }
-	
-	//dbIsOpen = true;
+  if(dbIsOpen==false){
+    //If the database is already open, throw an exception; the caller probably 
+	  // doesn't realize this.
+    try{ 
+      myDB = new H5File(dbName, H5F_ACC_RDWR);
+	    dbIsOpen = true;
+    }
+    catch( FileIException error )
+    {
+      error.printError();
+    }
+  };
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -135,12 +137,101 @@ bool BookKeeper::isGroup(string grp)
   toRet = false;
   hsize_t nObs = this->getDB()->getNumObjs();
   string testname;
-  for( hsize_t i; i< nObs ; i++ ){ 
-    testname = BI->getDB()->getObjnameByIdx(i);
+  int iter = 0;
+  while( iter < nObs && toRet==false ){ 
+    testname = this->getDB()->getObjnameByIdx(iter);
     if( testname == grp )
       toRet = true ;
+    iter++;
   }
   return toRet;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeFacList(){
+  // get dataset size from the Logician
+  int numFacs = LI->getNumFacilities();
+  
+  facModel_t facList[numFacs];
+  for (int i=0; i<numFacs; i++){
+    facList[i].ID = i;
+    Model* thefac = LI->getFacilityByID(i);
+    facList[i].modelImpl = thefac->getModelImpl();
+    facList[i].name = thefac->getName(); 
+  };
+
+  try{
+    /*
+     * Turn off the auto-printing when failure occurs so that we can
+     * handle the errors appropriately
+     */
+    Exception::dontPrint();
+    
+    /*
+     * Open the file and the dataset.
+     */
+    this->openDB();
+    const H5std_string ID_memb = "ID";
+    const H5std_string name_memb = "name";
+    const H5std_string modelImpl_memb = "modelImpl";
+    const H5std_string outputname = "output";
+    const H5std_string facilitiesname = "facilities";
+    string datasetname = "facList";
+
+    hsize_t dim[] = {1,numFacs};
+    int rank = 1;
+    Group* outputgroup;
+    outputgroup = new Group(myDB->openGroup(outputname));
+    Group* facilitiesgroup;
+    facilitiesgroup = new Group(outputgroup->createGroup(facilitiesname));
+    DataSpace* dataspace;
+    dataspace = new DataSpace( rank, dim );
+
+    //create a variable length string types
+    StrType vls_type(0, H5T_VARIABLE); 
+    DataType strtype = DataType(vls_type);
+
+    /*
+     * Create a datatype for facModel
+     */
+    CompType mtype( sizeof(facModel_t) );
+    mtype.insertMember( name_memb, HOFFSET(facModel_t, name), strtype);
+    mtype.insertMember( modelImpl_memb, HOFFSET(facModel_t, modelImpl), strtype);
+    mtype.insertMember( ID_memb, HOFFSET(facModel_t, ID), PredType::NATIVE_INT); 
+
+    DataSet* dataset;
+    dataset = new DataSet(myDB->createDataSet( "/output/facilities/facList" , mtype , *dataspace ));
+
+    dataset->write( facList , mtype );
+
+    delete dataspace;
+    delete dataset;
+  }
+  // catch failure caused by the H5File operations
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the Group operations
+  catch( GroupIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataType operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

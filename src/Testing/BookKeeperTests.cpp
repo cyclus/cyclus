@@ -14,6 +14,7 @@ class BookKeeperTest : public ::testing::Test {
     string nstr, test_filename, test_dsp_name, test_type, 
            test_group_name, test_nonsense;
 
+    // a buffer
     char buffer[16];
 
     // this sets up the fixtures
@@ -30,16 +31,33 @@ class BookKeeperTest : public ::testing::Test {
       sprintf( nbuff, "%i",  n) ;
       nstr = nbuff;
 
+      if (BI->exists()){
+        BI->openDB();
+      }
+      else{
+        BI->createDB(test_filename);
+      };
+    };
+
+    // this tears down the fixtures
+    virtual void TearDown(){
+      if (BI->isOpen()){
+        BI->closeDB();
+      };
     };
 };
 
 TEST_F(BookKeeperTest, createDataBase) {
+  BI->closeDB();
   BI->createDB(test_filename);
   EXPECT_EQ(       BI->getDBName(),               test_filename );
 }
 
 TEST_F(BookKeeperTest, openDB) {
+  BI->openDB();
   EXPECT_EQ(       BI->isOpen(),                           true );
+  BI->closeDB();
+  EXPECT_EQ(       BI->isOpen(),                          false );
 }
 
 TEST_F(BookKeeperTest, closeDB){
@@ -49,7 +67,6 @@ TEST_F(BookKeeperTest, closeDB){
 
 // Integers
 TEST_F(BookKeeperTest, ReadWrite1DIntegers) {
-  BI->createDB(test_filename);
   intData1d test_data_int1(boost::extents[nrows]);
   intData1d test_out_int1(boost::extents[nrows]);
   for (int1didx row=0; row!=nrows; ++row){
@@ -133,6 +150,13 @@ TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
   EXPECT_NEAR(    test_out_dbl3[n][n][n],  0.1*(3*n),      0.001 );  
   BI->closeDB();
 }
+
+TEST_F(BookKeeperTest, WriteFacList){
+  BI->writeFacList();
+  EXPECT_EQ(BI->isGroup("output")      ,     true);
+  EXPECT_EQ(BI->isGroup("facilities")      ,     true);
+}
+
 
 // Strings
 //TEST_F(BookKeeperTest, ReadWrite1DStrings) {
