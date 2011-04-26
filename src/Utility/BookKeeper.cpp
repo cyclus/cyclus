@@ -175,7 +175,7 @@ void BookKeeper::writeModelList(ModelType type){
   const H5std_string ID_memb = "ID";
   const H5std_string name_memb = "name";
   const H5std_string modelImpl_memb = "modelImpl";
-  const H5std_string output_name = "output";
+  const H5std_string output_name = "/output";
   string subgroup_name;
   string dataset_name;
 
@@ -188,37 +188,50 @@ void BookKeeper::writeModelList(ModelType type){
     case region:
       numModels = LI->getNumRegions();
       subgroup_name = "regions";
-      dataset_name = "regionList"; break;
-      ptr2getModel = &Logician::getRegionByID;
+      dataset_name = "regionList"; 
+      ptr2getModel = &Logician::getRegionByID; break;
     case inst:
       numModels = LI->getNumInsts();
       subgroup_name = "insts";
-      dataset_name = "instList"; break;
-      ptr2getModel = &Logician::getInstByID;
+      dataset_name = "instList"; 
+      ptr2getModel = &Logician::getInstByID; break;
     case facility:
       numModels = LI->getNumFacilities();
       subgroup_name = "facilities";
-      dataset_name = "facList"; break;
-      ptr2getModel = &Logician::getFacilityByID;
+      dataset_name = "facList"; 
+      ptr2getModel = &Logician::getFacilityByID; break;
     case market:
       numModels = LI->getNumMarkets();
       subgroup_name = "markets";
-      dataset_name = "marketList"; break;
-      ptr2getModel = &Logician::getMarketByID;
-    case converter:
+      dataset_name = "marketList"; 
+      ptr2getModel = &Logician::getMarketByID; break;
+    case converter: 
       numModels = LI->getNumConverters();
       subgroup_name = "converters";
-      dataset_name = "converterList"; break;
-      ptr2getModel = &Logician::getConverterByID;
+      dataset_name = "converterList"; 
+      ptr2getModel = &Logician::getConverterByID; break;
   };
 
+  int numStructs;
+  if(numModels==0)
+    numStructs=1;
+  else
+    numStructs=numModels;
+
   // create an array of the model structs
-  model_t modelList[numModels];
+  model_t modelList[numStructs];
   for (int i=0; i<numModels; i++){
     modelList[i].ID = i;
     Model* theModel = (LI->*ptr2getModel)(i);
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
+  };
+  if(numModels==0){
+    string str1="";
+    string str2="";
+    modelList[0].ID=0;
+    strcpy(modelList[0].modelImpl, str1.c_str());
+    strcpy(modelList[0].name, str2.c_str()); 
   };
 
   try{
@@ -233,22 +246,21 @@ void BookKeeper::writeModelList(ModelType type){
     hsize_t dim[] = {1,numModels};
     int rank = 1;
     Group* outputgroup;
-    outputgroup = new Group(myDB->openGroup(output_name));
+    outputgroup = new Group(this->getDB()->openGroup(output_name));
     Group* subgroup;
-    subgroup = new Group(outputgroup->createGroup("/"+output_name + "/" + subgroup_name));
+    subgroup = new Group(outputgroup->createGroup(subgroup_name));
     DataSpace* dataspace;
     dataspace = new DataSpace( rank, dim );
 
     //create a variable length string types
-    StrType vls_type(0, H5T_VARIABLE); 
-    DataType strtype = DataType(vls_type);
-
+    size_t charlen = sizeof(char[128]);
+    StrType strtype(PredType::C_S1,charlen); 
    
     // Create a datatype for models based on the struct
     CompType mtype( sizeof(model_t) );
+    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), PredType::NATIVE_INT); 
     mtype.insertMember( name_memb, HOFFSET(model_t, name), strtype);
     mtype.insertMember( modelImpl_memb, HOFFSET(model_t, modelImpl), strtype);
-    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), PredType::NATIVE_INT); 
 
     DataSet* dataset;
     dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
@@ -258,7 +270,7 @@ void BookKeeper::writeModelList(ModelType type){
 
     delete outputgroup;
     delete subgroup;
-    delete dataspace;
+    delete dataspace
     delete dataset;
   }
   // catch failure caused by the H5File operations
