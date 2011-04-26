@@ -270,7 +270,7 @@ void BookKeeper::writeModelList(ModelType type){
 
     delete outputgroup;
     delete subgroup;
-    delete dataspace
+    delete dataspace;
     delete dataset;
   }
   // catch failure caused by the H5File operations
