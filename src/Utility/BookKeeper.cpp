@@ -114,76 +114,128 @@ void BookKeeper::openDB()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB()
 {
-  if(dbIsOpen==true){
-    // Try to close it.
-    try{
+  try{
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
+    Exception::dontPrint();
+    if(dbIsOpen==true){
       this->getDB()->close();
       dbIsOpen = false;
     }
-    // catch failure caused by the H5File operations
-    catch( FileIException error )
-    {
-      error.printError();
-    }
+    else
+      throw GenException("Tried to close a database that was not open."); 
   }
-  else
-    throw GenException("Tried to close a database that was not open."); 
+  catch( FileIException error )
+  {
+    error.printError();
+  } 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BookKeeper::isGroup(string grp)
 {
-  bool toRet;
-  toRet = false;
-  hsize_t nObs = this->getDB()->getNumObjs();
-  string testname;
-  int iter = 0;
-  while( iter < nObs && toRet==false ){ 
-    testname = this->getDB()->getObjnameByIdx(iter);
-    if( testname == grp )
-      toRet = true ;
-    iter++;
-  }
+  bool toRet = true;
+//  string testname;
+//  int iter, subiter;
+//  hid_t idx;
+//  deque<hid_t> subgroups; 
+//  CommonFG* obj;
+//
+//  obj = this->getDB();
+//  hsize_t nObs = obj->getNumObjs();
+//  subgroups[0]= 0 ;
+//  bool toRet = false;
+//  subiter = 0;
+//
+//  while( toRet==false && subgroups.size()!=0){
+//    iter = 0; 
+//    nObs = obj->getNumObjs();
+//    while( iter < nObs){
+//      testname = obj->getObjnameByIdx(iter);
+//      if(obj->getObjTypeByIdx(iter) == H5G_GROUP){
+//        subgroups.push_back( iter );
+//      };
+//      if( testname == grp  && obj->getObjTypeByIdx(iter) == H5G_GROUP){
+//        toRet = true;
+//      };
+//      iter++;
+//    };
+//    delete obj;
+//    hid_t idx = subgroups.pop_front();
+//    obj = new Group(idx);
+//  };
+//
   return toRet;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeFacList(){
-  // get dataset size from the Logician
-  int numFacs = LI->getNumFacilities();
-  
-  facModel_t facList[numFacs];
-  for (int i=0; i<numFacs; i++){
-    facList[i].ID = i;
-    Model* thefac = LI->getFacilityByID(i);
-    facList[i].modelImpl = thefac->getModelImpl();
-    facList[i].name = thefac->getName(); 
+void BookKeeper::writeModelList(ModelType type){
+
+  // define some useful variables.
+  const H5std_string ID_memb = "ID";
+  const H5std_string name_memb = "name";
+  const H5std_string modelImpl_memb = "modelImpl";
+  const H5std_string output_name = "output";
+  string subgroup_name;
+  string dataset_name;
+
+  // prepare the function pointer
+  Model* (Logician::*ptr2getModel)(int) = NULL;
+
+  // parse the cases.
+  int numModels;
+  switch( type ) {
+    case region:
+      numModels = LI->getNumRegions();
+      subgroup_name = "regions";
+      dataset_name = "regionList"; break;
+      ptr2getModel = &Logician::getRegionByID;
+    case inst:
+      numModels = LI->getNumInsts();
+      subgroup_name = "insts";
+      dataset_name = "instList"; break;
+      ptr2getModel = &Logician::getInstByID;
+    case facility:
+      numModels = LI->getNumFacilities();
+      subgroup_name = "facilities";
+      dataset_name = "facList"; break;
+      ptr2getModel = &Logician::getFacilityByID;
+    case market:
+      numModels = LI->getNumMarkets();
+      subgroup_name = "markets";
+      dataset_name = "marketList"; break;
+      ptr2getModel = &Logician::getMarketByID;
+    case converter:
+      numModels = LI->getNumConverters();
+      subgroup_name = "converters";
+      dataset_name = "converterList"; break;
+      ptr2getModel = &Logician::getConverterByID;
+  };
+
+  // create an array of the model structs
+  model_t modelList[numModels];
+  for (int i=0; i<numModels; i++){
+    modelList[i].ID = i;
+    Model* theModel = (LI->*ptr2getModel)(i);
+    modelList[i].modelImpl = theModel->getModelImpl();
+    modelList[i].name = theModel->getName(); 
   };
 
   try{
-    /*
-     * Turn off the auto-printing when failure occurs so that we can
-     * handle the errors appropriately
-     */
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
     Exception::dontPrint();
     
-    /*
-     * Open the file and the dataset.
-     */
+    // Open the file and the dataset.
     this->openDB();
-    const H5std_string ID_memb = "ID";
-    const H5std_string name_memb = "name";
-    const H5std_string modelImpl_memb = "modelImpl";
-    const H5std_string outputname = "output";
-    const H5std_string facilitiesname = "facilities";
-    string datasetname = "facList";
 
-    hsize_t dim[] = {1,numFacs};
+    // describe the data in an hdf5-y way
+    hsize_t dim[] = {1,numModels};
     int rank = 1;
     Group* outputgroup;
-    outputgroup = new Group(myDB->openGroup(outputname));
-    Group* facilitiesgroup;
-    facilitiesgroup = new Group(outputgroup->createGroup(facilitiesname));
+    outputgroup = new Group(myDB->openGroup(output_name));
+    Group* subgroup;
+    subgroup = new Group(outputgroup->createGroup("/"+output_name + "/" + subgroup_name));
     DataSpace* dataspace;
     dataspace = new DataSpace( rank, dim );
 
@@ -191,19 +243,21 @@ void BookKeeper::writeFacList(){
     StrType vls_type(0, H5T_VARIABLE); 
     DataType strtype = DataType(vls_type);
 
-    /*
-     * Create a datatype for facModel
-     */
-    CompType mtype( sizeof(facModel_t) );
-    mtype.insertMember( name_memb, HOFFSET(facModel_t, name), strtype);
-    mtype.insertMember( modelImpl_memb, HOFFSET(facModel_t, modelImpl), strtype);
-    mtype.insertMember( ID_memb, HOFFSET(facModel_t, ID), PredType::NATIVE_INT); 
+   
+    // Create a datatype for models based on the struct
+    CompType mtype( sizeof(model_t) );
+    mtype.insertMember( name_memb, HOFFSET(model_t, name), strtype);
+    mtype.insertMember( modelImpl_memb, HOFFSET(model_t, modelImpl), strtype);
+    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), PredType::NATIVE_INT); 
 
     DataSet* dataset;
-    dataset = new DataSet(myDB->createDataSet( "/output/facilities/facList" , mtype , *dataspace ));
+    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
 
-    dataset->write( facList , mtype );
+    // write it, finally 
+    dataset->write( modelList , mtype );
 
+    delete outputgroup;
+    delete subgroup;
     delete dataspace;
     delete dataset;
   }

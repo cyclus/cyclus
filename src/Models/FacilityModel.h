@@ -91,11 +91,8 @@ protected:
   /// each instance of a facility needs a name
   string fac_name;
 
-  /// each facility needs a start construction date
-  int fac_start;
-
-  /// each facility needs an end decommisioning date
-  int fac_end;
+  /// each facility needs a lifetime
+  int fac_lifetime;
 
 public:
 
@@ -126,6 +123,21 @@ public:
    * @return the institution assosicated with this facility
    */
   InstModel* getFacInst();
+
+  /**
+   * Sets the facility's lifetime 
+   *
+   * @param lifetime is the new lifetime of the facility in months
+   */
+  void setFacLifetime(int lifetime) { fac_lifetime = lifetime; };
+
+  /**
+   * Returns the facility's lifetime
+   *
+   * @return fac_lifetime the lifetime of this facility, an int, in 
+   * months
+   */
+  int getFacLifetime() { return fac_lifetime; };
 
   /**
    * There is no default FacilityModel shipment requester 

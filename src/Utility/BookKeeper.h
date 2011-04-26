@@ -8,6 +8,9 @@
 
 #include "H5Cpp.h"
 #include "hdf5.h"
+
+#include "Model.h"
+
 #define BI BookKeeper::Instance()
 
 using namespace std;
@@ -33,6 +36,9 @@ typedef strData2d::index str2didx;
 typedef boost::multi_array<string, 3> strData3d;
 typedef strData3d::index str3didx;
 
+
+// defines the possible modeltypes
+enum ModelType {region, inst, facility, market, converter};
 
 /**
  * A (singleton) class for handling I/O.
@@ -73,12 +79,12 @@ protected:
 	 */
   BookKeeper();
   
-  // facility model struct
-  typedef struct facModel_t{
+  // facility or institution model struct
+  typedef struct model_t{
     int ID;                 /**< An integer indicating the model ID >**/
     string name;            /**< A string indicating the name of the template >**/ 
     string modelImpl;       /**< A string indicating the model implementation >**/
-  } facModel_t;
+  } model_t;
 
 public:
 		
@@ -153,9 +159,11 @@ public:
   string getDBName(){return dbName;};
 
   /**
-   * Write a list of the facility models in the simulation
+   * Write a list of the facility/inst/market models in the simulation
+   *
+   * @param type, the model type (i.e. insts, facilities, or markets)
    */
-  void writeFacList();
+  void writeModelList(ModelType type);
 
   /**
    * Prepares file and memory dataspaces for homogeneous data 
@@ -322,6 +330,6 @@ public:
    */
    void readData(string name, strData3d& out_data);
 
-
 };
+
 #endif
