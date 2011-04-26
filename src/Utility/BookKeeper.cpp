@@ -217,8 +217,8 @@ void BookKeeper::writeModelList(ModelType type){
   for (int i=0; i<numModels; i++){
     modelList[i].ID = i;
     Model* theModel = (LI->*ptr2getModel)(i);
-    modelList[i].modelImpl = theModel->getModelImpl();
-    modelList[i].name = theModel->getName(); 
+    strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
+    strcpy(modelList[i].name, theModel->getName().c_str()); 
   };
 
   try{

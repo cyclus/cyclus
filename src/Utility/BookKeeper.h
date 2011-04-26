@@ -82,8 +82,8 @@ protected:
   // facility or institution model struct
   typedef struct model_t{
     int ID;                 /**< An integer indicating the model ID >**/
-    string name;            /**< A string indicating the name of the template >**/ 
-    string modelImpl;       /**< A string indicating the model implementation >**/
+    char name[128];            /**< A string indicating the name of the template >**/ 
+    char modelImpl[128];       /**< A string indicating the model implementation >**/
   } model_t;
 
 public:
