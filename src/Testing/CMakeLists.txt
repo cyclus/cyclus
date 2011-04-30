@@ -17,8 +17,10 @@ set ( TestSource
   ../Utility/BookKeeper.cpp
   ../Utility/Env.cpp
   ../Utility/GenException.cpp 
+  ../Utility/LMatrix.cpp
   ../Utility/MassTable.cpp
   ../Utility/Timer.cpp
+  ../Utility/UniformTaylor.cpp
   ../Models/Model.cpp 
   ../Models/StubModel.cpp 
   ../Models/StubCommModel.cpp 

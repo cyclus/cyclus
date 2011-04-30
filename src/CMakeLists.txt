@@ -37,8 +37,10 @@ SET( CYCLUS_SRC
      Communicator.cpp
      Utility/BookKeeper.cpp 
      Utility/GenException.cpp 
+     Utility/LMatrix.cpp 
      Utility/MassTable.cpp 
      Utility/Timer.cpp
+     Utility/UniformTaylor.cpp 
      Utility/Env.cpp
      Models/Model.cpp 
         Models/StubModel.cpp 
@@ -63,6 +65,11 @@ COPYONLY
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/cyclus.rng
 ${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
+COPYONLY
+)
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
+${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
 COPYONLY
 )
 

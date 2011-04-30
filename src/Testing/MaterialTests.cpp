@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "Material.h"
 
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
   protected:
     Iso u235;
@@ -12,6 +12,7 @@ class MaterialTest : public ::testing::Test {
     double test_size;
     Basis test_type;
     Material* test_mat;
+    long int u235_halflife;
 
     virtual void SetUp(){
       u235 = 92235;
@@ -21,11 +22,13 @@ class MaterialTest : public ::testing::Test {
       test_rec_name = "test_rec_name";
       test_size = 10.0;
       test_type = atomBased;
+      u235_halflife = 8400000000; // in months
 
       test_mat = new Material(test_comp, test_mat_unit, test_rec_name, test_size, test_type); 
     };
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ManualConstructor) {
   EXPECT_EQ(       test_mat->getUnits(),        "test_mat_unit"       );
   EXPECT_EQ(       test_mat->getTotAtoms(),     10                    );
@@ -34,5 +37,11 @@ TEST_F(MaterialTest, ManualConstructor) {
   ASSERT_NEAR(     test_mat->getComp(u235),     1,               0.001); // normalized 
 }
 
-
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Decay){
+  Material::loadDecayInfo();
+  test_mat->decay(2);
+  ASSERT_NEAR(     test_mat->getComp(u235),     1,              0.001);
+  test_mat->decay(u235_halflife);
+  ASSERT_NEAR(     test_mat->getComp(u235),     0.5,              0.001);
+}

@@ -1,15 +1,22 @@
 // Material.cpp
 #include <iostream>
+#include <fstream>
+#include <vector>
 
 using namespace std;
 
 #include "Material.h"
-#include "MassTable.h"
 
 #include "GenException.h"
+#include "MassTable.h"
 #include "Logician.h"
 #include "Timer.h"
+#include "UniformTaylor.h"
 
+// Static variables to be initialized.
+ParentMap Material::parent = ParentMap();
+DaughtersMap Material::daughters = DaughtersMap();
+Matrix Material::decayMatrix = Matrix();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(): atomEqualsMass(true), total_mass(0), total_atoms(0) 
@@ -265,6 +272,18 @@ void Material::changeComp(Iso tope, Atoms change, int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::changeAtomComp(CompMap newComp, int time){
+  compHist[time]=newComp;
+  rationalize_A2M();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::changeMassComp(CompMap newComp, int time){
+  massHist[time]=newComp;
+  rationalize_M2A();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const CompMap Material::getMassComp() const
 {
   CompMap comp;
@@ -516,4 +535,204 @@ void Material::printComp(string header, CompMap comp_map)
   
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::loadDecayInfo()
+{
+  ifstream decayInfo ("Data/decayInfo.dat");
 
+  if ( decayInfo.is_open() ) {
+    int jcol = 1;
+    int iso = 0;
+    int nDaughters = 0;
+    double decayConst = 0; // decay constant, in inverse years
+    double branchRatio = 0;
+      
+    decayInfo >> iso;  // get first parent
+    
+    // checks to see if there are isotopes in 'decayInfo.dat'
+    if ( decayInfo.eof() ) {
+      throw GenException("There are no isotopes in the 'decayInfo.dat' file");
+    }
+    
+    // processes 'decayInfo.dat'
+    while ( !decayInfo.eof() ){
+      // make parent
+      decayInfo >> decayConst;
+      decayInfo >> nDaughters;
+     
+      // checks for duplicate parent isotopes
+      if ( parent.find(iso) == parent.end() ) {
+        parent[iso] = make_pair(jcol, decayConst);
+           
+        // make daughters
+        vector< pair<int,double> > temp(nDaughters);
+   
+        for ( int i = 0; i < nDaughters; ++i ) {
+          decayInfo >> iso;
+          decayInfo >> branchRatio;
+
+          // checks for duplicate daughter isotopes
+          for ( int j = 0; j < nDaughters; ++j ) {
+            if ( temp[j].first == iso ) {
+              throw GenException("A duplicate daughter isotope was found in decayInfo.dat");
+            } 
+          }
+
+          temp[i] = make_pair(iso, branchRatio);
+        }
+           
+        daughters[jcol] = temp;
+        ++jcol; // set next column
+      }
+      else {
+        throw GenException("A duplicate parent isotope was found in 'decayInfo.dat'");
+      }
+      decayInfo >> iso; // get next parent
+    } 
+    // builds the decay matrix from the parent and daughter maps
+    makeDecayMatrix();
+  }   
+  else {
+    throw GenException("The file 'decayInfo.dat' does not exist");
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::makeDecayMatrix()
+{
+  double decayConst = 0; // decay constant, in inverse years
+  int jcol = 1;
+  int n = parent.size();
+  decayMatrix = Matrix(n,n);
+
+  ParentMap::const_iterator parent_iter = parent.begin(); // get first parent
+
+  // populates the decay matrix column by column
+  while( parent_iter != parent.end() ) {
+    jcol = parent_iter->second.first; // determines column index
+    decayConst = parent_iter->second.second;
+    decayMatrix(jcol,jcol) = -1 * decayConst; // sets A(i,i) value
+ 
+    // processes the vector in the daughters map if it is not empty
+    if ( !daughters.find(jcol)->second.empty() ) {
+      // makes an iterator that points to the first daughter in the vector
+      vector< pair<Iso,BranchRatio> >::const_iterator
+        iso_iter = daughters.find(jcol)->second.begin();
+
+      // processes all daughters of the parent
+      while ( iso_iter != daughters.find(jcol)->second.end() ) {
+        int iso = iso_iter->first;
+        int irow = parent.find(iso)->second.first; // determines row index
+        double branchRatio = iso_iter->second;
+        decayMatrix(irow,jcol) = branchRatio * decayConst; // sets A(i,j) value
+    
+        ++iso_iter; // get next daughter
+      }
+    }
+    
+    ++parent_iter; // get next parent
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Vector Material::makeCompVector() const
+{
+  // gets the current composition map of the Material object
+  map<Iso, Atoms> compMap = this->getAtomComp();
+  map<Iso, Atoms>::const_iterator comp_iter = compMap.begin();
+        
+  Vector compVector = Vector(parent.size(),1);
+
+  // loops through the composition map and populates the Vector with the
+  // number density of each isotope
+  while( comp_iter != compMap.end() ) {
+    int iso = comp_iter->first;
+    long double numDens = comp_iter->second;
+
+    // if the isotope is tracked in the decay matrix  
+    if ( parent.find(iso) != parent.end() ) {
+      int col = parent.find(iso)->second.first; // get Vector position
+      compVector(col,1) = numDens;
+    }
+    // if it is not in the decay matrix, then it is added as a stable isotope
+    else {
+      double decayConst = 0;
+      int col = parent.size() + 1;
+      parent[iso] = make_pair(col, decayConst);  // add isotope to parent map
+
+      int nDaughters = 0;
+      vector< pair<int,double> > temp(nDaughters);
+      daughters[col] = temp;  // add isotope to daughters map
+      
+      vector<long double> row(1,numDens);
+      compVector.addRow(row);  // add isotope to the end of the Vector
+      
+      makeDecayMatrix();  // recreate the decay matrix with new stable isotope
+    }
+
+    ++comp_iter; // get next isotope
+  }
+
+  return compVector;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, Atoms> Material::makeCompMap(const Vector & compVector)
+{
+  map<Iso, Atoms> compMap; // new composition map
+  ParentMap::const_iterator parent_iter = parent.begin(); // get first parent
+
+  // loops through the ParentMap and populates the new composition map with
+  // the number density from the compVector parameter for each isotope
+  while( parent_iter != parent.end() ) {
+    int iso = parent_iter->first;
+    int col = parent.find(iso)->second.first; // get Vector position
+    
+    // checks to see if the Vector position is valid
+    if ( col <= compVector.numRows() ) {
+      double numDens = compVector(col,1);
+      // adds isotope to the map if its number density is non-zero
+      if ( numDens != 0 )
+        compMap.insert( make_pair(iso, numDens) );
+    }
+    else {
+      throw GenException("Decay Error - invalid Vector position");
+    }
+
+    ++parent_iter; // get next parent
+  }
+
+  return compMap;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::decay(double months)
+{
+  try {
+    // gets the initial composition Vector N_o for this Material object
+    Vector N_o = this->makeCompVector();
+
+    // convert months to years to match decay constant units in matrix
+    double years = months / 12;
+  
+    // solves the decay equation for the final composition Vector N_t using a
+    // matrix exponential method
+    Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix, N_o, years);
+
+    // converts the Vector solution N_t into a composition map
+    map<Iso, Atoms> newComp = makeCompMap(N_t);
+ 
+    // assigns the new composition map to this Material object
+    int time = Timer::Instance()->getTime();
+    this->changeAtomComp(newComp,time);
+  }
+  catch ( string e ) {
+    throw GenException(e);
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::decay() {
+        
+  // Figure out the time this object was most recently updated at.
+  int t0 = compHist.rbegin()->first;
+
+  // Figure out what time it is now.
+  int tf = Timer::Instance()->getTime();
+  this->decay(tf - t0);
+}

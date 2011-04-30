@@ -6,8 +6,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Vector UniformTaylor::matrixExpSolver(const Matrix & A,
-                                      const Vector & x_o,
-				      const double t)
+    const Vector & x_o, const double t)
 {
   int n = A.numRows();
   
@@ -27,7 +26,7 @@ Vector UniformTaylor::matrixExpSolver(const Matrix & A,
   B += A;
   
   // steps 3-7 of algorithm: computes the solution Vector x_t
-  double tol = 1e-12;
+  double tol = 1e-3;
   Vector x_t = x_o;
 
   try {
@@ -110,10 +109,7 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon)
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Vector UniformTaylor::getSolutionVector(const Matrix & B,
-                                        const Vector & x_o,
-	       	                        double alpha,
-			                double t,
-			                double tol)
+    const Vector & x_o, double alpha, double t, double tol)
 {
   // step 3 of algorithm: calculates exp( -alpha * t)
   long double alpha_t = alpha * t;

@@ -5,8 +5,10 @@
 #include <map>
 #include <iostream>
 #include <math.h>
+#include <vector>
 
 #include "InputXML.h"
+#include "UseMatrixLib.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
@@ -32,6 +34,42 @@ typedef double Atoms;
  */
 typedef double Mass;
 
+/**
+ * Spectra for which average cross-section data are available.
+ */
+enum Spectrum {thermal, fast};
+
+/**
+ * A double type to represent a decay constant of a parent isotope.
+ */
+typedef double DecayConst;
+
+/**
+ * A double type to represent a branching ratio of a daughter isotope.
+ */
+typedef double BranchRatio;
+
+/**
+ * An integer type to represent a column of the decay matrix.
+ */
+typedef int Col;
+
+/**
+ * A map type to represent all of the parent isotopes tracked.  The key for
+ * this map type is the parent's Iso number, and the value is a pair that
+ * contains the corresponding decay matrix column and decay constant
+ * associated with that parent.
+ */
+typedef map< Iso, pair<Col, DecayConst> > ParentMap;
+
+/**
+ * A map type to represent all of the daughter isotopes tracked.  The key for
+ * this map type is the decay matrix column associated with the parent, and the
+ * value is a vector of pairs of all the daughters for that parent. Each of the
+ * daughters are represented by a pair that contains the daughter's Iso number
+ * and its branching ratio.
+ */
+typedef map< Col, vector< pair<Iso, BranchRatio> > > DaughtersMap;
 
 /**
  * map integers to doubles: Iso => (Atoms|Mass)
@@ -261,9 +299,25 @@ public:
    * @param tope the isotope whose number density we want to change
    * @param change if positive, the amount to add to the given isotopes 
    * number density; if negative, the amount to subtract
-   * @param time the current time
+   * @param time the time at which this takes place.
    */
   virtual void changeComp(Iso tope, Atoms change, int time);
+
+  /**
+   * Changes the atomic composition to a new composition
+   *
+   * @param newComp is the new atom composition vector
+   * @param time is the time at which this takes place
+   */
+  virtual void changeAtomComp(CompMap newComp, int time);
+
+  /**
+   * Changes the mass composition to a new composition
+   *
+   * @param newComp is the new atom composition vector
+   * @param time is the time at which this takes place
+   */
+  virtual void changeMassComp(CompMap newComp, int time);
 
   /**
    * Returns the mass of the given element in this Material.
@@ -335,6 +389,27 @@ public:
    */
   void normalize(CompMap &comp_map);
 
+  /**
+   * Decays this Material object for the given number of months and updates
+   * its composition map with the new number densities.
+   *
+   * @param months the number of months to decay
+   */
+  void decay(double months);
+  
+  /**
+   * Decays this Material object for however many months have passed since the 
+   * last entry in the material history.
+   *
+   */
+  void decay();
+
+  /**
+   * Reads the decay information found in the 'decayInfo.dat' file into the
+   * parent and daughters maps.Uses these maps to create the decay matrix.
+   */
+  static void loadDecayInfo();
+
 protected:
   /**
    * Returns true if the given isotope's number density is for some reason 
@@ -381,8 +456,39 @@ protected:
    */
   FacHistory facHist;
 
-private:
+  /**
+   * Builds the decay matrix needed for the decay calculations from the parent
+   * and daughters map variables.  The resulting matrix is stored in the static
+   * variable decayMatrix.
+   */
+  static void makeDecayMatrix();
 
+  /**
+   * Returns a mathematical Vector representation of the Material's current
+   * composition map.
+   *
+   * @return the mathematical Vector 
+   */
+  Vector makeCompVector() const;
+
+  /**
+   * Converts the given mathematical Vector representation of the Material's 
+   * isotopic composition back into the map representation.
+   *
+   * @param compVector the mathematical Vector
+   * @return the composition map
+   */
+  static map<Iso, Atoms> makeCompMap(const Vector & compVector);
+
+private:
+  /**
+   * loads a recipebook full of recipes
+   *
+   * @param filename the name of the recipebook file, including the 
+   * extension
+   * @param ns the namespace under which these recipes will reside
+   * @param the format of the recipebook
+   */
   static void load_recipebook(string filename, string ns, string format);
 
   /**
@@ -419,7 +525,21 @@ private:
    * convert mass composition into a consitent atom composition
    */
   void rationalize_M2A();
- 
+  
+  /**
+   *
+   */
+  static ParentMap parent; 
+  
+  /**
+   *
+   */
+  static DaughtersMap daughters; 
+  
+  /**
+   *
+   */
+  static Matrix decayMatrix; 
 };
 
 
