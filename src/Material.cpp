@@ -657,6 +657,7 @@ Vector Material::makeCompVector() const
       double decayConst = 0;
       int col = parent.size() + 1;
       parent[iso] = make_pair(col, decayConst);  // add isotope to parent map
+      cout << "Hey I found this is stable : " << iso <<endl;
 
       int nDaughters = 0;
       vector< pair<int,double> > temp(nDaughters);
@@ -716,11 +717,11 @@ void Material::decay(double months)
     Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix, N_o, years);
 
     // converts the Vector solution N_t into a composition map
-    //map<Iso, Atoms> newComp = makeCompMap(N_t);
+    map<Iso, Atoms> newComp = makeCompMap(N_t);
  
     // assigns the new composition map to this Material object
-    //int time = Timer::Instance()->getTime();
-    //this->changeAtomComp(newComp,time);
+    int time = Timer::Instance()->getTime();
+    this->changeAtomComp(newComp,time);
   }
   catch ( string e ) {
     throw GenException(e);

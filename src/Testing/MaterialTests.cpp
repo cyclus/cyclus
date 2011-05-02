@@ -4,7 +4,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
   protected:
-    Iso u235, am241, th228;
+    Iso u235, am241, th228, pb208;
     Atoms one;
     CompMap test_comp, decay_comp;
     string test_mat_unit;
@@ -20,6 +20,7 @@ class MaterialTest : public ::testing::Test {
       u235 = 92235;
       am241 = 95241;
       th228 = 90228;
+      pb208 = 90228;
       Atoms one = 1.0;
       test_comp[u235]=one;
       decay_comp[u235]=one;
@@ -29,7 +30,7 @@ class MaterialTest : public ::testing::Test {
       test_size = 10.0;
       test_type = atomBased;
       u235_halflife = 8445600000; // approximate, in months
-      th228_halflife = 2*12; // approximate, in months
+      th228_halflife = 2*11; // approximate, in months
 
       test_mat = new Material(test_comp, test_mat_unit, test_rec_name, test_size, test_type); 
       decay_mat = new Material(decay_comp, test_mat_unit, test_rec_name, test_size, test_type); 
@@ -64,5 +65,6 @@ TEST_F(MaterialTest, Decay){
   ASSERT_NEAR(     decay_mat->getComp(u235),  0.5,              0.001);
   ASSERT_NEAR(     decay_mat->getComp(th228), 0.5,              0.001);
   decay_mat->decay(th228_halflife);
-  ASSERT_NEAR(     decay_mat->getComp(th228),  0.25,            0.001);
+  ASSERT_NEAR(     decay_mat->getComp(th228),  0.25,            0.01);
+  ASSERT_NEAR(     decay_mat->getComp(pb208),  0.25,            0.01);
 }
