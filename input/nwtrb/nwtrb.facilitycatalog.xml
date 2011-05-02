@@ -6,7 +6,7 @@
 <facility>
   <name>Arkansas_Nuclear_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -15,17 +15,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>05</licExpMonth>
-      <region>AR</region>
+      <lifetime>720</lifetime>
+      <state>AR</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>842</genCapacity>
+      <capacity>842</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Arkansas_Nuclear_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1971</startConstrYear>
@@ -34,17 +35,38 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2038</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>AR</region>
+      <lifetime>720</lifetime>
+      <state>AR</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>993</genCapacity>
+      <capacity>842</capacity>
+      <elecCF>0.99</elecCF>
+    </RecipeReactor>
+  </model>
+</facility>
+<facility>
+  <name>Arkansas_Nuclear_2</name>
+  <model>
+    <RecipeReactor>
+      <incommodity>fresh_uo2</incommodity>
+      <outcommodity>spent_uo2</outcommodity>
+      <startConstrYear>1971</startConstrYear>
+      <startConstrMonth>07</startConstrMonth>
+      <startOperYear>1980</startOperYear>
+      <startOperMonth>03</startOperMonth>
+      <licExpYear>2038</licExpYear>
+      <licExpMonth>07</licExpMonth>
+      <lifetime>720</lifetime>
+      <state>AR</state>
+      <typeReac>PWR</typeReac>
+      <capacity>993</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Beaver_Valley_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -53,17 +75,18 @@
       <startOperMonth>10</startOperMonth>
       <licExpYear>2036</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>892</genCapacity>
+      <capacity>892</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Beaver_Valley_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -72,17 +95,18 @@
       <startOperMonth>11</startOperMonth>
       <licExpYear>2047</licExpYear>
       <licExpMonth>05</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>885</genCapacity>
+      <capacity>885</capacity>
       <elecCF>0.88</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Braidwood_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -92,17 +116,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1178</genCapacity>
+      <capacity>1178</capacity>
       <elecCF>0.95</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Braidwood_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -112,17 +137,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1152</genCapacity>
+      <capacity>1152</capacity>
       <elecCF>0.93</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Browns_Ferry_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -131,17 +157,18 @@
       <startOperMonth>08</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>AL</region>
+      <lifetime>720</lifetime>
+      <state>AL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1066</genCapacity>
+      <capacity>1066</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Browns_Ferry_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -150,17 +177,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>06</licExpMonth>
-      <region>AL</region>
+      <lifetime>720</lifetime>
+      <state>AL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1104</genCapacity>
+      <capacity>1104</capacity>
       <elecCF>0.81</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Browns_Ferry_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -169,17 +197,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2036</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>AL</region>
+      <lifetime>720</lifetime>
+      <state>AL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1105</genCapacity>
+      <capacity>1105</capacity>
       <elecCF>0.95</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Brunswick_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -188,17 +217,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2036</licExpYear>
       <licExpMonth>09</licExpMonth>
-      <region>NC</region>
+      <lifetime>720</lifetime>
+      <state>NC</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>938</genCapacity>
+      <capacity>938</capacity>
       <elecCF>0.98</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Brunswick_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -207,17 +237,18 @@
       <startOperMonth>11</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>NC</region>
+      <lifetime>720</lifetime>
+      <state>NC</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>920</genCapacity>
+      <capacity>920</capacity>
       <elecCF>0.80</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Byron_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -227,17 +258,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1164</genCapacity>
+      <capacity>1164</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Byron_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -247,17 +279,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1136</genCapacity>
+      <capacity>1136</capacity>
       <elecCF>1.02</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Callaway_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -267,17 +300,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MO</region>
+      <lifetime>720</lifetime>
+      <state>MO</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1190</genCapacity>
+      <capacity>1190</capacity>
       <elecCF>0.98</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Calvert_Cliffs_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -286,17 +320,18 @@
       <startOperMonth>05</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>MD</region>
+      <lifetime>720</lifetime>
+      <state>MD</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>855</genCapacity>
+      <capacity>855</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Calvert_Cliffs_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -305,17 +340,18 @@
       <startOperMonth>04</startOperMonth>
       <licExpYear>2036</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>MD</region>
+      <lifetime>720</lifetime>
+      <state>MD</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>850</genCapacity>
+      <capacity>850</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Catawba_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -324,17 +360,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2043</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1129</genCapacity>
+      <capacity>1129</capacity>
       <elecCF>0.91</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Catawba_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -343,17 +380,18 @@
       <startOperMonth>08</startOperMonth>
       <licExpYear>2043</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1129</genCapacity>
+      <capacity>1129</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Clinton_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -363,17 +401,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1065</genCapacity>
+      <capacity>1065</capacity>
       <elecCF>0.95</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Columbia_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1972</startConstrYear>
@@ -383,17 +422,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>WA</region>
+      <lifetime>720</lifetime>
+      <state>WA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1131</genCapacity>
+      <capacity>1131</capacity>
       <elecCF>0.67</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Comanche_Peak_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -403,17 +443,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TX</region>
+      <lifetime>720</lifetime>
+      <state>TX</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1209</genCapacity>
+      <capacity>1209</capacity>
       <elecCF>1.00</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Comanche_Peak_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -423,17 +464,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TX</region>
+      <lifetime>720</lifetime>
+      <state>TX</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1158</genCapacity>
+      <capacity>1158</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Cooper</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -442,17 +484,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>NE</region>
+      <lifetime>720</lifetime>
+      <state>NE</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>774</genCapacity>
+      <capacity>774</capacity>
       <elecCF>0.85</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Crystal_River_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -462,17 +505,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>FL</region>
+      <lifetime>720</lifetime>
+      <state>FL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>860</genCapacity>
+      <capacity>860</capacity>
       <elecCF>0.72</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Davis_Besse_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -482,17 +526,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>OH</region>
+      <lifetime>720</lifetime>
+      <state>OH</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>894</genCapacity>
+      <capacity>894</capacity>
       <elecCF>0.97</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Diablo_Canyon_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -502,17 +547,17 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>CA</region>
+      <state>CA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1122</genCapacity>
+      <capacity>1122</capacity>
       <elecCF>0.82</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Diablo_Canyon_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -522,17 +567,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>CA</region>
+      <lifetime>720</lifetime>
+      <state>CA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1118</genCapacity>
+      <capacity>1118</capacity>
       <elecCF>0.84</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Donald_Cook_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -541,17 +587,18 @@
       <startOperMonth>08</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>MI</region>
+      <lifetime>720</lifetime>
+      <state>MI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1009</genCapacity>
+      <capacity>1009</capacity>
       <elecCF>0.03</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Donald_Cook_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -560,17 +607,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2037</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>MI</region>
+      <lifetime>720</lifetime>
+      <state>MI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1060</genCapacity>
+      <capacity>1060</capacity>
       <elecCF>0.87</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Dresden_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
@@ -579,17 +627,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2029</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>867</genCapacity>
+      <capacity>867</capacity>
       <elecCF>0.91</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Dresden_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
@@ -598,17 +647,18 @@
       <startOperMonth>11</startOperMonth>
       <licExpYear>2031</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>867</genCapacity>
+      <capacity>867</capacity>
       <elecCF>0.97</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Duane_Arnold_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -617,17 +667,18 @@
       <startOperMonth>02</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>02</licExpMonth>
-      <region>IA</region>
+      <lifetime>720</lifetime>
+      <state>IA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>601</genCapacity>
+      <capacity>601</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Enrico_Fermi_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -637,17 +688,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MI</region>
+      <lifetime>720</lifetime>
+      <state>MI</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1106</genCapacity>
+      <capacity>1106</capacity>
       <elecCF>0.76</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Farley_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -656,17 +708,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2037</licExpYear>
       <licExpMonth>06</licExpMonth>
-      <region>AL</region>
+      <lifetime>720</lifetime>
+      <state>AL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>851</genCapacity>
+      <capacity>851</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Farley_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -675,17 +728,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2041</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>AL</region>
+      <lifetime>720</lifetime>
+      <state>AL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>860</genCapacity>
+      <capacity>860</capacity>
       <elecCF>0.96</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Fitzpatrick</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -694,17 +748,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>855</genCapacity>
+      <capacity>855</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Fort_Calhoun_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -713,17 +768,18 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>NE</region>
+      <lifetime>720</lifetime>
+      <state>NE</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>478</genCapacity>
+      <capacity>478</capacity>
       <elecCF>0.88</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Grand_Gulf_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -733,17 +789,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MS</region>
+      <lifetime>720</lifetime>
+      <state>MS</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1251</genCapacity>
+      <capacity>1251</capacity>
       <elecCF>1.00</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>HB_Robinson_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -752,17 +809,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2030</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>724</genCapacity>
+      <capacity>724</capacity>
       <elecCF>1.02</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Hatch_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -771,17 +829,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>GA</region>
+      <lifetime>720</lifetime>
+      <state>GA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>876</genCapacity>
+      <capacity>876</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Hatch_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1972</startConstrYear>
@@ -790,17 +849,18 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2038</licExpYear>
       <licExpMonth>06</licExpMonth>
-      <region>GA</region>
+      <lifetime>720</lifetime>
+      <state>GA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>883</genCapacity>
+      <capacity>883</capacity>
       <elecCF>0.67</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Hope_Creek_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -810,17 +870,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NJ</region>
+      <lifetime>720</lifetime>
+      <state>NJ</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1161</genCapacity>
+      <capacity>1161</capacity>
       <elecCF>0.95</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Indian_Point_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
@@ -830,17 +891,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1022</genCapacity>
+      <capacity>1022</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Indian_Point_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -850,17 +912,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1040</genCapacity>
+      <capacity>1040</capacity>
       <elecCF>0.85</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Kewaunee</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -870,17 +933,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>WI</region>
+      <lifetime>720</lifetime>
+      <state>WI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>556</genCapacity>
+      <capacity>556</capacity>
       <elecCF>0.93</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>La_Salle_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
@@ -890,17 +954,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1118</genCapacity>
+      <capacity>1118</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>La_Salle_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
@@ -910,17 +975,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1120</genCapacity>
+      <capacity>1120</capacity>
       <elecCF>0.93</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Limerick_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -930,17 +996,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1130</genCapacity>
+      <capacity>1130</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Limerick_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -950,17 +1017,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1134</genCapacity>
+      <capacity>1134</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>McGuire_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1971</startConstrYear>
@@ -969,17 +1037,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2041</licExpYear>
       <licExpMonth>06</licExpMonth>
-      <region>NC</region>
+      <lifetime>720</lifetime>
+      <state>NC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1100</genCapacity>
+      <capacity>1100</capacity>
       <elecCF>1.04</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>McGuire_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1971</startConstrYear>
@@ -988,17 +1057,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2043</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>NC</region>
+      <lifetime>720</lifetime>
+      <state>NC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1100</genCapacity>
+      <capacity>1100</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Millstone_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -1007,17 +1077,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2035</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>CT</region>
+      <lifetime>720</lifetime>
+      <state>CT</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>869</genCapacity>
+      <capacity>869</capacity>
       <elecCF>0.82</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Millstone_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1026,17 +1097,18 @@
       <startOperMonth>04</startOperMonth>
       <licExpYear>2045</licExpYear>
       <licExpMonth>11</licExpMonth>
-      <region>CT</region>
+      <lifetime>720</lifetime>
+      <state>CT</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1233</genCapacity>
+      <capacity>1233</capacity>
       <elecCF>0.96</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Monticello</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1045,17 +1117,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2030</licExpYear>
       <licExpMonth>09</licExpMonth>
-      <region>MN</region>
+      <lifetime>720</lifetime>
+      <state>MN</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>572</genCapacity>
+      <capacity>572</capacity>
       <elecCF>0.83</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Nine_Mile_Point_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1965</startConstrYear>
@@ -1064,17 +1137,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2029</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>621</genCapacity>
+      <capacity>621</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Nine_Mile_Point_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -1083,17 +1157,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2046</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1143</genCapacity>
+      <capacity>1143</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>North_Anna_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1971</startConstrYear>
@@ -1102,17 +1177,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2038</licExpYear>
       <licExpMonth>04</licExpMonth>
-      <region>VA</region>
+      <lifetime>720</lifetime>
+      <state>VA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>903</genCapacity>
+      <capacity>903</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>North_Anna_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -1121,17 +1197,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2040</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>VA</region>
+      <lifetime>720</lifetime>
+      <state>VA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>903</genCapacity>
+      <capacity>903</capacity>
       <elecCF>1.00</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Oconee_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1140,17 +1217,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>02</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>846</genCapacity>
+      <capacity>846</capacity>
       <elecCF>0.85</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Oconee_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1159,17 +1237,18 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>846</genCapacity>
+      <capacity>846</capacity>
       <elecCF>1.03</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Oconee_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1178,17 +1257,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>846</genCapacity>
+      <capacity>846</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Oyster_Creek</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1964</startConstrYear>
@@ -1197,17 +1277,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2029</licExpYear>
       <licExpMonth>04</licExpMonth>
-      <region>NJ</region>
+      <lifetime>720</lifetime>
+      <state>NJ</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>615</genCapacity>
+      <capacity>615</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Palisades</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1216,17 +1297,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2031</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>MI</region>
+      <lifetime>720</lifetime>
+      <state>MI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>778</genCapacity>
+      <capacity>778</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Palo_Verde_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1236,17 +1318,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>AZ</region>
+      <lifetime>720</lifetime>
+      <state>AZ</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1311</genCapacity>
+      <capacity>1311</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Palo_Verde_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1256,17 +1339,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>AZ</region>
+      <lifetime>720</lifetime>
+      <state>AZ</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1314</genCapacity>
+      <capacity>1314</capacity>
       <elecCF>0.83</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Palo_Verde_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1276,17 +1360,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>AZ</region>
+      <lifetime>720</lifetime>
+      <state>AZ</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1317</genCapacity>
+      <capacity>1317</capacity>
       <elecCF>0.83</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Peach_Bottom_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1295,17 +1380,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1122</genCapacity>
+      <capacity>1122</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Peach_Bottom_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1314,17 +1400,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1112</genCapacity>
+      <capacity>1112</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Perry_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1334,17 +1421,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>OH</region>
+      <lifetime>720</lifetime>
+      <state>OH</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1240</genCapacity>
+      <capacity>1240</capacity>
       <elecCF>0.70</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Pilgrim_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1354,17 +1442,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MA</region>
+      <lifetime>720</lifetime>
+      <state>MA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>685</genCapacity>
+      <capacity>685</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Point_Beach_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1373,17 +1462,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2030</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>WI</region>
+      <lifetime>720</lifetime>
+      <state>WI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>512</genCapacity>
+      <capacity>512</capacity>
       <elecCF>0.98</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Point_Beach_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1392,17 +1482,18 @@
       <startOperMonth>10</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>WI</region>
+      <lifetime>720</lifetime>
+      <state>WI</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>515</genCapacity>
+      <capacity>515</capacity>
       <elecCF>0.84</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Praire_Island_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1412,17 +1503,17 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MN</region>
+      <state>MN</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>551</genCapacity>
+      <capacity>551</capacity>
       <elecCF>0.75</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Praire_Island_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
@@ -1432,17 +1523,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>MN</region>
+      <lifetime>720</lifetime>
+      <state>MN</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>545</genCapacity>
+      <capacity>545</capacity>
       <elecCF>0.97</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Quad_Cities_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1451,17 +1543,18 @@
       <startOperMonth>02</startOperMonth>
       <licExpYear>2032</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>882</genCapacity>
+      <capacity>882</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Quad_Cities_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1470,17 +1563,18 @@
       <startOperMonth>03</startOperMonth>
       <licExpYear>2032</licExpYear>
       <licExpMonth>12</licExpMonth>
-      <region>IL</region>
+      <lifetime>720</lifetime>
+      <state>IL</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>892</genCapacity>
+      <capacity>892</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>RE_Ginna</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
@@ -1489,17 +1583,18 @@
       <startOperMonth>07</startOperMonth>
       <licExpYear>2029</licExpYear>
       <licExpMonth>09</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>581</genCapacity>
+      <capacity>581</capacity>
       <elecCF>0.91</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>River_Bend_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1977</startConstrYear>
@@ -1509,17 +1604,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NY</region>
+      <lifetime>720</lifetime>
+      <state>NY</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>974</genCapacity>
+      <capacity>974</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Salem_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1529,17 +1625,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NJ</region>
+      <lifetime>720</lifetime>
+      <state>NJ</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1174</genCapacity>
+      <capacity>1174</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Salem_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1549,17 +1646,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NJ</region>
+      <lifetime>720</lifetime>
+      <state>NJ</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1158</genCapacity>
+      <capacity>1158</capacity>
       <elecCF>0.93</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>San_Onofre_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1569,17 +1667,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>CA</region>
+      <lifetime>720</lifetime>
+      <state>CA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1070</genCapacity>
+      <capacity>1070</capacity>
       <elecCF>0.60</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>San_Onofre_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1589,17 +1688,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>CA</region>
+      <lifetime>720</lifetime>
+      <state>CA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1080</genCapacity>
+      <capacity>1080</capacity>
       <elecCF>1.04</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Seabrook_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1609,17 +1709,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>NH</region>
+      <lifetime>720</lifetime>
+      <state>NH</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1247</genCapacity>
+      <capacity>1247</capacity>
       <elecCF>0.81</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Sequoyah_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -1629,17 +1730,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TN</region>
+      <lifetime>720</lifetime>
+      <state>TN</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1152</genCapacity>
+      <capacity>1152</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Sequoyah_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -1649,17 +1751,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TN</region>
+      <lifetime>720</lifetime>
+      <state>TN</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1126</genCapacity>
+      <capacity>1126</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Shearon_Harris_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1668,17 +1771,18 @@
       <startOperMonth>05</startOperMonth>
       <licExpYear>2046</licExpYear>
       <licExpMonth>10</licExpMonth>
-      <region>NC</region>
+      <lifetime>720</lifetime>
+      <state>NC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>900</genCapacity>
+      <capacity>900</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>South_Texas_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -1688,17 +1792,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TX</region>
+      <lifetime>720</lifetime>
+      <state>TX</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1280</genCapacity>
+      <capacity>1280</capacity>
       <elecCF>0.90</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>South_Texas_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
@@ -1708,17 +1813,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TX</region>
+      <lifetime>720</lifetime>
+      <state>TX</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1280</genCapacity>
+      <capacity>1280</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>St_Lucie_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
@@ -1727,17 +1833,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2036</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>FL</region>
+      <lifetime>720</lifetime>
+      <state>FL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>839</genCapacity>
+      <capacity>839</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>St_Lucie_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1746,17 +1853,18 @@
       <startOperMonth>08</startOperMonth>
       <licExpYear>2043</licExpYear>
       <licExpMonth>04</licExpMonth>
-      <region>FL</region>
+      <lifetime>720</lifetime>
+      <state>FL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>839</genCapacity>
+      <capacity>839</capacity>
       <elecCF>0.76</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Surry_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1765,17 +1873,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2032</licExpYear>
       <licExpMonth>05</licExpMonth>
-      <region>VA</region>
+      <lifetime>720</lifetime>
+      <state>VA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>799</genCapacity>
+      <capacity>799</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Surry_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1784,17 +1893,18 @@
       <startOperMonth>05</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>VA</region>
+      <lifetime>720</lifetime>
+      <state>VA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>799</genCapacity>
+      <capacity>799</capacity>
       <elecCF>0.92</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Susquehanna_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
@@ -1803,17 +1913,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2032</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1185</genCapacity>
+      <capacity>1185</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Susquehanna_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
@@ -1822,17 +1933,18 @@
       <startOperMonth>02</startOperMonth>
       <licExpYear>2044</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>1185</genCapacity>
+      <capacity>1185</capacity>
       <elecCF>0.86</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Three_Mile_Island_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
@@ -1841,17 +1953,18 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2034</licExpYear>
       <licExpMonth>04</licExpMonth>
-      <region>PA</region>
+      <lifetime>720</lifetime>
+      <state>PA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>805</genCapacity>
+      <capacity>805</capacity>
       <elecCF>0.84</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Turkey_Point_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1860,17 +1973,18 @@
       <startOperMonth>12</startOperMonth>
       <licExpYear>2032</licExpYear>
       <licExpMonth>07</licExpMonth>
-      <region>FL</region>
+      <lifetime>720</lifetime>
+      <state>FL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>693</genCapacity>
+      <capacity>693</capacity>
       <elecCF>0.86</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Turkey_Point_4</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1879,17 +1993,18 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2033</licExpYear>
       <licExpMonth>04</licExpMonth>
-      <region>FL</region>
+      <lifetime>720</lifetime>
+      <state>FL</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>693</genCapacity>
+      <capacity>693</capacity>
       <elecCF>0.89</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Vermont_Yankee</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
@@ -1899,17 +2014,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>VT</region>
+      <lifetime>720</lifetime>
+      <state>VT</state>
       <typeReac>BWR</typeReac>
-      <genCapacity>620</genCapacity>
+      <capacity>620</capacity>
       <elecCF>0.99</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Virgil_C_Summer_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
@@ -1918,17 +2034,18 @@
       <startOperMonth>01</startOperMonth>
       <licExpYear>2042</licExpYear>
       <licExpMonth>08</licExpMonth>
-      <region>SC</region>
+      <lifetime>720</lifetime>
+      <state>SC</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>966</genCapacity>
+      <capacity>966</capacity>
       <elecCF>0.81</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Vogtle_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1937,17 +2054,18 @@
       <startOperMonth>06</startOperMonth>
       <licExpYear>2047</licExpYear>
       <licExpMonth>01</licExpMonth>
-      <region>GA</region>
+      <lifetime>720</lifetime>
+      <state>GA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1150</genCapacity>
+      <capacity>1150</capacity>
       <elecCF>0.91</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Vogtle_2</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
@@ -1956,17 +2074,18 @@
       <startOperMonth>05</startOperMonth>
       <licExpYear>2049</licExpYear>
       <licExpMonth>02</licExpMonth>
-      <region>GA</region>
+      <lifetime>720</lifetime>
+      <state>GA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1152</genCapacity>
+      <capacity>1152</capacity>
       <elecCF>1.01</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Waterford_3</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
@@ -1976,17 +2095,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>LA</region>
+      <lifetime>720</lifetime>
+      <state>LA</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1168</genCapacity>
+      <capacity>1168</capacity>
       <elecCF>0.87</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Watts_Bar_1</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1972</startConstrYear>
@@ -1996,17 +2116,18 @@
       <!-- No license expiration date given -->
       <licExpYear>-1</licExpYear>
       <licExpMonth>-1</licExpMonth>
-      <region>TN</region>
+      <lifetime>720</lifetime>
+      <state>TN</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1123</genCapacity>
+      <capacity>1123</capacity>
       <elecCF>0.94</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 <facility>
   <name>Wolf_Creek</name>
   <model>
-    <NWTRBFacility>
+    <RecipeReactor>
       <incommodity>fresh_uo2</incommodity>
       <outcommodity>spent_uo2</outcommodity>
       <startConstrYear>1977</startConstrYear>
@@ -2015,11 +2136,12 @@
       <startOperMonth>09</startOperMonth>
       <licExpYear>2045</licExpYear>
       <licExpMonth>03</licExpMonth>
-      <region>KS</region>
+      <lifetime>720</lifetime>
+      <state>KS</state>
       <typeReac>PWR</typeReac>
-      <genCapacity>1160</genCapacity>
+      <capacity>1160</capacity>
       <elecCF>0.86</elecCF>
-    </NWTRBFacility>
+    </RecipeReactor>
   </model>
 </facility>
 
