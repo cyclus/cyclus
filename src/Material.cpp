@@ -574,7 +574,7 @@ void Material::loadDecayInfo()
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
-              throw GenException("A duplicate daughter isotope was found in decayInfo.dat");
+              throw GenException(string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
             } 
           }
 
@@ -716,11 +716,11 @@ void Material::decay(double months)
     Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix, N_o, years);
 
     // converts the Vector solution N_t into a composition map
-    map<Iso, Atoms> newComp = makeCompMap(N_t);
+    //map<Iso, Atoms> newComp = makeCompMap(N_t);
  
     // assigns the new composition map to this Material object
-    int time = Timer::Instance()->getTime();
-    this->changeAtomComp(newComp,time);
+    //int time = Timer::Instance()->getTime();
+    //this->changeAtomComp(newComp,time);
   }
   catch ( string e ) {
     throw GenException(e);
