@@ -17,15 +17,18 @@ using namespace std;
 ParentMap Material::parent = ParentMap();
 DaughtersMap Material::daughters = DaughtersMap();
 Matrix Material::decayMatrix = Matrix();
+int Material::nextID = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(): atomEqualsMass(true), total_mass(0), total_atoms(0) 
 {
+  ID=nextID++;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(xmlNodePtr cur)
 {
+  ID=nextID++;
   
   recipeName = XMLinput->get_xpath_content(cur,"name");
 
@@ -61,6 +64,8 @@ Material::Material(xmlNodePtr cur)
 Material::Material(CompMap comp, string mat_unit, string rec_name, double size, Basis type)  
 {
   
+  ID=nextID++;
+
   units = mat_unit;
   recipeName = rec_name;
 

@@ -168,6 +168,13 @@ public:
   void printComp(string header, CompMap comp_map);
 
   /**
+   * get material ID
+   *
+   * @return ID
+   */
+  const int getSN(){return ID;};
+
+  /**
    * returns the name of the recipe
    *
    * @return recipeName
@@ -411,6 +418,16 @@ public:
   static void loadDecayInfo();
 
 protected:
+  /** 
+   * The serial number for this Material.
+   */
+  int ID;
+
+  /**
+   * Stores the next available material ID
+   */
+  static int nextID;
+
   /**
    * Returns true if the given isotope's number density is for some reason 
    * negative, false otherwise. We define number densities that are negative by 

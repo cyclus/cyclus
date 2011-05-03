@@ -9,6 +9,9 @@
 #include "H5Exception.h"
 #include "GenException.h"
 
+#include "Material.h"
+#include "Message.h"
+
 BookKeeper* BookKeeper::_instance = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -169,6 +172,26 @@ bool BookKeeper::isGroup(string grp)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
+  // grab each material object off of the manifest
+  // and add its transaction to the list
+  for (vector<Material*>::iterator thisMat=manifest.begin();
+       thisMat != manifest.end();
+       thisMat++)
+  {
+    trans_t toRegister;
+    toRegister.requesterID=msg->getRequesterID();
+    toRegister.supplierID=msg->getSupplierID();
+    toRegister.price=msg->getPrice();
+    toRegister.timestamp=TI->getTime();
+    toRegister.materialID=(*thisMat)->getSN(); 
+    toRegister.price = msg->getPrice();
+    strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
+    transactions.push_back(toRegister);
+  };
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeModelList(ModelType type){
 
   // define some useful variables.
@@ -226,7 +249,6 @@ void BookKeeper::writeModelList(ModelType type){
     Model* theModel = (LI->*ptr2getModel)(i);
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
-    cout << " i = " << i << endl;
   };
   if(numModels==0){
     string str1="";
@@ -269,6 +291,120 @@ void BookKeeper::writeModelList(ModelType type){
 
     // write it, finally 
     dataset->write( modelList , mtype );
+    delete outputgroup;
+    delete subgroup;
+    delete dataspace;
+    delete dataset;
+  }
+  // catch failure caused by the H5File operations
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the Group operations
+  catch( GroupIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataType operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeTransList(){
+
+  // define some useful variables.
+  const H5std_string supplierID_memb = "supplierID";
+  const H5std_string requesterID_memb = "requesterID";
+  const H5std_string materialID_memb = "materialID";
+  const H5std_string timestamp_memb = "timestamp";
+  const H5std_string price_memb = "price";
+  const H5std_string commodName_memb = "commodName";
+  const H5std_string output_name = "/output";
+  string subgroup_name;
+  string dataset_name;
+
+  // prepare the function pointer
+  Model* (Logician::*ptr2getModel)(int) = NULL;
+
+  int numTrans = transactions.size();
+  subgroup_name = "Transactions";
+  dataset_name = "transactionList"; 
+
+  int numStructs;
+  if(numTrans==0)
+    numStructs=1;
+  else
+    numStructs=numTrans;
+
+  // create an array of the model structs
+  trans_t transList[numStructs];
+  for (int i=0; i<numStructs; i++){
+    transList[i].supplierID = transactions[i].supplierID;
+    transList[i].requesterID = transactions[i].requesterID;
+    transList[i].materialID = transactions[i].materialID;
+    transList[i].timestamp = transactions[i].timestamp;
+    transList[i].price = transactions[i].price;
+    strcpy( transList[i].commodName,transactions[i].commodName);
+  };
+  if(numTrans==0){
+    string str1="";
+    transList[0].supplierID=0;
+    transList[0].requesterID=0;
+    transList[0].materialID=0;
+    transList[0].timestamp=0;
+    strcpy(transList[0].commodName, str1.c_str());
+  };
+
+  try{
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
+    Exception::dontPrint();
+    
+    // Open the file and the dataset.
+    this->openDB();
+
+    // describe the data in an hdf5-y way
+    hsize_t dim[] = {1,numTrans};
+    int rank = 2;
+    Group* outputgroup;
+    outputgroup = new Group(this->getDB()->openGroup(output_name));
+    Group* subgroup;
+    subgroup = new Group(outputgroup->createGroup(subgroup_name));
+    DataSpace* dataspace;
+    dataspace = new DataSpace( rank, dim );
+
+    //create a variable length string types
+    size_t charlen = sizeof(char[128]);
+    StrType strtype(PredType::C_S1,charlen); 
+   
+    // Create a datatype for models based on the struct
+    CompType mtype( sizeof(trans_t) );
+    mtype.insertMember( supplierID_memb, HOFFSET(trans_t, supplierID), PredType::NATIVE_INT); 
+    mtype.insertMember( requesterID_memb, HOFFSET(trans_t, requesterID), PredType::NATIVE_INT); 
+    mtype.insertMember( materialID_memb, HOFFSET(trans_t, materialID), PredType::NATIVE_INT); 
+    mtype.insertMember( timestamp_memb, HOFFSET(trans_t, timestamp), PredType::NATIVE_INT); 
+    mtype.insertMember( timestamp_memb, HOFFSET(trans_t, price), PredType::IEEE_F64LE); 
+    mtype.insertMember( commodName_memb, HOFFSET(trans_t, commodName), strtype);
+
+    DataSet* dataset;
+    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+
+    // write it, finally 
+    dataset->write( transList , mtype );
 
     delete outputgroup;
     delete subgroup;

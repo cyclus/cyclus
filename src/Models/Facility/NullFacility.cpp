@@ -21,7 +21,7 @@
  * put it in stocks
  *
  * SEND MATERIAL
- * pull it from inventory
+ * pull it from inventory, fill the transaction
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -111,8 +111,9 @@ void NullFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::sendMaterial(Transaction trans, const Communicator* requester)
+void NullFacility::sendMaterial(Message* order, const Communicator* requester)
 {
+  Transaction trans = order->getTrans();
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
     throw GenException("NullFacility can only send out_commod materials.");
@@ -151,7 +152,7 @@ void NullFacility::sendMaterial(Transaction trans, const Communicator* requester
     cout<<"NullFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
-  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+  FacilityModel::sendMaterial( order, toSend );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -273,7 +274,7 @@ void NullFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
   

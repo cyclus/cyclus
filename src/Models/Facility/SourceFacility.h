@@ -81,7 +81,7 @@ public:
    * @param trans is the transaction object representing the order
    * @param requester is the communicator that the transaction is sent to
    */
-  virtual void sendMaterial(Transaction trans, const Communicator* requester);
+  virtual void sendMaterial(Message* msg, const Communicator* requester);
   
   /**
    * Receives material sent from another facility.

@@ -131,8 +131,9 @@ void RecipeReactor::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::sendMaterial(Transaction trans, const Communicator* requester)
+void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
 {
+  Transaction trans = msg->getTrans();
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
     throw GenException("RecipeReactor can only send out_commod materials.");
@@ -171,7 +172,7 @@ void RecipeReactor::sendMaterial(Transaction trans, const Communicator* requeste
     cout<<"RecipeReactor "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
-  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+  FacilityModel::sendMaterial(msg, toSend);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -293,7 +294,7 @@ void RecipeReactor::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
   

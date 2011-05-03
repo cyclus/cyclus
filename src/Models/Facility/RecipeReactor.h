@@ -81,7 +81,7 @@ public:
      * @param trans the Transaction object defining the order being filled
      * @param receiver the ultimate facility to receive this transaction
      */
-    virtual void sendMaterial(Transaction trans, const Communicator* receiver);
+    virtual void sendMaterial(Message* msg, const Communicator* receiver);
     
     /**
      * The facility receives the materials other facilities have sent.

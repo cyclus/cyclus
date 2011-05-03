@@ -3,6 +3,8 @@
 
 #include "FacilityModel.h"
 #include "Logician.h"
+#include "BookKeeper.h"
+//#include "Material.h"
 
 /* --------------------
  * all MODEL classes have these members
@@ -50,6 +52,14 @@ InstModel* FacilityModel::getFacInst()
 {
   return (InstModel*)(LI->getInstByName(inst_name));
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
+  // register this transaction with the bookkeper
+  BI->registerTrans(msg, manifest);
+  // send the material by calling the receiver's receiveMaterial function
+  ((FacilityModel*)LI->getFacilityByID(ID))->receiveMaterial(msg->getTrans(), manifest);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleTick(int time){
   // facilities should override this method, unless they're very naiive.

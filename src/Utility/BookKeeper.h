@@ -10,6 +10,8 @@
 #include "hdf5.h"
 
 #include "Model.h"
+#include "Material.h"
+#include "Message.h"
 
 #define BI BookKeeper::Instance()
 
@@ -86,6 +88,21 @@ protected:
     char modelImpl[128];       /**< A string indicating the model implementation >**/
   } model_t;
 
+  // facility, market, converter, or institution model struct
+  typedef struct trans_t{
+    int supplierID;         /**< An integer indicating the supplier model ID >**/
+    int requesterID;        /**< An integer indicating the requester model ID >**/
+    int materialID;         /**< An integer indicating the material object ID >**/
+    int timestamp;          /**< An integer indicating the month >**/
+    double price;           /**< A double indicating the transaction price >**/   
+    char commodName[128];   /**< the name of the commodity >**/
+  } trans_t;
+
+  /**
+   * Stores the transactions that have taken place during the simulation.
+   */
+  vector<trans_t> transactions;
+
 public:
 		
   /**
@@ -159,11 +176,25 @@ public:
   string getDBName(){return dbName;};
 
   /**
+   * Register the transaction in the BookKeeper's map of transactions
+   *
+   * @param msg the message containing the transaction
+   * @param manifest a vector the materials fulfilling this transaction
+   */
+  void registerTrans(Message* msg, vector<Material*> Manifest);
+
+  /**
    * Write a list of the facility/inst/market models in the simulation
    *
    * @param type, the model type (i.e. insts, facilities, or markets)
    */
+
   void writeModelList(ModelType type);
+  /**
+   * Write a list of the transactions in the simulation
+   *
+   */
+  void writeTransList();
 
   /**
    * Prepares file and memory dataspaces for homogeneous data 

@@ -127,8 +127,9 @@ void EnrichmentFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::sendMaterial(Transaction trans, const Communicator* requester)
+void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requester)
 {
+  Transaction trans = msg->getTrans();
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
     throw GenException("EnrichmentFacility can only send out_commod materials.");
@@ -167,7 +168,7 @@ void EnrichmentFacility::sendMaterial(Transaction trans, const Communicator* req
     cout<<"EnrichmentFacility "<< ID
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
-  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+  FacilityModel::sendMaterial(msg, toSend);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -234,7 +235,7 @@ void EnrichmentFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
   
@@ -442,7 +443,7 @@ void EnrichmentFacility::enrich()
     mess->setAmount(theProd->getTotMass());
     mess->setComp(pComp);
 
-		this->sendMaterial(mess->getTrans(), mess->getSender());
+		this->sendMaterial(mess, mess->getSender());
 		wastes.push_back(theTails);
 
 		delete mat;

@@ -127,8 +127,9 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicator* requester)
+void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* requester)
 {
+  Transaction trans = msg->getTrans();
   // it should be of out_commod Commodity type
   if(trans.commod != out_commod){
     throw GenException("SeparationsMatrixFacility can only send out_commod materials.");
@@ -171,9 +172,7 @@ void SeparationsMatrixFacility::sendMaterial(Transaction trans, const Communicat
 	cout << "Material Before Sending to Sink" << endl;
 	cout << ((FacilityModel*)(LI->getFacilityByID(trans.requesterID))) << endl;
 
-	// Current Status... I never even enter into the receiveMaterial function
-	// The Logician is being given ID of "0x31".  I have no idea what that means... is it bad?
-  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+  FacilityModel::sendMaterial(msg, toSend);
 
 	cout << "Material After Sending to Sink" << endl;
 
@@ -246,7 +245,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
 }

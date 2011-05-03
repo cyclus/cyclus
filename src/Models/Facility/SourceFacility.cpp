@@ -116,8 +116,9 @@ void SourceFacility::receiveMessage(Message* msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::sendMaterial(Transaction trans, const Communicator* requester)
+void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
 {
+  Transaction trans = msg->getTrans();
   Mass newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
@@ -151,7 +152,7 @@ void SourceFacility::sendMaterial(Transaction trans, const Communicator* request
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
     (newMat)->print();
   }    
-  ((FacilityModel*)(LI->getFacilityByID(trans.requesterID)))->receiveMaterial(trans, toSend);
+  FacilityModel::sendMaterial(msg, toSend);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -214,7 +215,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order->getTrans(), ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   }
   // Maybe someday it will record things.

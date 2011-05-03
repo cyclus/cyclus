@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Material.h"
+#include "Timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
@@ -20,7 +21,7 @@ class MaterialTest : public ::testing::Test {
       u235 = 92235;
       am241 = 95241;
       th228 = 90228;
-      pb208 = 90228;
+      pb208 = 82208;
       Atoms one = 1.0;
       test_comp[u235]=one;
       decay_comp[u235]=one;
@@ -31,6 +32,7 @@ class MaterialTest : public ::testing::Test {
       test_type = atomBased;
       u235_halflife = 8445600000; // approximate, in months
       th228_halflife = 2*11; // approximate, in months
+      int time = TI->getTime();
 
       test_mat = new Material(test_comp, test_mat_unit, test_rec_name, test_size, test_type); 
       decay_mat = new Material(decay_comp, test_mat_unit, test_rec_name, test_size, test_type); 
