@@ -213,8 +213,9 @@ void BookKeeper::writeModelList(ModelType type){
   };
 
   int numStructs;
-  if(numModels==0)
+  if(numModels==0){
     numStructs=1;
+  }
   else
     numStructs=numModels;
 
@@ -225,6 +226,7 @@ void BookKeeper::writeModelList(ModelType type){
     Model* theModel = (LI->*ptr2getModel)(i);
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
+    cout << " i = " << i << endl;
   };
   if(numModels==0){
     string str1="";
@@ -244,7 +246,7 @@ void BookKeeper::writeModelList(ModelType type){
 
     // describe the data in an hdf5-y way
     hsize_t dim[] = {1,numModels};
-    int rank = 1;
+    int rank = 2;
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
     Group* subgroup;

@@ -56,6 +56,10 @@ int main(int argc, char* argv[])
 
     // Create the output file
     BI->createDB();
+    BI->writeModelList(region);
+    BI->writeModelList(inst);
+    BI->writeModelList(facility);
+    BI->writeModelList(market);
     BI->closeDB();
 
     return 0;
