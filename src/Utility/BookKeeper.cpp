@@ -251,6 +251,7 @@ void BookKeeper::writeModelList(ModelType type){
     strcpy(modelList[i].name, theModel->getName().c_str()); 
   };
   if(numModels==0){
+    
     string str1="";
     string str2="";
     modelList[0].ID=0;
@@ -267,8 +268,15 @@ void BookKeeper::writeModelList(ModelType type){
     this->openDB();
 
     // describe the data in an hdf5-y way
-    hsize_t dim[] = {1,numModels};
-    int rank = 2;
+    hsize_t dim[] = {1, numModels};
+    // if there's only one model, the dataspace is a vector, which  
+    // hdf5 doesn't like to think of as a matrix 
+    int rank;
+    if(numModels <= 1)
+      rank = 1;
+    else
+      rank = 2;
+
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
     Group* subgroup;

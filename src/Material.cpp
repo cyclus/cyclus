@@ -278,13 +278,19 @@ void Material::changeComp(Iso tope, Atoms change, int time)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::changeAtomComp(CompMap newComp, int time){
-  compHist[time]=newComp;
+  // To replace the whole composition, we first erase that entry
+  compHist.erase(time);
+  // then we insert the new composition
+  compHist.insert(make_pair(time, newComp));
   rationalize_A2M();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::changeMassComp(CompMap newComp, int time){
-  massHist[time]=newComp;
+  // To replace the whole composition, we first erase that entry
+  massHist.erase(time);
+  // then we insert the new composition
+  massHist.insert(make_pair(time, newComp));
   rationalize_M2A();
 }
 

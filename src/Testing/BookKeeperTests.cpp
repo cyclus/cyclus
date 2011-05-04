@@ -47,12 +47,15 @@ class BookKeeperTest : public ::testing::Test {
     };
 };
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, createDataBase) {
   BI->closeDB();
   BI->createDB(test_filename);
   EXPECT_EQ(       BI->getDBName(),               test_filename );
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, openDB) {
   BI->openDB();
   EXPECT_EQ(       BI->isOpen(),                           true );
@@ -60,12 +63,15 @@ TEST_F(BookKeeperTest, openDB) {
   EXPECT_EQ(       BI->isOpen(),                          false );
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, closeDB){
   BI->closeDB();
   EXPECT_EQ(       BI->isOpen(),                          false );
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // Integers
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite1DIntegers) {
   intData1d test_data_int1(boost::extents[nrows]);
   intData1d test_out_int1(boost::extents[nrows]);
@@ -77,6 +83,7 @@ TEST_F(BookKeeperTest, ReadWrite1DIntegers) {
   EXPECT_EQ(       test_out_int1[n],            test_data_int1[n] );
   ASSERT_EQ(       n,                           test_out_int1[n] ); 
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite2DIntegers) {
   intData2d test_data_int2(boost::extents[nrows][ncols]);
   intData2d test_out_int2(boost::extents[nrows][ncols]);
@@ -91,6 +98,7 @@ TEST_F(BookKeeperTest, ReadWrite2DIntegers) {
   ASSERT_EQ(       test_out_int2[n][n],                       2*n  ); 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite3DIntegers) {
   intData3d test_data_int3(boost::extents[nrows][ncols][nlayers]);
   intData3d test_out_int3(boost::extents[nrows][ncols][nlayers]);
@@ -109,7 +117,9 @@ TEST_F(BookKeeperTest, ReadWrite3DIntegers) {
   ASSERT_EQ(      test_out_int3[0][1][n],                    1+n ); 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // Doubles
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite1DDoubles) {
   dblData1d test_data_dbl1(boost::extents[nrows]);
   dblData1d test_out_dbl1(boost::extents[nrows]);
@@ -121,6 +131,7 @@ TEST_F(BookKeeperTest, ReadWrite1DDoubles) {
   EXPECT_EQ(       test_out_dbl1[n],           test_data_dbl1[n] );
   ASSERT_NEAR(     test_out_dbl1[n],           0.1*n,      0.001 );  
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite2DDoubles) {
   dblData2d test_data_dbl2(boost::extents[nrows][ncols]);
   dblData2d test_out_dbl2(boost::extents[nrows][ncols]);
@@ -134,6 +145,7 @@ TEST_F(BookKeeperTest, ReadWrite2DDoubles) {
   EXPECT_EQ(       test_out_dbl2[n][n],     test_data_dbl2[n][n] );
   ASSERT_NEAR(     test_out_dbl2[n][n],       0.1*(n+n),   0.001 );  
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
   dblData3d test_data_dbl3(boost::extents[nrows][ncols][nlayers]);
   dblData3d test_out_dbl3(boost::extents[nrows][ncols][nlayers]);
@@ -151,10 +163,11 @@ TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
   BI->closeDB();
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, WriteModelLists){
   BI->writeModelList(region);
   EXPECT_EQ(BI->isGroup("output")      ,     true);
-  EXPECT_EQ(BI->isGroup("/output/regions")      ,     true);
+  EXPECT_EQ(BI->isGroup("regions")      ,     true);
   BI->writeModelList(inst);
   EXPECT_EQ(BI->isGroup("insts")      ,     true);
   BI->writeModelList(facility);
