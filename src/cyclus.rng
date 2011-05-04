@@ -217,6 +217,7 @@
         <ref name="SeparationsMatrixFacility"/>
         <ref name="SinkFacility"/>
         <ref name="SourceFacility"/>
+        <ref name="StorageFacility"/>
         <ref name="StubFacility"/>
         <!-- insert ref to new FacilityModels here -->
       </choice>
@@ -295,6 +296,24 @@
           <text/>
           </element>
         <element name="commodprice">
+          <text/>
+          </element>
+     </element>
+  </define>
+
+  <define name="StorageFacility">
+     <element name="StorageFacility"> 
+        <oneOrMore>
+          <ref name="incommodity"/>
+        </oneOrMore>
+
+        <element name="capacity">
+          <text/>
+          </element>
+        <element name="inventorysize">
+          <text/>
+          </element>
+        <element name="residencetime">
           <text/>
           </element>
      </element>
