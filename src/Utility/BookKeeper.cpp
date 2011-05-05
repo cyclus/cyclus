@@ -267,14 +267,14 @@ void BookKeeper::writeModelList(ModelType type){
     this->openDB();
 
     // describe the data in an hdf5-y way
-    hsize_t dim[] = {1, numModels};
+    hsize_t dim[] = {numStructs};
     // if there's only one model, the dataspace is a vector, which  
     // hdf5 doesn't like to think of as a matrix 
     int rank;
     if(numModels <= 1)
       rank = 1;
     else
-      rank = 2;
+      rank = 1;
 
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
@@ -362,6 +362,7 @@ void BookKeeper::writeTransList(){
     transList[i].price = transactions[i].price;
     strcpy( transList[i].commodName,transactions[i].commodName);
   };
+  // If there are no transactions, make a null transaction entry
   if(numTrans==0){
     string str1="";
     transList[0].supplierID=0;
@@ -381,14 +382,14 @@ void BookKeeper::writeTransList(){
     this->openDB();
 
     // describe the data in an hdf5-y way
-    hsize_t dim[] = {1, numTrans,128};
+    hsize_t dim[] = {numStructs};
     // if there's only one model, the dataspace is a vector, which  
     // hdf5 doesn't like to think of as a matrix 
     int rank;
     if(numTrans <= 1)
       rank = 1;
     else
-      rank = 2;
+      rank = 1;
 
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
