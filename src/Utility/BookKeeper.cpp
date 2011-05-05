@@ -182,9 +182,8 @@ void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
     trans_t toRegister;
     toRegister.requesterID=msg->getRequesterID();
     toRegister.supplierID=msg->getSupplierID();
-    toRegister.price=msg->getPrice();
-    toRegister.timestamp=TI->getTime();
     toRegister.materialID=(*thisMat)->getSN(); 
+    toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();
     strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
     transactions.push_back(toRegister);
@@ -342,15 +341,10 @@ void BookKeeper::writeTransList(){
   const H5std_string price_memb = "price";
   const H5std_string commodName_memb = "commodName";
   const H5std_string output_name = "/output";
-  string subgroup_name;
-  string dataset_name;
-
-  // prepare the function pointer
-  Model* (Logician::*ptr2getModel)(int) = NULL;
+  const H5std_string subgroup_name = "transactions";
+  const H5std_string dataset_name = "transList";
 
   int numTrans = transactions.size();
-  subgroup_name = "Transactions";
-  dataset_name = "transactionList"; 
 
   int numStructs;
   if(numTrans==0)
@@ -374,6 +368,7 @@ void BookKeeper::writeTransList(){
     transList[0].requesterID=0;
     transList[0].materialID=0;
     transList[0].timestamp=0;
+    transList[0].price=0;
     strcpy(transList[0].commodName, str1.c_str());
   };
 
@@ -386,8 +381,15 @@ void BookKeeper::writeTransList(){
     this->openDB();
 
     // describe the data in an hdf5-y way
-    hsize_t dim[] = {1,numTrans};
-    int rank = 2;
+    hsize_t dim[] = {1, numTrans,128};
+    // if there's only one model, the dataspace is a vector, which  
+    // hdf5 doesn't like to think of as a matrix 
+    int rank;
+    if(numTrans <= 1)
+      rank = 1;
+    else
+      rank = 2;
+
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
     Group* subgroup;
@@ -405,7 +407,7 @@ void BookKeeper::writeTransList(){
     mtype.insertMember( requesterID_memb, HOFFSET(trans_t, requesterID), PredType::NATIVE_INT); 
     mtype.insertMember( materialID_memb, HOFFSET(trans_t, materialID), PredType::NATIVE_INT); 
     mtype.insertMember( timestamp_memb, HOFFSET(trans_t, timestamp), PredType::NATIVE_INT); 
-    mtype.insertMember( timestamp_memb, HOFFSET(trans_t, price), PredType::IEEE_F64LE); 
+    mtype.insertMember( price_memb, HOFFSET(trans_t, price), PredType::IEEE_F64LE); 
     mtype.insertMember( commodName_memb, HOFFSET(trans_t, commodName), strtype);
 
     DataSet* dataset;

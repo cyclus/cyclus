@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
     BI->writeModelList(inst);
     BI->writeModelList(facility);
     BI->writeModelList(market);
+    BI->writeTransList();
     BI->closeDB();
 
     return 0;
