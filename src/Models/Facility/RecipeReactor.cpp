@@ -52,7 +52,7 @@ void RecipeReactor::init(xmlNodePtr cur)
                        + "' does not exist for facility '" + getName() 
                        + "'.");
 
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  //inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
   lifetime = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
   startConstrYr = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
@@ -63,7 +63,7 @@ void RecipeReactor::init(xmlNodePtr cur)
   licExpMo = atoi(XMLinput->get_xpath_content(cur,"licExpMonth"));
   state = XMLinput->get_xpath_content(cur,"state");
   typeReac = XMLinput->get_xpath_content(cur,"typeReac");
-  CF = atof(XMLinput->get_xpath_content(cur,"CF"));
+  CF = atof(XMLinput->get_xpath_content(cur,"elecCF"));
 
   inventory = deque<Material*>();
   stocks = deque<Material*>();

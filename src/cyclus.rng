@@ -214,6 +214,7 @@
       <choice>
         <ref name="EnrichmentFacility"/>
         <ref name="NullFacility"/>
+        <ref name="RecipeReactor"/>
         <ref name="SeparationsMatrixFacility"/>
         <ref name="SinkFacility"/>
         <ref name="SourceFacility"/>
@@ -270,6 +271,47 @@
         <ref name="outcommodity"/>
         <ref name="inventorysize"/>
         <ref name="capacity"/>
+     </element>
+  </define>
+
+  <define name="RecipeReactor">
+     <element name="RecipeReactor"> 
+        <oneOrMore>
+          <ref name="incommodity"/>
+          <ref name="outcommodity"/>
+        </oneOrMore>
+
+        <element name="startConstrYear">
+          <text/>
+          </element>
+        <element name="startConstrMonth">
+          <text/>
+          </element>
+        <element name="startOperYear">
+          <text/>
+          </element>
+        <element name="startOperMonth">
+          <text/>
+          </element>
+        <element name="licExpYear">
+          <text/>
+          </element>
+        <element name="licExpMonth">
+          <text/>
+          </element>
+        <element name="lifetime">
+          <text/>
+          </element>
+        <element name="state">
+          <text/>
+          </element>
+        <element name="typeReac">
+          <text/>
+          </element>
+        <ref name="capacity"/>
+        <element name="elecCF">
+          <text/>
+          </element>
      </element>
   </define>
 

@@ -1,14 +1,18 @@
 <?xml version="1.0"?>
 
 <facilitycatalog>
-<name>Sample NWTRB Facilitycatalog</name>
+<name>NWTRB Facilitycatalog</name>
 
 <facility>
   <name>Arkansas_Nuclear_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -27,8 +31,12 @@
   <name>Arkansas_Nuclear_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1971</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1980</startOperYear>
@@ -44,31 +52,15 @@
   </model>
 </facility>
 <facility>
-  <name>Arkansas_Nuclear_2</name>
-  <model>
-    <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
-      <startConstrYear>1971</startConstrYear>
-      <startConstrMonth>07</startConstrMonth>
-      <startOperYear>1980</startOperYear>
-      <startOperMonth>03</startOperMonth>
-      <licExpYear>2038</licExpYear>
-      <licExpMonth>07</licExpMonth>
-      <lifetime>720</lifetime>
-      <state>AR</state>
-      <typeReac>PWR</typeReac>
-      <capacity>993</capacity>
-      <elecCF>0.90</elecCF>
-    </RecipeReactor>
-  </model>
-</facility>
-<facility>
   <name>Beaver_Valley_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1976</startOperYear>
@@ -87,8 +79,12 @@
   <name>Beaver_Valley_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1987</startOperYear>
@@ -107,15 +103,18 @@
   <name>Braidwood_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1988</startOperYear>
       <startOperMonth>07</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>07</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>PWR</typeReac>
@@ -128,15 +127,18 @@
   <name>Braidwood_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1988</startOperYear>
       <startOperMonth>10</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>10</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>PWR</typeReac>
@@ -149,8 +151,8 @@
   <name>Browns_Ferry_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -169,8 +171,8 @@
   <name>Browns_Ferry_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -189,8 +191,8 @@
   <name>Browns_Ferry_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1977</startOperYear>
@@ -209,8 +211,8 @@
   <name>Brunswick_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1977</startOperYear>
@@ -229,8 +231,8 @@
   <name>Brunswick_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -249,15 +251,18 @@
   <name>Byron_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1985</startOperYear>
       <startOperMonth>09</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2025</licExpYear>
+      <licExpMonth>09</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>PWR</typeReac>
@@ -270,15 +275,18 @@
   <name>Byron_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1987</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>PWR</typeReac>
@@ -291,15 +299,18 @@
   <name>Callaway_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1984</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2024</licExpYear>
+      <licExpMonth>12</licExpMonth>
       <lifetime>720</lifetime>
       <state>MO</state>
       <typeReac>PWR</typeReac>
@@ -312,8 +323,12 @@
   <name>Calvert_Cliffs_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -332,8 +347,12 @@
   <name>Calvert_Cliffs_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1977</startOperYear>
@@ -352,8 +371,12 @@
   <name>Catawba_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1985</startOperYear>
@@ -372,8 +395,12 @@
   <name>Catawba_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1986</startOperYear>
@@ -392,15 +419,14 @@
   <name>Clinton_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1987</startOperYear>
       <startOperMonth>11</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2027</licExpYear>
+      <licExpMonth>11</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>BWR</typeReac>
@@ -413,15 +439,14 @@
   <name>Columbia_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1972</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1984</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2024</licExpYear>
+      <licExpMonth>12</licExpMonth>
       <lifetime>720</lifetime>
       <state>WA</state>
       <typeReac>BWR</typeReac>
@@ -434,15 +459,18 @@
   <name>Comanche_Peak_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1990</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2030</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>TX</state>
       <typeReac>PWR</typeReac>
@@ -455,15 +483,18 @@
   <name>Comanche_Peak_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1993</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2033</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>TX</state>
       <typeReac>PWR</typeReac>
@@ -476,8 +507,8 @@
   <name>Cooper</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -496,15 +527,18 @@
   <name>Crystal_River_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1977</startOperYear>
       <startOperMonth>03</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2017</licExpYear>
+      <licExpMonth>07</licExpMonth>
       <lifetime>720</lifetime>
       <state>FL</state>
       <typeReac>PWR</typeReac>
@@ -517,15 +551,18 @@
   <name>Davis_Besse_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1978</startOperYear>
       <startOperMonth>07</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2018</licExpYear>
+      <licExpMonth>07</licExpMonth>
       <lifetime>720</lifetime>
       <state>OH</state>
       <typeReac>PWR</typeReac>
@@ -538,15 +575,19 @@
   <name>Diablo_Canyon_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1985</startOperYear>
       <startOperMonth>05</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2025</licExpYear>
+      <licExpMonth>05</licExpMonth>
+      <lifetime>720</lifetime>
       <state>CA</state>
       <typeReac>PWR</typeReac>
       <capacity>1122</capacity>
@@ -558,15 +599,18 @@
   <name>Diablo_Canyon_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>12</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>03</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>03</licExpMonth>
       <lifetime>720</lifetime>
       <state>CA</state>
       <typeReac>PWR</typeReac>
@@ -579,8 +623,12 @@
   <name>Donald_Cook_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -599,8 +647,12 @@
   <name>Donald_Cook_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1978</startOperYear>
@@ -619,8 +671,8 @@
   <name>Dresden_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1970</startOperYear>
@@ -639,8 +691,8 @@
   <name>Dresden_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1966</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1971</startOperYear>
@@ -659,8 +711,8 @@
   <name>Duane_Arnold_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -679,15 +731,14 @@
   <name>Enrico_Fermi_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1988</startOperYear>
       <startOperMonth>01</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>01</licExpMonth>
       <lifetime>720</lifetime>
       <state>MI</state>
       <typeReac>BWR</typeReac>
@@ -700,8 +751,12 @@
   <name>Farley_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1977</startOperYear>
@@ -720,8 +775,12 @@
   <name>Farley_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1981</startOperYear>
@@ -740,8 +799,8 @@
   <name>Fitzpatrick</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -760,8 +819,12 @@
   <name>Fort_Calhoun_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -780,15 +843,14 @@
   <name>Grand_Gulf_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1985</startOperYear>
       <startOperMonth>07</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2025</licExpYear>
+      <licExpMonth>07</licExpMonth>
       <lifetime>720</lifetime>
       <state>MS</state>
       <typeReac>BWR</typeReac>
@@ -801,8 +863,12 @@
   <name>HB_Robinson_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1971</startOperYear>
@@ -821,8 +887,8 @@
   <name>Hatch_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -841,8 +907,8 @@
   <name>Hatch_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1972</startConstrYear>
       <startConstrMonth>02</startConstrMonth>
       <startOperYear>1979</startOperYear>
@@ -861,15 +927,14 @@
   <name>Hope_Creek_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>12</licExpMonth>
       <lifetime>720</lifetime>
       <state>NJ</state>
       <typeReac>BWR</typeReac>
@@ -882,15 +947,18 @@
   <name>Indian_Point_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1966</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1974</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2014</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>NY</state>
       <typeReac>PWR</typeReac>
@@ -903,15 +971,18 @@
   <name>Indian_Point_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1976</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2016</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>NY</state>
       <typeReac>PWR</typeReac>
@@ -924,15 +995,18 @@
   <name>Kewaunee</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1974</startOperYear>
       <startOperMonth>06</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2014</licExpYear>
+      <licExpMonth>06</licExpMonth>
       <lifetime>720</lifetime>
       <state>WI</state>
       <typeReac>PWR</typeReac>
@@ -945,15 +1019,14 @@
   <name>La_Salle_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1984</startOperYear>
       <startOperMonth>01</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2024</licExpYear>
+      <licExpMonth>01</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>BWR</typeReac>
@@ -966,15 +1039,14 @@
   <name>La_Salle_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
-      <startOperYear>1984/startOperYear>
+      <startOperYear>1984</startOperYear>
       <startOperMonth>10</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2024</licExpYear>
+      <licExpMonth>10</licExpMonth>
       <lifetime>720</lifetime>
       <state>IL</state>
       <typeReac>BWR</typeReac>
@@ -987,15 +1059,14 @@
   <name>Limerick_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>02</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>02</licExpMonth>
       <lifetime>720</lifetime>
       <state>PA</state>
       <typeReac>BWR</typeReac>
@@ -1008,15 +1079,14 @@
   <name>Limerick_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1990</startOperYear>
       <startOperMonth>01</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2030</licExpYear>
+      <licExpMonth>01</licExpMonth>
       <lifetime>720</lifetime>
       <state>PA</state>
       <typeReac>BWR</typeReac>
@@ -1029,8 +1099,12 @@
   <name>McGuire_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1971</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1981</startOperYear>
@@ -1049,8 +1123,12 @@
   <name>McGuire_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1971</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1984</startOperYear>
@@ -1069,8 +1147,12 @@
   <name>Millstone_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1975</startOperYear>
@@ -1089,8 +1171,12 @@
   <name>Millstone_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1986</startOperYear>
@@ -1109,8 +1195,8 @@
   <name>Monticello</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1971</startOperYear>
@@ -1129,8 +1215,8 @@
   <name>Nine_Mile_Point_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1965</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1969</startOperYear>
@@ -1149,8 +1235,8 @@
   <name>Nine_Mile_Point_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1988</startOperYear>
@@ -1169,8 +1255,12 @@
   <name>North_Anna_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1971</startConstrYear>
       <startConstrMonth>02</startConstrMonth>
       <startOperYear>1978</startOperYear>
@@ -1189,8 +1279,12 @@
   <name>North_Anna_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1980</startOperYear>
@@ -1209,8 +1303,12 @@
   <name>Oconee_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -1229,8 +1327,12 @@
   <name>Oconee_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -1249,8 +1351,12 @@
   <name>Oconee_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -1269,8 +1375,8 @@
   <name>Oyster_Creek</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1964</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1969</startOperYear>
@@ -1289,8 +1395,12 @@
   <name>Palisades</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>02</startConstrMonth>
       <startOperYear>1971</startOperYear>
@@ -1309,15 +1419,18 @@
   <name>Palo_Verde_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>01</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>01</licExpMonth>
       <lifetime>720</lifetime>
       <state>AZ</state>
       <typeReac>PWR</typeReac>
@@ -1330,15 +1443,18 @@
   <name>Palo_Verde_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>09</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>09</licExpMonth>
       <lifetime>720</lifetime>
       <state>AZ</state>
       <typeReac>PWR</typeReac>
@@ -1351,15 +1467,18 @@
   <name>Palo_Verde_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1988</startOperYear>
       <startOperMonth>01</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>01</licExpMonth>
       <lifetime>720</lifetime>
       <state>AZ</state>
       <typeReac>PWR</typeReac>
@@ -1372,8 +1491,8 @@
   <name>Peach_Bottom_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -1392,8 +1511,8 @@
   <name>Peach_Bottom_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -1412,15 +1531,14 @@
   <name>Perry_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>10</startConstrMonth>
       <startOperYear>1987</startOperYear>
       <startOperMonth>11</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2027</licExpYear>
+      <licExpMonth>11</licExpMonth>
       <lifetime>720</lifetime>
       <state>OH</state>
       <typeReac>BWR</typeReac>
@@ -1433,15 +1551,14 @@
   <name>Pilgrim_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1972</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2022</licExpYear>
+      <licExpMonth>12</licExpMonth>
       <lifetime>720</lifetime>
       <state>MA</state>
       <typeReac>BWR</typeReac>
@@ -1454,8 +1571,12 @@
   <name>Point_Beach_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1970</startOperYear>
@@ -1474,8 +1595,12 @@
   <name>Point_Beach_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1972</startOperYear>
@@ -1494,15 +1619,19 @@
   <name>Praire_Island_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1973</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2013</licExpYear>
+      <licExpMonth>12</licExpMonth>
+      <lifetime>720</lifetime>
       <state>MN</state>
       <typeReac>PWR</typeReac>
       <capacity>551</capacity>
@@ -1514,15 +1643,18 @@
   <name>Praire_Island_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1969</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1974</startOperYear>
       <startOperMonth>12</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2014</licExpYear>
+      <licExpMonth>12</licExpMonth>
       <lifetime>720</lifetime>
       <state>MN</state>
       <typeReac>PWR</typeReac>
@@ -1535,8 +1667,8 @@
   <name>Quad_Cities_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>02</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -1555,8 +1687,8 @@
   <name>Quad_Cities_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>02</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -1575,8 +1707,12 @@
   <name>RE_Ginna</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1966</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1970</startOperYear>
@@ -1595,15 +1731,14 @@
   <name>River_Bend_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1977</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1986</startOperYear>
       <startOperMonth>06</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2026</licExpYear>
+      <licExpMonth>06</licExpMonth>
       <lifetime>720</lifetime>
       <state>NY</state>
       <typeReac>BWR</typeReac>
@@ -1616,15 +1751,18 @@
   <name>Salem_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1977</startOperYear>
       <startOperMonth>06</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>-2017</licExpYear>
+      <licExpMonth>06</licExpMonth>
       <lifetime>720</lifetime>
       <state>NJ</state>
       <typeReac>PWR</typeReac>
@@ -1637,15 +1775,18 @@
   <name>Salem_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1981</startOperYear>
       <startOperMonth>10</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2021</licExpYear>
+      <licExpMonth>10</licExpMonth>
       <lifetime>720</lifetime>
       <state>NJ</state>
       <typeReac>PWR</typeReac>
@@ -1658,15 +1799,18 @@
   <name>San_Onofre_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1983</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2023</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>CA</state>
       <typeReac>PWR</typeReac>
@@ -1679,15 +1823,18 @@
   <name>San_Onofre_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1984</startOperYear>
       <startOperMonth>04</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2024</licExpYear>
+      <licExpMonth>04</licExpMonth>
       <lifetime>720</lifetime>
       <state>CA</state>
       <typeReac>PWR</typeReac>
@@ -1700,15 +1847,18 @@
   <name>Seabrook_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1990</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2030</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>NH</state>
       <typeReac>PWR</typeReac>
@@ -1721,15 +1871,18 @@
   <name>Sequoyah_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1981</startOperYear>
       <startOperMonth>07</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2021</licExpYear>
+      <licExpMonth>07</licExpMonth>
       <lifetime>720</lifetime>
       <state>TN</state>
       <typeReac>PWR</typeReac>
@@ -1742,15 +1895,18 @@
   <name>Sequoyah_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1982</startOperYear>
       <startOperMonth>06</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2022</licExpYear>
+      <licExpMonth>06</licExpMonth>
       <lifetime>720</lifetime>
       <state>TN</state>
       <typeReac>PWR</typeReac>
@@ -1763,8 +1919,12 @@
   <name>Shearon_Harris_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1987</startOperYear>
@@ -1783,15 +1943,18 @@
   <name>South_Texas_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1988</startOperYear>
       <startOperMonth>08</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2028</licExpYear>
+      <licExpMonth>08</licExpMonth>
       <lifetime>720</lifetime>
       <state>TX</state>
       <typeReac>PWR</typeReac>
@@ -1804,15 +1967,18 @@
   <name>South_Texas_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1975</startConstrYear>
       <startConstrMonth>09</startConstrMonth>
       <startOperYear>1989</startOperYear>
       <startOperMonth>06</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2029</licExpYear>
+      <licExpMonth>06</licExpMonth>
       <lifetime>720</lifetime>
       <state>TX</state>
       <typeReac>PWR</typeReac>
@@ -1825,8 +1991,12 @@
   <name>St_Lucie_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1970</startConstrYear>
       <startConstrMonth>07</startConstrMonth>
       <startOperYear>1976</startOperYear>
@@ -1845,8 +2015,12 @@
   <name>St_Lucie_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1983</startOperYear>
@@ -1865,8 +2039,12 @@
   <name>Surry_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1972</startOperYear>
@@ -1885,8 +2063,12 @@
   <name>Surry_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>06</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -1905,8 +2087,8 @@
   <name>Susquehanna_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1983</startOperYear>
@@ -1925,8 +2107,8 @@
   <name>Susquehanna_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1973</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1985</startOperYear>
@@ -1945,8 +2127,12 @@
   <name>Three_Mile_Island_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1968</startConstrYear>
       <startConstrMonth>05</startConstrMonth>
       <startOperYear>1974</startOperYear>
@@ -1965,8 +2151,12 @@
   <name>Turkey_Point_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1972</startOperYear>
@@ -1985,8 +2175,12 @@
   <name>Turkey_Point_4</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>04</startConstrMonth>
       <startOperYear>1973</startOperYear>
@@ -2005,15 +2199,14 @@
   <name>Vermont_Yankee</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_BWR_uo2</incommodity>
+      <outcommodity>spent_BWR_uo2</outcommodity>
       <startConstrYear>1967</startConstrYear>
       <startConstrMonth>12</startConstrMonth>
       <startOperYear>1972</startOperYear>
       <startOperMonth>11</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2012</licExpYear>
+      <licExpMonth>11</licExpMonth>
       <lifetime>720</lifetime>
       <state>VT</state>
       <typeReac>BWR</typeReac>
@@ -2026,8 +2219,12 @@
   <name>Virgil_C_Summer_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1973</startConstrYear>
       <startConstrMonth>03</startConstrMonth>
       <startOperYear>1984</startOperYear>
@@ -2046,8 +2243,12 @@
   <name>Vogtle_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1987</startOperYear>
@@ -2066,8 +2267,12 @@
   <name>Vogtle_2</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1976</startConstrYear>
       <startConstrMonth>08</startConstrMonth>
       <startOperYear>1989</startOperYear>
@@ -2086,15 +2291,18 @@
   <name>Waterford_3</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1974</startConstrYear>
       <startConstrMonth>11</startConstrMonth>
       <startOperYear>1985</startOperYear>
       <startOperMonth>09</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2025</licExpYear>
+      <licExpMonth>09</licExpMonth>
       <lifetime>720</lifetime>
       <state>LA</state>
       <typeReac>PWR</typeReac>
@@ -2107,15 +2315,18 @@
   <name>Watts_Bar_1</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1972</startConstrYear>
       <startConstrMonth>12</startConstrMonth>
       <startOperYear>1996</startOperYear>
       <startOperMonth>05</startOperMonth>
-      <!-- No license expiration date given -->
-      <licExpYear>-1</licExpYear>
-      <licExpMonth>-1</licExpMonth>
+      <licExpYear>2036</licExpYear>
+      <licExpMonth>05</licExpMonth>
       <lifetime>720</lifetime>
       <state>TN</state>
       <typeReac>PWR</typeReac>
@@ -2128,8 +2339,12 @@
   <name>Wolf_Creek</name>
   <model>
     <RecipeReactor>
-      <incommodity>fresh_uo2</incommodity>
-      <outcommodity>spent_uo2</outcommodity>
+      <incommodity>fresh_PWR_uo2</incommodity>
+      <outcommodity>spent_PWR_uo2</outcommodity>
+      <incommodity>fresh_r_uo2</incommodity>
+      <outcommodity>spent_r_uo2</outcommodity>
+      <incommodity>fresh_mox</incommodity>
+      <outcommodity>spent_mox</outcommodity>
       <startConstrYear>1977</startConstrYear>
       <startConstrMonth>01</startConstrMonth>
       <startOperYear>1985</startOperYear>
