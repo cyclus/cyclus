@@ -14,6 +14,10 @@
  * and old material is removed from the same queue inventory.
  *
  */
+
+typedef pair< Commodity*, Material*> InFuel; 
+typedef pair< Commodity*, Material*> OutFuel; 
+
 class RecipeReactor : public FacilityModel  
 {
 /* --------------------
@@ -120,14 +124,9 @@ public:
 
 protected:
     /**
-     * The RecipeReactor has one input commodity
+     * The RecipeReactor has pairs of input and output fuel
      */
-    Commodity* in_commod;
-
-    /**
-     * The RecipeReactor has one output commodity
-     */
-    Commodity* out_commod;
+    deque< pair< InFuel, OutFuel> > fuelPairs;
 
     /**
      * The RecipeReactor has a limit to how material it can process.
@@ -136,14 +135,19 @@ protected:
     double capacity;
 
     /**
-     * The stocks of raw material available to be processed.
+     * The stocks of fresh fuel assemblies available.
      */
-    deque<Material*> stocks;
+    deque<InFuel> stocks;
+
+    /**
+     * The fuel assembly currently in the core.
+     */
+    deque<InFuel> currCore;
     
     /**
-     * The inventory of processed material.
+     * The inventory of spent fuel assemblies.
      */
-    deque<Material*> inventory;
+    deque<OutFuel> inventory;
 
     /**
      * The list of orders to process on the Tock
@@ -163,6 +167,26 @@ protected:
      * @return the total mass of the raw materials in storage
      */
     Mass checkStocks();
+
+    /**
+     * The time between batch reloadings.
+     */
+    int cycle_time;
+
+    /**
+     * The current month in the cycle. 1 > month_in_cycle < cycle_time)
+     */
+    int month_in_cycle;
+
+    /**
+     * Perform the actions that must occur at the begining of the cycle
+     */
+    void beginCycle();
+
+    /**
+     * Perform the actions that must occur at the end of the cycle
+     */
+    void endCycle();
 
     /**
      * The time that the stock material spends in the facility.

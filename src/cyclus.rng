@@ -278,7 +278,9 @@
      <element name="RecipeReactor"> 
         <oneOrMore>
           <ref name="incommodity"/>
+          <ref name="inrecipe"/>
           <ref name="outcommodity"/>
+          <ref name="outrecipe"/>
         </oneOrMore>
 
         <element name="startConstrYear">
@@ -399,6 +401,18 @@
 
   <define name="inventorysize">
       <element name="inventorysize">
+          <text/>
+      </element>
+  </define>
+
+  <define name="inrecipe">
+      <element name="inrecipe">
+          <text/>
+      </element>
+  </define>
+
+  <define name="outrecipe">
+      <element name="outrecipe">
           <text/>
       </element>
   </define>
