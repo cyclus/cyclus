@@ -11,15 +11,16 @@
 
 /*
  * TICK
- * if stocks are empty, ask for an assembly
+ * if stocks are empty, ask for a batch
  * offer anything in the inventory
  * if we're at the end of a cycle
- *    - move currCore assembly to inventory
- *    - move stocks assembly to currCore
- *    - reset cycle_month
+ *    - begin the cycle
+ *      - move currCore batch to inventory
+ *      - move stocks batch to currCore
+ *      - reset month_in_cycle clock
  *
  * TOCK
- * advance cycle_month
+ * advance month_in_cycle
  * send appropriate materials to fill ordersWaiting.
  *
  * RECIEVE MATERIAL
@@ -34,9 +35,6 @@ void RecipeReactor::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
   
-  // cycle time in months should probably be initialized in input.
-  cycle_time = 18; 
- 
   // set the current month in cycle to 1, it's the first month.
   month_in_cycle = 1;
 
@@ -45,6 +43,7 @@ void RecipeReactor::init(xmlNodePtr cur)
 
   // initialize ordinary objects
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  cycle_time = atof(XMLinput->get_xpath_content(cur,"cycletime"));
   lifetime = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
   startConstrYr = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
   startConstrMo = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
@@ -157,18 +156,56 @@ void RecipeReactor::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::beginCycle()
-{
-  // reset the cycle time counter (months into this cycle)
-  cycle_time = 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::endCycle()
 {
-  // move a batch out of the core
-}
+  // move a batch out of the core 
+  Commodity* batchCommod = currCore.front().first;
+  Material* batchMat = currCore.front().second;
+  currCore.pop_front();
 
+  // figure out the spent fuel commodity and material
+  Commodity* outCommod;
+  Material* outMat;
+
+  bool found = false;
+  while(!found){
+    for(deque< pair<InFuel, OutFuel> >::iterator iter = fuelPairs.begin();
+        iter != fuelPairs.end();
+        iter++){
+      if((*iter).first.first == batchCommod){
+        outCommod = (*iter).second.first;
+        outMat = (*iter).second.second;
+        found=true;
+      };
+    };
+  };
+
+  // change the composition to the compositon of the spent fuel type
+  batchMat->changeAtomComp(outMat->getAtomComp(), TI->getTime());
+
+  // move converted material into Inventory
+  OutFuel outBatch;
+  outBatch = make_pair(outCommod, batchMat);
+  inventory.push_back(outBatch);
+};
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::beginCycle()
+{
+  // move stocks batch to currCore
+  Commodity* batchCommod = stocks.front().first;
+  Material* batchMat = stocks.front().second;
+  stocks.pop_front();
+
+  // move converted material into Inventory
+  InFuel inBatch;
+  inBatch = make_pair(batchCommod, batchMat);
+  currCore.push_back(inBatch);
+
+  // reset month_in_cycle clock
+  month_in_cycle = 1;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::receiveMessage(Message* msg)
@@ -246,13 +283,15 @@ void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifes
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTick(int time)
 {
-  /* if stocks are empty, ask for an assembly
-   * offer anything in the inventory
-   * if we're at the end of a cycle
-   *    - move currCore assembly to inventory
-   *    - move stocks assembly to currCore
-   *    - reset cycle_month
-   */
+  // if at beginning of cycle, beginCycle()
+  // if stocks are empty, ask for a batch
+  // offer anything in the inventory
+  
+  // BEGIN CYCLE
+  if(month_in_cycle == 1){
+    this->beginCycle();
+  };
+
   // MAKE A REQUEST
   if(stocks.front().first == NULL){
     // It chooses the next in/out commodity pair in the preference lineup
@@ -267,13 +306,13 @@ void RecipeReactor::handleTick(int time)
     fuelPairs.push_back(make_pair(request_commod_pair, offer_commod_pair));
     fuelPairs.pop_front();
   
-    // It can accept only a whole assembly
+    // It can accept only a whole batch
     Mass requestAmt;
-    Mass minAmt = 0; // KDHFLAG does this come from the facility or assembly definition?
-    // The Recipe Reactor should ask for an assembly if there isn't one in stock.
+    Mass minAmt = 0; // KDHFLAG does this come from the facility or batch definition?
+    // The Recipe Reactor should ask for an batch if there isn't one in stock.
     Mass sto = this->checkStocks(); 
-    // subtract sto from assembly size to get total empty space. 
-    // Hopefully the result is either 0 or the assembly size 
+    // subtract sto from batch size to get total empty space. 
+    // Hopefully the result is either 0 or the batch size 
     Mass space = minAmt - sto; // KDHFLAG get minAmt from the input ?
     // this will be a request for free stuff
     double commod_price = 0;
@@ -291,7 +330,7 @@ void RecipeReactor::handleTick(int time)
         // pass the message up to the inst
         (request->getInst())->receiveMessage(request);
     }
-    // otherwise, the upper bound is the assembly size
+    // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
     else if (space >= capacity){
       Communicator* recipient = (Communicator*)(in_commod->getMarket());
@@ -313,7 +352,7 @@ void RecipeReactor::handleTick(int time)
   // this will be an offer of free stuff
   double commod_price = 0;
 
-  // there are potentially many types of assembly in the inventory stack
+  // there are potentially many types of batch in the inventory stack
   Mass inv = this->checkInventory();
   // send an offer for each material on the stack 
   Material* m;
@@ -334,49 +373,23 @@ void RecipeReactor::handleTick(int time)
         this, recipient);
     // send it
     sendMessage(msg);
-  }
+  };
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTock(int time)
 {
   // at the end of the cycle
   if (month_in_cycle > cycle_time){
-    // get a batch out of the core
-    Commodity* batchCommod = currCore.front().first;
-    Material* batchMat = currCore.front().second;
-    currCore.pop_front();
-
-    // figure out the spent fuel commodity and material
-    Commodity* outCommod;
-    Material* outMat;
-
-    bool found = false;
-    while(!found){
-      for(deque< pair<InFuel, OutFuel> >::iterator iter = fuelPairs.begin();
-          iter != fuelPairs.end();
-          iter++){
-        if((*iter).first.first == batchCommod){
-          outCommod = (*iter).second.first;
-          outMat = (*iter).second.second;
-          found=true;
-        };
-      };
-    };
-
-    // change the composition to the compositon of the spent fuel type
-    batchMat->changeAtomComp(outMat->getAtomComp(), TI->getTime());
-
-    // move converted material into Inventory
-    OutFuel outBatch;
-    outBatch = make_pair(outCommod, batchMat);
-    inventory.push_back(outBatch);
+    this->endCycle();
   };
+
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
     sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
     ordersWaiting.pop_front();
   };
+  month_in_cycle++;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
