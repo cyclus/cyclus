@@ -126,7 +126,7 @@ protected:
     /**
      * The RecipeReactor has pairs of input and output fuel
      */
-    deque< pair< InFuel, OutFuel> > fuelPairs;
+    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > fuelPairs;
 
     /**
      * The RecipeReactor has a limit to how material it can process.

@@ -37,13 +37,14 @@ void RecipeReactor::init(xmlNodePtr cur)
   
   // set the current month in cycle to 1, it's the first month.
   month_in_cycle = 1;
+  cycle_time = 54;
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/RecipeReactor");
 
   // initialize ordinary objects
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  cycle_time = atof(XMLinput->get_xpath_content(cur,"cycletime"));
+  //cycle_time = atof(XMLinput->get_xpath_content(cur,"cycletime"));
   lifetime = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
   startConstrYr = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
   startConstrMo = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
@@ -71,28 +72,28 @@ void RecipeReactor::init(xmlNodePtr cur)
     in_recipe = out_recipe = NULL; 
 
     // get in_commod
-    commod_name = XMLinput->get_xpath_content(cur,"incommodity");
+    commod_name = XMLinput->get_xpath_content(pair_node,"incommodity");
     in_commod = LI->getCommodity(commod_name);
     if (NULL == in_commod)
       throw GenException("Input commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
           + "'.");
     // get in_recipe
-    recipe_name = XMLinput->get_xpath_content(cur,"inrecipe");
+    recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
     in_recipe = LI->getRecipe(recipe_name);
     if (NULL == in_recipe)
       throw GenException("Recipe '" + recipe_name 
           + "' does not exist for facility '" + getName()
           + "'.");
     
-    commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
+    commod_name = XMLinput->get_xpath_content(pair_node,"outcommodity");
     out_commod = LI->getCommodity(commod_name);
     if (NULL == out_commod)
       throw GenException("Output commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
           + "'.");
     // get out_recipe
-    recipe_name = XMLinput->get_xpath_content(cur,"outrecipe");
+    recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
     out_recipe = LI->getRecipe(recipe_name);
     if (NULL == out_recipe)
       throw GenException("Recipe '" + recipe_name 
@@ -102,7 +103,7 @@ void RecipeReactor::init(xmlNodePtr cur)
           make_pair(out_commod, out_recipe)));
   };
 
-  InFuel stocks;
+  stocks = deque<InFuel>();
   currCore = deque< pair<Commodity*, Material* > >();
   inventory = deque< pair<Commodity*, Material*> >();
   ordersWaiting = deque< Message*>();
@@ -147,12 +148,10 @@ void RecipeReactor::print()
 { 
   FacilityModel::print(); 
   cout << "converts commodity {"
-      << fuelPairs.front().first.first->getName()
+      << this->fuelPairs.front().first.first->getName()
       << "} into commodity {"
-      << fuelPairs.front().first.second->getName()
-      << "}, and has an inventory that holds " 
-      << inventory_size << " materials"
-      << endl;
+      << this->fuelPairs.front().second.first->getName()
+      << "}."  << endl;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -277,10 +277,12 @@
   <define name="RecipeReactor">
      <element name="RecipeReactor"> 
         <oneOrMore>
-          <ref name="incommodity"/>
-          <ref name="inrecipe"/>
-          <ref name="outcommodity"/>
-          <ref name="outrecipe"/>
+          <element name="fuelpair">
+            <ref name="incommodity"/>
+            <ref name="inrecipe"/>
+            <ref name="outcommodity"/>
+            <ref name="outrecipe"/>
+            </element>
         </oneOrMore>
 
         <element name="startConstrYear">
