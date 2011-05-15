@@ -354,7 +354,7 @@ void BookKeeper::writeTransList(){
 
   // create an array of the model structs
   trans_t transList[numStructs];
-  for (int i=0; i<numStructs; i++){
+  for (int i=0; i<numTrans; i++){
     transList[i].supplierID = transactions[i].supplierID;
     transList[i].requesterID = transactions[i].requesterID;
     transList[i].materialID = transactions[i].materialID;

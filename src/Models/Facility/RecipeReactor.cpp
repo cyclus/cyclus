@@ -37,7 +37,7 @@ void RecipeReactor::init(xmlNodePtr cur)
   
   // set the current month in cycle to 1, it's the first month.
   month_in_cycle = 1;
-  cycle_time = 54;
+  cycle_time = 3;
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/RecipeReactor");
@@ -155,6 +155,27 @@ void RecipeReactor::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::beginCycle()
+{
+  if( stocks.front().first  != NULL ){
+    // move stocks batch to currCore
+    Commodity* batchCommod = stocks.front().first;
+    Material* batchMat = stocks.front().second;
+    stocks.pop_front();
+    InFuel inBatch;
+    inBatch = make_pair(batchCommod, batchMat);
+    currCore.push_back(inBatch);
+    // reset month_in_cycle clock
+    month_in_cycle = 1;
+  }
+  else{
+    // wait for a successful transaction to fill the stocks.
+    // reset the cycle month to zero 
+    month_in_cycle=0;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::endCycle()
 {
   // move a batch out of the core 
@@ -168,10 +189,10 @@ void RecipeReactor::endCycle()
 
   bool found = false;
   while(!found){
-    for(deque< pair<InFuel, OutFuel> >::iterator iter = fuelPairs.begin();
+    for(deque< pair< InFuel , OutFuel> >::iterator iter = fuelPairs.begin();
         iter != fuelPairs.end();
         iter++){
-      if((*iter).first.first == batchCommod){
+      if((*iter).first.first->getName() == batchCommod->getName()){
         outCommod = (*iter).second.first;
         outMat = (*iter).second.second;
         found=true;
@@ -187,24 +208,6 @@ void RecipeReactor::endCycle()
   outBatch = make_pair(outCommod, batchMat);
   inventory.push_back(outBatch);
 };
-
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::beginCycle()
-{
-  // move stocks batch to currCore
-  Commodity* batchCommod = stocks.front().first;
-  Material* batchMat = stocks.front().second;
-  stocks.pop_front();
-
-  // move converted material into Inventory
-  InFuel inBatch;
-  inBatch = make_pair(batchCommod, batchMat);
-  currCore.push_back(inBatch);
-
-  // reset month_in_cycle clock
-  month_in_cycle = 1;
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::receiveMessage(Message* msg)
@@ -292,7 +295,8 @@ void RecipeReactor::handleTick(int time)
   };
 
   // MAKE A REQUEST
-  if(stocks.front().first == NULL){
+  if(this->checkStocks() == 0){
+    // if(stocks.front().first == NULL){
     // It chooses the next in/out commodity pair in the preference lineup
     InFuel request_commod_pair;
     OutFuel offer_commod_pair;
@@ -307,7 +311,7 @@ void RecipeReactor::handleTick(int time)
   
     // It can accept only a whole batch
     Mass requestAmt;
-    Mass minAmt = 0; // KDHFLAG does this come from the facility or batch definition?
+    Mass minAmt = in_recipe->getTotMass();
     // The Recipe Reactor should ask for an batch if there isn't one in stock.
     Mass sto = this->checkStocks(); 
     // subtract sto from batch size to get total empty space. 
@@ -319,7 +323,7 @@ void RecipeReactor::handleTick(int time)
     if (space == 0){
       // don't request anything
     }
-    else if (space < minAmt){
+    else if (space <= minAmt){
       Communicator* recipient = (Communicator*)(in_commod->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
@@ -331,7 +335,7 @@ void RecipeReactor::handleTick(int time)
     }
     // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
-    else if (space >= capacity){
+    else if (space >= minAmt){
       Communicator* recipient = (Communicator*)(in_commod->getMarket());
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity - sto;
@@ -413,12 +417,13 @@ Mass RecipeReactor::checkStocks(){
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
 
-
   for (deque< pair<Commodity*, Material*> >::iterator iter = stocks.begin(); 
        iter != stocks.end(); 
        iter ++){
-    total += (*iter).second->getTotMass();
-  }
+    if((*iter).second != NULL ){
+      total += ((*iter).second)->getTotMass();
+    };
+  };
 
   return total;
 }
