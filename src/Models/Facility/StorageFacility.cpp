@@ -26,6 +26,15 @@
  * pull it from inventory, fill the transaction
  */
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StorageFacility::getInitialState()
+{
+  std::cout << "yaaaaaaaaaaaaaaaaay" << std::endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::init(xmlNodePtr cur)
 { 
@@ -55,6 +64,8 @@ void StorageFacility::init(xmlNodePtr cur)
   inventory = deque<Material*>();
   stocks = deque<Material*>();
   ordersWaiting = deque<Message*>();
+
+  this -> getInitialState();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

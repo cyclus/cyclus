@@ -179,6 +179,11 @@ protected:
      */
     Mass inventory_size;
 
+    /**
+     * This function populated the Storage Facility with some inital stocks/inventory
+     */
+    void getInitialState();
+
 /* ------------------- */ 
 
 };

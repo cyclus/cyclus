@@ -3,6 +3,7 @@
 #include "BookKeeper.h"
 #include "Timer.h"
 #include "boost/multi_array.hpp"
+#include <string.h>
 
 #include "hdf5.h"
 #include "H5Cpp.h"

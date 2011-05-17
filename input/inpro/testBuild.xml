@@ -43,13 +43,27 @@
     </model>
   </facility>
 
+  <facility>
+    <name>Storage</name>
+    <model>
+      <StorageFacility>
+        <incommodity>uo2</incommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <residencetime>100</residencetime>
+      </StorageFacility>
+    </model>
+  </facility>
+
 	<region>
     <name>oneRegion</name>
 		<allowedfacility>FrontEnd</allowedfacility>
 		<allowedfacility>BackEnd</allowedfacility>
+		<allowedfacility>Storage</allowedfacility>
 		<model>
 			<BuildRegion>
-				<input_file>/home/gidden/work/cyclus/trunk/input/inpro/build.in</input_file>
+<!--				<input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/inpro/build.in</input_file> -->
+				<input_file>/home/gidden/work/cyclus/input/inpro/build.in</input_file>
 			</BuildRegion>
 		</model>
 		<institution>
@@ -63,6 +77,10 @@
           <facility>
             <type>BackEnd</type>
             <name>BackEnd</name>
+          </facility>
+          <facility>
+            <type>Storage</type>
+            <name>Storage</name>
           </facility>
         </BuildInst>
 			</model>
