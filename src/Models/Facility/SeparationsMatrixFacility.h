@@ -3,6 +3,7 @@
 #define _SEPARATIONSFACILITY_H
 #include <iostream>
 #include <queue>
+#include <vector>
 
 #include "FacilityModel.h"
 
@@ -14,6 +15,10 @@
  * in testing phase now. 
  *
  */
+
+typedef pair< Commodity*, Material*> InSep; 
+typedef pair< Commodity*, Material*> OutSep; 
+
 class SeparationsMatrixFacility : public FacilityModel  
 {
 /* --------------------
@@ -134,14 +139,14 @@ protected:
     typedef multimap<int, pair<Message*, Material*> > ProcessLine;
 
     /**
-     * The SeparationsMatrixFacility has one input commodity
+     *  Vector of incoming material
      */
-    Commodity* in_commod;
+    vector<Commodity*> in_commod;
 
     /**
-     * The SeparationsMatrixFacility has one output commodity
+     *  Vector of outgoing material
      */
-    Commodity* out_commod;
+    vector<Commodity*> out_commod;
 
     /**
      * The SeparationsMatrixFacility has a limit to how material it can process.
@@ -150,19 +155,24 @@ protected:
     double capacity;
 
     /**
+     * This is the structure for each stream.
+     */
+    map<Commodity*,pair<int, double> > stream_set;
+
+    /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks;
+    deque<pair<Commodity*,Material*> > stocks;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory;
+    deque<pair<Commodity*,Material*> > inventory;
 
     /**
      * The inventory of waste material.
      */
-    deque<Material*> wastes;
+    deque<pair<Commodity*,Material*> > wastes;
 
    	/**
      * The total mass flow required to process all outstanding orders this 
