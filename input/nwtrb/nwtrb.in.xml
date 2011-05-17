@@ -158,10 +158,26 @@
 	  <name>Storage</name>
 	  <model>
 	    <StorageFacility>
-              <incommodity>spent_BWR_uo2</incommodity>
+              <incommodity>spent_PWR_uo2</incommodity>
               <capacity>1</capacity>
               <inventorysize>1e4</inventorysize>
               <residencetime>100</residencetime>
+
+	      <initialstocks>
+		<entry>
+		  <facility>nwtrb:Arkansas_Nuclear_2</facility>
+		  <incommodity>spent_PWR_uo2</incommodity>
+		  <recipe>nwtrb:spent_PWR_uo2</recipe>
+		  <amount>3500.0</amount>
+		</entry>
+		<entry>
+		  <facility>nwtrb:Arkansas_Nuclear_1</facility>
+		  <incommodity>spent_PWR_uo2</incommodity>
+		  <recipe>nwtrb:spent_PWR_uo2</recipe>
+		  <amount>500.0</amount>
+		</entry>
+	      </initialstocks>
+
 	    </StorageFacility>
 	  </model>
 	</facility>
@@ -291,6 +307,10 @@
 		  <name>OneInst</name>
 		  <model>
 		    <FixedInst>
+		      <facility>
+			<type>Storage</type>
+			<name>Storage</name>
+		      </facility>
 		      <facility>
 			<type>nwtrb:Arkansas_Nuclear_1</type>
 			<name>nwtrb:Arkansas_Nuclear_1</name>

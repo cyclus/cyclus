@@ -89,7 +89,6 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, double size, 
 
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::load_recipes()
 {

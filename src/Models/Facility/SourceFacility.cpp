@@ -85,7 +85,7 @@ void SourceFacility::copy(SourceFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::copyFreshModel(Model* src)
 {
-  copy((SourceFacility*)(src));
+  copy( (SourceFacility*) (src) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

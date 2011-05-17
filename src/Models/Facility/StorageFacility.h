@@ -182,7 +182,7 @@ protected:
     /**
      * This function populated the Storage Facility with some inital stocks/inventory
      */
-    void getInitialState();
+    void getInitialState(xmlNodePtr cur);
 
 /* ------------------- */ 
 

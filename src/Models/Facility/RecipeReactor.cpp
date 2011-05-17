@@ -423,7 +423,7 @@ Mass RecipeReactor::checkStocks(){
          iter ++){
         total += (*iter).second->getTotMass();
     };
-
+  };
   return total;
 }
 

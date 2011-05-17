@@ -28,12 +28,67 @@
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::getInitialState()
-{
-//     cout<<"StorageFacility " << ID << " is receiving material with mass "
-//         << (*thisMat)->getTotMass() << endl;
-//     stocks.push_back(*thisMat);
-//     entryTimes.push_back(make_pair(TI->getTime(), *thisMat ));
+void StorageFacility::getInitialState(xmlNodePtr cur)
+{ 
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "initialstocks/entry");
+  string fac_name, commod_name, recipe_name;
+  FacilityModel* facility;
+  Commodity* commodity;
+  Material* recipe;
+  double amount;
+  int i;
+
+  // for each fuel pair, there is an in and an out commodity
+  for (int i=0;i<nodes->nodeNr;i++){
+    // get xml node
+    xmlNodePtr entry_node = nodes->nodeTab[i];
+
+    // assign each item initially in storage
+    facility, commodity, recipe = NULL;
+    // facility
+    fac_name = XMLinput->get_xpath_content(entry_node,"facility");
+    cout << "fac_name:" << fac_name <<endl;
+    facility = (FacilityModel*) LI->getFacilityByName(fac_name);
+    if (NULL == facility){
+      throw GenException("Facility '" 
+			 + fac_name 
+			 + "' is not defined in this problem.");
+    }
+    // commodity
+    commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
+    cout << "commod_name:" << commod_name <<endl;
+    commodity = LI->getCommodity(commod_name);
+    if (NULL == commodity){
+      throw GenException("Commodity '" 
+			 + commod_name
+			 + "' is not defined in this problem.");
+    }
+    // recipe
+    recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
+    cout << "recipe_name:" << recipe_name <<endl;
+    recipe = LI->getRecipe(recipe_name);
+    if (NULL == recipe){
+      throw GenException("Recipe '" 
+			 + recipe_name
+			 + "' is not defined in this problem.");
+    }
+    // amount
+    amount = atof(XMLinput->get_xpath_content(entry_node,"amount"));
+
+    // make new material
+    Material* newMat = new Material(recipe->getMassComp(), 
+                                    recipe->getUnits(), 
+                                    recipe->getName(),
+                                    amount, 
+                                    massBased);
+    // announce creation to the world
+    cout<<"StorageFacility " << ID << " is starting with material with mass "
+        << newMat->getTotMass() << endl;
+
+    // add material to stocks
+    stocks.push_back(newMat);
+    entryTimes.push_back(make_pair(TI->getTime(), newMat));
+  }     
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -67,8 +122,8 @@ void StorageFacility::init(xmlNodePtr cur)
   inventory = deque<Material*>();
   stocks = deque<Material*>();
   ordersWaiting = deque<Message*>();
-
-  this -> getInitialState();
+  
+  getInitialState(cur);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -82,9 +137,10 @@ void StorageFacility::copy(StorageFacility* src)
   capacity = src->capacity;
   residence_time = src->residence_time;
 
-  inventory = deque<Material*>();
-  stocks = deque<Material*>();
-  ordersWaiting = deque<Message*>();
+  // do we really want all of these to be copied?
+  inventory = src->inventory;
+  stocks = src->stocks;
+  ordersWaiting = src->ordersWaiting;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -194,6 +250,7 @@ void StorageFacility::handleTick(int time)
   Mass inv = this->checkInventory();
   // and how much is already in its stocks
   Mass sto = this->checkStocks(); 
+  cout << "stocks currently at: " << sto << " " << inv << endl;
   // subtract inv and sto from inventory max size to get total empty space
   Mass space = inventory_size - inv - sto;
   // this will be a request for free stuff
@@ -266,7 +323,10 @@ void StorageFacility::handleTock(int time)
         // youngest or oldest material first
         inventory.push_back(oldEnough);
         stocks.pop_front();
-      };
+    }
+    // added this 5/17/11 because an initial inventory would cause an infinite loop
+    // not positive this is correct
+    else{someOld=false;};
   };
 
   // check what orders are waiting, 

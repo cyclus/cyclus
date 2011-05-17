@@ -143,6 +143,7 @@ public:
    * @param type indicates whether comp and scale are in mass or atom units
    */
   Material(CompMap comp, string mat_unit, string rec_name, double scale, Basis type);
+
   
   /** 
    * Default destructor does nothing.
@@ -192,7 +193,6 @@ public:
    * returns the total mass of this material object PER UNIT
    */
   const Mass getTotMass() const {return total_mass;};
-  //  Mass getTotMass() {return total_mass;};
 
   /**
    * Returns the total mass of the given composition vector.
