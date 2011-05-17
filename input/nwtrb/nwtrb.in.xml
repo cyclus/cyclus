@@ -154,6 +154,18 @@
 		</model>
 	</facility>
 
+	<facility>
+	  <name>Storage</name>
+	  <model>
+	    <StorageFacility>
+              <incommodity>uo2</incommodity>
+              <capacity>1</capacity>
+              <inventorysize>1e4</inventorysize>
+              <residencetime>100</residencetime>
+	    </StorageFacility>
+	  </model>
+	</facility>
+
 	<facilitycatalog>
 		<filename>nwtrb.facilitycatalog.xml</filename>
 		<namespace>nwtrb</namespace>
@@ -166,6 +178,7 @@
 		<allowedfacility>PWR_mox_FuelFab</allowedfacility>
 		<allowedfacility>PWR_r_uo2_FuelFab</allowedfacility>
 		<allowedfacility>BWR_uo2_FuelFab</allowedfacility>
+		<allowedfacility>Storage</allowedfacility>
     <allowedfacility>nwtrb:Arkansas_Nuclear_1</allowedfacility>
     <allowedfacility>nwtrb:Arkansas_Nuclear_2</allowedfacility>
     <allowedfacility>nwtrb:Beaver_Valley_1</allowedfacility>
