@@ -192,6 +192,7 @@ public:
    * returns the total mass of this material object PER UNIT
    */
   const Mass getTotMass() const {return total_mass;};
+  //  Mass getTotMass() {return total_mass;};
 
   /**
    * Returns the total mass of the given composition vector.

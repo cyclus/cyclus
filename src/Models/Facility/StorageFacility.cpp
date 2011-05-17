@@ -30,7 +30,10 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::getInitialState()
 {
-  std::cout << "yaaaaaaaaaaaaaaaaay" << std::endl;
+//     cout<<"StorageFacility " << ID << " is receiving material with mass "
+//         << (*thisMat)->getTotMass() << endl;
+//     stocks.push_back(*thisMat);
+//     entryTimes.push_back(make_pair(TI->getTime(), *thisMat ));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
