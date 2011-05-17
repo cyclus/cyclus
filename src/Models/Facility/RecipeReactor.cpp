@@ -157,7 +157,7 @@ void RecipeReactor::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::beginCycle()
 {
-  if( stocks.front().first  != NULL ){
+  if( !stocks.empty() ){
     // move stocks batch to currCore
     Commodity* batchCommod = stocks.front().first;
     Material* batchMat = stocks.front().second;
@@ -417,11 +417,11 @@ Mass RecipeReactor::checkStocks(){
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque< pair<Commodity*, Material*> >::iterator iter = stocks.begin(); 
-       iter != stocks.end(); 
-       iter ++){
-    if((*iter).second != NULL ){
-      total += ((*iter).second)->getTotMass();
+  if(!stocks.empty()){
+    for (deque< pair<Commodity*, Material*> >::iterator iter = stocks.begin(); 
+         iter != stocks.end(); 
+         iter ++){
+        total += (*iter).second->getTotMass();
     };
   };
 
