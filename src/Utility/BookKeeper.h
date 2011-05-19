@@ -84,8 +84,8 @@ protected:
   // facility or institution model struct
   typedef struct model_t{
     int ID;                 /**< An integer indicating the model ID >**/
-    char name[128];            /**< A string indicating the name of the template >**/ 
-    char modelImpl[128];       /**< A string indicating the model implementation >**/
+    char name[64];            /**< A string indicating the name of the template >**/ 
+    char modelImpl[64];       /**< A string indicating the model implementation >**/
   } model_t;
 
   // facility, market, converter, or institution model struct
@@ -95,13 +95,26 @@ protected:
     int materialID;         /**< An integer indicating the material object ID >**/
     int timestamp;          /**< An integer indicating the month >**/
     double price;           /**< A double indicating the transaction price >**/   
-    char commodName[128];   /**< the name of the commodity >**/
+    char commodName[64];   /**< the name of the commodity >**/
   } trans_t;
+
+  // material history struct
+  typedef struct mat_hist_t{
+    int materialID;         /**< An integer indicating the material object ID >**/
+    int timestamp;          /**< An integer indicating the month >**/
+    int iso;                /**< An integer indicating the nuclide ID >**/   
+    double comp;            /**< The kg or moles of the iso in the material at that time >**/
+  } mat_hist_t;
 
   /**
    * Stores the transactions that have taken place during the simulation.
    */
   vector<trans_t> transactions;
+
+  /**
+   * Stores the material changes that have taken place during the simulation.
+   */
+  vector<mat_hist_t> materials;
 
 public:
 		
@@ -184,17 +197,30 @@ public:
   void registerTrans(Message* msg, vector<Material*> Manifest);
 
   /**
+   * Register the transaction in the BookKeeper's map of transactions
+   *
+   * @param mat the material with a history
+   */
+  void registerMatChange(Material* mat);
+
+  /**
    * Write a list of the facility/inst/market models in the simulation
    *
    * @param type, the model type (i.e. insts, facilities, or markets)
    */
-
   void writeModelList(ModelType type);
+
   /**
    * Write a list of the transactions in the simulation
    *
    */
   void writeTransList();
+
+  /**
+   * Write a list of the material histories in the simulation
+   *
+   */
+  void writeMatHist();
 
   /**
    * Prepares file and memory dataspaces for homogeneous data 

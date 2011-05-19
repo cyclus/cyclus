@@ -192,6 +192,23 @@ void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::registerMatChange(Material* mat){
+  mat_hist_t toRegister;
+
+  double total = mat->getTotMass();
+  toRegister.materialID = mat->getSN(); 
+  toRegister.timestamp = TI->getTime();
+
+  CompMap comp = mat->getMassComp();
+  CompMap::const_reverse_iterator it = comp.rbegin();
+  if(it != comp.rend()){
+    toRegister.iso = it->first;
+    toRegister.comp = (it->second)*(total);
+    materials.push_back(toRegister);
+  };
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeModelList(ModelType type){
 
   // define some useful variables.
@@ -285,7 +302,7 @@ void BookKeeper::writeModelList(ModelType type){
     dataspace = new DataSpace( rank, dim );
 
     //create a variable length string types
-    size_t charlen = sizeof(char[128]);
+    size_t charlen = sizeof(char[64]);
     StrType strtype(PredType::C_S1,charlen); 
    
     // Create a datatype for models based on the struct
@@ -400,7 +417,7 @@ void BookKeeper::writeTransList(){
     dataspace = new DataSpace( rank, dim );
 
     //create a variable length string types
-    size_t charlen = sizeof(char[128]);
+    size_t charlen = sizeof(char[64]);
     StrType strtype(PredType::C_S1,charlen); 
    
     // Create a datatype for models based on the struct
@@ -417,6 +434,111 @@ void BookKeeper::writeTransList(){
 
     // write it, finally 
     dataset->write( transList , mtype );
+
+    delete outputgroup;
+    delete subgroup;
+    delete dataspace;
+    delete dataset;
+  }
+  // catch failure caused by the H5File operations
+  catch( FileIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the Group operations
+  catch( GroupIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSet operations
+  catch( DataSetIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataSpace operations
+  catch( DataSpaceIException error )
+  {
+     error.printError();
+  }
+  // catch failure caused by the DataType operations
+  catch( DataTypeIException error )
+  {
+     error.printError();
+  }
+};
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeMatHist(){
+
+  // define some useful variables.
+  const H5std_string materialID_memb = "materialID";
+  const H5std_string timestamp_memb = "timestamp";
+  const H5std_string iso_memb = "iso";
+  const H5std_string comp_memb = "comp";
+  const H5std_string output_name = "/output";
+  const H5std_string subgroup_name = "materials";
+  const H5std_string dataset_name = "matHist";
+
+  int numHists = materials.size();
+
+  int numStructs;
+  if(numHists==0)
+    numStructs=1;
+  else
+    numStructs=numHists;
+
+  // create an array of the model structs
+  mat_hist_t matHist[numStructs];
+  for (int i=0; i<numHists; i++){
+    matHist[i].materialID = materials[i].materialID;
+    matHist[i].timestamp = materials[i].timestamp;
+    matHist[i].iso = materials[i].iso;
+    matHist[i].comp = materials[i].comp;
+  };
+  // If there are no materials, make a null entry
+  if(numHists==0){
+    matHist[0].materialID=0;
+    matHist[0].timestamp=0;
+    matHist[0].iso=0;
+    matHist[0].comp=0;
+  };
+
+  try{
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
+    Exception::dontPrint();
+    
+    // Open the file and the dataset.
+    this->openDB();
+
+    // describe the data in an hdf5-y way
+    hsize_t dim[] = {numStructs};
+    // if there's only one model, the dataspace is a vector, which  
+    // hdf5 doesn't like to think of as a matrix 
+    int rank;
+    if(numHists <= 1)
+      rank = 1;
+    else
+      rank = 1;
+
+    Group* outputgroup;
+    outputgroup = new Group(this->getDB()->openGroup(output_name));
+    Group* subgroup;
+    subgroup = new Group(outputgroup->createGroup(subgroup_name));
+    DataSpace* dataspace;
+    dataspace = new DataSpace( rank, dim );
+   
+    // Create a datatype for models based on the struct
+    CompType mtype( sizeof(mat_hist_t) );
+    mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
+    mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
+    mtype.insertMember( iso_memb, HOFFSET(mat_hist_t, iso), PredType::NATIVE_INT); 
+    mtype.insertMember( comp_memb, HOFFSET(mat_hist_t, comp), PredType::IEEE_F64LE); 
+
+    DataSet* dataset;
+    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+
+    // write it, finally 
+    dataset->write( matHist , mtype );
 
     delete outputgroup;
     delete subgroup;

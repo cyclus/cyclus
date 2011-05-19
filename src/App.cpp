@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
     BI->writeModelList(facility);
     BI->writeModelList(market);
     BI->writeTransList();
+    BI->writeMatHist();
     BI->closeDB();
 
     return 0;

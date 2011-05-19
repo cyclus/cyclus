@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "Material.h"
-
+#include "BookKeeper.h"
 #include "GenException.h"
 #include "MassTable.h"
 #include "Logician.h"
@@ -23,6 +23,7 @@ int Material::nextID = 0;
 Material::Material(): atomEqualsMass(true), total_mass(0), total_atoms(0) 
 {
   ID=nextID++;
+  BI->registerMatChange(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -50,14 +51,13 @@ Material::Material(xmlNodePtr cur)
     comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
   }
   
-  //normalize(comp_map);
-
   if ( "atom" != comp_type)
     rationalize_M2A();
   else
     rationalize_A2M();
 
   facHist = FacHistory() ;
+  BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -76,8 +76,6 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, double size, 
   total_comp = size;
   comp_map = comp;
 
-  //normalize(comp_map);
-
   if ( massBased == type)
     rationalize_M2A();
   else if (atomBased == type)
@@ -86,7 +84,7 @@ Material::Material(CompMap comp, string mat_unit, string rec_name, double size, 
     throw GenException("Type options are currently massBased or atomBased !");
 
   facHist = FacHistory() ;
-
+  BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -270,9 +268,9 @@ void Material::changeComp(Iso tope, Atoms change, int time)
 
   total_atoms += change;
 
-  //normalize(compHist[time]);
   rationalize_A2M();
 
+  BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
