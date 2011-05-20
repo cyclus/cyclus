@@ -469,6 +469,7 @@
         <ref name="StubRegion"/>
         <ref name="NullRegion"/>
         <ref name="BuildRegion"/>
+        <ref name="CapacityRegion"/>
         <!-- insert ref to new RegionModels here -->
       </choice>
       </element>
@@ -497,6 +498,34 @@
         <element name="input_file">
 	    <text/>
 	</element>
+     </element>
+  </define>
+
+  <define name="CapacityRegion">
+     <element name="CapacityRegion">
+        <element name="input_file">
+	    <text/>
+	</element>
+	<oneOrMore>
+        <element name="capacitydemand">
+		<element name="capacitytype">
+			<text/>
+		</element>
+		<element name="capacityfunction">
+			<text/>
+		</element>
+		<element name="nominalvalue">
+			<text/>
+		</element>
+		<oneOrMore>
+		<element name="replacementlist">
+			<element name="replacementfacility">
+				<text/>
+			</element>
+		</element>
+		</oneOrMore>
+	</element>
+	</oneOrMore>
      </element>
   </define>
 

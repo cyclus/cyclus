@@ -151,6 +151,13 @@ public:
   int getFacLifetime() { return fac_lifetime; };
 
   /**
+   * Returns the facility's power capacity
+   *
+   * @return 0 by default. If the facility produces power, it will use its own function.
+   */
+  double getPowerCapacity() { return 0.0; };
+
+  /**
    * Registers the transaction with the BookKeeper and sends the material
    *
    * @param order contains the order being executed

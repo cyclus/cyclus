@@ -122,6 +122,14 @@ public:
  * --------------------
  */
 
+public:
+    /**
+     * The RecipeReactor reports a power capacity of its capacity factor * power capacity
+     */
+    double getPowerCapactiy(){ return CF*capacity;};
+
+    
+
 protected:
     /**
      * The RecipeReactor has pairs of input and output fuel

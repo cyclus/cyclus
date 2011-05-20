@@ -114,6 +114,9 @@ public:
   /// reports number of facilities in this inst
   int getNumFacilities(){ return facilities.size();};
 
+  /// queries the power capacity of each facility in the institution
+  double getPowerCapacity();
+
   /// attempts to build another facility of type fac
   virtual bool pleaseBuild(Model* fac);
 

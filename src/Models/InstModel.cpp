@@ -113,3 +113,14 @@ bool InstModel::pleaseBuild(Model* fac){
 		     + " does not have a definied facility-building fuction.");
   return false;
 }
+
+double InstModel::getPowerCapacity(){
+  // queries each facility for their power capacity
+  double capacity = 0.0;
+  for(vector<Model*>::iterator fac=facilities.begin();
+      fac != facilities.end();
+      fac++){
+    capacity += ((FacilityModel*)(*fac))->getPowerCapacity();
+  }
+  return capacity;
+}

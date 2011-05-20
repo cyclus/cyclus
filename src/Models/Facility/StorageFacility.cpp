@@ -29,7 +29,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::getInitialState(xmlNodePtr cur)
-{ 
+ {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "initialstocks/entry");
   string fac_name, commod_name, recipe_name;
   FacilityModel* facility;
