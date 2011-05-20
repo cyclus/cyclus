@@ -2,9 +2,11 @@
 ADD_LIBRARY( NullRegion  NullRegion.cpp )
 ADD_LIBRARY( StubRegion  StubRegion.cpp )
 ADD_LIBRARY( BuildRegion  BuildRegion.cpp )
+ADD_LIBRARY( CapacityRegion  CapacityRegion.cpp )
 
 SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES}
   NullRegion
   StubRegion
   BuildRegion
+  CapacityRegion
   )

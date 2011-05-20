@@ -51,6 +51,7 @@
         <capacity>1</capacity>
         <inventorysize>1e4</inventorysize>
         <residencetime>100</residencetime>
+	<initialstocks/>
       </StorageFacility>
     </model>
   </facility>
@@ -62,8 +63,7 @@
 		<allowedfacility>Storage</allowedfacility>
 		<model>
 			<BuildRegion>
-<!--				<input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/inpro/build.in</input_file> -->
-				<input_file>/home/gidden/work/cyclus/input/inpro/build.in</input_file>
+			  <input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/inpro/build.in</input_file>
 			</BuildRegion>
 		</model>
 		<institution>

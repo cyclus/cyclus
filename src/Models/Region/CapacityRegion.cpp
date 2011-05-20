@@ -56,22 +56,24 @@ void CapacityRegion::initBuild(xmlNodePtr cur)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void CapacityRegion::initBuild(xmlNodePtr cur)
+void CapacityRegion::initCapacity(xmlNodePtr cur)
 {
   // Get input file
-  xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/CapacityRegion");
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(region_node, "capacitydemand");
-
+  cout << "capacity region cur: " << cur << endl;
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "model/CapacityRegion/capacitydemand");
+  
   // for each fuel pair, there is an in and an out commodity
   for (int i=0;i<nodes->nodeNr;i++){
+    cout << "i am in a capacity region node!" << endl;
     // get xml node
     xmlNodePtr entry_node = nodes->nodeTab[i];
     // get capacity information
-    _capacity_type.push_back(XMLinput->get_xpath_content(entry_node,"capacitytype"));
-    _capacity_function.push_back(XMLinput->get_xpath_content(entry_node,"capacityfunction"));
-    _nominal_value.push_back(atof(XMLinput->get_xpath_content(entry_node,"nominalvalue")));
+    _capacity_type.push_back( XMLinput->get_xpath_content( entry_node,"capacitytype" ));
+    _capacity_function.push_back( XMLinput->get_xpath_content( entry_node,"capacityfunction" ));
+    _nominal_value.push_back( atof( XMLinput->get_xpath_content( entry_node,"nominalvalue" )));
     // get replacement facility information
-    allReplacementFacs.push_back(ReplacementFacs replacementFacs);
+    ReplacementFacs replacementFacs;
+    allReplacementFacs.push_back(replacementFacs);
     Model* facility;
     xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(entry_node, "replacementlist");
     for (int j=0;i<fac_nodes->nodeNr;j++){
@@ -80,7 +82,7 @@ void CapacityRegion::initBuild(xmlNodePtr cur)
       facility = NULL;
       // facility
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
-      cout << "fac_name:" << fac_name <<endl;
+      cout << "fac_name:" << fac_name << "is on the list of repalcement facilities" <<endl;
       facility = (FacilityModel*) LI->getFacilityByName(fac_name);
       if (NULL == facility){
 	throw GenException("Facility '" 
@@ -89,9 +91,9 @@ void CapacityRegion::initBuild(xmlNodePtr cur)
       }
       else{
 	allReplacementFacs[i].push_back(facility);
-      }
+      };
     };
-    
+  };    
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -103,6 +105,7 @@ void CapacityRegion::init(xmlNodePtr cur)
   initBuild(cur);
   // Initiate the capacity data
   initCapacity(cur);
+  std::cout << "checking stage 1" << std::endl;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -136,8 +139,8 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
   // for now, all capacity types will be power capacity
   double capacity = 0.0;
   for(vector<Model*>::iterator inst=institutions.begin();
-      fac != institutions.end();
-      fac++){
+      inst != institutions.end();
+      inst++){
     capacity += ((InstModel*)(*inst))->getPowerCapacity();
   }
   return capacity;
@@ -205,17 +208,20 @@ void CapacityRegion::handleTick(int time)
   // check current capacity
   for (int i=0;i<nCapacities();i++){
     bool build_facility = true;
+    bool built = false;
     while (build_facility){
       double current_capacity = checkCurrentCapcity(capacity_type(i));
       build_facility = current_capacity < nominal_value(i);
+      Model* fac_to_build;
       if (build_facility){
 	Model* inst = chooseInstToBuildFac();
-	Model* fac_to_build = chooseFacToBuild( allReplacementFacs[i] );
+	fac_to_build = chooseFacToBuild( allReplacementFacs[i] );
 	built = requestBuild(fac_to_build,(InstModel*)(inst));
       }
       // For now, catch any situation for which no facility is built.
       // ************* This should eventually be changed
       if (build_facility && !built){
+	string fac_name = ((FacilityModel*)(fac_to_build))->getFacName();
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;
