@@ -17,7 +17,9 @@
  */
 
 typedef pair< Commodity*, Material*> InSep; 
-typedef pair< Commodity*, Material*> OutSep; 
+typedef pair< Commodity*, Material*> OutSep;
+
+// typedef pair< Commodity*, pair< Commodity*, Material*>  > stream_set;
 
 class SeparationsMatrixFacility : public FacilityModel  
 {

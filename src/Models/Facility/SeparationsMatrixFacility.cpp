@@ -14,21 +14,22 @@
 
 /*
  * TICK
+ * Make offers of separated material based on availabe inventory.
  * If there are ordersWaiting, prepare and send an appropriate 
  * request for spent fuel material.
- * If there is capacity to produce any extra material next month
- * prepare and send an appropriate offer of separating capacity.
+ * Check stocks to determine if there is capacity to produce any extra material
+ * next month. If so, process as much raw (spent fuel) stock material as
+ * capacity will allow.
  *
  * TOCK
- * Process as much raw (spent fuel) stock material as capacity will allow.
- * Send appropriate materials to fill ordersWaiting.
+ * Send appropriate separated material from inventory to fill ordersWaiting.
  *
  * RECIEVE MATERIAL
- * put it in stocks
+ * Put incoming spent nuclear fuel (SNF) material into stocks
  *
  * SEND MATERIAL
- * pull it from inventory
- * decrement ordersWaiting
+ * Pull separated material from inventory based on Requests
+ * Decrement ordersWaiting
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -213,9 +214,8 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
-{
-
-	cout << "Entered the receiveMaterial file " << endl;
+{  
+  cout << "Entered the receiveMaterial file " << endl;
 
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -248,9 +248,11 @@ void SeparationsMatrixFacility::handleTock(int time)
   // at rate allowed by capacity, convert material in Stocks to out_commod type
   // move converted material into Inventory
 
-  /*
-   * Handled more by separate function in handleTick than here."
+  
+  // Handled more by separate function in handleTick than here."
 
+  // Mass complete as in completely full inventory stored by SeparationsMatrix
+  // Facility
   Mass complete = 0;
 
   while(capacity > complete && !stocks.empty() ){
@@ -264,7 +266,11 @@ void SeparationsMatrixFacility::handleTock(int time)
                                   m->getUnits(),
                                   m->getName(), 
                                   0, atomBased);
-
+    //  }
+    // }
+  
+    
+   
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (capacity - complete)){
       complete += m->getTotMass();
@@ -277,12 +283,12 @@ void SeparationsMatrixFacility::handleTock(int time)
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
-    //    stocks.push_back(make_pair(trans.commod, *thisMat));
-    inventory.push_back(make_pair(trans.commod, newMat);
+    // stocks.push_back(make_pair(trans.commod, *thisMat));
+    // inventory.push_back(make_pair(commod, newMat);
   }    
 
   } // <- for the for loop end
-  */
+  
 
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
@@ -414,48 +420,52 @@ void SeparationsMatrixFacility::makeOffers()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::separate()
 {
-	// Get iterators that define the boundaries of the ordersExecuting that are 
-	// currently ready.~
-	int time = TI->getTime();
+  // Get iterators that define the boundaries of the ordersExecuting that are 
+  // currently ready.~
+  int time = TI->getTime();
 
-  pair<ProcessLine::iterator,
-		ProcessLine::iterator> iters;
-	iters = ordersExecuting.equal_range(time);
+  pair<ProcessLine::iterator, ProcessLine::iterator> iters;
 
-	ProcessLine::iterator curr, omega;
-	curr = iters.first;
-	omega = iters.second;
+  iters = ordersExecuting.equal_range(time);
 
-	// Create and send Materials corresponding to each order that's ready to go.
-	while (curr != omega) 
-		{
+  ProcessLine::iterator curr, omega;
+  curr = iters.first;
+  omega = iters.second;
 
-		// Get the info we need to make the separated Material.
-		Message* mess = (curr->second).first;
-		Material* mat = (curr->second).second;
+  // Create and send Materials corresponding to each order that's ready to go.
+  while (curr != omega) 
+  {
+    // Get the info we need to make the separated Material.
+    Message* mess = (curr->second).first;
+    Material* mat = (curr->second).second;
 
-		// Find out what we're trying to make.
-		map<Iso, Atoms> compToMake = mess->getComp();
+    // Find out what we're trying to make.
+    map<Iso, Atoms> compToMake = mess->getComp();
 
-	ordersExecuting.erase(time);
-		}
+    ordersExecuting.erase(time);
+  }
+ 
+  /*
+   * The section below is currently under development.  Its purpose is to do the
+   * actual separations of the isotopes based on the string information.
+   */
 
-        /*
-         * The section below is currently under development.  Its purpose is to do the
-         * actual separations of the isotopes based on the string information.
-         */
-        /*
-        // z = 114 is number of elements
-        for((*stream_set).first=1, (*stream_set).first=114, stream_set.first()++)
-          {
-            firstpair = inventory.pop_front()
-            Commodity* firstcommodity = firstpair.first();
-            Material* firstmaterial = firstpair.second();
-            // Multiply Amount of Element by Separation Efficieny and then add
-            // it to the stock of material for that Element.
-            stocks.second((*stream_set).first) = 
-              firstmaterial((*stream_set).first)*((*stream_set).second).second ++;
-          }
-        */
-
+        
+   // This loop will cycle through each element and then it will find out if 
+   // there is anything in the stream that needs to be added to the material 
+   //for separation.
+   /*
+   for(stream_set.second.first::iterator iter = stream_set.begin(); 
+       !iter = stream_set.end(); 
+       iter++){            
+     firstpair = inventory.pop_front();
+     Commodity* firstcommodity = firstpair.first();
+     Material* firstmaterial = firstpair.second();
+     // Multiply Amount of Element by Separation Efficieny and then add
+     // it to the stock of material for that Element
+     stocks.second((*stream_set).first) = 
+     firstmaterial((*stream_set).first)*((*stream_set).second).second ++;
+           
+   }
+   */       
 }
