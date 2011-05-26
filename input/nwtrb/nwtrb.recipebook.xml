@@ -86,13 +86,16 @@
     <unit>assembly</unit>
     <total>1000</total>
     <isotope>
-      <id>92235</id><comp>0.04</comp>
+      <id>92234</id><comp>0.0003</comp>
+    </isotope>    
+    <isotope>
+      <id>92235</id><comp>0.0435</comp>
     </isotope>
     <isotope>
-      <id>92236</id><comp>0.01</comp>
+      <id>92236</id><comp>0.0001</comp>
     </isotope>
     <isotope>
-      <id>92238</id><comp>0.95</comp>
+      <id>92238</id><comp>0.9561</comp>
     </isotope>
     <isotope>
       <id>08016</id><comp>0.13</comp>
@@ -165,13 +168,16 @@
     <unit>assembly</unit>
     <total>1000</total>
     <isotope>
-      <id>92235</id><comp>0.04</comp>
+      <id>92234</id><comp>0.0006</comp>
+    </isotope>    
+    <isotope>
+      <id>92235</id><comp>0.0455</comp>
     </isotope>
     <isotope>
-      <id>92236</id><comp>0.01</comp>
+      <id>92236</id><comp>0.032</comp>
     </isotope>
     <isotope>
-      <id>92238</id><comp>0.95</comp>
+      <id>92238</id><comp>0.9219</comp>
     </isotope>
     <isotope>
       <id>08016</id><comp>0.13</comp>
