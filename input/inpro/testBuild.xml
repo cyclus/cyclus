@@ -6,9 +6,9 @@
   <startyear>2000</startyear>
   <simstart>0</simstart>
 
-	<commodity>
-		<name>uo2</name>
-	</commodity>
+    <commodity>
+        <name>uo2</name>
+    </commodity>
 
   <market>
     <name>uo2market</name>
@@ -55,20 +55,20 @@
       </StorageFacility>
     </model>
   </facility>
-
-	<region>
+  
+  <region>
     <name>oneRegion</name>
-		<allowedfacility>FrontEnd</allowedfacility>
-		<allowedfacility>BackEnd</allowedfacility>
-		<allowedfacility>Storage</allowedfacility>
-		<model>
-			<BuildRegion>
-			  <input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/inpro/build.in</input_file>
-			</BuildRegion>
-		</model>
-		<institution>
-			<name>oneInst</name>
-			<model>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <allowedfacility>BackEnd</allowedfacility>
+    <allowedfacility>Storage</allowedfacility>
+    <model>
+      <BuildRegion>
+        <input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/inpro/build.in</input_file>
+      </BuildRegion>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
         <BuildInst>
           <facility>
             <type>FrontEnd</type>
@@ -83,15 +83,17 @@
             <name>Storage</name>
           </facility>
         </BuildInst>
-			</model>
-		</institution>
-	</region>
-
+      </model>
+    </institution>
+  </region>
+  
   <recipe>
     <name>fresh_50gwd</name>
     <basis>mass</basis>
     <unit>assembly</unit>
     <total>1000</total>
+    
+    
     <isotope>
       <id>92235</id>
       <comp>0.05</comp>
@@ -104,6 +106,7 @@
       <id>08016</id>
       <comp>0.13</comp>
     </isotope>
+
   </recipe>
 
 </simulation>

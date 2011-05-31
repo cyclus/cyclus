@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+
+<simulation>
+
+  <!-- General Simulation Information -->
+  <startyear>2000</startyear>
+  <startmonth>1</startmonth>
+  <simstart>0</simstart>
+  <duration>1</duration>
+
+
+  <!-- Commodities -->  
+  <commodity>
+    <name>fresh_PWR_uo2</name>
+  </commodity>
+
+  <commodity>
+    <name>spent_PWR_uo2</name>
+  </commodity>
+
+
+  <!-- Markets -->
+  <market>
+    <name>fresh_PWR_uo2market</name>
+    <mktcommodity>fresh_PWR_uo2</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+    
+  <market>
+    <name>spent_PWR_uo2market</name>
+    <mktcommodity>spent_PWR_uo2</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+
+  <!-- Material Recipies -->
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>  
+
+  <recipe>
+    <name>spent_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <!-- isotopes go here -->
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+  <recipe>
+    <name>water</name>
+    <basis>atom</basis>
+    <unit>barrel</unit>
+    <total>1e25</total>
+    <isotope>
+      <id>1001</id>
+      <comp>2</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>1</comp>
+    </isotope>
+  </recipe>
+
+
+  <!-- General Facility Models -->
+  <facility>
+    <name>PWR_uo2_FuelFab</name>
+    <model>
+      <SourceFacility>
+	<outcommodity>fresh_PWR_uo2</outcommodity>
+        <capacity>1e6</capacity>
+        <inventorysize>10e6</inventorysize>
+	<commodprice>0</commodprice>
+	<recipe>fresh_50gwd</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+  
+  <facility>
+    <name>Storage</name>
+    <model>
+      <StorageFacility>
+        <incommodity>spent_PWR_uo2</incommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <residencetime>100</residencetime>
+	
+	<initialstocks></initialstocks>
+	
+      </StorageFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>Reactor</name>
+    <model>
+      <RecipeReactor>
+	
+	<!-- Fresh and Spent Fuel Pairs -->
+	<fuelpair>
+	  <incommodity>fresh_PWR_uo2</incommodity>
+	  <inrecipe>fresh_50gwd</inrecipe>
+	  <outcommodity>spent_PWR_uo2</outcommodity>
+	  <outrecipe>spent_50gwd</outrecipe>
+	</fuelpair>
+
+	<startConstrYear>1968</startConstrYear>
+	<startConstrMonth>10</startConstrMonth>
+	<startOperYear>1974</startOperYear>
+	<startOperMonth>12</startOperMonth>
+	<licExpYear>2034</licExpYear>
+	<licExpMonth>05</licExpMonth>
+	<lifetime>720</lifetime>
+	<state>AR</state>
+	<typeReac>PWR</typeReac>
+	<capacity>842</capacity>
+	<elecCF>0.99</elecCF>	
+      </RecipeReactor>
+    </model>
+  </facility>
+
+  <!-- General Region Models -->
+  <region>
+    <name>USA</name>
+
+    <!-- Allowed Facilities -->
+    <allowedfacility>PWR_uo2_FuelFab</allowedfacility>
+    <allowedfacility>Storage</allowedfacility>
+    <allowedfacility>Reactor</allowedfacility>
+
+    <!-- Region Model -->
+    <model>
+      <NullRegion/>
+    </model>
+    
+    <!-- Institutions -->
+    <institution>
+      <name>OneInst</name>
+      <model>
+	<FixedInst>
+	  
+	  <!-- Facilities within Institution -->
+	  <facility>
+            <type>Storage</type>
+            <name>Storage</name>
+	  </facility>
+
+	  <facility>
+            <type>Reactor</type>
+	    <name>Reactor</name>
+	  </facility>
+
+	  <facility>
+            <type>PWR_uo2_FuelFab</type>
+	    <name>PWR_uo2_FuelFab</name>
+	  </facility>
+	  
+        </FixedInst>
+      </model>
+    </institution>
+
+  </region>
+  
+</simulation>
