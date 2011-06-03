@@ -161,8 +161,6 @@
 
     <!-- Region Model -->
     <model>
-      <NullRegion/>
-      <!--
       <CapacityRegion>
 	<input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/nwtrb/build.in</input_file>
 	<capacitydemand>
@@ -174,7 +172,6 @@
 	  </replacementlist>
 	</capacitydemand>
       </CapacityRegion>
-      -->
     </model>
     
     <!-- Institutions -->
