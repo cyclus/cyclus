@@ -4,7 +4,7 @@
   <startyear>2000</startyear>
   <startmonth>1</startmonth>
   <simstart>0</simstart>
-  <duration>1</duration>
+  <duration>0</duration>
   
   <commodity>
     <name>fresh_PWR_uo2</name>
@@ -54,6 +54,7 @@
     </model>
   </market>
   
+  <!-- Extraneous 
   <commodity>
     <name>fresh_r_uo2</name>
   </commodity>
@@ -101,6 +102,13 @@
       <GreedyMarket/>
     </model>
   </market>
+  -->
+
+  <recipebook>
+    <filename>nwtrb.recipebook.xml</filename>
+    <namespace>nwtrb</namespace>
+    <format>xml</format>
+  </recipebook>
   
   <facility>
     <name>PWR_uo2_FuelFab</name>
@@ -110,7 +118,7 @@
         <capacity>1e6</capacity>
         <inventorysize>10e6</inventorysize>
         <commodprice>0</commodprice>
-        <recipe>fresh_50gwd</recipe>
+        <recipe>fresh_PWR_uo2</recipe>
       </SourceFacility>
     </model>
   </facility>
@@ -123,11 +131,12 @@
         <capacity>1e6</capacity>
         <inventorysize>10e6</inventorysize>
         <commodprice>0</commodprice>
-        <recipe>fresh_50gwd</recipe>
+        <recipe>fresh_BWR_uo2</recipe>
       </SourceFacility>
     </model>
   </facility>
   
+  <!-- Extraneous
   <facility>
     <name>PWR_r_uo2_FuelFab</name>
     <model>
@@ -153,12 +162,14 @@
       </SourceFacility>
     </model>
   </facility>
+  -->
   
   <facility>
     <name>Storage</name>
     <model>
       <StorageFacility>
         <incommodity>spent_PWR_uo2</incommodity>
+        <incommodity>spent_BWR_uo2</incommodity>
         <capacity>1</capacity>
         <inventorysize>1e4</inventorysize>
         <residencetime>100</residencetime>
@@ -191,9 +202,11 @@
   <region>
     <name>USA</name>
     <allowedfacility>PWR_uo2_FuelFab</allowedfacility>
+    <allowedfacility>BWR_uo2_FuelFab</allowedfacility>
+    <!-- Extraneous
     <allowedfacility>PWR_mox_FuelFab</allowedfacility>
     <allowedfacility>PWR_r_uo2_FuelFab</allowedfacility>
-    <allowedfacility>BWR_uo2_FuelFab</allowedfacility>
+    -->
     <allowedfacility>Storage</allowedfacility>
     <allowedfacility>nwtrb:Arkansas_Nuclear_1</allowedfacility>
     <allowedfacility>nwtrb:Arkansas_Nuclear_2</allowedfacility>
@@ -732,7 +745,7 @@
     </institution>
   </region>
   
-  
+  <!-- Extraneous
   <recipe>
     <name>fresh_50gwd</name>
     <basis>mass</basis>
@@ -765,10 +778,5 @@
       <comp>1</comp>
     </isotope>
   </recipe>
-  
-  <recipebook>
-    <filename>nwtrb.recipebook.xml</filename>
-    <namespace>nwtrb</namespace>
-    <format>xml</format>
-  </recipebook>
+  -->
 </simulation>

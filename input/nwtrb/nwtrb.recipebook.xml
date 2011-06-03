@@ -1,154 +1,28 @@
 <?xml version="1.0"?>
 <recipebook>
-  <name>Sample XML Recipebook</name>
-  <recipe>
-    <name>fresh_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.05</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.95</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-  </recipe>
-  <recipe>
-    <name>spent_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.92</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-    <isotope>
-      <id>93237</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>38090</id><comp>0.04</comp>
-    </isotope>
-  </recipe>
-  
-  <recipe>
-    <name>spent_BWR_uo2_Pre2010</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.94</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.03</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-  </recipe>
+  <name>NWTRB Recipebook for Phase(s): 1</name>
 
-    <recipe>
-    <name>spent_PWR_uo2_Pre2010</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.94</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.03</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-  </recipe>
-  
-  <recipe>
-    <name>fresh_BWR_uo2</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92234</id><comp>0.0003</comp>
-    </isotope>       
-    <isotope>
-      <id>92235</id><comp>0.043</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.0001</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.9566</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-  </recipe>
-  <recipe>
-    <name>spent_BWR_uo2</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.94</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.03</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-  </recipe>
-
+  <!-- PWR Fresh Assembly -->
+  <!-- m = 0.43 MTU, e = 3.43% -->
   <recipe>
     <name>fresh_PWR_uo2</name>
     <basis>mass</basis>
     <unit>assembly</unit>
-    <total>1000</total>
+    <total>0.4878E+9</total>
     <isotope>
-      <id>92234</id><comp>0.0003</comp>
-    </isotope>    
-    <isotope>
-      <id>92235</id><comp>0.0435</comp>
+      <id>92235</id><comp>0.0302</comp>
     </isotope>
     <isotope>
-      <id>92236</id><comp>0.0001</comp>
+    <isotope>
+      <id>92238</id><comp>0.8512</comp>
     </isotope>
     <isotope>
-      <id>92238</id><comp>0.9561</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
+      <id>08016</id><comp>0.1186</comp>
     </isotope>
   </recipe>
+
+  <!-- PWR Spent Assembly -->
+  <!-- BU = 39 GWd/MT -->
   <recipe>
     <name>spent_PWR_uo2</name>
     <basis>mass</basis>
@@ -3615,6 +3489,134 @@
     </isotope>
   </recipe>
 
+  <!-- BWR Fresh Assembly -->
+  <!-- m = 0.18 MTU, e = 2.39% -->
+  <recipe>
+    <name>fresh_BWR_uo2</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>2.042E+8</total>
+    <isotope>
+      <id>92235</id><comp>0.0211</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.8604</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.1185</comp>
+    </isotope>
+  </recipe>
+
+  <!-- BWR Spent Assembly -->
+  <!-- BU = 32 GWd/MT -->
+  <recipe>
+    <name>spent_BWR_uo2</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.94</comp>
+    </isotope>
+    <isotope>
+      <id>92236</id><comp>0.03</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+  </recipe>
+
+  <!-- Extraneous Recipes
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+  </recipe>
+  <recipe>
+    <name>spent_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.92</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+    <isotope>
+      <id>93237</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>38090</id><comp>0.04</comp>
+    </isotope>
+  </recipe>
+  
+  <recipe>
+    <name>spent_BWR_uo2_Pre2010</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.94</comp>
+    </isotope>
+    <isotope>
+      <id>92236</id><comp>0.03</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+  </recipe>
+
+    <recipe>
+    <name>spent_PWR_uo2_Pre2010</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.94</comp>
+    </isotope>
+    <isotope>
+      <id>92236</id><comp>0.03</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+  </recipe>
+  
+
   <recipe>
     <name>fresh_mox</name>
     <basis>mass</basis>
@@ -3715,3 +3717,4 @@
     </isotope>
   </recipe>
 </recipebook>
+-->
