@@ -35,7 +35,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
   FacilityModel* facility;
   Commodity* commodity;
   Material* recipe;
-  double amount;
+  double amount, age;
   int i;
 
   // for each fuel pair, there is an in and an out commodity
@@ -74,6 +74,8 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     }
     // amount
     amount = atof(XMLinput->get_xpath_content(entry_node,"amount"));
+    // time in storage (age) in months
+    age = atof(XMLinput->get_xpath_content(entry_node,"age"));
 
     // make new material
     Material* newMat = new Material(recipe->getMassComp(), 
@@ -81,6 +83,10 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
                                     recipe->getName(),
                                     amount, 
                                     massBased);
+    
+    // decay the material for the alloted time
+    newMat->decay(age);
+    
     // announce creation to the world
     cout<<"StorageFacility " << ID << " is starting with material with mass "
         << newMat->getTotMass() << endl;

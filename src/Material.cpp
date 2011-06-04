@@ -665,7 +665,6 @@ Vector Material::makeCompVector() const
       double decayConst = 0;
       int col = parent.size() + 1;
       parent[iso] = make_pair(col, decayConst);  // add isotope to parent map
-      cout << "Hey I found this is stable : " << iso <<endl;
 
       int nDaughters = 0;
       vector< pair<int,double> > temp(nDaughters);

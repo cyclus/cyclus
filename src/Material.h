@@ -116,6 +116,8 @@ enum Basis {atomBased, massBased};
  *
  * It is an important goal (requirement) that all material objects maintain an
  * account of the atoms that is consistent with the account of the mass.
+ *
+ * The default mass unit is kilograms.
  */
 class Material {
 

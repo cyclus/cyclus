@@ -362,21 +362,24 @@
           <text/>
           </element>
         <element name="initialstocks">
-		<zeroOrMore>
-		<element name="entry">
-		      	<element name="facility">
-		                <text/>
-		      		</element>
-			<ref name="incommodity"/>
-		      	<element name="recipe">
-		                <text/>
-		      		</element>
-			<element name="amount">
-				<text/>
-				</element>
-		</element>
-        	</zeroOrMore>
-	</element>
+        <zeroOrMore>
+        <element name="entry">
+                  <element name="facility">
+                        <text/>
+                      </element>
+            <ref name="incommodity"/>
+                  <element name="recipe">
+                        <text/>
+                      </element>
+            <element name="amount">
+                <text/>
+                </element>
+            <element name="age">
+                <text/>
+                </element>
+        </element>
+            </zeroOrMore>
+    </element>
      </element>
   </define>
 
@@ -496,36 +499,36 @@
   <define name="BuildRegion">
      <element name="BuildRegion">
         <element name="input_file">
-	    <text/>
-	</element>
+        <text/>
+    </element>
      </element>
   </define>
 
   <define name="CapacityRegion">
      <element name="CapacityRegion">
         <element name="input_file">
-	    <text/>
-	</element>
-	<oneOrMore>
+        <text/>
+    </element>
+    <oneOrMore>
         <element name="capacitydemand">
-		<element name="capacitytype">
-			<text/>
-		</element>
-		<element name="capacityfunction">
-			<text/>
-		</element>
-		<element name="nominalvalue">
-			<text/>
-		</element>
-		<oneOrMore>
-		<element name="replacementlist">
-			<element name="replacementfacility">
-				<text/>
-			</element>
-		</element>
-		</oneOrMore>
-	</element>
-	</oneOrMore>
+        <element name="capacitytype">
+            <text/>
+        </element>
+        <element name="capacityfunction">
+            <text/>
+        </element>
+        <element name="nominalvalue">
+            <text/>
+        </element>
+        <oneOrMore>
+        <element name="replacementlist">
+            <element name="replacementfacility">
+                <text/>
+            </element>
+        </element>
+        </oneOrMore>
+    </element>
+    </oneOrMore>
      </element>
   </define>
 
@@ -727,7 +730,7 @@
           <data type = "integer" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
           <data type = "double" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
         </oneOrMore>
-      </list>							
+      </list>                            
     </element>
   </define>
 <!-- end section for Stream -->
