@@ -4,7 +4,7 @@
 <name>NWTRB Facilitycatalog</name>
 
 <facility>
-  <name>Arkansas_Nuclear_1</name>
+  <name>Arkansas_Nuclear_One_1</name>
   <model>
     <RecipeReactor>
       <fuelpair>
@@ -40,7 +40,7 @@
   </model>
 </facility>
 <facility>
-  <name>Arkansas_Nuclear_2</name>
+  <name>Arkansas_Nuclear_One_2</name>
   <model>
     <RecipeReactor>
       <fuelpair>
