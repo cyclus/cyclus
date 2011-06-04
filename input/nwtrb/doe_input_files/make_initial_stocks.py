@@ -92,7 +92,7 @@ for site in site_info:
         amount = wet_storage + (dry_storage / n_reactors)
         # Convert the amount from MTU to kg UO2
         # Note: conversion factor based on NWTRB-type assemblies
-        amount = 1.1344 * amount * 1E+09
+        amount = 1.1344 * amount * 1E+03
         
         # I assume all material is of the same age
         # equal to the reactor's median age (in months)

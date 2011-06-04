@@ -4,6 +4,7 @@ import re
 import string
 import sys
 import operator
+import os
 
 # Function uses name variable to determine the atomic number size then the
 # atomic number is parsed to determine number of zeroes to fit XML schema
@@ -18,13 +19,12 @@ def A_zero(name, Z):
   Iso = ''.join(Z + A)
   return Iso
 
-myfile = open('/filespace/people/r/relmore/cyclus-wc/trunk/input/nwtrb/\
-origin_files/Recipes/Pre_2010_BWR_Fresh_UO2.out', 'rb')
-
-"""
-myfile = open('/filespace/groups/cnerg/users/gidden/dropbox/\
-Post_2010_PWR_Fresh_v02.out', 'rb')
-"""
+# Filename and directory info
+current_dir=os.getcwd()+'/'
+input='Pre_2010_BWR_Fresh_UO2.out'
+#input='Post_2010_PWR_Fresh_v02.out'
+mypath=current_dir+input
+myfile=open(mypath,'rb')
 
 entry = open('test.txt', 'w')
 
@@ -570,7 +570,7 @@ for line in olines:
       compFloat = float(oline_array[1].rstrip())/(1.1345E+6)
       # Have to use compFloat to divide composition into mass fraction.
       # Then with comp you convert back to string.
-      comp = str(compFloat)
+      comp = '%1.3E'%(compFloat)
       XMLout.write("<comp>" + comp + "</comp>" + "\n")
       XMLout.write("    " + "</isotope>" + "\n")
 

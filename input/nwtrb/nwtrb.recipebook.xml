@@ -16,9 +16,6 @@
       <id>92235</id><comp>0.03023</comp>
     </isotope>
     <isotope>
-      <id>92236</id><comp>1.216E-04</comp>
-    </isotope>
-    <isotope>
       <id>92238</id><comp>0.8508</comp>
     </isotope>
     <isotope>
@@ -3551,7 +3548,7 @@
     <name>fresh_BWR_uo2</name>
     <basis>mass</basis>
     <unit>assembly</unit>
-    <total>0.2042E+3</total>
+    <total>2.042E+2</total>
     <isotope>
       <id>92234</id><comp>2.353E-04</comp>
     </isotope>    
@@ -7088,92 +7085,7 @@
     </isotope>
   </recipe>
 
-  <!-- Extraneous Recipes
-  <recipe>
-    <name>fresh_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.05</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.95</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-  </recipe>
-  <recipe>
-    <name>spent_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.92</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-    <isotope>
-      <id>93237</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>38090</id><comp>0.04</comp>
-    </isotope>
-  </recipe>
-  
-  <recipe>
-    <name>spent_BWR_uo2_Pre2010</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.94</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.03</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-  </recipe>
-
-    <recipe>
-    <name>spent_PWR_uo2_Pre2010</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id><comp>0.01</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id><comp>0.94</comp>
-    </isotope>
-    <isotope>
-      <id>92236</id><comp>0.03</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id><comp>0.13</comp>
-    </isotope>
-    <isotope>
-      <id>94239</id><comp>0.02</comp>
-    </isotope>
-  </recipe>
-  
-
+<!-- Unused Recipes -->
   <recipe>
     <name>fresh_mox</name>
     <basis>mass</basis>
@@ -7274,4 +7186,91 @@
     </isotope>
   </recipe>
 </recipebook>
+
+  <!-- Extraneous Recipes
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+  </recipe>
+  <recipe>
+    <name>spent_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.92</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+    <isotope>
+      <id>93237</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>38090</id><comp>0.04</comp>
+    </isotope>
+  </recipe>
+  
+  <recipe>
+    <name>spent_BWR_uo2_Pre2010</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.94</comp>
+    </isotope>
+    <isotope>
+      <id>92236</id><comp>0.03</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+  </recipe>
+
+    <recipe>
+    <name>spent_PWR_uo2_Pre2010</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id><comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id><comp>0.94</comp>
+    </isotope>
+    <isotope>
+      <id>92236</id><comp>0.03</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id><comp>0.13</comp>
+    </isotope>
+    <isotope>
+      <id>94239</id><comp>0.02</comp>
+    </isotope>
+  </recipe>
+  
+
 -->
