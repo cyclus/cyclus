@@ -64,9 +64,13 @@ for line in in_lines:
             number = line_arr[0]
             type = line_arr[1]
             start_year = int(line_arr[4])
+            end_year = int(line_arr[5])
             wet_storage = float(line_arr[9])
-            reactor = [number, type, start_year, wet_storage]
+            reactor = [number, type, start_year, end_year, wet_storage]
             reactor_info.append(reactor)
+# Catch the last entry
+site = [name,dry_storage,reactor_info]
+site_info.append(site)
 
 # Now construct the initial stocks container
 initial_stocks = []
@@ -80,7 +84,7 @@ for site in site_info:
     n_reactors = len(reactor_info)
     for reactor in reactor_info:
         # Get all the reactor information
-        number, type, start_year, wet_storage = reactor
+        number, type, start_year, end_year, wet_storage = reactor
         
         # Format the initial_stocks entries and append
         fac_name = 'nwtrb:' + site_name + '_' + number
@@ -96,7 +100,14 @@ for site in site_info:
         
         # I assume all material is of the same age
         # equal to the reactor's median age (in months)
-        age = (reference_year - start_year) * 12
+        if end_year > reference_year:
+            # Existing plants
+            age = (reference_year - start_year) * 12 / 2
+        else:
+            # Retired plants
+            # I assume all material was the median age when shut down
+            # and add the time since shutdown
+            age = (end_year - start_year) * 12 / 2 + (reference_year - end_year) * 12
         
         # Add the entry to the initial_stocks
         entry = [fac_name, in_commodity, recipe, amount, age]

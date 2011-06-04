@@ -21,7 +21,7 @@ def A_zero(name, Z):
 
 # Filename and directory info
 current_dir=os.getcwd()+'/'
-input='Pre_2010_BWR_Fresh_UO2.out'
+input='Pre_2010_PWR_Fresh_UO2.out'
 #input='Post_2010_PWR_Fresh_v02.out'
 mypath=current_dir+input
 myfile=open(mypath,'rb')
@@ -541,7 +541,7 @@ entry.close()
 output = open("test.txt", 'rb')
 olines = output.readlines()
 
-XMLout = open('XMLout.xml', 'wb')
+XMLout = open('pwr.xml', 'wb')
 
 xlines=[]
 i = 0

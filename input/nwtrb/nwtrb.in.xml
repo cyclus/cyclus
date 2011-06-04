@@ -175,798 +175,812 @@
         <capacity>1</capacity>
         <inventorysize>1e4</inventorysize>
         <residencetime>100</residencetime>
-	
+
         <initialstocks>
           <entry>
             <facility>nwtrb:Arkansas_Nuclear_One_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.990E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Arkansas_Nuclear_One_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.706E+05</amount>
-	    <age>360</age>
+	    <age>180</age>
           </entry>
           <entry>
             <facility>nwtrb:Beaver_Valley_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.421E+05</amount>
-	    <age>408</age>
+	    <age>204</age>
           </entry>
           <entry>
             <facility>nwtrb:Beaver_Valley_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.685E+05</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Big_Rock_Point_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.568E+04</amount>
-	    <age>564</age>
+	    <age>360</age>
           </entry>
           <entry>
             <facility>nwtrb:Braidwood_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.581E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:Braidwood_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.581E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:Browns_Ferry_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.760E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Browns_Ferry_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.760E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Browns_Ferry_3</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>4.614E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Brunswick_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>4.265E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Brunswick_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>4.628E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Byron_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.092E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Byron_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.080E+05</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Callaway_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.203E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Calvert_Cliffs_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.490E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Calvert_Cliffs_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.479E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Catawba_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.656E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Catawba_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.599E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Clinton_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>5.127E+05</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Columbia_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.729E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Comanche_Peak_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.889E+05</amount>
-	    <age>240</age>
+	    <age>120</age>
           </entry>
           <entry>
             <facility>nwtrb:Comanche_Peak_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.889E+05</amount>
-	    <age>204</age>
+	    <age>102</age>
           </entry>
           <entry>
             <facility>nwtrb:Cook_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.646E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Cook_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.635E+05</amount>
-	    <age>384</age>
+	    <age>192</age>
           </entry>
           <entry>
             <facility>nwtrb:Cooper_Station_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>4.379E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Crystal_River_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.001E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Davis_Besse_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.830E+05</amount>
-	    <age>384</age>
+	    <age>192</age>
           </entry>
           <entry>
             <facility>nwtrb:Diablo_Canyon_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.079E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Diablo_Canyon_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.136E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Dresden_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>8.146E+05</amount>
-	    <age>480</age>
+	    <age>240</age>
           </entry>
           <entry>
             <facility>nwtrb:Dresden_3</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>8.282E+05</amount>
-	    <age>468</age>
+	    <age>234</age>
           </entry>
           <entry>
             <facility>nwtrb:Duane_Arnold_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>5.130E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Enrico_Fermi_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>5.411E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:Farley_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.645E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Farley_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.577E+05</amount>
-	    <age>348</age>
+	    <age>174</age>
           </entry>
           <entry>
             <facility>nwtrb:Fitzpatrick_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.674E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Fort_Calhoun_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.352E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Ginna_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.946E+05</amount>
-	    <age>480</age>
+	    <age>240</age>
           </entry>
           <entry>
             <facility>nwtrb:Grand_Gulf_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>8.370E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Haddam_Neck_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.677E+05</amount>
-	    <age>504</age>
+	    <age>336</age>
           </entry>
           <entry>
             <facility>nwtrb:Harris_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>1.256E+06</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Hatch_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.611E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Hatch_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.600E+05</amount>
-	    <age>372</age>
+	    <age>186</age>
           </entry>
           <entry>
             <facility>nwtrb:Hope_Creek_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.020E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Humboldt_Bay_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>3.278E+04</amount>
-	    <age>408</age>
+	    <age>336</age>
           </entry>
           <entry>
             <facility>nwtrb:Indian_Point_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.645E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Indian_Point_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.395E+05</amount>
-	    <age>408</age>
+	    <age>204</age>
           </entry>
           <entry>
             <facility>nwtrb:Kewaunee_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.958E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:La_Crosse_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>4.311E+04</amount>
-	    <age>492</age>
+	    <age>384</age>
           </entry>
           <entry>
-            <facility>nwtrb:LaSalle_1</facility>
+            <facility>nwtrb:La_Salle_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.421E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
-            <facility>nwtrb:LaSalle_2</facility>
+            <facility>nwtrb:La_Salle_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.409E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Limerick_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.557E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Limerick_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.557E+05</amount>
-	    <age>240</age>
+	    <age>120</age>
           </entry>
           <entry>
             <facility>nwtrb:Maine_Yankee_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.152E+05</amount>
-	    <age>456</age>
+	    <age>312</age>
           </entry>
           <entry>
             <facility>nwtrb:McGuire_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>8.802E+05</amount>
-	    <age>348</age>
+	    <age>174</age>
           </entry>
           <entry>
             <facility>nwtrb:McGuire_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.202E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Millstone_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.501E+05</amount>
-	    <age>420</age>
+	    <age>210</age>
           </entry>
           <entry>
             <facility>nwtrb:Millstone_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.479E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Monticello_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>3.766E+05</amount>
-	    <age>468</age>
+	    <age>234</age>
           </entry>
           <entry>
             <facility>nwtrb:Morris_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.646E+05</amount>
-	    <age>540</age>
+	    <age>270</age>
           </entry>
           <entry>
             <facility>nwtrb:Nine_Mile_Point_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.421E+05</amount>
-	    <age>492</age>
+	    <age>246</age>
           </entry>
           <entry>
             <facility>nwtrb:Nine_Mile_Point_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>5.547E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:North_Anna_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.448E+05</amount>
-	    <age>384</age>
+	    <age>192</age>
           </entry>
           <entry>
             <facility>nwtrb:North_Anna_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.437E+05</amount>
-	    <age>360</age>
+	    <age>180</age>
           </entry>
           <entry>
             <facility>nwtrb:Oconee_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.016E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Oconee_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.016E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Oconee_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.118E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Oyster_Creek_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.724E+05</amount>
-	    <age>492</age>
+	    <age>246</age>
           </entry>
           <entry>
             <facility>nwtrb:Palisades_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.391E+05</amount>
-	    <age>468</age>
+	    <age>234</age>
           </entry>
           <entry>
             <facility>nwtrb:Palo_Verde_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.697E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Palo_Verde_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.697E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Palo_Verde_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.719E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:Peach_Bottom_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>9.072E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Peach_Bottom_3</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>9.117E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Perry_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.682E+05</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Pilgrim_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>5.958E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Point_Beach_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.481E+05</amount>
-	    <age>480</age>
+	    <age>240</age>
           </entry>
           <entry>
             <facility>nwtrb:Point_Beach_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.481E+05</amount>
-	    <age>456</age>
+	    <age>228</age>
           </entry>
           <entry>
             <facility>nwtrb:Prairie_Island_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.584E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Prairie_Island_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.573E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Quad_Cities_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.939E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Quad_Cities_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.927E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Rancho_Seco_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>2.591E+05</amount>
-	    <age>420</age>
+	    <age>336</age>
           </entry>
           <entry>
             <facility>nwtrb:River_Bend_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.158E+05</amount>
-	    <age>288</age>
+	    <age>144</age>
           </entry>
           <entry>
             <facility>nwtrb:Robinson_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>3.155E+05</amount>
-	    <age>468</age>
+	    <age>234</age>
           </entry>
           <entry>
             <facility>nwtrb:Salem_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.693E+05</amount>
-	    <age>396</age>
+	    <age>198</age>
           </entry>
           <entry>
             <facility>nwtrb:Salem_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.137E+05</amount>
-	    <age>348</age>
+	    <age>174</age>
           </entry>
           <entry>
             <facility>nwtrb:San_Onofre_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.504E+05</amount>
-	    <age>324</age>
+	    <age>162</age>
           </entry>
           <entry>
             <facility>nwtrb:San_Onofre_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.504E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Seabrook_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.409E+05</amount>
-	    <age>240</age>
+	    <age>120</age>
           </entry>
           <entry>
             <facility>nwtrb:Sequoyah_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.463E+05</amount>
-	    <age>348</age>
+	    <age>174</age>
           </entry>
           <entry>
             <facility>nwtrb:Sequoyah_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.452E+05</amount>
-	    <age>336</age>
+	    <age>168</age>
           </entry>
           <entry>
             <facility>nwtrb:Susquehanna_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.485E+05</amount>
-	    <age>324</age>
+	    <age>162</age>
           </entry>
           <entry>
             <facility>nwtrb:Susquehanna_2</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>7.473E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:South_Texas_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.171E+05</amount>
-	    <age>264</age>
+	    <age>132</age>
           </entry>
           <entry>
             <facility>nwtrb:South_Texas_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.547E+05</amount>
-	    <age>252</age>
+	    <age>126</age>
           </entry>
           <entry>
             <facility>nwtrb:St_Lucie_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>7.188E+05</amount>
-	    <age>408</age>
+	    <age>204</age>
           </entry>
           <entry>
             <facility>nwtrb:St_Lucie_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.691E+05</amount>
-	    <age>324</age>
+	    <age>162</age>
           </entry>
           <entry>
             <facility>nwtrb:Summer_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.570E+05</amount>
-	    <age>312</age>
+	    <age>156</age>
           </entry>
           <entry>
             <facility>nwtrb:Surry_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.638E+05</amount>
-	    <age>456</age>
+	    <age>228</age>
           </entry>
           <entry>
             <facility>nwtrb:Surry_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.627E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Three_Mile_Island_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.239E+05</amount>
-	    <age>432</age>
+	    <age>216</age>
           </entry>
           <entry>
             <facility>nwtrb:Trojan_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>4.071E+05</amount>
-	    <age>408</age>
+	    <age>312</age>
           </entry>
           <entry>
             <facility>nwtrb:Turkey_Point_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.262E+05</amount>
-	    <age>456</age>
+	    <age>228</age>
           </entry>
           <entry>
             <facility>nwtrb:Turkey_Point_4</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.251E+05</amount>
-	    <age>444</age>
+	    <age>222</age>
           </entry>
           <entry>
             <facility>nwtrb:Vermont_Yankee_1</facility>
             <incommodity>spent_BWR_uo2</incommodity>
             <recipe>nwtrb:spent_BWR_uo2</recipe>
             <amount>6.626E+05</amount>
-	    <age>456</age>
+	    <age>228</age>
           </entry>
           <entry>
             <facility>nwtrb:Vogtle_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.990E+05</amount>
-	    <age>276</age>
+	    <age>138</age>
           </entry>
           <entry>
             <facility>nwtrb:Vogtle_2</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>5.990E+05</amount>
-	    <age>252</age>
+	    <age>126</age>
           </entry>
           <entry>
             <facility>nwtrb:Waterford_3</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.727E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Watts_Bar_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>3.687E+05</amount>
-	    <age>168</age>
+	    <age>84</age>
           </entry>
           <entry>
             <facility>nwtrb:Wolf_Creek_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>6.988E+05</amount>
-	    <age>300</age>
+	    <age>150</age>
           </entry>
           <entry>
             <facility>nwtrb:Yankee_Rowe_1</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>nwtrb:spent_PWR_uo2</recipe>
             <amount>1.442E+05</amount>
-	    <age>600</age>
+	    <age>408</age>
+          </entry>
+          <entry>
+            <facility>nwtrb:Zion_1</facility>
+            <incommodity>spent_PWR_uo2</incommodity>
+            <recipe>nwtrb:spent_PWR_uo2</recipe>
+            <amount>5.782E+05</amount>
+	    <age>294</age>
+          </entry>
+          <entry>
+            <facility>nwtrb:Zion_2</facility>
+            <incommodity>spent_PWR_uo2</incommodity>
+            <recipe>nwtrb:spent_PWR_uo2</recipe>
+            <amount>5.782E+05</amount>
+	    <age>294</age>
           </entry>
         </initialstocks>
 	
@@ -989,6 +1003,7 @@
     <allowedfacility>PWR_r_uo2_FuelFab</allowedfacility>
     -->
     <allowedfacility>Storage</allowedfacility>
+    <!-- Existing Reactors -->
     <allowedfacility>nwtrb:Arkansas_Nuclear_One_1</allowedfacility>
     <allowedfacility>nwtrb:Arkansas_Nuclear_One_2</allowedfacility>
     <allowedfacility>nwtrb:Beaver_Valley_1</allowedfacility>
@@ -1008,32 +1023,33 @@
     <allowedfacility>nwtrb:Catawba_1</allowedfacility>
     <allowedfacility>nwtrb:Catawba_2</allowedfacility>
     <allowedfacility>nwtrb:Clinton_1</allowedfacility>
-    <allowedfacility>nwtrb:Columbia_2</allowedfacility>
+    <allowedfacility>nwtrb:Columbia_1</allowedfacility>
     <allowedfacility>nwtrb:Comanche_Peak_1</allowedfacility>
     <allowedfacility>nwtrb:Comanche_Peak_2</allowedfacility>
-    <allowedfacility>nwtrb:Cooper</allowedfacility>
+    <allowedfacility>nwtrb:Cooper_Station_1</allowedfacility>
     <allowedfacility>nwtrb:Crystal_River_3</allowedfacility>
     <allowedfacility>nwtrb:Davis_Besse_1</allowedfacility>
     <allowedfacility>nwtrb:Diablo_Canyon_1</allowedfacility>
     <allowedfacility>nwtrb:Diablo_Canyon_2</allowedfacility>
-    <allowedfacility>nwtrb:Donald_Cook_1</allowedfacility>
-    <allowedfacility>nwtrb:Donald_Cook_2</allowedfacility>
+    <allowedfacility>nwtrb:Cook_1</allowedfacility>
+    <allowedfacility>nwtrb:Cook_2</allowedfacility>
     <allowedfacility>nwtrb:Dresden_2</allowedfacility>
     <allowedfacility>nwtrb:Dresden_3</allowedfacility>
     <allowedfacility>nwtrb:Duane_Arnold_1</allowedfacility>
     <allowedfacility>nwtrb:Enrico_Fermi_2</allowedfacility>
     <allowedfacility>nwtrb:Farley_1</allowedfacility>
     <allowedfacility>nwtrb:Farley_2</allowedfacility>
-    <allowedfacility>nwtrb:Fitzpatrick</allowedfacility>
+    <allowedfacility>nwtrb:Fitzpatrick_1</allowedfacility>
     <allowedfacility>nwtrb:Fort_Calhoun_1</allowedfacility>
+    <allowedfacility>nwtrb:Ginna_1</allowedfacility>
     <allowedfacility>nwtrb:Grand_Gulf_1</allowedfacility>
-    <allowedfacility>nwtrb:HB_Robinson_2</allowedfacility>
+    <allowedfacility>nwtrb:Robinson_2</allowedfacility>
     <allowedfacility>nwtrb:Hatch_1</allowedfacility>
     <allowedfacility>nwtrb:Hatch_2</allowedfacility>
     <allowedfacility>nwtrb:Hope_Creek_1</allowedfacility>
     <allowedfacility>nwtrb:Indian_Point_2</allowedfacility>
     <allowedfacility>nwtrb:Indian_Point_3</allowedfacility>
-    <allowedfacility>nwtrb:Kewaunee</allowedfacility>
+    <allowedfacility>nwtrb:Kewaunee_1</allowedfacility>
     <allowedfacility>nwtrb:La_Salle_1</allowedfacility>
     <allowedfacility>nwtrb:La_Salle_2</allowedfacility>
     <allowedfacility>nwtrb:Limerick_1</allowedfacility>
@@ -1042,7 +1058,8 @@
     <allowedfacility>nwtrb:McGuire_2</allowedfacility>
     <allowedfacility>nwtrb:Millstone_2</allowedfacility>
     <allowedfacility>nwtrb:Millstone_3</allowedfacility>
-    <allowedfacility>nwtrb:Monticello</allowedfacility>
+    <allowedfacility>nwtrb:Monticello_1</allowedfacility>
+    <allowedfacility>nwtrb:Morris_1</allowedfacility>
     <allowedfacility>nwtrb:Nine_Mile_Point_1</allowedfacility>
     <allowedfacility>nwtrb:Nine_Mile_Point_2</allowedfacility>
     <allowedfacility>nwtrb:North_Anna_1</allowedfacility>
@@ -1050,8 +1067,8 @@
     <allowedfacility>nwtrb:Oconee_1</allowedfacility>
     <allowedfacility>nwtrb:Oconee_2</allowedfacility>
     <allowedfacility>nwtrb:Oconee_3</allowedfacility>
-    <allowedfacility>nwtrb:Oyster_Creek</allowedfacility>
-    <allowedfacility>nwtrb:Palisades</allowedfacility>
+    <allowedfacility>nwtrb:Oyster_Creek_1</allowedfacility>
+    <allowedfacility>nwtrb:Palisades_1</allowedfacility>
     <allowedfacility>nwtrb:Palo_Verde_1</allowedfacility>
     <allowedfacility>nwtrb:Palo_Verde_2</allowedfacility>
     <allowedfacility>nwtrb:Palo_Verde_3</allowedfacility>
@@ -1061,11 +1078,10 @@
     <allowedfacility>nwtrb:Pilgrim_1</allowedfacility>
     <allowedfacility>nwtrb:Point_Beach_1</allowedfacility>
     <allowedfacility>nwtrb:Point_Beach_2</allowedfacility>
-    <allowedfacility>nwtrb:Praire_Island_1</allowedfacility>
-    <allowedfacility>nwtrb:Praire_Island_2</allowedfacility>
+    <allowedfacility>nwtrb:Prairie_Island_1</allowedfacility>
+    <allowedfacility>nwtrb:Prairie_Island_2</allowedfacility>
     <allowedfacility>nwtrb:Quad_Cities_1</allowedfacility>
     <allowedfacility>nwtrb:Quad_Cities_2</allowedfacility>
-    <allowedfacility>nwtrb:RE_Ginna</allowedfacility>
     <allowedfacility>nwtrb:River_Bend_1</allowedfacility>
     <allowedfacility>nwtrb:Salem_1</allowedfacility>
     <allowedfacility>nwtrb:Salem_2</allowedfacility>
@@ -1074,7 +1090,7 @@
     <allowedfacility>nwtrb:Seabrook_1</allowedfacility>
     <allowedfacility>nwtrb:Sequoyah_1</allowedfacility>
     <allowedfacility>nwtrb:Sequoyah_2</allowedfacility>
-    <allowedfacility>nwtrb:Shearon_Harris_1</allowedfacility>
+    <allowedfacility>nwtrb:Harris_1</allowedfacility>
     <allowedfacility>nwtrb:South_Texas_1</allowedfacility>
     <allowedfacility>nwtrb:South_Texas_2</allowedfacility>
     <allowedfacility>nwtrb:St_Lucie_1</allowedfacility>
@@ -1086,13 +1102,24 @@
     <allowedfacility>nwtrb:Three_Mile_Island_1</allowedfacility>
     <allowedfacility>nwtrb:Turkey_Point_3</allowedfacility>
     <allowedfacility>nwtrb:Turkey_Point_4</allowedfacility>
-    <allowedfacility>nwtrb:Vermont_Yankee</allowedfacility>
-    <allowedfacility>nwtrb:Virgil_C_Summer_1</allowedfacility>
+    <allowedfacility>nwtrb:Vermont_Yankee_1</allowedfacility>
+    <allowedfacility>nwtrb:Summer_1</allowedfacility>
     <allowedfacility>nwtrb:Vogtle_1</allowedfacility>
     <allowedfacility>nwtrb:Vogtle_2</allowedfacility>
     <allowedfacility>nwtrb:Waterford_3</allowedfacility>
     <allowedfacility>nwtrb:Watts_Bar_1</allowedfacility>
-    <allowedfacility>nwtrb:Wolf_Creek</allowedfacility>
+    <allowedfacility>nwtrb:Wolf_Creek_1</allowedfacility>
+    <!-- Retired Reactors -->
+    <allowedfacility>nwtrb:Big_Rock_Point_1</allowedfacility>
+    <allowedfacility>nwtrb:Haddam_Neck_1</allowedfacility>
+    <allowedfacility>nwtrb:Humboldt_Bay_1</allowedfacility>
+    <allowedfacility>nwtrb:La_Crosse_1</allowedfacility>
+    <allowedfacility>nwtrb:Maine_Yankee_1</allowedfacility>
+    <allowedfacility>nwtrb:Rancho_Seco_1</allowedfacility>
+    <allowedfacility>nwtrb:Trojan_1</allowedfacility>
+    <allowedfacility>nwtrb:Yankee_Rowe_1</allowedfacility>
+    <allowedfacility>nwtrb:Zion_1</allowedfacility>
+    <allowedfacility>nwtrb:Zion_2</allowedfacility>
     <model>
       <NullRegion/>
     </model>
@@ -1105,6 +1132,7 @@
             <type>Storage</type>
             <name>Storage</name>
           </facility>
+	  <!-- Existing Reactors -->
           <facility>
             <type>nwtrb:Arkansas_Nuclear_One_1</type>
             <name>nwtrb:Arkansas_Nuclear_One_1</name>
@@ -1182,8 +1210,8 @@
             <name>nwtrb:Clinton_1</name>
           </facility>
           <facility>
-            <type>nwtrb:Columbia_2</type>
-            <name>nwtrb:Columbia_2</name>
+            <type>nwtrb:Columbia_1</type>
+            <name>nwtrb:Columbia_1</name>
           </facility>
           <facility>
             <type>nwtrb:Comanche_Peak_1</type>
@@ -1194,8 +1222,8 @@
             <name>nwtrb:Comanche_Peak_2</name>
           </facility>
           <facility>
-            <type>nwtrb:Cooper</type>
-            <name>nwtrb:Cooper</name>
+            <type>nwtrb:Cooper_Station_1</type>
+            <name>nwtrb:Cooper_Station_1</name>
           </facility>
           <facility>
             <type>nwtrb:Crystal_River_3</type>
@@ -1214,12 +1242,12 @@
             <name>nwtrb:Diablo_Canyon_2</name>
           </facility>
           <facility>
-            <type>nwtrb:Donald_Cook_1</type>
-            <name>nwtrb:Donald_Cook_1</name>
+            <type>nwtrb:Cook_1</type>
+            <name>nwtrb:Cook_1</name>
           </facility>
           <facility>
-            <type>nwtrb:Donald_Cook_2</type>
-            <name>nwtrb:Donald_Cook_2</name>
+            <type>nwtrb:Cook_2</type>
+            <name>nwtrb:Cook_2</name>
           </facility>
           <facility>
             <type>nwtrb:Dresden_2</type>
@@ -1246,8 +1274,8 @@
             <name>nwtrb:Farley_2</name>
           </facility>
           <facility>
-            <type>nwtrb:Fitzpatrick</type>
-            <name>nwtrb:Fitzpatrick</name>
+            <type>nwtrb:Fitzpatrick_1</type>
+            <name>nwtrb:Fitzpatrick_1</name>
           </facility>
           <facility>
             <type>nwtrb:Fort_Calhoun_1</type>
@@ -1258,8 +1286,8 @@
             <name>nwtrb:Grand_Gulf_1</name>
           </facility>
           <facility>
-            <type>nwtrb:HB_Robinson_2</type>
-            <name>nwtrb:HB_Robinson_2</name>
+            <type>nwtrb:Robinson_2</type>
+            <name>nwtrb:Robinson_2</name>
           </facility>
           <facility>
             <type>nwtrb:Hatch_1</type>
@@ -1282,8 +1310,8 @@
               <name>nwtrb:Indian_Point_3</name>
            </facility>
            <facility>
-              <type>nwtrb:Kewaunee</type>
-              <name>nwtrb:Kewaunee</name>
+              <type>nwtrb:Kewaunee_1</type>
+              <name>nwtrb:Kewaunee_1</name>
            </facility>
            <facility>
               <type>nwtrb:La_Salle_1</type>
@@ -1318,8 +1346,12 @@
               <name>nwtrb:Millstone_3</name>
            </facility>
            <facility>
-              <type>nwtrb:Monticello</type>
-              <name>nwtrb:Monticello</name>
+              <type>nwtrb:Monticello_1</type>
+              <name>nwtrb:Monticello_1</name>
+           </facility>
+           <facility>
+              <type>nwtrb:Morris_1</type>
+              <name>nwtrb:Morris_1</name>
            </facility>
            <facility>
               <type>nwtrb:Nine_Mile_Point_1</type>
@@ -1350,12 +1382,12 @@
               <name>nwtrb:Oconee_3</name>
            </facility>
            <facility>
-              <type>nwtrb:Oyster_Creek</type>
-              <name>nwtrb:Oyster_Creek</name>
+              <type>nwtrb:Oyster_Creek_1</type>
+              <name>nwtrb:Oyster_Creek_1</name>
            </facility>
            <facility>
-              <type>nwtrb:Palisades</type>
-              <name>nwtrb:Palisades</name>
+              <type>nwtrb:Palisades_1</type>
+              <name>nwtrb:Palisades_1</name>
            </facility>
            <facility>
               <type>nwtrb:Palo_Verde_1</type>
@@ -1394,12 +1426,12 @@
               <name>nwtrb:Point_Beach_2</name>
            </facility>
            <facility>
-              <type>nwtrb:Praire_Island_1</type>
-              <name>nwtrb:Praire_Island_1</name>
+              <type>nwtrb:Prairie_Island_1</type>
+              <name>nwtrb:Prairie_Island_1</name>
            </facility>
            <facility>
-              <type>nwtrb:Praire_Island_2</type>
-              <name>nwtrb:Praire_Island_2</name>
+              <type>nwtrb:Prairie_Island_2</type>
+              <name>nwtrb:Prairie_Island_2</name>
            </facility>
            <facility>
               <type>nwtrb:Quad_Cities_1</type>
@@ -1410,8 +1442,8 @@
               <name>nwtrb:Quad_Cities_2</name>
            </facility>
            <facility>
-              <type>nwtrb:RE_Ginna</type>
-              <name>nwtrb:RE_Ginna</name>
+              <type>nwtrb:Ginna_1</type>
+              <name>nwtrb:Ginna_1</name>
            </facility>
            <facility>
               <type>nwtrb:River_Bend_1</type>
@@ -1446,8 +1478,8 @@
               <name>nwtrb:Sequoyah_2</name>
            </facility>
            <facility>
-              <type>nwtrb:Shearon_Harris_1</type>
-              <name>nwtrb:Shearon_Harris_1</name>
+              <type>nwtrb:Harris_1</type>
+              <name>nwtrb:Harris_1</name>
            </facility>
            <facility>
               <type>nwtrb:South_Texas_1</type>
@@ -1494,12 +1526,12 @@
               <name>nwtrb:Turkey_Point_4</name>
            </facility>
            <facility>
-             <type>nwtrb:Vermont_Yankee</type>
-             <name>nwtrb:Vermont_Yankee</name>
+             <type>nwtrb:Vermont_Yankee_1</type>
+             <name>nwtrb:Vermont_Yankee_1</name>
            </facility>
            <facility>
-             <type>nwtrb:Virgil_C_Summer_1</type>
-             <name>nwtrb:Virgil_C_Summer_1</name>
+             <type>nwtrb:Summer_1</type>
+             <name>nwtrb:Summer_1</name>
            </facility>
            <facility>
              <type>nwtrb:Vogtle_1</type>
@@ -1518,9 +1550,51 @@
              <name>nwtrb:Watts_Bar_1</name>
            </facility>
            <facility>
-             <type>nwtrb:Wolf_Creek</type>
-             <name>nwtrb:Wolf_Creek</name>
+             <type>nwtrb:Wolf_Creek_1</type>
+             <name>nwtrb:Wolf_Creek_1</name>
            </facility>
+	  <!-- Retired Reactors -->
+          <facility>
+            <type>nwtrb:Big_Rock_Point_1</type>
+            <name>nwtrb:Big_Rock_Point_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Haddam_Neck_1</type>
+            <name>nwtrb:Haddam_Neck_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Humboldt_Bay_1</type>
+            <name>nwtrb:Humboldt_Bay_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:La_Crosse_1</type>
+            <name>nwtrb:La_Crosse_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Maine_Yankee_1</type>
+            <name>nwtrb:Maine_Yankee_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Rancho_Seco_1</type>
+            <name>nwtrb:Rancho_Seco_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Trojan_1</type>
+            <name>nwtrb:Trojan_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Yankee_Rowe_1</type>
+            <name>nwtrb:Yankee_Rowe_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Zion_1</type>
+            <name>nwtrb:Zion_1</name>
+          </facility>
+          <facility>
+            <type>nwtrb:Zion_2</type>
+            <name>nwtrb:Zion_2</name>
+          </facility>
+
         </FixedInst>
       </model>
     </institution>
