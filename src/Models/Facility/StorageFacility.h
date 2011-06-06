@@ -1,20 +1,13 @@
 // StorageFacility.h
-#if !defined(_NULLFACILITY_H)
-#define _NULLFACILITY_H
+#if !defined(_STORAGEFACILITY_H)
+#define _STORAGEFACILITY_H
 #include <iostream>
 #include <queue>
 
 #include "FacilityModel.h"
 
 /**
- * @brief Stores material for some time, in which it only undergoes decay.
- * 
- * The StorageFacility class inherits from the FacilityModel class and is 
- * dynamically loaded by the Model class when requested.
- * 
- * This facility model does very little.  New material is added to queue inventory
- * and old material is removed from the same queue inventory.
- *
+ * @brief  fill this out
  */
 class StorageFacility : public FacilityModel  
 {

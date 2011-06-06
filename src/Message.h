@@ -63,6 +63,7 @@ struct Transaction
    * The ID of the Communicator who is the requester in this transaction.
    */
   int requesterID;
+
 };
 
 
@@ -181,6 +182,13 @@ class Message {
      * @return the copy of this Message
      */
     Message* clone() const;
+
+    /**
+     * Prints the transaction data.
+     *
+     */
+    void printTrans();
+
 
     /**
      * Returns the sender of this Message.

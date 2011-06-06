@@ -49,6 +49,13 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::printTrans(){
+  std::cout << "Transaction info (via Message):" << std::endl <<
+    "    Requester ID: " << trans.requesterID << std::endl <<
+    "    Supplier ID: " << trans.supplierID << std::endl <<
+    "    Price: "  << trans.price << std::endl;
+};
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount, double thisPrice, double minAmt,
 		 Communicator* toSend, Communicator* toReceive)
 {
@@ -62,6 +69,8 @@ Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount, dou
   mkt = ((MarketModel*)(mktModel));
   sender = toSend;
   recipient = toReceive;
+  this->setSupplierID(((FacilityModel*)sender)->getSN());
+  this->setRequesterID(((FacilityModel*)recipient)->getSN());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

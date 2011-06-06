@@ -48,7 +48,6 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility, commodity, recipe = NULL;
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
-    cout << "fac_name:" << fac_name <<endl;
     sending_facility = (FacilityModel*) LI->getFacilityByName(fac_name);
     if (NULL == facility){
       throw GenException("Facility '" 
@@ -57,7 +56,6 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     }
     // commodity
     commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
-    cout << "commod_name:" << commod_name <<endl;
     commodity = LI->getCommodity(commod_name);
     if (NULL == commodity){
       throw GenException("Commodity '" 
@@ -66,7 +64,6 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     }
     // recipe
     recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
-    cout << "recipe_name:" << recipe_name <<endl;
     recipe = LI->getRecipe(recipe_name);
     if (NULL == recipe){
       throw GenException("Recipe '" 
@@ -88,8 +85,9 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     // decay the material for the alloted time
     newMat->decay(age);
 
+    /* this needs to be fixed */
     // create the book keeping message
-    double price, minAmt = 0.0;
+    double price = 0.0, minAmt = 0.0;
     Message* storage_history = 
       new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
 		  price, minAmt, sending_facility, this);
@@ -97,8 +95,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     BI->registerTrans(storage_history,newMat);
       
     // announce creation to the world
-    cout<<"StorageFacility " << ID << " is starting with material with mass "
-        << newMat->getTotMass() << endl;
+    cout<<"StorageFacilityIniStocks: "<<recipe->getName()<< " "<<amount<<endl ;
 
     // add material to stocks
     stocks.push_back(newMat);

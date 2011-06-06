@@ -395,6 +395,13 @@ public:
    */
    void readData(string name, strData3d& out_data);
 
+  /**
+   * Prints all members of a transaction.
+   *
+   * @param trans transaction
+   */
+   void printTrans(trans_t trans);
+
 };
 
 #endif

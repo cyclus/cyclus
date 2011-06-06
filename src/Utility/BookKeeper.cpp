@@ -186,9 +186,21 @@ void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
     toRegister.materialID=(*thisMat)->getSN(); 
     toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();
+     
     strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
     transactions.push_back(toRegister);
   };
+};
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::printTrans(trans_t trans){
+  std::cout << "Transaction info (via BookKeeper):" << std::endl <<
+    "    Requester ID: " << trans.requesterID << std::endl <<
+    "    Supplier ID: " << trans.supplierID << std::endl <<
+    "    Material ID: " << trans.materialID << std::endl <<
+    "    Timestamp: " << trans.timestamp << std::endl <<
+    "    Price: "  << trans.price << std::endl;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -200,6 +212,7 @@ void BookKeeper::registerTrans(Message* msg, Material* mat){
   toRegister.materialID=mat->getSN(); 
   toRegister.timestamp=TI->getTime();
   toRegister.price = msg->getPrice();
+  //printTrans(toRegister);
   strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
   transactions.push_back(toRegister);
 };
