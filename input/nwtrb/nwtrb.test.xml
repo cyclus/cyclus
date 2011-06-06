@@ -6,7 +6,7 @@
   <startyear>2000</startyear>
   <startmonth>1</startmonth>
   <simstart>0</simstart>
-  <duration>1</duration>
+  <duration>0</duration>
 
 
   <!-- Commodities -->  
@@ -106,21 +106,7 @@
       </SourceFacility>
     </model>
   </facility>
-  
-  <facility>
-    <name>Storage</name>
-    <model>
-      <StorageFacility>
-        <incommodity>spent_PWR_uo2</incommodity>
-        <capacity>1</capacity>
-        <inventorysize>1e4</inventorysize>
-        <residencetime>100</residencetime>
-	
-	<initialstocks></initialstocks>
-	
-      </StorageFacility>
-    </model>
-  </facility>
+
 
   <facility>
     <name>Reactor</name>
@@ -149,6 +135,29 @@
       </RecipeReactor>
     </model>
   </facility>
+  
+  <facility>
+    <name>Storage</name>
+    <model>
+      <StorageFacility>
+        <incommodity>spent_PWR_uo2</incommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <residencetime>100</residencetime>
+	
+	<initialstocks>
+          <entry>
+            <facility>Reactor</facility>
+            <incommodity>spent_PWR_uo2</incommodity>
+            <recipe>spent_50gwd</recipe>
+            <amount>6.990E+05</amount>
+	    <age>216</age>
+          </entry>
+	</initialstocks>
+	
+      </StorageFacility>
+    </model>
+  </facility>
 
   <!-- General Region Models -->
   <region>
@@ -160,6 +169,10 @@
     <allowedfacility>Reactor</allowedfacility>
 
     <!-- Region Model -->
+    <model>
+      <NullRegion/>
+    </model>
+    <!--
     <model>
       <CapacityRegion>
 	<input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/nwtrb/build.in</input_file>
@@ -173,7 +186,7 @@
 	</capacitydemand>
       </CapacityRegion>
     </model>
-    
+    -->
     <!-- Institutions -->
     <institution>
       <name>OneInst</name>
