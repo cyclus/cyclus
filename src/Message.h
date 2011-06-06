@@ -13,7 +13,7 @@ class Communicator;
  * An enumerative type to specify which direction (up or down the class 
  * hierarchy) this message is moving.
  */
-enum MessageDir {up, down};
+enum MessageDir {up, down, none};
 
 /**
  * A transaction structure to include in any message.
@@ -127,6 +127,16 @@ class Message {
      */
     Message(MessageDir dir, Transaction trans, 
         Communicator* toSend, Communicator* toReceive);
+
+    /**
+     * Creates a message regarding a transaction. This is used
+     * in conjunction with the BookKeeper and does not need a 
+     * direction.
+     * Ex: Recording the initial stocks of fuel in a StorageFacility
+     */
+    Message(Commodity* thisCommod, CompMap thisComp, double thisAmount, 
+	    double thisPrice, double minAmt,
+	    Communicator* toSend, Communicator* toReceive);
 
     /**
      * Creates a new Message with the given specs.

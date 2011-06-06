@@ -8,6 +8,7 @@
 #include "GenException.h"
 #include "InputXML.h"
 #include "Timer.h"
+#include "BookKeeper.h"
 
 /*
  * TICK
@@ -32,7 +33,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
  {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "initialstocks/entry");
   string fac_name, commod_name, recipe_name;
-  FacilityModel* facility;
+  FacilityModel* sending_facility;
   Commodity* commodity;
   Material* recipe;
   double amount, age;
@@ -44,11 +45,11 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     xmlNodePtr entry_node = nodes->nodeTab[i];
 
     // assign each item initially in storage
-    facility, commodity, recipe = NULL;
+    sending_facility, commodity, recipe = NULL;
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
     cout << "fac_name:" << fac_name <<endl;
-    facility = (FacilityModel*) LI->getFacilityByName(fac_name);
+    sending_facility = (FacilityModel*) LI->getFacilityByName(fac_name);
     if (NULL == facility){
       throw GenException("Facility '" 
 			 + fac_name 
@@ -86,7 +87,15 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     
     // decay the material for the alloted time
     newMat->decay(age);
-    
+
+    // create the book keeping message
+    double price, minAmt = 0.0;
+    Message* storage_history = 
+      new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
+		  price, minAmt, sending_facility, this);
+    // record the message
+    BI->registerTrans(storage_history,newMat);
+      
     // announce creation to the world
     cout<<"StorageFacility " << ID << " is starting with material with mass "
         << newMat->getTotMass() << endl;

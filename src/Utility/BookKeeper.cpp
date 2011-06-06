@@ -192,6 +192,19 @@ void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::registerTrans(Message* msg, Material* mat){
+  // same as above, but for a single material
+  trans_t toRegister;
+  toRegister.requesterID=msg->getRequesterID();
+  toRegister.supplierID=msg->getSupplierID();
+  toRegister.materialID=mat->getSN(); 
+  toRegister.timestamp=TI->getTime();
+  toRegister.price = msg->getPrice();
+  strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
+  transactions.push_back(toRegister);
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerMatChange(Material* mat){
   mat_hist_t toRegister;
 

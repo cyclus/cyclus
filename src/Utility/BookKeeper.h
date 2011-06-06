@@ -49,19 +49,19 @@ class BookKeeper {
 private:
   /**
    * A pointer to this BookKeeper once it has been initialized.
-	 */
+     */
   static BookKeeper* _instance;
-		
+        
   /**
    * The HDF5 output database for the simulation this BookKeeper is 
    * responsible for.
-	 */
+     */
   H5File* myDB;
-		
+        
   /**
    * Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
-	 */
+     */
   string dbName;
 
   /**
@@ -78,7 +78,7 @@ protected:
   /**
    * The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
-	 */
+     */
   BookKeeper();
   
   // facility or institution model struct
@@ -117,53 +117,53 @@ protected:
   vector<mat_hist_t> materials;
 
 public:
-		
+        
   /**
    * Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
    * Like the Highlander, there can be only one.
-	 *
+     *
    * @return a pointer to the BookKeeper
-	 */
+     */
   static BookKeeper* Instance();
-		
+        
   /**
    * Creates a database file with the default name, cyclus.h5. 
-	 */
+     */
   void createDB();
 
   /**
    * Creates a database file with the name indicated. 
-	 *
+     *
    * @param name is the name of the hdf5 database file. Should end in .h5
-	 */
+     */
   void createDB(string name);
 
   /**
    * Creates a dataset with the name,type, and dimesions indicated 
-	 *
+     *
    * @param rank is the rank of the dataset
    * @param dims are the dimensions of the dataset 
    * @param type is type of data to be placed in the dataspace
    * @param name is the name of the dataset 
-	 */
+     */
   DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, string name);
 
   /**
    * Returns a handle to the database this BookKeeper is maintaining.
-	 *
+     *
    * @return the handle to the database
-	 */
+     */
   H5File* getDB();
 
   /**
    * Opens the output database in memory space.
-	 */
+     */
   void openDB();
 
   /**
    * Closes the database this BookKeeper is maintaining.
-	 */
+     */
   void closeDB();
   
   /**
@@ -195,6 +195,14 @@ public:
    * @param manifest a vector the materials fulfilling this transaction
    */
   void registerTrans(Message* msg, vector<Material*> Manifest);
+
+  /**
+   * Register the transaction in the BookKeeper's map of transactions
+   *
+   * @param msg the message containing the transaction
+   * @param mat a single material which is transacted
+   */
+  void registerTrans(Message* msg, Material* mat);
 
   /**
    * Register the transaction in the BookKeeper's map of transactions

@@ -49,6 +49,22 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount, double thisPrice, double minAmt,
+		 Communicator* toSend, Communicator* toReceive)
+{
+  dir = none;
+  trans.commod = thisCommod;
+  trans.amount = thisAmount; 
+  trans.min = minAmt;
+  trans.price = thisPrice;
+  trans.comp = thisComp;
+  Model* mktModel = trans.commod->getMarket();
+  mkt = ((MarketModel*)(mktModel));
+  sender = toSend;
+  recipient = toReceive;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, double minAmt, 
     double thisPrice, Communicator* toSend, Communicator* toReceive, CompMap thisComp)
 {
