@@ -77,6 +77,11 @@ hAct = 103
 mFPs = 0.0
 lFPs = 70
 hFPs = 170
+# Need to account for spent fuel components less then A = 70
+mOther = 0.0
+lOther = 1
+hOther = 69
+
 for isotope in iter(fracBWR):
     test = int(isotope[0:2])
     if test >= lAct and test <=hAct:
@@ -84,6 +89,8 @@ for isotope in iter(fracBWR):
     test = int(isotope[2:])
     if test >= lFPs and test <=hFPs:
         mFPs += fracBWR[isotope]
+    if test >= lOther and test <= hOther:
+        mOther += fracBWR[isotope]
 for isotope in iter(fracPWR):
     test = int(isotope[0:2])
     if test >= lAct and test <=hAct:
@@ -91,6 +98,8 @@ for isotope in iter(fracPWR):
     test = int(isotope[2:])
     if test >= lFPs and test <=hFPs:
         mFPs += fracPWR[isotope]
+    if test >= lOther and test <= hOther:
+        mOther += fracPWR[isotope]
 
 print "Total mass: %1.3E \n\
       mU234: %1.3E \n\
@@ -103,7 +112,8 @@ print "Total mass: %1.3E \n\
       mPu241: %1.3E \n\
       mPu242: %1.3E \n\
       mActinides (with above masses included): %1.3E \n\
-      mFPs: %1.3E" \
+      mFPs: %1.3E \n\
+      mOther: %1.3E" \
       % (total_mass,mU234,mU235,mU236,mU238, \
              mPu238,mPu239,mPu240,mPu241,mPu242, \
-             mActinides,mFPs)
+             mActinides,mFPs,mOther)
