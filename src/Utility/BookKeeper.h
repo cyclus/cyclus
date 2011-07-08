@@ -199,14 +199,6 @@ public:
   /**
    * Register the transaction in the BookKeeper's map of transactions
    *
-   * @param msg the message containing the transaction
-   * @param mat a single material which is transacted
-   */
-  void registerTrans(Message* msg, Material* mat);
-
-  /**
-   * Register the transaction in the BookKeeper's map of transactions
-   *
    * @param mat the material with a history
    */
   void registerMatChange(Material* mat);

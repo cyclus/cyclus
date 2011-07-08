@@ -181,10 +181,11 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
   Commodity* commodity;
   Material* recipe;
   double amount, age;
-  int i;
+  int i, nNodes = nodes->nodeNr;
+  std::cout << "**** nNodes = " << nNodes << std::endl;
 
   // for each fuel pair, there is an in and an out commodity
-  for (int i=0;i<nodes->nodeNr;i++){
+  for (int i=0;i<nNodes;i++){
     // get xml node
     xmlNodePtr entry_node = nodes->nodeTab[i];
 
@@ -229,28 +230,31 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     // decay the material for the alloted time
     newMat->decay(age);
 
+    vector <Material*> manifest;
+    manifest.push_back(newMat);
+
     /* this needs to be fixed */
     // create the book keeping message
     double price = 0.0, minAmt = 0.0;
     Message* storage_history = 
       new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
 		  price, minAmt, sending_facility, this);
-    // record the message
-    BI->registerTrans(storage_history,newMat);
-      
-    // announce creation to the world
-    cout<<"StorageFacilityIniStocks: "<<recipe->getName()<< " "<<amount<<endl ;
 
-    // add material to stocks
-    stocks.push_back(newMat);
-    entryTimes.push_back(make_pair(TI->getTime(), newMat));
-  }     
+    // have the facility send its stocks
+    sending_facility->sendMaterial(storage_history,manifest);
+  }
+  
+  std::cout << "\n ** Checking initial stocks of size " << stocks.size() << " **\n" << std::endl;
+  // check to make sure we got the correct initial inventory
+  for (int i=0;i<stocks.size();i++){
+    stocks[i]->print();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::handlePreHistory()
 {
-  getInitialState( initialStateCur() );
+  getInitialState( _initialStateCur );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -52,12 +52,14 @@ InstModel* FacilityModel::getFacInst()
 {
   return (InstModel*)(LI->getInstByName(inst_name));
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
   // register this transaction with the bookkeper
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
   ((FacilityModel*)LI->getFacilityByID(ID))->receiveMaterial(msg->getTrans(), manifest);
+  std::cout << "Material sent from " << ID << " to " << this->getSN() << "." << std::endl;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

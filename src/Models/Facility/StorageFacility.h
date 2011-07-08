@@ -183,17 +183,12 @@ protected:
     /**
      * XML cursor for facility initial state information
      */
-    xmlNotePtr _initialStateCur;
-
-    /**
-     * Return XML cursor for facility initial state information
-     */
-    xmlNotePtr initialStateCur(){return _initialStateCur;};
+    xmlNodePtr _initialStateCur;
 
     /**
      * This function populated the Storage Facility with some inital stocks/inventory
      */
-    void getInitialState(xmlNodePtr initialStateCur);
+    void getInitialState(xmlNodePtr cur);
 
 /* ------------------- */ 
 

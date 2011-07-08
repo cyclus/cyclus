@@ -12,7 +12,9 @@ Timer* Timer::_instance = 0;
 void Timer::runSim()
 {
 
+  time = -1;
   LI->handlePreHistory();
+  time = time0;
 
   for (int i = time; i < simDur; i++) {
     
