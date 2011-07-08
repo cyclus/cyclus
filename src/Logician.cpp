@@ -23,6 +23,17 @@ Logician* Logician::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::handlePreHistory()
+{
+  // tell all of the region models to handle the tick
+  for(ModelList::iterator reg=regions.begin();
+    reg != regions.end(); 
+    reg++){
+    ((RegionModel*)(*reg))->handlePreHistory();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::handleTimeStep(int time)
 {
   sendTick(time);
@@ -40,6 +51,7 @@ void Logician::sendTick(int time)
     ((RegionModel*)(*reg))->handleTick(time);
   }
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::sendTock(int time)
 {

@@ -11,20 +11,24 @@ Timer* Timer::_instance = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::runSim()
 {
-	for (int i = time; i < simDur; i++) {
-		
-		// Give a status report, periodically.
+
+  LI->handlePreHistory();
+
+  for (int i = time; i < simDur; i++) {
+    
+    // Give a status report, periodically.
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
-		if (i % 1 == 0)
-		 	cout << "Current time: " << i << endl;
-
-		// Tell the Logician to handle this month.
-		LI-> handleTimeStep(time);
-
-		// Increment the time.
-		time ++;
-	}
+    if (i % 1 == 0)
+      cout << "Current time: " << i << endl;
+    
+    // Tell the Logician to handle this month.
+    LI-> handleTimeStep(time);
+    
+    // Increment the time.
+    time ++;
+  }
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getTime() {
 	return time;

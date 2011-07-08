@@ -29,83 +29,6 @@
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::getInitialState(xmlNodePtr cur)
- {
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "initialstocks/entry");
-  string fac_name, commod_name, recipe_name;
-  FacilityModel* sending_facility;
-  Commodity* commodity;
-  Material* recipe;
-  double amount, age;
-  int i;
-
-  // for each fuel pair, there is an in and an out commodity
-  for (int i=0;i<nodes->nodeNr;i++){
-    // get xml node
-    xmlNodePtr entry_node = nodes->nodeTab[i];
-
-    // assign each item initially in storage
-    sending_facility, commodity, recipe = NULL;
-    // facility
-    fac_name = XMLinput->get_xpath_content(entry_node,"facility");
-    sending_facility = (FacilityModel*) LI->getFacilityByName(fac_name);
-    if (NULL == facility){
-      throw GenException("Facility '" 
-			 + fac_name 
-			 + "' is not defined in this problem.");
-    }
-    // commodity
-    commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
-    commodity = LI->getCommodity(commod_name);
-    if (NULL == commodity){
-      throw GenException("Commodity '" 
-			 + commod_name
-			 + "' is not defined in this problem.");
-    }
-    // recipe
-    recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
-    recipe = LI->getRecipe(recipe_name);
-    if (NULL == recipe){
-      throw GenException("Recipe '" 
-			 + recipe_name
-			 + "' is not defined in this problem.");
-    }
-    // amount
-    amount = atof(XMLinput->get_xpath_content(entry_node,"amount"));
-    // time in storage (age) in months
-    age = atof(XMLinput->get_xpath_content(entry_node,"age"));
-
-    // make new material
-    Material* newMat = new Material(recipe->getMassComp(), 
-                                    recipe->getUnits(), 
-                                    recipe->getName(),
-                                    amount, 
-                                    massBased);
-    
-    // decay the material for the alloted time
-    newMat->decay(age);
-
-    /* this needs to be fixed */
-    // create the book keeping message
-    double price = 0.0, minAmt = 0.0;
-    Message* storage_history = 
-      new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
-		  price, minAmt, sending_facility, this);
-    // record the message
-    BI->registerTrans(storage_history,newMat);
-      
-    // announce creation to the world
-    cout<<"StorageFacilityIniStocks: "<<recipe->getName()<< " "<<amount<<endl ;
-
-    // add material to stocks
-    stocks.push_back(newMat);
-    entryTimes.push_back(make_pair(TI->getTime(), newMat));
-  }     
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
@@ -135,7 +58,7 @@ void StorageFacility::init(xmlNodePtr cur)
   stocks = deque<Material*>();
   ordersWaiting = deque<Message*>();
   
-  getInitialState(cur);
+  _initialStateCur = cur;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -247,6 +170,87 @@ void StorageFacility::receiveMaterial(Transaction trans, vector<Material*> manif
     stocks.push_back(*thisMat);
     entryTimes.push_back(make_pair(TI->getTime(), *thisMat ));
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StorageFacility::getInitialState(xmlNodePtr cur)
+ {
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "initialstocks/entry");
+  string fac_name, commod_name, recipe_name;
+  FacilityModel* sending_facility;
+  Commodity* commodity;
+  Material* recipe;
+  double amount, age;
+  int i;
+
+  // for each fuel pair, there is an in and an out commodity
+  for (int i=0;i<nodes->nodeNr;i++){
+    // get xml node
+    xmlNodePtr entry_node = nodes->nodeTab[i];
+
+    // assign each item initially in storage
+    sending_facility, commodity, recipe = NULL;
+    // facility
+    fac_name = XMLinput->get_xpath_content(entry_node,"facility");
+    sending_facility = (FacilityModel*) LI->getFacilityByName(fac_name);
+    if (NULL == facility){
+      throw GenException("Facility '" 
+			 + fac_name 
+			 + "' is not defined in this problem.");
+    }
+    // commodity
+    commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
+    commodity = LI->getCommodity(commod_name);
+    if (NULL == commodity){
+      throw GenException("Commodity '" 
+			 + commod_name
+			 + "' is not defined in this problem.");
+    }
+    // recipe
+    recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
+    recipe = LI->getRecipe(recipe_name);
+    if (NULL == recipe){
+      throw GenException("Recipe '" 
+			 + recipe_name
+			 + "' is not defined in this problem.");
+    }
+    // amount
+    amount = atof(XMLinput->get_xpath_content(entry_node,"amount"));
+    // time in storage (age) in months
+    age = atof(XMLinput->get_xpath_content(entry_node,"age"));
+
+    // make new material
+    Material* newMat = new Material(recipe->getMassComp(), 
+                                    recipe->getUnits(), 
+                                    recipe->getName(),
+                                    amount, 
+                                    massBased);
+    
+    // decay the material for the alloted time
+    newMat->decay(age);
+
+    /* this needs to be fixed */
+    // create the book keeping message
+    double price = 0.0, minAmt = 0.0;
+    Message* storage_history = 
+      new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
+		  price, minAmt, sending_facility, this);
+    // record the message
+    BI->registerTrans(storage_history,newMat);
+      
+    // announce creation to the world
+    cout<<"StorageFacilityIniStocks: "<<recipe->getName()<< " "<<amount<<endl ;
+
+    // add material to stocks
+    stocks.push_back(newMat);
+    entryTimes.push_back(make_pair(TI->getTime(), newMat));
+  }     
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StorageFacility::handlePreHistory()
+{
+  getInitialState( initialStateCur() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

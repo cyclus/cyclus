@@ -65,14 +65,19 @@ public:
 	 * @return a pointer to the Logician
 	 */
 	static Logician* Instance();
-
-  /**
-   * Handles all the duties of the time step (typically, a month)
-   *
-   * @param time is the simulation time step that is being handled.
-   */
-  void handleTimeStep(int time);
-		
+	
+	/**
+	 * This handles all pre-history interactions between regions, institutions, and facilities.
+	 */
+	void handlePreHistory();
+	
+	/**
+	 * Handles all the duties of the time step (typically, a month)
+	 *
+	 * @param time is the simulation time step that is being handled.
+	 */
+	void handleTimeStep(int time);
+	
 	/// generic routines to handle Model-based entities
   /**
    * sends the tick signal to all of the models

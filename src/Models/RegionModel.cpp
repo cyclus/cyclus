@@ -104,6 +104,15 @@ void RegionModel::receiveMessage(Message* msg){
   }
 }
 
+void RegionModel::handlePreHistory(){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator inst=institutions.begin();
+      inst != institutions.end();
+      inst++){
+    ((InstModel*)(*inst))->handlePreHistory();
+  }
+}
+
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=institutions.begin();

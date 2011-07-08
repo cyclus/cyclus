@@ -166,6 +166,13 @@ public:
   virtual void sendMaterial(Message* order, vector<Material*> manifest);
   
   /**
+   * Each facility is prompted to do its beginning-of-life
+   * stuff.
+   *
+   */
+  virtual void handlePreHistory();
+
+  /**
    * Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *

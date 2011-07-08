@@ -68,6 +68,15 @@ public:
     virtual void receiveMessage(Message* msg);
 
     /**
+     * Each region is prompted to do its beginning-of-life-step
+     * stuff before the simulation begins.
+     *
+     * Normally, Regions simply hand the command down to institutions.
+     *
+     */
+    virtual void handlePreHistory();
+
+    /**
      * Each region is prompted to do its beginning-of-time-step
      * stuff at the tick of the timer.
      * The default behavior is to ignore the tick.

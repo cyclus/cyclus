@@ -80,21 +80,32 @@ void InstModel::receiveMessage(Message* msg){
   }
 }
 
+void InstModel::handlePreHistory(){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator fac=facilities.begin();
+      fac != facilities.end();
+      fac++){
+    //    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
+    ((FacilityModel*)(*fac))->handlePreHistory();
+  }
+}
+
 void InstModel::handleTick(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
+    //    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
     ((FacilityModel*)(*fac))->handleTick(time);
   }
 }
+
 void InstModel::handleTock(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    cout << "Inst " << ID << " is sending handleTock to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
+    //    cout << "Inst " << ID << " is sending handleTock to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
     ((FacilityModel*)(*fac))->handleTock(time);
   }
 }

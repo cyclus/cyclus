@@ -47,6 +47,7 @@ public:
    * Print information about this model
    */
   virtual void print();
+  
 
 /* ------------------- */ 
 
@@ -85,6 +86,13 @@ public:
      * @param manifest the list of material objects being received
      */
     virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
+
+    /**
+     * The handlePreHistory function specific to the StorageFacility.
+     * This function fills the StorageFacility with its initial stocks.
+     *
+     */
+    virtual void handlePreHistory();
 
     /**
      * The handleTick function specific to the StorageFacility.
@@ -173,9 +181,19 @@ protected:
     Mass inventory_size;
 
     /**
+     * XML cursor for facility initial state information
+     */
+    xmlNotePtr _initialStateCur;
+
+    /**
+     * Return XML cursor for facility initial state information
+     */
+    xmlNotePtr initialStateCur(){return _initialStateCur;};
+
+    /**
      * This function populated the Storage Facility with some inital stocks/inventory
      */
-    void getInitialState(xmlNodePtr cur);
+    void getInitialState(xmlNodePtr initialStateCur);
 
 /* ------------------- */ 
 
