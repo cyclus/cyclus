@@ -1,8 +1,8 @@
-// Repository.cpp
-// Implements the Repository class
+// GenericRepository.cpp
+// Implements the GenericRepository class
 #include <iostream>
 
-#include "Repository.h"
+#include "GenericRepository.h"
 
 #include "Logician.h"
 #include "GenException.h"
@@ -12,7 +12,7 @@
 
 
 /**
- * The Repository class inherits from the FacilityModel class and is dynamically
+ * The GenericRepository class inherits from the FacilityModel class and is dynamically
  * loaded by the Model class when requested.
  * 
  * This facility model is intended to calculate nuclide and heat metrics over
@@ -48,12 +48,12 @@
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::init(xmlNodePtr cur)
+void GenericRepository::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
   
   // move XML pointer to current model
-  cur = XMLinput->get_xpath_element(cur,"model/Repository");
+  cur = XMLinput->get_xpath_element(cur,"model/GenericRepository");
 
   // initialize ordinary objects
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
@@ -86,7 +86,7 @@ void Repository::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Repository::copy(Repository* src)
+void GenericRepository::copy(GenericRepository* src)
 {
 
   FacilityModel::copy(src);
@@ -102,14 +102,14 @@ void Repository::copy(Repository* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::copyFreshModel(Model* src)
+void GenericRepository::copyFreshModel(Model* src)
 {
-  copy((Repository*)(src));
+  copy((GenericRepository*)(src));
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::print() 
+void GenericRepository::print() 
 { 
   FacilityModel::print(); 
   cout << "stores commodity {"
@@ -118,13 +118,13 @@ void Repository::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::receiveMessage(Message* msg)
+void GenericRepository::receiveMessage(Message* msg)
 {
-  throw GenException("Repository doesn't know what to do with a msg.");
+  throw GenException("GenericRepository doesn't know what to do with a msg.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::receiveMaterial(Transaction trans, vector<Material*> manifest)
+void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -132,14 +132,14 @@ void Repository::receiveMaterial(Transaction trans, vector<Material*> manifest)
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"Repository " << ID << " is receiving material with mass "
+    cout<<"GenericRepository " << ID << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_front(*thisMat);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::handleTick(int time)
+void GenericRepository::handleTick(int time)
 {
   // EMPLACE WASTE
   emplaceWaste();
@@ -157,7 +157,7 @@ void Repository::handleTick(int time)
     // It can accept amounts however small
     Mass requestAmt;
     Mass minAmt = 0;
-    // The Repository should ask for material unless it's full
+    // The GenericRepository should ask for material unless it's full
     Mass inv = this->checkInventory();
     // including how much is already in its stocks
     Mass sto = this->checkStocks(); 
@@ -191,14 +191,14 @@ void Repository::handleTick(int time)
   };
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Repository::handleTock(int time)
+void GenericRepository::handleTock(int time)
 {
   // send tock to the emplaced material module
   
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass Repository::checkInventory(){
+Mass GenericRepository::checkInventory(){
   Mass total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
@@ -212,7 +212,7 @@ Mass Repository::checkInventory(){
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass Repository::checkStocks(){
+Mass GenericRepository::checkStocks(){
   Mass total = 0;
 
   // Iterate through the stocks and sum the amount of whatever

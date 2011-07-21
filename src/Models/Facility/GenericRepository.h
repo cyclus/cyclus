@@ -1,13 +1,13 @@
-// Repository.h
-#if !defined(_REPOSITORY_H)
-#define _REPOSITORY_H
+// GenericRepository.h
+#if !defined(_GENERICREPOSITORY_H)
+#define _GENERICREPOSITORY_H
 #include <iostream>
 #include <queue>
 
 #include "FacilityModel.h"
 
 /**
- * The Repository class inherits from the FacilityModel class and is 
+ * The GenericRepository class inherits from the FacilityModel class and is 
  * dynamically
  * loaded by the Model class when requested.
  * 
@@ -17,28 +17,28 @@
  *
  */
 
-class Repository : public FacilityModel  {
+class GenericRepository : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
 public:
-  /** Default constructor for the Repository class.
+  /** Default constructor for the GenericRepository class.
    */
-  Repository() {};
+  GenericRepository() {};
 
   /**
-   * Destructor for the Repository class. 
+   * Destructor for the GenericRepository class. 
    */
-  ~Repository() {};
+  ~GenericRepository() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
   /// initialize an object by copying another
-  virtual void copy(Repository* src);
+  virtual void copy(GenericRepository* src);
   /**
    * This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
@@ -97,7 +97,7 @@ public:
         manifest);
 
     /**
-     * The handleTick function specific to the Repository.
+     * The handleTick function specific to the GenericRepository.
      * At each tick, it requests as much raw inCommod as it can 
      * process this * month and offers as much outCommod as it 
      * will have in its inventory by the end of the month.
@@ -107,7 +107,7 @@ public:
     virtual void handleTick(int time);
 
     /**
-     * The handleTick function specific to the Repository.
+     * The handleTick function specific to the GenericRepository.
      * At each tock, it processes material and handles orders, and 
      * records this month's actions.
      *
@@ -127,12 +127,12 @@ public:
 
 protected:
     /**
-     * The Repository has many input commodities
+     * The GenericRepository has many input commodities
      */
     deque<Commodity*> in_commods;
 
     /**
-     * The Repository has a limit to how material it can process.
+     * The GenericRepository has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
     double capacity;
@@ -163,7 +163,7 @@ protected:
 
     /**
      * The maximum size to which the inventory may grow..
-     * The Repository must stop processing the material in its stocks 
+     * The GenericRepository must stop processing the material in its stocks 
      * when its inventory is full.
      */
     Mass inventory_size;
@@ -215,7 +215,7 @@ protected:
  */
 
 extern "C" Model* construct() {
-    return new Repository();
+    return new GenericRepository();
 }
 
 extern "C" void destruct(Model* p) {
