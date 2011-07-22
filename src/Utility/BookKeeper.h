@@ -12,6 +12,7 @@
 #include "Model.h"
 #include "Material.h"
 #include "Message.h"
+#include "Volume.h"
 
 #define BI BookKeeper::Instance()
 
@@ -106,6 +107,12 @@ protected:
     double comp;            /**< The kg or moles of the iso in the material at that time >**/
   } mat_hist_t;
 
+  // volume history struct
+  typedef struct vol_hist_t{
+    int volID;              /**< An integer indicating the volume object ID >**/
+    int timestamp;          /**< An integer indicating the month >**/
+  } vol_hist_t;
+
   /**
    * Stores the transactions that have taken place during the simulation.
    */
@@ -197,11 +204,18 @@ public:
   void registerTrans(Message* msg, vector<Material*> Manifest);
 
   /**
-   * Register the transaction in the BookKeeper's map of transactions
+   * Register the materialin the BookKeeper's map of material changes
    *
    * @param mat the material with a history
    */
   void registerMatChange(Material* mat);
+
+  /**
+   * Register the volume change in the BookKeeper's map of volume changess
+   *
+   * @param vol the volume with a history
+   */
+  void registerVolChange(Volume* vol);
 
   /**
    * Write a list of the facility/inst/market models in the simulation

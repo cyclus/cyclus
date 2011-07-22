@@ -35,25 +35,19 @@ Volume::Volume(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Volume::Volume(string name, Temp temp, Radius inner, Radius outer, 
-    vector<Concentration*> concs, Solid* mat, Fluid* liq)  
+Volume::Volume(string volName, Temp temp, Radius inner, Radius outer, 
+    ConcMap concs, Solid* mat, Fluid* liq, Component type)  
 {
   
   ID=nextID++;
-
   name = name;
-
   temperature = temp;
-
   inner_radius = inner;
-
   outer_radius = outer;
-
   matrix = mat;
-
   liquid = liq;
-
   concentrations = concs;
+  vol_type = type;
 
   volCompHist = CompHistory() ;
   BI->registerVolChange(this);
@@ -61,12 +55,11 @@ Volume::Volume(string name, Temp temp, Radius inner, Radius outer,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Volume::print(){
-    printComp("Atom composition:", volCompHist[TI->getTime()]);
-    cout << "\tTotal atoms: " << this->getTotAtoms() 
-        << " moles per " << units << endl;
-    printComp("Mass composition:", massHist[TI->getTime()]);
-    cout << "\tTotal mass: " << this->getTotMass() 
-        << " kg per " << units << endl;
+    cout << "Volume: " << this->getName() << endl;
+    cout << "Contains Materials:" << endl;
+    for(int i=0; i<this->getWastes().size() ; i++){
+      cout << wastes[i];
+    }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

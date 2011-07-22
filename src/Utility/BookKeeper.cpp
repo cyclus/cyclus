@@ -221,6 +221,17 @@ void BookKeeper::registerMatChange(Material* mat){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::registerVolChange(Volume* vol){
+  vol_hist_t toRegister;
+
+  toRegister.volID = vol->getSN(); 
+  toRegister.timestamp = TI->getTime();
+
+
+  // Add more stuff here as you decide what the volume history should contain.
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeModelList(ModelType type){
 
   // define some useful variables.

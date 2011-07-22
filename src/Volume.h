@@ -7,6 +7,7 @@
 
 #include "InputXML.h"
 #include "Material.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ typedef map<Iso, Concentration> ConcMap;
 /**
  * Enum for type of volume.
  */
-enum Component {env, ff, ebs, buffer, wp, wf}
+enum Component {env, ff, ebs, buffer, wp, wf};
 
 /** 
  * A struct to describe solids
@@ -44,7 +45,7 @@ struct Solid{
   double mass;
   double vol;
   double conductivity;
-}
+};
 
 /** 
  * A struct to describe fluids
@@ -54,7 +55,7 @@ struct Fluid{
   double diffusivity;
   double mass;
   map<Iso, double> solubilities;
-}
+};
 
 /** 
  * Class Volume describes a uniformly mixed volume cell
@@ -83,16 +84,17 @@ public:
   /**
    * a constructor for making a volume object from a known recipe and size.
    *
-   * @param temperature
+   * @param volName
+   * @param temp
    * @param inner
    * @param outer
-   * @param concentrations a vector, per isotope 
+   * @param concs a vector, per isotope 
    * @param matrix the solid, a struct
    * @param liquid the fluid, a struct
    * @param type indicates whether comp and scale are in mass or atom units
    */
-  Volume(Temp temperature, Radius inner, Radius outer, vector<double> concentrations, 
-      Solid* matrix, Fluid* liquid, Component type);
+  Volume(string volName, Temp temperature, Radius inner, Radius outer, 
+      ConcMap concs, Solid* matrix, Fluid* liquid, Component type);
 
   
   /** 
@@ -105,6 +107,41 @@ public:
    */
   void print(); 
     
+  /**
+   * get the ID
+   *
+   * @return ID
+   */
+  const int getSN(){return ID;};
+
+  /**
+   * get the Name
+   *
+   * @return name
+   */
+  const string getName(){return name;};
+
+  /**
+   * get the list of waste objects 
+   *
+   * @return wastes
+   */
+  const vector<Material*> getWastes(){return wastes;};
+
+  /**
+   * get the solid matrix
+   *
+   * @return matrix
+   */
+  const Solid* getMatrix(){return matrix;};
+
+  /**
+   * get the liquid
+   *
+   * @return liquid
+   */
+  const Fluid* getLiquid(){return liquid;};
+
   /**
    * get the Temperature
    *
@@ -168,7 +205,7 @@ protected:
    * compositions. A composition is a map of isotopes and their 
    * corresponding number of atoms.
    */
-  CompHistory VolCompHist;
+  CompHistory volCompHist;
 
   /**
    * The mass history of this Volume, in the form of a map whose
@@ -186,6 +223,16 @@ private:
   void mixCell();
 
   /**
+   * The contained contaminants, a list of material objects..
+   */
+  vector<Material*> wastes;
+
+  /**
+   * The name of this volume, a string
+   */
+  string name;
+
+  /**
    * The inner radius of the (cylindrical) volume
    */
   Radius inner_radius;
@@ -194,6 +241,21 @@ private:
    * The outer radius of the (cyllindrical) volume
    */
   Radius outer_radius;
+
+  /**
+   * The solid matrix object which is the main constituent of this volume.
+   */
+  Solid* matrix;
+
+  /**
+   * The fluid liquid object which is the second constituent of this volume.
+   */
+  Fluid* liquid;
+
+  /**
+   * The type of component that this volume represents 
+   */
+  Component vol_type;
 
   /**
    * The temperature taken to be the homogeneous temperature of the whole 
@@ -205,11 +267,7 @@ private:
    * The concentrations of contaminant isotopes in the volume
    */
   ConcMap concentrations;
-
-
 };
-
-
 
 
 #endif
