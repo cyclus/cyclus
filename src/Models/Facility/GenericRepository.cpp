@@ -98,7 +98,7 @@ void GenericRepository::copy(GenericRepository* src)
   in_commods = src->in_commods;
 
   stocks = deque<Material*>();
-  inventory = deque< Material>();
+  inventory = deque< Material*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -113,7 +113,7 @@ void GenericRepository::print()
 { 
   FacilityModel::print(); 
   cout << "stores commodity {"
-      << in_commods.front()->getName();
+    << in_commods.front()->getName()
       << "} among others."  << endl;
 };
 
@@ -147,11 +147,11 @@ void GenericRepository::handleTick(int time)
   // MAKE A REQUEST
   if(this->checkStocks() == 0){
     // It chooses the next incommodity in the preference lineup
-    Commodity* request_commod;
-    request_commod = in_commods.front().first;
+    Commodity* in_commod;
+    in_commod = in_commods.front();
 
     // It then moves that commodity from the front to the back of the preference lineup
-    in_commods.push_back(request_commod_pair);
+    in_commods.push_back(in_commod);
     in_commods.pop_front();
   
     // It can accept amounts however small
@@ -181,13 +181,15 @@ void GenericRepository::handleTick(int time)
     }
     // otherwise
     else if (space >= capacity){
-    // the upper bound is the monthly acceptance capacity
+      Communicator* recipient = (Communicator*)(in_commod->getMarket());
+      // the upper bound is the monthly acceptance capacity
       requestAmt = capacity;
       // recall that requests have a negative amount
       Message* request = new Message(up, in_commod, -requestAmt, minAmt, commod_price,
-                                     this, recipient); 
+          this, recipient); 
       // send it
       sendMessage(request);
+    };
   };
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -228,4 +230,8 @@ Mass GenericRepository::checkStocks(){
   return total;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void emplaceWaste(){
+  // EMPLACE THE WASTE
+}
 

@@ -139,14 +139,14 @@ protected:
     double capacity;
 
     /**
-     * The stocks of fresh fuel assemblies available.
+     * The stocks of pre-emplacement waste materials.
      */
-    deque<InFuel> stocks;
+    deque<Material*> stocks;
 
     /**
-     * The inventory of spent fuel assemblies.
+     * The inventory of emplaced materials.
      */
-    deque<OutFuel> inventory;
+    deque<Material*> inventory;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -221,6 +221,10 @@ protected:
      */
     vector<Volume*> ebsList;
 
+    /**
+     * Emplace the waste
+     */
+    void emplaceWaste();
 
 /* ------------------- */ 
 
