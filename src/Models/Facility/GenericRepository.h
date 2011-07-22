@@ -5,6 +5,7 @@
 #include <queue>
 
 #include "FacilityModel.h"
+#include "Volume.h"
 
 /**
  * The GenericRepository class inherits from the FacilityModel class and is 
@@ -204,6 +205,22 @@ protected:
      * (it should be less than one. Double check that.)
      */
     double CF;
+
+    /**
+     * The Environment volume
+     */
+    Volume* environment;
+
+    /**
+     * The Far Field volume
+     */
+    Volume* far_field;
+
+    /**
+     * Many engineered barrier systems
+     */
+    vector<Volume*> ebsList;
+
 
 /* ------------------- */ 
 
