@@ -58,8 +58,9 @@ void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
   // register this transaction with the bookkeper
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
-  ((FacilityModel*)LI->getFacilityByID(ID))->receiveMaterial(msg->getTrans(), manifest);
-  std::cout << "Material sent from " << ID << " to " << this->getSN() << "." << std::endl;
+  int recvID = msg->getRequesterID();
+  ((FacilityModel*)LI->getFacilityByID(recvID))->receiveMaterial(msg->getTrans(), manifest);
+  std::cout << "Material sent from " << ID << " to " << recvID << "." << std::endl;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
