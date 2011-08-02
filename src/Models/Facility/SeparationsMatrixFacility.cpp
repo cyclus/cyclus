@@ -46,9 +46,13 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   Commodity* new_commod;
   new_commod = NULL;
 
-  // get incommodities
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/SeparationsMatrixFacility/incommodity");
+  // Hack Force!!
+  // Forcing Separations Matrix to know ahead of time the number of streams to be processed.
+  int nodeForce = 1;
 
+  // get incommodities
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
+ 
   for (int i=0;i<nodes->nodeNr;i++)
   {
     xmlNodePtr commod = nodes->nodeTab[i];
@@ -64,15 +68,19 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
 
   // get inventory size
   inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+
   // get capacity
   capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
 
   // get Stream
-  nodes = XMLinput->get_xpath_elements(cur,"model/SeparationsMatrixFacility/Stream");
+  nodes = XMLinput->get_xpath_elements(cur,"Stream");
+  // See nodeForce Hack Above
 
-  for (int i=0;i<nodes->nodeNr;i++)
+  for (int i=0;i<nodeForce;i++)
   {
+
     xmlNodePtr stream = nodes->nodeTab[i];
+
     string stream_commod = XMLinput->get_xpath_content(stream,"outcommodity");
     new_commod = NULL;
     new_commod = LI->getCommodity(stream_commod);

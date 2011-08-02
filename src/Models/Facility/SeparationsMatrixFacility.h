@@ -249,8 +249,13 @@ protected:
     int inventory_size;
 
     /**
+     * Hack Force to Get Streams to operate by telling code how many streams to separate
+     */
+    int nodeForce;
+
+    /**
      * Stream of material in a list to use as Separations Guide
-		 * Contains matched set of element (integer) and sep fraction (double)
+     * Contains matched set of element (integer) and sep fraction (double)
      */
     //struct Stream;
 

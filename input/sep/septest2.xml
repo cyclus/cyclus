@@ -2,7 +2,7 @@
 <!-- 1 A SourceFacility FrontEnd, 1 SeparationsMatrixFacility MiddleMan, --> 
 <!-- 1 SinkFacility BackEnd, and 2 GreedyMarkets A and B -->
 <simulation>
-  <duration>10</duration>
+  <duration>4</duration>
   <startmonth>1</startmonth>
   <startyear>2000</startyear>
   <simstart>0</simstart>
@@ -37,7 +37,7 @@
       <SourceFacility>
         <outcommodity>snf</outcommodity>
         <capacity>1</capacity>
-        <inventorysize>1e4</inventorysize>
+        <inventorysize>1e5</inventorysize>
         <commodprice>0</commodprice>
         <recipe>fresh_50gwd</recipe>
       </SourceFacility>
@@ -54,9 +54,9 @@
           <Z>92</Z>
           <eff>0.95</eff>
         </Stream>
-        <inventorysize>1e4</inventorysize>
+        <inventorysize>1e6</inventorysize>
         <capacity>1</capacity>
-      </SeparationsMatrixFacility>
+       </SeparationsMatrixFacility>
     </model>
   </facility>
 
@@ -66,7 +66,7 @@
       <SinkFacility>
         <incommodity>UPu</incommodity>
         <capacity>1</capacity>
-        <inventorysize>1e4</inventorysize>
+        <inventorysize>1e5</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
     </model>
