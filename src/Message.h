@@ -76,42 +76,42 @@ class Message {
      * The direction this message is traveling (up or down the class 
      * hierarchy).
      */
-    MessageDir dir;
+    MessageDir dir_;
 
     /**
      * The Transaction this message is concerned with
      */
-    Transaction trans;
+    Transaction trans_;
 
     /**
      * The Communicator who sent this Message.
      */
-    Communicator* sender;
+    Communicator* sender_;
 
     /**
      * The Communicator who will receive this Message.
      */
-    Communicator* recipient;
+    Communicator* recipient_;
 
     /**
      * The Market this message will pass to or from.
      */
-    Communicator* mkt;
+    Communicator* mkt_;
 
     /**
      * The region this messgae will pas through.
      */
-    Communicator* reg;
+    Communicator* reg_;
 
     /**
      * The region this messgae will pas through.
      */
-    Communicator* inst;
+    Communicator* inst_;
 
     /**
      * The region this messgae will pas through.
      */
-    Communicator* fac;
+    Communicator* fac_;
 
   public:
     /**
@@ -341,12 +341,13 @@ class Message {
 
     /**
      * Sets the path of the message using the direction, sender and recipient.
+     * TODO: make this a private method (rcarlsen)
      *
      * @param dir the direction of the message
      * @param sender the sender of the message
      * @param recipient the recipient of the message
      */
-    void setPath(MessageDir dir, Communicator* sender, Communicator* recipient);
+    void setPath(Communicator* sender, Communicator* recipient);
 
     /**
      * unEnumerates the message direction.
