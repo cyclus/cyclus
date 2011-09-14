@@ -44,13 +44,13 @@ void FacilityModel::copy(FacilityModel* src)
   fac_name = "";
 
 
-  LI->addFacility(this);
+  LI->addModel(this, FACILITY);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::getFacInst()
 {
-  return (InstModel*)(LI->getInstByName(inst_name));
+  return (InstModel*)(LI->getModelByName(inst_name, INST));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +59,7 @@ void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
   int recvID = msg->getRequesterID();
-  ((FacilityModel*)LI->getFacilityByID(recvID))->receiveMaterial(msg->getTrans(), manifest);
+  ((FacilityModel*)LI->getModelByID(recvID, FACILITY))->receiveMaterial(msg->getTrans(), manifest);
   std::cout << "Material sent from " << ID << " to " << recvID << "." << std::endl;
 }
 

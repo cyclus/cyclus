@@ -18,7 +18,7 @@ void ConverterMarket::init(xmlNodePtr cur)
   conv_name = XMLinput->get_xpath_content(conv_node,"type");
   
   Model* converter = NULL; 
-  converter = LI->getConverterByName(conv_name);
+  converter = LI->getModelByName(conv_name, CONVERTER);
 
   if (NULL == converter){
     throw GenException("Converter '" 
@@ -83,10 +83,9 @@ void ConverterMarket::print()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-ConverterModel* ConverterMarket::getConverter()
-{
+ConverterModel* ConverterMarket::getConverter() {
   Model* converter = NULL;
-  converter = LI->getConverterByName(conv_name);
+  converter = LI->getModelByName(conv_name, CONVERTER);
 
   if (NULL == converter){
     throw GenException("Converter '" 

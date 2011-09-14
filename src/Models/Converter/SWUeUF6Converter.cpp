@@ -100,7 +100,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
       out_commod == LI->getCommodity("eUF6")){
     // the enricher is the supplier in the convMsg
     enrID = convMsg->getSupplierID();
-    castEnr = dynamic_cast<Model*>(LI->getFacilityByID(enrID));
+    castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
     if (0 == castEnr){
       throw GenException("SWUs offered by non-Model");
     }
@@ -112,7 +112,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
       out_commod == LI->getCommodity("SWUs")){ 
     // the enricher is the supplier in the refMsg
     enrID = refMsg->getSupplierID();
-    castEnr = dynamic_cast<Model*>(LI->getFacilityByID(enrID));
+    castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
     if (0 == castEnr){
       throw GenException("SWUs offered by non-Model");
     }

@@ -34,8 +34,7 @@ void MarketModel::init(xmlNodePtr cur)
   commodity->setMarket(this);
 }
 
-void MarketModel::copy(MarketModel* src)
-{
+void MarketModel::copy(MarketModel* src) {
   Model::copy(src);
   Communicator::copy(src);
 
@@ -44,20 +43,16 @@ void MarketModel::copy(MarketModel* src)
    */
 
   commodity = src->commodity;
-  LI->addMarket(this);
-
+  LI->addModel(this, MARKET);
 }
 
-
-void MarketModel::print()              
-{ 
+void MarketModel::print() { 
   Model::print(); 
 
   cout << "trades commodity " 
       << commodity->getName() << endl;
 
-} ;
-
+};
 
 /* --------------------
  * all COMMUNICATOR classes have these members

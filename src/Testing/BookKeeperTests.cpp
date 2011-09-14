@@ -165,16 +165,16 @@ TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, WriteModelLists){
-  BI->writeModelList(region);
+  BI->writeModelList(REGION);
   EXPECT_EQ(BI->isGroup("output")      ,     true);
   EXPECT_EQ(BI->isGroup("regions")      ,     true);
-  BI->writeModelList(inst);
+  BI->writeModelList(INST);
   EXPECT_EQ(BI->isGroup("insts")      ,     true);
-  BI->writeModelList(facility);
+  BI->writeModelList(FACILITY);
   EXPECT_EQ(BI->isGroup("facilities")      ,     true);
-  BI->writeModelList(market);
+  BI->writeModelList(MARKET);
   EXPECT_EQ(BI->isGroup("markets")      ,     true);
-  BI->writeModelList(converter);
+  BI->writeModelList(CONVERTER);
   EXPECT_EQ(BI->isGroup("converters")      ,     true);
 }
 

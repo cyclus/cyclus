@@ -235,7 +235,7 @@ void EnrichmentFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   

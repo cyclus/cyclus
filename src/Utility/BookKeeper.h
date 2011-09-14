@@ -39,10 +39,6 @@ typedef strData2d::index str2didx;
 typedef boost::multi_array<string, 3> strData3d;
 typedef strData3d::index str3didx;
 
-
-// defines the possible modeltypes
-enum ModelType {region, inst, facility, market, converter};
-
 /**
  * A (singleton) class for handling I/O.
  */
@@ -185,6 +181,7 @@ public:
 
   /**
    * Returns whether the group exists in the database
+   * TODO: not used at all - deprecated (rcarlsen).
    *
    * @param grp the name of the group being queried
    */

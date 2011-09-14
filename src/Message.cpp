@@ -43,7 +43,7 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
   recipient_ = toReceive;
   Model* mktModel = trans_.commod->getMarket();
   mkt_ = ((MarketModel*)(mktModel));
-  setPath(sender_, recipient_);
+  setPath();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,7 +77,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   mkt_ = ((MarketModel*)(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
-  setPath(sender_, recipient_);
+  setPath();
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -110,7 +110,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   mkt_ = ((MarketModel*)(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
-  setPath(sender_, recipient_);
+  setPath();
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -233,7 +233,7 @@ void Message::reverseDirection() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPath(Communicator* sender_, Communicator* recipient_) {
+void Message::setPath() {
   if(dir_==up) {
     switch (sender_->getCommType())
     {
@@ -291,7 +291,7 @@ string Message::unEnumerateDir() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute() {
   FacilityModel* theFac;
-  theFac = ((FacilityModel*)LI->getFacilityByID(trans_.supplierID));
+  theFac = ((FacilityModel*)LI->getModelByID(trans_.supplierID, FACILITY));
   CommunicatorType type;
   type = ((Communicator*)theFac)->getCommType();
 

@@ -24,7 +24,7 @@ void FixedInst::init(xmlNodePtr cur)
     xmlNodePtr fac_node = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(fac_node,"type");
   
-    Model* facility = LI->getFacilityByName(fac_name);
+    Model* facility = LI->getModelByName(fac_name, FACILITY);
 
     if (NULL == facility){
       throw GenException("Facility '" 

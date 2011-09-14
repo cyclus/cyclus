@@ -215,7 +215,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   // Maybe someday it will record things.

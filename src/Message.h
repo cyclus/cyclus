@@ -343,11 +343,8 @@ class Message {
      * Sets the path of the message using the direction, sender and recipient.
      * TODO: make this a private method (rcarlsen)
      *
-     * @param dir the direction of the message
-     * @param sender the sender of the message
-     * @param recipient the recipient of the message
      */
-    void setPath(Communicator* sender, Communicator* recipient);
+    void setPath();
 
     /**
      * unEnumerates the message direction.

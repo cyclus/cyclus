@@ -23,7 +23,7 @@ void DeployInst::init(xmlNodePtr cur)
     xmlNodePtr deploy = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(deploy,"type");
   
-    Model* facility = LI->getFacilityByName(fac_name);
+    Model* facility = LI->getModelByName(fac_name, FACILITY);
 
     if (NULL == facility){
       throw GenException("Facility '" 
@@ -83,15 +83,15 @@ void DeployInst::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void DeployInst::handleTick(int time){
+void DeployInst::handleTick(int time) {
   map<int,Model*>::iterator next_build = to_build_map.begin();
-  while (time==(*next_build).first){
+  while (time==(*next_build).first) {
     Model* new_facility = Model::create((*next_build).second);
     //((FacilityModel*)new_facility)->setFacName(pointer, name);
     // this->addFacility((*next_build).second);
     to_build_map.erase(next_build);
     next_build=to_build_map.begin();
-    LI->addFacility(new_facility);
+    LI->addModel(new_facility, FACILITY);
   };
-
 };
+

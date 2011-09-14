@@ -106,7 +106,7 @@ void BuildRegion::handleTick(int time)
       // build said facility
       if (time == next_build_time) {
 	Model* inst;
-	Model* fac_to_build = LI->getFacilityByName(fac_name);
+	Model* fac_to_build = LI->getModelByName(fac_name, FACILITY);
 	int num_facs_to_build = next_fac_build.second;
 	int i;
 	// Build the prescribed number of facilities for this time step

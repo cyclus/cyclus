@@ -30,7 +30,7 @@ void ConverterModel::copy(ConverterModel* src)
 
   // don't copy conv_name to new instance
   conv_name = "";
-  LI->addConverter(this);
+  LI->addModel(this, CONVERTER);
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConverterModel::handleTick(int time){

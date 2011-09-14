@@ -389,7 +389,7 @@ void RecipeReactor::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   };
   month_in_cycle++;

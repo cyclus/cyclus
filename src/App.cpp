@@ -35,19 +35,14 @@ int main(int argc, char* argv[])
     //     * if not found load market
     XMLinput->load_file(argv[1]); // should probably check that the file exists.
 
-    // get commodities
-    
-    // get markets
-
-
-    cout << "Here is a list of " << LI->getNumConverters() << " converters:" << endl;
-    LI->printConverters();
-    cout << "Here is a list of " << LI->getNumMarkets() << " markets:" << endl;
-    LI->printMarkets();
-    cout << "Here is a list of " << LI->getNumFacilities() << " facilities:" << endl;
-    LI->printFacilities();
-    cout << "Here is a list of " << LI->getNumRegions() << " regions:" << endl;
-    LI->printRegions();
+    cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
+    LI->printModelList(CONVERTER);
+    cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
+    LI->printModelList(MARKET);
+    cout << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
+    LI->printModelList(FACILITY);
+    cout << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
+    LI->printModelList(REGION);
     cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
     LI->printRecipes();
     
@@ -56,12 +51,14 @@ int main(int argc, char* argv[])
 
     // Create the output file
     BI->createDB();
-    BI->writeModelList(region);
-    BI->writeModelList(inst);
-    BI->writeModelList(facility);
-    BI->writeModelList(market);
+
+    BI->writeModelList(INST);
+    BI->writeModelList(REGION);
+    BI->writeModelList(FACILITY);
+    BI->writeModelList(MARKET);
     BI->writeTransList();
     BI->writeMatHist();
+
     BI->closeDB();
 
     return 0;

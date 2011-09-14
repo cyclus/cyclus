@@ -33,7 +33,7 @@ void RegionModel::init(xmlNodePtr cur)
   
   for (int i=0;i<nodes->nodeNr;i++){
     fac_name = (const char*)nodes->nodeTab[i]->children->content;
-    new_fac = LI->getFacilityByName(fac_name);
+    new_fac = LI->getModelByName(fac_name, FACILITY);
     if (NULL == new_fac){
       throw GenException("Facility " + fac_name 
           + " is not defined in this simulation.");
@@ -43,8 +43,7 @@ void RegionModel::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::copy(RegionModel* src)
-{
+void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
 
@@ -55,13 +54,12 @@ void RegionModel::copy(RegionModel* src)
   allowedFacilities = src->allowedFacilities;
   
   // don't copy institutions!
-  LI->addRegion(this);
+  LI->addModel(this, REGION);
 
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::print()
-{
+void RegionModel::print() {
 
   Model::print();
 

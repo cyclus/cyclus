@@ -10,9 +10,6 @@
 
 using namespace std;
 
-
-
-
 //-----------------------------------------------------------------------------
 /*
  * The InstModel class is the abstract class/interface used by all institution models

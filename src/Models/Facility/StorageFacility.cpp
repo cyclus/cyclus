@@ -193,7 +193,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility, commodity, recipe = NULL;
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
-    sending_facility = (FacilityModel*) LI->getFacilityByName(fac_name);
+    sending_facility = (FacilityModel*) LI->getModelByName(fac_name, FACILITY);
     if (NULL == facility){
       throw GenException("Facility '" 
 			 + fac_name 
@@ -352,7 +352,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getFacilityByID(order->getRequesterID())));
+    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   

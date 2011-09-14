@@ -15,6 +15,8 @@ class Model;
 typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
 
+// defines the possible modeltypes
+enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER};
 
 /*!
  * The Model class is the abstract class used by all types of models
@@ -198,8 +200,5 @@ private:
   
 };
 
-
 #endif
-
-
 

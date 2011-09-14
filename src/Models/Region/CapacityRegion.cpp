@@ -83,7 +83,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       // facility
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
       cout << "fac_name:" << fac_name << "is on the list of repalcement facilities" <<endl;
-      facility = (FacilityModel*) LI->getFacilityByName(fac_name);
+      facility = (FacilityModel*) LI->getModelByName(fac_name, FACILITY);
       if (NULL == facility){
 	throw GenException("Facility '" 
 			   + fac_name 
@@ -177,7 +177,7 @@ void CapacityRegion::handleTick(int time)
       // build said facility
       if (time == next_build_time) {
 	Model* inst;
-	Model* fac_to_build = LI->getFacilityByName(fac_name);
+	Model* fac_to_build = LI->getModelByName(fac_name, FACILITY);
 	int num_facs_to_build = next_fac_build.second;
 	int i;
 	// Build the prescribed number of facilities for this time step

@@ -27,7 +27,7 @@ void InstModel::init(xmlNodePtr cur)
   
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
-  region = LI->getRegionByName(region_name);
+  region = LI->getModelByName(region_name, REGION);
   this->setRegion(region);
   cout << "Inst " << ID << " has set its region to be " << region_name << endl;
   
@@ -47,7 +47,7 @@ void InstModel::copy(InstModel* src)
   
   region = src->region;
   ((RegionModel*)region)->addInstitution(this);
-  LI->addInst(this);
+  LI->addModel(this, INST);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

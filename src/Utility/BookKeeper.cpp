@@ -232,66 +232,59 @@ void BookKeeper::registerVolChange(Volume* vol){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeModelList(ModelType type){
+void BookKeeper::writeModelList(ModelType type) {
 
   // define some useful variables.
   const H5std_string ID_memb = "ID";
   const H5std_string name_memb = "name";
   const H5std_string modelImpl_memb = "modelImpl";
   const H5std_string output_name = "/output";
+
   string subgroup_name;
   string dataset_name;
+  int numStructs, numModels;
 
-  // prepare the function pointer
-  Model* (Logician::*ptr2getModel)(int) = NULL;
+  numModels = LI->getNumModels(type);
+  if (numModels==0) {
+    numStructs=1;
+  } else {
+    numStructs=numModels;
+  }
 
   // parse the cases.
-  int numModels;
   switch( type ) {
-    case region:
-      numModels = LI->getNumRegions();
+    case REGION:
       subgroup_name = "regions";
       dataset_name = "regionList"; 
-      ptr2getModel = &Logician::getRegionByID; break;
-    case inst:
-      numModels = LI->getNumInsts();
+      break;
+    case INST:
       subgroup_name = "insts";
       dataset_name = "instList"; 
-      ptr2getModel = &Logician::getInstByID; break;
-    case facility:
-      numModels = LI->getNumFacilities();
+      break;
+    case FACILITY:
       subgroup_name = "facilities";
       dataset_name = "facList"; 
-      ptr2getModel = &Logician::getFacilityByID; break;
-    case market:
-      numModels = LI->getNumMarkets();
+      break;
+    case MARKET:
       subgroup_name = "markets";
       dataset_name = "marketList"; 
-      ptr2getModel = &Logician::getMarketByID; break;
-    case converter: 
-      numModels = LI->getNumConverters();
+      break;
+    case CONVERTER: 
       subgroup_name = "converters";
       dataset_name = "converterList"; 
-      ptr2getModel = &Logician::getConverterByID; break;
+      break;
   };
-
-  int numStructs;
-  if(numModels==0){
-    numStructs=1;
-  }
-  else
-    numStructs=numModels;
 
   // create an array of the model structs
   model_t modelList[numStructs];
-  for (int i=0; i<numModels; i++){
+  for (int i=0; i<numModels; i++) {
     modelList[i].ID = i;
-    Model* theModel = (LI->*ptr2getModel)(i);
+    Model* theModel = LI->getModelByID(i, type);
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
   };
-  if(numModels==0){
-    
+
+  if(numModels==0) {
     string str1="";
     string str2="";
     modelList[0].ID=0;
@@ -312,14 +305,16 @@ void BookKeeper::writeModelList(ModelType type){
     // if there's only one model, the dataspace is a vector, which  
     // hdf5 doesn't like to think of as a matrix 
     int rank;
-    if(numModels <= 1)
+    if(numModels <= 1) {
       rank = 1;
-    else
+    } else {
       rank = 1;
+    }
 
     Group* outputgroup;
     outputgroup = new Group(this->getDB()->openGroup(output_name));
     Group* subgroup;
+
     subgroup = new Group(outputgroup->createGroup(subgroup_name));
     DataSpace* dataspace;
     dataspace = new DataSpace( rank, dim );
