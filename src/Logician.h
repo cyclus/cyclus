@@ -83,10 +83,10 @@ class Logician {
      */
     void handleTimeStep(int time);
     
-    /// generic routines to handle Model-based entities
     /**
      * sends the tick signal to all of the models
-     * TODO: should be private (rcarlsen)
+     *
+     * @todo should be private (rcarlsen)
      *
      * @param time is the simulation time of the tick
      */
@@ -94,7 +94,8 @@ class Logician {
 
     /**
      * sends the tock signal to all of the models
-     * TODO: should be private (rcarlsen)
+     *
+     * @todo should be private (rcarlsen)
      *
      * @param time is the simulation time of the tock
      */
@@ -103,14 +104,16 @@ class Logician {
     /**
      * sends the resolve signal to all of the market models
      * which in turn make matches and send orders
-     * TODO: should be private (rcarlsen)
+     *
+     * @todo should be private (rcarlsen)
      *
      */
     void resolveMarkets();
 
     /* 
      * Generic routine to add a Model-based entity to a specific list
-     * TODO: should be private (rcarlsen)
+     *
+     * @todo should be private (rcarlsen)
      *
      * @param new_model pointer to model-based entity to be added
      * @param model_type type of new_model as defined by ModelType enum
@@ -160,7 +163,7 @@ class Logician {
      * @param commod a pointer to the commodity to register
      * @param market a pointer to the market with which to register the commod.
      */
-    void   registerCommodityMarket(Commodity* commod, Model* market);
+    void registerCommodityMarket(Commodity* commod, Model* market);
     
     /*
      * Generic routine to print a list of model-based entities

@@ -10,8 +10,10 @@ Logician* Logician::_instance = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::Logician() {
 
-  // Important note: this loop requires the ModelType enum to have its 
-  // default consecutive integer values.
+  /*
+   * @warning This loop requires the ModelType enum to have its default
+   *          consecutive integer values.
+   */
   for ( int i = 0; i != END_MODEL_TYPES; i++ ) {
     createModelList((ModelType)i);
   }

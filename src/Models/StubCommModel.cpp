@@ -11,7 +11,7 @@
 StubCommModel::StubCommModel() { 
   ID = nextID++; 
   model_type="StubComm";
-  commType = StubComm;
+  commType = STUB_COMM;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

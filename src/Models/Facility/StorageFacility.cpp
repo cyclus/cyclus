@@ -284,7 +284,7 @@ void StorageFacility::handleTick(int time)
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
     // recall that requests have a negative amount
-    Message* request = new Message(up, incommod, -requestAmt, minAmt, 
+    Message* request = new Message(UP_MSG, incommod, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
@@ -296,7 +296,7 @@ void StorageFacility::handleTick(int time)
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity - sto;
     // recall that requests have a negative amount
-    Message* request = new Message(up, incommod, -requestAmt, minAmt, commod_price,
+    Message* request = new Message(UP_MSG, incommod, -requestAmt, minAmt, commod_price,
                                    this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
@@ -322,7 +322,7 @@ void StorageFacility::handleTick(int time)
   Communicator* recipient = (Communicator*)(incommod->getMarket());
 
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(up, incommod, offer_amt, min_amt, commod_price, 
+  Message* msg = new Message(UP_MSG, incommod, offer_amt, min_amt, commod_price, 
       this, recipient);
 
   // send it

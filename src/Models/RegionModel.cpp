@@ -92,11 +92,11 @@ void RegionModel::receiveMessage(Message* msg){
   // If it's going up, send it to the market.
   // If it's going down, send it to the inst.
   MessageDir dir = msg->getDir();
-  if (dir == up){
+  if (dir == UP_MSG){
     Communicator* nextRecipient = msg->getMkt();
     nextRecipient->receiveMessage(msg);
   }
-  else if (dir == down){
+  else if (dir == DOWN_MSG){
     Communicator* nextRecipient = msg->getInst();
     nextRecipient->receiveMessage(msg);
   }

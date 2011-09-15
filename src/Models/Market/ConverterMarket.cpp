@@ -175,7 +175,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequesterID(requestMsg->getRequesterID());
-      offerMsg->setDir(down);
+      offerMsg->setDir(DOWN_MSG);
 
       // tenatively queue a new order (don't execute yet)
       matchedOffers.insert(offerMsg);
@@ -197,7 +197,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // queue a new order
       Message* maybe_offer = new Message(*offerMsg);
       maybe_offer->setAmount(requestAmt);
-      maybe_offer->setDir(down);
+      maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequesterID(requestMsg->getRequesterID());
 
       matchedOffers.insert(offerMsg);

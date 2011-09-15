@@ -15,8 +15,15 @@ class Model;
 typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
 
-// defines the possible modeltypes
-// DO NOT manually set int values for the constants - other code will break.
+/*! 
+ * @brief defines the possible model types
+ * 
+ * @warning DO NOT manually set int values for the constants - other code 
+ *          will break.
+ *
+ * @todo consider changing to a vector of strings & consolidating with
+ *       the model_type instance variable of the model class
+ */
 enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 
 /*!

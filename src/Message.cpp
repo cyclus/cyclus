@@ -49,7 +49,7 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,                 double thisPrice, double minAmt, Communicator* toSend, 
                  Communicator* toReceive) {
-  dir_ = none;
+  dir_ = NONE_MSG;
   trans_.commod = thisCommod;
   trans_.amount = thisAmount; 
   trans_.min = minAmt;
@@ -222,10 +222,10 @@ void Message::setComp(CompMap newComp) {
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::reverseDirection() {
-  if (down == dir_) {
-    dir_ = up; 
+  if (DOWN_MSG == dir_) {
+    dir_ = UP_MSG; 
   } else {
-  	dir_ = down;
+  	dir_ = DOWN_MSG;
     // Speaking of "getting up" or "getting down," check out
     // "National Funk Congress Deadlocked On Get Up/Get Down Issue,"
     // The Onion (1999, October 27), 35(39).
@@ -234,42 +234,42 @@ void Message::reverseDirection() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setPath() {
-  if(dir_==up) {
+  if(dir_== UP_MSG) {
     switch (sender_->getCommType())
     {
-      case FacilityComm:
+      case FACILITY_COMM:
         fac_ = sender_; 
         inst_ = ((FacilityModel*)(fac_))->getFacInst();
         reg_ = ((InstModel*)(inst_))->getRegion();
         break;
-      case InstComm:
+      case INST_COMM:
         fac_ = NULL;
         inst_ = sender_;
         reg_ = ((InstModel*)(inst_))->getRegion();
         break;
-      case RegionComm:
+      case REGION_COMM:
         reg_ = sender_;
         break;
-      case MarketComm:
+      case MARKET_COMM:
         throw GenException("A Market can't send a message *up* to anyone.");
       break;
     }
-  } else if(dir_==down) {
+  } else if(dir_== DOWN_MSG) {
     switch (recipient_->getCommType()) {
-      case FacilityComm:
+      case FACILITY_COMM:
         fac_ = recipient_;
         inst_ = ((FacilityModel*)(fac_))->getFacInst();
         reg_ = ((InstModel*)(inst_))->getRegion();
         break;
-      case InstComm:
+      case INST_COMM:
         fac_ = NULL;
         inst_ = sender_;
         reg_ = ((InstModel*)(inst_))->getRegion();
         break;
-      case RegionComm:
+      case REGION_COMM:
         reg_ = recipient_;
         break;
-      case MarketComm:
+      case MARKET_COMM:
         throw GenException("No one can send a message *down* to a market.");
       break;
     }
@@ -279,9 +279,9 @@ void Message::setPath() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Message::unEnumerateDir() {
   string toRet;
-  if (up == dir_)
+  if (UP_MSG == dir_)
     toRet = "up";
-  else if (down == dir_)
+  else if (DOWN_MSG == dir_)
     toRet = "down";
   else
     throw GenException("Attempted to send a message neither up nor down.");
@@ -295,7 +295,7 @@ void Message::execute() {
   CommunicatorType type;
   type = ((Communicator*)theFac)->getCommType();
 
-  if (type == FacilityComm)
+  if (type == FACILITY_COMM)
     (theFac)->receiveMessage(this);
   else
     throw GenException("Only FacilityModels can send material.");

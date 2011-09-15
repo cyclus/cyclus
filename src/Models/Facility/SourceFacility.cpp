@@ -178,7 +178,7 @@ void SourceFacility::handleTick(int time){
   cout << "During handleTick, " << getFacName() << " offers: "<< offer_amt << "."  << endl;
 
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(up, out_commod, offer_amt, min_amt, commod_price, 
+  Message* msg = new Message(UP_MSG, out_commod, offer_amt, min_amt, commod_price, 
       this, recipient);
 
   // send it

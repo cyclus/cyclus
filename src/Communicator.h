@@ -8,19 +8,19 @@ using namespace std;
 
 #include "Message.h"
 
-/// Enumerate the different types of Communicators
 /**
- * The types of Communicators (Market, Regions, Insts, and Facilities).
+ *  @brief Used for determining message passing paths
+ *
+ *  The types of Communicators (Market, Regions, Insts, and Facilities).
  */
-enum CommunicatorType {StubComm, MarketComm, RegionComm, InstComm, FacilityComm};
+enum CommunicatorType {STUB_COMM, MARKET_COMM, REGION_COMM, INST_COMM, 
+                        FACILITY_COMM};
 
 /**
- *  An abstract class for deriving simulation entities that can communicate.
+ *  @brief An abstract class for deriving simulation entities that can communicate via the Message class.
  *
- *  This base class does not contain much information or define an extensive
- *  interface.  
- * 
- *  This class header explicitly includes full header for Message so that all
+ *  This base class was intentionally kept minimal.
+ *  This class header explicitly includes Message.h so that all
  *  Communicator derived classes automatically get this definition for their
  *  own use.
 */
@@ -29,7 +29,7 @@ class Communicator {
 public:
   
   /**
-   * Communicator Destructor.
+   * @brief Communicator Destructor.
    */
   virtual ~Communicator();
 
@@ -67,3 +67,4 @@ protected:
 
 };
 #endif
+

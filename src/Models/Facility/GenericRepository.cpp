@@ -174,7 +174,7 @@ void GenericRepository::handleTick(int time)
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
-      Message* request = new Message(up, in_commod, -requestAmt, minAmt, 
+      Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt,
                                        commod_price, this, recipient);
         // pass the message up to the inst
         (request->getInst())->receiveMessage(request);
@@ -185,7 +185,7 @@ void GenericRepository::handleTick(int time)
       // the upper bound is the monthly acceptance capacity
       requestAmt = capacity;
       // recall that requests have a negative amount
-      Message* request = new Message(up, in_commod, -requestAmt, minAmt, commod_price,
+      Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, commod_price,
           this, recipient); 
       // send it
       sendMessage(request);

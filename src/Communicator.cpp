@@ -4,70 +4,64 @@
 #include "FacilityModel.h"
 #include "Communicator.h"
 #include "GenException.h"
+#include <string>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator::~Communicator()
-{
+Communicator::~Communicator() {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Communicator::sendMessage() {
+  std::string warn_msg = "Sender did not override sendMessage(msg)";
+  throw GenException(warn_msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::sendMessage()
-{
-  throw GenException
-    ("Sender did not override sendMessage()");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::sendMessage(Message* msg)
-{
+void Communicator::sendMessage(Message* msg) {
   Communicator* recipient = msg->getRecipient();
   Communicator* sender = msg->getSender();
 
-  if (recipient == this)
+  if (recipient == this) {
     receiveMessage(msg);
-  else 
-    switch(msg->getDir())
-    {
-      case up:
-        switch(commType)
-        {
-          case FacilityComm:
+  } else {
+    switch(msg->getDir()) {
+      case UP_MSG:
+        switch(commType) {
+          case FACILITY_COMM:
             msg->getInst()->receiveMessage(msg);
             break;
-          case InstComm:
+          case INST_COMM:
             msg->getReg()->receiveMessage(msg);
             break;
-          case RegionComm:
+          case REGION_COMM:
             msg->getMkt()->receiveMessage(msg);
             break;
-          case MarketComm:
+          case MARKET_COMM:
             receiveMessage(msg);
             break;
         }
         break;
-      case down:
-        switch(commType)
-        {
-          case FacilityComm:
+      case DOWN_MSG:
+        switch(commType) {
+          case FACILITY_COMM:
             receiveMessage(msg);
             break;
-          case InstComm:
+          case INST_COMM:
             msg->getFac()->receiveMessage(msg);
             break;
-          case RegionComm:
+          case REGION_COMM:
             msg->getInst()->receiveMessage(msg);
             break;
-          case MarketComm:
+          case MARKET_COMM:
             msg->getReg()->receiveMessage(msg);
             break;
         }
         break;
     }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Communicator::receiveMessage(Message* msg)
-{
-  throw GenException
-    ("Recipient did not override receiveMessage(msg)");
+void Communicator::receiveMessage(Message* msg) {
+  std::string warn_msg = "Recipient did not override receiveMessage(msg)";
+  throw GenException(warn_msg);
 }

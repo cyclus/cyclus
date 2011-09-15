@@ -181,7 +181,8 @@ public:
 
   /**
    * Returns whether the group exists in the database
-   * TODO: not used at all - deprecated (rcarlsen).
+   *
+   * @deprecated not used at all. Needs removal (rcarlsen).
    *
    * @param grp the name of the group being queried
    */

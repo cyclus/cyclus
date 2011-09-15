@@ -29,7 +29,7 @@ class RegionModel : public Model, public Communicator
  */
 public:
     /// Default constructor for RegionModel Class
-    RegionModel() { ID = nextID++; model_type="Region"; commType=RegionComm; };
+    RegionModel() { ID = nextID++; model_type="Region"; commType=REGION_COMM; };
 
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};

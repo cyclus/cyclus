@@ -13,7 +13,7 @@ class Communicator;
  * An enumerative type to specify which direction (up or down the class 
  * hierarchy) this message is moving.
  */
-enum MessageDir {up, down, none};
+enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 
 /**
  * A transaction structure to include in any message.
@@ -340,14 +340,14 @@ class Message {
     void reverseDirection();
 
     /**
-     * Sets the path of the message using the direction, sender and recipient.
-     * TODO: make this a private method (rcarlsen)
+     * @brief Set the message path using a direction, sender and recipient.
+     * @todo make this a private method (rcarlsen)
      *
      */
     void setPath();
 
     /**
-     * unEnumerates the message direction.
+     * @brief unenumerates the message direction.
      * 
      * @return the string associated with myDir
      */

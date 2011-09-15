@@ -70,11 +70,11 @@ void InstModel::receiveMessage(Message* msg){
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
   MessageDir dir = msg->getDir();
-  if (dir == up){
+  if (dir == UP_MSG){
     Communicator* nextRecipient = msg->getReg();
     nextRecipient->receiveMessage(msg);
   }
-  else if (dir == down){
+  else if (dir == DOWN_MSG){
     Communicator* nextRecipient = msg->getFac();
     nextRecipient->receiveMessage(msg);
   }

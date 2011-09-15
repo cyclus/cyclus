@@ -118,7 +118,7 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = (Communicator*)((*commod)->getMarket());
       // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods.size());
-      Message* request = new Message(up, *commod, -requestAmt, minAmt, 
+      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
@@ -134,7 +134,7 @@ void SinkFacility::handleTick(int time){
     {
       Communicator* recipient = (Communicator*)((*commod)->getMarket());
       requestAmt = capacity/in_commods.size();
-      Message* request = new Message(up, *commod, -requestAmt, minAmt, commod_price,
+      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price,
                           this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
