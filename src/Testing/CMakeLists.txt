@@ -8,6 +8,7 @@ set ( TestSource
   TruthTests.cpp
   MaterialTests.cpp
   BookKeeperTests.cpp
+  LogicianTests.cpp
   ../InputXML.cpp
   ../Logician.cpp
   ../Material.cpp
