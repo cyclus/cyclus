@@ -9,12 +9,19 @@ Logician* Logician::_instance = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::Logician() {
-    model_lists[FACILITY] = &facilities;
-    model_lists[INST] = &insts;
-    model_lists[REGION] = &regions;
-    model_lists[MARKET] = &markets;
-    model_lists[CONVERTER] = &converters;
+
+  // Important note: this loop requires the ModelType enum to have its 
+  // default consecutive integer values.
+  for ( int i = 0; i != END_MODEL_TYPES; i++ ) {
+    createModelList((ModelType)i);
+  }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::createModelList(ModelType model_type) {
+  ModelList new_list;
+  model_lists_[CONVERTER] = new_list;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::~Logician() {};
@@ -31,9 +38,12 @@ Logician* Logician::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::handlePreHistory() {
   // tell all of the region models to handle the tick
-  for(ModelList::iterator reg=regions.begin();
-    reg != regions.end(); 
-    reg++){
+  ModelList* region_list;
+  region_list = &(model_lists_[REGION]);
+
+  for(ModelList::iterator reg=region_list->begin();
+       reg != region_list->end(); 
+       reg++) {
     ((RegionModel*)(*reg))->handlePreHistory();
   }
 }
@@ -48,9 +58,12 @@ void Logician::handleTimeStep(int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::sendTick(int time) {
   // tell all of the region models to handle the tick
-  for(ModelList::iterator reg=regions.begin();
-    reg != regions.end(); 
-    reg++){
+  ModelList* region_list;
+  region_list = &(model_lists_[REGION]);
+
+  for(ModelList::iterator reg=region_list->begin();
+       reg != region_list->end(); 
+       reg++) {
     ((RegionModel*)(*reg))->handleTick(time);
   }
 }
@@ -58,9 +71,12 @@ void Logician::sendTick(int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::sendTock(int time) {
   // tell all of the region models to handle the tock
-  for(ModelList::iterator reg=regions.begin();
-    reg != regions.end(); 
-    reg++){
+  ModelList* region_list;
+  region_list = &(model_lists_[REGION]);
+
+  for(ModelList::iterator reg=region_list->begin();
+       reg != region_list->end(); 
+       reg++) {
     ((RegionModel*)(*reg))->handleTock(time);
   }
 }
@@ -68,8 +84,11 @@ void Logician::sendTock(int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::resolveMarkets() {
   // tell each market model to make matches and send out the orders
-  for(ModelList::iterator mkt=markets.begin();
-      mkt != markets.end();
+  ModelList* market_list;
+  market_list = &(model_lists_[MARKET]);
+
+  for(ModelList::iterator mkt=market_list->begin();
+      mkt != market_list->end();
       mkt++){
     ((MarketModel*)(*mkt))-> resolve();
   }
@@ -77,12 +96,12 @@ void Logician::resolveMarkets() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addModel(Model* new_model, ModelType model_type) { 
-  (model_lists[model_type])->push_back(new_model);
+  model_lists_[model_type].push_back(new_model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Logician::getModelByID(int ID, ModelType model_type) { 
-  return (model_lists[model_type])->at(ID);
+  return model_lists_[model_type].at(ID);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,7 +109,7 @@ Model* Logician::getModelByName(string name, ModelType model_type) {
   Model* found_model = NULL;
 
   ModelList* list;
-  list = model_lists[model_type];
+  list = &model_lists_[model_type];
   
   for(ModelList::iterator model=list->begin();
       model != list->end(); model++) {
@@ -104,29 +123,29 @@ Model* Logician::getModelByName(string name, ModelType model_type) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Logician::getNumModels(ModelType model_type) { 
-  return model_lists[model_type]->size(); 
+  return model_lists_[model_type].size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Logician::getMarketByCommodity(string commodity_name) 
 { 
-  return commodity_market_map[getCommodity(commodity_name)]; 
+  return commodity_market_map_[getCommodity(commodity_name)]; 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Logician::getMarketByCommodity(Commodity* commod) { 
-  return commodity_market_map[commod]; 
+  return commodity_market_map_[commod]; 
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::  registerCommodityMarket(Commodity* commod, Model* market) { 
-  commodity_market_map[commod] = market; 
+  commodity_market_map_[commod] = market; 
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::printModelList(ModelType model_type) {
   ModelList* list;
-  list = model_lists[model_type];
+  list = &model_lists_[model_type];
   
   for (ModelList::iterator model = list->begin();
        model != list->end();
@@ -137,13 +156,13 @@ void Logician::printModelList(ModelType model_type) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addRecipe(string name, Material* new_mat) { 
-  recipes[name] = new_mat; 
+  recipes_[name] = new_mat; 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::printRecipes() {
-  for (RecipeList::iterator recipe=recipes.begin();
-      recipe != recipes.end();
+  for (RecipeList::iterator recipe=recipes_.begin();
+      recipe != recipes_.end();
       recipe++){
     cout << "Recipe " << (*recipe).first << endl;
     (*recipe).second->print();
@@ -152,26 +171,26 @@ void Logician::printRecipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Logician::getNumRecipes() { 
-  return recipes.size(); 
+  return recipes_.size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Logician::getRecipe(string name) { 
-  return recipes[name]; 
+  return recipes_[name]; 
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addCommodity(Commodity* new_commod) { 
-  commodities[new_commod->getName()] = new_commod; 
+  commodities_[new_commod->getName()] = new_commod; 
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Logician::getNumCommodities() {
-  return commodities.size(); 
+  return commodities_.size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Logician::getCommodity(string name) { 
-  return commodities[name]; 
+  return commodities_[name]; 
 } 
 

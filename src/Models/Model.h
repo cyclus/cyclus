@@ -16,7 +16,8 @@ typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
 
 // defines the possible modeltypes
-enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER};
+// DO NOT manually set int values for the constants - other code will break.
+enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 
 /*!
  * The Model class is the abstract class used by all types of models
