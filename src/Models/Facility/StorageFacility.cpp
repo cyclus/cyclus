@@ -132,7 +132,7 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
     if(m->getTotMass() <= (capacity - complete)){
       complete += m->getTotMass();
       toSend.push_back(m);
-      cout<<"StorageFacility "<< ID
+      cout<<"StorageFacility "<< getSN()
         <<"  is sending a mat with mass: "<< m->getTotMass()<< endl;
       inventory.pop_front();
     }
@@ -147,7 +147,7 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
-      cout<<"StorageFacility "<< ID
+      cout<<"StorageFacility "<< getSN()
         <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
     };
   };    
@@ -165,7 +165,7 @@ void StorageFacility::receiveMaterial(Transaction trans, vector<Material*> manif
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"StorageFacility " << ID << " is receiving material with mass "
+    cout<<"StorageFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_back(*thisMat);
     entryTimes.push_back(make_pair(TI->getTime(), *thisMat ));

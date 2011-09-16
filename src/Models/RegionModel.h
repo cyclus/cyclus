@@ -9,9 +9,6 @@
 
 using namespace std;
 
-
-
-
 //-----------------------------------------------------------------------------
 /*
  * The RegionModel class is the abstract class/interface used by all region
@@ -29,7 +26,11 @@ class RegionModel : public Model, public Communicator
  */
 public:
     /// Default constructor for RegionModel Class
-    RegionModel() { ID = nextID++; model_type="Region"; commType=REGION_COMM; };
+    RegionModel() {
+      setSN(nextID++);
+      setModelType("Region");
+      commType=REGION_COMM; 
+    };
 
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};

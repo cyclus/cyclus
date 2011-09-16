@@ -9,7 +9,8 @@
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
-  ID = nextID++; model_type="Stub"; 
+  setSN(nextID++);
+  setModelType("Stub");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

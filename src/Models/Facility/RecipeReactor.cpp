@@ -259,7 +259,7 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        cout<<"RecipeReactor "<< ID
+        cout<<"RecipeReactor "<< getSN()
           <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
       }
     }
@@ -276,7 +276,7 @@ void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifes
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"RecipeReactor " << ID << " is receiving material with mass "
+    cout<<"RecipeReactor " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_front(make_pair(trans.commod, *thisMat));
   }

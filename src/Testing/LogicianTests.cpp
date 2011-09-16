@@ -19,11 +19,11 @@ class TestModel : public Model {
     TestModel() {}
 
     TestModel(string aname, ModelType amodel_type) {
-      handle = aname;
-      name = aname;
+      // needs adjustment because these are private to Model
+      //handle_ = aname;
+      //name_ = aname;
 
-      // this line needs to be changed
-      model_type = "type-generic";
+      setModelType("type-generic");
 
       pre_history_handled_runs_ = 0;
       tick_handled_runs_ = 0;

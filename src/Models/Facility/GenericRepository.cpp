@@ -132,7 +132,7 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> man
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"GenericRepository " << ID << " is receiving material with mass "
+    cout<<"GenericRepository " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_front(*thisMat);
   }

@@ -148,7 +148,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    cout<<"SourceFacility "<< ID
+    cout<<"SourceFacility "<< getSN()
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
     (newMat)->print();
   }    

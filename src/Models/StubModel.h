@@ -9,9 +9,6 @@
 
 using namespace std;
 
-
-
-
 //-----------------------------------------------------------------------------
 /*
  * The StubModel class is the abstract class/interface used by all stub models

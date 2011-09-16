@@ -149,7 +149,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    cout<<"NullFacility "<< ID
+    cout<<"NullFacility "<< getSN()
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
   FacilityModel::sendMaterial( order, toSend );
@@ -164,7 +164,7 @@ void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"NullFacility " << ID << " is receiving material with mass "
+    cout<<"NullFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_back(*thisMat);
   }

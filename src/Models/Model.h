@@ -107,22 +107,37 @@ public:
   /**
    * get model instance name
    */
-  const string getName() const { return name; };
+  const string getName() const { return name_; };
 
   /**
    * get model instance SN
    */
-  const int getSN() const { return ID; };
+  const int getSN() const { return ID_; };
+
+  /**
+   * set model instance SN
+   */
+  void setSN(int new_id) { ID_ = new_id; };
 
   /**
    * get model implementation name
    */
-  const string getModelImpl() { return modelImpl; };
+  const string getModelImpl() { return model_impl_; };
+
+  /**
+   * get model type
+   */
+  const string getModelType() { return model_type_; };
+
+  /**
+   * set model type
+   */
+  void setModelType(string new_type) { model_type_ = new_type; };
 
   /**
    * get model instance handle
    */
-  const string getHandle() const { return handle; };
+  const string getHandle() const { return handle_; };
 
   /**
    * every model should be able to print a verbose description
@@ -163,12 +178,12 @@ public:
    */
   static void load_institutions();
 
-protected:
+private:
   /**
    * every instance of a model should have a handle
    * perhaps this is redundant with name. Discuss amongst yourselves.
    */
-  string handle;
+  string handle_;
 
   /**
    * generate model handle
@@ -178,33 +193,32 @@ protected:
   /**
    * every instance of a model should have a name
    */
-  string name;
+  string name_;
 
   /** 
    * every instance of a model should know its type
    */
-  string model_type;
+  string model_type_;
 
   /**
    * every instance of a model should know its implementation
    */
-  string modelImpl;
+  string model_impl_;
 
   /**
    * every instance of a model will have a serialized ID
    */
-  int ID;
+  int ID_;
 
-private:    
   /**
    * map of constructor methods for each loaded model
    */
-  static map<string, mdl_ctor*> create_map;
+  static map<string, mdl_ctor*> create_map_;
 
   /**
    * map of destructor methods for each loaded model
    */
-  static map<string, mdl_dtor*> destroy_map;
+  static map<string, mdl_dtor*> destroy_map_;
   
 };
 

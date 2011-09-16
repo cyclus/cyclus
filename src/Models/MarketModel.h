@@ -30,7 +30,11 @@ class MarketModel : public Model, public Communicator
 
 public:
   /// Default constructor for the MarketModel Class
-  MarketModel() { ID = nextID++; model_type="Market"; commType=MARKET_COMM; };
+  MarketModel() {
+    setSN(nextID++);
+    setModelType("Market");
+    commType=MARKET_COMM;
+  };
   
   /// MarketModels should not be indestructible.
   virtual ~MarketModel() {};

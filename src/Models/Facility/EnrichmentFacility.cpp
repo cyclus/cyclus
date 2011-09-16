@@ -165,7 +165,7 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
     }
 
     toSend.push_back(newMat);
-    cout<<"EnrichmentFacility "<< ID
+    cout<<"EnrichmentFacility "<< getSN()
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
   FacilityModel::sendMaterial(msg, toSend);
@@ -180,7 +180,7 @@ void EnrichmentFacility::receiveMaterial(Transaction trans, vector<Material*> ma
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"EnrichmentFacility " << ID << " is receiving material with mass "
+    cout<<"EnrichmentFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_back(*thisMat);
   }

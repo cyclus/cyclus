@@ -29,7 +29,7 @@ void InstModel::init(xmlNodePtr cur)
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   region = LI->getModelByName(region_name, REGION);
   this->setRegion(region);
-  cout << "Inst " << ID << " has set its region to be " << region_name << endl;
+  cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
   
   ((RegionModel*)region)->addInstitution(this);
 
@@ -119,7 +119,7 @@ void InstModel::handleTock(int time){
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt
   std::stringstream ss;
-  ss << this->ID;
+  ss << this->getSN();
   throw GenException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
   return false;

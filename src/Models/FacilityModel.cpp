@@ -30,7 +30,7 @@ void FacilityModel::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     this->setInstName(inst_name);
-    cout << "Facility " << ID << " has just set its inst to " << inst_name << endl;
+    cout << "Facility " << getSN() << " has just set its inst to " << inst_name << endl;
   }
 } 
 
@@ -60,7 +60,7 @@ void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
   // send the material by calling the receiver's receiveMaterial function
   int recvID = msg->getRequesterID();
   ((FacilityModel*)LI->getModelByID(recvID, FACILITY))->receiveMaterial(msg->getTrans(), manifest);
-  std::cout << "Material sent from " << ID << " to " << recvID << "." << std::endl;
+  std::cout << "Material sent from " << getSN() << " to " << recvID << "." << std::endl;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

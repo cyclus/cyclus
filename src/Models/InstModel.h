@@ -27,7 +27,7 @@ class InstModel : public Model, public Communicator
  */
 public:
   /// Default constructor for InstModel Class
-  InstModel() { ID = nextID++; model_type="Inst"; commType=INST_COMM; };
+  InstModel() { setSN(nextID++); setModelType("Inst"); commType=INST_COMM; };
 
   /// every model should be destructable
   virtual ~InstModel() {};

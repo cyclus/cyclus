@@ -15,16 +15,16 @@
 
 using namespace std;
 
-map<string, mdl_ctor*> Model::create_map;
-map<string, mdl_dtor*> Model::destroy_map;
+map<string, mdl_ctor*> Model::create_map_;
+map<string, mdl_dtor*> Model::destroy_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mdl_ctor* Model::load(string model_type,string model_name) {
+mdl_ctor* Model::load(string model_type, string model_name) {
   mdl_ctor* new_model;
 
   model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
 
-  if (create_map.find(model_name) == create_map.end()) {
+  if (create_map_.find(model_name) == create_map_.end()) {
     void* model = dlopen(model_name.c_str(),RTLD_LAZY);
     if (!model) {
       throw GenException((string)"Unable to load model: " + dlerror() );
@@ -42,10 +42,10 @@ mdl_ctor* Model::load(string model_type,string model_name) {
                          dlerror()  );
     }
   
-    create_map[model_name] = new_model;
-    destroy_map[model_name] = del_model;
+    create_map_[model_name] = new_model;
+    destroy_map_[model_name] = del_model;
   } else {
-    new_model = create_map[model_name];
+    new_model = create_map_[model_name];
   }
 
   return new_model;
@@ -53,10 +53,10 @@ mdl_ctor* Model::load(string model_type,string model_name) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(string model_type,xmlNodePtr cur) {
-  string modelImpl = XMLinput->get_xpath_name(cur, "model/*");
+Model* Model::create(string model_type, xmlNodePtr cur) {
+  string model_impl = XMLinput->get_xpath_name(cur, "model/*");
 
-  mdl_ctor* model_creator = load(model_type,modelImpl);
+  mdl_ctor* model_creator = load(model_type, model_impl);
 
   Model* model = model_creator();
 
@@ -67,7 +67,7 @@ Model* Model::create(string model_type,xmlNodePtr cur) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::create(Model* src) {
-  mdl_ctor* model_creator = load(src->model_type,src->modelImpl);
+  mdl_ctor* model_creator = load(src->getModelType(),src->getModelImpl());
   
   Model* model = model_creator();
   
@@ -78,7 +78,7 @@ Model* Model::create(Model* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Model::destroy(Model* model) {
-  mdl_dtor* model_destructor = destroy_map[model->getModelImpl()];
+  mdl_dtor* model_destructor = destroy_map_[model->getModelImpl()];
 
   model_destructor(model);
 
@@ -88,10 +88,10 @@ void* Model::destroy(Model* model) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Model::generateHandle() {
 
-  string toRet = modelImpl ;
+  string toRet = model_impl_;
 
 	char SNString[100];
-	sprintf(SNString, "%d", ID); 
+	sprintf(SNString, "%d", ID_); 
 
 	toRet.append(SNString);
 
@@ -100,23 +100,24 @@ string Model::generateHandle() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
-  name = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  modelImpl = XMLinput->get_xpath_name(cur, "model/*");
-  handle = this->generateHandle();
+  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+  model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
+  handle_ = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* src) {
-  if (src->model_type != model_type && src->modelImpl != modelImpl) {
+  if (src->getModelType() != model_type_ && 
+       src->getModelImpl() != model_impl_) {
     throw GenException("Cannot copy a model of type " 
-        + src->model_type + "/" + src->modelImpl
+        + src->getModelType() + "/" + src->getModelImpl()
         + " to an object of type "
-        + model_type + "/" + modelImpl);
+        + model_type_ + "/" + model_impl_);
   }
 
-  name = src->name;
-  modelImpl = src->modelImpl;
-  handle = this->generateHandle();
+  name_ = src->getName();
+  model_impl_ = src->getModelImpl();
+  handle_ = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -192,10 +193,10 @@ void Model::load_institutions() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  cout << model_type << " " << name 
-      << " (ID=" << ID
-      << ", implementation = " << modelImpl 
-      << "  handle = " << handle
+  cout << model_type_ << " " << name_ 
+      << " (ID=" << ID_
+      << ", implementation = " << model_impl_
+      << "  handle = " << handle_
       << " ) " ;
 };
 

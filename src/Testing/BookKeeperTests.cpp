@@ -149,33 +149,39 @@ TEST_F(BookKeeperTest, ReadWrite2DDoubles) {
 TEST_F(BookKeeperTest, ReadWrite3DDoubles) {
   dblData3d test_data_dbl3(boost::extents[nrows][ncols][nlayers]);
   dblData3d test_out_dbl3(boost::extents[nrows][ncols][nlayers]);
-  for (dbl3didx row=0; row!=nrows; ++row){
-    for (dbl3didx col=0; col!=ncols; ++col){ 
-      for (dbl3didx layer=0; layer!=nlayers; ++layer){ 
+  for (dbl3didx row=0; row!=nrows; ++row) {
+    for (dbl3didx col=0; col!=ncols; ++col) { 
+      for (dbl3didx layer=0; layer!=nlayers; ++layer) {
         test_data_dbl3[row][col][layer]= (row+col+layer)*0.1  ;
       };
     };
   };
+
   BI->writeData( test_data_dbl3, "/output/test_dbl3" );
   BI->readData("/output/test_dbl3", test_out_dbl3);
   EXPECT_EQ(      test_out_dbl3[n][n][n], test_data_dbl3[n][n][n]);
   EXPECT_NEAR(    test_out_dbl3[n][n][n],  0.1*(3*n),      0.001 );  
+
   BI->closeDB();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, WriteModelLists){
   BI->writeModelList(REGION);
-  EXPECT_EQ(BI->isGroup("output")      ,     true);
-  EXPECT_EQ(BI->isGroup("regions")      ,     true);
+  EXPECT_EQ(BI->isGroup("output"), true);
+  EXPECT_EQ(BI->isGroup("regions"), true);
+
   BI->writeModelList(INST);
-  EXPECT_EQ(BI->isGroup("insts")      ,     true);
+  EXPECT_EQ(BI->isGroup("insts"), true);
+
   BI->writeModelList(FACILITY);
-  EXPECT_EQ(BI->isGroup("facilities")      ,     true);
+  EXPECT_EQ(BI->isGroup("facilities"), true);
+
   BI->writeModelList(MARKET);
-  EXPECT_EQ(BI->isGroup("markets")      ,     true);
+  EXPECT_EQ(BI->isGroup("markets"), true);
+
   BI->writeModelList(CONVERTER);
-  EXPECT_EQ(BI->isGroup("converters")      ,     true);
+  EXPECT_EQ(BI->isGroup("converters"), true);
 }
 
 

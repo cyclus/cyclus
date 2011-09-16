@@ -31,7 +31,7 @@ class ConverterModel : public Model
 
 public:
   /// Default constructor for ConverterModel Class
-  ConverterModel() { ID = nextID++; model_type="Converter"; };
+  ConverterModel() { setSN(nextID++); setModelType("Converter"); };
 
   /// every model should be destructable
   virtual ~ConverterModel() {};

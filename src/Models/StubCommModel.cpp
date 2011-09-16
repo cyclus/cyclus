@@ -9,8 +9,8 @@
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
-  ID = nextID++; 
-  model_type="StubComm";
+  setSN(nextID++);
+  setModelType("StubComm");
   commType = STUB_COMM;
 };
 

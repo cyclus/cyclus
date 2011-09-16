@@ -208,7 +208,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     }
 
     toSend.push_back(newMat);
-    cout<<"SeparationsMatrixFacility "<< ID
+    cout<<"SeparationsMatrixFacility "<< getSN()
       <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
   }    
 
@@ -231,7 +231,7 @@ void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Materi
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"SeparationsFacility " << ID << " is receiving material with mass "
+    cout<<"SeparationsFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     stocks.push_back(make_pair(trans.commod, *thisMat));
   }
