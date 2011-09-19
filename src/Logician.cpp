@@ -22,7 +22,7 @@ Logician::Logician() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::createModelList(ModelType model_type) {
   ModelList new_list;
-  model_lists_[CONVERTER] = new_list;
+  model_lists_[model_type] = new_list;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -73,6 +73,9 @@ class Logician {
     /**
      * This handles all pre-history interactions between regions,
      * institutions, and facilities.
+     *
+     * @todo should be private (rcarlsen). 
+     *
      */
     void handlePreHistory();
     
@@ -113,7 +116,7 @@ class Logician {
     /* 
      * Generic routine to add a Model-based entity to a specific list
      *
-     * @todo should be private (rcarlsen)
+     * @todo should be private (rcarlsen). Consider consolidation with handle[Tick/Tock].
      *
      * @param new_model pointer to model-based entity to be added
      * @param model_type type of new_model as defined by ModelType enum
