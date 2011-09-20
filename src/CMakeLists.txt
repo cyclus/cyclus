@@ -95,6 +95,10 @@ SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
 ADD_DEFINITIONS(${HDF5_DEFINITIONS})
 set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
 
+# Include the boost header files
+FIND_PACKAGE( Boost  REQUIRED)
+INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
 
