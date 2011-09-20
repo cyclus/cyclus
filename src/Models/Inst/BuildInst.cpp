@@ -25,7 +25,7 @@ void BuildInst::copy(BuildInst* src)
 void BuildInst::copyFreshModel(Model* src)
 {
 
-  copy((BuildInst*)src);
+  copy(dynamic_cast<BuildInst*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -37,7 +37,7 @@ void BuildInst::print()
   for (vector<Model*>::iterator fac=facilities.begin(); 
        fac != facilities.end(); 
        fac++){
-    cout << "\t\t* " << ((FacilityModel*)(*fac))->getFacName()
+    cout << "\t\t* " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
      << " (" << (*fac)->getName() << ")" << endl;
   }
 };
@@ -49,10 +49,10 @@ bool BuildInst::pleaseBuild(Model* fac)
   Model* new_facility=Model::create(fac);
   // !!! We need a way to determine the new facility's name
   // Set the facility name
-  string name = ((FacilityModel*)fac)->getFacName()+" 2";
-  ((FacilityModel*)new_facility)->setFacName(name);
+  string name = dynamic_cast<FacilityModel*>(fac)->getFacName()+" 2";
+  dynamic_cast<FacilityModel*>(new_facility)->setFacName(name);
   // Set the facility's parent institution
-  ((FacilityModel*)new_facility)->setInstName(this->getName());
+  dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
   // Add the facility to the parent inst's list of facilities
   this->addFacility(new_facility);
 

@@ -30,7 +30,7 @@ void StubInst::copy(StubInst* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::copyFreshModel(Model* src) { 
-  copy((StubInst*)src); 
+  copy(dynamic_cast<StubInst*>(src)); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

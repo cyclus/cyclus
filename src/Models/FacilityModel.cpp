@@ -37,7 +37,7 @@ void FacilityModel::copy(FacilityModel* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::getFacInst()
 {
-  return (InstModel*)(LI->getModelByName(inst_name, INST));
+  return dynamic_cast<InstModel*>(LI->getModelByName(inst_name, INST));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +46,7 @@ void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
   int recvID = msg->getRequesterID();
-  ((FacilityModel*)LI->getModelByID(recvID, FACILITY))->receiveMaterial(msg->getTrans(), manifest);
+  dynamic_cast<FacilityModel*>(LI->getModelByID(recvID, FACILITY))->receiveMaterial(msg->getTrans(), manifest);
   std::cout << "Material sent from " << getSN() << " to " << recvID << "." << std::endl;
 }
 

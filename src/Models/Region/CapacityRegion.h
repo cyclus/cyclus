@@ -66,7 +66,7 @@ class CapacityRegion : public RegionModel
      *
      * @param src the pointer to the original (initialized ?) model to be copied
      */
-    virtual void copyFreshModel(Model* src){ copy((CapacityRegion*)src); };
+    virtual void copyFreshModel(Model* src){ copy(dynamic_cast<CapacityRegion*>(src)); };
   
     // print information about the region
     virtual void print()               { RegionModel::print();   } ;

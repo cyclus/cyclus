@@ -45,7 +45,7 @@ class NullRegion : public RegionModel
      *
      * @param src the pointer to the original (initialized ?) model to be copied
      */
-    virtual void copyFreshModel(Model* src){ copy((NullRegion*)src); };
+    virtual void copyFreshModel(Model* src){ copy(dynamic_cast<NullRegion*>(src)); };
   
     // print information about the region
     virtual void print()               { RegionModel::print();   } ;

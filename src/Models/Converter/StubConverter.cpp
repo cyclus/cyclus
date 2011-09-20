@@ -30,7 +30,7 @@ void StubConverter::copy(StubConverter* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubConverter::copyFreshModel(Model* src) { 
-  copy((StubConverter*)src); 
+  copy(dynamic_cast<StubConverter*>(src)); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

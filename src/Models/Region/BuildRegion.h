@@ -62,7 +62,7 @@ class BuildRegion : public RegionModel
      *
      * @param src the pointer to the original (initialized ?) model to be copied
      */
-    virtual void copyFreshModel(Model* src){ copy((BuildRegion*)src); };
+    virtual void copyFreshModel(Model* src){ copy(dynamic_cast<BuildRegion*>(src)); };
   
     // print information about the region
     virtual void print()               { RegionModel::print();   } ;

@@ -106,7 +106,7 @@ public:
   void setRegion(Model* my_region) { region = my_region; };
 
   /// returns this institution's region
-  RegionModel* getRegion() { return ((RegionModel*)(region)); };
+  RegionModel* getRegion() { return (dynamic_cast<RegionModel*>(region)); };
 
   /// adds a facility to this model
   void addFacility(Model* new_fac){ facilities.push_back(new_fac);};

@@ -41,7 +41,7 @@ void SinkFacility::init(xmlNodePtr cur)
 
   for (int i=0;i<nodes->nodeNr;i++)
   {
-    commod_name = (const char*)nodes->nodeTab[i]->children->content;
+    commod_name = (const char*)(nodes->nodeTab[i]->children->content);
     new_commod = LI->getCommodity(commod_name);
     if (NULL == new_commod)
       throw GenException("Input commodity '" + commod_name 
@@ -74,7 +74,7 @@ void SinkFacility::copy(SinkFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::copyFreshModel(Model* src)
 {
-  copy((SinkFacility*)(src));
+  copy(dynamic_cast<SinkFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -115,7 +115,7 @@ void SinkFacility::handleTick(int time){
        commod != in_commods.end();
        commod++) 
     {
-      Communicator* recipient = (Communicator*)((*commod)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
       // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods.size());
       Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, 
@@ -132,7 +132,7 @@ void SinkFacility::handleTick(int time){
        commod != in_commods.end();
        commod++) 
     {
-      Communicator* recipient = (Communicator*)((*commod)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
       requestAmt = capacity/in_commods.size();
       Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price,
                           this, recipient); 

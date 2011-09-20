@@ -67,7 +67,7 @@ void ConverterMarket::copy(ConverterMarket* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::copyFreshModel(Model* src)
 { 
-  copy((ConverterMarket*)src);
+  copy(dynamic_cast<ConverterMarket*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -93,7 +93,7 @@ ConverterModel* ConverterMarket::getConverter() {
         + "' is not defined in this problem.");
     }
 
-  return ((ConverterModel*)converter);
+  return dynamic_cast<ConverterModel*>(converter);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void ConverterMarket::receiveMessage(Message *msg)

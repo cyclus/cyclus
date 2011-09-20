@@ -104,7 +104,7 @@ void GenericRepository::copy(GenericRepository* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::copyFreshModel(Model* src)
 {
-  copy((GenericRepository*)(src));
+  copy(dynamic_cast<GenericRepository*>(src));
 }
 
 
@@ -170,7 +170,7 @@ void GenericRepository::handleTick(int time)
       // don't request anything
     }
     else if (space <= capacity){
-      Communicator* recipient = (Communicator*)(in_commod->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
@@ -181,7 +181,7 @@ void GenericRepository::handleTick(int time)
     }
     // otherwise
     else if (space >= capacity){
-      Communicator* recipient = (Communicator*)(in_commod->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // the upper bound is the monthly acceptance capacity
       requestAmt = capacity;
       // recall that requests have a negative amount

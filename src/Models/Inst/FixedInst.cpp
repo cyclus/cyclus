@@ -32,7 +32,7 @@ void FixedInst::init(xmlNodePtr cur)
                          + "' is not defined in this problem.");
     }
     
-    if (!((RegionModel*)region)->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>(region))->isAllowedFacility(facility)){
       throw GenException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
@@ -41,8 +41,8 @@ void FixedInst::init(xmlNodePtr cur)
 
     Model* new_facility = Model::create(facility);
 
-    ((FacilityModel*)new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
-    ((FacilityModel*)new_facility)->setInstName(this->getName());
+    dynamic_cast<FacilityModel*>(new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
+    dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
     this->addFacility(new_facility);
   }
 }
@@ -60,7 +60,7 @@ void FixedInst::copy(FixedInst* src)
 void FixedInst::copyFreshModel(Model* src)
 {
 
-  copy((FixedInst*)src);
+  copy(dynamic_cast<FixedInst*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -72,7 +72,7 @@ void FixedInst::print()
   for (vector<Model*>::iterator fac=facilities.begin(); 
        fac != facilities.end(); 
        fac++){
-    cout << "\t\t* " << ((FacilityModel*)(*fac))->getFacName()
+    cout << "\t\t* " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
      << " (" << (*fac)->getName() << ")" << endl;
   }
 };

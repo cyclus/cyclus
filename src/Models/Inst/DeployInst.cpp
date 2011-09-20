@@ -31,7 +31,7 @@ void DeployInst::init(xmlNodePtr cur)
                          + "' is not defined in this problem.");
     }
 
-    if (!((RegionModel*)region)->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>(region))->isAllowedFacility(facility)){
       throw GenException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
@@ -39,7 +39,7 @@ void DeployInst::init(xmlNodePtr cur)
     }
     //Model* new_facility = Model::create(facility);
     
-    //((FacilityModel*)facility)->setFacName(XMLinput->get_xpath_content(deploy,"name"));
+    //dynamic_cast<FacilityModel*>(facility)->setFacName(XMLinput->get_xpath_content(deploy,"name"));
     
     int start_month = atoi(XMLinput->get_xpath_content(deploy,"start"));
     
@@ -63,7 +63,7 @@ void DeployInst::copy(DeployInst* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void DeployInst::copyFreshModel(Model* src)
 {
-  copy((DeployInst*)src);
+  copy(dynamic_cast<DeployInst*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -76,7 +76,7 @@ void DeployInst::print()
   for (map<int,Model*>::iterator deploy=deployment_map.begin();
        deploy!=deployment_map.end();
        deploy++){
-    cout << "\t\t\tFacility " << ((FacilityModel*)(*deploy).second)->getFacName()
+    cout << "\t\t\tFacility " << dynamic_cast<FacilityModel*>((*deploy).second)->getFacName()
         << " ("  << (*deploy).second->getName() 
         << ") is deployed in month " << (*deploy).first << endl;
   }
@@ -87,7 +87,7 @@ void DeployInst::handleTick(int time) {
   map<int,Model*>::iterator next_build = to_build_map.begin();
   while (time==(*next_build).first) {
     Model* new_facility = Model::create((*next_build).second);
-    //((FacilityModel*)new_facility)->setFacName(pointer, name);
+    //dynamic_cast<FacilityModel*>(new_facility)->setFacName(pointer, name);
     // this->addFacility((*next_build).second);
     to_build_map.erase(next_build);
     next_build=to_build_map.begin();

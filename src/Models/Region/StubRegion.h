@@ -53,7 +53,7 @@ public:
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
-  virtual void copyFreshModel(Model* src){copy((StubRegion*)src);}
+  virtual void copyFreshModel(Model* src){copy(dynamic_cast<StubRegion*>(src));}
 
   /**
    * every model should be able to print a verbose description

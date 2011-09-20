@@ -23,7 +23,7 @@ void InstModel::init(xmlNodePtr cur)
   this->setRegion(region);
   cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
   
-  ((RegionModel*)region)->addInstitution(this);
+  dynamic_cast<RegionModel*>(region)->addInstitution(this);
 
 }
 
@@ -38,7 +38,7 @@ void InstModel::copy(InstModel* src)
    */
   
   region = src->region;
-  ((RegionModel*)region)->addInstitution(this);
+  dynamic_cast<RegionModel*>(region)->addInstitution(this);
   LI->addModel(this, INST);
 }
 
@@ -77,8 +77,8 @@ void InstModel::handlePreHistory(){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
-    ((FacilityModel*)(*fac))->handlePreHistory();
+    //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
   }
 }
 
@@ -87,8 +87,8 @@ void InstModel::handleTick(int time){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTick to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
-    ((FacilityModel*)(*fac))->handleTick(time);
+    //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
   }
 }
 
@@ -97,8 +97,8 @@ void InstModel::handleTock(int time){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTock to facility " << ((FacilityModel*)(*fac))->getFacName() << endl;
-    ((FacilityModel*)(*fac))->handleTock(time);
+    //    cout << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
   }
 }
 
@@ -123,7 +123,7 @@ double InstModel::getPowerCapacity(){
   for(vector<Model*>::iterator fac=facilities.begin();
       fac != facilities.end();
       fac++){
-    capacity += ((FacilityModel*)(*fac))->getPowerCapacity();
+    capacity += (dynamic_cast<FacilityModel*>(*fac))->getPowerCapacity();
   }
   return capacity;
 }

@@ -129,7 +129,7 @@ void SeparationsMatrixFacility::copy(SeparationsMatrixFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SeparationsMatrixFacility::copyFreshModel(Model* src)
 {
-  copy((SeparationsMatrixFacility*)(src));
+  copy(dynamic_cast<SeparationsMatrixFacility*>(src));
 }
 
 
@@ -301,7 +301,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
 }
@@ -367,7 +367,7 @@ void SeparationsMatrixFacility::makeRequests(){
     }
     else if (space < capacity){
       int total = checkStocks();
-      Communicator* recipient = (Communicator*)((*iter)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
@@ -379,7 +379,7 @@ void SeparationsMatrixFacility::makeRequests(){
     // otherwise, the upper bound is the monthly acceptance capacity 
     // minus the amount in stocks.
     else if (space >= capacity){
-      Communicator* recipient = (Communicator*)((*iter)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity - sto;
       // recall that requests have a negative amount
@@ -413,7 +413,7 @@ void SeparationsMatrixFacility::makeOffers()
     double commod_price = 0;
   
     // decide what market to offer to
-    Communicator* recipient = (Communicator*)((*iter)->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
 
     // create a message to go up to the market with these parameters
     Message* msg = new Message(UP_MSG, (*iter), offer_amt, min_amt, commod_price, 

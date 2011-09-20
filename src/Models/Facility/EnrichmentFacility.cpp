@@ -97,7 +97,7 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::copyFreshModel(Model* src)
 {
-  copy((EnrichmentFacility*)(src));
+  copy(dynamic_cast<EnrichmentFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -235,7 +235,7 @@ void EnrichmentFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   
@@ -301,7 +301,7 @@ void EnrichmentFacility::makeRequests(){
     // don't request anything
   }
   else if (space < capacity){
-    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
     // recall that requests have a negative amount
@@ -313,7 +313,7 @@ void EnrichmentFacility::makeRequests(){
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
   else if (space >= capacity){
-    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity - sto;
     // recall that requests have a negative amount
@@ -344,7 +344,7 @@ void EnrichmentFacility::makeOffers()
   double commod_price = 0;
   
   // decide what market to offer to
-  Communicator* recipient = (Communicator*)(out_commod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(out_commod->getMarket());
 
   // create a message to go up to the market with these parameters
   Message* msg = new Message(UP_MSG, out_commod, offer_amt, min_amt, commod_price, 

@@ -98,7 +98,7 @@ void RegionModel::handlePreHistory(){
   for(vector<Model*>::iterator inst=institutions.begin();
       inst != institutions.end();
       inst++){
-    ((InstModel*)(*inst))->handlePreHistory();
+    (dynamic_cast<InstModel*>(*inst))->handlePreHistory();
   }
 }
 
@@ -107,7 +107,7 @@ void RegionModel::handleTick(int time){
   for(vector<Model*>::iterator inst=institutions.begin();
       inst != institutions.end();
       inst++){
-    ((InstModel*)(*inst))->handleTick(time);
+    (dynamic_cast<InstModel*>(*inst))->handleTick(time);
   }
 }
 
@@ -116,7 +116,7 @@ void RegionModel::handleTock(int time){
   for(vector<Model*>::iterator inst=institutions.begin();
       inst != institutions.end();
       inst++){
-    ((InstModel*)(*inst))->handleTock(time);
+    (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }
 }
 

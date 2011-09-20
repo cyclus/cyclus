@@ -42,7 +42,7 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
   sender_ = toSend;
   recipient_ = toReceive;
   Model* mktModel = trans_.commod->getMarket();
-  mkt_ = ((MarketModel*)(mktModel));
+  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   setPath();
 }
 
@@ -56,11 +56,11 @@ Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,    
   trans_.price = thisPrice;
   trans_.comp = thisComp;
   Model* mktModel = trans_.commod->getMarket();
-  mkt_ = ((MarketModel*)(mktModel));
+  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
-  this->setSupplierID(((FacilityModel*)sender_)->getSN());
-  this->setRequesterID(((FacilityModel*)recipient_)->getSN());
+  this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
+  this->setRequesterID((dynamic_cast<FacilityModel*>(recipient_))->getSN());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,7 +74,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   trans_.price = thisPrice;
   trans_.comp = thisComp;
   Model* mktModel = trans_.commod->getMarket();
-  mkt_ = ((MarketModel*)(mktModel));
+  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
   setPath();
@@ -83,14 +83,14 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // this message is an offer and 
   // the sender is the supplier
   if (trans_.amount > 0){
-    this->setSupplierID(((FacilityModel*)sender_)->getSN());
+    this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
   if (trans_.amount < 0){
-    this->setRequesterID(((FacilityModel*)sender_)->getSN());
+    this->setRequesterID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,7 +107,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   thisComp.insert(make_pair(NULL,NULL));
 
   Model* mktModel = trans_.commod->getMarket();
-  mkt_ = ((MarketModel*)(mktModel));
+  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
   setPath();
@@ -116,14 +116,14 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // this message is an offer and 
   // the sender is the supplier
   if (trans_.amount > 0){
-    this->setSupplierID(((FacilityModel*)sender_)->getSN());
+    this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
   if (trans_.amount < 0){
-    this->setRequesterID(((FacilityModel*)sender_)->getSN());
+    this->setRequesterID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 }
 
@@ -239,13 +239,13 @@ void Message::setPath() {
     {
       case FACILITY_COMM:
         fac_ = sender_; 
-        inst_ = ((FacilityModel*)(fac_))->getFacInst();
-        reg_ = ((InstModel*)(inst_))->getRegion();
+        inst_ = (dynamic_cast<FacilityModel*>(fac_))->getFacInst();
+        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
         break;
       case INST_COMM:
         fac_ = NULL;
         inst_ = sender_;
-        reg_ = ((InstModel*)(inst_))->getRegion();
+        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
         break;
       case REGION_COMM:
         reg_ = sender_;
@@ -258,13 +258,13 @@ void Message::setPath() {
     switch (recipient_->getCommType()) {
       case FACILITY_COMM:
         fac_ = recipient_;
-        inst_ = ((FacilityModel*)(fac_))->getFacInst();
-        reg_ = ((InstModel*)(inst_))->getRegion();
+        inst_ = (dynamic_cast<FacilityModel*>(fac_))->getFacInst();
+        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
         break;
       case INST_COMM:
         fac_ = NULL;
         inst_ = sender_;
-        reg_ = ((InstModel*)(inst_))->getRegion();
+        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
         break;
       case REGION_COMM:
         reg_ = recipient_;
@@ -291,9 +291,9 @@ string Message::unEnumerateDir() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute() {
   FacilityModel* theFac;
-  theFac = ((FacilityModel*)LI->getModelByID(trans_.supplierID, FACILITY));
+  theFac = (dynamic_cast<FacilityModel*>(LI->getModelByID(trans_.supplierID, FACILITY)));
   CommunicatorType type;
-  type = ((Communicator*)theFac)->getCommType();
+  type = (dynamic_cast<Communicator*>(theFac))->getCommType();
 
   if (type == FACILITY_COMM)
     (theFac)->receiveMessage(this);

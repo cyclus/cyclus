@@ -112,7 +112,7 @@ void BuildRegion::handleTick(int time)
 	// Build the prescribed number of facilities for this time step
 	for (i=0;i!=num_facs_to_build;i++){
 	  inst = chooseInstToBuildFac();
-	  built = requestBuild(fac_to_build,(InstModel*)(inst));
+	  built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
 	}
       }
       // If there is nothing to build at this time, consider 0 facilities built

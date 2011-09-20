@@ -80,7 +80,7 @@ void NullFacility::copy(NullFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::copyFreshModel(Model* src)
 {
-  copy((NullFacility*)(src));
+  copy(dynamic_cast<NullFacility*>(src));
 }
 
 
@@ -191,7 +191,7 @@ void NullFacility::handleTick(int time)
     // don't request anything
   }
   else if (space < capacity){
-    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
     // recall that requests have a negative amount
@@ -203,7 +203,7 @@ void NullFacility::handleTick(int time)
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
   else if (space >= capacity){
-    Communicator* recipient = (Communicator*)(in_commod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity - sto;
     // recall that requests have a negative amount
@@ -229,7 +229,7 @@ void NullFacility::handleTick(int time)
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = (Communicator*)(out_commod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(out_commod->getMarket());
 
   // create a message to go up to the market with these parameters
   Message* msg = new Message(UP_MSG, out_commod, offer_amt, min_amt, commod_price, 
@@ -274,7 +274,7 @@ void NullFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   

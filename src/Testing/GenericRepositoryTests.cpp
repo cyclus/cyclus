@@ -27,8 +27,9 @@ class GenericRepositoryTest : public ::testing::Test {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(GenericRepositoryTest, loadModel) {
   EXPECT_EQ(TestModel1->getModelType(), "Facility");
-  EXPECT_EQ(TestModel1->getSN(), 0);
-  EXPECT_EQ(TestModel2->getSN(), 1);
+  EXPECT_NE(TestModel1->getSN(), NULL);
+  EXPECT_NE(TestModel2->getSN(), NULL);
+  EXPECT_NE(TestModel1->getSN(), TestModel2->getSN());
   // This sort of thing  will fail until we have a non xml model init funciton
   // EXPECT_EQ(TestModel1->getModelImpl(), "GenericRepository"); 
 }

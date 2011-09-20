@@ -27,7 +27,7 @@ void StubMarket::copy(StubMarket* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::copyFreshModel(Model* src){
-  copy((StubMarket*)src);
+  copy(dynamic_cast<StubMarket*>(src));
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

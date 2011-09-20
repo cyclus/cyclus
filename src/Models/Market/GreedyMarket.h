@@ -48,7 +48,7 @@ public:
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
-  virtual void copyFreshModel(Model* src) { copy((GreedyMarket*)src); } ;
+  virtual void copyFreshModel(Model* src) { copy(dynamic_cast<GreedyMarket*>(src)); } ;
 
   /** 
    * Prints information about this model.

@@ -46,7 +46,7 @@ void Logician::handlePreHistory() {
   for(ModelList::iterator reg = region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(reg->second))->handlePreHistory();
+    dynamic_cast<RegionModel*>(reg->second)->handlePreHistory();
   }
 }
 
@@ -66,7 +66,7 @@ void Logician::sendTick(int time) {
   for(ModelList::iterator reg=region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(reg->second))->handleTick(time);
+    dynamic_cast<RegionModel*>(reg->second)->handleTick(time);
   }
 }
 
@@ -79,7 +79,7 @@ void Logician::sendTock(int time) {
   for(ModelList::iterator reg=region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(reg->second))->handleTock(time);
+    dynamic_cast<RegionModel*>(reg->second)->handleTock(time);
   }
 }
 
@@ -92,7 +92,7 @@ void Logician::resolveMarkets() {
   for(ModelList::iterator mkt=market_list->begin();
       mkt != market_list->end();
       mkt++){
-    ((MarketModel*)(mkt->second))->resolve();
+    (dynamic_cast<MarketModel*>(mkt->second))->resolve();
   }
 }
 

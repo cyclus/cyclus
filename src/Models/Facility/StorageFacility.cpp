@@ -81,7 +81,7 @@ void StorageFacility::copy(StorageFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::copyFreshModel(Model* src)
 {
-  copy((StorageFacility*)(src));
+  copy(dynamic_cast<StorageFacility*>(src));
 }
 
 
@@ -193,7 +193,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility, commodity, recipe = NULL;
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
-    sending_facility = (FacilityModel*) LI->getModelByName(fac_name, FACILITY);
+    sending_facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
     if (NULL == facility){
       throw GenException("Facility '" 
 			 + fac_name 
@@ -280,7 +280,7 @@ void StorageFacility::handleTick(int time)
     // don't request anything
   }
   else if (space < capacity){
-    Communicator* recipient = (Communicator*)(incommod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
     // recall that requests have a negative amount
@@ -292,7 +292,7 @@ void StorageFacility::handleTick(int time)
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
   else if (space >= capacity){
-    Communicator* recipient = (Communicator*)(incommod->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity - sto;
     // recall that requests have a negative amount
@@ -319,7 +319,7 @@ void StorageFacility::handleTick(int time)
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = (Communicator*)(incommod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
 
   // create a message to go up to the market with these parameters
   Message* msg = new Message(UP_MSG, incommod, offer_amt, min_amt, commod_price, 
@@ -352,7 +352,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   

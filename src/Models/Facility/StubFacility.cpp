@@ -38,7 +38,7 @@ void StubFacility::copy(StubFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::copyFreshModel(Model* src)
 {
-  copy((StubFacility*)(src));
+  copy(dynamic_cast<StubFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

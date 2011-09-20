@@ -85,7 +85,7 @@ void SourceFacility::copy(SourceFacility* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::copyFreshModel(Model* src)
 {
-  copy( (SourceFacility*) (src) );
+  copy( dynamic_cast<SourceFacility*>(src) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -174,7 +174,7 @@ void SourceFacility::handleTick(int time){
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = (Communicator*)(out_commod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(out_commod->getMarket());
   cout << "During handleTick, " << getFacName() << " offers: "<< offer_amt << "."  << endl;
 
   // create a message to go up to the market with these parameters
@@ -215,7 +215,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   }
   // Maybe someday it will record things.

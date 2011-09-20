@@ -83,7 +83,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       // facility
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
       cout << "fac_name:" << fac_name << "is on the list of repalcement facilities" <<endl;
-      facility = (FacilityModel*) LI->getModelByName(fac_name, FACILITY);
+      facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
       if (NULL == facility){
 	throw GenException("Facility '" 
 			   + fac_name 
@@ -141,7 +141,7 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
   for(vector<Model*>::iterator inst=institutions.begin();
       inst != institutions.end();
       inst++){
-    capacity += ((InstModel*)(*inst))->getPowerCapacity();
+    capacity += (dynamic_cast<InstModel*>(*inst))->getPowerCapacity();
   }
   return capacity;
 };
@@ -183,7 +183,7 @@ void CapacityRegion::handleTick(int time)
 	// Build the prescribed number of facilities for this time step
 	for (i=0;i!=num_facs_to_build;i++){
 	  inst = chooseInstToBuildFac();
-	  built = requestBuild(fac_to_build,(InstModel*)(inst));
+	  built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
 	}
       }
       // If there is nothing to build at this time, consider 0 facilities built
@@ -216,12 +216,12 @@ void CapacityRegion::handleTick(int time)
       if (build_facility){
 	Model* inst = chooseInstToBuildFac();
 	fac_to_build = chooseFacToBuild( allReplacementFacs[i] );
-	built = requestBuild(fac_to_build,(InstModel*)(inst));
+	built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
       }
       // For now, catch any situation for which no facility is built.
       // ************* This should eventually be changed
       if (build_facility && !built){
-	string fac_name = ((FacilityModel*)(fac_to_build))->getFacName();
+	string fac_name = (dynamic_cast<FacilityModel*>(fac_to_build))->getFacName();
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;

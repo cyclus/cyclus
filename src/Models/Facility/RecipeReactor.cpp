@@ -139,7 +139,7 @@ void RecipeReactor::copy(RecipeReactor* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::copyFreshModel(Model* src)
 {
-  copy((RecipeReactor*)(src));
+  copy(dynamic_cast<RecipeReactor*>(src));
 }
 
 
@@ -324,7 +324,7 @@ void RecipeReactor::handleTick(int time)
       // don't request anything
     }
     else if (space <= minAmt){
-      Communicator* recipient = (Communicator*)(in_commod->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
@@ -336,7 +336,7 @@ void RecipeReactor::handleTick(int time)
     // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
     else if (space >= minAmt){
-      Communicator* recipient = (Communicator*)(in_commod->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity - sto;
       // recall that requests have a negative amount
@@ -368,7 +368,7 @@ void RecipeReactor::handleTick(int time)
     // get commod
     commod = iter->first;
     // decide what market to offer to
-    recipient = (Communicator*)(commod->getMarket());
+    recipient = dynamic_cast<Communicator*>(commod->getMarket());
     // get amt
     offer_amt = iter->second->getTotMass();
     // create a message to go up to the market with these parameters
@@ -389,7 +389,7 @@ void RecipeReactor::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting.empty()){
     Message* order = ordersWaiting.front();
-    sendMaterial(order, ((Communicator*)LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
     ordersWaiting.pop_front();
   };
   month_in_cycle++;
