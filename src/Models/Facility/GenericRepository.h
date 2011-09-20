@@ -86,7 +86,7 @@ public:
      * @param receiver the last facility to receive this transaction
      */
     virtual void sendMaterial(Message* msg, const Communicator* 
-        receiver);
+        receiver) {};
     
     /**
      * The facility receives the materials other facilities have sent.
@@ -224,7 +224,7 @@ protected:
     /**
      * Emplace the waste
      */
-    void emplaceWaste();
+    void emplaceWaste() {};
 
 /* ------------------- */ 
 

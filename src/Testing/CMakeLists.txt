@@ -9,6 +9,7 @@ set ( TestSource
   MaterialTests.cpp
   BookKeeperTests.cpp
   LogicianTests.cpp
+  GenericRepositoryTests.cpp
   ../InputXML.cpp
   ../Logician.cpp
   ../Material.cpp
