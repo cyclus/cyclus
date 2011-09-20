@@ -3,13 +3,8 @@
 
 #include "StubModel.h"
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
-  setSN(nextID++);
   setModelType("Stub");
 };
 
@@ -31,8 +26,4 @@ void StubModel::print() {
   Model::print(); 
   cout << endl; 
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Initialize the StubModel nextID to zero.
-int StubModel::nextID = 0;
 

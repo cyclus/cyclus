@@ -3,13 +3,8 @@
 
 #include "StubCommModel.h"
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
-  setSN(nextID++);
   setModelType("StubComm");
   commType = STUB_COMM;
 };
@@ -33,8 +28,4 @@ void StubCommModel::print() {
   Model::print(); 
   cout << endl; 
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Initialize the StubCommModel nextID to zero.
-int StubCommModel::nextID = 0;
 

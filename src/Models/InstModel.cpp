@@ -4,14 +4,6 @@
 #include "InstModel.h"
 #include <sstream>
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-// Initialize the InstModel nextID to zero.
-int InstModel::nextID = 0;
-
 #include "Logician.h"
 #include "InputXML.h"
 #include "GenException.h"

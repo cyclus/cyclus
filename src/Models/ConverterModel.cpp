@@ -4,19 +4,6 @@
 #include "ConverterModel.h"
 #include "Logician.h"
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-// Initialize the ConverterModel nextID to zero.
-int ConverterModel::nextID = 0;
-
-/* --------------------
- * all CONVERTERMODEL classes have these members
- * --------------------
- */
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConverterModel::init(xmlNodePtr cur)
 {

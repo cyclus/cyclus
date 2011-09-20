@@ -27,7 +27,10 @@ class InstModel : public Model, public Communicator
  */
 public:
   /// Default constructor for InstModel Class
-  InstModel() { setSN(nextID++); setModelType("Inst"); commType=INST_COMM; };
+  InstModel() {
+    setModelType("Inst");
+    commType=INST_COMM;
+  };
 
   /// every model should be destructable
   virtual ~InstModel() {};
@@ -55,16 +58,6 @@ public:
   // every model should be able to print a verbose description
   virtual void print();
 
-protected: 
-  /// Stores the next available institution ID
-  static int nextID;
-/* ------------------- */ 
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 public:
   /// default InstModel receiver is to ignore message.
   virtual void receiveMessage(Message* msg);

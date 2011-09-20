@@ -65,7 +65,6 @@ void BookKeeper::createDB(string name){
   }
 };
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsName){
   DataSet dataset;
@@ -136,40 +135,8 @@ void BookKeeper::closeDB()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BookKeeper::isGroup(string grp)
-{
-  bool toRet = true;
-//  string testname;
-//  int iter, subiter;
-//  hid_t idx;
-//  deque<hid_t> subgroups; 
-//  CommonFG* obj;
-//
-//  obj = this->getDB();
-//  hsize_t nObs = obj->getNumObjs();
-//  subgroups[0]= 0 ;
-//  bool toRet = false;
-//  subiter = 0;
-//
-//  while( toRet==false && subgroups.size()!=0){
-//    iter = 0; 
-//    nObs = obj->getNumObjs();
-//    while( iter < nObs){
-//      testname = obj->getObjnameByIdx(iter);
-//      if(obj->getObjTypeByIdx(iter) == H5G_GROUP){
-//        subgroups.push_back( iter );
-//      };
-//      if( testname == grp  && obj->getObjTypeByIdx(iter) == H5G_GROUP){
-//        toRet = true;
-//      };
-//      iter++;
-//    };
-//    delete obj;
-//    hid_t idx = subgroups.pop_front();
-//    obj = new Group(idx);
-//  };
-//
-  return toRet;
+bool BookKeeper::isGroup(string grp) {
+  return true;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -277,11 +244,15 @@ void BookKeeper::writeModelList(ModelType type) {
 
   // create an array of the model structs
   model_t modelList[numStructs];
-  for (int i=0; i<numModels; i++) {
-    modelList[i].ID = i;
-    Model* theModel = LI->getModelByID(i, type);
+  int i = 0;
+  for (ModelList::iterator model_iter = LI->begin(type);
+        model_iter != LI->end(type);
+        model_iter++) {
+    Model* theModel = model_iter->second;
+    modelList[i].ID = theModel->getSN();
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
+    i++;
   };
 
   if(numModels==0) {

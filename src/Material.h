@@ -40,17 +40,17 @@ typedef double Mass;
 enum Spectrum {thermal, fast};
 
 /**
- * A double type to represent a decay constant of a parent isotope.
+ * Represents a decay constant of a parent isotope.
  */
 typedef double DecayConst;
 
 /**
- * A double type to represent a branching ratio of a daughter isotope.
+ * Represents a branching ratio of a daughter isotope.
  */
 typedef double BranchRatio;
 
 /**
- * An integer type to represent a column of the decay matrix.
+ * Represents a column of the decay matrix.
  */
 typedef int Col;
 

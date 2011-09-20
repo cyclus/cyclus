@@ -32,7 +32,10 @@ class FacilityModel : public Model, public Communicator
 
 public:
   /// Default constructor for FacilityModel Class
-  FacilityModel() { setSN(nextID++); setModelType("Facility"); commType=FACILITY_COMM;};
+  FacilityModel() {
+    setModelType("Facility");
+    commType = FACILITY_COMM;
+  };
 
   /// every model should be destructable
   virtual ~FacilityModel() {};
@@ -56,15 +59,6 @@ public:
   // every model should be able to print a verbose description
   virtual void print()              { Model::print(); };
 
-protected: 
-  /// Stores the next available facility ID
-  static int nextID;
-/* ------------------- */ 
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 public:
   /**
    *  There is no default FacilityModel receiver 
@@ -73,16 +67,6 @@ public:
    */ 
   virtual void receiveMessage(Message* msg)=0;
 
-protected:
-
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
 protected:
   /// each facility should have an institution that manages it
   //Model* inst;

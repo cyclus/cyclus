@@ -6,19 +6,6 @@
 #include "BookKeeper.h"
 //#include "Material.h"
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-// Initialize the FacilityModel nextID to zero.
-int FacilityModel::nextID = 0;
-
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::init(xmlNodePtr cur)
 {

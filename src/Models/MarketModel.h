@@ -31,7 +31,6 @@ class MarketModel : public Model, public Communicator
 public:
   /// Default constructor for the MarketModel Class
   MarketModel() {
-    setSN(nextID++);
     setModelType("Market");
     commType=MARKET_COMM;
   };
@@ -58,15 +57,6 @@ public:
   // every model should be able to print a verbose description
   virtual void print();
 
-protected:
-  /// Stores next available market ID
-  static int nextID;
-/* ------------------- */ 
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 public:
   /// default MarketModel receiver simply logs the offer/request
   virtual void receiveMessage(Message* msg) 

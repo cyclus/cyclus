@@ -2,15 +2,6 @@
 // Implements the RegionModel class
 
 #include "RegionModel.h"
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-// Initialize the RegionModel nextID to zero.
-int RegionModel::nextID = 0;
-
 #include "GenException.h"
 #include "Logician.h"
 #include "InputXML.h"

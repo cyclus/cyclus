@@ -65,13 +65,6 @@ public:
    */
    virtual void print();
 
-protected: 
-    /// Stores the next available stub ID
-    static int nextID;
-
-/* ------------------- */ 
-
-
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -80,19 +73,6 @@ public:
     /// No default STUBCOMMMODEL message receiver.
     virtual void receiveMessage(Message* msg) = 0;
 
-protected:
-
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all STUBCOMMMODEL classes have these members
- * --------------------
- */
-
-/* ------------------- */ 
-    
 };
 
 #endif

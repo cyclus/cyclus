@@ -64,22 +64,6 @@ public:
    */
    virtual void print();
 
-protected: 
-   /** 
-    * Stores the next available stub ID
-    */ 
-   static int nextID;
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all STUBMODEL classes have these members
- * --------------------
- */
-
-/* ------------------- */ 
-    
 };
 
 #endif

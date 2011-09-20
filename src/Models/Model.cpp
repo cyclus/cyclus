@@ -15,6 +15,9 @@
 
 using namespace std;
 
+// Initialize static member variable next_id_
+int Model::next_id_ = 0;
+
 map<string, mdl_ctor*> Model::create_map_;
 map<string, mdl_dtor*> Model::destroy_map_;
 

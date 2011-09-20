@@ -27,7 +27,6 @@ class RegionModel : public Model, public Communicator
 public:
     /// Default constructor for RegionModel Class
     RegionModel() {
-      setSN(nextID++);
       setModelType("Region");
       commType=REGION_COMM; 
     };
@@ -54,16 +53,6 @@ public:
     // every model should be able to print a verbose description
     virtual void print();
 
-protected:
-    /// Stores next available region ID
-    static int nextID;
-/* ------------------- */ 
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 public:
     /// default RegionModel receiver is to ignore messages
     virtual void receiveMessage(Message* msg);

@@ -17,9 +17,9 @@
 
 using namespace std;
 
-typedef vector<Model*> ModelList;
-typedef map<string,Material*> RecipeList;
-typedef map<string,Commodity*> CommodityList;
+typedef map<int, Model*> ModelList;
+typedef map<string, Material*> RecipeList;
+typedef map<string, Commodity*> CommodityList;
 
 /**
  * A (singleton) simulation logician class. This class sends tick messages
@@ -130,6 +130,21 @@ class Logician {
      * @param model_type type of the model pointer to return (ModelType enum)
      */
     Model* getModelByID(int ID, ModelType model_type);        
+
+    /**
+     * @brief Get an iterator to models of particular type.
+     *
+     * @param model_type type of models to iterate over.
+     */
+    ModelList::iterator begin(ModelType model_type);
+
+    /**
+     * @brief Get an iterator to models of particular type.
+     * 
+     * @param model_type type of models to iterate over.
+     *
+     */
+    ModelList::iterator end(ModelType model_type);
 
     /**
      * get a pointer to a converter based on its name

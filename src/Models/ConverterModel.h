@@ -19,19 +19,15 @@ class Material;
  * The ConverterModel class is the abstract class/interconve used by all
  * converter models
  * 
- * This is all that is known externally about converters
 */
 //-----------------------------------------------------------------------------
-class ConverterModel : public Model
-{
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
+class ConverterModel : public Model {
 
 public:
   /// Default constructor for ConverterModel Class
-  ConverterModel() { setSN(nextID++); setModelType("Converter"); };
+  ConverterModel() {
+    setModelType("Converter");
+  };
 
   /// every model should be destructable
   virtual ~ConverterModel() {};
@@ -55,16 +51,6 @@ public:
   // every model should be able to print a verbose description
   virtual void print()              { Model::print(); };
 
-protected: 
-  /// Stores the next available converter ID
-  static int nextID;
-/* ------------------- */ 
-
-
-/* --------------------
- * all CONVERTERMODEL classes have these members
- * --------------------
- */
 protected:
   /// each instance of a converter needs a name
   string conv_name;

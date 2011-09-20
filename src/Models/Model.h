@@ -32,10 +32,13 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
  * means that the basic process of loading and registering models can
  * be implemented in a single place.
  *
- * To allow serialization of different types of models in separate
+ * To allow serialization of different types of models in unified
  * ID space, this interface is inherited by type-specific abstract
  * classes, such as MarketModel, that has its own static integer
  * to keep track of the next available ID.
+ *
+ * @warning all constructors must set ID_ and increment next_id_
+ * 
  */
 class Model
 {
@@ -96,8 +99,13 @@ public:
 
   /**
    * Constructor for the Model Class
+   * 
+   * @warning all constructors must set ID_ and increment next_id_
+   * 
    */
-  Model() {};
+  Model() {
+    ID_ = ++next_id_;
+  };
 
   /**
    * Destructor for the Model Class
@@ -122,7 +130,7 @@ public:
   /**
    * get model implementation name
    */
-  const string getModelImpl() { return model_impl_; };
+  const string getModelImpl() {return model_impl_; };
 
   /**
    * get model type
@@ -179,6 +187,9 @@ public:
   static void load_institutions();
 
 private:
+  /// Stores the next available facility ID
+  static int next_id_;
+
   /**
    * every instance of a model should have a handle
    * perhaps this is redundant with name. Discuss amongst yourselves.

@@ -43,10 +43,10 @@ void Logician::handlePreHistory() {
   ModelList* region_list;
   region_list = &(model_lists_[REGION]);
 
-  for(ModelList::iterator reg=region_list->begin();
+  for(ModelList::iterator reg = region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(*reg))->handlePreHistory();
+    ((RegionModel*)(reg->second))->handlePreHistory();
   }
 }
 
@@ -66,7 +66,7 @@ void Logician::sendTick(int time) {
   for(ModelList::iterator reg=region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(*reg))->handleTick(time);
+    ((RegionModel*)(reg->second))->handleTick(time);
   }
 }
 
@@ -79,7 +79,7 @@ void Logician::sendTock(int time) {
   for(ModelList::iterator reg=region_list->begin();
        reg != region_list->end(); 
        reg++) {
-    ((RegionModel*)(*reg))->handleTock(time);
+    ((RegionModel*)(reg->second))->handleTock(time);
   }
 }
 
@@ -92,18 +92,35 @@ void Logician::resolveMarkets() {
   for(ModelList::iterator mkt=market_list->begin();
       mkt != market_list->end();
       mkt++){
-    ((MarketModel*)(*mkt))-> resolve();
+    ((MarketModel*)(mkt->second))->resolve();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addModel(Model* new_model, ModelType model_type) { 
-  model_lists_[model_type].push_back(new_model);
+  int model_id = new_model->getSN();
+  model_lists_[model_type][model_id] = new_model;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Logician::getModelByID(int ID, ModelType model_type) { 
-  return model_lists_[model_type].at(ID);
+  return model_lists_[model_type][ID];
+}
+
+ModelList::iterator Logician::begin(ModelType model_type) {
+  ModelList* list;
+  list = &model_lists_[model_type];
+
+  ModelList::iterator my_iter = list->begin();
+  return my_iter;
+}
+
+ModelList::iterator Logician::end(ModelType model_type) {
+  ModelList* list;
+  list = &model_lists_[model_type];
+
+  ModelList::iterator my_iter = list->end();
+  return my_iter;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -115,8 +132,8 @@ Model* Logician::getModelByName(string name, ModelType model_type) {
   
   for(ModelList::iterator model=list->begin();
       model != list->end(); model++) {
-    if (name == (*model)->getName()) {
-      found_model = *model;
+    if (name == model->second->getName()) {
+      found_model = model->second;
     }
   }
   
@@ -152,7 +169,7 @@ void Logician::printModelList(ModelType model_type) {
   for (ModelList::iterator model = list->begin();
        model != list->end();
        model++) {
-    (*model)->print();
+    model->second->print();
   }
 }
 
@@ -167,7 +184,7 @@ void Logician::printRecipes() {
       recipe != recipes_.end();
       recipe++){
     cout << "Recipe " << (*recipe).first << endl;
-    (*recipe).second->print();
+    recipe->second->print();
   }
 }
 

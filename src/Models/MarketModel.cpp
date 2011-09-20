@@ -2,15 +2,6 @@
 // Implements the MarketModel Class
 
 #include "MarketModel.h"
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-// Initializes the MarketModel nextID to 0.
-int MarketModel::nextID = 0;
-
 #include "InputXML.h"
 #include "GenException.h"
 #include "Logician.h"
