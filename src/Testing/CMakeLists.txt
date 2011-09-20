@@ -69,7 +69,7 @@ add_executable(CyclusUnitTestDriver
   CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-target_link_libraries ( CyclusUnitTestDriver ${CYCLUS_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
+target_link_libraries ( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp)
 
 # Add all the tests by parsing the source code
 # This macro searches for GoogleTest macros and adds them as test automatically
