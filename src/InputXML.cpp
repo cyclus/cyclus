@@ -91,6 +91,18 @@ void InputXML::stripCurNS()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_file(string filename)
 {
+  // double check that the file exists
+  if(filename=="") {
+    throw GenException("No input filename was given");
+  }
+  else{ 
+    FILE* file = fopen(filename.c_str(),"r");
+    if(file == NULL) { 
+      throw GenException("The file cannot be loaded because it has not been found.");
+    }
+    fclose(file);
+  }
+
   curFilePtr = new xmlFileInfo;
 
   xmlFileInfo &inputFile = *curFilePtr;
@@ -106,6 +118,7 @@ void InputXML::load_file(string filename)
   }
   
   Commodity::load_commodities();
+ 
 
   Material::load_recipes();
   

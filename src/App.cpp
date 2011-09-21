@@ -7,6 +7,7 @@
 #include "BookKeeper.h"
 #include "Timer.h"
 #include "InputXML.h"
+#include "GenException.h"
 
 using namespace std;
 
@@ -23,7 +24,15 @@ int main(int argc, char* argv[])
     cout << "|  from the University of Wisconsin-Madison  |" << endl;
     cout << "|--------------------------------------------|" << endl;
 
+    // parse arguments
+    try{
+      if(argc<2){
+        throw GenException("Cyclus usage requires an input file. \nUsage:\n./cyclus [path/to/input/filename]");
+      }
+
     // read input file
+    XMLinput->load_file(argv[1]); 
+
 
     // setup simulation
     // =====================
@@ -33,8 +42,7 @@ int main(int argc, char* argv[])
     //  * get market model name
     //  * search cache for market methods
     //     * if not found load market
-    XMLinput->load_file(argv[1]); // should probably check that the file exists.
-
+    
     cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
     LI->printModelList(CONVERTER);
     cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
@@ -60,6 +68,8 @@ int main(int argc, char* argv[])
     BI->writeMatHist();
 
     BI->closeDB();
+    }
+    catch(GenException ge){cout << ge.what() << endl;};
 
     return 0;
 }
