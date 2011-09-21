@@ -85,7 +85,7 @@ public:
    * a constructor for making a volume object from a known recipe and size.
    *
    * @param volName
-   * @param temp
+   * @param temperature
    * @param inner
    * @param outer
    * @param concs a vector, per isotope 

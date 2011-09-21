@@ -507,7 +507,7 @@ private:
    * @param filename the name of the recipebook file, including the 
    * extension
    * @param ns the namespace under which these recipes will reside
-   * @param the format of the recipebook
+   * @param format the format of the recipebook
    */
   static void load_recipebook(string filename, string ns, string format);
 

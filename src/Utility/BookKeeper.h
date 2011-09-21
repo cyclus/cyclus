@@ -199,7 +199,7 @@ public:
    * @param msg the message containing the transaction
    * @param manifest a vector the materials fulfilling this transaction
    */
-  void registerTrans(Message* msg, vector<Material*> Manifest);
+  void registerTrans(Message* msg, vector<Material*> manifest);
 
   /**
    * Register the materialin the BookKeeper's map of material changes
@@ -218,7 +218,7 @@ public:
   /**
    * Write a list of the facility/inst/market models in the simulation
    *
-   * @param type, the model type (i.e. insts, facilities, or markets)
+   * @param type the model type (i.e. insts, facilities, or markets)
    */
   void writeModelList(ModelType type);
 
@@ -240,7 +240,7 @@ public:
    * @param dsname is the name of the dataset/dataspace
    * @param type is the type of data of the homogenous dataspace
    * @param memspace is a reference to the memory space
-   * @param filepace is a reference to the file space
+   * @param filespace is a reference to the file space
    * @param dataset is the prepared, selected dataset
    */
   void prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
@@ -251,7 +251,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
 
   void writeData(intData1d data, string dsname);
@@ -261,7 +261,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(intData2d data, string dsname);
 
@@ -270,7 +270,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(intData3d data, string dsname);
 
@@ -279,7 +279,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(dblData1d data, string dsname);
 
@@ -288,7 +288,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(dblData2d data, string dsname);
 
@@ -297,7 +297,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(dblData3d data, string dsname);
 
@@ -306,7 +306,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(strData1d data, string dsname);
 
@@ -315,7 +315,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(strData2d data, string dsname);
 
@@ -324,7 +324,7 @@ public:
    * dataspace
    *
    * @param data is the data
-   * @param dspace is the dataspace
+   * @param dsname is the dataspace
    */
   void writeData(strData3d data, string dsname);
 

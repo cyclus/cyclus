@@ -78,7 +78,7 @@ public:
   /**
    * Sends material from this facility's inventory to another facility.
    *
-   * @param trans is the transaction object representing the order
+   * @param msg is the Message object representing the order
    * @param requester is the communicator that the transaction is sent to
    */
   virtual void sendMaterial(Message* msg, const Communicator* requester);

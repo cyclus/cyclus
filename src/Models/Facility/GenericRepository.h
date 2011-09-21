@@ -82,7 +82,7 @@ public:
      * This sends material up the Inst/Region/Logician line
      * to be passed back down to the receiver
      *
-     * @param trans the Transaction defining the order being filled
+     * @param msg the Message defining the order being filled
      * @param receiver the last facility to receive this transaction
      */
     virtual void sendMaterial(Message* msg, const Communicator* 

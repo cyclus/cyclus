@@ -149,7 +149,7 @@ class Logician {
     /**
      * get a pointer to a converter based on its name
      *
-     * @param name the name of the converter whose pointer to return
+     * @param search_name the name of the converter whose pointer to return
      * @param model_type type of the model pointer to return (ModelType enum)
      */
     Model* getModelByName(string search_name, ModelType model_type); 
