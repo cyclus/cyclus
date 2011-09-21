@@ -1,6 +1,6 @@
-// Volume.h
-#if !defined(_VOLUME_H)
-#define _VOLUME_H
+// Component.h
+#if !defined(_COMPONENT_H)
+#define _COMPONENT_H
 
 #include <vector>
 #include <map>
@@ -32,9 +32,9 @@ typedef double Concentration;
 typedef map<Iso, Concentration> ConcMap;
 
 /**
- * Enum for type of volume.
+ * Enum for type of component.
  */
-enum Component {env, ff, ebs, buffer, wp, wf};
+enum ComponentType {ENV, FF, EBS, BUFFER, WP, WF};
 
 /** 
  * A struct to describe solids
@@ -58,31 +58,31 @@ struct Fluid{
 };
 
 /** 
- * Class Volume describes a uniformly mixed volume cell
+ * Class Component describes a uniformly mixed component cell
  * 
  * This class is intended to describe the subcomponents of the repository
  *
  * The mixed cell conserves mass with a mass balance every month and is linked 
- * to other volumes by mass transfer links.
+ * to other components by mass transfer links.
  */
-class Volume {
+class Component {
 
 public:
   
   /**
-   * Default constructor for the volume class. Creates an empty volume.
+   * Default constructor for the component class. Creates an empty component.
    */
-  Volume(); 
+  Component(); 
 
   /**
    * primary constructor reads input from XML node
    *
    * @param cur input XML node
    */
-  Volume(xmlNodePtr cur);
+  Component(xmlNodePtr cur);
 
   /**
-   * a constructor for making a volume object from a known recipe and size.
+   * a constructor for making a component object from a known recipe and size.
    *
    * @param volName
    * @param temperature
@@ -93,14 +93,14 @@ public:
    * @param liquid the fluid, a struct
    * @param type indicates whether comp and scale are in mass or atom units
    */
-  Volume(string volName, Temp temperature, Radius inner, Radius outer, 
-      ConcMap concs, Solid* matrix, Fluid* liquid, Component type);
+  Component(string volName, Temp temperature, Radius inner, Radius outer, 
+      ConcMap concs, Solid* matrix, Fluid* liquid, ComponentType type);
 
   
   /** 
    * Default destructor does nothing.
    */
-  ~Volume() {};
+  ~Component() {};
 
   /**
    * standard verbose printer includes current temp and concentrations
@@ -110,111 +110,111 @@ public:
   /**
    * get the ID
    *
-   * @return ID
+   * @return ID_
    */
-  const int getSN(){return ID;};
+  const int getSN(){return ID_;};
 
   /**
    * get the Name
    *
-   * @return name
+   * @return name_
    */
-  const string getName(){return name;};
+  const string getName(){return name_;};
 
   /**
    * get the list of waste objects 
    *
    * @return wastes
    */
-  const vector<Material*> getWastes(){return wastes;};
+  const vector<Material*> getWastes(){return wastes_;};
 
   /**
    * get the solid matrix
    *
-   * @return matrix
+   * @return matrix_
    */
-  const Solid* getMatrix(){return matrix;};
+  const Solid* getMatrix(){return matrix_;};
 
   /**
    * get the liquid
    *
-   * @return liquid
+   * @return liquid_
    */
-  const Fluid* getLiquid(){return liquid;};
+  const Fluid* getLiquid(){return liquid_;};
 
   /**
    * get the Temperature
    *
-   * @return temperature
+   * @return temperature_
    */
-  const Temp getTemp(){return temperature;};
+  const Temp getTemp(){return temperature_;};
 
   /**
    * get the Inner Radius
    *
-   * @return inner
+   * @return inner_radius_
    */
-  const Radius getInnerRadius(){return inner_radius;};
+  const Radius getInnerRadius(){return inner_radius_;};
 
   /**
    * get the Outer Radius
    *
-   * @return outer
+   * @return outer_radius_
    */
-  const Radius getOuterRadius(){return outer_radius;};
+  const Radius getOuterRadius(){return outer_radius_;};
 
   /**
    * get the concentration of an isotope 
    *
-   * @return concentration
+   * @return concentration_
    */
   const Concentration getConcentration(Iso tope);
 
   /**
-   * Absorbs the contents of the given Material into this Volume.
+   * Absorbs the contents of the given Material into this Component.
    * 
-   * @param matToAdd the Volume to be absorbed
+   * @param matToAdd the Component to be absorbed
    */
   virtual void absorb(Material* matToAdd);
 
   /**
-   * Extracts the contents of the given Material from this Volume. Use this 
-   * function for decrementing a Volume's mass balance after transferring 
+   * Extracts the contents of the given Material from this Component. Use this 
+   * function for decrementing a Component's mass balance after transferring 
    * through a link. 
    *
    * @param matToRem the Material whose composition we want to decrement 
-   * against this Volume
+   * against this Component
    */
   virtual void extract(Material* matToRem);
 
 protected:
   /** 
-   * The serial number for this Volume.
+   * The serial number for this Component.
    */
-  int ID;
+  int ID_;
 
   /**
-   * Stores the next available volume ID
+   * Stores the next available component ID
    */
-  static int nextID;
+  static int nextID_;
 
   /**
-   * The composition history of this Volume, in the form of a map whose
-   * keys are integers representing the time at which this Volume had a 
+   * The composition history of this Component, in the form of a map whose
+   * keys are integers representing the time at which this Component had a 
    * particular composition and whose values are the corresponding 
    * compositions. A composition is a map of isotopes and their 
    * corresponding number of atoms.
    */
-  CompHistory volCompHist;
+  CompHistory vol_comp_hist_;
 
   /**
-   * The mass history of this Volume, in the form of a map whose
-   * keys are integers representing the time at which this Volume had a 
+   * The mass history of this Component, in the form of a map whose
+   * keys are integers representing the time at which this Component had a 
    * particular composition and whose values are the corresponding mass 
    * compositions. A composition is a map of isotopes and the corresponding
    * masses.
    */
-  MassHistory volMassHist;
+  MassHistory vol_mass_hist_;
 
 private:
   /**
@@ -225,48 +225,48 @@ private:
   /**
    * The contained contaminants, a list of material objects..
    */
-  vector<Material*> wastes;
+  vector<Material*> wastes_;
 
   /**
-   * The name of this volume, a string
+   * The name of this component, a string
    */
-  string name;
+  string name_;
 
   /**
-   * The inner radius of the (cylindrical) volume
+   * The inner radius of the (cylindrical) component
    */
-  Radius inner_radius;
+  Radius inner_radius_;
 
   /**
-   * The outer radius of the (cyllindrical) volume
+   * The outer radius of the (cylindrical) component
    */
-  Radius outer_radius;
+  Radius outer_radius_;
 
   /**
-   * The solid matrix object which is the main constituent of this volume.
+   * The solid matrix object which is the main constituent of this component.
    */
-  Solid* matrix;
+  Solid* matrix_;
 
   /**
-   * The fluid liquid object which is the second constituent of this volume.
+   * The fluid liquid object which is the second constituent of this component.
    */
-  Fluid* liquid;
+  Fluid* liquid_;
 
   /**
-   * The type of component that this volume represents 
+   * The type of component that this component represents 
    */
-  Component vol_type;
+  ComponentType type_;
 
   /**
    * The temperature taken to be the homogeneous temperature of the whole 
-   * volume.
+   * component.
    */
-  Temp temperature;
+  Temp temperature_;
 
   /**
-   * The concentrations of contaminant isotopes in the volume
+   * The concentrations of contaminant isotopes in the component
    */
-  ConcMap concentrations;
+  ConcMap concentrations_;
 };
 
 

@@ -47,6 +47,23 @@
  *
  */
 
+
+ 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void GenericRepository::init(string name, vector<Commodity*> in_commods, 
+      double capacity, int lifetime, double area, int startOpYr, int startOpMo){
+  //FacilityModel::init(name, impl, etc.))
+  vector<Commodity*>::iterator it;
+  for ( it=in_commods.begin() ; it < in_commods.end(); it++ ){
+    in_commods_.push_back(*it) ;
+  }
+  capacity_ = capacity;
+  lifetime_ = lifetime;
+  area_ = area;
+  startOpYr_ = startOpYr;
+  startOpMo_ = startOpMo;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(xmlNodePtr cur)
 { 
@@ -56,33 +73,35 @@ void GenericRepository::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/GenericRepository");
 
   // initialize ordinary objects
-  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  startOpYr = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  startOpMo = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  lifetime_ = atof(XMLinput->get_xpath_content(cur,"lifetime"));
+  area_ = atof(XMLinput->get_xpath_content(cur,"area"));
+  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  startOpYr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
+  startOpMo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
 
   // The repository accepts any commodities designated waste.
   // This will be a list
+  //
+
+  /// all facilities require commodities - possibly many
   string commod_name;
-  Commodity* in_commod;
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "incommodity");
+  Commodity* new_commod;
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
 
-  // there are potentially many in commodities, but no outcommodities
-  for (int i=0;i<nodes->nodeNr;i++){
-    xmlNodePtr ptr = nodes->nodeTab[i];
-
-    // get in_commod
-    commod_name = XMLinput->get_xpath_content(ptr,"text");
-    in_commod = LI->getCommodity(commod_name);
-    if (NULL == in_commod)
+  for (int i=0;i<nodes->nodeNr;i++)
+  {
+    commod_name = (const char*)(nodes->nodeTab[i]->children->content);
+    new_commod = LI->getCommodity(commod_name);
+    if (NULL == new_commod)
       throw GenException("Input commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
-          + "'.");
-    in_commods.push_back(in_commod);
-  };
+                            + "'.");
+    in_commods_.push_back(new_commod);
+  }
 
-  stocks = deque<Material*>();
-  inventory = deque< Material* >();
+  stocks_ = deque<Material*>();
+  inventory_ = deque< Material* >();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -91,14 +110,15 @@ void GenericRepository::copy(GenericRepository* src)
 
   FacilityModel::copy(src);
 
-  capacity = src->capacity;
-  inventory_size = src->inventory_size;
-  startOpYr = src->startOpYr;
-  startOpMo = src->startOpMo;
-  in_commods = src->in_commods;
+  // are these accessing the right stuff?
+  capacity_ = src->capacity_;
+  inventory_size_ = src->inventory_size_;
+  startOpYr_ = src->startOpYr_;
+  startOpMo_ = src->startOpMo_;
+  in_commods_ = src->in_commods_;
 
-  stocks = deque<Material*>();
-  inventory = deque< Material*>();
+  stocks_ = deque<Material*>();
+  inventory_ = deque< Material*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -113,7 +133,7 @@ void GenericRepository::print()
 { 
   FacilityModel::print(); 
   cout << "stores commodity {"
-    << in_commods.front()->getName()
+    << in_commods_.front()->getName()
       << "} among others."  << endl;
 };
 
@@ -134,7 +154,7 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> man
   {
     cout<<"GenericRepository " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
-    stocks.push_front(*thisMat);
+    stocks_.push_front(*thisMat);
   }
 }
 
@@ -148,11 +168,11 @@ void GenericRepository::handleTick(int time)
   if(this->checkStocks() == 0){
     // It chooses the next incommodity in the preference lineup
     Commodity* in_commod;
-    in_commod = in_commods.front();
+    in_commod = in_commods_.front();
 
     // It then moves that commodity from the front to the back of the preference lineup
-    in_commods.push_back(in_commod);
-    in_commods.pop_front();
+    in_commods_.push_back(in_commod);
+    in_commods_.pop_front();
   
     // It can accept amounts however small
     Mass requestAmt;
@@ -164,12 +184,12 @@ void GenericRepository::handleTick(int time)
     // this will be a request for free stuff
     double commod_price = 0;
     // subtract inv and sto from inventory max size to get total empty space
-    Mass space = inventory_size - inv - sto;
+    Mass space = inventory_size_- inv - sto;
   
     if (space == 0){
       // don't request anything
     }
-    else if (space <= capacity){
+    else if (space <= capacity_){
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
@@ -180,10 +200,10 @@ void GenericRepository::handleTick(int time)
         (request->getInst())->receiveMessage(request);
     }
     // otherwise
-    else if (space >= capacity){
+    else if (space >= capacity_){
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // the upper bound is the monthly acceptance capacity
-      requestAmt = capacity;
+      requestAmt = capacity_;
       // recall that requests have a negative amount
       Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, commod_price,
           this, recipient); 
@@ -205,8 +225,8 @@ Mass GenericRepository::checkInventory(){
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
-  for (deque< Material*>::iterator iter = inventory.begin(); 
-       iter != inventory.end(); 
+  for (deque< Material*>::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }
@@ -220,9 +240,9 @@ Mass GenericRepository::checkStocks(){
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
 
-  if(!stocks.empty()){
-    for (deque< Material* >::iterator iter = stocks.begin(); 
-         iter != stocks.end(); 
+  if(!stocks_.empty()){
+    for (deque< Material* >::iterator iter = stocks_.begin(); 
+         iter != stocks_.end(); 
          iter ++){
         total += (*iter)->getTotMass();
     };

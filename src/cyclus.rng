@@ -213,6 +213,7 @@
       <element name="model">
       <choice>
         <ref name="EnrichmentFacility"/>
+        <ref name="GenericRepository"/>
         <ref name="NullFacility"/>
         <ref name="RecipeReactor"/>
         <ref name="SeparationsMatrixFacility"/>
@@ -262,6 +263,20 @@
         <ref name="inventorysize"/>
         <ref name="capacity"/>
         <ref name="tailsassay"/>
+     </element>
+  </define>
+
+  <define name="GenericRepository">
+     <element name="GenericRepository"> 
+        <ref name="area"/>
+        <ref name="capacity"/>
+        <element name="incommodity">
+          <text/>
+        </element>
+        <ref name="inventorysize"/>
+        <ref name="lifetime"/>
+        <ref name="startOperMonth"/>
+        <ref name="startOperYear"/>
      </element>
   </define>
 
@@ -407,8 +422,20 @@
      </element>
   </define>
 
+  <define name="area">
+      <element name="area">
+          <text/>
+      </element>
+  </define>
+
   <define name="capacity">
       <element name="capacity">
+          <text/>
+      </element>
+  </define>
+
+  <define name="lifetime">
+      <element name="lifetime">
           <text/>
       </element>
   </define>
@@ -448,6 +475,19 @@
          <text/>
       </element>
   </define>
+
+  <define name="startOperMonth">
+      <element name="startOperMonth">
+         <text/>
+      </element>
+  </define>
+
+  <define name="startOperYear">
+      <element name="startOperYear">
+         <text/>
+      </element>
+  </define>
+
 
   <!-- insert new FacilityModel parameter sets here -->
 

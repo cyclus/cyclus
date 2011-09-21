@@ -12,7 +12,6 @@
 #include "Model.h"
 #include "Material.h"
 #include "Message.h"
-#include "Volume.h"
 
 #define BI BookKeeper::Instance()
 
@@ -207,13 +206,6 @@ public:
    * @param mat the material with a history
    */
   void registerMatChange(Material* mat);
-
-  /**
-   * Register the volume change in the BookKeeper's map of volume changess
-   *
-   * @param vol the volume with a history
-   */
-  void registerVolChange(Volume* vol);
 
   /**
    * Write a list of the facility/inst/market models in the simulation

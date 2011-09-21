@@ -5,7 +5,7 @@
 #include <queue>
 
 #include "FacilityModel.h"
-#include "Volume.h"
+#include "GenericRepository/Component.h"
 
 /**
  * The GenericRepository class inherits from the FacilityModel class and is 
@@ -35,11 +35,26 @@ public:
   ~GenericRepository() {};
   
   // different ways to populate an object after creation
+  /**
+   * initialize an object from XML input
+   * @param name the name of the repository (i.e. Forsmark)
+   * @param in_commods a vector of commodities acceptable to this model 
+   * @param capacity the monthly acceptance rate
+   * @param lifetime the length of time the repository shall function
+   * @param area the areal extent of the repository footprint
+   * @param startOpYr the year of construction starts
+   * @param startOpMo the month of construction starts
+   */
+  virtual void init(string name, vector<Commodity*> in_commods, 
+      double capacity, int lifetime, double area , int startOpYr,
+      int startOpMo);
+
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
   /// initialize an object by copying another
   virtual void copy(GenericRepository* src);
+
   /**
    * This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
@@ -130,23 +145,28 @@ protected:
     /**
      * The GenericRepository has many input commodities
      */
-    deque<Commodity*> in_commods;
+    deque<Commodity*> in_commods_;
 
     /**
-     * The GenericRepository has a limit to how material it can process.
+     * A limit to how quickly the GenericRepository can accept waste.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
+
+    /**
+     * The areal extent of the repository footprint in sq. kilometers.
+     */
+    double area_;
 
     /**
      * The stocks of pre-emplacement waste materials.
      */
-    deque<Material*> stocks;
+    deque<Material*> stocks_;
 
     /**
      * The inventory of emplaced materials.
      */
-    deque<Material*> inventory;
+    deque<Material*> inventory_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -167,59 +187,45 @@ protected:
      * The GenericRepository must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    Mass inventory_size;
+    Mass inventory_size_;
 
     /**
      * The number of months that a facility stays operational.
      * hopefully, this repository is forever, but ust in case... 
      */
-    int lifetime;
-
-    /**
-     * The year in which construction of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startConstrYr;
-
-    /**
-     * The month in which construction of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startConstrMo;
+    int lifetime_;
 
     /**
      * The year in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpYr;
+    int startOpYr_;
 
     /**
      * The month in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpMo;
+    int startOpMo_;
 
     /**
-     * The percent of the time the facility functions at 100% 
-     * capacity.
-     * (it should be less than one. Double check that.)
+     * The Far Field component
      */
-    double CF;
+    Component* far_field_;
 
     /**
-     * The Environment volume
+     * The Buffer components
      */
-    Volume* environment;
+    vector<Component*> buffers_;
 
     /**
-     * The Far Field volume
+     * The waste package component
      */
-    Volume* far_field;
+    vector<Component*> waste_packages_;
 
     /**
-     * Many engineered barrier systems
+     * The waste form components
      */
-    vector<Volume*> ebsList;
+    vector<Component*> waste_forms_;
 
     /**
      * Emplace the waste
