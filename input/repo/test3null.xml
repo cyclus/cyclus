@@ -32,7 +32,7 @@
   </facility>
 
   <facility>
-    <name>BackEnd</name>
+    <name>BackEnd1</name>
     <model>
       <GenericRepository>
         <area>1</area>
@@ -48,7 +48,7 @@
 
 
   <facility>
-    <name>BackEnd</name>
+    <name>BackEnd2</name>
     <model>
       <GenericRepository>
         <area>1</area>
