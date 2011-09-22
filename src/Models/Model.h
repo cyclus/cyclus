@@ -40,39 +40,72 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
  * @warning all constructors must set ID_ and increment next_id_
  * 
  */
-class Model
-{
+class Model {
 public:
   /**
-   * Adds a model to the simulation
+   * @brief Creates a model instance for use in the simulation
    *
-   * @param model_type is the type (region, inst, facility, market...) to add
-   * @param model_name is the model name (NullFacility, StubMarket, ...) to add
-   */
-  static mdl_ctor* load(string model_type,string model_name);
-
-  /**
-   * Creates a model for use in the simulation
-   *
-   * @param model_type is the type (region, inst, facility, market...) to create
-   * @param cur is the pointer to the xml input representing the model to create
+   * @param model_type model type (region, inst, facility, ...) to create
+   * @param cur pointer to the xml input representing the model to create
    */
   static Model* create(string model_type, xmlNodePtr cur);
 
   /** 
-   * Create a new model object based on an existing one
+   * @brief Create a new model object based on an existing one
    *
-   * @param src a pointer to the original Model to be mimicked
+   * @param model_orig a pointer to the original Model to be mimicked
    */
-  static Model* create(Model* src);
+  static Model* create(Model* model_orig);
 
   /**
-   * Destroy a model cleanly
+   * @brief dynamically loads a model constructor from a shared object file
+   *
+   * @param model_type model type (region, inst, facility, ...) to add
+   * @param model_name name of model (NullFacility, StubMarket, ...) to add
+   */
+  static mdl_ctor* loadConstructor(string model_type,string model_name);
+
+  /**
+   * @brief Destroy a model cleanly
    * 
    * @param model a pointer to the model being destroyed
    */
   static void* destroy(Model* model);
   
+  /**
+   * loads the market models available to the simulation
+   */
+  static void load_markets();
+
+  /**
+   * loads the converter models available to the simulation
+   */
+  static void load_converters();
+
+  /** 
+   * loads the facility models available to the simulation
+   */
+  static void load_facilities();
+
+  /**
+   * loads the facilities specified in a file
+   *
+   * @param filename name of the file holding the facility specification
+   * @param ns the string to append to the current namespace modifier
+   * @param format format of the file (currently cyclus supports only xml)
+   */
+  static void load_facilitycatalog(string filename, string ns, string format);
+
+  /**
+   * loads the regions available to the simulation
+   */
+  static void load_regions();
+
+  /**
+   * loads the institutions available to the simulation
+   */
+  static void load_institutions();
+
   /**
    * A method to initialize the model
    *
@@ -83,19 +116,20 @@ public:
   /**
    * A method to copy a model
    *
-   * @param src the pointer to the original (initialized ?) model to be copied
+   * @param model_orig pointer to the original (usu initialized) model to be copied
    */
-  virtual void copy(Model* src);
+  virtual void copy(Model* model_orig);
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * Drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
    *
-   * @param src the pointer to the original (initialized ?) model to be copied
+   * @param model_orig pointer to (usu initialized) model to be copied
    */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual void copyFreshModel(Model* model_orig)=0;
 
   /**
    * Constructor for the Model Class
@@ -152,44 +186,20 @@ public:
    */
   virtual void print();
 
-  /**
-   * loads the market models available to the simulation
-   */
-  static void load_markets();
-
-  /**
-   * loads the converter models available to the simulation
-   */
-  static void load_converters();
-
-  /** 
-   * loads the facility models available to the simulation
-   */
-  static void load_facilities();
-
-  /**
-   * loads the facilities specified in a file
-   *
-   * @param filename the name of the file holding the facility specification
-   * @param ns the string to append to the current namespace modifier
-   * @param format the format of the file (currently cyclus supports only xml)
-   */
-  static void load_facilitycatalog(string filename, string ns, string format);
-
-  /**
-   * loads the regions available to the simulation
-   */
-  static void load_regions();
-
-  /**
-   * loads the institutions available to the simulation
-   */
-  static void load_institutions();
-
 private:
   /// Stores the next available facility ID
   static int next_id_;
 
+  /**
+   * map of constructor methods for each loaded model
+   */
+  static map<string, mdl_ctor*> create_map_;
+
+  /**
+   * map of destructor methods for each loaded model
+   */
+  static map<string, mdl_dtor*> destroy_map_;
+  
   /**
    * every instance of a model should have a handle
    * perhaps this is redundant with name. Discuss amongst yourselves.
@@ -221,16 +231,6 @@ private:
    */
   int ID_;
 
-  /**
-   * map of constructor methods for each loaded model
-   */
-  static map<string, mdl_ctor*> create_map_;
-
-  /**
-   * map of destructor methods for each loaded model
-   */
-  static map<string, mdl_dtor*> destroy_map_;
-  
 };
 
 #endif

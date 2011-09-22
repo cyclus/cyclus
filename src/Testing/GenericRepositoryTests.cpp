@@ -16,7 +16,7 @@ class GenericRepositoryTest : public ::testing::Test {
       //test_empty_repo = new GenericRepository();
       model_name = "GenericRepository";
       model_type = "Facility";
-      new_model = Model::load(model_type, model_name);
+      new_model = Model::loadConstructor(model_type, model_name);
       TestModel1 = new_model();
       TestModel2 = new_model();
       TestModel1->setModelType("Facility");

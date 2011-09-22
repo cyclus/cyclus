@@ -15,14 +15,39 @@
 
 using namespace std;
 
-// Initialize static member variable next_id_
+// Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
 
 map<string, mdl_ctor*> Model::create_map_;
 map<string, mdl_dtor*> Model::destroy_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mdl_ctor* Model::load(string model_type, string model_name) {
+Model* Model::create(string model_type, xmlNodePtr cur) {
+  string model_impl = XMLinput->get_xpath_name(cur, "model/*");
+
+  // get instance
+  mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
+
+  Model* model = model_constructor();
+
+  model->init(cur);
+
+  return model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::create(Model* model_orig) {
+  mdl_ctor* model_constructor = loadConstructor(model_orig->getModelType(),model_orig->getModelImpl());
+  
+  Model* model_copy = model_constructor();
+  
+  model_copy->copyFreshModel(model_orig);
+
+  return model_copy;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mdl_ctor* Model::loadConstructor(string model_type, string model_name) {
   mdl_ctor* new_model;
 
   model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
@@ -30,19 +55,23 @@ mdl_ctor* Model::load(string model_type, string model_name) {
   if (create_map_.find(model_name) == create_map_.end()) {
     void* model = dlopen(model_name.c_str(),RTLD_LAZY);
     if (!model) {
-      throw GenException((string)"Unable to load model: " + dlerror() );
+      string err_msg = "Unable to load model shared object file: ";
+      err_msg + dlerror();
+      throw GenException(err_msg);
     }
     
     new_model = (mdl_ctor*) dlsym(model,"construct");
     if (!new_model) {
-      throw GenException((string)"Unable to load model's create symbol: " + 
-                         dlerror() );
+      string err_msg = "Unable to load model constructor: ";
+      err_msg + dlerror();
+      throw GenException(err_msg);
     }
 
     mdl_dtor* del_model = (mdl_dtor*) dlsym(model,"destruct");
     if (!del_model) {
-      throw GenException((string)"Unable to load model delete symbol: " + 
-                         dlerror()  );
+      string err_msg = "Unable to load model destructor: ";
+      err_msg + dlerror();
+      throw GenException(err_msg);
     }
   
     create_map_[model_name] = new_model;
@@ -54,31 +83,6 @@ mdl_ctor* Model::load(string model_type, string model_name) {
   return new_model;
 }
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(string model_type, xmlNodePtr cur) {
-  string model_impl = XMLinput->get_xpath_name(cur, "model/*");
-
-  mdl_ctor* model_creator = load(model_type, model_impl);
-
-  Model* model = model_creator();
-
-  model->init(cur);
-
-  return model;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(Model* src) {
-  mdl_ctor* model_creator = load(src->getModelType(),src->getModelImpl());
-  
-  Model* model = model_creator();
-  
-  model->copyFreshModel(src);
-
-  return model;
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Model::destroy(Model* model) {
   mdl_dtor* model_destructor = destroy_map_[model->getModelImpl()];
@@ -86,41 +90,6 @@ void* Model::destroy(Model* model) {
   model_destructor(model);
 
   return model;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Model::generateHandle() {
-
-  string toRet = model_impl_;
-
-	char SNString[100];
-	sprintf(SNString, "%d", ID_); 
-
-	toRet.append(SNString);
-
-  return toRet;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::init(xmlNodePtr cur) {
-  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  handle_ = this->generateHandle();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::copy(Model* src) {
-  if (src->getModelType() != model_type_ && 
-       src->getModelImpl() != model_impl_) {
-    throw GenException("Cannot copy a model of type " 
-        + src->getModelType() + "/" + src->getModelImpl()
-        + " to an object of type "
-        + model_type_ + "/" + model_impl_);
-  }
-
-  name_ = src->getName();
-  model_impl_ = src->getModelImpl();
-  handle_ = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -195,6 +164,28 @@ void Model::load_institutions() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::init(xmlNodePtr cur) {
+  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+  model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
+  handle_ = this->generateHandle();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::copy(Model* model_orig) {
+  if (model_orig->getModelType() != model_type_ && 
+       model_orig->getModelImpl() != model_impl_) {
+    throw GenException("Cannot copy a model of type " 
+        + model_orig->getModelType() + "/" + model_orig->getModelImpl()
+        + " to an object of type "
+        + model_type_ + "/" + model_impl_);
+  }
+
+  name_ = model_orig->getName();
+  model_impl_ = model_orig->getModelImpl();
+  handle_ = this->generateHandle();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
   cout << model_type_ << " " << name_ 
       << " (ID=" << ID_
@@ -202,4 +193,17 @@ void Model::print() {
       << "  handle = " << handle_
       << " ) " ;
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+string Model::generateHandle() {
+
+  string toRet = model_impl_;
+
+	char SNString[100];
+	sprintf(SNString, "%d", ID_); 
+
+	toRet.append(SNString);
+
+  return toRet;
+}
 
