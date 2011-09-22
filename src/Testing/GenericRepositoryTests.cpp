@@ -6,8 +6,8 @@
 class GenericRepositoryTest : public ::testing::Test {
   protected:
     string model_name, model_type;
-    Model* TestModel1;
-    Model* TestModel2;
+    Model* test_model_1;
+    Model* test_model_2;
     void* model;
     mdl_ctor* new_model;
     mdl_dtor* del_model;
@@ -17,21 +17,22 @@ class GenericRepositoryTest : public ::testing::Test {
       model_name = "GenericRepository";
       model_type = "Facility";
       new_model = Model::loadConstructor(model_type, model_name);
-      TestModel1 = new_model();
-      TestModel2 = new_model();
-      TestModel1->setModelType("Facility");
-      TestModel1->setModelType("Facility");
+      test_model_1 = new_model();
+      test_model_2 = new_model();
+      test_model_1->setModelType("Facility");
+      test_model_1->setModelType("Facility");
     };
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(GenericRepositoryTest, loadModel) {
-  EXPECT_EQ(TestModel1->getModelType(), "Facility");
-  EXPECT_NE(TestModel1->getSN(), NULL);
-  EXPECT_NE(TestModel2->getSN(), NULL);
-  EXPECT_NE(TestModel1->getSN(), TestModel2->getSN());
+  EXPECT_EQ(test_model_1->getModelType(), "Facility");
+  EXPECT_NE(test_model_1->getSN(), NULL);
+  EXPECT_NE(test_model_2->getSN(), NULL);
+  EXPECT_GT(test_model_1->getSN(),0);
+  EXPECT_GT(test_model_2->getSN(), test_model_1->getSN());   
   // This sort of thing  will fail until we have a non xml model init funciton
-  // EXPECT_EQ(TestModel1->getModelImpl(), "GenericRepository"); 
+  // EXPECT_EQ(test_model_1->getModelImpl(), "GenericRepository"); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
