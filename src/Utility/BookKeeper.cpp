@@ -298,31 +298,9 @@ void BookKeeper::writeModelList(ModelType type) {
     delete subgroup;
     delete dataspace;
     delete dataset;
-  }
-  // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the Group operations
-  catch( GroupIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataType operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -417,31 +395,9 @@ void BookKeeper::writeTransList(){
     delete subgroup;
     delete dataspace;
     delete dataset;
-  }
-  // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the Group operations
-  catch( GroupIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataType operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+
+  } catch (Exception error) {
+    error.printError();
   }
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -522,31 +478,9 @@ void BookKeeper::writeMatHist(){
     delete subgroup;
     delete dataspace;
     delete dataset;
-  }
-  // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the Group operations
-  catch( GroupIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
-  // catch failure caused by the DataType operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -595,21 +529,7 @@ void BookKeeper::writeData(intData1d data, string dsname){
     // write it
     dataset.write(dat_array, type, memspace, filespace );
 
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -642,21 +562,8 @@ void BookKeeper::writeData(intData2d data, string dsname){
 
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -693,21 +600,8 @@ void BookKeeper::writeData(intData3d data, string dsname){
 
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -738,17 +632,8 @@ void BookKeeper::writeData(dblData1d data, string dsname){
   
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -781,21 +666,8 @@ void BookKeeper::writeData(dblData2d data, string dsname){
 
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -831,21 +703,8 @@ void BookKeeper::writeData(dblData3d data, string dsname){
 
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -880,17 +739,8 @@ void BookKeeper::writeData(strData1d data, string dsname){
   
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -927,21 +777,7 @@ void BookKeeper::writeData(strData2d data, string dsname){
     // write it
     dataset.write(dat_array, type, memspace, filespace );
 
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -980,21 +816,8 @@ void BookKeeper::writeData(strData3d data, string dsname){
 
     // write it
     dataset.write(dat_array, type, memspace, filespace );
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSpaceIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+
+  } catch (Exception error) {
     error.printError();
   }
 };
@@ -1046,30 +869,10 @@ void BookKeeper::readData(string dsname, intData1d& out_data){
     dataset.read( out_array, inttype, memspace , filespace );
     
     out_data.assign(out_array, out_array + sizeof(out_array));
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
-  }
 
+  } catch (Exception error) {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1125,31 +928,9 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
       };
     };
 
-    
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
+  } catch (Exception error) {
+    error.printError();
   }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
-  }
-
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1208,28 +989,9 @@ void BookKeeper::readData(string dsname, intData3d& out_data){
         };
       };
     };
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -1283,30 +1045,10 @@ void BookKeeper::readData(string dsname, dblData1d& out_data){
     };
     
     out_data.assign(out_array, out_array + sizeof(out_array));
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
-  }
 
+  } catch (Exception error) {
+    error.printError();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1360,32 +1102,10 @@ void BookKeeper::readData(string dsname, dblData2d& out_data){
         out_data[row][col] = out_array[row][col];
       };
     };
-    
 
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
+  } catch (Exception error) {
+    error.printError();
   }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
-  }
-
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1445,28 +1165,8 @@ void BookKeeper::readData(string dsname, dblData3d& out_data){
       };
     };
 
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -1519,28 +1219,8 @@ void BookKeeper::readData(string dsname, strData1d& out_data){
       out_data[row] = out_array[row];
     };
 
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -1596,28 +1276,8 @@ void BookKeeper::readData(string dsname, strData2d& out_data){
       };
     };
 
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+  } catch (Exception error) {
+    error.printError();
   }
 };
 
@@ -1677,27 +1337,9 @@ void BookKeeper::readData(string dsname, strData3d& out_data){
         };
       };
     };
-  } 
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataTypeIException error )
-  {
-     error.printError();
+
+  } catch (Exception error) {
+    error.printError();
   }
 };
+
