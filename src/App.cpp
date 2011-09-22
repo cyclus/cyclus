@@ -27,7 +27,9 @@ int main(int argc, char* argv[])
     // parse arguments
     try{
       if(argc<2){
-        throw GenException("Cyclus usage requires an input file. \nUsage:\n./cyclus [path/to/input/filename]");
+        string err_msg = "Cyclus usage requires an input file.\n";
+        err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
+        throw GenException(err_msg);
       }
 
     // read input file
