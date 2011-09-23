@@ -34,7 +34,7 @@ public:
   virtual ~Communicator();
 
   /// Get the type of this communicator
-  CommunicatorType getCommType() { return commType; };
+  CommunicatorType getCommType() { return commType_; };
 
   /**
    *  @brief Default (trivial) sender is implemented
@@ -60,10 +60,10 @@ public:
 protected:
 
   /// Copy the base class data members from one object to another
-  virtual void copy(Communicator* src) { commType = src->commType; };
+  virtual void copy(Communicator* src) { commType_ = src->commType_; };
 
   /// All communicators need to know what type they are
-  CommunicatorType commType;
+  CommunicatorType commType_;
 
 };
 #endif

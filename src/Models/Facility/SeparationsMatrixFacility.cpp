@@ -192,7 +192,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0, atomBased);
+                                  0, ATOMBASED);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
@@ -273,7 +273,7 @@ void SeparationsMatrixFacility::handleTock(int time)
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->getName(), 
-                                  0, atomBased);
+                                  0, ATOMBASED);
     //  }
     // }
   

@@ -25,7 +25,7 @@ void Communicator::sendMessage(Message* msg) {
   } else {
     switch(msg->getDir()) {
       case UP_MSG:
-        switch(commType) {
+        switch(commType_) {
           case FACILITY_COMM:
             msg->getInst()->receiveMessage(msg);
             break;
@@ -41,7 +41,7 @@ void Communicator::sendMessage(Message* msg) {
         }
         break;
       case DOWN_MSG:
-        switch(commType) {
+        switch(commType_) {
           case FACILITY_COMM:
             receiveMessage(msg);
             break;

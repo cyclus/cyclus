@@ -29,7 +29,7 @@ public:
   /// Default constructor for InstModel Class
   InstModel() {
     setModelType("Inst");
-    commType=INST_COMM;
+    commType_=INST_COMM;
   };
 
   /// every model should be destructable

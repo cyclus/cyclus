@@ -38,14 +38,14 @@ public:
   static InputXML* Instance();
   
   /// Method to return the current namespace modifier
-  string getCurNS() { return cur_ns; };
+  string getCurNS() { return cur_ns_; };
 
   /**
    *  @brief Extend the current namespace modifier
    *
    * @param ns string to append to current namespace modifier
    */
-  void extendCurNS(string ns) { cur_ns += ns + ":"; };
+  void extendCurNS(string ns) { cur_ns_ += ns + ":"; };
 
   /**
    *  @brief Strip last namespace from namespace modifier
@@ -204,7 +204,7 @@ public:
 
 private:
   /// pointer to thie single instance of this class
-  static InputXML* _instance;
+  static InputXML* instance_;
 
   /// default constructor
   InputXML();
@@ -239,7 +239,7 @@ private:
    *  is pushed onto this stack.  Every time a nested input file is closed
    *  the last fileinfo is popped off this stack.
    */
-  stack<xmlFileInfo*> fileStack;
+  stack<xmlFileInfo*> fileStack_;
 
   /**
    *  @brief Current namespace modifier value
@@ -252,7 +252,7 @@ private:
    *  objects, the namespace modifier is a colon-delimited list of strings
    *  with a trailing colon.
    */
-  string cur_ns;
+  string cur_ns_;
 
   /**
    *  @brief Validate an XML file against a Relax-NG schema
@@ -267,7 +267,7 @@ private:
   xmlDocPtr validate_file(xmlFileInfo *fileInfo);
 
   /// primary schema used for Cyclus processing
-  static string main_schema; 
+  static string main_schema_; 
 
 };
 

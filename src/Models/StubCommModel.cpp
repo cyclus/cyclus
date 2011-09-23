@@ -6,7 +6,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
   setModelType("StubComm");
-  commType = STUB_COMM;
+  commType_ = STUB_COMM;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

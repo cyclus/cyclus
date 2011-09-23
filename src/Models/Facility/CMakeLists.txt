@@ -16,6 +16,7 @@ SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES}
   SeparationsMatrixFacility
   SinkFacility
   SourceFacility
-  StorageFacility
   StubFacility
   )
+
+#  StorageFacility

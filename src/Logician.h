@@ -31,7 +31,7 @@ class Logician {
     /**
      * A pointer to this Logician once it has been initialized.
      */
-    static Logician* _instance;
+    static Logician* instance_;
     
     /**
      * The (protected) constructor for this class, which can only 

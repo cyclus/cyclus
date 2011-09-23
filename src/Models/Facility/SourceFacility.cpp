@@ -131,7 +131,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
     Material* newMat = new Material(CompMap(), 
                                   recipe->getUnits(),
                                   recipe->getName(), 
-                                  0, massBased);
+                                  0, MASSBASED);
 
     Material* m = inventory.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
@@ -195,7 +195,7 @@ void SourceFacility::handleTock(int time){
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     capacity*recipe->getTotMass(), 
-                                    massBased);
+                                    MASSBASED);
     cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);
@@ -206,7 +206,7 @@ void SourceFacility::handleTock(int time){
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     space,
-                                    atomBased);
+                                    ATOMBASED);
     cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
     inventory.push_front(newMat);

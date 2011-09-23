@@ -30,20 +30,20 @@ public:
   ~Commodity() {};
   
   /// get the Commodity name
-  const string getName() const { return name;};
+  const string getName() const { return name_;};
   
   /// get the ID number
-  int getSN() const {return ID;};
+  int getSN() const {return ID_;};
   
   /// get the Model pointer
-  Model* getMarket() {return market;};
+  Model* getMarket() {return market_;};
   
   /**
    *  @brief set the Model pointer
    *
    * @param new_market pointer to Model that represents MarketModel
    */
-  void setMarket(Model* new_market) { market = new_market; };
+  void setMarket(Model* new_market) { market_ = new_market; };
   
   /**
    *  @brief Load the Commodity objects from the XML file
@@ -60,12 +60,12 @@ public:
 
 private:
   /// unique ID space for serialization
-  static int nextID;
+  static int nextID_;
   
   /**
    * @brief the name of this Commodity as defined by the user
    */
-  string name;
+  string name_;
   
   /**
    * @brief the unique ID number of this Commodity as serialized by the
@@ -74,7 +74,7 @@ private:
    * Although the pointer to this object already serves as a unique
    * reference, this ID is provided as reference in a contiguous ID space.
    */
-  int ID;
+  int ID_;
   
   /**
    * @brief a pointer to the MarketModel model that is trading this
@@ -83,7 +83,7 @@ private:
    * Each commodity should be associated with a market on which it will be
    * traded between offering and requesting facilities at each timestep.
    */
-  Model* market;
+  Model* market_;
   
 };
 #endif

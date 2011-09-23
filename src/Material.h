@@ -37,7 +37,7 @@ typedef double Mass;
 /**
  * Spectra for which average cross-section data are available.
  */
-enum Spectrum {thermal, fast};
+enum Spectrum {THERMAL, FAST};
 
 /**
  * Represents a decay constant of a parent isotope.
@@ -94,7 +94,7 @@ typedef map<int, pair<int, int> > FacHistory;
 /**
  * An enumeration for different types of recipe bases
  **/
-enum Basis {atomBased, massBased};
+enum Basis {ATOMBASED, MASSBASED};
 
 /**
  * we will always need Avogadro's number somewhere
@@ -175,26 +175,26 @@ public:
    *
    * @return ID
    */
-  const int getSN(){return ID;};
+  const int getSN(){return ID_;};
 
   /**
    * returns the name of the recipe
    *
    * @return recipeName
    */
-  string getName() { return recipeName; };
+  string getName() { return recipeName_; };
 
   /**
    * returns the units of the recipe, a string
    *
    * @return units
    */
-  string getUnits() { return units; };
+  string getUnits() { return units_; };
 
   /**
    * returns the total mass of this material object PER UNIT
    */
-  const Mass getTotMass() const {return total_mass;};
+  const Mass getTotMass() const {return total_mass_;};
 
   /**
    * Returns the total mass of the given composition vector.
@@ -207,7 +207,7 @@ public:
   /**
    * returns the total atoms in this material object 
    */
-  const Atoms getTotAtoms() const {return total_atoms;};
+  const Atoms getTotAtoms() const {return total_atoms_;};
 
   /**
    * Returns the total atoms in the given composition vector.
@@ -337,22 +337,22 @@ public:
    */
   const virtual double getEltMass(int elt) const;
 
-	/**
-	 * Returns the mass of the given element in the given composition vector.
-	 *
-	 * @param elt the atomic number of the element
-	 * @param comp the composition vector
-	 * @return the mass (in tons)
-	 */
-	static double getEltMass(int elt, const map<Iso, Atoms>& comp);
+  /**
+   * Returns the mass of the given element in the given composition vector.
+   *
+   * @param elt the atomic number of the element
+   * @param comp the composition vector
+   * @return the mass (in tons)
+   */
+  static double getEltMass(int elt, const map<Iso, Atoms>& comp);
 
-	/**
-	 * Returns the mass of the given isotope in this Material.
-	 *
-	 * @param tope the isotope
-	 * @return the mass of the element (in tons)
-	 */
-	const virtual double getIsoMass(Iso tope) const;
+  /**
+   * Returns the mass of the given isotope in this Material.
+   *
+   * @param tope the isotope
+   * @return the mass of the element (in tons)
+   */
+  const virtual double getIsoMass(Iso tope) const;
 
   /**
    * Returns the mass of the given isotope in the given composition vector.
@@ -424,12 +424,12 @@ protected:
   /** 
    * The serial number for this Material.
    */
-  int ID;
+  int ID_;
 
   /**
    * Stores the next available material ID
    */
-  static int nextID;
+  static int nextID_;
 
   /**
    * Returns true if the given isotope's number density is for some reason 
@@ -457,7 +457,7 @@ protected:
    * compositions. A composition is a map of isotopes and their 
    * corresponding number of atoms.
    */
-  CompHistory compHist;
+  CompHistory compHist_;
 
   /**
    * The mass history of this Material, in the form of a map whose
@@ -466,7 +466,7 @@ protected:
    * compositions. A composition is a map of isotopes and the corresponding
    * masses.
    */
-  MassHistory massHist;
+  MassHistory massHist_;
     
   /**
    * The facility history of this Material. The form is a map whose keys 
@@ -474,7 +474,7 @@ protected:
    * are pairs storing (first) the SN of the originating facility and 
    * (second) the SN of the destination facility.
    */
-  FacHistory facHist;
+  FacHistory facHist_;
 
   /**
    * Builds the decay matrix needed for the decay calculations from the parent
@@ -514,27 +514,27 @@ private:
   /**
    * total mass of this material object PER UNIT
    */
-  Mass total_mass;
+  Mass total_mass_;
 
   /**
    * total number of atoms in this material object PER UNIT
    */
-  Atoms total_atoms;
+  Atoms total_atoms_;
 
   /**
    * Keeps track of whether or not the mass & atom count is still consistent
    */
-  bool atomEqualsMass;
+  bool atomEqualsMass_;
 
   /**
    * units for this material
    */
-  string units;
+  string units_;
 
   /*
    * name of this recipe
    */
-  string recipeName;
+  string recipeName_;
   
   /**
    * convert an atom composition into a consitent mass composition
@@ -549,17 +549,17 @@ private:
   /**
    *
    */
-  static ParentMap parent; 
+  static ParentMap parent_; 
   
   /**
    *
    */
-  static DaughtersMap daughters; 
+  static DaughtersMap daughters_; 
   
   /**
    *
    */
-  static Matrix decayMatrix; 
+  static Matrix decayMatrix_; 
 };
 
 

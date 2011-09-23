@@ -5,7 +5,7 @@
 #include "Logician.h"
 #include "GenException.h"
 
-Logician* Logician::_instance = 0;
+Logician* Logician::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician::Logician() {
@@ -31,10 +31,10 @@ Logician::~Logician() {};
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logician* Logician::Instance() {
   // If we haven't created a Logician yet, create and return it.
-  if (0 == _instance)
-    _instance = new Logician();
+  if (0 == instance_)
+    instance_ = new Logician();
   
-  return _instance;
+  return instance_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

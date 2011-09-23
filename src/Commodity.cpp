@@ -9,19 +9,19 @@
 #include "InputXML.h"
 
 /// Initialize the Commodity ID serialization
-int Commodity::nextID = 0;
+int Commodity::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity(xmlNodePtr cur)
 {
   // advance the commodity ID
-  ID = nextID++;
+  ID_ = nextID_++;
 
-  // get the name of the commodity
-  name = XMLinput->get_xpath_content(cur,"name");
+  // get the name_ of the commodity
+  name_ = XMLinput->get_xpath_content(cur,"name");
 
   // don't give it any market
-  market = NULL;
+  market_ = NULL;
 
 }
 

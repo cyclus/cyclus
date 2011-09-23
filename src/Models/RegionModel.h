@@ -28,7 +28,7 @@ public:
     /// Default constructor for RegionModel Class
     RegionModel() {
       setModelType("Region");
-      commType=REGION_COMM; 
+      commType_=REGION_COMM; 
     };
 
     /// RegionModels should not be indestructible.

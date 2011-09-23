@@ -29,7 +29,7 @@ class MaterialTest : public ::testing::Test {
       test_mat_unit = "test_mat_unit";
       test_rec_name = "test_rec_name";
       test_size = 10.0;
-      test_type = atomBased;
+      test_type = ATOMBASED;
       u235_halflife = 8445600000; // approximate, in months
       th228_halflife = 2*11; // approximate, in months
       int time = TI->getTime();

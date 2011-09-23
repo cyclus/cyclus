@@ -12,26 +12,26 @@
 #include "Logician.h"
 #include "Model.h"
 
-InputXML* InputXML::_instance = 0;
+InputXML* InputXML::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string InputXML::main_schema = ENV->searchPathForFile("Data/cyclus.rng","","" ,"");
+string InputXML::main_schema_ = ENV->searchPathForFile("Data/cyclus.rng","","" ,"");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML::InputXML()
 {
 
-  cur_ns = "";
+  cur_ns_ = "";
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML* InputXML::Instance() {
 
-  if (0 == _instance)
-  _instance = new InputXML();
+  if (0 == instance_)
+  instance_ = new InputXML();
   
-  return _instance;
+  return instance_;
 
 }
 
@@ -70,18 +70,18 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 void InputXML::stripCurNS()
 {
 
-  if ("" == cur_ns)
+  if ("" == cur_ns_)
   throw GenException("Unable to strip tokens from an empty namespace.");
 
-  string::iterator pos = cur_ns.end();
-  cur_ns.erase(--pos);
+  string::iterator pos = cur_ns_.end();
+  cur_ns_.erase(--pos);
 
-  size_t delimeter_pos = cur_ns.rfind(':');
+  size_t delimeter_pos = cur_ns_.rfind(':');
 
   if (string::npos != delimeter_pos)
-  cur_ns.erase(delimeter_pos);
+  cur_ns_.erase(delimeter_pos);
   else
-  cur_ns.erase();
+  cur_ns_.erase();
 
 
 }
@@ -108,7 +108,7 @@ void InputXML::load_file(string filename)
   xmlFileInfo &inputFile = *curFilePtr;
 
   inputFile.filename = filename;
-  inputFile.schema = &main_schema;
+  inputFile.schema = &main_schema_;
   inputFile.doc = validate_file(&inputFile);
 
   /* Create xpath evaluation context */
@@ -139,13 +139,13 @@ void InputXML::load_file(string filename)
 void InputXML::load_recipebook(string filename)
 {
   /// store parent file info
-  fileStack.push(curFilePtr);
+  fileStack_.push(curFilePtr);
 
   curFilePtr = new xmlFileInfo;
   xmlFileInfo &recipebook = *curFilePtr;
 
   recipebook.filename = filename;
-  recipebook.schema = &main_schema;
+  recipebook.schema = &main_schema_;
   recipebook.doc = validate_file(&recipebook);
   recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
@@ -155,8 +155,8 @@ void InputXML::load_recipebook(string filename)
   delete curFilePtr;
 
   /// restore parent file info
-  curFilePtr = fileStack.top();
-  fileStack.pop();
+  curFilePtr = fileStack_.top();
+  fileStack_.pop();
 
 
 }
@@ -165,13 +165,13 @@ void InputXML::load_recipebook(string filename)
 void InputXML::load_facilitycatalog(string filename)
 {
   /// store parent file info
-  fileStack.push(curFilePtr);
+  fileStack_.push(curFilePtr);
 
   curFilePtr = new xmlFileInfo;
   xmlFileInfo &facilitycatalog = *curFilePtr;
 
   facilitycatalog.filename = filename;
-  facilitycatalog.schema = &main_schema;
+  facilitycatalog.schema = &main_schema_;
   facilitycatalog.doc = validate_file(&facilitycatalog);
   facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
 
@@ -182,8 +182,8 @@ void InputXML::load_facilitycatalog(string filename)
   delete curFilePtr;
 
   /// restore parent file info
-  curFilePtr = fileStack.top();
-  fileStack.pop();
+  curFilePtr = fileStack_.top();
+  fileStack_.pop();
 
 
 }
