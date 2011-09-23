@@ -82,8 +82,10 @@ public:
 	 * @param y0 the year the simulation starts (default = 2010)
 	 * @param start the GENIUS time representing the first month of the simulation 
 	 * (default = 0)
+	 * @param decay interval between decay calculations in months. <=0 if decay is off 
+	 * (default = 0)
 	 */
-	void initialize(int dur, int m0 = 1, int y0 = 2010, int start = 0);
+	void initialize(int dur, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
 
 	/**
 	 * Runs the simulation.

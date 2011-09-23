@@ -47,7 +47,7 @@ Timer* Timer::Instance()
 	return _instance;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::initialize(int dur, int m0, int y0, int start) {
+void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 
 	if (m0 < 1 || m0 > 12)
 		throw GenException("Invalid month0; must be between 1 and 12 (inclusive).");
@@ -58,12 +58,17 @@ void Timer::initialize(int dur, int m0, int y0, int start) {
 	if (y0 > 2063)
 		throw GenException("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
 
+	if (decay > dur)
+		throw GenException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
+  LI->setDecay(decay);
+
 	month0 = m0;
 	year0 = y0;
 
 	time0 = start;
 	time = start;
 	simDur = dur;
+  
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getSimDur() {
@@ -90,8 +95,8 @@ pair<int, int> Timer::convertDate(int time)
 void Timer::load_simulation()
 { 
   
-  int dur, m0, y0, sim0;
-  string dur_str, m0_str, y0_str, sim0_str;
+  int dur, m0, y0, sim0, dec;
+  string dur_str, m0_str, y0_str, sim0_str, decay_str;
 
   xmlNodePtr cur = XMLinput->get_xpath_element("/simulation");
   // get duration
@@ -102,12 +107,15 @@ void Timer::load_simulation()
   y0_str = (XMLinput->get_xpath_content(cur,"startyear"));
   // get simulation start
   sim0_str = (XMLinput->get_xpath_content(cur,"simstart"));
+  // get decay interval
+  decay_str = (XMLinput->get_xpath_content(cur,"decay"));
 
   dur = atoi(dur_str.c_str());
   m0 = atoi(m0_str.c_str());
   y0 = atoi(y0_str.c_str());
   sim0 = atoi(sim0_str.c_str());
+  dec = atoi(decay_str.c_str());
 
-  TI->initialize(dur, m0, y0, sim0);
+  TI->initialize(dur, m0, y0, sim0, dec);
 }
 

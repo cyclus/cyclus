@@ -23,6 +23,11 @@ int Material::nextID_ = 0;
 Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0) 
 {
   ID_=nextID_++;
+  facHist_ = FacHistory() ;
+  CompMap zero_map;
+  zero_map.insert(make_pair(Iso(92235),0));
+  massHist_.insert(make_pair(TI->getTime(), zero_map));
+  compHist_.insert(make_pair(TI->getTime(), zero_map));
   BI->registerMatChange(this);
 };
 
@@ -122,18 +127,18 @@ void Material::load_recipebook(string filename, string ns, string format)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isNeg(Iso tope) const
 {
-  if (this->getComp(tope) == 0)
+  if (this->getAtomComp(tope) == 0)
     return false;
   // (kg) * (g/kg) * (mol/g)
   Atoms atoms_eps =  eps * 1e3 / Material::getAtomicMass(tope); 
-  return (this->getComp(tope) + atoms_eps < 0);
+  return (this->getAtomComp(tope) + atoms_eps < 0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const
 {
   // (kg) * (g/kg) * (mol/g) 
   Atoms atoms_eps = eps * 1e3 / Material::getAtomicMass(tope) ; 
-  return (fabs(this->getComp(tope)) < atoms_eps);
+  return (fabs(this->getAtomComp(tope)) < atoms_eps);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double Material::getIsoMass(Iso tope) const
@@ -213,7 +218,7 @@ double Material::getTotAtoms(const CompMap& comp)
   double atoms = 0;
 
   while (iter != comp.end()) {
-    atoms = atoms + Material::getComp(iter->first, comp);
+    atoms = atoms + Material::getAtomComp(iter->first, comp);
     iter ++;
   }
   return atoms;
@@ -309,7 +314,6 @@ const CompMap Material::getMassComp() const
 const Mass Material::getMassComp(Iso tope) const
 {
   CompMap currComp = this->getMassComp();
-
   // If the isotope isn't currently present, return 0. Else return the 
   // isotope's current number density.
   if (currComp.find(tope) == currComp.end()) {
@@ -345,7 +349,7 @@ const CompMap Material::getAtomComp() const
   return comp;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Material::getComp(Iso tope, const CompMap& comp)
+double Material::getAtomComp(Iso tope, const CompMap& comp)
 {
   // If the given isotope is present, calculate and return its comp. 
   // Else return 0.
@@ -376,7 +380,7 @@ const CompMap Material::getFracComp(double frac) const
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Atoms Material::getComp(Iso tope) const
+const Atoms Material::getAtomComp(Iso tope) const
 {
   CompMap currComp = this->getAtomComp();
 

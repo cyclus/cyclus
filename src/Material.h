@@ -256,7 +256,7 @@ public:
    * @param comp the composition vector
    * @return the number of atoms
    */
-  static double getComp(Iso tope, const CompMap& comp);
+  static double getAtomComp(Iso tope, const CompMap& comp);
  
   /**
    * Returns an isotopic vector corresponding to the given fraction of this 
@@ -276,7 +276,7 @@ public:
    * @param tope the isotope whose number density will be returned
    * @return the number density of the given isotope, or zero
    */
-  const virtual Atoms getComp(Iso tope) const;
+  const virtual Atoms getAtomComp(Iso tope) const;
 
   /**
    * Returns the atomic number of the isotope with the given identifier.

@@ -7,6 +7,7 @@
   <startmonth>1</startmonth>
   <simstart>0</simstart>
   <duration>1</duration>
+  <decay>0</decay>
 
 
   <!-- Commodities -->  

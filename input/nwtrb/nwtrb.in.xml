@@ -4,6 +4,7 @@
   <startyear>2000</startyear>
   <startmonth>1</startmonth>
   <simstart>0</simstart>
+  <decay>0</decay>
   <duration>0</duration>
 
   <!-- Commodities -->

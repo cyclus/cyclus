@@ -20,6 +20,7 @@ using namespace std;
 typedef map<int, Model*> ModelList;
 typedef map<string, Material*> RecipeList;
 typedef map<string, Commodity*> CommodityList;
+typedef vector<Material*> MaterialList;
 
 /**
  * A (singleton) simulation logician class. This class sends tick messages
@@ -39,6 +40,12 @@ class Logician {
      */
     Logician();
 
+    /// true if decay should occur, false if not.
+    bool decay_;
+
+    /// how many months between decay calculations
+    int decay_interval_;
+
     /**
      * Used by the constructor to create a ModelList for every ModelType.
      */
@@ -52,6 +59,9 @@ class Logician {
     
     /// list of commodities
     CommodityList commodities_;
+
+    /// list of materialss
+    MaterialList materials_;
     
     /// map commodities to markets
     map<Commodity*, Model*> commodity_market_map_;
@@ -87,6 +97,15 @@ class Logician {
     void handleTimeStep(int time);
     
     /**
+     * Decays all of the materials if decay is on
+     *
+     * @todo should be private (khuff/rcarlsen)
+     *
+     * @param time is the simulation time of the tick
+     */
+    void decayMaterials(int time);
+    
+    /**
      * sends the tick signal to all of the models
      *
      * @todo should be private (rcarlsen)
@@ -112,6 +131,11 @@ class Logician {
      *
      */
     void resolveMarkets();
+
+    /*
+     * sets the decay boolean and the interval
+     */
+    void setDecay(int dec);
 
     /* 
      * Generic routine to add a Model-based entity to a specific list

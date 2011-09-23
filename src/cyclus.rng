@@ -8,21 +8,15 @@
 
     <interleave>
 
-    <oneOrMore>
     <ref name="duration"/>
-    </oneOrMore>
 
-    <oneOrMore>
     <ref name="startmonth"/>
-    </oneOrMore>
 
-    <oneOrMore>
     <ref name="startyear"/>
-    </oneOrMore>
 
-    <oneOrMore>
     <ref name="simstart"/>
-    </oneOrMore>
+
+    <ref name="decay"/>
 
     <oneOrMore>
     <ref name="commodity"/>
@@ -110,6 +104,12 @@
 
   <define name="simstart">
     <element name="simstart">
+      <text/>
+    </element>
+  </define>
+
+  <define name="decay">
+    <element name="decay">
       <text/>
     </element>
   </define>

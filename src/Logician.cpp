@@ -52,9 +52,27 @@ void Logician::handlePreHistory() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::handleTimeStep(int time) {
+  decayMaterials(time);
   sendTick(time);
   resolveMarkets();
   sendTock(time);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::decayMaterials(int time){
+  // if decay is on
+  if(decay_) {
+    // and if (time(mod interval)==0)
+    if(time/decay_interval_ == 0) {
+      // acquire a list of all materials
+      for(MaterialList::iterator mat = materials_.begin();
+          mat != materials_.end();
+          mat++){
+         // and decay each of them
+         (*mat)->Material::decay();
+      }
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -97,6 +115,18 @@ void Logician::resolveMarkets() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Logician::setDecay(int dec){
+  if( dec <= 0 ){
+    decay_ = false;
+    decay_interval_ = NULL;
+  }
+  else if ( dec > 0 ){
+    decay_ = true;
+    decay_interval_ = dec;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addModel(Model* new_model, ModelType model_type) { 
   int model_id = new_model->getSN();
   model_lists_[model_type][model_id] = new_model;
@@ -107,6 +137,7 @@ Model* Logician::getModelByID(int ID, ModelType model_type) {
   return model_lists_[model_type][ID];
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ModelList::iterator Logician::begin(ModelType model_type) {
   ModelList* list;
   list = &model_lists_[model_type];
@@ -115,6 +146,7 @@ ModelList::iterator Logician::begin(ModelType model_type) {
   return my_iter;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ModelList::iterator Logician::end(ModelType model_type) {
   ModelList* list;
   list = &model_lists_[model_type];

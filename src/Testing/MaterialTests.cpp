@@ -45,8 +45,8 @@ TEST_F(MaterialTest, ManualConstructor) {
   EXPECT_EQ(       test_mat->getTotAtoms(),     10                    );
   ASSERT_NEAR(     test_mat->getTotMass(),      2.35,            0.001); // 10mol U235 ~= 2.35kg
   ASSERT_NEAR(     test_mat->getMassComp(u235), 1,               0.001); // normalized 
-  ASSERT_NEAR(     test_mat->getComp(u235),     1,               0.001); // normalized 
-  ASSERT_NEAR(     decay_mat->getComp(am241), 0.0,               0.001); // americium is absent
+  ASSERT_NEAR(     test_mat->getAtomComp(u235),     1,               0.001); // normalized 
+  ASSERT_NEAR(     decay_mat->getAtomComp(am241), 0.0,               0.001); // americium is absent
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -54,8 +54,8 @@ TEST_F(MaterialTest, ChangeComp) {
   test_mat->changeAtomComp(decay_comp,TI->getTime());
   ASSERT_NEAR(     test_mat->getTotMass(),      2.315,            0.001); // 10mol U235+Th228 ~= 2.315kg
   ASSERT_NEAR(     test_mat->getMassComp(u235), 0.508,            0.001); // normalized 
-  ASSERT_NEAR(     test_mat->getComp(u235),     0.5,              0.001); // normalized 
-  ASSERT_NEAR(     test_mat->getComp(am241),    0.0,              0.001); // americium is absent
+  ASSERT_NEAR(     test_mat->getAtomComp(u235),     0.5,              0.001); // normalized 
+  ASSERT_NEAR(     test_mat->getAtomComp(am241),    0.0,              0.001); // americium is absent
 }
 
 
@@ -63,10 +63,10 @@ TEST_F(MaterialTest, ChangeComp) {
 TEST_F(MaterialTest, Decay){
   Material::loadDecayInfo();
   test_mat->decay(2);
-  ASSERT_NEAR(     test_mat->getComp(u235),     1,              0.001);
-  ASSERT_NEAR(     decay_mat->getComp(u235),  0.5,              0.001);
-  ASSERT_NEAR(     decay_mat->getComp(th228), 0.5,              0.001);
+  ASSERT_NEAR(     test_mat->getAtomComp(u235),     1,              0.001);
+  ASSERT_NEAR(     decay_mat->getAtomComp(u235),  0.5,              0.001);
+  ASSERT_NEAR(     decay_mat->getAtomComp(th228), 0.5,              0.001);
   decay_mat->decay(th228_halflife);
-  ASSERT_NEAR(     decay_mat->getComp(th228),  0.25,            0.01);
-  ASSERT_NEAR(     decay_mat->getComp(pb208),  0.25,            0.01);
+  ASSERT_NEAR(     decay_mat->getAtomComp(th228),  0.25,            0.01);
+  ASSERT_NEAR(     decay_mat->getAtomComp(pb208),  0.25,            0.01);
 }
