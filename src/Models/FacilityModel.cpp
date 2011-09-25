@@ -15,9 +15,9 @@ void FacilityModel::init(xmlNodePtr cur)
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
   
   for (int i=0;i<nodes->nodeNr;i++){
-    inst_name = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
-    this->setInstName(inst_name);
-    cout << "Facility " << getSN() << " has just set its inst to " << inst_name << endl;
+    inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+    this->setInstName(inst_name_);
+    cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
   }
 } 
 
@@ -27,8 +27,8 @@ void FacilityModel::copy(FacilityModel* src)
   Model::copy(src); 
   Communicator::copy(src); 
 
-  // don't copy fac_name to new instance
-  fac_name = "";
+  // don't copy fac_jname to new instance
+  fac_name_ = "";
 
 
   LI->addModel(this, FACILITY);
@@ -37,7 +37,7 @@ void FacilityModel::copy(FacilityModel* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::getFacInst()
 {
-  return dynamic_cast<InstModel*>(LI->getModelByName(inst_name, INST));
+  return dynamic_cast<InstModel*>(LI->getModelByName(inst_name_, INST));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

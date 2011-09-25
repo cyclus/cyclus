@@ -60,7 +60,7 @@ public:
 public:
   /// default MarketModel receiver simply logs the offer/request
   virtual void receiveMessage(Message* msg) 
-  { messages.insert(msg); };
+  { messages_.insert(msg); };
 
 protected:
 
@@ -74,7 +74,7 @@ protected:
  */
 public:
   /// every market should provide its commodity
-  Commodity* getCommodity() { return commodity; } ;
+  Commodity* getCommodity() { return commodity_; } ;
 
   // Primary MarketModel methods
 
@@ -94,14 +94,14 @@ public:
 
 protected: 
   /// every market has a commodity
-  Commodity* commodity;
+  Commodity* commodity_;
 
   /// every market collects offers & requests
-  set<Message*> messages;
+  set<Message*> messages_;
 
   /// every market generates a set of orders
-  deque<Message*> orders;
-  int firmOrders;
+  deque<Message*> orders_;
+  int firmOrders_;
   
 
 /* ------------------- */ 

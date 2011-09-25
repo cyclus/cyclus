@@ -15,53 +15,53 @@ void ConverterMarket::init(xmlNodePtr cur)
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/ConverterMarket/converter");
   
   xmlNodePtr conv_node = nodes->nodeTab[0];
-  conv_name = XMLinput->get_xpath_content(conv_node,"type");
+  conv_name_ = XMLinput->get_xpath_content(conv_node,"type");
   
   Model* converter = NULL; 
-  converter = LI->getModelByName(conv_name, CONVERTER);
+  converter = LI->getModelByName(conv_name_, CONVERTER);
 
   if (NULL == converter){
     throw GenException("Converter '" 
-        + conv_name 
+        + conv_name_ 
         + "' is not defined in this problem.");
     }
   Model* new_converter = Model::create(converter);
 
   // The commodity initialized as the mktcommodity is the request commodity.
 
-  offer_commod = NULL; 
+  offer_commod_ = NULL; 
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
   string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
-  offer_commod = LI->getCommodity(commod_name);
-  if (NULL == offer_commod)
+  offer_commod_ = LI->getCommodity(commod_name);
+  if (NULL == offer_commod_)
     throw GenException("Offer commodity '" + commod_name 
                        + "' does not exist for converter market '" + getName() 
                        + "'.");
   
-  offer_commod->setMarket(this);
+  offer_commod_->setMarket(this);
   
   commod_name = XMLinput->get_xpath_content(cur,"reqcommodity");
-  req_commod = LI->getCommodity(commod_name);
-  if (NULL == req_commod)
+  req_commod_ = LI->getCommodity(commod_name);
+  if (NULL == req_commod_)
     throw GenException("Request commodity '" + commod_name 
                        + "' does not exist for converter market '" + getName() 
                        + "'.");
   
-  req_commod->setMarket(this);
+  req_commod_->setMarket(this);
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::copy(ConverterMarket* src)
 { 
   MarketModel::copy(src);
-  offer_commod = src->offer_commod;
-  offer_commod->setMarket(this);
-  req_commod = src->req_commod;
-  req_commod->setMarket(this);
-  conv_name = src->conv_name;
+  offer_commod_ = src->offer_commod_;
+  offer_commod_->setMarket(this);
+  req_commod_ = src->req_commod_;
+  req_commod_->setMarket(this);
+  conv_name_ = src->conv_name_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -75,9 +75,9 @@ void ConverterMarket::print()
 { 
   MarketModel::print();
   cout << "where the offer commodity is {"
-      << offer_commod->getName()
+      << offer_commod_->getName()
       << "}, the request commodity is {"
-      << req_commod->getName()
+      << req_commod_->getName()
       << "}. "
       << endl;
 }
@@ -85,11 +85,11 @@ void ConverterMarket::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 ConverterModel* ConverterMarket::getConverter() {
   Model* converter = NULL;
-  converter = LI->getModelByName(conv_name, CONVERTER);
+  converter = LI->getModelByName(conv_name_, CONVERTER);
 
   if (NULL == converter){
     throw GenException("Converter '" 
-        + conv_name 
+        + conv_name_ 
         + "' is not defined in this problem.");
     }
 
@@ -98,13 +98,13 @@ ConverterModel* ConverterMarket::getConverter() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void ConverterMarket::receiveMessage(Message *msg)
 {
-  messages.insert(msg);
+  messages_.insert(msg);
 
   if (msg->getAmount() > 0){
-    offers.insert(indexedMsg(msg->getAmount(),msg));
+    offers_.insert(indexedMsg(msg->getAmount(),msg));
   }
   else{
-    requests.insert(indexedMsg(-msg->getAmount(),msg));
+    requests_.insert(indexedMsg(-msg->getAmount(),msg));
   }
 }
 
@@ -118,18 +118,18 @@ void ConverterMarket::reject_request(sortedMsgList::iterator request)
   //                               (*request).second->getRequester()));
 
   // delete the tentative orders
-  while ( orders.size() > firmOrders)
+  while ( orders_.size() > firmOrders_)
   {
-    delete orders.back();
-    orders.pop_back();
+    delete orders_.back();
+    orders_.pop_back();
   }
 
   // put all matched offers back in the sorted list
-  while (matchedOffers.size() > 0)
+  while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers.begin());
-    offers.insert(indexedMsg(msg->getAmount(),msg));
-    matchedOffers.erase(msg);
+    Message *msg = *(matchedOffers_.begin());
+    offers_.insert(indexedMsg(msg->getAmount(),msg));
+    matchedOffers_.erase(msg);
   }
 
 }
@@ -138,13 +138,13 @@ void ConverterMarket::reject_request(sortedMsgList::iterator request)
 void ConverterMarket::process_request()
 {
   // update pointer to firm orders
-  firmOrders = orders.size();
+  firmOrders_ = orders_.size();
 
-  while (matchedOffers.size() > 0)
+  while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers.begin());
-    messages.erase(msg);
-    matchedOffers.erase(msg);
+    Message *msg = *(matchedOffers_.begin());
+    messages_.erase(msg);
+    matchedOffers_.erase(msg);
   }
 }
  
@@ -159,17 +159,17 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
   requestMsg = (*request).second;
   
   // if this request is not yet satisfied &&
-  // there are more offers left
-  while ( requestAmt > 0 && offers.size() > 0)
+  // there are more offers_ left
+  while ( requestAmt > 0 && offers_.size() > 0)
   {
     // get a new offer
-    offer = offers.end();
+    offer = offers_.end();
     offer--;
     offerMsg = (this->getConverter())->convert((*offer).second, (*request).second);
     offerAmt = offerMsg->getAmount();
 
     // pop off this offer
-    offers.erase(offer);
+    offers_.erase(offer);
   
     if (requestAmt > offerAmt) { 
       // put a new message in the order stack
@@ -178,9 +178,9 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       offerMsg->setDir(DOWN_MSG);
 
       // tenatively queue a new order (don't execute yet)
-      matchedOffers.insert(offerMsg);
+      matchedOffers_.insert(offerMsg);
 
-      orders.push_back(offerMsg);
+      orders_.push_back(offerMsg);
 
       cout << "ConverterMarket has resolved a match from "
           << offerMsg->getSupplierID()
@@ -200,9 +200,9 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequesterID(requestMsg->getRequesterID());
 
-      matchedOffers.insert(offerMsg);
+      matchedOffers_.insert(offerMsg);
 
-      orders.push_back(maybe_offer);
+      orders_.push_back(maybe_offer);
 
       cout << "ConverterMarket has resolved a partial match from "
           << maybe_offer->getSupplierID()
@@ -237,12 +237,12 @@ void ConverterMarket::resolve()
 {
   sortedMsgList::iterator request;
 
-  firmOrders = 0;
+  firmOrders_ = 0;
 
-  /// while requests remain and there is at least one offer left
-  while (requests.size() > 0)
+  /// while requests_ remain and there is at least one offer left
+  while (requests_.size() > 0)
   {
-    request = requests.end();
+    request = requests_.end();
     request--;
     
     if(match_request(request)) {
@@ -255,8 +255,8 @@ void ConverterMarket::resolve()
       reject_request(request);
     }
     // remove this request
-    messages.erase((*request).second);
-    requests.erase(request);
+    messages_.erase((*request).second);
+    requests_.erase(request);
   }
 
   executeOrderQueue();

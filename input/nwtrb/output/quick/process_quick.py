@@ -29,6 +29,8 @@ fracBWR={}
 fracPWR={}
 inBWR=False
 inPWR=False
+normBWR=0.0
+normPWR=0.0
 
 for line in in_lines:
     line_arr = line.split()
@@ -47,11 +49,13 @@ for line in in_lines:
     if inBWR:
         isotope = line_arr[0]
         frac = float(line_arr[2])
-        fracBWR[isotope] = frac * massBWR
+        fracBWR[isotope] = frac
+        normBWR += frac
     elif inPWR:
         isotope = line_arr[0]
         frac = float(line_arr[2])
-        fracPWR[isotope] = frac * massPWR
+        fracPWR[isotope] = frac
+        normPWR += frac
 
     test = line_arr[1]
     if test == 'nwtrb:spent_BWR_uo2':
@@ -59,7 +63,12 @@ for line in in_lines:
     elif test == 'nwtrb:spent_PWR_uo2':
         inBWR = False
         inPWR = True
-    
+
+# normalize mass fractions and multiply by total mass
+for isotope in iter(fracBWR):
+    fracBWR[isotope] *= massBWR / normBWR
+for isotope in iter(fracPWR):
+    fracPWR[isotope] *= massPWR / normPWR
     
 total_mass = massBWR + massPWR
 mU234 = fracBWR['92234'] + fracBWR['92234']

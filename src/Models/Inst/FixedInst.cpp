@@ -32,11 +32,11 @@ void FixedInst::init(xmlNodePtr cur)
                          + "' is not defined in this problem.");
     }
     
-    if (!(dynamic_cast<RegionModel*>(region))->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
       throw GenException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
-                         + region->getName() +"'.");
+                         + region_->getName() +"'.");
   }
 
     Model* new_facility = Model::create(facility);
@@ -52,7 +52,7 @@ void FixedInst::copy(FixedInst* src)
 {
   InstModel::copy(src);
 
-  facilities = src->facilities;
+  facilities_ = src->facilities_;
 
 }
 
@@ -68,9 +68,9 @@ void FixedInst::print()
 { 
   InstModel::print();
 
-  cout << " and the following permanent facilities: " << endl;
-  for (vector<Model*>::iterator fac=facilities.begin(); 
-       fac != facilities.end(); 
+  cout << " and the following permanent facilities_: " << endl;
+  for (vector<Model*>::iterator fac=facilities_.begin(); 
+       fac != facilities_.end(); 
        fac++){
     cout << "\t\t* " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
      << " (" << (*fac)->getName() << ")" << endl;

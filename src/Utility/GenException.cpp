@@ -9,25 +9,25 @@ string dtoa(double d) { stringstream out; out << d; return out.str(); };
 
 
 
-string GenException::prepend = "cyclus exception";
+string GenException::prepend_ = "cyclus exception";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException()
 {
-	myMessage = prepend;
+	myMessage_ = prepend_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::GenException(string msg)
 {
-	myMessage = prepend + ": " + msg;
+	myMessage_ = prepend_ + ": " + msg;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* GenException::what() const throw()
 {
-	//const char* toRet = myMessage;
+	//const char* toRet = myMessage_;
 	//	return toRet;
-	return myMessage.c_str();
+	return myMessage_.c_str();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenException::~GenException() throw() 

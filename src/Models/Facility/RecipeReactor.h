@@ -126,7 +126,7 @@ public:
     /**
      * The RecipeReactor reports a power capacity of its capacity factor * power capacity
      */
-    double getPowerCapactiy(){ return CF*capacity;};
+    double getPowerCapactiy(){ return CF_*capacity_;};
 
     
 
@@ -134,33 +134,33 @@ protected:
     /**
      * The RecipeReactor has pairs of input and output fuel
      */
-    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > fuelPairs;
+    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > fuelPairs_;
 
     /**
      * The RecipeReactor has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
 
     /**
      * The stocks of fresh fuel assemblies available.
      */
-    deque<InFuel> stocks;
+    deque<InFuel> stocks_;
 
     /**
      * The fuel assembly currently in the core.
      */
-    deque<InFuel> currCore;
+    deque<InFuel> currCore_;
     
     /**
      * The inventory of spent fuel assemblies.
      */
-    deque<OutFuel> inventory;
+    deque<OutFuel> inventory_;
 
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting;
+    deque<Message*> ordersWaiting_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -179,12 +179,12 @@ protected:
     /**
      * The time between batch reloadings.
      */
-    int cycle_time;
+    int cycle_time_;
 
     /**
      * The current month in the cycle. 1 > month_in_cycle < cycle_time)
      */
-    int month_in_cycle;
+    int month_in_cycle_;
 
     /**
      * Perform the actions that must occur at the begining of the cycle
@@ -199,82 +199,82 @@ protected:
     /**
      * The time that the stock material spends in the facility.
      */
-    int residence_time;
+    int residence_time_;
 
     /**
      * The maximum (number of commodity units?) that the inventory can grow to.
      * The RecipeReactor must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    Mass inventory_size;
+    Mass inventory_size_;
 
     /**
      * The number of months that a facility stays operational.
      */
-    int lifetime;
+    int lifetime_;
 
     /**
      * The year in which construction of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startConstrYr;
+    int startConstrYr_;
 
     /**
      * The month in which construction of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startConstrMo;
+    int startConstrMo_;
 
     /**
      * The year in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpYr;
+    int startOpYr_;
 
     /**
      * The month in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpMo;
+    int startOpMo_;
 
     /**
      * The year in which the facility's lisence expires.
      * (maybe this should just be in the deployment description?)
      */
-    int licExpYr;
+    int licExpYr_;
 
     /**
      * The month in which the facility's lisence expires..
      * (maybe this should just be in the deployment description?)
      */
-    int licExpMo;
+    int licExpMo_;
 
     /**
      * The state in which the facility exists.
      */
-    string state;
+    string state_;
 
     /**
      * The type of reactor that this is.
      * (this may be redundant or unnecessary information.)
      */
-    string typeReac;
+    string typeReac_;
 
     /**
      * The percent of the time the facility functions at 100% capacity.
      * (it should be less than one. Double check that.)
      */
-    double CF;
+    double CF_;
 
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe;
+    Material* in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe;
+    Material* out_recipe_;
 
 /* ------------------- */ 
 

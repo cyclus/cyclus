@@ -33,9 +33,9 @@ void CapacityRegion::populateSchedule(FILE *infile)
       schedule.push(time_step_to_build);
     };
     
-    // Populate the to_build_map for the given facility
+    // Populate the to_build_map_ for the given facility
     string fac_str (fac_name);
-    to_build_map[fac_str]=schedule;
+    to_build_map_[fac_str]=schedule;
   };
 }
 
@@ -68,12 +68,12 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
     // get xml node
     xmlNodePtr entry_node = nodes->nodeTab[i];
     // get capacity information
-    _capacity_type.push_back( XMLinput->get_xpath_content( entry_node,"capacitytype" ));
-    _capacity_function.push_back( XMLinput->get_xpath_content( entry_node,"capacityfunction" ));
-    _nominal_value.push_back( atof( XMLinput->get_xpath_content( entry_node,"nominalvalue" )));
+    capacity_type_.push_back( XMLinput->get_xpath_content( entry_node,"capacitytype" ));
+    capacity_function_.push_back( XMLinput->get_xpath_content( entry_node,"capacityfunction" ));
+    nominal_value_.push_back( atof( XMLinput->get_xpath_content( entry_node,"nominalvalue" )));
     // get replacement facility information
     ReplacementFacs replacementFacs;
-    allReplacementFacs.push_back(replacementFacs);
+    allReplacementFacs_.push_back(replacementFacs);
     Model* facility;
     xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(entry_node, "replacementlist");
     for (int j=0;i<fac_nodes->nodeNr;j++){
@@ -90,7 +90,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
 			   + "' is not defined in this problem.");
       }
       else{
-	allReplacementFacs[i].push_back(facility);
+	allReplacementFacs_[i].push_back(facility);
       };
     };
   };    
@@ -122,7 +122,7 @@ bool CapacityRegion::requestBuild(Model* fac, InstModel* inst)
 int CapacityRegion::nFacs()
 {
   // Return the total number of facilities which will be built
-  return _nFacs;
+  return nFacs_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -130,7 +130,7 @@ Model* CapacityRegion::chooseInstToBuildFac()
 {
   // Define the inst to build some fac
   // By default we pick the first institution in the region's list
-  return institutions[0];
+  return institutions_[0];
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -138,8 +138,8 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
 {
   // for now, all capacity types will be power capacity
   double capacity = 0.0;
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
+  for(vector<Model*>::iterator inst=institutions_.begin();
+      inst != institutions_.end();
       inst++){
     capacity += (dynamic_cast<InstModel*>(*inst))->getPowerCapacity();
   }
@@ -158,10 +158,10 @@ Model* CapacityRegion::chooseFacToBuild(ReplacementFacs facs)
 void CapacityRegion::handleTick(int time)
 {
   // Overwriting RegionModel's handleTick
-  // We loop through each facility that exists in the to_build_map
+  // We loop through each facility that exists in the to_build_map_
   map <string, queue <pair <int,int> > >::iterator fac;
 
-  for (fac = to_build_map.begin(); fac != to_build_map.end(); ++fac){
+  for (fac = to_build_map_.begin(); fac != to_build_map_.end(); ++fac){
     // Define a few parameters
     /* !!!! This method is not full proof... what if multiple facilities need
 			 to be built and some fail and some succeed...? !!!! */
@@ -215,7 +215,7 @@ void CapacityRegion::handleTick(int time)
       Model* fac_to_build;
       if (build_facility){
 	Model* inst = chooseInstToBuildFac();
-	fac_to_build = chooseFacToBuild( allReplacementFacs[i] );
+	fac_to_build = chooseFacToBuild( allReplacementFacs_[i] );
 	built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
       }
       // For now, catch any situation for which no facility is built.

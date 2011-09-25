@@ -122,33 +122,33 @@ protected:
     /**
      * The NullFacility has one input commodity
      */
-    Commodity* in_commod;
+    Commodity* in_commod_;
 
     /**
      * The NullFacility has one output commodity
      */
-    Commodity* out_commod;
+    Commodity* out_commod_;
 
     /**
      * The NullFacility has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
 
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks;
+    deque<Material*> stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory;
+    deque<Material*> inventory_;
 
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting;
+    deque<Message*> ordersWaiting_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -168,24 +168,24 @@ protected:
     /**
      * The time that the stock material spends in the facility.
      */
-    int residence_time;
+    int residence_time_;
 
     /**
      * The maximum (number of commodity units?) that the inventory can grow to.
      * The NullFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    Mass inventory_size;
+    Mass inventory_size_;
 
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe;
+    Material* in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe;
+    Material* out_recipe_;
 
 /* ------------------- */ 
 

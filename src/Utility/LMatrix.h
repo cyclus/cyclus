@@ -43,9 +43,9 @@ class LMatrix {
     const LMatrix & operator*=(const LMatrix & rhs);
 
   private:
-    vector< vector<long double> > M;  // 2D vector containing matrix elements
-    int rows;                    // number of rows
-    int cols;                    // number of columns
+    vector< vector<long double> > M_;  // 2D vector containing matrix elements
+    int rows_;                    // number of rows
+    int cols_;                    // number of columns
 
 };
 

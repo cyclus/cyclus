@@ -80,7 +80,7 @@ protected:
 
 protected:
 
-  vector<Model*> facilities;
+  vector<Model*> facilities_;
 
 /* ------------------- */ 
 

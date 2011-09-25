@@ -33,7 +33,7 @@ void StorageFacility::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
 
-  incommod =  NULL; 
+  incommod_ =  NULL; 
   
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/StorageFacility");
@@ -43,22 +43,22 @@ void StorageFacility::init(xmlNodePtr cur)
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  incommod = LI->getCommodity(commod_name);
-  if (NULL == incommod)
+  incommod_ = LI->getCommodity(commod_name);
+  if (NULL == incommod_)
     throw GenException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  residence_time = atof(XMLinput->get_xpath_content(cur,"residencetime"));
+  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  residence_time_ = atof(XMLinput->get_xpath_content(cur,"residencetime"));
 
 
-  inventory = deque<Material*>();
-  stocks = deque<Material*>();
-  ordersWaiting = deque<Message*>();
+  inventory_ = deque<Material*>();
+  stocks_ = deque<Material*>();
+  ordersWaiting_ = deque<Message*>();
   
-  _initialStateCur = cur;
+  initialStateCur_ = cur;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -67,15 +67,15 @@ void StorageFacility::copy(StorageFacility* src)
 
   FacilityModel::copy(src);
 
-  incommod = src->incommod;
-  inventory_size = src->inventory_size;
-  capacity = src->capacity;
-  residence_time = src->residence_time;
+  incommod_ = src->incommod_;
+  inventory_size_ = src->inventory_size_;
+  capacity_ = src->capacity_;
+  residence_time_ = src->residence_time_;
 
   // do we really want all of these to be copied?
-  inventory = src->inventory;
-  stocks = src->stocks;
-  ordersWaiting = src->ordersWaiting;
+  inventory_ = src->inventory_;
+  stocks_ = src->stocks_;
+  ordersWaiting_ = src->ordersWaiting_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -90,11 +90,11 @@ void StorageFacility::print()
 { 
   FacilityModel::print(); 
   cout << "stores commodity {"
-      << incommod->getName()
+      << incommod_->getName()
       << "}, for a minimum time of " 
-      << residence_time 
-      << " months and has an inventory that holds " 
-      << inventory_size << " materials."
+      << residence_time_ 
+      << " months and has an inventory_ that holds " 
+      << inventory__size_ << " materials."
       << endl;
 };
 
@@ -104,7 +104,7 @@ void StorageFacility::receiveMessage(Message* msg)
   // is this a message from on high? 
   if(msg->getSupplierID()==this->getSN()){
     // file the order
-    ordersWaiting.push_front(msg);
+    ordersWaiting_.push_front(msg);
   }
   else {
     throw GenException("StorageFacility is not the supplier of this msg.");
@@ -116,34 +116,34 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
 {
   Transaction trans = order->getTrans();
   // it should be of incommod Commodity type
-  if(trans.commod != incommod){
+  if(trans.commod != incommod_){
     throw GenException("StorageFacility can only send incommodity type materials.");
   }
-  // pull materials off of the inventory stack until you get the trans amount
+  // pull materials off of the inventory_ stack until you get the trans amount
   Mass complete = 0;
 
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > complete && !inventory.empty() ){
-    Material* m = inventory.front();
+  while(trans.amount > complete && !inventory_.empty() ){
+    Material* m = inventory_.front();
 
-    // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (capacity - complete)){
+    // if the inventory_ obj isn't larger than the remaining need, send it as is.
+    if(m->getTotMass() <= (capacity_ - complete)){
       complete += m->getTotMass();
       toSend.push_back(m);
       cout<<"StorageFacility "<< getSN()
         <<"  is sending a mat with mass: "<< m->getTotMass()<< endl;
-      inventory.pop_front();
+      inventory_.pop_front();
     }
     else{ 
-      // if the inventory obj is larger than the remaining need, split it.
+      // if the inventory_ obj is larger than the remaining need, split it.
       // start with an empty material
       Material* newMat = new Material(CompMap(), 
           m->getUnits(),
           m->getName(), 
           0, atomBased);
-      Material* toAbsorb = m->extractMass(capacity - complete);
+      Material* toAbsorb = m->extractMass(capacity_ - complete);
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
@@ -167,8 +167,8 @@ void StorageFacility::receiveMaterial(Transaction trans, vector<Material*> manif
   {
     cout<<"StorageFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
-    stocks.push_back(*thisMat);
-    entryTimes.push_back(make_pair(TI->getTime(), *thisMat ));
+    stocks_.push_back(*thisMat);
+    entryTimes_.push_back(make_pair(TI->getTime(), *thisMat ));
   }
 }
 
@@ -244,17 +244,17 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
-  std::cout << "\n ** Checking initial stocks of size " << stocks.size() << " **\n" << std::endl;
-  // check to make sure we got the correct initial inventory
-  for (int i=0;i<stocks.size();i++){
-    stocks[i]->print();
+  std::cout << "\n ** Checking initial stocks of size " << stocks_.size() << " **\n" << std::endl;
+  // check to make sure we got the correct initial inventory_
+  for (int i=0;i<stocks_.size();i++){
+    stocks_[i]->print();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::handlePreHistory()
 {
-  getInitialState( _initialStateCur );
+  getInitialState( initialStateCur_ );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -266,63 +266,63 @@ void StorageFacility::handleTick(int time)
   Mass requestAmt;
   // And it can accept amounts no matter how small
   Mass minAmt = 0;
-  // check how full its inventory is
-  Mass inv = this->checkInventory();
+  // check how full its inventory_ is
+  Mass inv = this->checkInventory_();
   // and how much is already in its stocks
   Mass sto = this->checkStocks(); 
   cout << "stocks currently at: " << sto << " " << inv << endl;
-  // subtract inv and sto from inventory max size to get total empty space
-  Mass space = inventory_size - inv - sto;
+  // subtract inv and sto from inventory_ max size to get total empty space
+  Mass space = inventory__size_ - inv - sto;
   // this will be a request for free stuff
   double commod_price = 0;
 
   if (space == 0){
     // don't request anything
   }
-  else if (space < capacity){
-    Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
+  else if (space < capacity_){
+    Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
     // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, incommod, -requestAmt, minAmt, 
+    Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
   }
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
-  else if (space >= capacity){
-    Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
+  else if (space >= capacity_){
+    Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is more than monthly acceptance capacity
-    requestAmt = capacity - sto;
+    requestAmt = capacity_ - sto;
     // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, incommod, -requestAmt, minAmt, commod_price,
+    Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, commod_price,
                                    this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
   }
   
   // MAKE OFFERS
-  // anything in the inventory is old enough to leave 
+  // anything in the inventory_ is old enough to leave 
   Mass offer_amt;
   Mass possInv = inv;
 
-  // if the inventory isn't full, then offer what you have
-  if (possInv < inventory_size){
+  // if the inventory_ isn't full, then offer what you have
+  if (possInv < inventory__size_){
     offer_amt = possInv;
   }
   else {
-    offer_amt = inventory_size; 
+    offer_amt = inventory__size_; 
   }
 
   // there is no minimum amount a storage facility may send
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(incommod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
 
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, incommod, offer_amt, min_amt, commod_price, 
+  Message* msg = new Message(UP_MSG, incommod_, offer_amt, min_amt, commod_price, 
       this, recipient);
 
   // send it
@@ -333,16 +333,16 @@ void StorageFacility::handleTock(int time)
 {
   // CHECK MATERIAL AGES
   // Some materials in the stocks have reached their minimum residence time. 
-  // put them in the inventory
+  // put them in the inventory_
   bool someOld = true;
-  while( someOld == true && !stocks.empty()){
-    Material* oldEnough = stocks.front();
-    if(TI->getTime() - entryTimes.front().first >= residence_time ){
-        entryTimes.pop_front();
+  while( someOld == true && !stocks_.empty()){
+    Material* oldEnough = stocks_.front();
+    if(TI->getTime() - entryTimes_.front().first >= residence_time_ ){
+        entryTimes_.pop_front();
         // Here is is where we could add a case switch between sending
         // youngest or oldest material first
-        inventory.push_back(oldEnough);
-        stocks.pop_front();
+        inventory_.push_back(oldEnough);
+        stocks_.pop_front();
     }
     // added this 5/17/11 because an initial inventory would cause an infinite loop
     // not positive this is correct
@@ -350,10 +350,10 @@ void StorageFacility::handleTock(int time)
   };
 
   // check what orders are waiting, 
-  while(!ordersWaiting.empty()){
-    Message* order = ordersWaiting.front();
+  while(!ordersWaiting_.empty()){
+    Message* order = ordersWaiting_.front();
     sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
-    ordersWaiting.pop_front();
+    ordersWaiting_.pop_front();
   }
   
 }
@@ -365,8 +365,8 @@ Mass StorageFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory.begin(); 
-       iter != inventory.end(); 
+  for (deque<Material*>::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }
@@ -381,8 +381,8 @@ Mass StorageFacility::checkStocks(){
   // material unit is in each object.
 
 
-  for (deque<Material*>::iterator iter = stocks.begin(); 
-       iter != stocks.end(); 
+  for (deque<Material*>::iterator iter = stocks_.begin(); 
+       iter != stocks_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }

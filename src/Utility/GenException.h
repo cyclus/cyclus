@@ -17,10 +17,10 @@ class GenException: public exception
 protected:
 
     /// The message associated with this exception.
-    string myMessage;
+    string myMessage_;
     
     /// A string to prepend to all message of this class.
-    static string prepend;
+    static string prepend_;
     
 public:
     

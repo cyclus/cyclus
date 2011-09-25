@@ -111,10 +111,10 @@ public:
 
 protected:
   /// all facilities must have at least one input commodity
-  vector<Commodity*> in_commods;
+  vector<Commodity*> in_commods_;
 
   /// this facility holds material in storage. 
-  deque<Material*> inventory;
+  deque<Material*> inventory_;
 
   /**
    * get the total mass of the stuff in the inventory
@@ -124,13 +124,13 @@ protected:
   Mass checkInventory();
 
   /// maximum inventory size
-  Mass inventory_size;
+  Mass inventory_size_;
 
   /// monthly acceptance capacity
-  Mass capacity;
+  Mass capacity_;
 
   /// commodity price
-  double commod_price;
+  double commod_price_;
 
 
 /* ------------------- */ 

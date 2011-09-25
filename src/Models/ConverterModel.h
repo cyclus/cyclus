@@ -53,10 +53,10 @@ public:
 
 protected:
   /// each instance of a converter needs a name
-  string conv_name;
+  string conv_name_;
 
   /// each converter needs a list of equivalent commodities it converts
-  list<Commodity*> commodities; 
+  list<Commodity*> commodities_; 
 
 public:
 
@@ -65,10 +65,10 @@ public:
    *
    * @param convName is the new name of the converter
    */
-  void setConvName(string convName) { conv_name = convName; };
+  void setConvName(string convName) { conv_name_ = convName; };
 
   /// Returns the converter's name
-  string getConvName() { return conv_name; };
+  string getConvName() { return conv_name_; };
 
   /**
    * Converts between amounts of two commodities

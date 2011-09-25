@@ -46,29 +46,29 @@ private:
   /**
    * A pointer to this BookKeeper once it has been initialized.
      */
-  static BookKeeper* _instance;
+  static BookKeeper* instance_;
         
   /**
    * The HDF5 output database for the simulation this BookKeeper is 
    * responsible for.
      */
-  H5File* myDB;
+  H5File* myDB_;
         
   /**
    * Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
      */
-  string dbName;
+  string dbName_;
 
   /**
    * True iff the db is open.
    */
-  bool dbIsOpen;
+  bool dbIsOpen_;
 
   /**
    * True iff the db is open.
    */
-  bool dbExists;
+  bool dbExists_;
 
 protected:
   /**
@@ -111,12 +111,12 @@ protected:
   /**
    * Stores the transactions that have taken place during the simulation.
    */
-  vector<trans_t> transactions;
+  vector<trans_t> transactions_;
 
   /**
    * Stores the material changes that have taken place during the simulation.
    */
-  vector<mat_hist_t> materials;
+  vector<mat_hist_t> materials_;
 
 public:
         
@@ -171,12 +171,12 @@ public:
   /**
    * Returns whether it's open
    */
-  bool isOpen(){return dbIsOpen;};
+  bool isOpen(){return dbIsOpen_;};
   
   /**
    * Returns whether it exists
    */
-  bool exists(){return dbExists;};
+  bool exists(){return dbExists_;};
 
   /**
    * Returns whether the group exists in the database
@@ -190,7 +190,7 @@ public:
   /**
    * Returns the name of the database
    */
-  string getDBName(){return dbName;};
+  string getDBName(){return dbName_;};
 
   /**
    * Register the transaction in the BookKeeper's map of transactions

@@ -31,11 +31,11 @@ void DeployInst::init(xmlNodePtr cur)
                          + "' is not defined in this problem.");
     }
 
-    if (!(dynamic_cast<RegionModel*>(region))->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
       throw GenException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
-                         + region->getName() +"'.");
+                         + region_->getName() +"'.");
     }
     //Model* new_facility = Model::create(facility);
     
@@ -46,9 +46,9 @@ void DeployInst::init(xmlNodePtr cur)
     if (start_month < 0){
       throw GenException("You can't deploy a facility in the past.");
     }
-    deployment_map[start_month] = facility;
+    deployment_map_[start_month] = facility;
   }
-  to_build_map = deployment_map;
+  to_build_map_ = deployment_map_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -56,8 +56,8 @@ void DeployInst::copy(DeployInst* src)
 {
   InstModel::copy(src);
 
-  deployment_map = src->deployment_map;
-  to_build_map = deployment_map;
+  deployment_map_ = src->deployment_map_;
+  to_build_map_ = deployment_map_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -73,8 +73,8 @@ void DeployInst::print()
 
   cout << " with deployment schedule: " << endl;
 
-  for (map<int,Model*>::iterator deploy=deployment_map.begin();
-       deploy!=deployment_map.end();
+  for (map<int,Model*>::iterator deploy=deployment_map_.begin();
+       deploy!=deployment_map_.end();
        deploy++){
     cout << "\t\t\tFacility " << dynamic_cast<FacilityModel*>((*deploy).second)->getFacName()
         << " ("  << (*deploy).second->getName() 
@@ -84,13 +84,13 @@ void DeployInst::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void DeployInst::handleTick(int time) {
-  map<int,Model*>::iterator next_build = to_build_map.begin();
+  map<int,Model*>::iterator next_build = to_build_map_.begin();
   while (time==(*next_build).first) {
     Model* new_facility = Model::create((*next_build).second);
     //dynamic_cast<FacilityModel*>(new_facility)->setFacName(pointer, name);
     // this->addFacility((*next_build).second);
-    to_build_map.erase(next_build);
-    next_build=to_build_map.begin();
+    to_build_map_.erase(next_build);
+    next_build=to_build_map_.begin();
     LI->addModel(new_facility, FACILITY);
   };
 };

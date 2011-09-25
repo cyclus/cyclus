@@ -13,44 +13,45 @@
 #include "Material.h"
 #include "Message.h"
 
-BookKeeper* BookKeeper::_instance = 0;
+BookKeeper* BookKeeper::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper* BookKeeper::Instance()
 {
 	// If we haven't created a BookKeeper yet, create and return it.
-	if (0 == _instance)
-		_instance = new BookKeeper();
+	if (0 == instance_)
+		instance_ = new BookKeeper();
 	
-	return _instance;
+	return instance_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() 
 {
-  dbIsOpen = false;
-  dbExists = false;
+  dbIsOpen_ = false;
+  dbExists_ = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 void BookKeeper::createDB(){
   createDB("cyclus.h5");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::createDB(string name){
-  dbName = name;
+  dbName_ = name;
 
   try{
     // create database. If it already exits, H5F_ACC_TRUNC erases all 
     // data previously stored in the file.
-    myDB = new H5File( name , H5F_ACC_TRUNC );
-    dbIsOpen = true; // use the H5 function for this.. !!! KDHFLAG
-    dbExists = true;
+    myDB_ = new H5File( name , H5F_ACC_TRUNC );
+    dbIsOpen_ = true; // use the H5 function for this.. !!! KDHFLAG
+    dbExists_ = true;
 
     // create groups for the input and output data, respectively
-    Group* outGroup = new Group( myDB->createGroup("/output"));
-    Group* inGroup = new Group( myDB->createGroup("/input"));
+    Group* outGroup = new Group( myDB_->createGroup("/output"));
+    Group* inGroup = new Group( myDB_->createGroup("/input"));
 
     delete outGroup;
     delete inGroup;
@@ -94,18 +95,18 @@ DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, st
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 H5File* BookKeeper::getDB()
 {
-	return myDB;
+	return myDB_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB()
 {
-  if(dbIsOpen==false){
+  if(dbIsOpen_==false){
     //If the database is already open, throw an exception; the caller probably 
 	  // doesn't realize this.
     try{ 
-      myDB = new H5File(dbName, H5F_ACC_RDWR);
-	    dbIsOpen = true;
+      myDB_ = new H5File(dbName_, H5F_ACC_RDWR);
+	    dbIsOpen_ = true;
     }
     catch( FileIException error )
     {
@@ -121,9 +122,9 @@ void BookKeeper::closeDB()
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
     Exception::dontPrint();
-    if(dbIsOpen==true){
+    if(dbIsOpen_==true){
       this->getDB()->close();
-      dbIsOpen = false;
+      dbIsOpen_ = false;
     }
     else
       throw GenException("Tried to close a database that was not open."); 
@@ -155,7 +156,7 @@ void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
     toRegister.price = msg->getPrice();
      
     strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
-    transactions.push_back(toRegister);
+    transactions_.push_back(toRegister);
   };
 };
 
@@ -183,7 +184,7 @@ void BookKeeper::registerMatChange(Material* mat){
   if(it != comp.rend()){
     toRegister.iso = it->first;
     toRegister.comp = (it->second)*(total);
-    materials.push_back(toRegister);
+    materials_.push_back(toRegister);
   };
 };
 
@@ -318,7 +319,7 @@ void BookKeeper::writeTransList(){
   const H5std_string subgroup_name = "transactions";
   const H5std_string dataset_name = "transList";
 
-  int numTrans = transactions.size();
+  int numTrans = transactions_.size();
 
   int numStructs;
   if(numTrans==0)
@@ -329,12 +330,12 @@ void BookKeeper::writeTransList(){
   // create an array of the model structs
   trans_t transList[numStructs];
   for (int i=0; i<numTrans; i++){
-    transList[i].supplierID = transactions[i].supplierID;
-    transList[i].requesterID = transactions[i].requesterID;
-    transList[i].materialID = transactions[i].materialID;
-    transList[i].timestamp = transactions[i].timestamp;
-    transList[i].price = transactions[i].price;
-    strcpy( transList[i].commodName,transactions[i].commodName);
+    transList[i].supplierID = transactions_[i].supplierID;
+    transList[i].requesterID = transactions_[i].requesterID;
+    transList[i].materialID = transactions_[i].materialID;
+    transList[i].timestamp = transactions_[i].timestamp;
+    transList[i].price = transactions_[i].price;
+    strcpy( transList[i].commodName,transactions_[i].commodName);
   };
   // If there are no transactions, make a null transaction entry
   if(numTrans==0){
@@ -412,7 +413,7 @@ void BookKeeper::writeMatHist(){
   const H5std_string subgroup_name = "materials";
   const H5std_string dataset_name = "matHist";
 
-  int numHists = materials.size();
+  int numHists = materials_.size();
 
   int numStructs;
   if(numHists==0)
@@ -423,10 +424,10 @@ void BookKeeper::writeMatHist(){
   // create an array of the model structs
   mat_hist_t matHist[numStructs];
   for (int i=0; i<numHists; i++){
-    matHist[i].materialID = materials[i].materialID;
-    matHist[i].timestamp = materials[i].timestamp;
-    matHist[i].iso = materials[i].iso;
-    matHist[i].comp = materials[i].comp;
+    matHist[i].materialID = materials_[i].materialID;
+    matHist[i].timestamp = materials_[i].timestamp;
+    matHist[i].iso = materials_[i].iso;
+    matHist[i].comp = materials_[i].comp;
   };
   // If there are no materials, make a null entry
   if(numHists==0){
@@ -829,7 +830,7 @@ void BookKeeper::readData(string dsname, intData1d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
 
@@ -882,7 +883,7 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its an integer
@@ -940,7 +941,7 @@ void BookKeeper::readData(string dsname, intData3d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its an integer
@@ -1001,7 +1002,7 @@ void BookKeeper::readData(string dsname, dblData1d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
 
@@ -1057,7 +1058,7 @@ void BookKeeper::readData(string dsname, dblData2d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its a double
@@ -1115,7 +1116,7 @@ void BookKeeper::readData(string dsname, dblData3d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its a double
@@ -1176,7 +1177,7 @@ void BookKeeper::readData(string dsname, strData1d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
 
@@ -1230,7 +1231,7 @@ void BookKeeper::readData(string dsname, strData2d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its a string
@@ -1288,7 +1289,7 @@ void BookKeeper::readData(string dsname, strData3d& out_data){
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
     // get the dataset open
-    DataSet dataset = myDB->openDataSet(dsname);
+    DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its an string

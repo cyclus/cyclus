@@ -19,7 +19,7 @@ private:
 	/**
 	 * A pointer to this Env once it has been initialized.
 	 */
-	static Env* _instance;
+	static Env* instance_;
 
 
 protected:

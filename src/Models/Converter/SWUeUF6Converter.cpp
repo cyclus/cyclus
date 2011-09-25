@@ -13,7 +13,7 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
 { 
   ConverterModel::init(cur);
   
-  in_commod = out_commod = NULL; 
+  in_commod_ = out_commod_ = NULL; 
   
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SWUeUF6Converter");
@@ -23,15 +23,15 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod = LI->getCommodity(commod_name);
-  if (NULL == in_commod)
+  in_commod_ = LI->getCommodity(commod_name);
+  if (NULL == in_commod_)
     throw GenException("Input commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
                        + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod = LI->getCommodity(commod_name);
-  if (NULL == out_commod)
+  out_commod_ = LI->getCommodity(commod_name);
+  if (NULL == out_commod_)
     throw GenException("Output commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
                        + "'.");
@@ -43,8 +43,8 @@ void SWUeUF6Converter::copy(SWUeUF6Converter* src)
 
   ConverterModel::copy(src);
 
-  in_commod = src->in_commod;
-  out_commod = src->out_commod;
+  in_commod_ = src->in_commod_;
+  out_commod_ = src->out_commod_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -58,9 +58,9 @@ void SWUeUF6Converter::print()
 { 
   ConverterModel::print(); 
   cout << "converts offers of commodity {"
-      << in_commod->getName()
+      << in_commod_->getName()
       << "} into offers of commodity {"
-      << out_commod->getName()
+      << out_commod_->getName()
       << "}."
       << endl;
 };
@@ -81,8 +81,8 @@ void SWUeUF6Converter::handleTock(int time)
 Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
 {
   // Figure out what you're converting to and from
-  in_commod = convMsg->getCommod();
-  out_commod = refMsg->getCommod();
+  in_commod_ = convMsg->getCommod();
+  out_commod_ = refMsg->getCommod();
   int enrID;
   Model* castEnr;
   Message* toRet;
@@ -96,8 +96,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   CompMap comp;
 
   // determine which direction we're converting
-  if (in_commod == LI->getCommodity("SWUs") &&
-      out_commod == LI->getCommodity("eUF6")){
+  if (in_commod_ == LI->getCommodity("SWUs") &&
+      out_commod_ == LI->getCommodity("eUF6")){
     // the enricher is the supplier in the convMsg
     enrID = convMsg->getSupplierID();
     castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
@@ -108,8 +108,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     comp = refMsg->getComp();
   }
 
-  else if (in_commod == LI->getCommodity("eUF6") &&
-      out_commod == LI->getCommodity("SWUs")){ 
+  else if (in_commod_ == LI->getCommodity("eUF6") &&
+      out_commod_ == LI->getCommodity("SWUs")){ 
     // the enricher is the supplier in the refMsg
     enrID = refMsg->getSupplierID();
     castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
@@ -139,16 +139,16 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   massProdU = SWUs/(term1 + term2 - term3);
   SWUs = massProdU*(term1 + term2 - term3);
 
-  if(out_commod == LI->getCommodity("eUF6")){
+  if(out_commod_ == LI->getCommodity("eUF6")){
     toRet = convMsg->clone();
     toRet->setAmount(massProdU); 
   }
-  else if(out_commod == LI->getCommodity("SWUs")){
+  else if(out_commod_ == LI->getCommodity("SWUs")){
     toRet = convMsg->clone();
     toRet->setAmount(SWUs); 
   }
 
-  toRet->setCommod(out_commod);
+  toRet->setCommod(out_commod_);
   toRet->setComp(comp);
 
   return toRet;

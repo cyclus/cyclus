@@ -95,16 +95,16 @@ protected:
  * --------------------
  */
 public:
-    void addInstitution(Model* new_inst) { institutions.push_back(new_inst); };
+    void addInstitution(Model* new_inst) { institutions_.push_back(new_inst); };
     bool isAllowedFacility(Model* test_fac) 
-    { return ( allowedFacilities.find(test_fac) != allowedFacilities.end() ); } ;
+    { return ( allowedFacilities_.find(test_fac) != allowedFacilities_.end() ); } ;
 
 protected:
     /// every region has a list of allowed facilities
-    set<Model*> allowedFacilities;
+    set<Model*> allowedFacilities_;
 
     /// every region has a list of institutions
-    vector<Model*> institutions;
+    vector<Model*> institutions_;
 /* -------------------- */
 
 };

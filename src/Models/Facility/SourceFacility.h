@@ -120,47 +120,47 @@ protected:
   /**
    * This facility has only one output commodity
    */
-  Commodity* out_commod;
+  Commodity* out_commod_;
   
   /**
    * This facility has a specific recipe for its output
    */
-  Material* recipe;
+  Material* recipe_;
   
   /**
    *  The capacity is defined in terms of the number of units of the recipe
    *  that can be provided each time step.  A very large number can be
    *  provided to represent infinte capacity.
    */
-  double capacity;
+  double capacity_;
 
   /**
    * The maximum size that the inventory can grow to.
    * The NullFacility must stop processing the material in its stocks 
    * when its inventory is full.
    */
-  int inventory_size;
+  int inventory_size_;
 
   /**
    * The price that the facility will charge for its output commodity.
    * Units vary and are in dollars per inventory unit.
    */
-  double commod_price;
+  double commod_price_;
 
-	/**
-	 * A collection  that holds the "product" Material this Facility has on 
-	 * hand to send to others. For instance, a Reactor's inventory is its 
-	 * collection of old fuel assemblies that have come out of the core.
-	 */ 
-	deque<Material*> inventory;
+  /**
+   * A collection  that holds the "product" Material this Facility has on 
+   * hand to send to others. For instance, a Reactor's inventory is its 
+   * collection of old fuel assemblies that have come out of the core.
+   */ 
+  deque<Material*> inventory_;
   
   /// return the inventory
-  deque<Material*>* getInventory(){return &inventory;};
+  deque<Material*>* getInventory(){return &inventory_;};
 
   /**
    * A list of orders to be processed on the Tock
    */
-  deque<Message*> ordersWaiting;
+  deque<Message*> ordersWaiting_;
 
   /**
    * return the total mass of the material objects in the inventory

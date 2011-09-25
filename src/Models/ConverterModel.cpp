@@ -16,7 +16,7 @@ void ConverterModel::copy(ConverterModel* src)
   Model::copy(src); 
 
   // don't copy conv_name to new instance
-  conv_name = "";
+  conv_name_ = "";
   LI->addModel(this, CONVERTER);
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

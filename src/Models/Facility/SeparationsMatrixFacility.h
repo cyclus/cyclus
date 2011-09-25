@@ -143,38 +143,38 @@ protected:
     /**
      *  Vector of incoming material
      */
-    vector<Commodity*> in_commod;
+    vector<Commodity*> in_commod_;
 
     /**
      *  Vector of outgoing material
      */
-    vector<Commodity*> out_commod;
+    vector<Commodity*> out_commod_;
 
     /**
      * The SeparationsMatrixFacility has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
 
     /**
      * This is the structure for each stream.
      */
-    map<Commodity*,pair<int, double> > stream_set;
+    map<Commodity*,pair<int, double> > stream_set_;
 
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<pair<Commodity*,Material*> > stocks;
+    deque<pair<Commodity*,Material*> > stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<pair<Commodity*,Material*> > inventory;
+    deque<pair<Commodity*,Material*> > inventory_;
 
     /**
      * The inventory of waste material.
      */
-    deque<pair<Commodity*,Material*> > wastes;
+    deque<pair<Commodity*,Material*> > wastes_;
 
    	/**
      * The total mass flow required to process all outstanding orders this 
@@ -182,19 +182,19 @@ protected:
      * uranium and sometimes of certain isotopes. For Enrichment, they're 
      * tons U SWU. For Fuel Fab, they're tons U.
      */
-    double outstMF;
+    double outstMF_;
 
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting;
+    deque<Message*> ordersWaiting_;
 
     /**
      * A map whose keys are times at which this Facility will finish 
      * executing a given order and the values are pairs comprising the orders 
      * themselves and the Materials each is to be made with.
      */
-    ProcessLine ordersExecuting;
+    ProcessLine ordersExecuting_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -239,19 +239,19 @@ protected:
     /**
      * The time that the stock material spends in the facility.
      */
-    int residence_time;
+    int residence_time_;
 
     /**
      * The maximum size that the inventory can grow to.
      * The SeparationsMatrixFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    int inventory_size;
+    int inventory_size_;
 
     /**
      * Hack Force to Get Streams to operate by telling code how many streams to separate
      */
-    int nodeForce;
+    int nodeForce_;
 
     /**
      * Stream of material in a list to use as Separations Guide
@@ -262,12 +262,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe;
+    Material* in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe;
+    Material* out_recipe_;
 
 /* ------------------- */ 
 

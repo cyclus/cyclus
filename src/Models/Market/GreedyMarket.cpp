@@ -11,13 +11,13 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GreedyMarket::receiveMessage(Message *msg)
 {
-  messages.insert(msg);
+  messages_.insert(msg);
 
   if (msg->getAmount() > 0){
-    offers.insert(indexedMsg(msg->getAmount(),msg));
+    offers_.insert(indexedMsg(msg->getAmount(),msg));
   }
   else{
-    requests.insert(indexedMsg(-msg->getAmount(),msg));
+    requests_.insert(indexedMsg(-msg->getAmount(),msg));
   }
 }
 
@@ -27,22 +27,22 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request)
   // send a failure message to the facility
   //  Transaction trans;
   //  trans.amount = 0;
-  //  orders.push_back(new Message(down, trans, this, 
+  //  orders_.push_back(new Message(down, trans, this, 
   //                               (*request).second->getRequester()));
 
   // delete the tentative orders
-  while ( orders.size() > firmOrders)
+  while ( orders_.size() > firmOrders_)
   {
-    delete orders.back();
-    orders.pop_back();
+    delete orders_.back();
+    orders_.pop_back();
   }
 
-  // put all matched offers back in the sorted list
-  while (matchedOffers.size() > 0)
+  // put all matched offers_ back in the sorted list
+  while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers.begin());
-    offers.insert(indexedMsg(msg->getAmount(),msg));
-    matchedOffers.erase(msg);
+    Message *msg = *(matchedOffers_.begin());
+    offers_.insert(indexedMsg(msg->getAmount(),msg));
+    matchedOffers_.erase(msg);
   }
 
 }
@@ -51,13 +51,13 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request)
 void GreedyMarket::process_request()
 {
   // update pointer to firm orders
-  firmOrders = orders.size();
+  firmOrders_ = orders_.size();
 
-  while (matchedOffers.size() > 0)
+  while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers.begin());
-    messages.erase(msg);
-    matchedOffers.erase(msg);
+    Message *msg = *(matchedOffers_.begin());
+    messages_.erase(msg);
+    matchedOffers_.erase(msg);
   }
 }
  
@@ -72,17 +72,17 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
   requestMsg = (*request).second;
   
   // if this request is not yet satisfied &&
-  // there are more offers left
-  while ( requestAmt > 0 && offers.size() > 0)
+  // there are more offers_ left
+  while ( requestAmt > 0 && offers_.size() > 0)
   {
     // get a new offer
-    offer = offers.end();
+    offer = offers_.end();
     offer--;
     offerAmt = (*offer).first;
     offerMsg = (*offer).second;
 
     // pop off this offer
-    offers.erase(offer);
+    offers_.erase(offer);
   
     if (requestAmt > offerAmt) { 
       // put a new message in the order stack
@@ -91,9 +91,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       offerMsg->setDir(DOWN_MSG);
 
       // tenatively queue a new order (don't execute yet)
-      matchedOffers.insert(offerMsg);
+      matchedOffers_.insert(offerMsg);
 
-      orders.push_back(offerMsg);
+      orders_.push_back(offerMsg);
 
       cout << "GreedyMarket has resolved a match from "
           << offerMsg->getSupplierID()
@@ -116,9 +116,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequesterID(requestMsg->getRequesterID());
 
-      matchedOffers.insert(offerMsg);
+      matchedOffers_.insert(offerMsg);
 
-      orders.push_back(maybe_offer);
+      orders_.push_back(maybe_offer);
 
       cout << "GreedyMarket has resolved a match from "
           << maybe_offer->getSupplierID()
@@ -153,12 +153,12 @@ void GreedyMarket::resolve()
 {
   sortedMsgList::iterator request;
 
-  firmOrders = 0;
+  firmOrders_ = 0;
 
-  /// while requests remain and there is at least one offer left
-  while (requests.size() > 0)
+  /// while requests_ remain and there is at least one offer left
+  while (requests_.size() > 0)
   {
-    request = requests.end();
+    request = requests_.end();
     request--;
     
     if(match_request(request)) {
@@ -171,8 +171,8 @@ void GreedyMarket::resolve()
       reject_request(request);
     }
     // remove this request
-    messages.erase((*request).second);
-    requests.erase(request);
+    messages_.erase((*request).second);
+    requests_.erase(request);
   }
 
   executeOrderQueue();

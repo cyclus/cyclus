@@ -129,60 +129,60 @@ protected:
     /**
      * The EnrichmentFacility has one input commodity
      */
-    Commodity* in_commod;
+    Commodity* in_commod_;
 
     /**
      * The EnrichmentFacility has one output commodity
      */
-    Commodity* out_commod;
+    Commodity* out_commod_;
 
     /**
      * The EnrichmentFacility has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
 
     /**
      * The EnrichmentFacility has a default tails fraction (xw)
      * to help it calculate SWUs from a desired product.
      * If it is not set in the XML input, the default value is 0.25% 
      */
-    double default_xw;
+    double default_xw_;
 
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks;
+    deque<Material*> stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory;
+    deque<Material*> inventory_;
 
     /**
      * The inventory of waste material.
      */
-    deque<Material*> wastes;
+    deque<Material*> wastes_;
 
-   	/**
+     /**
      * The total mass flow required to process all outstanding orders this 
      * Facility has already committed to. Units are tons, sometimes of 
      * uranium and sometimes of certain isotopes. For Enrichment, they're 
      * tons U SWU. For Fuel Fab, they're tons U.
      */
-    double outstMF;
+    double outstMF_;
 
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting;
+    deque<Message*> ordersWaiting_;
 
     /**
      * A map whose keys are times at which this Facility will finish 
      * executing a given order and the values are pairs comprising the orders 
      * themselves and the Materials each is to be made with.
      */
-    ProcessLine ordersExecuting;
+    ProcessLine ordersExecuting_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -214,44 +214,44 @@ protected:
     void makeOffers();
 
     /**
-	   * Calculates the separative work (in ton SWU) required to create a certain 
-	   * amount of enriched uranium product subject to a given enrichment scheme.
-	   * 
-	   * Note: for now, this model assumes two-component enrichment (only 
-	   * U-235 and U-238, no U-234 or U-236).
-	   *
-	   * @param massProdU the mass (in tons U) of product required
-	   * @param xp the required product enrichment of U-235 (between 0 and 1)
-	   * @param xf the feed enrichment of U-235 (between 0 and 1)
-	   * @param xw the tails enrichment of U-235 (between 0 and 1)
-	   * @return the separative work (in tons SWU)
-	   */
-	  static double calcSWUs(double massProdU, double xp, double xf, double xw);
+     * Calculates the separative work (in ton SWU) required to create a certain 
+     * amount of enriched uranium product subject to a given enrichment scheme.
+     * 
+     * Note: for now, this model assumes two-component enrichment (only 
+     * U-235 and U-238, no U-234 or U-236).
+     *
+     * @param massProdU the mass (in tons U) of product required
+     * @param xp the required product enrichment of U-235 (between 0 and 1)
+     * @param xf the feed enrichment of U-235 (between 0 and 1)
+     * @param xw the tails enrichment of U-235 (between 0 and 1)
+     * @return the separative work (in tons SWU)
+     */
+    static double calcSWUs(double massProdU, double xp, double xf, double xw);
 
-	  /**
-	   * Same as the four-argument version, but uses this Enrichment plant's 
-	   * default value for tails enrichment.
-	   * 
-	   * Note: for now, this function assumes two-component enrichment (only 
-	   * U-235 and U-238, no U-234 or U-236).
-	   *
-	   * @param massProdU the mass (in tons U) of product required
-	   * @param xp the required product enrichment of U-235 (between 0 and 1)
-	   * @param xf the feed enrichment of U-235 (between 0 and 1)
-	   * @return the separative work (in tons SWU)
-	   */
-	   double calcSWUs(double massProdU, double xp, double xf);
+    /**
+     * Same as the four-argument version, but uses this Enrichment plant's 
+     * default value for tails enrichment.
+     * 
+     * Note: for now, this function assumes two-component enrichment (only 
+     * U-235 and U-238, no U-234 or U-236).
+     *
+     * @param massProdU the mass (in tons U) of product required
+     * @param xp the required product enrichment of U-235 (between 0 and 1)
+     * @param xf the feed enrichment of U-235 (between 0 and 1)
+     * @return the separative work (in tons SWU)
+     */
+     double calcSWUs(double massProdU, double xp, double xf);
 
     /**
      * Checks to see if the given candidate Material can be used for enrichment
      * of any of the ordersWaiting for Material. If so, returns 
      * an iterator pointing to that item. If not, returns an iterator just past 
-	   * the last element.
-	   *
-	   * @param candMat the candidate material
-	   * @return the iterator
-	   */
-	  multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
+     * the last element.
+     *
+     * @param candMat the candidate material
+     * @return the iterator
+     */
+    multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
 
     /**
      * The time that the stock material spends in the facility.

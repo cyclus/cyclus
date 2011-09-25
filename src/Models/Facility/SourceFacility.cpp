@@ -17,9 +17,9 @@ SourceFacility::SourceFacility(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::~SourceFacility(){
   // Delete all the Material in the inventory.
-  while (!inventory.empty()) {
-    Material* m = inventory.front();
-    inventory.pop_front();
+  while (!inventory_.empty()) {
+    Material* m = inventory_.front();
+    inventory_.pop_front();
     delete m;
   }
 }
@@ -30,7 +30,7 @@ void SourceFacility::init(xmlNodePtr cur)
   FacilityModel::init(cur);
 
   cout<<"The Source Facility is being initialized"<<endl;
-  out_commod = NULL;
+  out_commod_ = NULL;
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -40,31 +40,31 @@ void SourceFacility::init(xmlNodePtr cur)
   string input_token;
 
   input_token = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod = LI->getCommodity(input_token);
-  if (NULL == out_commod)
+  out_commod_ = LI->getCommodity(input_token);
+  if (NULL == out_commod_)
     throw GenException("Output commodity '" + input_token 
         + "' does not exist for facility '" + getName() 
         + "'.");
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");
-  recipe = LI->getRecipe(input_token);
-  if (NULL == recipe)
+  recipe_ = LI->getRecipe(input_token);
+  if (NULL == recipe_)
     throw GenException("Recipe '" + input_token 
         + "' does not exist for facility '" + getName()
         + "'.");
 
   // get capacity
-  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
 
-  // get inventory_size
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  // get inventory_size_
+  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
 
   // get commodity price 
-  commod_price = atof(XMLinput->get_xpath_content(cur,"commodprice"));
+  commod_price_ = atof(XMLinput->get_xpath_content(cur,"commodprice"));
 
-  inventory = deque<Material*>();
-  ordersWaiting = deque<Message*>();
+  inventory_ = deque<Material*>();
+  ordersWaiting_ = deque<Message*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -72,14 +72,14 @@ void SourceFacility::copy(SourceFacility* src)
 {
   FacilityModel::copy(src);
 
-  out_commod = src->out_commod;
-  recipe = src->recipe;
-  capacity = src->capacity;
-  inventory_size = src->inventory_size;
-  commod_price = src->commod_price;
+  out_commod_ = src->out_commod_;
+  recipe_ = src->recipe_;
+  capacity_ = src->capacity_;
+  inventory_size_ = src->inventory_size_;
+  commod_price_ = src->commod_price_;
   
-  inventory = deque<Material*>();
-  ordersWaiting = deque<Message*>();
+  inventory_ = deque<Material*>();
+  ordersWaiting_ = deque<Message*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -94,11 +94,11 @@ void SourceFacility::print()
   FacilityModel::print();
 
   cout << "supplies commodity {"
-      << out_commod->getName() << "} with recipe '" 
-      << recipe->getName() << "' at a capacity of "
-      << capacity << " " << recipe->getUnits() << " per time step."
-      << " It has a max inventory of " << inventory_size << " " 
-      << recipe->getUnits() <<  "." << endl;
+      << out_commod_->getName() << "} with recipe '" 
+      << recipe_->getName() << "' at a capacity of "
+      << capacity_ << " " << recipe_->getUnits() << " per time step."
+      << " It has a max inventory of " << inventory_size_ << " " 
+      << recipe_->getUnits() <<  "." << endl;
   
 }
 
@@ -108,7 +108,7 @@ void SourceFacility::receiveMessage(Message* msg){
   // is this a message from on high? 
   if(msg->getSupplierID()==this->getSN()){
     // file the order
-    ordersWaiting.push_front(msg);
+    ordersWaiting_.push_front(msg);
   }
   else {
     throw GenException("SourceFacility is not the supplier of this msg.");
@@ -126,19 +126,19 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory.empty() ){
+  while(trans.amount > newAmt && !inventory_.empty() ){
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
-                                  recipe->getUnits(),
-                                  recipe->getName(), 
+                                  recipe_->getUnits(),
+                                  recipe_->getName(), 
                                   0, MASSBASED);
 
-    Material* m = inventory.front();
+    Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
-      inventory.pop_front();
+      inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
@@ -161,24 +161,24 @@ void SourceFacility::handleTick(int time){
   // decide how much to offer
   Mass offer_amt;
   Mass inv = this->checkInventory();
-  Mass possInv = inv+capacity*recipe->getTotMass(); 
+  Mass possInv = inv+capacity_*recipe_->getTotMass(); 
 
-  if (possInv < inventory_size*recipe->getTotMass()){
+  if (possInv < inventory_size_*recipe_->getTotMass()){
     offer_amt = possInv;
   }
   else {
-    offer_amt = inventory_size*recipe->getTotMass(); 
+    offer_amt = inventory_size_*recipe_->getTotMass(); 
   }
 
   // there is no minimum amount a source facility may send
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(out_commod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
   cout << "During handleTick, " << getFacName() << " offers: "<< offer_amt << "."  << endl;
 
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, out_commod, offer_amt, min_amt, commod_price, 
+  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price_, 
       this, recipient);
 
   // send it
@@ -188,35 +188,35 @@ void SourceFacility::handleTick(int time){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
   // if there's room in the inventory, process material at capacity
-  Mass space = inventory_size - this->checkInventory(); 
-  if(capacity*recipe->getTotMass() <= space){
+  Mass space = inventory_size_ - this->checkInventory(); 
+  if(capacity_*recipe_->getTotMass() <= space){
     // add a material the size of the capacity to the inventory
-    Material* newMat = new Material(recipe->getMassComp(), 
-                                    recipe->getUnits(), 
-                                    recipe->getName(),
-                                    capacity*recipe->getTotMass(), 
+    Material* newMat = new Material(recipe_->getMassComp(), 
+                                    recipe_->getUnits(), 
+                                    recipe_->getName(),
+                                    capacity_*recipe_->getTotMass(), 
                                     MASSBASED);
     cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
-    inventory.push_front(newMat);
+    inventory_.push_front(newMat);
   }
-  else if (space < capacity*recipe->getTotMass() && space > 0){
+  else if (space < capacity_*recipe_->getTotMass() && space > 0){
     // add a material that fills the inventory
-    Material* newMat = new Material(recipe->getMassComp(), 
-                                    recipe->getUnits(), 
-                                    recipe->getName(),
+    Material* newMat = new Material(recipe_->getMassComp(), 
+                                    recipe_->getUnits(), 
+                                    recipe_->getName(),
                                     space,
                                     ATOMBASED);
     cout << getFacName() << ", handling the tock, has created a material:"<<endl;
     newMat->print();
-    inventory.push_front(newMat);
+    inventory_.push_front(newMat);
   }
   // check what orders are waiting,
   // send material if you have it now
-  while(!ordersWaiting.empty()){
-    Message* order = ordersWaiting.front();
+  while(!ordersWaiting_.empty()){
+    Message* order = ordersWaiting_.front();
     sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
-    ordersWaiting.pop_front();
+    ordersWaiting_.pop_front();
   }
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
@@ -236,8 +236,8 @@ Mass SourceFacility::checkInventory(){
   // material unit is in each object.
   
   
-  for (deque<Material*>::iterator iter = inventory.begin(); 
-       iter != inventory.end(); 
+  for (deque<Material*>::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }

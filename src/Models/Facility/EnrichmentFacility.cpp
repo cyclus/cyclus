@@ -21,6 +21,7 @@
  * Process as much raw stock material as capacity will allow.
  * Send appropriate materials to fill ordersWaiting.
  *
+ *
  * RECIEVE MATERIAL
  * put it in stocks
  *
@@ -34,7 +35,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
   
-  in_commod = out_commod = NULL; 
+  in_commod_ = out_commod_ = NULL; 
   
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/EnrichmentFacility");
@@ -44,32 +45,32 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod = LI->getCommodity(commod_name);
-  if (NULL == in_commod)
+  in_commod_ = LI->getCommodity(commod_name);
+  if (NULL == in_commod_)
     throw GenException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod = LI->getCommodity(commod_name);
-  if (NULL == out_commod)
+  out_commod_ = LI->getCommodity(commod_name);
+  if (NULL == out_commod_)
     throw GenException("Output commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
 
   // get inventory size
   inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  // get capacity
-  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  // get capacity_
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity_"));
   // get default tails fraction
-  default_xw = atof(XMLinput->get_xpath_content(cur,"tailsassay"));
+  default_xw_ = atof(XMLinput->get_xpath_content(cur,"tailsassay"));
 
-  inventory = deque<Material*>();
-  stocks = deque<Material*>();
-  ordersWaiting = deque<Message*>();
-  ordersExecuting = ProcessLine();
+  inventory_ = deque<Material*>();
+  stocks_ = deque<Material*>();
+  ordersWaiting_ = deque<Message*>();
+  ordersExecuting_ = ProcessLine();
 
-  outstMF = 0;
+  outstMF_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -78,18 +79,18 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 
   FacilityModel::copy(src);
 
-  in_commod = src->in_commod;
-  out_commod = src->out_commod;
+  in_commod_ = src->in_commod_;
+  out_commod_ = src->out_commod_;
   inventory_size = src->inventory_size;
-  capacity = src->capacity;
-  default_xw = src->default_xw;
+  capacity_ = src->capacity_;
+  default_xw_ = src->default_xw_;
 
-  inventory = deque<Material*>();
-  stocks = deque<Material*>();
-  ordersWaiting = deque<Message*>();
-  ordersExecuting = ProcessLine();
+  inventory_ = deque<Material*>();
+  stocks_ = deque<Material*>();
+  ordersWaiting_ = deque<Message*>();
+  ordersExecuting_ = ProcessLine();
 
-  outstMF = 0;
+  outstMF_ = 0;
 }
 
 
@@ -105,9 +106,9 @@ void EnrichmentFacility::print()
 { 
   FacilityModel::print(); 
   cout << "converts commodity {"
-      << in_commod->getName()
+      << in_commod_->getName()
       << "} into commodity {"
-      << out_commod->getName()
+      << out_commod_->getName()
       << "}, and has an inventory that holds " 
       << inventory_size << " materials"
       << endl;
@@ -119,7 +120,7 @@ void EnrichmentFacility::receiveMessage(Message* msg)
   // is this a message from on high? 
   if(msg->getSupplierID()==this->getSN()){
     // file the order
-    ordersWaiting.push_front(msg);
+    ordersWaiting_.push_front(msg);
   }
   else {
     throw GenException("EnrichmentFacility is not the supplier of this msg.");
@@ -130,9 +131,9 @@ void EnrichmentFacility::receiveMessage(Message* msg)
 void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requester)
 {
   Transaction trans = msg->getTrans();
-  // it should be of out_commod Commodity type
-  if(trans.commod != out_commod){
-    throw GenException("EnrichmentFacility can only send out_commod materials.");
+  // it should be of out_commod_ Commodity type
+  if(trans.commod != out_commod_){
+    throw GenException("EnrichmentFacility can only send out_commod_ materials.");
   }
 
   Mass newAmt = 0;
@@ -142,8 +143,8 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory.empty() ){
-    Material* m = inventory.front();
+  while(trans.amount > newAmt && !inventory_.empty() ){
+    Material* m = inventory_.front();
 
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
@@ -155,7 +156,7 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
     if(m->getTotMass() <= (trans.amount - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
-      inventory.pop_front();
+      inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
@@ -182,7 +183,7 @@ void EnrichmentFacility::receiveMaterial(Transaction trans, vector<Material*> ma
   {
     cout<<"EnrichmentFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
-    stocks.push_back(*thisMat);
+    stocks_.push_back(*thisMat);
   }
 }
 
@@ -202,13 +203,13 @@ void EnrichmentFacility::handleTick(int time)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::handleTock(int time)
 {
-  // at rate allowed by capacity, convert material in Stocks to out_commod type
+  // at rate allowed by capacity_, convert material in Stocks to out_commod_ type
   // move converted material into Inventory
 
   Mass complete = 0;
 
-  while(capacity > complete && !stocks.empty() ){
-    Material* m = stocks.front();
+  while(capacity_ > complete && !stocks_.empty() ){
+    Material* m = stocks_.front();
 
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
@@ -217,26 +218,26 @@ void EnrichmentFacility::handleTock(int time)
                                   0, ATOMBASED);
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (capacity - complete)){
+    if(m->getTotMass() <= (capacity_ - complete)){
       complete += m->getTotMass();
       newMat->absorb(m);
-      stocks.pop_front();
+      stocks_.pop_front();
     }
     else{ 
       // if the stocks obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(capacity - complete);
+      Material* toAbsorb = m->extractMass(capacity_ - complete);
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
 
-    inventory.push_back(newMat);
+    inventory_.push_back(newMat);
   }    
 
   // fill the orders that are waiting, 
-  while(!ordersWaiting.empty()){
-    Message* order = ordersWaiting.front();
+  while(!ordersWaiting_.empty()){
+    Message* order = ordersWaiting_.front();
     sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
-    ordersWaiting.pop_front();
+    ordersWaiting_.pop_front();
   }
   
 }
@@ -248,8 +249,8 @@ Mass EnrichmentFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory.begin(); 
-       iter != inventory.end(); 
+  for (deque<Material*>::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }
@@ -264,8 +265,8 @@ Mass EnrichmentFacility::checkStocks(){
   // material unit is in each object.
 
 
-  for (deque<Material*>::iterator iter = stocks.begin(); 
-       iter != stocks.end(); 
+  for (deque<Material*>::iterator iter = stocks_.begin(); 
+       iter != stocks_.end(); 
        iter ++){
     total += (*iter)->getTotMass();
   }
@@ -294,30 +295,30 @@ void EnrichmentFacility::makeRequests(){
   // "The Nuclear Fuel Cycle : Analysis and Management" 
   double commod_price = 0;
   
-  // spotCapacity represents unaccounted for capacity
-  Mass spotCapacity = capacity - outstMF;
+  // spotCapacity represents unaccounted for capacity_
+  Mass spotCapacity = capacity_ - outstMF_;
 
   if (space == 0){
     // don't request anything
   }
-  else if (space < capacity){
-    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
-    // if empty space is less than monthly acceptance capacity
+  else if (space < capacity_){
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
+    // if empty space is less than monthly acceptance capacity_
     requestAmt = space;
     // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, 
+    Message* request = new Message(UP_MSG, in_commod_, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
   }
-  // otherwise, the upper bound is the monthly acceptance capacity 
+  // otherwise, the upper bound is the monthly acceptance capacity_ 
   // minus the amount in stocks.
-  else if (space >= capacity){
-    Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
-    // if empty space is more than monthly acceptance capacity
-    requestAmt = capacity - sto;
+  else if (space >= capacity_){
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
+    // if empty space is more than monthly acceptance capacity_
+    requestAmt = capacity_ - sto;
     // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, commod_price,
+    Message* request = new Message(UP_MSG, in_commod_, -requestAmt, minAmt, commod_price,
                                    this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
@@ -329,9 +330,9 @@ void EnrichmentFacility::makeOffers()
 {
   // decide how much to offer
   Mass offer_amt;
-  Mass spotCapacity = capacity - outstMF;
+  Mass spotCapacity = capacity_ - outstMF_;
 
-  // and offer no more than the spotCapacity allows you to produce
+  // and offer no more than the spotCapacity_ allows you to produce
     offer_amt = spotCapacity; 
 
   // there is no minimum amount a enrichment facility may send
@@ -344,10 +345,10 @@ void EnrichmentFacility::makeOffers()
   double commod_price = 0;
   
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(out_commod->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
 
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, out_commod, offer_amt, min_amt, commod_price, 
+  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price, 
       this, recipient);
 
   // send it
@@ -362,7 +363,7 @@ void EnrichmentFacility::enrich()
 
   pair<ProcessLine::iterator,
 		ProcessLine::iterator> iters;
-	iters = ordersExecuting.equal_range(time);
+	iters = ordersExecuting_.equal_range(time);
 
 	ProcessLine::iterator curr, omega;
 	curr = iters.first;
@@ -438,19 +439,19 @@ void EnrichmentFacility::enrich()
 			throw GenException("Conservation of mass violation at Enrichment!!");
 
 		// Don't forget to decrement outstMF before sending.
-		outstMF -= this->calcSWUs(P, xp, xf);
+		outstMF_ -= this->calcSWUs(P, xp, xf);
 
     mess->setAmount(theProd->getTotMass());
     mess->setComp(pComp);
 
 		this->sendMaterial(mess, mess->getSender());
-		wastes.push_back(theTails);
+		wastes_.push_back(theTails);
 
 		delete mat;
 		curr ++;
 	}
 
-	ordersExecuting.erase(time);
+	ordersExecuting_.erase(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -465,5 +466,5 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, doub
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
 {
-	return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw);
+	return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
 }

@@ -70,13 +70,13 @@ public:
 protected:
   /// each facility should have an institution that manages it
   //Model* inst;
-  string inst_name;
+  string inst_name_;
 
   /// each instance of a facility needs a name
-  string fac_name;
+  string fac_name_;
 
   /// each facility needs a lifetime
-  int fac_lifetime;
+  int fac_lifetime_;
 
   /**
    * There is no default FacilityModel shipment requester 
@@ -96,21 +96,21 @@ public:
    *
    * @param facName is the new name of the facility
    */
-  void setFacName(string facName) { fac_name = facName; };
+  void setFacName(string facName) { fac_name_ = facName; };
 
   /**
    * Returns the facility's name
    *
-   * @return fac_name the name of this facility, a string
+   * @return fac_name_ the name of this facility, a string
    */
-  string getFacName() { return fac_name; };
+  string getFacName() { return fac_name_; };
 
   /**
    * Sets this facility's instutution name 
    *
    * @param name the name of the institution associated with this facility.
    */
-  void setInstName(string name){ inst_name = name;};
+  void setInstName(string name){ inst_name_ = name;};
 
   /**
    * Returns this facility's institution
@@ -124,15 +124,15 @@ public:
    *
    * @param lifetime is the new lifetime of the facility in months
    */
-  void setFacLifetime(int lifetime) { fac_lifetime = lifetime; };
+  void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
    * Returns the facility's lifetime
    *
-   * @return fac_lifetime the lifetime of this facility, an int, in 
+   * @return fac_lifetime_ the lifetime of this facility, an int, in 
    * months
    */
-  int getFacLifetime() { return fac_lifetime; };
+  int getFacLifetime() { return fac_lifetime_; };
 
   /**
    * Returns the facility's power capacity

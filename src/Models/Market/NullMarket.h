@@ -107,17 +107,17 @@ private:
   /** 
    * The requests that have been sorted according to their size.
    */
-  sortedMsgList requests;
+  sortedMsgList requests_;
 
   /**
    * The offers that have been sorted according to their size.
    */
-  sortedMsgList offers;
+  sortedMsgList offers_;
 
   /**
    * The set of pointers to offers that have been matched.
    */
-  set<Message*> matchedOffers;
+  set<Message*> matchedOffers_;
   
   /**
    * This function adds an Message object to the list of matchedOffers

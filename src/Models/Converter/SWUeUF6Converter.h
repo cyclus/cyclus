@@ -103,12 +103,12 @@ protected:
     /**
      * The SWUeUF6Converter has one input commodity
      */
-    Commodity* in_commod;
+    Commodity* in_commod_;
 
     /**
      * The SWUeUF6Converter has one output commodity
      */
-    Commodity* out_commod;
+    Commodity* out_commod_;
 
 /* ------------------- */ 
 

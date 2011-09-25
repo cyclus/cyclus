@@ -125,34 +125,34 @@ protected:
     /**
      * The StorageFacility has one commodity. It's the same in and out.
      */
-    Commodity* incommod;
+    Commodity* incommod_;
 
     /**
      * The StorageFacility has a limit to how material it can process.
      * Units vary. It will be in the commodity unit per month.
      */
-    double capacity;
+    double capacity_;
 
     /**
      * The stocks of entering material
      * These are not yet old enough to leave
      */
-    deque<Material*> stocks;
+    deque<Material*> stocks_;
     
     /**
      * The inventory of material ready to exit
      */
-    deque<Material*> inventory;
+    deque<Material*> inventory_;
 
     /**
      * The list of the entry times for each material
      */
-    deque< pair<int, Material*> > entryTimes;
+    deque< pair<int, Material*> > entryTimes_;
 
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting;
+    deque<Message*> ordersWaiting_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -171,19 +171,19 @@ protected:
     /**
      * The minimum time that the stock material spends in the facility.
      */
-    int residence_time;
+    int residence_time_;
 
     /**
      * The maximum (number of commodity units?) that the inventory can grow to.
      * The StorageFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    Mass inventory_size;
+    Mass inventory_size_;
 
     /**
      * XML cursor for facility initial state information
      */
-    xmlNodePtr _initialStateCur;
+    xmlNodePtr initialStateCur_;
 
     /**
      * This function populated the Storage Facility with some inital stocks/inventory

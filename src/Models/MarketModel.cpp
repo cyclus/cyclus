@@ -16,13 +16,13 @@ void MarketModel::init(xmlNodePtr cur)
 
   /// all markets require commodities
   string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
-  commodity = LI->getCommodity(commod_name);
-  if (NULL == commodity)
+  commodity_ = LI->getCommodity(commod_name);
+  if (NULL == commodity_)
     throw GenException("Market commodity '" + commod_name 
         + "' does not exist for market '" + getName() 
         + "'.");
   
-  commodity->setMarket(this);
+  commodity_->setMarket(this);
 }
 
 void MarketModel::copy(MarketModel* src) {
@@ -33,7 +33,7 @@ void MarketModel::copy(MarketModel* src) {
    *  Specific initialization for MarketModels
    */
 
-  commodity = src->commodity;
+  commodity_ = src->commodity_;
   LI->addModel(this, MARKET);
 }
 
@@ -41,7 +41,7 @@ void MarketModel::print() {
   Model::print(); 
 
   cout << "trades commodity " 
-      << commodity->getName() << endl;
+      << commodity_->getName() << endl;
 
 };
 
@@ -59,10 +59,10 @@ void MarketModel::print() {
 void MarketModel::executeOrderQueue()
 {
 
-  while( orders.size() > 0)
+  while( orders_.size() > 0)
   {
-    (*orders.begin())->execute();
-    orders.pop_front();
+    (*orders_.begin())->execute();
+    orders_.pop_front();
   }
 
 

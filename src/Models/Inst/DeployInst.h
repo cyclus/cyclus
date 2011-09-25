@@ -81,8 +81,8 @@ public:
  */
 
 protected:
-  map<int,Model*> deployment_map;
-  map<int,Model*> to_build_map;
+  map<int,Model*> deployment_map_;
+  map<int,Model*> to_build_map_;
 
 /* ------------------- */ 
 

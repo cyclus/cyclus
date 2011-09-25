@@ -19,11 +19,11 @@ void InstModel::init(xmlNodePtr cur)
   
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
-  region = LI->getModelByName(region_name, REGION);
-  this->setRegion(region);
+  region_ = LI->getModelByName(region_name, REGION);
+  this->setRegion(region_);
   cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
   
-  dynamic_cast<RegionModel*>(region)->addInstitution(this);
+  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
 
 }
 
@@ -37,8 +37,8 @@ void InstModel::copy(InstModel* src)
    *  Specific initialization for InstModels
    */
   
-  region = src->region;
-  dynamic_cast<RegionModel*>(region)->addInstitution(this);
+  region_ = src->region_;
+  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
   LI->addModel(this, INST);
 }
 
@@ -47,7 +47,7 @@ void InstModel::print()
 {
   Model::print();
 
-  cout << "in region " << region->getName();
+  cout << "in region " << region_->getName();
 }
 
 
@@ -74,8 +74,8 @@ void InstModel::receiveMessage(Message* msg){
 
 void InstModel::handlePreHistory(){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities.begin();
-      fac != facilities.end();
+  for(vector<Model*>::iterator fac=facilities_.begin();
+      fac != facilities_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
@@ -84,8 +84,8 @@ void InstModel::handlePreHistory(){
 
 void InstModel::handleTick(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities.begin();
-      fac != facilities.end();
+  for(vector<Model*>::iterator fac=facilities_.begin();
+      fac != facilities_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
@@ -94,8 +94,8 @@ void InstModel::handleTick(int time){
 
 void InstModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities.begin();
-      fac != facilities.end();
+  for(vector<Model*>::iterator fac=facilities_.begin();
+      fac != facilities_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
@@ -120,8 +120,8 @@ bool InstModel::pleaseBuild(Model* fac){
 double InstModel::getPowerCapacity(){
   // queries each facility for their power capacity
   double capacity = 0.0;
-  for(vector<Model*>::iterator fac=facilities.begin();
-      fac != facilities.end();
+  for(vector<Model*>::iterator fac=facilities_.begin();
+      fac != facilities_.end();
       fac++){
     capacity += (dynamic_cast<FacilityModel*>(*fac))->getPowerCapacity();
   }

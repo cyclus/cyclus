@@ -15,9 +15,9 @@ SinkFacility::SinkFacility(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SinkFacility::~SinkFacility(){
   // Delete all the Material in the inventory.
-  while (!inventory.empty()) {
-    Material* m = inventory.front();
-    inventory.pop_front();
+  while (!inventory_.empty()) {
+    Material* m = inventory_.front();
+    inventory_.pop_front();
     delete m;
   }
 }
@@ -47,17 +47,17 @@ void SinkFacility::init(xmlNodePtr cur)
       throw GenException("Input commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
 			    + "'.");
-    in_commods.push_back(new_commod);
+    in_commods_.push_back(new_commod);
   }
 
   // get monthly capacity
-  capacity = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
 
-  // get inventory_size
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  // get inventory_size_
+  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
 
   // get commodity price
-  commod_price = atof(XMLinput->get_xpath_content(cur,"commodprice"));
+  commod_price_ = atof(XMLinput->get_xpath_content(cur,"commodprice"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -65,10 +65,10 @@ void SinkFacility::copy(SinkFacility* src)
 {
   FacilityModel::copy(src);
 
-  in_commods = src->in_commods;
-  capacity = src->capacity;
-  inventory_size = src->inventory_size;
-  commod_price = src->commod_price;
+  in_commods_ = src->in_commods_;
+  capacity_ = src->capacity_;
+  inventory_size_ = src->inventory_size_;
+  commod_price_ = src->commod_price_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -83,15 +83,15 @@ void SinkFacility::print()
   FacilityModel::print();
 
   cout << "accepts commodities ";
-  for (vector<Commodity*>::iterator commod=in_commods.begin();
-       commod != in_commods.end();
+  for (vector<Commodity*>::iterator commod=in_commods_.begin();
+       commod != in_commods_.end();
        commod++)
   {
-    cout << (commod == in_commods.begin() ? "{" : ", " );
+    cout << (commod == in_commods_.begin() ? "{" : ", " );
     cout << (*commod)->getName();
   }
   cout << "} until its inventory is full at ";
-  cout << inventory_size << " units." << endl ;
+  cout << inventory_size_ << " units." << endl ;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -103,38 +103,38 @@ void SinkFacility::handleTick(int time){
   // check how full its inventory is
   Mass fullness = this->checkInventory();
   // subtract from max size to get total empty space
-  Mass emptiness = inventory_size - fullness;
+  Mass emptiness = inventory_size_ - fullness;
 
   if (emptiness == 0){
     // don't request anything
   }
-  else if (emptiness < capacity){
+  else if (emptiness < capacity_){
   // if empty space is less than monthly acceptance capacity, request it,
     // for each commodity, request emptiness/(noCommodities)
-    for (vector<Commodity*>::iterator commod=in_commods.begin();
-       commod != in_commods.end();
+    for (vector<Commodity*>::iterator commod=in_commods_.begin();
+       commod != in_commods_.end();
        commod++) 
     {
       Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
       // recall that requests have a negative amount
-      requestAmt = (emptiness/in_commods.size());
+      requestAmt = (emptiness/in_commods_.size());
       Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, 
-                                     commod_price, this, recipient);
+                                     commod_price_, this, recipient);
       // pass the message up to the inst
       (request->getInst())->receiveMessage(request);
       cout << "During handleTick, " << getFacName() << " requests: "<< requestAmt << "."  << endl;
     }
   }
   // otherwise, the upper bound is the monthly acceptance capacity, request cap.
-  else if (emptiness >= capacity){
+  else if (emptiness >= capacity_){
     // for each commodity, request capacity/(noCommodities)
-    for (vector<Commodity*>::iterator commod=in_commods.begin();
-       commod != in_commods.end();
+    for (vector<Commodity*>::iterator commod=in_commods_.begin();
+       commod != in_commods_.end();
        commod++) 
     {
       Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
-      requestAmt = capacity/in_commods.size();
-      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price,
+      requestAmt = capacity_/in_commods_.size();
+      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price_,
                           this, recipient); 
     // pass the message up to the inst
     (request->getInst())->receiveMessage(request);
@@ -168,7 +168,7 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
     cout<<"SinkFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
     (*thisMat)->print();
-    inventory.push_back(*thisMat);
+    inventory_.push_back(*thisMat);
   }
 }
 
@@ -181,7 +181,7 @@ Mass SinkFacility::checkInventory(){
 
   deque<Material*>::iterator iter;
 
-  for (iter = inventory.begin(); iter != inventory.end(); iter ++)
+  for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
     total += (*iter)->getTotMass();
 
   return total;

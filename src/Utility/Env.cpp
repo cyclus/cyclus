@@ -9,7 +9,7 @@
 #include <string.h>
 #include <cstring>
 
-Env* Env::_instance = 0;
+Env* Env::instance_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Env::Env(){
 }
@@ -19,11 +19,11 @@ Env* Env::Instance()
 {
 	// If we haven't created an ENV yet, create it, and then and return it
 	// either way.
-	if (0 == _instance) {
-		_instance = new Env();
+	if (0 == instance_) {
+		instance_ = new Env();
 	}
 
-	return _instance;
+	return instance_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Env::searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)

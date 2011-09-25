@@ -29,7 +29,7 @@ void RegionModel::init(xmlNodePtr cur)
       throw GenException("Facility " + fac_name 
           + " is not defined in this simulation.");
     }
-    allowedFacilities.insert(new_fac);
+    allowedFacilities_.insert(new_fac);
   }
 }
 
@@ -42,7 +42,7 @@ void RegionModel::copy(RegionModel* src) {
    *  Specific initialization for RegionModels
    */
 
-  allowedFacilities = src->allowedFacilities;
+  allowedFacilities_ = src->allowedFacilities_;
   
   // don't copy institutions!
   LI->addModel(this, REGION);
@@ -56,17 +56,17 @@ void RegionModel::print() {
 
   cout << "allows facilities " ;
 
-  for(set<Model*>::iterator fac=allowedFacilities.begin();
-      fac != allowedFacilities.end();
+  for(set<Model*>::iterator fac=allowedFacilities_.begin();
+      fac != allowedFacilities_.end();
       fac++){
-    cout << (fac == allowedFacilities.begin() ? "{" : ", " )
+    cout << (fac == allowedFacilities_.begin() ? "{" : ", " )
         << (*fac)->getName();
   }
   
   cout << "} and has the following institutions:" << endl;
   
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
+  for(vector<Model*>::iterator inst=institutions_.begin();
+      inst != institutions_.end();
       inst++){
     (*inst)->print();
   }
@@ -95,8 +95,8 @@ void RegionModel::receiveMessage(Message* msg){
 
 void RegionModel::handlePreHistory(){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
+  for(vector<Model*>::iterator inst=institutions_.begin();
+      inst != institutions_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handlePreHistory();
   }
@@ -104,8 +104,8 @@ void RegionModel::handlePreHistory(){
 
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
+  for(vector<Model*>::iterator inst=institutions_.begin();
+      inst != institutions_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTick(time);
   }
@@ -113,8 +113,8 @@ void RegionModel::handleTick(int time){
 
 void RegionModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions.begin();
-      inst != institutions.end();
+  for(vector<Model*>::iterator inst=institutions_.begin();
+      inst != institutions_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }

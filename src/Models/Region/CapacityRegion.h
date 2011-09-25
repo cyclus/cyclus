@@ -101,23 +101,23 @@ class CapacityRegion : public RegionModel
  public:
     bool requestBuild(Model* fac, InstModel* inst);
     int nFacs();
-    string capacity_type(int i){return _capacity_type[i];};
-    string capacity_function(int i){return _capacity_function[i];};
-    double nominal_value(int i){return _nominal_value[i];};
-    int nCapacities(){return _capacity_type.size();};
+    string capacity_type(int i){return capacity_type_[i];};
+    string capacity_function(int i){return capacity_function_[i];};
+    double nominal_value(int i){return nominal_value_[i];};
+    int nCapacities(){return capacity_type_.size();};
 
  protected:
-    int _nFacs;
-    std::vector <string> _capacity_type, _capacity_function;
-    std::vector <double> _nominal_value;
-    AllReplacementFacs allReplacementFacs;
+    int nFacs_;
+    std::vector <string> capacity_type_, capacity_function_;
+    std::vector <double> nominal_value_;
+    AllReplacementFacs allReplacementFacs_;
     void initBuild(xmlNodePtr cur);
     void initCapacity(xmlNodePtr cur);
     Model* chooseInstToBuildFac();
     double checkCurrentCapcity(string capacity_type);
     Model* chooseFacToBuild(ReplacementFacs facs);
-    map <string, queue <pair <int,int> > > to_build_map;
-    map <string, queue <pair <int,int> > > have_built_map;
+    map <string, queue <pair <int,int> > > to_build_map_;
+    map <string, queue <pair <int,int> > > have_built_map_;
   
 /* ------------------- */ 
 

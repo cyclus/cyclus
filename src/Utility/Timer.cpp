@@ -6,17 +6,17 @@
 #include "GenException.h"
 #include <iostream>
 
-Timer* Timer::_instance = 0;
+Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::runSim()
 {
 
-  time = -1;
+  time_ = -1;
   LI->handlePreHistory();
-  time = time0;
+  time_ = time0_;
 
-  for (int i = time; i < simDur; i++) {
+  for (int i = time_; i < simDur_; i++) {
     
     // Give a status report, periodically.
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
@@ -24,27 +24,27 @@ void Timer::runSim()
       cout << "Current time: " << i << endl;
     
     // Tell the Logician to handle this month.
-    LI-> handleTimeStep(time);
+    LI-> handleTimeStep(time_);
     
     // Increment the time.
-    time ++;
+    time_ ++;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getTime() {
-	return time;
+	return time_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer* Timer::Instance() 
 {
 	// If we haven't created a Timer yet, create it, and then and return it
 	// either way.
-	if (0 == _instance) {
-		_instance = new Timer();
+	if (0 == instance_) {
+		instance_ = new Timer();
 	}
 
-	return _instance;
+	return instance_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
@@ -62,17 +62,17 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 		throw GenException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
   LI->setDecay(decay);
 
-	month0 = m0;
-	year0 = y0;
+	month0_ = m0;
+	year0_ = y0;
 
-	time0 = start;
-	time = start;
-	simDur = dur;
+	time0_ = start;
+	time_ = start;
+	simDur_ = dur;
   
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getSimDur() {
-	return simDur;
+	return simDur_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer::Timer() 
@@ -82,13 +82,13 @@ Timer::Timer()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::convertDate(int month, int year)
 {
-	return (year - year0) * 12 + (month - month0) + time0;
+	return (year - year0_) * 12 + (month - month0_) + time0_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 pair<int, int> Timer::convertDate(int time)
 {
-	int month = (time - time0) % 12 + 1;
-	int year = (time - time0 - (month - 1)) / 12 + year0;
+	int month = (time - time0_) % 12 + 1;
+	int year = (time - time0_ - (month - 1)) / 12 + year0_;
 	return make_pair(month, year);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

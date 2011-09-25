@@ -40,59 +40,59 @@ using namespace std;
 // constructs a 1x1 matrix of zeroes
 
 LMatrix::LMatrix() {
-  rows = 1;                   // sets number of rows
-  cols = 1;                   // sets number of columns
+  rows_ = 1;                   // sets number of rows
+  cols_ = 1;                   // sets number of columns
   vector<long double> element(1);  // creates a single element
-  M.push_back(element);       // adds element to the matrix
+  M_.push_back(element);       // adds element to the matrix
 }
 
 // constructs an nxm matrix of zeroes
 
 LMatrix::LMatrix(int n, int m) {
-  rows = n;                     // sets number of rows
-  cols = m;                     // sets number of columns
+  rows_ = n;                     // sets number of rows
+  cols_ = m;                     // sets number of columns
   vector<long double> row(m);   // creates a row with m elements
-  M.assign(n,row);              // adds n rows to the matrix
+  M_.assign(n,row);              // adds n rows_ to the matrix
 }
 
 // returns the number of rows n in the matrix
 
 int LMatrix::numRows() const {
-  return rows;
+  return rows_;
 }
 
 // returns the number of columns m in the matrix
 
 int LMatrix::numCols() const {
-  return cols;
+  return cols_;
 }
 
 // overloads the () operator so that A(i,j) will return a reference to 
 // the element aij
 
 const long double & LMatrix::operator()(int i, int j) const {
-  return M.at(i-1).at(j-1);
+  return M_.at(i-1).at(j-1);
 }
 
 // sets the value for the element aij at row i and column j
 
 void LMatrix::setElement(int i, int j, long double aij) {
-  M.at(i-1).at(j-1) = aij; 
+  M_.at(i-1).at(j-1) = aij; 
 }
 
 // overloads the () operator so that A(i,j) will write the element aij
 
 long double & LMatrix::operator()(int i, int j) {
-  return M.at(i-1).at(j-1);
+  return M_.at(i-1).at(j-1);
 }
 
 // adds a row at the end of the Matrix if it contains the same number of
 // elements as the number of columns in the Matrix
 void LMatrix::addRow(vector<long double> row) {
   int size = row.size();
-  if ( size == cols ) {
-    M.push_back(row);
-    ++rows;  // increase the number of rows
+  if ( size == cols_ ) {
+    M_.push_back(row);
+    ++rows_;  // increase the number of rows
   }
 }
 
@@ -106,18 +106,18 @@ void LMatrix::print() const {
   cout << setiosflags(ios::fixed) << setprecision(10);
   
   // prints single element if M is a 1x1 matrix
-  if (M.capacity() == 1 && M[0].capacity() == 1) {
-    cout << "[ " << M.at(0).at(0) << " ]" << endl;
+  if (M_.capacity() == 1 && M_[0].capacity() == 1) {
+    cout << "[ " << M_.at(0).at(0) << " ]" << endl;
   }
   else {
     // loops through the rows of the matrix
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows_; i++) {
       // prints all of the elements in the ith row of the matrix
       cout << "[";
-      for (int j = 0; j < cols - 1; j++) {
-	cout << "  " << setw(9) << M.at(i).at(j)  << "  ";
+      for (int j = 0; j < cols_ - 1; j++) {
+	cout << "  " << setw(9) << M_.at(i).at(j)  << "  ";
       }
-      cout << setw(9) << M.at(i).at(cols - 1) << "  ]" << endl;
+      cout << setw(9) << M_.at(i).at(cols_ - 1) << "  ]" << endl;
     }
   }
 }
@@ -129,18 +129,18 @@ const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
     return *this;     // returns A if it is already the same matrix as B
   }
   else {
-    M.empty();        // removes the original elements of A
-    rows = rhs.rows;  // resets the number of rows to match B
-    cols = rhs.cols;  // resets the number of columns to match B 
+    M_.empty();        // removes the original elements of A
+    rows_ = rhs.rows_;  // resets the number of rows to match B
+    cols_ = rhs.cols_;  // resets the number of columns to match B 
     
     // rebuilds A with the dimensions of B
-    vector<long double> row(cols);
-    M.assign(rows,row);
+    vector<long double> row(cols_);
+    M_.assign(rows_,row);
     
     // copies all of the elements from B into A
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        M.at(i).at(j) = rhs(i+1, j+1);
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        M_.at(i).at(j) = rhs(i+1, j+1);
       }
     }
 
@@ -152,11 +152,11 @@ const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
 // Note: if the matrix dimensions do not match, then A is returned unchanged
 
 const LMatrix & LMatrix::operator+=(const LMatrix & rhs) {
-  if (this->rows == rhs.rows && this->cols == rhs.cols) {
+  if (this->rows_ == rhs.rows_ && this->cols_ == rhs.cols_) {
     // performs matrix addition and stores the result in A
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        M.at(i).at(j) = M.at(i).at(j) + rhs(i+1, j+1);
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        M_.at(i).at(j) = M_.at(i).at(j) + rhs(i+1, j+1);
       }
     }
   }
@@ -168,11 +168,11 @@ const LMatrix & LMatrix::operator+=(const LMatrix & rhs) {
 // Note: if the matrix dimensions do not match, then A is returned unchanged
 
 const LMatrix & LMatrix::operator-=(const LMatrix & rhs) {
-  if (this->rows == rhs.rows && this->cols == rhs.cols) {
+  if (this->rows_ == rhs.rows_ && this->cols_ == rhs.cols_) {
     // performs matrix subtraction and stores the result in A
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        M.at(i).at(j) = M.at(i).at(j) - rhs(i+1, j+1);
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        M_.at(i).at(j) = M_.at(i).at(j) - rhs(i+1, j+1);
       }
     }
   }
@@ -192,21 +192,21 @@ const LMatrix & LMatrix::operator*=(const LMatrix & rhs) {
   
   // creates a new matrix called temp with the number of rows of A and the
   // number of columns of B
-  LMatrix temp(this->rows,rhs.cols);
+  LMatrix temp(this->rows_,rhs.cols_);
 
   // performs matrix multiplication if the number of columns of A equals the
   // number of rows of B
-  if (this->cols == rhs.rows) {
+  if (this->cols_ == rhs.rows_) {
     // multiplies row vector i of A by the column vector j of B and stores
     // the result in the new matrix temp as element aij
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < rhs.cols; j++) {
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < rhs.cols_; j++) {
         aij = 0;  // resets the sum for the next element
         
         // sums the product of the row vector from A and the column vector
         // from B using the formula aij = ai1*b1j + ai2*b2j + ...
-        for (int k = 0; k < rows; k++) {
-          aij = aij + M.at(i).at(k) * rhs(k+1,j+1);
+        for (int k = 0; k < rows_; k++) {
+          aij = aij + M_.at(i).at(k) * rhs(k+1,j+1);
         }
         
         temp.setElement(i+1, j+1, aij);  // copies element aij into temp
@@ -250,8 +250,8 @@ LMatrix operator*(const long double k, const LMatrix & A) {
   long double aij;
  
   // multiplies every element in the matrix A by the scalar k
-  for (int i = 0; i < A.rows; i++) {
-    for (int j = 0; j < A.cols; j++) {
+  for (int i = 0; i < A.rows_; i++) {
+    for (int j = 0; j < A.cols_; j++) {
       aij = A(i+1, j+1) * k;
       ans.setElement(i+1, j+1, aij);
     }
@@ -267,8 +267,8 @@ LMatrix operator*(const LMatrix & A, const long double k) {
   long double aij;
   
   // multiplies every element in the matrix A by the scalar k
-  for (int i = 0; i < A.rows; i++) {
-    for (int j = 0; j < A.cols; j++) {
+  for (int i = 0; i < A.rows_; i++) {
+    for (int j = 0; j < A.cols_; j++) {
       aij = A(i+1, j+1) * k;
       ans.setElement(i+1, j+1, aij);
     }
@@ -284,7 +284,7 @@ LMatrix operator^(const LMatrix & A, const int k) {
   LMatrix ans(A);  // copies A into a new matrix called ans
  
   // multiplies A by itself k times if the matrix is square
-  if (A.cols == A.rows) {
+  if (A.cols_ == A.rows_) {
     for (int i = 0; i < k-1; i++) {
       ans *= A; 
     }

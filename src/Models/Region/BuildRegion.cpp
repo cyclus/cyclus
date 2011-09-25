@@ -33,9 +33,9 @@ void BuildRegion::populateSchedule(FILE *infile)
       schedule.push(time_step_to_build);
     };
     
-    // Populate the to_build_map for the given facility
+    // Populate the to_build_map_ for the given facility
     string fac_str (fac_name);
-    to_build_map[fac_str]=schedule;
+    to_build_map_[fac_str]=schedule;
   };
 }
 
@@ -72,7 +72,7 @@ bool BuildRegion::requestBuild(Model* fac, InstModel* inst)
 int BuildRegion::nFacs()
 {
   // Return the total number of facilities which will be built
-  return _nFacs;
+  return nFacs_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -80,17 +80,17 @@ Model* BuildRegion::chooseInstToBuildFac()
 {
   // Define the inst to build some fac
   // By default we pick the first institution in the region's list
-  return institutions[0];
+  return institutions_[0];
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BuildRegion::handleTick(int time)
 {
   // Overwriting RegionModel's handleTick
-  // We loop through each facility that exists in the to_build_map
+  // We loop through each facility that exists in the to_build_map_
   map <string, queue <pair <int,int> > >::iterator fac;
 
-  for (fac = to_build_map.begin(); fac != to_build_map.end(); ++fac){
+  for (fac = to_build_map_.begin(); fac != to_build_map_.end(); ++fac){
     // Define a few parameters
     /* !!!! This method is not full proof... what if multiple facilities need
 			 to be built and some fail and some succeed...? !!!! */
