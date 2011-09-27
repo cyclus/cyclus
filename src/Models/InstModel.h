@@ -4,7 +4,7 @@
 #include <string>
 
 
-#include "Model.h"
+#include "TimeAgent.h"
 #include "Communicator.h"
 #include "RegionModel.h"
 
@@ -18,7 +18,7 @@ using namespace std;
  * Models.
  */
 //-----------------------------------------------------------------------------
-class InstModel : public Model, public Communicator
+class InstModel : public TimeAgent, public Communicator
 {
 
 /* --------------------

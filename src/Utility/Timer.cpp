@@ -9,26 +9,59 @@
 Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::runSim()
-{
-
+void Timer::runSim() {
   time_ = -1;
-  LI->handlePreHistory();
+  handlePreHistory();
   time_ = time0_;
 
   for (int i = time_; i < simDur_; i++) {
     
     // Give a status report, periodically.
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
-    if (i % 1 == 0)
+    if (i % 1 == 0) {
       cout << "Current time: " << i << endl;
+    }
     
     // Tell the Logician to handle this month.
-    LI-> handleTimeStep(time_);
+    LI->decayMaterials(time_);
+    sendTick();
+    LI->resolveMarkets();
+    sendTock();
     
     // Increment the time.
-    time_ ++;
+    time_++;
   }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::handlePreHistory() {
+  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
+       agent != time_agents_.end(); 
+       agent++) {
+    (*agent)->handlePreHistory();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::sendTick() {
+  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
+       agent != time_agents_.end(); 
+       agent++) {
+    (*agent)->handleTick(time_);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::sendTock() {
+  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
+       agent != time_agents_.end(); 
+       agent++) {
+    (*agent)->handleTock(time_);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::registerAgent(TimeAgent* agent) {
+  time_agents_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

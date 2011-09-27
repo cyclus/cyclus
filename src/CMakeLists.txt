@@ -43,6 +43,7 @@ SET( CYCLUS_SRC
      Utility/UniformTaylor.cpp 
      Utility/Env.cpp
      Models/Model.cpp 
+        Models/StubTimeAgent.cpp 
         Models/StubModel.cpp 
         Models/StubCommModel.cpp 
         Models/ConverterModel.cpp 

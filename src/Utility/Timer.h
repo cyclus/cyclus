@@ -3,6 +3,7 @@
 # define _TIMER
 
 #include "Logician.h"
+#include "TimeAgent.h"
 #include <utility>
 
 #define TI Timer::Instance()
@@ -14,14 +15,12 @@ using namespace std;
 /**
  * A (singleton) timer to control a simulation with a one-month time step.
  */
-class Timer
-{
+class Timer {
 private:
     
   /**
    * The Manager for which this Timer is keeping time.
    */
-//  Manager* myManager;
     
   /**
    * A pointer to this Timer once it has been initialized.
@@ -55,6 +54,29 @@ private:
    */
   int year0_;
 
+  vector<TimeAgent*> time_agents_;
+
+  /**
+   * @brief sends the tick signal to all of the models receiving time
+   * notifications.
+   *
+   */
+  void sendTick();
+
+  /**
+   * @brief sends the tock signal to all of the models receiving time
+   * notifications.
+   *
+   */
+  void sendTock();
+
+    
+  /**
+   * This handles all pre-history interactions between regions,
+   * institutions, and facilities.
+   *
+   */
+  void handlePreHistory();
 
 protected:
     
@@ -91,6 +113,13 @@ public:
    * Runs the simulation.
    */ 
   void runSim();
+
+  /**
+   * @brief registers a sim. agent to receive time step notifications.
+   *
+   * @param agent agent that will receive time-step notifications
+   */
+  void registerAgent(TimeAgent* agent);
 
   /**
    * Returns the current time, in months since the simulation started.

@@ -24,6 +24,7 @@ set ( TestSource
   ../Utility/Timer.cpp
   ../Utility/UniformTaylor.cpp
   ../Models/Model.cpp 
+  ../Models/StubTimeAgent.cpp 
   ../Models/StubModel.cpp 
   ../Models/StubCommModel.cpp 
   ../Models/ConverterModel.cpp 

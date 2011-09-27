@@ -3,6 +3,7 @@
 #include <iostream> 
 #include <math.h>
 #include "Logician.h"
+#include "Timer.h"
 #include "GenException.h"
 
 Logician* Logician::instance_ = 0;
@@ -38,27 +39,6 @@ Logician* Logician::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::handlePreHistory() {
-  // tell all of the region models to handle the tick
-  ModelList* region_list;
-  region_list = &(model_lists_[REGION]);
-
-  for(ModelList::iterator reg = region_list->begin();
-       reg != region_list->end(); 
-       reg++) {
-    dynamic_cast<RegionModel*>(reg->second)->handlePreHistory();
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::handleTimeStep(int time) {
-  decayMaterials(time);
-  sendTick(time);
-  resolveMarkets();
-  sendTock(time);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::decayMaterials(int time){
   // if decay is on
   if(decay_) {
@@ -72,32 +52,6 @@ void Logician::decayMaterials(int time){
          (*mat)->Material::decay();
       }
     }
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::sendTick(int time) {
-  // tell all of the region models to handle the tick
-  ModelList* region_list;
-  region_list = &(model_lists_[REGION]);
-
-  for(ModelList::iterator reg=region_list->begin();
-       reg != region_list->end(); 
-       reg++) {
-    dynamic_cast<RegionModel*>(reg->second)->handleTick(time);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::sendTock(int time) {
-  // tell all of the region models to handle the tock
-  ModelList* region_list;
-  region_list = &(model_lists_[REGION]);
-
-  for(ModelList::iterator reg=region_list->begin();
-       reg != region_list->end(); 
-       reg++) {
-    dynamic_cast<RegionModel*>(reg->second)->handleTock(time);
   }
 }
 

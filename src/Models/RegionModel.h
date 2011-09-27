@@ -4,7 +4,7 @@
 #include <string>
 #include <set>
 
-#include "Model.h"
+#include "TimeAgent.h"
 #include "Communicator.h"
 
 using namespace std;
@@ -17,7 +17,7 @@ using namespace std;
  * This is all that is known externally about Regions
  */
 //-----------------------------------------------------------------------------
-class RegionModel : public Model, public Communicator
+class RegionModel : public TimeAgent, public Communicator
 {
 	
 /* --------------------
@@ -26,10 +26,7 @@ class RegionModel : public Model, public Communicator
  */
 public:
     /// Default constructor for RegionModel Class
-    RegionModel() {
-      setModelType("Region");
-      commType_=REGION_COMM; 
-    };
+    RegionModel();
 
     /// RegionModels should not be indestructible.
     virtual ~RegionModel() {};

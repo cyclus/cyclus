@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 
-#include "Model.h"
+#include "TimeAgent.h"
 #include "Message.h"
 
 using namespace std;
@@ -21,7 +21,7 @@ class Material;
  * 
 */
 //-----------------------------------------------------------------------------
-class ConverterModel : public Model {
+class ConverterModel : public TimeAgent {
 
 public:
   /// Default constructor for ConverterModel Class
@@ -95,6 +95,12 @@ public:
    * @param time is the time to perform the tock
    */
   virtual void handleTock(int time);
+
+  /**
+   * Each converter may be prompted to do its begining of life setup
+   * 
+   */
+  virtual void handlePreHistory() {}
 
 /* ------------------- */ 
   

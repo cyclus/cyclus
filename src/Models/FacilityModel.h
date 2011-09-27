@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Model.h"
+#include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"
 
@@ -23,8 +23,7 @@ class Material;
  * This is all that is known externally about facilities
 */
 //-----------------------------------------------------------------------------
-class FacilityModel : public Model, public Communicator
-{
+class FacilityModel : public TimeAgent, public Communicator {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

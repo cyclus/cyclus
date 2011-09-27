@@ -5,6 +5,17 @@
 #include "GenException.h"
 #include "Logician.h"
 #include "InputXML.h"
+#include "Timer.h"
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+  /// Default constructor for RegionModel Class
+  RegionModel::RegionModel() {
+    setModelType("Region");
+    commType_=REGION_COMM; 
+
+    // register to receive time-step notifications
+    TI->registerAgent(this);
+  };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::init(xmlNodePtr cur)

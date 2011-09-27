@@ -81,22 +81,6 @@ class Logician {
     static Logician* Instance();
     
     /**
-     * This handles all pre-history interactions between regions,
-     * institutions, and facilities.
-     *
-     * @todo should be private (rcarlsen). 
-     *
-     */
-    void handlePreHistory();
-    
-    /**
-     * Handles all the duties of the time step (typically, a month)
-     *
-     * @param time is the simulation time step that is being handled.
-     */
-    void handleTimeStep(int time);
-    
-    /**
      * Decays all of the materials if decay is on
      *
      * @todo should be private (khuff/rcarlsen)
@@ -105,24 +89,6 @@ class Logician {
      */
     void decayMaterials(int time);
     
-    /**
-     * sends the tick signal to all of the models
-     *
-     * @todo should be private (rcarlsen)
-     *
-     * @param time is the simulation time of the tick
-     */
-    void sendTick(int time);
-
-    /**
-     * sends the tock signal to all of the models
-     *
-     * @todo should be private (rcarlsen)
-     *
-     * @param time is the simulation time of the tock
-     */
-    void sendTock(int time);
-
     /**
      * sends the resolve signal to all of the market models
      * which in turn make matches and send orders
@@ -139,8 +105,6 @@ class Logician {
 
     /* 
      * Generic routine to add a Model-based entity to a specific list
-     *
-     * @todo should be private (rcarlsen). Consider consolidation with handle[Tick/Tock].
      *
      * @param new_model pointer to model-based entity to be added
      * @param model_type type of new_model as defined by ModelType enum
