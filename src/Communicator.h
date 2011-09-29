@@ -1,10 +1,6 @@
 // Communicator.h
 #if !defined(_COMMUNICATOR_H)
 #define _COMMUNICATOR_H
-#include <string>
-#include "Material.h"
-
-using namespace std;
 
 #include "Message.h"
 

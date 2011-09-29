@@ -5,8 +5,6 @@
 #include <string>
 #include <stack>
 
-using namespace std;
-
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
@@ -38,14 +36,14 @@ public:
   static InputXML* Instance();
   
   /// Method to return the current namespace modifier
-  string getCurNS() { return cur_ns_; };
+  std::string getCurNS() { return cur_ns_; };
 
   /**
    *  @brief Extend the current namespace modifier
    *
    * @param ns string to append to current namespace modifier
    */
-  void extendCurNS(string ns) { cur_ns_ += ns + ":"; };
+  void extendCurNS(std::string ns) { cur_ns_ += ns + ":"; };
 
   /**
    *  @brief Strip last namespace from namespace modifier
@@ -72,7 +70,7 @@ public:
    *
    *  @param filename name of the file to  load
    */
-  void load_file(string filename);
+  void load_file(std::string filename);
 
   /**
    *  @brief Opens and loads a recipebook: included library of recipes
@@ -84,7 +82,7 @@ public:
    *
    *  @param filename name of recipebook file to open
    */
-  void load_recipebook(string filename);
+  void load_recipebook(std::string filename);
 
   /**
    *  @brief Opens and loads a facilitycatalog: included catalog of facility
@@ -97,7 +95,7 @@ public:
    *
    *  @param filename name of facilitycatalog file to open
    */
-  void load_facilitycatalog(string filename);
+  void load_facilitycatalog(std::string filename);
   
   /**
    *  @brief Get the contents of the single element with this XPath
@@ -221,9 +219,9 @@ private:
    */
   struct xmlFileInfo {
     /// filename currently being processed
-    string filename;  
+    std::string filename;  
     /// pointer to the schema URI used for this file
-    string* schema;   
+    std::string* schema;   
     /// XML doc ptr for input file
     xmlDocPtr doc;    
     /// XML XPath search context
@@ -239,7 +237,7 @@ private:
    *  is pushed onto this stack.  Every time a nested input file is closed
    *  the last fileinfo is popped off this stack.
    */
-  stack<xmlFileInfo*> fileStack_;
+  std::stack<xmlFileInfo*> fileStack_;
 
   /**
    *  @brief Current namespace modifier value
@@ -252,7 +250,7 @@ private:
    *  objects, the namespace modifier is a colon-delimited list of strings
    *  with a trailing colon.
    */
-  string cur_ns_;
+  std::string cur_ns_;
 
   /**
    *  @brief Validate an XML file against a Relax-NG schema
@@ -267,7 +265,7 @@ private:
   xmlDocPtr validate_file(xmlFileInfo *fileInfo);
 
   /// primary schema used for Cyclus processing
-  static string main_schema_; 
+  static std::string main_schema_; 
 
 };
 

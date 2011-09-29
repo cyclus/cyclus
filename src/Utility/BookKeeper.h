@@ -1,11 +1,10 @@
 // BookKeeper.h
 #if !defined(_BOOKKEEPER)
 #define _BOOKKEEPER
+
 #include <string>
-#include <map>
 #include <vector>
 #include "boost/multi_array.hpp"
-
 #include "H5Cpp.h"
 #include "hdf5.h"
 
@@ -15,7 +14,6 @@
 
 #define BI BookKeeper::Instance()
 
-using namespace std;
 using namespace H5;
 
 // homogeneous boost multidimensional arrays 
@@ -31,11 +29,11 @@ typedef boost::multi_array<double, 2> dblData2d;
 typedef dblData2d::index dbl2didx;
 typedef boost::multi_array<double, 3> dblData3d;
 typedef dblData3d::index dbl3didx;
-typedef boost::multi_array<string, 1> strData1d;
+typedef boost::multi_array<std::string, 1> strData1d;
 typedef strData1d::index str1didx;
-typedef boost::multi_array<string, 2> strData2d;
+typedef boost::multi_array<std::string, 2> strData2d;
 typedef strData2d::index str2didx;
-typedef boost::multi_array<string, 3> strData3d;
+typedef boost::multi_array<std::string, 3> strData3d;
 typedef strData3d::index str3didx;
 
 /**
@@ -58,7 +56,7 @@ private:
    * Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
      */
-  string dbName_;
+  std::string dbName_;
 
   /**
    * True iff the db is open.
@@ -111,12 +109,12 @@ protected:
   /**
    * Stores the transactions that have taken place during the simulation.
    */
-  vector<trans_t> transactions_;
+  std::vector<trans_t> transactions_;
 
   /**
    * Stores the material changes that have taken place during the simulation.
    */
-  vector<mat_hist_t> materials_;
+  std::vector<mat_hist_t> materials_;
 
 public:
         
@@ -139,7 +137,7 @@ public:
      *
    * @param name is the name of the hdf5 database file. Should end in .h5
      */
-  void createDB(string name);
+  void createDB(std::string name);
 
   /**
    * Creates a dataset with the name,type, and dimesions indicated 
@@ -149,7 +147,7 @@ public:
    * @param type is type of data to be placed in the dataspace
    * @param name is the name of the dataset 
      */
-  DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, string name);
+  DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string name);
 
   /**
    * Returns a handle to the database this BookKeeper is maintaining.
@@ -185,12 +183,12 @@ public:
    *
    * @param grp the name of the group being queried
    */
-  bool isGroup(string grp);
+  bool isGroup(std::string grp);
 
   /**
    * Returns the name of the database
    */
-  string getDBName(){return dbName_;};
+  std::string getDBName(){return dbName_;};
 
   /**
    * Register the transaction in the BookKeeper's map of transactions
@@ -235,7 +233,7 @@ public:
    * @param filespace is a reference to the file space
    * @param dataset is the prepared, selected dataset
    */
-  void prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
+  void prepareSpaces(std::string dsname, DataType type, DataSpace &memspace, 
       DataSpace &filespace, DataSet &dataset);
 
   /**
@@ -246,7 +244,7 @@ public:
    * @param dsname is the dataspace
    */
 
-  void writeData(intData1d data, string dsname);
+  void writeData(intData1d data, std::string dsname);
 
   /**
    * Puts a one dimensional vector of integer data in the indicated 
@@ -255,7 +253,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(intData2d data, string dsname);
+  void writeData(intData2d data, std::string dsname);
 
   /**
    * Puts a one dimensional vector of integer data in the indicated 
@@ -264,7 +262,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(intData3d data, string dsname);
+  void writeData(intData3d data, std::string dsname);
 
   /**
    * Puts a one dimensional vector of double data in the indicated 
@@ -273,7 +271,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(dblData1d data, string dsname);
+  void writeData(dblData1d data, std::string dsname);
 
   /**
    * Puts a two dimensional vector of double data in the indicated 
@@ -282,7 +280,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(dblData2d data, string dsname);
+  void writeData(dblData2d data, std::string dsname);
 
   /**
    * Puts a three dimensional vector of double data in the indicated 
@@ -291,7 +289,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(dblData3d data, string dsname);
+  void writeData(dblData3d data, std::string dsname);
 
   /**
    * Puts a one dimensional vector of string data in the indicated 
@@ -300,7 +298,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(strData1d data, string dsname);
+  void writeData(strData1d data, std::string dsname);
 
   /**
    * Puts a two dimensional vector of string data in the indicated 
@@ -309,7 +307,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(strData2d data, string dsname);
+  void writeData(strData2d data, std::string dsname);
 
   /**
    * Puts a three dimensional vector of string data in the indicated 
@@ -318,7 +316,7 @@ public:
    * @param data is the data
    * @param dsname is the dataspace
    */
-  void writeData(strData3d data, string dsname);
+  void writeData(strData3d data, std::string dsname);
 
   /**
    * Reads 1d integer data from the dataset indicated.
@@ -326,7 +324,7 @@ public:
    * @param name is the hyperspace to read out
    * @param out_data is the vector to write to
    */
-  void readData(string name, intData1d& out_data);
+  void readData(std::string name, intData1d& out_data);
 
   /**
    * Reads 2d integer data from the dataset indicated.
@@ -334,7 +332,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(string name, intData2d& out_data);
+  void readData(std::string name, intData2d& out_data);
 
   /**
    * Reads 3d integer data from the dataset indicated.
@@ -342,14 +340,14 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(string name, intData3d& out_data);
+   void readData(std::string name, intData3d& out_data);
   /**
    * Reads data from the dataset indicated.
    *
    * @param name is the hyperspace to read out
    * @param out_data is the vector to write to
    */
-  void readData(string name, dblData1d& out_data);
+  void readData(std::string name, dblData1d& out_data);
 
   /**
    * Reads data from the dataset indicated.
@@ -357,7 +355,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(string name, dblData2d& out_data);
+  void readData(std::string name, dblData2d& out_data);
 
   /**
    * Reads data from the dataset indicated.
@@ -365,7 +363,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(string name, dblData3d& out_data);
+   void readData(std::string name, dblData3d& out_data);
 
   /**
    * Reads data from the dataset indicated.
@@ -373,7 +371,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(string name, strData1d& out_data);
+  void readData(std::string name, strData1d& out_data);
 
   /**
    * Reads data from the dataset indicated.
@@ -381,7 +379,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-  void readData(string name, strData2d& out_data);
+  void readData(std::string name, strData2d& out_data);
 
   /**
    * Reads data from the dataset indicated.
@@ -389,7 +387,7 @@ public:
    * @param name is the name of the dataset
    * @param out_data is the vector to write to
    */
-   void readData(string name, strData3d& out_data);
+   void readData(std::string name, strData3d& out_data);
 
   /**
    * Prints all members of a transaction.

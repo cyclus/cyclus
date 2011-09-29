@@ -1,23 +1,27 @@
 // BookKeeper.cpp
 // Implements the BookKeeper class
-#include "BookKeeper.h"
-#include "Timer.h"
-#include "boost/multi_array.hpp"
-#include <string.h>
 
+#include "BookKeeper.h"
+
+#include <string.h>
+#include "boost/multi_array.hpp"
 #include "hdf5.h"
 #include "H5Cpp.h"
 #include "H5Exception.h"
-#include "GenException.h"
 
+#include "Timer.h"
+#include "GenException.h"
 #include "Material.h"
 #include "Message.h"
+#include "Logician.h"
+#include "Model.h"
+
+using namespace std;
 
 BookKeeper* BookKeeper::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-BookKeeper* BookKeeper::Instance()
-{
+BookKeeper* BookKeeper::Instance() {
 	// If we haven't created a BookKeeper yet, create and return it.
 	if (0 == instance_)
 		instance_ = new BookKeeper();
@@ -26,23 +30,22 @@ BookKeeper* BookKeeper::Instance()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-BookKeeper::BookKeeper() 
-{
+BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
   dbExists_ = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void BookKeeper::createDB(){
+void BookKeeper::createDB() {
   createDB("cyclus.h5");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::createDB(string name){
+void BookKeeper::createDB(string name) {
   dbName_ = name;
 
-  try{
+  try {
     // create database. If it already exits, H5F_ACC_TRUNC erases all 
     // data previously stored in the file.
     myDB_ = new H5File( name , H5F_ACC_TRUNC );
@@ -55,13 +58,7 @@ void BookKeeper::createDB(string name){
 
     delete outGroup;
     delete inGroup;
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
+  } catch( Exception error ) {
     error.printError();
   }
 };

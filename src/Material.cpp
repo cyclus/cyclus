@@ -700,27 +700,22 @@ map<Iso, Atoms> Material::makeCompMap(const Vector & compVector) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay(double months) {
-  try {
-    // gets the initial composition Vector N_o for this Material object
-    Vector N_o = this->makeCompVector();
+  // gets the initial composition Vector N_o for this Material object
+  Vector N_o = this->makeCompVector();
 
-    // convert months to years to match decay constant units in matrix
-    double years = months / 12;
-  
-    // solves the decay equation for the final composition Vector N_t using a
-    // matrix exponential method
-    Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix_, N_o, years);
+  // convert months to years to match decay constant units in matrix
+  double years = months / 12;
 
-    // converts the Vector solution N_t into a composition map
-    map<Iso, Atoms> newComp = makeCompMap(N_t);
- 
-    // assigns the new composition map to this Material object
-    int time = Timer::Instance()->getTime();
-    this->changeAtomComp(newComp,time);
-  }
-  catch ( string e ) {
-    throw GenException(e);
-  }
+  // solves the decay equation for the final composition Vector N_t using a
+  // matrix exponential method
+  Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix_, N_o, years);
+
+  // converts the Vector solution N_t into a composition map
+  map<Iso, Atoms> newComp = makeCompMap(N_t);
+
+  // assigns the new composition map to this Material object
+  int time = Timer::Instance()->getTime();
+  this->changeAtomComp(newComp,time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

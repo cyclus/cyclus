@@ -9,8 +9,6 @@
 
 #include <vector>
 
-using namespace std;
-
 class LMatrix {
 
   // friend arithmetic operators involving a scalar k and matrix A
@@ -31,7 +29,7 @@ class LMatrix {
     // population functions
     void setElement(int i, int j, long double aij);  // sets value of element aij
     long double & operator()(int i, int j);  // sets value of element A(i,j)
-    void addRow(vector<long double> row);  // adds a row at the end of the Matrix
+    void addRow(std::vector<long double> row);  // adds a row at the end of the Matrix
 
     // other member functions
     void print() const;  // prints the matrix
@@ -43,7 +41,7 @@ class LMatrix {
     const LMatrix & operator*=(const LMatrix & rhs);
 
   private:
-    vector< vector<long double> > M_;  // 2D vector containing matrix elements
+    std::vector< std::vector<long double> > M_;  // 2D vector containing matrix elements
     int rows_;                    // number of rows
     int cols_;                    // number of columns
 
@@ -58,3 +56,4 @@ LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs);  // A * B
 LMatrix identity(int n);  // creates an nxn identity matrix
 
 #endif
+

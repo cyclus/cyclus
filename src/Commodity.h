@@ -5,8 +5,6 @@
 
 #include <libxml/tree.h>
 
-using namespace std;
-
 // foward declaration avoids including entire class header here
 class Model;
 
@@ -15,8 +13,7 @@ class Model;
  *  have a single MarketModel market that is repsonsible for managing the
  *  trade of that Commodity.
  */
-class Commodity
-{
+class Commodity {
 public:
   /**
    *  @brief Primary constructor uses an existing XML Node Pointer to
@@ -30,7 +27,7 @@ public:
   ~Commodity() {};
   
   /// get the Commodity name
-  const string getName() const { return name_;};
+  const std::string getName() const { return name_;};
   
   /// get the ID number
   int getSN() const {return ID_;};
@@ -65,7 +62,7 @@ private:
   /**
    * @brief the name of this Commodity as defined by the user
    */
-  string name_;
+  std::string name_;
   
   /**
    * @brief the unique ID number of this Commodity as serialized by the

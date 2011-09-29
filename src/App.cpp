@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 //-----------------------------------------------------------------------------
 // Main entry point for the test application...
 //-----------------------------------------------------------------------------
@@ -24,14 +23,14 @@ int main(int argc, char* argv[])
     cout << "|  from the University of Wisconsin-Madison  |" << endl;
     cout << "|--------------------------------------------|" << endl;
 
-    // parse arguments
-    try{
-      if(argc<2){
-        string err_msg = "Cyclus usage requires an input file.\n";
-        err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
-        throw GenException(err_msg);
-      }
+    if(argc<2) {
+      string err_msg = "Cyclus usage requires an input file.\n";
+      err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
+      cout << err_msg;
+    }
 
+    // parse arguments
+    try {
     // read input file
     XMLinput->load_file(argv[1]); 
 
@@ -70,8 +69,9 @@ int main(int argc, char* argv[])
     BI->writeMatHist();
 
     BI->closeDB();
-    }
-    catch(GenException ge){cout << ge.what() << endl;};
+    } catch (GenException ge) {
+      cout << ge.what() << endl;
+    };
 
     return 0;
 }

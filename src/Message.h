@@ -19,8 +19,7 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
  * A transaction structure to include in any message.
  */
 
-struct Transaction
-{
+struct Transaction {
   /**
    * The Commodity that is being requested or offered in this Message.
    */
@@ -351,7 +350,7 @@ class Message {
      * 
      * @return the string associated with myDir
      */
-    string unEnumerateDir();
+    std::string unEnumerateDir();
 
     /**
      * Executes the transaction involved in the message.

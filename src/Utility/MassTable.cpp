@@ -1,12 +1,15 @@
 // MassTable class
-#include <iostream>
+
 #include "MassTable.h"
 
+#include "GenException.h"
+
+#include <iostream>
 #include "hdf5.h"
 #include "H5Cpp.h" 
 #include "H5CompType.h"
 #include "H5Exception.h"
-#include "GenException.h"
+
 #define MASS_FILE "Data/mass.h5"
 
 using namespace std;
@@ -15,8 +18,7 @@ using namespace H5;
 MassTable* MassTable::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MassTable* MassTable::Instance() 
-{
+MassTable* MassTable::Instance() {
   // If we haven't created a MassTable yet, create it, and then and return it
   // either way.
   if (0 == instance_) {
@@ -26,30 +28,26 @@ MassTable* MassTable::Instance()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MassTable::MassTable()
-{
+MassTable::MassTable() {
   // figure out what's in the file
   initialize();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MassTable::~MassTable()
-{
+MassTable::~MassTable() {
   //Should close the 'mass.h5' file
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Mass MassTable::getMass(Iso tope){
+Mass MassTable::getMass(Iso tope) {
   Mass toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string MassTable::getName(Iso tope){
-};
+string MassTable::getName(Iso tope){ };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MassTable::initialize()
-{
+void MassTable::initialize() {
   const H5std_string filename = MASS_FILE; 
   const H5std_string groupname = "ame03";
   const H5std_string datasetname = "nuclide";
@@ -60,11 +58,12 @@ void MassTable::initialize()
   
   //check if the file is an hdf5 file first.
   if (H5File::isHdf5(MASS_FILE)) {
-  }
-  else{
+
+  } else{
     throw GenException("The MASS_FILE is not an hdf5 file.");
   }
-  try{
+
+  try {
     /*
      * Turn off the auto-printing when failure occurs so that we can
      * handle the errors appropriately
@@ -110,7 +109,8 @@ void MassTable::initialize()
     Iso Anum;
     Iso Znum;
     Iso tope;
-    for(int i = 0; i < nuclide_len_; i++){
+
+    for(int i = 0; i < nuclide_len_; i++) {
       Znum = nuclide[i].Z*1000;
       Anum = nuclide[i].A;
       tope = Anum+Znum;
@@ -139,35 +139,8 @@ void MassTable::initialize()
     delete group;
     delete dataset;
     delete file;
-  }
-
   // catch failure caused by the H5File operations
-  catch( FileIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the Group operations
-  catch( GroupIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSet operations
-  catch( DataSetIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataSpace operations
-  catch( DataSpaceIException error )
-  {
-     error.printError();
-  }
- 
-  // catch failure caused by the DataType operations
-  catch( DataTypeIException error )
-  {
+  } catch( Exception error ) {
      error.printError();
   }
 };

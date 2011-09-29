@@ -1,10 +1,12 @@
 // Communicator.cpp
 // Implements the Communicator class.
 //
-#include "FacilityModel.h"
 #include "Communicator.h"
+
 #include "GenException.h"
 #include <string>
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator::~Communicator() {}

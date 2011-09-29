@@ -1,10 +1,16 @@
 // Timer.cpp
 // Implements the Timer class
 
-#include "InputXML.h"
 #include "Timer.h"
+
+#include "Logician.h"
+#include "InputXML.h"
 #include "GenException.h"
+
+#include <string>
 #include <iostream>
+
+using namespace std;
 
 Timer* Timer::instance_ = 0;
 
@@ -68,9 +74,9 @@ void Timer::registerAgent(TimeAgent* agent) {
 int Timer::getTime() {
 	return time_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer* Timer::Instance() 
-{
+Timer* Timer::Instance() {
 	// If we haven't created a Timer yet, create it, and then and return it
 	// either way.
 	if (0 == instance_) {
@@ -79,6 +85,7 @@ Timer* Timer::Instance()
 
 	return instance_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 
@@ -103,30 +110,29 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 	simDur_ = dur;
   
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::getSimDur() {
 	return simDur_;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer::Timer() 
-{
 
-}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::convertDate(int month, int year)
-{
+Timer::Timer() { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Timer::convertDate(int month, int year) {
 	return (year - year0_) * 12 + (month - month0_) + time0_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pair<int, int> Timer::convertDate(int time)
-{
+pair<int, int> Timer::convertDate(int time) {
 	int month = (time - time0_) % 12 + 1;
 	int year = (time - time0_ - (month - 1)) / 12 + year0_;
 	return make_pair(month, year);
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation()
-{ 
+void Timer::load_simulation() { 
   
   int dur, m0, y0, sim0, dec;
   string dur_str, m0_str, y0_str, sim0_str, decay_str;

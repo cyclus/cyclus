@@ -1,26 +1,22 @@
 // GenException.h
 #if !defined(_GEN_EXCEPTION)
 #define _GEN_EXCEPTION
-#include <iostream>
+
 #include <exception>
 #include <string>
-
-using namespace std;
-
 
 /**
  *  A generic mechanism to manually manage exceptions
  */
-class GenException: public exception
-{
+class GenException: public std::exception {
 
 protected:
 
     /// The message associated with this exception.
-    string myMessage_;
+    std::string myMessage_;
     
     /// A string to prepend to all message of this class.
-    static string prepend_;
+    static std::string prepend_;
     
 public:
     
@@ -32,7 +28,7 @@ public:
      *
      * @param msg the message
      */
-    GenException(string  msg);
+    GenException(std::string  msg);
     
     /**
      * Returns the error message associated with this GenException.
@@ -48,3 +44,4 @@ public:
     
 };
 #endif
+

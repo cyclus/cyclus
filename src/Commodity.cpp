@@ -1,7 +1,5 @@
 // Commodity.cpp
 // Implements the Commodity Class
-#include <string>
-
 #include "Commodity.h"
 
 #include "Logician.h"
@@ -12,12 +10,11 @@
 int Commodity::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity(xmlNodePtr cur)
-{
+Commodity::Commodity(xmlNodePtr cur) {
   // advance the commodity ID
   ID_ = nextID_++;
 
-  // get the name_ of the commodity
+  // get commodity name
   name_ = XMLinput->get_xpath_content(cur,"name");
 
   // don't give it any market
@@ -26,12 +23,12 @@ Commodity::Commodity(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Commodity::load_commodities()
-{
+void Commodity::load_commodities() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/commodity");
   
-  // for each node from the input, add a commodity to the Logician's list.
-  for (int i=0;i<nodes->nodeNr;i++)
+  // Logician maintains a list of commods retrievable as needed by sim Agents
+  for (int i=0;i<nodes->nodeNr;i++) {
     LI->addCommodity(new Commodity(nodes->nodeTab[i]));
+  }
 }
 

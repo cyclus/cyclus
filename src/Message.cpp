@@ -5,11 +5,12 @@
 
 #include "Logician.h"
 #include "Material.h"
+#include "Communicator.h"
+#include "GenException.h"
+
 #include "FacilityModel.h"
 #include "MarketModel.h"
 #include "InstModel.h"
-#include "Communicator.h"
-#include "GenException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(MessageDir thisDir, Communicator* toSend) {
@@ -82,7 +83,7 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // if amt is positive and there is no supplier
   // this message is an offer and 
   // the sender is the supplier
-  if (trans_.amount > 0){
+  if (trans_.amount > 0) {
     this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 
@@ -115,14 +116,14 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // if amt is positive and there is no supplier
   // this message is an offer and 
   // the sender is the supplier
-  if (trans_.amount > 0){
+  if (trans_.amount > 0) {
     this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
-  if (trans_.amount < 0){
+  if (trans_.amount < 0) {
     this->setRequesterID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   }
 }
@@ -197,7 +198,7 @@ void Message::setDir(MessageDir newDir) {
   dir_ = newDir;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setAmount(double newAmount)  {
+void Message::setAmount(double newAmount) {
   trans_.amount = newAmount;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -235,8 +236,7 @@ void Message::reverseDirection() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setPath() {
   if(dir_== UP_MSG) {
-    switch (sender_->getCommType())
-    {
+    switch (sender_->getCommType()) {
       case FACILITY_COMM:
         fac_ = sender_; 
         inst_ = (dynamic_cast<FacilityModel*>(fac_))->getFacInst();
@@ -279,15 +279,17 @@ void Message::setPath() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Message::unEnumerateDir() {
   string toRet;
-  if (UP_MSG == dir_)
+  if (UP_MSG == dir_) {
     toRet = "up";
-  else if (DOWN_MSG == dir_)
+  } else if (DOWN_MSG == dir_) {
     toRet = "down";
-  else
+  } else {
     throw GenException("Attempted to send a message neither up nor down.");
+  }
 
   return toRet;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute() {
   FacilityModel* theFac;
@@ -295,9 +297,10 @@ void Message::execute() {
   CommunicatorType type;
   type = (dynamic_cast<Communicator*>(theFac))->getCommType();
 
-  if (type == FACILITY_COMM)
+  if (type == FACILITY_COMM) {
     (theFac)->receiveMessage(this);
-  else
+  } else {
     throw GenException("Only FacilityModels can send material.");
+  }
 } 
 

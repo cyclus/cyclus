@@ -1,15 +1,15 @@
 // MassTable.h
 #if !defined(_MASSTABLE)
 #define _MASSTABLE
+
 #include <string>
 #include <vector>
+#include <map>
 #include "hdf5.h"
+
 #include "Material.h"
 
 #define MT MassTable::Instance()
-
-
-using namespace std;
 
 /**
  * The MassTable class inherits from the Material class. The Material
@@ -71,7 +71,7 @@ public:
    * 
    * @ return a string, the name of the tope isotope.
    */
-  string getName(Iso tope);
+  std::string getName(Iso tope);
 
 protected:
   /**
@@ -95,12 +95,12 @@ protected:
   /**
    * The vector of nuclide structs that holds the data in the mass table instance.
    */
-  vector<nuclide_t> nuclide_vec_;
+  std::vector<nuclide_t> nuclide_vec_;
 
   /** 
    * a map for index lookup in the nuclide vector.
    */
-  map<Iso, int> isoIndex_;
+  std::map<Iso, int> isoIndex_;
 
   /** 
    * a function to initialize a large array of nuclide_t structs via the 

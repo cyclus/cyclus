@@ -2,13 +2,10 @@
 #if !defined(_TIMER)
 # define _TIMER
 
-#include "Logician.h"
 #include "TimeAgent.h"
 #include <utility>
 
 #define TI Timer::Instance()
-
-using namespace std;
 
 //class Manager;
 
@@ -148,13 +145,13 @@ public:
   /**
    * Converts the given GENIUS time into a (month, year) pair.
    */
-  pair<int, int> convertDate(int time);
+  std::pair<int, int> convertDate(int time);
 
   /**
    * Loads the information about the simulation timing
    */
   static void load_simulation();
 
-
 };
 #endif
+

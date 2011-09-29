@@ -47,17 +47,6 @@ class UniformTaylor {
     static double maxAbsDiag(const Matrix & A);
 
     /**
-     * Computes the maximum number of terms needed to obtain an accuracy of
-     * epsilon when using the Taylor Series with Uniformization method.
-     *
-     * @param alpha_t the product alpha * t
-     * @param epsilon the accuracy desired in the series computation
-     * @return the maximum number of terms needed
-     * @throw <string> if exp(alpha * t) exceeds range 
-     */
-    static int maxNumTerms(long double alpha_t, double epsilon);
-
-    /**
      * Computes the solution Vector x_t using the Taylor Series with
      * Uniformization method.
      *
@@ -74,6 +63,18 @@ class UniformTaylor {
 		        	    double alpha,
 			            double t,
 			            double tol);
+
+    /**
+     * Computes the maximum number of terms needed to obtain an accuracy of
+     * epsilon when using the Taylor Series with Uniformization method.
+     *
+     * @param alpha_t the product alpha * t
+     * @param epsilon the accuracy desired in the series computation
+     * @return the maximum number of terms needed
+     * @throw <string> if exp(alpha * t) exceeds range 
+     */
+    static int maxNumTerms(long double alpha_t, double epsilon);
+
 };
 
 #endif

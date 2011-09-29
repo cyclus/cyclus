@@ -1,22 +1,25 @@
 // Env.cpp
 // Implements the Env class
+#include "Env.h"
 
 #include "InputXML.h"
-#include "Env.h"
 #include "GenException.h"
+#include "Logician.h"
+
 #include <sys/stat.h>
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <cstring>
+#include <utility>
+
+using namespace std;
 
 Env* Env::instance_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env::Env(){
-}
+Env::Env() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env* Env::Instance() 
-{
+Env* Env::Instance() {
 	// If we haven't created an ENV yet, create it, and then and return it
 	// either way.
 	if (0 == instance_) {
@@ -25,15 +28,15 @@ Env* Env::Instance()
 
 	return instance_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::searchPathForFile(string filename, string inputPath, string envPath, string builtinPath)
-{
+string Env::searchPathForFile(string filename, string inputPath,
+                              string envPath, string builtinPath) {
   struct stat stat_info;
   int stat_result = -1;
   string::size_type begin = 0;
   string::size_type end = 0;
   string searchFilename;
-
 
   string searchPath = "./";  // initialize search path with this directory
   
@@ -60,8 +63,9 @@ string Env::searchPathForFile(string filename, string inputPath, string envPath,
   return searchFilename;
 
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::checkEnv(string varname){
+string Env::checkEnv(string varname) {
 
   string toRet;
   if ((strlen(getenv(varname.c_str()))>0)&&(getenv(varname.c_str())!=NULL)){

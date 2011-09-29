@@ -31,9 +31,10 @@
 // rows and columns start from 1.
 //-----------------------------------------------------------------------------
 
+#include "LMatrix.h"
+
 #include <iostream>
 #include <iomanip>
-#include "LMatrix.h"
 
 using namespace std;
 

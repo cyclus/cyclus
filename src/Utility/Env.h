@@ -2,25 +2,20 @@
 #if !defined(_ENVIRONMENT)
 # define _ENVIRONMENT
 
-#include "Logician.h"
-#include <utility>
+#include <string>
 
 #define ENV Env::Instance()
-
-using namespace std;
 
 /**
  * A (singleton) environment utility to help locate files and find environment settings 
  */
-class Env
-{
+class Env {
 private:
 		
 	/**
 	 * A pointer to this Env once it has been initialized.
 	 */
 	static Env* instance_;
-
 
 protected:
 		
@@ -39,7 +34,6 @@ public:
 	 */
 	static Env* Instance();
 
-
   /**
    * implement a searchpath paradigm
    *
@@ -50,16 +44,17 @@ public:
    *
    * @return file path
    */
-   string searchPathForFile(string filename, string inputPath, string envPath, string builtinPath);
+   std::string searchPathForFile(std::string filename, std::string inputPath,
+                                 std::string envPath, std::string builtinPath);
 
   /**
    * Method to check the existence of and return an environment variable
    *
    * @param var is the variable to check and return 
    */
-  string checkEnv(string var);
-
-
+  std::string checkEnv(std::string var);
 
 };
+
 #endif
+

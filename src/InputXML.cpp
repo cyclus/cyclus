@@ -1,7 +1,6 @@
 // InputXML.cpp
 // Implements XML input handling class
-#include <iostream>
-#include <string.h>
+#include <string>
 #include <sys/stat.h>
 
 #include "InputXML.h"
@@ -9,8 +8,11 @@
 #include "Timer.h"
 #include "Env.h"
 #include "GenException.h"
-#include "Logician.h"
 #include "Model.h"
+#include "Commodity.h"
+#include "Material.h"
+
+using namespace std;
 
 InputXML* InputXML::instance_ = 0;
 
@@ -18,11 +20,8 @@ InputXML* InputXML::instance_ = 0;
 string InputXML::main_schema_ = ENV->searchPathForFile("Data/cyclus.rng","","" ,"");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InputXML::InputXML()
-{
-
+InputXML::InputXML() {
   cur_ns_ = "";
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,8 +35,7 @@ InputXML* InputXML::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
-{
+xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
   xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
   if (NULL == ctxt)
   throw GenException("Failed to generate parser from schema: " + *(fileInfo->schema));
@@ -67,8 +65,7 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::stripCurNS()
-{
+void InputXML::stripCurNS() {
 
   if ("" == cur_ns_)
   throw GenException("Unable to strip tokens from an empty namespace.");
@@ -83,19 +80,14 @@ void InputXML::stripCurNS()
   else
   cur_ns_.erase();
 
-
 }
 
-
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_file(string filename)
-{
+void InputXML::load_file(string filename) {
   // double check that the file exists
   if(filename=="") {
     throw GenException("No input filename was given");
-  }
-  else{ 
+  } else { 
     FILE* file = fopen(filename.c_str(),"r");
     if(file == NULL) { 
       throw GenException("The file cannot be loaded because it has not been found.");
@@ -134,10 +126,8 @@ void InputXML::load_file(string filename)
 
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_recipebook(string filename)
-{
+void InputXML::load_recipebook(string filename) {
   /// store parent file info
   fileStack_.push(curFilePtr);
 
@@ -162,8 +152,7 @@ void InputXML::load_recipebook(string filename)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_facilitycatalog(string filename)
-{
+void InputXML::load_facilitycatalog(string filename) {
   /// store parent file info
   fileStack_.push(curFilePtr);
 
@@ -185,27 +174,9 @@ void InputXML::load_facilitycatalog(string filename)
   curFilePtr = fileStack_.top();
   fileStack_.pop();
 
-
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*xmlNodeSetPtr InputXML::get_xpath_axes(xmlNodePtr cur,const char* expression)
-{
-
-  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
-  xpathCtxt->node = cur;
-  
-  xmlXPathObjectPtr xpathAx = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
-  if(xpathAx == NULL) {
-    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
-    xmlXPathFreeContext(xpathCtxt); 
-  }
-
-  return xpathAx->nodeaxes;
-}
-*/
-xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression)
-{
+xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
   xpathCtxt->node = cur;
@@ -219,14 +190,12 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression
 
   return xpathObj->nodesetval;
 
-
   // when and how to cleanup memory allocation?
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression)
-{
+xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
   xpathCtxt->node = cur;
@@ -244,8 +213,7 @@ xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression)
 
 }
 
-const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression)
-{
+const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
   xpathCtxt->node = cur;
@@ -264,8 +232,7 @@ const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* InputXML::get_xpath_name(xmlNodePtr cur,const char* expression)
-{
+const char* InputXML::get_xpath_name(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
   xpathCtxt->node = cur;
