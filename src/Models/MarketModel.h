@@ -1,14 +1,12 @@
 // MarketModel.h
 #if !defined(_MARKETMODEL_H)
 #define _MARKETMODEL_H
-#include <string>
+
 #include <deque>
 #include <set>
 
 #include "Model.h"
 #include "Communicator.h"
-
-using namespace std;
 
 /// forward declaration to resolve recursion
 class Commodity;
@@ -97,10 +95,10 @@ protected:
   Commodity* commodity_;
 
   /// every market collects offers & requests
-  set<Message*> messages_;
+  std::set<Message*> messages_;
 
   /// every market generates a set of orders
-  deque<Message*> orders_;
+  std::deque<Message*> orders_;
   int firmOrders_;
   
 

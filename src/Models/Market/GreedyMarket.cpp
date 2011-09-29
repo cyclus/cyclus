@@ -8,6 +8,8 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GreedyMarket::receiveMessage(Message *msg)
 {

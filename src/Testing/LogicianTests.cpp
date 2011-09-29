@@ -7,8 +7,9 @@
 #include <string>
 #include <map>
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+using namespace std;
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TestModel : public Model {
   public:
     int pre_history_handled_runs_;

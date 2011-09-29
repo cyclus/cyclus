@@ -2,13 +2,9 @@
 #if !defined(_MODEL_H)
 #define _MODEL_H
 
-#include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 #include <libxml/tree.h>
-
-using namespace std;
 
 class Model;
 
@@ -48,7 +44,7 @@ public:
    * @param model_type model type (region, inst, facility, ...) to create
    * @param cur pointer to the xml input representing the model to create
    */
-  static Model* create(string model_type, xmlNodePtr cur);
+  static Model* create(std::string model_type, xmlNodePtr cur);
 
   /** 
    * @brief Create a new model object based on an existing one
@@ -63,7 +59,7 @@ public:
    * @param model_type model type (region, inst, facility, ...) to add
    * @param model_name name of model (NullFacility, StubMarket, ...) to add
    */
-  static mdl_ctor* loadConstructor(string model_type,string model_name);
+  static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
 
   /**
    * @brief Destroy a model cleanly
@@ -94,7 +90,7 @@ public:
    * @param ns the string to append to the current namespace modifier
    * @param format format of the file (currently cyclus supports only xml)
    */
-  static void load_facilitycatalog(string filename, string ns, string format);
+  static void load_facilitycatalog(std::string filename, std::string ns, std::string format);
 
   /**
    * loads the regions available to the simulation
@@ -149,7 +145,7 @@ public:
   /**
    * get model instance name
    */
-  const string getName() const { return name_; };
+  const std::string getName() const { return name_; };
 
   /**
    * get model instance SN
@@ -164,22 +160,22 @@ public:
   /**
    * get model implementation name
    */
-  const string getModelImpl() {return model_impl_; };
+  const std::string getModelImpl() {return model_impl_; };
 
   /**
    * get model type
    */
-  const string getModelType() { return model_type_; };
+  const std::string getModelType() { return model_type_; };
 
   /**
    * set model type
    */
-  void setModelType(string new_type) { model_type_ = new_type; };
+  void setModelType(std::string new_type) { model_type_ = new_type; };
 
   /**
    * get model instance handle
    */
-  const string getHandle() const { return handle_; };
+  const std::string getHandle() const { return handle_; };
 
   /**
    * every model should be able to print a verbose description
@@ -193,38 +189,38 @@ private:
   /**
    * map of constructor methods for each loaded model
    */
-  static map<string, mdl_ctor*> create_map_;
+  static std::map<std::string, mdl_ctor*> create_map_;
 
   /**
    * map of destructor methods for each loaded model
    */
-  static map<string, mdl_dtor*> destroy_map_;
+  static std::map<std::string, mdl_dtor*> destroy_map_;
   
   /**
    * every instance of a model should have a handle
    * perhaps this is redundant with name. Discuss amongst yourselves.
    */
-  string handle_;
+  std::string handle_;
 
   /**
    * generate model handle
    */
-  string generateHandle();
+  std::string generateHandle();
 
   /**
    * every instance of a model should have a name
    */
-  string name_;
+  std::string name_;
 
   /** 
    * every instance of a model should know its type
    */
-  string model_type_;
+  std::string model_type_;
 
   /**
    * every instance of a model should know its implementation
    */
-  string model_impl_;
+  std::string model_impl_;
 
   /**
    * every instance of a model will have a serialized ID

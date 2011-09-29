@@ -1,13 +1,12 @@
 // ConverterModel.h
 #if !defined(_CONVERTERMODEL_H)
 #define _CONVERTERMODEL_H
+
 #include <string>
 #include <list>
 
 #include "TimeAgent.h"
 #include "Message.h"
-
-using namespace std;
 
 /// forward declaration to resolve recursion
 class Commodity;
@@ -53,7 +52,7 @@ public:
 
 protected:
   /// each instance of a converter needs a name
-  string conv_name_;
+  std::string conv_name_;
 
   /// each converter needs a list of equivalent commodities it converts
   list<Commodity*> commodities_; 
@@ -65,10 +64,10 @@ public:
    *
    * @param convName is the new name of the converter
    */
-  void setConvName(string convName) { conv_name_ = convName; };
+  void setConvName(std::string convName) { conv_name_ = convName; };
 
   /// Returns the converter's name
-  string getConvName() { return conv_name_; };
+  std::string getConvName() { return conv_name_; };
 
   /**
    * Converts between amounts of two commodities

@@ -4,6 +4,7 @@
 
 #include "TimeAgent.h"
 #include <utility>
+#include <vector>
 
 #define TI Timer::Instance()
 
@@ -51,7 +52,7 @@ private:
    */
   int year0_;
 
-  vector<TimeAgent*> time_agents_;
+  std::vector<TimeAgent*> time_agents_;
 
   /**
    * @brief sends the tick signal to all of the models receiving time

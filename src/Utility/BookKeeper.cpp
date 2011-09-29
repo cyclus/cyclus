@@ -3,7 +3,8 @@
 
 #include "BookKeeper.h"
 
-#include <string.h>
+#include <string>
+#include <iostream>
 #include "boost/multi_array.hpp"
 #include "hdf5.h"
 #include "H5Cpp.h"

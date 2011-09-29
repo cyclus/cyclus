@@ -3,6 +3,10 @@
 
 #include "StubModel.h"
 
+#include <iostream>
+
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
   setModelType("Stub");

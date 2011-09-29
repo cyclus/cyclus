@@ -3,6 +3,10 @@
 
 #include "StubTimeAgent.h"
 
+#include <iostream>
+
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::StubTimeAgent() { 
   setModelType("Stub");

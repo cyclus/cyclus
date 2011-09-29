@@ -3,6 +3,10 @@
 
 #include "StubCommModel.h"
 
+#include <iostream>
+
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
   setModelType("StubComm");

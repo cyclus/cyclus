@@ -3,14 +3,15 @@
 
 #include "Message.h"
 
+#include "GenException.h"
 #include "Logician.h"
 #include "Material.h"
 #include "Communicator.h"
-#include "GenException.h"
-
 #include "FacilityModel.h"
 #include "MarketModel.h"
 #include "InstModel.h"
+
+#include <iostream>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(MessageDir thisDir, Communicator* toSend) {

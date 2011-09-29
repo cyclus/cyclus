@@ -1,14 +1,13 @@
 // FacilityModel.h
 #if !defined(_FACILITYMODEL_H)
 #define _FACILITYMODEL_H
+
 #include <string>
 #include <vector>
 
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"
-
-using namespace std;
 
 /// forward declaration to resolve recursion
 class Commodity;
@@ -69,10 +68,10 @@ public:
 protected:
   /// each facility should have an institution that manages it
   //Model* inst;
-  string inst_name_;
+  std::string inst_name_;
 
   /// each instance of a facility needs a name
-  string fac_name_;
+  std::string fac_name_;
 
   /// each facility needs a lifetime
   int fac_lifetime_;
@@ -85,7 +84,7 @@ protected:
    * @param manifest is the set of materials being received
    *
    */ 
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest) = 0;
+  virtual void receiveMaterial(Transaction trans, std::vector<Material*> manifest) = 0;
   
 
 public:
@@ -95,21 +94,21 @@ public:
    *
    * @param facName is the new name of the facility
    */
-  void setFacName(string facName) { fac_name_ = facName; };
+  void setFacName(std::string facName) { fac_name_ = facName; };
 
   /**
    * Returns the facility's name
    *
    * @return fac_name_ the name of this facility, a string
    */
-  string getFacName() { return fac_name_; };
+  std::string getFacName() { return fac_name_; };
 
   /**
    * Sets this facility's instutution name 
    *
    * @param name the name of the institution associated with this facility.
    */
-  void setInstName(string name){ inst_name_ = name;};
+  void setInstName(std::string name){ inst_name_ = name;};
 
   /**
    * Returns this facility's institution
@@ -146,7 +145,7 @@ public:
    * @param order contains the order being executed
    * @param manifest is the set of materials being received
    */ 
-  virtual void sendMaterial(Message* order, vector<Material*> manifest);
+  virtual void sendMaterial(Message* order, std::vector<Material*> manifest);
   
   /**
    * Each facility is prompted to do its beginning-of-life

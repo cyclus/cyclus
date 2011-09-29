@@ -1,13 +1,11 @@
 // RegionModel.h
 #if !defined(_REGIONMODEL_H)
 #define _REGIONMODEL_H
-#include <string>
 #include <set>
+#include <vector>
 
 #include "TimeAgent.h"
 #include "Communicator.h"
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
@@ -17,8 +15,7 @@ using namespace std;
  * This is all that is known externally about Regions
  */
 //-----------------------------------------------------------------------------
-class RegionModel : public TimeAgent, public Communicator
-{
+class RegionModel : public TimeAgent, public Communicator {
 	
 /* --------------------
  * all MODEL classes have these members
@@ -98,10 +95,10 @@ public:
 
 protected:
     /// every region has a list of allowed facilities
-    set<Model*> allowedFacilities_;
+    std::set<Model*> allowedFacilities_;
 
     /// every region has a list of institutions
-    vector<Model*> institutions_;
+    std::vector<Model*> institutions_;
 /* -------------------- */
 
 };

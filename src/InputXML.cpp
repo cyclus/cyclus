@@ -1,5 +1,6 @@
 // InputXML.cpp
 // Implements XML input handling class
+#include <iostream>
 #include <string>
 #include <sys/stat.h>
 

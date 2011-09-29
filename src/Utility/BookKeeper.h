@@ -196,7 +196,7 @@ public:
    * @param msg the message containing the transaction
    * @param manifest a vector the materials fulfilling this transaction
    */
-  void registerTrans(Message* msg, vector<Material*> manifest);
+  void registerTrans(Message* msg, std::vector<Material*> manifest);
 
   /**
    * Register the materialin the BookKeeper's map of material changes

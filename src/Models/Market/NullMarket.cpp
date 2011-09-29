@@ -8,9 +8,10 @@
 #include "GenException.h"
 #include "InputXML.h"
 
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void NullMarket::receiveMessage(Message *msg)
-{
+void NullMarket::receiveMessage(Message *msg) {
   messages_.insert(msg);
 
   if (msg->getAmount() > 0){

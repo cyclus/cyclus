@@ -6,6 +6,11 @@
 #include "GenException.h"
 #include "Logician.h"
 
+#include <iostream>
+#include <string>
+
+using namespace std;
+
 void MarketModel::init(xmlNodePtr cur)
 {
   Model::init(cur);

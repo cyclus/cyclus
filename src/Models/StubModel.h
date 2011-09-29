@@ -1,13 +1,8 @@
 // StubModel.h
 #if !defined(_STUBMODEL_H)
 #define _STUBMODEL_H
-#include <string>
-
 
 #include "Model.h"
-
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
@@ -17,8 +12,7 @@ using namespace std;
  * Models.
  */
 //-----------------------------------------------------------------------------
-class StubModel : public Model
-{
+class StubModel : public Model {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

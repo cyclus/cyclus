@@ -1,13 +1,9 @@
 // StubCommModel.h
 #if !defined(_STUBCOMMMODEL_H)
 #define _STUBCOMMMODEL_H
-#include <string>
-
 
 #include "Model.h"
 #include "Communicator.h"
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
@@ -17,8 +13,7 @@ using namespace std;
  * Models.
  */
 //-----------------------------------------------------------------------------
-class StubCommModel : public Model, public Communicator
-{
+class StubCommModel : public Model, public Communicator {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

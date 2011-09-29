@@ -2,13 +2,20 @@
 // Implements the FacilityModel class
 
 #include "FacilityModel.h"
+
 #include "Logician.h"
 #include "BookKeeper.h"
-//#include "Material.h"
+#include "InputXML.h"
+
+#include <iostream>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::init(xmlNodePtr cur)
-{
+void FacilityModel::init(xmlNodePtr cur) {
   Model::init(cur);
 
   // Specific initialization for FacilityModels
@@ -22,8 +29,7 @@ void FacilityModel::init(xmlNodePtr cur)
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::copy(FacilityModel* src)
-{ 
+void FacilityModel::copy(FacilityModel* src) { 
   Model::copy(src); 
   Communicator::copy(src); 
 
@@ -35,13 +41,12 @@ void FacilityModel::copy(FacilityModel* src)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel* FacilityModel::getFacInst()
-{
+InstModel* FacilityModel::getFacInst() {
   return dynamic_cast<InstModel*>(LI->getModelByName(inst_name_, INST));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
+void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest) {
   // register this transaction with the bookkeper
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
@@ -51,7 +56,7 @@ void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::handlePreHistory(){
+void FacilityModel::handlePreHistory() {
   // facilities should override this method, unless they're very naiive.
   // this function allows the facility to set up the simulation before it begins.
 }

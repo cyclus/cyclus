@@ -1,15 +1,19 @@
 // Material.cpp
-#include <iostream>
-#include <fstream>
-#include <vector>
-
 #include "Material.h"
+
 #include "BookKeeper.h"
 #include "GenException.h"
 #include "MassTable.h"
 #include "Logician.h"
 #include "Timer.h"
 #include "UniformTaylor.h"
+#include "InputXML.h"
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 
 using namespace std;
 

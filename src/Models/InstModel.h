@@ -1,14 +1,10 @@
 // InstModel.h
 #if !defined(_INSTMODEL_H)
 #define _INSTMODEL_H
-#include <string>
-
 
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "RegionModel.h"
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 /*
@@ -18,8 +14,7 @@ using namespace std;
  * Models.
  */
 //-----------------------------------------------------------------------------
-class InstModel : public TimeAgent, public Communicator
-{
+class InstModel : public TimeAgent, public Communicator {
 
 /* --------------------
  * all MODEL classes have these members
@@ -136,6 +131,4 @@ protected:
 };
 
 #endif
-
-
 

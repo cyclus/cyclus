@@ -1,11 +1,8 @@
 // StubTimeAgent.h
 #if !defined(_STUBTIMEAGENT_H)
 #define _STUBTIMEAGENT_H
-#include <string>
 
 #include "TimeAgent.h"
-
-using namespace std;
 
 //-----------------------------------------------------------------------------
 /*

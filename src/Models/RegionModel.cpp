@@ -8,6 +8,11 @@
 #include "InputXML.h"
 #include "Timer.h"
 
+#include <string>
+#include <iostream>
+
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
   /// Default constructor for RegionModel Class
   RegionModel::RegionModel() {

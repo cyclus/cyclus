@@ -3,11 +3,15 @@
 
 #include "InstModel.h"
 #include "FacilityModel.h"
-#include <sstream>
-
 #include "Logician.h"
 #include "InputXML.h"
 #include "GenException.h"
+
+#include <iostream>
+#include <sstream>
+#include <string>
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur)

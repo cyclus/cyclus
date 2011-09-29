@@ -6,8 +6,9 @@
 #include <utility>
 #include <math.h>
 #include <vector>
+#include <string>
+#include <libxml/tree.h>
 
-#include "InputXML.h"
 #include "UseMatrixLib.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
