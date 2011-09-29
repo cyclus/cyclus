@@ -2,6 +2,7 @@
 // Implements the InstModel class
 
 #include "InstModel.h"
+#include "FacilityModel.h"
 #include <sstream>
 
 #include "Logician.h"

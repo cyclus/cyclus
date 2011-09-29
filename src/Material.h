@@ -3,7 +3,7 @@
 #define _MATERIAL_H
 
 #include <map>
-#include <iostream>
+#include <utility>
 #include <math.h>
 #include <vector>
 
@@ -11,8 +11,6 @@
 #include "UseMatrixLib.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
-
-using namespace std;
 
 /**
  * type definition for isotopes
@@ -60,7 +58,7 @@ typedef int Col;
  * contains the corresponding decay matrix column and decay constant
  * associated with that parent.
  */
-typedef map< Iso, pair<Col, DecayConst> > ParentMap;
+typedef std::map< Iso, std::pair<Col, DecayConst> > ParentMap;
 
 /**
  * A map type to represent all of the daughter isotopes tracked.  The key for
@@ -69,27 +67,27 @@ typedef map< Iso, pair<Col, DecayConst> > ParentMap;
  * daughters are represented by a pair that contains the daughter's Iso number
  * and its branching ratio.
  */
-typedef map< Col, vector< pair<Iso, BranchRatio> > > DaughtersMap;
+typedef std::map<Col, std::vector<std::pair<Iso, BranchRatio> > > DaughtersMap;
 
 /**
  * map integers to doubles: Iso => (Atoms|Mass)
  */
-typedef map<Iso, double> CompMap;
+typedef std::map<Iso, double> CompMap;
 
 /**
  * A map for storing the composition history of a material.
  */
-typedef map<int, map<Iso, Atoms> > CompHistory;
+typedef std::map<int, std::map<Iso, Atoms> > CompHistory;
 
 /**
  * A map for storing the mass history of a material.
  */
-typedef map<int, map<Iso, Mass> > MassHistory;
+typedef std::map<int, std::map<Iso, Mass> > MassHistory;
 
 /**
  * A map for storing the facility history of a material.
  */
-typedef map<int, pair<int, int> > FacHistory;
+typedef std::map<int, std::pair<int, int> > FacHistory;
 
 /**
  * An enumeration for different types of recipe bases
@@ -144,7 +142,8 @@ public:
    * @param scale is the size of this material
    * @param type indicates whether comp and scale are in mass or atom units
    */
-  Material(CompMap comp, string mat_unit, string rec_name, double scale, Basis type);
+  Material(CompMap comp, std::string mat_unit, std::string rec_name, 
+            double scale, Basis type);
 
   
   /** 
@@ -168,7 +167,7 @@ public:
    * @param header is the description to precede the composition 
    * @param comp_map is the map between isotopes and mass
    */
-  void printComp(string header, CompMap comp_map);
+  void printComp(std::string header, CompMap comp_map);
 
   /**
    * get material ID
@@ -182,14 +181,14 @@ public:
    *
    * @return recipeName
    */
-  string getName() { return recipeName_; };
+  std::string getName() { return recipeName_; };
 
   /**
    * returns the units of the recipe, a string
    *
    * @return units
    */
-  string getUnits() { return units_; };
+  std::string getUnits() { return units_; };
 
   /**
    * returns the total mass of this material object PER UNIT
@@ -344,7 +343,7 @@ public:
    * @param comp the composition vector
    * @return the mass (in tons)
    */
-  static double getEltMass(int elt, const map<Iso, Atoms>& comp);
+  static double getEltMass(int elt, const std::map<Iso, Atoms>& comp);
 
   /**
    * Returns the mass of the given isotope in this Material.
@@ -498,7 +497,7 @@ protected:
    * @param compVector the mathematical Vector
    * @return the composition map
    */
-  static map<Iso, Atoms> makeCompMap(const Vector & compVector);
+  static std::map<Iso, Atoms> makeCompMap(const Vector & compVector);
 
 private:
   /**
@@ -509,7 +508,15 @@ private:
    * @param ns the namespace under which these recipes will reside
    * @param format the format of the recipebook
    */
-  static void load_recipebook(string filename, string ns, string format);
+  static void load_recipebook(std::string filename, std::string ns, 
+                               std::string format);
+
+  /**
+   * @brief Used to determine validity of isotope defnition.
+   * @param tope 
+   * @return true if isotope (number) is valid, false otherwise
+   */
+  static bool isAtomicNumValid(Iso tope);
 
   /**
    * total mass of this material object PER UNIT
@@ -529,12 +536,12 @@ private:
   /**
    * units for this material
    */
-  string units_;
+  std::string units_;
 
   /*
    * name of this recipe
    */
-  string recipeName_;
+  std::string recipeName_;
   
   /**
    * convert an atom composition into a consitent mass composition

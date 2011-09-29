@@ -2,25 +2,21 @@
 #if !defined(_LOGICIAN)
 #define _LOGICIAN
 
-#include "FacilityModel.h"
-#include "MarketModel.h"
 #include "Model.h"
 #include "Material.h"
 #include "Commodity.h"
+
 #include <vector>
 #include <string>
 #include <map>
-#include <iostream>
 #include <list>
 
 #define LI Logician::Instance()
 
-using namespace std;
-
-typedef map<int, Model*> ModelList;
-typedef map<string, Material*> RecipeList;
-typedef map<string, Commodity*> CommodityList;
-typedef vector<Material*> MaterialList;
+typedef std::map<int, Model*> ModelList;
+typedef std::map<std::string, Material*> RecipeList;
+typedef std::map<std::string, Commodity*> CommodityList;
+typedef std::vector<Material*> MaterialList;
 
 /**
  * A (singleton) simulation logician class. This class sends tick messages
@@ -41,7 +37,7 @@ class Logician {
     Logician();
 
     /// true if decay should occur, false if not.
-    bool decay_;
+    bool decay_wanted_;
 
     /// how many months between decay calculations
     int decay_interval_;
@@ -52,7 +48,7 @@ class Logician {
     void createModelList(ModelType model_type);
     
     /// map of model types to model lists. Used by [add/get]Model methods)
-    map<ModelType, ModelList> model_lists_;
+    std::map<ModelType, ModelList> model_lists_;
     
     /// list of material templates
     RecipeList recipes_;
@@ -64,7 +60,7 @@ class Logician {
     MaterialList materials_;
     
     /// map commodities to markets
-    map<Commodity*, Model*> commodity_market_map_;
+    std::map<Commodity*, Model*> commodity_market_map_;
     
     /**
      * (Recursively) deletes this Logician (and the objects it oversees).
@@ -140,7 +136,7 @@ class Logician {
      * @param search_name the name of the converter whose pointer to return
      * @param model_type type of the model pointer to return (ModelType enum)
      */
-    Model* getModelByName(string search_name, ModelType model_type); 
+    Model* getModelByName(std::string search_name, ModelType model_type); 
 
     /** 
      * get number of models of type model_type
@@ -154,7 +150,7 @@ class Logician {
      *
      * @param commodity_name the name of the commodity
      */
-    Model* getMarketByCommodity(string commodity_name);
+    Model* getMarketByCommodity(std::string commodity_name);
 
     /**
      * get a pointer to a market based on its commodity pointer
@@ -184,7 +180,7 @@ class Logician {
      * @param name the name of the recipe to add 
      * @param new_mat the material object to add to the recipes list
      */
-    void addRecipe(string name, Material* new_mat);
+    void addRecipe(std::string name, Material* new_mat);
 
     /**
      * print list of recipes
@@ -201,7 +197,7 @@ class Logician {
      *
      * @param name the name of the recipe for which to return a material pointer.
      */
-    Material* getRecipe(string name);                      
+    Material* getRecipe(std::string name);                      
     
     /**
      * add a commodity to the list
@@ -220,8 +216,9 @@ class Logician {
      *
      * @param name the name of the commodity for which to return a pointer.
      */
-    Commodity* getCommodity(string name);
+    Commodity* getCommodity(std::string name);
 
 };
+
 #endif
 

@@ -2,6 +2,7 @@
 // Implements the RegionModel class
 
 #include "RegionModel.h"
+#include "InstModel.h"
 #include "GenException.h"
 #include "Logician.h"
 #include "InputXML.h"

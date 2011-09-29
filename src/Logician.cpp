@@ -5,6 +5,9 @@
 #include "Logician.h"
 #include "Timer.h"
 #include "GenException.h"
+#include "MarketModel.h"
+
+using namespace std;
 
 Logician* Logician::instance_ = 0;
 
@@ -41,7 +44,7 @@ Logician* Logician::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::decayMaterials(int time){
   // if decay is on
-  if(decay_) {
+  if(decay_wanted_) {
     // and if (time(mod interval)==0)
     if(time/decay_interval_ == 0) {
       // acquire a list of all materials
@@ -71,11 +74,11 @@ void Logician::resolveMarkets() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::setDecay(int dec){
   if( dec <= 0 ){
-    decay_ = false;
+    decay_wanted_ = false;
     decay_interval_ = NULL;
   }
   else if ( dec > 0 ){
-    decay_ = true;
+    decay_wanted_ = true;
     decay_interval_ = dec;
   }
 }

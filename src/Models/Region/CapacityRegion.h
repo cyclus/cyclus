@@ -11,6 +11,7 @@
  */
 
 #include "RegionModel.h"
+#include "FacilityModel.h"
 #include "Logician.h"
 #include "GenException.h"
 #include "InputXML.h"

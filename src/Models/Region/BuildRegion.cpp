@@ -2,6 +2,7 @@
 // Implements the BuildRegion class
 
 #include "BuildRegion.h"
+#include "InstModel.h"
 
 #include <sstream>
 #include <iostream>
@@ -59,8 +60,7 @@ void BuildRegion::init(xmlNodePtr cur)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool BuildRegion::requestBuild(Model* fac, InstModel* inst)
-{
+bool BuildRegion::requestBuild(Model* fac, InstModel* inst) {
   bool test_build;
   // Request that Institution inst build Facility fac
   test_build=inst->pleaseBuild(fac);
