@@ -18,31 +18,54 @@ void FixedInst::init(xmlNodePtr cur)
 
   /// get facility list
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/FixedInst/facility");
-  
+
   for (int i=0;i<nodes->nodeNr;i++) 
   {
     xmlNodePtr fac_node = nodes->nodeTab[i];
-    string fac_name = XMLinput->get_xpath_content(fac_node,"type");
-  
-    Model* facility = LI->getModelByName(fac_name, FACILITY);
+    // TYPE
+    string fac_type = XMLinput->get_xpath_content(fac_node,"type");
+    // NAME
+    string fac_name = XMLinput->get_xpath_content(fac_node,"name");
+    fac_list_.push_back(make_pair(fac_type, fac_name));
+  }
+  setMemberVar("fac_list_",&fac_list_);
+  this->init(member_var_map_);
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void FixedInst::init(map<string, void*> member_var_map)
+{
+  member_var_map_ = member_var_map;
+  InstModel::init(member_var_map);
+  // for each facility in the list 
+  fac_list_ = getMapVar<deque< pair< string, string > > >("fac_list_",member_var_map);
+  for(deque< pair< string , string> >::iterator iter = fac_list_.begin();
+        iter != fac_list_.end();
+        iter++){
+    // get the implementation of the model
+    string fac_type = (*iter).first;
+    // create a facility pointer to that model
+    Model* facility = LI->getModelByName(fac_type, FACILITY);
+    // freak out if it isn't in the logician already
     if (NULL == facility){
       throw GenException("Facility '" 
-                         + fac_name 
+                         + fac_type 
                          + "' is not defined in this problem.");
     }
-    
+    // if this region doesn't allow this facility, also freak out 
     if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
       throw GenException("Facility '" 
-                         + fac_name 
+                         + fac_type 
                          + "' is not an allowed facility for region '" 
                          + region_->getName() +"'.");
-  }
-
+    }
+    // now, create the new facility from the pointer
     Model* new_facility = Model::create(facility);
-
-    dynamic_cast<FacilityModel*>(new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
+    // you'll need to set its name
+    dynamic_cast<FacilityModel*>(new_facility)->setFacName((*iter).second);
+    // as well as its inst name
     dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
+    // and register it with the logician
     this->addFacility(new_facility);
   }
 }

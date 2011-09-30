@@ -2,6 +2,7 @@
 #if !defined(_FIXEDINST_H)
 #define _FIXEDINST_H
 #include <iostream>
+#include <queue>
 
 #include "InstModel.h"
 
@@ -35,6 +36,9 @@ public:
   // different ways to populate an object after creation
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
+
+  /// initialize an object from a map of pointers
+  virtual void init(map<string, void*> member_var_map);
 
   /// initialize an object by copying another
   virtual void copy(FixedInst* src);
@@ -74,13 +78,12 @@ protected:
 /* ------------------- */ 
 
 /* --------------------
- * This INSTMODEL classes have these members
+ * This INSTMODEL class has these members
  * --------------------
  */
-
-protected:
-
   vector<Model*> facilities_;
+  
+  deque< pair< string, string > > fac_list_; 
 
 /* ------------------- */ 
 

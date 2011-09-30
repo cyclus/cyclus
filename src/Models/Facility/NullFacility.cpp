@@ -29,38 +29,68 @@ void NullFacility::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
   
-  in_commod_ = out_commod_ = NULL; 
-  
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/NullFacility");
 
-  // all facilities require commodities - possibly many
-  string commod_name;
+  // all facilities require commodities 
   Commodity* new_commod;
-  
+  string commod_name;
+  new_commod=NULL;
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = LI->getCommodity(commod_name);
-  if (NULL == in_commod_)
+  new_commod = LI->getCommodity(commod_name);
+  if (NULL == new_commod){ 
     throw GenException("Input commodity '" + commod_name 
-                       + "' does not exist for facility '" + getName() 
-                       + "'.");
-  
+                       + "' does not exist for converter '" + getName() 
+                       + "'.");}
+  else{
+    in_commod_ = new_commod;
+    setMemberVar("in_commod_",in_commod_);
+  }
+
+  new_commod=NULL;
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = LI->getCommodity(commod_name);
-  if (NULL == out_commod_)
+  new_commod = LI->getCommodity(commod_name);
+  if (NULL == new_commod){
     throw GenException("Output commodity '" + commod_name 
-                       + "' does not exist for facility '" + getName() 
-                       + "'.");
+                       + "' does not exist for converter '" + getName() 
+                       + "'.");}
+  else {
+    out_commod_ = new_commod;
+    setMemberVar("out_commod_", out_commod_);
+  }
 
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  setMemberVar("inventory_size_",&inventory_size_); 
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  setMemberVar("capacity_",&capacity_); 
+  
+  this->init(member_var_map_);
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::init(map<string, void*> member_var_map)
+{
+  // set the member variable map across the board, just in case. 
+  member_var_map_ = member_var_map;
+
+  // send the init signal upward
+  FacilityModel::init(member_var_map);
+
+  // this takes commodity names as commodity* objects
+  // it assumes that the commodity* provided exists within the simulation.
+  in_commod_ = static_cast<Commodity*>(member_var_map["in_commod_"]);
+
+  out_commod_ = static_cast<Commodity*>(member_var_map["out_commod_"]);
+  
+  // get inventory size
+  inventory_size_ = getMapVar<double>("inventory_size_", member_var_map);
+  // get capacity_
+  capacity_ = getMapVar<double>("capacity_", member_var_map);
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
   ordersWaiting_ = deque<Message*>();
 }
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void NullFacility::copy(NullFacility* src)
 {

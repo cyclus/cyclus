@@ -34,6 +34,9 @@ public:
   // every model needs a method to initialize from XML
   virtual void init(xmlNodePtr cur);
 
+  // every model needs a method to initialize in general
+  virtual void init(map<string, void*> member_var_map);
+
   // every model needs a method to copy one object to another
   virtual void copy(ConverterModel* src);
 
@@ -48,7 +51,7 @@ public:
   virtual void copyFreshModel(Model* src)=0;
 
   // every model should be able to print a verbose description
-  virtual void print()              { Model::print(); };
+  virtual void print() { Model::print(); };
 
 protected:
   /// each instance of a converter needs a name

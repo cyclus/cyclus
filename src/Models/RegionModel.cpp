@@ -46,8 +46,24 @@ void RegionModel::init(xmlNodePtr cur)
       throw GenException("Facility " + fac_name 
           + " is not defined in this simulation.");
     }
-    allowedFacilities_.insert(new_fac);
+    allowed_facilities_.insert(new_fac);
   }
+  setMemberVar("allowed_facilities_",&allowed_facilities_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void RegionModel::init(map<string, void*>member_var_map)
+{
+ 
+  Model::init(member_var_map);
+
+  /** 
+   *  Specific initialization for RegionModels
+   */
+
+  /// all regions require allowed facilities - possibly many
+  allowed_facilities_ = getMapVar<set< Model*> >("allowed_facilities_", member_var_map);
+  setMemberVar("allowed_facilities_",&allowed_facilities_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -59,7 +75,7 @@ void RegionModel::copy(RegionModel* src) {
    *  Specific initialization for RegionModels
    */
 
-  allowedFacilities_ = src->allowedFacilities_;
+  allowed_facilities_ = src->allowed_facilities_;
   
   // don't copy institutions!
   LI->addModel(this, REGION);
@@ -73,10 +89,10 @@ void RegionModel::print() {
 
   cout << "allows facilities " ;
 
-  for(set<Model*>::iterator fac=allowedFacilities_.begin();
-      fac != allowedFacilities_.end();
+  for(set<Model*>::iterator fac=allowed_facilities_.begin();
+      fac != allowed_facilities_.end();
       fac++){
-    cout << (fac == allowedFacilities_.begin() ? "{" : ", " )
+    cout << (fac == allowed_facilities_.begin() ? "{" : ", " )
         << (*fac)->getName();
   }
   

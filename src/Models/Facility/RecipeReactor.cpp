@@ -36,27 +36,33 @@
 void RecipeReactor::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
-  
-  // set the current month in cycle to 1, it's the first month.
-  month_in_cycle_ = 1;
-  cycle_time_ = 3;
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/RecipeReactor");
 
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  //cycle_time_ = atof(XMLinput->get_xpath_content(cur,"cycletime"));
-  lifetime_ = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
-  startConstrYr_ = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
-  startConstrMo_ = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
-  startOpYr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  startOpMo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-  licExpYr_ = atoi(XMLinput->get_xpath_content(cur,"licExpYear"));
-  licExpMo_ = atoi(XMLinput->get_xpath_content(cur,"licExpMonth"));
+  setMemberVar("capacity_",&capacity_);
+  //cycle_time_ = atoi(XMLinput->get_xpath_content(cur,"cycleTime"));
+  //setMemberVar("cycle_time_",&cycle_time_);
+  start_constr_yr_ = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
+  setMemberVar("start_constr_yr_",&start_constr_yr_);
+  start_constr_mo_ = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
+  setMemberVar("start_constr_mo_",&start_constr_mo_);
+  start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
+  setMemberVar("start_op_yr_",&start_op_yr_);
+  start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
+  setMemberVar("start_op_mo_",&start_op_mo_);
+  lic_exp_yr_ = atoi(XMLinput->get_xpath_content(cur,"licExpYear"));
+  setMemberVar("lic_exp_yr_",&lic_exp_yr_);
+  lic_exp_mo_ = atoi(XMLinput->get_xpath_content(cur,"licExpMonth"));
+  setMemberVar("lic_exp_mo_",&lic_exp_mo_);
   state_ = XMLinput->get_xpath_content(cur,"state");
-  typeReac_ = XMLinput->get_xpath_content(cur,"typeReac");
+  setMemberVar("state_",&state_);
+  type_reac_ = XMLinput->get_xpath_content(cur,"typeReac");
+  setMemberVar("type_reac_",&type_reac_);
   CF_ = atof(XMLinput->get_xpath_content(cur,"elecCF"));
+  setMemberVar("CF_",&CF_);
 
   // all facilities require commodities - possibly many
   string commod_name;
@@ -101,14 +107,41 @@ void RecipeReactor::init(xmlNodePtr cur)
       throw GenException("Recipe '" + recipe_name 
           + "' does not exist for facility '" + getName()
           + "'.");
-    fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
+    fuel_pairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
           make_pair(out_commod, out_recipe)));
   };
 
-  stocks_ = deque<InFuel>();
-  currCore_ = deque< pair<Commodity*, Material* > >();
-  inventory_ = deque< pair<Commodity*, Material*> >();
-  ordersWaiting_ = deque< Message*>();
+  setMemberVar("fuel_pairs_",&fuel_pairs_);
+
+  this->init(member_var_map_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::init(map<string, void*> member_var_map)
+{ 
+  // set the member variable map to this one
+  member_var_map_ = member_var_map;
+
+  // send the init signal upward
+  FacilityModel::init(member_var_map);
+  
+  // set the current month in cycle to 1, it's the first month.
+  month_in_cycle_ = 1;
+  cycle_time_ = 3;
+
+  // initialize ordinary objects
+  capacity_ = getMapVar<double>("capacity_",member_var_map);
+  lifetime_ = getMapVar<double>("lifetime_",member_var_map);
+  start_constr_yr_ = getMapVar<int>("start_constr_yr_",member_var_map);
+  start_constr_mo_ = getMapVar<int>("start_constr_mo_",member_var_map);
+  start_op_yr_ = getMapVar<int>("start_op_yr_",member_var_map);
+  start_op_mo_ = getMapVar<int>("start_op_mo_",member_var_map);
+  lic_exp_yr_ = getMapVar<int>("lic_exp_yr_",member_var_map);
+  lic_exp_mo_ = getMapVar<int>("lic_exp_mo_",member_var_map);
+  state_ = getMapVar<string>("state_",member_var_map);
+  type_reac_ = getMapVar<string>("type_reac_",member_var_map);
+  CF_ = getMapVar<double>("CF_",member_var_map);
+  fuel_pairs_ = getMapVar<deque< pair< pair< Commodity*, Material*> , pair< Commodity*, Material*> > > >("fuel_pairs_", member_var_map);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -117,18 +150,18 @@ void RecipeReactor::copy(RecipeReactor* src)
 
   FacilityModel::copy(src);
 
-  fuelPairs_ = src->fuelPairs_;
+  fuel_pairs_ = src->fuel_pairs_;
   capacity_ = src->capacity_;
   cycle_time_ = src->cycle_time_;
   lifetime_ = src->lifetime_;
   month_in_cycle_ = src->month_in_cycle_;
-  startConstrYr_ = src->startConstrYr_;
-  startOpYr_ = src->startOpYr_;
-  startOpMo_ = src->startOpMo_;
-  licExpYr_ = src->licExpYr_;
-  licExpMo_ = src->licExpMo_;
+  start_constr_yr_ = src->start_constr_yr_;
+  start_op_yr_ = src->start_op_yr_;
+  start_op_mo_ = src->start_op_mo_;
+  lic_exp_yr_ = src->lic_exp_yr_;
+  lic_exp_mo_ = src->lic_exp_mo_;
   state_ = src->state_;
-  typeReac_ = src->typeReac_;
+  type_reac_ = src->type_reac_;
   CF_ = src->CF_;
 
 
@@ -150,9 +183,9 @@ void RecipeReactor::print()
 { 
   FacilityModel::print(); 
   cout << "converts commodity {"
-      << this->fuelPairs_.front().first.first->getName()
+      << this->fuel_pairs_.front().first.first->getName()
       << "} into commodity {"
-      << this->fuelPairs_.front().second.first->getName()
+      << this->fuel_pairs_.front().second.first->getName()
       << "}."  << endl;
 };
 
@@ -191,8 +224,8 @@ void RecipeReactor::endCycle()
 
   bool found = false;
   while(!found){
-    for(deque< pair< InFuel , OutFuel> >::iterator iter = fuelPairs_.begin();
-        iter != fuelPairs_.end();
+    for(deque< pair< InFuel , OutFuel> >::iterator iter = fuel_pairs_.begin();
+        iter != fuel_pairs_.end();
         iter++){
       if((*iter).first.first->getName() == batchCommod->getName()){
         outCommod = (*iter).second.first;
@@ -302,14 +335,14 @@ void RecipeReactor::handleTick(int time)
     // It chooses the next in/out commodity pair in the preference lineup
     InFuel request_commod_pair;
     OutFuel offer_commod_pair;
-    request_commod_pair = fuelPairs_.front().first;
-    offer_commod_pair = fuelPairs_.front().second;
+    request_commod_pair = fuel_pairs_.front().first;
+    offer_commod_pair = fuel_pairs_.front().second;
     Commodity* in_commod = request_commod_pair.first;
     Material* in_recipe = request_commod_pair.second;
 
     // It then moves that pair from the front to the back of the preference lineup
-    fuelPairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
-    fuelPairs_.pop_front();
+    fuel_pairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
+    fuel_pairs_.pop_front();
   
     // It can accept only a whole batch
     Mass requestAmt;

@@ -37,6 +37,20 @@ Model* Model::create(string model_type, xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::create(string model_type, string model_impl, 
+    map<string, void*> member_vars) {
+
+  // get instance
+  mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
+
+  Model* model = model_constructor();
+
+  model->init(member_vars);
+
+  return model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::create(Model* model_orig) {
   mdl_ctor* model_constructor = loadConstructor(model_orig->getModelType(),model_orig->getModelImpl());
   
@@ -45,16 +59,16 @@ Model* Model::create(Model* model_orig) {
   model_copy->copyFreshModel(model_orig);
 
   return model_copy;
-}
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mdl_ctor* Model::loadConstructor(string model_type, string model_name) {
+mdl_ctor* Model::loadConstructor(string model_type, string model_impl) {
   mdl_ctor* new_model;
 
-  model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
+  model_impl = "Models/" + model_type + "/lib" + model_impl+SUFFIX;
 
-  if (create_map_.find(model_name) == create_map_.end()) {
-    void* model = dlopen(model_name.c_str(),RTLD_LAZY);
+  if (create_map_.find(model_impl) == create_map_.end()) {
+    void* model = dlopen(model_impl.c_str(),RTLD_LAZY);
     if (!model) {
       string err_msg = "Unable to load model shared object file: ";
       err_msg + dlerror();
@@ -75,10 +89,10 @@ mdl_ctor* Model::loadConstructor(string model_type, string model_name) {
       throw GenException(err_msg);
     }
   
-    create_map_[model_name] = new_model;
-    destroy_map_[model_name] = del_model;
+    create_map_[model_impl] = new_model;
+    destroy_map_[model_impl] = del_model;
   } else {
-    new_model = create_map_[model_name];
+    new_model = create_map_[model_impl];
   }
 
   return new_model;
@@ -166,10 +180,18 @@ void Model::load_institutions() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
-  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+  name_ = (XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name"));
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  handle_ = this->generateHandle();
+  setMemberVar("name_",&name_);
+  setMemberVar("model_impl_",&model_impl_);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::init(map<string, void*> member_var_map) {
+  name_ = getMapVar<string>("name_", member_var_map);
+  model_impl_ = getMapVar<string>("model_impl_", member_var_map);
+  handle_ = this->generateHandle();
+  }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* model_orig) {

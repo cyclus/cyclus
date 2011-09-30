@@ -25,8 +25,21 @@ void InstModel::init(xmlNodePtr cur)
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   region_ = LI->getModelByName(region_name, REGION);
+  setMemberVar("region_",&region_);
+  
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::init(map<string, void*> member_var_map)
+{
+  Model::init(member_var_map);
+
+  /** 
+   *  Specific initialization for InstModels
+   */
+  region_ = getMapVar<RegionModel*>("region_", member_var_map);
   this->setRegion(region_);
-  cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
+  cout << "Inst " << getSN() << " has set its region to be " << 
+    region_->getName() << endl;
   
   dynamic_cast<RegionModel*>(region_)->addInstitution(this);
 

@@ -38,6 +38,7 @@ void BuildRegion::populateSchedule(FILE *infile)
     string fac_str (fac_name);
     to_build_map_[fac_str]=schedule;
   };
+  setMemberVar("to_build_map_",&to_build_map_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -57,6 +58,17 @@ void BuildRegion::init(xmlNodePtr cur)
   populateSchedule(input_file);
   // Close the files that you open
   fclose(input_file);
+  this->init(member_var_map_);
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildRegion::init(map<string, void*> member_var_map)
+{
+  member_var_map_ = member_var_map;
+  RegionModel::init(member_var_map);
+  to_build_map_ = getMapVar< map <string, queue <pair <int,int> > > >("to_build_map_",
+      member_var_map);
+  setMemberVar("to_build_map_",&to_build_map_);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

@@ -40,6 +40,9 @@ public:
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
+  /// initialize an object from a map of pointers
+  virtual void init(map<string, void*> member_var_map);
+
   /// initialize an object by copying another
   virtual void copy(RecipeReactor* src);
   /**
@@ -134,7 +137,7 @@ protected:
     /**
      * The RecipeReactor has pairs of input and output fuel
      */
-    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > fuelPairs_;
+    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > fuel_pairs_;
 
     /**
      * The RecipeReactor has a limit to how material it can process.
@@ -217,37 +220,37 @@ protected:
      * The year in which construction of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startConstrYr_;
+    int start_constr_yr_;
 
     /**
      * The month in which construction of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startConstrMo_;
+    int start_constr_mo_;
 
     /**
      * The year in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpYr_;
+    int start_op_yr_;
 
     /**
      * The month in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpMo_;
+    int start_op_mo_;
 
     /**
      * The year in which the facility's lisence expires.
      * (maybe this should just be in the deployment description?)
      */
-    int licExpYr_;
+    int lic_exp_yr_;
 
     /**
      * The month in which the facility's lisence expires..
      * (maybe this should just be in the deployment description?)
      */
-    int licExpMo_;
+    int lic_exp_mo_;
 
     /**
      * The state in which the facility exists.
@@ -258,7 +261,7 @@ protected:
      * The type of reactor that this is.
      * (this may be redundant or unnecessary information.)
      */
-    string typeReac_;
+    string type_reac_;
 
     /**
      * The percent of the time the facility functions at 100% capacity.

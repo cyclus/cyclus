@@ -22,6 +22,12 @@ StubRegion::~StubRegion() {};
 void StubRegion::init(xmlNodePtr cur) { 
   RegionModel::init(cur); 
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubRegion::init(map<string, void*> member_var_map) { 
+  member_var_map_=member_var_map;
+  RegionModel::init(member_var_map); 
+};
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::copy(StubRegion* src) { 

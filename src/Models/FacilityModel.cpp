@@ -23,13 +23,24 @@ void FacilityModel::init(xmlNodePtr cur) {
   
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
-    this->setInstName(inst_name_);
-    cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
+    setMemberVar("inst_name_",&inst_name_); 
   }
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::copy(FacilityModel* src) { 
+void FacilityModel::init(map<string,void*> member_var_map)
+{
+  Model::init(member_var_map);
+
+  // Specific initialization for FacilityModels
+  inst_name_ = getMapVar<string>("inst_name_",member_var_map);
+  this->setInstName(inst_name_);
+  cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::copy(FacilityModel* src)
+{ 
   Model::copy(src); 
   Communicator::copy(src); 
 

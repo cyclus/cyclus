@@ -52,6 +52,9 @@ public:
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
+  /// initialize an object from a map of pointers
+  virtual void init(map<string,void*> member_var_map);
+
   /// initialize an object by copying another
   virtual void copy(GenericRepository* src);
 
@@ -199,13 +202,13 @@ protected:
      * The year in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpYr_;
+    int start_op_yr_;
 
     /**
      * The month in which operation of the facility begins.
      * (maybe this should just be in the deployment description?)
      */
-    int startOpMo_;
+    int start_op_mo_;
 
     /**
      * The Far Field component

@@ -60,8 +60,8 @@ void GenericRepository::init(string name, vector<Commodity*> in_commods,
   capacity_ = capacity;
   lifetime_ = lifetime;
   area_ = area;
-  startOpYr_ = startOpYr;
-  startOpMo_ = startOpMo;
+  start_op_yr_ = startOpYr;
+  start_op_mo_ = startOpMo;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -74,15 +74,17 @@ void GenericRepository::init(xmlNodePtr cur)
 
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  setMemberVar("capacity_",&capacity_);
   lifetime_ = atof(XMLinput->get_xpath_content(cur,"lifetime"));
+  setMemberVar("lifetime_",&lifetime_);
   area_ = atof(XMLinput->get_xpath_content(cur,"area"));
+  setMemberVar("area_",&area_);
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  startOpYr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  startOpMo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-
-  // The repository accepts any commodities designated waste.
-  // This will be a list
-  //
+  setMemberVar("inventory_size_",&inventory_size_);
+  start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
+  setMemberVar("start_op_mo_",&start_op_mo_);
+  start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
+  setMemberVar("start_op_yr_",&start_op_yr_);
 
   /// all facilities require commodities - possibly many
   string commod_name;
@@ -100,6 +102,35 @@ void GenericRepository::init(xmlNodePtr cur)
     in_commods_.push_back(new_commod);
   }
 
+  setMemberVar("in_commods_",&in_commods_);
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void GenericRepository::init(map<string, void*> member_var_map)
+{ 
+  // set the member variable map accross the board
+  member_var_map_ = member_var_map;
+
+  // send the init signal upward
+  FacilityModel::init(member_var_map);
+  
+  // initialize ordinary objects
+  // get capacity_
+  capacity_ = getMapVar<double>("capacity_",member_var_map); 
+  // get lifetime_
+  lifetime_ = getMapVar<double>("lifetime_",member_var_map); 
+  // get area_
+  area_ = getMapVar<double>("area_",member_var_map); 
+  // get inventory_size_
+  inventory_size_ = getMapVar<double>("inventory_size_",member_var_map); 
+  // get start_op_yr_
+  start_op_yr_ = getMapVar<int>("start_op_yr_",member_var_map); 
+  // get start_op_mo_
+  start_op_mo_ = getMapVar<int>("start_op_mo_",member_var_map); 
+
+  // this takes commodity names as commodity* objects
+  // it assumes that the commodity* provided exists within the simulation.
+  in_commods_ = getMapVar< deque<Commodity*> > ("in_commods_", member_var_map);
+
   stocks_ = deque<Material*>();
   inventory_ = deque< Material* >();
 }
@@ -113,8 +144,8 @@ void GenericRepository::copy(GenericRepository* src)
   // are these accessing the right stuff?
   capacity_ = src->capacity_;
   inventory_size_ = src->inventory_size_;
-  startOpYr_ = src->startOpYr_;
-  startOpMo_ = src->startOpMo_;
+  start_op_yr_ = src->start_op_yr_;
+  start_op_mo_ = src->start_op_mo_;
   in_commods_ = src->in_commods_;
 
   stocks_ = deque<Material*>();

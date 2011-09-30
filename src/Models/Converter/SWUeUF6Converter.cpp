@@ -13,30 +13,57 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
 { 
   ConverterModel::init(cur);
   
-  in_commod_ = out_commod_ = NULL; 
-  
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SWUeUF6Converter");
 
-  // all converters require commodities - possibly many
-  string commod_name;
+  // all facilities require commodities 
   Commodity* new_commod;
-  
+  string commod_name;
+  new_commod=NULL;
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = LI->getCommodity(commod_name);
-  if (NULL == in_commod_)
+  new_commod = LI->getCommodity(commod_name);
+  if (NULL == new_commod){ 
     throw GenException("Input commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
-                       + "'.");
-  
+                       + "'.");}
+  else{
+    in_commod_ = new_commod;
+    setMemberVar("in_commod_",&in_commod_); 
+  }
+
+  new_commod=NULL;
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = LI->getCommodity(commod_name);
-  if (NULL == out_commod_)
+  new_commod = LI->getCommodity(commod_name);
+  if (NULL == new_commod){
     throw GenException("Output commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
-                       + "'.");
+                       + "'.");}
+  else {
+    out_commod_ = new_commod;
+    setMemberVar("out_commod_",&out_commod_); 
+  }
+  this->init(member_var_map_);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void SWUeUF6Converter::init(map<string, void*> member_var_map){
+  // set the member variable map across the board, just in case. 
+  member_var_map_ = member_var_map;
+
+  // send the init signal upward
+  ConverterModel::init(member_var_map);
+
+
+  // this takes commodity names as commodity* objects
+  // it assumes that the commodity* provided exists within the simulation.
+  in_commod_ = static_cast<Commodity*>(member_var_map["in_commod"]);
+  setMemberVar("in_commod_",&in_commod_ );
+
+  out_commod_ = static_cast<Commodity*>(member_var_map["out_commod"]);
+  setMemberVar("out_commod_",&out_commod_ );
+
+
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SWUeUF6Converter::copy(SWUeUF6Converter* src)
 {

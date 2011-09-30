@@ -1,6 +1,7 @@
 // RegionModel.h
 #if !defined(_REGIONMODEL_H)
 #define _REGIONMODEL_H
+#include <string>
 #include <set>
 #include <vector>
 
@@ -30,6 +31,9 @@ public:
     
     // every model needs a method to initialize from XML
     virtual void init(xmlNodePtr cur);
+    
+    // every model needs a method to initialize from a map of pointers
+    virtual void init(map<string, void*>member_var_map);
 
     // every model needs a method to copy one object to another
     virtual void copy(RegionModel* src);
@@ -91,11 +95,11 @@ protected:
 public:
     void addInstitution(Model* new_inst) { institutions_.push_back(new_inst); };
     bool isAllowedFacility(Model* test_fac) 
-    { return ( allowedFacilities_.find(test_fac) != allowedFacilities_.end() ); } ;
+    { return ( allowed_facilities_.find(test_fac) != allowed_facilities_.end() ); } ;
 
 protected:
     /// every region has a list of allowed facilities
-    std::set<Model*> allowedFacilities_;
+    std::set<Model*> allowed_facilities_;
 
     /// every region has a list of institutions
     std::vector<Model*> institutions_;

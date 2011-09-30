@@ -36,6 +36,10 @@ public:
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur)  { InstModel::init(cur); };
 
+  /// initialize an object from a map of pointers
+  virtual void init(map<string, void*> member_var_map)  { 
+    member_var_map_ = member_var_map; InstModel::init(member_var_map); };
+
   /// initialize an object by copying another
   virtual void copy(BuildInst* src);
 
