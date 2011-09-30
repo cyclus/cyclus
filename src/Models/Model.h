@@ -136,7 +136,7 @@ public:
    * @param var_value is the pointer to a function returning the 
    * value of the variable (Facility, RecipeReactor ...)
    */
-   void setMemberVar(std::string var_name, void* var_value) { 
+   void setMapVar(std::string var_name, void* var_value) { 
      member_var_map_[var_name] = var_value; };
 
   /**

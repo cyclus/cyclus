@@ -28,7 +28,7 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
                        + "'.");}
   else{
     in_commod_ = new_commod;
-    setMemberVar("in_commod_",&in_commod_); 
+    setMapVar("in_commod_",&in_commod_); 
   }
 
   new_commod=NULL;
@@ -40,7 +40,7 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
                        + "'.");}
   else {
     out_commod_ = new_commod;
-    setMemberVar("out_commod_",&out_commod_); 
+    setMapVar("out_commod_",&out_commod_); 
   }
   this->init(member_var_map_);
 }
@@ -57,10 +57,10 @@ void SWUeUF6Converter::init(map<string, void*> member_var_map){
   // this takes commodity names as commodity* objects
   // it assumes that the commodity* provided exists within the simulation.
   in_commod_ = static_cast<Commodity*>(member_var_map["in_commod"]);
-  setMemberVar("in_commod_",&in_commod_ );
+  setMapVar("in_commod_",&in_commod_ );
 
   out_commod_ = static_cast<Commodity*>(member_var_map["out_commod"]);
-  setMemberVar("out_commod_",&out_commod_ );
+  setMapVar("out_commod_",&out_commod_ );
 
 
 }

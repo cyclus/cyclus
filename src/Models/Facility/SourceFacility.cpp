@@ -45,7 +45,7 @@ void SourceFacility::init(xmlNodePtr cur)
     throw GenException("Output commodity '" + input_token 
         + "' does not exist for facility '" + getName() 
         + "'.");
-  setMemberVar("out_commod_",&out_commod_);
+  setMapVar("out_commod_",&out_commod_);
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");
@@ -54,19 +54,19 @@ void SourceFacility::init(xmlNodePtr cur)
     throw GenException("Recipe '" + input_token 
         + "' does not exist for facility '" + getName()
         + "'.");
-  setMemberVar("recipe_",&recipe_);
+  setMapVar("recipe_",&recipe_);
 
   // get capacity
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_);
+  setMapVar("capacity_",&capacity_);
 
   // get inventory_size_
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMemberVar("inventory_size_",&inventory_size_);
+  setMapVar("inventory_size_",&inventory_size_);
 
   // get commodity price 
   commod_price_ = atof(XMLinput->get_xpath_content(cur,"commodprice"));
-  setMemberVar("commod_price_",&commod_price_);
+  setMapVar("commod_price_",&commod_price_);
 
   this->init(member_var_map_);
 }

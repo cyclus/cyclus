@@ -48,7 +48,7 @@ void RegionModel::init(xmlNodePtr cur)
     }
     allowed_facilities_.insert(new_fac);
   }
-  setMemberVar("allowed_facilities_",&allowed_facilities_);
+  setMapVar("allowed_facilities_",&allowed_facilities_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -63,7 +63,7 @@ void RegionModel::init(map<string, void*>member_var_map)
 
   /// all regions require allowed facilities - possibly many
   allowed_facilities_ = getMapVar<set< Model*> >("allowed_facilities_", member_var_map);
-  setMemberVar("allowed_facilities_",&allowed_facilities_);
+  setMapVar("allowed_facilities_",&allowed_facilities_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

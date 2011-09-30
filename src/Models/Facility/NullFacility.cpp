@@ -40,11 +40,11 @@ void NullFacility::init(xmlNodePtr cur)
   new_commod = LI->getCommodity(commod_name);
   if (NULL == new_commod){ 
     throw GenException("Input commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
+                       + "' does not exist for facility '" + getName() 
                        + "'.");}
   else{
     in_commod_ = new_commod;
-    setMemberVar("in_commod_",in_commod_);
+    setMapVar("in_commod_",in_commod_);
   }
 
   new_commod=NULL;
@@ -52,17 +52,17 @@ void NullFacility::init(xmlNodePtr cur)
   new_commod = LI->getCommodity(commod_name);
   if (NULL == new_commod){
     throw GenException("Output commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
+                       + "' does not exist for facility '" + getName() 
                        + "'.");}
   else {
     out_commod_ = new_commod;
-    setMemberVar("out_commod_", out_commod_);
+    setMapVar("out_commod_", out_commod_);
   }
 
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMemberVar("inventory_size_",&inventory_size_); 
+  setMapVar("inventory_size_",&inventory_size_); 
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_); 
+  setMapVar("capacity_",&capacity_); 
   
   this->init(member_var_map_);
 }

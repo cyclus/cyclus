@@ -182,8 +182,8 @@ void Model::load_institutions() {
 void Model::init(xmlNodePtr cur) {
   name_ = (XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name"));
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  setMemberVar("name_",&name_);
-  setMemberVar("model_impl_",&model_impl_);
+  setMapVar("name_",&name_);
+  setMapVar("model_impl_",&model_impl_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

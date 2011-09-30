@@ -74,17 +74,17 @@ void GenericRepository::init(xmlNodePtr cur)
 
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_);
+  setMapVar("capacity_",&capacity_);
   lifetime_ = atof(XMLinput->get_xpath_content(cur,"lifetime"));
-  setMemberVar("lifetime_",&lifetime_);
+  setMapVar("lifetime_",&lifetime_);
   area_ = atof(XMLinput->get_xpath_content(cur,"area"));
-  setMemberVar("area_",&area_);
+  setMapVar("area_",&area_);
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMemberVar("inventory_size_",&inventory_size_);
+  setMapVar("inventory_size_",&inventory_size_);
   start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-  setMemberVar("start_op_mo_",&start_op_mo_);
+  setMapVar("start_op_mo_",&start_op_mo_);
   start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  setMemberVar("start_op_yr_",&start_op_yr_);
+  setMapVar("start_op_yr_",&start_op_yr_);
 
   /// all facilities require commodities - possibly many
   string commod_name;
@@ -102,7 +102,7 @@ void GenericRepository::init(xmlNodePtr cur)
     in_commods_.push_back(new_commod);
   }
 
-  setMemberVar("in_commods_",&in_commods_);
+  setMapVar("in_commods_",&in_commods_);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(map<string, void*> member_var_map)

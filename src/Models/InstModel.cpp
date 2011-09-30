@@ -25,7 +25,7 @@ void InstModel::init(xmlNodePtr cur)
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   region_ = LI->getModelByName(region_name, REGION);
-  setMemberVar("region_",&region_);
+  setMapVar("region_",&region_);
   
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -28,7 +28,7 @@ void FixedInst::init(xmlNodePtr cur)
     string fac_name = XMLinput->get_xpath_content(fac_node,"name");
     fac_list_.push_back(make_pair(fac_type, fac_name));
   }
-  setMemberVar("fac_list_",&fac_list_);
+  setMapVar("fac_list_",&fac_list_);
   this->init(member_var_map_);
 }
 

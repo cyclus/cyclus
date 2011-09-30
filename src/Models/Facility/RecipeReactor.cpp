@@ -42,27 +42,27 @@ void RecipeReactor::init(xmlNodePtr cur)
 
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_);
+  setMapVar("capacity_",&capacity_);
   //cycle_time_ = atoi(XMLinput->get_xpath_content(cur,"cycleTime"));
-  //setMemberVar("cycle_time_",&cycle_time_);
+  //setMapVar("cycle_time_",&cycle_time_);
   start_constr_yr_ = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
-  setMemberVar("start_constr_yr_",&start_constr_yr_);
+  setMapVar("start_constr_yr_",&start_constr_yr_);
   start_constr_mo_ = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
-  setMemberVar("start_constr_mo_",&start_constr_mo_);
+  setMapVar("start_constr_mo_",&start_constr_mo_);
   start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  setMemberVar("start_op_yr_",&start_op_yr_);
+  setMapVar("start_op_yr_",&start_op_yr_);
   start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-  setMemberVar("start_op_mo_",&start_op_mo_);
+  setMapVar("start_op_mo_",&start_op_mo_);
   lic_exp_yr_ = atoi(XMLinput->get_xpath_content(cur,"licExpYear"));
-  setMemberVar("lic_exp_yr_",&lic_exp_yr_);
+  setMapVar("lic_exp_yr_",&lic_exp_yr_);
   lic_exp_mo_ = atoi(XMLinput->get_xpath_content(cur,"licExpMonth"));
-  setMemberVar("lic_exp_mo_",&lic_exp_mo_);
+  setMapVar("lic_exp_mo_",&lic_exp_mo_);
   state_ = XMLinput->get_xpath_content(cur,"state");
-  setMemberVar("state_",&state_);
+  setMapVar("state_",&state_);
   type_reac_ = XMLinput->get_xpath_content(cur,"typeReac");
-  setMemberVar("type_reac_",&type_reac_);
+  setMapVar("type_reac_",&type_reac_);
   CF_ = atof(XMLinput->get_xpath_content(cur,"elecCF"));
-  setMemberVar("CF_",&CF_);
+  setMapVar("CF_",&CF_);
 
   // all facilities require commodities - possibly many
   string commod_name;
@@ -111,7 +111,7 @@ void RecipeReactor::init(xmlNodePtr cur)
           make_pair(out_commod, out_recipe)));
   };
 
-  setMemberVar("fuel_pairs_",&fuel_pairs_);
+  setMapVar("fuel_pairs_",&fuel_pairs_);
 
   this->init(member_var_map_);
 }

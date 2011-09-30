@@ -38,6 +38,9 @@ public:
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
+  /// initialize an object from a map of pointers
+  virtual void init(std::map<std::string, void*> member_var_map);
+
   /// initialize an object by copying another
   virtual void copy(ConverterMarket* src) ;
 

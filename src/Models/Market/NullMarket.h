@@ -34,7 +34,10 @@ public:
   
   // different ways to populate an object after creation
   /// initialize an object from XML input
-  virtual void init(xmlNodePtr cur)  { MarketModel::init(cur); };
+  virtual void init(xmlNodePtr cur)  { MarketModel::init(cur); this->init(member_var_map_); };
+
+  /// initialize an object from a map of pointers
+  virtual void init(std::map<std::string, void*> member_var_map)  { MarketModel::init(member_var_map); };
 
   /// initialize an object by copying another
   virtual void copy(NullMarket* src) { MarketModel::copy(src); } ;

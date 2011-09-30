@@ -64,7 +64,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
                          + "' does not exist for facility '" + getName() 
                          + "'.");
    in_commod_.push_back(new_commod);
-   setMemberVar("in_commod_",&in_commod_);
+   setMapVar("in_commod_",&in_commod_);
   }
   // get Stream
   nodes = XMLinput->get_xpath_elements(cur,"Stream");
@@ -92,15 +92,15 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     cout << "Z = " << stream_Z << endl;
     cout << "Eff = " << stream_eff << endl;
   };
-  setMemberVar("out_commod_",&out_commod_);
+  setMapVar("out_commod_",&out_commod_);
 
   // get inventory size
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMemberVar("inventory_size_",&inventory_size_);
+  setMapVar("inventory_size_",&inventory_size_);
 
   // get capacity
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_);
+  setMapVar("capacity_",&capacity_);
 
   this->init(member_var_map_);
 }
@@ -117,17 +117,17 @@ void SeparationsMatrixFacility::init(map<string, void*> member_var_map)
   // this takes commodity names as commodity* objects
   // it assumes that the commodity* provided exists within the simulation.
   in_commod_ = getMapVar<vector<Commodity*> >("in_commod_", member_var_map);
-  setMemberVar("in_commod_",&in_commod_ );
+  setMapVar("in_commod_",&in_commod_ );
 
   out_commod_ = getMapVar<vector<Commodity*> >("out_commod_", member_var_map);
-  setMemberVar("out_commod_",&out_commod_ );
+  setMapVar("out_commod_",&out_commod_ );
   
   // get inventory size
   inventory_size_ = getMapVar<double>("inventory_size_", member_var_map);
-  setMemberVar("inventory_size_",&inventory_size_ );
+  setMapVar("inventory_size_",&inventory_size_ );
   // get capacity_
   capacity_ = getMapVar<double>("capacity_", member_var_map);
-  setMemberVar("capacity_",&capacity_ );
+  setMapVar("capacity_",&capacity_ );
 
   inventory_ = deque<pair<Commodity*,Material*> >();
   stocks_ = deque<pair<Commodity*,Material*> >();

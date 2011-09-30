@@ -48,12 +48,12 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   new_commod = LI->getCommodity(commod_name);
   if (NULL == new_commod){ 
     throw GenException("Input commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
+                       + "' does not exist for facility '" + getName() 
                        + "'.");}
   else{
     in_commod_ = new_commod;
-    setMemberVar("in_commod_",&in_commod_); 
-    //setMemberVar<Commodity*>("in_commod_", &in_commod_); // should probably be called addToMap()
+    setMapVar("in_commod_",&in_commod_); 
+    //setMapVar<Commodity*>("in_commod_", &in_commod_); // should probably be called addToMap()
   }
 
   new_commod=NULL;
@@ -61,22 +61,22 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   new_commod = LI->getCommodity(commod_name);
   if (NULL == new_commod){
     throw GenException("Output commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
+                       + "' does not exist for facility '" + getName() 
                        + "'.");}
   else {
     out_commod_ = new_commod;
-    setMemberVar("out_commod_",&out_commod_); 
-    //setMemberVar<Commodity*>("in_commod_", &out_commod_); // should probably be called addToMap()
+    setMapVar("out_commod_",&out_commod_); 
+    //setMapVar<Commodity*>("in_commod_", &out_commod_); // should probably be called addToMap()
   }
   // get inventory size
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMemberVar("inventory_size_",&inventory_size_);
+  setMapVar("inventory_size_",&inventory_size_);
   // get capacity_
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMemberVar("capacity_",&capacity_);
+  setMapVar("capacity_",&capacity_);
   // get default tails fraction
   default_xw_ = atof(XMLinput->get_xpath_content(cur,"tailsassay"));
-  setMemberVar("default_xw_",&default_xw_);
+  setMapVar("default_xw_",&default_xw_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -91,10 +91,10 @@ void EnrichmentFacility::init(map<string, void*> member_var_map)
   // this takes commodity names as commodity* objects
   // it assumes that the commodity* provided exists within the simulation.
   in_commod_ = static_cast<Commodity*>(member_var_map["in_commod"]);
-  setMemberVar("in_commod_",&in_commod_ );
+  setMapVar("in_commod_",&in_commod_ );
 
   out_commod_ = static_cast<Commodity*>(member_var_map["out_commod"]);
-  setMemberVar("out_commod_",&out_commod_ );
+  setMapVar("out_commod_",&out_commod_ );
   
   // get inventory size
   inventory_size_ = getMapVar<double>("inventory_size_", member_var_map);

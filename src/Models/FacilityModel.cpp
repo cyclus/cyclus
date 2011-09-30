@@ -23,7 +23,7 @@ void FacilityModel::init(xmlNodePtr cur) {
   
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
-    setMemberVar("inst_name_",&inst_name_); 
+    setMapVar("inst_name_",&inst_name_); 
   }
 } 
 
