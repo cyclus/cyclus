@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <time.h>
 
 using namespace std;
 
@@ -17,7 +18,6 @@ Component::Component(): temperature_(0), inner_radius_(0), outer_radius_(0)
 {
   name_ = "";
   ID_=nextID_++;
-  //BI->registerVolChange(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -30,7 +30,6 @@ Component::Component(xmlNodePtr cur)
   string vol_type_ = XMLinput->get_xpath_content(cur,"basis");
 
   vol_comp_hist_ = CompHistory() ;
-  //BI->registerVolChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -49,7 +48,6 @@ Component::Component(string name, Temp temp, Radius inner, Radius outer,
   type_ = type;
 
   vol_comp_hist_ = CompHistory() ;
-  //BI->registerVolChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -75,3 +73,8 @@ void Component::extract(Material* matToRem)
   // subtract the material from it with the material extract function.
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Component::isFull() {
+  // for now, return true and false at random
+  return time(NULL) % 2;
+}

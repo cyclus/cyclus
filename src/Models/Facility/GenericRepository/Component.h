@@ -12,17 +12,22 @@
 using namespace std;
 
 /**
- * type definition for Temperature 
+ * type definition for Toxicity in units of Sv 
+ */
+typedef double Tox;
+
+/**
+ * type definition for Temperature in Kelvin
  */
 typedef double Temp;
 
 /**
- * type definition for Radius 
+ * type definition for Radius in meters
  */
 typedef double Radius;
 
 /**
- * type definition for Concentrations 
+ * type definition for Concentrations in kg/m^3
  */
 typedef double Concentration;
 
@@ -35,6 +40,11 @@ typedef map<Iso, Concentration> ConcMap;
  * Enum for type of component.
  */
 enum ComponentType {ENV, FF, EBS, BUFFER, WP, WF};
+
+/**
+ * Enum for type of boundary.
+ */
+enum BoundaryType {INNER, OUTER};
 
 /** 
  * A struct to describe solids
@@ -143,6 +153,37 @@ public:
   const Fluid* getLiquid(){return liquid_;};
 
   /**
+   * get the maximum Temperature this object allows at its boundaries 
+   *
+   * @return temperature_lim_
+   */
+  const Temp getTempLim(){return temperature_lim_;};
+
+  /**
+   * get the maximum Toxicity this object allows at its boundaries 
+   *
+   * @return toxicity_lim_
+   */
+  const Tox getToxLim(){return toxicity_lim_;};
+
+  /**
+   * get the peak Temperature this object will experience during the simulation
+   *
+   * @param type indicates whether to return the inner or outer peak temp
+   *
+   * @return peak_temperature_
+   */
+  const Temp getPeakTemp(BoundaryType type){
+    return (type==INNER)?peak_inner_temperature_:peak_outer_temperature_; };
+
+  /**
+   * get the peak Toxicity this object will experience during the simulation
+   *
+   * @return peak_toxicity_
+   */
+  const Tox getPeakTox(){return peak_toxicity_;};
+
+  /**
    * get the Temperature
    *
    * @return temperature_
@@ -150,18 +191,13 @@ public:
   const Temp getTemp(){return temperature_;};
 
   /**
-   * get the Inner Radius
+   * get a Radius of the object
    *
+   * @param type indicates whether to return the inner or outer radius
    * @return inner_radius_
    */
-  const Radius getInnerRadius(){return inner_radius_;};
-
-  /**
-   * get the Outer Radius
-   *
-   * @return outer_radius_
-   */
-  const Radius getOuterRadius(){return outer_radius_;};
+  const Radius getRadius(BoundaryType type){
+    return (type==INNER)?inner_radius_:outer_radius_; };
 
   /**
    * get the concentration of an isotope 
@@ -186,6 +222,12 @@ public:
    * against this Component
    */
   virtual void extract(Material* matToRem);
+
+  /** 
+   * Reports true if this component may be loaded with more of whatever goes 
+   * inside it and reports false if that is not the case.
+   */
+  bool isFull();
 
 protected:
   /** 
@@ -256,6 +298,31 @@ private:
    * The type of component that this component represents 
    */
   ComponentType type_;
+
+  /**
+   * The temperature limit of this component 
+   */
+  Temp temperature_lim_;
+
+  /**
+   * The toxicitylimit of this component 
+   */
+  Tox toxicity_lim_;
+
+  /**
+   * The peak temperature achieved at the outer boundary 
+   */
+  Temp peak_outer_temperature_;
+
+  /**
+   * The peak temperature achieved at the inner boundary 
+   */
+  Temp peak_inner_temperature_;
+
+  /**
+   * The peak toxicity achieved  
+   */
+  Tox peak_toxicity_;
 
   /**
    * The temperature taken to be the homogeneous temperature of the whole 

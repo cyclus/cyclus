@@ -50,21 +50,6 @@
 
  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void GenericRepository::init(string name, vector<Commodity*> in_commods, 
-      double capacity, int lifetime, double area, int startOpYr, int startOpMo){
-  //FacilityModel::init(name, impl, etc.))
-  vector<Commodity*>::iterator it;
-  for ( it=in_commods.begin() ; it < in_commods.end(); it++ ){
-    in_commods_.push_back(*it) ;
-  }
-  capacity_ = capacity;
-  lifetime_ = lifetime;
-  area_ = area;
-  start_op_yr_ = startOpYr;
-  start_op_mo_ = startOpMo;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
@@ -192,9 +177,6 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> man
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::handleTick(int time)
 {
-  // EMPLACE WASTE
-  emplaceWaste();
-
   // MAKE A REQUEST
   if(this->checkStocks() == 0){
     // It chooses the next incommodity in the preference lineup
@@ -246,7 +228,15 @@ void GenericRepository::handleTick(int time)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::handleTock(int time)
 {
-  // send tock to the emplaced material module
+
+  // emplace the waste that's ready
+  emplaceWaste();
+
+  // calculate the heat
+  transportHeat();
+  
+  // calculate the nuclide transport
+  transportNuclides();
   
 }
 
@@ -282,7 +272,77 @@ Mass GenericRepository::checkStocks(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void emplaceWaste(){
-  // EMPLACE THE WASTE
+void GenericRepository::emplaceWaste(){
+  // if there's anything in the stocks, try to emplace it
+  if(!stocks_.empty()){
+    // for each waste stream in the stocks
+    for (deque< Material* >::iterator iter = stocks_.begin(); 
+        iter != stocks_.end(); 
+        iter ++){
+      // start by packing it in a waste form
+      // -- what waste form does this type of waste go into?
+      // -- what density?
+      // -- associate the waste stream with the waste form
+      Component* waste_form = conditionWaste((*iter));
+    
+      // put the in a waste package
+      // -- what waste package does this type of waste go into?
+      // -- what density?
+      // -- associate the waste form with the was package
+      Component* waste_package = packageWaste(waste_form);
+    
+      // try to load it in the current buffer 
+      Component* current_buffer = new_buffers_.front();
+      // if the package is full
+      if( waste_package->isFull()
+          // and not too hot
+          && waste_package->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
+          // or too toxic
+          && waste_package->getPeakTox() <= current_buffer->getToxLim()){
+        // take the stream out of the stocks
+        // emplace it in the buffer
+        loadBuffer(waste_package);
+        if( current_buffer->isFull() ) {
+          full_buffers_.push_back(new_buffers_.front());
+          new_buffers_.pop_front();
+        }
+      }
+      // once the waste is emplaced, is there anything else to do?
+    }
+  }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* GenericRepository::conditionWaste(Material* waste_stream){
+  Component* toRet = new Component();
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* GenericRepository::packageWaste(Component* waste_form){
+  Component* toRet = new Component();
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* GenericRepository::loadBuffer(Component* waste_package){
+  // find the current buffer and load it
+  Component* toRet = new Component();
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void GenericRepository::transportHeat(){
+  // update the thermal BCs everywhere
+  // pass the transport heat signal through the components, inner -> outer
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void GenericRepository::transportNuclides(){
+  // update the nuclide transport BCs everywhere
+  // pass the transport nuclides signal through the components, inner -> outer
+}
+
+
+
 

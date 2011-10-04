@@ -91,7 +91,7 @@ void FixedInst::print()
 { 
   InstModel::print();
 
-  cout << " and the following permanent facilities_: " << endl;
+  cout << " and the following permanent facilities: " << endl;
   for (vector<Model*>::iterator fac=facilities_.begin(); 
        fac != facilities_.end(); 
        fac++){

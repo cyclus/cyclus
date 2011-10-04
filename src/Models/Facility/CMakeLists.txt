@@ -18,5 +18,4 @@ SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES}
   SourceFacility
   StubFacility
   )
-
-#  StorageFacility
+ADD_SUBDIRECTORY( GenericRepository )

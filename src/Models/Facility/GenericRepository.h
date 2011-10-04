@@ -34,21 +34,6 @@ public:
    */
   ~GenericRepository() {};
   
-  // different ways to populate an object after creation
-  /**
-   * initialize an object from XML input
-   * @param name the name of the repository (i.e. Forsmark)
-   * @param in_commods a vector of commodities acceptable to this model 
-   * @param capacity the monthly acceptance rate
-   * @param lifetime the length of time the repository shall function
-   * @param area the areal extent of the repository footprint
-   * @param startOpYr the year of construction starts
-   * @param startOpMo the month of construction starts
-   */
-  virtual void init(string name, vector<Commodity*> in_commods, 
-      double capacity, int lifetime, double area , int startOpYr,
-      int startOpMo);
-
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
@@ -194,7 +179,7 @@ protected:
 
     /**
      * The number of months that a facility stays operational.
-     * hopefully, this repository is forever, but ust in case... 
+     * hopefully, this repository is forever, but just in case... 
      */
     int lifetime_;
 
@@ -216,24 +201,62 @@ protected:
     Component* far_field_;
 
     /**
-     * The Buffer components
+     * The not yet full buffer components
      */
-    vector<Component*> buffers_;
+    deque<Component*> new_buffers_;
+    /**
+     * The full buffer components
+     */
+    deque<Component*> full_buffers_;
 
     /**
      * The waste package component
      */
-    vector<Component*> waste_packages_;
+    deque<Component*> waste_packages_;
 
     /**
      * The waste form components
      */
-    vector<Component*> waste_forms_;
+    deque<Component*> waste_forms_;
 
     /**
      * Emplace the waste
      */
-    void emplaceWaste() {};
+    void emplaceWaste() ;
+
+    /**
+     * Condition the waste
+     *
+     * @param waste_stream is the material to be conditioned
+     * @return the form that has been loaded with the waste stream
+     */
+    Component* conditionWaste(Material* waste_stream) ;
+
+    /**
+     * Package the waste
+     *
+     * @param waste_form is the loaded waste form to be packaged
+     * @return the package that has been loaded with the waste form
+     */
+    Component* packageWaste(Component* waste_form) ;
+
+    /**
+     * Load the buffer with the waste
+     *
+     * @param waste_package is the package to load into the buffer
+     * @return the buffer that has been loaded with the waste package
+     */
+    Component* loadBuffer(Component* waste_package) ;
+
+    /**
+     * Do heat transport calculations
+     */
+    void transportHeat() ;
+
+    /**
+     * Do nuclide transport calculations
+     */
+    void transportNuclides() ;
 
 /* ------------------- */ 
 
