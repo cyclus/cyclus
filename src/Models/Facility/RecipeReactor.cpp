@@ -43,8 +43,8 @@ void RecipeReactor::init(xmlNodePtr cur)
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
   setMapVar("capacity_",&capacity_);
-  //cycle_time_ = atoi(XMLinput->get_xpath_content(cur,"cycleTime"));
-  //setMapVar("cycle_time_",&cycle_time_);
+  lifetime_ = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
+  setMapVar("lifetime_",&lifetime_);
   start_constr_yr_ = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
   setMapVar("start_constr_yr_",&start_constr_yr_);
   start_constr_mo_ = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));

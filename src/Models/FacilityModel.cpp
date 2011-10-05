@@ -6,11 +6,9 @@
 #include "Logician.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
+#include "GenException.h"
 
 #include <iostream>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 
 using namespace std;
 
@@ -20,7 +18,7 @@ void FacilityModel::init(xmlNodePtr cur) {
 
   // Specific initialization for FacilityModels
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
-  
+   
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     setMapVar("inst_name_",&inst_name_); 
@@ -33,9 +31,12 @@ void FacilityModel::init(map<string,void*> member_var_map)
   Model::init(member_var_map);
 
   // Specific initialization for FacilityModels
-  inst_name_ = getMapVar<string>("inst_name_",member_var_map);
-  this->setInstName(inst_name_);
-  cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
+  // if it's not a template, set its inst_name_
+  if(member_var_map.find("inst_name_") != member_var_map.end()){
+    inst_name_ = getMapVar<string>("inst_name_",member_var_map);
+    this->setInstName(inst_name_);
+    cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,9 +45,8 @@ void FacilityModel::copy(FacilityModel* src)
   Model::copy(src); 
   Communicator::copy(src); 
 
-  // don't copy fac_jname to new instance
+  // don't copy fac_name to new instance
   fac_name_ = "";
-
 
   LI->addModel(this, FACILITY);
 };
