@@ -71,7 +71,7 @@ mdl_ctor* Model::loadConstructor(string model_type, string model_impl) {
     void* model = dlopen(model_impl.c_str(),RTLD_LAZY);
     if (!model) {
       string err_msg = "Unable to load model shared object file: ";
-      err_msg + dlerror();
+      err_msg += dlerror();
       throw GenException(err_msg);
     }
     
@@ -140,8 +140,7 @@ void Model::load_facilities() {
   nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    Model* thisFac = create("Facility",nodes->nodeTab[i]);
-    LI->addModel(thisFac, FACILITY);
+    LI->addModel( create("Facility",nodes->nodeTab[i]), FACILITY );
   }
 }
 
