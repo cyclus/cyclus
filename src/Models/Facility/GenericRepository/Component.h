@@ -39,7 +39,7 @@ typedef map<Iso, Concentration> ConcMap;
 /**
  * Enum for type of component.
  */
-enum ComponentType {ENV, FF, EBS, BUFFER, WP, WF};
+enum ComponentType {ENV, FF, NF, BUFFER, WP, WF};
 
 /**
  * Enum for type of boundary.
@@ -68,12 +68,10 @@ struct Fluid{
 };
 
 /** 
- * Class Component describes a uniformly mixed component cell
+ * Class Component describes the component interface 
  * 
  * This class is intended to describe the subcomponents of the repository
  *
- * The mixed cell conserves mass with a mass balance every month and is linked 
- * to other components by mass transfer links.
  */
 class Component {
 
@@ -94,19 +92,17 @@ public:
   /**
    * a constructor for making a component object from a known recipe and size.
    *
-   * @param volName
-   * @param temperature
-   * @param inner
-   * @param outer
-   * @param concs a vector, per isotope 
-   * @param matrix the solid, a struct
-   * @param liquid the fluid, a struct
-   * @param type indicates whether comp and scale are in mass or atom units
+   * @param name 
+   * @param temperature is the initial temperature
+   * @param temperature_lim is the temperature limit
+   * @param toxicity_lim is the toxicity limit
+   * @param inner is the inner radius
+   * @param outer is the outer radius
+   * @param type indicates wf, wp, buffer, nf, ff, or env component 
    */
-  Component(string volName, Temp temperature, Radius inner, Radius outer, 
-      ConcMap concs, Solid* matrix, Fluid* liquid, ComponentType type);
+  Component(string volName, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
+      Radius inner, Radius outer, ComponentType type);
 
-  
   /** 
    * Default destructor does nothing.
    */
@@ -130,27 +126,13 @@ public:
    * @return name_
    */
   const string getName(){return name_;};
-
+  
   /**
    * get the list of waste objects 
    *
    * @return wastes
    */
   const vector<Material*> getWastes(){return wastes_;};
-
-  /**
-   * get the solid matrix
-   *
-   * @return matrix_
-   */
-  const Solid* getMatrix(){return matrix_;};
-
-  /**
-   * get the liquid
-   *
-   * @return liquid_
-   */
-  const Fluid* getLiquid(){return liquid_;};
 
   /**
    * get the maximum Temperature this object allows at its boundaries 
@@ -198,13 +180,6 @@ public:
    */
   const Radius getRadius(BoundaryType type){
     return (type==INNER)?inner_radius_:outer_radius_; };
-
-  /**
-   * get the concentration of an isotope 
-   *
-   * @return concentration_
-   */
-  const Concentration getConcentration(Iso tope);
 
   /**
    * Absorbs the contents of the given Material into this Component.
@@ -260,11 +235,6 @@ protected:
 
 private:
   /**
-   * This step mixes the material and performs a mass balance.
-   */
-  void mixCell();
-
-  /**
    * The contained contaminants, a list of material objects..
    */
   vector<Material*> wastes_;
@@ -283,16 +253,6 @@ private:
    * The outer radius of the (cylindrical) component
    */
   Radius outer_radius_;
-
-  /**
-   * The solid matrix object which is the main constituent of this component.
-   */
-  Solid* matrix_;
-
-  /**
-   * The fluid liquid object which is the second constituent of this component.
-   */
-  Fluid* liquid_;
 
   /**
    * The type of component that this component represents 

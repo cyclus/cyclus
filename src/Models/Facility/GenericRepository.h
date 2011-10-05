@@ -157,23 +157,9 @@ protected:
     deque<Material*> inventory_;
 
     /**
-     * get the total mass of the stuff in the inventory
-     *
-     * @return the total mass of the processed materials in storage
-     */
-    Mass checkInventory();
-
-    /**
-     * get the total mass of the stuff in the stocks
-     *
-     * @return the total mass of the raw materials in storage
-     */
-    Mass checkStocks();
-
-    /**
      * The maximum size to which the inventory may grow..
      * The GenericRepository must stop processing the material in its stocks 
-     * when its inventory is full.
+     * when its inventory is full. (YMRLegislative = 70,000tHM) 
      */
     Mass inventory_size_;
 
@@ -201,13 +187,14 @@ protected:
     Component* far_field_;
 
     /**
-     * The not yet full buffer components
+     * Reports true if the repository has reached capacity, false otherwiset
      */
-    deque<Component*> new_buffers_;
+    bool is_full_;
+
     /**
-     * The full buffer components
+     * The buffer components
      */
-    deque<Component*> full_buffers_;
+    deque<Component*> buffers_;
 
     /**
      * The waste package component
@@ -220,10 +207,25 @@ protected:
     deque<Component*> waste_forms_;
 
     /**
+     * get the total mass of the stuff in the inventory
+     *
+     * @return the total mass of the processed materials in storage
+     */
+    Mass checkInventory();
+
+    /**
+     * get the total mass of the stuff in the stocks
+     *
+     * @return the total mass of the raw materials in storage
+     */
+    Mass checkStocks();
+
+
+    /**
      * Emplace the waste
      */
     void emplaceWaste() ;
-
+    
     /**
      * Condition the waste
      *

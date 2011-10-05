@@ -71,7 +71,7 @@ void GenericRepository::init(xmlNodePtr cur)
   start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
   setMapVar("start_op_yr_",&start_op_yr_);
 
-  /// all facilities require commodities - possibly many
+  // this facility requires input commodities
   string commod_name;
   Commodity* new_commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
@@ -88,6 +88,9 @@ void GenericRepository::init(xmlNodePtr cur)
   }
 
   setMapVar("in_commods_",&in_commods_);
+
+  this->init(member_var_map_);
+
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(map<string, void*> member_var_map)
@@ -97,6 +100,9 @@ void GenericRepository::init(map<string, void*> member_var_map)
 
   // send the init signal upward
   FacilityModel::init(member_var_map);
+
+  // this facility starts out empty 
+  is_full_ = false;
   
   // initialize ordinary objects
   // get capacity_
@@ -118,6 +124,17 @@ void GenericRepository::init(map<string, void*> member_var_map)
 
   stocks_ = deque<Material*>();
   inventory_ = deque< Material* >();
+
+  // create far field component
+  // inititalize far field component
+  // create buffer template
+  // copy template and initialize buffers
+  // create waste package templates
+  // create waste form templates
+  buffers_ = deque< Component* >();
+  waste_packages_ = deque< Component* >();
+  waste_forms_ = deque< Component* >();
+  is_full_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -279,35 +296,45 @@ void GenericRepository::emplaceWaste(){
     for (deque< Material* >::iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
-      // start by packing it in a waste form
-      // -- what waste form does this type of waste go into?
-      // -- what density?
-      // -- associate the waste stream with the waste form
-      Component* waste_form = conditionWaste((*iter));
-    
-      // put the in a waste package
-      // -- what waste package does this type of waste go into?
-      // -- what density?
-      // -- associate the waste form with the was package
-      Component* waste_package = packageWaste(waste_form);
-    
-      // try to load it in the current buffer 
-      Component* current_buffer = new_buffers_.front();
-      // if the package is full
-      if( waste_package->isFull()
-          // and not too hot
-          && waste_package->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
-          // or too toxic
-          && waste_package->getPeakTox() <= current_buffer->getToxLim()){
-        // take the stream out of the stocks
-        // emplace it in the buffer
-        loadBuffer(waste_package);
-        if( current_buffer->isFull() ) {
-          full_buffers_.push_back(new_buffers_.front());
-          new_buffers_.pop_front();
+      while( !is_full_ ){
+        // start by packing it in a waste form
+        // -- what waste form does this type of waste go into?
+        // -- what density?
+        // -- associate the waste stream with the waste form
+        Component* waste_form = conditionWaste((*iter));
+      
+        // put the in a waste package
+        // -- what waste package does this type of waste go into?
+        // -- what density?
+        // -- associate the waste form with the was package
+        Component* waste_package = packageWaste(waste_form);
+      
+        // try to load it in the current buffer 
+        Component* current_buffer = buffers_.front();
+        if (NULL == current_buffer) {
+          string err_msg = "Buffers not yet loaded into Generic Repository.";
+          throw GenException(err_msg);
         }
+        // if the package is full
+        if( waste_package->isFull()
+            // and not too hot
+            && waste_package->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
+            // or too toxic
+            && waste_package->getPeakTox() <= current_buffer->getToxLim()){
+          // take the stream out of the stocks
+          // emplace it in the buffer
+          loadBuffer(waste_package);
+          if( current_buffer->isFull() ) {
+            buffers_.push_back(buffers_.front());
+            buffers_.pop_front();
+            if( buffers_.front()->isFull()){
+              // all buffers are now full, capacity reached
+              is_full_ = true;
+            }
+          }
+        }
+        // once the waste is emplaced, is there anything else to do?
       }
-      // once the waste is emplaced, is there anything else to do?
     }
   }
 }

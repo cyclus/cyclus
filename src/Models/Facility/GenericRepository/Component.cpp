@@ -14,10 +14,14 @@ using namespace std;
 int Component::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Component::Component(): temperature_(0), inner_radius_(0), outer_radius_(0)
+Component::Component(): temperature_(0), inner_radius_(0), outer_radius_(0),
+  temperature_lim_(373), toxicity_lim_(2)
 {
   name_ = "";
   ID_=nextID_++;
+
+  vol_comp_hist_ = CompHistory();
+  vol_mass_hist_ = MassHistory();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -29,12 +33,13 @@ Component::Component(xmlNodePtr cur)
 
   string vol_type_ = XMLinput->get_xpath_content(cur,"basis");
 
-  vol_comp_hist_ = CompHistory() ;
+  vol_comp_hist_ = CompHistory();
+  vol_mass_hist_ = MassHistory();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Component::Component(string name, Temp temp, Radius inner, Radius outer, 
-    ConcMap concs, Solid* mat, Fluid* liq, ComponentType type)  
+Component::Component(string name, Temp temp, Temp temperature_lim, Tox toxicity_lim,
+    Radius inner, Radius outer, ComponentType type)  
 {
   
   ID_=nextID_++;
@@ -42,12 +47,13 @@ Component::Component(string name, Temp temp, Radius inner, Radius outer,
   temperature_ = temp;
   inner_radius_ = inner;
   outer_radius_ = outer;
-  matrix_ = mat;
-  liquid_ = liq;
-  concentrations_ = concs;
   type_ = type;
+  temperature_lim_ = temperature_lim ;
+  toxicity_lim_ = toxicity_lim ;
 
-  vol_comp_hist_ = CompHistory() ;
+  vol_comp_hist_ = CompHistory();
+  vol_mass_hist_ = MassHistory();
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
