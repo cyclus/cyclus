@@ -4,11 +4,11 @@
 #include <vector>
 #include <time.h>
 
-using namespace std;
-
 #include "Component.h"
 #include "GenException.h"
-#include "Logician.h"
+#include "InputXML.h"
+
+using namespace std;
 
 // Static variables to be initialized.
 int Component::nextID_ = 0;

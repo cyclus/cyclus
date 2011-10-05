@@ -3,6 +3,8 @@
 
 #include "CapacityRegion.h"
 
+#include "Logician.h"
+
 #include <sstream>
 #include <iostream>
 

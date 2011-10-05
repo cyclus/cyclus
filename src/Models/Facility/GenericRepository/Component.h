@@ -4,12 +4,12 @@
 
 #include <vector>
 #include <map>
+#include <string>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 
-#include "InputXML.h"
 #include "Material.h"
-#include "Timer.h"
-
-using namespace std;
 
 /**
  * type definition for Toxicity in units of Sv 
@@ -34,7 +34,7 @@ typedef double Concentration;
 /**
  * type definition for ConcMap 
  */
-typedef map<Iso, Concentration> ConcMap;
+typedef std::map<Iso, Concentration> ConcMap;
 
 /**
  * Enum for type of component.
@@ -64,7 +64,7 @@ struct Fluid{
   double viscosity;
   double diffusivity;
   double mass;
-  map<Iso, double> solubilities;
+  std::map<Iso, double> solubilities;
 };
 
 /** 
@@ -100,7 +100,7 @@ public:
    * @param outer is the outer radius
    * @param type indicates wf, wp, buffer, nf, ff, or env component 
    */
-  Component(string volName, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
+  Component(std::string volName, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
       Radius inner, Radius outer, ComponentType type);
 
   /** 
@@ -125,14 +125,14 @@ public:
    *
    * @return name_
    */
-  const string getName(){return name_;};
+  const std::string getName(){return name_;};
   
   /**
    * get the list of waste objects 
    *
    * @return wastes
    */
-  const vector<Material*> getWastes(){return wastes_;};
+  const std::vector<Material*> getWastes(){return wastes_;};
 
   /**
    * get the maximum Temperature this object allows at its boundaries 
@@ -237,12 +237,12 @@ private:
   /**
    * The contained contaminants, a list of material objects..
    */
-  vector<Material*> wastes_;
+  std::vector<Material*> wastes_;
 
   /**
    * The name of this component, a string
    */
-  string name_;
+  std::string name_;
 
   /**
    * The inner radius of the (cylindrical) component
