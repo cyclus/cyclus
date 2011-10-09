@@ -4,6 +4,7 @@
 #include "BookKeeper.h"
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include "boost/multi_array.hpp"
 #include "hdf5.h"
