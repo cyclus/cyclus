@@ -89,13 +89,149 @@ void GenericRepository::init(xmlNodePtr cur)
 
   setMapVar("in_commods_",&in_commods_);
 
-  this->init(member_var_map_);
+  // get components
+  // get far field
+  Component* ff;
+  ff = NULL;
+  nodes = XMLinput->get_xpath_elements(cur,"farfield");
+  xmlNodePtr comp_node = nodes->nodeTab[0]; // this may need to be 1
+  string comp_name;
+  string model_name;
+  // // get name
+  comp_name = XMLinput->get_xpath_content(comp_node,"name");
+  // // get model
+  model_name = XMLinput->get_xpath_content(comp_node,"model");
+  ff = new Component();
+  ff->init(comp_node);
+  far_field_=ff;
+  setMapVar("far_field_",&far_field_);
 
+  // get buffer
+  Component* buffer;
+  buffer = NULL;
+  nodes = XMLinput->get_xpath_elements(cur,"buffer");
+  xmlNodePtr buff_node = nodes->nodeTab[0]; // this may need to be 1
+  // // get name
+  comp_name = XMLinput->get_xpath_content(comp_node,"name");
+  // // get model
+  model_name = XMLinput->get_xpath_content(comp_node,"model");
+  buffer = new Component();
+  buffer->init(comp_node);
+  buffer_templates_.push_back(buffer);
+  setMapVar("buffer_templates_",&buffer_templates_);
+
+  // for each waste form
+  // (these are found before wp's in order to help with wf_wp_map creation)
+  nodes = XMLinput->get_xpath_elements(cur,"wasteform");
+  for (int i=0;i<nodes->nodeNr;i++)
+  {
+    xmlNodePtr wf_node = nodes->nodeTab[i];
+    string comp_name;
+    string model_name;
+    // // get name
+    comp_name = XMLinput->get_xpath_content(wf_node,"name");
+    // // get model
+    model_name = XMLinput->get_xpath_content(wf_node,"model");
+    Component* wf = new Component();
+    wf->init(wf_node);
+    // // get allowed waste commodities
+    xmlNodeSetPtr allowed_commod_nodes = XMLinput->get_xpath_elements(wf_node,"allowedcommod");
+    for (int i=0;i<allowed_commod_nodes->nodeNr;i++) {
+      Commodity* allowed_commod = LI->getCommodity((const char*)(nodes->nodeTab[i]->children->content));
+      commod_wf_map_.insert(make_pair(allowed_commod, wf));
+    }
+    wf_templates_.push_back(wf);
+  }
+  setMapVar("wf_templates_",&wf_templates_);
+
+  // for each waste package
+  nodes = XMLinput->get_xpath_elements(cur,"wastepackage");
+  for (int i=0;i<nodes->nodeNr;i++)
+  {
+    xmlNodePtr wp_node = nodes->nodeTab[i];
+    // // get name
+    comp_name = XMLinput->get_xpath_content(wp_node,"name");
+    // // get model
+    model_name = XMLinput->get_xpath_content(wp_node,"model");
+    Component* wp = new Component();
+    wp->init(wp_node);
+    // // get allowed waste forms
+    xmlNodeSetPtr allowed_wf_nodes = XMLinput->get_xpath_elements(wp_node,"allowedwf");
+    for (int i=0;i<allowed_wf_nodes->nodeNr;i++) {
+      string allowed_wf_name = (const char*)(nodes->nodeTab[i]->children->content);
+      //iterate through wf_templates_
+      //for each wf_template_
+      for (deque< Component* >::iterator iter = wf_templates_.begin(); 
+           iter != wf_templates_.end(); 
+           iter ++){
+        //if wf_template_.getName() = allowed_wf_name
+        if ((*iter)->getName() == allowed_wf_name){
+          wf_wp_map_.insert(make_pair((*iter), wp));
+        }
+      }
+    }
+    wp_templates_.push_back(wp);
+  }
+  setMapVar("wp_templates_",&wp_templates_);
+
+
+//  // get components
+//  nodes = XMLinput->get_xpath_elements(cur,"component");
+//  // for each component, there is a model and component type
+//  for (int i=0;i<nodes->nodeNr;i++)
+//  {
+//    xmlNodePtr comp_node = nodes->nodeTab[i];
+//    string model_name;
+//    string type;
+//    component = NULL;
+//
+//    // get model
+//    model_name = XMLinput->get_xpath_content(comp_node,"model");
+//      component = new Component();
+//      component->init(cur);
+//    if (NULL == component){
+//      throw GenException("Component '" + model_name 
+//          + "' does not exist for facility '" + getName() 
+//          + "'."); }
+//    // get type
+//    type = XMLinput->get_xpath_content(comp_node,"type");
+//    switch(component->getComponentType(type))
+//    {
+//      case ENV:
+//        env_ = component;
+//        setMapVar("env_",&env_);
+//        break;
+//      case FF:
+//        far_field_ = component;
+//        setMapVar("far_field_",&far_field_);
+//        break;
+//      case NF:
+//        near_field_ = component;
+//        setMapVar("near_field_",&near_field_);
+//        break;
+//      case BUFFER:
+//        buffer_templates_.push_back( component );
+//        setMapVar("buffer_templates_",&buffer_templates_);
+//        break;
+//      case WP:
+//        wp_templates_.push_back( component );
+//        setMapVar("wp_templates_",&wp_templates_);
+//        break;
+//      case WF:
+//        wf_templates_.push_back( component );
+//        setMapVar("wf_templates_",&wf_templates_);
+//        break;
+//      default:
+//        throw GenException("Unknown enum value encountered."); 
+//    }
+//  }
+//
+  this->init(member_var_map_);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(map<string, void*> member_var_map)
 { 
-  // set the member variable map accross the board
+  // set the member variable map across the board
   member_var_map_ = member_var_map;
 
   // send the init signal upward
@@ -122,8 +258,25 @@ void GenericRepository::init(map<string, void*> member_var_map)
   // it assumes that the commodity* provided exists within the simulation.
   in_commods_ = getMapVar< deque<Commodity*> > ("in_commods_", member_var_map);
 
-  stocks_ = deque<Material*>();
-  inventory_ = deque< Material* >();
+  // get env
+  //env_ = getMapVar<Component*>("env_",member_var_map); 
+  // get far_field
+  far_field_ = getMapVar<Component*>("far_field_",member_var_map); 
+  // get near_field
+  //near_field_ = getMapVar<Component*>("near_field_",member_var_map); 
+  // get buffers
+  buffer_templates_ = getMapVar< deque<Component*> > ("buffer_templates_", member_var_map);
+  // get waste packages
+  wp_templates_ = getMapVar< deque<Component*> > ("wp_templates_", member_var_map);
+  // get waste forms
+  wf_templates_ = getMapVar< deque<Component*> > ("wf_templates_", member_var_map);
+  // get wf_wp_map
+  wf_wp_map_ = getMapVar< map<Component*, Component*> > ("wf_wp_map_", member_var_map);
+  // get waste forms
+  commod_wf_map_ = getMapVar< map<Commodity*, Component*> > ("commod_wf_map_", member_var_map);
+
+  stocks_ = deque< WasteStream >();
+  inventory_ = deque< WasteStream >();
 
   // create far field component
   // inititalize far field component
@@ -143,15 +296,18 @@ void GenericRepository::copy(GenericRepository* src)
 
   FacilityModel::copy(src);
 
-  // are these accessing the right stuff?
   capacity_ = src->capacity_;
   inventory_size_ = src->inventory_size_;
   start_op_yr_ = src->start_op_yr_;
   start_op_mo_ = src->start_op_mo_;
   in_commods_ = src->in_commods_;
 
-  stocks_ = deque<Material*>();
-  inventory_ = deque< Material*>();
+  stocks_ = deque< WasteStream >();
+  inventory_ = deque< WasteStream >();
+  buffers_ = deque< Component* >();
+  waste_packages_ = deque< Component* >();
+  waste_forms_ = deque< Component* >();
+  is_full_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -187,7 +343,7 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> man
   {
     cout<<"GenericRepository " << getSN() << " is receiving material with mass "
         << (*thisMat)->getTotMass() << endl;
-    stocks_.push_front(*thisMat);
+    stocks_.push_front(make_pair(*thisMat, trans.commod));
   }
 }
 
@@ -263,10 +419,10 @@ Mass GenericRepository::checkInventory(){
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
-  for (deque< Material*>::iterator iter = inventory_.begin(); 
+  for (deque< WasteStream >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getTotMass();
+    total += (*iter).first->getTotMass();
   }
 
   return total;
@@ -279,10 +435,10 @@ Mass GenericRepository::checkStocks(){
   // material unit is in each object.
 
   if(!stocks_.empty()){
-    for (deque< Material* >::iterator iter = stocks_.begin(); 
+    for (deque< WasteStream >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
-        total += (*iter)->getTotMass();
+        total += (*iter).first->getTotMass();
     };
   };
   return total;
@@ -293,7 +449,7 @@ void GenericRepository::emplaceWaste(){
   // if there's anything in the stocks, try to emplace it
   if(!stocks_.empty()){
     // for each waste stream in the stocks
-    for (deque< Material* >::iterator iter = stocks_.begin(); 
+    for (deque< WasteStream >::iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
       while( !is_full_ ){
@@ -340,22 +496,42 @@ void GenericRepository::emplaceWaste(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Component* GenericRepository::conditionWaste(Material* waste_stream){
-  Component* toRet = new Component();
-  return toRet;
+Component* GenericRepository::conditionWaste(WasteStream waste_stream){
+  // figure out what waste form to put the waste stream in
+  Component* chosen_wf_template;
+  chosen_wf_template = commod_wf_map_[waste_stream.second];
+  // if there doesn't already exist a partially full one
+  // @todo check for partially full wf's before creating new one (katyhuff)
+  // create that waste form
+  Component* chosen_waste_form = new Component();
+  chosen_waste_form->copy(chosen_wf_template);
+  // and load in the waste stream
+  chosen_waste_form->absorb(waste_stream.first);
+  return chosen_waste_form;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component* GenericRepository::packageWaste(Component* waste_form){
-  Component* toRet = new Component();
-  return toRet;
+  // figure out what waste form to put the waste stream in
+  Component* chosen_wp_template;
+  chosen_wp_template = wf_wp_map_[waste_form];
+  // if there doesn't already exist a partially full one
+  // @todo check for partially full wp's before creating new one (katyhuff)
+  // create that waste package
+  Component* chosen_waste_package = new Component();
+  chosen_waste_package->copy(chosen_wp_template);
+  // and load in the waste form
+  chosen_waste_package->load(WP, waste_form);
+  return chosen_waste_package;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component* GenericRepository::loadBuffer(Component* waste_package){
-  // find the current buffer and load it
-  Component* toRet = new Component();
-  return toRet;
+  // figure out what waste form to put the waste stream in
+  Component* chosen_buffer = buffers_.front();
+  // and load in the waste package
+  chosen_buffer = chosen_buffer->load(BUFFER, waste_package);
+  return chosen_buffer;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -369,7 +545,4 @@ void GenericRepository::transportNuclides(){
   // update the nuclide transport BCs everywhere
   // pass the transport nuclides signal through the components, inner -> outer
 }
-
-
-
 

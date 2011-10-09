@@ -43,6 +43,32 @@
         <lifetime>1</lifetime>
         <startOperMonth>1</startOperMonth>
         <startOperYear>1</startOperYear>
+        <farfield>
+          <name>ff</name>
+          <model>
+            <StubComponent/>
+          </model>
+        </farfield>
+        <buffer>
+          <name>buffer</name>
+          <model>
+            <StubComponent/>
+          </model>
+        </buffer>
+        <wastepackage>
+          <name>wp</name>
+          <model>
+            <StubComponent/>
+          </model>
+          <allowedwf>wf</allowedwf>
+        </wastepackage>
+        <wasteform>
+          <name>wf</name>
+          <model>
+            <StubComponent/>
+          </model>
+          <allowedcommod>uo2</allowedcommod>
+        </wasteform>
       </GenericRepository>
     </model>
   </facility>

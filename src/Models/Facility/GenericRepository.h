@@ -8,14 +8,21 @@
 #include "GenericRepository/Component.h"
 
 /**
- * The GenericRepository class inherits from the FacilityModel class and is 
- * dynamically
- * loaded by the Model class when requested.
+ * type definition for waste stream objects
+ */
+typedef pair<Material*, Commodity*> WasteStream;
+
+/**
+ * enumerator for the component models available to the repo
+ */
+enum RepoComponents{STUBCOMPONENT, LAST_COMPONENT}; 
+
+/**
+ * @brief This model seeks to provide a generic disposal system model
  * 
- * This facility model does very little.  New material is added to 
- * queue inventory
- * and old material is removed from the same queue inventory.
- *
+ * The GenericRepository class inherits from the FacilityModel class and is 
+ * dynamically loaded by the Model class when requested.
+ * 
  */
 
 class GenericRepository : public FacilityModel  {
@@ -25,13 +32,10 @@ class GenericRepository : public FacilityModel  {
  */
 
 public:
-  /** Default constructor for the GenericRepository class.
-   */
+  /// Default constructor for the GenericRepository class.
   GenericRepository() {};
 
-  /**
-   * Destructor for the GenericRepository class. 
-   */
+  /// Destructor for the GenericRepository class. 
   ~GenericRepository() {};
   
   /// initialize an object from XML input
@@ -44,6 +48,8 @@ public:
   virtual void copy(GenericRepository* src);
 
   /**
+   * @brief deep copy method 
+   *
    * This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
@@ -54,9 +60,7 @@ public:
    */
   virtual void copyFreshModel(Model* src);
 
-  /**
-   * Print information about this model
-   */
+  /// Print information about this model
   virtual void print();
 
 /* ------------------- */ 
@@ -70,6 +74,8 @@ public:
   /**
    * When the facility receives a message, execute any transaction 
    * therein
+   *
+   * @param msg the message to receive
    */
     virtual void receiveMessage(Message* msg);
 
@@ -149,12 +155,12 @@ protected:
     /**
      * The stocks of pre-emplacement waste materials.
      */
-    deque<Material*> stocks_;
+    deque<WasteStream> stocks_;
 
     /**
      * The inventory of emplaced materials.
      */
-    deque<Material*> inventory_;
+    deque<WasteStream> inventory_;
 
     /**
      * The maximum size to which the inventory may grow..
@@ -182,15 +188,42 @@ protected:
     int start_op_mo_;
 
     /**
+     * Reports true if the repository has reached capacity, false otherwiset
+     */
+    bool is_full_;
+
+    /**
+     * The Environment component
+     */
+    Component* env_;
+
+    /**
      * The Far Field component
      */
     Component* far_field_;
 
     /**
-     * Reports true if the repository has reached capacity, false otherwiset
+     * The Near Field component
      */
-    bool is_full_;
+    Component* near_field_;
 
+    /**
+     * The buffer templates before initialization.
+     * These will be copied and initialized before use.
+     */
+    deque<Component*> buffer_templates_;
+
+    /**
+     * The waste package component templates before initialization.
+     * These will be copied and initialized before use.
+     */
+    deque<Component*> wp_templates_;
+
+    /**
+     * The waste form templates before initialization.
+     * These will be copied and initialized before use.
+     */
+    deque<Component*> wf_templates_;
     /**
      * The buffer components
      */
@@ -205,6 +238,16 @@ protected:
      * The waste form components
      */
     deque<Component*> waste_forms_;
+
+    /**
+     * Each Commodity is associated with a waste form.
+     */
+    map<Commodity*, Component*> commod_wf_map_;
+
+    /**
+     * Each waste form associated with a waste package.
+     */
+    map<Component*, Component*> wf_wp_map_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -229,10 +272,10 @@ protected:
     /**
      * Condition the waste
      *
-     * @param waste_stream is the material to be conditioned
+     * @param waste_stream is the WasteStream object to be conditioned
      * @return the form that has been loaded with the waste stream
      */
-    Component* conditionWaste(Material* waste_stream) ;
+    Component* conditionWaste(WasteStream waste_stream) ;
 
     /**
      * Package the waste
@@ -253,12 +296,20 @@ protected:
     /**
      * Do heat transport calculations
      */
-    void transportHeat() ;
+    static void transportHeat() ;
 
     /**
      * Do nuclide transport calculations
      */
-    void transportNuclides() ;
+    static void transportNuclides() ;
+
+    /**
+     * Return the component model named by the string
+     *
+     * @param model_name is the name of the component model (e.g. StubComponent)
+     */
+    static Component* getComponent(string model_name) ;
+
 
 /* ------------------- */ 
 

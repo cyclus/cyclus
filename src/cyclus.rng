@@ -278,6 +278,56 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <ref name="lifetime"/>
         <ref name="startOperMonth"/>
         <ref name="startOperYear"/>
+        <element name="farfield">
+          <ref name="name"/>
+          <element name="model">
+          <choice>
+            <ref name="StubComponent"/>
+            <!-- insert ref to new potential far field component models here -->
+          </choice>
+          </element>
+        </element>
+        <element name="buffer">
+          <ref name="name"/>
+          <element name="model">
+          <choice>
+            <ref name="StubComponent"/>
+            <!-- insert ref to new potential far field component models here -->
+          </choice>
+          </element>
+        </element>
+        <oneOrMore>
+        <element name="wastepackage">
+          <ref name= "name"/>
+          <element name="model">
+          <choice>
+            <ref name="StubComponent"/>
+            <!-- insert ref to new potential waste package component models here -->
+          </choice>
+          </element>
+          <oneOrMore>
+          <element name="allowedwf">
+            <text/>
+          </element>
+          </oneOrMore>
+        </element>
+        </oneOrMore>
+        <oneOrMore>
+        <element name="wasteform">
+          <ref name="name"/>
+          <element name="model">
+          <choice>
+            <ref name="StubComponent"/>
+            <!-- insert ref to new potential far field component models here -->
+          </choice>
+          </element>
+          <oneOrMore>
+          <element name="allowedcommod">
+            <text/>
+          </element>
+          </oneOrMore>
+        </element>
+        </oneOrMore>
      </element>
   </define>
 
@@ -417,45 +467,15 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
   </define>
 
-  <define name="commodprice">
-      <element name="commodprice">
-        <data type="double"/>
-      </element>
-  </define>
-
   <define name="capacity">
       <element name="capacity">
         <data type="double"/>
       </element>
   </define>
 
-  <define name="lifetime">
-      <element name="lifetime">
-        <data type="nonNegativeInteger"/>
-      </element>
-  </define>
-  
-  <define name="tailsassay">
-      <element name="tailsassay">
+  <define name="commodprice">
+      <element name="commodprice">
         <data type="double"/>
-      </element>
-  </define>
-
-  <define name="inventorysize">
-      <element name="inventorysize">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="inrecipe">
-      <element name="inrecipe">
-          <text/>
-      </element>
-  </define>
-
-  <define name="outrecipe">
-      <element name="outrecipe">
-          <text/>
       </element>
   </define>
 
@@ -465,9 +485,39 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
   </define>
 
+  <define name="inrecipe">
+      <element name="inrecipe">
+          <text/>
+      </element>
+  </define>
+
+  <define name="inventorysize">
+      <element name="inventorysize">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="lifetime">
+      <element name="lifetime">
+        <data type="nonNegativeInteger"/>
+      </element>
+  </define>
+
+  <define name="name">
+      <element name="name">
+        <data type="string"/>
+      </element>
+  </define>
+
   <define name="outcommodity">
       <element name="outcommodity">
          <text/>
+      </element>
+  </define>
+
+  <define name="outrecipe">
+      <element name="outrecipe">
+          <text/>
       </element>
   </define>
 
@@ -482,6 +532,13 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <data type="nonNegativeInteger"/>
       </element>
   </define>
+
+  <define name="tailsassay">
+      <element name="tailsassay">
+        <data type="double"/>
+      </element>
+  </define>
+
 
 
   <!-- insert new FacilityModel parameter sets here -->
@@ -757,7 +814,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- end section for recipes -->
 
   <!-- begin section for Stream -->
-<!-- SepMatrix Stream List Arrangement Command -->
+  <!-- SepMatrix Stream List Arrangement Command -->
   <define name="Stream">
     <element name= "Stream">
       <list>
@@ -768,7 +825,18 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </list>                            
     </element>
   </define>
-<!-- end section for Stream -->
+  <!-- end section for Stream -->
+
+  <!-- begin section for repocomponents -->
+  <define name="StubComponent">
+    <element name="StubComponent">
+      <text/>
+    </element>
+  </define>
+
+  <!-- insert new repocomponent parameter sets here -->
+
+  <!-- end section for repocomponents -->
 
 </grammar>
 

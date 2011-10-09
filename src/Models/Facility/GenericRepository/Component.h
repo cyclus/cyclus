@@ -11,6 +11,8 @@
 
 #include "Material.h"
 
+class Component;
+
 /**
  * type definition for Toxicity in units of Sv 
  */
@@ -39,7 +41,7 @@ typedef std::map<Iso, Concentration> ConcMap;
 /**
  * Enum for type of component.
  */
-enum ComponentType {ENV, FF, NF, BUFFER, WP, WF};
+enum ComponentType {ENV, FF, NF, BUFFER, WP, WF, LAST_TYPE};
 
 /**
  * Enum for type of boundary.
@@ -68,10 +70,12 @@ struct Fluid{
 };
 
 /** 
- * Class Component describes the component interface 
- * 
- * This class is intended to describe the subcomponents of the repository
+ * @brief Defines interface for subcomponents of the GenericRepository
  *
+ * Components such as the Waste Form, Waste Package, Buffer, Near Field,
+ * Far Field, and Envrionment will share a universal interface so that 
+ * information passing concerning fluxes and other boundary conditions 
+ * can be passed in and out of them.
  */
 class Component {
 
@@ -89,10 +93,11 @@ public:
    */
   Component(xmlNodePtr cur);
 
+  
   /**
    * a constructor for making a component object from a known recipe and size.
    *
-   * @param name 
+   * @param name is the name of the component
    * @param temperature is the initial temperature
    * @param temperature_lim is the temperature limit
    * @param toxicity_lim is the toxicity limit
@@ -100,7 +105,7 @@ public:
    * @param outer is the outer radius
    * @param type indicates wf, wp, buffer, nf, ff, or env component 
    */
-  Component(std::string volName, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
+  Component(std::string name, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
       Radius inner, Radius outer, ComponentType type);
 
   /** 
@@ -109,10 +114,60 @@ public:
   ~Component() {};
 
   /**
+   * initializes the model parameters from an xmlNodePtr
+   *
+   * @param cur is the current xmlNodePtr
+   */
+  virtual void init(xmlNodePtr cur); 
+
+  /**
+   * copies a component and its parameters from another
+   *
+   * @param src is the component being copied
+   */
+  virtual void copy(Component* src); 
+
+  /**
    * standard verbose printer includes current temp and concentrations
    */
-  void print(); 
+  virtual void print(); 
+
+  /**
+   * Absorbs the contents of the given Material into this Component.
+   * 
+   * @param matToAdd the Component to be absorbed
+   */
+  virtual void absorb(Material* matToAdd) ;
+
+  /**
+   * Extracts the contents of the given Material from this Component. Use this 
+   * function for decrementing a Component's mass balance after transferring 
+   * through a link. 
+   *
+   * @param matToRem the Material whose composition we want to decrement 
+   * against this Component
+   */
+  virtual void extract(Material* matToRem) ;
+
+  /** 
+   * Loads this component with another component.
+   *
+   * @param type the ComponentType of this component
+   * @param to_load the Component to load into this component
+   */
+  virtual Component* load(ComponentType type, Component* to_load);
+
+  /** 
+   * Reports true if this component may be loaded with more of whatever goes 
+   * inside it and reports false if that is not the case.
+   */
+  virtual bool isFull();
     
+  /** 
+   * Enumerates a string if it is one of the named ComponentTypes
+   */
+  ComponentType getComponentType(std::string);
+
   /**
    * get the ID
    *
@@ -126,7 +181,7 @@ public:
    * @return name_
    */
   const std::string getName(){return name_;};
-  
+ 
   /**
    * get the list of waste objects 
    *
@@ -181,29 +236,6 @@ public:
   const Radius getRadius(BoundaryType type){
     return (type==INNER)?inner_radius_:outer_radius_; };
 
-  /**
-   * Absorbs the contents of the given Material into this Component.
-   * 
-   * @param matToAdd the Component to be absorbed
-   */
-  virtual void absorb(Material* matToAdd);
-
-  /**
-   * Extracts the contents of the given Material from this Component. Use this 
-   * function for decrementing a Component's mass balance after transferring 
-   * through a link. 
-   *
-   * @param matToRem the Material whose composition we want to decrement 
-   * against this Component
-   */
-  virtual void extract(Material* matToRem);
-
-  /** 
-   * Reports true if this component may be loaded with more of whatever goes 
-   * inside it and reports false if that is not the case.
-   */
-  bool isFull();
-
 protected:
   /** 
    * The serial number for this Component.
@@ -222,7 +254,7 @@ protected:
    * compositions. A composition is a map of isotopes and their 
    * corresponding number of atoms.
    */
-  CompHistory vol_comp_hist_;
+  CompHistory comp_hist_;
 
   /**
    * The mass history of this Component, in the form of a map whose
@@ -231,9 +263,19 @@ protected:
    * compositions. A composition is a map of isotopes and the corresponding
    * masses.
    */
-  MassHistory vol_mass_hist_;
+  MassHistory mass_hist_;
 
 private:
+  /**
+   * The immediate parent component of this component.
+   */
+  Component* parent_component_;
+
+  /**
+   * The immediate daughter components of this component.
+   */
+  std::vector<Component*> daughter_components_;
+
   /**
    * The contained contaminants, a list of material objects..
    */
