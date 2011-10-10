@@ -143,7 +143,7 @@ void GenericRepository::init(xmlNodePtr cur)
     wf_templates_.push_back(wf);
   }
   setMapVar("wf_templates_",&wf_templates_);
-  setMapVar("wf_wp_map_",&wf_wp_map_);
+  setMapVar("commod_wf_map_",&commod_wf_map_);
 
   // for each waste package
   nodes = XMLinput->get_xpath_elements(cur,"wastepackage");
@@ -174,7 +174,7 @@ void GenericRepository::init(xmlNodePtr cur)
     wp_templates_.push_back(wp);
   }
   setMapVar("wp_templates_",&wp_templates_);
-  setMapVar("commod_wf_map_",&commod_wf_map_);
+  setMapVar("wf_wp_map_",&wf_wp_map_);
 
 
 //  // get components
@@ -500,8 +500,14 @@ void GenericRepository::emplaceWaste(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   // figure out what waste form to put the waste stream in
-  Component* chosen_wf_template;
+  Component* chosen_wf_template = NULL;
   chosen_wf_template = commod_wf_map_[waste_stream.second];
+  if(chosen_wf_template == NULL){
+    string err_msg = "The commodity '";
+    err_msg += (waste_stream.second)->getName();
+    err_msg +="' does not have a matching waste form in the GenericRepsitory.";
+    throw GenException(err_msg);
+  }
   // if there doesn't already exist a partially full one
   // @todo check for partially full wf's before creating new one (katyhuff)
   // create that waste form
