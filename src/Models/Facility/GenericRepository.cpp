@@ -138,7 +138,7 @@ void GenericRepository::init(xmlNodePtr cur)
     // // get allowed waste commodities
     xmlNodeSetPtr allowed_commod_nodes = XMLinput->get_xpath_elements(wf_node,"allowedcommod");
     for (int i=0;i<allowed_commod_nodes->nodeNr;i++) {
-      Commodity* allowed_commod = LI->getCommodity((const char*)(nodes->nodeTab[i]->children->content));
+      Commodity* allowed_commod = LI->getCommodity((const char*)(allowed_commod_nodes->nodeTab[i]->children->content));
       commod_wf_map_.insert(make_pair(allowed_commod, wf));
     }
     wf_templates_.push_back(wf);
@@ -160,7 +160,7 @@ void GenericRepository::init(xmlNodePtr cur)
     // // get allowed waste forms
     xmlNodeSetPtr allowed_wf_nodes = XMLinput->get_xpath_elements(wp_node,"allowedwf");
     for (int i=0;i<allowed_wf_nodes->nodeNr;i++) {
-      string allowed_wf_name = (const char*)(nodes->nodeTab[i]->children->content);
+      string allowed_wf_name = (const char*)(allowed_wf_nodes->nodeTab[i]->children->content);
       //iterate through wf_templates_
       //for each wf_template_
       for (deque< Component* >::iterator iter = wf_templates_.begin(); 
@@ -410,7 +410,7 @@ void GenericRepository::emplaceWaste(){
         iter != stocks_.end(); 
         iter ++){
       while( !is_full_ ){
-        // start by packing it in a waste form
+        // start by packing the commod in a waste form
         // -- what waste form does this type of waste go into?
         // -- what density?
         // -- associate the waste stream with the waste form
@@ -457,13 +457,6 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   // figure out what waste form to put the waste stream in
   Component* chosen_wf_template = NULL;
   chosen_wf_template = commod_wf_map_[waste_stream.second];
-  map<Commodity*, Component*>::const_iterator end = commod_wf_map_.end(); 
-  for (map<Commodity*, Component*>::const_iterator it = commod_wf_map_.begin(); 
-      it != end; 
-      ++it) {
-      std::cout << "Commod(key = first): " << (it->first)->getName();
-      std::cout << " WF(value = second): " << (it->second)->getName() << '\n';
-  }
   if(chosen_wf_template == NULL){
     string err_msg = "The commodity '";
     err_msg += (waste_stream.second)->getName();
