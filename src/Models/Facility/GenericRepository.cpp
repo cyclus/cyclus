@@ -8,6 +8,7 @@
 #include "GenException.h"
 #include "InputXML.h"
 #include "Timer.h"
+#include "GenericRepository/StubComponent.h"
 
 
 
@@ -100,9 +101,9 @@ void GenericRepository::init(xmlNodePtr cur)
   // // get name
   comp_name = XMLinput->get_xpath_content(comp_node,"name");
   // // get model
-  model_name = XMLinput->get_xpath_content(comp_node,"model");
-  ff = new Component();
-  ff->init(comp_node);
+  model_name = XMLinput->get_xpath_name(comp_node,"model/*");
+  ff = getComponent(model_name);
+  ff->init(comp_node); // do we really want to do this now?
   far_field_=ff;
   setMapVar("far_field_",&far_field_);
 
@@ -112,11 +113,11 @@ void GenericRepository::init(xmlNodePtr cur)
   nodes = XMLinput->get_xpath_elements(cur,"buffer");
   xmlNodePtr buff_node = nodes->nodeTab[0]; // this may need to be 1
   // // get name
-  comp_name = XMLinput->get_xpath_content(comp_node,"name");
+  comp_name = XMLinput->get_xpath_content(buff_node,"name");
   // // get model
-  model_name = XMLinput->get_xpath_content(comp_node,"model");
-  buffer = new Component();
-  buffer->init(comp_node);
+  model_name = XMLinput->get_xpath_name(buff_node,"model/*");
+  buffer = getComponent(model_name);
+  buffer->init(buff_node); // do we really want to do this now?
   buffer_templates_.push_back(buffer);
   setMapVar("buffer_templates_",&buffer_templates_);
 
@@ -131,9 +132,9 @@ void GenericRepository::init(xmlNodePtr cur)
     // // get name
     comp_name = XMLinput->get_xpath_content(wf_node,"name");
     // // get model
-    model_name = XMLinput->get_xpath_content(wf_node,"model");
-    Component* wf = new Component();
-    wf->init(wf_node);
+    model_name = XMLinput->get_xpath_name(wf_node,"model/*");
+    Component* wf = getComponent(model_name);
+    wf->init(wf_node); // do we really want to do this now?
     // // get allowed waste commodities
     xmlNodeSetPtr allowed_commod_nodes = XMLinput->get_xpath_elements(wf_node,"allowedcommod");
     for (int i=0;i<allowed_commod_nodes->nodeNr;i++) {
@@ -153,9 +154,9 @@ void GenericRepository::init(xmlNodePtr cur)
     // // get name
     comp_name = XMLinput->get_xpath_content(wp_node,"name");
     // // get model
-    model_name = XMLinput->get_xpath_content(wp_node,"model");
-    Component* wp = new Component();
-    wp->init(wp_node);
+    model_name = XMLinput->get_xpath_name(wp_node,"model/*");
+    Component* wp = getComponent(model_name);
+    wp->init(wp_node); // do we really want to do this now?
     // // get allowed waste forms
     xmlNodeSetPtr allowed_wf_nodes = XMLinput->get_xpath_elements(wp_node,"allowedwf");
     for (int i=0;i<allowed_wf_nodes->nodeNr;i++) {
@@ -176,58 +177,6 @@ void GenericRepository::init(xmlNodePtr cur)
   setMapVar("wp_templates_",&wp_templates_);
   setMapVar("wf_wp_map_",&wf_wp_map_);
 
-
-//  // get components
-//  nodes = XMLinput->get_xpath_elements(cur,"component");
-//  // for each component, there is a model and component type
-//  for (int i=0;i<nodes->nodeNr;i++)
-//  {
-//    xmlNodePtr comp_node = nodes->nodeTab[i];
-//    string model_name;
-//    string type;
-//    component = NULL;
-//
-//    // get model
-//    model_name = XMLinput->get_xpath_content(comp_node,"model");
-//      component = new Component();
-//      component->init(cur);
-//    if (NULL == component){
-//      throw GenException("Component '" + model_name 
-//          + "' does not exist for facility '" + getName() 
-//          + "'."); }
-//    // get type
-//    type = XMLinput->get_xpath_content(comp_node,"type");
-//    switch(component->getComponentType(type))
-//    {
-//      case ENV:
-//        env_ = component;
-//        setMapVar("env_",&env_);
-//        break;
-//      case FF:
-//        far_field_ = component;
-//        setMapVar("far_field_",&far_field_);
-//        break;
-//      case NF:
-//        near_field_ = component;
-//        setMapVar("near_field_",&near_field_);
-//        break;
-//      case BUFFER:
-//        buffer_templates_.push_back( component );
-//        setMapVar("buffer_templates_",&buffer_templates_);
-//        break;
-//      case WP:
-//        wp_templates_.push_back( component );
-//        setMapVar("wp_templates_",&wp_templates_);
-//        break;
-//      case WF:
-//        wf_templates_.push_back( component );
-//        setMapVar("wf_templates_",&wf_templates_);
-//        break;
-//      default:
-//        throw GenException("Unknown enum value encountered."); 
-//    }
-//  }
-//
   this->init(member_var_map_);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -303,6 +252,12 @@ void GenericRepository::copy(GenericRepository* src)
   start_op_yr_ = src->start_op_yr_;
   start_op_mo_ = src->start_op_mo_;
   in_commods_ = src->in_commods_;
+  far_field_ = src->far_field_;
+  buffer_templates_ = src->buffer_templates_;
+  wp_templates_ = src->wp_templates_;
+  wf_templates_ = src->wf_templates_;
+  wf_wp_map_ = src->wf_wp_map_;
+  commod_wf_map_ = src->commod_wf_map_;
 
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
@@ -502,6 +457,13 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   // figure out what waste form to put the waste stream in
   Component* chosen_wf_template = NULL;
   chosen_wf_template = commod_wf_map_[waste_stream.second];
+  map<Commodity*, Component*>::const_iterator end = commod_wf_map_.end(); 
+  for (map<Commodity*, Component*>::const_iterator it = commod_wf_map_.begin(); 
+      it != end; 
+      ++it) {
+      std::cout << "Commod(key = first): " << (it->first)->getName();
+      std::cout << " WF(value = second): " << (it->second)->getName() << '\n';
+  }
   if(chosen_wf_template == NULL){
     string err_msg = "The commodity '";
     err_msg += (waste_stream.second)->getName();
@@ -554,3 +516,34 @@ void GenericRepository::transportNuclides(){
   // pass the transport nuclides signal through the components, inner -> outer
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* GenericRepository::getComponent(string model_name){
+  Component* toRet;
+  switch(getRepoComponentType(model_name))
+  {
+    case STUB:
+      toRet = new StubComponent();
+      break;
+    default:
+      throw GenException("Unknown component model enum value encountered."); 
+  }
+  return toRet;
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+RepoComponent GenericRepository::getRepoComponentType(string model_name) {
+  RepoComponent toRet;
+  string repo_component_names[] = {"StubComponent"};
+  for(int type = 0; type < LAST_COMPONENT; type++){
+    if(repo_component_names[type] == model_name){
+      toRet = (RepoComponent)type;
+    } else {
+      string err_msg ="'";
+      err_msg += model_name;
+      err_msg += "' does not name a valid RepoComponent.\n";
+      throw GenException(err_msg);
+    }
+  }
+  return toRet;
+}

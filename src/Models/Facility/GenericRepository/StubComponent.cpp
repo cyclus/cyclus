@@ -12,6 +12,8 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubComponent::init(xmlNodePtr cur){
+  // move the xml pointer to the current model
+  cur = XMLinput->get_xpath_element(cur,"model/StubComponent");
   // for now, just say you've done it... 
   cout << "The StubComponent Class init(cur) function has been called"<< endl;;
 }

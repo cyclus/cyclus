@@ -15,7 +15,7 @@ typedef pair<Material*, Commodity*> WasteStream;
 /**
  * enumerator for the component models available to the repo
  */
-enum RepoComponents{STUBCOMPONENT, LAST_COMPONENT}; 
+enum RepoComponent{STUB, LAST_COMPONENT}; 
 
 /**
  * @brief This model seeks to provide a generic disposal system model
@@ -309,6 +309,13 @@ protected:
      * @param model_name is the name of the component model (e.g. StubComponent)
      */
     static Component* getComponent(string model_name) ;
+
+    /**
+     * Return the component model enumerated type named by the string
+     *
+     * @param model_name is the name of the component model (e.g. StubComponent)
+     */
+    static RepoComponent getRepoComponentType(string model_name) ;
 
 
 /* ------------------- */ 
