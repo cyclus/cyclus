@@ -143,6 +143,7 @@ void GenericRepository::init(xmlNodePtr cur)
     wf_templates_.push_back(wf);
   }
   setMapVar("wf_templates_",&wf_templates_);
+  setMapVar("wf_wp_map_",&wf_wp_map_);
 
   // for each waste package
   nodes = XMLinput->get_xpath_elements(cur,"wastepackage");
@@ -173,6 +174,7 @@ void GenericRepository::init(xmlNodePtr cur)
     wp_templates_.push_back(wp);
   }
   setMapVar("wp_templates_",&wp_templates_);
+  setMapVar("commod_wf_map_",&commod_wf_map_);
 
 
 //  // get components
