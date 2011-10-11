@@ -414,29 +414,36 @@ void GenericRepository::emplaceWaste(){
         // -- what waste form does this type of waste go into?
         // -- what density?
         // -- associate the waste stream with the waste form
-        Component* waste_form = conditionWaste((*iter));
-      
-        // put the in a waste package
-        // -- what waste package does this type of waste go into?
-        // -- what density?
-        // -- associate the waste form with the was package
-        Component* waste_package = packageWaste(waste_form);
-      
-        // try to load it in the current buffer 
-        Component* current_buffer = buffers_.front();
-        if (NULL == current_buffer) {
-          string err_msg = "Buffers not yet loaded into Generic Repository.";
-          throw GenException(err_msg);
-        }
+        conditionWaste((*iter));
+      }
+    }
+    for (deque< Component* >::iterator iter = current_waste_forms_.begin(); 
+        iter != current_waste_forms_.end(); 
+        iter ++){
+      // put the waste form in a waste package
+      // -- what waste package does this type of waste go into?
+      // -- what density?
+      // -- associate the waste form with the was package
+      packageWaste((*iter));
+      waste_forms_.push_back(current_waste_forms_.front());
+      current_waste_forms_.pop_front();
+    }
+    for (deque< Component* >::iterator iter = current_waste_packages_.begin(); 
+        iter != current_waste_packages_.end(); 
+        iter ++){
+      // try to load each package in the current buffer 
+      Component* current_buffer = buffers_.front();
+      if (NULL == current_buffer) {
+        string err_msg = "Buffers not yet loaded into Generic Repository.";
+        throw GenException(err_msg);
         // if the package is full
-        if( waste_package->isFull()
+        if( (*iter)->isFull()
             // and not too hot
-            && waste_package->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
+            && (*iter)->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
             // or too toxic
-            && waste_package->getPeakTox() <= current_buffer->getToxLim()){
-          // take the stream out of the stocks
+            && (*iter)->getPeakTox() <= current_buffer->getToxLim()){
           // emplace it in the buffer
-          loadBuffer(waste_package);
+          loadBuffer((*iter));
           if( current_buffer->isFull() ) {
             buffers_.push_back(buffers_.front());
             buffers_.pop_front();
@@ -445,7 +452,16 @@ void GenericRepository::emplaceWaste(){
               is_full_ = true;
             }
           }
+          // take the waste package out of the current packagess
+          waste_packages_.push_back(current_waste_packages_.front());
+          current_waste_packages_.pop_front();
+          inventory_.push_back(stocks_.front());
+          stocks_.pop_front();
         }
+        // if the waste package was either too hot or not full
+        // push it back on the stack
+        current_waste_packages_.push_back(current_waste_packages_.front());
+        current_waste_packages_.pop_front();
         // once the waste is emplaced, is there anything else to do?
       }
     }
@@ -466,26 +482,32 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   // if there doesn't already exist a partially full one
   // @todo check for partially full wf's before creating new one (katyhuff)
   // create that waste form
-  Component* chosen_waste_form = new Component();
-  chosen_waste_form->copy(chosen_wf_template);
+  current_waste_forms_.push_back( getComponent(chosen_wf_template->getImpl()));
+  current_waste_forms_.back()->copy(chosen_wf_template);
   // and load in the waste stream
-  chosen_waste_form->absorb(waste_stream.first);
-  return chosen_waste_form;
+  current_waste_forms_.back()->absorb(waste_stream.first);
+  return current_waste_forms_.back();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component* GenericRepository::packageWaste(Component* waste_form){
-  // figure out what waste form to put the waste stream in
-  Component* chosen_wp_template;
+  // figure out what waste package to put the waste form in
+  Component* chosen_wp_template = NULL;
   chosen_wp_template = wf_wp_map_[waste_form];
+  if(chosen_wp_template == NULL){
+    string err_msg = "The waste form '";
+    err_msg += (waste_form)->getName();
+    err_msg +="' does not have a matching waste package in the GenericRepsitory.";
+    throw GenException(err_msg);
+  }
   // if there doesn't already exist a partially full one
   // @todo check for partially full wp's before creating new one (katyhuff)
   // create that waste package
-  Component* chosen_waste_package = new Component();
-  chosen_waste_package->copy(chosen_wp_template);
+  current_waste_packages_.push_back(getComponent(chosen_wp_template->getImpl()));
+  current_waste_packages_.back()->copy(chosen_wp_template);
   // and load in the waste form
-  chosen_waste_package->load(WP, waste_form);
-  return chosen_waste_package;
+  current_waste_packages_.back()->load(WP, waste_form); // what is this?
+  return current_waste_packages_.back();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -493,8 +515,8 @@ Component* GenericRepository::loadBuffer(Component* waste_package){
   // figure out what waste form to put the waste stream in
   Component* chosen_buffer = buffers_.front();
   // and load in the waste package
-  chosen_buffer = chosen_buffer->load(BUFFER, waste_package);
-  return chosen_buffer;
+  buffers_.front()->load(BUFFER, waste_package);
+  return buffers_.front();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

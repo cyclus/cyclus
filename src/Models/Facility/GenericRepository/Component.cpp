@@ -25,20 +25,6 @@ Component::Component(): temperature_(0), inner_radius_(0), outer_radius_(0),
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Component::Component(xmlNodePtr cur)
-{
-  ID_=nextID_++;
-  
-  name_ = XMLinput->get_xpath_content(cur,"name");
-
-  string vol_type_ = XMLinput->get_xpath_content(cur,"basis");
-
-  comp_hist_ = CompHistory();
-  mass_hist_ = MassHistory();
-}
-
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component::Component(string name, Temp temp, Temp temperature_lim, Tox toxicity_lim,
     Radius inner, Radius outer, ComponentType type)  
 {
@@ -59,6 +45,12 @@ Component::Component(string name, Temp temp, Temp temperature_lim, Tox toxicity_
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Component::init(xmlNodePtr cur){
+  ID_=nextID_++;
+  
+  name_ = XMLinput->get_xpath_content(cur,"name");
+
+  comp_hist_ = CompHistory();
+  mass_hist_ = MassHistory();
   // for now, just say you've done it... 
   cout << "The Component Class init(cur) function has been called"<< endl;;
 }
@@ -88,16 +80,16 @@ void Component::print(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Component::absorb(Material* matToAdd)
-{
-  // Get the given Component's contaminant material.
-  // add the material to it with the material absorb function.
-  // each component should override this function
-  string err_msg = "Component Model : ";
-  err_msg += this->getName();
-  err_msg += " did not override absorb function.\n" ; 
-  throw GenException(err_msg);
-}
+//void Component::absorb(Material* matToAdd)
+//{
+//  // Get the given Component's contaminant material.
+//  // add the material to it with the material absorb function.
+//  // each component should override this function
+//  string err_msg = "Component Model : ";
+//  err_msg += this->getName();
+//  err_msg += " did not override absorb function.\n" ; 
+//  throw GenException(err_msg);
+//}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Component::extract(Material* matToRem)

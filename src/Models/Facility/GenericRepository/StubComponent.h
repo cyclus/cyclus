@@ -29,14 +29,14 @@ public:
   /**
    * Default constructor for the component class. Creates an empty component.
    */
-  StubComponent(){}; 
+  StubComponent(){this->impl_name_="StubComponent";}; 
 
   /**
    * primary constructor reads input from XML node
    *
    * @param cur input XML node
    */
-  StubComponent(xmlNodePtr cur){};
+  StubComponent(xmlNodePtr cur){this->impl_name_="StubComponent";};
 
   /**
    * a constructor for making a component object from c++ objects.
@@ -75,6 +75,11 @@ public:
    * standard verbose printer includes current temp and concentrations
    */
   virtual void print(); 
+
+  /**
+   * return the implementation name
+   */
+  const std::string getImpl(){return impl_name_;}; 
 
   /**
    * Absorbs the contents of the given Material into this StubComponent.

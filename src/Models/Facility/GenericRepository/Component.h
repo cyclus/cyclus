@@ -44,6 +44,11 @@ typedef std::map<Iso, Concentration> ConcMap;
 enum ComponentType {ENV, FF, NF, BUFFER, WP, WF, LAST_TYPE};
 
 /**
+ * enumerator for the component models available to the repo
+ */
+enum RepoComponent{STUB, LAST_COMPONENT}; 
+
+/**
  * Enum for type of boundary.
  */
 enum BoundaryType {INNER, OUTER};
@@ -85,14 +90,6 @@ public:
    * Default constructor for the component class. Creates an empty component.
    */
   Component(); 
-
-  /**
-   * primary constructor reads input from XML node
-   *
-   * @param cur input XML node
-   */
-  Component(xmlNodePtr cur);
-
   
   /**
    * a constructor for making a component object from a known recipe and size.
@@ -137,7 +134,7 @@ public:
    * 
    * @param matToAdd the Component to be absorbed
    */
-  virtual void absorb(Material* matToAdd) ;
+  virtual void absorb(Material* matToAdd) = 0;
 
   /**
    * Extracts the contents of the given Material from this Component. Use this 
@@ -181,6 +178,13 @@ public:
    * @return name_
    */
   const std::string getName(){return name_;};
+ 
+  /**
+   * get the component implementation name
+   *
+   * @return impl_name_
+   */
+  const virtual std::string getImpl()=0;
  
   /**
    * get the list of waste objects 
@@ -265,7 +269,11 @@ protected:
    */
   MassHistory mass_hist_;
 
-private:
+  /**
+   * The type of model implemented by this component (Stub, MixedCell, etc.) 
+   */
+  std::string impl_name_;
+
   /**
    * The immediate parent component of this component.
    */
@@ -297,7 +305,7 @@ private:
   Radius outer_radius_;
 
   /**
-   * The type of component that this component represents 
+   * The type of component that this component represents (ff, buffer, wp, etc.) 
    */
   ComponentType type_;
 

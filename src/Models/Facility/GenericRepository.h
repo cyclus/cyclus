@@ -13,11 +13,6 @@
 typedef pair<Material*, Commodity*> WasteStream;
 
 /**
- * enumerator for the component models available to the repo
- */
-enum RepoComponent{STUB, LAST_COMPONENT}; 
-
-/**
  * @brief This model seeks to provide a generic disposal system model
  * 
  * The GenericRepository class inherits from the FacilityModel class and is 
@@ -224,6 +219,17 @@ protected:
      * These will be copied and initialized before use.
      */
     deque<Component*> wf_templates_;
+
+    /**
+     * The waste package component
+     */
+    deque<Component*> current_waste_packages_;
+
+    /**
+     * The waste form components
+     */
+    deque<Component*> current_waste_forms_;
+
     /**
      * The buffer components
      */
