@@ -7,11 +7,6 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConverterModel::init(xmlNodePtr cur) {
   Model::init(cur);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConverterModel::init(map<string, void*> member_var_map) {
-  Model::init(member_var_map);
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

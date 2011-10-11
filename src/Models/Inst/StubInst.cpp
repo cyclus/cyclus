@@ -20,12 +20,6 @@ StubInst::~StubInst() {};
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::init(xmlNodePtr cur) { 
   InstModel::init(cur); 
-  this->init(member_var_map_);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::init(map<string, void*> member_var_map) { 
-  InstModel::init(member_var_map); 
 };
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

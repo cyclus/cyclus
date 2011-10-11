@@ -24,11 +24,6 @@ void StubConverter::init(xmlNodePtr cur) {
 };
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubConverter::init(map<string, void*> member_var_map) { 
-  ConverterModel::init(member_var_map);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubConverter::copy(StubConverter* src) { 
   ConverterModel::copy(src); 
 };

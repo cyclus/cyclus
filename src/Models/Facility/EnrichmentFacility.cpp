@@ -40,68 +40,30 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/EnrichmentFacility");
 
-  // all facilities require commodities 
-  Commodity* new_commod;
+  // all facilities require commodities - possibly many
   string commod_name;
-  new_commod=NULL;
+  Commodity* new_commod;
+  
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  new_commod = LI->getCommodity(commod_name);
-  if (NULL == new_commod){ 
+  in_commod_ = LI->getCommodity(commod_name);
+  if (NULL == in_commod_)
     throw GenException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
-                       + "'.");}
-  else{
-    in_commod_ = new_commod;
-    setMapVar("in_commod_",&in_commod_); 
-    //setMapVar<Commodity*>("in_commod_", &in_commod_); // should probably be called addToMap()
-  }
-
-  new_commod=NULL;
+                       + "'.");
+  
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  new_commod = LI->getCommodity(commod_name);
-  if (NULL == new_commod){
+  out_commod_ = LI->getCommodity(commod_name);
+  if (NULL == out_commod_)
     throw GenException("Output commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
-                       + "'.");}
-  else {
-    out_commod_ = new_commod;
-    setMapVar("out_commod_",&out_commod_); 
-    //setMapVar<Commodity*>("in_commod_", &out_commod_); // should probably be called addToMap()
-  }
+                       + "'.");
+
   // get inventory size
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMapVar("inventory_size_",&inventory_size_);
+  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
   // get capacity_
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMapVar("capacity_",&capacity_);
+  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity_"));
   // get default tails fraction
   default_xw_ = atof(XMLinput->get_xpath_content(cur,"tailsassay"));
-  setMapVar("default_xw_",&default_xw_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::init(map<string, void*> member_var_map)
-{ 
-  // set the member variable map across the board, just in case. 
-  member_var_map_ = member_var_map;
-
-  // send the init signal upward
-  FacilityModel::init(member_var_map);
-
-  // this takes commodity names as commodity* objects
-  // it assumes that the commodity* provided exists within the simulation.
-  in_commod_ = static_cast<Commodity*>(member_var_map["in_commod"]);
-  setMapVar("in_commod_",&in_commod_ );
-
-  out_commod_ = static_cast<Commodity*>(member_var_map["out_commod"]);
-  setMapVar("out_commod_",&out_commod_ );
-  
-  // get inventory size
-  inventory_size_ = getMapVar<double>("inventory_size_", member_var_map);
-  // get capacity_
-  capacity_ = getMapVar<double>("capacity_", member_var_map);
-  // get default tails fraction
-  default_xw_ = getMapVar<double>("default_xw_", member_var_map);
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
@@ -119,7 +81,7 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 
   in_commod_ = src->in_commod_;
   out_commod_ = src->out_commod_;
-  inventory_size_ = src->inventory_size_;
+  inventory_size = src->inventory_size;
   capacity_ = src->capacity_;
   default_xw_ = src->default_xw_;
 
@@ -148,7 +110,7 @@ void EnrichmentFacility::print()
       << "} into commodity {"
       << out_commod_->getName()
       << "}, and has an inventory that holds " 
-      << inventory_size_ << " materials"
+      << inventory_size << " materials"
       << endl;
 };
 
@@ -325,7 +287,7 @@ void EnrichmentFacility::makeRequests(){
   Mass sto = this->checkStocks(); 
   // subtract inv and sto from inventory max size to get total empty space
   // the request cannot exceed the space available
-  Mass space = inventory_size_ - inv - sto;
+  Mass space = inventory_size - inv - sto;
 
   // this will be a request for free stuff
   // until cyclus has a working notion of default pricing

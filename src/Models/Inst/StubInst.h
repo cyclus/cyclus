@@ -40,13 +40,6 @@ public:
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to initialize from a map of pointers
-   *
-   * @param member_var_map is a map from variable names to values
-   */
-  virtual void init(map<string, void*> member_var_map);
-  
-  /**
    * every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy

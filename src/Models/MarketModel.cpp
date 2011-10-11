@@ -11,7 +11,6 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::init(xmlNodePtr cur)
 {
   Model::init(cur);
@@ -27,20 +26,10 @@ void MarketModel::init(xmlNodePtr cur)
     throw GenException("Market commodity '" + commod_name 
         + "' does not exist for market '" + getName() 
         + "'.");
-    setMapVar("commodity_",&commodity_); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MarketModel::init(map<string,void*> member_var_map)
-{
-  Model::init(member_var_map);
-
-  // Specific initialization for FacilityModels
-  commodity_ = getMapVar<Commodity*>("commodity_",member_var_map);
+  
   commodity_->setMarket(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::copy(MarketModel* src) {
   Model::copy(src);
   Communicator::copy(src);
@@ -53,7 +42,6 @@ void MarketModel::copy(MarketModel* src) {
   LI->addModel(this, MARKET);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::print() { 
   Model::print(); 
 
@@ -73,7 +61,6 @@ void MarketModel::print() {
  * --------------------
  */
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::executeOrderQueue()
 {
 

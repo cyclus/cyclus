@@ -18,12 +18,6 @@ StubMarket::~StubMarket() {};
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::init(xmlNodePtr cur) { 
   MarketModel::init(cur); 
-  this->init(member_var_map_);
-};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::init(std::map<std::string, void*> member_var_map) { 
-  MarketModel::init(member_var_map); 
 };
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

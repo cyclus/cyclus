@@ -21,32 +21,30 @@ StubFacility::~StubFacility() {};
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::init(xmlNodePtr cur)
 {
-  FacilityModel::init(cur);
-  /// move XML pointer to current model
-  cur = XMLinput->get_xpath_element(cur,"model/StubFacility");
-  /// initialize any StubFacility-specific datamembers here
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::init(map<string, void*> member_var_map)
-{
-  FacilityModel::init(member_var_map);
+    FacilityModel::init(cur);
+
+    /// move XML pointer to current model
+    cur = XMLinput->get_xpath_element(cur,"model/StubFacility");
+    /// initialize any StubFacility-specific datamembers here
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::copy(StubFacility* src)
 {
-  FacilityModel::copy(src);
+    FacilityModel::copy(src);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubFacility::copyFreshModel(Model* src)
 {
-  
   copy(dynamic_cast<StubFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::print() { FacilityModel::print();
+void StubFacility::print() 
+{ 
+    FacilityModel::print();
     
 };
 
@@ -68,13 +66,11 @@ void StubFacility::receiveMessage(Message* msg) {};
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::sendMaterial(Transaction trans, const Communicator* 
-    receiver){
+void StubFacility::sendMaterial(Transaction trans, const Communicator* receiver){
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::receiveMaterial(Transaction trans, vector<Material*> 
-    manifest){
+void StubFacility::receiveMaterial(Transaction trans, vector<Material*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

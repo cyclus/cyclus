@@ -60,19 +60,17 @@ void GenericRepository::init(xmlNodePtr cur)
 
   // initialize ordinary objects
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMapVar("capacity_",&capacity_);
   lifetime_ = atof(XMLinput->get_xpath_content(cur,"lifetime"));
-  setMapVar("lifetime_",&lifetime_);
   area_ = atof(XMLinput->get_xpath_content(cur,"area"));
-  setMapVar("area_",&area_);
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMapVar("inventory_size_",&inventory_size_);
-  start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-  setMapVar("start_op_mo_",&start_op_mo_);
   start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  setMapVar("start_op_yr_",&start_op_yr_);
+  start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
 
-  // this facility requires input commodities
+  // The repository accepts any commodities designated waste.
+  // This will be a list
+  //
+
+  /// all facilities require commodities - possibly many
   string commod_name;
   Commodity* new_commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
@@ -87,8 +85,6 @@ void GenericRepository::init(xmlNodePtr cur)
                             + "'.");
     in_commods_.push_back(new_commod);
   }
-
-  setMapVar("in_commods_",&in_commods_);
 
   // get components
   // get far field
@@ -105,7 +101,6 @@ void GenericRepository::init(xmlNodePtr cur)
   ff = getComponent(model_name);
   ff->init(comp_node); // do we really want to do this now?
   far_field_=ff;
-  setMapVar("far_field_",&far_field_);
 
   // get buffer
   Component* buffer;
@@ -119,7 +114,6 @@ void GenericRepository::init(xmlNodePtr cur)
   buffer = getComponent(model_name);
   buffer->init(buff_node); // do we really want to do this now?
   buffer_templates_.push_back(buffer);
-  setMapVar("buffer_templates_",&buffer_templates_);
 
   // for each waste form
   // (these are found before wp's in order to help with wf_wp_map creation)
@@ -143,8 +137,6 @@ void GenericRepository::init(xmlNodePtr cur)
     }
     wf_templates_.push_back(wf);
   }
-  setMapVar("wf_templates_",&wf_templates_);
-  setMapVar("commod_wf_map_",&commod_wf_map_);
 
   // for each waste package
   nodes = XMLinput->get_xpath_elements(cur,"wastepackage");
@@ -174,67 +166,9 @@ void GenericRepository::init(xmlNodePtr cur)
     }
     wp_templates_.push_back(wp);
   }
-  setMapVar("wp_templates_",&wp_templates_);
-  setMapVar("wf_wp_map_",&wf_wp_map_);
-
-  this->init(member_var_map_);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void GenericRepository::init(map<string, void*> member_var_map)
-{ 
-  // set the member variable map across the board
-  member_var_map_ = member_var_map;
-
-  // send the init signal upward
-  FacilityModel::init(member_var_map);
-
-  // this facility starts out empty 
   is_full_ = false;
-  
-  // initialize ordinary objects
-  // get capacity_
-  capacity_ = getMapVar<double>("capacity_",member_var_map); 
-  // get lifetime_
-  lifetime_ = getMapVar<double>("lifetime_",member_var_map); 
-  // get area_
-  area_ = getMapVar<double>("area_",member_var_map); 
-  // get inventory_size_
-  inventory_size_ = getMapVar<double>("inventory_size_",member_var_map); 
-  // get start_op_yr_
-  start_op_yr_ = getMapVar<int>("start_op_yr_",member_var_map); 
-  // get start_op_mo_
-  start_op_mo_ = getMapVar<int>("start_op_mo_",member_var_map); 
-
-  // this takes commodity names as commodity* objects
-  // it assumes that the commodity* provided exists within the simulation.
-  in_commods_ = getMapVar< deque<Commodity*> > ("in_commods_", member_var_map);
-
-  // get env
-  //env_ = getMapVar<Component*>("env_",member_var_map); 
-  // get far_field
-  far_field_ = getMapVar<Component*>("far_field_",member_var_map); 
-  // get near_field
-  //near_field_ = getMapVar<Component*>("near_field_",member_var_map); 
-  // get buffers
-  buffer_templates_ = getMapVar< deque<Component*> > ("buffer_templates_", member_var_map);
-  // get waste packages
-  wp_templates_ = getMapVar< deque<Component*> > ("wp_templates_", member_var_map);
-  // get waste forms
-  wf_templates_ = getMapVar< deque<Component*> > ("wf_templates_", member_var_map);
-  // get wf_wp_map
-  wf_wp_map_ = getMapVar< map<Component*, Component*> > ("wf_wp_map_", member_var_map);
-  // get waste forms
-  commod_wf_map_ = getMapVar< map<Commodity*, Component*> > ("commod_wf_map_", member_var_map);
-
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
-
-  // create far field component
-  // inititalize far field component
-  // create buffer template
-  // copy template and initialize buffers
-  // create waste package templates
-  // create waste form templates
   buffers_ = deque< Component* >();
   waste_packages_ = deque< Component* >();
   waste_forms_ = deque< Component* >();

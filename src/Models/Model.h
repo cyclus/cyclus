@@ -2,10 +2,8 @@
 #if !defined(_MODEL_H)
 #define _MODEL_H
 
-#include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 #include <libxml/tree.h>
 
 class Model;
@@ -48,17 +46,6 @@ public:
    */
   static Model* create(std::string model_type, xmlNodePtr cur);
 
-  /**
-   * @brief Creates a model instance for use in the simulation
-   *
-   * @param model_type model type (region, inst, facility, ...) to add
-   * @param model_impl model implementation (NullFacility, StubMarket, ...) to add
-   * @param member_var_map keys to values 
-   *
-   */
-  static Model* create(std::string model_type, std::string model_impl,
-      std::map<std::string, void*>member_var_map);
-
   /** 
    * @brief Create a new model object based on an existing one
    *
@@ -70,9 +57,9 @@ public:
    * @brief dynamically loads a model constructor from a shared object file
    *
    * @param model_type model type (region, inst, facility, ...) to add
-   * @param model_impl model implementation (NullFacility, StubMarket, ...) to add
+   * @param model_name name of model (NullFacility, StubMarket, ...) to add
    */
-  static mdl_ctor* loadConstructor(std::string model_type,std::string model_impl);
+  static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
 
   /**
    * @brief Destroy a model cleanly
@@ -121,32 +108,6 @@ public:
    * @param cur the pointer to the xml input for the model to initialize
    */
   virtual void init(xmlNodePtr cur);
-
-  /**
-   * A method to initialize the model
-   *
-   * @param member_var_map keys to pointers 
-   */
-  virtual void init(std::map<std::string, void*> member_var_map);
-
-  /**
-   * A method to set variables from functions referenced by the map
-   *
-   * @param var_name is the name of the variable (model_type_, model_impl_ ...)
-   * @param var_value is the pointer to a function returning the 
-   * value of the variable (Facility, RecipeReactor ...)
-   */
-   void setMapVar(std::string var_name, void* var_value) { 
-     member_var_map_[var_name] = var_value; };
-
-  /**
-   * A method to get variables from functions referenced by the map
-   *
-   * @param var_name is the name of the variable (model_type_, model_impl_ ...)
-   */
-  template <class MemVarType>
-  MemVarType getMapVar(std::string var_name, std::map<std::string, void*> var_map){
-    return *(static_cast<MemVarType*>(var_map[var_name]));};
 
   /**
    * A method to copy a model
@@ -220,10 +181,6 @@ public:
    * every model should be able to print a verbose description
    */
   virtual void print();
-
-protected:
-  /// Stores the member variable map
-  std::map<std::string, void*>member_var_map_;
 
 private:
   /// Stores the next available facility ID

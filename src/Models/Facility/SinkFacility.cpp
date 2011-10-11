@@ -49,44 +49,15 @@ void SinkFacility::init(xmlNodePtr cur)
 			    + "'.");
     in_commods_.push_back(new_commod);
   }
-  setMapVar("in_commods_",&in_commods_); 
 
   // get monthly capacity
   capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  setMapVar("capacity_",&capacity_); 
 
   // get inventory_size_
   inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  setMapVar("inventory_size_",&inventory_size_); 
 
   // get commodity price
   commod_price_ = atof(XMLinput->get_xpath_content(cur,"commodprice"));
-  setMapVar("commod_price_",&commod_price_); 
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::init(map<string, void*> member_var_map)
-{
-  // set the member variable map across the board, just in case. 
-  member_var_map_ = member_var_map;
-
-  // send the init signal upward
-  FacilityModel::init(member_var_map);
-
-  // this takes commodities as commodity* objects
-  // it assumes that the commodity* provided exists within the simulation.
-  in_commods_ = getMapVar<vector< Commodity*> >("in_commods_", member_var_map);
-  setMapVar("in_commod_",&in_commods_ );
-  
-  // get inventory size
-  inventory_size_ = getMapVar<double>("inventory_size_", member_var_map);
-  setMapVar("inventory_size_",&inventory_size_ );
-  // get capacity_
-  capacity_ = getMapVar<double>("capacity_", member_var_map);
-  setMapVar("capacity_",&capacity_ );
-  // get commod price
-  commod_price_ = getMapVar<double>("commod_price_", member_var_map);
-  setMapVar("commod_price_",&commod_price_ );
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

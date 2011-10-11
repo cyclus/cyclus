@@ -39,13 +39,6 @@ public:
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to initialize from XML
-   *
-   * @param cur is the pointer to the model's xml node 
-   */
-  virtual void init(map<string, void*> member_var_map);
-  
-  /**
    * every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy

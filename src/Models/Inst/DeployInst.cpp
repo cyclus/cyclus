@@ -48,17 +48,7 @@ void DeployInst::init(xmlNodePtr cur)
     }
     deployment_map_[start_month] = facility;
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void DeployInst::init(map<string, void*> member_var_map)
-{
-  member_var_map_ = member_var_map;
-  InstModel::init(member_var_map);
-
-  /// get deployments
-  deployment_map_ = getMapVar< map< int, Model* > >("deployment_map_", member_var_map);
-  to_build_map_ = deployment_map_; 
+  to_build_map_ = deployment_map_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

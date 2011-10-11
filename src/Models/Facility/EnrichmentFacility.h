@@ -36,9 +36,6 @@ public:
   /// initialize an object from XML input
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object from a map of pointerss
-  virtual void init(map<string, void*> member_var_map);
-
   /// initialize an object by copying another
   virtual void copy(EnrichmentFacility* src);
   /**
@@ -257,12 +254,26 @@ protected:
     multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
 
     /**
+     * The time that the stock material spends in the facility.
+     */
+    int residence_time;
+
+    /**
      * The maximum size that the inventory can grow to.
      * The EnrichmentFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    int inventory_size_;
+    int inventory_size;
 
+    /**
+     * The receipe of input materials.
+     */
+    Material* in_recipe;
+
+    /**
+     * The receipe of the output material.
+     */
+    Material* out_recipe;
 
 /* ------------------- */ 
 

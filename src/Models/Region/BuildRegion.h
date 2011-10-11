@@ -52,9 +52,6 @@ class BuildRegion : public RegionModel
     /// initialize an object from XML input
     virtual void init(xmlNodePtr cur);
 
-    /// initialize an object from a map of pointers
-    virtual void init(map<string, void*>member_var_map);
-
     /// initialize an object by copying another
     virtual void copy(BuildRegion* src) { RegionModel::copy(src); } ;
 
@@ -94,7 +91,7 @@ class BuildRegion : public RegionModel
 /* -------------------- */
 
 /* --------------------
- * the BuildRegion class has these members
+ * the BuildRegion class have these members
  * --------------------
  */
 
@@ -106,6 +103,7 @@ class BuildRegion : public RegionModel
     int nFacs_;
     Model* chooseInstToBuildFac();
     map <string, queue <pair <int,int> > > to_build_map_;
+    map <string, queue <pair <int,int> > > have_built_map_;
   
 /* ------------------- */ 
 

@@ -40,9 +40,6 @@ public:
   
   // every model needs a method to initialize from XML
   virtual void init(xmlNodePtr cur);
-
-  // every model needs a method to initialize from a pointer map
-  virtual void init(map<string, void*> member_var_map);
   
   // every model needs a method to copy one object to another
   virtual void copy(FacilityModel* src);

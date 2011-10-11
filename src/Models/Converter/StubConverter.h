@@ -38,9 +38,6 @@ public:
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
-
-  /// initialize an object from a map of pointers
-  virtual void init(map<string, void*> member_var_map);
   
   /**
    * every model needs a method to copy one object to another
