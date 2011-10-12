@@ -250,7 +250,7 @@ protected:
     /**
      * Each waste form associated with a waste package.
      */
-    map<Component*, Component*> wf_wp_map_;
+    map<string, Component*> wf_wp_map_;
 
     /**
      * get the total mass of the stuff in the inventory
@@ -297,10 +297,9 @@ protected:
     Component* loadBuffer(Component* waste_package) ;
 
     /**
-     * Initialize a component from the xml pointer and a string naming the node
+     * Initializes the name and model type of the component
      *
      * @param cur the current xml pointer
-     * @param component the name of the node of interest
      *
      * @return the initialized component
      */

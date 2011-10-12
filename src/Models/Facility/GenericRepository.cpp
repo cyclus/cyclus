@@ -120,6 +120,7 @@ void GenericRepository::init(xmlNodePtr cur)
   {
     xmlNodePtr wp_node = nodes->nodeTab[i];
     Component* wp = initComponent(wp_node); 
+    wp_templates_.push_back(wp);
     // // get allowed waste forms
     xmlNodeSetPtr allowed_wf_nodes = XMLinput->get_xpath_elements(wp_node,"allowedwf");
     for (int i=0;i<allowed_wf_nodes->nodeNr;i++) {
@@ -129,13 +130,11 @@ void GenericRepository::init(xmlNodePtr cur)
       for (deque< Component* >::iterator iter = wf_templates_.begin(); 
            iter != wf_templates_.end(); 
            iter ++){
-        //if wf_template_.getName() = allowed_wf_name
         if ((*iter)->getName() == allowed_wf_name){
-          wf_wp_map_.insert(make_pair((*iter), wp));
+          wf_wp_map_.insert(make_pair(allowed_wf_name, wp_templates_.back()));
         }
       }
     }
-    wp_templates_.push_back(wp);
   }
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
@@ -318,13 +317,11 @@ void GenericRepository::emplaceWaste(){
     for (deque< WasteStream >::iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
-      while( !is_full_ ){
-        // start by packing the commod in a waste form
-        // -- what waste form does this type of waste go into?
-        // -- what density?
-        // -- associate the waste stream with the waste form
-        conditionWaste((*iter));
-      }
+       // start by packing the commod in a waste form
+       // -- what waste form does this type of waste go into?
+       // -- what density?
+       // -- associate the waste stream with the waste form
+       conditionWaste((*iter));
     }
     for (deque< Component* >::iterator iter = current_waste_forms_.begin(); 
         iter != current_waste_forms_.end(); 
@@ -364,13 +361,13 @@ void GenericRepository::emplaceWaste(){
           // take the waste package out of the current packagess
           waste_packages_.push_back(current_waste_packages_.front());
           current_waste_packages_.pop_front();
-          inventory_.push_back(stocks_.front());
-          stocks_.pop_front();
         }
         // if the waste package was either too hot or not full
         // push it back on the stack
         current_waste_packages_.push_back(current_waste_packages_.front());
         current_waste_packages_.pop_front();
+        inventory_.push_back(stocks_.front());
+        stocks_.pop_front();
         // once the waste is emplaced, is there anything else to do?
       }
     }
@@ -385,7 +382,7 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   if(chosen_wf_template == NULL){
     string err_msg = "The commodity '";
     err_msg += (waste_stream.second)->getName();
-    err_msg +="' does not have a matching waste form in the GenericRepsitory.";
+    err_msg +="' does not have a matching waste form in the GenericRepository.";
     throw GenException(err_msg);
   }
   // if there doesn't already exist a partially full one
@@ -402,11 +399,12 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
 Component* GenericRepository::packageWaste(Component* waste_form){
   // figure out what waste package to put the waste form in
   Component* chosen_wp_template = NULL;
-  chosen_wp_template = wf_wp_map_[waste_form];
+  string name = waste_form->getName();
+  chosen_wp_template = wf_wp_map_[name];
   if(chosen_wp_template == NULL){
     string err_msg = "The waste form '";
     err_msg += (waste_form)->getName();
-    err_msg +="' does not have a matching waste package in the GenericRepsitory.";
+    err_msg +="' does not have a matching waste package in the GenericRepository.";
     throw GenException(err_msg);
   }
   // if there doesn't already exist a partially full one
