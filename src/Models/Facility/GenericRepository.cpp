@@ -68,7 +68,6 @@ void GenericRepository::init(xmlNodePtr cur)
 
   // The repository accepts any commodities designated waste.
   // This will be a list
-  //
 
   /// all facilities require commodities - possibly many
   string commod_name;
@@ -86,34 +85,18 @@ void GenericRepository::init(xmlNodePtr cur)
     in_commods_.push_back(new_commod);
   }
 
+
   // get components
   // get far field
-  Component* ff;
-  ff = NULL;
-  nodes = XMLinput->get_xpath_elements(cur,"farfield");
-  xmlNodePtr comp_node = nodes->nodeTab[0]; // this may need to be 1
-  string comp_name;
-  string model_name;
-  // // get name
-  comp_name = XMLinput->get_xpath_content(comp_node,"name");
-  // // get model
-  model_name = XMLinput->get_xpath_name(comp_node,"model/*");
-  ff = getComponent(model_name);
-  ff->init(comp_node); // do we really want to do this now?
-  far_field_=ff;
+  Component* new_comp;
+  nodes = XMLinput->get_xpath_elements(cur, "farfield");
+  xmlNodePtr comp_node = nodes->nodeTab[0];
+  far_field_ = initComponent(comp_node);
 
   // get buffer
-  Component* buffer;
-  buffer = NULL;
-  nodes = XMLinput->get_xpath_elements(cur,"buffer");
-  xmlNodePtr buff_node = nodes->nodeTab[0]; // this may need to be 1
-  // // get name
-  comp_name = XMLinput->get_xpath_content(buff_node,"name");
-  // // get model
-  model_name = XMLinput->get_xpath_name(buff_node,"model/*");
-  buffer = getComponent(model_name);
-  buffer->init(buff_node); // do we really want to do this now?
-  buffer_templates_.push_back(buffer);
+  nodes = XMLinput->get_xpath_elements(cur, "buffer");
+  comp_node = nodes->nodeTab[0];
+  buffer_templates_.push_back(initComponent(comp_node));
 
   // for each waste form
   // (these are found before wp's in order to help with wf_wp_map creation)
@@ -121,14 +104,7 @@ void GenericRepository::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++)
   {
     xmlNodePtr wf_node = nodes->nodeTab[i];
-    string comp_name;
-    string model_name;
-    // // get name
-    comp_name = XMLinput->get_xpath_content(wf_node,"name");
-    // // get model
-    model_name = XMLinput->get_xpath_name(wf_node,"model/*");
-    Component* wf = getComponent(model_name);
-    wf->init(wf_node); // do we really want to do this now?
+    Component* wf = initComponent(wf_node);
     // // get allowed waste commodities
     xmlNodeSetPtr allowed_commod_nodes = XMLinput->get_xpath_elements(wf_node,"allowedcommod");
     for (int i=0;i<allowed_commod_nodes->nodeNr;i++) {
@@ -143,12 +119,7 @@ void GenericRepository::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++)
   {
     xmlNodePtr wp_node = nodes->nodeTab[i];
-    // // get name
-    comp_name = XMLinput->get_xpath_content(wp_node,"name");
-    // // get model
-    model_name = XMLinput->get_xpath_name(wp_node,"model/*");
-    Component* wp = getComponent(model_name);
-    wp->init(wp_node); // do we really want to do this now?
+    Component* wp = initComponent(wp_node); 
     // // get allowed waste forms
     xmlNodeSetPtr allowed_wf_nodes = XMLinput->get_xpath_elements(wp_node,"allowedwf");
     for (int i=0;i<allowed_wf_nodes->nodeNr;i++) {
@@ -166,13 +137,21 @@ void GenericRepository::init(xmlNodePtr cur)
     }
     wp_templates_.push_back(wp);
   }
-  is_full_ = false;
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
   buffers_ = deque< Component* >();
   waste_packages_ = deque< Component* >();
   waste_forms_ = deque< Component* >();
   is_full_ = false;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Component* GenericRepository::initComponent(xmlNodePtr cur){
+  string comp_name = XMLinput->get_xpath_content(cur,"name");
+  string model_name = XMLinput->get_xpath_name(cur,"model/*");
+  Component* toRet = getComponent(model_name);
+  toRet->init(cur);
+  return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

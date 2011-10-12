@@ -297,6 +297,16 @@ protected:
     Component* loadBuffer(Component* waste_package) ;
 
     /**
+     * Initialize a component from the xml pointer and a string naming the node
+     *
+     * @param cur the current xml pointer
+     * @param component the name of the node of interest
+     *
+     * @return the initialized component
+     */
+    static Component* initComponent(xmlNodePtr cur) ;
+
+    /**
      * Do heat transport calculations
      */
     static void transportHeat() ;
