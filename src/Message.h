@@ -89,19 +89,26 @@ class Message {
     Communicator* sender_;
 
     /**
+     * The Communicator who will receive this Message.
+     */
+    Communicator* recipient_;
+
+    /**
      * Pointers to each model this message passes through.
      */
     std::vector<Communicator*> path_stack_;
 
     /**
+     * @brief the most recent communicator to receive this message.
+     *
+     * Used to prevent circular messaging.
+     */
+    Communicator* current_owner_;
+
+    /**
      * Pointers to each model this message passes through.
      */
     bool new_dest_set_;
-
-    /**
-     * The Communicator who will receive this Message.
-     */
-    Communicator* recipient_;
 
   public:
     /**
@@ -179,8 +186,10 @@ class Message {
      *
      * @exception GenException attempted to send message with direction
      *            DOWN_MSG with no designated receiver (message has already
-     *            arrived at its source).
+     *            arrived at its source)
      *
+     * @exception GenException attempted to send a message to the message
+     *            sender (circular messaging)
      */
     void sendOn();
 

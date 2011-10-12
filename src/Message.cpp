@@ -150,9 +150,17 @@ void Message::sendOn() {
   }
 
   Communicator* next_stop = path_stack_.back();
+
+  if (next_stop == current_owner_ || next_stop == sender_) {
+    string err_msg = "Message receiver and sender are the same.";
+    throw GenException(err_msg);
+  }
+
+  current_owner_ = next_stop;
   next_stop->receiveMessage(this);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
     path_stack_.push_back(next_stop);
@@ -160,6 +168,7 @@ void Message::setNextDest(Communicator* next_stop) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getMarket() {
   return dynamic_cast<Communicator*>(trans_.commod->getMarket());
 }

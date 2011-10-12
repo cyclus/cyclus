@@ -213,7 +213,6 @@ void NullFacility::handleTick(int time)
     // pass the message up to the inst
     request->setNextDest(getFacInst());
     request->sendOn();
-
   }
   
   // MAKE OFFERS
