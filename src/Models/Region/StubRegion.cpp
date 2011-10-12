@@ -38,8 +38,6 @@ void StubRegion::print() {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::sendMessage() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::receiveMessage(Message* msg) {};

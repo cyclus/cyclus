@@ -265,33 +265,29 @@ void GenericRepository::handleTick(int time)
   
     if (space == 0){
       // don't request anything
-    }
-    else if (space <= capacity_){
+    } else {
+      if (space <= capacity_){
+        // if empty space is less than monthly acceptance capacity
+        requestAmt = space;
+
+      // otherwise
+      } else if (space >= capacity_){
+        // the upper bound is the monthly acceptance capacity
+        requestAmt = capacity_;
+      }
+
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
-      // if empty space is less than monthly acceptance capacity
-      requestAmt = space;
-      // recall that requests have a negative amount
-      Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt,
-                                       commod_price, this, recipient);
-        // pass the message up to the inst
-        (request->getInst())->receiveMessage(request);
-    }
-    // otherwise
-    else if (space >= capacity_){
-      Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
-      // the upper bound is the monthly acceptance capacity
-      requestAmt = capacity_;
       // recall that requests have a negative amount
       Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, commod_price,
           this, recipient); 
       // send it
-      sendMessage(request);
-    };
-  };
+      request->setNextDest(getFacInst());
+      request->sendOn();
+    }
+  }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void GenericRepository::handleTock(int time)
-{
+void GenericRepository::handleTock(int time) {
 
   // emplace the waste that's ready
   emplaceWaste();

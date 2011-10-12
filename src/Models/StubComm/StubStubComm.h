@@ -56,10 +56,6 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The StubStubComm should never generate any messages
-    */
-    virtual void sendMessage();
 
     /**
      * The StubStubComm should ignore incoming messages

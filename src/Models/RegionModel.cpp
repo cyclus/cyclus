@@ -17,7 +17,6 @@ using namespace std;
   /// Default constructor for RegionModel Class
   RegionModel::RegionModel() {
     setModelType("Region");
-    commType_=REGION_COMM; 
 
     // register to receive time-step notifications
     TI->registerAgent(this);
@@ -95,19 +94,8 @@ void RegionModel::print() {
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::receiveMessage(Message* msg){
-  // Default regions aren't insterested in fooling with messages.
-  // Just pass them along. 
-  // If it's going up, send it to the market.
-  // If it's going down, send it to the inst.
-  MessageDir dir = msg->getDir();
-  if (dir == UP_MSG){
-    Communicator* nextRecipient = msg->getMkt();
-    nextRecipient->receiveMessage(msg);
-  }
-  else if (dir == DOWN_MSG){
-    Communicator* nextRecipient = msg->getInst();
-    nextRecipient->receiveMessage(msg);
-  }
+  msg->setNextDest(msg->getMarket());
+  msg->sendOn();
 }
 
 void RegionModel::handlePreHistory(){

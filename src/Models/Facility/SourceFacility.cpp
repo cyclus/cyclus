@@ -3,16 +3,12 @@
 #include <iostream>
 
 #include "SourceFacility.h"
-
 #include "Logician.h"
 #include "GenException.h"
 #include "InputXML.h"
 
-
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::SourceFacility(){
-}
+SourceFacility::SourceFacility(){ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::~SourceFacility(){
@@ -182,7 +178,8 @@ void SourceFacility::handleTick(int time){
       this, recipient);
 
   // send it
-  sendMessage(msg);
+  msg->setNextDest(getFacInst());
+  msg->sendOn();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

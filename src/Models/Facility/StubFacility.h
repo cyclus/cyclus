@@ -67,11 +67,6 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The StubFacility should never generate any messages
-    */
-    virtual void sendMessage();
-
     /**
      * The StubFacility should ignore incoming messages
      */

@@ -121,7 +121,9 @@ void SinkFacility::handleTick(int time){
       Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, 
                                      commod_price_, this, recipient);
       // pass the message up to the inst
-      (request->getInst())->receiveMessage(request);
+      request->setNextDest(getFacInst());
+      request->sendOn();
+
       cout << "During handleTick, " << getFacName() << " requests: "<< requestAmt << "."  << endl;
     }
   }
@@ -137,7 +139,9 @@ void SinkFacility::handleTick(int time){
       Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price_,
                           this, recipient); 
     // pass the message up to the inst
-    (request->getInst())->receiveMessage(request);
+    request->setNextDest(getFacInst());
+    request->sendOn();
+
     cout << "During handleTick, " << getFacName() << " requests: " << requestAmt << "."  << endl;
     }
   }

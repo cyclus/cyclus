@@ -39,8 +39,6 @@ void StubMarket::print() {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::sendMessage() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::receiveMessage(Message* msg) {};

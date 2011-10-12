@@ -10,7 +10,6 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
   setModelType("StubComm");
-  commType_ = STUB_COMM;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

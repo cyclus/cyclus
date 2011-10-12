@@ -68,10 +68,6 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The StubInst should never generate any messages
-    */
-    virtual void sendMessage();
 
     /**
      * The StubInst should ignore incoming messages

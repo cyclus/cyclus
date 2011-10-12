@@ -30,7 +30,6 @@ public:
   /// Default constructor for the MarketModel Class
   MarketModel() {
     setModelType("Market");
-    commType_=MARKET_COMM;
   };
   
   /// MarketModels should not be indestructible.

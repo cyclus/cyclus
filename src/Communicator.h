@@ -29,22 +29,9 @@ public:
    */
   virtual ~Communicator();
 
-  /// Get the type of this communicator
-  CommunicatorType getCommType() { return commType_; };
+  friend class Message;
 
-  /**
-   *  @brief Default (trivial) sender is implemented
-   *
-   *  Generates a new, empty message and sends it up/down the chain.
-   */
-  virtual void sendMessage();
-
-  /**
-   * @brief Sends a message where it needs to go.
-   *
-   * @param msg the message to send
-   */
-  virtual void sendMessage(Message* msg);
+protected:
 
   /**
    *  @brief Default (trivial) receiver is implemented to ignore messages
@@ -56,10 +43,7 @@ public:
 protected:
 
   /// Copy the base class data members from one object to another
-  virtual void copy(Communicator* src) { commType_ = src->commType_; };
-
-  /// All communicators need to know what type they are
-  CommunicatorType commType_;
+  virtual void copy(Communicator* src) { };
 
 };
 #endif

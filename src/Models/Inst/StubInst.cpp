@@ -42,8 +42,6 @@ void StubInst::print() {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::sendMessage() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::receiveMessage(Message* msg) {};

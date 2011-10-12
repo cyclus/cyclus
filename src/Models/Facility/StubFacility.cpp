@@ -53,8 +53,6 @@ void StubFacility::print()
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::sendMessage() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::receiveMessage(Message* msg) {};

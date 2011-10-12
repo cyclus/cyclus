@@ -66,15 +66,8 @@ void InstModel::receiveMessage(Message* msg){
   // Just pass them along. 
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
-  MessageDir dir = msg->getDir();
-  if (dir == UP_MSG){
-    Communicator* nextRecipient = msg->getReg();
-    nextRecipient->receiveMessage(msg);
-  }
-  else if (dir == DOWN_MSG){
-    Communicator* nextRecipient = msg->getFac();
-    nextRecipient->receiveMessage(msg);
-  }
+  msg->setNextDest(getRegion());
+  msg->sendOn();
 }
 
 void InstModel::handlePreHistory(){

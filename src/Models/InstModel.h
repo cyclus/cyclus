@@ -24,7 +24,6 @@ public:
   /// Default constructor for InstModel Class
   InstModel() {
     setModelType("Inst");
-    commType_=INST_COMM;
   };
 
   /// every model should be destructable

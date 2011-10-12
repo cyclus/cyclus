@@ -67,10 +67,6 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The StubRegion should never generate any messages
-    */
-    virtual void sendMessage();
 
     /**
      * The StubRegion should ignore incoming messages

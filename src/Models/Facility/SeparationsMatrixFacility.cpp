@@ -373,8 +373,10 @@ void SeparationsMatrixFacility::makeRequests(){
       // recall that requests have a negative amount
       Message* request = new Message(UP_MSG, (*iter), -requestAmt, minAmt, 
                                        commod_price, this, recipient);
-        // pass the message up to the inst
-        (request->getInst())->receiveMessage(request);
+
+      // pass the message up to the inst
+      request->setNextDest(getFacInst());
+      request->sendOn();
     }
     // otherwise, the upper bound is the monthly acceptance capacity 
     // minus the amount in stocks.
@@ -386,7 +388,8 @@ void SeparationsMatrixFacility::makeRequests(){
       Message* request = new Message(UP_MSG, (*iter), -requestAmt, minAmt, commod_price,
                                      this, recipient); 
       // pass the message up to the inst
-      (request->getInst())->receiveMessage(request);
+      request->setNextDest(getFacInst());
+      request->sendOn();
     }
 
   } // <- for loop
@@ -420,7 +423,8 @@ void SeparationsMatrixFacility::makeOffers()
         this, recipient);
 
     // send it
-    sendMessage(msg);
+    msg->setNextDest(getFacInst());
+    msg->sendOn();
   }
 
 }

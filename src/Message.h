@@ -6,6 +6,7 @@
 
 #include "Commodity.h"
 #include "Material.h"
+#include <vector>
 
 class Communicator;
 
@@ -88,29 +89,19 @@ class Message {
     Communicator* sender_;
 
     /**
+     * Pointers to each model this message passes through.
+     */
+    std::vector<Communicator*> path_stack_;
+
+    /**
+     * Pointers to each model this message passes through.
+     */
+    bool new_dest_set_;
+
+    /**
      * The Communicator who will receive this Message.
      */
     Communicator* recipient_;
-
-    /**
-     * The Market this message will pass to or from.
-     */
-    Communicator* mkt_;
-
-    /**
-     * The region this messgae will pas through.
-     */
-    Communicator* reg_;
-
-    /**
-     * The region this messgae will pas through.
-     */
-    Communicator* inst_;
-
-    /**
-     * The region this messgae will pas through.
-     */
-    Communicator* fac_;
 
   public:
     /**
@@ -174,6 +165,40 @@ class Message {
     Message(MessageDir dir, Commodity* commod, 
         double amount, double minAmt, double price, Communicator* toSend, 
         Communicator* toReceive);
+
+    /**
+     * @brief Send this message to the next communicator in it's path
+     *
+     * Messages heading up (UP_MSG) are forwareded to the communicator
+     * designated by the setNextDest(Communicator*) function. Messages
+     * heading down (DOWN_MSG) are sent successively to each communicator
+     * in reverse order of their 'upward' sequence.
+     *
+     * @exception GenException setNextDest was not called in between
+     *            calls to this function for message direction UP_MSG
+     *
+     * @exception GenException attempted to send message with direction
+     *            DOWN_MSG with no designated receiver (message has already
+     *            arrived at its source).
+     *
+     */
+    void sendOn();
+
+    /**
+     * @brief designate the next object to receive this message
+     *
+     * @param next_stop the next communicator to receive this message
+     *
+     */
+    void setNextDest(Communicator* next_stop);
+
+    /**
+     * @brief Get the market corresponding to the transaction commodity
+     *
+     * @return market corresponding to this msg's transaction's commodity
+     *
+     */
+    Communicator* getMarket();
 
     /**
      * A copy "constructor" for this class.
@@ -252,34 +277,6 @@ class Message {
     double getAmount() const;
 
     /**
-     * Returns the facility this message is passing to or from
-     *
-     * @return fac
-     */
-    Communicator* getFac() const;
-
-    /**
-     * Returns the institution this message is passing through
-     *
-     * @return inst
-     */
-    Communicator* getInst() const;
-
-    /**
-     * Returns the region this message is passing through
-     *
-     * @return reg
-     */
-    Communicator* getReg() const;
-
-    /**
-     * Returns the facility this message is passing to or from
-     *
-     * @return mkt
-     */
-    Communicator* getMkt() const;
-    
-    /**
      * Sets the direction of the message
      *
      * @param newDir is the new direction
@@ -337,20 +334,6 @@ class Message {
      * to an appropriate handler.
      */
     void reverseDirection();
-
-    /**
-     * @brief Set the message path using a direction, sender and recipient.
-     * @todo make this a private method (rcarlsen)
-     *
-     */
-    void setPath();
-
-    /**
-     * @brief unenumerates the message direction.
-     * 
-     * @return the string associated with myDir
-     */
-    std::string unEnumerateDir();
 
     /**
      * Executes the transaction involved in the message.

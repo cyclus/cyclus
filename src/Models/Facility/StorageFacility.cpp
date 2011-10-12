@@ -286,8 +286,10 @@ void StorageFacility::handleTick(int time)
     // recall that requests have a negative amount
     Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
-      // pass the message up to the inst
-      (request->getInst())->receiveMessage(request);
+    // pass the message up to the inst
+    request->setNextDest(getFacInst());
+    request->sendOn();
+
   }
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
@@ -299,7 +301,8 @@ void StorageFacility::handleTick(int time)
     Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, commod_price,
                                    this, recipient); 
     // pass the message up to the inst
-    (request->getInst())->receiveMessage(request);
+    request->setNextDest(getFacInst());
+    request->sendOn();
   }
   
   // MAKE OFFERS
@@ -326,7 +329,8 @@ void StorageFacility::handleTick(int time)
       this, recipient);
 
   // send it
-  sendMessage(msg);
+  msg.setNextDest(getFacInst());
+  msg.sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::handleTock(int time)

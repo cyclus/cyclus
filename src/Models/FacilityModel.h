@@ -32,7 +32,6 @@ public:
   /// Default constructor for FacilityModel Class
   FacilityModel() {
     setModelType("Facility");
-    commType_ = FACILITY_COMM;
   };
 
   /// every model should be destructable

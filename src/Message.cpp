@@ -30,10 +30,6 @@ Message::Message(MessageDir thisDir, Communicator* toSend) {
   trans_.min = 0;
   trans_.price = 0;
 
-  mkt_ = NULL;
-  reg_ = NULL;
-  inst_ = NULL;
-  fac_ = NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,9 +39,7 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
   trans_ = thisTrans;
   sender_ = toSend;
   recipient_ = toReceive;
-  Model* mktModel = trans_.commod->getMarket();
-  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
-  setPath();
+  new_dest_set_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,10 +51,9 @@ Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,    
   trans_.min = minAmt;
   trans_.price = thisPrice;
   trans_.comp = thisComp;
-  Model* mktModel = trans_.commod->getMarket();
-  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
+  new_dest_set_ = false;
   this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   this->setRequesterID((dynamic_cast<FacilityModel*>(recipient_))->getSN());
 }
@@ -75,11 +68,9 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   trans_.min = minAmt;
   trans_.price = thisPrice;
   trans_.comp = thisComp;
-  Model* mktModel = trans_.commod->getMarket();
-  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
-  setPath();
+  new_dest_set_ = false;
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -106,13 +97,11 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   trans_.price = thisPrice;
 
   CompMap thisComp;
-  thisComp.insert(make_pair(NULL,NULL));
+  thisComp.insert(make_pair(NULL, NULL));
 
-  Model* mktModel = trans_.commod->getMarket();
-  mkt_ = (dynamic_cast<MarketModel*>(mktModel));
   sender_ = toSend;
   recipient_ = toReceive;
-  setPath();
+  new_dest_set_ = false;
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -137,10 +126,42 @@ void Message::printTrans() {
     "    Price: "  << trans_.price << std::endl;
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message* Message::clone() const
-{
+Message* Message::clone() const {
 	return new Message(dir_, trans_.commod, trans_.amount, trans_.min, 
                        trans_.price, sender_, recipient_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::sendOn() {
+  if (dir_ == UP_MSG) {
+    if (! new_dest_set_) {
+      string err_msg = "Must add new destination before sending message.";
+      throw GenException(err_msg);
+    }
+    new_dest_set_ = false;
+
+  } else if (dir_ == DOWN_MSG) {
+    if (path_stack_.size() < 1) {
+      string err_msg = "Can't send the message any further.";
+      throw GenException(err_msg);
+    }
+
+    path_stack_.pop_back();
+  }
+
+  Communicator* next_stop = path_stack_.back();
+  next_stop->receiveMessage(this);
+}
+
+void Message::setNextDest(Communicator* next_stop) {
+  if (dir_ == UP_MSG) {
+    path_stack_.push_back(next_stop);
+    new_dest_set_ = true;
+  }
+}
+
+Communicator* Message::getMarket() {
+  return dynamic_cast<Communicator*>(trans_.commod->getMarket());
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getSender() const {
@@ -177,22 +198,6 @@ void Message::setCommod(Commodity* newCommod) {
 //- - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getAmount() const {
   return trans_.amount;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getFac() const {
-  return fac_;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getInst() const {
-  return inst_;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getReg() const {
-  return reg_;
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getMkt() const {
-  return mkt_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setDir(MessageDir newDir) {
@@ -235,73 +240,10 @@ void Message::reverseDirection() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPath() {
-  if(dir_== UP_MSG) {
-    switch (sender_->getCommType()) {
-      case FACILITY_COMM:
-        fac_ = sender_; 
-        inst_ = (dynamic_cast<FacilityModel*>(fac_))->getFacInst();
-        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
-        break;
-      case INST_COMM:
-        fac_ = NULL;
-        inst_ = sender_;
-        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
-        break;
-      case REGION_COMM:
-        reg_ = sender_;
-        break;
-      case MARKET_COMM:
-        throw GenException("A Market can't send a message *up* to anyone.");
-      break;
-    }
-  } else if(dir_== DOWN_MSG) {
-    switch (recipient_->getCommType()) {
-      case FACILITY_COMM:
-        fac_ = recipient_;
-        inst_ = (dynamic_cast<FacilityModel*>(fac_))->getFacInst();
-        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
-        break;
-      case INST_COMM:
-        fac_ = NULL;
-        inst_ = sender_;
-        reg_ = (dynamic_cast<InstModel*>(inst_))->getRegion();
-        break;
-      case REGION_COMM:
-        reg_ = recipient_;
-        break;
-      case MARKET_COMM:
-        throw GenException("No one can send a message *down* to a market.");
-      break;
-    }
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Message::unEnumerateDir() {
-  string toRet;
-  if (UP_MSG == dir_) {
-    toRet = "up";
-  } else if (DOWN_MSG == dir_) {
-    toRet = "down";
-  } else {
-    throw GenException("Attempted to send a message neither up nor down.");
-  }
-
-  return toRet;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute() {
   FacilityModel* theFac;
   theFac = (dynamic_cast<FacilityModel*>(LI->getModelByID(trans_.supplierID, FACILITY)));
-  CommunicatorType type;
-  type = (dynamic_cast<Communicator*>(theFac))->getCommType();
 
-  if (type == FACILITY_COMM) {
-    (theFac)->receiveMessage(this);
-  } else {
-    throw GenException("Only FacilityModels can send material.");
-  }
+  (theFac)->receiveMessage(this);
 } 
 

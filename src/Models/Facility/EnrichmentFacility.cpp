@@ -301,27 +301,25 @@ void EnrichmentFacility::makeRequests(){
   if (space == 0){
     // don't request anything
   }
-  else if (space < capacity_){
-    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
+  else {
     // if empty space is less than monthly acceptance capacity_
-    requestAmt = space;
+    if (space < capacity_){
+      requestAmt = space;
+
+    // otherwise, the upper bound is the monthly acceptance capacity_ 
+    // minus the amount in stocks.
+    } else if (space >= capacity_){
+      requestAmt = capacity_ - sto;
+    }
+
+    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
     // recall that requests have a negative amount
     Message* request = new Message(UP_MSG, in_commod_, -requestAmt, minAmt, 
                                      commod_price, this, recipient);
-      // pass the message up to the inst
-      (request->getInst())->receiveMessage(request);
-  }
-  // otherwise, the upper bound is the monthly acceptance capacity_ 
-  // minus the amount in stocks.
-  else if (space >= capacity_){
-    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
-    // if empty space is more than monthly acceptance capacity_
-    requestAmt = capacity_ - sto;
-    // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, in_commod_, -requestAmt, minAmt, commod_price,
-                                   this, recipient); 
+
     // pass the message up to the inst
-    (request->getInst())->receiveMessage(request);
+    request->setNextDest(getFacInst());
+    request->sendOn();
   }
 }
 
@@ -352,7 +350,8 @@ void EnrichmentFacility::makeOffers()
       this, recipient);
 
   // send it
-  sendMessage(msg);
+  msg->setNextDest(getFacInst());
+  msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentFacility::enrich()

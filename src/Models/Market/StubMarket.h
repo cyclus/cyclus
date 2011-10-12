@@ -67,10 +67,6 @@ public:
  * --------------------
  */
 public:
-   /**
-    * The StubMarket should never generate any messages
-    */
-    virtual void sendMessage();
 
     /**
      * The StubMarket should ignore incoming messages
