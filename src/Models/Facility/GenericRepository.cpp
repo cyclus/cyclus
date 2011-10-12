@@ -59,12 +59,12 @@ void GenericRepository::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/GenericRepository");
 
   // initialize ordinary objects
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  lifetime_ = atof(XMLinput->get_xpath_content(cur,"lifetime"));
-  area_ = atof(XMLinput->get_xpath_content(cur,"area"));
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  start_op_yr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  start_op_mo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
+  lifetime_ = strtod(XMLinput->get_xpath_content(cur,"lifetime"), NULL);
+  area_ = strtod(XMLinput->get_xpath_content(cur,"area"), NULL);
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  start_op_yr_ = strtol(XMLinput->get_xpath_content(cur,"startOperYear"), NULL, 10);
+  start_op_mo_ = strtol(XMLinput->get_xpath_content(cur,"startOperMonth"), NULL, 10);
 
   // The repository accepts any commodities designated waste.
   // This will be a list

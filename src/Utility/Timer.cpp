@@ -149,11 +149,11 @@ void Timer::load_simulation() {
   // get decay interval
   decay_str = (XMLinput->get_xpath_content(cur,"decay"));
 
-  dur = atoi(dur_str.c_str());
-  m0 = atoi(m0_str.c_str());
-  y0 = atoi(y0_str.c_str());
-  sim0 = atoi(sim0_str.c_str());
-  dec = atoi(decay_str.c_str());
+  dur = strtol(dur_str.c_str(), NULL, 10);
+  m0 = strtol(m0_str.c_str(), NULL, 10);
+  y0 = strtol(y0_str.c_str(), NULL, 10);
+  sim0 = strtol(sim0_str.c_str(), NULL, 10);
+  dec = strtol(decay_str.c_str(), NULL, 10);
 
   TI->initialize(dur, m0, y0, sim0, dec);
 }

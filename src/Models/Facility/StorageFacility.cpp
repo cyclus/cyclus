@@ -49,9 +49,9 @@ void StorageFacility::init(xmlNodePtr cur)
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  residence_time_ = atof(XMLinput->get_xpath_content(cur,"residencetime"));
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
+  residence_time_ = strtod(XMLinput->get_xpath_content(cur,"residencetime"), NULL);
 
 
   inventory_ = deque<Material*>();
@@ -216,9 +216,9 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
 			 + "' is not defined in this problem.");
     }
     // amount
-    amount = atof(XMLinput->get_xpath_content(entry_node,"amount"));
+    amount = strtod(XMLinput->get_xpath_content(entry_node,"amount"), NULL);
     // time in storage (age) in months
-    age = atof(XMLinput->get_xpath_content(entry_node,"age"));
+    age = strtod(XMLinput->get_xpath_content(entry_node,"age"), NULL);
 
     // make new material
     Material* newMat = new Material(recipe->getMassComp(), 

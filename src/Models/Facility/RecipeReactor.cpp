@@ -45,18 +45,18 @@ void RecipeReactor::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/RecipeReactor");
 
   // initialize ordinary objects
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
-  //cycle_time_ = atof(XMLinput->get_xpath_content(cur,"cycletime"));
-  lifetime_ = atoi(XMLinput->get_xpath_content(cur,"lifetime"));
-  startConstrYr_ = atoi(XMLinput->get_xpath_content(cur,"startConstrYear"));
-  startConstrMo_ = atoi(XMLinput->get_xpath_content(cur,"startConstrMonth"));
-  startOpYr_ = atoi(XMLinput->get_xpath_content(cur,"startOperYear"));
-  startOpMo_ = atoi(XMLinput->get_xpath_content(cur,"startOperMonth"));
-  licExpYr_ = atoi(XMLinput->get_xpath_content(cur,"licExpYear"));
-  licExpMo_ = atoi(XMLinput->get_xpath_content(cur,"licExpMonth"));
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
+  //cycle_time_ = strtod(XMLinput->get_xpath_content(cur,"cycletime"), NULL);
+  lifetime_ = strtol(XMLinput->get_xpath_content(cur,"lifetime"), NULL, 10);
+  startConstrYr_ = strtol(XMLinput->get_xpath_content(cur,"startConstrYear"), NULL, 10);
+  startConstrMo_ = strtol(XMLinput->get_xpath_content(cur,"startConstrMonth"), NULL, 10);
+  startOpYr_ = strtol(XMLinput->get_xpath_content(cur,"startOperYear"), NULL, 10);
+  startOpMo_ = strtol(XMLinput->get_xpath_content(cur,"startOperMonth"), NULL, 10);
+  licExpYr_ = strtol(XMLinput->get_xpath_content(cur,"licExpYear"), NULL, 10);
+  licExpMo_ = strtol(XMLinput->get_xpath_content(cur,"licExpMonth"), NULL, 10);
   state_ = XMLinput->get_xpath_content(cur,"state");
   typeReac_ = XMLinput->get_xpath_content(cur,"typeReac");
-  CF_ = atof(XMLinput->get_xpath_content(cur,"elecCF"));
+  CF_ = strtod(XMLinput->get_xpath_content(cur,"elecCF"), NULL);
 
   // all facilities require commodities - possibly many
   string commod_name;

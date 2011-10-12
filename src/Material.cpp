@@ -47,15 +47,15 @@ Material::Material(xmlNodePtr cur) {
 
   units_ = XMLinput->get_xpath_content(cur,"unit");
   
-  total_comp = atoi(XMLinput->get_xpath_content(cur,"total"));
+  total_comp = strtol(XMLinput->get_xpath_content(cur,"total"), NULL, 10);
 
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
   for (int i=0;i<isotopes->nodeNr;i++)
   {
     xmlNodePtr iso_node = isotopes->nodeTab[i];
-    Iso isotope = atoi(XMLinput->get_xpath_content(iso_node,"id"));
-    comp_map[isotope] = atof(XMLinput->get_xpath_content(iso_node,"comp"));
+    Iso isotope = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
+    comp_map[isotope] = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
   }
   
   if ( "atom" != comp_type)

@@ -41,7 +41,7 @@ void DeployInst::init(xmlNodePtr cur)
     
     //dynamic_cast<FacilityModel*>(facility)->setFacName(XMLinput->get_xpath_content(deploy,"name"));
     
-    int start_month = atoi(XMLinput->get_xpath_content(deploy,"start"));
+    int start_month = strtol(XMLinput->get_xpath_content(deploy,"start"), NULL, 10);
     
     if (start_month < 0){
       throw GenException("You can't deploy a facility in the past.");

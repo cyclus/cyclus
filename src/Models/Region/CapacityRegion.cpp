@@ -72,7 +72,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
     // get capacity information
     capacity_type_.push_back( XMLinput->get_xpath_content( entry_node,"capacitytype" ));
     capacity_function_.push_back( XMLinput->get_xpath_content( entry_node,"capacityfunction" ));
-    nominal_value_.push_back( atof( XMLinput->get_xpath_content( entry_node,"nominalvalue" )));
+    nominal_value_.push_back( strtod( XMLinput->get_xpath_content( entry_node,"nominalvalue" ), NULL));
     // get replacement facility information
     ReplacementFacs replacementFacs;
     allReplacementFacs_.push_back(replacementFacs);

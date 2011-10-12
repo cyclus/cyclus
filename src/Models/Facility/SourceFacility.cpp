@@ -51,13 +51,13 @@ void SourceFacility::init(xmlNodePtr cur)
         + "'.");
 
   // get capacity
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
   // get inventory_size_
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
 
   // get commodity price 
-  commod_price_ = atof(XMLinput->get_xpath_content(cur,"commodprice"));
+  commod_price_ = strtod(XMLinput->get_xpath_content(cur,"commodprice"), NULL);
 
   inventory_ = deque<Material*>();
   ordersWaiting_ = deque<Message*>();

@@ -59,11 +59,11 @@ void EnrichmentFacility::init(xmlNodePtr cur)
                        + "'.");
 
   // get inventory size
-  inventory_size = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  inventory_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   // get capacity_
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity_"));
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity_"), NULL);
   // get default tails fraction
-  default_xw_ = atof(XMLinput->get_xpath_content(cur,"tailsassay"));
+  default_xw_ = strtod(XMLinput->get_xpath_content(cur,"tailsassay"), NULL);
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();

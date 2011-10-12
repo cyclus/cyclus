@@ -67,10 +67,10 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   }
 
   // get inventory size
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
 
   // get capacity
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
   // get Stream
   nodes = XMLinput->get_xpath_elements(cur,"Stream");
@@ -90,8 +90,8 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
                          + "'.");
     out_commod_.push_back(new_commod);
 
-    int stream_Z = atoi(XMLinput->get_xpath_content(stream,"Z"));
-    double stream_eff = atof(XMLinput->get_xpath_content(stream,"eff"));
+    int stream_Z = strtol(XMLinput->get_xpath_content(stream,"Z"), NULL, 10);
+    double stream_eff = strtod(XMLinput->get_xpath_content(stream,"eff"), NULL);
     stream_set_.insert(make_pair(new_commod,
                                 make_pair(stream_Z, stream_eff)));
     cout << "Name = " << stream_commod << endl;

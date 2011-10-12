@@ -52,8 +52,8 @@ void NullFacility::init(xmlNodePtr cur)
                        + "' does not exist for facility '" + getName() 
                        + "'.");
 
-  inventory_size_ = atof(XMLinput->get_xpath_content(cur,"inventorysize"));
-  capacity_ = atof(XMLinput->get_xpath_content(cur,"capacity"));
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
 
   inventory_ = deque<Material*>();
