@@ -15,7 +15,6 @@ set ( TestSource
   ../Material.cpp
   ../Commodity.cpp
   ../Message.cpp
-  ../Communicator.cpp
   ../Utility/BookKeeper.cpp
   ../Utility/Env.cpp
   ../Utility/GenException.cpp 

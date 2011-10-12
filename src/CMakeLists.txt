@@ -34,7 +34,6 @@ SET( CYCLUS_SRC
      Material.cpp
      Commodity.cpp
      Message.cpp
-     Communicator.cpp
      Utility/BookKeeper.cpp 
      Utility/GenException.cpp 
      Utility/LMatrix.cpp 
