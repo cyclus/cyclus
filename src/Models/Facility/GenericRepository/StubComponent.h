@@ -99,6 +99,16 @@ public:
   virtual void extract(Material* matToRem) ;
 
   /**
+   * Transports heat from the inner to the outer boundary 
+   */
+  virtual void transportHeat();
+
+  /**
+   * Transports nuclides from the inner to the outer boundary 
+   */
+  virtual void transportNuclides();
+
+  /**
    * Loads the subcomponent within this component
    *
    * @param type the component type this component represents

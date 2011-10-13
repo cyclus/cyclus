@@ -26,10 +26,11 @@ void StubComponent::copy(StubComponent* src){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubComponent::print(){
-    cout << "StubComponent: " << this->getName();
-    cout << "Contains Components:" << endl;
-    for(int i=0; i<this->getDaughters().size() ; i++){
-      cout << this->getDaughters()[i]->getName();
+    cout << "StubComponent: '" << this->getName() << this->getSN();
+    cout << "' Contains " << this->getDaughters().size()<<" Components: " << endl;
+    for(int i=0; i<this->getDaughters().size() ; i++){ 
+      Component* comp = this->getDaughters()[i];
+      cout << comp->getName() << comp->getSN() << endl;
     }
 }
 
@@ -53,6 +54,14 @@ void StubComponent::extract(Material* matToRem)
   cout << "StubComponent: " << this->getName() << endl;
   cout << "is extracting material: " << endl;
   matToRem->print() ;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubComponent::transportHeat(){ 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubComponent::transportNuclides(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

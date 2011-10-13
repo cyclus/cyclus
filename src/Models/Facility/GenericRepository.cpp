@@ -9,6 +9,7 @@
 #include "InputXML.h"
 #include "Timer.h"
 #include "GenericRepository/StubComponent.h"
+#include "GenericRepository/StubThermal.h"
 
 
 
@@ -234,30 +235,18 @@ void GenericRepository::handleTick(int time)
     in_commods_.pop_front();
   
     // It can accept amounts however small
-    Mass requestAmt;
     Mass minAmt = 0;
-    // The GenericRepository should ask for material unless it's full
-    Mass inv = this->checkInventory();
-    // including how much is already in its stocks
-    Mass sto = this->checkStocks(); 
     // this will be a request for free stuff
     double commod_price = 0;
-    // subtract inv and sto from inventory max size to get total empty space
-    Mass space = inventory_size_- inv - sto;
-  
-    if (space == 0){
+    // It will need to figure out its capacity
+    Mass requestAmt;
+    // Perform the task of figuring out the capacity for this commod
+    requestAmt = getCapacity(in_commod);
+    
+    // make requests
+    if (requestAmt == 0){
       // don't request anything
     } else {
-      if (space <= capacity_){
-        // if empty space is less than monthly acceptance capacity
-        requestAmt = space;
-
-      // otherwise
-      } else if (space >= capacity_){
-        // the upper bound is the monthly acceptance capacity
-        requestAmt = capacity_;
-      }
-
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // recall that requests have a negative amount
       Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, commod_price,
@@ -268,6 +257,7 @@ void GenericRepository::handleTick(int time)
     }
   }
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::handleTock(int time) {
 
@@ -280,6 +270,28 @@ void GenericRepository::handleTock(int time) {
   // calculate the nuclide transport
   transportNuclides();
   
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Mass GenericRepository::getCapacity(Commodity* commod){
+  Mass toRet;
+  // if the overall repo has a legislative limit, report it
+  // we need a heat model
+  // The GenericRepository should ask for material unless it's full
+  Mass inv = this->checkInventory();
+  // including how much is already in its stocks
+  Mass sto = this->checkStocks(); 
+  // subtract inv and sto from inventory max size to get total empty space
+  Mass space = inventory_size_- inv - sto;
+  // if empty space is less than monthly acceptance capacity
+  if (space <= capacity_){
+    toRet = space;
+    // otherwise
+  } else if (space >= capacity_){
+    // the upper bound is the monthly acceptance capacity
+    toRet = capacity_;
+  } 
+  return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -433,12 +445,44 @@ Component* GenericRepository::loadBuffer(Component* waste_package){
 void GenericRepository::transportHeat(){
   // update the thermal BCs everywhere
   // pass the transport heat signal through the components, inner -> outer
+  for( deque< Component* >::const_iterator iter = waste_forms_.begin();
+      iter != waste_forms_.end();
+      iter++){
+    (*iter)->transportHeat();
+  }
+  for( deque< Component* >::const_iterator iter = waste_packages_.begin();
+      iter != waste_packages_.end();
+      iter++){
+    (*iter)->transportHeat();
+  }
+  for( deque< Component* >::const_iterator iter = buffers_.begin();
+      iter != buffers_.end();
+      iter++){
+    (*iter)->transportHeat();
+  }
+  far_field_->transportHeat();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::transportNuclides(){
   // update the nuclide transport BCs everywhere
   // pass the transport nuclides signal through the components, inner -> outer
+  for( deque< Component* >::const_iterator iter = waste_forms_.begin();
+      iter != waste_forms_.end();
+      iter++){
+    (*iter)->transportNuclides();
+  }
+  for( deque< Component* >::const_iterator iter = waste_packages_.begin();
+      iter != waste_packages_.end();
+      iter++){
+    (*iter)->transportNuclides();
+  }
+  for( deque< Component* >::const_iterator iter = buffers_.begin();
+      iter != buffers_.end();
+      iter++){
+    (*iter)->transportNuclides();
+  }
+  far_field_->transportNuclides();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

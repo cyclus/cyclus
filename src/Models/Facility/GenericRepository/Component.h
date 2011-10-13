@@ -146,6 +146,18 @@ public:
    */
   virtual void extract(Material* matToRem) = 0 ;
 
+  /**
+   * Transports heat from the inner boundary to the outer boundary in this 
+   * component
+   */
+  virtual void transportHeat() = 0 ;
+
+  /**
+   * Transports nuclides from the inner boundary to the outer boundary in this 
+   * component
+   */
+  virtual void transportNuclides() = 0 ;
+
   /** 
    * Loads this component with another component.
    *

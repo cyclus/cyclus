@@ -308,12 +308,19 @@ protected:
     /**
      * Do heat transport calculations
      */
-    static void transportHeat() ;
+    void transportHeat() ;
 
     /**
      * Do nuclide transport calculations
      */
-    static void transportNuclides() ;
+    void transportNuclides() ;
+
+    /**
+     * get the commodity-specific capacity of the GenericRepository
+     *
+     * @param commod the commodity
+     */
+    Mass getCapacity(Commodity* commod) ;
 
     /**
      * Return the component model named by the string
