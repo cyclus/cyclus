@@ -23,7 +23,7 @@ public:
 
   friend class Message;
 
-protected:
+private:
 
   /**
    *  @brief Default (trivial) receiver is implemented to ignore messages
