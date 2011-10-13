@@ -96,9 +96,11 @@ void GenericRepository::init(xmlNodePtr cur)
   // get buffer
   nodes = XMLinput->get_xpath_elements(cur, "buffer");
   comp_node = nodes->nodeTab[0];
-  buffers_ = deque< Component* >();
-  buffer_templates_.push_back(initComponent(comp_node));
-  buffers_.push_back(initComponent(comp_node));
+  buffer_template_ = initComponent(comp_node);
+  // below: would it be better to initComponent(comp_node) again?
+  Component* new_buffer = getComponent(buffer_template_->getImpl()); 
+  new_buffer->copy(buffer_template_);
+  buffers_.push_back(new_buffer);
 
   // for each waste form
   // (these are found before wp's in order to help with wf_wp_map creation)
@@ -167,7 +169,7 @@ void GenericRepository::copy(GenericRepository* src)
   start_op_mo_ = src->start_op_mo_;
   in_commods_ = src->in_commods_;
   far_field_ = src->far_field_;
-  buffer_templates_ = src->buffer_templates_;
+  buffer_template_ = src->buffer_template_;
   wp_templates_ = src->wp_templates_;
   wf_templates_ = src->wf_templates_;
   wf_wp_map_ = src->wf_wp_map_;
@@ -316,62 +318,62 @@ void GenericRepository::emplaceWaste(){
   // if there's anything in the stocks, try to emplace it
   if(!stocks_.empty()){
     // for each waste stream in the stocks
-    for (deque< WasteStream >::iterator iter = stocks_.begin(); 
+    for (deque< WasteStream >::const_iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
-       // start by packing the commod in a waste form
-       // -- what waste form does this type of waste go into?
-       // -- what density?
-       // -- associate the waste stream with the waste form
-       conditionWaste((*iter));
+      // -- put the waste stream in the waste form
+      // -- associate the waste stream with the waste form
+      conditionWaste((*iter));
     }
-    for (deque< Component* >::iterator iter = current_waste_forms_.begin(); 
+    for (deque< Component* >::const_iterator iter = current_waste_forms_.begin(); 
         iter != current_waste_forms_.end(); 
         iter ++){
-      // put the waste form in a waste package
-      // -- what waste package does this type of waste go into?
-      // -- what density?
-      // -- associate the waste form with the was package
+      // -- put the waste form in a waste package
+      // -- associate the waste form with the waste package
       packageWaste((*iter));
+    }
+    int nwf = current_waste_forms_.size();
+    for(int i=0; i < nwf; i++){
       waste_forms_.push_back(current_waste_forms_.front());
       current_waste_forms_.pop_front();
     }
-    for (deque< Component* >::iterator iter = current_waste_packages_.begin(); 
-        iter != current_waste_packages_.end(); 
-        iter ++){
+    int nwp = current_waste_packages_.size();
+    for(int i=0; i < nwp; i++){
+      Component* iter = current_waste_packages_.front();
       // try to load each package in the current buffer 
       Component* current_buffer = buffers_.front();
       if (NULL == current_buffer) {
         string err_msg = "Buffers not yet loaded into Generic Repository.";
         throw GenException(err_msg);
-        // if the package is full
-        if( (*iter)->isFull()
-            // and not too hot
-            && (*iter)->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
-            // or too toxic
-            && (*iter)->getPeakTox() <= current_buffer->getToxLim()){
-          // emplace it in the buffer
-          loadBuffer((*iter));
-          if( current_buffer->isFull() ) {
-            buffers_.push_back(buffers_.front());
-            buffers_.pop_front();
-            if( buffers_.front()->isFull()){
-              // all buffers are now full, capacity reached
-              is_full_ = true;
-            }
-          }
-          // take the waste package out of the current packagess
-          waste_packages_.push_back(current_waste_packages_.front());
-          current_waste_packages_.pop_front();
-        }
-        // if the waste package was either too hot or not full
-        // push it back on the stack
-        current_waste_packages_.push_back(current_waste_packages_.front());
-        current_waste_packages_.pop_front();
-        inventory_.push_back(stocks_.front());
-        stocks_.pop_front();
-        // once the waste is emplaced, is there anything else to do?
       }
+      // if the package is full
+      if( iter->isFull()
+          // and not too hot
+          //&& (*iter)->getPeakTemp(OUTER) <= current_buffer->getTempLim() 
+          // or too toxic
+          //&& (*iter)->getPeakTox() <= current_buffer->getToxLim()
+          ) {
+        // emplace it in the buffer
+        loadBuffer(iter);
+        if( current_buffer->isFull() ) {
+          buffers_.push_back(buffers_.front());
+          buffers_.pop_front();
+          if( buffers_.front()->isFull()){
+            // all buffers are now full, capacity reached
+            is_full_ = true;
+          }
+        }
+        // take the waste package out of the current packagess
+        waste_packages_.push_back(current_waste_packages_.front());
+        current_waste_packages_.pop_front();
+      }
+      // if the waste package was either too hot or not full
+      // push it back on the stack
+      current_waste_packages_.push_back(current_waste_packages_.front());
+      current_waste_packages_.pop_front();
+      inventory_.push_back(stocks_.front());
+      stocks_.pop_front();
+      // once the waste is emplaced, is there anything else to do?
     }
   }
 }
@@ -415,8 +417,7 @@ Component* GenericRepository::packageWaste(Component* waste_form){
   current_waste_packages_.push_back(getComponent(chosen_wp_template->getImpl()));
   current_waste_packages_.back()->copy(chosen_wp_template);
   // and load in the waste form
-  current_waste_packages_.back()->load(WP, waste_form); // what is this?
-  return current_waste_packages_.back();
+  return current_waste_packages_.back()->load(WP, waste_form); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

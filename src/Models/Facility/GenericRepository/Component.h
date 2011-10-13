@@ -144,7 +144,7 @@ public:
    * @param matToRem the Material whose composition we want to decrement 
    * against this Component
    */
-  virtual void extract(Material* matToRem) ;
+  virtual void extract(Material* matToRem) = 0 ;
 
   /** 
    * Loads this component with another component.
@@ -158,7 +158,7 @@ public:
    * Reports true if this component may be loaded with more of whatever goes 
    * inside it and reports false if that is not the case.
    */
-  virtual bool isFull();
+  virtual bool isFull() = 0;
     
   /** 
    * Enumerates a string if it is one of the named ComponentTypes
@@ -186,6 +186,13 @@ public:
    */
   const virtual std::string getImpl()=0;
  
+  /**
+   * get the list of components 
+   *
+   * @return components
+   */
+  const std::vector<Component*> getDaughters(){return daughter_components_;};
+
   /**
    * get the list of waste objects 
    *

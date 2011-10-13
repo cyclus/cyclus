@@ -27,9 +27,9 @@ void StubComponent::copy(StubComponent* src){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubComponent::print(){
     cout << "StubComponent: " << this->getName();
-    cout << "Contains Materials:" << endl;
-    for(int i=0; i<this->getWastes().size() ; i++){
-      cout << this->getWastes()[i];
+    cout << "Contains Components:" << endl;
+    for(int i=0; i<this->getDaughters().size() ; i++){
+      cout << this->getDaughters()[i]->getName();
     }
 }
 
@@ -55,9 +55,15 @@ void StubComponent::extract(Material* matToRem)
   matToRem->print() ;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* StubComponent::load(ComponentType type, Component* to_load)
+{
+  Component::load(type, to_load);
+  return this;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool StubComponent::isFull() {
-  // for now, return true and false at random
-  return time(NULL) % 2;
+  return (daughter_components_.size()>=1) ? true : false ;
 }
 

@@ -98,6 +98,14 @@ public:
    */
   virtual void extract(Material* matToRem) ;
 
+  /**
+   * Loads the subcomponent within this component
+   *
+   * @param type the component type this component represents
+   * @param to_load the component type being loaded
+   */
+  virtual Component* load(ComponentType type, Component* to_load) ;
+
   /** 
    * Reports true if this component may be loaded with more of whatever goes 
    * inside it and reports false if that is not the case.

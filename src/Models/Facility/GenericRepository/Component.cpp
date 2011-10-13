@@ -79,44 +79,12 @@ void Component::print(){
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//void Component::absorb(Material* matToAdd)
-//{
-//  // Get the given Component's contaminant material.
-//  // add the material to it with the material absorb function.
-//  // each component should override this function
-//  string err_msg = "Component Model : ";
-//  err_msg += this->getName();
-//  err_msg += " did not override absorb function.\n" ; 
-//  throw GenException(err_msg);
-//}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Component::extract(Material* matToRem)
-{
-  // Get the given Component's contaminant material.
-  // subtract the material from it with the material extract function.
-  // each component should override this function
-  string err_msg = "Component Model : ";
-  err_msg += this->getName();
-  err_msg += " did not override extract function.\n"; 
-  throw GenException(err_msg);
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Component* Component::load(ComponentType type, Component* to_load) {
   Component* toRet = this;
   this->daughter_components_.push_back(to_load);
+  to_load->parent_component_ = this;
   return this;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Component::isFull() {
-  // each component should override this function
-  string err_msg = "Component Model : ";
-  err_msg += this->getName();
-  err_msg += " did not override the isFull function.\n"; 
-  throw GenException(err_msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

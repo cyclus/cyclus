@@ -200,10 +200,10 @@ protected:
     Component* near_field_;
 
     /**
-     * The buffer templates before initialization.
-     * These will be copied and initialized before use.
+     * The buffer template before initialization.
+     * This will be copied and initialized before use.
      */
-    deque<Component*> buffer_templates_;
+    Component* buffer_template_;
 
     /**
      * The waste package component templates before initialization.
