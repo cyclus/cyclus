@@ -96,7 +96,9 @@ void GenericRepository::init(xmlNodePtr cur)
   // get buffer
   nodes = XMLinput->get_xpath_elements(cur, "buffer");
   comp_node = nodes->nodeTab[0];
+  buffers_ = deque< Component* >();
   buffer_templates_.push_back(initComponent(comp_node));
+  buffers_.push_back(initComponent(comp_node));
 
   // for each waste form
   // (these are found before wp's in order to help with wf_wp_map creation)
@@ -138,10 +140,10 @@ void GenericRepository::init(xmlNodePtr cur)
   }
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
-  buffers_ = deque< Component* >();
   waste_packages_ = deque< Component* >();
   waste_forms_ = deque< Component* >();
   is_full_ = false;
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -170,10 +172,10 @@ void GenericRepository::copy(GenericRepository* src)
   wf_templates_ = src->wf_templates_;
   wf_wp_map_ = src->wf_wp_map_;
   commod_wf_map_ = src->commod_wf_map_;
+  buffers_ = src->buffers_;
 
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
-  buffers_ = deque< Component* >();
   waste_packages_ = deque< Component* >();
   waste_forms_ = deque< Component* >();
   is_full_ = false;
