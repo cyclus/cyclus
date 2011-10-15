@@ -39,7 +39,6 @@ Message::Message(MessageDir thisDir, Transaction thisTrans,
   trans_ = thisTrans;
   sender_ = toSend;
   recipient_ = toReceive;
-  new_dest_set_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,7 +52,6 @@ Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,    
   trans_.comp = thisComp;
   sender_ = toSend;
   recipient_ = toReceive;
-  new_dest_set_ = false;
   this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
   this->setRequesterID((dynamic_cast<FacilityModel*>(recipient_))->getSN());
 }
@@ -70,7 +68,6 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   trans_.comp = thisComp;
   sender_ = toSend;
   recipient_ = toReceive;
-  new_dest_set_ = false;
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -101,7 +98,6 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
 
   sender_ = toSend;
   recipient_ = toReceive;
-  new_dest_set_ = false;
   
   // if amt is positive and there is no supplier
   // this message is an offer and 
@@ -133,38 +129,52 @@ Message* Message::clone() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::sendOn() {
-  if (dir_ == UP_MSG) {
-    if (! new_dest_set_) {
-      string err_msg = "Must add new destination before sending message.";
-      throw GenException(err_msg);
-    }
-    new_dest_set_ = false;
+  validateForSend();
 
-  } else if (dir_ == DOWN_MSG) {
-    if (path_stack_.size() < 1) {
-      string err_msg = "Can't send the message any further.";
-      throw GenException(err_msg);
-    }
-
+  if (dir_ == DOWN_MSG) {
     path_stack_.pop_back();
   }
 
   Communicator* next_stop = path_stack_.back();
-
-  if (next_stop == current_owner_ || next_stop == sender_) {
-    string err_msg = "Message receiver and sender are the same.";
-    throw GenException(err_msg);
-  }
 
   current_owner_ = next_stop;
   next_stop->receiveMessage(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::validateForSend() {
+  int next_stop_index = -1;
+  bool receiver_specified = false;
+  Communicator* next_stop;
+
+  if (dir_ == UP_MSG) {
+    receiver_specified = (path_stack_.size() > 0);
+    next_stop_index = path_stack_.size() - 1;
+  } else if (dir_ == DOWN_MSG) {
+    receiver_specified = (path_stack_.size() > 1);
+    next_stop_index = path_stack_.size() - 2;
+  }
+
+  if (!receiver_specified) {
+    string err_msg = "Can't send the message: next dest is unspecified.";
+    throw GenException(err_msg);
+  }
+
+  next_stop = path_stack_[next_stop_index];
+  if (next_stop == current_owner_) {
+    string err_msg = "Message receiver and sender are the same.";
+    throw GenException(err_msg);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
+    if (path_stack_.size() == 0) {
+      path_stack_.push_back(sender_);
+    }
+
     path_stack_.push_back(next_stop);
-    new_dest_set_ = true;
   }
 }
 

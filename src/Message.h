@@ -106,11 +106,13 @@ class Message {
     Communicator* current_owner_;
 
     /**
-     * Pointers to each model this message passes through.
+     * @brief Checks required conditions prior to sending a message.
+     *
      */
-    bool new_dest_set_;
+    void validateForSend();
 
   public:
+    
     /**
      * Creates an empty message from some communicator in some direction.
      *
@@ -181,20 +183,19 @@ class Message {
      * heading down (DOWN_MSG) are sent successively to each communicator
      * in reverse order of their 'upward' sequence.
      *
-     * @exception GenException setNextDest was not called in between
-     *            calls to this function for message direction UP_MSG
-     *
-     * @exception GenException attempted to send message with direction
-     *            DOWN_MSG with no designated receiver (message has already
-     *            arrived at its source)
+     * @exception GenException attempted to send message with
+     *            with no designated receiver (next dest is undefined)
      *
      * @exception GenException attempted to send a message to the message
      *            sender (circular messaging)
      */
-    void sendOn();
+    virtual void sendOn();
 
     /**
      * @brief designate the next object to receive this message
+     * 
+     * Calls to this method are ignored when the message direction is
+     * down.
      *
      * @param next_stop the next communicator to receive this message
      *
