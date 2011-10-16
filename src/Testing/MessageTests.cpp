@@ -23,24 +23,31 @@ class TestCommunicator : public Communicator {
 
     TestCommunicator(string name) {
       msg_ = new TrackerMessage(UP_MSG, this);
+
       name_ = name;
       stop_at_return_ = true;
       flip_at_receive_ = false;
+      flip_down_to_up_ = false;
       forget_set_dest_ = false;
+      down_up_count_ = 0;
     }
+
+    ~TestCommunicator() {
+      delete msg_;
+    }
+
     Communicator* parent_;
+    TrackerMessage* msg_;
+
     string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
-    TrackerMessage* msg_;
+    bool flip_down_to_up_;
+    int down_up_count_;
 
     void startMessage() {
       msg_->dest_list_.push_back(name_);
       msg_->setNextDest(parent_);
       msg_->sendOn();
-    }
-
-    ~TestCommunicator() {
-      delete msg_;
     }
 
   private:
@@ -51,6 +58,12 @@ class TestCommunicator : public Communicator {
         return;
       } else if (flip_at_receive_) {
         msg->setDir(DOWN_MSG);
+      } else if (flip_down_to_up_) {
+        int max_num_flips = 2;
+        if (msg->getDir() == DOWN_MSG && down_up_count_ < max_num_flips) {
+          msg->setDir(UP_MSG);
+          down_up_count_++;
+        }
       }
 
       if ( !forget_set_dest_ ) {
@@ -69,12 +82,16 @@ class MessageTest : public ::testing::Test {
     TestCommunicator* comm3;
     TestCommunicator* comm4;
 
-
     virtual void SetUp(){
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
       comm3 = new TestCommunicator("comm3");
       comm4 = new TestCommunicator("comm4");
+
+      comm1->parent_ = comm2;
+      comm2->parent_ = comm3;
+      comm3->parent_ = comm4;
+      comm4->flip_at_receive_ = true;
     };
 
     virtual void TearDown() {
@@ -87,25 +104,22 @@ class MessageTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, CleanThrough) {
-  bool passed = true;
-
-  comm1->parent_ = comm2;
-  comm2->parent_ = comm3;
-  comm3->parent_ = comm4;
-
-  comm4->flip_at_receive_ = true;
+  bool threw_exception = false;
 
   try {
     comm1->startMessage();
   } catch (GenException error) {
-    passed = false;
+    threw_exception = true;
   }
 
   vector<string> stops = comm1->msg_->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 7;
 
-  EXPECT_TRUE(stops.size() == 7);
+  EXPECT_FALSE(threw_exception);
+  EXPECT_TRUE(num_stops == expected_num_stops);
 
-  if (passed) {
+  if (num_stops == expected_num_stops) {
     EXPECT_TRUE(stops[0] == "comm1");
     EXPECT_TRUE(stops[1] == "comm2");
     EXPECT_TRUE(stops[2] == "comm3");
@@ -118,27 +132,24 @@ TEST_F(MessageTest, CleanThrough) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, PassBeyondOrigin) {
-  bool passed = true;
-
-  comm1->parent_ = comm2;
-  comm2->parent_ = comm3;
-  comm3->parent_ = comm4;
+  bool threw_exception = false;
 
   comm1->stop_at_return_ = false;
-  comm4->flip_at_receive_ = true;
 
   try {
     comm1->startMessage();
   } catch (GenException error) {
-    passed = false;
+    threw_exception = true;
   }
 
   vector<string> stops = comm1->msg_->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 7;
 
-  EXPECT_FALSE(passed);
-  EXPECT_TRUE(stops.size() == 7);
+  EXPECT_TRUE(threw_exception);
+  EXPECT_TRUE(num_stops == expected_num_stops);
 
-  if (passed) {
+  if (num_stops == expected_num_stops) {
     EXPECT_TRUE(stops[0] == "comm1");
     EXPECT_TRUE(stops[1] == "comm2");
     EXPECT_TRUE(stops[2] == "comm3");
@@ -149,3 +160,92 @@ TEST_F(MessageTest, PassBeyondOrigin) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessageTest, ForgetToSetDest) {
+  bool threw_exception = false;
+
+  comm3->forget_set_dest_ = true;
+
+  try {
+    comm1->startMessage();
+  } catch (GenException error) {
+    threw_exception = true;
+  }
+
+  vector<string> stops = comm1->msg_->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 3;
+
+  EXPECT_TRUE(threw_exception);
+  EXPECT_TRUE(num_stops == expected_num_stops);
+
+  if (num_stops == expected_num_stops) {
+    EXPECT_TRUE(stops[0] == "comm1");
+    EXPECT_TRUE(stops[1] == "comm2");
+    EXPECT_TRUE(stops[2] == "comm3");
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessageTest, SendToSelf) {
+  bool threw_exception = false;
+
+  comm3->parent_ = comm3;
+
+  try {
+    comm1->startMessage();
+  } catch (GenException error) {
+    threw_exception = true;
+  }
+
+  vector<string> stops = comm1->msg_->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 3;
+
+  EXPECT_TRUE(threw_exception);
+  EXPECT_TRUE(num_stops == expected_num_stops);
+
+  if (num_stops == expected_num_stops) {
+    EXPECT_TRUE(stops[0] == "comm1");
+    EXPECT_TRUE(stops[1] == "comm2");
+    EXPECT_TRUE(stops[2] == "comm3");
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessageTest, YoYo) {
+  bool threw_exception = false;
+
+  comm2->flip_down_to_up_ = true;
+
+  try {
+    comm1->startMessage();
+  } catch (GenException error) {
+    threw_exception = true;
+  }
+
+  vector<string> stops = comm1->msg_->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 15;
+
+  EXPECT_FALSE(threw_exception);
+  EXPECT_TRUE(num_stops == expected_num_stops);
+
+  if (num_stops == expected_num_stops) {
+    EXPECT_TRUE(stops[0] == "comm1");
+    EXPECT_TRUE(stops[1] == "comm2");
+    EXPECT_TRUE(stops[2] == "comm3");
+    EXPECT_TRUE(stops[3] == "comm4");
+    EXPECT_TRUE(stops[4] == "comm3");
+    EXPECT_TRUE(stops[5] == "comm2");
+    EXPECT_TRUE(stops[6] == "comm3");
+    EXPECT_TRUE(stops[7] == "comm4");
+    EXPECT_TRUE(stops[8] == "comm3");
+    EXPECT_TRUE(stops[9] == "comm2");
+    EXPECT_TRUE(stops[10] == "comm3");
+    EXPECT_TRUE(stops[11] == "comm4");
+    EXPECT_TRUE(stops[12] == "comm3");
+    EXPECT_TRUE(stops[13] == "comm2");
+    EXPECT_TRUE(stops[14] == "comm1");
+  }
+}
