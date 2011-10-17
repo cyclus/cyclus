@@ -104,148 +104,104 @@ class MessageTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, CleanThrough) {
-  bool threw_exception = false;
-
-  try {
-    comm1->startMessage();
-  } catch (GenException error) {
-    threw_exception = true;
-  }
+  ASSERT_NO_THROW(comm1->startMessage());
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
-  EXPECT_FALSE(threw_exception);
-  EXPECT_TRUE(num_stops == expected_num_stops);
+  ASSERT_EQ(num_stops, expected_num_stops);
 
-  if (num_stops == expected_num_stops) {
-    EXPECT_TRUE(stops[0] == "comm1");
-    EXPECT_TRUE(stops[1] == "comm2");
-    EXPECT_TRUE(stops[2] == "comm3");
-    EXPECT_TRUE(stops[3] == "comm4");
-    EXPECT_TRUE(stops[4] == "comm3");
-    EXPECT_TRUE(stops[5] == "comm2");
-    EXPECT_TRUE(stops[6] == "comm1");
-  }
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
+  EXPECT_EQ(stops[3], "comm4");
+  EXPECT_EQ(stops[4], "comm3");
+  EXPECT_EQ(stops[5], "comm2");
+  EXPECT_EQ(stops[6], "comm1");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, PassBeyondOrigin) {
-  bool threw_exception = false;
-
   comm1->stop_at_return_ = false;
 
-  try {
-    comm1->startMessage();
-  } catch (GenException error) {
-    threw_exception = true;
-  }
+  ASSERT_THROW(comm1->startMessage(), GenException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
-  EXPECT_TRUE(threw_exception);
-  EXPECT_TRUE(num_stops == expected_num_stops);
+  ASSERT_EQ(num_stops, expected_num_stops);
 
-  if (num_stops == expected_num_stops) {
-    EXPECT_TRUE(stops[0] == "comm1");
-    EXPECT_TRUE(stops[1] == "comm2");
-    EXPECT_TRUE(stops[2] == "comm3");
-    EXPECT_TRUE(stops[3] == "comm4");
-    EXPECT_TRUE(stops[4] == "comm3");
-    EXPECT_TRUE(stops[5] == "comm2");
-    EXPECT_TRUE(stops[6] == "comm1");
-  }
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
+  EXPECT_EQ(stops[3], "comm4");
+  EXPECT_EQ(stops[4], "comm3");
+  EXPECT_EQ(stops[5], "comm2");
+  EXPECT_EQ(stops[6], "comm1");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, ForgetToSetDest) {
-  bool threw_exception = false;
-
   comm3->forget_set_dest_ = true;
 
-  try {
-    comm1->startMessage();
-  } catch (GenException error) {
-    threw_exception = true;
-  }
+  ASSERT_THROW(comm1->startMessage(), GenException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
-  EXPECT_TRUE(threw_exception);
-  EXPECT_TRUE(num_stops == expected_num_stops);
+  ASSERT_EQ(num_stops, expected_num_stops);
 
-  if (num_stops == expected_num_stops) {
-    EXPECT_TRUE(stops[0] == "comm1");
-    EXPECT_TRUE(stops[1] == "comm2");
-    EXPECT_TRUE(stops[2] == "comm3");
-  }
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, SendToSelf) {
-  bool threw_exception = false;
-
   comm3->parent_ = comm3;
 
-  try {
-    comm1->startMessage();
-  } catch (GenException error) {
-    threw_exception = true;
-  }
+  ASSERT_THROW(comm1->startMessage(), GenException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
-  EXPECT_TRUE(threw_exception);
-  EXPECT_TRUE(num_stops == expected_num_stops);
+  ASSERT_EQ(num_stops, expected_num_stops);
 
-  if (num_stops == expected_num_stops) {
-    EXPECT_TRUE(stops[0] == "comm1");
-    EXPECT_TRUE(stops[1] == "comm2");
-    EXPECT_TRUE(stops[2] == "comm3");
-  }
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessageTest, YoYo) {
-  bool threw_exception = false;
-
   comm2->flip_down_to_up_ = true;
 
-  try {
-    comm1->startMessage();
-  } catch (GenException error) {
-    threw_exception = true;
-  }
+  ASSERT_NO_THROW(comm1->startMessage());
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 15;
 
-  EXPECT_FALSE(threw_exception);
-  EXPECT_TRUE(num_stops == expected_num_stops);
+  ASSERT_EQ(num_stops, expected_num_stops);
 
-  if (num_stops == expected_num_stops) {
-    EXPECT_TRUE(stops[0] == "comm1");
-    EXPECT_TRUE(stops[1] == "comm2");
-    EXPECT_TRUE(stops[2] == "comm3");
-    EXPECT_TRUE(stops[3] == "comm4");
-    EXPECT_TRUE(stops[4] == "comm3");
-    EXPECT_TRUE(stops[5] == "comm2");
-    EXPECT_TRUE(stops[6] == "comm3");
-    EXPECT_TRUE(stops[7] == "comm4");
-    EXPECT_TRUE(stops[8] == "comm3");
-    EXPECT_TRUE(stops[9] == "comm2");
-    EXPECT_TRUE(stops[10] == "comm3");
-    EXPECT_TRUE(stops[11] == "comm4");
-    EXPECT_TRUE(stops[12] == "comm3");
-    EXPECT_TRUE(stops[13] == "comm2");
-    EXPECT_TRUE(stops[14] == "comm1");
-  }
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
+  EXPECT_EQ(stops[3], "comm4");
+  EXPECT_EQ(stops[4], "comm3");
+  EXPECT_EQ(stops[5], "comm2");
+  EXPECT_EQ(stops[6], "comm3");
+  EXPECT_EQ(stops[7], "comm4");
+  EXPECT_EQ(stops[8], "comm3");
+  EXPECT_EQ(stops[9], "comm2");
+  EXPECT_EQ(stops[10], "comm3");
+  EXPECT_EQ(stops[11], "comm4");
+  EXPECT_EQ(stops[12], "comm3");
+  EXPECT_EQ(stops[13], "comm2");
+  EXPECT_EQ(stops[14], "comm1");
 }
+
