@@ -29,13 +29,9 @@ class FacilityModel : public TimeAgent, public Communicator {
  */
 
 public:
-  /// Default constructor for FacilityModel Class
-  FacilityModel() {
-    setModelType("Facility");
-  };
+  FacilityModel();
 
-  /// every model should be destructable
-  virtual ~FacilityModel() {};
+  virtual ~FacilityModel();
   
   // every model needs a method to initialize from XML
   virtual void init(xmlNodePtr cur);

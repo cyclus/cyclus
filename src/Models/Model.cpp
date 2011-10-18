@@ -186,6 +186,14 @@ void Model::copy(Model* model_orig) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model::Model() {
+  ID_ = ++next_id_;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model::~Model() {};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
   cout << model_type_ << " " << name_ 
       << " (ID=" << ID_

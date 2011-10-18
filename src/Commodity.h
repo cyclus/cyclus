@@ -15,6 +15,9 @@ class Model;
  */
 class Commodity {
 public:
+
+  Commodity() { };
+
   /**
    *  @brief Primary constructor uses an existing XML Node Pointer to
    *  extract the name of the Commodity.

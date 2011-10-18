@@ -13,6 +13,14 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+FacilityModel::FacilityModel() {
+  setModelType("Facility");
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+FacilityModel::~FacilityModel() {};
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::init(xmlNodePtr cur) {
   Model::init(cur);
 

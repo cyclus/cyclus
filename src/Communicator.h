@@ -15,10 +15,6 @@
 class Communicator {
   
 public:
-  
-  /**
-   * @brief Communicator Destructor.
-   */
   virtual ~Communicator() { };
 
   friend class Message;
@@ -26,9 +22,10 @@ public:
 private:
 
   /**
-   *  @brief Default (trivial) receiver is implemented to ignore messages
+   *  @brief Models communicate desires for material, etc. by sending
+   *         and receiveing messages.
    *
-   *  @param msg the message to be received
+   *  @param msg pointer to message to be received
    */
   virtual void receiveMessage(Message* msg) = 0;
 

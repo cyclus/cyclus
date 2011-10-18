@@ -14,8 +14,7 @@
  * and old material is removed from the same queue inventory.
  *
  */
-class NullFacility : public FacilityModel  
-{
+class NullFacility : public FacilityModel {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

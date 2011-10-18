@@ -133,14 +133,12 @@ public:
    * @warning all constructors must set ID_ and increment next_id_
    * 
    */
-  Model() {
-    ID_ = ++next_id_;
-  };
+  Model();
 
   /**
    * Destructor for the Model Class
    */
-  virtual ~Model() {};
+  virtual ~Model();
 
   /**
    * get model instance name

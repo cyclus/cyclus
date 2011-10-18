@@ -25,8 +25,7 @@
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::init(xmlNodePtr cur)
-{ 
+void NullFacility::init(xmlNodePtr cur) { 
   FacilityModel::init(cur);
   
   in_commod_ = out_commod_ = NULL; 
