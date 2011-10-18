@@ -20,26 +20,27 @@ void StubThermal::init(xmlNodePtr cur){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubThermal::copy(StubThermal* src){
-  ThermalModel::copy(src);
-}
+void StubThermal::copy(ThermalModel* src){ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubThermal::print(){
-    cout << "StubThermal: '" << this->getName() << endl;
+    cout << "StubThermal Model" <<  endl;
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Power StubThermal::getAvailCapacity(Component* comp){
+void StubThermal::transportHeat(){
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Power StubThermal::getAvailCapacity(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Temp StubThermal::getPeakTemp(BoundaryType type, Component* comp){
+Temp StubThermal::getPeakTemp(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Temp StubThermal::getTemp(Component* comp){
+Temp StubThermal::getTemp(){
 }
 
 

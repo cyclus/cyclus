@@ -271,62 +271,40 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
      <element name="GenericRepository"> 
         <ref name="area"/>
         <ref name="capacity"/>
-        <element name="incommodity">
-          <text/>
-        </element>
+        <oneOrMore>
+          <ref name="incommodity"/>
+        </oneOrMore>
         <ref name="inventorysize"/>
         <ref name="lifetime"/>
         <ref name="startOperMonth"/>
         <ref name="startOperYear"/>
-        <element name="farfield">
-          <ref name="name"/>
-          <element name="model">
-          <choice>
-            <ref name="StubComponent"/>
-            <!-- insert ref to new potential far field component models here -->
-          </choice>
-          </element>
-        </element>
-        <element name="buffer">
-          <ref name="name"/>
-          <element name="model">
-          <choice>
-            <ref name="StubComponent"/>
-            <!-- insert ref to new potential far field component models here -->
-          </choice>
-          </element>
-        </element>
         <oneOrMore>
-        <element name="wastepackage">
-          <ref name= "name"/>
-          <element name="model">
-          <choice>
-            <ref name="StubComponent"/>
-            <!-- insert ref to new potential waste package component models here -->
-          </choice>
+          <element name="component">
+            <ref name="name"/>
+            <ref name="componenttype"/>
+            <element name="thermalmodel">
+              <choice>
+                <ref name="StubThermal"/>
+                <!-- insert ref to new potential thermal models here -->
+              </choice>
+            </element>
+            <element name="nuclidemodel">
+              <choice>
+                <ref name="StubNuclide"/>
+                <!-- insert LumpedThermalotential nuclide models here -->
+              </choice>
+            </element>
+            <zeroOrMore>
+            <element name="allowedcommod">
+              <text/>
+            </element>
+            </zeroOrMore>
+            <zeroOrMore>
+            <element name="allowedwf">
+              <text/>
+            </element>
+            </zeroOrMore>
           </element>
-          <oneOrMore>
-          <element name="allowedwf">
-            <text/>
-          </element>
-          </oneOrMore>
-        </element>
-        </oneOrMore>
-        <oneOrMore>
-        <element name="wasteform">
-          <ref name="name"/>
-          <element name="model">
-          <choice>
-            <ref name="StubComponent"/>
-            <!-- insert ref to new potential far field component models here -->
-          </choice>
-          </element>
-          <oneOrMore>
-          <element name="allowedcommod">
-            <text/>
-          </element>
-          </oneOrMore>
-        </element>
         </oneOrMore>
      </element>
   </define>
@@ -476,6 +454,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="commodprice">
       <element name="commodprice">
         <data type="double"/>
+      </element>
+  </define>
+
+  <define name="componenttype">
+      <element name="componenttype">
+        <data type="string"/>
       </element>
   </define>
 
@@ -827,16 +811,20 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </define>
   <!-- end section for Stream -->
 
-  <!-- begin section for repocomponents -->
-  <define name="StubComponent">
-    <element name="StubComponent">
+  <!-- begin section for thermalmodels -->
+  <define name="StubThermal">
+    <element name="StubThermal">
       <text/>
     </element>
   </define>
 
-  <!-- insert new repocomponent parameter sets here -->
+  <!-- begin section for nuclidemodels -->
+  <define name="StubNuclide">
+    <element name="StubNuclide">
+      <text/>
+    </element>
+  </define>
 
-  <!-- end section for repocomponents -->
 
 </grammar>
 

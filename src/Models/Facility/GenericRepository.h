@@ -303,7 +303,7 @@ protected:
      *
      * @return the initialized component
      */
-    static Component* initComponent(xmlNodePtr cur) ;
+    Component* initComponent(xmlNodePtr cur) ;
 
     /**
      * Do heat transport calculations
@@ -321,20 +321,6 @@ protected:
      * @param commod the commodity
      */
     Mass getCapacity(Commodity* commod) ;
-
-    /**
-     * Return the component model named by the string
-     *
-     * @param model_name is the name of the component model (e.g. StubComponent)
-     */
-    static Component* getComponent(string model_name) ;
-
-    /**
-     * Return the component model enumerated type named by the string
-     *
-     * @param model_name is the name of the component model (e.g. StubComponent)
-     */
-    static RepoComponent getRepoComponentType(string model_name) ;
 
 
 /* ------------------- */ 
@@ -355,5 +341,6 @@ extern "C" void destruct(Model* p) {
 }
 
 /* ------------------- */ 
+
 
 #endif

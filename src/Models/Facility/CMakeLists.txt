@@ -1,6 +1,6 @@
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_LIBRARY( EnrichmentFacility  EnrichmentFacility.cpp )
-ADD_LIBRARY( GenericRepository   GenericRepository.cpp GenericRepository/Component.cpp GenericRepository/StubComponent.cpp GenericRepository/StubThermal.cpp)
+ADD_LIBRARY( GenericRepository   GenericRepository.cpp GenericRepository/Component.cpp GenericRepository/StubNuclide.cpp GenericRepository/StubThermal.cpp)
 ADD_LIBRARY( NullFacility        NullFacility.cpp )
 ADD_LIBRARY( RecipeReactor       RecipeReactor.cpp )
 ADD_LIBRARY( SeparationsMatrixFacility      SeparationsMatrixFacility.cpp )

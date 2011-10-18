@@ -11,7 +11,6 @@
 
 #include "ThermalModel.h"
 
-
 /** 
  * @brief StubThermal is a skeleton component model that does nothing.
 
@@ -28,14 +27,14 @@ public:
   /**
    * Default constructor for the component class. Creates an empty component.
    */
-  StubThermal(){this->impl_name_="StubThermal";}; 
+  StubThermal(){}; 
 
   /**
    * primary constructor reads input from XML node
    *
    * @param cur input XML node
    */
-  StubThermal(xmlNodePtr cur){this->impl_name_="StubThermal";};
+  StubThermal(xmlNodePtr cur){};
 
   /** 
    * Default destructor does nothing.
@@ -54,7 +53,7 @@ public:
    *
    * @param src is the component being copied
    */
-  virtual void copy(StubThermal* src); 
+  virtual void copy(ThermalModel* src); 
 
   /**
    * standard verbose printer includes current temp and concentrations
@@ -62,51 +61,38 @@ public:
   virtual void print(); 
 
   /**
+   * transports the heat
+   */
+  virtual void transportHeat();
+
+  /**
    * Get the available capacity within the component
    *
    * @param comp the component whose capacity is being queried
    */
-  virtual Power getAvailCapacity(Component* comp);
+  virtual Power getAvailCapacity();
 
   /**
-   * Returns the name of this 
-   *
-   * @return name_ the name of the ThermalModel 
-   */
-  const virtual std::string getName(){return name_;};
-
-  /**
-   * return the implementation name
+   * return the thermal model implementation type
    *
    * @return impl_name_ the name of the ThermalModel implementation 
    */
-  const std::string getImpl(){return impl_name_;}; 
+  const virtual ThermalModelType getThermalModelType(){return STUB_THERMAL;}; 
   
   /**
    * gets the peak temperature that this component will experience on the 
    * boundary
    *
-   * @param type the type of boundary (i.e. INNER or OUTER)
    * @param comp the component whose boundary is being queried
    */
-  virtual Temp getPeakTemp(BoundaryType type, Component* comp);
+  virtual Temp getPeakTemp();
 
   /**
    * gets the temperature average in the component
    *
    * @param comp the component whose temperature is being queried
    */
-  virtual Temp getTemp(Component* comp);
+  virtual Temp getTemp();
 
-protected:
-  /**
-   * The name of the ThermalModel implementation
-   */
-  std::string impl_name_;
-
-  /**
-   * The name of the ThermalModel 
-   */
-  std::string name_;
 };
 #endif

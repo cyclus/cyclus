@@ -7,11 +7,8 @@
 #include <libxml/xpathInternals.h>
 
 #include "Material.h"
-#include "Component.h"
 
-class ThermalModel;
-
-/**
+/**  
  * type definition for Temperature in Kelvin
  */
 typedef double Temp;
@@ -22,37 +19,21 @@ typedef double Temp;
 typedef double Power;
 
 /**
- * type definition for Radius in meters
- */
-typedef double Radius;
-
-/**
- * type definition for Concentrations in kg/m^3
- */
-typedef double Concentration;
-
-/**
- * type definition for ConcMap 
- */
-typedef std::map<Iso, Concentration> ConcMap;
-
-/**
  * enumerator for the component models available to the repo
  */
-enum ThermalModelType{LUMP, SINDA, LLNL, LAST_THERMAL}; 
+enum ThermalModelType{LLNL_THERMAL, LUMP_THERMAL, SINDA_THERMAL, STUB_THERMAL, LAST_THERMAL};  
 
 /** 
- * @brief Defines interface for subcomponents of the GenericRepository
+ * @brief Defines interface for thermal models to be used in the GenericRepository
  *
- * ThermalModels such as the Waste Form, Waste Package, Buffer, Near Field,
- * Far Field, and Envrionment will share a universal interface so that 
- * information passing concerning fluxes and other boundary conditions 
- * can be passed in and out of them.
+ * ThermalModels such as LumpedHeat, Sinda, LLNL, etc,
+ * will share this virtual interface so that they can be interchanged within the  
+ * GenericRepository.
  */
 class ThermalModel {
 
 public:
-  
+
   /**
    * initializes the model parameters from an xmlNodePtr
    *
@@ -77,30 +58,28 @@ public:
    *
    * @param comp the component whose capacity is being analyzed
    */
-  virtual Power getAvailCapacity(Component* comp) = 0;
+  virtual Power getAvailCapacity() = 0;
+ 
 
   /**
-   * get the Name
-   *
-   * @return name_
+   * transports the heat
    */
-  const virtual std::string getName()=0;
- 
+  virtual void transportHeat() =0;
+
   /**
    * get the component implementation name
    *
    * @return impl_name_
    */
-  const virtual std::string getImpl()=0;
+  const virtual ThermalModelType getThermalModelType()=0;
 
   /**
    * get the peak Temperature this object will experience during the simulation
    *
-   * @param type indicates whether to return the inner or outer peak temp
+   * @param comp is the Component being queried
    *
-   * @return peak_temperature_
    */
-  virtual Temp getPeakTemp(BoundaryType type, Component* comp) = 0;
+  virtual Temp getPeakTemp() = 0;
 
   /**
    * get the Temperature
@@ -108,7 +87,7 @@ public:
    * @param comp the component whose temperature we're getting
    * @return temperature_
    */
-  virtual Temp getTemp(Component* comp)=0;
+  virtual Temp getTemp()=0;
 
 };
 

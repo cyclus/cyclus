@@ -10,23 +10,18 @@
 #include <libxml/xpathInternals.h>
 
 #include "Material.h"
-
-class Component;
-
-/**
- * type definition for Toxicity in units of Sv 
- */
-typedef double Tox;
-
-/**
- * type definition for Temperature in Kelvin
- */
-typedef double Temp;
+#include "ThermalModel.h"
+#include "NuclideModel.h"
 
 /**
  * type definition for Radius in meters
  */
 typedef double Radius;
+
+/**
+ * type definition for Toxicity in units of Sv 
+ */
+typedef double Tox;
 
 /**
  * type definition for Concentrations in kg/m^3
@@ -39,40 +34,25 @@ typedef double Concentration;
 typedef std::map<Iso, Concentration> ConcMap;
 
 /**
- * Enum for type of component.
+ * type definition for Temperature in Kelvin
  */
-enum ComponentType {ENV, FF, NF, BUFFER, WP, WF, LAST_TYPE};
+typedef double Temp;
 
 /**
- * enumerator for the component models available to the repo
+ * type definition for Power in Watts
  */
-enum RepoComponent{STUB, LAST_COMPONENT}; 
+typedef double Power;
+
+/**
+ * Enum for type of engineered barrier component.
+ */
+enum ComponentType {BUFFER, ENV, FF, NF, WF, WP, LAST_EBS};
 
 /**
  * Enum for type of boundary.
  */
 enum BoundaryType {INNER, OUTER};
 
-/** 
- * A struct to describe solids
- */
-struct Solid{
-  double density;
-  double porosity;
-  double mass;
-  double vol;
-  double conductivity;
-};
-
-/** 
- * A struct to describe fluids
- */
-struct Fluid{
-  double viscosity;
-  double diffusivity;
-  double mass;
-  std::map<Iso, double> solubilities;
-};
 
 /** 
  * @brief Defines interface for subcomponents of the GenericRepository
@@ -85,25 +65,10 @@ struct Fluid{
 class Component {
 
 public:
-  
   /**
    * Default constructor for the component class. Creates an empty component.
    */
-  Component(); 
-  
-  /**
-   * a constructor for making a component object from a known recipe and size.
-   *
-   * @param name is the name of the component
-   * @param temperature is the initial temperature
-   * @param temperature_lim is the temperature limit
-   * @param toxicity_lim is the toxicity limit
-   * @param inner is the inner radius
-   * @param outer is the outer radius
-   * @param type indicates wf, wp, buffer, nf, ff, or env component 
-   */
-  Component(std::string name, Temp temperature, Temp temperature_lim, Tox toxicity_lim,
-      Radius inner, Radius outer, ComponentType type);
+  Component();
 
   /** 
    * Default destructor does nothing.
@@ -115,26 +80,26 @@ public:
    *
    * @param cur is the current xmlNodePtr
    */
-  virtual void init(xmlNodePtr cur); 
+  void init(xmlNodePtr cur); 
 
   /**
    * copies a component and its parameters from another
    *
    * @param src is the component being copied
    */
-  virtual void copy(Component* src); 
+  void copy(Component* src); 
 
   /**
    * standard verbose printer includes current temp and concentrations
    */
-  virtual void print(); 
+  void print(); 
 
   /**
    * Absorbs the contents of the given Material into this Component.
    * 
    * @param matToAdd the Component to be absorbed
    */
-  virtual void absorb(Material* matToAdd) = 0;
+  void absorb(Material* matToAdd){nuclide_model_->absorb(matToAdd);};
 
   /**
    * Extracts the contents of the given Material from this Component. Use this 
@@ -144,19 +109,19 @@ public:
    * @param matToRem the Material whose composition we want to decrement 
    * against this Component
    */
-  virtual void extract(Material* matToRem) = 0 ;
+  void extract(Material* matToRem){nuclide_model_->extract(matToRem);};
 
   /**
    * Transports heat from the inner boundary to the outer boundary in this 
    * component
    */
-  virtual void transportHeat() = 0 ;
+  void transportHeat(){thermal_model_->transportHeat();};
 
   /**
    * Transports nuclides from the inner boundary to the outer boundary in this 
    * component
    */
-  virtual void transportNuclides() = 0 ;
+  void transportNuclides(){nuclide_model_->transportNuclides();};
 
   /** 
    * Loads this component with another component.
@@ -164,18 +129,38 @@ public:
    * @param type the ComponentType of this component
    * @param to_load the Component to load into this component
    */
-  virtual Component* load(ComponentType type, Component* to_load);
+  Component* load(ComponentType type, Component* to_load);
 
   /** 
    * Reports true if this component may be loaded with more of whatever goes 
    * inside it and reports false if that is not the case.
    */
-  virtual bool isFull() = 0;
-    
+  bool isFull() ;
+
   /** 
    * Enumerates a string if it is one of the named ComponentTypes
    */
-  ComponentType getComponentType(std::string);
+  ComponentType getComponentType(std::string type);
+
+  /** 
+   * Enumerates a string if it is one of the named ThermalModelTypes
+   */
+  ThermalModelType getThermalModelType(std::string type);
+
+  /** 
+   * Enumerates a string if it is one of the named NuclideModelTypes
+   */
+  NuclideModelType getNuclideModelType(std::string type);
+
+  /** 
+   * Returns a new thermal model of the string type xml node pointer
+   */
+  ThermalModel* getThermalModel(xmlNodePtr cur);
+
+  /** 
+   * Returns a new nuclide model of the string type and xml node pointer
+   */
+  NuclideModel* getNuclideModel(xmlNodePtr cur);
 
   /**
    * get the ID
@@ -190,13 +175,6 @@ public:
    * @return name_
    */
   const std::string getName(){return name_;};
- 
-  /**
-   * get the component implementation name
-   *
-   * @return impl_name_
-   */
-  const virtual std::string getImpl()=0;
  
   /**
    * get the list of components 
@@ -289,9 +267,14 @@ protected:
   MassHistory mass_hist_;
 
   /**
-   * The type of model implemented by this component (Stub, MixedCell, etc.) 
+   * The type of thermal model implemented by this component
    */
-  std::string impl_name_;
+  ThermalModel* thermal_model_;
+
+  /**
+   * The type of nuclide model implemented by this component
+   */
+  NuclideModel* nuclide_model_;
 
   /**
    * The immediate parent component of this component.
