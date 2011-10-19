@@ -55,7 +55,7 @@ public:
    *
    * @param src is the nuclide model being copied
    */
-  virtual void copy(NuclideModel* src); 
+  virtual NuclideModel* copy(NuclideModel* src); 
 
   /**
    * standard verbose printer includes current temp and concentrations

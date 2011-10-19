@@ -162,6 +162,16 @@ public:
    */
   NuclideModel* getNuclideModel(xmlNodePtr cur);
 
+  /** 
+   * Returns a new thermal model that is a copy of the src model
+   */
+  ThermalModel* copyThermalModel(ThermalModel* src);
+
+  /** 
+   * Returns a new nuclide model that is a copy of the src model
+   */
+  NuclideModel* copyNuclideModel(NuclideModel* src);
+
   /**
    * get the ID
    *

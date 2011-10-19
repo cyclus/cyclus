@@ -59,7 +59,6 @@ public:
    * @param comp the component whose capacity is being analyzed
    */
   virtual Power getAvailCapacity() = 0;
- 
 
   /**
    * transports the heat
@@ -67,9 +66,7 @@ public:
   virtual void transportHeat() =0;
 
   /**
-   * get the component implementation name
-   *
-   * @return impl_name_
+   * get the component implementation type
    */
   const virtual ThermalModelType getThermalModelType()=0;
 

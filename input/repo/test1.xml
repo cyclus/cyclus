@@ -37,38 +37,54 @@
     <model>
       <GenericRepository>
         <area>1</area>
-        <capacity>3</capacity>
+        <capacity>1000</capacity>
         <incommodity>uo2</incommodity>
         <inventorysize>1e4</inventorysize>
         <lifetime>1</lifetime>
         <startOperMonth>1</startOperMonth>
         <startOperYear>1</startOperYear>
-        <farfield>
+        <component>
           <name>ff</name>
-          <model>
-            <StubComponent/>
-          </model>
-        </farfield>
-        <buffer>
+          <componenttype>FF</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+        </component>
+        <component>
           <name>buffer</name>
-          <model>
-            <StubComponent/>
-          </model>
-        </buffer>
-        <wastepackage>
+          <componenttype>BUFFER</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+        </component>
+        <component>
           <name>wp</name>
-          <model>
-            <StubComponent/>
-          </model>
+          <componenttype>WP</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
           <allowedwf>wf</allowedwf>
-        </wastepackage>
-        <wasteform>
+        </component>
+        <component>
           <name>wf</name>
-          <model>
-            <StubComponent/>
-          </model>
+          <componenttype>WF</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
           <allowedcommod>uo2</allowedcommod>
-        </wasteform>
+        </component>
       </GenericRepository>
     </model>
   </facility>

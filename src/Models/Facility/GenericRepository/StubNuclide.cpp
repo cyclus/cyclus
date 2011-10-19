@@ -19,7 +19,9 @@ void StubNuclide::init(xmlNodePtr cur){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubNuclide::copy(NuclideModel* src){
+NuclideModel* StubNuclide::copy(NuclideModel* src){
+  StubNuclide* toRet = new StubNuclide();
+  return (NuclideModel*)toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -49,6 +49,11 @@ public:
   virtual void init(xmlNodePtr cur); 
 
   /**
+   * A function that copies deeply.
+   */
+  StubThermal* deepCopy();
+
+  /**
    * copies a component and its parameters from another
    *
    * @param src is the component being copied

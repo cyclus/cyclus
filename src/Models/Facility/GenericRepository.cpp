@@ -180,6 +180,7 @@ void GenericRepository::copy(GenericRepository* src)
   wf_wp_map_ = src->wf_wp_map_;
   commod_wf_map_ = src->commod_wf_map_;
   buffers_.push_front(new Component());
+  buffers_.front()->copy(buffer_template_);
 
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();

@@ -12,7 +12,6 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubThermal::init(xmlNodePtr cur){
-  ThermalModel::init(cur);
   // move the xml pointer to the current model
   cur = XMLinput->get_xpath_element(cur,"model/StubThermal");
   // for now, just say you've done it... 
@@ -20,7 +19,15 @@ void StubThermal::init(xmlNodePtr cur){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubThermal::copy(ThermalModel* src){ }
+StubThermal* StubThermal::deepCopy(){
+  StubThermal* toRet = new StubThermal();
+  toRet->copy(this);
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubThermal::copy(ThermalModel* src){
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubThermal::print(){

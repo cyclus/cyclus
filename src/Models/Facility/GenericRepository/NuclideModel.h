@@ -53,7 +53,7 @@ public:
    *
    * @param src is the component being copied
    */
-  virtual void copy(NuclideModel* src)=0; 
+  virtual NuclideModel* copy(NuclideModel* src)=0; 
 
   /**
    * standard verbose printer explains the model

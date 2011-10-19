@@ -61,11 +61,11 @@ void Component::copy(Component* src){
 
   type_ = src->type_;
 
+  thermal_model_ = copyThermalModel(src->thermal_model_);
+  nuclide_model_ = copyNuclideModel(src->nuclide_model_);
+
   temperature_lim_ = src->temperature_lim_ ;
   toxicity_lim_ = src->toxicity_lim_ ;
-
-  thermal_model_->copy(src->thermal_model_);
-  nuclide_model_->copy(src->nuclide_model_);
 
   comp_hist_ = CompHistory();
   mass_hist_ = MassHistory();
@@ -188,7 +188,6 @@ ThermalModel* Component::getThermalModel(xmlNodePtr cur){
   }
   return toRet;
 }
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 NuclideModel* Component::getNuclideModel(xmlNodePtr cur){
   NuclideModel* toRet;
@@ -209,6 +208,57 @@ NuclideModel* Component::getNuclideModel(xmlNodePtr cur){
     default:
       throw GenException("Unknown nuclide model enum value encountered."); 
   }
+  return toRet;
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+ThermalModel* Component::copyThermalModel(ThermalModel* src){
+  ThermalModel* toRet;
+  switch( src->getThermalModelType() )
+  {
+//    case LLNL_THERMAL:
+//      toRet = new LLNLThermal();
+//      toRet->copy(src);
+//      break;
+//    case LUMP_THERMAL:
+//      toRet = new LumpThermal();
+//      toRet->copy(src);
+//      break;
+//    case SINDA_THERMAL:
+//      toRet = new SindaThermal();
+//      toRet->copy(src);
+//      break;
+    case STUB_THERMAL:
+      toRet = new StubThermal();
+      toRet->copy(src);
+      break;
+    default:
+      throw GenException("Unknown thermal model enum value encountered when copying."); 
+  }      
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+NuclideModel* Component::copyNuclideModel(NuclideModel* src){
+  NuclideModel* toRet;
+  switch(src->getNuclideModelType())
+  {
+//    case LUMP_NUCLIDE:
+//      toRet = new LumpNuclide();
+//      toRet->copy(src);
+//      break;
+//    case MIXEDCELL_NUCLIDE:
+//      toRet = new MixedCellNuclide();
+//      toRet->copy(src);
+//      break;
+    case STUB_NUCLIDE:
+      toRet = new StubNuclide();
+      toRet->copy(src);
+      break;
+    default:
+      throw GenException("Unknown nuclide model enum value encountered when copying."); 
+  }      
   return toRet;
 }
 

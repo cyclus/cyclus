@@ -44,8 +44,6 @@
       </SourceFacility>
     </model>
   </facility>
-
-
   <facility>
     <name>BackEnd</name>
     <model>
@@ -57,6 +55,48 @@
         <lifetime>1</lifetime>
         <startOperMonth>1</startOperMonth>
         <startOperYear>1</startOperYear>
+        <component>
+          <name>ff</name>
+          <componenttype>FF</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+        </component>
+        <component>
+          <name>buffer</name>
+          <componenttype>BUFFER</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+        </component>
+        <component>
+          <name>wp</name>
+          <componenttype>WP</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+          <allowedwf>wf</allowedwf>
+        </component>
+        <component>
+          <name>wf</name>
+          <componenttype>WF</componenttype>
+          <thermalmodel>
+            <StubThermal/>
+          </thermalmodel>
+          <nuclidemodel>
+            <StubNuclide/>
+          </nuclidemodel>
+          <allowedcommod>uo2</allowedcommod>
+        </component>
       </GenericRepository>
     </model>
   </facility>
