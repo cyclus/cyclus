@@ -266,6 +266,12 @@ protected:
      */
     Mass checkStocks();
 
+    /**
+     * Make requests based on capacity
+     *
+     * @param time the time at which to make the requests. 
+     */
+    void makeRequests(int time);
 
     /**
      * Emplace the waste
