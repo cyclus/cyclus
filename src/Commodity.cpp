@@ -9,6 +9,13 @@
 /// Initialize the Commodity ID serialization
 int Commodity::nextID_ = 0;
 
+using namespace std;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity::Commodity() {
+  market_ = NULL;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity(xmlNodePtr cur) {
   // advance the commodity ID
@@ -31,4 +38,15 @@ void Commodity::load_commodities() {
     LI->addCommodity(new Commodity(nodes->nodeTab[i]));
   }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Commodity::getMarket() {
+  if (market_ == NULL) {
+    string err_msg = "Attempted to retrieve an uninitialized market pointer";
+    err_msg += "from a commodity.";
+    throw GenException(err_msg);
+  }
+
+  return market_;
+};
 

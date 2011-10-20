@@ -16,7 +16,7 @@ class Model;
 class Commodity {
 public:
 
-  Commodity() { };
+  Commodity();
 
   /**
    *  @brief Primary constructor uses an existing XML Node Pointer to
@@ -36,7 +36,7 @@ public:
   int getSN() const {return ID_;};
   
   /// get the Model pointer
-  Model* getMarket() {return market_;};
+  Model* getMarket();
   
   /**
    *  @brief set the Model pointer

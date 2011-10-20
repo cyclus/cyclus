@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     if(argc<2) {
       string err_msg = "Cyclus usage requires an input file.\n";
       err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
-      cout << err_msg;
+      throw GenException(err_msg);
     }
 
     // parse arguments

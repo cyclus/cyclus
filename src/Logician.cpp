@@ -125,6 +125,11 @@ Model* Logician::getModelByName(string name, ModelType model_type) {
       found_model = model->second;
     }
   }
+
+  if (found_model == NULL) {
+    string err_msg = "Model '" + name + "' doesn't exist.";
+    throw GenException(err_msg);
+  }
   
   return found_model;
 }
