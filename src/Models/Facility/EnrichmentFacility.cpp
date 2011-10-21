@@ -467,3 +467,19 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
 {
 	return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
 }
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* construct() {
+    return new EnrichmentFacility();
+}
+
+extern "C" void destruct(Model* p) {
+    delete p;
+}
+
+/* ------------------- */ 
+

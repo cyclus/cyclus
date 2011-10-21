@@ -328,25 +328,9 @@ protected:
      */
     Mass getCapacity(Commodity* commod) ;
 
-
 /* ------------------- */ 
 
 };
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-extern "C" Model* construct() {
-    return new GenericRepository();
-}
-
-extern "C" void destruct(Model* p) {
-    delete p;
-}
-
-/* ------------------- */ 
-
-
 #endif
+

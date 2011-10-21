@@ -519,4 +519,18 @@ void GenericRepository::transportNuclides(){
   far_field_->transportNuclides();
 }
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* construct() {
+    return new GenericRepository();
+}
+
+extern "C" void destruct(Model* p) {
+    delete p;
+}
+
+/* ------------------- */ 
 

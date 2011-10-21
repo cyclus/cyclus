@@ -137,19 +137,5 @@ protected:
 
 };
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-extern "C" Model* construct() {
-  return new SinkFacility();
-}
-
-extern "C" void destruct(Model* p) {
-  delete p;
-}
-
-/* ------------------- */ 
-
 #endif
+

@@ -481,3 +481,20 @@ void SeparationsMatrixFacility::separate()
    }
    */       
 }
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* construct() {
+  return new SeparationsMatrixFacility();
+}
+
+extern "C" void destruct(Model* p) {
+  delete p;
+}
+
+/* ------------------- */ 
+
+
