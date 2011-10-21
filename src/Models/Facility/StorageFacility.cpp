@@ -94,7 +94,7 @@ void StorageFacility::print()
       << "}, for a minimum time of " 
       << residence_time_ 
       << " months and has an inventory_ that holds " 
-      << inventory__size_ << " materials."
+      << inventory_size_ << " materials."
       << endl;
 };
 
@@ -142,7 +142,7 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
       Material* newMat = new Material(CompMap(), 
           m->getUnits(),
           m->getName(), 
-          0, atomBased);
+          0, ATOMBASED);
       Material* toAbsorb = m->extractMass(capacity_ - complete);
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
@@ -194,7 +194,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
     sending_facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
-    if (NULL == facility){
+    if (NULL == sending_facility){
       throw GenException("Facility '" 
 			 + fac_name 
 			 + "' is not defined in this problem.");
@@ -225,7 +225,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     amount, 
-                                    massBased);
+                                    MASSBASED);
     
     // decay the material for the alloted time
     newMat->decay(age);
@@ -267,12 +267,12 @@ void StorageFacility::handleTick(int time)
   // And it can accept amounts no matter how small
   Mass minAmt = 0;
   // check how full its inventory_ is
-  Mass inv = this->checkInventory_();
+  Mass inv = this->checkInventory();
   // and how much is already in its stocks
   Mass sto = this->checkStocks(); 
   cout << "stocks currently at: " << sto << " " << inv << endl;
   // subtract inv and sto from inventory_ max size to get total empty space
-  Mass space = inventory__size_ - inv - sto;
+  Mass space = inventory_size_ - inv - sto;
   // this will be a request for free stuff
   double commod_price = 0;
 
@@ -311,11 +311,11 @@ void StorageFacility::handleTick(int time)
   Mass possInv = inv;
 
   // if the inventory_ isn't full, then offer what you have
-  if (possInv < inventory__size_){
+  if (possInv < inventory_size_){
     offer_amt = possInv;
   }
   else {
-    offer_amt = inventory__size_; 
+    offer_amt = inventory_size_; 
   }
 
   // there is no minimum amount a storage facility may send
@@ -329,8 +329,8 @@ void StorageFacility::handleTick(int time)
       this, recipient);
 
   // send it
-  msg.setNextDest(getFacInst());
-  msg.sendOn();
+  msg->setNextDest(getFacInst());
+  msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::handleTock(int time)
