@@ -30,8 +30,8 @@ Env* Env::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::searchPathForFile(string filename, string inputPath,
-                              string envPath, string builtinPath) {
+std::string Env::searchPathForFile(std::string filename, std::string inputPath,
+                              std::string envPath, std::string builtinPath) {
   struct stat stat_info;
   int stat_result = -1;
   string::size_type begin = 0;
@@ -65,7 +65,7 @@ string Env::searchPathForFile(string filename, string inputPath,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::checkEnv(string varname) {
+std::string Env::checkEnv(std::string varname) {
 
   string toRet;
   if ((strlen(getenv(varname.c_str()))>0)&&(getenv(varname.c_str())!=NULL)){

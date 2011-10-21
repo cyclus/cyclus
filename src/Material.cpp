@@ -68,7 +68,7 @@ Material::Material(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(CompMap comp, string mat_unit, string rec_name, double size, Basis type) {
+Material::Material(CompMap comp, std::string mat_unit, std::string rec_name, double size, Basis type) {
   
   ID_=nextID_++;
 
@@ -113,7 +113,7 @@ void Material::load_recipes() {
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::load_recipebook(string filename, string ns, string format) {
+void Material::load_recipebook(std::string filename, std::string ns, std::string format) {
   XMLinput->extendCurNS(ns);
 
   if ("xml" == format)
@@ -170,7 +170,7 @@ const double Material::getEltMass(int elt) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Material::getEltMass(int elt, const map<Iso, Atoms>& comp) {
+double Material::getEltMass(int elt, const std::map<Iso, Atoms>& comp) {
   // Iterate through the current composition...
   map<Iso, Atoms>::const_iterator iter = comp.begin();
   double massToRet = 0;
@@ -530,7 +530,7 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::printComp(string header, CompMap comp_map) {
+void Material::printComp(std::string header, CompMap comp_map) {
 
   cout << "\t" << header << endl;
   for (CompMap::iterator iso = comp_map.begin();

@@ -44,7 +44,7 @@ void BookKeeper::createDB() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::createDB(string name) {
+void BookKeeper::createDB(std::string name) {
   dbName_ = name;
 
   try {
@@ -66,7 +66,7 @@ void BookKeeper::createDB(string name) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, string dsName){
+DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string dsName){
   DataSet dataset;
   try{
     // create the dataspace from rank and dimension information
@@ -135,12 +135,12 @@ void BookKeeper::closeDB()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BookKeeper::isGroup(string grp) {
+bool BookKeeper::isGroup(std::string grp) {
   return true;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTrans(Message* msg, vector<Material*> manifest){
+void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
   for (vector<Material*>::iterator thisMat=manifest.begin();
@@ -485,7 +485,7 @@ void BookKeeper::writeMatHist(){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::prepareSpaces(string dsname, DataType type, DataSpace &memspace, 
+void BookKeeper::prepareSpaces(std::string dsname, DataType type, DataSpace &memspace, 
     DataSpace &filespace, DataSet &dataset){
     
     // define the dataset to match the dataspace
@@ -503,7 +503,7 @@ void BookKeeper::prepareSpaces(string dsname, DataType type, DataSpace &memspace
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(intData1d data, string dsname){ 
+void BookKeeper::writeData(intData1d data, std::string dsname){ 
   try {
     hsize_t nrows = data.size(); 
   
@@ -535,7 +535,7 @@ void BookKeeper::writeData(intData1d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(intData2d data, string dsname){
+void BookKeeper::writeData(intData2d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
     hsize_t ncols = data[0].size(); 
@@ -569,7 +569,7 @@ void BookKeeper::writeData(intData2d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(intData3d data, string dsname){
+void BookKeeper::writeData(intData3d data, std::string dsname){
 
   try {
     hsize_t nrows = data.size(); 
@@ -607,7 +607,7 @@ void BookKeeper::writeData(intData3d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(dblData1d data, string dsname){
+void BookKeeper::writeData(dblData1d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
   
@@ -639,7 +639,7 @@ void BookKeeper::writeData(dblData1d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(dblData2d data, string dsname){
+void BookKeeper::writeData(dblData2d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
     hsize_t ncols = data[0].size(); 
@@ -673,7 +673,7 @@ void BookKeeper::writeData(dblData2d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(dblData3d data, string dsname){
+void BookKeeper::writeData(dblData3d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
     hsize_t ncols = data[0].size(); 
@@ -710,7 +710,7 @@ void BookKeeper::writeData(dblData3d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(strData1d data, string dsname){
+void BookKeeper::writeData(strData1d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
   
@@ -746,7 +746,7 @@ void BookKeeper::writeData(strData1d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(strData2d data, string dsname){
+void BookKeeper::writeData(strData2d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
     hsize_t ncols = data[0].size(); 
@@ -783,7 +783,7 @@ void BookKeeper::writeData(strData2d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeData(strData3d data, string dsname){
+void BookKeeper::writeData(strData3d data, std::string dsname){
   try {
     hsize_t nrows = data.size(); 
     hsize_t ncols = data[0].size(); 
@@ -823,7 +823,7 @@ void BookKeeper::writeData(strData3d data, string dsname){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, intData1d& out_data){
+void BookKeeper::readData(std::string dsname, intData1d& out_data){
 
   try{
     // turn off auto printing and deal with exceptions at the end
@@ -876,7 +876,7 @@ void BookKeeper::readData(string dsname, intData1d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, intData2d& out_data){
+void BookKeeper::readData(std::string dsname, intData2d& out_data){
 
   try{
     // turn off auto printing and deal with exceptions at the end
@@ -934,7 +934,7 @@ void BookKeeper::readData(string dsname, intData2d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, intData3d& out_data){
+void BookKeeper::readData(std::string dsname, intData3d& out_data){
 
   try{
     // turn off auto printing and deal with exceptions at the end
@@ -996,7 +996,7 @@ void BookKeeper::readData(string dsname, intData3d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, dblData1d& out_data){
+void BookKeeper::readData(std::string dsname, dblData1d& out_data){
   try{
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
@@ -1052,7 +1052,7 @@ void BookKeeper::readData(string dsname, dblData1d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, dblData2d& out_data){
+void BookKeeper::readData(std::string dsname, dblData2d& out_data){
   try{
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
@@ -1109,7 +1109,7 @@ void BookKeeper::readData(string dsname, dblData2d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, dblData3d& out_data){
+void BookKeeper::readData(std::string dsname, dblData3d& out_data){
 
   try{
     // turn off auto printing and deal with exceptions at the end
@@ -1171,7 +1171,7 @@ void BookKeeper::readData(string dsname, dblData3d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, strData1d& out_data){
+void BookKeeper::readData(std::string dsname, strData1d& out_data){
   try{
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
@@ -1225,7 +1225,7 @@ void BookKeeper::readData(string dsname, strData1d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, strData2d& out_data){
+void BookKeeper::readData(std::string dsname, strData2d& out_data){
   try{
     // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
@@ -1282,7 +1282,7 @@ void BookKeeper::readData(string dsname, strData2d& out_data){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::readData(string dsname, strData3d& out_data){
+void BookKeeper::readData(std::string dsname, strData3d& out_data){
 
   try{
     // turn off auto printing and deal with exceptions at the end

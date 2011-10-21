@@ -17,7 +17,7 @@ GenException::GenException() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenException::GenException(string msg) {
+GenException::GenException(std::string msg) {
 	myMessage_ = prepend_ + ": " + msg;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

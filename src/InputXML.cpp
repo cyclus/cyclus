@@ -84,7 +84,7 @@ void InputXML::stripCurNS() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_file(string filename) {
+void InputXML::load_file(std::string filename) {
   // double check that the file exists
   if(filename=="") {
     throw GenException("No input filename was given");
@@ -128,7 +128,7 @@ void InputXML::load_file(string filename) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_recipebook(string filename) {
+void InputXML::load_recipebook(std::string filename) {
   /// store parent file info
   fileStack_.push(curFilePtr);
 
@@ -153,7 +153,7 @@ void InputXML::load_recipebook(string filename) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_facilitycatalog(string filename) {
+void InputXML::load_facilitycatalog(std::string filename) {
   /// store parent file info
   fileStack_.push(curFilePtr);
 

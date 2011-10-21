@@ -23,7 +23,7 @@ map<string, mdl_ctor*> Model::create_map_;
 map<string, mdl_dtor*> Model::destroy_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(string model_type, xmlNodePtr cur) {
+Model* Model::create(std::string model_type, xmlNodePtr cur) {
   string model_impl = XMLinput->get_xpath_name(cur, "model/*");
 
   // get instance
@@ -48,7 +48,7 @@ Model* Model::create(Model* model_orig) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mdl_ctor* Model::loadConstructor(string model_type, string model_name) {
+mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name) {
   mdl_ctor* new_model;
 
   model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
@@ -131,7 +131,7 @@ void Model::load_facilities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilitycatalog(string filename, string ns, string format){
+void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
   XMLinput->extendCurNS(ns);
 
   if ("xml" == format){

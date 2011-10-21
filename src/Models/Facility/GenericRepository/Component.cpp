@@ -96,7 +96,7 @@ bool Component::isFull() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ComponentType Component::getComponentType(string type_name) {
+ComponentType Component::getComponentType(std::string type_name) {
   ComponentType toRet = LAST_EBS;
   string component_type_names[] = {"BUFFER", "ENV", "FF", "NF", "WF", "WP"};
   for(int type = 0; type < LAST_EBS; type++){
@@ -119,7 +119,7 @@ ComponentType Component::getComponentType(string type_name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ThermalModelType Component::getThermalModelType(string type_name) {
+ThermalModelType Component::getThermalModelType(std::string type_name) {
   ThermalModelType toRet = LAST_THERMAL;
   string thermal_type_names[] = {"LLNLThermal","LumpThermal","SindaThermal","StubThermal"};
   for(int type = 0; type < LAST_THERMAL; type++){
@@ -142,7 +142,7 @@ ThermalModelType Component::getThermalModelType(string type_name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-NuclideModelType Component::getNuclideModelType(string type_name) {
+NuclideModelType Component::getNuclideModelType(std::string type_name) {
   NuclideModelType toRet = LAST_NUCLIDE;
   string nuclide_type_names[] = {"LumpNuclide","MixedCellNuclide", "StubNuclide" };
   for(int type = 0; type < LAST_NUCLIDE; type++){

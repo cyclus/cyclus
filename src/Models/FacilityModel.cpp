@@ -51,7 +51,7 @@ InstModel* FacilityModel::getFacInst() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::sendMaterial(Message* msg, vector<Material*> manifest) {
+void FacilityModel::sendMaterial(Message* msg, std::vector<Material*> manifest) {
   // register this transaction with the bookkeper
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function

@@ -113,7 +113,7 @@ ModelList::iterator Logician::end(ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Logician::getModelByName(string name, ModelType model_type) {
+Model* Logician::getModelByName(std::string name, ModelType model_type) {
   Model* found_model = NULL;
 
   ModelList* list;
@@ -140,7 +140,7 @@ int Logician::getNumModels(ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Logician::getMarketByCommodity(string commodity_name) 
+Model* Logician::getMarketByCommodity(std::string commodity_name) 
 { 
   return commodity_market_map_[getCommodity(commodity_name)]; 
 }
@@ -168,7 +168,7 @@ void Logician::printModelList(ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::addRecipe(string name, Material* new_mat) { 
+void Logician::addRecipe(std::string name, Material* new_mat) { 
   recipes_[name] = new_mat; 
 };
 
@@ -188,7 +188,7 @@ int Logician::getNumRecipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Logician::getRecipe(string name) { 
+Material* Logician::getRecipe(std::string name) { 
   return recipes_[name]; 
 } 
   
@@ -203,7 +203,7 @@ int Logician::getNumCommodities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Logician::getCommodity(string name) { 
+Commodity* Logician::getCommodity(std::string name) { 
   return commodities_[name]; 
 } 
 

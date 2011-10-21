@@ -56,7 +56,6 @@ public:
   /**
    * Reports the peak thermal source, in Watts, that a component can contain
    *
-   * @param comp the component whose capacity is being analyzed
    */
   virtual Power getAvailCapacity() = 0;
 
@@ -73,7 +72,6 @@ public:
   /**
    * get the peak Temperature this object will experience during the simulation
    *
-   * @param comp is the Component being queried
    *
    */
   virtual Temp getPeakTemp() = 0;
@@ -81,7 +79,6 @@ public:
   /**
    * get the Temperature
    *
-   * @param comp the component whose temperature we're getting
    * @return temperature_
    */
   virtual Temp getTemp()=0;

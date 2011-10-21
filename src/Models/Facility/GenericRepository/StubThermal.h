@@ -73,7 +73,6 @@ public:
   /**
    * Get the available capacity within the component
    *
-   * @param comp the component whose capacity is being queried
    */
   virtual Power getAvailCapacity();
 
@@ -88,14 +87,12 @@ public:
    * gets the peak temperature that this component will experience on the 
    * boundary
    *
-   * @param comp the component whose boundary is being queried
    */
   virtual Temp getPeakTemp();
 
   /**
    * gets the temperature average in the component
    *
-   * @param comp the component whose temperature is being queried
    */
   virtual Temp getTemp();
 
