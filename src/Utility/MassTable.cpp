@@ -48,7 +48,7 @@ string MassTable::getName(Iso tope){ };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initialize() {
-  string file_path = Env::path_from_cwd_to_cyclus_ + "/Data/mass.h5"; 
+  string file_path = ENV->getCyclusPath() + "/Data/mass.h5"; 
 
   const H5std_string filename = file_path;
   const H5std_string groupname = "ame03";

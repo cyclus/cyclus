@@ -52,7 +52,7 @@ Model* Model::create(Model* model_orig) {
 mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name) {
   mdl_ctor* new_model;
 
-  string start_path = Env::path_from_cwd_to_cyclus_;
+  string start_path = ENV->getCyclusPath();
 
   model_name = start_path + "/Models/" + model_type + "/lib" + 
                model_name+SUFFIX;

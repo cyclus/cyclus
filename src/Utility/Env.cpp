@@ -32,6 +32,22 @@ Env* Env::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Env::getCyclusPath() {
+  return path_from_cwd_to_cyclus_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Env::setCyclusPath(std::string path) {
+  string path_only;
+  int index;
+
+  index = path.rfind("/");
+  path_only = path.substr(0, index);
+
+  path_from_cwd_to_cyclus_ = path_only;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::checkEnv(std::string varname) {
 
   string toRet;

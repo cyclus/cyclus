@@ -17,6 +17,8 @@ private:
 	 */
 	static Env* instance_;
 
+  static std::string path_from_cwd_to_cyclus_;
+
 protected:
 		
 	/**
@@ -27,14 +29,27 @@ protected:
 public:
 
 	/**
+	 * @return the relative path from the cwd to the cyclus executable
+	 */
+  static std::string getCyclusPath();
+
+	/**
+   * Allows configuration and other files to be located independent
+   * of the working directory from which cyclus is executed.
+	 *
+	 * @param path this should be argv[0] as passed to the main function
+   *             (i.e. the relative path from the cwd to cyclus including
+   *              the name of the cyclus executable)
+	 */
+  static void setCyclusPath(std::string path);
+
+	/**
 	 * Gives all simulation objects global access to the Env by 
 	 * returning a pointer to it.
 	 *
 	 * @return a pointer to the Env
 	 */
 	static Env* Instance();
-
-  static std::string path_from_cwd_to_cyclus_;
 
   /**
    * Method to check the existence of and return an environment variable
