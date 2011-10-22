@@ -5,6 +5,7 @@
 #include "Model.h"
 
 #include "GenException.h"
+#include "Env.h"
 #include "InputXML.h"
 #include "Logician.h"
 
@@ -51,7 +52,10 @@ Model* Model::create(Model* model_orig) {
 mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name) {
   mdl_ctor* new_model;
 
-  model_name = "Models/" + model_type + "/lib" + model_name+SUFFIX;
+  string start_path = Env::path_from_cwd_to_cyclus_;
+
+  model_name = start_path + "/Models/" + model_type + "/lib" + 
+               model_name+SUFFIX;
 
   if (create_map_.find(model_name) == create_map_.end()) {
     void* model = dlopen(model_name.c_str(),RTLD_LAZY);

@@ -9,8 +9,7 @@
 #include "H5Cpp.h" 
 #include "H5CompType.h"
 #include "H5Exception.h"
-
-#define MASS_FILE "Data/mass.h5"
+#include "Env.h"
 
 using namespace std;
 using namespace H5;
@@ -46,9 +45,12 @@ Mass MassTable::getMass(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string MassTable::getName(Iso tope){ };
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initialize() {
-  const H5std_string filename = MASS_FILE; 
+  string file_path = Env::path_from_cwd_to_cyclus_ + "/Data/mass.h5"; 
+
+  const H5std_string filename = file_path;
   const H5std_string groupname = "ame03";
   const H5std_string datasetname = "nuclide";
   const H5std_string A_memb = "A";
@@ -57,9 +59,7 @@ void MassTable::initialize() {
   const H5std_string name_memb = "name";
   
   //check if the file is an hdf5 file first.
-  if (H5File::isHdf5(MASS_FILE)) {
-
-  } else{
+  if (! H5File::isHdf5(file_path)) {
     throw GenException("The MASS_FILE is not an hdf5 file.");
   }
 

@@ -34,18 +34,7 @@ public:
 	 */
 	static Env* Instance();
 
-  /**
-   * implement a searchpath paradigm
-   *
-   * @param filename
-   * @param inputPath
-   * @param envPath
-   * @param builtinPath
-   *
-   * @return file path
-   */
-   std::string searchPathForFile(std::string filename, std::string inputPath,
-                                 std::string envPath, std::string builtinPath);
+  static std::string path_from_cwd_to_cyclus_;
 
   /**
    * Method to check the existence of and return an environment variable

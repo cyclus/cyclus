@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "InputXML.h"
 #include "GenException.h"
+#include "Env.h"
 
 using namespace std;
 
@@ -16,6 +17,15 @@ using namespace std;
 //-----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+    // tell ENV the path between the cwd and the cyclus executable
+    string exec_path, path_only;
+    int index;
+    exec_path = argv[0];
+    index = exec_path.rfind("/");
+    path_only = exec_path.substr(0, index);
+    Env::path_from_cwd_to_cyclus_ = path_only;
+    cout << "here: " << Env::path_from_cwd_to_cyclus_ << endl;
+
     // announce yourself
     cout << "|--------------------------------------------|" << endl;
     cout << "|                  Cyclus                    |" << endl;
