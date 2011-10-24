@@ -28,6 +28,11 @@ protected:
 	
 public:
 
+  /**
+   * @return path with the last item removed
+   */
+  static std::string pathBase(std::string path);
+
 	/**
 	 * @return the relative path from the cwd to the cyclus executable
 	 */

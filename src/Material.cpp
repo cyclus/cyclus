@@ -6,6 +6,7 @@
 #include "MassTable.h"
 #include "Logician.h"
 #include "Timer.h"
+#include "Env.h"
 #include "UniformTaylor.h"
 #include "InputXML.h"
 
@@ -542,7 +543,8 @@ void Material::printComp(std::string header, CompMap comp_map) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::loadDecayInfo() {
-  ifstream decayInfo ("Data/decayInfo.dat");
+  string path = ENV->getCyclusPath() + "/Data/decayInfo.dat";
+  ifstream decayInfo (path.c_str());
 
   if ( decayInfo.is_open() ) {
     int jcol = 1;
@@ -597,7 +599,7 @@ void Material::loadDecayInfo() {
     // builds the decay matrix from the parent and daughter maps
     makeDecayMatrix();
   } else {
-    throw GenException("The file 'decayInfo.dat' does not exist");
+    throw GenException("Could not find file 'decayInfo.dat'.");
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

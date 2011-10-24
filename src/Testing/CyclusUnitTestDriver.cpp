@@ -1,9 +1,15 @@
 #include <iostream>
+#include <string>
 
 #include <gtest/gtest.h>
+#include "Env.h"
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
+
+  // tell ENV the path between the cwd and the cyclus executable
+  std::string path = ENV->pathBase(argv[0]) + "/..";
+  ENV->setCyclusPath(path);
+  
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];
     if ( arg == "--help" ) {

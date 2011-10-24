@@ -5,7 +5,6 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( TestSource
-  TruthTests.cpp
   MaterialTests.cpp
   BookKeeperTests.cpp
   LogicianTests.cpp
