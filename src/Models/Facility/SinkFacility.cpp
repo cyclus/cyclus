@@ -5,7 +5,7 @@
 #include "SinkFacility.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -44,7 +44,7 @@ void SinkFacility::init(xmlNodePtr cur)
     commod_name = (const char*)(nodes->nodeTab[i]->children->content);
     new_commod = LI->getCommodity(commod_name);
     if (NULL == new_commod)
-      throw GenException("Input commodity '" + commod_name 
+      throw CycException("Input commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
 			    + "'.");
     in_commods_.push_back(new_commod);

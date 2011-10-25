@@ -5,7 +5,7 @@
 #include "NullFacility.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /*
@@ -40,14 +40,14 @@ void NullFacility::init(xmlNodePtr cur) {
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   in_commod_ = LI->getCommodity(commod_name);
   if (NULL == in_commod_)
-    throw GenException("Input commodity '" + commod_name 
+    throw CycException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(commod_name);
   if (NULL == out_commod_)
-    throw GenException("Output commodity '" + commod_name 
+    throw CycException("Output commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
 
@@ -105,7 +105,7 @@ void NullFacility::receiveMessage(Message* msg)
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("NullFacility is not the supplier of this msg.");
+    throw CycException("NullFacility is not the supplier of this msg.");
   }
 }
 
@@ -115,7 +115,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
   Transaction trans = order->getTrans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
-    throw GenException("NullFacility can only send out_commod_ materials.");
+    throw CycException("NullFacility can only send out_commod_ materials.");
   }
 
   Mass newAmt = 0;

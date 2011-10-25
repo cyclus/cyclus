@@ -4,7 +4,7 @@
 #include "suffix.h"
 #include "Model.h"
 
-#include "GenException.h"
+#include "CycException.h"
 #include "Env.h"
 #include "InputXML.h"
 #include "Logician.h"
@@ -62,21 +62,21 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
     if (!model) {
       string err_msg = "Unable to load model shared object file: ";
       err_msg += dlerror();
-      throw GenException(err_msg);
+      throw CycIOException(err_msg);
     }
     
     new_model = (mdl_ctor*) dlsym(model,"construct");
     if (!new_model) {
       string err_msg = "Unable to load model constructor: ";
       err_msg += dlerror();
-      throw GenException(err_msg);
+      throw CycIOException(err_msg);
     }
 
     mdl_dtor* del_model = (mdl_dtor*) dlsym(model,"destruct");
     if (!del_model) {
       string err_msg = "Unable to load model destructor: ";
       err_msg += dlerror();
-      throw GenException(err_msg);
+      throw CycIOException(err_msg);
     }
   
     create_map_[model_name] = new_model;
@@ -140,9 +140,9 @@ void Model::load_facilitycatalog(std::string filename, std::string ns, std::stri
 
   if ("xml" == format){
     XMLinput->load_facilitycatalog(filename);
+  } else {
+    throw CycRangeException(format + "is not a supported facilitycatalog format.");
   }
-  else
-    throw GenException(format + "is not a supported facilitycatalog format.");
 
   XMLinput->stripCurNS();
 }
@@ -178,7 +178,7 @@ void Model::init(xmlNodePtr cur) {
 void Model::copy(Model* model_orig) {
   if (model_orig->getModelType() != model_type_ && 
        model_orig->getModelImpl() != model_impl_) {
-    throw GenException("Cannot copy a model of type " 
+    throw CycTypeException("Cannot copy a model of type " 
         + model_orig->getModelType() + "/" + model_orig->getModelImpl()
         + " to an object of type "
         + model_type_ + "/" + model_impl_);

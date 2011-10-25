@@ -7,7 +7,7 @@
 #include "FacilityModel.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -26,13 +26,13 @@ void DeployInst::init(xmlNodePtr cur)
     Model* facility = LI->getModelByName(fac_name, FACILITY);
 
     if (NULL == facility){
-      throw GenException("Facility '" 
+      throw CycException("Facility '" 
                          + fac_name 
                          + "' is not defined in this problem.");
     }
 
     if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
-      throw GenException("Facility '" 
+      throw CycException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
                          + region_->getName() +"'.");
@@ -44,7 +44,7 @@ void DeployInst::init(xmlNodePtr cur)
     int start_month = strtol(XMLinput->get_xpath_content(deploy,"start"), NULL, 10);
     
     if (start_month < 0){
-      throw GenException("You can't deploy a facility in the past.");
+      throw CycException("You can't deploy a facility in the past.");
     }
     deployment_map_[start_month] = facility;
   }

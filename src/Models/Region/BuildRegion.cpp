@@ -126,7 +126,7 @@ void BuildRegion::handleTick(int time)
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;
-	throw GenException("Facility " + ss1.str()
+	throw CycException("Facility " + ss1.str()
 			   + " could not be built at time " + ss2.str() + ".");	
       }
       

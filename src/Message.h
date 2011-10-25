@@ -183,10 +183,10 @@ class Message {
      * heading down (DOWN_MSG) are sent successively to each communicator
      * in reverse order of their 'upward' sequence.
      *
-     * @exception GenException attempted to send message with
+     * @exception CycException attempted to send message with
      *            with no designated receiver (next dest is undefined)
      *
-     * @exception GenException attempted to send a message to the message
+     * @exception CycException attempted to send a message to the message
      *            sender (circular messaging)
      */
     virtual void sendOn();

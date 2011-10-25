@@ -1,31 +1,31 @@
-// GenException.cpp
-// Implements the GenException class
+// CycException.cpp
+// Implements the CycException class
 #include <sstream>
 
-#include "GenException.h"
+#include "CycException.h"
 
 using namespace std;
 
 string itoa(int i)    { stringstream out; out << i; return out.str(); };
 string dtoa(double d) { stringstream out; out << d; return out.str(); };
 
-string GenException::prepend_ = "cyclus exception";
+string CycException::prepend_ = "cyclus exception";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenException::GenException() {
+CycException::CycException() {
 	myMessage_ = prepend_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenException::GenException(std::string msg) {
+CycException::CycException(std::string msg) {
 	myMessage_ = prepend_ + ": " + msg;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* GenException::what() const throw() {
+const char* CycException::what() const throw() {
 	//const char* toRet = myMessage_;
 	//	return toRet;
 	return myMessage_.c_str();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenException::~GenException() throw()  { }
+CycException::~CycException() throw()  { }
 

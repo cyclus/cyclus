@@ -12,7 +12,7 @@
 #include "H5Exception.h"
 
 #include "Timer.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Material.h"
 #include "Message.h"
 #include "Logician.h"
@@ -126,7 +126,7 @@ void BookKeeper::closeDB()
       dbIsOpen_ = false;
     }
     else
-      throw GenException("Tried to close a database that was not open."); 
+      throw CycIOException("Tried to close a database that was not open."); 
   }
   catch( FileIException error )
   {
@@ -841,7 +841,7 @@ void BookKeeper::readData(std::string dsname, intData1d& out_data){
       inttype = dataset.getIntType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of integer type");
+      throw CycTypeException("The dataset " + dsname + " is not of integer type");
     }
   
     // get the file dataspace
@@ -893,7 +893,7 @@ void BookKeeper::readData(std::string dsname, intData2d& out_data){
       inttype = dataset.getIntType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of integer type");
+      throw CycTypeException("The dataset " + dsname + " is not of integer type");
     }
   
     // get the file dataspace
@@ -951,7 +951,7 @@ void BookKeeper::readData(std::string dsname, intData3d& out_data){
       inttype = dataset.getIntType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of integer type");
+      throw CycTypeException("The dataset " + dsname + " is not of integer type");
     }
   
     // get the file dataspace
@@ -1013,7 +1013,7 @@ void BookKeeper::readData(std::string dsname, dblData1d& out_data){
       dbltype = dataset.getFloatType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of float type");
+      throw CycTypeException("The dataset " + dsname + " is not of float type");
     }
   
     // get the file dataspace
@@ -1068,7 +1068,7 @@ void BookKeeper::readData(std::string dsname, dblData2d& out_data){
       dbltype = dataset.getFloatType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of float type");
+      throw CycTypeException("The dataset " + dsname + " is not of float type");
     }
   
     // get the file dataspace
@@ -1126,7 +1126,7 @@ void BookKeeper::readData(std::string dsname, dblData3d& out_data){
       dbltype = dataset.getFloatType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of double type");
+      throw CycTypeException("The dataset " + dsname + " is not of double type");
     }
   
     // get the file dataspace
@@ -1188,7 +1188,7 @@ void BookKeeper::readData(std::string dsname, strData1d& out_data){
       strtype = dataset.getStrType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of string type");
     }
   
     // get the file dataspace
@@ -1241,7 +1241,7 @@ void BookKeeper::readData(std::string dsname, strData2d& out_data){
       strtype = dataset.getStrType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of string type");
     }
   
     // get the file dataspace
@@ -1299,7 +1299,7 @@ void BookKeeper::readData(std::string dsname, strData3d& out_data){
       strtype = dataset.getStrType();
     }
     else{
-      throw GenException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of string type");
     }
   
     // get the file dataspace

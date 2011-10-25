@@ -87,7 +87,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       cout << "fac_name:" << fac_name << "is on the list of repalcement facilities" <<endl;
       facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
       if (NULL == facility){
-	throw GenException("Facility '" 
+	throw CycException("Facility '" 
 			   + fac_name 
 			   + "' is not defined in this problem.");
       }
@@ -199,7 +199,7 @@ void CapacityRegion::handleTick(int time)
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;
-	throw GenException("Facility " + ss1.str()
+	throw CycException("Facility " + ss1.str()
 			   + " could not be built at time " + ss2.str() + ".");	
       }
       
@@ -227,7 +227,7 @@ void CapacityRegion::handleTick(int time)
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;
-	throw GenException("Facility " + ss1.str()
+	throw CycException("Facility " + ss1.str()
 			   + " could not be built at time " + ss2.str() + ".");	
       }
     }

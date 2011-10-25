@@ -5,7 +5,7 @@
 
 #include "Logician.h"
 #include "InputXML.h"
-#include "GenException.h"
+#include "CycException.h"
 
 #include <string>
 #include <iostream>
@@ -90,16 +90,16 @@ Timer* Timer::Instance() {
 void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 
 	if (m0 < 1 || m0 > 12)
-		throw GenException("Invalid month0; must be between 1 and 12 (inclusive).");
+		throw CycRangeException("Invalid month0; must be between 1 and 12 (inclusive).");
 
 	if (y0 < 1942)
-		throw GenException("Invalid year0; the first man-made nuclear reactor was build in 1942");
+		throw CycRangeException("Invalid year0; the first man-made nuclear reactor was build in 1942");
 
 	if (y0 > 2063)
-		throw GenException("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
+		throw CycRangeException("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
 
 	if (decay > dur)
-		throw GenException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
+		throw CycRangeException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
   LI->setDecay(decay);
 
 	month0_ = m0;

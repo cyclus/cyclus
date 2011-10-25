@@ -5,7 +5,7 @@
 #include "GenericRepository.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 
@@ -78,7 +78,7 @@ void GenericRepository::init(xmlNodePtr cur)
     commod_name = (const char*)(nodes->nodeTab[i]->children->content);
     new_commod = LI->getCommodity(commod_name);
     if (NULL == new_commod)
-      throw GenException("Input commodity '" + commod_name + 
+      throw CycException("Input commodity '" + commod_name + 
           "' does not exist for facility '" + getName() + "'.");
     in_commods_.push_back(new_commod);
   }
@@ -162,7 +162,7 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
       }
       break;
     default:
-      throw GenException("Unknown ComponentType enum value encountered."); }
+      throw CycException("Unknown ComponentType enum value encountered."); }
 
   return toRet;
 }
@@ -212,7 +212,7 @@ void GenericRepository::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::receiveMessage(Message* msg)
 {
-  throw GenException("GenericRepository doesn't know what to do with a msg.");
+  throw CycException("GenericRepository doesn't know what to do with a msg.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -374,7 +374,7 @@ void GenericRepository::emplaceWaste(){
       Component* current_buffer = buffers_.front();
       if (NULL == current_buffer) {
         string err_msg = "Buffers not yet loaded into Generic Repository.";
-        throw GenException(err_msg);
+        throw CycException(err_msg);
       }
       // if the package is full
       if( iter->isFull()
@@ -417,7 +417,7 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
     string err_msg = "The commodity '";
     err_msg += (waste_stream.second)->getName();
     err_msg +="' does not have a matching WF in the GenericRepository.";
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
   // if there doesn't already exist a partially full one
   // @todo check for partially full wf's before creating new one (katyhuff)
@@ -440,7 +440,7 @@ Component* GenericRepository::packageWaste(Component* waste_form){
     string err_msg = "The waste form '";
     err_msg += (waste_form)->getName();
     err_msg +="' does not have a matching WP in the GenericRepository.";
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
   Component* toRet;
   while (!loaded){

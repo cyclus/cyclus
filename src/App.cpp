@@ -7,7 +7,7 @@
 #include "BookKeeper.h"
 #include "Timer.h"
 #include "InputXML.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Env.h"
 
 using namespace std;
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   if(argc<2) {
     string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
 
   // parse arguments
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
 
     BI->closeDB();
-  } catch (GenException ge) {
+  } catch (CycException ge) {
     cout << ge.what() << endl;
   };
 

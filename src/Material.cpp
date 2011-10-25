@@ -2,7 +2,7 @@
 #include "Material.h"
 
 #include "BookKeeper.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "MassTable.h"
 #include "Logician.h"
 #include "Timer.h"
@@ -88,7 +88,7 @@ Material::Material(CompMap comp, std::string mat_unit, std::string rec_name, dou
   else if (ATOMBASED == type)
     rationalize_A2M();
   else 
-    throw GenException("Type options are currently MASSBASED or ATOMBASED !");
+    throw CycRangeException("Type options are currently MASSBASED or ATOMBASED !");
 
   facHist_ = FacHistory() ;
   BI->registerMatChange(this);
@@ -120,7 +120,7 @@ void Material::load_recipebook(std::string filename, std::string ns, std::string
   if ("xml" == format)
     XMLinput->load_recipebook(filename);
   else
-    throw GenException(format + "is not a supported recipebook format.");
+    throw CycRangeException(format + "is not a supported recipebook format.");
 
   XMLinput->stripCurNS();
 }
@@ -261,7 +261,7 @@ void Material::changeComp(Iso tope, Atoms change, int time) {
   // If the value is negative, throw an exception;
   // something's gone wrong.
   if (this->isNeg(tope)) {
-    throw GenException("Tried to make isotope composition negative.");
+    throw CycRangeException("Tried to make isotope composition negative.");
   }
 
   total_atoms_ += change;
@@ -427,7 +427,7 @@ void Material::extract(Material* matToRem) {
 int Material::getAtomicNum(Iso tope) {
   // Make sure the number's in a reasonable range.
   if (isAtomicNumValid(tope)) {
-    throw GenException("Tried to get atomic number of invalid isotope");
+    throw CycRangeException("Tried to get atomic number of invalid isotope");
   }
 
   // Get the atomic number and return.
@@ -438,7 +438,7 @@ int Material::getAtomicNum(Iso tope) {
 int Material::getMassNum(Iso tope) {
   // Make sure the number's in a reasonable range.
   if (isAtomicNumValid(tope)) {
-    throw GenException("Tried to get atomic number of invalid isotope");
+    throw CycRangeException("Tried to get atomic number of invalid isotope");
   }
 
   return tope % 1000;
@@ -558,7 +558,7 @@ void Material::loadDecayInfo() {
     // checks to see if there are isotopes in 'decayInfo.dat'
     if ( decayInfo.eof() ) {
       string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
-      throw GenException(err_msg);
+      throw CycParseException(err_msg);
     }
     
     // processes 'decayInfo.dat'
@@ -581,7 +581,7 @@ void Material::loadDecayInfo() {
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
-              throw GenException(string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
+              throw CycParseException(string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
             } 
           }
           temp[i] = make_pair(iso, branchRatio);
@@ -592,14 +592,14 @@ void Material::loadDecayInfo() {
       } else {
         string err_msg;
         err_msg = "A duplicate parent isotope was found in 'decayInfo.dat'";
-        throw GenException(err_msg);
+        throw CycParseException(err_msg);
       }
       decayInfo >> iso; // get next parent
     } 
     // builds the decay matrix from the parent and daughter maps
     makeDecayMatrix();
   } else {
-    throw GenException("Could not find file 'decayInfo.dat'.");
+    throw CycIOException("Could not find file 'decayInfo.dat'.");
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -695,7 +695,7 @@ map<Iso, Atoms> Material::makeCompMap(const Vector & compVector) {
       if ( numDens != 0 )
         compMap.insert( make_pair(iso, numDens) );
     } else {
-      throw GenException("Decay Error - invalid Vector position");
+      throw CycRangeException("Decay Error - invalid Vector position");
     }
 
     ++parent_iter; // get next parent

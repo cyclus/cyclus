@@ -5,7 +5,7 @@
 #include "SWUeUF6Converter.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -25,14 +25,14 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   in_commod_ = LI->getCommodity(commod_name);
   if (NULL == in_commod_)
-    throw GenException("Input commodity '" + commod_name 
+    throw CycException("Input commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
                        + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(commod_name);
   if (NULL == out_commod_)
-    throw GenException("Output commodity '" + commod_name 
+    throw CycException("Output commodity '" + commod_name 
                        + "' does not exist for converter '" + getName() 
                        + "'.");
 }
@@ -102,7 +102,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     enrID = convMsg->getSupplierID();
     castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
     if (0 == castEnr){
-      throw GenException("SWUs offered by non-Model");
+      throw CycException("SWUs offered by non-Model");
     }
     SWUs = convMsg->getAmount();
     comp = refMsg->getComp();
@@ -114,7 +114,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     enrID = refMsg->getSupplierID();
     castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
     if (0 == castEnr){
-      throw GenException("SWUs offered by non-Model");
+      throw CycException("SWUs offered by non-Model");
     }
     comp = convMsg->getComp();
   }

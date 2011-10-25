@@ -6,7 +6,6 @@
 #include "Logician.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
-#include "GenException.h"
 
 #include <iostream>
 

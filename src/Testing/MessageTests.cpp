@@ -2,7 +2,7 @@
 
 #include "Communicator.h"
 #include "Message.h"
-#include "GenException.h"
+#include "CycException.h"
 
 #include <string>
 #include <vector>
@@ -125,7 +125,7 @@ TEST_F(MessageTest, CleanThrough) {
 TEST_F(MessageTest, PassBeyondOrigin) {
   comm1->stop_at_return_ = false;
 
-  ASSERT_THROW(comm1->startMessage(), GenException);
+  ASSERT_THROW(comm1->startMessage(), CycException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
@@ -146,7 +146,7 @@ TEST_F(MessageTest, PassBeyondOrigin) {
 TEST_F(MessageTest, ForgetToSetDest) {
   comm3->forget_set_dest_ = true;
 
-  ASSERT_THROW(comm1->startMessage(), GenException);
+  ASSERT_THROW(comm1->startMessage(), CycException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();
@@ -163,7 +163,7 @@ TEST_F(MessageTest, ForgetToSetDest) {
 TEST_F(MessageTest, SendToSelf) {
   comm3->parent_ = comm3;
 
-  ASSERT_THROW(comm1->startMessage(), GenException);
+  ASSERT_THROW(comm1->startMessage(), CycException);
 
   vector<string> stops = comm1->msg_->dest_list_;
   int num_stops = stops.size();

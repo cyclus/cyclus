@@ -3,7 +3,7 @@
 
 #include "MarketModel.h"
 #include "InputXML.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Logician.h"
 
 #include <iostream>
@@ -23,7 +23,7 @@ void MarketModel::init(xmlNodePtr cur)
   string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
   commodity_ = LI->getCommodity(commod_name);
   if (NULL == commodity_)
-    throw GenException("Market commodity '" + commod_name 
+    throw CycException("Market commodity '" + commod_name 
         + "' does not exist for market '" + getName() 
         + "'.");
   

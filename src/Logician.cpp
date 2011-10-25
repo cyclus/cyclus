@@ -4,7 +4,7 @@
 #include <math.h>
 #include "Logician.h"
 #include "Timer.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "MarketModel.h"
 
 using namespace std;
@@ -128,7 +128,7 @@ Model* Logician::getModelByName(std::string name, ModelType model_type) {
 
   if (found_model == NULL) {
     string err_msg = "Model '" + name + "' doesn't exist.";
-    throw GenException(err_msg);
+    throw CycNullException(err_msg);
   }
   
   return found_model;

@@ -3,7 +3,7 @@
 
 #include "RegionModel.h"
 #include "InstModel.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Logician.h"
 #include "InputXML.h"
 #include "Timer.h"
@@ -42,7 +42,7 @@ void RegionModel::init(xmlNodePtr cur)
     fac_name = (const char*)nodes->nodeTab[i]->children->content;
     new_fac = LI->getModelByName(fac_name, FACILITY);
     if (NULL == new_fac){
-      throw GenException("Facility " + fac_name 
+      throw CycNullException("Facility " + fac_name 
           + " is not defined in this simulation.");
     }
     allowedFacilities_.insert(new_fac);

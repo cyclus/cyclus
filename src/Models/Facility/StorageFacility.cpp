@@ -5,7 +5,7 @@
 #include "StorageFacility.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 #include "BookKeeper.h"
@@ -45,7 +45,7 @@ void StorageFacility::init(xmlNodePtr cur)
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   incommod_ = LI->getCommodity(commod_name);
   if (NULL == incommod_)
-    throw GenException("Input commodity '" + commod_name 
+    throw CycException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
@@ -107,7 +107,7 @@ void StorageFacility::receiveMessage(Message* msg)
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("StorageFacility is not the supplier of this msg.");
+    throw CycException("StorageFacility is not the supplier of this msg.");
   }
 }
 
@@ -117,7 +117,7 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
   Transaction trans = order->getTrans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
-    throw GenException("StorageFacility can only send incommodity type materials.");
+    throw CycException("StorageFacility can only send incommodity type materials.");
   }
   // pull materials off of the inventory_ stack until you get the trans amount
   Mass complete = 0;
@@ -195,7 +195,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
     sending_facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
     if (NULL == sending_facility){
-      throw GenException("Facility '" 
+      throw CycException("Facility '" 
 			 + fac_name 
 			 + "' is not defined in this problem.");
     }
@@ -203,7 +203,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
     commodity = LI->getCommodity(commod_name);
     if (NULL == commodity){
-      throw GenException("Commodity '" 
+      throw CycException("Commodity '" 
 			 + commod_name
 			 + "' is not defined in this problem.");
     }
@@ -211,7 +211,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
     recipe = LI->getRecipe(recipe_name);
     if (NULL == recipe){
-      throw GenException("Recipe '" 
+      throw CycException("Recipe '" 
 			 + recipe_name
 			 + "' is not defined in this problem.");
     }

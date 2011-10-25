@@ -4,7 +4,7 @@
 #include <vector>
 #include <time.h>
 
-#include "GenException.h"
+#include "CycException.h"
 #include "Component.h"
 //#include "LLNLThermal.h"
 //#include "LumpThermal.h"
@@ -113,7 +113,7 @@ ComponentType Component::getComponentType(std::string type_name) {
       err_msg += component_type_names[name];
       err_msg += "\n";
     }
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
   return toRet;
 }
@@ -136,7 +136,7 @@ ThermalModelType Component::getThermalModelType(std::string type_name) {
       err_msg += thermal_type_names[name];
       err_msg += "\n";
     }     
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
   return toRet;
 }
@@ -159,7 +159,7 @@ NuclideModelType Component::getNuclideModelType(std::string type_name) {
       err_msg += nuclide_type_names[name];
       err_msg += "\n";
     }
-    throw GenException(err_msg);
+    throw CycException(err_msg);
   }
   return toRet;
 }
@@ -184,7 +184,7 @@ ThermalModel* Component::getThermalModel(xmlNodePtr cur){
       toRet = new StubThermal(cur);
       break;
     default:
-      throw GenException("Unknown thermal model enum value encountered."); 
+      throw CycException("Unknown thermal model enum value encountered."); 
   }
   return toRet;
 }
@@ -206,7 +206,7 @@ NuclideModel* Component::getNuclideModel(xmlNodePtr cur){
       toRet = new StubNuclide(cur);
       break;
     default:
-      throw GenException("Unknown nuclide model enum value encountered."); 
+      throw CycException("Unknown nuclide model enum value encountered."); 
   }
   return toRet;
 }
@@ -234,7 +234,7 @@ ThermalModel* Component::copyThermalModel(ThermalModel* src){
       toRet->copy(src);
       break;
     default:
-      throw GenException("Unknown thermal model enum value encountered when copying."); 
+      throw CycException("Unknown thermal model enum value encountered when copying."); 
   }      
   return toRet;
 }
@@ -257,7 +257,7 @@ NuclideModel* Component::copyNuclideModel(NuclideModel* src){
       toRet->copy(src);
       break;
     default:
-      throw GenException("Unknown nuclide model enum value encountered when copying."); 
+      throw CycException("Unknown nuclide model enum value encountered when copying."); 
   }      
   return toRet;
 }

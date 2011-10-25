@@ -35,7 +35,7 @@ SET( CYCLUS_SRC
      Commodity.cpp
      Message.cpp
      Utility/BookKeeper.cpp 
-     Utility/GenException.cpp 
+     Utility/CycException.cpp 
      Utility/LMatrix.cpp 
      Utility/MassTable.cpp 
      Utility/Timer.cpp

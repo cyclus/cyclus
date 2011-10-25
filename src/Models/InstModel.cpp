@@ -5,7 +5,7 @@
 #include "FacilityModel.h"
 #include "Logician.h"
 #include "InputXML.h"
-#include "GenException.h"
+#include "CycException.h"
 
 #include <iostream>
 #include <sstream>
@@ -110,7 +110,7 @@ bool InstModel::pleaseBuild(Model* fac){
   // by defualt
   std::stringstream ss;
   ss << this->getSN();
-  throw GenException("Institution " + ss.str()
+  throw CycOverrideException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
   return false;
 }

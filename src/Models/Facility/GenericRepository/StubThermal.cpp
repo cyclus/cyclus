@@ -4,7 +4,7 @@
 #include <vector>
 #include <time.h>
 
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 #include "StubThermal.h"
 

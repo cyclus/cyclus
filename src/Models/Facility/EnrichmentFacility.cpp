@@ -7,7 +7,7 @@
 
 #include "Timer.h"
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /*
@@ -47,14 +47,14 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   in_commod_ = LI->getCommodity(commod_name);
   if (NULL == in_commod_)
-    throw GenException("Input commodity '" + commod_name 
+    throw CycException("Input commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(commod_name);
   if (NULL == out_commod_)
-    throw GenException("Output commodity '" + commod_name 
+    throw CycException("Output commodity '" + commod_name 
                        + "' does not exist for facility '" + getName() 
                        + "'.");
 
@@ -123,7 +123,7 @@ void EnrichmentFacility::receiveMessage(Message* msg)
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("EnrichmentFacility is not the supplier of this msg.");
+    throw CycException("EnrichmentFacility is not the supplier of this msg.");
   }
 }
 
@@ -133,7 +133,7 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
   Transaction trans = msg->getTrans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
-    throw GenException("EnrichmentFacility can only send out_commod_ materials.");
+    throw CycException("EnrichmentFacility can only send out_commod_ materials.");
   }
 
   Mass newAmt = 0;
@@ -430,12 +430,12 @@ void EnrichmentFacility::enrich()
 		// CONSERVATION OF MASS CHECKS:
 		if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 
 						 - mat->getEltMass(92)) > eps)
-			throw GenException("Conservation of mass violation at Enrichment!!");
+			throw CycException("Conservation of mass violation at Enrichment!!");
 
 		if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
          Material::getIsoMass(922350, theTails->getAtomComp()) 
           - Material::getIsoMass(922350, mat->getAtomComp())) > eps)
-			throw GenException("Conservation of mass violation at Enrichment!!");
+			throw CycException("Conservation of mass violation at Enrichment!!");
 
 		// Don't forget to decrement outstMF before sending.
 		outstMF_ -= this->calcSWUs(P, xp, xf);

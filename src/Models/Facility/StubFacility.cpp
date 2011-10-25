@@ -5,7 +5,7 @@
 #include "StubFacility.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /* --------------------

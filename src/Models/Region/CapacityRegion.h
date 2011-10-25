@@ -12,7 +12,7 @@
 
 #include "RegionModel.h"
 #include "FacilityModel.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 #include <queue>

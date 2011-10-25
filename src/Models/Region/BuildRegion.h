@@ -13,7 +13,7 @@
 #include "RegionModel.h"
 #include "InstModel.h"
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 #include <queue>

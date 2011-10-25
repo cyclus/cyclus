@@ -6,7 +6,7 @@
 #include "ConverterModel.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConverterMarket::init(xmlNodePtr cur)
@@ -21,7 +21,7 @@ void ConverterMarket::init(xmlNodePtr cur)
   converter = LI->getModelByName(conv_name_, CONVERTER);
 
   if (NULL == converter){
-    throw GenException("Converter '" 
+    throw CycException("Converter '" 
         + conv_name_ 
         + "' is not defined in this problem.");
     }
@@ -37,7 +37,7 @@ void ConverterMarket::init(xmlNodePtr cur)
   string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
   offer_commod_ = LI->getCommodity(commod_name);
   if (NULL == offer_commod_)
-    throw GenException("Offer commodity '" + commod_name 
+    throw CycException("Offer commodity '" + commod_name 
                        + "' does not exist for converter market '" + getName() 
                        + "'.");
   
@@ -46,7 +46,7 @@ void ConverterMarket::init(xmlNodePtr cur)
   commod_name = XMLinput->get_xpath_content(cur,"reqcommodity");
   req_commod_ = LI->getCommodity(commod_name);
   if (NULL == req_commod_)
-    throw GenException("Request commodity '" + commod_name 
+    throw CycException("Request commodity '" + commod_name 
                        + "' does not exist for converter market '" + getName() 
                        + "'.");
   
@@ -88,7 +88,7 @@ ConverterModel* ConverterMarket::getConverter() {
   converter = LI->getModelByName(conv_name_, CONVERTER);
 
   if (NULL == converter){
-    throw GenException("Converter '" 
+    throw CycException("Converter '" 
         + conv_name_ 
         + "' is not defined in this problem.");
     }

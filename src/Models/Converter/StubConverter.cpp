@@ -5,7 +5,7 @@
 #include "StubConverter.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /* --------------------
@@ -56,7 +56,7 @@ void StubConverter::handleTock(int time)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Message* convert(Message* convMsg, Message* refMsg)
 {
-  throw GenException("The StubConverter should not be used to convert things.");
+  throw CycException("The StubConverter should not be used to convert things.");
 }
     
 

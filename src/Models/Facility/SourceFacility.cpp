@@ -4,7 +4,7 @@
 
 #include "SourceFacility.h"
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -38,7 +38,7 @@ void SourceFacility::init(xmlNodePtr cur)
   input_token = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(input_token);
   if (NULL == out_commod_)
-    throw GenException("Output commodity '" + input_token 
+    throw CycException("Output commodity '" + input_token 
         + "' does not exist for facility '" + getName() 
         + "'.");
 
@@ -46,7 +46,7 @@ void SourceFacility::init(xmlNodePtr cur)
   input_token = XMLinput->get_xpath_content(cur,"recipe");
   recipe_ = LI->getRecipe(input_token);
   if (NULL == recipe_)
-    throw GenException("Recipe '" + input_token 
+    throw CycException("Recipe '" + input_token 
         + "' does not exist for facility '" + getName()
         + "'.");
 
@@ -107,7 +107,7 @@ void SourceFacility::receiveMessage(Message* msg){
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("SourceFacility is not the supplier of this msg.");
+    throw CycException("SourceFacility is not the supplier of this msg.");
   }
 }
 

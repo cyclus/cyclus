@@ -8,7 +8,7 @@
 
 #include "Timer.h"
 #include "Env.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Model.h"
 #include "Commodity.h"
 #include "Material.h"
@@ -40,7 +40,7 @@ InputXML* InputXML::Instance() {
 xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
   xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
   if (NULL == ctxt)
-  throw GenException("Failed to generate parser from schema: " + *(fileInfo->schema));
+  throw CycParseException("Failed to generate parser from schema: " + *(fileInfo->schema));
 
   xmlRelaxNGPtr schema = xmlRelaxNGParse(ctxt);
 
@@ -48,11 +48,11 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
 
   xmlDocPtr doc = xmlReadFile(fileInfo->filename.c_str(), NULL,0);
   if (NULL == doc) {
-    throw GenException("Failed to parse: " + fileInfo->filename);
+    throw CycParseException("Failed to parse: " + fileInfo->filename);
   }
 
   if (xmlRelaxNGValidateDoc(vctxt,doc))
-    throw GenException("Invalid XML file; file: "    
+    throw CycParseException("Invalid XML file; file: "    
       + fileInfo->filename 
       + " does not validate against schema " 
       + *(fileInfo->schema));
@@ -70,7 +70,7 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
 void InputXML::stripCurNS() {
 
   if ("" == cur_ns_)
-  throw GenException("Unable to strip tokens from an empty namespace.");
+  throw CycParseException("Unable to strip tokens from an empty namespace.");
 
   string::iterator pos = cur_ns_.end();
   cur_ns_.erase(--pos);
@@ -88,11 +88,11 @@ void InputXML::stripCurNS() {
 void InputXML::load_file(std::string filename) {
   // double check that the file exists
   if(filename=="") {
-    throw GenException("No input filename was given");
+    throw CycIOException("No input filename was given");
   } else { 
     FILE* file = fopen(filename.c_str(),"r");
     if(file == NULL) { 
-      throw GenException("The file cannot be loaded because it has not been found.");
+      throw CycIOException("The file cannot be loaded because it has not been found.");
     }
     fclose(file);
   }

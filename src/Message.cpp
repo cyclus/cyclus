@@ -3,7 +3,7 @@
 
 #include "Message.h"
 
-#include "GenException.h"
+#include "CycException.h"
 #include "Logician.h"
 #include "Material.h"
 #include "Communicator.h"
@@ -157,13 +157,13 @@ void Message::validateForSend() {
 
   if (!receiver_specified) {
     string err_msg = "Can't send the message: next dest is unspecified.";
-    throw GenException(err_msg);
+    throw CycMessageException(err_msg);
   }
 
   next_stop = path_stack_[next_stop_index];
   if (next_stop == current_owner_) {
     string err_msg = "Message receiver and sender are the same.";
-    throw GenException(err_msg);
+    throw CycMessageException(err_msg);
   }
 }
 

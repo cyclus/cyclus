@@ -5,7 +5,7 @@
 #include "RecipeReactor.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 
@@ -77,28 +77,28 @@ void RecipeReactor::init(xmlNodePtr cur)
     commod_name = XMLinput->get_xpath_content(pair_node,"incommodity");
     in_commod = LI->getCommodity(commod_name);
     if (NULL == in_commod)
-      throw GenException("Input commodity '" + commod_name 
+      throw CycException("Input commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
           + "'.");
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
     in_recipe = LI->getRecipe(recipe_name);
     if (NULL == in_recipe)
-      throw GenException("Recipe '" + recipe_name 
+      throw CycException("Recipe '" + recipe_name 
           + "' does not exist for facility '" + getName()
           + "'.");
     
     commod_name = XMLinput->get_xpath_content(pair_node,"outcommodity");
     out_commod = LI->getCommodity(commod_name);
     if (NULL == out_commod)
-      throw GenException("Output commodity '" + commod_name 
+      throw CycException("Output commodity '" + commod_name 
           + "' does not exist for facility '" + getName() 
           + "'.");
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
     out_recipe = LI->getRecipe(recipe_name);
     if (NULL == out_recipe)
-      throw GenException("Recipe '" + recipe_name 
+      throw CycException("Recipe '" + recipe_name 
           + "' does not exist for facility '" + getName()
           + "'.");
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
@@ -220,7 +220,7 @@ void RecipeReactor::receiveMessage(Message* msg)
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("RecipeReactor is not the supplier of this msg.");
+    throw CycException("RecipeReactor is not the supplier of this msg.");
   }
 }
 

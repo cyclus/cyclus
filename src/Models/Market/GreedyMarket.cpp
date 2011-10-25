@@ -5,7 +5,7 @@
 #include "GreedyMarket.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 using namespace std;
@@ -109,7 +109,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     else {
       // split offer
       if (NULL == offerMsg)
-        throw GenException("offer message does not exist in market '" 
+        throw CycException("offer message does not exist in market '" 
             + getName() + "'.");
       
       // queue a new order

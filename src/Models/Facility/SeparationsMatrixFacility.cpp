@@ -9,7 +9,7 @@
 
 #include "Timer.h"
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /*
@@ -60,7 +60,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     commod_name = XMLinput->get_xpath_content(cur,"incommodity");
     new_commod = LI->getCommodity(commod_name);
     if (NULL == new_commod)
-      throw GenException("Input commodity '" + commod_name 
+      throw CycException("Input commodity '" + commod_name 
                          + "' does not exist for facility '" + getName() 
                          + "'.");
    in_commod_.push_back(new_commod);
@@ -85,7 +85,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     new_commod = NULL;
     new_commod = LI->getCommodity(stream_commod);
     if (NULL == new_commod)
-      throw GenException("Output commodity '" + commod_name
+      throw CycException("Output commodity '" + commod_name
                          + "' does not exist for facility '" + getName()
                          + "'.");
     out_commod_.push_back(new_commod);
@@ -166,7 +166,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
     ordersWaiting_.push_front(msg);
   }
   else {
-    throw GenException("SeparationsMatrixFacility is not the supplier of this msg.");
+    throw CycException("SeparationsMatrixFacility is not the supplier of this msg.");
   }
 }
 

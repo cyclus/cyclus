@@ -3,7 +3,7 @@
 #include "Commodity.h"
 
 #include "Logician.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "InputXML.h"
 
 /// Initialize the Commodity ID serialization
@@ -44,7 +44,7 @@ Model* Commodity::getMarket() {
   if (market_ == NULL) {
     string err_msg = "Attempted to retrieve an uninitialized market pointer";
     err_msg += "from a commodity.";
-    throw GenException(err_msg);
+    throw CycNullException(err_msg);
   }
 
   return market_;

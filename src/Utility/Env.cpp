@@ -2,7 +2,7 @@
 #include "Env.h"
 
 #include "InputXML.h"
-#include "GenException.h"
+#include "CycException.h"
 #include "Logician.h"
 
 #include <sys/stat.h>
@@ -58,7 +58,7 @@ std::string Env::checkEnv(std::string varname) {
     toRet = getenv(varname.c_str());
   }
   else {
-    throw GenException("Environment variable " + varname + " not set.");
+    throw CycException("Environment variable " + varname + " not set.");
   }
   return toRet;
 }

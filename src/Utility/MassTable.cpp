@@ -2,7 +2,7 @@
 
 #include "MassTable.h"
 
-#include "GenException.h"
+#include "CycException.h"
 
 #include <iostream>
 #include "hdf5.h"
@@ -60,7 +60,7 @@ void MassTable::initialize() {
   
   //check if the file is an hdf5 file first.
   if (! H5File::isHdf5(file_path)) {
-    throw GenException("The MASS_FILE is not an hdf5 file.");
+    throw CycIOException("The MASS_FILE is not an hdf5 file.");
   }
 
   try {
