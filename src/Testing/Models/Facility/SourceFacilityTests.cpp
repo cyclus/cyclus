@@ -50,9 +50,9 @@ class TransactionMaker : public InstModel {
   void receiveMessage(Message* msg) {
     msg->setDir(DOWN_MSG);
 
-    int what_id = 0;
+    Model* what_model = NULL;
 
-    msg->setRequesterID(what_id);
+    msg->setRequester(what_model);
 
   }
 

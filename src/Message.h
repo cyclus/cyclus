@@ -55,14 +55,14 @@ struct Transaction {
   CompMap comp;
 
   /**
-   * The ID of the Communicator who is the supplier in this transaction.
+   * @brief supplier in this transaction.
    */
-  int supplierID;
+  Model* supplier;
 
   /**
-   * The ID of the Communicator who is the requester in this transaction.
+   * @brief requester in this transaction.
    */
-  int requesterID;
+  Model* requester;
 
 };
 
@@ -239,18 +239,18 @@ class Message {
     Communicator* getRecipient() const;
 
     /**
-     * Returns the ID of the supplier in this Message.
+     * Returns the supplier in this Message.
      *
-     * @return the ID of the supplier
+     * @return pointer to the supplier
      */
-    int getSupplierID() const;
+    Model* getSupplier() const;
 
     /**
      * Returns the requester in this Message.
      *
-     * @return the ID of the requester
+     * @return pointer to the requester
      */
-    int getRequesterID() const;
+    Model* getRequester() const;
 
     /**
      * Returns the direction this Message is traveling.
@@ -305,17 +305,17 @@ class Message {
      * Sets the assigned supplier of the material for the 
      * transaction in this message. 
      *
-     * @param newID the ID of the new supplier
+     * @param supplier pointer to the new supplier
      */
-    void setSupplierID(int newID);
+    void setSupplier(Model* supplier);
 
     /**
      * Sets the assigned requester to receive the material
      * for the transaction in this message.
      *
-     * @param newID the ID of the new requester
+     * @param requester pointer to the new requester
      */
-    void setRequesterID(int newID);
+    void setRequester(Model* requester);
 
     /**
      * Returns the price being requested or offered in this message.

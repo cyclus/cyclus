@@ -83,7 +83,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   // Figure out what you're converting to and from
   in_commod_ = convMsg->getCommod();
   out_commod_ = refMsg->getCommod();
-  int enrID;
+  Model* enr;
   Model* castEnr;
   Message* toRet;
 
@@ -99,9 +99,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   if (in_commod_ == LI->getCommodity("SWUs") &&
       out_commod_ == LI->getCommodity("eUF6")){
     // the enricher is the supplier in the convMsg
-    enrID = convMsg->getSupplierID();
-    castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
-    if (0 == castEnr){
+    enr = convMsg->getSupplier();
+    if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
     SWUs = convMsg->getAmount();
@@ -111,9 +110,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   else if (in_commod_ == LI->getCommodity("eUF6") &&
       out_commod_ == LI->getCommodity("SWUs")){ 
     // the enricher is the supplier in the refMsg
-    enrID = refMsg->getSupplierID();
-    castEnr = dynamic_cast<Model*>(LI->getModelByID(enrID, FACILITY));
-    if (0 == castEnr){
+    enr = refMsg->getSupplier();
+    if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
     comp = convMsg->getComp();

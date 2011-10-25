@@ -148,8 +148,8 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
        thisMat++)
   {
     trans_t toRegister;
-    toRegister.requesterID=msg->getRequesterID();
-    toRegister.supplierID=msg->getSupplierID();
+    toRegister.requesterID=msg->getRequester()->getSN();
+    toRegister.supplierID=msg->getSupplier()->getSN();
     toRegister.materialID=(*thisMat)->getSN(); 
     toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();

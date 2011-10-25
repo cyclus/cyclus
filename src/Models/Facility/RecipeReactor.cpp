@@ -215,7 +215,7 @@ void RecipeReactor::endCycle()
 void RecipeReactor::receiveMessage(Message* msg)
 {
   // is this a message from on high? 
-  if(msg->getSupplierID()==this->getSN()){
+  if(msg->getSupplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -396,7 +396,7 @@ void RecipeReactor::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

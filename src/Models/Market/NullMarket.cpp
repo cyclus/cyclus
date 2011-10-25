@@ -83,7 +83,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
     if (requestAmt > offerAmt) { 
       // put a new message in the order stack
       // it goes down to supplier
-      offerMsg->setRequesterID(requestMsg->getRequesterID());
+      offerMsg->setRequester(requestMsg->getRequester());
       offerMsg->setDir(DOWN_MSG);
 
       // Queue an order
@@ -95,9 +95,9 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(offerMsg);
 
       cout << "NullMarket has resolved a match from "
-          << offerMsg->getSupplierID()
+          << offerMsg->getSupplier()->getSN()
           << " to "
-          << offerMsg->getRequesterID() 
+          << offerMsg->getRequester()->getSN()
           << " for the amount:  " 
           << offerMsg->getAmount() << endl;
 
@@ -110,16 +110,16 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       Message* maybe_offer = new Message(*offerMsg);
       maybe_offer->setAmount(requestAmt);
       maybe_offer->setDir(DOWN_MSG);
-      maybe_offer->setRequesterID(requestMsg->getRequesterID());
+      maybe_offer->setRequester(requestMsg->getRequester());
 
       matchedOffers_.insert(offerMsg);
 
       orders_.push_back(maybe_offer);
 
       cout << "NullMarket has resolved a match from "
-          << maybe_offer->getSupplierID()
+          << maybe_offer->getSupplier()->getSN()
           << " to "
-          << maybe_offer->getRequesterID() 
+          << maybe_offer->getRequester()->getSN()
           << " for the amount:  " 
           << maybe_offer->getAmount() << endl;
 
@@ -166,7 +166,7 @@ void NullMarket::resolve()
       process_request();
     } 
     else {
-      cout << "The request from Requester "<< (*request).second->getRequesterID() 
+      cout << "The request from Requester "<< (*request).second->getRequester()->getSN()
           << " for the amount " << (*request).first 
           << " rejected. "<<endl;
       reject_request(request);

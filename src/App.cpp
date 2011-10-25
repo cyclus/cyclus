@@ -30,24 +30,16 @@ int main(int argc, char* argv[]) {
   if(argc<2) {
     string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   ./cyclus [path/to/input/filename]\n";
-    throw CycException(err_msg);
+    cout << err_msg << endl;
+    return 0;
   }
 
   // parse arguments
   try {
-    // read input file
+    // read input file and setup simulation
     XMLinput->load_file(argv[1]); 
 
 
-    // setup simulation
-    // =====================
-
-    // load markets
-    // create_market_method
-    //  * get market model name
-    //  * search cache for market methods
-    //     * if not found load market
-    
     cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
     LI->printModelList(CONVERTER);
     cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;

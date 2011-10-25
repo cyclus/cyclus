@@ -90,11 +90,6 @@ void Logician::addModel(Model* new_model, ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Logician::getModelByID(int ID, ModelType model_type) { 
-  return model_lists_[model_type][ID];
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ModelList::iterator Logician::begin(ModelType model_type) {
   ModelList* list;
   list = &model_lists_[model_type];

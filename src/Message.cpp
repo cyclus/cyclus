@@ -21,8 +21,8 @@ Message::Message(MessageDir thisDir, Communicator* toSend) {
   trans_.commod = NULL;
   recipient_ = NULL;
 
-  trans_.supplierID = NULL;
-  trans_.requesterID = NULL;
+  trans_.supplier = NULL;
+  trans_.requester = NULL;
 
   trans_.comp.insert(make_pair(0,0));
 
@@ -52,8 +52,8 @@ Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,    
   trans_.comp = thisComp;
   sender_ = toSend;
   recipient_ = toReceive;
-  this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
-  this->setRequesterID((dynamic_cast<FacilityModel*>(recipient_))->getSN());
+  this->setSupplier(dynamic_cast<Model*>(sender_));
+  this->setRequester(dynamic_cast<Model*>(recipient_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,14 +73,14 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // this message is an offer and 
   // the sender is the supplier
   if (trans_.amount > 0) {
-    this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
+    this->setSupplier(dynamic_cast<Model*>(sender_));
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
   if (trans_.amount < 0){
-    this->setRequesterID((dynamic_cast<FacilityModel*>(sender_))->getSN());
+    this->setRequester(dynamic_cast<Model*>(sender_));
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,22 +103,22 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
   // this message is an offer and 
   // the sender is the supplier
   if (trans_.amount > 0) {
-    this->setSupplierID((dynamic_cast<FacilityModel*>(sender_))->getSN());
+    this->setSupplier(dynamic_cast<Model*>(sender_));
   }
 
   // if amt is negative and there is no requester
   // this message is a request and
   // the sender is the requester
   if (trans_.amount < 0) {
-    this->setRequesterID((dynamic_cast<FacilityModel*>(sender_))->getSN());
+    this->setRequester(dynamic_cast<Model*>(sender_));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
   std::cout << "Transaction info (via Message):" << std::endl <<
-    "    Requester ID: " << trans_.requesterID << std::endl <<
-    "    Supplier ID: " << trans_.supplierID << std::endl <<
+    "    Requester ID: " << trans_.requester->getSN() << std::endl <<
+    "    Supplier ID: " << trans_.supplier->getSN() << std::endl <<
     "    Price: "  << trans_.price << std::endl;
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -188,15 +188,30 @@ Communicator* Message::getSender() const {
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getRecipient() const {
+  if (recipient_ == NULL) {
+    string err_msg = "Uninitilized message recipient.";
+    throw CycNullException(err_msg);
+  }
+
   return recipient_;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Message::getSupplierID() const {
-  return trans_.supplierID;
+Model* Message::getSupplier() const {
+  if (trans_.supplier == NULL) {
+    string err_msg = "Uninitilized message supplier.";
+    throw CycNullException(err_msg);
+  }
+
+  return trans_.supplier;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Message::getRequesterID() const {
-  return trans_.requesterID;
+Model* Message::getRequester() const {
+  if (trans_.requester == NULL) {
+    string err_msg = "Uninitilized message requester.";
+    throw CycNullException(err_msg);
+  }
+
+  return trans_.requester;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MessageDir Message::getDir() const {
@@ -227,12 +242,12 @@ void Message::setAmount(double newAmount) {
   trans_.amount = newAmount;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplierID(int newID) {
-  trans_.supplierID = newID;
+void Message::setSupplier(Model* supplier) {
+  trans_.supplier = supplier;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRequesterID(int newID) {
-  trans_.requesterID = newID;
+void Message::setRequester(Model* requester) {
+  trans_.requester = requester;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getPrice() const {
@@ -260,9 +275,7 @@ void Message::reverseDirection() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::execute() {
-  FacilityModel* theFac;
-  theFac = (dynamic_cast<FacilityModel*>(LI->getModelByID(trans_.supplierID, FACILITY)));
-
-  (theFac)->receiveMessage(this);
+  Communicator* theFac = dynamic_cast<Communicator*>(trans_.supplier);
+  theFac->receiveMessage(this);
 } 
 

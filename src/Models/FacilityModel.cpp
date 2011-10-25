@@ -54,9 +54,10 @@ void FacilityModel::sendMaterial(Message* msg, std::vector<Material*> manifest) 
   // register this transaction with the bookkeper
   BI->registerTrans(msg, manifest);
   // send the material by calling the receiver's receiveMaterial function
-  int recvID = msg->getRequesterID();
-  dynamic_cast<FacilityModel*>(LI->getModelByID(recvID, FACILITY))->receiveMaterial(msg->getTrans(), manifest);
-  std::cout << "Material sent from " << getSN() << " to " << recvID << "." << std::endl;
+  Model* requester = msg->getRequester();
+  dynamic_cast<FacilityModel*>(requester)->receiveMaterial(msg->getTrans(), manifest);
+  std::cout << "Material sent from " << getSN() << " to " 
+            << requester->getSN() << "." << std::endl;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

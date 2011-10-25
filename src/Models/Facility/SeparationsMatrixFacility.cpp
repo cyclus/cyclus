@@ -161,7 +161,7 @@ void SeparationsMatrixFacility::print()
 void SeparationsMatrixFacility::receiveMessage(Message* msg) 
 {
   // is this a message from on high? 
-  if(msg->getSupplierID()==this->getSN()){
+  if(msg->getSupplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -301,7 +301,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(LI->getModelByID(order->getRequesterID(), FACILITY)));
+    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
 }

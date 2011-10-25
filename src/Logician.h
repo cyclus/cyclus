@@ -110,6 +110,7 @@ class Logician {
     /**
      * get a pointer to a model based on its ID number
      *
+     * @deprecated
      * @param ID the ID number of the model to return
      * @param model_type type of the model pointer to return (ModelType enum)
      */
