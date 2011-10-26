@@ -9,6 +9,7 @@
 #include "InputXML.h"
 #include "CycException.h"
 #include "Env.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -16,6 +17,24 @@ using namespace std;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+
+  ////// logging example //////
+
+  // set the reporting/printing cutoff level (do once per session/run
+  Log::report_level = LOG_DEBUG2;
+
+  const int count = 3;
+
+  // use the LOG macro where its arg is the log level or type
+  // LOG_DEBUG is the type used for this logging statement
+  // the macro statment returns a string stream that can be used like cout
+  LOG(LOG_DEBUG) << "A loop with " << count << " iterations";
+  for (int i = 0; i != count; ++i) {
+     LOG(LOG_DEBUG1) << "the counter i = " << i;
+  }
+
+  ////// end logging example //////
+
   // tell ENV the path between the cwd and the cyclus executable
   string path = ENV->pathBase(argv[0]);
   ENV->setCyclusPath(path);
