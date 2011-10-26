@@ -18,7 +18,7 @@ using namespace std;
 InputXML* InputXML::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string InputXML::main_schema_ = ENV->getCyclusPath() + "/Data/cyclus.rng";
+string InputXML::main_schema_ = "./Data/cyclus.rng";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML::InputXML() {
