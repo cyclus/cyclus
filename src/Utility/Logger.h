@@ -1,6 +1,6 @@
 
 #define LOG(level) \
-if (level > Log::report_level) ; \
+if (level > Log::ReportLevel()) ; \
 else Log().Get(level)
 
 #include <iostream>
@@ -18,7 +18,9 @@ class Log {
 
     std::ostringstream& Get(LogLevel level = LOG_INFO);
 
-    static LogLevel report_level;
+    static LogLevel& ReportLevel() {return report_level;};
+
+    static LogLevel ToLogLevel(std::string text);
 
   protected:
     std::ostringstream os;
@@ -31,6 +33,8 @@ class Log {
     std::string toString(LogLevel level);
 
     LogLevel messageLevel;
+
+    static LogLevel report_level;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,6 +62,33 @@ Log::~Log() {
   // fprintf used to maintain thread safety
   fprintf(stderr, "%s", os.str().c_str());
   fflush(stderr);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+LogLevel Log::ToLogLevel(std::string text) {
+  LogLevel level;
+
+  if(text == "LOG_ERROR") {
+    level = LOG_ERROR;
+  } else if (text == "LOG_WARNING") {
+    level = LOG_WARNING;
+  } else if (text == "LOG_INFO") {
+    level = LOG_INFO;
+  } else if (text == "LOG_DEBUG") {
+    level = LOG_DEBUG;
+  } else if (text == "LOG_DEBUG1") {
+    level = LOG_DEBUG1;
+  } else if (text == "LOG_DEBUG2") {
+    level = LOG_DEBUG2;
+  } else if (text == "LOG_DEBUG3") {
+    level = LOG_DEBUG3;
+  } else if (text == "LOG_DEBUG4") {
+    level = LOG_DEBUG4;
+  } else {
+    level = LOG_ERROR;
+  }
+
+  return level;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
