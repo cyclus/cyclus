@@ -30,26 +30,32 @@ class Log {
 
     Log& operator =(const Log&);
 
-    std::string toString(LogLevel level);
-
     LogLevel messageLevel;
 
     static LogLevel report_level;
+
+    static std::map<LogLevel, std::string> level_to_string;
+    static std::map<std::string, LogLevel> string_to_level;
+    static void addLevel(LogLevel level, std::string text);
+    static void initialize();
+    static std::string ToString(LogLevel level);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-LogLevel Log::report_level = LOG_ERROR;
+std::map<LogLevel, std::string> Log::level_to_string;
+std::map<std::string, LogLevel> Log::string_to_level;
+LogLevel Log::report_level = (Log::initialize(), LOG_ERROR);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Log::Get(LogLevel level) {
   //os << "- " << GetTimeSomehow();
-  os << " " << toString(level) << ": ";
+  os << " " << ToString(level) << ": ";
 
   int ind_level = 0;
   if(level > LOG_DEBUG) {ind_level = level - LOG_DEBUG;}
 
   for(int i = 0; i < ind_level; i++) {
-    os << "   ";
+    os << "    ";
   }
 
   messageLevel = level;
@@ -60,76 +66,48 @@ std::ostringstream& Log::Get(LogLevel level) {
 Log::~Log() {
   os << std::endl;
   // fprintf used to maintain thread safety
-  fprintf(stderr, "%s", os.str().c_str());
-  fflush(stderr);
+  fprintf(stdout, "%s", os.str().c_str());
+  fflush(stdout);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Log::initialize() {
+  Log::addLevel(LOG_ERROR, "LOG_ERROR");
+  Log::addLevel(LOG_WARNING, "LOG_WARNING");
+  Log::addLevel(LOG_INFO, "LOG_INFO");
+  Log::addLevel(LOG_DEBUG, "LOG_DEBUG");
+  Log::addLevel(LOG_DEBUG1, "LOG_DEBUG1");
+  Log::addLevel(LOG_DEBUG2, "LOG_DEBUG2");
+  Log::addLevel(LOG_DEBUG3, "LOG_DEBUG3");
+  Log::addLevel(LOG_DEBUG4, "LOG_DEBUG4");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 LogLevel Log::ToLogLevel(std::string text) {
-  LogLevel level;
-
-  if(text == "LOG_ERROR") {
-    level = LOG_ERROR;
-  } else if (text == "LOG_WARNING") {
-    level = LOG_WARNING;
-  } else if (text == "LOG_INFO") {
-    level = LOG_INFO;
-  } else if (text == "LOG_DEBUG") {
-    level = LOG_DEBUG;
-  } else if (text == "LOG_DEBUG1") {
-    level = LOG_DEBUG1;
-  } else if (text == "LOG_DEBUG2") {
-    level = LOG_DEBUG2;
-  } else if (text == "LOG_DEBUG3") {
-    level = LOG_DEBUG3;
-  } else if (text == "LOG_DEBUG4") {
-    level = LOG_DEBUG4;
-  } else {
-    level = LOG_ERROR;
-  }
-
-  return level;
+  return string_to_level[text];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Log::toString(LogLevel level) {
+std::string Log::ToString(LogLevel level) {
   std::string text;
-  int field_width = 12;
-
-  switch(level) {
-    case LOG_ERROR:
-      text = "LOG_ERROR";
-      break;
-    case LOG_WARNING:
-      text = "LOG_WARNING";
-      break;
-    case LOG_INFO:
-      text = "LOG_INFO";
-      break;
-    case LOG_DEBUG:
-      text = "LOG_DEBUG";
-      break;
-    case LOG_DEBUG1:
-      text = "LOG_DEBUG1";
-      break;
-    case LOG_DEBUG2:
-      text = "LOG_DEBUG2";
-      break;
-    case LOG_DEBUG3:
-      text = "LOG_DEBUG3";
-      break;
-    case LOG_DEBUG4:
-      text = "LOG_DEBUG4";
-      break;
-    default:
-      text = "BAD_LOG_LEVEL";
+  try {
+    text = level_to_string[level];
+  } catch (...) {
+    text = "BAD_LOG_LEVEL";
   }
+  return text;
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Log::addLevel(LogLevel level, std::string text) {
+  Log::string_to_level[text] = level;
+
+  int field_width = 12;
   int to_add = field_width - text.size();
   for (int i = 0; i < to_add; i++) {
     text = " " + text;
   }
  
-  return text;
+  Log::level_to_string[level] = text;
 }
 
