@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
   po::notify(vm);
 
   po::positional_options_description p;
-  p.add("input-file", -1);
+  p.add("input-file", 1);
 
   //po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).
@@ -74,12 +74,12 @@ int main(int argc, char* argv[]) {
 
   ////// logging example //////
   // use the LOG macro where its arg is the log level or type
-  // LOG_DEBUG is the type used for this logging statement
+  // LEV_DEBUG is the type used for this logging statement
   // the macro statment returns a string stream that can be used like cout
   const int count = 3;
-  LOG(LOG_DEBUG) << "A loop with " << count << " iterations";
+  LOG(LEV_DEBUG) << "A loop with " << count << " iterations";
   for (int i = 0; i != count; ++i) {
-     LOG(LOG_DEBUG1) << "the counter i = " << i;
+     LOG(LEV_DEBUG1) << "the counter i = " << i;
   }
   ////// end logging example //////
 

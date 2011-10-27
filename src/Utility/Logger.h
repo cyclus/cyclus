@@ -1,14 +1,14 @@
 
 #define LOG(level) \
 if (level > Log::ReportLevel()) ; \
-else Log().Get(level)
+else Log().Get(level) << " [desired-prefix]: "
 
 #include <iostream>
 #include <string>
 #include <sstream>
 
-enum LogLevel {LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBUG, LOG_DEBUG1,
-               LOG_DEBUG2, LOG_DEBUG3, LOG_DEBUG4};
+enum LogLevel {LEV_WARNING, LEV_INFO,
+               LEV_DEBUG, LEV_DEBUG1, LEV_DEBUG2, LEV_DEBUG3};
 
 class Log {
   public:
@@ -16,11 +16,12 @@ class Log {
 
     virtual ~Log();
 
-    std::ostringstream& Get(LogLevel level = LOG_INFO);
+    std::ostringstream& Get(LogLevel level = LEV_INFO);
 
     static LogLevel& ReportLevel() {return report_level;};
 
     static LogLevel ToLogLevel(std::string text);
+    static std::string ToString(LogLevel level);
 
   protected:
     std::ostringstream os;
@@ -36,15 +37,15 @@ class Log {
 
     static std::map<LogLevel, std::string> level_to_string;
     static std::map<std::string, LogLevel> string_to_level;
-    static void addLevel(LogLevel level, std::string text);
+
     static void initialize();
-    static std::string ToString(LogLevel level);
+    static void addLevel(LogLevel level, std::string text);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::map<LogLevel, std::string> Log::level_to_string;
 std::map<std::string, LogLevel> Log::string_to_level;
-LogLevel Log::report_level = (Log::initialize(), LOG_ERROR);
+LogLevel Log::report_level = (Log::initialize(), LEV_WARNING);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Log::Get(LogLevel level) {
@@ -52,7 +53,7 @@ std::ostringstream& Log::Get(LogLevel level) {
   os << " " << ToString(level) << ": ";
 
   int ind_level = 0;
-  if(level > LOG_DEBUG) {ind_level = level - LOG_DEBUG;}
+  if(level > LEV_DEBUG) {ind_level = level - LEV_DEBUG;}
 
   for(int i = 0; i < ind_level; i++) {
     os << "    ";
@@ -72,14 +73,12 @@ Log::~Log() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Log::initialize() {
-  Log::addLevel(LOG_ERROR, "LOG_ERROR");
-  Log::addLevel(LOG_WARNING, "LOG_WARNING");
-  Log::addLevel(LOG_INFO, "LOG_INFO");
-  Log::addLevel(LOG_DEBUG, "LOG_DEBUG");
-  Log::addLevel(LOG_DEBUG1, "LOG_DEBUG1");
-  Log::addLevel(LOG_DEBUG2, "LOG_DEBUG2");
-  Log::addLevel(LOG_DEBUG3, "LOG_DEBUG3");
-  Log::addLevel(LOG_DEBUG4, "LOG_DEBUG4");
+  Log::addLevel(LEV_WARNING, "LEV_WARNING");
+  Log::addLevel(LEV_INFO, "LEV_INFO");
+  Log::addLevel(LEV_DEBUG, "LEV_DEBUG");
+  Log::addLevel(LEV_DEBUG1, "LEV_DEBUG1");
+  Log::addLevel(LEV_DEBUG2, "LEV_DEBUG2");
+  Log::addLevel(LEV_DEBUG3, "LEV_DEBUG3");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,7 +92,7 @@ std::string Log::ToString(LogLevel level) {
   try {
     text = level_to_string[level];
   } catch (...) {
-    text = "BAD_LOG_LEVEL";
+    text = "BAD_LEVEL";
   }
   return text;
 }
