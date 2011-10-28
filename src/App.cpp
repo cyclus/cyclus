@@ -20,8 +20,6 @@ namespace po = boost::program_options;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  map<string, string> mymap;
-  cout << "myval: " << mymap.count("empty") << endl;
 
   // parse command line options
   po::options_description desc("Allowed options");
