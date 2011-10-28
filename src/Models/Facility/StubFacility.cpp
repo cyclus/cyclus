@@ -64,7 +64,7 @@ void StubFacility::receiveMessage(Message* msg) {};
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::sendMaterial(Transaction trans, const Communicator* receiver){
+void StubFacility::sendMaterial(Message* order, const Communicator* receiver){
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -44,9 +44,6 @@ Mass MassTable::getMass(Iso tope) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string MassTable::getName(Iso tope){ };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initialize() {
   string file_path = ENV->getCyclusPath() + "/Data/mass.h5"; 
 

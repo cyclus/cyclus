@@ -84,15 +84,15 @@ public:
      * This sends material up the Inst/Region/Logician line
      * to be passed back down to the receiver
      *
-     * @param trans the Transaction object defining the order being filled
+     * @param order the Message object containing the order being filled
      * @param receiver the ultimate facility to receive this transaction
      */
-    virtual void sendMaterial(Transaction trans, const Communicator* receiver);
+    virtual void sendMaterial(Message* order, const Communicator* receiver);
     
     /**
      * The facility receives the materials other facilities have sent.
      *
-     * @param trans the Transaction object defining the order being filled
+     * @param trans the Transaction object describing the order being filled
      * @param manifest the list of material objects being received
      */
     virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);

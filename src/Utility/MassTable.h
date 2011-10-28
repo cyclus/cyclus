@@ -64,15 +64,6 @@ public:
    */
    Mass getMass(Iso tope);
 
-  /**
-   * get the name of an isotope according to its identifier. 
-   *
-   * @param tope is the isotope identifier of type Iso, which is an int typedef 
-   * 
-   * @ return a string, the name of the tope isotope.
-   */
-  std::string getName(Iso tope);
-
 protected:
   /**
    * Defines the structure of data associated with each row entry in the mass
