@@ -129,20 +129,6 @@ class Logician {
     int getNumModels(ModelType model_type); 
     
     /**
-     * get a pointer to a market based on its commodity name
-     *
-     * @param commodity_name the name of the commodity
-     */
-    Model* getMarketByCommodity(std::string commodity_name);
-
-    /**
-     * get a pointer to a market based on its commodity pointer
-     *
-     * @param commod the pointer to a commodity
-     */
-    Model* getMarketByCommodity(Commodity* commod); 
-
-    /**
      * register a commodity with a market
      * 
      * @param commod a pointer to the commodity to register

@@ -190,7 +190,7 @@ Communicator* Message::getSender() const {
 Communicator* Message::getRecipient() const {
   if (recipient_ == NULL) {
     string err_msg = "Uninitilized message recipient.";
-    throw CycNullException(err_msg);
+    throw CycMessageException(err_msg);
   }
 
   return recipient_;
@@ -199,7 +199,7 @@ Communicator* Message::getRecipient() const {
 Model* Message::getSupplier() const {
   if (trans_.supplier == NULL) {
     string err_msg = "Uninitilized message supplier.";
-    throw CycNullException(err_msg);
+    throw CycMessageException(err_msg);
   }
 
   return trans_.supplier;
@@ -208,7 +208,7 @@ Model* Message::getSupplier() const {
 Model* Message::getRequester() const {
   if (trans_.requester == NULL) {
     string err_msg = "Uninitilized message requester.";
-    throw CycNullException(err_msg);
+    throw CycMessageException(err_msg);
   }
 
   return trans_.requester;

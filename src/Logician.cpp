@@ -122,17 +122,6 @@ int Logician::getNumModels(ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Logician::getMarketByCommodity(std::string commodity_name) 
-{ 
-  return commodity_market_map_[getCommodity(commodity_name)]; 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Logician::getMarketByCommodity(Commodity* commod) { 
-  return commodity_market_map_[commod]; 
-} 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::  registerCommodityMarket(Commodity* commod, Model* market) { 
   commodity_market_map_[commod] = market; 
 } 

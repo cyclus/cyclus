@@ -13,6 +13,7 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity() {
+
   market_ = NULL;
 }
 

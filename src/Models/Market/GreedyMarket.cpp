@@ -75,8 +75,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
   
   // if this request is not yet satisfied &&
   // there are more offers_ left
-  while ( requestAmt > 0 && offers_.size() > 0)
-  {
+  while ( requestAmt > 0 && offers_.size() > 0) {
     // get a new offer
     offer = offers_.end();
     offer--;
@@ -105,12 +104,12 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
           << offerMsg->getAmount() << endl;
 
       requestAmt -= offerAmt;
-    } 
-    else {
+    } else {
       // split offer
-      if (NULL == offerMsg)
+      if (NULL == offerMsg) {
         throw CycException("offer message does not exist in market '" 
             + getName() + "'.");
+      }
       
       // queue a new order
       Message* maybe_offer = new Message(*offerMsg);
@@ -135,7 +134,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // if the residual is above threshold,
       // make a new offer with reduced amount
 
-      if(offerAmt > eps){
+      if(offerAmt > eps) {
         Message *new_offer = new Message(*offerMsg);
         new_offer->setAmount(offerAmt);
         // call this method for consistency
@@ -151,27 +150,27 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::resolve()
-{
+void GreedyMarket::resolve() {
+
   sortedMsgList::iterator request;
 
   firmOrders_ = 0;
 
   /// while requests_ remain and there is at least one offer left
-  while (requests_.size() > 0)
-  {
+  while (requests_.size() > 0) {
+
     request = requests_.end();
     request--;
     
     if(match_request(request)) {
       process_request();
-    } 
-    else {
+    } else {
       cout << "The request from Requester "<< (*request).second->getRequester()->getSN()
           << " for the amount " << (*request).first 
           << " rejected. "<<endl;
       reject_request(request);
     }
+
     // remove this request
     messages_.erase((*request).second);
     requests_.erase(request);
