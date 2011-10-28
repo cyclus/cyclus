@@ -3,6 +3,7 @@
 # define _TIMER
 
 #include "TimeAgent.h"
+#include "MarketModel.h"
 #include <utility>
 #include <vector>
 
@@ -52,7 +53,22 @@ private:
    */
   int year0_;
 
-  std::vector<TimeAgent*> time_agents_;
+  /**
+   * Concrete models that desire to receive tick and tock notifications
+   */
+  std::vector<TimeAgent*> tick_listeners_;
+
+  /**
+   * Concrete models that desire to receive resolve (markets) notifications
+   */
+  std::vector<MarketModel*> resolve_listeners_;
+
+  /**
+   * @brief sends the resolve signal to all of the (market) models receiving
+   * resolve notifications.
+   *
+   */
+  void sendResolve();
 
   /**
    * @brief sends the tick signal to all of the models receiving time
@@ -117,7 +133,14 @@ public:
    *
    * @param agent agent that will receive time-step notifications
    */
-  void registerAgent(TimeAgent* agent);
+  void registerTickListener(TimeAgent* agent);
+
+  /**
+   * @brief registers a sim. agent to receive (market) resolve notifications.
+   *
+   * @param agent agent that will receive resolve notifications
+   */
+  void registerResolveListener(MarketModel* agent);
 
   /**
    * Returns the current time, in months since the simulation started.

@@ -5,12 +5,18 @@
 #include "InputXML.h"
 #include "CycException.h"
 #include "Logician.h"
+#include "Timer.h"
 
 #include <iostream>
 #include <string>
 
 using namespace std;
 
+MarketModel::MarketModel() {
+  setModelType("Market");
+  TI->registerResolveListener(this);
+};
+  
 void MarketModel::init(xmlNodePtr cur)
 {
   Model::init(cur);

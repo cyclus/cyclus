@@ -27,10 +27,7 @@ class MarketModel : public Model, public Communicator
  */
 
 public:
-  /// Default constructor for the MarketModel Class
-  MarketModel() {
-    setModelType("Market");
-  };
+  MarketModel();
   
   /// MarketModels should not be indestructible.
   virtual ~MarketModel() {};
@@ -60,10 +57,6 @@ public:
   { messages_.insert(msg); };
 
 protected:
-
-
-/* ------------------- */ 
-
 
 /* --------------------
  * all MARKETMODEL classes have these members

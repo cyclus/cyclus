@@ -59,19 +59,6 @@ void Logician::decayMaterials(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::resolveMarkets() {
-  // tell each market model to make matches and send out the orders
-  ModelList* market_list;
-  market_list = &(model_lists_[MARKET]);
-
-  for(ModelList::iterator mkt=market_list->begin();
-      mkt != market_list->end();
-      mkt++){
-    (dynamic_cast<MarketModel*>(mkt->second))->resolve();
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::setDecay(int dec){
   if( dec <= 0 ){
     decay_wanted_ = false;

@@ -31,7 +31,7 @@ void Timer::runSim() {
     // Tell the Logician to handle this month.
     LI->decayMaterials(time_);
     sendTick();
-    LI->resolveMarkets();
+    sendResolve();
     sendTock();
     
     // Increment the time.
@@ -40,17 +40,25 @@ void Timer::runSim() {
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::handlePreHistory() {
-  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
-       agent != time_agents_.end(); 
+  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+       agent != tick_listeners_.end(); 
        agent++) {
     (*agent)->handlePreHistory();
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::sendResolve() {
+  for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
+       agent != resolve_listeners_.end(); 
+       agent++) {
+    (*agent)->resolve();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendTick() {
-  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
-       agent != time_agents_.end(); 
+  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+       agent != tick_listeners_.end(); 
        agent++) {
     (*agent)->handleTick(time_);
   }
@@ -58,16 +66,21 @@ void Timer::sendTick() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendTock() {
-  for(vector<TimeAgent*>::iterator agent=time_agents_.begin();
-       agent != time_agents_.end(); 
+  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+       agent != tick_listeners_.end(); 
        agent++) {
     (*agent)->handleTock(time_);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::registerAgent(TimeAgent* agent) {
-  time_agents_.push_back(agent);
+void Timer::registerTickListener(TimeAgent* agent) {
+  tick_listeners_.push_back(agent);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::registerResolveListener(MarketModel* agent) {
+  resolve_listeners_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

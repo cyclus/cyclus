@@ -85,15 +85,6 @@ class Logician {
      */
     void decayMaterials(int time);
     
-    /**
-     * sends the resolve signal to all of the market models
-     * which in turn make matches and send orders
-     *
-     * @todo should be private (rcarlsen)
-     *
-     */
-    void resolveMarkets();
-
     /*
      * sets the decay boolean and the interval
      */
@@ -106,15 +97,6 @@ class Logician {
      * @param model_type type of new_model as defined by ModelType enum
      */
     void addModel(Model* new_model, ModelType model_type);
-
-    /**
-     * get a pointer to a model based on its ID number
-     *
-     * @deprecated
-     * @param ID the ID number of the model to return
-     * @param model_type type of the model pointer to return (ModelType enum)
-     */
-    Model* getModelByID(int ID, ModelType model_type);        
 
     /**
      * @brief Get an iterator to models of particular type.

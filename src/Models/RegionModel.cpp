@@ -19,7 +19,7 @@ using namespace std;
     setModelType("Region");
 
     // register to receive time-step notifications
-    TI->registerAgent(this);
+    TI->registerTickListener(this);
   };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
