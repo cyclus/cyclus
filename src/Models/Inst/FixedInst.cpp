@@ -26,18 +26,13 @@ void FixedInst::init(xmlNodePtr cur)
   
     Model* facility = LI->getModelByName(fac_name, FACILITY);
 
-    if (NULL == facility){
-      throw CycException("Facility '" 
-                         + fac_name 
-                         + "' is not defined in this problem.");
-    }
     
     if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
       throw CycException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
                          + region_->getName() +"'.");
-  }
+    }
 
     Model* new_facility = Model::create(facility);
 

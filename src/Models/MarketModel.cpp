@@ -28,10 +28,6 @@ void MarketModel::init(xmlNodePtr cur)
   /// all markets require commodities
   string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
   commodity_ = LI->getCommodity(commod_name);
-  if (NULL == commodity_)
-    throw CycException("Market commodity '" + commod_name 
-        + "' does not exist for market '" + getName() 
-        + "'.");
   
   commodity_->setMarket(this);
 }

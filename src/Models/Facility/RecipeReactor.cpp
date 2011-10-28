@@ -76,31 +76,18 @@ void RecipeReactor::init(xmlNodePtr cur)
     // get in_commod
     commod_name = XMLinput->get_xpath_content(pair_node,"incommodity");
     in_commod = LI->getCommodity(commod_name);
-    if (NULL == in_commod)
-      throw CycException("Input commodity '" + commod_name 
-          + "' does not exist for facility '" + getName() 
-          + "'.");
+
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
     in_recipe = LI->getRecipe(recipe_name);
-    if (NULL == in_recipe)
-      throw CycException("Recipe '" + recipe_name 
-          + "' does not exist for facility '" + getName()
-          + "'.");
     
     commod_name = XMLinput->get_xpath_content(pair_node,"outcommodity");
     out_commod = LI->getCommodity(commod_name);
-    if (NULL == out_commod)
-      throw CycException("Output commodity '" + commod_name 
-          + "' does not exist for facility '" + getName() 
-          + "'.");
+
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
     out_recipe = LI->getRecipe(recipe_name);
-    if (NULL == out_recipe)
-      throw CycException("Recipe '" + recipe_name 
-          + "' does not exist for facility '" + getName()
-          + "'.");
+
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
           make_pair(out_commod, out_recipe)));
   };

@@ -86,14 +86,8 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
       cout << "fac_name:" << fac_name << "is on the list of repalcement facilities" <<endl;
       facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
-      if (NULL == facility){
-	throw CycException("Facility '" 
-			   + fac_name 
-			   + "' is not defined in this problem.");
-      }
-      else{
-	allReplacementFacs_[i].push_back(facility);
-      };
+
+      allReplacementFacs_[i].push_back(facility);
     };
   };    
 };

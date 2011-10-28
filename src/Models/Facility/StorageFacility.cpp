@@ -44,10 +44,6 @@ void StorageFacility::init(xmlNodePtr cur)
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   incommod_ = LI->getCommodity(commod_name);
-  if (NULL == incommod_)
-    throw CycException("Input commodity '" + commod_name 
-                       + "' does not exist for facility '" + getName() 
-                       + "'.");
   
   inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
@@ -194,27 +190,15 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
     sending_facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
-    if (NULL == sending_facility){
-      throw CycException("Facility '" 
-			 + fac_name 
-			 + "' is not defined in this problem.");
-    }
+
     // commodity
     commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
     commodity = LI->getCommodity(commod_name);
-    if (NULL == commodity){
-      throw CycException("Commodity '" 
-			 + commod_name
-			 + "' is not defined in this problem.");
-    }
+
     // recipe
     recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
     recipe = LI->getRecipe(recipe_name);
-    if (NULL == recipe){
-      throw CycException("Recipe '" 
-			 + recipe_name
-			 + "' is not defined in this problem.");
-    }
+
     // amount
     amount = strtod(XMLinput->get_xpath_content(entry_node,"amount"), NULL);
     // time in storage (age) in months

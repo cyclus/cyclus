@@ -44,7 +44,6 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   // all facilities require commodities - possibly many
   string commod_name;
   Commodity* new_commod;
-  new_commod = NULL;
 
   // Hack Force!!
   // Forcing Separations Matrix to know ahead of time the number of streams to be processed.
@@ -59,11 +58,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
 
     commod_name = XMLinput->get_xpath_content(cur,"incommodity");
     new_commod = LI->getCommodity(commod_name);
-    if (NULL == new_commod)
-      throw CycException("Input commodity '" + commod_name 
-                         + "' does not exist for facility '" + getName() 
-                         + "'.");
-   in_commod_.push_back(new_commod);
+    in_commod_.push_back(new_commod);
   }
 
   // get inventory size
@@ -82,12 +77,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     xmlNodePtr stream = nodes->nodeTab[i];
 
     string stream_commod = XMLinput->get_xpath_content(stream,"outcommodity");
-    new_commod = NULL;
     new_commod = LI->getCommodity(stream_commod);
-    if (NULL == new_commod)
-      throw CycException("Output commodity '" + commod_name
-                         + "' does not exist for facility '" + getName()
-                         + "'.");
     out_commod_.push_back(new_commod);
 
     int stream_Z = strtol(XMLinput->get_xpath_content(stream,"Z"), NULL, 10);

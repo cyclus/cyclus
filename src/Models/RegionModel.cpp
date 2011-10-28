@@ -41,10 +41,6 @@ void RegionModel::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++){
     fac_name = (const char*)nodes->nodeTab[i]->children->content;
     new_fac = LI->getModelByName(fac_name, FACILITY);
-    if (NULL == new_fac){
-      throw CycNullException("Facility " + fac_name 
-          + " is not defined in this simulation.");
-    }
     allowedFacilities_.insert(new_fac);
   }
 }

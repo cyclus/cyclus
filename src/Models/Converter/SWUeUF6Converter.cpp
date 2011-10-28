@@ -13,8 +13,6 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
 { 
   ConverterModel::init(cur);
   
-  in_commod_ = out_commod_ = NULL; 
-  
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SWUeUF6Converter");
 
@@ -24,17 +22,9 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   in_commod_ = LI->getCommodity(commod_name);
-  if (NULL == in_commod_)
-    throw CycException("Input commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
-                       + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(commod_name);
-  if (NULL == out_commod_)
-    throw CycException("Output commodity '" + commod_name 
-                       + "' does not exist for converter '" + getName() 
-                       + "'.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

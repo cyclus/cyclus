@@ -46,17 +46,9 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
   in_commod_ = LI->getCommodity(commod_name);
-  if (NULL == in_commod_)
-    throw CycException("Input commodity '" + commod_name 
-                       + "' does not exist for facility '" + getName() 
-                       + "'.");
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(commod_name);
-  if (NULL == out_commod_)
-    throw CycException("Output commodity '" + commod_name 
-                       + "' does not exist for facility '" + getName() 
-                       + "'.");
 
   // get inventory size
   inventory_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);

@@ -171,7 +171,11 @@ int Logician::getNumRecipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Logician::getRecipe(std::string name) { 
-  return recipes_[name]; 
+  if (recipes_.count(name) == 0) {
+      throw CycNullException("Recipe '" + name 
+          + "' does not exist.");
+  }
+  return recipes_[name];
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -186,6 +190,10 @@ int Logician::getNumCommodities() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Logician::getCommodity(std::string name) { 
-  return commodities_[name]; 
+  if (commodities_.count(name) == 0) {
+      throw CycNullException("Commodity '" + name 
+          + "' does not exist.");
+  }
+  return commodities_[name];
 } 
 

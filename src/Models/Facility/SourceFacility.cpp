@@ -26,7 +26,6 @@ void SourceFacility::init(xmlNodePtr cur)
   FacilityModel::init(cur);
 
   cout<<"The Source Facility is being initialized"<<endl;
-  out_commod_ = NULL;
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -37,18 +36,10 @@ void SourceFacility::init(xmlNodePtr cur)
 
   input_token = XMLinput->get_xpath_content(cur,"outcommodity");
   out_commod_ = LI->getCommodity(input_token);
-  if (NULL == out_commod_)
-    throw CycException("Output commodity '" + input_token 
-        + "' does not exist for facility '" + getName() 
-        + "'.");
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");
   recipe_ = LI->getRecipe(input_token);
-  if (NULL == recipe_)
-    throw CycException("Recipe '" + input_token 
-        + "' does not exist for facility '" + getName()
-        + "'.");
 
   // get capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);

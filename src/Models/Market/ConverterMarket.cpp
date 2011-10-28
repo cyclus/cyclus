@@ -17,38 +17,23 @@ void ConverterMarket::init(xmlNodePtr cur)
   xmlNodePtr conv_node = nodes->nodeTab[0];
   conv_name_ = XMLinput->get_xpath_content(conv_node,"type");
   
-  Model* converter = NULL; 
+  Model* converter; 
   converter = LI->getModelByName(conv_name_, CONVERTER);
 
-  if (NULL == converter){
-    throw CycException("Converter '" 
-        + conv_name_ 
-        + "' is not defined in this problem.");
-    }
   Model* new_converter = Model::create(converter);
 
   // The commodity initialized as the mktcommodity is the request commodity.
-
-  offer_commod_ = NULL; 
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
   string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
   offer_commod_ = LI->getCommodity(commod_name);
-  if (NULL == offer_commod_)
-    throw CycException("Offer commodity '" + commod_name 
-                       + "' does not exist for converter market '" + getName() 
-                       + "'.");
   
   offer_commod_->setMarket(this);
   
   commod_name = XMLinput->get_xpath_content(cur,"reqcommodity");
   req_commod_ = LI->getCommodity(commod_name);
-  if (NULL == req_commod_)
-    throw CycException("Request commodity '" + commod_name 
-                       + "' does not exist for converter market '" + getName() 
-                       + "'.");
   
   req_commod_->setMarket(this);
 
@@ -84,14 +69,8 @@ void ConverterMarket::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 ConverterModel* ConverterMarket::getConverter() {
-  Model* converter = NULL;
+  Model* converter;
   converter = LI->getModelByName(conv_name_, CONVERTER);
-
-  if (NULL == converter){
-    throw CycException("Converter '" 
-        + conv_name_ 
-        + "' is not defined in this problem.");
-    }
 
   return dynamic_cast<ConverterModel*>(converter);
 }
