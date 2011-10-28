@@ -21,10 +21,10 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = LI->getCommodity(commod_name);
+  in_commod_ = Commodity::getCommodity(commod_name);
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = LI->getCommodity(commod_name);
+  out_commod_ = Commodity::getCommodity(commod_name);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -86,8 +86,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   CompMap comp;
 
   // determine which direction we're converting
-  if (in_commod_ == LI->getCommodity("SWUs") &&
-      out_commod_ == LI->getCommodity("eUF6")){
+  if (in_commod_ == Commodity::getCommodity("SWUs") &&
+      out_commod_ == Commodity::getCommodity("eUF6")){
     // the enricher is the supplier in the convMsg
     enr = convMsg->getSupplier();
     if (0 == enr){
@@ -97,8 +97,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     comp = refMsg->getComp();
   }
 
-  else if (in_commod_ == LI->getCommodity("eUF6") &&
-      out_commod_ == LI->getCommodity("SWUs")){ 
+  else if (in_commod_ == Commodity::getCommodity("eUF6") &&
+      out_commod_ == Commodity::getCommodity("SWUs")){ 
     // the enricher is the supplier in the refMsg
     enr = refMsg->getSupplier();
     if (0 == enr){
@@ -127,11 +127,11 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   massProdU = SWUs/(term1 + term2 - term3);
   SWUs = massProdU*(term1 + term2 - term3);
 
-  if(out_commod_ == LI->getCommodity("eUF6")){
+  if(out_commod_ == Commodity::getCommodity("eUF6")){
     toRet = convMsg->clone();
     toRet->setAmount(massProdU); 
   }
-  else if(out_commod_ == LI->getCommodity("SWUs")){
+  else if(out_commod_ == Commodity::getCommodity("SWUs")){
     toRet = convMsg->clone();
     toRet->setAmount(SWUs); 
   }

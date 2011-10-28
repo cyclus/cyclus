@@ -42,7 +42,7 @@ void SinkFacility::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++)
   {
     commod_name = (const char*)(nodes->nodeTab[i]->children->content);
-    new_commod = LI->getCommodity(commod_name);
+    new_commod = Commodity::getCommodity(commod_name);
     in_commods_.push_back(new_commod);
   }
 

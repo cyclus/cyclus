@@ -38,10 +38,10 @@ void NullFacility::init(xmlNodePtr cur) {
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = LI->getCommodity(commod_name);
+  in_commod_ = Commodity::getCommodity(commod_name);
   
   commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = LI->getCommodity(commod_name);
+  out_commod_ = Commodity::getCommodity(commod_name);
 
   inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);

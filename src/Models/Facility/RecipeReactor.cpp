@@ -75,14 +75,14 @@ void RecipeReactor::init(xmlNodePtr cur)
 
     // get in_commod
     commod_name = XMLinput->get_xpath_content(pair_node,"incommodity");
-    in_commod = LI->getCommodity(commod_name);
+    in_commod = Commodity::getCommodity(commod_name);
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
     in_recipe = LI->getRecipe(recipe_name);
     
     commod_name = XMLinput->get_xpath_content(pair_node,"outcommodity");
-    out_commod = LI->getCommodity(commod_name);
+    out_commod = Commodity::getCommodity(commod_name);
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");

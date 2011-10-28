@@ -43,7 +43,7 @@ void StorageFacility::init(xmlNodePtr cur)
   Commodity* new_commod;
   
   commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  incommod_ = LI->getCommodity(commod_name);
+  incommod_ = Commodity::getCommodity(commod_name);
   
   inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
@@ -193,7 +193,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
 
     // commodity
     commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
-    commodity = LI->getCommodity(commod_name);
+    commodity = Commodity::getCommodity(commod_name);
 
     // recipe
     recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");

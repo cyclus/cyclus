@@ -57,7 +57,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     xmlNodePtr commod = nodes->nodeTab[i];
 
     commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-    new_commod = LI->getCommodity(commod_name);
+    new_commod = Commodity::getCommodity(commod_name);
     in_commod_.push_back(new_commod);
   }
 
@@ -77,7 +77,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     xmlNodePtr stream = nodes->nodeTab[i];
 
     string stream_commod = XMLinput->get_xpath_content(stream,"outcommodity");
-    new_commod = LI->getCommodity(stream_commod);
+    new_commod = Commodity::getCommodity(stream_commod);
     out_commod_.push_back(new_commod);
 
     int stream_Z = strtol(XMLinput->get_xpath_content(stream,"Z"), NULL, 10);

@@ -4,7 +4,6 @@
 
 #include "Model.h"
 #include "Material.h"
-#include "Commodity.h"
 
 #include <vector>
 #include <string>
@@ -15,7 +14,6 @@
 
 typedef std::map<int, Model*> ModelList;
 typedef std::map<std::string, Material*> RecipeList;
-typedef std::map<std::string, Commodity*> CommodityList;
 typedef std::vector<Material*> MaterialList;
 
 /**
@@ -53,14 +51,8 @@ class Logician {
     /// list of material templates
     RecipeList recipes_;
     
-    /// list of commodities
-    CommodityList commodities_;
-
     /// list of materialss
     MaterialList materials_;
-    
-    /// map commodities to markets
-    std::map<Commodity*, Model*> commodity_market_map_;
     
     /**
      * (Recursively) deletes this Logician (and the objects it oversees).
@@ -128,14 +120,6 @@ class Logician {
      */
     int getNumModels(ModelType model_type); 
     
-    /**
-     * register a commodity with a market
-     * 
-     * @param commod a pointer to the commodity to register
-     * @param market a pointer to the market with which to register the commod.
-     */
-    void registerCommodityMarket(Commodity* commod, Model* market);
-    
     /*
      * Generic routine to print a list of model-based entities
      *
@@ -168,25 +152,6 @@ class Logician {
      */
     Material* getRecipe(std::string name);                      
     
-    /**
-     * add a commodity to the list
-     *
-     * @param new_commod the new commodity to add to the list 
-     */
-    void addCommodity(Commodity* new_commod);
-
-    /**
-     * get number or commodities
-     */
-    int getNumCommodities(); 
-
-    /**
-     * get a pointer to the commodity based on its name
-     *
-     * @param name the name of the commodity for which to return a pointer.
-     */
-    Commodity* getCommodity(std::string name);
-
 };
 
 #endif

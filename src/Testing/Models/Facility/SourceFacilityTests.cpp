@@ -13,7 +13,7 @@ using namespace std;
 class FakeSourceFacility : public SourceFacility {
   public:
     FakeSourceFacility() : SourceFacility() {
-      out_commod_ = new Commodity();
+      out_commod_ = new Commodity("my-commod");
       recipe_ = new Material();
 
       capacity_ = 25;

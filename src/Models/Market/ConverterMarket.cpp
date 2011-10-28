@@ -28,12 +28,12 @@ void ConverterMarket::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
   string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
-  offer_commod_ = LI->getCommodity(commod_name);
+  offer_commod_ = Commodity::getCommodity(commod_name);
   
   offer_commod_->setMarket(this);
   
   commod_name = XMLinput->get_xpath_content(cur,"reqcommodity");
-  req_commod_ = LI->getCommodity(commod_name);
+  req_commod_ = Commodity::getCommodity(commod_name);
   
   req_commod_->setMarket(this);
 

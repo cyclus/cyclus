@@ -35,7 +35,7 @@ void SourceFacility::init(xmlNodePtr cur)
   string input_token;
 
   input_token = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = LI->getCommodity(input_token);
+  out_commod_ = Commodity::getCommodity(input_token);
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");

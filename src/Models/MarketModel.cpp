@@ -27,7 +27,7 @@ void MarketModel::init(xmlNodePtr cur)
 
   /// all markets require commodities
   string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
-  commodity_ = LI->getCommodity(commod_name);
+  commodity_ = Commodity::getCommodity(commod_name);
   
   commodity_->setMarket(this);
 }

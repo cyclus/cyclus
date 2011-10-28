@@ -122,11 +122,6 @@ int Logician::getNumModels(ModelType model_type) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::  registerCommodityMarket(Commodity* commod, Model* market) { 
-  commodity_market_map_[commod] = market; 
-} 
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::printModelList(ModelType model_type) {
   ModelList* list;
   list = &model_lists_[model_type];
@@ -167,22 +162,3 @@ Material* Logician::getRecipe(std::string name) {
   return recipes_[name];
 } 
   
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::addCommodity(Commodity* new_commod) { 
-  commodities_[new_commod->getName()] = new_commod; 
-} 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Logician::getNumCommodities() {
-  return commodities_.size(); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Logician::getCommodity(std::string name) { 
-  if (commodities_.count(name) == 0) {
-      throw CycNullException("Commodity '" + name 
-          + "' does not exist.");
-  }
-  return commodities_[name];
-} 
-

@@ -76,7 +76,7 @@ void GenericRepository::init(xmlNodePtr cur)
   for (int i=0;i<nodes->nodeNr;i++)
   {
     commod_name = (const char*)(nodes->nodeTab[i]->children->content);
-    new_commod = LI->getCommodity(commod_name);
+    new_commod = Commodity::getCommodity(commod_name);
     in_commods_.push_back(new_commod);
   }
 
@@ -135,7 +135,7 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
       allowed_sub_nodes = XMLinput->get_xpath_elements(cur,"allowedcommod");
       for (int i=0;i<allowed_sub_nodes->nodeNr;i++) {
         Commodity* allowed_commod = NULL;
-        allowed_commod = LI->getCommodity((const 
+        allowed_commod = Commodity::getCommodity((const 
               char*)(allowed_sub_nodes->nodeTab[i]->children->content));
         commod_wf_map_.insert(make_pair(allowed_commod, toRet));
       }

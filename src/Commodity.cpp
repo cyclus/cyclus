@@ -2,24 +2,26 @@
 // Implements the Commodity Class
 #include "Commodity.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 
-/// Initialize the Commodity ID serialization
-int Commodity::nextID_ = 0;
-
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity::Commodity() {
+/// Initialize the Commodity ID serialization
+int Commodity::nextID_ = 0;
+std::map<std::string, Commodity*> Commodity::commodities_;
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity::Commodity(std::string name) {
+  ID_ = nextID_++;
+  name_ = name;
   market_ = NULL;
+
+  commodities_[name] = this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity::Commodity(xmlNodePtr cur) {
-  // advance the commodity ID
   ID_ = nextID_++;
 
   // get commodity name
@@ -28,6 +30,7 @@ Commodity::Commodity(xmlNodePtr cur) {
   // don't give it any market
   market_ = NULL;
 
+  commodities_[name_] = this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,7 +39,7 @@ void Commodity::load_commodities() {
   
   // Logician maintains a list of commods retrievable as needed by sim Agents
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addCommodity(new Commodity(nodes->nodeTab[i]));
+    new Commodity(nodes->nodeTab[i]);
   }
 }
 
@@ -51,3 +54,16 @@ Model* Commodity::getMarket() {
   return market_;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int Commodity::getNumCommodities() {
+  return Commodity::commodities_.size();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Commodity* Commodity::getCommodity(std::string name) {
+  if (Commodity::commodities_.count(name) == 0) {
+      throw CycNullException("Commodity '" + name 
+          + "' does not exist.");
+  }
+  return Commodity::commodities_[name];
+}

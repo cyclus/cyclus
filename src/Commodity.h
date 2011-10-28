@@ -2,6 +2,7 @@
 #if !defined(_COMMODITY_H)
 #define _COMMODITY_H
 #include <string>
+#include <map>
 
 #include <libxml/tree.h>
 
@@ -16,7 +17,7 @@ class Model;
 class Commodity {
 public:
 
-  Commodity();
+  Commodity(std::string name);
 
   /**
    *  @brief Primary constructor uses an existing XML Node Pointer to
@@ -58,7 +59,21 @@ public:
    */
   static void load_commodities();
 
+  /**
+   * get number or commodities
+   */
+  static int getNumCommodities(); 
+
+  /**
+   * get a pointer to the commodity based on its name
+   *
+   * @param name the name of the commodity for which to return a pointer.
+   */
+  static Commodity* getCommodity(std::string name);
+
 private:
+  static std::map<std::string, Commodity*> commodities_;
+
   /// unique ID space for serialization
   static int nextID_;
   
