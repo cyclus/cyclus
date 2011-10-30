@@ -43,7 +43,11 @@ void Timer::handlePreHistory() {
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    (*agent)->handlePreHistory();
+    try {
+      (*agent)->handlePreHistory();
+    } catch(CycException err) {
+      cout << "ERROR occured: " << err.what();
+    }
   }
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,7 +55,11 @@ void Timer::sendResolve() {
   for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
        agent != resolve_listeners_.end(); 
        agent++) {
-    (*agent)->resolve();
+    try {
+      (*agent)->resolve();
+    } catch(CycException err) {
+      cout << "ERROR occured: " << err.what();
+    }
   }
 }
 
@@ -60,7 +68,11 @@ void Timer::sendTick() {
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    (*agent)->handleTick(time_);
+    try {
+      (*agent)->handleTick(time_);
+    } catch(CycException err) {
+      cout << "ERROR occured: " << err.what();
+    }
   }
 }
 
@@ -69,7 +81,11 @@ void Timer::sendTock() {
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    (*agent)->handleTock(time_);
+    try {
+      (*agent)->handleTock(time_);
+    } catch(CycException err) {
+      cout << "ERROR occured: " << err.what();
+    }
   }
 }
 

@@ -35,7 +35,7 @@ class Log {
 
     static LogLevel report_level;
 
-    static std::map<LogLevel, std::string> level_to_string;
+    static std::vector<std::string> level_to_string;
     static std::map<std::string, LogLevel> string_to_level;
 
     static void initialize();
@@ -43,7 +43,7 @@ class Log {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::map<LogLevel, std::string> Log::level_to_string;
+std::vector<std::string> Log::level_to_string;
 std::map<std::string, LogLevel> Log::string_to_level;
 LogLevel Log::report_level = (Log::initialize(), LEV_WARNING);
 
@@ -90,7 +90,7 @@ LogLevel Log::ToLogLevel(std::string text) {
 std::string Log::ToString(LogLevel level) {
   std::string text;
   try {
-    text = level_to_string[level];
+    text = level_to_string.at((int)level);
   } catch (...) {
     text = "BAD_LEVEL";
   }
@@ -107,6 +107,6 @@ void Log::addLevel(LogLevel level, std::string text) {
     text = " " + text;
   }
  
-  Log::level_to_string[level] = text;
+  Log::level_to_string.push_back(text);
 }
 

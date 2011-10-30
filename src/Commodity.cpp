@@ -48,7 +48,7 @@ Model* Commodity::getMarket() {
   if (market_ == NULL) {
     string err_msg = "Attempted to retrieve an uninitialized market pointer";
     err_msg += "from a commodity.";
-    throw CycNullException(err_msg);
+    throw CycIndexException(err_msg);
   }
 
   return market_;
@@ -62,7 +62,7 @@ int Commodity::getNumCommodities() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Commodity::getCommodity(std::string name) {
   if (Commodity::commodities_.count(name) == 0) {
-      throw CycNullException("Commodity '" + name 
+      throw CycIndexException("Commodity '" + name 
           + "' does not exist.");
   }
   return Commodity::commodities_[name];

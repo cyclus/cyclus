@@ -110,7 +110,7 @@ Model* Logician::getModelByName(std::string name, ModelType model_type) {
 
   if (found_model == NULL) {
     string err_msg = "Model '" + name + "' doesn't exist.";
-    throw CycNullException(err_msg);
+    throw CycIndexException(err_msg);
   }
   
   return found_model;
@@ -156,7 +156,7 @@ int Logician::getNumRecipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Logician::getRecipe(std::string name) { 
   if (recipes_.count(name) == 0) {
-      throw CycNullException("Recipe '" + name 
+      throw CycIndexException("Recipe '" + name 
           + "' does not exist.");
   }
   return recipes_[name];

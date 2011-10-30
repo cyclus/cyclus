@@ -45,8 +45,8 @@ public:
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycNullException: public CycException {
-  public: CycNullException(std::string msg) : CycException(msg) {};
+class CycIndexException: public CycException {
+  public: CycIndexException(std::string msg) : CycException(msg) {};
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
