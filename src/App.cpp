@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   cout << "|                  Cyclus                    |" << endl;
   cout << "|       a nuclear fuel cycle simulator       |" << endl;
   cout << "|  from the University of Wisconsin-Madison  |" << endl;
-  cout << "|--------------------------------------------|" << endl;
+  cout << "|--------------------------------------------|\r\n" << endl;
 
   // respond to command line args
   if (vm.count("help")) {
@@ -78,32 +78,36 @@ int main(int argc, char* argv[]) {
   // LEV_DEBUG is the type used for this logging statement
   // the macro statment returns a string stream that can be used like cout
   const int count = 3;
+  LOG(LEV_INFO) << "Info about my app as it runs.";
   LOG(LEV_DEBUG) << "A loop with " << count << " iterations";
   for (int i = 0; i != count; ++i) {
      LOG(LEV_DEBUG1) << "the counter i = " << i;
   }
   ////// end logging example //////
 
-  // initialize simulation
+  // read input file and setup simulation
   try {
-    // read input file and setup simulation
     XMLinput->load_file(vm["input-file"].as<string>()); 
+  } catch (CycIOException ge) {
+    cout << ge.what() << endl;
+  };
 
-    cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
-    LI->printModelList(CONVERTER);
-    cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
-    LI->printModelList(MARKET);
-    cout << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
-    LI->printModelList(FACILITY);
-    cout << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
-    LI->printModelList(REGION);
-    cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
-    LI->printRecipes();
-    
-    // Run the simulation 
-    TI->runSim();
+  cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
+  LI->printModelList(CONVERTER);
+  cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
+  LI->printModelList(MARKET);
+  cout << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
+  LI->printModelList(FACILITY);
+  cout << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
+  LI->printModelList(REGION);
+  cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
+  LI->printRecipes();
+  
+  // Run the simulation 
+  TI->runSim();
 
-    // Create the output file
+  // Create the output file
+  try {
     BI->createDB();
 
     BI->writeModelList(INST);
@@ -114,8 +118,8 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
 
     BI->closeDB();
-  } catch (CycException gen_exception) {
-    cout << gen_exception.what() << endl;
+  } catch (CycException ge) {
+    cout << ge.what() << endl;
   };
 
   return 0;

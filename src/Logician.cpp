@@ -44,11 +44,11 @@ Logician* Logician::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::decayMaterials(int time){
   // if decay is on
-  if(decay_wanted_) {
+  if (decay_wanted_) {
     // and if (time(mod interval)==0)
     if(time/decay_interval_ == 0) {
       // acquire a list of all materials
-      for(MaterialList::iterator mat = materials_.begin();
+      for(vector<Material*>::iterator mat = materials_.begin();
           mat != materials_.end();
           mat++){
          // and decay each of them
@@ -60,11 +60,10 @@ void Logician::decayMaterials(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::setDecay(int dec){
-  if( dec <= 0 ){
+  if ( dec <= 0 ) {
     decay_wanted_ = false;
     decay_interval_ = NULL;
-  }
-  else if ( dec > 0 ){
+  } else if ( dec > 0 ) {
     decay_wanted_ = true;
     decay_interval_ = dec;
   }

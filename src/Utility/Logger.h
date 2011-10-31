@@ -1,13 +1,13 @@
 
 #define LOG(level) \
 if (level > Log::ReportLevel()) ; \
-else Log().Get(level) << " [desired-prefix]: "
+else Log().Get(level) << " [desired-prefix] "
 
 #include <iostream>
 #include <string>
 #include <sstream>
 
-enum LogLevel {LEV_WARNING, LEV_INFO,
+enum LogLevel {LEV_ERROR, LEV_WARNING, LEV_INFO,
                LEV_DEBUG, LEV_DEBUG1, LEV_DEBUG2, LEV_DEBUG3};
 
 class Log {
@@ -16,7 +16,7 @@ class Log {
 
     virtual ~Log();
 
-    std::ostringstream& Get(LogLevel level = LEV_INFO);
+    std::ostringstream& Get(LogLevel level);
 
     static LogLevel& ReportLevel() {return report_level;};
 
@@ -31,8 +31,6 @@ class Log {
 
     Log& operator =(const Log&);
 
-    LogLevel messageLevel;
-
     static LogLevel report_level;
 
     static std::vector<std::string> level_to_string;
@@ -40,26 +38,28 @@ class Log {
 
     static void initialize();
     static void addLevel(LogLevel level, std::string text);
+
+    static int ind_level_;
+    static int spc_per_lev_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> Log::level_to_string;
 std::map<std::string, LogLevel> Log::string_to_level;
-LogLevel Log::report_level = (Log::initialize(), LEV_WARNING);
+LogLevel Log::report_level = (Log::initialize(), LEV_ERROR);
+
+int Log::ind_level_ = 0;
+int Log::spc_per_lev_ = 3;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Log::Get(LogLevel level) {
-  //os << "- " << GetTimeSomehow();
+  // configure indentation
+  if(level > LEV_DEBUG) {ind_level_ = level - LEV_DEBUG;}
+
+  // build log message
   os << " " << ToString(level) << ": ";
+  os << std::string(ind_level_ * spc_per_lev_, ' ');
 
-  int ind_level = 0;
-  if(level > LEV_DEBUG) {ind_level = level - LEV_DEBUG;}
-
-  for(int i = 0; i < ind_level; i++) {
-    os << "    ";
-  }
-
-  messageLevel = level;
   return os;
 }
 
@@ -73,6 +73,7 @@ Log::~Log() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Log::initialize() {
+  Log::addLevel(LEV_ERROR, "LEV_ERROR");
   Log::addLevel(LEV_WARNING, "LEV_WARNING");
   Log::addLevel(LEV_INFO, "LEV_INFO");
   Log::addLevel(LEV_DEBUG, "LEV_DEBUG");

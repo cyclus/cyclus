@@ -91,7 +91,7 @@ void InputXML::load_file(std::string filename) {
     throw CycIOException("No input filename was given");
   } else { 
     FILE* file = fopen(filename.c_str(),"r");
-    if(file == NULL) { 
+    if (file == NULL) { 
       throw CycIOException("The file cannot be loaded because it has not been found.");
     }
     fclose(file);

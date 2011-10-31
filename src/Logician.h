@@ -14,7 +14,6 @@
 
 typedef std::map<int, Model*> ModelList;
 typedef std::map<std::string, Material*> RecipeList;
-typedef std::vector<Material*> MaterialList;
 
 /**
  * A (singleton) simulation logician class. This class sends tick messages
@@ -52,7 +51,7 @@ class Logician {
     RecipeList recipes_;
     
     /// list of materialss
-    MaterialList materials_;
+    std::vector<Material*> materials_;
     
     /**
      * (Recursively) deletes this Logician (and the objects it oversees).
