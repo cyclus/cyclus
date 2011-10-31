@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include <libxml/tree.h>
 
 class Model;
@@ -188,13 +189,19 @@ public:
   /**
    * set this model's parent
    */
-  void setParent(Model* parent){parent_ = parent;};
+  void setParent(Model* parent){ parent_ = parent; };
+
+  /**
+   * add a child to the list of children
+   */
+  void addChild(Model* child);
+  
 
  protected:
   /**
    * container of children
    */
-  Vector<Model*> children_;
+  std::vector<Model*> children_;
   
  private:
   /// Stores the next available facility ID

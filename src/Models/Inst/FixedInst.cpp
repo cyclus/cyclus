@@ -27,18 +27,17 @@ void FixedInst::init(xmlNodePtr cur)
     Model* facility = LI->getModelByName(fac_name, FACILITY);
 
     
-    if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
       throw CycException("Facility '" 
                          + fac_name 
                          + "' is not an allowed facility for region '" 
-                         + region_->getName() +"'.");
+                         + parent()->getName() +"'.");
     }
 
     Model* new_facility = Model::create(facility);
 
     dynamic_cast<FacilityModel*>(new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
-    dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
-    this->addFacility(new_facility);
+    this->addChild(new_facility);
   }
 }
 
@@ -47,7 +46,7 @@ void FixedInst::copy(FixedInst* src)
 {
   InstModel::copy(src);
 
-  facilities_ = src->facilities_;
+  children_ = src->children_;
 
 }
 
@@ -64,8 +63,8 @@ void FixedInst::print()
   InstModel::print();
 
   cout << " and the following permanent facilities: " << endl;
-  for (vector<Model*>::iterator fac=facilities_.begin(); 
-       fac != facilities_.end(); 
+  for (vector<Model*>::iterator fac=children_.begin(); 
+       fac != children_.end(); 
        fac++){
     cout << "\t\t* " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
      << " (" << (*fac)->getName() << ")" << endl;

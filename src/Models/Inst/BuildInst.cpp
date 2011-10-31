@@ -8,6 +8,7 @@
 #include "Model.h"
 
 #include "Logician.h"
+#include "Timer.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -49,12 +50,10 @@ bool BuildInst::pleaseBuild(Model* fac)
   Model* new_facility=Model::create(fac);
   // !!! We need a way to determine the new facility's name
   // Set the facility name
-  string name = dynamic_cast<FacilityModel*>(fac)->getFacName()+" 2";
+  std::string name = dynamic_cast<FacilityModel*>(fac)->getFacName() + " new_build";
   dynamic_cast<FacilityModel*>(new_facility)->setFacName(name);
-  // Set the facility's parent institution
-  dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
   // Add the facility to the parent inst's list of facilities
-  this->addFacility(new_facility);
+  this->addChild(new_facility);
 
   // For now, by default, return true.
   return true;

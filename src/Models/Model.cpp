@@ -207,14 +207,20 @@ void Model::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* parent(){
-  try{
-    if (parent_ == NULL){
-      throw something
-    }
-    return parent_;
+Model* Model::parent(){
+  if (parent_ == NULL){
+    std::string null_err = "You have tried to access the parent of " +	\
+      this->getName() + " but the parent point is NULL.";
+    throw CycIndexException(null_err);
   }
-  catch{something}
+  return parent_;
+};
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::addChild(Model* child){ 
+  child->setParent(this);
+  children_.push_back(child); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -49,25 +49,9 @@ class NullRegion : public RegionModel
   
     // print information about the region
     virtual void print()               { RegionModel::print();   } ;
-
-/* ------------------- */ 
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-  public:
     
-protected:
-
-
-/* -------------------- */
-
-/* --------------------
- * all REGIONMODEL classes have these members
- * --------------------
- */
-
+    /* -------------------- */
+    
 /* ------------------- */ 
 
 };

@@ -97,10 +97,10 @@ protected:
 
 public:
   /// returns this institution's region
-  RegionModel* parent() { return (dynamic_cast<RegionModel*>(region_)); };
+  RegionModel* parent() { return (dynamic_cast<RegionModel*>(parent())); };
 
   /// adds a facility to this model
-  void addFacility(Model* new_fac);
+  void addChild(Model* child);
 
   /// reports number of facilities in this inst
   int getNumFacilities(){ return children_.size();};

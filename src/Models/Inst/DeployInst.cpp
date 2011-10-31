@@ -25,10 +25,10 @@ void DeployInst::init(xmlNodePtr cur)
   
     Model* facility = LI->getModelByName(fac_name, FACILITY);
 
-    if (!(dynamic_cast<RegionModel*>(region_))->isAllowedFacility(facility)){
+    if (!(dynamic_cast<RegionModel*>(parent()))->isAllowedFacility(facility)){
       std::string err_msg = "Facility '" + fac_name;
       err_msg += "' is not an allowed facility for region '";
-      err_msg +=  region_->getName() +"'.";
+      err_msg +=  parent()->getName() +"'.";
       throw CycException(err_msg);
     }
     //Model* new_facility = Model::create(facility);

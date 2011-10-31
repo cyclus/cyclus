@@ -1,7 +1,7 @@
 
 #define LOG(level) \
 if (level > Log::ReportLevel()) ; \
-else Log().Get(level) << " [desired-prefix]: "
+else Log().Get(level) << " [MJG]: "
 
 #include <iostream>
 #include <string>

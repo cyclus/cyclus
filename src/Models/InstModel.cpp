@@ -11,7 +11,6 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur)
@@ -24,26 +23,24 @@ void InstModel::init(xmlNodePtr cur)
   
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
-  region_ = LI->getModelByName(region_name, REGION);
-  this->setRegion(region_);
-  cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
-  
-  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
+  Model* parent = LI->getModelByName(region_name, REGION);
+  std::cout << "Inst " << getSN() << " has set its region to be " << parent->getName() << std::endl;
+  parent->addChild(this);
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::copy(InstModel* src)
 {
+  // Copy parent classes
   Model::copy(src);
   Communicator::copy(src);
 
   /** 
    *  Specific initialization for InstModels
    */
-  
-  region_ = src->region_;
-  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
+  this->setParent(src->parent());
+  parent()->addChild(this);
   LI->addModel(this, INST);
 }
 
@@ -51,8 +48,7 @@ void InstModel::copy(InstModel* src)
 void InstModel::print()
 {
   Model::print();
-
-  cout << "in region " << region_->getName();
+  std::cout << "in region (parent) " << parent()->getName() << std::endl;
 }
 
 
@@ -66,7 +62,7 @@ void InstModel::receiveMessage(Message* msg){
   // Just pass them along. 
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
-  msg->setNextDest(getRegion());
+  msg->setNextDest(parent());
   msg->sendOn();
 }
 
@@ -104,12 +100,6 @@ void InstModel::handleTock(int time){
  * all INSTMODEL classes have these members
  * --------------------
  */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   
-void InstModel::addFacility(Model* new_fac){ 
-  children_.push_back(new_fac);
-  new_fac->setParent(this);
-}
 
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt

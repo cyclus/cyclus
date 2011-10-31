@@ -3,6 +3,7 @@
 #define _STUBMODEL_H
 
 #include "Model.h"
+#include <vector>
 
 //-----------------------------------------------------------------------------
 /*
@@ -72,7 +73,13 @@ public:
   /**
    * container of children
    */
-  Vector<Model*> children_;
+  std::vector<Model*> children_;
+  
+ private:
+  /**
+   * the model's parent
+   */
+  Model* parent_;
 
 
 };
