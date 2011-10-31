@@ -18,17 +18,15 @@
 #include "Logician.h"
 #include "Model.h"
 
-using namespace std;
 
 BookKeeper* BookKeeper::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper* BookKeeper::Instance() {
-	// If we haven't created a BookKeeper yet, create and return it.
-	if (0 == instance_)
-		instance_ = new BookKeeper();
-	
-	return instance_;
+  // If we haven't created a BookKeeper yet, create and return it.
+  if (0 == instance_)
+    instance_ = new BookKeeper();  
+  return instance_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,7 +36,6 @@ BookKeeper::BookKeeper() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 void BookKeeper::createDB() {
   createDB("cyclus.h5");
 };
@@ -65,36 +62,37 @@ void BookKeeper::createDB(std::string name) {
   }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string dsName){
-  DataSet dataset;
-  try{
-    // create the dataspace from rank and dimension information
-    DataSpace* dataspace = new DataSpace(rank, dims);
+// This function is not currently used (MJG)
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string dsName){
+//   DataSet dataset;
+//   try{
+//     // create the dataspace from rank and dimension information
+//     DataSpace* dataspace = new DataSpace(rank, dims);
 
-    // create a dataset to match the dataspace
-    dataset = this->getDB()->createDataSet(dsName, type, *dataspace) ; 
+//     // create a dataset to match the dataspace
+//     dataset = this->getDB()->createDataSet(dsName, type, *dataspace) ; 
 
-  }
-  catch( FileIException error )
-  {
-    error.printError();
-  }
-  catch( DataSetIException error )
-  {
-    error.printError();
-  }
-  catch( GroupIException error )
-  {
-    error.printError();
-  }
-  return dataset;
-};
+//   }
+//   catch( FileIException error )
+//   {
+//     error.printError();
+//   }
+//   catch( DataSetIException error )
+//   {
+//     error.printError();
+//   }
+//   catch( GroupIException error )
+//   {
+//     error.printError();
+//   }
+//   return dataset;
+// };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 H5File* BookKeeper::getDB()
 {
-	return myDB_;
+  return myDB_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -102,10 +100,10 @@ void BookKeeper::openDB()
 {
   if(dbIsOpen_==false){
     //If the database is already open, throw an exception; the caller probably 
-	  // doesn't realize this.
+    // doesn't realize this.
     try{ 
       myDB_ = new H5File(dbName_, H5F_ACC_RDWR);
-	    dbIsOpen_ = true;
+      dbIsOpen_ = true;
     }
     catch( FileIException error )
     {
@@ -134,6 +132,7 @@ void BookKeeper::closeDB()
   } 
 };
 
+//Function only used in tests (MJG)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BookKeeper::isGroup(std::string grp) {
   return true;
@@ -196,62 +195,89 @@ void BookKeeper::writeModelList(ModelType type) {
   const H5std_string modelImpl_memb = "modelImpl";
   const H5std_string output_name = "/output";
 
-  string subgroup_name;
-  string dataset_name;
+  std::string subgroup_name;
+  std::string dataset_name;
   int numStructs, numModels;
-
+  
   numModels = LI->getNumModels(type);
   if (numModels==0) {
     numStructs=1;
   } else {
     numStructs=numModels;
   }
-
+  
   // parse the cases.
   switch( type ) {
-    case REGION:
-      subgroup_name = "regions";
-      dataset_name = "regionList"; 
-      break;
-    case INST:
-      subgroup_name = "insts";
-      dataset_name = "instList"; 
-      break;
-    case FACILITY:
-      subgroup_name = "facilities";
-      dataset_name = "facList"; 
-      break;
-    case MARKET:
-      subgroup_name = "markets";
-      dataset_name = "marketList"; 
-      break;
-    case CONVERTER: 
-      subgroup_name = "converters";
-      dataset_name = "converterList"; 
-      break;
+  case REGION:
+    subgroup_name = "regions";
+    dataset_name = "regionList"; 
+    break;
+  case INST:
+    subgroup_name = "insts";
+    dataset_name = "instList"; 
+    break;
+  case FACILITY:
+    subgroup_name = "facilities";
+    dataset_name = "facList"; 
+    break;
+  case MARKET:
+    subgroup_name = "markets";
+    dataset_name = "marketList"; 
+    break;
+  case CONVERTER: 
+    subgroup_name = "converters";
+    dataset_name = "converterList"; 
+    break;
   };
-
+  
   // create an array of the model structs
   model_t modelList[numStructs];
   int i = 0;
   for (ModelList::iterator model_iter = LI->begin(type);
-        model_iter != LI->end(type);
-        model_iter++) {
+       model_iter != LI->end(type);
+       model_iter++) {
     Model* theModel = model_iter->second;
     modelList[i].ID = theModel->getSN();
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->getName().c_str()); 
     i++;
   };
-
   if(numModels==0) {
-    string str1="";
-    string str2="";
+    std::string str1="";
+    std::string str2="";
     modelList[0].ID=0;
     strcpy(modelList[0].modelImpl, str1.c_str());
     strcpy(modelList[0].name, str2.c_str()); 
   };
 
+  // Work in Progress (MJG)
+  // setUpModelWrite(type,ID_memb, name_memb, modelImpl_memb,  \
+  //       output_name, subgroup_name, dataset_name,  \
+  //       numStructs, numModels, modelList);
+
+  model_t *pModelList = modelList;
+  doModelWrite(ID_memb, name_memb, modelImpl_memb, \
+         output_name, subgroup_name, dataset_name, \
+         numStructs, numModels, pModelList);
+};
+
+// Work in Progress (MJG)
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// void BookKeeper::setUpModelWrite(ModelType type,       \
+//                      H5std_string ID_memb, H5std_string name_memb, \
+//                      H5std_string modelImpl_memb, H5std_string output_name, \
+//          std::string subgroup_name, std::string dataset_name, \
+//                 int numStructs, int numModels, model_t modelList[]){
+//   try{
+//   } catch (Exception error) {
+//     error.printError();
+//   }
+// };
+
+void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb,  \
+                              H5std_string modelImpl_memb, H5std_string output_name, \
+                              std::string subgroup_name, std::string dataset_name, \
+                              int numStructs, int numModels, model_t* modelList){
   try{
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
@@ -338,7 +364,7 @@ void BookKeeper::writeTransList(){
   };
   // If there are no transactions, make a null transaction entry
   if(numTrans==0){
-    string str1="";
+    std::string str1="";
     transList[0].supplierID=0;
     transList[0].requesterID=0;
     transList[0].materialID=0;
@@ -372,7 +398,7 @@ void BookKeeper::writeTransList(){
     DataSpace* dataspace;
     dataspace = new DataSpace( rank, dim );
 
-    //create a variable length string types
+    //create a variable length std::string types
     size_t charlen = sizeof(char[64]);
     StrType strtype(PredType::C_S1,charlen); 
    
@@ -724,14 +750,14 @@ void BookKeeper::writeData(strData1d data, std::string dsname){
     DataSpace filespace;
     // create a dataset
     DataSet dataset;
-    //create a variable length string types
+    //create a variable length std::string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
 
     // the data needs to be an array
-    string dat_array[nrows];
+    std::string dat_array[nrows];
     dat_array;
     for(int row=0; row < nrows;row++){
       dat_array[row]=data[row];
@@ -760,14 +786,14 @@ void BookKeeper::writeData(strData2d data, std::string dsname){
     DataSpace filespace;
     // create a dataset
     DataSet dataset;
-    //create a variable length string types
+    //create a variable length std::string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
     // the data needs to be an array
-    string dat_array[nrows][ncols];
+    std::string dat_array[nrows][ncols];
     for(int row=0; row<nrows; row++){
       for(int col=0; col<ncols; col++){
         dat_array[row][col]=data[row][col];
@@ -798,14 +824,14 @@ void BookKeeper::writeData(strData3d data, std::string dsname){
     DataSpace filespace;
     // create a dataset
     DataSet dataset;
-    //create a variable length string types
+    //create a variable length std::string types
     StrType vls_type(0, H5T_VARIABLE); 
     DataType type = DataType(vls_type);
     // prepare the spaces
     this->prepareSpaces(dsname, type, memspace, filespace, dataset);
     
     // the data needs to be an array 
-    string dat_array[nrows][ncols][nlayers];
+    std::string dat_array[nrows][ncols][nlayers];
     for(int row=0; row<nrows; row++){
       for(int col=0; col<ncols; col++){
         for(int layer=0; layer<nlayers;layer++){
@@ -1180,15 +1206,15 @@ void BookKeeper::readData(std::string dsname, strData1d& out_data){
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
 
-    // double check that its a string
+    // double check that its a std::string
     StrType strtype;
     if( type_class == H5T_STRING ) 
     {
-      // oh good, it's a string. Now figure out what kind.
+      // oh good, it's a std::string. Now figure out what kind.
       strtype = dataset.getStrType();
     }
     else{
-      throw CycTypeException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of std::string type");
     }
   
     // get the file dataspace
@@ -1208,7 +1234,7 @@ void BookKeeper::readData(std::string dsname, strData1d& out_data){
     memspace.selectAll();
     filespace.selectAll();
   
-    string out_array[dims[0]];
+    std::string out_array[dims[0]];
     for (int i=0; i<dims[0]; i++){
       out_array[i]="";
     };
@@ -1233,15 +1259,15 @@ void BookKeeper::readData(std::string dsname, strData2d& out_data){
     DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
-    // double check that its a string
+    // double check that its a std::string
     StrType strtype;
     if( type_class == H5T_STRING ) 
     {
-      // oh good, it's a string. Now figure out what kind.
+      // oh good, it's a std::string. Now figure out what kind.
       strtype = dataset.getStrType();
     }
     else{
-      throw CycTypeException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of std::string type");
     }
   
     // get the file dataspace
@@ -1261,7 +1287,7 @@ void BookKeeper::readData(std::string dsname, strData2d& out_data){
     memspace.selectAll();
     filespace.selectAll();
   
-    string out_array[dims[0]][dims[1]];
+    std::string out_array[dims[0]][dims[1]];
     for (int i=0; i<dims[0]; i++){
       for (int j=0; j<dims[1]; j++){
         out_array[i][j]="";
@@ -1291,15 +1317,15 @@ void BookKeeper::readData(std::string dsname, strData3d& out_data){
     DataSet dataset = myDB_->openDataSet(dsname);
     // get the class of the datatype used in the dataset
     H5T_class_t type_class = dataset.getTypeClass(); 
-    // double check that its an string
+    // double check that its an std::string
     StrType  strtype;
     if( type_class == H5T_STRING ) 
     {
-      // oh good, it's a string. Now figure out what kind.
+      // oh good, it's a std::string. Now figure out what kind.
       strtype = dataset.getStrType();
     }
     else{
-      throw CycTypeException("The dataset " + dsname + " is not of string type");
+      throw CycTypeException("The dataset " + dsname + " is not of std::string type");
     }
   
     // get the file dataspace
@@ -1319,7 +1345,7 @@ void BookKeeper::readData(std::string dsname, strData3d& out_data){
     memspace.selectAll();
     filespace.selectAll();
   
-    string out_array[dims[0]][dims[1]][dims[2]];
+    std::string out_array[dims[0]][dims[1]][dims[2]];
     for (int i=0; i<dims[0]; i++){
       for (int j=0; j<dims[1]; j++){
         for (int k=0; k<dims[2]; k++){
