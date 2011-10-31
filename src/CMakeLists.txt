@@ -41,6 +41,7 @@ SET( CYCLUS_SRC
      Utility/Timer.cpp
      Utility/UniformTaylor.cpp 
      Utility/Env.cpp
+     Utility/Logger.cpp 
      Models/Model.cpp 
         Models/StubTimeAgent.cpp 
         Models/StubModel.cpp 

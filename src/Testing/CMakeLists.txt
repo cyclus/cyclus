@@ -24,6 +24,7 @@ set ( TestSource
   ../Utility/MassTable.cpp
   ../Utility/Timer.cpp
   ../Utility/UniformTaylor.cpp
+  ../Utility/Logger.cpp
   ../Models/Model.cpp 
   ../Models/StubTimeAgent.cpp 
   ../Models/StubModel.cpp 

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ void Timer::handlePreHistory() {
     try {
       (*agent)->handlePreHistory();
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      LOG(LEV_ERROR) << err.what();
     }
   }
 }
@@ -58,7 +59,7 @@ void Timer::sendResolve() {
     try {
       (*agent)->resolve();
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      LOG(LEV_ERROR) << err.what();
     }
   }
 }
@@ -71,7 +72,7 @@ void Timer::sendTick() {
     try {
       (*agent)->handleTick(time_);
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      LOG(LEV_ERROR) << err.what();
     }
   }
 }
@@ -84,7 +85,7 @@ void Timer::sendTock() {
     try {
       (*agent)->handleTock(time_);
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      LOG(LEV_ERROR) << err.what();
     }
   }
 }

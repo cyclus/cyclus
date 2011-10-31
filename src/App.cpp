@@ -46,11 +46,13 @@ int main(int argc, char* argv[]) {
   ENV->setCyclusPath(path);
 
   // announce yourself
+  cout << endl;
   cout << "|--------------------------------------------|" << endl;
   cout << "|                  Cyclus                    |" << endl;
   cout << "|       a nuclear fuel cycle simulator       |" << endl;
   cout << "|  from the University of Wisconsin-Madison  |" << endl;
-  cout << "|--------------------------------------------|\r\n" << endl;
+  cout << "|--------------------------------------------|" << endl;
+  cout << endl;
 
   // respond to command line args
   if (vm.count("help")) {
@@ -70,37 +72,31 @@ int main(int argc, char* argv[]) {
   }
 
   if (vm.count("verbosity")) {
-    Log::ReportLevel() = Log::ToLogLevel(vm["verbosity"].as<string>());
+    std::string v_level = vm["verbosity"].as<string>();
+    if (v_level.length() < 3) {
+      Log::ReportLevel() = (LogLevel)strtol(v_level.c_str(), NULL, 10);
+    } else {
+      Log::ReportLevel() = Log::ToLogLevel(v_level);
+    }
   }
-
-  ////// logging example //////
-  // use the LOG macro where its arg is the log level or type
-  // LEV_DEBUG is the type used for this logging statement
-  // the macro statment returns a string stream that can be used like cout
-  const int count = 3;
-  LOG(LEV_INFO) << "Info about my app as it runs.";
-  LOG(LEV_DEBUG) << "A loop with " << count << " iterations";
-  for (int i = 0; i != count; ++i) {
-     LOG(LEV_DEBUG1) << "the counter i = " << i;
-  }
-  ////// end logging example //////
 
   // read input file and setup simulation
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
   } catch (CycIOException ge) {
-    cout << ge.what() << endl;
+    LOG(LEV_ERROR) << ge.what() << endl;
+    return 0;
   };
 
-  cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
+  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
   LI->printModelList(CONVERTER);
-  cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
+  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
   LI->printModelList(MARKET);
-  cout << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
+  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
   LI->printModelList(FACILITY);
-  cout << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
+  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
   LI->printModelList(REGION);
-  cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
+  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
   LI->printRecipes();
   
   // Run the simulation 
@@ -119,7 +115,7 @@ int main(int argc, char* argv[]) {
 
     BI->closeDB();
   } catch (CycException ge) {
-    cout << ge.what() << endl;
+    LOG(LEV_ERROR) << ge.what() << endl;
   };
 
   return 0;
