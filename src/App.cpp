@@ -114,8 +114,8 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
 
     BI->closeDB();
-  } catch (CycException ge) {
-    cout << ge.what() << endl;
+  } catch (CycException gen_exception) {
+    cout << gen_exception.what() << endl;
   };
 
   return 0;

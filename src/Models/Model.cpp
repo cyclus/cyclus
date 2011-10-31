@@ -207,6 +207,17 @@ void Model::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* parent(){
+  try{
+    if (parent_ == NULL){
+      throw something
+    }
+    return parent_;
+  }
+  catch{something}
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Model::generateHandle() {
 
   string toRet = model_impl_;

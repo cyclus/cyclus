@@ -58,6 +58,23 @@ public:
    */
    virtual void print();
 
+  /**
+   * return this model's parent
+   */
+  Model* parent(){return parent_;};
+
+  /**
+   * set this model's parent
+   */
+  void setParent(Model* parent){parent_ = parent;};
+
+ protected:
+  /**
+   * container of children
+   */
+  Vector<Model*> children_;
+
+
 };
 
 #endif

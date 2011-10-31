@@ -78,8 +78,9 @@ protected:
   // facility or institution model struct
   typedef struct model_t{
     int ID;                 /**< An integer indicating the model ID >**/
-    char name[64];            /**< A string indicating the name of the template >**/ 
-    char modelImpl[64];       /**< A string indicating the model implementation >**/
+    char name[64];            /**< A std::string indicating the name of the template >**/ 
+    char modelImpl[64];       /**< A std::string indicating the model implementation >**/
+    int parentID; /**< An integer of the model's parent's ID >**/
   } model_t;
 
   // facility, market, converter, or institution model struct
@@ -139,15 +140,16 @@ public:
      */
   void createDB(std::string name);
 
-  /**
-   * Creates a dataset with the name,type, and dimesions indicated 
-     *
-   * @param rank is the rank of the dataset
-   * @param dims are the dimensions of the dataset 
-   * @param type is type of data to be placed in the dataspace
-   * @param name is the name of the dataset 
-     */
-  DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string name);
+  /* function not currently used (MJG) */
+  /* /\** */
+  /*  * Creates a dataset with the name,type, and dimesions indicated  */
+  /*    * */
+  /*  * @param rank is the rank of the dataset */
+  /*  * @param dims are the dimensions of the dataset  */
+  /*  * @param type is type of data to be placed in the dataspace */
+  /*  * @param name is the name of the dataset  */
+  /*    *\/ */
+  /* DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string name); */
 
   /**
    * Returns a handle to the database this BookKeeper is maintaining.
@@ -176,6 +178,7 @@ public:
    */
   bool exists(){return dbExists_;};
 
+  /* Function only used in tests (MJG) */
   /**
    * Returns whether the group exists in the database
    *
@@ -211,6 +214,45 @@ public:
    * @param type the model type (i.e. insts, facilities, or markets)
    */
   void writeModelList(ModelType type);
+
+  /* Work in Progress (MJG) */
+  /* /\** */
+  /*  * Set up parameters to write the model list to a .h5 file */
+  /*  * @param type the model type (as above) */
+  /*  * @param ID_memb id hdf5 string */
+  /*  * @param name_memb name hdf5 string */
+  /*  * @param modelImpl_memb implementation hdf5 string */
+  /*  * @param output_name output hdf5 string */
+  /*  * @param subgroup_name subgroup name std::string */
+  /*  * @param dataset_name dataset name std::string */
+  /*  * @param numStructs number of models to write (if numModels = 0; numStructs = 1) */
+  /*  * @param numModels number of models to write */
+  /*  * we use numStrucs and numModels so that HDF5 behaves well when numModels = 0 */
+  /*  * @param modelList the list of models to write (created by setUpModelList) */
+  /*  *\/ */
+  /* void setUpModelWrite(ModelType type,       \ */
+  /*            H5std_string ID_memb, H5std_string name_memb,  \ */
+  /*            H5std_string modelImpl_memb, H5std_string output_name, \ */
+  /*            std::string subgroup_name, std::string dataset_name, \ */
+  /*            int numStructs, int numModels, model_t* modelList); */
+
+  /**
+   * Given information from the set-up, write the model list
+   * @param ID_memb id hdf5 string
+   * @param name_memb name hdf5 string
+   * @param modelImpl_memb implementation hdf5 string
+   * @param output_name output hdf5 string
+   * @param subgroup_name subgroup name std::string
+   * @param dataset_name dataset name std::string
+   * @param numStructs number of models to write (if numModels = 0; numStructs = 1)
+   * @param numModels number of models to write
+   * we use numStrucs and numModels so that HDF5 behaves well when numModels = 0
+   * @param modelList the list of models to write (created by setUpModelList)
+   */
+  void doModelWrite(H5std_string ID_memb, H5std_string name_memb,  \
+        H5std_string modelImpl_memb, H5std_string output_name, \
+        std::string subgroup_name, std::string dataset_name, \
+        int numStructs, int numModels, model_t* modelList);
 
   /**
    * Write a list of the transactions in the simulation
@@ -292,7 +334,7 @@ public:
   void writeData(dblData3d data, std::string dsname);
 
   /**
-   * Puts a one dimensional vector of string data in the indicated 
+   * Puts a one dimensional vector of std::string data in the indicated 
    * dataspace
    *
    * @param data is the data
@@ -301,7 +343,7 @@ public:
   void writeData(strData1d data, std::string dsname);
 
   /**
-   * Puts a two dimensional vector of string data in the indicated 
+   * Puts a two dimensional vector of std::string data in the indicated 
    * dataspace
    *
    * @param data is the data
@@ -310,7 +352,7 @@ public:
   void writeData(strData2d data, std::string dsname);
 
   /**
-   * Puts a three dimensional vector of string data in the indicated 
+   * Puts a three dimensional vector of std::string data in the indicated 
    * dataspace
    *
    * @param data is the data

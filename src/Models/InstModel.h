@@ -96,35 +96,20 @@ protected:
  */
 
 public:
-  /// sets this institution's region
-  void setRegion(Model* my_region) { region_ = my_region; };
-
   /// returns this institution's region
-  RegionModel* getRegion() { return (dynamic_cast<RegionModel*>(region_)); };
+  RegionModel* parent() { return (dynamic_cast<RegionModel*>(region_)); };
 
   /// adds a facility to this model
-  void addFacility(Model* new_fac){ facilities_.push_back(new_fac);};
+  void addFacility(Model* new_fac);
 
   /// reports number of facilities in this inst
-  int getNumFacilities(){ return facilities_.size();};
+  int getNumFacilities(){ return children_.size();};
 
   /// queries the power capacity of each facility in the institution
   double getPowerCapacity();
 
   /// attempts to build another facility of type fac
   virtual bool pleaseBuild(Model* fac);
-
-protected:
-  /**
-   * Each institution is a member of exactly one region
-   */
-  Model* region_;
-
-  /**
-   * Each institution keeps a list of its facilities;
-   */
-  vector<Model*> facilities_;
-
 /* ------------------- */ 
   
 };

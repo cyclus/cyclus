@@ -180,10 +180,26 @@ public:
    */
   virtual void print();
 
-private:
+  /**
+   * return this model's parent
+   */
+  Model* parent();
+
+  /**
+   * set this model's parent
+   */
+  void setParent(Model* parent){parent_ = parent;};
+
+ protected:
+  /**
+   * container of children
+   */
+  Vector<Model*> children_;
+  
+ private:
   /// Stores the next available facility ID
   static int next_id_;
-
+  
   /**
    * map of constructor methods for each loaded model
    */
@@ -225,6 +241,10 @@ private:
    */
   int ID_;
 
+  /**
+   * some models have a parent
+   */
+  Model* parent_;
 };
 
 #endif

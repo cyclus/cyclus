@@ -72,8 +72,8 @@ void InstModel::receiveMessage(Message* msg){
 
 void InstModel::handlePreHistory(){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
@@ -82,8 +82,8 @@ void InstModel::handlePreHistory(){
 
 void InstModel::handleTick(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
@@ -92,8 +92,8 @@ void InstModel::handleTick(int time){
 
 void InstModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
     //    cout << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
@@ -105,7 +105,12 @@ void InstModel::handleTock(int time){
  * --------------------
  */
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   
+void InstModel::addFacility(Model* new_fac){ 
+  children_.push_back(new_fac);
+  new_fac->setParent(this);
+}
+
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt
   std::stringstream ss;
@@ -118,8 +123,8 @@ bool InstModel::pleaseBuild(Model* fac){
 double InstModel::getPowerCapacity(){
   // queries each facility for their power capacity
   double capacity = 0.0;
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
     capacity += (dynamic_cast<FacilityModel*>(*fac))->getPowerCapacity();
   }

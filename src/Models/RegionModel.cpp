@@ -58,7 +58,7 @@ void RegionModel::copy(RegionModel* src) {
   
   // don't copy institutions!
   LI->addModel(this, REGION);
-
+  this->setParent(this);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -125,3 +125,8 @@ void RegionModel::handleTock(int time){
  * all REGIONMODEL classes have these members
  * --------------------
  */
+
+void RegionModel::addInstitution(Model* new_inst) { 
+  new_inst->setParent(this);
+  children_.push_back(new_inst); 
+}
