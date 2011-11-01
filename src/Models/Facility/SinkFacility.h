@@ -2,6 +2,7 @@
 #if !defined(_SINKFACILITY_H)
 #define _SINKFACILITY_H
 #include <iostream>
+#include "Logger.h"
 #include <deque>
 #include <queue>
 

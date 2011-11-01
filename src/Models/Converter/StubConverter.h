@@ -2,6 +2,7 @@
 #if !defined(_STUBCONVERTER_H)
 #define _STUBCONVERTER_H
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 
 #include "ConverterModel.h"

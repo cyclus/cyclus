@@ -2,6 +2,7 @@
 #if !defined(_NULLREGION_H)
 #define _NULLREGION_H
 #include <iostream>
+#include "Logger.h"
 
 #include "RegionModel.h"
 

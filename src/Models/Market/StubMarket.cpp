@@ -1,6 +1,7 @@
 // StubMarket.cpp
 // Implements the StubMarket class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubMarket.h"
 

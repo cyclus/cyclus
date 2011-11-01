@@ -2,6 +2,7 @@
 #if !defined(_SOURCEFACILITY_H)
 #define _SOURCEFACILITY_H
 #include <iostream>
+#include "Logger.h"
 #include <deque>
 #include <queue>
 

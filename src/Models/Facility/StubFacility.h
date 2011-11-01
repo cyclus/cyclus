@@ -2,6 +2,7 @@
 #if !defined(_STUBFACILITY_H)
 #define _STUBFACILITY_H
 #include <iostream>
+#include "Logger.h"
 
 #include "FacilityModel.h"
 

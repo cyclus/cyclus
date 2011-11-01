@@ -1,6 +1,7 @@
 // NullFacility.cpp
 // Implements the NullFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "NullFacility.h"
 
@@ -79,13 +80,12 @@ void NullFacility::copyFreshModel(Model* src)
 void NullFacility::print() 
 { 
   FacilityModel::print(); 
-  cout << "converts commodity {"
+  LOG(LEV_DEBUG2) << "    converts commodity {"
       << in_commod_->getName()
       << "} into commodity {"
       << out_commod_->getName()
       << "}, and has an inventory that holds " 
-      << inventory_size_ << " materials"
-      << endl;
+      << inventory_size_ << " materials";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -140,8 +140,8 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    cout<<"NullFacility "<< getSN()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    LOG(LEV_DEBUG2) <<"NullFacility "<< getSN()
+      <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
   FacilityModel::sendMaterial( order, toSend );
 }
@@ -155,8 +155,8 @@ void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"NullFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"NullFacility " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_back(*thisMat);
   }
 }

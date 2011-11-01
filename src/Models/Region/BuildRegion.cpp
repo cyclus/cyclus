@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <iostream>
+#include "Logger.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BuildRegion::populateSchedule(FILE *infile)

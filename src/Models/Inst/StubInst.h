@@ -2,6 +2,7 @@
 #if !defined(_STUBINST_H)
 #define _STUBINST_H
 #include <iostream>
+#include "Logger.h"
 
 #include "InstModel.h"
 

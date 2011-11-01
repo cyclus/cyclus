@@ -3,6 +3,7 @@
 #define _STUBNUCLIDE_H
 
 #include <iostream>
+#include "Logger.h"
 #include <vector>
 #include <map>
 #include <string>

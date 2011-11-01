@@ -1,6 +1,7 @@
 // GenericRepository.cpp
 // Implements the GenericRepository class
 #include <iostream>
+#include "Logger.h"
 
 #include "GenericRepository.h"
 
@@ -201,9 +202,9 @@ void GenericRepository::copyFreshModel(Model* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::print() { 
   
-  FacilityModel::print(); cout << "stores commodity {"
+  FacilityModel::print(); LOG(LEV_DEBUG2) << "    stores commodity {"
     << in_commods_.front()->getName()
-    << "} among others."  << endl;
+    << "} among others.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -222,8 +223,8 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*>
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"GenericRepository " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"GenericRepository " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(*thisMat, trans.commod));
   }
 }

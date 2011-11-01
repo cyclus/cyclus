@@ -1,6 +1,7 @@
 // SourceFacility.cpp
 // Implements the SourceFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "SourceFacility.h"
 #include "Logician.h"
@@ -25,7 +26,7 @@ void SourceFacility::init(xmlNodePtr cur)
 {
   FacilityModel::init(cur);
 
-  cout<<"The Source Facility is being initialized"<<endl;
+  LOG(LEV_DEBUG2) <<"The Source Facility is being initialized";
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -80,12 +81,12 @@ void SourceFacility::print()
 { 
   FacilityModel::print();
 
-  cout << "supplies commodity {"
+  LOG(LEV_DEBUG2) << "    supplies commodity {"
       << out_commod_->getName() << "} with recipe '" 
       << recipe_->getName() << "' at a capacity of "
       << capacity_ << " " << recipe_->getUnits() << " per time step."
       << " It has a max inventory of " << inventory_size_ << " " 
-      << recipe_->getUnits() <<  "." << endl;
+      << recipe_->getUnits() <<  ".";
   
 }
 
@@ -135,8 +136,8 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    cout<<"SourceFacility "<< getSN()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    LOG(LEV_DEBUG2) <<"SourceFacility "<< getSN()
+      <<"  is sending a mat with mass: "<< newMat->getTotMass();
     (newMat)->print();
   }    
   FacilityModel::sendMaterial(msg, toSend);
@@ -162,7 +163,7 @@ void SourceFacility::handleTick(int time){
 
   // decide what market to offer to
   Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
-  cout << "During handleTick, " << getFacName() << " offers: "<< offer_amt << "."  << endl;
+  LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
 
   // create a message to go up to the market with these parameters
   Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price_, 
@@ -184,7 +185,7 @@ void SourceFacility::handleTock(int time){
                                     recipe_->getName(),
                                     capacity_*recipe_->getTotMass(), 
                                     MASSBASED);
-    cout << getFacName() << ", handling the tock, has created a material:"<<endl;
+    LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   }
@@ -195,7 +196,7 @@ void SourceFacility::handleTock(int time){
                                     recipe_->getName(),
                                     space,
                                     ATOMBASED);
-    cout << getFacName() << ", handling the tock, has created a material:"<<endl;
+    LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   }
@@ -208,10 +209,10 @@ void SourceFacility::handleTock(int time){
   }
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  cout << "SourceFacility " << this->getSN();
-  cout << " is holding " << this->checkInventory();
-  cout << " units of material at the close of month " << time; 
-  cout << "." << endl;
+  LOG(LEV_DEBUG2) << "SourceFacility " << this->getSN()
+                  << " is holding " << this->checkInventory()
+                  << " units of material at the close of month " << time
+                  << ".";
 
 }
 

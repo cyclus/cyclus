@@ -2,6 +2,7 @@
 #if !defined(_STUBREGION_H)
 #define _STUBREGION_H
 #include <iostream>
+#include "Logger.h"
 
 #include "RegionModel.h"
 

@@ -84,19 +84,19 @@ int main(int argc, char* argv[]) {
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
   } catch (CycIOException ge) {
-    LOG(LEV_ERROR) << ge.what() << endl;
+    LOG(LEV_ERROR) << ge.what();
     return 0;
   };
 
-  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:";
   LI->printModelList(CONVERTER);
-  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(MARKET) << " markets:";
   LI->printModelList(MARKET);
-  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:";
   LI->printModelList(FACILITY);
-  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(REGION) << " regions:";
   LI->printModelList(REGION);
-  LOG(LEV_DEBUG3) << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumRecipes() << " recipes:";
   LI->printRecipes();
   
   // Run the simulation 
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 
     BI->closeDB();
   } catch (CycException ge) {
-    LOG(LEV_ERROR) << ge.what() << endl;
+    LOG(LEV_ERROR) << ge.what();
   };
 
   return 0;

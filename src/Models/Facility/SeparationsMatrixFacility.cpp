@@ -1,6 +1,7 @@
 // SeparationsMatrixFacility.cpp
 // Implements the SeparationsMatrixFacility class
 #include <iostream>
+#include "Logger.h"
 #include <deque>
 #include <string.h>
 #include <vector>
@@ -84,9 +85,9 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     double stream_eff = strtod(XMLinput->get_xpath_content(stream,"eff"), NULL);
     stream_set_.insert(make_pair(new_commod,
                                 make_pair(stream_Z, stream_eff)));
-    cout << "Name = " << stream_commod << endl;
-    cout << "Z = " << stream_Z << endl;
-    cout << "Eff = " << stream_eff << endl;
+    LOG(LEV_DEBUG2) << "Name = " << stream_commod;
+    LOG(LEV_DEBUG2) << "Z = " << stream_Z;
+    LOG(LEV_DEBUG2) << "Eff = " << stream_eff;
   };
 
   inventory_ = deque<pair<Commodity*,Material*> >();
@@ -127,24 +128,24 @@ void SeparationsMatrixFacility::copyFreshModel(Model* src)
 void SeparationsMatrixFacility::print() 
 { 
   FacilityModel::print();
-  cout << "converts commodities {" << endl;
+  LOG(LEV_DEBUG2) << "converts commodities {";
  
   for(vector<Commodity*>::const_iterator iter = in_commod_.begin(); 
        iter != in_commod_.end(); 
        iter ++){
-    cout << (*iter)->getName()<< endl;
+    LOG(LEV_DEBUG2) << (*iter)->getName();
   };
 
-  cout << "} into commodities {" << endl;
+  LOG(LEV_DEBUG2) << "} into commodities {";
 
   for (vector<Commodity*>::iterator iter = out_commod_.begin(); 
        iter != out_commod_.end(); 
        iter ++){
-    cout << (*iter)->getName()<< endl;
+    LOG(LEV_DEBUG2) << (*iter)->getName();
   }; 
-  cout << "}, and has an inventory that holds " 
+  LOG(LEV_DEBUG2) << "}, and has an inventory that holds " 
       << inventory_size_ << " materials"
-      << endl;
+;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,22 +199,22 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     }
 
     toSend.push_back(newMat);
-    cout<<"SeparationsMatrixFacility "<< getSN()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< getSN()
+      <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
 
   } // <- for loop {
 
   FacilityModel::sendMaterial(msg, toSend);
 
-  //	cout << "Material After Sending to Sink" << endl;
+  //	LOG(LEV_DEBUG2) << "Material After Sending to Sink";
 
 }
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
 {  
-  cout << "Entered the receiveMaterial file " << endl;
+  LOG(LEV_DEBUG2) << "Entered the receiveMaterial file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -221,8 +222,8 @@ void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Materi
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"SeparationsFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"SeparationsFacility " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_back(make_pair(trans.commod, *thisMat));
   }
 }

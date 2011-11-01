@@ -1,6 +1,7 @@
 // StubStub.cpp
 // Implements the StubStub class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubStub.h"
 

@@ -13,6 +13,7 @@
 
 #include <dlfcn.h>
 #include <iostream>
+#include "Logger.h"
 
 
 using namespace std;
@@ -199,7 +200,7 @@ Model::~Model() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  cout << model_type_ << " " << name_ 
+  LOG(LEV_DEBUG2) << model_type_ << " " << name_ 
       << " (ID=" << ID_
       << ", implementation = " << model_impl_
       << "  handle = " << handle_

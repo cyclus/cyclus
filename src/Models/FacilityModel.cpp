@@ -8,6 +8,7 @@
 #include "InputXML.h"
 
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ void FacilityModel::init(xmlNodePtr cur) {
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     this->setInstName(inst_name_);
-    cout << "Facility " << getSN() << " has just set its inst to " << inst_name_ << endl;
+    LOG(LEV_DEBUG2) << "Facility " << getSN() << " has just set its inst to " << inst_name_;
   }
 } 
 
@@ -56,8 +57,8 @@ void FacilityModel::sendMaterial(Message* msg, std::vector<Material*> manifest) 
   // send the material by calling the receiver's receiveMaterial function
   Model* requester = msg->getRequester();
   dynamic_cast<FacilityModel*>(requester)->receiveMaterial(msg->getTrans(), manifest);
-  std::cout << "Material sent from " << getSN() << " to " 
-            << requester->getSN() << "." << std::endl;
+  LOG(LEV_DEBUG2) << "Material sent from " << getSN() << " to " 
+            << requester->getSN() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,6 +1,7 @@
 // NullMarket.cpp
 // Implements the NullMarket class
 #include <iostream>
+#include "Logger.h"
 
 #include "NullMarket.h"
 
@@ -94,12 +95,12 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(offerMsg);
 
-      cout << "NullMarket has resolved a match from "
+      LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
           << offerMsg->getSupplier()->getSN()
           << " to "
           << offerMsg->getRequester()->getSN()
           << " for the amount:  " 
-          << offerMsg->getAmount() << endl;
+          << offerMsg->getAmount();
 
       requestAmt -= offerAmt;
     } 
@@ -116,12 +117,12 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(maybe_offer);
 
-      cout << "NullMarket has resolved a match from "
+      LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
           << maybe_offer->getSupplier()->getSN()
           << " to "
           << maybe_offer->getRequester()->getSN()
           << " for the amount:  " 
-          << maybe_offer->getAmount() << endl;
+          << maybe_offer->getAmount();
 
       // reduce the offer amount
       offerAmt -= requestAmt;
@@ -166,9 +167,9 @@ void NullMarket::resolve()
       process_request();
     } 
     else {
-      cout << "The request from Requester "<< (*request).second->getRequester()->getSN()
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->getSN()
           << " for the amount " << (*request).first 
-          << " rejected. "<<endl;
+          << " rejected. ";
       reject_request(request);
     }
     // remove this request

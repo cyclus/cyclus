@@ -1,6 +1,7 @@
 // SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "SinkFacility.h"
 
@@ -78,16 +79,19 @@ void SinkFacility::print()
 { 
   FacilityModel::print();
 
-  cout << "accepts commodities ";
+  std::string msg = "";
+
+  msg += "accepts commodities ";
+
   for (vector<Commodity*>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
        commod++)
   {
-    cout << (commod == in_commods_.begin() ? "{" : ", " );
-    cout << (*commod)->getName();
+    msg += (commod == in_commods_.begin() ? "{" : ", " );
+    msg += (*commod)->getName();
   }
-  cout << "} until its inventory is full at ";
-  cout << inventory_size_ << " units." << endl ;
+  msg += "} until its inventory is full at ";
+  LOG(LEV_DEBUG2) << msg << inventory_size_ << " units.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -120,7 +124,7 @@ void SinkFacility::handleTick(int time){
       request->setNextDest(getFacInst());
       request->sendOn();
 
-      cout << "During handleTick, " << getFacName() << " requests: "<< requestAmt << "."  << endl;
+      LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: "<< requestAmt << ".";
     }
   }
   // otherwise, the upper bound is the monthly acceptance capacity, request cap.
@@ -138,7 +142,7 @@ void SinkFacility::handleTick(int time){
     request->setNextDest(getFacInst());
     request->sendOn();
 
-    cout << "During handleTick, " << getFacName() << " requests: " << requestAmt << "."  << endl;
+    LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: " << requestAmt << ".";
     }
   }
 
@@ -150,10 +154,10 @@ void SinkFacility::handleTock(int time){
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  cout << "SinkFacility " << this->getSN();
-  cout << " is holding " << this->checkInventory();
-  cout << " units of material at the close of month " << time; 
-  cout << "." << endl;
+  LOG(LEV_DEBUG2) << "SinkFacility " << this->getSN()
+                  << " is holding " << this->checkInventory()
+                  << " units of material at the close of month " << time
+                  << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -165,8 +169,8 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"SinkFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"SinkFacility " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     (*thisMat)->print();
     inventory_.push_back(*thisMat);
   }

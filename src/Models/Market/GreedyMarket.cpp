@@ -1,6 +1,7 @@
 // GreedyMarket.cpp
 // Implements the GreedyMarket class
 #include <iostream>
+#include "Logger.h"
 
 #include "GreedyMarket.h"
 
@@ -96,12 +97,12 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(offerMsg);
 
-      cout << "GreedyMarket has resolved a match from "
+      LOG(LEV_DEBUG2) << "GreedyMarket has resolved a match from "
           << offerMsg->getSupplier()->getSN()
           << " to "
           << offerMsg->getRequester()->getSN()
           << " for the amount:  " 
-          << offerMsg->getAmount() << endl;
+          << offerMsg->getAmount();
 
       requestAmt -= offerAmt;
     } else {
@@ -121,12 +122,12 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(maybe_offer);
 
-      cout << "GreedyMarket has resolved a match from "
+      LOG(LEV_DEBUG2) << "GreedyMarket has resolved a match from "
           << maybe_offer->getSupplier()->getSN()
           << " to "
           << maybe_offer->getRequester()->getSN()
           << " for the amount:  " 
-          << maybe_offer->getAmount() << endl;
+          << maybe_offer->getAmount();
 
       // reduce the offer amount
       offerAmt -= requestAmt;
@@ -165,9 +166,9 @@ void GreedyMarket::resolve() {
     if(match_request(request)) {
       process_request();
     } else {
-      cout << "The request from Requester "<< (*request).second->getRequester()->getSN()
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->getSN()
           << " for the amount " << (*request).first 
-          << " rejected. "<<endl;
+          << " rejected. ";
       reject_request(request);
     }
 

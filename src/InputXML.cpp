@@ -12,6 +12,7 @@
 #include "Model.h"
 #include "Commodity.h"
 #include "Material.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -56,14 +57,10 @@ xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
       + fileInfo->filename 
       + " does not validate against schema " 
       + *(fileInfo->schema));
-  else
-    cerr << "File " << fileInfo->filename << " is valid against schema "
-    << *(fileInfo->schema) << endl;
 
   /// free up some data
 
   return doc;
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

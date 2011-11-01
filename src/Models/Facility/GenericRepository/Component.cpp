@@ -1,5 +1,6 @@
 // Component.cpp
 #include <iostream>
+#include "Logger.h"
 #include <fstream>
 #include <vector>
 #include <time.h>
@@ -49,7 +50,7 @@ void Component::init(xmlNodePtr cur){
   comp_hist_ = CompHistory();
   mass_hist_ = MassHistory();
   // for now, just say you've done it... 
-  cout << "The Component Class init(cur) function has been called."<< endl;;
+  LOG(LEV_DEBUG2) << "The Component Class init(cur) function has been called.";;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -75,10 +76,10 @@ void Component::copy(Component* src){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Component::print(){
-  cout << "Component: " << this->getName() << endl;
-  cout << "Contains Materials:" << endl;
+  LOG(LEV_DEBUG2) << "Component: " << this->getName();
+  LOG(LEV_DEBUG2) << "Contains Materials:";
   for(int i=0; i<this->getWastes().size() ; i++){
-    cout << wastes_[i];
+    LOG(LEV_DEBUG2) << wastes_[i];
   }
 }
 

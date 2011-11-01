@@ -4,6 +4,7 @@
 #include "StubModel.h"
 
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -28,6 +29,6 @@ void StubModel::copy(StubModel* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubModel::print() { 
   Model::print(); 
-  cout << endl; 
+  LOG(LEV_DEBUG2); 
 };
 

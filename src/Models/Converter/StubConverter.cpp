@@ -1,6 +1,7 @@
 // StubConverter.cpp
 // Implements the StubConverter class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubConverter.h"
 

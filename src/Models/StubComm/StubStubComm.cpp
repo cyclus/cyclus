@@ -1,6 +1,7 @@
 // StubStubCommComm.cpp
 // Implements the StubStubCommComm class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubStubComm.h"
 

@@ -1,6 +1,7 @@
 // FixedInst.cpp
 // Implements the FixedInst class
 #include <iostream>
+#include "Logger.h"
 
 #include "FixedInst.h"
 
@@ -63,12 +64,12 @@ void FixedInst::print()
 { 
   InstModel::print();
 
-  cout << " and the following permanent facilities: " << endl;
+  LOG(LEV_DEBUG2) << " and the following permanent facilities: ";
   for (vector<Model*>::iterator fac=facilities_.begin(); 
        fac != facilities_.end(); 
        fac++){
-    cout << "\t\t* " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
-     << " (" << (*fac)->getName() << ")" << endl;
+    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
+     << " (" << (*fac)->getName() << ")";
   }
 };
 

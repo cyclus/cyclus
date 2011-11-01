@@ -2,6 +2,7 @@
 #if !defined(_CONVERTERMARKET_H)
 #define _CONVERTERMARKET_H
 #include <iostream>
+#include "Logger.h"
 #include <map>
 #include <deque>
 

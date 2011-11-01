@@ -1,6 +1,7 @@
 // StubRegion.cpp
 // Implements the StubRegion class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubRegion.h"
 

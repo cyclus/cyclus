@@ -8,6 +8,7 @@
 #include "CycException.h"
 
 #include <iostream>
+#include "Logger.h"
 #include <sstream>
 #include <string>
 
@@ -26,7 +27,7 @@ void InstModel::init(xmlNodePtr cur)
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   region_ = LI->getModelByName(region_name, REGION);
   this->setRegion(region_);
-  cout << "Inst " << getSN() << " has set its region to be " << region_name << endl;
+  LOG(LEV_DEBUG2) << "Inst " << getSN() << " has set its region to be " << region_name;
   
   dynamic_cast<RegionModel*>(region_)->addInstitution(this);
 
@@ -52,7 +53,7 @@ void InstModel::print()
 {
   Model::print();
 
-  cout << "in region " << region_->getName();
+  LOG(LEV_DEBUG2) << "in region " << region_->getName();
 }
 
 
@@ -75,7 +76,7 @@ void InstModel::handlePreHistory(){
   for(vector<Model*>::iterator fac=facilities_.begin();
       fac != facilities_.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
   }
 }
@@ -85,7 +86,7 @@ void InstModel::handleTick(int time){
   for(vector<Model*>::iterator fac=facilities_.begin();
       fac != facilities_.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
   }
 }
@@ -95,7 +96,7 @@ void InstModel::handleTock(int time){
   for(vector<Model*>::iterator fac=facilities_.begin();
       fac != facilities_.end();
       fac++){
-    //    cout << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName() << endl;
+    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
   }
 }

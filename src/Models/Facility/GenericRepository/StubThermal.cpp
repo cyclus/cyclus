@@ -1,5 +1,6 @@
 // StubThermal.cpp
 #include <iostream>
+#include "Logger.h"
 #include <fstream>
 #include <vector>
 #include <time.h>
@@ -15,7 +16,7 @@ void StubThermal::init(xmlNodePtr cur){
   // move the xml pointer to the current model
   cur = XMLinput->get_xpath_element(cur,"model/StubThermal");
   // for now, just say you've done it... 
-  cout << "The StubThermal Class init(cur) function has been called"<< endl;;
+  LOG(LEV_DEBUG2) << "The StubThermal Class init(cur) function has been called";;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,7 +32,7 @@ void StubThermal::copy(ThermalModel* src){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubThermal::print(){
-    cout << "StubThermal Model" <<  endl;
+    LOG(LEV_DEBUG2) << "StubThermal Model";
 }
 
 
