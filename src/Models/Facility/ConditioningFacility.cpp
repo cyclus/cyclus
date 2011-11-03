@@ -1,6 +1,7 @@
 // ConditioningFacility.cpp
 // Implements the ConditioningFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "ConditioningFacility.h"
 
@@ -93,7 +94,7 @@ void ConditioningFacility::copyFreshModel(Model* src)
 void ConditioningFacility::print() 
 { 
     FacilityModel::print();
-    cout << " conditions waste streams into waste forms" << endl;
+    LOG(LEV_DEBUG2) << " conditions waste streams into waste forms";
 };
 
 
@@ -104,7 +105,7 @@ void ConditioningFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::receiveMessage(Message* msg) {
-  cout << "Warning, the ConditioningFacility ignores messages." << endl;
+  LOG(LEV_DEBUG2) << "Warning, the ConditioningFacility ignores messages.";
 
 };
 
@@ -150,8 +151,8 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
     }
 
     toSend.push_back(newMat);
-    cout<<"NullFacility "<< getSN()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    LOG(LEV_DEBUG2) <<"NullFacility "<< getSN()
+      <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
   FacilityModel::sendMaterial( order, toSend );
 };
@@ -165,8 +166,8 @@ void ConditioningFacility::receiveMaterial(Transaction trans, vector<Material*> 
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"RecipeReactor " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"RecipeReactor " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   } 
 };

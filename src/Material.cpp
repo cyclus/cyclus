@@ -9,6 +9,7 @@
 #include "Env.h"
 #include "UniformTaylor.h"
 #include "InputXML.h"
+#include "Logger.h"
 
 #include <iostream>
 #include <fstream>
@@ -523,21 +524,21 @@ void Material::rationalize_M2A() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print() {
     printComp("Atom composition:", compHist_[TI->getTime()]);
-    cout << "\tTotal atoms: " << this->getTotAtoms() 
-        << " moles per " << units_ << endl;
+    LOG(LEV_DEBUG3) << "    Total atoms: " << this->getTotAtoms() 
+        << " moles per " << units_;
     printComp("Mass composition:", massHist_[TI->getTime()]);
-    cout << "\tTotal mass: " << this->getTotMass() 
-        << " kg per " << units_ << endl;
+    LOG(LEV_DEBUG3) << "    Total mass: " << this->getTotMass() 
+        << " kg per " << units_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::printComp(std::string header, CompMap comp_map) {
 
-  cout << "\t" << header << endl;
+  LOG(LEV_DEBUG3) << "    " << header;
   for (CompMap::iterator iso = comp_map.begin();
        iso != comp_map.end();
        iso++) {
-    cout << "\t" << (*iso).first << " : " <<  (*iso).second << endl;
+    LOG(LEV_DEBUG3) << "    " << (*iso).first << " : " <<  (*iso).second;
   }
 }
 

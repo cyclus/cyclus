@@ -2,6 +2,7 @@
 #if !defined(_STORAGEFACILITY_H)
 #define _STORAGEFACILITY_H
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 
 #include "FacilityModel.h"

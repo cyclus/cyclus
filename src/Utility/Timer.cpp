@@ -9,9 +9,7 @@
 
 #include <string>
 #include <iostream>
-
-using namespace std;
-
+#include "Logger.h"
 Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,7 +23,7 @@ void Timer::runSim() {
     // Give a status report, periodically.
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
     if (i % 1 == 0) {
-      cout << "Current time: " << i << endl;
+      LOG(LEV_DEBUG1) << "Current time: " << i;
     }
     
     // Tell the Logician to handle this month.

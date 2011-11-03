@@ -1,6 +1,7 @@
 // RecipeReactor.cpp
 // Implements the RecipeReactor class
 #include <iostream>
+#include "Logger.h"
 
 #include "RecipeReactor.h"
 
@@ -136,11 +137,11 @@ void RecipeReactor::copyFreshModel(Model* src)
 void RecipeReactor::print() 
 { 
   FacilityModel::print(); 
-  cout << "converts commodity {"
+  LOG(LEV_DEBUG2) << "    converts commodity {"
       << this->fuelPairs_.front().first.first->getName()
       << "} into commodity {"
       << this->fuelPairs_.front().second.first->getName()
-      << "}."  << endl;
+      << "}.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -248,8 +249,8 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        cout<<"RecipeReactor "<< getSN()
-          <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+        LOG(LEV_DEBUG2) <<"RecipeReactor "<< getSN()
+          <<"  is sending a mat with mass: "<< newMat->getTotMass();
       }
     }
   }    
@@ -265,8 +266,8 @@ void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifes
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"RecipeReactor " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"RecipeReactor " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   }
 }

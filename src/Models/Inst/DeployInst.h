@@ -2,6 +2,7 @@
 #if !defined(_DEPLOYINST_H)
 #define _DEPLOYINST_H
 #include <iostream>
+#include "Logger.h"
 
 #include "InstModel.h"
 

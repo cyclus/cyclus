@@ -2,6 +2,7 @@
 #if !defined(_SEPARATIONSFACILITY_H)
 #define _SEPARATIONSFACILITY_H
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 #include <vector>
 

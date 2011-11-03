@@ -182,14 +182,14 @@ public:
   virtual void print();
 
   /**
+   * set this model's parent
+   */
+  void setParent(Model* parent);
+
+  /**
    * return this model's parent
    */
   Model* parent();
-
-  /**
-   * set this model's parent
-   */
-  void setParent(Model* parent){ parent_ = parent; };
 
   /**
    * add a child to the list of children

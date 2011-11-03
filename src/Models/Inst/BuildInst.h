@@ -2,6 +2,7 @@
 #if !defined(_BUILDINST_H)
 #define _BUILDINST_H
 #include <iostream>
+#include "Logger.h"
 
 #include "InstModel.h"
 

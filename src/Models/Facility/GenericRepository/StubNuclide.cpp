@@ -1,5 +1,6 @@
 // StubNuclide.cpp
 #include <iostream>
+#include "Logger.h"
 #include <fstream>
 #include <vector>
 #include <time.h>
@@ -15,7 +16,7 @@ void StubNuclide::init(xmlNodePtr cur){
   // move the xml pointer to the current model
   cur = XMLinput->get_xpath_element(cur,"model/StubNuclide");
   // for now, just say you've done it... 
-  cout << "The StubNuclide Class init(cur) function has been called"<< endl;;
+  LOG(LEV_DEBUG2) << "The StubNuclide Class init(cur) function has been called";;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,7 +27,7 @@ NuclideModel* StubNuclide::copy(NuclideModel* src){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubNuclide::print(){
-    cout << "StubNuclide Model" << endl;;
+    LOG(LEV_DEBUG2) << "StubNuclide Model";;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -35,7 +36,7 @@ void StubNuclide::absorb(Material* matToAdd)
   // Get the given StubNuclide's contaminant material.
   // add the material to it with the material absorb function.
   // each nuclide model should override this function
-  cout << "StubNuclide is absorbing material: " << endl;
+  LOG(LEV_DEBUG2) << "StubNuclide is absorbing material: ";
   matToAdd->print();
 }
 
@@ -45,7 +46,7 @@ void StubNuclide::extract(Material* matToRem)
   // Get the given StubNuclide's contaminant material.
   // add the material to it with the material extract function.
   // each nuclide model should override this function
-  cout << "StubNuclide" << "is extracting material: " << endl;
+  LOG(LEV_DEBUG2) << "StubNuclide" << "is extracting material: ";
   matToRem->print() ;
 }
 

@@ -1,6 +1,7 @@
 // ConverterMarket.cpp
 // Implements the ConverterMarket class
 #include <iostream>
+#include "Logger.h"
 
 #include "ConverterMarket.h"
 #include "ConverterModel.h"
@@ -59,12 +60,11 @@ void ConverterMarket::copyFreshModel(Model* src)
 void ConverterMarket::print()
 { 
   MarketModel::print();
-  cout << "where the offer commodity is {"
+  LOG(LEV_DEBUG2) << "where the offer commodity is {"
       << offer_commod_->getName()
       << "}, the request commodity is {"
       << req_commod_->getName()
-      << "}. "
-      << endl;
+      << "}. ";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -161,12 +161,12 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(offerMsg);
 
-      cout << "ConverterMarket has resolved a match from "
+      LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
           << offerMsg->getSupplier()->getSN()
           << " to "
           << offerMsg->getRequester()->getSN()
           << " for the amount:  " 
-          << offerMsg->getAmount() << endl;
+          << offerMsg->getAmount();
 
       requestAmt -= offerAmt;
     } 
@@ -183,12 +183,12 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(maybe_offer);
 
-      cout << "ConverterMarket has resolved a partial match from "
+      LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
           << maybe_offer->getSupplier()->getSN()
           << " to "
           << maybe_offer->getRequester()->getSN()
           << " for the amount:  " 
-          << maybe_offer->getAmount() << endl;
+          << maybe_offer->getAmount();
 
       // reduce the offer amount
       offerAmt -= requestAmt;
@@ -228,10 +228,10 @@ void ConverterMarket::resolve()
       process_request();
     } 
     else {
-      cout << "The request from Requester "<< 
+      LOG(LEV_DEBUG2) << "The request from Requester "<< 
           (*request).second->getRequester()->getSN()
           << " for the amount " << (*request).first 
-          << " rejected by the ConverterMarket. "<<endl;
+          << " rejected by the ConverterMarket. ";
       reject_request(request);
     }
     // remove this request

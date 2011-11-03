@@ -1,6 +1,7 @@
 // EnrichmentFacility.cpp
 // Implements the EnrichmentFacility class
 #include <iostream>
+#include "Logger.h"
 #include <deque>
 
 #include "EnrichmentFacility.h"
@@ -97,13 +98,12 @@ void EnrichmentFacility::copyFreshModel(Model* src)
 void EnrichmentFacility::print() 
 { 
   FacilityModel::print(); 
-  cout << "converts commodity {"
+  LOG(LEV_DEBUG2) << "    converts commodity {"
       << in_commod_->getName()
       << "} into commodity {"
       << out_commod_->getName()
       << "}, and has an inventory that holds " 
-      << inventory_size << " materials"
-      << endl;
+      << inventory_size << " materials";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -158,8 +158,8 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
     }
 
     toSend.push_back(newMat);
-    cout<<"EnrichmentFacility "<< getSN()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+    LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< getSN()
+      <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
   FacilityModel::sendMaterial(msg, toSend);
 }
@@ -173,8 +173,8 @@ void EnrichmentFacility::receiveMaterial(Transaction trans, vector<Material*> ma
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"EnrichmentFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"EnrichmentFacility " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_back(*thisMat);
   }
 }

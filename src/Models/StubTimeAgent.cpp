@@ -4,6 +4,7 @@
 #include "StubTimeAgent.h"
 
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ void StubTimeAgent::copy(StubTimeAgent* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::print() { 
   TimeAgent::print(); 
-  cout << endl; 
+  LOG(LEV_DEBUG2); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

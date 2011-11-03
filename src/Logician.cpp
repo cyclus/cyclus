@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "CycException.h"
 #include "MarketModel.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -143,7 +144,7 @@ void Logician::printRecipes() {
   for (RecipeList::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    cout << "Recipe " << (*recipe).first << endl;
+    LOG(LEV_DEBUG2) << "Recipe " << (*recipe).first;
     recipe->second->print();
   }
 }

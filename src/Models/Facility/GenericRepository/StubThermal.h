@@ -3,6 +3,7 @@
 #define _STUBTHERMAL_H
 
 #include <iostream>
+#include "Logger.h"
 #include <string>
 
 #include <libxml/tree.h>

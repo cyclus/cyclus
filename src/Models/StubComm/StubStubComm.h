@@ -2,6 +2,7 @@
 #if !defined(_STUBSTUBCOMM_H)
 #define _STUBSTUBCOMM_H
 #include <iostream>
+#include "Logger.h"
 
 #include "StubCommModel.h"
 /**

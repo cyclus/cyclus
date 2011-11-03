@@ -2,6 +2,7 @@
 #if !defined(_SWUEUF6CONVERTER_H)
 #define _SWUEUF6CONVERTER_H
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 
 #include "ConverterModel.h"

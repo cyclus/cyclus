@@ -13,6 +13,7 @@
 
 #include <dlfcn.h>
 #include <iostream>
+#include "Logger.h"
 
 
 using namespace std;
@@ -33,6 +34,7 @@ Model* Model::create(std::string model_type, xmlNodePtr cur) {
   Model* model = model_constructor();
 
   model->init(cur);
+  LOG(LEV_DEBUG3) << "Model _-" << model->getName() << "-_ has been initialized";
 
   return model;
 }
@@ -199,7 +201,7 @@ Model::~Model() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  cout << model_type_ << " " << name_ 
+  LOG(LEV_DEBUG2) << model_type_ << " " << name_ 
       << " (ID=" << ID_
       << ", implementation = " << model_impl_
       << "  handle = " << handle_
@@ -207,19 +209,30 @@ void Model::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::setParent(Model* parent){ 
+  // set the pointer to this model's parent
+  parent_ = parent;
+  // root nodes are their own parents
+  // if this node is not its own parent, add it to its parent's list of children
+  if (parent_ != this){
+    parent_->addChild(this);
+  }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::parent(){
+  // if parent pointer is null, throw an error
   if (parent_ == NULL){
     std::string null_err = "You have tried to access the parent of " +	\
-      this->getName() + " but the parent point is NULL.";
+      this->getName() + " but the parent pointer is NULL.";
     throw CycIndexException(null_err);
   }
+  // else return pointer to parent
   return parent_;
 };
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addChild(Model* child){ 
-  child->setParent(this);
+void Model::addChild(Model* child){
   children_.push_back(child); 
 };
 

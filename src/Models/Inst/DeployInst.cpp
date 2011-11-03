@@ -1,6 +1,7 @@
 // DeployInst.cpp
 // Implements the DeployInst class
 #include <iostream>
+#include "Logger.h"
 
 #include "DeployInst.h"
 
@@ -65,14 +66,14 @@ void DeployInst::print()
 { 
   InstModel::print();
 
-  cout << " with deployment schedule: " << endl;
+  LOG(LEV_DEBUG2) << " with deployment schedule: ";
 
   for (map<int,Model*>::iterator deploy=deployment_map_.begin();
        deploy!=deployment_map_.end();
        deploy++){
-    cout << "\t\t\tFacility " << dynamic_cast<FacilityModel*>((*deploy).second)->getFacName()
+    LOG(LEV_DEBUG2) << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->getFacName()
         << " ("  << (*deploy).second->getName() 
-        << ") is deployed in month " << (*deploy).first << endl;
+        << ") is deployed in month " << (*deploy).first;
   }
 };
 

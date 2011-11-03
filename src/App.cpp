@@ -77,33 +77,38 @@ int main(int argc, char* argv[]) {
   // use the LOG macro where its arg is the log level or type
   // LEV_DEBUG is the type used for this logging statement
   // the macro statment returns a string stream that can be used like cout
-  const int count = 3;
-  LOG(LEV_DEBUG) << "A loop with " << count << " iterations";
-  for (int i = 0; i != count; ++i) {
-     LOG(LEV_DEBUG1) << "the counter i = " << i;
-  }
+//   const int count = 3;
+//   LOG(LEV_DEBUG) << "A loop with " << count << " iterations";
+//   for (int i = 0; i != count; ++i) {
+//      LOG(LEV_DEBUG1) << "the counter i = " << i;
+//   }
   ////// end logging example //////
 
   // initialize simulation
   try {
     // read input file and setup simulation
     XMLinput->load_file(vm["input-file"].as<string>()); 
+  } catch (CycIOException ge) {
+    LOG(LEV_ERROR) << ge.what();
+    return 0;
+  };
 
-    cout << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:" << endl;
-    LI->printModelList(CONVERTER);
-    cout << "Here is a list of " << LI->getNumModels(MARKET) << " markets:" << endl;
-    LI->printModelList(MARKET);
-    cout << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:" << endl;
-    LI->printModelList(FACILITY);
-    cout << "Here is a list of " << LI->getNumModels(REGION) << " regions:" << endl;
-    LI->printModelList(REGION);
-    cout << "Here is a list of " << LI->getNumRecipes() << " recipes:" << endl;
-    LI->printRecipes();
-    
-    // Run the simulation 
-    TI->runSim();
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:";
+  LI->printModelList(CONVERTER);
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(MARKET) << " markets:";
+  LI->printModelList(MARKET);
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:";
+  LI->printModelList(FACILITY);
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(REGION) << " regions:";
+  LI->printModelList(REGION);
+  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumRecipes() << " recipes:";
+  LI->printRecipes();
+  
+  // Run the simulation 
+  TI->runSim();
 
     // Create the output file
+  try{
     BI->createDB();
 
     BI->writeModelList(INST);
@@ -114,8 +119,8 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
 
     BI->closeDB();
-  } catch (CycException gen_exception) {
-    cout << gen_exception.what() << endl;
+  } catch (CycException ge) {
+    LOG(LEV_ERROR) << ge.what();
   };
 
   return 0;

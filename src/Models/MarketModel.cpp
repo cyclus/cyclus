@@ -8,6 +8,7 @@
 #include "Timer.h"
 
 #include <iostream>
+#include "Logger.h"
 #include <string>
 
 using namespace std;
@@ -47,8 +48,8 @@ void MarketModel::copy(MarketModel* src) {
 void MarketModel::print() { 
   Model::print(); 
 
-  cout << "trades commodity " 
-      << commodity_->getName() << endl;
+  LOG(LEV_DEBUG2) << "    trades commodity " 
+      << commodity_->getName();
 
 };
 

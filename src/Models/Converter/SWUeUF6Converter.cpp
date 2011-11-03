@@ -1,6 +1,7 @@
 // SWUeUF6Converter.cpp
 // Implements the SWUeUF6Converter class
 #include <iostream>
+#include "Logger.h"
 
 #include "SWUeUF6Converter.h"
 
@@ -47,12 +48,11 @@ void SWUeUF6Converter::copyFreshModel(Model* src)
 void SWUeUF6Converter::print() 
 { 
   ConverterModel::print(); 
-  cout << "converts offers of commodity {"
+  LOG(LEV_DEBUG2) << "converts offers of commodity {"
       << in_commod_->getName()
       << "} into offers of commodity {"
       << out_commod_->getName()
-      << "}."
-      << endl;
+      << "}.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

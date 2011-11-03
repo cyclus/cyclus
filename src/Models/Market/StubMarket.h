@@ -2,6 +2,7 @@
 #if !defined(_STUBMARKET_H)
 #define _STUBMARKET_H
 #include <iostream>
+#include "Logger.h"
 
 #include "MarketModel.h"
 

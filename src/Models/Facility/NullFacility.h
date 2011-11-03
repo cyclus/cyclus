@@ -2,6 +2,7 @@
 #if !defined(_NULLFACILITY_H)
 #define _NULLFACILITY_H
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 
 #include "FacilityModel.h"

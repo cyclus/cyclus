@@ -10,6 +10,7 @@
 
 #include <string>
 #include <iostream>
+#include "Logger.h"
 
 using namespace std;
 
@@ -66,16 +67,16 @@ void RegionModel::print() {
 
   Model::print();
 
-  cout << "allows facilities " ;
+  LOG(LEV_DEBUG2) << "allows facilities " ;
 
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    cout << (fac == allowedFacilities_.begin() ? "{" : ", " )
+    LOG(LEV_DEBUG2) << (fac == allowedFacilities_.begin() ? "{" : ", " )
         << (*fac)->getName();
   }
   
-  cout << "} and has the following institutions:" << endl;
+  LOG(LEV_DEBUG2) << "} and has the following institutions:";
   
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();

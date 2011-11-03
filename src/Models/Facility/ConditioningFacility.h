@@ -3,6 +3,7 @@
 #define _CONDITIONINGFACILITY_H
 
 #include <iostream>
+#include "Logger.h"
 #include <queue>
 #include <string>
 #include <vector>

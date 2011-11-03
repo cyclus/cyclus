@@ -1,6 +1,7 @@
 // StorageFacility.cpp
 // Implements the StorageFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "StorageFacility.h"
 
@@ -85,13 +86,13 @@ void StorageFacility::copyFreshModel(Model* src)
 void StorageFacility::print() 
 { 
   FacilityModel::print(); 
-  cout << "stores commodity {"
+  LOG(LEV_DEBUG2) << "    stores commodity {"
       << incommod_->getName()
       << "}, for a minimum time of " 
       << residence_time_ 
       << " months and has an inventory_ that holds " 
       << inventory_size_ << " materials."
-      << endl;
+;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -128,8 +129,8 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
     if(m->getTotMass() <= (capacity_ - complete)){
       complete += m->getTotMass();
       toSend.push_back(m);
-      cout<<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< m->getTotMass()<< endl;
+      LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
+        <<"  is sending a mat with mass: "<< m->getTotMass();
       inventory_.pop_front();
     }
     else{ 
@@ -143,8 +144,8 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
       complete += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
-      cout<<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< newMat->getTotMass()<< endl;
+      LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
+        <<"  is sending a mat with mass: "<< newMat->getTotMass();
     };
   };    
 
@@ -161,8 +162,8 @@ void StorageFacility::receiveMaterial(Transaction trans, vector<Material*> manif
        thisMat != manifest.end();
        thisMat++)
   {
-    cout<<"StorageFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass() << endl;
+    LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
+        << (*thisMat)->getTotMass();
     stocks_.push_back(*thisMat);
     entryTimes_.push_back(make_pair(TI->getTime(), *thisMat ));
   }
@@ -178,7 +179,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
   Material* recipe;
   double amount, age;
   int i, nNodes = nodes->nodeNr;
-  std::cout << "**** nNodes = " << nNodes << std::endl;
+  LOG(LEV_DEBUG2) << "**** nNodes = " << nNodes;
 
   // for each fuel pair, there is an in and an out commodity
   for (int i=0;i<nNodes;i++){
@@ -228,7 +229,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
-  std::cout << "\n ** Checking initial stocks of size " << stocks_.size() << " **\n" << std::endl;
+  LOG(LEV_DEBUG2) << "\n ** Checking initial stocks of size " << stocks_.size() << " **\n";
   // check to make sure we got the correct initial inventory_
   for (int i=0;i<stocks_.size();i++){
     stocks_[i]->print();
@@ -254,7 +255,7 @@ void StorageFacility::handleTick(int time)
   Mass inv = this->checkInventory();
   // and how much is already in its stocks
   Mass sto = this->checkStocks(); 
-  cout << "stocks currently at: " << sto << " " << inv << endl;
+  LOG(LEV_DEBUG2) << "stocks currently at: " << sto << " " << inv;
   // subtract inv and sto from inventory_ max size to get total empty space
   Mass space = inventory_size_ - inv - sto;
   // this will be a request for free stuff

@@ -2,6 +2,7 @@
 #if !defined(_FIXEDINST_H)
 #define _FIXEDINST_H
 #include <iostream>
+#include "Logger.h"
 
 #include "InstModel.h"
 

@@ -1,6 +1,7 @@
 // StubFacility.cpp
 // Implements the StubFacility class
 #include <iostream>
+#include "Logger.h"
 
 #include "StubFacility.h"
 
