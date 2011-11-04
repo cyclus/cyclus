@@ -97,7 +97,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(offerMsg);
 
-      LOG(LEV_DEBUG2) << "GreedyMarket has resolved a match from "
+      LOG(LEV_DEBUG1) << "GreedyMarket has resolved a match from "
           << offerMsg->getSupplier()->getSN()
           << " to "
           << offerMsg->getRequester()->getSN()
@@ -122,9 +122,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       orders_.push_back(maybe_offer);
 
-      LOG(LEV_DEBUG2) << "GreedyMarket has resolved a match from "
+      LOG(LEV_DEBUG1) << "GreedyMarket has resolved a match from "
           << maybe_offer->getSupplier()->getSN()
-          << " to "
+          << " (offer split) to "
           << maybe_offer->getRequester()->getSN()
           << " for the amount:  " 
           << maybe_offer->getAmount();
@@ -134,11 +134,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
 
       // if the residual is above threshold,
       // make a new offer with reduced amount
-
       if(offerAmt > eps) {
         Message *new_offer = new Message(*offerMsg);
         new_offer->setAmount(offerAmt);
-        // call this method for consistency
         receiveMessage(new_offer);
       }
       
