@@ -27,15 +27,10 @@ int IsoVector::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
+  ID_ = nextID_++;
+
   total_mass_ = 0;
   total_atoms_ = 0;
-
-  ID_ = nextID_++;
-  CompMap zero_map;
-  zero_map.insert(make_pair(Iso(92235),0));
-  massHist_.insert(make_pair(TI->getTime(), zero_map));
-  compHist_.insert(make_pair(TI->getTime(), zero_map));
-  BI->registerMatChange(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -46,14 +41,12 @@ IsoVector::IsoVector(CompMap comp, std::string mat_unit, std::string rec_name, d
   units_ = mat_unit;
   recipeName_ = rec_name;
 
-  comp_map_ = comp;
-
+  atom_comp_ = comp;
+  total_atoms_ = size;
   if ( MASSBASED == type) {
     total_mass_ = size;
     rationalize_M2A();
   } else if (ATOMBASED == type) {
-    total_atoms_ = size;
-    rationalize_A2M();
   } else {
     throw CycRangeException("Type options are currently MASSBASED or ATOMBASED !");
   }
@@ -61,35 +54,57 @@ IsoVector::IsoVector(CompMap comp, std::string mat_unit, std::string rec_name, d
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool IsoVector::isNeg(Iso tope) const {
-  if (this->getAtomComp(tope) == 0) return false;
+  Atoms num_atoms = getAtomComp(tope);
 
-  // (kg) * (g/kg) * (mol/g)
-  Atoms atoms_eps =  EPS * 1e3 / IsoVector::getAtomicMass(tope); 
-  return (this->getAtomComp(tope) + atoms_eps < 0);
+  if (num_atoms == 0) {
+    return false;
+  } else {
+    int grams_per_kg = 1000;
+    Atoms atoms_eps =  EPS_KG * grams_per_kg / MT->getMassInGrams(tope); 
+    return (num_atoms + atoms_eps < 0);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool IsoVector::isZero(Iso tope) const {
-  // (kg) * (g/kg) * (mol/g) 
-  Atoms atoms_eps = EPS * 1e3 / IsoVector::getAtomicMass(tope) ; 
-  return (fabs(this->getAtomComp(tope)) < atoms_eps);
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double IsoVector::getIsoMass(Iso tope) const {
-  map<Iso, Atoms> currComp = this->getAtomComp();
-  return total_mass_*IsoVector::getIsoMass(tope, currComp);
+  int grams_per_kg = 1000;
+  Atoms atoms_eps = EPS_KG * grams_per_kg / MT->getMassInGrams(tope) ; 
+  return (fabs(getAtomComp(tope)) < atoms_eps);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Mass IsoVector::getAtomicMass(Iso tope) {
-  Mass toRet = MT->getMass(tope);
-  return toRet;
-};
+const double IsoVector::getIsoMass(Iso tope) const {
+  // If the given isotope is present, calculate and return its mass. 
+  // Else return 0.
+  double massToRet = 0;
+  if (atom_comp_.count(tope) > 0) {
+    int grams_per_kg = 1000;
+    massToRet = atom_comp_[tope] * MT->getMassInGrams(tope) / grams_per_kg;
+  }
+  return massToRet;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const double IsoVector::getEltMass(int elt) const {
-  map<Iso, Atoms> currComp = this->getAtomComp();
-  return total_mass_*IsoVector::getEltMass(elt, currComp);
+
+  double massToRet = 0;
+  Iso isotope;
+  int atomic_num;
+
+  // Iterate through the current composition...
+  map<Iso, Atoms>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+
+    isotope = iter->first;
+    atomic_num = IsoVector::getAtomicNum(isotope);
+
+    if (atomic_num == elt) {
+      massToRet += getIsoMass(isotope);
+    }
+    iter++;
+  }
+
+  return massToRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -179,14 +194,12 @@ const CompMap IsoVector::getFracComp(double frac) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Atoms IsoVector::getAtomComp(Iso tope) const {
-  CompMap currComp = this->getAtomComp();
-
   // If the isotope isn't currently present, return 0. Else return the 
   // isotope's current number density.
-  if (currComp.find(tope) == currComp.end()) {
+  if (atom_comp_.count(tope) == 0) {
     return 0;
   } else {
-    return currComp[tope];
+    return atom_comp_[tope];
   }
 }
 
@@ -277,9 +290,6 @@ void IsoVector::normalize(CompMap &comp_map) {
   double sum_total_comp = 0;
   CompMap::iterator entry;
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++) {
-    //if (this->isZero((*entry).first))
-    //  comp_map.erase((*entry).first);
-    //else
     sum_total_comp += (*entry).second;
   }
 
@@ -290,42 +300,50 @@ void IsoVector::normalize(CompMap &comp_map) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void IsoVector::rationalize_A2M() {
-  normalize(compHist_[TI->getTime()]);
+  Iso isotope;
+  double num_atoms, grams_per_atom;
+  int grams_per_kg = 1000;
 
-  total_atoms_ = this->getTotAtoms();
-  total_mass_ = 0;
+  normalize(atom_comp_);
 
   // loop through each isotope in the composition for the current time.
-  for(CompMap::iterator entry = compHist_[TI->getTime()].begin();
-      entry != compHist_[TI->getTime()].end();
+  total_mass_ = 0;
+  for(CompMap::iterator entry = atom_comp_.begin();
+      entry != atom_comp_.end();
       entry++) {
+
+    isotope = (*entry).first;
+    num_atoms = (*entry).second;
+    grams_per_atom = MT->getMassInGrams(isotope);
     // multiply the number of atoms by the mass number of that isotope and convert to kg
-    massHist_[TI->getTime()][(*entry).first] = 
-              (*entry).second*getAtomicMass((double)(*entry).first)/1e3;
-    total_mass_ += total_atoms_ * (*entry).second * 
-              getAtomicMass((double)(*entry).first)/1e3;
+    atom_comp_[isotope] = num_atoms * grams_per_atom / grams_per_kg;
+    total_mass_ += total_atoms_ * num_atoms * grams_per_atom / grams_per_kg;
   }
 
-  normalize(massHist_[TI->getTime()]);
+  normalize(atom_comp_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void IsoVector::rationalize_M2A() {
-  normalize(massHist_[TI->getTime()]);
+  Iso isotope;
+  double mass_kg, grams_per_atom;
+  int grams_per_kg = 1000;
 
-  total_mass_ = this->getTotMass();
+  normalize(atom_comp_);
+
   total_atoms_ = 0;
-
-  for(CompMap::iterator entry = massHist_[TI->getTime()].begin();
-      entry != massHist_[TI->getTime()].end();
+  for(CompMap::iterator entry = atom_comp_.begin();
+      entry != atom_comp_.end();
       entry++) {
-    compHist_[TI->getTime()][(*entry).first] = 
-                      (*entry).second*1e3/getAtomicMass((*entry).first);
-    total_atoms_ += total_mass_ * (*entry).second * 1e3 / 
-                      getAtomicMass((*entry).first);
+    isotope = (*entry).first;
+    mass_kg = (*entry).second;
+    grams_per_atom = MT->getMassInGrams(isotope);
+
+    atom_comp_[isotope] = mass_kg * grams_per_kg / grams_per_atom;
+    total_atoms_ += total_mass_ * mass_kg * grams_per_kg / grams_per_atom;
   }
   
-  normalize(compHist_[TI->getTime()]);
+  normalize(atom_comp_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

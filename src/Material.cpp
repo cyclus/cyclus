@@ -135,13 +135,13 @@ const bool Material::isNeg(Iso tope) const {
   if (this->getAtomComp(tope) == 0) return false;
 
   // (kg) * (g/kg) * (mol/g)
-  Atoms atoms_eps =  eps * 1e3 / Material::getAtomicMass(tope); 
+  Atoms atoms_eps =  EPS_KG * 1e3 / Material::getAtomicMass(tope); 
   return (this->getAtomComp(tope) + atoms_eps < 0);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const bool Material::isZero(Iso tope) const {
   // (kg) * (g/kg) * (mol/g) 
-  Atoms atoms_eps = eps * 1e3 / Material::getAtomicMass(tope) ; 
+  Atoms atoms_eps = EPS_KG * 1e3 / Material::getAtomicMass(tope) ; 
   return (fabs(this->getAtomComp(tope)) < atoms_eps);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -166,7 +166,7 @@ double Material::getIsoMass(Iso tope, const CompMap& comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Mass Material::getAtomicMass(Iso tope) {
-  Mass toRet = MT->getMass(tope);
+  Mass toRet = MT->getMassInGrams(tope);
   return toRet;
 };
 

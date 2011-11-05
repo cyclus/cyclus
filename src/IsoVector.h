@@ -104,7 +104,7 @@ enum Basis {ATOMBASED, MASSBASED};
  * we should define this numerical threshold as a simulation parameter
  * its units are kg.
  */
-#define EPS 1e-6
+#define EPS_KG 1e-6
 
 /** 
  * Class Material the object used to transact material objects around the system.
@@ -219,14 +219,6 @@ public:
    * @return the mass number
    */
   static int getMassNum(Iso tope);
-
-  /**
-   * Returns the atomic mass of the isotope with the given identifier.
-   *
-   * @param tope the isotope whose mass is being returned
-   * @return the atomic mass (g/mol) 
-   */
-  static Mass getAtomicMass(Iso tope);
 
   /**
    * Adds (or subtracts) from the number density of the given isotope by 
@@ -393,7 +385,7 @@ private:
    */
   std::string recipeName_;
   
-  CompMap comp_map_;
+  CompMap atom_comp_;
 
   /**
    * convert an atom composition into a consitent mass composition

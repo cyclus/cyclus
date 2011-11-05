@@ -196,7 +196,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // if the residual is above threshold,
       // make a new offer with reduced amount
 
-      if(offerAmt > eps){
+      if(offerAmt > EPS_KG){
         Message *new_offer = new Message(*offerMsg);
         new_offer->setAmount(offerAmt);
         // call this method for consistency

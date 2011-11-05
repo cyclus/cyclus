@@ -38,7 +38,7 @@ MassTable::~MassTable() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Mass MassTable::getMass(Iso tope) {
+Mass MassTable::getMassInGrams(Iso tope) {
   Mass toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };

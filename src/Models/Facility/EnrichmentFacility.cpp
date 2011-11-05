@@ -420,12 +420,12 @@ void EnrichmentFacility::enrich()
 
 		// CONSERVATION OF MASS CHECKS:
 		if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 
-						 - mat->getEltMass(92)) > eps)
+						 - mat->getEltMass(92)) > EPS_KG)
 			throw CycException("Conservation of mass violation at Enrichment!!");
 
 		if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
          Material::getIsoMass(922350, theTails->getAtomComp()) 
-          - Material::getIsoMass(922350, mat->getAtomComp())) > eps)
+          - Material::getIsoMass(922350, mat->getAtomComp())) > EPS_KG)
 			throw CycException("Conservation of mass violation at Enrichment!!");
 
 		// Don't forget to decrement outstMF before sending.

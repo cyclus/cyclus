@@ -62,7 +62,7 @@ public:
    *
    * @return the mass, a double, of the tope isotope.
    */
-   Mass getMass(Iso tope);
+   Mass getMassInGrams(Iso tope);
 
 protected:
   /**

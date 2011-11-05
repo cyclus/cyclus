@@ -104,7 +104,7 @@ enum Basis {ATOMBASED, MASSBASED};
  * we should define this numerical threshold as a simulation parameter
  * its units are kg.
  */
-#define eps 1e-6
+#define EPS_KG 1e-6
 
 /** 
  * Class Material the object used to transact material objects around the system.
