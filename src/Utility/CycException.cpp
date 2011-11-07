@@ -24,7 +24,8 @@ CycException::CycException(std::string msg) {
 const char* CycException::what() const throw() {
 	//const char* toRet = myMessage_;
 	//	return toRet;
-	return myMessage_.c_str();
+  std::string err = myMessage_ + "\n";
+  return err.c_str();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CycException::~CycException() throw()  { }

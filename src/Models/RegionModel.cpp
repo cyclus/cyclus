@@ -109,6 +109,7 @@ void RegionModel::handleTick(int time){
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
+    LOG(LEV_DEBUG2) << "RegionModel " << this->getName() << " ID " << this->getSN() << " sending tick to InstModel " << (*inst)->getName() << " ID " << (*inst)->getSN();
     (dynamic_cast<InstModel*>(*inst))->handleTick(time);
   }
 }

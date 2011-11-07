@@ -24,6 +24,7 @@ void Timer::runSim() {
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
     if (i % 1 == 0) {
       LOG(LEV_DEBUG1) << "Current time: " << i;
+      LOG(LEV_DEBUG2) << "The list of current tick listeners is: " << reportListeners();
     }
     
     // Tell the Logician to handle this month.
@@ -36,6 +37,18 @@ void Timer::runSim() {
     time_++;
   }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Timer::reportListeners() {
+  std::string report = "";
+  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+      agent != tick_listeners_.end(); 
+      agent++) {
+    report += (*agent)->getName() + " ";
+  }
+  return report;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::handlePreHistory() {
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
@@ -44,10 +57,11 @@ void Timer::handlePreHistory() {
     try {
       (*agent)->handlePreHistory();
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      std::cout << "ERROR occured in handlePreHistory(): " << err.what();
     }
   }
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendResolve() {
   for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
@@ -56,7 +70,7 @@ void Timer::sendResolve() {
     try {
       (*agent)->resolve();
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      std::cout << "ERROR occured in sendResolve(): " << err.what();
     }
   }
 }
@@ -69,7 +83,7 @@ void Timer::sendTick() {
     try {
       (*agent)->handleTick(time_);
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      std::cout << "ERROR occured in sendTick(): " << err.what();
     }
   }
 }
@@ -82,7 +96,7 @@ void Timer::sendTock() {
     try {
       (*agent)->handleTock(time_);
     } catch(CycException err) {
-      cout << "ERROR occured: " << err.what();
+      std::cout << "ERROR occured in sendTock(): " << err.what();
     }
   }
 }

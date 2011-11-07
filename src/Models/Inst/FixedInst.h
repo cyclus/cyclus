@@ -81,8 +81,6 @@ protected:
 
 protected:
 
-  vector<Model*> facilities_;
-
 /* ------------------- */ 
 
 

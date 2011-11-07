@@ -38,7 +38,7 @@ void FixedInst::init(xmlNodePtr cur)
     Model* new_facility = Model::create(facility);
 
     dynamic_cast<FacilityModel*>(new_facility)->setFacName(XMLinput->get_xpath_content(fac_node,"name"));
-    this->addChild(new_facility);
+    new_facility->setParent(this);
   }
 }
 

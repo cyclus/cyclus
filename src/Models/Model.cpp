@@ -233,6 +233,7 @@ Model* Model::parent(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
+  LOG(LEV_DEBUG3) << "Model " << this->getName() << " ID " << this->getSN() << " has added child " << child->getName() << " ID " << child->getSN() << " to its list of children.";
   children_.push_back(child); 
 };
 

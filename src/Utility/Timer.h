@@ -30,6 +30,7 @@ private:
    * The current time, measured in months from when the simulation 
    * started.
    */
+
   int time_;
     
   /**
@@ -62,6 +63,12 @@ private:
    * Concrete models that desire to receive resolve (markets) notifications
    */
   std::vector<MarketModel*> resolve_listeners_;
+
+  /**
+   * @brief returns a string of the name of all listeners.
+   *
+   */
+  std::string reportListeners();
 
   /**
    * @brief sends the resolve signal to all of the (market) models receiving

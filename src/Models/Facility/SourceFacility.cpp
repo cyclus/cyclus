@@ -144,8 +144,9 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
   FacilityModel::sendMaterial(msg, toSend);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   
 void SourceFacility::handleTick(int time){
+  LOG(LEV_DEBUG3) << "Facility " << this->getName() << this->getSN() << " is handling the tick.";
   // make offers
   // decide how much to offer
   Mass offer_amt;
@@ -165,18 +166,23 @@ void SourceFacility::handleTick(int time){
   // decide what market to offer to
   Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
   LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
-
+  
   // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price_, 
-      this, recipient);
+  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price_,this, recipient);
 
   // send it
+
   msg->setNextDest(getFacInst());
+  LOG(LEV_DEBUG3) << "During handleTick, " << getFacName() << " set next message destination to " << parent()->getName() << parent()->getSN();
+  
   msg->sendOn();
+  LOG(LEV_DEBUG3) << "During handleTick, " << getFacName() << " sent message.";
+  
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   
 void SourceFacility::handleTock(int time){
+  LOG(LEV_DEBUG3) << "Facility " << this->getName() << this->getSN() << " is handling the tock.";
   // if there's room in the inventory, process material at capacity
   Mass space = inventory_size_ - this->checkInventory(); 
   if(capacity_*recipe_->getTotMass() <= space){

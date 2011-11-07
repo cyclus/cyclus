@@ -96,6 +96,7 @@ void SinkFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
+  LOG(LEV_DEBUG3) << "Facility " << this->getName() << this->getSN() << " is handling the tick.";
   // The sink facility should ask for as much stuff as it can reasonably receive.
   Mass requestAmt;
   // And it can accept amounts no matter how small
@@ -150,6 +151,7 @@ void SinkFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTock(int time){
+  LOG(LEV_DEBUG3) << "Facility " << this->getName() << this->getSN() << " is handling the tock.";
 
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
