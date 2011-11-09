@@ -1,6 +1,6 @@
-// Material.h
-#if !defined(_MATERIAL_H)
-#define _MATERIAL_H
+// IsoVector.h
+#if !defined(_ISOVECTOR_H)
+#define _ISOVECTOR_H
 
 #include <map>
 #include <utility>
@@ -72,18 +72,6 @@ public:
    */
   IsoVector(); 
 
-  /**
-   * a constructor for making a material object from a known recipe and size.
-   *
-   * @param comp a map from isotopes to number of atoms
-   * @param mat_unit the units for this material
-   * @param rec_name name of this recipe
-   * @param scale is the size of this material
-   * @param type indicates whether comp and scale are in mass or atom units
-   */
-  IsoVector(CompMap comp, std::string mat_unit, std::string rec_name, 
-            double scale, Basis type);
-
   /** 
    * Default destructor does nothing.
    */
@@ -116,14 +104,14 @@ public:
    *
    * @return ID
    */
-  const int getSN(){return ID_;};
+  const int id(){return ID_;};
 
   /**
    * returns the name of the recipe
    *
    * @return recipeName
    */
-  std::string getName() { return recipeName_; };
+  std::string name() { return recipeName_; };
 
   /**
    * returns the total mass of this material object PER UNIT
@@ -137,7 +125,7 @@ public:
    * @param tope the isotope whose mass in the material will be returned
    * @return the mass of the given isotope within the material, or zero
    */
-  const virtual double mass(int tope) const;
+  const double mass(int tope) const;
 
   /**
    * returns the total atoms in this material object 
@@ -151,7 +139,7 @@ public:
    * @param tope the isotope whose number density will be returned
    * @return the number density of the given isotope, or zero
    */
-  const virtual double atomCount(int tope) const;
+  const double atomCount(int tope) const;
 
   /**
    * Returns the mass of the given element in this Material.
@@ -159,7 +147,16 @@ public:
    * @param elt the element
    * @return the mass of the element (in tons)
    */
-  const virtual double getEltMass(int elt) const;
+  const double eltMass(int elt) const;
+
+  /**
+   * @brief Returns the atom composition.
+   *
+   * Intended for use primarily in operator overloading.
+   *
+   * @return std::map of isotopes and corresponding atom counts
+   */
+  const CompMap atomComp() {return atom_comp_};
 
   /**
    * Decays this Material object for the given change in time and updates
@@ -175,16 +172,8 @@ private:
    * and daughters map variables.  The resulting matrix is stored in the static
    * variable decayMatrix.
    */
-  static void makeDecayMatrix();
+  static void buildDecayMatrix();
 
-  /**
-   * Converts the given mathematical Vector representation of the Material's 
-   * isotopic composition back into the map representation.
-   *
-   * @param compVector the mathematical Vector
-   */
-  static void makeFromVect(const Vector & compVector, CompMap comp);
-  
   /**
    * Stores the next available material ID
    */
@@ -211,7 +200,15 @@ private:
    *
    * @return the mathematical Vector 
    */
-  Vector makeCompVector() const;
+  Vector compositionAsVector() const;
+
+  /**
+   * Overwrites composition with data from the given Vector.
+   *
+   * @param compVector Vector of data that constitutes the new composition
+   *
+   */
+  map<Iso, Atoms> copyVectorIntoComp(const Vector & compVector);
 
   /**
    * @brief Used to determine validity of isotope defnition.
@@ -246,13 +243,8 @@ private:
    */
   void normalize(CompMap &comp_map);
 
-  /**
-   * convert mass composition into a consitent atom composition
-   */
-  void rationalize_M2A();
-  
   /** 
-   * The serial number for this Material.
+   * Unique identifier.
    */
   int ID_;
 

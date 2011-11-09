@@ -1,11 +1,8 @@
-// Material.cpp
-#include "Material.h"
+// IsoVector.cpp
+#include "IsoVector.h"
 
-#include "BookKeeper.h"
 #include "CycException.h"
 #include "MassTable.h"
-#include "Logician.h"
-#include "Timer.h"
 #include "Env.h"
 #include "UniformTaylor.h"
 #include "InputXML.h"
@@ -32,32 +29,6 @@ IsoVector::IsoVector() {
   total_mass_ = 0;
   total_atoms_ = 0;
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-IsoVector::IsoVector(CompMap comp, std::string mat_unit, std::string rec_name, double size, Basis type) {
-  
-  ID_=nextID_++;
-
-  units_ = mat_unit;
-  recipeName_ = rec_name;
-
-  atom_comp_ = comp;
-  total_atoms_ = size;
-  if ( MASSBASED == type) {
-    total_mass_ = size;
-    rationalize_M2A();
-  } else if (ATOMBASED == type) {
-  } else {
-    throw CycRangeException("Type options are currently MASSBASED or ATOMBASED !");
-  }
-}
-
-IsoVector::operator+(IsoVector right_side) {
-
-  IsoVector sum;
-  for comp in 
-
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(int tope) {
@@ -127,7 +98,7 @@ void IsoVector::loadDecayInfo() {
       decayInfo >> iso; // get next parent
     } 
     // builds the decay matrix from the parent and daughter maps
-    makeDecayMatrix();
+    buildDecayMatrix();
   } else {
     throw CycIOException("Could not find file 'decayInfo.dat'.");
   }
@@ -158,7 +129,7 @@ const double IsoVector::atomCount(int tope) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double IsoVector::getEltMass(int elt) const {
+const double IsoVector::eltMass(int elt) const {
 
   double elt_mass = 0;
   int isotope;
@@ -181,22 +152,120 @@ const double IsoVector::getEltMass(int elt) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::decay(double time_change) {
-  // gets the initial composition Vector N_o for this Material object
-  Vector N_o = this->makeCompVector();
+  double months_per_year = 12;
+  double years = time_change / months_per_year;
 
-  // convert months to years to match decay constant units in matrix
-  double years = time_change / 12;
+  Vector N_o = compositionAsVector();
+  buildDecayMatrix(); // update the decay matrix
 
-  // solves the decay equation for the final composition Vector N_t using a
-  // matrix exponential method
+  // solves the decay equation for the final composition
   Vector N_t = UniformTaylor::matrixExpSolver(decayMatrix_, N_o, years);
 
-  // converts the Vector solution N_t into a composition map
-  map<int, double> newComp = makeCompMap(N_t);
+  copyVectorIntoComp(N_t);
+}
 
-  // assigns the new composition map to this Material object
-  int time = Timer::Instance()->getTime();
-  this->changeAtomComp(newComp,time);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Vector IsoVector::compositionAsVector() const {
+        
+  Vector comp_vector = Vector(parent_.size(),1);
+
+  map<int, double>::const_iterator comp_iter = atom_comp_.begin();
+  while( comp_iter != compMap.end() ) {
+    int iso = comp_iter->first;
+    long double atom_count = comp_iter->second;
+
+    // if the isotope is tracked in the decay matrix  
+    if ( parent_.count(iso) > 0 ) {
+      int col = parent_.find(iso)->second.first; // get Vector position
+      comp_vector(col,1) = atom_count;
+    // if it is not in the decay matrix, then it is added as a stable isotope
+    } else {
+      double decayConst = 0;
+      int col = parent_.size() + 1;
+      parent_[iso] = make_pair(col, decayConst);  // add isotope to parent map
+
+      int nDaughters = 0;
+      vector< pair<int,double> > temp(nDaughters);
+      daughters_[col] = temp;  // add isotope to daughters map
+      
+      vector<long double> row(1,numDens);
+      comp_vector.addRow(row);  // add isotope to the end of the Vector
+    }
+
+    ++comp_iter; // get next isotope
+  }
+
+  return comp_vector;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, Atoms> IsoVector::copyVectorIntoComp(const Vector & compVector) {
+  atom_comp_.clear();
+
+  // loops through the ParentMap and populates the new composition map with
+  // the number density from the compVector parameter for each isotope
+  ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
+  while( parent_iter != parent_.end() ) {
+    int iso = parent_iter->first;
+    int col = parent_.find(iso)->second.first; // get Vector position
+    
+    // checks to see if the Vector position is valid
+    if ( col <= compVector.numRows() ) {
+      double atom_count = compVector(col,1);
+      // adds isotope to the map if its number density is non-zero
+      if ( numDens != 0 )
+        compMap[iso] = atom_count;
+    } else {
+      throw CycRangeException("Decay Error - invalid Vector position");
+    }
+
+    ++parent_iter; // get next parent
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::buildDecayMatrix() {
+  double decayConst = 0; // decay constant, in inverse years
+  int jcol = 1;
+  int n = parent_.size();
+  decayMatrix_ = Matrix(n,n);
+
+  ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
+
+  // populates the decay matrix column by column
+  while( parent_iter != parent_.end() ) {
+    jcol = parent_iter->second.first; // determines column index
+    decayConst = parent_iter->second.second;
+    decayMatrix_(jcol,jcol) = -1 * decayConst; // sets A(i,i) value
+ 
+    // processes the vector in the daughters map if it is not empty
+    if ( !daughters_.find(jcol)->second.empty() ) {
+      // makes an iterator that points to the first daughter in the vector
+      vector< pair<Iso,BranchRatio> >::const_iterator
+        iso_iter = daughters_.find(jcol)->second.begin();
+
+      // processes all daughters of the parent
+      while ( iso_iter != daughters_.find(jcol)->second.end() ) {
+        int iso = iso_iter->first;
+        int irow = parent_.find(iso)->second.first; // determines row index
+        double branchRatio = iso_iter->second;
+        decayMatrix_(irow,jcol) = branchRatio * decayConst; // sets A(i,j) value
+    
+        ++iso_iter; // get next daughter
+      }
+    }
+    ++parent_iter; // get next parent
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::validateAtomicNumber(int tope) {
+  int lower_limit = 1001;
+  int upper_limit = 1182949;
+
+  if (tope < lower_limit || tope > upper_limit) {
+    throw CycRangeException("Tried to get atomic number of invalid isotope");
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -219,127 +288,16 @@ const bool IsoVector::isZero(int tope) const {
   return (fabs(getAtomComp(tope)) < atoms_eps);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateAtomicNumber(int tope) {
-  int lower_limit = 1001;
-  int upper_limit = 1182949;
-
-  if (tope < lower_limit || tope > upper_limit) {
-    throw CycRangeException("Tried to get atomic number of invalid isotope");
-  }
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void IsoVector::normalize(CompMap &comp_map) {
-  double sum_total_comp = 0;
+  double total_atom_count = 0;
   CompMap::iterator entry;
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++) {
-    sum_total_comp += (*entry).second;
+    total_atom_count += entry->second;
   }
 
   for (entry = comp_map.begin(); entry != comp_map.end(); entry++) {
-    (*entry).second /= sum_total_comp;
+    entry->second /= total_atom_count;
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-CompMap atomComp() {
-  return atom_comp_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void IsoVector::rationalize_M2A() {
-  int isotope;
-  double mass_kg, grams_per_atom;
-  int grams_per_kg = 1000;
-
-  normalize(atom_comp_);
-
-  total_atoms_ = 0;
-  for(CompMap::iterator entry = atom_comp_.begin();
-      entry != atom_comp_.end();
-      entry++) {
-    isotope = (*entry).first;
-    mass_kg = (*entry).second;
-    grams_per_atom = MT->getMassInGrams(isotope);
-
-    atom_comp_[isotope] = mass_kg * grams_per_kg / grams_per_atom;
-    total_atoms_ += atom_comp_[isotope];
-  }
-  total_atoms_ *= total_mass;
-  
-  normalize(atom_comp_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector IsoVector::makeCompVector() const {
-  // gets the current composition map of the Material object
-  map<int, double> compMap = this->getAtomComp();
-  map<int, double>::const_iterator comp_iter = compMap.begin();
-        
-  Vector compVector = Vector(parent_.size(),1);
-
-  // loops through the composition map and populates the Vector with the
-  // number density of each isotope
-  while( comp_iter != compMap.end() ) {
-    int iso = comp_iter->first;
-    long double numDens = comp_iter->second;
-
-    // if the isotope is tracked in the decay matrix  
-    if ( parent_.find(iso) != parent_.end() ) {
-      int col = parent_.find(iso)->second.first; // get Vector position
-      compVector(col,1) = numDens;
-    // if it is not in the decay matrix, then it is added as a stable isotope
-    } else {
-      double decayConst = 0;
-      int col = parent_.size() + 1;
-      parent_[iso] = make_pair(col, decayConst);  // add isotope to parent map
-
-      int nDaughters = 0;
-      vector< pair<int,double> > temp(nDaughters);
-      daughters_[col] = temp;  // add isotope to daughters map
-      
-      vector<long double> row(1,numDens);
-      compVector.addRow(row);  // add isotope to the end of the Vector
-      
-      makeDecayMatrix();  // recreate the decay matrix with new stable isotope
-    }
-
-    ++comp_iter; // get next isotope
-  }
-
-  return compVector;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::makeFromVect(const Vector & compVector) {
-  map<int, double> compMap; // new composition map
-  ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
-
-  // loops through the ParentMap and populates the new composition map with
-  // the number density from the compVector parameter for each isotope
-  for (int i = 0; i < compVector.numRows(); i++) {
-    if ( numDens != 0 ) {
-      compMap.insert( make_pair(iso, numDens) );
-    }
-  }
-  while( parent_iter != parent_.end() ) {
-    int iso = parent_iter->first;
-    int col = parent_.find(iso)->second.first; // get Vector position
-    
-    // checks to see if the Vector position is valid
-    if ( col <= compVector.numRows() ) {
-      double numDens = compVector(col,1);
-      // adds isotope to the map if its number density is non-zero
-      if ( numDens != 0 )
-        compMap.insert( make_pair(iso, numDens) );
-    } else {
-      throw CycRangeException("Decay Error - invalid Vector position");
-    }
-
-    ++parent_iter; // get next parent
-  }
-
-  return compMap;
 }
 
