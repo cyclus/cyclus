@@ -11,8 +11,6 @@
 
 #include "UseMatrixLib.h"
 
-#define WF_U235 0.007200 // feed, natural uranium 
-
 /**
  * we will always need Avogadro's number somewhere
  */
@@ -23,11 +21,6 @@
  * its units are kg.
  */
 #define EPS_KG 1e-6
-
-/**
- * An enumeration for different types of recipe bases
- **/
-enum Basis {ATOMBASED, MASSBASED};
 
 /**
  * A map type to represent all of the parent isotopes tracked.  The key for
@@ -67,15 +60,18 @@ class IsoVector {
 
 public:
   
-  /**
-   * Default constructor for the material class. Creates an empty material.
-   */
   IsoVector(); 
+
+  IsoVector(CompMap initial_comp); 
 
   /** 
    * Default destructor does nothing.
    */
   ~IsoVector() {};
+
+  IsoVector operator+ (IsoVector rhs_vector);
+
+  IsoVector operator- (IsoVector rhs_vector);
 
   /**
    * Returns the atomic number of the isotope with the given identifier.
@@ -104,19 +100,12 @@ public:
    *
    * @return ID
    */
-  const int id(){return ID_;};
-
-  /**
-   * returns the name of the recipe
-   *
-   * @return recipeName
-   */
-  std::string name() { return recipeName_; };
+  int id() {return ID_;};
 
   /**
    * returns the total mass of this material object PER UNIT
    */
-  const double mass() const {return total_mass_;};
+  double mass();
 
   /**
    * Returns the current mass of the given isotope, or zero if 
@@ -125,12 +114,12 @@ public:
    * @param tope the isotope whose mass in the material will be returned
    * @return the mass of the given isotope within the material, or zero
    */
-  const double mass(int tope) const;
+  double mass(int tope);
 
   /**
    * returns the total atoms in this material object 
    */
-  const double atomCount() const {return total_atoms_;};
+  double atomCount() {return total_atoms_;};
 
   /**
    * Returns the current number density of the given isotope, or zero if 
@@ -139,7 +128,7 @@ public:
    * @param tope the isotope whose number density will be returned
    * @return the number density of the given isotope, or zero
    */
-  const double atomCount(int tope) const;
+  double atomCount(int tope);
 
   /**
    * Returns the mass of the given element in this Material.
@@ -147,16 +136,7 @@ public:
    * @param elt the element
    * @return the mass of the element (in tons)
    */
-  const double eltMass(int elt) const;
-
-  /**
-   * @brief Returns the atom composition.
-   *
-   * Intended for use primarily in operator overloading.
-   *
-   * @return std::map of isotopes and corresponding atom counts
-   */
-  const CompMap atomComp() {return atom_comp_};
+  double eltMass(int elt);
 
   /**
    * Decays this Material object for the given change in time and updates
@@ -164,7 +144,7 @@ public:
    *
    * @param time_change the number of months to decay
    */
-  void decay(double time_change);
+  void executeDecay(double time_change);
   
 private:
   /**
@@ -200,7 +180,7 @@ private:
    *
    * @return the mathematical Vector 
    */
-  Vector compositionAsVector() const;
+  Vector compositionAsVector();
 
   /**
    * Overwrites composition with data from the given Vector.
@@ -208,24 +188,16 @@ private:
    * @param compVector Vector of data that constitutes the new composition
    *
    */
-  map<Iso, Atoms> copyVectorIntoComp(const Vector & compVector);
+  void copyVectorIntoComp(const Vector & compVector);
+
+  void validateComposition();
 
   /**
    * @brief Used to determine validity of isotope defnition.
-   * @param tope 
-   * @return true if isotope (number) is valid, false otherwise
+   * @param tope isotope identifier
+   * @exception thrown if isotope identifier is invalid
    */
-  void validateAtomicNumber(int tope);
-
-  /**
-   * Returns true if the given isotope's number density is for some reason 
-   * negative, false otherwise. We define number densities that are negative by 
-   * less than the conservation of mass tolerance as positive.
-   *
-   * @param tope the isotope in question
-   * @return true iff nd(tope) < 0
-   */
-  const bool isNeg(int tope) const;
+  static void validateAtomicNumber(int tope);
 
   /**
    * Returns true if the given isotope's number density is less than the 
@@ -234,14 +206,14 @@ private:
    * @param tope the isotope in question
    * @return true iff nd(tope) == 0
    */
-  const bool isZero(int tope) const;
+  bool isZero(int tope);
 
   /**
    * Normalizes the composition vector it is provided.
    * 
-   * @param comp_map the vector to normalize
+   * @return composition normalized to 1 mole total
    */
-  void normalize(CompMap &comp_map);
+  CompMap normalized();
 
   /** 
    * Unique identifier.
@@ -249,20 +221,10 @@ private:
   int ID_;
 
   /**
-   * total mass of this material object PER UNIT
-   */
-  double total_mass_;
-
-  /**
    * total number of atoms in this material object PER UNIT
    */
   double total_atoms_;
 
-  /*
-   * name of this recipe
-   */
-  std::string recipeName_;
-  
   /*
    * Core isotope composition information stored here.
    */

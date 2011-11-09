@@ -5,7 +5,6 @@
 #include "MassTable.h"
 #include "Env.h"
 #include "UniformTaylor.h"
-#include "InputXML.h"
 #include "Logger.h"
 
 #include <iostream>
@@ -25,10 +24,61 @@ int IsoVector::nextID_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
-
-  total_mass_ = 0;
   total_atoms_ = 0;
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector::IsoVector(CompMap initial_comp) {
+  ID_ = nextID_++;
+  total_atoms_ = 0;
+  atom_comp_ = initial_comp;
+
+  validateComposition();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
+  int isotope;
+  double rhs_atoms;
+  CompMap sum_comp(atom_comp_);
+  CompMap rhs_comp = rhs_vector.atom_comp_;
+
+  CompMap::iterator rhs;
+  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
+    isotope = rhs->first;
+    rhs_atoms = rhs->second;
+
+    if (sum_comp.count(isotope) == 0) {
+      sum_comp[isotope] = 0;
+    }
+    sum_comp[isotope] += rhs_atoms;
+  }
+
+  IsoVector temp(sum_comp);
+  return (temp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector IsoVector::operator- (IsoVector rhs_vector) {
+  int isotope;
+  double rhs_atoms;
+  CompMap diff_comp(atom_comp_);
+  CompMap rhs_comp = rhs_vector.atom_comp_;
+
+  CompMap::iterator rhs;
+  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
+    isotope = rhs->first;
+    rhs_atoms = rhs->second;
+
+    if (diff_comp.count(isotope) == 0) {
+      diff_comp[isotope] = 0;
+    }
+    diff_comp[isotope] -= rhs_atoms;
+  }
+
+  IsoVector temp(diff_comp);
+  return (temp);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(int tope) {
@@ -105,31 +155,36 @@ void IsoVector::loadDecayInfo() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double IsoVector::mass(int tope) const {
+double IsoVector::mass() {
+  return 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::mass(int tope) {
   if (atom_comp_.count(tope) == 0) {
     return 0;
   } else {
     double grams_per_atom;
     int grams_per_kg = 1000;
-    grams_per_atom = MT->getMassInGrams(isotope);
+    grams_per_atom = MT->getMassInGrams(tope);
 
     return atom_comp_[tope] * grams_per_atom / grams_per_kg;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double IsoVector::atomCount(int tope) const {
+double IsoVector::atomCount(int tope) {
   // If the isotope isn't currently present, return 0. Else return the 
   // isotope's current number density.
   if (atom_comp_.count(tope) == 0) {
     return 0;
   } else {
-    return atom_comp_[tope] * total_atoms_;
+    return atom_comp_[tope];
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double IsoVector::eltMass(int elt) const {
+double IsoVector::eltMass(int elt) {
 
   double elt_mass = 0;
   int isotope;
@@ -151,7 +206,7 @@ const double IsoVector::eltMass(int elt) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::decay(double time_change) {
+void IsoVector::executeDecay(double time_change) {
   double months_per_year = 12;
   double years = time_change / months_per_year;
 
@@ -165,12 +220,12 @@ void IsoVector::decay(double time_change) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector IsoVector::compositionAsVector() const {
+Vector IsoVector::compositionAsVector() {
         
   Vector comp_vector = Vector(parent_.size(),1);
 
   map<int, double>::const_iterator comp_iter = atom_comp_.begin();
-  while( comp_iter != compMap.end() ) {
+  while( comp_iter != atom_comp_.end() ) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
 
@@ -188,7 +243,7 @@ Vector IsoVector::compositionAsVector() const {
       vector< pair<int,double> > temp(nDaughters);
       daughters_[col] = temp;  // add isotope to daughters map
       
-      vector<long double> row(1,numDens);
+      vector<long double> row(1, atom_count);
       comp_vector.addRow(row);  // add isotope to the end of the Vector
     }
 
@@ -199,7 +254,7 @@ Vector IsoVector::compositionAsVector() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, Atoms> IsoVector::copyVectorIntoComp(const Vector & compVector) {
+void IsoVector::copyVectorIntoComp(const Vector & compVector) {
   atom_comp_.clear();
 
   // loops through the ParentMap and populates the new composition map with
@@ -213,10 +268,10 @@ map<Iso, Atoms> IsoVector::copyVectorIntoComp(const Vector & compVector) {
     if ( col <= compVector.numRows() ) {
       double atom_count = compVector(col,1);
       // adds isotope to the map if its number density is non-zero
-      if ( numDens != 0 )
-        compMap[iso] = atom_count;
+      if ( atom_count != 0 )
+        atom_comp_[iso] = atom_count;
     } else {
-      throw CycRangeException("Decay Error - invalid Vector position");
+      LOG(LEV_ERROR) << "Decay Error - invalid Vector position";
     }
 
     ++parent_iter; // get next parent
@@ -259,45 +314,58 @@ void IsoVector::buildDecayMatrix() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::validateComposition() {
+  int grams_per_kg = 1000;
+  int tope;
+  double num_atoms, atoms_eps;
+
+  CompMap::iterator comp_iter;
+  for (comp_iter = atom_comp_.begin();
+       comp_iter != atom_comp_.end();
+       comp_iter++) {
+
+    tope = comp_iter->first;
+    num_atoms = comp_iter->second;
+
+    validateAtomicNumber(tope);
+
+    atoms_eps =  EPS_KG * grams_per_kg / MT->getMassInGrams(tope); 
+    if (num_atoms < -1 * atoms_eps) {
+      string err_msg = "Composition has negative quantity for an isotope.";
+      throw CycRangeException(err_msg);
+    }
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::validateAtomicNumber(int tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;
 
   if (tope < lower_limit || tope > upper_limit) {
-    throw CycRangeException("Tried to get atomic number of invalid isotope");
+    throw CycRangeException("Invalid isotope identifier.");
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const bool IsoVector::isNeg(int tope) const {
-  double num_atoms = getAtomComp(tope);
-
-  if (num_atoms == 0) {
-    return false;
-  } else {
-    int grams_per_kg = 1000;
-    double atoms_eps =  EPS_KG * grams_per_kg / MT->getMassInGrams(tope); 
-    return (num_atoms + atoms_eps < 0);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const bool IsoVector::isZero(int tope) const {
+bool IsoVector::isZero(int tope) {
   int grams_per_kg = 1000;
   double atoms_eps = EPS_KG * grams_per_kg / MT->getMassInGrams(tope) ; 
-  return (fabs(getAtomComp(tope)) < atoms_eps);
+
+  if (atom_comp_.count(tope) == 0) {
+    return 0;
+  }
+  return (fabs(atom_comp_[tope]) < atoms_eps);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void IsoVector::normalize(CompMap &comp_map) {
-  double total_atom_count = 0;
+CompMap IsoVector::normalized() {
+  CompMap normalized_comp;
   CompMap::iterator entry;
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++) {
-    total_atom_count += entry->second;
-  }
 
-  for (entry = comp_map.begin(); entry != comp_map.end(); entry++) {
-    entry->second /= total_atom_count;
+  for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
+    normalized_comp[entry->first] = entry->second / total_atoms_;
   }
+  return normalized_comp;
 }
 

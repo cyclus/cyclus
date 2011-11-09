@@ -32,6 +32,7 @@ SET( CYCLUS_SRC
      InputXML.cpp
      Logician.cpp
      Material.cpp
+     IsoVector.cpp
      Commodity.cpp
      Message.cpp
      Utility/BookKeeper.cpp 

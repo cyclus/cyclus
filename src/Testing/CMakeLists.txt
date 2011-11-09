@@ -15,6 +15,7 @@ set ( TestSource
   ../InputXML.cpp
   ../Logician.cpp
   ../Material.cpp
+  ../IsoVector.cpp
   ../Commodity.cpp
   ../Message.cpp
   ../Utility/BookKeeper.cpp
