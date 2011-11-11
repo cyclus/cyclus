@@ -1,19 +1,21 @@
 // ConditioningFacility.cpp
 // Implements the ConditioningFacility class
 #include <iostream>
-#include "Logger.h"
+#include "boost/multi_array.hpp"
 
 #include "ConditioningFacility.h"
 
-#include "Logician.h"
 #include "CycException.h"
+#include "Env.h"
 #include "InputXML.h"
 #include "hdf5.h"
 #include "H5Cpp.h"
 #include "H5Exception.h"
-#include "Env.h"
+#include "Logician.h"
+#include "Logger.h"
 
 using namespace std;
+using namespace H5;
 
 
 /**
@@ -73,7 +75,7 @@ void ConditioningFacility::init(xmlNodePtr cur)
     // call loadTable
     loadTable(datafile, fileformat);
     // commodities will be loaded by loadTable
-    
+    file_is_open_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -180,7 +182,6 @@ void ConditioningFacility::handleTick(int time){
   // It also makes offers of any conditioned waste it contains
   makeRequests();
   makeOffers();
-
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -222,9 +223,9 @@ void ConditioningFacility::loadTable(string datafile, string fileformat){
   // columns/fields = waste forms
   // data = loading, grams per m^3
   // fill the data table
-  map<string, void(ConditioningFacility::*)(string)>::iterator found;
-  found = allowed_formats_.find(fileformat);
-  (this->*found->second)(datafile);
+  map<string, void(ConditioningFacility::*)(string)>::iterator format_found;
+  format_found = allowed_formats_.find(fileformat);
+  (this->*format_found->second)(datafile);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -245,11 +246,34 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadHDF5File(string datafile){
+
   // get dimensions
   // // how many rows
   // // how many columns
   // create array
   string file_path = ENV->getCyclusPath() + datafile; 
+
+  // check that the file is valid
+  if(!H5File::isHdf5(file_path))
+  {
+    string err = file_path;
+    err += " is not a valid HDF5 file";
+    throw CycException(err);
+  }
+
+  // open the file
+  H5File* db;
+  if(file_is_open_==false){
+    //If the database is already open, throw an exception. 
+    try{ 
+      db  = new H5File(file_path, H5F_ACC_RDWR);
+      file_is_open_ = true;
+    }
+    catch( FileIException error )
+    {
+      error.printError();
+    }
+  }
 
   const H5std_string filename = file_path;
   const H5std_string groupname = "/";
@@ -263,38 +287,26 @@ void ConditioningFacility::loadHDF5File(string datafile){
     throw CycIOException("The waste conditioning file is not an hdf5 file.");
   }
 
-  try {
-    /*
-     * Turn off the auto-printing when failure occurs so that we can
-     * handle the errors appropriately
-     */
+  try{
+    // turn off auto printing and deal with exceptions at the end
     Exception::dontPrint();
-    
-    /*
-     * Open the file and the dataset.
-     */
-    H5File* file;
-    file = new H5File( filename, H5F_ACC_RDONLY );
-    Group* group;
-    group = new Group (file->openGroup( groupname ));
-    DataSet* dataset;
-    dataset = new DataSet (group->openDataSet( datasetname ));
-
+    // get the dataset open
+    DataSet dataset = db->openDataSet(datasetname);
     // get the class of the datatype used in the dataset
-    H5T_class_t type_class = dataset->getTypeClass(); 
+    H5T_class_t type_class = dataset.getTypeClass(); 
     // double check that its a double
     FloatType dbltype;
     if( type_class == H5T_FLOAT ) 
     {
       // oh good, it's a double. Now figure out what kind.
-      dbltype = dataset->getFloatType();
+      dbltype = dataset.getFloatType();
     }
     else{
       throw CycTypeException("The dataset " + datasetname + " is not of float type");
     }
   
     // get the file dataspace
-    DataSpace filespace = dataset->getSpace();
+    DataSpace filespace = dataset.getSpace();
   
     // find the rank
     int rank = filespace.getSimpleExtentNdims();
@@ -310,30 +322,37 @@ void ConditioningFacility::loadHDF5File(string datafile){
     memspace.selectAll();
     filespace.selectAll();
   
+    // initializes the memory space for the data
     double out_array[dims[0]][dims[1]];
     for (int i=0; i<dims[0]; i++){
       for (int j=0; j<dims[1]; j++){
         out_array[i][j]=1.0;
-      };
-    };
+      }
+    }
   
-//   should do all this in multi-array
-//    dataset->read( out_array, dbltype, memspace , filespace );
-//
-//    for(int row=0; row<dims[0]; row++){
-//      for(int col=0; col<dims[1]; col++){
-//        out_data[row][col] = out_array[row][col];
-//      };
-//    };
+    // This is basically a memcopy from the memspace into out_array
+    dataset.read( out_array, dbltype, memspace , filespace );
 
-    delete group;
-    delete dataset;
-    delete file;
-  // catch failure caused by the H5File operations
-  } catch( Exception error ) {
-     error.printError();
+    // Now the data is a multi_array of doubles
+    // (which is much easier to deal with... thanks boost)
+    for(int row=0; row<dims[0]; row++){
+      for(int col=0; col<dims[1]; col++){
+        loading_densities_[row][col] = out_array[row][col];
+      }
+    }
+
+    // assume that the rows are waste streams
+    // get their names
+    // the columns are waste forms
+    // get their names
+    // assume there will be an attribute called UNIT
+    // assume there will be a dataspace of waste form masses?
+    // assume there will be a dataspace of waste form volumes?
+
+  } catch (Exception error) {
+    error.printError();
   }
- 
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -342,6 +361,8 @@ void ConditioningFacility::loadXMLFile(string datafile){
   // // how many rows
   // // how many columns
   // create array
+  
+
 
 }
 

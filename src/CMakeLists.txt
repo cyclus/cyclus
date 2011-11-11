@@ -80,9 +80,6 @@ set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
 set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
 set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
-# Add subdirs and build for the models
-ADD_SUBDIRECTORY(Models)
-
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
 INCLUDE_DIRECTORIES (${LIBXML2_INCLUDE_DIR})
@@ -103,6 +100,9 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED)
 INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+# Add subdirs and build for the models
+ADD_SUBDIRECTORY(Models)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)

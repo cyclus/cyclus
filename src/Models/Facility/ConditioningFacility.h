@@ -144,6 +144,12 @@ protected:
     /// a map from format names to table loading function pointers
     std::map<std::string, void(ConditioningFacility:: *)(std::string)> allowed_formats_;
 
+    /// is the datafile open?
+    bool file_is_open_;
+
+    /// Loading density table. Rows are waste streams, columns are waste forms
+    boost::multi_array<double, 2> loading_densities_;
+
     /**
      * loads the table from a file of filetype type
      *
