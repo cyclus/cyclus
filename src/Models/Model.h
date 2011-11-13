@@ -147,6 +147,11 @@ public:
   const std::string getName() const { return name_; };
 
   /**
+   * get model instance name
+   */
+  void setName(std::string name) { name_ = name; };
+
+  /**
    * get model instance SN
    */
   const int getSN() const { return ID_; };
