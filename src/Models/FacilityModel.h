@@ -96,7 +96,7 @@ public:
    *
    * @return fac_name_ the name of this facility, a string
    */
-  std::string getFacName() { return fac_name_; };
+  std::string getFacName() { return this->getName(); };
 
   /**
    * Sets this facility's instutution name 
