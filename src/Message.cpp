@@ -117,8 +117,8 @@ Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
   std::cout << "Transaction info (via Message):" << std::endl <<
-    "    Requester ID: " << trans_.requester->getSN() << std::endl <<
-    "    Supplier ID: " << trans_.supplier->getSN() << std::endl <<
+    "    Requester ID: " << trans_.requester->ID() << std::endl <<
+    "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
     "    Price: "  << trans_.price << std::endl;
 };
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

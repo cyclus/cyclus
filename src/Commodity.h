@@ -34,7 +34,7 @@ public:
   const std::string getName() const { return name_;};
   
   /// get the ID number
-  int getSN() const {return ID_;};
+  int ID() const {return ID_;};
   
   /// get the Model pointer
   Model* getMarket();

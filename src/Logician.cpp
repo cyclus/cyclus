@@ -72,7 +72,7 @@ void Logician::setDecay(int dec){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logician::addModel(Model* new_model, ModelType model_type) { 
-  int model_id = new_model->getSN();
+  int model_id = new_model->ID();
   model_lists_[model_type][model_id] = new_model;
 }
 

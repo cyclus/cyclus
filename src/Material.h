@@ -175,7 +175,7 @@ public:
    *
    * @return ID
    */
-  const int getSN(){return ID_;};
+  const int ID(){return ID_;};
 
   /**
    * returns the name of the recipe
