@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <libxml/tree.h>
+#include <vector>
 
 class Model;
 
@@ -143,17 +144,17 @@ public:
   /**
    * get model instance name
    */
-  const std::string getName() const { return name_; };
+  const std::string name() const { return name_; };
 
   /**
    * get model instance SN
    */
-  const int getSN() const { return ID_; };
+  const int ID() const { return ID_; };
 
   /**
    * set model instance SN
    */
-  void setSN(int new_id) { ID_ = new_id; };
+  void setID(int new_id) { ID_ = new_id; };
 
   /**
    * get model implementation name
@@ -180,9 +181,29 @@ public:
    */
   virtual void print();
 
+  /**
+   * return parent of this model
+   */
+  Model* parent() { return parent_; };
+
+  /**
+   * add a child to the list of children
+   */
+  Model* addChild(Model* child) { children_.push_back(child); };
+
 private:
   /// Stores the next available facility ID
   static int next_id_;
+
+  /**
+   * parent of this model
+   */
+  Model* parent_;
+  
+  /**
+   * children of this model
+   */
+  std::vector <Model*> children_;
 
   /**
    * map of constructor methods for each loaded model
