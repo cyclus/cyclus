@@ -12,25 +12,18 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur)
 {
   Model::init(cur);
-
   /** 
    *  Specific initialization for InstModels
    */
   
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
-  region_ = LI->getModelByName(region_name, REGION);
-  this->setRegion(region_);
-  LOG(LEV_DEBUG2) << "Inst " << getSN() << " has set its region to be " << region_name;
-  
-  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
-
+  Model* parent = LI->getModelByName(region_name, REGION);
+  this->setParent(parent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -38,13 +31,13 @@ void InstModel::copy(InstModel* src)
 {
   Model::copy(src);
   Communicator::copy(src);
-
+  
   /** 
    *  Specific initialization for InstModels
    */
-  
-  region_ = src->region_;
-  dynamic_cast<RegionModel*>(region_)->addInstitution(this);
+  children_ = src->children_;
+  Model* parent = src->parent();
+  this->setParent(parent);
   LI->addModel(this, INST);
 }
 
@@ -53,7 +46,7 @@ void InstModel::print()
 {
   Model::print();
 
-  LOG(LEV_DEBUG2) << "in region " << region_->getName();
+  LOG(LEV_DEBUG2) << "in region " << parent()->name();
 }
 
 
@@ -67,36 +60,33 @@ void InstModel::receiveMessage(Message* msg){
   // Just pass them along. 
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
-  msg->setNextDest(getRegion());
+  msg->setNextDest( (dynamic_cast<Communicator*>( parent() )) );
   msg->sendOn();
 }
 
 void InstModel::handlePreHistory(){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
-    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
   }
 }
 
 void InstModel::handleTick(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
-    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTick to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
   }
 }
 
 void InstModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
-    //    LOG(LEV_DEBUG2) << "Inst " << ID << " is sending handleTock to facility " << (dynamic_cast<FacilityModel*>(*fac))->getFacName();
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
   }
 }
@@ -110,7 +100,7 @@ void InstModel::handleTock(int time){
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt
   std::stringstream ss;
-  ss << this->getSN();
+  ss << this->ID();
   throw CycOverrideException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
   return false;
@@ -119,8 +109,8 @@ bool InstModel::pleaseBuild(Model* fac){
 double InstModel::getPowerCapacity(){
   // queries each facility for their power capacity
   double capacity = 0.0;
-  for(vector<Model*>::iterator fac=facilities_.begin();
-      fac != facilities_.end();
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
       fac++){
     capacity += (dynamic_cast<FacilityModel*>(*fac))->getPowerCapacity();
   }

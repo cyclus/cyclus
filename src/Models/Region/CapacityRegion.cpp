@@ -127,7 +127,7 @@ Model* CapacityRegion::chooseInstToBuildFac()
 {
   // Define the inst to build some fac
   // By default we pick the first institution in the region's list
-  return institutions_[0];
+  return children(0);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -135,8 +135,8 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
 {
   // for now, all capacity types will be power capacity
   double capacity = 0.0;
-  for(vector<Model*>::iterator inst=institutions_.begin();
-      inst != institutions_.end();
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
       inst++){
     capacity += (dynamic_cast<InstModel*>(*inst))->getPowerCapacity();
   }

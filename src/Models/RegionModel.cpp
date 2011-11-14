@@ -73,13 +73,13 @@ void RegionModel::print() {
       fac != allowedFacilities_.end();
       fac++){
     LOG(LEV_DEBUG2) << (fac == allowedFacilities_.begin() ? "{" : ", " )
-        << (*fac)->getName();
+        << (*fac)->name();
   }
   
   LOG(LEV_DEBUG2) << "} and has the following institutions:";
   
-  for(vector<Model*>::iterator inst=institutions_.begin();
-      inst != institutions_.end();
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
       inst++){
     (*inst)->print();
   }
@@ -97,8 +97,8 @@ void RegionModel::receiveMessage(Message* msg){
 
 void RegionModel::handlePreHistory(){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions_.begin();
-      inst != institutions_.end();
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handlePreHistory();
   }
@@ -106,8 +106,8 @@ void RegionModel::handlePreHistory(){
 
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions_.begin();
-      inst != institutions_.end();
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTick(time);
   }
@@ -115,14 +115,9 @@ void RegionModel::handleTick(int time){
 
 void RegionModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=institutions_.begin();
-      inst != institutions_.end();
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }
 }
-
-/* --------------------
- * all REGIONMODEL classes have these members
- * --------------------
- */

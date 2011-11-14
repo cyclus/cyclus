@@ -10,8 +10,6 @@
 #include <iostream>
 #include "Logger.h"
 
-using namespace std;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
   setModelType("Facility");
@@ -30,7 +28,7 @@ void FacilityModel::init(xmlNodePtr cur) {
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     this->setInstName(inst_name_);
-    LOG(LEV_DEBUG2) << "Facility " << getSN() << " has just set its inst to " << inst_name_;
+    LOG(LEV_DEBUG2) << "Facility " << ID() << " has just set its inst to " << inst_name_;
   }
 } 
 
@@ -40,14 +38,14 @@ void FacilityModel::copy(FacilityModel* src) {
   Communicator::copy(src); 
 
   // don't copy fac_name to new instance
-  fac_name_ = "";
+  this->setFacName("");
 
   LI->addModel(this, FACILITY);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::getFacInst() {
-  return dynamic_cast<InstModel*>(LI->getModelByName(inst_name_, INST));
+  return dynamic_cast<InstModel*>( parent() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,8 +55,8 @@ void FacilityModel::sendMaterial(Message* msg, std::vector<Material*> manifest) 
   // send the material by calling the receiver's receiveMaterial function
   Model* requester = msg->getRequester();
   dynamic_cast<FacilityModel*>(requester)->receiveMaterial(msg->getTrans(), manifest);
-  LOG(LEV_DEBUG2) << "Material sent from " << getSN() << " to " 
-            << requester->getSN() << ".";
+  LOG(LEV_DEBUG2) << "Material sent from " << ID() << " to " 
+            << requester->ID() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

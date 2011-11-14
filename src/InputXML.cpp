@@ -107,17 +107,33 @@ void InputXML::load_file(std::string filename) {
   if(inputFile.xpathCtxt == NULL) {
     fprintf(stderr,"Error: unable to create new xpath context \n");
   }
-  
-  Commodity::load_commodities();
- 
 
-  Material::load_recipes();
+  // Commodities
+  LOG(LEV_DEBUG3) << "Begin loading commodities";
+  Commodity::load_commodities();
+  LOG(LEV_DEBUG3) << "End loading commodities";
   
+  // Recipes
+  LOG(LEV_DEBUG3) << "Begin loading recipes";
+  Material::load_recipes();
+  LOG(LEV_DEBUG3) << "End loading recipes";
+  
+  //Models
+  LOG(LEV_DEBUG3) << "Begin loading models - converters";
   Model::load_converters();
+  LOG(LEV_DEBUG3) << "End loading models - converters";
+  LOG(LEV_DEBUG3) << "Begin loading models - markets";
   Model::load_markets();
+  LOG(LEV_DEBUG3) << "End loading models - markets";
+  LOG(LEV_DEBUG3) << "Begin loading models - facilities";
   Model::load_facilities();
+  LOG(LEV_DEBUG3) << "End loading models - facilities";
+  LOG(LEV_DEBUG3) << "Begin loading models - regions";
   Model::load_regions();
+  LOG(LEV_DEBUG3) << "End loading models - regions";
+  LOG(LEV_DEBUG3) << "Begin loading models - institutions";
   Model::load_institutions();
+  LOG(LEV_DEBUG3) << "End loading models - institutions";
 
   TI->load_simulation();
 
@@ -164,7 +180,9 @@ void InputXML::load_facilitycatalog(std::string filename) {
   facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
 
   /// load here???
+  LOG(LEV_DEBUG3) << "Begin loading models - facilities";
   Model::load_facilities();
+  LOG(LEV_DEBUG3) << "End loading models - facilities";
 
   // get rid of facilitycatalog, freeing memory
   delete curFilePtr;

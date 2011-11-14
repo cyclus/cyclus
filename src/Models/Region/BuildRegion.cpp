@@ -81,7 +81,7 @@ Model* BuildRegion::chooseInstToBuildFac()
 {
   // Define the inst to build some fac
   // By default we pick the first institution in the region's list
-  return institutions_[0];
+  return children(0);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

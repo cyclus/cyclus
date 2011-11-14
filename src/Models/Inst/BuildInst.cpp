@@ -39,7 +39,7 @@ void BuildInst::print()
        fac != facilities_.end(); 
        fac++){
     LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
-     << " (" << (*fac)->getName() << ")";
+     << " (" << (*fac)->name() << ")";
   }
 };
 
@@ -53,9 +53,9 @@ bool BuildInst::pleaseBuild(Model* fac)
   string name = dynamic_cast<FacilityModel*>(fac)->getFacName()+" 2";
   dynamic_cast<FacilityModel*>(new_facility)->setFacName(name);
   // Set the facility's parent institution
-  dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->getName());
+  dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->name());
   // Add the facility to the parent inst's list of facilities
-  this->addFacility(new_facility);
+  new_facility->setParent(this);
 
   // For now, by default, return true.
   return true;

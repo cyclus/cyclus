@@ -147,6 +147,11 @@ public:
   const std::string name() const { return name_; };
 
   /**
+   * set model instance SN
+   */
+  void setName(std::string name) { name_ = name; };
+
+  /**
    * get model instance SN
    */
   const int ID() const { return ID_; };
@@ -184,12 +189,32 @@ public:
   /**
    * return parent of this model
    */
-  Model* parent() { return parent_; };
+  Model* parent();
 
   /**
    * add a child to the list of children
    */
-  Model* addChild(Model* child) { children_.push_back(child); };
+  void addChild(Model* child);
+
+  /**
+   * Return the number of children the model has
+   */
+  int nChildren(){return children_.size();}
+
+  /**
+   * set the parent of this model
+   */
+  void setParent(Model* parent);
+
+  /**
+   * return the ith child
+   */
+  Model* children(int i){return children_[i];}
+
+  /**
+   * children of this model
+   */
+  std::vector <Model*> children_;
 
 private:
   /// Stores the next available facility ID
@@ -200,11 +225,6 @@ private:
    */
   Model* parent_;
   
-  /**
-   * children of this model
-   */
-  std::vector <Model*> children_;
-
   /**
    * map of constructor methods for each loaded model
    */

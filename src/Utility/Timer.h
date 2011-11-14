@@ -59,6 +59,11 @@ private:
   std::vector<TimeAgent*> tick_listeners_;
 
   /**
+   * @brief Returns a string of all models listening to the tick
+   */
+  std::string reportListeners();
+
+  /**
    * Concrete models that desire to receive resolve (markets) notifications
    */
   std::vector<MarketModel*> resolve_listeners_;

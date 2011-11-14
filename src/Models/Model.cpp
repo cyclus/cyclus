@@ -15,9 +15,6 @@
 #include <iostream>
 #include "Logger.h"
 
-
-using namespace std;
-
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
 
@@ -185,7 +182,7 @@ void Model::copy(Model* model_orig) {
         + model_type_ + "/" + model_impl_);
   }
 
-  name_ = model_orig->getName();
+  name_ = model_orig->name();
   model_impl_ = model_orig->getModelImpl();
   handle_ = this->generateHandle();
 }
@@ -220,3 +217,32 @@ string Model::generateHandle() {
   return toRet;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::setParent(Model* parent){ 
+  // set the pointer to this model's parent
+  parent_ = parent;
+  // root nodes are their own parents
+  // if this node is not its own parent, add it to its parent's list of children
+  if (parent_ != this){
+    parent_->addChild(this);
+  }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::parent(){
+  // if parent pointer is null, throw an error
+  if (parent_ == NULL){
+    std::string null_err = "You have tried to access the parent of " +	\
+      this->name() + " but the parent pointer is NULL.";
+    throw CycIndexException(null_err);
+  }
+  // else return pointer to parent
+  return parent_;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::addChild(Model* child){
+  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() << " has added child " \
+		  << child->name() << " ID " << child->ID() << " to its list of children.";
+  children_.push_back(child); 
+};

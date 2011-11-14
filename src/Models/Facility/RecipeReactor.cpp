@@ -138,9 +138,9 @@ void RecipeReactor::print()
 { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2) << "    converts commodity {"
-      << this->fuelPairs_.front().first.first->getName()
+      << this->fuelPairs_.front().first.first->name()
       << "} into commodity {"
-      << this->fuelPairs_.front().second.first->getName()
+      << this->fuelPairs_.front().second.first->name()
       << "}.";
 };
 
@@ -182,7 +182,7 @@ void RecipeReactor::endCycle()
     for(deque< pair< InFuel , OutFuel> >::iterator iter = fuelPairs_.begin();
         iter != fuelPairs_.end();
         iter++){
-      if((*iter).first.first->getName() == batchCommod->getName()){
+      if((*iter).first.first->name() == batchCommod->name()){
         outCommod = (*iter).second.first;
         outMat = (*iter).second.second;
         found=true;
@@ -234,7 +234,7 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
         // start with an empty material
         Material* newMat = new Material(CompMap(), 
             m->getUnits(),
-            m->getName(), 
+            m->name(), 
             0, ATOMBASED);
         // if the inventory obj isn't larger than the remaining need, send it as is.
         if(m->getTotMass() <= (trans.amount - newAmt)){
@@ -249,7 +249,7 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        LOG(LEV_DEBUG2) <<"RecipeReactor "<< getSN()
+        LOG(LEV_DEBUG2) <<"RecipeReactor "<< ID()
           <<"  is sending a mat with mass: "<< newMat->getTotMass();
       }
     }
@@ -266,7 +266,7 @@ void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifes
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"RecipeReactor " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   }

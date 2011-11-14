@@ -62,11 +62,7 @@ public:
 
 protected:
   /// each facility should have an institution that manages it
-  //Model* inst;
   std::string inst_name_;
-
-  /// each instance of a facility needs a name
-  std::string fac_name_;
 
   /// each facility needs a lifetime
   int fac_lifetime_;
@@ -89,14 +85,14 @@ public:
    *
    * @param facName is the new name of the facility
    */
-  void setFacName(std::string facName) { fac_name_ = facName; };
+  void setFacName(std::string facName) { this->setName(facName); };
 
   /**
    * Returns the facility's name
    *
    * @return fac_name_ the name of this facility, a string
    */
-  std::string getFacName() { return fac_name_; };
+  std::string getFacName() { return this->name(); };
 
   /**
    * Sets this facility's instutution name 

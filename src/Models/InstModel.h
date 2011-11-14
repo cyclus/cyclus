@@ -35,8 +35,6 @@ public:
   // every model needs a method to copy one object to another
   virtual void copy(InstModel* src);
 
-
-
   /**
    * This drills down the dependency tree to initialize all relevant parameters/containers.
    *
@@ -47,15 +45,12 @@ public:
    */
   virtual void copyFreshModel(Model* src)=0;
 
-
-
   // every model should be able to print a verbose description
   virtual void print();
 
 public:
   /// default InstModel receiver is to ignore message.
   virtual void receiveMessage(Message* msg);
-
   
   /**
    * Each inst is prompted to do its beginning-of-life-step
@@ -96,17 +91,11 @@ protected:
  */
 
 public:
-  /// sets this institution's region
-  void setRegion(Model* my_region) { region_ = my_region; };
-
   /// returns this institution's region
-  RegionModel* getRegion() { return (dynamic_cast<RegionModel*>(region_)); };
-
-  /// adds a facility to this model
-  void addFacility(Model* new_fac){ facilities_.push_back(new_fac);};
+  RegionModel* getRegion() { return (dynamic_cast<RegionModel*>( this->parent() )); };
 
   /// reports number of facilities in this inst
-  int getNumFacilities(){ return facilities_.size();};
+  int getNumFacilities(){ return this->nChildren();};
 
   /// queries the power capacity of each facility in the institution
   double getPowerCapacity();
@@ -115,16 +104,6 @@ public:
   virtual bool pleaseBuild(Model* fac);
 
 protected:
-  /**
-   * Each institution is a member of exactly one region
-   */
-  Model* region_;
-
-  /**
-   * Each institution keeps a list of its facilities;
-   */
-  vector<Model*> facilities_;
-
 /* ------------------- */ 
   
 };

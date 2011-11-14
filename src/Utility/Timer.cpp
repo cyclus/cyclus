@@ -27,6 +27,7 @@ void Timer::runSim() {
     // (monthly during testing, change to (i % 12 == 0) for annual reporting.
     if (i % 1 == 0) {
       LOG(LEV_DEBUG1) << "Current time: " << i;
+      LOG(LEV_DEBUG2) << "The list of current tick listeners is: " << reportListeners();
     }
     
     // Tell the Logician to handle this month.
@@ -39,6 +40,18 @@ void Timer::runSim() {
     time_++;
   }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Timer::reportListeners() {
+  std::string report = "";
+  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+      agent != tick_listeners_.end(); 
+      agent++) {
+    report += (*agent)->name() + " ";
+  }
+  return report;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::handlePreHistory() {
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
@@ -47,7 +60,7 @@ void Timer::handlePreHistory() {
     try {
       (*agent)->handlePreHistory();
     } catch(CycException err) {
-      LOG(LEV_ERROR) << err.what();
+      LOG(LEV_ERROR) << "ERROR occured in handlePreHistory(): " << err.what();
     }
   }
 }
@@ -59,7 +72,7 @@ void Timer::sendResolve() {
     try {
       (*agent)->resolve();
     } catch(CycException err) {
-      LOG(LEV_ERROR) << err.what();
+      LOG(LEV_ERROR) << "ERROR occured in sendResolve(): " << err.what();
     }
   }
 }
@@ -72,7 +85,7 @@ void Timer::sendTick() {
     try {
       (*agent)->handleTick(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR) << err.what();
+      LOG(LEV_ERROR) << "ERROR occured in sendTick(): " << err.what();
     }
   }
 }
@@ -85,7 +98,7 @@ void Timer::sendTock() {
     try {
       (*agent)->handleTock(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR) << err.what();
+      LOG(LEV_ERROR) << "ERROR occured in sendTock(): " << err.what();
     }
   }
 }
