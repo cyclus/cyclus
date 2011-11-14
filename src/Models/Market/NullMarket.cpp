@@ -96,9 +96,9 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(offerMsg);
 
       LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
-          << offerMsg->getSupplier()->getSN()
+          << offerMsg->getSupplier()->ID()
           << " to "
-          << offerMsg->getRequester()->getSN()
+          << offerMsg->getRequester()->ID()
           << " for the amount:  " 
           << offerMsg->getAmount();
 
@@ -118,9 +118,9 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(maybe_offer);
 
       LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
-          << maybe_offer->getSupplier()->getSN()
+          << maybe_offer->getSupplier()->ID()
           << " to "
-          << maybe_offer->getRequester()->getSN()
+          << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
           << maybe_offer->getAmount();
 
@@ -167,7 +167,7 @@ void NullMarket::resolve()
       process_request();
     } 
     else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->getSN()
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->ID()
           << " for the amount " << (*request).first 
           << " rejected. ";
       reject_request(request);

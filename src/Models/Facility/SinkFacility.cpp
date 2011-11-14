@@ -88,7 +88,7 @@ void SinkFacility::print()
        commod++)
   {
     msg += (commod == in_commods_.begin() ? "{" : ", " );
-    msg += (*commod)->getName();
+    msg += (*commod)->name();
   }
   msg += "} until its inventory is full at ";
   LOG(LEV_DEBUG2) << msg << inventory_size_ << " units.";
@@ -154,7 +154,7 @@ void SinkFacility::handleTock(int time){
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "SinkFacility " << this->getSN()
+  LOG(LEV_DEBUG2) << "SinkFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
@@ -169,7 +169,7 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"SinkFacility " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     (*thisMat)->print();
     inventory_.push_back(*thisMat);

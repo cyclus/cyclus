@@ -136,7 +136,7 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
-                                  m->getName(), 
+                                  m->name(), 
                                   0, ATOMBASED);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
@@ -153,7 +153,7 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"NullFacility "<< getSN()
+    LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
   FacilityModel::sendMaterial( order, toSend );
@@ -168,7 +168,7 @@ void ConditioningFacility::receiveMaterial(Transaction trans, vector<Material*> 
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"RecipeReactor " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   } 

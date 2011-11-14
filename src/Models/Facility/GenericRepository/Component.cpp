@@ -76,7 +76,7 @@ void Component::copy(Component* src){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Component::print(){
-  LOG(LEV_DEBUG2) << "Component: " << this->getName();
+  LOG(LEV_DEBUG2) << "Component: " << this->name();
   LOG(LEV_DEBUG2) << "Contains Materials:";
   for(int i=0; i<this->getWastes().size() ; i++){
     LOG(LEV_DEBUG2) << wastes_[i];

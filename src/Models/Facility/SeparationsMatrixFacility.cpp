@@ -133,7 +133,7 @@ void SeparationsMatrixFacility::print()
   for(vector<Commodity*>::const_iterator iter = in_commod_.begin(); 
        iter != in_commod_.end(); 
        iter ++){
-    LOG(LEV_DEBUG2) << (*iter)->getName();
+    LOG(LEV_DEBUG2) << (*iter)->name();
   };
 
   LOG(LEV_DEBUG2) << "} into commodities {";
@@ -141,7 +141,7 @@ void SeparationsMatrixFacility::print()
   for (vector<Commodity*>::iterator iter = out_commod_.begin(); 
        iter != out_commod_.end(); 
        iter ++){
-    LOG(LEV_DEBUG2) << (*iter)->getName();
+    LOG(LEV_DEBUG2) << (*iter)->name();
   }; 
   LOG(LEV_DEBUG2) << "}, and has an inventory that holds " 
       << inventory_size_ << " materials"
@@ -182,7 +182,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
-                                  m->getName(), 
+                                  m->name(), 
                                   0, ATOMBASED);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
@@ -199,7 +199,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< getSN()
+    LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
 
@@ -222,7 +222,7 @@ void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Materi
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"SeparationsFacility " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     stocks_.push_back(make_pair(trans.commod, *thisMat));
   }
@@ -263,7 +263,7 @@ void SeparationsMatrixFacility::handleTock(int time)
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
-                                  m->getName(), 
+                                  m->name(), 
                                   0, ATOMBASED);
     //  }
     // }

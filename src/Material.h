@@ -182,7 +182,7 @@ public:
    *
    * @return recipeName
    */
-  std::string getName() { return recipeName_; };
+  std::string name() { return recipeName_; };
 
   /**
    * returns the units of the recipe, a string

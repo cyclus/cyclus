@@ -98,9 +98,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(offerMsg);
 
       LOG(LEV_DEBUG1) << "GreedyMarket has resolved a match from "
-          << offerMsg->getSupplier()->getSN()
+          << offerMsg->getSupplier()->ID()
           << " to "
-          << offerMsg->getRequester()->getSN()
+          << offerMsg->getRequester()->ID()
           << " for the amount:  " 
           << offerMsg->getAmount();
 
@@ -109,7 +109,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // split offer
       if (NULL == offerMsg) {
         throw CycException("offer message does not exist in market '" 
-            + getName() + "'.");
+            + name() + "'.");
       }
       
       // queue a new order
@@ -123,9 +123,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(maybe_offer);
 
       LOG(LEV_DEBUG1) << "GreedyMarket has resolved a match from "
-          << maybe_offer->getSupplier()->getSN()
+          << maybe_offer->getSupplier()->ID()
           << " (offer split) to "
-          << maybe_offer->getRequester()->getSN()
+          << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
           << maybe_offer->getAmount();
 
@@ -164,7 +164,7 @@ void GreedyMarket::resolve() {
     if(match_request(request)) {
       process_request();
     } else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->getSN()
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->ID()
           << " for the amount " << (*request).first 
           << " rejected. ";
       reject_request(request);

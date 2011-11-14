@@ -82,8 +82,8 @@ void SourceFacility::print()
   FacilityModel::print();
 
   LOG(LEV_DEBUG2) << "    supplies commodity {"
-      << out_commod_->getName() << "} with recipe '" 
-      << recipe_->getName() << "' at a capacity of "
+      << out_commod_->name() << "} with recipe '" 
+      << recipe_->name() << "' at a capacity of "
       << capacity_ << " " << recipe_->getUnits() << " per time step."
       << " It has a max inventory of " << inventory_size_ << " " 
       << recipe_->getUnits() <<  ".";
@@ -118,7 +118,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   recipe_->getUnits(),
-                                  recipe_->getName(), 
+                                  recipe_->name(), 
                                   0, MASSBASED);
 
     Material* m = inventory_.front();
@@ -136,7 +136,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"SourceFacility "<< getSN()
+    LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getTotMass();
     (newMat)->print();
   }    
@@ -182,7 +182,7 @@ void SourceFacility::handleTock(int time){
     // add a material the size of the capacity to the inventory
     Material* newMat = new Material(recipe_->getMassComp(), 
                                     recipe_->getUnits(), 
-                                    recipe_->getName(),
+                                    recipe_->name(),
                                     capacity_*recipe_->getTotMass(), 
                                     MASSBASED);
     LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
@@ -193,7 +193,7 @@ void SourceFacility::handleTock(int time){
     // add a material that fills the inventory
     Material* newMat = new Material(recipe_->getMassComp(), 
                                     recipe_->getUnits(), 
-                                    recipe_->getName(),
+                                    recipe_->name(),
                                     space,
                                     ATOMBASED);
     LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
@@ -209,7 +209,7 @@ void SourceFacility::handleTock(int time){
   }
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "SourceFacility " << this->getSN()
+  LOG(LEV_DEBUG2) << "SourceFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";

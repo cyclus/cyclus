@@ -184,7 +184,7 @@ public:
    *
    * @return name_
    */
-  const std::string getName(){return name_;};
+  const std::string name(){return name_;};
  
   /**
    * get the list of components 

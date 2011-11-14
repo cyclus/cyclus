@@ -61,9 +61,9 @@ void ConverterMarket::print()
 { 
   MarketModel::print();
   LOG(LEV_DEBUG2) << "where the offer commodity is {"
-      << offer_commod_->getName()
+      << offer_commod_->name()
       << "}, the request commodity is {"
-      << req_commod_->getName()
+      << req_commod_->name()
       << "}. ";
 }
 
@@ -162,9 +162,9 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(offerMsg);
 
       LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
-          << offerMsg->getSupplier()->getSN()
+          << offerMsg->getSupplier()->ID()
           << " to "
-          << offerMsg->getRequester()->getSN()
+          << offerMsg->getRequester()->ID()
           << " for the amount:  " 
           << offerMsg->getAmount();
 
@@ -184,9 +184,9 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       orders_.push_back(maybe_offer);
 
       LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
-          << maybe_offer->getSupplier()->getSN()
+          << maybe_offer->getSupplier()->ID()
           << " to "
-          << maybe_offer->getRequester()->getSN()
+          << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
           << maybe_offer->getAmount();
 
@@ -229,7 +229,7 @@ void ConverterMarket::resolve()
     } 
     else {
       LOG(LEV_DEBUG2) << "The request from Requester "<< 
-          (*request).second->getRequester()->getSN()
+          (*request).second->getRequester()->ID()
           << " for the amount " << (*request).first 
           << " rejected by the ConverterMarket. ";
       reject_request(request);

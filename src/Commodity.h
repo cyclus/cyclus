@@ -31,7 +31,7 @@ public:
   ~Commodity() {};
   
   /// get the Commodity name
-  const std::string getName() const { return name_;};
+  const std::string name() const { return name_;};
   
   /// get the ID number
   int ID() const {return ID_;};

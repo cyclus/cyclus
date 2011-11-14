@@ -147,13 +147,13 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
        thisMat++)
   {
     trans_t toRegister;
-    toRegister.requesterID=msg->getRequester()->getSN();
-    toRegister.supplierID=msg->getSupplier()->getSN();
-    toRegister.materialID=(*thisMat)->getSN(); 
+    toRegister.requesterID=msg->getRequester()->ID();
+    toRegister.supplierID=msg->getSupplier()->ID();
+    toRegister.materialID=(*thisMat)->ID(); 
     toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();
      
-    strcpy(toRegister.commodName, msg->getCommod()->getName().c_str());
+    strcpy(toRegister.commodName, msg->getCommod()->name().c_str());
     transactions_.push_back(toRegister);
   };
 };
@@ -174,7 +174,7 @@ void BookKeeper::registerMatChange(Material* mat){
   mat_hist_t toRegister;
 
   double total = mat->getTotMass();
-  toRegister.materialID = mat->getSN(); 
+  toRegister.materialID = mat->ID(); 
   toRegister.timestamp = TI->getTime();
 
   CompMap comp = mat->getMassComp();
@@ -237,9 +237,9 @@ void BookKeeper::writeModelList(ModelType type) {
        model_iter != LI->end(type);
        model_iter++) {
     Model* theModel = model_iter->second;
-    modelList[i].ID = theModel->getSN();
+    modelList[i].ID = theModel->ID();
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
-    strcpy(modelList[i].name, theModel->getName().c_str()); 
+    strcpy(modelList[i].name, theModel->name().c_str()); 
     i++;
   };
   if(numModels==0) {

@@ -103,7 +103,7 @@ Model* Logician::getModelByName(std::string name, ModelType model_type) {
   
   for(ModelList::iterator model=list->begin();
       model != list->end(); model++) {
-    if (name == model->second->getName()) {
+    if (name == model->second->name()) {
       found_model = model->second;
     }
   }

@@ -49,9 +49,9 @@ void SWUeUF6Converter::print()
 { 
   ConverterModel::print(); 
   LOG(LEV_DEBUG2) << "converts offers of commodity {"
-      << in_commod_->getName()
+      << in_commod_->name()
       << "} into offers of commodity {"
-      << out_commod_->getName()
+      << out_commod_->name()
       << "}.";
 };
 

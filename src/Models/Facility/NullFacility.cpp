@@ -81,9 +81,9 @@ void NullFacility::print()
 { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2) << "    converts commodity {"
-      << in_commod_->getName()
+      << in_commod_->name()
       << "} into commodity {"
-      << out_commod_->getName()
+      << out_commod_->name()
       << "}, and has an inventory that holds " 
       << inventory_size_ << " materials";
 };
@@ -123,7 +123,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
-                                  m->getName(), 
+                                  m->name(), 
                                   0, ATOMBASED);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
@@ -140,7 +140,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"NullFacility "<< getSN()
+    LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getTotMass();
   }    
   FacilityModel::sendMaterial( order, toSend );
@@ -155,7 +155,7 @@ void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"NullFacility " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     stocks_.push_back(*thisMat);
   }
@@ -246,7 +246,7 @@ void NullFacility::handleTock(int time)
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
-                                  m->getName(), 
+                                  m->name(), 
                                   0, ATOMBASED);
 
     // if the stocks obj isn't larger than the remaining need, send it as is.

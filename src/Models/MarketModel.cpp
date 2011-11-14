@@ -49,7 +49,7 @@ void MarketModel::print() {
   Model::print(); 
 
   LOG(LEV_DEBUG2) << "    trades commodity " 
-      << commodity_->getName();
+      << commodity_->name();
 
 };
 

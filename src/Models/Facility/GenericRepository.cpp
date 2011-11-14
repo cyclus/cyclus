@@ -153,7 +153,7 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
         //for each wf_template_
         for (deque< Component* >::iterator iter = wf_templates_.begin(); iter != 
             wf_templates_.end(); iter ++){
-          if ((*iter)->getName() == allowed_wf_name){
+          if ((*iter)->name() == allowed_wf_name){
             wf_wp_map_.insert(make_pair(allowed_wf_name, wp_templates_.back()));
           }
         }
@@ -203,7 +203,7 @@ void GenericRepository::copyFreshModel(Model* src)
 void GenericRepository::print() { 
   
   FacilityModel::print(); LOG(LEV_DEBUG2) << "    stores commodity {"
-    << in_commods_.front()->getName()
+    << in_commods_.front()->name()
     << "} among others.";
 };
 
@@ -223,7 +223,7 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*>
        thisMat != manifest.end();
        thisMat++)
   {
-    LOG(LEV_DEBUG2) <<"GenericRepository " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"GenericRepository " << ID() << " is receiving material with mass "
         << (*thisMat)->getTotMass();
     stocks_.push_front(make_pair(*thisMat, trans.commod));
   }
@@ -413,7 +413,7 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   chosen_wf_template = commod_wf_map_[waste_stream.second];
   if(chosen_wf_template == NULL){
     string err_msg = "The commodity '";
-    err_msg += (waste_stream.second)->getName();
+    err_msg += (waste_stream.second)->name();
     err_msg +="' does not have a matching WF in the GenericRepository.";
     throw CycException(err_msg);
   }
@@ -432,11 +432,11 @@ Component* GenericRepository::packageWaste(Component* waste_form){
   // figure out what waste package to put the waste form in
   bool loaded = false;
   Component* chosen_wp_template = NULL;
-  string name = waste_form->getName();
+  string name = waste_form->name();
   chosen_wp_template = wf_wp_map_[name];
   if(chosen_wp_template == NULL){
     string err_msg = "The waste form '";
-    err_msg += (waste_form)->getName();
+    err_msg += (waste_form)->name();
     err_msg +="' does not have a matching WP in the GenericRepository.";
     throw CycException(err_msg);
   }
@@ -448,8 +448,8 @@ Component* GenericRepository::packageWaste(Component* waste_form){
         iter != current_waste_packages_.end();
         iter++){
       // if there already exists an only partially full one
-      if( !(*iter)->isFull() && (*iter)->getName() == 
-          chosen_wp_template->getName()){
+      if( !(*iter)->isFull() && (*iter)->name() == 
+          chosen_wp_template->name()){
         // fill it
         (*iter)->load(WP, waste_form);
         toRet = (*iter);
