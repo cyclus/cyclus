@@ -204,6 +204,13 @@ protected:
     void loadXMLFile(std::string name);
 
     /**
+     * loads csv file into a table of waste streams and forms
+     *
+     * @param name the name of the file to load
+     */
+    void loadCSVFile(std::string name);
+
+    /**
      * Requests each of the commodities it can accept and condition
      * at a level that corresponds to its monthly capacity
      */

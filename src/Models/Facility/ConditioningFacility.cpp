@@ -1,6 +1,7 @@
 // ConditioningFacility.cpp
 // Implements the ConditioningFacility class
 #include <iostream>
+#include <fstream>
 #include "boost/multi_array.hpp"
 
 #include "ConditioningFacility.h"
@@ -66,6 +67,7 @@ void ConditioningFacility::init(xmlNodePtr cur)
     allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
     allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
     allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
+    allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
 
     /// initialize any ConditioningFacility-specific datamembers here
     string datafile = XMLinput->get_xpath_content(cur, "datafile");
@@ -307,24 +309,6 @@ void ConditioningFacility::loadHDF5File(string datafile){
 
     stream_vec_.resize(stream_len_);
     std::copy(stream, stream + stream_len_, stream_vec_.begin() );
- 
-    /*
-     * Display the fields
-     */
-    cout << endl << "Field streamID : " << endl;
-    for(int i = 0; i < stream_len_; i++)
-      cout << stream_vec_[i].streamID << " ";
-    cout << endl;
-
-    cout << endl << "Field formID : " << endl;
-    for(int i = 0; i < stream_len_; i++)
-      cout << stream_vec_[i].formID << " ";
-    cout << endl;
-
-    cout << endl << "Field density : " << endl;
-    for(int i = 0; i < stream_len_; i++)
-      cout << stream_vec_[i].density << " ";
-    cout << endl;
 
   } catch (Exception error) {
     error.printError();
@@ -337,9 +321,7 @@ void ConditioningFacility::loadXMLFile(string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
-  // create array
-  
-
+  // create array 
 
 }
 
@@ -350,6 +332,49 @@ void ConditioningFacility::loadSQLFile(string datafile){
   // // how many columns
   // create array
 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::loadCSVFile(string datafile){
+  string file_path = ENV->getCyclusPath() + "/" + datafile; 
+  
+  // create an ifstream for the file
+  ifstream file(file_path.c_str());
+
+  // and data structures to read the data into
+  string buffer;
+  stream_t stream;
+
+  if (file.is_open()){
+    while(file.good()){
+      // set the buffer string equal to everything up to the next comma 
+      getline(file, buffer, ',');
+      // copy the data to the typed member of the stream struct
+      stream.streamID = strtol(buffer.c_str() , NULL, 10);
+      LOG(LEV_DEBUG2) <<  "streamID  = " <<  stream.streamID ;;
+      getline(file, buffer, ',');
+      stream.formID = strtol(buffer.c_str() , NULL, 10);
+      LOG(LEV_DEBUG2) <<  "formID  = " <<  stream.formID ;;
+      getline(file, buffer, ',');
+      stream.density = strtod(buffer.c_str() , NULL);
+      LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
+      getline(file, buffer, ',');
+      stream.wfvol = strtod(buffer.c_str() , NULL);
+      LOG(LEV_DEBUG2) <<  "wfvol  = " <<  stream.wfvol ;;
+      getline(file, buffer, '\n');
+      stream.wfmass = strtod(buffer.c_str() , NULL);
+      LOG(LEV_DEBUG2) <<  "wfmass  = " <<  stream.wfmass ;;
+      // put the full struct into the vector of structs
+      stream_vec_.push_back(stream);
+    }
+    file.close();
+  }
+  else {
+    string err = "XML file, ";
+    err += file_path;
+    err += ", not found.";
+    throw CycException(err);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -213,6 +213,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
+        <ref name="ConditioningFacility"/>
         <ref name="EnrichmentFacility"/>
         <ref name="GenericRepository"/>
         <ref name="NullFacility"/>
@@ -254,6 +255,17 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <ref name="outcommodity"/>
       </oneOrMore>
+     </element>
+  </define>
+
+  <define name="ConditioningFacility">
+     <element name="ConditioningFacility"> 
+        <element name="fileformat">
+          <text/>
+        </element>
+        <element name="datafile">
+          <text/>
+        </element>
      </element>
   </define>
 
