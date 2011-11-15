@@ -7,6 +7,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <map>
 #include "H5Cpp.h"
 #include "hdf5.h"
 
@@ -128,12 +129,27 @@ protected:
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-    /// typedef for the stream type
+    /**
+     * Defines the structure of data associated with each row entry in the 
+     * loading database. 
+     */
     typedef struct stream_t{
-      string ws;
-      string wf;
-      double load;
+      int streamID; /**< an integer indicating the id of the waste stream >**/
+      int formID; /**< an integer indicating the id of the waste form >**/
+      double density; /**< a double indicating the maximum loading density >**/
+      double wfvol; /**< a double indicating the canonical waste form volume >**/
+      double wfmass; /**< a double indicating the mass of the not-loaded waste form >**/
     } stream_t;
+ 
+    /**
+     * The integer length (number of rows) of the datafile/med/loading/ dataset 
+     */
+    int stream_len_;
+
+    /**
+     * The vector of stream structs that holds the data in the datafile instance.
+     */
+    std::vector<stream_t> stream_vec_;
 
     /// the stocks are where the processed material is kept
     std::deque<std::pair<Commodity*,Material*> >stocks_;

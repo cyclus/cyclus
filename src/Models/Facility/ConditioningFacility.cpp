@@ -14,7 +14,6 @@
 #include "Logician.h"
 #include "Logger.h"
 
-using namespace std;
 using namespace H5;
 
 
@@ -246,108 +245,86 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadHDF5File(string datafile){
-
-  // get dimensions
-  // // how many rows
-  // // how many columns
-  // create array
   string file_path = ENV->getCyclusPath() + datafile; 
-
-  // check that the file is valid
-  if(!H5File::isHdf5(file_path))
-  {
-    string err = file_path;
-    err += " is not a valid HDF5 file";
-    throw CycException(err);
-  }
-
-  // open the file
-  H5File* db;
-  if(file_is_open_==false){
-    //If the database is already open, throw an exception. 
-    try{ 
-      db  = new H5File(file_path, H5F_ACC_RDWR);
-      file_is_open_ = true;
-    }
-    catch( FileIException error )
-    {
-      error.printError();
-    }
-  }
 
   const H5std_string filename = file_path;
   const H5std_string groupname = "/";
-  const H5std_string datasetname = "conditioning";
-  const H5std_string ws_memb = "ws";
-  const H5std_string wf_memb = "wf";
-  const H5std_string load_memb = "load";
+  const H5std_string datasetname = "loading";
+  const H5std_string streamID_memb = "streamID";
+  const H5std_string formID_memb = "formID";
+  const H5std_string density_memb = "density";
+  const H5std_string wfvol_memb = "wfvol";
+  const H5std_string wfmass_memb = "wfmass";
   
   //check if the file is an hdf5 file first.
   if (! H5File::isHdf5(file_path)) {
-    throw CycIOException("The waste conditioning file is not an hdf5 file.");
+    string err = "The file at ";
+    err += file_path;
+    err += " is not an hdf5 file.";
+    throw CycIOException(err);
   }
 
-  try{
-    // turn off auto printing and deal with exceptions at the end
+  try {
+    /*
+     * Turn off the auto-printing when failure occurs so that we can
+     * handle the errors appropriately
+     */
     Exception::dontPrint();
-    // get the dataset open
-    DataSet dataset = db->openDataSet(datasetname);
-    // get the class of the datatype used in the dataset
-    H5T_class_t type_class = dataset.getTypeClass(); 
-    // double check that its a double
-    FloatType dbltype;
-    if( type_class == H5T_FLOAT ) 
-    {
-      // oh good, it's a double. Now figure out what kind.
-      dbltype = dataset.getFloatType();
-    }
-    else{
-      throw CycTypeException("The dataset " + datasetname + " is not of float type");
-    }
-  
-    // get the file dataspace
-    DataSpace filespace = dataset.getSpace();
-  
-    // find the rank
-    int rank = filespace.getSimpleExtentNdims();
-  
-    // find what the dataspace dimensions are
-    hsize_t dims[2];
-    int ndims = filespace.getSimpleExtentDims(dims, NULL);
-  
-    // create a memory dataspace
-    DataSpace memspace = DataSpace( rank, dims );
-  
-    // select everything in each dataspace
-    memspace.selectAll();
-    filespace.selectAll();
-  
-    // initializes the memory space for the data
-    double out_array[dims[0]][dims[1]];
-    for (int i=0; i<dims[0]; i++){
-      for (int j=0; j<dims[1]; j++){
-        out_array[i][j]=1.0;
-      }
-    }
-  
-    // This is basically a memcopy from the memspace into out_array
-    dataset.read( out_array, dbltype, memspace , filespace );
+    
+    /*
+     * Open the file and the dataset.
+     */
+    H5File* file;
+    file = new H5File( filename, H5F_ACC_RDONLY );
+    Group* group;
+    group = new Group (file->openGroup( groupname ));
+    DataSet* dataset;
+    dataset = new DataSet (group->openDataSet( datasetname ));
+    DataSpace* dataspace;
+    dataspace = new DataSpace (dataset->getSpace( ));
 
-    // Now the data is a multi_array of doubles
-    // (which is much easier to deal with... thanks boost)
-    for(int row=0; row<dims[0]; row++){
-      for(int col=0; col<dims[1]; col++){
-        loading_densities_[row][col] = out_array[row][col];
-      }
-    }
+    hsize_t dims_out[2];
+    int ndims = dataspace->getSimpleExtentDims(dims_out, NULL);
+    stream_len_ = dims_out[0];
 
-    // assume that the rows are waste streams
-    // get their names
-    // the columns are waste forms
-    // get their names
-    // assume there will be an attribute called UNIT
-    // assume there will be a dataspace of waste form masses?
-    // assume there will be a dataspace of waste form volumes?
+
+    /*
+     * Create a datatype for stream
+     */
+    CompType mtype( sizeof(stream_t) );
+    mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); 
+    mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT);
+    mtype.insertMember( density_memb, HOFFSET(stream_t, density), PredType::IEEE_F64LE);
+    mtype.insertMember( wfvol_memb, HOFFSET(stream_t, wfvol), PredType::IEEE_F64LE);
+    mtype.insertMember( wfmass_memb, HOFFSET(stream_t, wfmass), PredType::IEEE_F64LE);
+
+    /*
+     * Read two fields c and a from s1 dataset. Fields in the file
+     * are found by their names "c_name" and "a_name".
+     */
+    stream_t stream[stream_len_];
+    dataset->read( stream, mtype );
+
+    stream_vec_.resize(stream_len_);
+    std::copy(stream, stream + stream_len_, stream_vec_.begin() );
+ 
+    /*
+     * Display the fields
+     */
+    cout << endl << "Field streamID : " << endl;
+    for(int i = 0; i < stream_len_; i++)
+      cout << stream_vec_[i].streamID << " ";
+    cout << endl;
+
+    cout << endl << "Field formID : " << endl;
+    for(int i = 0; i < stream_len_; i++)
+      cout << stream_vec_[i].formID << " ";
+    cout << endl;
+
+    cout << endl << "Field density : " << endl;
+    for(int i = 0; i < stream_len_; i++)
+      cout << stream_vec_[i].density << " ";
+    cout << endl;
 
   } catch (Exception error) {
     error.printError();
