@@ -281,7 +281,24 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="GenericRepository">
      <element name="GenericRepository"> 
-        <ref name="area"/>
+        <element name="x">
+          <data type="double"/>
+        </element>
+        <element name="y">
+          <data type="double"/>
+        </element>
+        <element name="z">
+          <data type="double"/>
+        </element>
+        <element name="dx">
+          <data type="double"/>
+        </element>
+        <element name="dy">
+          <data type="double"/>
+        </element>
+        <element name="dz">
+          <data type="double"/>
+        </element>
         <ref name="capacity"/>
         <oneOrMore>
           <ref name="incommodity"/>
@@ -449,12 +466,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           </element>
 
      </element>
-  </define>
-
-  <define name="area">
-      <element name="area">
-        <data type="double"/>
-      </element>
   </define>
 
   <define name="capacity">

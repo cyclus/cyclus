@@ -56,7 +56,12 @@ void GenericRepository::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/GenericRepository");
 
   // initialize ordinary objects
-  area_ = strtod(XMLinput->get_xpath_content(cur,"area"), NULL);
+  x_ = strtod(XMLinput->get_xpath_content(cur,"x"), NULL);
+  y_ = strtod(XMLinput->get_xpath_content(cur,"y"), NULL);
+  z_ = strtod(XMLinput->get_xpath_content(cur,"z"), NULL);
+  dx_ = strtod(XMLinput->get_xpath_content(cur,"dx"), NULL);
+  dy_ = strtod(XMLinput->get_xpath_content(cur,"dy"), NULL);
+  dz_ = strtod(XMLinput->get_xpath_content(cur,"dz"), NULL);
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
   inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), 
       NULL);
@@ -118,18 +123,24 @@ void GenericRepository::init(xmlNodePtr cur)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Component* GenericRepository::initComponent(xmlNodePtr cur){
   Component* toRet = new Component();
+  // the component class initialization function will pass down the xml pointer
   toRet->init(cur);
 
+  // all components have a name and a type
   string comp_name = XMLinput->get_xpath_content(cur,"name");
   string comp_type = XMLinput->get_xpath_content(cur,"componenttype");
+
+  // they will have allowed subcomponents (think russian doll)
   xmlNodeSetPtr allowed_sub_nodes;
 
   switch(toRet->getComponentType(comp_type)) {
     case BUFFER:
       buffer_template_ = toRet;
+      // do the buffers have allowed waste package types?
       break;
     case FF:
       far_field_ = toRet;
+      // does the far field have allowed buffer types?
       break;
     case WF:
       // get allowed waste commodities
@@ -169,9 +180,17 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
 void GenericRepository::copy(GenericRepository* src)
 {
 
+  // copy facility level stuff
   FacilityModel::copy(src);
 
+  // copy variables specific to this model
   capacity_ = src->capacity_;
+  x_= src->x_;
+  y_= src->y_;
+  z_= src->z_;
+  dx_= src->dx_;
+  dy_= src->dy_;
+  dz_= src->dz_;
   inventory_size_ = src->inventory_size_;
   start_op_yr_ = src->start_op_yr_;
   start_op_mo_ = src->start_op_mo_;
@@ -185,6 +204,8 @@ void GenericRepository::copy(GenericRepository* src)
   buffers_.push_front(new Component());
   buffers_.front()->copy(buffer_template_);
 
+  // don't copy things that should start out empty
+  // initialize empty structures instead
   stocks_ = deque< WasteStream >();
   inventory_ = deque< WasteStream >();
   waste_packages_ = deque< Component* >();
@@ -201,7 +222,7 @@ void GenericRepository::copyFreshModel(Model* src)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::print() { 
-  
+  // this should ultimately print all of the components loaded into this repository.
   FacilityModel::print(); LOG(LEV_DEBUG2) << "    stores commodity {"
     << in_commods_.front()->name()
     << "} among others.";

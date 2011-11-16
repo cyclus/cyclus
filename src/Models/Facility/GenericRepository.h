@@ -141,9 +141,14 @@ protected:
     double capacity_;
 
     /**
-     * The areal extent of the repository footprint in sq. kilometers.
+     * The x, y, and z dimensional extents of the repository in kilometers.
      */
-    double area_;
+    double x_,y_,z_;
+
+    /**
+     * The x, y, and z dimensional spacing of the source centers in kilometers.
+     */
+    double dx_,dy_,dz_;
 
     /**
      * The stocks of pre-emplacement waste materials.
