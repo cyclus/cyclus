@@ -247,8 +247,18 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadHDF5File(string datafile){
-  string file_path = ENV->getCyclusPath() + datafile; 
+  // add the current path to the file
+  string file_path = ENV->getCyclusPath() + "/" + datafile; 
 
+  // check if the file is an hdf5 file first.
+  if (! H5File::isHdf5(file_path)) {
+    string err = "The file at ";
+    err += file_path;
+    err += " is not an hdf5 file.";
+    throw CycIOException(err);
+  }
+
+  // create strings that H5Cpp can use to access the data
   const H5std_string filename = file_path;
   const H5std_string groupname = "/";
   const H5std_string datasetname = "loading";
@@ -258,14 +268,6 @@ void ConditioningFacility::loadHDF5File(string datafile){
   const H5std_string wfvol_memb = "wfvol";
   const H5std_string wfmass_memb = "wfmass";
   
-  //check if the file is an hdf5 file first.
-  if (! H5File::isHdf5(file_path)) {
-    string err = "The file at ";
-    err += file_path;
-    err += " is not an hdf5 file.";
-    throw CycIOException(err);
-  }
-
   try {
     /*
      * Turn off the auto-printing when failure occurs so that we can
