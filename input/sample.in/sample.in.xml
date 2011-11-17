@@ -6,10 +6,10 @@
   <simstart>0</simstart>
   <decay>0</decay>
   <duration>1</duration>
-	<commodity>
-		<name>uo2</name>
-	</commodity>
-  
+  <commodity>
+    <name>uo2</name>
+  </commodity>
+
   <market>
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
@@ -18,11 +18,11 @@
     </model>
   </market>
 
-	<commodity>
-		<name>snf</name>
-	</commodity>
+  <commodity>
+    <name>snf</name>
+  </commodity>
 
-	<market>
+  <market>
     <name>snfmarket</name>
     <mktcommodity>snf</mktcommodity>
     <model>
@@ -30,19 +30,19 @@
     </model>
   </market>
 
-	<facility>
-		<name>LWR</name>
-		<model>
-			<NullFacility>
-				<incommodity>uo2</incommodity>
-				<outcommodity>snf</outcommodity>
+  <facility>
+    <name>LWR</name>
+    <model>
+      <NullFacility>
+        <incommodity>uo2</incommodity>
+        <outcommodity>snf</outcommodity>
         <inventorysize>1e4</inventorysize>
         <capacity>1e6</capacity>
-			</NullFacility>
-		</model>
-	</facility>
+      </NullFacility>
+    </model>
+  </facility>
 
-	<facility>
+  <facility>
     <name>HWR</name>
     <model>
       <NullFacility>
@@ -51,109 +51,109 @@
         <inventorysize>1e4</inventorysize>
         <capacity>1e6</capacity>
       </NullFacility>
-		</model>
-	</facility>
+    </model>
+  </facility>
 
-	<facility>
-		<name>FuelFab</name>
-		<model>
-			<SourceFacility>
-				<outcommodity>uo2</outcommodity>
+  <facility>
+    <name>FuelFab</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>uo2</outcommodity>
         <capacity>1e6</capacity>
         <inventorysize>10e6</inventorysize>
-				<commodprice>0</commodprice>
-				<recipe>fresh_50gwd</recipe>
-			</SourceFacility>
-		</model>
-	</facility>
+        <commodprice>0</commodprice>
+        <recipe>fresh_50gwd</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
 
-	<facilitycatalog>
-		<filename>sample.facilitycatalog.xml</filename>
-		<namespace>sample</namespace>
-		<format>xml</format>
-	</facilitycatalog>
+  <facilitycatalog>
+    <filename>sample.facilitycatalog.xml</filename>
+    <namespace>sample</namespace>
+    <format>xml</format>
+  </facilitycatalog>
 
-	<region>
-		<name>canada</name>
-		<allowedfacility>HWR</allowedfacility>
-		<allowedfacility>sample:HWR</allowedfacility>
-		<model>
-			<StubRegion/>
-		</model>
-		<institution>
-			<name>OPD</name>
-			<model>
-				<StubInst/>
-			</model>
-		</institution>
-	</region>
+  <region>
+    <name>canada</name>
+    <allowedfacility>HWR</allowedfacility>
+    <allowedfacility>sample:HWR</allowedfacility>
+    <model>
+      <StubRegion/>
+    </model>
+    <institution>
+      <name>OPD</name>
+      <model>
+        <StubInst/>
+      </model>
+    </institution>
+  </region>
 
-	<region>
-		<name>USA</name>
-		<allowedfacility>LWR</allowedfacility>
-		<allowedfacility>FuelFab</allowedfacility>
-		<model>
-			<StubRegion/>
-		</model>
-		<institution>
-			<name>Exelon</name>
-			<model>
-				<DeployInst>
-					<deploy>
-						<type>LWR</type>
-						<name>Clinton</name>
-						<start>1</start>
-					</deploy>
-				</DeployInst>
-			</model>
-		</institution>
-		<institution>
-			<name>Westinghouse</name>
-			<model>
-				<FixedInst>
-					<facility>
-						<type>FuelFab</type>
-						<name>Columbia</name>
-					</facility>
-				</FixedInst>
-			</model>
-		</institution>
-	</region>
-	<recipe>
-		<name>fresh_50gwd</name>
-		<basis>mass</basis>
-		<unit>assembly</unit>
-		<total>1000</total>
-		<isotope>
-			<id>92235</id>
-			<comp>0.05</comp>
-		</isotope>
-		<isotope>
-			<id>92238</id>
-			<comp>0.95</comp>
-		</isotope>
-		<isotope>
-			<id>08016</id>
-			<comp>0.13</comp>
-		</isotope>
-	</recipe>
-	<recipe>
-		<name>water</name>
-		<basis>atom</basis>
-		<unit>barrel</unit>
-		<total>1e25</total>
-		<isotope>
-			<id>1001</id>
-			<comp>2</comp>
-		</isotope>
-		<isotope>
-			<id>08016</id>
-			<comp>1</comp>
-		</isotope>
-	</recipe>
-	<recipebook>
-		<filename>sample.recipebook.xml</filename>
-		<namespace>sample</namespace>
-		<format>xml</format>
-	</recipebook>
+  <region>
+    <name>USA</name>
+    <allowedfacility>LWR</allowedfacility>
+    <allowedfacility>FuelFab</allowedfacility>
+    <model>
+      <StubRegion/>
+    </model>
+    <institution>
+      <name>Exelon</name>
+      <model>
+        <DeployInst>
+          <deploy>
+            <type>LWR</type>
+            <name>Clinton</name>
+            <start>1</start>
+          </deploy>
+        </DeployInst>
+      </model>
+    </institution>
+    <institution>
+      <name>Westinghouse</name>
+      <model>
+        <FixedInst>
+          <facility>
+            <type>FuelFab</type>
+            <name>Columbia</name>
+          </facility>
+        </FixedInst>
+      </model>
+    </institution>
+  </region>
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+  <recipe>
+    <name>water</name>
+    <basis>atom</basis>
+    <unit>barrel</unit>
+    <total>1e25</total>
+    <isotope>
+      <id>1001</id>
+      <comp>2</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>1</comp>
+    </isotope>
+  </recipe>
+  <recipebook>
+    <filename>sample.recipebook.xml</filename>
+    <namespace>sample</namespace>
+    <format>xml</format>
+  </recipebook>
 </simulation>

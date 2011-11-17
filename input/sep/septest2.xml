@@ -57,7 +57,7 @@
         </Stream>
         <inventorysize>1e6</inventorysize>
         <capacity>1</capacity>
-       </SeparationsMatrixFacility>
+      </SeparationsMatrixFacility>
     </model>
   </facility>
 

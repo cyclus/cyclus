@@ -193,6 +193,7 @@ void InputXML::load_facilitycatalog(std::string filename) {
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;

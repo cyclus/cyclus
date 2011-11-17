@@ -8,13 +8,13 @@
   <simstart>0</simstart>
   <decay>0</decay>
 
-	<commodity>
-		<name>snf</name>
-	</commodity>
+  <commodity>
+    <name>snf</name>
+  </commodity>
 
-	<commodity>
-		<name>sepsnf</name>
-	</commodity>
+  <commodity>
+    <name>sepsnf</name>
+  </commodity>
 
   <market>
     <name>snfmarket</name>
@@ -51,7 +51,7 @@
       <SeparationsMatrixFacility>
         <incommodity>snf</incommodity>
         <outcommodity>sepsnf</outcommodity>
-				<newvar>sepsnf</newvar>
+        <newvar>sepsnf</newvar>
         <inventorysize>1e4</inventorysize>
         <capacity>1</capacity>
       </SeparationsMatrixFacility>
@@ -70,17 +70,17 @@
     </model>
   </facility>
 
-	<region>
+  <region>
     <name>oneRegion</name>
-		<allowedfacility>FrontEnd</allowedfacility>
-		<allowedfacility>MiddleMan</allowedfacility>
-		<allowedfacility>BackEnd</allowedfacility>
-		<model>
-			<NullRegion/>
-		</model>
-		<institution>
-			<name>oneInst</name>
-			<model>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <allowedfacility>MiddleMan</allowedfacility>
+    <allowedfacility>BackEnd</allowedfacility>
+    <model>
+      <NullRegion/>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
         <FixedInst>
           <facility>
             <type>FrontEnd</type>
@@ -95,9 +95,9 @@
             <name>BackEnd</name>
           </facility>
         </FixedInst>
-			</model>
-		</institution>
-	</region>
+      </model>
+    </institution>
+  </region>
 
   <recipe>
     <name>fresh_50gwd</name>

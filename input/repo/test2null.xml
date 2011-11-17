@@ -62,6 +62,8 @@
         <startOperYear>1</startOperYear>
         <component>
           <name>ff</name>
+          <innerradius>3</innerradius>
+          <outerradius>10</outerradius>
           <componenttype>FF</componenttype>
           <thermalmodel>
             <StubThermal/>
@@ -72,6 +74,8 @@
         </component>
         <component>
           <name>buffer</name>
+          <innerradius>2</innerradius>
+          <outerradius>3</outerradius>
           <componenttype>BUFFER</componenttype>
           <thermalmodel>
             <StubThermal/>
@@ -82,6 +86,8 @@
         </component>
         <component>
           <name>wp</name>
+          <innerradius>1</innerradius>
+          <outerradius>2</outerradius>
           <componenttype>WP</componenttype>
           <thermalmodel>
             <StubThermal/>
@@ -93,6 +99,8 @@
         </component>
         <component>
           <name>wf</name>
+          <innerradius>0</innerradius>
+          <outerradius>1</outerradius>
           <componenttype>WF</componenttype>
           <thermalmodel>
             <StubThermal/>

@@ -7,9 +7,9 @@
   <simstart>0</simstart>
   <decay>2</decay>
 
-	<commodity>
-		<name>uo2</name>
-	</commodity>
+  <commodity>
+    <name>uo2</name>
+  </commodity>
 
   <market>
     <name>uo2market</name>
@@ -44,16 +44,16 @@
     </model>
   </facility>
 
-	<region>
+  <region>
     <name>oneRegion</name>
-		<allowedfacility>FrontEnd</allowedfacility>
-		<allowedfacility>BackEnd</allowedfacility>
-		<model>
-			<NullRegion/>
-		</model>
-		<institution>
-			<name>oneInst</name>
-			<model>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <allowedfacility>BackEnd</allowedfacility>
+    <model>
+      <NullRegion/>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
         <FixedInst>
           <facility>
             <type>FrontEnd</type>
@@ -64,9 +64,9 @@
             <name>BackEnd</name>
           </facility>
         </FixedInst>
-			</model>
-		</institution>
-	</region>
+      </model>
+    </institution>
+  </region>
 
   <recipe>
     <name>fresh_50gwd</name>

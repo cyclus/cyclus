@@ -28,7 +28,7 @@
       <GreedyMarket/>
     </model>
   </market>
-    
+
   <market>
     <name>spent_PWR_uo2market</name>
     <mktcommodity>spent_PWR_uo2</mktcommodity>
@@ -99,11 +99,11 @@
     <name>PWR_uo2_FuelFab</name>
     <model>
       <SourceFacility>
-	<outcommodity>fresh_PWR_uo2</outcommodity>
+        <outcommodity>fresh_PWR_uo2</outcommodity>
         <capacity>1e6</capacity>
         <inventorysize>10e6</inventorysize>
-	<commodprice>0</commodprice>
-	<recipe>fresh_50gwd</recipe>
+        <commodprice>0</commodprice>
+        <recipe>fresh_50gwd</recipe>
       </SourceFacility>
     </model>
   </facility>
@@ -113,30 +113,30 @@
     <name>Reactor</name>
     <model>
       <RecipeReactor>
-	
-	<!-- Fresh and Spent Fuel Pairs -->
-	<fuelpair>
-	  <incommodity>fresh_PWR_uo2</incommodity>
-	  <inrecipe>fresh_50gwd</inrecipe>
-	  <outcommodity>spent_PWR_uo2</outcommodity>
-	  <outrecipe>spent_50gwd</outrecipe>
-	</fuelpair>
 
-	<startConstrYear>1968</startConstrYear>
-	<startConstrMonth>10</startConstrMonth>
-	<startOperYear>1974</startOperYear>
-	<startOperMonth>12</startOperMonth>
-	<licExpYear>2034</licExpYear>
-	<licExpMonth>05</licExpMonth>
-	<lifetime>720</lifetime>
-	<state>AR</state>
-	<typeReac>PWR</typeReac>
-	<capacity>842</capacity>
-	<elecCF>0.99</elecCF>	
+        <!-- Fresh and Spent Fuel Pairs -->
+        <fuelpair>
+          <incommodity>fresh_PWR_uo2</incommodity>
+          <inrecipe>fresh_50gwd</inrecipe>
+          <outcommodity>spent_PWR_uo2</outcommodity>
+          <outrecipe>spent_50gwd</outrecipe>
+        </fuelpair>
+
+        <startConstrYear>1968</startConstrYear>
+        <startConstrMonth>10</startConstrMonth>
+        <startOperYear>1974</startOperYear>
+        <startOperMonth>12</startOperMonth>
+        <licExpYear>2034</licExpYear>
+        <licExpMonth>05</licExpMonth>
+        <lifetime>720</lifetime>
+        <state>AR</state>
+        <typeReac>PWR</typeReac>
+        <capacity>842</capacity>
+        <elecCF>0.99</elecCF>	
       </RecipeReactor>
     </model>
   </facility>
-  
+
   <facility>
     <name>Storage</name>
     <model>
@@ -145,17 +145,17 @@
         <capacity>1</capacity>
         <inventorysize>1e4</inventorysize>
         <residencetime>100</residencetime>
-	
-	<initialstocks>
+
+        <initialstocks>
           <entry>
             <facility>Reactor</facility>
             <incommodity>spent_PWR_uo2</incommodity>
             <recipe>spent_50gwd</recipe>
             <amount>6.990E+05</amount>
-	    <age>216</age>
+            <age>216</age>
           </entry>
-	</initialstocks>
-	
+        </initialstocks>
+
       </StorageFacility>
     </model>
   </facility>
@@ -176,15 +176,15 @@
     <!--
     <model>
       <CapacityRegion>
-	<input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/nwtrb/build.in</input_file>
-	<capacitydemand>
-	  <capacitytype>power</capacitytype>
-	  <capacityfunction>constant</capacityfunction>
-	  <nominalvalue>1000</nominalvalue>
-	  <replacementlist>
-	    <replacementfacility>Reactor</replacementfacility>
-	  </replacementlist>
-	</capacitydemand>
+        <input_file>/filespace/people/g/gidden/work/cyclus/trunk/input/nwtrb/build.in</input_file>
+        <capacitydemand>
+          <capacitytype>power</capacitytype>
+          <capacityfunction>constant</capacityfunction>
+          <nominalvalue>1000</nominalvalue>
+          <replacementlist>
+            <replacementfacility>Reactor</replacementfacility>
+          </replacementlist>
+        </capacitydemand>
       </CapacityRegion>
     </model>
     -->
@@ -192,28 +192,28 @@
     <institution>
       <name>OneInst</name>
       <model>
-	<FixedInst>
-	  
-	  <!-- Facilities within Institution -->
-	  <facility>
+        <FixedInst>
+
+          <!-- Facilities within Institution -->
+          <facility>
             <type>Storage</type>
             <name>Storage</name>
-	  </facility>
+          </facility>
 
-	  <facility>
+          <facility>
             <type>Reactor</type>
-	    <name>Reactor</name>
-	  </facility>
+            <name>Reactor</name>
+          </facility>
 
-	  <facility>
+          <facility>
             <type>PWR_uo2_FuelFab</type>
-	    <name>PWR_uo2_FuelFab</name>
-	  </facility>
-	  
+            <name>PWR_uo2_FuelFab</name>
+          </facility>
+
         </FixedInst>
       </model>
     </institution>
 
   </region>
-  
+
 </simulation>
