@@ -310,6 +310,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <oneOrMore>
           <element name="component">
             <ref name="name"/>
+            <ref name="innerradius"/>
+            <ref name="outerradius"/>
             <ref name="componenttype"/>
             <element name="thermalmodel">
               <choice>
@@ -492,6 +494,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
   </define>
 
+  <define name="innerradius">
+      <element name="innerradius">
+        <data type="double"/>
+      </element>
+  </define>
+
   <define name="inrecipe">
       <element name="inrecipe">
           <text/>
@@ -519,6 +527,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="outcommodity">
       <element name="outcommodity">
          <text/>
+      </element>
+  </define>
+
+  <define name="outerradius">
+      <element name="outerradius">
+        <data type="double"/>
       </element>
   </define>
 

@@ -43,6 +43,8 @@ void Component::init(xmlNodePtr cur){
   ID_=nextID_++;
   
   name_ = XMLinput->get_xpath_content(cur,"name");
+  inner_radius_ = strtod(XMLinput->get_xpath_content(cur,"innerradius"),NULL);
+  outer_radius_ = strtod(XMLinput->get_xpath_content(cur,"outerradius"),NULL);
 
   thermal_model_ = getThermalModel(cur);
   nuclide_model_ = getNuclideModel(cur);
