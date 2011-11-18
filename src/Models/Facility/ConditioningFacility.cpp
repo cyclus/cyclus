@@ -260,61 +260,69 @@ void ConditioningFacility::loadHDF5File(string datafile){
 
   // create strings that H5Cpp can use to access the data
   const H5std_string filename = file_path;
-  const H5std_string groupname = "/";
-  const H5std_string datasetname = "loading";
+  const H5std_string groupname = "/loading";
+  const H5std_string datasetname = "low";
   const H5std_string streamID_memb = "streamID";
   const H5std_string formID_memb = "formID";
   const H5std_string density_memb = "density";
   const H5std_string wfvol_memb = "wfvol";
   const H5std_string wfmass_memb = "wfmass";
-  
-  try {
-    /*
-     * Turn off the auto-printing when failure occurs so that we can
-     * handle the errors appropriately
-     */
-    Exception::dontPrint();
-    
-    /*
-     * Open the file and the dataset.
-     */
-    H5File* file;
-    file = new H5File( filename, H5F_ACC_RDONLY );
-    Group* group;
-    group = new Group (file->openGroup( groupname ));
-    DataSet* dataset;
-    dataset = new DataSet (group->openDataSet( datasetname ));
-    DataSpace* dataspace;
-    dataspace = new DataSpace (dataset->getSpace( ));
 
-    hsize_t dims_out[2];
-    int ndims = dataspace->getSimpleExtentDims(dims_out, NULL);
-    stream_len_ = dims_out[0];
+  //try {
+  /*
+   * Turn off the auto-printing when failure occurs so that we can
+   * handle the errors appropriately
+   */
+  //Exception::dontPrint();
 
+  /*
+   * Open the file and the dataset.
+   */
+  H5File* file;
+  file = new H5File( filename, H5F_ACC_RDONLY );
+  Group* group;
+  group = new Group (file->openGroup( groupname ));
+  DataSet* dataset;
+  dataset = new DataSet (group->openDataSet( datasetname ));
+  DataSpace* dataspace;
+  dataspace = new DataSpace (dataset->getSpace( ));
 
-    /*
-     * Create a datatype for stream
-     */
-    CompType mtype( sizeof(stream_t) );
-    mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); 
-    mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT);
-    mtype.insertMember( density_memb, HOFFSET(stream_t, density), PredType::IEEE_F64LE);
-    mtype.insertMember( wfvol_memb, HOFFSET(stream_t, wfvol), PredType::IEEE_F64LE);
-    mtype.insertMember( wfmass_memb, HOFFSET(stream_t, wfmass), PredType::IEEE_F64LE);
+  hsize_t dims_out[2];
+  int ndims = dataspace->getSimpleExtentDims(dims_out, NULL);
+  stream_len_ = dims_out[0];
 
-    /*
-     * Read two fields c and a from s1 dataset. Fields in the file
-     * are found by their names "c_name" and "a_name".
-     */
-    stream_t stream[stream_len_];
-    dataset->read( stream, mtype );
+  /*
+   * Create a datatype for stream
+   */
+  CompType mtype( sizeof(stream_t) );
+  mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); // Change this to int when you can make a table where this is an int. 
+  mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT); // Change this to int when you can make a table where this is an int. 
+  mtype.insertMember( density_memb, HOFFSET(stream_t, density), PredType::NATIVE_DOUBLE);
+  mtype.insertMember( wfvol_memb, HOFFSET(stream_t, wfvol), PredType::NATIVE_DOUBLE);
+  mtype.insertMember( wfmass_memb, HOFFSET(stream_t, wfmass), PredType::NATIVE_DOUBLE);
 
-    stream_vec_.resize(stream_len_);
-    std::copy(stream, stream + stream_len_, stream_vec_.begin() );
+  /*
+   * Read two fields c and a from s1 dataset. Fields in the file
+   * are found by their names "c_name" and "a_name".
+   */
+  stream_t streams[stream_len_];
+  dataset->read( streams, mtype );
 
-  } catch (Exception error) {
-    error.printError();
-  }
+  stream_vec_.resize(stream_len_);
+  std::copy(streams, streams + stream_len_, stream_vec_.begin() );
+
+  stream_t stream;
+  stream = stream_vec_[1];
+  LOG(LEV_DEBUG2) <<  "streamID  = " <<  stream.streamID ;;
+  LOG(LEV_DEBUG2) <<  "formID  = " <<  stream.formID ;;
+  LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
+  LOG(LEV_DEBUG2) <<  "wfVol= " <<  stream.wfvol;;
+  LOG(LEV_DEBUG2) <<  "wfMass  = " <<  stream.wfmass;;
+
+  //  } catch (Exception error) {
+  // error.printError();
+  // }
+
 
 }
 
@@ -339,7 +347,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadCSVFile(string datafile){
   string file_path = ENV->getCyclusPath() + "/" + datafile; 
-  
+
   // create an ifstream for the file
   ifstream file(file_path.c_str());
 
@@ -381,6 +389,8 @@ void ConditioningFacility::loadCSVFile(string datafile){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::makeRequests(){
+  // The ConditioningFacility should make requests of all of the things it's 
+  // capable of conditioning
 
 }
 
