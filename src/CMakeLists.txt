@@ -9,14 +9,20 @@ SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 SET(BUILD_SHARED_LIBS true)
 
 # This allows apple to build the libraries dynamically
-IF(APPLE)
+IF (WIN32)
+  set(suffix ".dll")
+  set(dynamicloadlib "WinLoadConstr.h")
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+ELSEIF(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
   set(suffix ".dylib")
+  set(dynamicloadlib "UnixLoadConstr.h")
   CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
-ELSE (APPLE)
+ELSE()
   set(suffix ".so")
+  set(dynamicloadlib "UnixLoadConstr.h")
   CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
-ENDIF(APPLE)
+ENDIF()
 
 # Includes the directories in which there are source files. 
 SET(CYCLUS_INCLUDE_DIR
