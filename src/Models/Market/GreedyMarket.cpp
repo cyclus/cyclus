@@ -25,14 +25,37 @@ void GreedyMarket::receiveMessage(Message *msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::reject_request(sortedMsgList::iterator request)
-{
-  // send a failure message to the facility
-  //  Transaction trans;
-  //  trans.amount = 0;
-  //  orders_.push_back(new Message(down, trans, this, 
-  //                               (*request).second->getRequester()));
+void GreedyMarket::resolve() {
 
+  sortedMsgList::iterator request;
+
+  firmOrders_ = 0;
+
+  /// while requests_ remain and there is at least one offer left
+  while (requests_.size() > 0) {
+
+    request = requests_.end();
+    request--;
+    
+    if(match_request(request)) {
+      process_request();
+    }
+
+    // remove this request
+    messages_.erase((*request).second);
+    requests_.erase(request);
+  }
+
+  for (int i = 0; i < orders_.size(); i++) {
+    Message* msg = orders_.at(i);
+    msg->setDir(DOWN_MSG);
+    msg->sendOn();
+  }
+  orders_.clear();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void GreedyMarket::reject_request(sortedMsgList::iterator request) {
   // delete the tentative orders
   while ( orders_.size() > firmOrders_)
   {
@@ -47,12 +70,10 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request)
     offers_.insert(indexedMsg(msg->getAmount(),msg));
     matchedOffers_.erase(msg);
   }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::process_request()
-{
+void GreedyMarket::process_request() {
   // update pointer to firm orders
   firmOrders_ = orders_.size();
 
@@ -65,8 +86,7 @@ void GreedyMarket::process_request()
 }
  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GreedyMarket::match_request(sortedMsgList::iterator request)
-{
+bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   sortedMsgList::iterator offer;
   double requestAmt,offerAmt;
   Message *offerMsg, *requestMsg;
@@ -80,8 +100,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     // get a new offer
     offer = offers_.end();
     offer--;
-    offerAmt = (*offer).first;
-    offerMsg = (*offer).second;
+    offerAmt = offer->first;
+    offerMsg = offer->second;
 
     // pop off this offer
     offers_.erase(offer);
@@ -90,7 +110,6 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequester(requestMsg->getRequester());
-      offerMsg->setDir(DOWN_MSG);
 
       // tenatively queue a new order (don't execute yet)
       matchedOffers_.insert(offerMsg);
@@ -113,9 +132,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       }
       
       // queue a new order
-      Message* maybe_offer = new Message(*offerMsg);
+      Message* maybe_offer = offerMsg->clone();
       maybe_offer->setAmount(requestAmt);
-      maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequester(requestMsg->getRequester());
 
       matchedOffers_.insert(offerMsg);
@@ -135,7 +153,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
       // if the residual is above threshold,
       // make a new offer with reduced amount
       if(offerAmt > EPS_KG) {
-        Message *new_offer = new Message(*offerMsg);
+        Message* new_offer = offerMsg->clone();
         new_offer->setAmount(offerAmt);
         receiveMessage(new_offer);
       }
@@ -145,36 +163,13 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request)
     }
   }
 
-  return (0 == requestAmt);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::resolve() {
-
-  sortedMsgList::iterator request;
-
-  firmOrders_ = 0;
-
-  /// while requests_ remain and there is at least one offer left
-  while (requests_.size() > 0) {
-
-    request = requests_.end();
-    request--;
-    
-    if(match_request(request)) {
-      process_request();
-    } else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->ID()
-          << " for the amount " << (*request).first 
-          << " rejected. ";
+  if (requestAmt != 0) {
+      LOG(LEV_DEBUG2) << "The request from Requester "
+                      << requestMsg->getRequester()->ID()
+                      << " for the amount " << requestAmt << " rejected. ";
       reject_request(request);
-    }
-
-    // remove this request
-    messages_.erase((*request).second);
-    requests_.erase(request);
   }
 
-  executeOrderQueue();
+  return (requestAmt == 0);
 }
 

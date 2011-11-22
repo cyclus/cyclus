@@ -58,20 +58,3 @@ void MarketModel::print() {
  * --------------------
  */
 
-
-/* --------------------
- * all MARKETMODEL classes have these members
- * --------------------
- */
-
-void MarketModel::executeOrderQueue()
-{
-
-  while( orders_.size() > 0)
-  {
-    (*orders_.begin())->execute();
-    orders_.pop_front();
-  }
-
-
-}

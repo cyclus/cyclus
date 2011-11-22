@@ -114,66 +114,30 @@ class Message {
   public:
     
     /**
-     * Creates an empty message from some communicator in some direction.
+     * Creates an empty upward message from some communicator.
      *
-     * @param dir the direction this Message is traveling
-     * @param toSend the sender of this Message
+     * @param sender the sender of this Message
      */
-    Message(MessageDir dir, Communicator* toSend);
+    Message(Communicator* sender);
 
     /**
-     * Creates a message from a direction, a transaction, 
-     * a recipient, and a sender.
-     */
-    Message(MessageDir dir, Transaction trans, 
-        Communicator* toSend, Communicator* toReceive);
-
-    /**
-     * Creates a message regarding a transaction. This is used
-     * in conjunction with the BookKeeper and does not need a 
-     * direction.
-     * Ex: Recording the initial stocks of fuel in a StorageFacility
-     */
-    Message(Commodity* thisCommod, CompMap thisComp, double thisAmount, 
-	    double thisPrice, double minAmt,
-	    Communicator* toSend, Communicator* toReceive);
-
-    /**
-     * Creates a new Message with the given specs.
+     * Creates an upward message using the given
+     * sender, and recipient.
      *
-     * @param dir the direction this Message is traveling
-     * @param commod the Commodity being offered or requested
-     * @param amount the amount of the given Commodity being offered/requested
-     * Note: positive amounts mean you want something, negative amounts 
-     * mean you want to get rid of something.
-     * @param minAmt the minimum amount acceptible for this transaction
-     * @param price the price of the Commodity
-     * @param toSend the sender of this Message
-     * @param toReceive the recipient of this Message, or null if the 
-     * eventual recipient/handler is unknown to the sender
-     * @param comp the specific composition of the material to be traded 
+     * @param sender sender of this Message
+     * @param receiver recipient of this Message
      */
-    Message(MessageDir dir, Commodity* commod, 
-        double amount, double minAmt, double price, Communicator* toSend, 
-        Communicator* toReceive, CompMap comp);
+    Message(Communicator* sender, Communicator* receiver);
 
     /**
-     * Creates a new Message with the given specs.
+     * Creates an upward message using the given sender, 
+     * recipient, and transaction.
      *
-     * @param dir the direction this Message is traveling
-     * @param commod the Commodity being offered or requested
-     * @param amount the amount of the given Commodity being offered/requested
-     * Note: positive amounts mean you want something, negative amounts 
-     * mean you want to get rid of something.
-     * @param minAmt the minimum amount acceptible for this transaction
-     * @param price the price of the Commodity
-     * @param toSend the sender of this Message
-     * @param toReceive the recipient of this Message, or null if the 
-     * eventual recipient/handler is unknown to the sender
+     * @param sender sender of this Message
+     * @param receiver recipient of this Message
+     * @param trans the message's transaction specifics
      */
-    Message(MessageDir dir, Commodity* commod, 
-        double amount, double minAmt, double price, Communicator* toSend, 
-        Communicator* toReceive);
+    Message(Communicator* sender, Communicator* receiver, Transaction trans);
 
     /**
      * @brief Send this message to the next communicator in it's path
@@ -203,19 +167,20 @@ class Message {
     void setNextDest(Communicator* next_stop);
 
     /**
+     * Creates a new message by copying the current one and
+     * returns a reference to it.
+     *
+     * @warning don't forget to delete the pointer when you're done.
+     */
+    Message* clone();
+
+    /**
      * @brief Get the market corresponding to the transaction commodity
      *
      * @return market corresponding to this msg's transaction's commodity
      *
      */
     Communicator* getMarket();
-
-    /**
-     * A copy "constructor" for this class.
-     *
-     * @return the copy of this Message
-     */
-    Message* clone() const;
 
     /**
      * Prints the transaction data.
@@ -253,9 +218,23 @@ class Message {
     Model* getRequester() const;
 
     /**
+     * Reverses the direction this Message is being sent (so, for 
+     * instance, the Manager can forward a message back down the hierarchy 
+     * to an appropriate handler.
+     */
+    void reverseDirection();
+
+    /**
      * Returns the direction this Message is traveling.
      */
     MessageDir getDir() const;
+
+    /**
+     * Sets the direction of the message
+     *
+     * @param newDir is the new direction
+     */
+    void setDir(MessageDir newDir);
 
     /**
      * Returns the transaction associated with this message.
@@ -285,13 +264,6 @@ class Message {
      * @return the amount (units vary)
      */
     double getAmount() const;
-
-    /**
-     * Sets the direction of the message
-     *
-     * @param newDir is the new direction
-     */
-    void setDir(MessageDir newDir);
 
     /**
      * Sets the amount of some Commodity being requested or offered in this 
@@ -337,18 +309,6 @@ class Message {
      * @param newComp is the new composition in the transaction
      */
     void setComp(CompMap newComp);
-
-    /**
-     * Reverses the direction this Message is being sent (so, for 
-     * instance, the Manager can forward a message back down the hierarchy 
-     * to an appropriate handler.
-     */
-    void reverseDirection();
-
-    /**
-     * Executes the transaction involved in the message.
-     */
-    void execute();
 
 };
 #endif

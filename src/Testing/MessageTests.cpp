@@ -11,8 +11,7 @@ using namespace std;
 
 class TrackerMessage : public Message {
   public:
-    TrackerMessage(MessageDir dir, Communicator* originator) : 
-                                       Message(dir, originator) { }
+    TrackerMessage(Communicator* originator) : Message(originator) { }
 
     vector<string> dest_list_;
 };
@@ -22,7 +21,7 @@ class TestCommunicator : public Communicator {
   public:
 
     TestCommunicator(string name) {
-      msg_ = new TrackerMessage(UP_MSG, this);
+      msg_ = new TrackerMessage(this);
 
       name_ = name;
       stop_at_return_ = true;

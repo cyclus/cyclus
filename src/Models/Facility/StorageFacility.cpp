@@ -221,11 +221,16 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     /* this needs to be fixed */
     // create the book keeping message
     double price = 0.0, minAmt = 0.0;
-    Message* storage_history = 
-      new Message(commodity, newMat->getAtomComp(), newMat->getTotMass(), 
-		  price, minAmt, sending_facility, this);
 
-    // have the facility send its stocks
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = commodity;
+    trans.comp = newMat->getAtomComp();
+    trans.min = minAmt;
+    trans.price = price;
+    trans.amount = newMat->getTotMass();
+
+    Message* storage_history = new Message(sending_facility, this, trans); 
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
@@ -263,29 +268,37 @@ void StorageFacility::handleTick(int time)
 
   if (space == 0){
     // don't request anything
-  }
-  else if (space < capacity_){
+  } else if (space < capacity_){
     Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
-    // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, 
-                                     commod_price, this, recipient);
-    // pass the message up to the inst
+
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = in_commod_;
+    trans.min = minAmt;
+    trans.price = commod_price;
+    trans.amount = -requestAmt; // requests have a negative amount
+
+    Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
     request->sendOn();
 
-  }
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
-  else if (space >= capacity_){
+  } else if (space >= capacity_){
     Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity_ - sto;
-    // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, incommod_, -requestAmt, minAmt, commod_price,
-                                   this, recipient); 
-    // pass the message up to the inst
+
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = in_commod_;
+    trans.min = minAmt;
+    trans.price = commod_price;
+    trans.amount = -requestAmt; // requests have a negative amount
+
+    Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
     request->sendOn();
   }
@@ -309,11 +322,14 @@ void StorageFacility::handleTick(int time)
   // decide what market to offer to
   Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
 
-  // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, incommod_, offer_amt, min_amt, commod_price, 
-      this, recipient);
+  // build the transaction and message
+  Transaction trans;
+  trans.commod = incommod_;
+  trans.min = min_amt;
+  trans.price = commod_price;
+  trans.amount = offer_amt; // offers have a positive amount
 
-  // send it
+  Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
   msg->sendOn();
 }

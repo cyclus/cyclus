@@ -37,7 +37,7 @@ void NullMarket::reject_request(sortedMsgList::iterator request)
   // put all matched offers_ back in the sorted list
   while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers_.begin());
+    Message* msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->getAmount(),msg));
     matchedOffers_.erase(msg);
   }
@@ -52,7 +52,7 @@ void NullMarket::process_request()
 
   while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers_.begin());
+    Message* msg = *(matchedOffers_.begin());
     messages_.erase(msg);
     matchedOffers_.erase(msg);
   }
@@ -65,8 +65,8 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
   double requestAmt,offerAmt, toRet;
   Message *offerMsg, *requestMsg;
 
-  requestAmt = (*request).first;
-  requestMsg = (*request).second;
+  requestAmt = request->first;
+  requestMsg = request->second;
   
   // if this request is not yet satisfied &&
   // there are more offers_ left
@@ -85,7 +85,6 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequester(requestMsg->getRequester());
-      offerMsg->setDir(DOWN_MSG);
 
       // Queue an order
       matchedOffers_.insert(offerMsg);
@@ -108,9 +107,8 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       // split offer
 
       // queue a new order
-      Message* maybe_offer = new Message(*offerMsg);
+      Message* maybe_offer = offerMsg->clone();
       maybe_offer->setAmount(requestAmt);
-      maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequester(requestMsg->getRequester());
 
       matchedOffers_.insert(offerMsg);
@@ -131,7 +129,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
       // make a new offer with reduced amount
 
       if(offerAmt > EPS_KG){
-        Message *new_offer = new Message(*offerMsg);
+        Message* new_offer = offerMsg->clone();
         new_offer->setAmount(offerAmt);
         // call this method for consistency
         receiveMessage(new_offer);
@@ -177,6 +175,11 @@ void NullMarket::resolve()
     requests_.erase(request);
   }
 
-  executeOrderQueue();
+  for (int i = 0; i < orders_.size(); i++) {
+    Message* msg = orders_.at(i);
+    msg->setDir(DOWN_MSG);
+    msg->sendOn();
+  }
+  orders_.clear();
 }
 

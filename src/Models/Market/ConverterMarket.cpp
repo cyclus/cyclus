@@ -90,11 +90,6 @@ void ConverterMarket::receiveMessage(Message *msg)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void ConverterMarket::reject_request(sortedMsgList::iterator request)
 {
-  // send a failure message to the facility
-  //  Transaction trans;
-  //  trans.amount = 0;
-  //  orders.push_back(new Message(down, trans, this, 
-  //                               (*request).second->getRequester()));
 
   // delete the tentative orders
   while ( orders_.size() > firmOrders_)
@@ -154,7 +149,6 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequester(requestMsg->getRequester());
-      offerMsg->setDir(DOWN_MSG);
 
       // tenatively queue a new order (don't execute yet)
       matchedOffers_.insert(offerMsg);
@@ -174,9 +168,8 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // split offer
 
       // queue a new order
-      Message* maybe_offer = new Message(*offerMsg);
+      Message* maybe_offer = offerMsg->clone();
       maybe_offer->setAmount(requestAmt);
-      maybe_offer->setDir(DOWN_MSG);
       maybe_offer->setRequester(requestMsg->getRequester());
 
       matchedOffers_.insert(offerMsg);
@@ -197,7 +190,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       // make a new offer with reduced amount
 
       if(offerAmt > EPS_KG){
-        Message *new_offer = new Message(*offerMsg);
+        Message *new_offer = offerMsg->clone();
         new_offer->setAmount(offerAmt);
         // call this method for consistency
         receiveMessage(new_offer);
@@ -239,6 +232,11 @@ void ConverterMarket::resolve()
     requests_.erase(request);
   }
 
-  executeOrderQueue();
+  for (int i = 0; i < orders_.size(); i++) {
+    Message* msg = orders_.at(i);
+    msg->setDir(DOWN_MSG);
+    msg->sendOn();
+  }
+  orders_.clear();
 }
 

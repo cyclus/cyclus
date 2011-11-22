@@ -75,13 +75,6 @@ public:
    */
   virtual void resolve() = 0;
 
-  /// Execute list of shipments
-  /**
-   *  Once market is resolved, go through the deque/queue and 
-   *  execute the shipments.
-   */
-  virtual void executeOrderQueue();
-
 protected: 
   /// every market has a commodity
   Commodity* commodity_;

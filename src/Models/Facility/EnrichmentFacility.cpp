@@ -304,11 +304,15 @@ void EnrichmentFacility::makeRequests(){
     }
 
     Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
-    // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, in_commod_, -requestAmt, minAmt, 
-                                     commod_price, this, recipient);
 
-    // pass the message up to the inst
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = in_commod_;
+    trans.min = minAmt;
+    trans.price = commod_price;
+    trans.amount = -requestAmt; // requests have a negative amount
+
+    Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
     request->sendOn();
   }
@@ -336,11 +340,14 @@ void EnrichmentFacility::makeOffers()
   // decide what market to offer to
   Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
 
-  // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price, 
-      this, recipient);
+  // build the transaction and message
+  Transaction trans;
+  trans.commod = out_commod_;
+  trans.min = min_amt;
+  trans.price = commod_price;
+  trans.amount = offer_amt; // offers have a positive amount
 
-  // send it
+  Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
   msg->sendOn();
 }

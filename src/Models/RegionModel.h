@@ -78,16 +78,6 @@ public:
      */
     virtual void handleTock(int time);
 
-protected:
-
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all REGIONMODEL classes have these members
- * --------------------
- */
 public:
     bool isAllowedFacility(Model* test_fac) 
     { return ( allowedFacilities_.find(test_fac) != allowedFacilities_.end() ); } ;

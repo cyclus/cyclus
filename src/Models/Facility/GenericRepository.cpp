@@ -302,11 +302,15 @@ void GenericRepository::makeRequests(int time){
   } else {
     Communicator* recipient = 
       dynamic_cast<Communicator*>(in_commod->getMarket());
-    // recall that requests have a negative amount
-    Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt, 
-        commod_price,
-        this, recipient); 
-    // send it
+
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = in_commod;
+    trans.min = minAmt;
+    trans.price = commod_price;
+    trans.amount = -requestAmt; // requests have a negative amount
+
+    Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
     request->sendOn();
   }

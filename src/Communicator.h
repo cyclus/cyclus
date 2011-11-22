@@ -26,6 +26,8 @@ private:
    *         and receiveing messages.
    *
    *  @param msg pointer to message to be received
+   *  @warning This method should never be called directly by any Model object.
+   *           Message sending should be handled via methods on the Message class.
    */
   virtual void receiveMessage(Message* msg) = 0;
 

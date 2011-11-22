@@ -165,11 +165,14 @@ void SourceFacility::handleTick(int time){
   Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
   LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
 
-  // create a message to go up to the market with these parameters
-  Message* msg = new Message(UP_MSG, out_commod_, offer_amt, min_amt, commod_price_, 
-      this, recipient);
+  // build the transaction and message
+  Transaction trans;
+  trans.commod = out_commod_;
+  trans.min = min_amt;
+  trans.price = commod_price_;
+  trans.amount = offer_amt; // offers have a positive amount
 
-  // send it
+  Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
   msg->sendOn();
 }

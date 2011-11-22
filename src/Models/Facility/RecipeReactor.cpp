@@ -317,27 +317,34 @@ void RecipeReactor::handleTick(int time)
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
-      // recall that requests have a negative amount
-      Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt,
-                                       commod_price, this, recipient);
-      // pass the message up to the inst
+
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = in_commod;
+      trans.min = minAmt;
+      trans.price = commod_price;
+      trans.amount = -requestAmt; // requests have a negative amount
+
+      Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
       request->sendOn();
-
-    }
     // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
-    else if (space >= minAmt){
+    } else if (space >= minAmt){
       Communicator* recipient = dynamic_cast<Communicator*>(in_commod->getMarket());
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity_ - sto;
-      // recall that requests have a negative amount
-      Message* request = new Message(UP_MSG, in_commod, -requestAmt, minAmt,
-                                      commod_price, this, recipient); 
-      // pass the message up to the inst
+
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = in_commod;
+      trans.min = minAmt;
+      trans.price = commod_price;
+      trans.amount = -requestAmt; // requests have a negative amount
+
+      Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
       request->sendOn();
-
     }
   }
 
@@ -365,10 +372,15 @@ void RecipeReactor::handleTick(int time)
     recipient = dynamic_cast<Communicator*>(commod->getMarket());
     // get amt
     offer_amt = iter->second->getTotMass();
-    // create a message to go up to the market with these parameters
-    Message* msg = new Message(UP_MSG, commod, offer_amt, min_amt, 
-                                commod_price, this, recipient);
-    // send it
+
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = commod;
+    trans.min = min_amt;
+    trans.price = commod_price;
+    trans.amount = offer_amt; // requests have a negative amount
+
+    Message* msg = new Message(this, recipient, trans); 
     msg->setNextDest(getFacInst());
     msg->sendOn();
   };

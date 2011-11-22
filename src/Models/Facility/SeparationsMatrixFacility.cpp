@@ -362,10 +362,15 @@ void SeparationsMatrixFacility::makeRequests(){
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
-      Message* request = new Message(UP_MSG, (*iter), -requestAmt, minAmt, 
-                                       commod_price, this, recipient);
+      
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = (*iter);
+      trans.min = minAmt;
+      trans.price = commod_price;
+      trans.amount = -requestAmt; // requests have a negative amount
 
-      // pass the message up to the inst
+      Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
       request->sendOn();
     }
@@ -375,10 +380,15 @@ void SeparationsMatrixFacility::makeRequests(){
       Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity_ - sto;
-      // recall that requests have a negative amount
-      Message* request = new Message(UP_MSG, (*iter), -requestAmt, minAmt, commod_price,
-                                     this, recipient); 
-      // pass the message up to the inst
+
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = (*iter);
+      trans.min = minAmt;
+      trans.price = commod_price;
+      trans.amount = -requestAmt; // requests have a negative amount
+
+      Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
       request->sendOn();
     }
@@ -409,11 +419,14 @@ void SeparationsMatrixFacility::makeOffers()
     // decide what market to offer to
     Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
 
-    // create a message to go up to the market with these parameters
-    Message* msg = new Message(UP_MSG, (*iter), offer_amt, min_amt, commod_price, 
-        this, recipient);
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = (*iter);
+    trans.min = min_amt;
+    trans.price = commod_price;
+    trans.amount = offer_amt; // offers have a positive amount
 
-    // send it
+    Message* msg = new Message(this, recipient, trans); 
     msg->setNextDest(getFacInst());
     msg->sendOn();
   }

@@ -14,103 +14,51 @@
 #include <iostream>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(MessageDir thisDir, Communicator* toSend) {
-  dir_ = thisDir;
-  sender_ = toSend;
-
-  trans_.commod = NULL;
+Message::Message(Communicator* sender) {
+  dir_ = UP_MSG;
+  sender_ = sender;
   recipient_ = NULL;
 
+  trans_.commod = NULL;
   trans_.supplier = NULL;
   trans_.requester = NULL;
-
-  trans_.comp.insert(make_pair(0,0));
-
   trans_.amount = 0;
   trans_.min = 0;
   trans_.price = 0;
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(MessageDir thisDir, Transaction thisTrans,
-                 Communicator* toSend, Communicator* toReceive) {
-  dir_ = thisDir;
+Message::Message(Communicator* sender, Communicator* receiver) {
+  dir_ = UP_MSG;
+  sender_ = sender;
+  recipient_ = receiver;
+
+  trans_.commod = NULL;
+  trans_.supplier = NULL;
+  trans_.requester = NULL;
+  trans_.amount = 0;
+  trans_.min = 0;
+  trans_.price = 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::Message(Communicator* sender, Communicator* receiver,
+                 Transaction thisTrans) {
+  dir_ = UP_MSG;
   trans_ = thisTrans;
-  sender_ = toSend;
-  recipient_ = toReceive;
-}
+  sender_ = sender;
+  recipient_ = receiver;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(Commodity* thisCommod, CompMap thisComp, double thisAmount,                 double thisPrice, double minAmt, Communicator* toSend, 
-                 Communicator* toReceive) {
-  dir_ = NONE_MSG;
-  trans_.commod = thisCommod;
-  trans_.amount = thisAmount; 
-  trans_.min = minAmt;
-  trans_.price = thisPrice;
-  trans_.comp = thisComp;
-  sender_ = toSend;
-  recipient_ = toReceive;
-  this->setSupplier(dynamic_cast<Model*>(sender_));
-  this->setRequester(dynamic_cast<Model*>(recipient_));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, 
-                 double minAmt, double thisPrice, Communicator* toSend, 
-                 Communicator* toReceive, CompMap thisComp) {
-  dir_ = thisDir;
-  trans_.commod = thisCommod;
-  trans_.amount = thisAmount; 
-  trans_.min = minAmt;
-  trans_.price = thisPrice;
-  trans_.comp = thisComp;
-  sender_ = toSend;
-  recipient_ = toReceive;
-  
-  // if amt is positive and there is no supplier
-  // this message is an offer and 
+  // if amt is positive this message is an offer and 
   // the sender is the supplier
   if (trans_.amount > 0) {
-    this->setSupplier(dynamic_cast<Model*>(sender_));
+    setSupplier(dynamic_cast<Model*>(sender_));
   }
 
-  // if amt is negative and there is no requester
-  // this message is a request and
+  // if amt is negative this message is a request and
   // the sender is the requester
   if (trans_.amount < 0){
-    this->setRequester(dynamic_cast<Model*>(sender_));
-  }
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(MessageDir thisDir, Commodity* thisCommod, double thisAmount, 
-                 double minAmt, double thisPrice, Communicator* toSend, 
-                 Communicator* toReceive) {
-  dir_ = thisDir;
-  trans_.commod = thisCommod;
-  trans_.amount = thisAmount; 
-  trans_.min = minAmt;
-  trans_.price = thisPrice;
-
-  CompMap thisComp;
-  thisComp.insert(make_pair(NULL, NULL));
-
-  sender_ = toSend;
-  recipient_ = toReceive;
-  
-  // if amt is positive and there is no supplier
-  // this message is an offer and 
-  // the sender is the supplier
-  if (trans_.amount > 0) {
-    this->setSupplier(dynamic_cast<Model*>(sender_));
-  }
-
-  // if amt is negative and there is no requester
-  // this message is a request and
-  // the sender is the requester
-  if (trans_.amount < 0) {
-    this->setRequester(dynamic_cast<Model*>(sender_));
+    setRequester(dynamic_cast<Model*>(sender_));
   }
 }
 
@@ -121,10 +69,10 @@ void Message::printTrans() {
     "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
     "    Price: "  << trans_.price << std::endl;
 };
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message* Message::clone() const {
-	return new Message(dir_, trans_.commod, trans_.amount, trans_.min, 
-                       trans_.price, sender_, recipient_);
+Message* Message::clone() {
+  return new Message(*this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -179,13 +127,34 @@ void Message::setNextDest(Communicator* next_stop) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::reverseDirection() {
+  if (DOWN_MSG == dir_) {
+    dir_ = UP_MSG; 
+  } else {
+  	dir_ = DOWN_MSG;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+MessageDir Message::getDir() const {
+  return dir_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setDir(MessageDir newDir) {
+  dir_ = newDir;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getMarket() {
   return dynamic_cast<Communicator*>(trans_.commod->getMarket());
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getSender() const {
 	return sender_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getRecipient() const {
   if (recipient_ == NULL) {
@@ -195,6 +164,7 @@ Communicator* Message::getRecipient() const {
 
   return recipient_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Message::getSupplier() const {
   if (trans_.supplier == NULL) {
@@ -204,6 +174,12 @@ Model* Message::getSupplier() const {
 
   return trans_.supplier;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setSupplier(Model* supplier) {
+  trans_.supplier = supplier;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Message::getRequester() const {
   if (trans_.requester == NULL) {
@@ -213,69 +189,49 @@ Model* Message::getRequester() const {
 
   return trans_.requester;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MessageDir Message::getDir() const {
-  return dir_;
-}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction Message::getTrans() const{
   return trans_;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Commodity* Message::getCommod() const {
   return trans_.commod;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setCommod(Commodity* newCommod) {
   trans_.commod = newCommod;
 }
+
 //- - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getAmount() const {
   return trans_.amount;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setDir(MessageDir newDir) {
-  dir_ = newDir;
-}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setAmount(double newAmount) {
   trans_.amount = newAmount;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplier(Model* supplier) {
-  trans_.supplier = supplier;
-}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setRequester(Model* requester) {
   trans_.requester = requester;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Message::getPrice() const {
   return trans_.price;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CompMap Message::getComp() const {
   return trans_.comp;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setComp(CompMap newComp) {
   trans_.comp = newComp;
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::reverseDirection() {
-  if (DOWN_MSG == dir_) {
-    dir_ = UP_MSG; 
-  } else {
-  	dir_ = DOWN_MSG;
-    // Speaking of "getting up" or "getting down," check out
-    // "National Funk Congress Deadlocked On Get Up/Get Down Issue,"
-    // The Onion (1999, October 27), 35(39).
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::execute() {
-  Communicator* theFac = dynamic_cast<Communicator*>(trans_.supplier);
-  theFac->receiveMessage(this);
-} 
 

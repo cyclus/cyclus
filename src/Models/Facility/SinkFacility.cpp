@@ -118,9 +118,15 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
       // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods_.size());
-      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, 
-                                     commod_price_, this, recipient);
-      // pass the message up to the inst
+
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = *commod;
+      trans.min = minAmt;
+      trans.price = commod_price_;
+      trans.amount = -requestAmt; // requests have a negative amount
+
+      Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
       request->sendOn();
 
@@ -136,13 +142,19 @@ void SinkFacility::handleTick(int time){
     {
       Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
       requestAmt = capacity_/in_commods_.size();
-      Message* request = new Message(UP_MSG, *commod, -requestAmt, minAmt, commod_price_,
-                          this, recipient); 
-    // pass the message up to the inst
-    request->setNextDest(getFacInst());
-    request->sendOn();
 
-    LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: " << requestAmt << ".";
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = *commod;
+      trans.min = minAmt;
+      trans.price = commod_price_;
+      trans.amount = -requestAmt; // requests have a negative amount
+
+      Message* request = new Message(this, recipient, trans); 
+      request->setNextDest(getFacInst());
+      request->sendOn();
+
+      LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: " << requestAmt << ".";
     }
   }
 
