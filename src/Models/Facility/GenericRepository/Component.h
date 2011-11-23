@@ -1,4 +1,6 @@
-// Component.h
+/** \file Component.h
+ * \brief Declares the Component class
+ */
 #if !defined(_COMPONENT_H)
 #define _COMPONENT_H
 
@@ -13,46 +15,38 @@
 #include "ThermalModel.h"
 #include "NuclideModel.h"
 
-/**
- * type definition for Radius in meters
- */
+/// type definition for Radius in meters
 typedef double Radius;
 
-/**
- * type definition for Toxicity in units of Sv 
- */
+/// type definition for Toxicity in units of Sv 
 typedef double Tox;
 
-/**
- * type definition for Concentrations in kg/m^3
- */
+/// type definition for Concentrations in kg/m^3
 typedef double Concentration;
 
-/**
- * type definition for ConcMap 
- */
+/// type definition for ConcMap 
 typedef std::map<Iso, Concentration> ConcMap;
 
-/**
- * type definition for Temperature in Kelvin
- */
+/// type definition for Temperature in Kelvin
 typedef double Temp;
 
-/**
- * type definition for Power in Watts
- */
+/// type definition for Power in Watts
 typedef double Power;
 
-/**
- * Enum for type of engineered barrier component.
- */
+/// Enum for type of engineered barrier component.
 enum ComponentType {BUFFER, ENV, FF, NF, WF, WP, LAST_EBS};
 
-/**
- * Enum for type of boundary.
- */
+/// Enum for type of boundary.
 enum BoundaryType {INNER, OUTER};
 
+/// This struct stores the cylindrical Component geometry 
+typedef struct geometry_t{
+  Radius inner_radius_; /**<Radius of the inner surface. 0 for solid objects. */
+  Radius outer_radius_; /**<Radius of the outer surface. NULL for infinite objects. */
+  double x_; /**<The x coordinate of the centroid */
+  double y_; /**<The y coordinate of the centroid */
+  double z_; /**<The z coordinate of the centroid */
+}geometry_t;
 
 /** 
  * @brief Defines interface for subcomponents of the GenericRepository
@@ -242,10 +236,20 @@ public:
    * get a Radius of the object
    *
    * @param type indicates whether to return the inner or outer radius
-   * @return inner_radius_
+   * @return inner_radius__ or outer_radius__
    */
   const Radius getRadius(BoundaryType type){
-    return (type==INNER)?inner_radius_:outer_radius_; };
+    return (type==INNER)?geom_.inner_radius_:geom_.outer_radius_; };
+
+  /**
+   * set the placement of the object
+   *
+   * @param x is the x dimension of the centroid position vector
+   * @param y is the y dimension of the centroid position vector
+   * @param z is the z dimension of the centroid position vector
+   */
+  void* setPlacement(double x, double y, double z){
+    geom_.x_=x, geom_.y_=y, geom_.z_=z; };
 
 protected:
   /** 
@@ -307,14 +311,9 @@ protected:
   std::string name_;
 
   /**
-   * The inner radius of the (cylindrical) component
+   * The geometry of the cylindrical component
    */
-  Radius inner_radius_;
-
-  /**
-   * The outer radius of the (cylindrical) component
-   */
-  Radius outer_radius_;
+  geometry_t geom_;
 
   /**
    * The type of component that this component represents (ff, buffer, wp, etc.) 

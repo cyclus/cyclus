@@ -1,4 +1,7 @@
-// Component.cpp
+/** \file Component.cpp
+ * \brief Implements the Component class used by the Generic Repository 
+ */
+
 #include <iostream>
 #include "Logger.h"
 #include <fstream>
@@ -24,8 +27,8 @@ int Component::nextID_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Component::Component(){
   name_ = "";
-  inner_radius_ = 0;
-  outer_radius_ = 0;
+  geom_.inner_radius_ = 0;  // 0 indicates a solid
+  geom_.outer_radius_ = NULL;   // NULL indicates an infinite object
   temperature_ = 0;
 
   temperature_lim_ = 373;
@@ -43,8 +46,8 @@ void Component::init(xmlNodePtr cur){
   ID_=nextID_++;
   
   name_ = XMLinput->get_xpath_content(cur,"name");
-  inner_radius_ = strtod(XMLinput->get_xpath_content(cur,"innerradius"),NULL);
-  outer_radius_ = strtod(XMLinput->get_xpath_content(cur,"outerradius"),NULL);
+  geom_.inner_radius_ = strtod(XMLinput->get_xpath_content(cur,"innerradius"),NULL);
+  geom_.outer_radius_ = strtod(XMLinput->get_xpath_content(cur,"outerradius"),NULL);
 
   thermal_model_ = getThermalModel(cur);
   nuclide_model_ = getNuclideModel(cur);
@@ -59,8 +62,8 @@ void Component::init(xmlNodePtr cur){
 void Component::copy(Component* src){
 
   name_ = src->name_;
-  inner_radius_ = src->inner_radius_;
-  outer_radius_ = src->outer_radius_;
+  geom_.inner_radius_ = src->geom_.inner_radius_;
+  geom_.outer_radius_ = src->geom_.outer_radius_;
 
   type_ = src->type_;
 

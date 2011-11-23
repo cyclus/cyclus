@@ -223,7 +223,15 @@ void GenericRepository::copyFreshModel(Model* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::print() { 
   // this should ultimately print all of the components loaded into this repository.
-  FacilityModel::print(); LOG(LEV_DEBUG2) << "    stores commodity {"
+  FacilityModel::print(); LOG(LEV_DEBUG2) << "    with far_field_ {" 
+    << far_field_->name()
+    << "}, buffer {"
+    << buffer_template_->name() 
+    << "}, wp {"
+    << wp_templates_.front()->name()
+    << "}, wf {"
+    << wf_templates_.front()->name()
+    << "} which stores commodity {"
     << in_commods_.front()->name()
     << "} among others.";
 };
@@ -491,8 +499,9 @@ Component* GenericRepository::packageWaste(Component* waste_form){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Component* GenericRepository::loadBuffer(Component* waste_package){
-  // figure out what waste form to put the waste stream in
+  // figure out what buffer to put the waste package in
   Component* chosen_buffer = buffers_.front();
+  // set the location of the waste package 
   // and load in the waste package
   buffers_.front()->load(BUFFER, waste_package);
   return buffers_.front();
