@@ -175,6 +175,25 @@ class Message {
     Message* clone();
 
     /**
+     * Reverses the direction this Message is being sent (so, for 
+     * instance, the Manager can forward a message back down the hierarchy 
+     * to an appropriate handler.
+     */
+    void reverseDirection();
+
+    /**
+     * Returns the direction this Message is traveling.
+     */
+    MessageDir getDir() const;
+
+    /**
+     * Sets the direction of the message
+     *
+     * @param newDir is the new direction
+     */
+    void setDir(MessageDir newDir);
+
+    /**
      * @brief Get the market corresponding to the transaction commodity
      *
      * @return market corresponding to this msg's transaction's commodity
@@ -218,30 +237,11 @@ class Message {
     Model* getRequester() const;
 
     /**
-     * Reverses the direction this Message is being sent (so, for 
-     * instance, the Manager can forward a message back down the hierarchy 
-     * to an appropriate handler.
-     */
-    void reverseDirection();
-
-    /**
-     * Returns the direction this Message is traveling.
-     */
-    MessageDir getDir() const;
-
-    /**
-     * Sets the direction of the message
-     *
-     * @param newDir is the new direction
-     */
-    void setDir(MessageDir newDir);
-
-    /**
      * Returns the transaction associated with this message.
      *
      * @return the Transaction
      */
-    Transaction getTrans() const;
+    Transaction trans() const;
 
     /**
      * Returns the Commodity requested or offered in this Message.
