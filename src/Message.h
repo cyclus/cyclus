@@ -241,7 +241,7 @@ class Message {
      *
      * @return the Transaction
      */
-    Transaction trans() const;
+    Transaction getTrans() const;
 
     /**
      * Returns the Commodity requested or offered in this Message.
