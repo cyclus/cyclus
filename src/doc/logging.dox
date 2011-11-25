@@ -1,0 +1,89 @@
+
+/*!
+
+@page logging Using the Logger
+
+Built-in logging functionality has been provided to aid debugging.  @e std::cout
+statements should be generally avoided.  The LOG(level) macro should be used
+for all logging/debugging needs.  The LOG macro uses the Log class to
+provide this functionality.  The Log class should generally not be accessed
+directly.   The macro returns a string stream object that can be used
+exactlyl as @e std::cout for printing output.  Streamed in content is flushed
+to stdout as soon as execution passes beyond the terminating semi-colon of
+the log statement.
+
+A brief description of when to use which log level is given with the #LogLevel
+enum.  Developers working on models should prefix all content streamed to the
+logger with a unique devloper-specific identifier. This will allow developers to
+more easily filter the logger output in order to isolate information most
+relevant to their work (see @ref examples "Examples").
+
+@warning do not place any state-changing expressions with the LOG macro as they
+         may not run if the report level excludes the specified @e level.
+
+@section examples Examples
+
+@code
+
+LOG(LEV_ERROR) << "This is my error statement. " << "and more info...";
+LOG(LEV_DEBUG2) << "This is my debug statement. " << "and more info...";
+
+@endcode
+
+The command-line specified verbosity is used to determine the logger
+report-cutoff.  Available levels are described in the #LogLevel enum. In the
+above example if the command line verbosity were set to #LEV_DEBUG1, the first statement would
+print, while the second would not.  Any expression placed with a log statment
+that is not printed will not be executed. An example follows.
+
+@code
+
+LOG(LEV_DEBUG2) << "The expression myobject.setName(newname): " 
+                << myobject.setName(newname)
+                << " might not ever execute"
+                << " depending on the verbosity level.";
+
+@endcode
+
+As explained above, developers should prefix log output with model-specific
+identifiers. A prefix should be present on every LOG statement in every
+file and model created.  For example, If Henry Hopless were creating a 
+model, he might use the prefix @e "HHopeless":
+
+@code
+
+void henrysFunction() {
+  ...
+  LOG(LEV_DEBUG) << "HHopeless: " << "my debugging info.";
+  LOG(LEV_DEBUG1) << "HHopeless: " << "more detailed debugging info.";
+  LOG(LEV_DEBUG1) << "HHopeless: " << "even more debugging info.";
+  ...
+}
+
+@endcode
+
+Rather than adding the prefix onto every LOG statement as per the above
+example, developers are encouraged to write their own macro identical to the
+LOG(level) macro except that it automatically adds the desired prefix.
+Something similar to the macro below could be defined at the top of Henry
+Hopeless's model.  Henry could then use his macro instead of the LOG
+macro.  The following example would give the exact same output as the previous
+example:
+
+@code
+
+#define HENRY_LOG(level) \
+if (level > Log::ReportLevel()) ; \
+else Log().Get(level) << "HHopeless:"
+
+void henrysFunction() {
+  ...
+  HENRY_LOG(LEV_DEBUG) << "my debugging info.";
+  HENRY_LOG(LEV_DEBUG1) << "more detailed debugging info.";
+  HENRY_LOG(LEV_DEBUG1) << "even more debugging info.";
+  ...
+}
+
+@endcode
+
+*/

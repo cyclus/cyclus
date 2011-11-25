@@ -1,6 +1,26 @@
+// Logger.h
+
 #if !defined(_LOGGER_H)
 #define _LOGGER_H
 
+/*!
+@def LOG(level)
+
+@brief allows easy logging via the streaming operator similar to std::cout
+
+This is the primary way to use the Log class. This macro returns an
+anonymous instance of the Log class (not assigned to any variable) that can be
+streamed into just like any string stream (e.g.  std::cout).  This macro does a
+check on the given #LogLevel 'level' argument; if the specified level is not within
+the report-level range, the macro does nothing, limiting the performance impact
+of logging statements.
+
+@param level #LogLevel category or type of log statement.
+
+@warning do not place any state-changing expressions with this macro as they
+         may not run if the report level excludes the specified log 'level'.
+
+*/
 #define LOG(level) \
 if (level > Log::ReportLevel()) ; \
 else Log().Get(level)
@@ -11,9 +31,31 @@ else Log().Get(level)
 #include <vector>
 #include <map>
 
-enum LogLevel {LEV_ERROR, LEV_WARNING, LEV_INFO,
-               LEV_DEBUG, LEV_DEBUG1, LEV_DEBUG2, LEV_DEBUG3};
+/*!
+@enum LogLevel
 
+@brief categorical (verbosity) levels for log statements.
+
+*/
+enum LogLevel {
+               LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
+               LEV_WARNING, //!< Use to report questionable simulation state (use extremely sparingly)
+               LEV_INFO, //!< Information helpful for non-debugging simulation runs (use sparingly)
+               LEV_DEBUG, //!< overview debugging information (use occasionally)
+               LEV_DEBUG1, //!< debugging information (use often)
+               LEV_DEBUG2, //!< debugging information (use very often)
+               LEV_DEBUG3 //!< debugging information (use most often)
+               };
+
+/*!
+
+@brief A logging tool providing finer grained control over standard output for debugging.
+
+The Log class is primarily intended to aid debugging.
+The Log class should be used via the LOG macro
+exclusively.  Usage details are outlined in @ref logging "Using the Logger".
+
+*/
 class Log {
 
   public:
