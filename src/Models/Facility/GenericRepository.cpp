@@ -21,8 +21,8 @@
  *
  * BEGINNING OF SIMULATION
  * At the beginning of the simulation, this facility model loads the components 
- * within it and figures out its initial capacity for each heat or dose 
- * generating waste type it expects to accept. 
+ * within it, arranges them, and figures out its initial capacity for each 
+ * heat or dose generating waste type it expects to accept. 
  *
  * TICK
  * Examining the stocks, materials recieved last month are emplaced.
@@ -203,6 +203,7 @@ void GenericRepository::copy(GenericRepository* src)
   commod_wf_map_ = src->commod_wf_map_;
   buffers_.push_front(new Component());
   buffers_.front()->copy(buffer_template_);
+  setPlacement(buffers_.front());
 
   // don't copy things that should start out empty
   // initialize empty structures instead
@@ -416,12 +417,15 @@ void GenericRepository::emplaceWaste(){
           ) {
         // emplace it in the buffer
         loadBuffer(iter);
+        emplaced_waste_packages_.push_back(iter);
         if( current_buffer->isFull() ) {
           buffers_.push_back(buffers_.front());
           buffers_.pop_front();
           if( buffers_.front()->isFull()){
             // all buffers are now full, capacity reached
             is_full_ = true;
+          } else {
+            setPlacement(buffers_.front());
           }
         }
         // take the waste package out of the current packagess
@@ -492,7 +496,8 @@ Component* GenericRepository::packageWaste(Component* waste_form){
     current_waste_packages_.push_back( new Component() );
     current_waste_packages_.back()->copy(chosen_wp_template);
     // and load in the waste form
-    toRet = current_waste_packages_.back()->load(WP, waste_form); loaded = true;
+    toRet = current_waste_packages_.back()->load(WP, waste_form); 
+    loaded = true;
   }
   return toRet;
 }
@@ -502,9 +507,56 @@ Component* GenericRepository::loadBuffer(Component* waste_package){
   // figure out what buffer to put the waste package in
   Component* chosen_buffer = buffers_.front();
   // set the location of the waste package 
+  setPlacement(waste_package);
+  // set the location of the waste forms within it
+  std::vector<Component*> daughters = waste_package->getDaughters();
+  for (std::vector<Component*>::iterator iter = daughters.begin();  
+      iter != daughters.end(); 
+      iter ++){
+    setPlacement(*iter);
+  }
   // and load in the waste package
   buffers_.front()->load(BUFFER, waste_package);
   return buffers_.front();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Component* GenericRepository::setPlacement(Component* comp){
+  double x,y,z;
+  // figure out what type of component it is
+  switch(comp->getComponentType()) 
+  {
+    case FF :
+      x = x_/2;
+      y = y_/2;
+      z = z_/2;
+      break;
+    case BUFFER :
+      x = (buffers_.size()*dx_ - dx_/2) ;
+      y = y_/2 ; 
+      z = dz_ ; 
+      break;
+    case WP :
+      x = (buffers_.size()*dx_ - dx_/2) ;
+      y = (emplaced_waste_packages_.size()*dy_ - dy_/2) ; 
+      z = dz_ ; 
+      break;
+    case WF :
+      x = (comp->getParent())->getX();
+      y = (comp->getParent())->getY();
+      z = (comp->getParent())->getZ();
+      break;
+    default :
+      string err = "ComponentType, '";
+      err += comp->getComponentType();
+      err +="' is not a valid type for Component ";
+      err += comp->name();
+      err += ".";
+      throw CycException(err);
+  }
+  // figure out what buffer to put the waste package in
+  comp->setPlacement(x,y,z);
+  return comp; 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

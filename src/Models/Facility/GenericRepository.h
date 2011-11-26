@@ -224,9 +224,14 @@ protected:
     deque<Component*> wf_templates_;
 
     /**
-     * The waste package component
+     * The waste package components current being dealt with
      */
     deque<Component*> current_waste_packages_;
+
+    /**
+     * The waste package components that have been emplaced
+     */
+    deque<Component*> emplaced_waste_packages_;
 
     /**
      * The waste form components
@@ -307,6 +312,14 @@ protected:
      * @return the buffer that has been loaded with the waste package
      */
     Component* loadBuffer(Component* waste_package) ;
+
+    /**
+     * Set the placement for the component within the repository
+     *
+     * @param comp the component to be placed
+     * @return comp the component once it has been placed
+     */
+    Component* setPlacement(Component* comp);
 
     /**
      * Initializes the name and model type of the component

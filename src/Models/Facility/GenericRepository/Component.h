@@ -132,6 +132,11 @@ public:
   bool isFull() ;
 
   /** 
+   * Returns the ComponentType of this component
+   */
+  ComponentType getComponentType(){return type_;};
+
+  /** 
    * Enumerates a string if it is one of the named ComponentTypes
    */
   ComponentType getComponentType(std::string type);
@@ -181,11 +186,18 @@ public:
   const std::string name(){return name_;};
  
   /**
-   * get the list of components 
+   * get the list of daughter components 
    *
    * @return components
    */
   const std::vector<Component*> getDaughters(){return daughter_components_;};
+
+  /**
+   * get the parent component 
+   *
+   * @return component
+   */
+  Component* getParent(){return parent_component_;};
 
   /**
    * get the list of waste objects 
@@ -240,6 +252,18 @@ public:
    */
   const Radius getRadius(BoundaryType type){
     return (type==INNER)?geom_.inner_radius_:geom_.outer_radius_; };
+
+  /// get the x component of the centroid position vector of the object
+  const double getX(){
+    return geom_.x_;};
+
+  /// get the y component of the centroid position vector of the object
+  const double getY(){
+    return geom_.y_;};
+
+  /// get the z component of the centroid position vector of the object
+  const double getZ(){
+    return geom_.z_;};
 
   /**
    * set the placement of the object
