@@ -20,20 +20,21 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
     if (!model) {
       string err_msg = "Unable to load model shared object file: ";
       err_msg += model_name;
-      err_msg += errbuf;
+      err_msg += ". Error code is: ";
+      err_msg += GetLastError();
       throw CycIOException(err_msg);
     }
-    new_model = (mdl_ctor*) dlsym(model,"construct");
+    new_model = (mdl_ctor*) GetProcAddress(model,"construct");
     if (!new_model) {
       string err_msg = "Unable to load model constructor: ";
-      err_msg += dlerror();
+      err_msg += GetLastError();
       throw CycIOException(err_msg);
     }
 
-    mdl_dtor* del_model = (mdl_dtor*) dlsym(model,"destruct");
+    mdl_dtor* del_model = (mdl_dtor*) GetProcAddress(model,"destruct");
     if (!del_model) {
       string err_msg = "Unable to load model destructor: ";
-      err_msg += dlerror();
+      err_msg += GetLastError();
       throw CycIOException(err_msg);
     }
 
