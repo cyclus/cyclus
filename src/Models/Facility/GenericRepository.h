@@ -347,6 +347,7 @@ protected:
      */
     Mass getCapacity(Commodity* commod) ;
 
+
 /* ------------------- */ 
 
 };

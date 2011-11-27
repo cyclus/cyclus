@@ -77,35 +77,44 @@ protected:
   
   // facility or institution model struct
   typedef struct model_t{
-    int ID;                 /**< An integer indicating the model ID >**/
-    char name[64];            /**< A std::string indicating the name of the template >**/ 
-    char modelImpl[64];       /**< A std::string indicating the model implementation >**/
-    int parentID; /**< An integer of the model's parent's ID >**/
+    int ID;                 /**< An integer indicating the model ID **/
+    char name[64];            /**< A std::string indicating the name of the template **/ 
+    char modelImpl[64];       /**< A std::string indicating the model implementation **/
+    int parentID; /**< An integer of the model's parent's ID **/
   } model_t;
 
   // facility, market, converter, or institution model struct
   typedef struct trans_t{
-    int supplierID;         /**< An integer indicating the supplier model ID >**/
-    int requesterID;        /**< An integer indicating the requester model ID >**/
-    int materialID;         /**< An integer indicating the material object ID >**/
-    int timestamp;          /**< An integer indicating the month >**/
-    double price;           /**< A double indicating the transaction price >**/   
-    char commodName[64];   /**< the name of the commodity >**/
+    int supplierID;         /**< An integer indicating the supplier model ID **/
+    int requesterID;        /**< An integer indicating the requester model ID **/
+    int materialID;         /**< An integer indicating the material object ID **/
+    int timestamp;          /**< An integer indicating the month **/
+    double price;           /**< A double indicating the transaction price **/   
+    char commodName[64];   /**< the name of the commodity **/
   } trans_t;
 
   // material history struct
   typedef struct mat_hist_t{
-    int materialID;         /**< An integer indicating the material object ID >**/
-    int timestamp;          /**< An integer indicating the month >**/
-    int iso;                /**< An integer indicating the nuclide ID >**/   
-    double comp;            /**< The kg or moles of the iso in the material at that time >**/
+    int materialID;         /**< An integer indicating the material object ID **/
+    int timestamp;          /**< An integer indicating the month **/
+    int iso;                /**< An integer indicating the nuclide ID **/   
+    double comp;            /**< The kg or moles of the iso in the material at that time **/
   } mat_hist_t;
 
-  // volume history struct
-  typedef struct vol_hist_t{
-    int volID;              /**< An integer indicating the volume object ID >**/
-    int timestamp;          /**< An integer indicating the month >**/
-  } vol_hist_t;
+  // generic repository component struct
+  typedef struct repo_component_t{
+    int ID;                 /**< An integer indicating the model ID **/
+    char name[64];          /**< A std::string indicating the name of the template **/ 
+    char thermalModel[64];  /**< A std::string indicating the thermal model implementation **/
+    char nuclideModel[64];  /**< A std::string indicating the nuclide model implementation **/
+    int parentID; /**< An integer of the model's parent's ID **/
+    double innerRadius; /**< An integer of the component's inner radius **/
+    double outerRadius; /**< An integer of the model's parent's ID **/
+    double x; /**< The x component of the component placement centroid. **/
+    double y; /**< The y component of the component placement centroid. **/
+    double z; /**< The z component of the component placement centroid. **/
+    int timestamp; /**< The time at which the component was emplaced **/
+  } repo_component_t;
 
   /**
    * Stores the transactions that have taken place during the simulation.
@@ -116,6 +125,11 @@ protected:
    * Stores the material changes that have taken place during the simulation.
    */
   std::vector<mat_hist_t> materials_;
+
+  /**
+   * Stores the components of the generic repository 
+   */
+  std::vector<repo_component_t> repo_components_;
 
 public:
         
@@ -209,11 +223,24 @@ public:
   void registerMatChange(Material* mat);
 
   /**
+   * Register the materialin the BookKeeper's map of material changes
+   *
+   */
+  void registerRepoComponent(int ID, std::string name, std::string thermalModel, 
+      std::string nuclideModel, int parentID, double innerRadius, 
+      double outerRadius, double x, double y, double z);
+
+  /**
    * Write a list of the facility/inst/market models in the simulation
    *
    * @param type the model type (i.e. insts, facilities, or markets)
    */
   void writeModelList(ModelType type);
+
+  /**
+   * Write a list of the components in the generic repository if there is onen
+   */
+  void writeRepoComponents();
 
   /* Work in Progress (MJG) */
   /* /\** */

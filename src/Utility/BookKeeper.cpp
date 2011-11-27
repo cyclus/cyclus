@@ -138,6 +138,7 @@ bool BookKeeper::isGroup(std::string grp) {
   return true;
 };
 
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
   // grab each material object off of the manifest
@@ -157,7 +158,6 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
     transactions_.push_back(toRegister);
   };
 };
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::printTrans(trans_t trans){
@@ -184,6 +184,33 @@ void BookKeeper::registerMatChange(Material* mat){
     toRegister.comp = (it->second)*(total);
     materials_.push_back(toRegister);
   };
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::registerRepoComponent(int ID, std::string name, 
+    std::string thermalModel, std::string nuclideModel,
+    int parentID, double innerRadius, double outerRadius, double x, double y, 
+    double z){
+
+  repo_component_t toRegister;
+
+  toRegister.ID = ID;
+  //toRegister.name = name.c_str();
+  //toRegister.thermalModel = thermalModel.c_str();
+  //toRegister.nuclideModel = nuclideModel.c_str();
+  toRegister.parentID = parentID;
+  toRegister.innerRadius = innerRadius;
+  toRegister.outerRadius = outerRadius;
+  toRegister.x = x;
+  toRegister.y = y;
+  toRegister.z = z;
+  toRegister.timestamp = TI->getTime();
+
+  strcpy(toRegister.thermalModel, thermalModel.c_str());
+  strcpy(toRegister.thermalModel, thermalModel.c_str());
+  strcpy(toRegister.thermalModel, thermalModel.c_str());
+
+  repo_components_.push_back(toRegister);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -426,6 +453,7 @@ void BookKeeper::writeTransList(){
     error.printError();
   }
 };
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeMatHist(){
 
@@ -499,6 +527,124 @@ void BookKeeper::writeMatHist(){
 
     // write it, finally 
     dataset->write( matHist , mtype );
+
+    delete outputgroup;
+    delete subgroup;
+    delete dataspace;
+    delete dataset;
+
+  } catch (Exception error) {
+    error.printError();
+  }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeRepoComponents(){
+
+  // define some useful variables.
+  const H5std_string ID_memb = "ID";
+  const H5std_string name_memb = "name";
+  const H5std_string thermalModel_memb = "thermalModel";
+  const H5std_string nuclideModel_memb = "nuclideModel";
+  const H5std_string parentID_memb = "parentID";
+  const H5std_string innerRadius_memb = "innerRadius";
+  const H5std_string outerRadius_memb = "outerRadius";
+  const H5std_string x_memb = "x";
+  const H5std_string y_memb = "y";
+  const H5std_string z_memb = "z";
+  const H5std_string timestamp_memb = "timestamp";
+  const H5std_string output_name = "/output";
+
+  std::string subgroup_name;
+  std::string dataset_name;
+  int numStructs, numComponents;
+
+  numComponents = repo_components_.size();
+
+  if(numComponents==0)
+    numStructs=1;
+  else
+    numStructs=numComponents;
+
+  // create an array of the repo component structs
+  repo_component_t repoComponent[numStructs];
+  for (int i=0; i<numComponents; i++){
+    repoComponent[i].ID = repo_components_[i].ID;
+    strcpy(repoComponent[0].name, repo_components_[i].name);
+    strcpy(repoComponent[0].thermalModel, (repo_components_[i].thermalModel));
+    strcpy(repoComponent[0].nuclideModel, (repo_components_[i].nuclideModel));
+    repoComponent[i].innerRadius = repo_components_[i].innerRadius;
+    repoComponent[i].outerRadius = repo_components_[i].outerRadius;
+    repoComponent[i].x = repo_components_[i].x;
+    repoComponent[i].y = repo_components_[i].y;
+    repoComponent[i].z = repo_components_[i].z;
+    repoComponent[i].timestamp = repo_components_[i].timestamp;
+  };
+
+  // If there are no repo_components, make a null entry
+  if(numComponents==0){
+    std::string str1="";
+    repoComponent[0].ID=0;
+    strcpy(repoComponent[0].name, str1.c_str());
+    strcpy(repoComponent[0].thermalModel, str1.c_str());
+    strcpy(repoComponent[0].nuclideModel, str1.c_str());
+    repoComponent[0].innerRadius=0;
+    repoComponent[0].outerRadius=0;
+    repoComponent[0].x=0;
+    repoComponent[0].y=0;
+    repoComponent[0].z=0;
+    repoComponent[0].timestamp=0;
+  };
+
+  try{
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
+    Exception::dontPrint();
+    
+    // Open the file and the dataset.
+    this->openDB();
+
+    // describe the data in an hdf5-y way
+    hsize_t dim[] = {numStructs};
+    // if there's only one model, the dataspace is a vector, which  
+    // hdf5 doesn't like to think of as a matrix 
+    int rank;
+    if(numComponents <= 1)
+      rank = 1;
+    else
+      rank = 1;
+
+    Group* outputgroup;
+    outputgroup = new Group(this->getDB()->openGroup(output_name));
+    Group* subgroup;
+    subgroup = new Group(outputgroup->createGroup(subgroup_name));
+    DataSpace* dataspace;
+    dataspace = new DataSpace( rank, dim );
+
+    //create a variable length std::string types
+    size_t charlen = sizeof(char[64]);
+    StrType strtype(PredType::C_S1,charlen); 
+   
+   
+    // Create a datatype for models based on the struct
+    CompType mtype( sizeof(repo_component_t) );
+    mtype.insertMember( ID_memb, HOFFSET(repo_component_t, ID), PredType::NATIVE_INT); 
+    mtype.insertMember( name_memb, HOFFSET(repo_component_t, name), strtype); 
+    mtype.insertMember( thermalModel_memb, HOFFSET(repo_component_t, thermalModel), strtype); 
+    mtype.insertMember( nuclideModel_memb, HOFFSET(repo_component_t, nuclideModel), strtype); 
+    mtype.insertMember( parentID_memb, HOFFSET(repo_component_t, parentID), PredType::NATIVE_INT); 
+    mtype.insertMember( innerRadius_memb, HOFFSET(repo_component_t, innerRadius), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( outerRadius_memb, HOFFSET(repo_component_t, outerRadius), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( x_memb, HOFFSET(repo_component_t, x), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( y_memb, HOFFSET(repo_component_t, y), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( z_memb, HOFFSET(repo_component_t, z), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( timestamp_memb, HOFFSET(repo_component_t, timestamp), PredType::NATIVE_INT); 
+
+    DataSet* dataset;
+    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+
+    // write it, finally 
+    dataset->write( repoComponent , mtype );
 
     delete outputgroup;
     delete subgroup;
