@@ -82,8 +82,10 @@ public:
   /**
    * Each inst is prompted to do its daily tasks.
    *
-   * Normally, inst.s simply hand the command down to facilities.
+   * Normally, insts simply hand the command down to facilities.
    *
+   * @param time is the number of months since the beginning of the simulation
+   * @param day is the current day in this month
    */
   virtual void handleDailyTasks(int time, int day);
 
