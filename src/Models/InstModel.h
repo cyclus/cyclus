@@ -79,6 +79,14 @@ public:
    */
   virtual void handleTock(int time);
 
+  /**
+   * Each inst is prompted to do its daily tasks.
+   *
+   * Normally, inst.s simply hand the command down to facilities.
+   *
+   */
+  virtual void handleDailyTasks(int time, int day);
+
 
 
 protected:

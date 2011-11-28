@@ -161,6 +161,12 @@ public:
    */
   virtual void handleTock(int time);
 
+  /**
+   * Each facility is prompted to do its daily tasks
+   *
+   */
+  virtual void handleDailyTasks(int time, int day);
+
 /* ------------------- */ 
   
 };

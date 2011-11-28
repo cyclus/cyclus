@@ -29,6 +29,11 @@ void ConverterModel::handleTock(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConverterModel::handleDailyTasks(int time, int day) {
+  // converters might someday override this method
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* ConverterModel::convert(Message* convMsg, Message* refMsg) {
   // converters should override this method, unless they're very naiive.
   // generally, a converter's convert behavior should be to 

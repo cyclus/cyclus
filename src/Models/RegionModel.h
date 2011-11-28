@@ -61,7 +61,7 @@ public:
     virtual void handlePreHistory();
 
     /**
-     * Each region is prompted to do its beginning-of-time-step
+     * @brief Each region is prompted to do its beginning-of-time-step
      * stuff at the tick of the timer.
      * The default behavior is to ignore the tick.
      *
@@ -70,13 +70,21 @@ public:
     virtual void handleTick(int time);
 
     /**
-     * Each region is prompted to do its beginning-of-time-step
+     * @brief Each region is prompted to do its end-of-time-step
      * stuff at the tock of the timer.
      * The default behavior is to ignore the tock.
      *
      * @param time is the time to perform the tock
      */
     virtual void handleTock(int time);
+
+    /**
+     * @brief Each region is prompted to do its daily task.
+     *
+     * @param time is the month since the start of the simulation
+     * @param day is the current day of that month
+     */
+    virtual void handleDailyTasks(int time, int day);
 
 public:
     bool isAllowedFacility(Model* test_fac) 

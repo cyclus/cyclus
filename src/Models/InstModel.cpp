@@ -91,6 +91,15 @@ void InstModel::handleTock(int time){
   }
 }
 
+void InstModel::handleDailyTasks(int time, int day){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
+      fac++){
+    (dynamic_cast<FacilityModel*>(*fac))->handleDailyTasks(time,day);
+  }
+}
+
 /* --------------------
  * all INSTMODEL classes have these members
  * --------------------

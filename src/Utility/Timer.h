@@ -6,8 +6,10 @@
 #include "MarketModel.h"
 #include <utility>
 #include <vector>
+#include "boost/date_time/gregorian/gregorian.hpp"
 
 #define TI Timer::Instance()
+
 
 //class Manager;
 
@@ -41,6 +43,21 @@ private:
    * The duration of this simulation, in months.
    */
   int simDur_;
+    
+  /**
+   * The start date of the simulation
+   */
+  boost::gregorian::date startDate_;
+    
+  /**
+   * The end date of the simulation
+   */
+  boost::gregorian::date endDate_;
+    
+  /**
+   * The current date of the simulation
+   */
+  boost::gregorian::date date_;
 
   /**
    * The number of the month (Jan = 1, etc.) corresponding to t = 0 for the 
@@ -88,14 +105,19 @@ private:
    *
    */
   void sendTock();
-
     
   /**
-   * This handles all pre-history interactions between regions,
+   * @brief handles all pre-history interactions between regions,
    * institutions, and facilities.
    *
    */
   void handlePreHistory();
+
+  /**
+   * @brief sends a notification to Tick listeners that a day has passed
+   *
+   */
+  void sendDailyTasks();
 
 protected:
     
@@ -160,6 +182,44 @@ public:
    * @return the duration, in months
    */
   int getSimDur();
+
+  /**
+   * Returns the starting date of the simulation.
+   *
+   * @return the start date as a datetime object
+   */
+  boost::gregorian::date startDate(){return startDate_;}
+
+  /**
+   * Calculates the ending date of the simulation.
+   *
+   * @param startDate the starting date as specified in the input file
+   * @param simDur the simulation duration as specified
+   *
+   * @return the end date as a datetime object
+   */
+  boost::gregorian::date getEndDate(boost::gregorian::date startDate, int simDur);
+
+  /**
+   * Returns the ending date of the simulation.
+   *
+   * @return the end date as a datetime object
+   */
+  boost::gregorian::date endDate(){return endDate_;}
+  
+  /**
+   * Given the current date, returns the last day of the current month
+   *
+   * @return the last date of the current month
+   */
+  int lastDayOfMonth();
+
+  /**
+   * Returns the current date of the simulation.
+   *
+   * @return the current date as a datetime object
+   */
+  boost::gregorian::date date(){return date_;}
 
   /**
    * Converts the given date into a GENIUS time.

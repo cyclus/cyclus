@@ -121,3 +121,12 @@ void RegionModel::handleTock(int time){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }
 }
+
+void RegionModel::handleDailyTasks(int time, int day){
+  // tell all of the institution models to handle the tick
+  for(vector<Model*>::iterator inst=children_.begin();
+      inst != children_.end();
+      inst++){
+    (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
+  }
+}

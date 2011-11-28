@@ -101,6 +101,14 @@ public:
    */
   virtual void handlePreHistory() {}
 
+  /**
+   * Each converter may be prompted to do its daily tasks
+   * 
+   * @param time is the month since the start of the simulation
+   * @param day is the current day of the month
+   */
+  virtual void handleDailyTasks(int time, int day);
+
 /* ------------------- */ 
   
 };
