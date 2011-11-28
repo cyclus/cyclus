@@ -27,7 +27,6 @@ void Timer::runSim() {
       LI->decayMaterials(time_);
       sendTick();
       sendResolve();
-      sendTock();
 
       LOG(LEV_DEBUG1) << "Current date: " << date_;
       LOG(LEV_DEBUG2) << "The list of current tick listeners is: " << reportListeners();
@@ -38,6 +37,7 @@ void Timer::runSim() {
       sendDailyTasks();
       if (i == eom_day){
 	LOG(LEV_DEBUG3) << "Last date of month: " << date_;
+	sendTock();
       }
       date_ += boost::gregorian::days(1);
     }
