@@ -112,6 +112,7 @@ int main(int argc, char* argv[]) {
     BI->writeModelList(MARKET);
     BI->writeTransList();
     BI->writeMatHist();
+    BI->writeRepoComponents();
 
     BI->closeDB();
   } catch (CycException ge) {

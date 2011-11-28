@@ -195,9 +195,6 @@ void BookKeeper::registerRepoComponent(int ID, std::string name,
   repo_component_t toRegister;
 
   toRegister.ID = ID;
-  //toRegister.name = name.c_str();
-  //toRegister.thermalModel = thermalModel.c_str();
-  //toRegister.nuclideModel = nuclideModel.c_str();
   toRegister.parentID = parentID;
   toRegister.innerRadius = innerRadius;
   toRegister.outerRadius = outerRadius;
@@ -206,9 +203,9 @@ void BookKeeper::registerRepoComponent(int ID, std::string name,
   toRegister.z = z;
   toRegister.timestamp = TI->getTime();
 
+  strcpy(toRegister.name, name.c_str());
   strcpy(toRegister.thermalModel, thermalModel.c_str());
-  strcpy(toRegister.thermalModel, thermalModel.c_str());
-  strcpy(toRegister.thermalModel, thermalModel.c_str());
+  strcpy(toRegister.nuclideModel, nuclideModel.c_str());
 
   repo_components_.push_back(toRegister);
 };
@@ -554,13 +551,12 @@ void BookKeeper::writeRepoComponents(){
   const H5std_string z_memb = "z";
   const H5std_string timestamp_memb = "timestamp";
   const H5std_string output_name = "/output";
+  const H5std_string subgroup_name = "repoComponents";
+  const H5std_string dataset_name = "components";
 
-  std::string subgroup_name;
-  std::string dataset_name;
-  int numStructs, numComponents;
+  int numComponents = repo_components_.size();
 
-  numComponents = repo_components_.size();
-
+  int numStructs;
   if(numComponents==0)
     numStructs=1;
   else
@@ -570,9 +566,10 @@ void BookKeeper::writeRepoComponents(){
   repo_component_t repoComponent[numStructs];
   for (int i=0; i<numComponents; i++){
     repoComponent[i].ID = repo_components_[i].ID;
-    strcpy(repoComponent[0].name, repo_components_[i].name);
-    strcpy(repoComponent[0].thermalModel, (repo_components_[i].thermalModel));
-    strcpy(repoComponent[0].nuclideModel, (repo_components_[i].nuclideModel));
+    strcpy(repoComponent[i].name, repo_components_[i].name);
+    strcpy(repoComponent[i].thermalModel, (repo_components_[i].thermalModel));
+    strcpy(repoComponent[i].nuclideModel, (repo_components_[i].nuclideModel));
+    repoComponent[i].parentID = repo_components_[i].parentID;
     repoComponent[i].innerRadius = repo_components_[i].innerRadius;
     repoComponent[i].outerRadius = repo_components_[i].outerRadius;
     repoComponent[i].x = repo_components_[i].x;
@@ -588,6 +585,7 @@ void BookKeeper::writeRepoComponents(){
     strcpy(repoComponent[0].name, str1.c_str());
     strcpy(repoComponent[0].thermalModel, str1.c_str());
     strcpy(repoComponent[0].nuclideModel, str1.c_str());
+    repoComponent[0].parentID=0;
     repoComponent[0].innerRadius=0;
     repoComponent[0].outerRadius=0;
     repoComponent[0].x=0;
@@ -633,11 +631,11 @@ void BookKeeper::writeRepoComponents(){
     mtype.insertMember( thermalModel_memb, HOFFSET(repo_component_t, thermalModel), strtype); 
     mtype.insertMember( nuclideModel_memb, HOFFSET(repo_component_t, nuclideModel), strtype); 
     mtype.insertMember( parentID_memb, HOFFSET(repo_component_t, parentID), PredType::NATIVE_INT); 
-    mtype.insertMember( innerRadius_memb, HOFFSET(repo_component_t, innerRadius), PredType::NATIVE_FLOAT); 
-    mtype.insertMember( outerRadius_memb, HOFFSET(repo_component_t, outerRadius), PredType::NATIVE_FLOAT); 
-    mtype.insertMember( x_memb, HOFFSET(repo_component_t, x), PredType::NATIVE_FLOAT); 
-    mtype.insertMember( y_memb, HOFFSET(repo_component_t, y), PredType::NATIVE_FLOAT); 
-    mtype.insertMember( z_memb, HOFFSET(repo_component_t, z), PredType::NATIVE_FLOAT); 
+    mtype.insertMember( innerRadius_memb, HOFFSET(repo_component_t, innerRadius), PredType::IEEE_F64LE); 
+    mtype.insertMember( outerRadius_memb, HOFFSET(repo_component_t, outerRadius), PredType::IEEE_F64LE); 
+    mtype.insertMember( x_memb, HOFFSET(repo_component_t, x), PredType::IEEE_F64LE); 
+    mtype.insertMember( y_memb, HOFFSET(repo_component_t, y), PredType::IEEE_F64LE); 
+    mtype.insertMember( z_memb, HOFFSET(repo_component_t, z), PredType::IEEE_F64LE); 
     mtype.insertMember( timestamp_memb, HOFFSET(repo_component_t, timestamp), PredType::NATIVE_INT); 
 
     DataSet* dataset;

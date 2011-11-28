@@ -88,6 +88,11 @@ public:
    */
   virtual NuclideModelType getNuclideModelType() = 0;
 
+  /** 
+   * returns the name of the NuclideModelType of the model
+   */
+  virtual std::string getNuclideModelName() = 0;
+
   /**
    * get the peak Toxicity this object will experience during the simulation
    *

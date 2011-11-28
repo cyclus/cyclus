@@ -86,9 +86,14 @@ public:
   virtual void transportNuclides();
 
   /**
-   * Transports nuclides from the inner to the outer boundary 
+   * Returns the nuclide model type
    */
   virtual NuclideModelType getNuclideModelType(){return STUB_NUCLIDE;};
+
+  /**
+   * Returns the nuclide model type name
+   */
+  virtual std::string getNuclideModelName(){return "STUB_NUCLIDE";};
 
   /**
    * returns the peak Toxicity this object will experience during the 

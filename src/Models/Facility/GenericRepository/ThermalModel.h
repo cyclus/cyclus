@@ -65,9 +65,14 @@ public:
   virtual void transportHeat() =0;
 
   /**
-   * get the component implementation type
+   * get the thermal model implementation type
    */
   const virtual ThermalModelType getThermalModelType()=0;
+
+  /**
+   * get the name of the thermal model implementation type
+   */
+  virtual std::string getThermalModelName()=0;
 
   /**
    * get the peak Temperature this object will experience during the simulation

@@ -125,6 +125,11 @@ public:
    */
   Component* load(ComponentType type, Component* to_load);
 
+  /**
+   * registers this component with the BookKeeper.
+   */
+  void registerComponent() ;
+
   /** 
    * Reports true if this component may be loaded with more of whatever goes 
    * inside it and reports false if that is not the case.
@@ -176,7 +181,7 @@ public:
    *
    * @return ID_
    */
-  const int getSN(){return ID_;};
+  const int ID(){return ID_;};
 
   /**
    * get the Name
@@ -264,6 +269,13 @@ public:
   /// get the z component of the centroid position vector of the object
   const double getZ(){
     return geom_.z_;};
+
+  /**
+   * set the parent component 
+   *
+   * @param parent is the component that should be set as the parent
+   */
+  void setParent(Component* parent){parent_component_ = parent;};
 
   /**
    * set the placement of the object

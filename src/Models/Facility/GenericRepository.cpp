@@ -127,7 +127,6 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
   toRet->init(cur);
 
   // all components have a name and a type
-  string comp_name = XMLinput->get_xpath_content(cur,"name");
   string comp_type = XMLinput->get_xpath_content(cur,"componenttype");
 
   // they will have allowed subcomponents (think russian doll)
@@ -195,7 +194,8 @@ void GenericRepository::copy(GenericRepository* src)
   start_op_yr_ = src->start_op_yr_;
   start_op_mo_ = src->start_op_mo_;
   in_commods_ = src->in_commods_;
-  far_field_ = src->far_field_;
+  far_field_ = new Component();
+  far_field_->copy(src->far_field_);
   buffer_template_ = src->buffer_template_;
   wp_templates_ = src->wp_templates_;
   wf_templates_ = src->wf_templates_;
@@ -262,6 +262,12 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::handleTick(int time)
 {
+  // if this is the first timestep, register the far field
+  if (time==0){
+    setPlacement(far_field_);
+    far_field_->registerComponent();
+  }
+
   // make requests
   makeRequests(time);
 }
@@ -417,7 +423,6 @@ void GenericRepository::emplaceWaste(){
           ) {
         // emplace it in the buffer
         loadBuffer(iter);
-        emplaced_waste_packages_.push_back(iter);
         if( current_buffer->isFull() ) {
           buffers_.push_back(buffers_.front());
           buffers_.pop_front();
@@ -457,7 +462,7 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   // if there doesn't already exist a partially full one
   // @todo check for partially full wf's before creating new one (katyhuff)
   // create that waste form
-  current_waste_forms_.push_back( chosen_wf_template );
+  current_waste_forms_.push_back( new Component() );
   current_waste_forms_.back()->copy(chosen_wf_template);
   // and load in the waste stream
   current_waste_forms_.back()->absorb(waste_stream.first);
@@ -478,13 +483,14 @@ Component* GenericRepository::packageWaste(Component* waste_form){
     throw CycException(err_msg);
   }
   Component* toRet;
+  // until the waste form has been loaded into a package
   while (!loaded){
     // look through the current waste packages 
     for (deque<Component*>::const_iterator iter= 
         current_waste_packages_.begin();
         iter != current_waste_packages_.end();
         iter++){
-      // if there already exists an only partially full one
+      // if there already exists an only partially full one of the right kind
       if( !(*iter)->isFull() && (*iter)->name() == 
           chosen_wp_template->name()){
         // fill it
@@ -492,7 +498,7 @@ Component* GenericRepository::packageWaste(Component* waste_form){
         toRet = (*iter);
         loaded = true;
       } }
-    // create a new waste package
+    // if no currently unfilled waste packages match, create a new waste package
     current_waste_packages_.push_back( new Component() );
     current_waste_packages_.back()->copy(chosen_wp_template);
     // and load in the waste form
@@ -506,17 +512,21 @@ Component* GenericRepository::packageWaste(Component* waste_form){
 Component* GenericRepository::loadBuffer(Component* waste_package){
   // figure out what buffer to put the waste package in
   Component* chosen_buffer = buffers_.front();
+  // and load in the waste package
+  buffers_.front()->load(BUFFER, waste_package);
+  // put this on the stack of waste packages that have been emplaced
+  emplaced_waste_packages_.push_back(waste_package);
   // set the location of the waste package 
   setPlacement(waste_package);
-  // set the location of the waste forms within it
+  waste_package->registerComponent();
+  // set the location of the waste forms within the waste package
   std::vector<Component*> daughters = waste_package->getDaughters();
   for (std::vector<Component*>::iterator iter = daughters.begin();  
       iter != daughters.end(); 
       iter ++){
     setPlacement(*iter);
+    (*iter)->registerComponent();
   }
-  // and load in the waste package
-  buffers_.front()->load(BUFFER, waste_package);
   return buffers_.front();
 }
 
@@ -532,12 +542,12 @@ Component* GenericRepository::setPlacement(Component* comp){
       z = z_/2;
       break;
     case BUFFER :
-      x = (buffers_.size()*dx_ - dx_/2) ;
+      x = (buffers_.size()- .5)*dx_ ;
       y = y_/2 ; 
       z = dz_ ; 
       break;
     case WP :
-      x = (buffers_.size()*dx_ - dx_/2) ;
+      x = (comp->getParent())->getX();
       y = (emplaced_waste_packages_.size()*dy_ - dy_/2) ; 
       z = dz_ ; 
       break;

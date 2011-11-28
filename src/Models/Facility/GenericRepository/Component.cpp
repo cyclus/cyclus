@@ -3,7 +3,6 @@
  */
 
 #include <iostream>
-#include "Logger.h"
 #include <fstream>
 #include <vector>
 #include <time.h>
@@ -17,7 +16,9 @@
 //#include "LumpNuclide.h"
 //#include "MixedCellNuclide.h"
 #include "StubNuclide.h"
+#include "BookKeeper.h"
 #include "InputXML.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -29,13 +30,14 @@ Component::Component(){
   name_ = "";
   geom_.inner_radius_ = 0;  // 0 indicates a solid
   geom_.outer_radius_ = NULL;   // NULL indicates an infinite object
-  temperature_ = 0;
 
+  temperature_ = 0;
   temperature_lim_ = 373;
   toxicity_lim_ = 10 ;
 
   thermal_model_ = NULL;
   nuclide_model_ = NULL;
+  parent_component_ = NULL;
 
   comp_hist_ = CompHistory();
   mass_hist_ = MassHistory();
@@ -46,11 +48,14 @@ void Component::init(xmlNodePtr cur){
   ID_=nextID_++;
   
   name_ = XMLinput->get_xpath_content(cur,"name");
+  type_ = getComponentType(XMLinput->get_xpath_content(cur,"componenttype"));
   geom_.inner_radius_ = strtod(XMLinput->get_xpath_content(cur,"innerradius"),NULL);
   geom_.outer_radius_ = strtod(XMLinput->get_xpath_content(cur,"outerradius"),NULL);
 
   thermal_model_ = getThermalModel(cur);
   nuclide_model_ = getNuclideModel(cur);
+
+  parent_component_ = NULL;
 
   comp_hist_ = CompHistory();
   mass_hist_ = MassHistory();
@@ -60,23 +65,33 @@ void Component::init(xmlNodePtr cur){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Component::copy(Component* src){
+  ID_=nextID_++;
 
   name_ = src->name_;
+  type_ = src->type_;
+
   geom_.inner_radius_ = src->geom_.inner_radius_;
   geom_.outer_radius_ = src->geom_.outer_radius_;
 
-  type_ = src->type_;
-
   thermal_model_ = copyThermalModel(src->thermal_model_);
+  if (!thermal_model_){
+    string err = "The " ;
+    err += name_;
+    err += " model with ID: ";
+    err += ID_;
+    err += " does not have a thermal model";
+    throw CycException(err);
+  }
   nuclide_model_ = copyNuclideModel(src->nuclide_model_);
+  parent_component_ = NULL;
 
+  temperature_ = src->temperature_;
   temperature_lim_ = src->temperature_lim_ ;
   toxicity_lim_ = src->toxicity_lim_ ;
 
   comp_hist_ = CompHistory();
   mass_hist_ = MassHistory();
 
-  temperature_ = src->temperature_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -90,10 +105,27 @@ void Component::print(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Component* Component::load(ComponentType type, Component* to_load) {
-  Component* toRet = this;
-  this->daughter_components_.push_back(to_load);
-  to_load->parent_component_ = this;
+  to_load->setParent(this);
+  daughter_components_.push_back(to_load);
   return this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Component::registerComponent(){
+  int parentID;
+  if (!parent_component_){
+    parentID = 0;
+  } else {
+    parentID = parent_component_->ID();
+  }
+
+  string thermal_name = thermal_model_->getThermalModelName();
+  string nuclide_name = nuclide_model_->getNuclideModelName(); 
+
+  BI->registerRepoComponent(ID_, name_, 
+      thermal_name, nuclide_name,
+      parentID, geom_.inner_radius_, 
+      geom_.outer_radius_, geom_.x_, geom_.y_,geom_.z_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
