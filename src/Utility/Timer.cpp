@@ -44,28 +44,6 @@ void Timer::runSim() {
 
     time_++;
   }
-  /* Old Timer Loop, just in case.... */
-  /*
-  for (int i = time_; i < simDur_; i++) {
-    
-    // Give a status report, periodically.
-    // (monthly during testing, change to (i % 12 == 0) for annual reporting.
-    if (i % 1 == 0) {
-      LOG(LEV_DEBUG1) << "Current date: " << date_;
-      LOG(LEV_DEBUG2) << "The list of current tick listeners is: " << reportListeners();
-
-    }
-    
-    // Tell the Logician to handle this month.
-    LI->decayMaterials(time_);
-    sendTick();
-    sendResolve();
-    sendTock();
-    
-    // Increment the time.
-    time_++;
-  }
-  */
 }
 
 int Timer::lastDayOfMonth(){
