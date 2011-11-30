@@ -15,7 +15,7 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
   string start_path = ENV->getCyclusPath();
 
   if (create_map_.find(model_name) == create_map_.end()) {
-    model_name = start_path + "/Models/" + model_type + model_name+SUFFIX;
+    model_name = start_path + "/Models/" + model_type + "/" +  model_name+SUFFIX;
     HMODULE model = LoadLibrary(model_name.c_str());
     if (!model) {
       string err_msg = "Unable to load model shared object file: ";
