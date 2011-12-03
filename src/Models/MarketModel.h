@@ -11,13 +11,41 @@
 /// forward declaration to resolve recursion
 class Commodity;
 
-//-----------------------------------------------------------------------------
-/*
- * The MarketModel class is the abstract class/interface used by all market
- * models
- * 
- * This is all that is known externally about Markets
+//----------------------------------------------------------------------------
+/**
+   @brief Markets are used to allocate transactions between agents. Each 
+   Market is associated with one resource or commodity.
+   
+   @section introduction Introduction
+   The MarketModel type plays a primary role in Cyclus. A MarketModel market 
+   is where a set of offers and requests are collected from facilities and a 
+   set of shipments of material is derived from matching these offers and 
+   requests. The algorithm for performing this matching of offers with 
+   requests is a primary differentiator between different MarketModel 
+   implementations.
+
+   Like all model implementations, there are a number of implementations 
+   that are distributed as part of the core Cyclus application as well as 
+   implementations contributed by third-party developers. The links below 
+   describe additional parameters necessary for the complete definition of a 
+   market of that implementation.
+
+   @section availableCoreImpl Available Core Implementations
+   (None)
+   
+   @section anticipatedCoreImpl Anticipated Core Implementations
+   - NullMarket: Match first offer with first request, defining the transfer 
+   quantity as the smaller of the two.
+   - GreedyMarket: Match largest requests first with largest remaining 
+   offers. Only match complete requests and fail if full request can't be 
+   matched.
+   - NetFlowMarket: Use network flow algorithm with arc costs (aka trade 
+   affinitites) defined on each facility pair in the market (GENIUS2)
+
+   @section thirdPartyImpl Third-party Implementations
+   (None)
  */
+
 //-----------------------------------------------------------------------------
 class MarketModel : public Model, public Communicator
 {

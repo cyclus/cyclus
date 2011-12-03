@@ -17,8 +17,8 @@ simulation and exists until the end of the simulation.
 @section modelParameters Model Parameters
 FixedInst behavior is comprehensively defined by the following 
 parameters:
-@param vector<Model*> facilities: The list of facilities with which 
-this fixed institution is associated.
+@param facilities: The list of facilities provide via XML (or whichever 
+other kind of) input with which this fixed institution is associated.
 
 @section detailedBehavior Detailed Behavior
 The FixedInst starts operation at the beginning of the 
@@ -30,16 +30,6 @@ its region or down to the appropriate facility without making
 any changes.
  */
 
-
-/**
- * The FixedInst class inherits from the InstModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This InstModel defines an institution that has an initial set of facilities
- * that continue operating forever.  No facilities are added and no facilities
- * are decommissioned.
- *
- */
 class FixedInst : public InstModel  
 {
 /* --------------------
