@@ -2,11 +2,19 @@
 /*!
 @mainpage Cyclus Documentation
 
-Developers are encouraged to make use of the logging functionality built into Cyclus.
+How to get started as a Cyclus developer:
 
-@ref tutorial
+-# @ref getting
+-# @ref building
+-# @ref running
+-# @ref styleguide
+-# Other references:
+  - @ref navigatingdoxy
+  - @ref tutorial
+  - @ref logging
+    - Developers are encouraged to make use of the logging functionality built
+      into Cyclus.
 
-@ref logging
 
 */
 

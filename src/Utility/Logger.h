@@ -1,4 +1,11 @@
-// Logger.h
+/*!
+@file Logger.h
+
+Code providing rudimentary logging capability for the Cyclus core. Details
+outlining proper use of this logging functionality are outlined in @ref
+logging "Using the Logger".
+
+*/
 
 #if !defined(_LOGGER_H)
 #define _LOGGER_H
