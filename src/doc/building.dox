@@ -1,0 +1,107 @@
+
+/*!
+
+@page building Building Cyclus
+
+The Cyclus code requires the following software and libraries:
+
+<table class="wikitable">
+  <tr>
+    <td style="border: 1px solid #ccc; padding: 5px;">Package</td>
+    <td style="border: 1px solid #ccc; padding: 5px;"> Minimum Version </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ccc; padding: 5px;">
+      <tt>CMake</tt>
+    </td>
+    <td style="border: 1px solid #ccc; padding: 5px;">2.6.4</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ccc; padding: 5px;">
+      <tt>HDF5</tt>
+    </td>
+    <td style="border: 1px solid #ccc; padding: 5px;">1.8.3</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ccc; padding: 5px;">
+      <tt>libxml2</tt>
+    </td>
+    <td style="border: 1px solid #ccc; padding: 5px;">2</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ccc; padding: 5px;">
+      <tt>boost</tt>
+    </td>
+    <td style="border: 1px solid #ccc; padding: 5px;">1.34.1</td>
+  </tr>
+</table>
+
+@section regbuild Regular Build
+
+  In order to facilitate future compatibility with multiple platforms, Cyclus
+  is built using [link: http://www.cmake.org Cmake]. This relies on CMake
+  version 2.6 or higher and the CMakeLists.txt file in /cyclus/trunk/src/. It
+  is recommended that you use CMake to build the Cyclus executable external to
+  the source code. To do this, execute the following steps:
+
+  @code
+  /cyclus/trunk/$ mkdir build
+  /cyclus/trunk/$ cd build
+  cyclus/trunk/build$ cmake ../src
+  @endcode
+
+  You should see output like this:
+
+  @code
+  ...
+  ...
+  >> -- Configuring done
+  >> -- Generating done
+  >> -- Build files have been written to: /cyclus/trunk/build
+  /cyclus/trunk/build$ make cyclus
+  >> Scanning dependencies of target cyclus
+  ...
+  ...
+  >> [100%] Building CXX object CMakeFiles/cyclus.dir/SourceFac.cpp.o
+  >> Linking CXX executable cyclus
+  >> [100%] Built target cyclus
+  @endcode
+
+  Now, you can make cyclus, and run it with some input file, for this example,
+  call it input.xml:
+
+  @code
+  cyclus/trunk/build$ make
+  cyclus/trunk/build$ ./cyclus input.xml
+  @endcode
+
+@section debugbuild Debugging Build
+
+  If you are a developer, you may be interested in building Cyclus in such a
+  was as to facilitate debugging. It is recommended that you create second
+  build directory in which you'll build a Cyclus executable for which
+  optimizations are disabled and debug symbols are added. To do this, execute
+  the following steps:
+
+  @code
+  /cyclus/trunk$ mkdir debug
+  /cyclus/trunk$ cd debug
+  /cyclus/trunk/debug$ cmake -DCMAKE_BUILD_TYPE:STRING=Debug ../src
+  @endcode
+
+  As before, you should call make to actually build the cyclus executable.
+
+  @code
+  /cyclus/trunk/debug$ make
+  @endcode
+
+  Now when you call gdb, ddd, or some other debugger within this debug
+  directory it will recognize the target as a debuggable target. To debug a run
+  for some input file input.xml, try the following:
+
+  @code
+  /cyclus/trunk/debug$ ddd ./cyclus input.xml
+  @endcode
+
+  */
+
