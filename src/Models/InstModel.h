@@ -6,14 +6,34 @@
 #include "Communicator.h"
 #include "RegionModel.h"
 
-//-----------------------------------------------------------------------------
-/*
- * The InstModel class is the abstract class/interface used by all institution models
- * 
- * This InstModel is intended as a skeleton to guide the implementation of new
- * Models.
- */
-//-----------------------------------------------------------------------------
+/*!
+@brief the InstModel class is the abstract class/interface 
+used by all institution models
+
+@section introduction Introduction
+The InstModel type assists in defining the 
+region-institution-facility hierarchy in Cyclus. A InstModel 
+institution is an actor associated with a set of facilities 
+for which it is responsible. An InstModel may be used to help 
+MarketModel implementations to make material routing decisions 
+based on interfacility relationships. Deployment is a primary 
+differentiator between different InstModel implementations.
+
+Like all model implementations, there are a number of 
+implementations that are distributed as part of the core Cyclus 
+application as well as implementations contributed by third-party 
+developers. The links below descrie parameters necessary for the 
+complete definition of an implemented instituion.
+
+@section availableCoreImpl Available Core Implementations
+- FixedInst: This institution is unchanging and is statically 
+associated with facilities that are deployed by some other 
+entity (such as the region or the logician. 
+
+@section anticipatedCoreImpl Anticipated Core Implementations
+- DeploymentInst: This institution deploys allowed facilities according to a demand curve.
+*/
+
 class InstModel : public TimeAgent, public Communicator {
 
 /* --------------------
