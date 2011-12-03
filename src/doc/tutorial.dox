@@ -1,0 +1,43 @@
+
+/*!
+@page tutorial Tutorial for Adding a New Model
+
+This tutorial will take a developer through all the steps necessary to
+create a new agent module that can be used with a Cyclus simulation at
+runtime.
+
+For the purpose of this tutorial, the agent will represent a Facility
+and be based on the FacilityModel template.  To make the example
+accessible to the widest possible audience, this agent will be a
+toaster.
+
+A toaster makes requests for a discrete number of slices of bread,
+proccesses it for 1 month, and then makes offers of toast.  The
+ToasterFacility model will offer some variables for user input:
+capacity (number of slices), power (kW).
+
+-# Make a new agent based on the FacilityModel stub
+  -# Copy StubFacility.[cpp|h] to ToasterFacility.[cpp|h]
+  -# Rename class & variables (search & replace)
+  -# Add to the Cmake build system
+  -# Test that the new module builds
+-# Make tests for your new agent
+   -# Copy XXXXX to testToasterFacility
+   -# Rename class & variables (search & replace)
+   -# run stub tests on new facility
+-# Make input for the new ToasterFacility
+  -# Copy the RelaxNG schema for the StubFacility
+  -# Rename RelaxNG Schema variables (search & replace)
+  -# Add your ToasterFacility to a sample input
+  -# Test that the new sample input runs
+-# Define unique behavior of your agent
+   -# extend stub tests to define behavior of ToasterFacility
+   -# Write methods to implement behavior in ToasterFacility
+   -# run units tests
+   -# update RelaxNG schema for your behavior
+   -# update test input files
+   -# Run tests
+-# write documentation for your agent module
+
+*/
+
