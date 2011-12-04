@@ -9,9 +9,9 @@ set ( TestSource
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp
-  GenericRepositoryTests.cpp
   ../Models/Facility/SourceFacility/SourceFacility.cpp
-  Models/Facility/SourceFacilityTests.cpp
+  ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
+  ../Models/Facility/GenericRepository/GenericRepositoryTests.cpp
   ../InputXML.cpp
   ../Logician.cpp
   ../Material.cpp
@@ -36,6 +36,7 @@ set ( TestSource
   ../Models/RegionModel.cpp
   ../Models/InstModel.cpp
   )
+
 
 #file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/TestingTests)
 
