@@ -125,54 +125,72 @@ public:
    */
   Component* load(ComponentType type, Component* to_load);
 
-  /**
-   * registers this component with the BookKeeper.
-   */
+  /// registers this component with the BookKeeper.
   void registerComponent() ;
 
-  /** 
-   * Reports true if this component may be loaded with more of whatever goes 
-   * inside it and reports false if that is not the case.
+  /**
+   * Reports true if the component is full of whatever goes inside it.
+   *
+   * @return TRUE if the component is full and FALSE if there is no more room 
    */
   bool isFull() ;
 
-  /** 
+  /**
    * Returns the ComponentType of this component
+   *
+   * @return type_ the ComponentType of this component
    */
   ComponentType getComponentType(){return type_;};
 
-  /** 
+  /**
    * Enumerates a string if it is one of the named ComponentTypes
+   * 
+   * @param type the name of the ComponentType (i.e. FF)
+   * @return the ComponentType enum associated with this string by the 
+   * component_type_names_ list 
    */
   ComponentType getComponentType(std::string type);
-
-  /** 
+  
+  /**
    * Enumerates a string if it is one of the named ThermalModelTypes
+   *
+   * @param type the name of the ThermalModelType (i.e. StubThermal)
    */
   ThermalModelType getThermalModelType(std::string type);
 
   /** 
    * Enumerates a string if it is one of the named NuclideModelTypes
+   *
+   * @param type the name of the NuclideModelType (i.e. StubNuclide)
    */
   NuclideModelType getNuclideModelType(std::string type);
 
   /** 
    * Returns a new thermal model of the string type xml node pointer
+   *
+   * @param cur the xml node pointer defining the thermal model
+   * @return thermal_model_ a pointer to the ThermalModel that was created
    */
   ThermalModel* getThermalModel(xmlNodePtr cur);
 
   /** 
    * Returns a new nuclide model of the string type and xml node pointer
+   *
+   * @param cur the xml node pointer defining the nuclide model
+   * @return nuclide_model_ a pointer to the NuclideModel that was created
    */
   NuclideModel* getNuclideModel(xmlNodePtr cur);
 
   /** 
    * Returns a new thermal model that is a copy of the src model
+   *
+   * @param src a pointer to the thermal model to copy
+   * @return a pointer to the ThermalModel that was created
    */
   ThermalModel* copyThermalModel(ThermalModel* src);
 
   /** 
-   * Returns a new nuclide model that is a copy of the src model
+   * Returns atd::s new nuclide model that is a copy of the src model
    */
   NuclideModel* copyNuclideModel(NuclideModel* src);
 
@@ -297,6 +315,12 @@ protected:
    * Stores the next available component ID
    */
   static int nextID_;
+
+  /// ThermalModleType names list
+  static std::string thermal_type_names_[LAST_THERMAL];
+
+  /// NuclideModelType names list
+  static std::string nuclide_type_names_[LAST_NUCLIDE];
 
   /**
    * The composition history of this Component, in the form of a map whose

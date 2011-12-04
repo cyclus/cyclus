@@ -25,6 +25,9 @@ using namespace std;
 // Static variables to be initialized.
 int Component::nextID_ = 0;
 
+string Component::thermal_type_names_[] = {"LLNLThermal","LumpThermal","SindaThermal","StubThermal"};
+string Component::nuclide_type_names_[] = {"LumpNuclide","MixedCellNuclide", "StubNuclide" };
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Component::Component(){
   name_ = "";
@@ -159,9 +162,8 @@ ComponentType Component::getComponentType(std::string type_name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ThermalModelType Component::getThermalModelType(std::string type_name) {
   ThermalModelType toRet = LAST_THERMAL;
-  string thermal_type_names[] = {"LLNLThermal","LumpThermal","SindaThermal","StubThermal"};
   for(int type = 0; type < LAST_THERMAL; type++){
-    if(thermal_type_names[type] == type_name){
+    if(thermal_type_names_[type] == type_name){
       toRet = (ThermalModelType)type;
     } 
   }
@@ -171,7 +173,7 @@ ThermalModelType Component::getThermalModelType(std::string type_name) {
     err_msg += "' does not name a valid ThermalModelType.\n";
     err_msg += "Options are:\n";
     for(int name=0; name < LAST_THERMAL; name++){
-      err_msg += thermal_type_names[name];
+      err_msg += thermal_type_names_[name];
       err_msg += "\n";
     }     
     throw CycException(err_msg);
@@ -182,9 +184,8 @@ ThermalModelType Component::getThermalModelType(std::string type_name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NuclideModelType Component::getNuclideModelType(std::string type_name) {
   NuclideModelType toRet = LAST_NUCLIDE;
-  string nuclide_type_names[] = {"LumpNuclide","MixedCellNuclide", "StubNuclide" };
   for(int type = 0; type < LAST_NUCLIDE; type++){
-    if(nuclide_type_names[type] == type_name){
+    if(nuclide_type_names_[type] == type_name){
       toRet = (NuclideModelType)type;
     }
   }
@@ -194,7 +195,7 @@ NuclideModelType Component::getNuclideModelType(std::string type_name) {
     err_msg += "' does not name a valid NuclideModelType.\n";
     err_msg += "Options are:\n";
     for(int name=0; name < LAST_NUCLIDE; name++){
-      err_msg += nuclide_type_names[name];
+      err_msg += nuclide_type_names_[name];
       err_msg += "\n";
     }
     throw CycException(err_msg);

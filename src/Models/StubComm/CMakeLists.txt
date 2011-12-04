@@ -1,5 +1,2 @@
 # Build the cyclus executable from the CYCLUS_SRC source files
-ADD_LIBRARY( StubStubComm  StubStubComm.cpp )
-SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES}
-  StubStubCom
-  )
+ADD_SUBDIRECTORY( StubStubComm )

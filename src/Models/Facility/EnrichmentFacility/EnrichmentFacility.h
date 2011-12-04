@@ -8,23 +8,81 @@
 #include "FacilityModel.h"
 
 /**
- * The EnrichmentFacility class inherits from the FacilityModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This facility model does very little.  New material is added to queue inventory
- * and old material is removed from the same queue inventory.
- *
+  \class EnrichmentFacility
+  \brief The EnrichmentFacility class inherits from the FacilityModel class and 
+  is dynamically loaded by the Model class when requested.
+  
+  This facility model does very little.  New material is added to queue 
+  inventory
+  and old material is removed from the same queue inventory.
+ 
+  \section Introduction 
+  The EnrichmentFacility is a facility type in Cyclus which accepts unenriced 
+  UF,,6,, (uuf6) and produces enriched UF,,6,, (euf6), and depleted uranium tails 
+  (tails). An EnrichmentFacility generates appropriately enriched UF,,6,, and 
+  offers that material on the appropriate market. Shipments of this material are 
+  executed when the market issues an order that the offer has been matched with a 
+  request.
+ 
+  \section Model Parameters  
+
+ EnrichmentFacility behavior is comprehensively defined by the following 
+parameters:
+ - double capacity : The production capacity of the facility (SWU's).
+ - double enrichment product fraction
+ - double tails fraction
+ - int startDate : The date on which the facility begins to operate (months).
+ - int lifeTime : The length of time that the facility operates (months).
+ - Mass inventorysize: the maximum quantity of material to be held in the 
+   inventory
+ - string name : A non-generic name for this facility. 
+
+ \section Optional Parameters  
+
+ EnrichmentFacility behavior may also be specified with the following optional 
+ parameters which have default values listed here.
+
+ - capacityFactor : The ratio of actual production capacity to the rated 
+ production capacity. Default is 1 (actual/rated).
+ - double availFactor : The percent of time the facility operates at its 
+ - capacity factor. Default is 100%.
+ - double capitalCost : The cost of constructing and commissioning this 
+   facility. Default is 0 ($).
+ - double opCost : The annual cost of operation and maintenance of this 
+   facility. Default is 0 ( $/year).
+ - int constrTime : The number of months it takes to construct and commission 
+   this facility. Default is 0 (months).
+ - int decomTime : The number of months it takes to deconstruct and decommission 
+   this facility. Default is 0 (months).
+ - Inst`-` inst : The institution responsible for this facility.  double price: 
+   the offer price of the enriched UF,,6,, per kg. Default is 0 ($).
+
+ \section Detailed Behavior  
+
+ The EnrichmentFacility starts operation when the simulation reaches the month 
+ specified as the startDate. It immediately begins to request unenriched UF,,6,, 
+ material at the rate determined by its capacity and offers exactly as much 
+ material as it has in its inventory. When it receives UF,,6,, that material is 
+ placed into its stocks to await processing. The EnrichmentFacility then 
+ processes as much of the material in its stocks as is allowed by its capacity. 
+ When it processes some unenriched material into enriched UF,,6,, it adds the 
+ amount it has produced to its inventory.  If an offer is matched with a 
+ request, the EnrichmentFacility executes that order by subtracting the quantity 
+ from its inventory and sending that amount to the requesting facility. When the 
+ simulation time equals the startDate plus the lifeTime, the facility ceases to 
+ operate.  
+
  */
-class EnrichmentFacility : public FacilityModel  
-{
+
+
+class EnrichmentFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
 public:
-  /** 
-   * Default constructor for the EnrichmentFacility class.
+  /** Default constructor for the EnrichmentFacility class.
    */
   EnrichmentFacility() {};
 
@@ -40,10 +98,11 @@ public:
   /// initialize an object by copying another
   virtual void copy(EnrichmentFacility* src);
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * This drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
@@ -95,7 +154,8 @@ public:
     /**
      * The handleTick function specific to the EnrichmentFacility.
      * At each tick, it requests as much raw inCommod as it can process this
-     * month and offers as much outCommod as it will have in its inventory by the
+     * month and offers as much outCommod as it will have in its inventory by 
+     * the
      * end of the month.
      *
      * @param time the time of the tick
@@ -167,9 +227,9 @@ protected:
 
      /**
      * The total mass flow required to process all outstanding orders this 
-     * Facility has already committed to. Units are tons, sometimes of 
-     * uranium and sometimes of certain isotopes. For Enrichment, they're 
-     * tons U SWU. For Fuel Fab, they're tons U.
+     * Facility has already committed to. Units are tons, sometimes of uranium 
+     * and sometimes of certain isotopes. For Enrichment, they're tons U SWU. 
+     * For Fuel Fab, they're tons U.
      */
     double outstMF_;
 
@@ -179,9 +239,9 @@ protected:
     deque<Message*> ordersWaiting_;
 
     /**
-     * A map whose keys are times at which this Facility will finish 
-     * executing a given order and the values are pairs comprising the orders 
-     * themselves and the Materials each is to be made with.
+     * A map whose keys are times at which this Facility will finish executing a 
+     * given order and the values are pairs comprising the orders themselves and 
+     * the Materials each is to be made with.
      */
     ProcessLine ordersExecuting_;
 
@@ -218,8 +278,8 @@ protected:
      * Calculates the separative work (in ton SWU) required to create a certain 
      * amount of enriched uranium product subject to a given enrichment scheme.
      * 
-     * Note: for now, this model assumes two-component enrichment (only 
-     * U-235 and U-238, no U-234 or U-236).
+     * Note: for now, this model assumes two-component enrichment (only U-235 
+     * and U-238, no U-234 or U-236).
      *
      * @param massProdU the mass (in tons U) of product required
      * @param xp the required product enrichment of U-235 (between 0 and 1)
@@ -233,8 +293,8 @@ protected:
      * Same as the four-argument version, but uses this Enrichment plant's 
      * default value for tails enrichment.
      * 
-     * Note: for now, this function assumes two-component enrichment (only 
-     * U-235 and U-238, no U-234 or U-236).
+     * Note: for now, this function assumes two-component enrichment (only U-235 
+     * and U-238, no U-234 or U-236).
      *
      * @param massProdU the mass (in tons U) of product required
      * @param xp the required product enrichment of U-235 (between 0 and 1)
@@ -245,9 +305,9 @@ protected:
 
     /**
      * Checks to see if the given candidate Material can be used for enrichment
-     * of any of the ordersWaiting for Material. If so, returns 
-     * an iterator pointing to that item. If not, returns an iterator just past 
-     * the last element.
+     * of any of the ordersWaiting for Material. If so, returns an iterator 
+     * pointing to that item. If not, returns an iterator just past the last 
+     * element.
      *
      * @param candMat the candidate material
      * @return the iterator

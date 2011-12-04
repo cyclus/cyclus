@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Facility/SourceFacility.h"
+#include "Facility/SourceFacility/SourceFacility.h"
 #include "Commodity.h"
 #include "Message.h"
 

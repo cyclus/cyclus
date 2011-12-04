@@ -52,6 +52,13 @@ void StubNuclide::extract(Material* matToRem)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StubNuclide::transportNuclides(){
+  // This should transport the nuclides through the component.
+  // It will likely rely on the internal flux and will produce an external flux. 
+  // The convention will be that flux is positive in the radial direction
+  // If these fluxes are negative, nuclides aphysically flow toward the waste package 
+  // It will send the adjacent components information?
+  // The StubNuclide class should transport all nuclides
+
 }
 
 

@@ -6,7 +6,7 @@
 #include <queue>
 
 #include "FacilityModel.h"
-#include "GenericRepository/Component.h"
+#include "Component.h"
 
 /**
  * type definition for waste stream objects
@@ -14,11 +14,14 @@
 typedef pair<Material*, Commodity*> WasteStream;
 
 /**
- * @brief This model seeks to provide a generic disposal system model
- * 
- * The GenericRepository class inherits from the FacilityModel class and is 
- * dynamically loaded by the Model class when requested.
- * 
+  @brief This model seeks to provide a generic disposal system model
+  
+  The GenericRepository class inherits from the FacilityModel class and is 
+  dynamically loaded by the Model class when requested.
+
+
+ 
+  
  */
 
 class GenericRepository : public FacilityModel  {
@@ -331,7 +334,7 @@ protected:
     Component* initComponent(xmlNodePtr cur) ;
 
     /**
-     * Do heat transport calculations
+     * Do heat transport calculations. 
      */
     void transportHeat() ;
 

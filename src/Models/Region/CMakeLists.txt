@@ -1,12 +1,6 @@
 # Build the cyclus executable from the CYCLUS_SRC source files
-ADD_LIBRARY( NullRegion  NullRegion.cpp )
-ADD_LIBRARY( StubRegion  StubRegion.cpp )
-ADD_LIBRARY( BuildRegion  BuildRegion.cpp )
-ADD_LIBRARY( CapacityRegion  CapacityRegion.cpp )
+ADD_SUBDIRECTORY( NullRegion )
+ADD_SUBDIRECTORY( StubRegion )
+ADD_SUBDIRECTORY( BuildRegion )
+ADD_SUBDIRECTORY( CapacityRegion )
 
-SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES}
-  NullRegion
-  StubRegion
-  BuildRegion
-  CapacityRegion
-  )

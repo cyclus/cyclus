@@ -10,7 +10,7 @@ set ( TestSource
   LogicianTests.cpp
   MessageTests.cpp
   GenericRepositoryTests.cpp
-  ../Models/Facility/SourceFacility.cpp
+  ../Models/Facility/SourceFacility/SourceFacility.cpp
   Models/Facility/SourceFacilityTests.cpp
   ../InputXML.cpp
   ../Logician.cpp

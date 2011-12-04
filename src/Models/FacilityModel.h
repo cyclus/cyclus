@@ -16,11 +16,59 @@ class Material;
 
 //-----------------------------------------------------------------------------
 /**
- * The FacilityModel class is the abstract class/interface used by all
- * facility models
- * 
- * This is all that is known externally about facilities
-*/
+ \class FacilityModel
+ \brief The FacilityModel class is the abstract class/interface used by all
+ facility models
+ 
+ This is all that is known externally about facilities
+  
+ \section intro Introduction 
+  
+  The FacilityModel type plays a primary role in Cyclus.  A FacilityModel 
+  facility is where offers and requests are generated and transmitted to markets 
+  and where shipments of material, issued by the markets, are executed.  The 
+  algorithms to determine what offers and requests are issued and how material 
+  shipments are handled are the primary differentiators between different 
+  FacilityModel implementations.
+  
+  Like all model implementations, there are a number of implementations that are 
+  distributed as part of the core Cyclus application as well as implementations 
+  contributed by third-party developers.  The links below describe additional 
+  parameters necessary for the complete definition of a facility of that 
+  implementation.
+  
+  \section available Available Core Implementations 
+  
+    - SourceFacility: A facility that can produce a constant (or infinite) 
+    amount of some commodity
+    - SinkFacility:  A facility that can consume a constant (or infinite) amount 
+    of some commodity
+    - NullFacility: A facility that consumes a constant amount of one commodity 
+    and produces a constant amount of another
+  
+  
+  \section anticipated Anticipated Core Implementations 
+  
+  Developers are encouraged to add to this list and create pages that describe 
+  the detailed behavior of these models.
+  
+    - RecipeReactorFacility: A facility that consumes a fixed fresh fuel recipe 
+    one a time scale governed by reactor cycle lengths and batch sizes, and 
+    produced a fixed/corresponding spent fuel recipe at the same frequency
+    - SeparationsMatrixFacility: A facility that consumes a fixed quantity of 
+    material of one commodity and produces many different output streams with 
+    the input isotopes distributed across those output streams according to a 
+    fixed matrix
+    - EnrichmentFacility: A facility that offers a fixed quantity of SWUs to 
+    accomplish isotopic enrichment of material
+  
+  \section thirdparty Third-party Implementations 
+  
+  Collaborators are encouraged to add to this list and link to external pages 
+  that describe how to get the models and the detailed behavior of these models.
+  
+  */
+
 //-----------------------------------------------------------------------------
 class FacilityModel : public TimeAgent, public Communicator {
 /* --------------------
@@ -40,10 +88,11 @@ public:
   virtual void copy(FacilityModel* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * This drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
@@ -68,14 +117,15 @@ protected:
   int fac_lifetime_;
 
   /**
-   * There is no default FacilityModel shipment requester 
-   * Each derived class must implement a shipment requester
+   * There is no default FacilityModel shipment requester Each derived class 
+   * must implement a shipment requester
    *
    * @param trans is the transaction being executed
    * @param manifest is the set of materials being received
    *
    */ 
-  virtual void receiveMaterial(Transaction trans, std::vector<Material*> manifest) = 0;
+  virtual void receiveMaterial(Transaction trans, std::vector<Material*> 
+      manifest) = 0;
   
 
 public:
@@ -118,15 +168,15 @@ public:
   /**
    * Returns the facility's lifetime
    *
-   * @return fac_lifetime_ the lifetime of this facility, an int, in 
-   * months
+   * @return fac_lifetime_ the lifetime of this facility, an int, in months
    */
   int getFacLifetime() { return fac_lifetime_; };
 
   /**
    * Returns the facility's power capacity
    *
-   * @return 0 by default. If the facility produces power, it will use its own function.
+   * @return 0 by default. If the facility produces power, it will use its own 
+   * function.
    */
   double getPowerCapacity() { return 0.0; };
 
