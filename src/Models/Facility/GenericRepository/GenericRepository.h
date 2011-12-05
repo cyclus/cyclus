@@ -14,14 +14,60 @@
 typedef pair<Material*, Commodity*> WasteStream;
 
 /**
-  @brief This model seeks to provide a generic disposal system model
+  \class GenericRepository
+  \brief This FacilityModel seeks to provide a generic disposal system model
   
   The GenericRepository class inherits from the FacilityModel class and is 
   dynamically loaded by the Model class when requested.
 
-
- 
+  \section intro Introduction 
   
+  The GenericRepository is a facility type in *Cyclus* which represents a generic 
+  disposal system. It continually requests wastes of all incoming commodities that
+  it allows until the capacity has been reached. While there are new waste streams 
+  in the stocks, they are conditioned into a waste form, packaged into a waste 
+  package, and emplaced in a buffer.
+  
+  \section modelparams Model Parameters 
+  
+  GenericRepository behavior is comprehensively defined by the following 
+  parameters:
+   - double capacity : The production capacity of the facility (units vary, but 
+   typically kg/month). *Question:* Do we want to allow this to be infinite?  
+   - int startOpYear : The year in which the facility begins to operate .
+   - int startOpMonth : The month in which the facility begins to operate .
+   - int lifeTime : The length of time that the facility operates (months).
+   - Commodity`*` inCommod : One or more types of commodity that this facility accepts.
+   - Component`*` component : One or more types of component that facility contains
+   - Inst`*` inst : The institution responsible for this facility.  
+   - double area : The square  meters of topographic area that the repository may occupy.
+  
+   \section optionalparams Optional Parameters  
+  
+   GenericRepository behavior may also be specified with the following optional 
+   parameters which have default values listed here...  
+  
+   \section detailed Detailed Behavior 
+  
+   The GenericRepository is under development at this time. 
+  
+   In general, it starts operation when the simulation reaches the month specified 
+   as the startDate. Each month, the GenericRepository makes a request for the 
+   inCommod commodity types at a rate corresponding to the calculated capacity less 
+   the amount it currently has in its stocks (which begins the simulation empty). 
+  
+   If a request is matched with an offer, the GenericRepository receives that 
+   order from the supplier and adds the quantity to its stocks. 
+  
+   At the end of the month, it then proceeds to condition, package, and load the 
+   material into the repository according to thermal and nuclide constraints. 
+  
+   During each month, nuclide and heat transport calculations are completed within 
+   the repository in order to determine useful fuel cycle metrics.
+  
+  When the simulation time equals the start date plus the lifetime, the facility 
+  ceases to operate. 
+
  */
 
 class GenericRepository : public FacilityModel  {

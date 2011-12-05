@@ -9,12 +9,13 @@
 
 /**
   \class EnrichmentFacility
-  \brief The EnrichmentFacility class inherits from the FacilityModel class and 
+  \brief The EnrichmentFacility enriches uranium. 
+  
+  This class inherits from the FacilityModel class and 
   is dynamically loaded by the Model class when requested.
   
   This facility model does very little.  New material is added to queue 
-  inventory
-  and old material is removed from the same queue inventory.
+  inventory and old material is removed from the same queue inventory.
  
   \section Introduction 
   The EnrichmentFacility is a facility type in Cyclus which accepts unenriced 

@@ -16,12 +16,59 @@ using namespace H5;
 
 
 /**
- * The ConditioningFacility class inherits from the FacilityModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This facility will do nothing. This FacilityModel is intended as a skeleton to guide
- * the implementation of new FacilityModel models. 
- *
+  \class ConditioningFacility
+  \brief This facility accepts material that must be conditioned into a waste form. 
+ 
+  The ConditioningFacility class inherits from the FacilityModel class and 
+  is dynamically loaded by the Model class when requested.
+  
+  \section intro Introduction
+
+  Place an introduction to the model here. 
+
+  \section modelparams Model Parameters
+
+  Place a description of the required input parameters which define the model 
+  implementation.
+
+  - string fileformat : Currently supported formats for wasteform tables include hdf5 
+    and csv
+  - string datafile : The filename of the file containing the wasteform tables
+
+  \section optionalparams Optional Parameters
+
+  none
+
+  \section detailed Detailed Behavior
+
+  Place a description of the detailed behavior of the model. Consider describing 
+  the behavior at the tick and tock as well as the behavior upon sending and
+  receiving materials and messages. 
+
+  \subsection tick handleTick
+
+  On the tick the ConditioningFacility makes requests for each  of the waste
+  commodities (streams) that its table addresses. It also makes offers of any 
+  conditioned waste it contains.
+
+  \subsection tock handleTock
+
+  On the tock the ConditioningFacility first prepares transactions by preparing 
+  and sending material from its stocks all material in its stocks up to its 
+  monthly processing  capacity.
+
+  \subsection receivemessage receiveMessage
+
+  The ConditioningFacility throws an exception, as it doesn't deal with messages.
+
+  \subsection sendMaterial sendMaterial
+
+  Sends the material from the inventory to fulfill transactions. 
+
+  \subsection receivematerial receiveMaterial
+
+  Puts the material it has recieved in the stocks, to be conditioned on the tick.
+
  */
 class ConditioningFacility : public FacilityModel  
 {

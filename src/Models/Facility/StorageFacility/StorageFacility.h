@@ -8,7 +8,32 @@
 #include "FacilityModel.h"
 
 /**
- * @brief  fill this out
+  \class StorageFacility
+  \brief This FacilityModel stores material.
+  
+  The StorageFacility class inherits from the FacilityModel class and is 
+  dynamically loaded by the Model class when requested.
+
+  \section intro Introduction
+
+  Place an introduction to the model here. 
+
+  \section modelparams Model Parameters
+
+  Place a description of the required input parameters which define the model 
+  implementation.
+
+  \section optionalparams Optional Parameters
+
+  Place a description of the optional input parameters to define the model 
+  implementation.
+
+  \section detailed Detailed Behavior
+
+  Place a description of the detailed behavior of the model. Consider describing 
+  the behavior at the tick and tock as well as the behavior upon sending and
+  receiving materials and messages. 
+ 
  */
 class StorageFacility : public FacilityModel  
 {

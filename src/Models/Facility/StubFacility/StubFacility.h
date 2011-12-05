@@ -7,15 +7,36 @@
 #include "FacilityModel.h"
 
 /**
- * The StubFacility class inherits from the FacilityModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This facility will do nothing. This FacilityModel is intended as a skeleton to guide
- * the implementation of new FacilityModel models. 
- *
+  \class StubFacility
+  \brief This FacilityModel is intended 
+  as a skeleton to guide the implementation of new FacilityModel models. 
+  
+  The StubFacility class inherits from the FacilityModel class and is 
+  dynamically loaded by the Model class when requested.
+  
+
+  \section intro Introduction
+
+  Place an introduction to the model here. 
+
+  \section modelparams Model Parameters
+
+  Place a description of the required input parameters which define the model 
+  implementation.
+
+  \section optionalparams Optional Parameters
+
+  Place a description of the optional input parameters to define the model 
+  implementation.
+
+  \section detailed Detailed Behavior
+
+  Place a description of the detailed behavior of the model. Consider describing 
+  the behavior at the tick and tock as well as the behavior upon sending and
+  receiving materials and messages. 
+
  */
-class StubFacility : public FacilityModel  
-{
+class StubFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -47,10 +68,11 @@ public:
   virtual void copy(StubFacility* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * This drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
    *
    * @param src the pointer to the original (initialized ?) model to be copied
    */
