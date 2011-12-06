@@ -1,0 +1,16 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="SinkFacility">
+     <element name="SinkFacility"> 
+        <oneOrMore>
+          <ref name="incommodity"/>
+        </oneOrMore>
+        <ref name="capacity"/>
+        <ref name="inventorysize"/>
+        <ref name="commodprice"/>
+     </element>
+  </define>
+
+
+</grammar>

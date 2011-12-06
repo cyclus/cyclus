@@ -1,0 +1,13 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="BuildRegion">
+     <element name="BuildRegion">
+        <element name="input_file">
+        <text/>
+    </element>
+     </element>
+  </define>
+
+
+</grammar>

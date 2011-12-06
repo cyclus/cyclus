@@ -1,0 +1,40 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="StorageFacility">
+     <element name="StorageFacility"> 
+        <oneOrMore>
+          <ref name="incommodity"/>
+          </oneOrMore>
+        <element name="capacity">
+          <text/>
+          </element>
+        <element name="inventorysize">
+          <text/>
+          </element>
+        <element name="residencetime">
+          <text/>
+          </element>
+        <element name="initialstocks">
+        <zeroOrMore>
+        <element name="entry">
+                  <element name="facility">
+                        <text/>
+                      </element>
+            <ref name="incommodity"/>
+                  <element name="recipe">
+                        <text/>
+                      </element>
+            <element name="amount">
+                <text/>
+                </element>
+            <element name="age">
+                <text/>
+                </element>
+        </element>
+            </zeroOrMore>
+    </element>
+     </element>
+  </define>
+
+</grammar>

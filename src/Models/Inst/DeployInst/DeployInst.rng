@@ -1,0 +1,28 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+
+  <define name="DeployInst">
+    <element name="DeployInst">
+      <oneOrMore>
+      <ref name="deploy"/>
+      </oneOrMore>       
+    </element>
+  </define>
+
+  <define name="deploy">
+    <element name="deploy">
+      <element name="type">
+        <text/>
+      </element>   
+      <element name="name">
+        <text/>
+      </element>   
+      <element name="start">
+        <text/>
+      </element>
+    </element>
+  </define>
+
+
+</grammar>

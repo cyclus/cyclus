@@ -1,0 +1,28 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="ConverterMarket">
+    <element name="ConverterMarket">
+        <element name="offercommodity">
+          <text/>
+        </element>
+        <element name="reqcommodity">
+          <text/>
+        </element>
+
+        <oneOrMore>
+          <element name="converter">
+            <element name="type">
+              <text/>
+            </element>
+            <element name="name">
+              <text/>
+            </element>
+          </element>
+        </oneOrMore>       
+          
+    </element>
+  </define> 
+
+
+</grammar>

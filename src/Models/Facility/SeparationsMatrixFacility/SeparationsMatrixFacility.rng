@@ -1,0 +1,14 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="SeparationsMatrixFacility">
+     <element name="SeparationsMatrixFacility"> 
+        <ref name="incommodity"/>
+        <ref name="outcommodity"/>
+        <ref name="Stream"/>
+        <ref name="inventorysize"/>
+        <ref name="capacity"/>
+     </element>
+  </define>
+
+</grammar>

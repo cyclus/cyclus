@@ -1,0 +1,22 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="FixedInst">
+    <element name="FixedInst">
+
+      <oneOrMore>
+        <element name="facility">
+          <element name="type">
+            <text/>
+          </element>
+          <element name="name">
+            <text/>
+          </element>
+        </element>
+      </oneOrMore>       
+
+    </element>
+  </define>
+
+
+</grammar>

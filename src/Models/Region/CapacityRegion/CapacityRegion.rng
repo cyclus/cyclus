@@ -1,0 +1,32 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="CapacityRegion">
+     <element name="CapacityRegion">
+        <element name="input_file">
+        <text/>
+    </element>
+    <oneOrMore>
+        <element name="capacitydemand">
+        <element name="capacitytype">
+            <text/>
+        </element>
+        <element name="capacityfunction">
+            <text/>
+        </element>
+        <element name="nominalvalue">
+            <text/>
+        </element>
+        <oneOrMore>
+        <element name="replacementlist">
+            <element name="replacementfacility">
+                <text/>
+            </element>
+        </element>
+        </oneOrMore>
+    </element>
+    </oneOrMore>
+     </element>
+  </define>
+
+</grammar>

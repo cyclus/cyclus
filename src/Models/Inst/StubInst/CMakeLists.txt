@@ -2,3 +2,8 @@
 ADD_LIBRARY( StubInst       StubInst.cpp )
 
 SET( CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} StubInst )
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Models/Inst/StubInst/StubInst.rng
+${CMAKE_CURRENT_BINARY_DIR}/StubInst.rng
+COPYONLY
+)

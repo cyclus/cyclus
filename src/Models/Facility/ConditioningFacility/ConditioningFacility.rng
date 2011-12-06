@@ -1,0 +1,18 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="ConditioningFacility">
+     <element name="ConditioningFacility"> 
+        <element name="fileformat">
+          <text/>
+        </element>
+        <element name="datafile">
+          <text/>
+        </element>
+     </element>
+  </define>
+
+</grammar>
+
+
+    

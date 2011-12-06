@@ -1,0 +1,25 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="SourceFacility">
+     <element name="SourceFacility"> 
+        <oneOrMore>
+          <ref name="outcommodity"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="capacity"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="inventorysize"/>
+        </oneOrMore>
+        <element name="commodprice">
+          <text/>
+          </element>
+        <element name="recipe">
+          <text/>
+          </element>
+     </element>
+  </define>
+
+
+</grammar>
