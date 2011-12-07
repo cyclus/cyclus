@@ -138,7 +138,9 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
     Material* newMat = new Material(CompMap(), 
                                   m->getUnits(),
                                   m->name(), 
-                                  0, ATOMBASED);
+                                  0, 
+                                  ATOMBASED,
+                                  false);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.amount - newAmt)){

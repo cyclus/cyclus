@@ -173,17 +173,20 @@ void BookKeeper::printTrans(trans_t trans){
 void BookKeeper::registerMatChange(Material* mat){
   mat_hist_t toRegister;
 
-  double total = mat->getTotMass();
-  toRegister.materialID = mat->ID(); 
-  toRegister.timestamp = TI->getTime();
+  if (!mat->isTemplate()){
+    double total = mat->getTotMass();
+    toRegister.materialID = mat->ID(); 
+    /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
+    toRegister.timestamp = TI->getTime();
 
-  CompMap comp = mat->getMassComp();
-  CompMap::const_reverse_iterator it = comp.rbegin();
-  if(it != comp.rend()){
-    toRegister.iso = it->first;
-    toRegister.comp = (it->second)*(total);
-    materials_.push_back(toRegister);
-  };
+    CompMap comp = mat->getMassComp();
+    CompMap::const_reverse_iterator it = comp.rbegin();
+    if(it != comp.rend()){
+      toRegister.iso = it->first;
+      toRegister.comp = (it->second)*(total);
+      materials_.push_back(toRegister);
+  }
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

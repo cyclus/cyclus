@@ -16,6 +16,7 @@ class MaterialTest : public ::testing::Test {
     Material* decay_mat;
     long int u235_halflife;
     int th228_halflife;
+    bool test_template;
 
     virtual void SetUp(){
       u235 = 92235;
@@ -33,9 +34,12 @@ class MaterialTest : public ::testing::Test {
       u235_halflife = 8445600000; // approximate, in months
       th228_halflife = 2*11; // approximate, in months
       int time = TI->getTime();
+      test_template = false;
 
-      test_mat = new Material(test_comp, test_mat_unit, test_rec_name, test_size, test_type); 
-      decay_mat = new Material(decay_comp, test_mat_unit, test_rec_name, test_size, test_type); 
+      test_mat = new Material(test_comp, test_mat_unit, test_rec_name, test_size, 
+          test_type, test_template); 
+      decay_mat = new Material(decay_comp, test_mat_unit, test_rec_name, 
+          test_size, test_type, test_template); 
     };
 };
 

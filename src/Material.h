@@ -10,6 +10,7 @@
 #include <libxml/tree.h>
 
 #include "UseMatrixLib.h"
+#include "Resource.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
@@ -122,10 +123,6 @@ class Material {
 
 public:
   
-  /**
-   * Default constructor for the material class. Creates an empty material.
-   */
-  Material(); 
 
   /**
    * primary constructor reads input from XML node
@@ -142,9 +139,10 @@ public:
    * @param rec_name name of this recipe
    * @param scale is the size of this material
    * @param type indicates whether comp and scale are in mass or atom units
+   * @param is_template indicates whether comp and scale are in mass or atom units
    */
   Material(CompMap comp, std::string mat_unit, std::string rec_name, 
-            double scale, Basis type);
+            double scale, Basis type, bool is_template);
 
   
   /** 
@@ -420,7 +418,19 @@ public:
    */
   static void loadDecayInfo();
 
+  /**
+   * Returns true if this material is a template, false otherwise
+   *
+   * @return is_template_
+   */
+  bool isTemplate() const {return is_template_;};
+
 protected:
+  /**
+   * Default constructor for the material class. Creates an empty material.
+   */
+  Material(); 
+
   /** 
    * The serial number for this Material.
    */
@@ -430,6 +440,12 @@ protected:
    * Stores the next available material ID
    */
   static int nextID_;
+
+  /** 
+   * True if this Material is a template, not to be kept in the records or 
+   * traded between facilities. False otherwise.
+   */
+  bool is_template_;
 
   /**
    * Returns true if the given isotope's number density is for some reason 

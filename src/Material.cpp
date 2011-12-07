@@ -26,11 +26,12 @@ Matrix Material::decayMatrix_ = Matrix();
 int Material::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0) {
+Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0),
+  is_template_(true) {
   ID_ = nextID_++;
   facHist_ = FacHistory() ;
   CompMap zero_map;
-  zero_map.insert(make_pair(Iso(92235),0));
+  zero_map.insert(make_pair(Iso(99999),0));
   massHist_.insert(make_pair(TI->getTime(), zero_map));
   compHist_.insert(make_pair(TI->getTime(), zero_map));
   BI->registerMatChange(this);
@@ -38,6 +39,8 @@ Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(xmlNodePtr cur) {
+  is_template_ = true;
+
   ID_ = nextID_++;
   
   recipeName_ = XMLinput->get_xpath_content(cur,"name");
@@ -67,12 +70,16 @@ Material::Material(xmlNodePtr cur) {
   }
 
   facHist_ = FacHistory() ;
+  is_template_ = true;
   BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(CompMap comp, std::string mat_unit, std::string rec_name, double size, Basis type) {
+Material::Material(CompMap comp, std::string mat_unit, std::string rec_name, 
+    double size, Basis type, bool is_template) {
   
+  is_template_ = is_template;
+
   ID_=nextID_++;
 
   units_ = mat_unit;
@@ -465,7 +472,8 @@ bool Material::isAtomicNumValid(Iso tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extractMass(Mass amt) {
   CompMap comp = this->getMassComp();
-  Material* newMat = new Material(comp , units_, " ", amt, MASSBASED);
+  bool is_template = false;
+  Material* newMat = new Material(comp , units_, " ", amt, MASSBASED, is_template);
   this->extract(newMat);
   return newMat;
 }
