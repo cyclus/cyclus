@@ -10,13 +10,41 @@
 #include "ConverterModel.h"
 
 /**
- * The ConverterMarket class inherits from the MarketModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This market will take a set of requests and match the biggest requests with
- * the biggest offers first.
- *
- */
+   @brief
+   The ConverterMarket class inherits from the MarketModel 
+   class and is dynamically loaded by the Model class when requested.
+   
+   @section introduction Introduction
+   The ConverterMarket is a market type in Cyclus which receives requests 
+   and offers for two different commodities, calls an appropriate converter 
+   model, and matches appropriate offers and requests according to a scheme 
+   much like the GreedyMarket. Either the offer or request must be for the 
+   characteristic commodity of that Market. The ConverterMarket is 
+   instantiated at the beginning of the simulation and exists until 
+   the end of the simulation.
+
+   @section modelParams Model Parameters
+   ConverterMarket behavior is comprehensively defined by the following 
+   parameters:
+   -list<Commodity*> commods: The types of commodity for which this 
+   market accepts offers and requests.
+   -ConverterModel* converter: The converter that will be called to 
+   translate an offer or request in one commodity into another 
+   equivalent commodity.
+      
+   @section detailedBehavior Detailed Behavior
+   The ConverterMarket starts operation at the beginning of the simulation 
+   and ends operation at the end of the simulation. It collects offers and 
+   requests for its characteristic commodities. It employs a converter model 
+   to make the appropiate conversions into a single commodity. Once all 
+   requests and offers are of the same commodity type, it matches offers and 
+   requests according to the greedy algorithm, matching the largest request 
+   with the first offers until it is filled and proceeding to fill other 
+   requests only if the first large request is filled or is determined to be 
+   too large to fill with all offers. Once matches are made, the market 
+   dictates the matches back down to the facilities.
+*/
+
 class ConverterMarket : public MarketModel  
 {
 /* --------------------

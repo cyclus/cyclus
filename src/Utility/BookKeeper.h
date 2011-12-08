@@ -37,8 +37,40 @@ typedef boost::multi_array<std::string, 3> strData3d;
 typedef strData3d::index str3didx;
 
 /**
- * A (singleton) class for handling I/O.
- */
+   @brief
+   The BookKeeper is a (singleton) class for handling I/O.
+   
+   @section introduction Introduction
+   The Cyclus Book Keeper is a singleton member of the 
+   BookKeeperClass. The Book Keeper Instance (BI) controls 
+   reading and writing from the simulation database. The 
+   Book Keeper creates the database file (cyclus.h5) and 
+   maintains functions with which the LogicianClass and 
+   various models can write individual datasets to that file.
+   
+   @section singletonInstance Singleton Instance
+   In order to utilize the database functions stewarded by the 
+   Book Keeper, a model must include the Book Keeper header file 
+   and call BookKeeperClass functions via the singleton Book 
+   Keeper Instance LI.
+   
+   @section writeDB Writing the Database File
+   In the long term, the function that writes the output for 
+   Cyclus may be of any format. For now, the only supported format 
+   is hdf5. The Book Keeper creates a simulation data file in the 
+   build directory (called cyclus.h5) as soon as it is initialized.
+
+   @section writeToDB Writing to the Database
+   It is an open question whether the data for the simulation should 
+   be kept entirely in memory until the end of the simulation. It 
+   may be best to open and write to the file all in one fluid process 
+   at the end of the simulation to save time. Alternatively though, 
+   there may be some value in writing the simulation data to the file 
+   as it is generated in order to facilitate a future in which the 
+   simulation might have a dynamic start and stop capability.
+*/
+
+
 class BookKeeper {
 private:
   /**

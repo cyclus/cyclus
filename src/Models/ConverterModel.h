@@ -13,12 +13,42 @@ class Commodity;
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 
-//-----------------------------------------------------------------------------
 /**
- * The ConverterModel class is the abstract class/interconve used by all
- * converter models
- * 
+   @brief
+   The ConverterModel class is the abstract class/interconve used by all
+   converter models.
+   
+   @section introduction Introduction
+   The ConverterModel type is used to translate between commodity types 
+   in Cyclus. A ConverterModel receives a message concerning an amount 
+   of one commodity, A, and translates that amount into another 
+   commodity B. It then returns the message with the amount and commodity 
+   type altered to reflect this translation. The algorithm to determine 
+   the method of translation between commodities is the primary 
+   differentiator between different ConverterModel implementations.
+
+   Like all model implementations, there are a number of implementations 
+   that are distributed as part of the core Cyclus application as well 
+   as implementations contributed by third-party developers. The links 
+   below describe additional parameters necessary for the complete 
+   definition of a facility of that implementation.
+   
+   @section availableCoreImpl Available Core Implementations
+   (None)
+   
+   @section anticipatedCoreImpl Anticipated Core Implementations
+   (Developers are encouraged to add to this list and create pages 
+   that describe the detailed behavior of these models.)
+   - SWUeUF6Converter: A facility that can convert between SWU 
+   amounts and enriched uranium hexafluoride.
+   
+   @section thirdPartyImpl Third Party Implementations
+   (Developers are encouraged to add to this list and create 
+   pages that describe the detailed behavior of these models.)
+   
+   (None)
 */
+
 //-----------------------------------------------------------------------------
 class ConverterModel : public TimeAgent {
 

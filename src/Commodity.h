@@ -10,10 +10,27 @@
 class Model;
 
 /**
- *  A class to defining a particular type of material.  Each Commodity will
- *  have a single MarketModel market that is repsonsible for managing the
- *  trade of that Commodity.
- */
+   @brief
+   A class to defining a particular type of material. 
+   Each Commodity will have a single MarketModel market 
+   that is repsonsible for managing the trade of that Commodity.
+   
+   @section introduction Introduction
+   The Cyclus Commodity class supports the type of material 
+   classification that allows materials with different isotopics 
+   and chemical characteristics to be traded on the appropriate 
+   markets and treated as equivalents.
+
+   While a MarketModel may trade many commodities, aach commodity 
+   is traded on only one MarketModel. In order to add a commodity 
+   to the appropriate map in the logician class, the logician 
+   calls the function addCommodity (Commodity *new_commod).
+
+   Every model that requests or offers materials must define their 
+   offer or request as an amount of a commodity in order for the 
+   offers or requests to be sent to the proper market.
+*/
+
 class Commodity {
 public:
 
