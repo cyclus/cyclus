@@ -26,8 +26,8 @@ Matrix Material::decayMatrix_ = Matrix();
 int Material::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0),
-  is_template_(true) {
+Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0){
+  is_template_= true;
   ID_ = nextID_++;
   facHist_ = FacHistory() ;
   CompMap zero_map;
@@ -70,7 +70,6 @@ Material::Material(xmlNodePtr cur) {
   }
 
   facHist_ = FacHistory() ;
-  is_template_ = true;
   BI->registerMatChange(this);
 }
 
@@ -281,7 +280,6 @@ void Material::changeComp(Iso tope, Atoms change, int time) {
 
   rationalize_A2M();
 
-  BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -412,6 +410,7 @@ void Material::absorb(Material* matToAdd) {
     this->changeComp(isoToAdd, atomsToAdd, TI->getTime());
     iter++;
   }
+  BI->registerMatChange(this);
 
   // Delete the given Material.
   delete matToAdd;
@@ -434,6 +433,8 @@ void Material::extract(Material* matToRem) {
     this->changeComp(isoToRem, aToRem, TI->getTime());
     iter++;
   }
+
+  BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

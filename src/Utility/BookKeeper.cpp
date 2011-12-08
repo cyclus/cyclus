@@ -172,20 +172,41 @@ void BookKeeper::printTrans(trans_t trans){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerMatChange(Material* mat){
   mat_hist_t toRegister;
+  fill_n(toRegister.iso, NUMISOS, 0);
+  fill_n(toRegister.comp, NUMISOS, 0.0);
 
-  if (!mat->isTemplate()){
+  if (!(mat->isTemplate())){
     double total = mat->getTotMass();
     toRegister.materialID = mat->ID(); 
     /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
     toRegister.timestamp = TI->getTime();
-
     CompMap comp = mat->getMassComp();
-    CompMap::const_reverse_iterator it = comp.rbegin();
-    if(it != comp.rend()){
-      toRegister.iso = it->first;
-      toRegister.comp = (it->second)*(total);
+    CompMap::const_iterator it = comp.begin();
+    int i=0;
+    for(it=comp.begin(); it != comp.end(); it++){
+      toRegister.iso[i] = it->first;
+      toRegister.comp[i] = (it->second)*(total);
+      i++;
+    }
+    // if this material has registered 
+    if (last_mat_idx_.find(toRegister.materialID)!=last_mat_idx_.end()){
+      // in this timestamp
+      if ((materials_[last_mat_idx_[toRegister.materialID]]).timestamp == toRegister.timestamp){
+        //replace the entry.
+        materials_.at(last_mat_idx_[toRegister.materialID])=toRegister;
+        // the index of the last registeration stays the same
+      } else {
+        // if it's registered in some other timestamp, register the material 
+        materials_.push_back(toRegister);
+        // set the new last registeration index for this material 
+        last_mat_idx_[toRegister.materialID]= (materials_.size()-1);
+      }
+    }else{
+      // if it's never been registed, register the material anew
       materials_.push_back(toRegister);
-  }
+      // set the index of the newly registered material
+      last_mat_idx_[toRegister.materialID] = (materials_.size()-1);
+    }
   }
 };
 
@@ -476,66 +497,74 @@ void BookKeeper::writeMatHist(){
 
   // create an array of the model structs
   mat_hist_t matHist[numStructs];
+  size_t arrintlen = sizeof(int[NUMISOS]);
+  size_t arrdoublelen = sizeof(double[NUMISOS]);
   for (int i=0; i<numHists; i++){
     matHist[i].materialID = materials_[i].materialID;
     matHist[i].timestamp = materials_[i].timestamp;
-    matHist[i].iso = materials_[i].iso;
-    matHist[i].comp = materials_[i].comp;
+    memcpy(matHist[i].iso, materials_[i].iso, arrintlen);
+    memcpy(matHist[i].comp, materials_[i].comp, arrdoublelen);
   };
   // If there are no materials, make a null entry
   if(numHists==0){
     matHist[0].materialID=0;
     matHist[0].timestamp=0;
-    matHist[0].iso=0;
-    matHist[0].comp=0;
+    fill_n(matHist[0].iso, NUMISOS, 0);
+    fill_n(matHist[0].comp, NUMISOS, 0.0);
   };
 
-  try{
-    // Turn off the auto-printing when failure occurs so that we can
-    // handle the errors appropriately
-    Exception::dontPrint();
-    
-    // Open the file and the dataset.
-    this->openDB();
+  //try{
+  // Turn off the auto-printing when failure occurs so that we can
+  // handle the errors appropriately
+  //Exception::dontPrint();
 
-    // describe the data in an hdf5-y way
-    hsize_t dim[] = {numStructs};
-    // if there's only one model, the dataspace is a vector, which  
-    // hdf5 doesn't like to think of as a matrix 
-    int rank;
-    if(numHists <= 1)
-      rank = 1;
-    else
-      rank = 1;
+  // Open the file and the dataset.
+  this->openDB();
 
-    Group* outputgroup;
-    outputgroup = new Group(this->getDB()->openGroup(output_name));
-    Group* subgroup;
-    subgroup = new Group(outputgroup->createGroup(subgroup_name));
-    DataSpace* dataspace;
-    dataspace = new DataSpace( rank, dim );
-   
-    // Create a datatype for models based on the struct
-    CompType mtype( sizeof(mat_hist_t) );
-    mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
-    mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
-    mtype.insertMember( iso_memb, HOFFSET(mat_hist_t, iso), PredType::NATIVE_INT); 
-    mtype.insertMember( comp_memb, HOFFSET(mat_hist_t, comp), PredType::IEEE_F64LE); 
+  // describe the data in an hdf5-y way
+  hsize_t dim[] = {numStructs};
+  // if there's only one model, the dataspace is a vector, which  
+  // hdf5 doesn't like to think of as a matrix 
+  int rank;
+  if(numHists <= 1)
+    rank = 1;
+  else
+    rank = 1;
 
-    DataSet* dataset;
-    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+  Group* outputgroup;
+  outputgroup = new Group(this->getDB()->openGroup(output_name));
+  Group* subgroup;
+  subgroup = new Group(outputgroup->createGroup(subgroup_name));
+  DataSpace* dataspace;
+  dataspace = new DataSpace( rank, dim );
 
-    // write it, finally 
-    dataset->write( matHist , mtype );
+  // create an array type
+  // describe the data in an hdf5-y way
+  hsize_t arraydim[] = {NUMISOS};
+  ArrayType arrinttype(PredType::NATIVE_INT , 1, arraydim ); 
+  ArrayType arrdoubletype(PredType::IEEE_F64LE, 1, arraydim ); 
 
-    delete outputgroup;
-    delete subgroup;
-    delete dataspace;
-    delete dataset;
+  // Create a datatype for models based on the struct
+  CompType mtype( sizeof(mat_hist_t) );
+  mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
+  mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
+  mtype.insertMember( iso_memb, HOFFSET(mat_hist_t, iso), arrinttype); 
+  mtype.insertMember( comp_memb, HOFFSET(mat_hist_t, comp), arrdoubletype); 
 
-  } catch (Exception error) {
-    error.printError();
-  }
+  DataSet* dataset;
+  dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+
+  // write it, finally 
+  dataset->write( matHist , mtype );
+
+  delete outputgroup;
+  delete subgroup;
+  delete dataspace;
+  delete dataset;
+
+  //} catch ( Exception error) {
+  //  error.printError();
+  //}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -13,6 +13,7 @@
 #include "Message.h"
 
 #define BI BookKeeper::Instance()
+#define NUMISOS 1000
 
 using namespace H5;
 
@@ -128,9 +129,9 @@ protected:
   // material history struct
   typedef struct mat_hist_t{
     int materialID;         /**< An integer indicating the material object ID **/
-    int timestamp;          /**< An integer indicating the month **/
-    int iso;                /**< An integer indicating the nuclide ID **/   
-    double comp;            /**< The kg or moles of the iso in the material at that time **/
+    int timestamp;          /**< An integer indicating the timestamp **/
+    int iso[NUMISOS];               /**< An integer indicating the nuclide ID **/   
+    double comp[NUMISOS];          /**< The kg or moles of the iso in the material at that time **/
   } mat_hist_t;
 
   // generic repository component struct
@@ -157,6 +158,11 @@ protected:
    * Stores the material changes that have taken place during the simulation.
    */
   std::vector<mat_hist_t> materials_;
+
+  /**
+   * Stores the materials_ vector index of the last time a material registered
+   */
+  std::map<int, int> last_mat_idx_;
 
   /**
    * Stores the components of the generic repository 
