@@ -8,12 +8,40 @@
 #include "ConverterModel.h"
 
 /**
- * The SWUeUF6Converter class inherits from the ConverterModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This converter model changes SWUs into amounts of material (and back?) 
- *
+   @brief The SWUeUF6Converter class inherits from the ConverterModel class 
+   and is dynamically loaded by the Model class when requested.
+   
+   This converter model changes SWUs into amounts of material (and back?) 
+   
+   @section intro Introduction
+   The SWUeUF6Converter is a converter type in Cyclus capable of translating 
+   a message concerning some Separative Work Unit amount to enriched uranium 
+   hexafluoride. It relies on a default value for natural uranium enrichment 
+   and requests tails information from the SWU generating facility in order 
+   to determine the parameters for the conversion.
+
+   @section modelParams Model Parameters
+   SWUeUF6Converter behavior is comprehensively defined by the following 
+   parameters:
+   - Commodity* in_commod : The commodity that the converter will translate 
+   into the out_commod.
+   - Commodity* out_commod : The commodity that the converter will translate 
+   the in_commod into.
+
+   @section optionalParams Optional Parameters
+   SWUeUF6Converter behavior may also be specified with the following 
+   optional parameters which have default values listed here.
+   - double WF_U35 : The tails fraction to be assumed in the calculations.
+
+   @section behavior Detailed Behavior
+   The SWUeUF6Converter simply responds to requests for conversion. It 
+   receives an amount and a commodity and applies the definition of the 
+   separative work unit, the natural enrichment of uranium, a desired final 
+   enrichment, and a provided tails fraction in order to convert between the 
+   two commodities. It then sends a response to the request for conversion 
+   including the new amount.
  */
+
 class SWUeUF6Converter : public ConverterModel  
 {
 /* --------------------

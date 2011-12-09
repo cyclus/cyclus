@@ -16,58 +16,58 @@ class Material;
 
 //-----------------------------------------------------------------------------
 /**
- \class FacilityModel
- \brief The FacilityModel class is the abstract class/interface used by all
+ @class FacilityModel
+ @brief The FacilityModel class is the abstract class/interface used by all
  facility models
  
  This is all that is known externally about facilities
   
- \section intro Introduction 
+ @section intro Introduction 
   
-  The FacilityModel type plays a primary role in Cyclus.  A FacilityModel 
-  facility is where offers and requests are generated and transmitted to markets 
-  and where shipments of material, issued by the markets, are executed.  The 
-  algorithms to determine what offers and requests are issued and how material 
-  shipments are handled are the primary differentiators between different 
-  FacilityModel implementations.
-  
-  Like all model implementations, there are a number of implementations that are 
-  distributed as part of the core Cyclus application as well as implementations 
-  contributed by third-party developers.  The links below describe additional 
-  parameters necessary for the complete definition of a facility of that 
-  implementation.
-  
-  \section available Available Core Implementations 
-  
-    - SourceFacility: A facility that can produce a constant (or infinite) 
-    amount of some commodity
-    - SinkFacility:  A facility that can consume a constant (or infinite) amount 
-    of some commodity
-    - NullFacility: A facility that consumes a constant amount of one commodity 
-    and produces a constant amount of another
-  
-  
-  \section anticipated Anticipated Core Implementations 
-  
-  Developers are encouraged to add to this list and create pages that describe 
-  the detailed behavior of these models.
-  
-    - RecipeReactorFacility: A facility that consumes a fixed fresh fuel recipe 
-    one a time scale governed by reactor cycle lengths and batch sizes, and 
-    produced a fixed/corresponding spent fuel recipe at the same frequency
-    - SeparationsMatrixFacility: A facility that consumes a fixed quantity of 
-    material of one commodity and produces many different output streams with 
-    the input isotopes distributed across those output streams according to a 
-    fixed matrix
-    - EnrichmentFacility: A facility that offers a fixed quantity of SWUs to 
-    accomplish isotopic enrichment of material
-  
-  \section thirdparty Third-party Implementations 
-  
-  Collaborators are encouraged to add to this list and link to external pages 
-  that describe how to get the models and the detailed behavior of these models.
-  
-  */
+ The FacilityModel type plays a primary role in Cyclus.  A FacilityModel 
+ facility is where offers and requests are generated and transmitted to 
+ markets and where shipments of material, issued by the markets, are 
+ executed. The algorithms to determine what offers and requests are issued 
+ and how material shipments are handled are the primary differentiators 
+ between different FacilityModel implementations.
+ 
+ Like all model implementations, there are a number of implementations that 
+ are distributed as part of the core Cyclus application as well as 
+ implementations contributed by third-party developers.  The links below 
+ describe additional parameters necessary for the complete definition of a 
+ facility of that implementation.
+ 
+ @section available Available Core Implementations 
+ 
+ - SourceFacility: A facility that can produce a constant (or infinite) 
+ amount of some commodity
+ - SinkFacility:  A facility that can consume a constant (or infinite) 
+ amount of some commodity
+ - NullFacility: A facility that consumes a constant amount of one 
+ commodity and produces a constant amount of another
+ 
+ 
+ @section anticipated Anticipated Core Implementations 
+ 
+ Developers are encouraged to add to this list and create pages that describe 
+ the detailed behavior of these models.
+ 
+ - RecipeReactor: A facility that consumes a fixed fresh fuel recipe 
+ one a time scale governed by reactor cycle lengths and batch sizes, and 
+ produced a fixed/corresponding spent fuel recipe at the same frequency
+ - SeparationsMatrixFacility: A facility that consumes a fixed quantity of 
+ material of one commodity and produces many different output streams with 
+ the input isotopes distributed across those output streams according to a 
+ fixed matrix
+ - EnrichmentFacility: A facility that offers a fixed quantity of SWUs to 
+ accomplish isotopic enrichment of material
+ 
+ @section thirdparty Third-party Implementations 
+ 
+ Collaborators are encouraged to add to this list and link to external pages 
+ that describe how to get the models and the detailed behavior of these models.
+ 
+*/
 
 //-----------------------------------------------------------------------------
 class FacilityModel : public TimeAgent, public Communicator {

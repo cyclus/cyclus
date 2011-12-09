@@ -8,112 +8,103 @@
 #include "FacilityModel.h"
 
 /**
-  \class RecipeReactor
-  \brief This FacilityModel represents a reactor using predefined fresh and
-  spent fuel recipes.
-
-  The RecipeReactor class inherits from the FacilityModel class and is 
-  dynamically loaded by the Model class when requested.
-
-  This facility model does very little.  New material is added to queue inventory
-  and old material is removed from the same queue inventory.
-
-  \section intro Introduction 
-
-  The RecipeReactorFacility is a facility type in *Cyclus* which consumes a 
-  fixed fresh fuel recipe on a time scale governed by reactor cycle lengths and 
-  batch sizes, and produces a fixed/corresponding spent fuel recipe at the same 
-  frequency. A RecipeReactorFacility generates spentFuel, then offers that 
-  material on the appropriate market. Shipments of this material are executed 
-  when the market issues an order that the offer has been matched with a 
-  request.
-
-  \section modelparams Model Parameters  
-
-  RecipeReactorFacility behavior is fully defined by the following parameters:
-
-  - double capacity : The power production capacity of the reactor (MW 
-  electric).
-  - int startDate : The date on which the facility begins to operate (months).
-  - int lifeTime : The length of time that the facility operates (months).
-  - int batPerCore : The number of batches per reactor core.
-  - Commodity`*` outCommod : The commodity this reactor facility discharges 
-  (e.g. freshUOX, freshMOX, etc.)
-  - vector<Isos, NumDens> inComp : The composotion of the fixed fresh fuel 
-  recipe that this reactor can accept.
-  - Commodity`*` outCommod : The commodity this reactor facility discharges 
-  (e.g. spentUOX, spentMOX, etc)
-  - vector<Isos, NumDens> outComp : The composition of the fixed spent fuel 
-  recipe that this reactor produces.
-
-  \section optionalparams Optional Parameters 
-
-  RecipeReactorFacility behavior may also be specified with the following 
-  optional parameters which have default values listed here.
-
-  - double capacityFactor : The ratio of actual power production to the rated 
-  power production of the reactor. Default is 1 (actual/rated).
-  - double availFactor : The percent of time the reactor operates at its 
-  capacity factor. Default is 100%.
-  - double capitalCost : The cost of commissioning this reactor. Default is 0 
-  ($).
-  - double opCost : The annual cost of operation and maintenance of this 
-  reactor. Default is 0 ( $/year).
-  - int constrTime : The number of months it takes to construct and commission 
-  this reactor. Default is 0 (months).
-  - int decomTime : The number of months it takes to deconstruct and 
-  decommission this reactor. Default is 0 (months).
-  - Inst`*` inst : The institution responsible for this reactor.  
-  - string name : A non-generic name for this reactor. 
-
-  \section detailed Detailed Behavior 
-
-  The RecipeReactorFacility starts operation when the simulation reaches the 
-  month specified as the startDate.   It immediately begins to produce material 
-  at the rate defined by its capacity. Each month the RecipeReactorFacility adds 
-  the amount it has produced to its inventory. It then offers to the appropriate 
-  market exactly as much material as it has in its inventory. If an offer is 
-  matched with a request, the RecipeReactorFacility executes that order by 
-  subtracting the quantity from its inventory and sending that amount to the 
-  requesting facility. When the simulation time equals the startDate plus the 
-  lifeTime, the facility ceases to operate.  
-
-  \subsection handletick handleTick
-
-  If the stocks are empty, the RecipeReactor asks for a batch. 
-  The RecipeReactor offers anything in the inventory.
-  If the reactor is at the end of a cycle, it begins the cycle by moving the
-  current core batch to inventory,moving the stocks batch to the current core
-  and reset month_in_cycle clock.
- 
-  \subsection handletock handleTock
-
-  On the tock, the recipe reactor advances the month_in_cycle and
-  sends appropriate materials of the outgoing recipe in the inventory in order
-  to fill the ordersWaiting.
- 
-  \subsection receivematerial receiveMaterial
-
-  The RecipeReactor puts the material it receives in the stocks.
-
-  \subsection sendmaterial sendMaterial
-  
-  Spent fuel of the output recipe is pulled from inventory to fulfill orders. 
-
-  \subsection infinite If Infinite Capacity:
-
-  The RecipeReactorFacility starts operation when the simulation reaches the 
-  month specified as the startDate. Each month the RecipeReactorFacility offers 
-  an infinite amount of material to the appropriate market. If there is a
-  request for that material, the RecipeReactorFacility executes that order by 
-  sending that amount to the requesting facility. When the simulation time 
-  equals the startDate plus the lifeTime, the facility ceases to operate. 
-  
-  \section question Question: 
- 
-  What is the best way to allow offers of an infinite amount of 
-  material on a market? 
-
+   @class RecipeReactor
+   @brief This FacilityModel represents a reactor using predefined fresh and
+   spent fuel recipes.
+   
+   The RecipeReactor class inherits from the FacilityModel class and is 
+   dynamically loaded by the Model class when requested.
+   
+   This facility model does very little.  New material is added to queue 
+   inventory and old material is removed from the same queue inventory.
+   
+   @section intro Introduction 
+   The RecipeReactorFacility is a facility type in *Cyclus* which consumes a 
+   fixed fresh fuel recipe on a time scale governed by reactor cycle lengths 
+   and batch sizes, and produces a fixed/corresponding spent fuel recipe at 
+   the same frequency. A RecipeReactorFacility generates spentFuel, then 
+   offers that material on the appropriate market. Shipments of this material 
+   are executed when the market issues an order that the offer has been 
+   matched with a request.
+   
+   @section modelparams Model Parameters
+   RecipeReactorFacility behavior is fully defined by the following parameters:
+   
+   - double capacity: The power production capacity of the reactor (MW 
+   electric).
+   - int startDate: The date on which the facility begins to operate (months).
+   - int lifeTime: The length of time that the facility operates (months).
+   - int batPerCore: The number of batches per reactor core.
+   - Commodity* outCommod: The commodity this reactor facility discharges 
+   (e.g. freshUOX, freshMOX, etc.)
+   - vector<Isos, NumDens> inComp : The composotion of the fixed fresh fuel 
+   recipe that this reactor can accept.
+   - Commodity* outCommod: The commodity this reactor facility discharges 
+   (e.g. spentUOX, spentMOX, etc)
+   - vector<Isos, NumDens> outComp: The composition of the fixed spent fuel 
+   recipe that this reactor produces.
+   
+   @section optionalparams Optional Parameters 
+   RecipeReactorFacility behavior may also be specified with the following 
+   optional parameters which have default values listed here.
+   
+   - double capacityFactor: The ratio of actual power production to the rated 
+   power production of the reactor. Default is 1 (actual/rated).
+   - double availFactor: The percent of time the reactor operates at its 
+   capacity factor. Default is 100%.
+   - double capitalCost: The cost of commissioning this reactor. Default is 0 
+   ($).
+   - double opCost: The annual cost of operation and maintenance of this 
+   reactor. Default is 0 ( $/year).
+   - int constrTime: The number of months it takes to construct and commission 
+   this reactor. Default is 0 (months).
+   - int decomTime: The number of months it takes to deconstruct and 
+   decommission this reactor. Default is 0 (months).
+   - Inst* inst: The institution responsible for this reactor.  
+   - string name: A non-generic name for this reactor. 
+   
+   @section detailed Detailed Behavior 
+   The RecipeReactorFacility starts operation when the simulation reaches the 
+   month specified as the startDate.   It immediately begins to produce 
+   material at the rate defined by its capacity. Each month the 
+   RecipeReactorFacility adds the amount it has produced to its inventory. It 
+   then offers to the appropriate market exactly as much material as it has 
+   in its inventory. If an offer is matched with a request, the 
+   RecipeReactorFacility executes that order by subtracting the quantity from 
+   its inventory and sending that amount to the requesting facility. When the 
+   simulation time equals the startDate plus the lifeTime, the facility 
+   ceases to operate.  
+   
+   @subsection handletick handleTick
+   If the stocks are empty, the RecipeReactor asks for a batch. 
+   The RecipeReactor offers anything in the inventory.
+   If the reactor is at the end of a cycle, it begins the cycle by moving the
+   current core batch to inventory,moving the stocks batch to the current core
+   and reset month_in_cycle clock.
+   
+   @subsection handletock handleTock
+   On the tock, the recipe reactor advances the month_in_cycle and
+   sends appropriate materials of the outgoing recipe in the inventory in order
+   to fill the ordersWaiting.
+   
+   @subsection receivematerial receiveMaterial
+   The RecipeReactor puts the material it receives in the stocks.
+   
+   @subsection sendmaterial sendMaterial
+   Spent fuel of the output recipe is pulled from inventory to fulfill orders. 
+   
+   @subsection infinite If Infinite Capacity:
+   The RecipeReactorFacility starts operation when the simulation reaches the 
+   month specified as the startDate. Each month the RecipeReactorFacility 
+   offers an infinite amount of material to the appropriate market. If there 
+   is a request for that material, the RecipeReactorFacility executes that 
+   order by sending that amount to the requesting facility. When the 
+   simulation time equals the startDate plus the lifeTime, the facility 
+   ceases to operate. 
+   
+   @section question Question:
+   What is the best way to allow offers of an infinite amount of 
+   material on a market?
 */
 
 typedef pair< Commodity*, Material*> InFuel; typedef pair< Commodity*, 

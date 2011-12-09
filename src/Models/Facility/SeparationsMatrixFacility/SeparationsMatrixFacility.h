@@ -9,79 +9,74 @@
 #include "FacilityModel.h"
 
 /**
-  \class SeparationsMatrixFacility
-  \brief This FacilityModel is still under construction.
+   @class SeparationsMatrixFacility
+   @brief This FacilityModel is still under construction.
+   
+   The SeparationsMatrixFacility class inherits from the FacilityModel 
+   class and is dynamically loaded by the Model class when requested.
+   
+   @section intro Introduction 
+   The SeparationsMatrixFacility is a facility type in Cyclus which accepts 
+   spent fuel and separates it into multiple reusable material streams and at 
+   least one waste stream. The transformation process from spent fuel to 
+   streams is dictated by a separation matrix. A SeparationsMatrixFacility 
+   offers the various types of separated material on their appropriate 
+   markets. Shipments of these materials are executed when a market issues an 
+   order that an offer has been matched with a request.
+   
+   @section modelparams Model Parameters 
+   SeparationsMatrixFacility behavior is comprehensively defined by the 
+   following parameters:
+   - double capacity: The production capacity of the facility (TBD).
+   - int startDate: The date on which the facility begins to operate (months).
+   - int lifeTime: The length of time that the facility operates (months).
+   - Mass inventorysize: the maximum quantity of material to be held in the 
+   inventory
+   - string name: A non-generic name for this facility.  
+   - matrix sepMatrix: The separations matrix
+   
+   @section optionalparams Optional Parameters 
+   SeparationsMatrixFacility behavior may also be specified with the following 
+   optional parameters which have default values listed here.
+   
+   - double capacityFactor: The ratio of actual production capacity to the 
+   rated production capacity. Default is 1 (actual/rated).
+   - double availFactor: The percent of time the facility operates at its 
+   capacity factor. Default is 100%.
+   - double capitalCost: The cost of constructing and commissioning this 
+   facility. Default is 0 ($).
+   - double opCost: The annual cost of operation and maintenance of this 
+   facility. Default is 0 ( $/year).
+   - int constrTime: The number of months it takes to construct and commission 
+   this facility. Default is 0 (months).
+   - int decomTime: The number of months it takes to deconstruct and 
+   decommission this facility. Default is 0 (months).
+   - Inst* inst: The institution responsible for this facility.  double 
+   price: the offer price per kg of processed fuel. Default is 0 ($).
+   
+   @section detailed Detailed Behavior 
+   The SeparationsMatrixFacility starts operation when the simulation reaches 
+   the month specified as the startDate. It immediately begins to request 
+   usedFuel material. Each month it continues to request usedFuel at the rate 
+   determined by its capacity and offers exactly as much separated material 
+   as it has in its inventory. When it receives usedFuel that material is 
+   placed into its stocks to await processing. The SeparationsMatrixFacility 
+   then processes as much of the material in its stocks as is allowed by its 
+   capacity. When it processes some usedFuel into separated streams it adds 
+   that amount to its inventory. If an offer is matched with a request, the 
+   SeparationsMatrixFacility executes that order by subtracting the quantity 
+   from its inventory and sending that amount to the requesting facility. 
+   When the simulation time equals the startDate plus the lifeTime, the 
+   facility ceases to operate.  
   
-  The SeparationsMatrixFacility class inherits from the FacilityModel 
-  class and is dynamically loaded by the Model class when requested.
-
-  \section intro Introduction 
+   @section example Example Matrix 
+   Here, describe how a separations matrix should be constructed and fed into 
+   the simulation.
   
-  The SeparationsMatrixFacility is a facility type in Cyclus which accepts 
-  spent fuel and separates it into multiple reusable material streams and at 
-  least one waste stream. The transformation process from spent fuel to streams 
-  is dictated by a separation matrix. A SeparationsMatrixFacility offers the 
-  various types of separated material on their appropriate markets. Shipments of 
-  these materials are executed when a market issues an order that an offer has 
-  been matched with a request.
-  
-  \section modelparams Model Parameters 
-  
-  SeparationsMatrixFacility behavior is comprehensively defined by the following 
-parameters:
-    - double capacity : The production capacity of the facility (TBD).
-    - int startDate : The date on which the facility begins to operate (months).
-    - int lifeTime : The length of time that the facility operates (months).
-    - Mass inventorysize: the maximum quantity of material to be held in the 
-     inventory
-    - string name : A non-generic name for this facility.  matrix sepMatrix : 
-     The separations matrix
-  
-  \section optionalparams Optional Parameters 
-  
-  SeparationsMatrixFacility behavior may also be specified with the following 
-  optional parameters which have default values listed here.
-  
-    - double capacityFactor : The ratio of actual production capacity to the 
-     rated production capacity. Default is 1 (actual/rated).
-    - double availFactor : The percent of time the facility operates at its 
-     capacity factor. Default is 100%.
-    - double capitalCost : The cost of constructing and commissioning this 
-     facility. Default is 0 ($).
-    - double opCost : The annual cost of operation and maintenance of this 
-     facility. Default is 0 ( $/year).
-    - int constrTime : The number of months it takes to construct and commission 
-     this facility. Default is 0 (months).
-    - int decomTime : The number of months it takes to deconstruct and 
-     decommission this facility. Default is 0 (months).
-    - Inst`-` inst : The institution responsible for this facility.  double 
-     price: the offer price per kg of processed fuel. Default is 0 ($).
-  
-  \section detailed Detailed Behavior 
-  
-  The SeparationsMatrixFacility starts operation when the simulation reaches the 
-  month specified as the startDate. It immediately begins to request usedFuel 
-  material. Each month it continues to request usedFuel at the rate determined 
-  by its capacity and offers exactly as much separated material as it has in its 
-  inventory. When it receives usedFuel that material is placed into its stocks 
-  to await processing. The SeparationsMatrixFacility then processes as much of 
-  the material in its stocks as is allowed by its capacity. When it processes 
-  some usedFuel into separated streams it adds that amount to its inventory.  If 
-  an offer is matched with a request, the SeparationsMatrixFacility executes 
-  that order by subtracting the quantity from its inventory and sending that 
-  amount to the requesting facility. When the simulation time equals the 
-  startDate plus the lifeTime, the facility ceases to operate.  
-  
-  \section example Example Matrix 
-  
-  Here, describe how a separations matrix should be constructed and fed into the 
-simulation.
-  
-  \section issues Known Issues
-  
-    * issue 45: unclear behavior if user does not carefully account for 100% of 
-    * each element across all streams
- 
+   @section issues Known Issues
+   - <a href="http://code.google.com/p/cyclus/issues/detail?id=45">
+   issue 45</a>: unclear behavior if user does not carefully account for 100% 
+   of each element across all streams.
  */
 
 typedef pair< Commodity*, Material*> InSep; typedef pair< Commodity*, Material*> 

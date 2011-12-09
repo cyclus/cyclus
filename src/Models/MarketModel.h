@@ -11,7 +11,6 @@
 /// forward declaration to resolve recursion
 class Commodity;
 
-//----------------------------------------------------------------------------
 /**
    @brief Markets are used to allocate transactions between agents. Each 
    Market is associated with one resource or commodity.
@@ -39,7 +38,8 @@ class Commodity;
    - GreedyMarket: Match largest requests first with largest remaining 
    offers. Only match complete requests and fail if full request can't be 
    matched.
-   - NetFlowMarket: Use network flow algorithm with arc costs (aka trade 
+   - <a href="http://code.google.com/p/cyclus/wiki/NetFlowMarket">
+   NetFlowMarket</a>: Use network flow algorithm with arc costs (aka trade 
    affinitites) defined on each facility pair in the market (GENIUS2)
 
    @section thirdPartyImpl Third-party Implementations
