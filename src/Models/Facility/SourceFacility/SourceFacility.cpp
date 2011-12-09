@@ -35,8 +35,7 @@ void SourceFacility::init(xmlNodePtr cur)
   /// all facilities require commodities - possibly many
   string input_token;
 
-  input_token = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = Commodity::getCommodity(input_token);
+  out_commod_ = XMLinput->get_xpath_content(cur,"outcommodity");
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");
@@ -82,7 +81,7 @@ void SourceFacility::print()
   FacilityModel::print();
 
   LOG(LEV_DEBUG2) << "    supplies commodity {"
-      << out_commod_->name() << "} with recipe '" 
+      << out_commod_ << "} with recipe '" 
       << recipe_->name() << "' at a capacity of "
       << capacity_ << " " << recipe_->getUnits() << " per time step."
       << " It has a max inventory of " << inventory_size_ << " " 
@@ -164,7 +163,8 @@ void SourceFacility::handleTick(int time){
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
+  MarketModel* market = MarketModel::marketForCommod(out_commod_);
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
   LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
 
   // build the transaction and message

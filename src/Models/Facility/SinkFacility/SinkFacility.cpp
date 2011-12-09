@@ -36,15 +36,10 @@ void SinkFacility::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/SinkFacility");
 
   /// all facilities require commodities - possibly many
-  string commod_name;
-  Commodity* new_commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
-
-  for (int i=0;i<nodes->nodeNr;i++)
-  {
-    commod_name = (const char*)(nodes->nodeTab[i]->children->content);
-    new_commod = Commodity::getCommodity(commod_name);
-    in_commods_.push_back(new_commod);
+  for (int i=0;i<nodes->nodeNr;i++) {
+    commod = (const char*)(nodes->nodeTab[i]->children->content);
+    in_commods_.push_back(commod);
   }
 
   // get monthly capacity
@@ -83,12 +78,12 @@ void SinkFacility::print()
 
   msg += "accepts commodities ";
 
-  for (vector<Commodity*>::iterator commod=in_commods_.begin();
+  for (vector<std::string>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
        commod++)
   {
     msg += (commod == in_commods_.begin() ? "{" : ", " );
-    msg += (*commod)->name();
+    msg += (*commod);
   }
   msg += "} until its inventory is full at ";
   LOG(LEV_DEBUG2) << msg << inventory_size_ << " units.";
@@ -110,12 +105,12 @@ void SinkFacility::handleTick(int time){
   }
   else if (emptiness < capacity_){
   // if empty space is less than monthly acceptance capacity, request it,
-    // for each commodity, request emptiness/(noCommodities)
-    for (vector<Commodity*>::iterator commod=in_commods_.begin();
+    // for each commodity, request emptiness/(no commodities)
+    for (vector<std::string>::iterator commod = in_commods_.begin();
        commod != in_commods_.end();
-       commod++) 
-    {
-      Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
+       commod++) {
+      MarketModel* market = MarketModel::marketForCommod(*commod);
+      Communicator* recipient = dynamic_cast<Communicator*>(market);
       // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods_.size());
 
@@ -136,11 +131,11 @@ void SinkFacility::handleTick(int time){
   // otherwise, the upper bound is the monthly acceptance capacity, request cap.
   else if (emptiness >= capacity_){
     // for each commodity, request capacity/(noCommodities)
-    for (vector<Commodity*>::iterator commod=in_commods_.begin();
+    for (vector<std::string>::iterator commod = in_commods_.begin();
        commod != in_commods_.end();
-       commod++) 
-    {
-      Communicator* recipient = dynamic_cast<Communicator*>((*commod)->getMarket());
+       commod++) {
+      MarketModel* market = MarketModel::marketForCommod(*commod);
+      Communicator* recipient = dynamic_cast<Communicator*>(market);
       requestAmt = capacity_/in_commods_.size();
 
       // build the transaction and message

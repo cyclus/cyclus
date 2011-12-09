@@ -37,7 +37,7 @@ typedef pair<Material*, Commodity*> WasteStream;
    - int startOpYear : The year in which the facility begins to operate .
    - int startOpMonth : The month in which the facility begins to operate .
    - int lifeTime : The length of time that the facility operates (months).
-   - Commodity`*` inCommod : One or more types of commodity that this facility accepts.
+   - std::string inCommod : One or more types of commodity that this facility accepts.
    - Component`*` component : One or more types of component that facility contains
    - Inst`*` inst : The institution responsible for this facility.  
    - double area : The square  meters of topographic area that the repository may occupy.

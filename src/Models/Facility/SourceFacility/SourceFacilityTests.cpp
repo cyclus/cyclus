@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "Facility/SourceFacility/SourceFacility.h"
-#include "Commodity.h"
 #include "Message.h"
 
 #include <string>
@@ -13,7 +12,7 @@ using namespace std;
 class FakeSourceFacility : public SourceFacility {
   public:
     FakeSourceFacility() : SourceFacility() {
-      out_commod_ = new Commodity("my-commod");
+      out_commod_ = "my-commod";
       recipe_ = new Material();
 
       capacity_ = 25;
@@ -25,7 +24,6 @@ class FakeSourceFacility : public SourceFacility {
     }
 
     virtual ~FakeSourceFacility() {
-      delete out_commod_;
       delete recipe_;
     }
 

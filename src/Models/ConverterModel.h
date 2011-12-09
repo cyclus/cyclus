@@ -8,8 +8,6 @@
 #include "TimeAgent.h"
 #include "Message.h"
 
-/// forward declaration to resolve recursion
-class Commodity;
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 
@@ -85,7 +83,7 @@ protected:
   std::string conv_name_;
 
   /// each converter needs a list of equivalent commodities it converts
-  list<Commodity*> commodities_; 
+  list<std::string> commodities_; 
 
 public:
 

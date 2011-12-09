@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include <deque>
 #include <queue>
+#include <string>
 
 #include "FacilityModel.h"
 
@@ -19,7 +20,7 @@
   \section intro Introduction 
   
   The SinkFacility is a facility type in *Cyclus* capable of accepting a finite 
-  or infinite quantity of some Commodity produced in the simulation.  A 
+  or infinite quantity of some commodity produced in the simulation.  A 
   SinkFacility requests an amount of that commodity from the appropriate market. 
   It then receives that commodity when the market issues an order that the 
   request has been matched with a corresponding offer.
@@ -31,7 +32,7 @@
     typically kg/month). Capacity is infinite if a positive value is provided.
     - int startDate : The date on which the facility begins to operate (months).
     - int lifeTime : The length of time that the facility operates (months).
-    - Commodity`-` inCommod : The commodity type this facility accepts.
+    - commodity`-` inCommod : The commodity type this facility accepts.
   
   \section optionalparams Optional Parameters 
   
@@ -178,7 +179,7 @@ public:
 
 protected:
   /// all facilities must have at least one input commodity
-  vector<Commodity*> in_commods_;
+  vector<std::string> in_commods_;
 
   /// this facility holds material in storage. 
   deque<Material*> inventory_;
