@@ -2,7 +2,7 @@
 ADD_LIBRARY( GenericRepository   GenericRepository.cpp Component.cpp StubNuclide.cpp StubThermal.cpp)
 SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} GenericRepository )
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Models/Facility/GenericRepository/genericrepository.rng
-${CMAKE_CURRENT_BINARY_DIR}/genericrepository.rng
+${CYCLUS_SOURCE_DIR}/Models/Facility/GenericRepository/GenericRepository.rng
+${CMAKE_CURRENT_BINARY_DIR}/GenericRepository.rng
 COPYONLY
 )
