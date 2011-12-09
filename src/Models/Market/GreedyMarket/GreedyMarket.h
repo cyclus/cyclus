@@ -41,8 +41,7 @@
    request.
 */   
 
-class GreedyMarket : public MarketModel  
-{
+class GreedyMarket : public MarketModel {
 /* --------------------
  * all MODEL classes have these public members
  * --------------------
@@ -170,19 +169,5 @@ private:
   void process_request();
 
 };
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-extern "C" Model* construct() {
-  return new GreedyMarket();
-}
-
-extern "C" void destruct(Model* p) {
-  delete p;
-}
-
-/* -------------------- */
 
 #endif

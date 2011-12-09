@@ -18,6 +18,7 @@ MarketModel::MarketModel() {
 
   TI->registerResolveListener(this);
   markets_.push_back(this);
+
 };
 
 MarketModel* MarketModel::marketForCommod(std::string commod) {
@@ -37,8 +38,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   return market;
 }
   
-void MarketModel::init(xmlNodePtr cur)
-{
+void MarketModel::init(xmlNodePtr cur) {
   Model::init(cur);
   
   /** 
@@ -46,7 +46,7 @@ void MarketModel::init(xmlNodePtr cur)
    */
 
   /// all markets require commodities
-  string commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
+  commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
 }
 
 void MarketModel::copy(MarketModel* src) {
