@@ -13,7 +13,7 @@
 class Commodity;
 
 //----------------------------------------------------------------------------
-/**
+/*!
    @brief Markets are used to allocate transactions between agents. Each 
    Market is associated with one resource or commodity.
    
@@ -101,7 +101,7 @@ public:
  */
 public:
   /// every market should provide its commodity
-  Commodity* commodity() { return commodity_; } ;
+  std::string commodity() { return commodity_; } ;
 
   // Primary MarketModel methods
 
@@ -114,7 +114,7 @@ public:
 
 protected: 
   /// every market has a commodity
-  Commodity* commodity_;
+  std::string commodity_;
 
   /// every market collects offers & requests
   std::set<Message*> messages_;

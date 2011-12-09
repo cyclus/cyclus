@@ -4,10 +4,8 @@
 #include "MarketModel.h"
 #include "InputXML.h"
 #include "CycException.h"
-#include "Logician.h"
 #include "Timer.h"
 
-#include <iostream>
 #include "Logger.h"
 #include <string>
 
@@ -46,11 +44,7 @@ void MarketModel::init(xmlNodePtr cur)
    */
 
   /// all markets require commodities
-  string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
-  MarketModel::
-  commodity_ = Commodity::getCommodity(commod_name);
-  
-  commodity_->setMarket(this);
+  string commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
 }
 
 void MarketModel::copy(MarketModel* src) {
@@ -61,20 +55,13 @@ void MarketModel::copy(MarketModel* src) {
    *  Specific initialization for MarketModels
    */
 
-  commodity_ = src->commodity_;
-  LI->addModel(this, MARKET);
+  commodity_ = src->commodity();
 }
 
 void MarketModel::print() { 
   Model::print(); 
 
-  LOG(LEV_DEBUG2) << "    trades commodity " 
-      << commodity_->name();
+  LOG(LEV_DEBUG2) << "    trades commodity " << commodity_;
 
 };
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 
