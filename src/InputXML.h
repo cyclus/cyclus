@@ -61,10 +61,9 @@ public:
    *  structure and validate the file against a given RelaxNG schema.  After
    *  these generic steps, the method will load the objects described by the
    *  XML file in a carefully defined order:
-   *   * Commodity objects
    *   * recipe Material objects 
-   *   * MarketModel objects (refers to Commodity objects)
-   *   * FacilityModel objects (refers to Commodity and MarketModel objects)
+   *   * MarketModel objects
+   *   * FacilityModel objects (refers to MarketModel objects)
    *   * RegionModel objects (refers to FacilityModel objects)
    *   * InstModel objects (refers to RegionModel objects)
    *

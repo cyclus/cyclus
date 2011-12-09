@@ -8,10 +8,10 @@
 
 #include "FacilityModel.h"
 
-/**
+/*!
    @class SourceFacility
    @brief This FacilityModel provides a simple source of some capacity 
-   (possibly infinite) of some Commodity/Recipe.
+   (possibly infinite) of some commodity/Recipe.
    
    The SourceFacility class inherits from the FacilityModel class and is 
    dynamically loaded by the Model class when requested.
@@ -34,7 +34,7 @@
    -  int startDate: The date on which the facility begins to operate 
    (months).
    -  int lifeTime: The length of time that the facility operates (months).
-   -  Commodity* outCommod: the commodity that this facility produces
+   -  std::string outCommod: the commodity that this facility produces
    -  Mass inventorysize: the maximum quantity of material to be held in the 
    inventory
    -  double commodprice: the price of the output material PER UNIT
@@ -188,7 +188,7 @@ protected:
   /**
    * This facility has only one output commodity
    */
-  Commodity* out_commod_;
+  std::string out_commod_;
   
   /**
    * This facility has a specific recipe for its output

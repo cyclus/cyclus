@@ -26,7 +26,7 @@
    @section modelParams Model Parameters
    ConverterMarket behavior is comprehensively defined by the following 
    parameters:
-   - list<Commodity*> commods: The types of commodity for which this 
+   - list<std::string> commods: The types of commodity for which this 
    market accepts offers and requests.
    - ConverterModel* converter: The converter that will be called to 
    translate an offer or request in one commodity into another 
@@ -44,9 +44,7 @@
    too large to fill with all offers. Once matches are made, the market 
    dictates the matches back down to the facilities.
 */
-
-class ConverterMarket : public MarketModel  
-{
+class ConverterMarket : public MarketModel {
 /* --------------------
  * all MODEL classes have these public members
  * --------------------
@@ -183,12 +181,12 @@ private:
   /**
    * The commodity for which the market receives offers
    */
-  Commodity* offer_commod_;
+  std::string offer_commod_;
 
   /**
    * The commodity for which the market receives requests
    */
-  Commodity* req_commod_;
+  std::string req_commod_;
 
   /**
    * The name of the converter model that this market relies on to make conversions.
@@ -197,18 +195,5 @@ private:
 
 };
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-extern "C" Model* construct() {
-  return new ConverterMarket();
-}
-
-extern "C" void destruct(Model* p) {
-  delete p;
-}
-
-/* -------------------- */
-
 #endif
+

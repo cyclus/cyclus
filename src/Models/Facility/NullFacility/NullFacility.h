@@ -30,8 +30,8 @@
    infinite?  
    - int startDate: The date on which the facility begins to operate (months).
    - int lifeTime: The length of time that the facility operates (months).
-   - Commodity* inCommod: The type of commodity that this facility accepts.
-   - Commodity* outCommod: The type of commodity that this facility 
+   - std::string inCommod: The type of commodity that this facility accepts.
+   - std::string outCommod: The type of commodity that this facility 
    produces.
    
    @section optionalParams Optional Parameters
@@ -187,12 +187,12 @@ protected:
     /**
      * The NullFacility has one input commodity
      */
-    Commodity* in_commod_;
+    std::string in_commod_;
 
     /**
      * The NullFacility has one output commodity
      */
-    Commodity* out_commod_;
+    std::string out_commod_;
 
     /**
      * The NullFacility has a limit to how material it can process.

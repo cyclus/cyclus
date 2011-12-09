@@ -71,8 +71,8 @@ void SWUeUF6Converter::handleTock(int time)
 Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
 {
   // Figure out what you're converting to and from
-  in_commod_ = convMsg->getCommod();
-  out_commod_ = refMsg->getCommod();
+  in_commod_ = convMsg->commod();
+  out_commod_ = refMsg->commod();
   Model* enr;
   Model* castEnr;
   Message* toRet;

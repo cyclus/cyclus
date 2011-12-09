@@ -16,7 +16,6 @@ set ( TestSource
   ../Logician.cpp
   ../Material.cpp
   ../IsoVector.cpp
-  ../Commodity.cpp
   ../Message.cpp
   ../Utility/BookKeeper.cpp
   ../Utility/Env.cpp

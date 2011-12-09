@@ -35,11 +35,11 @@
    - int startDate: The date on which the facility begins to operate (months).
    - int lifeTime: The length of time that the facility operates (months).
    - int batPerCore: The number of batches per reactor core.
-   - Commodity* outCommod: The commodity this reactor facility discharges 
+   - std::string outCommod: The commodity this reactor facility discharges 
    (e.g. freshUOX, freshMOX, etc.)
    - vector<Isos, NumDens> inComp : The composotion of the fixed fresh fuel 
    recipe that this reactor can accept.
-   - Commodity* outCommod: The commodity this reactor facility discharges 
+   - std::string outCommod: The commodity this reactor facility discharges 
    (e.g. spentUOX, spentMOX, etc)
    - vector<Isos, NumDens> outComp: The composition of the fixed spent fuel 
    recipe that this reactor produces.
@@ -107,8 +107,8 @@
    material on a market?
 */
 
-typedef pair< Commodity*, Material*> InFuel; typedef pair< Commodity*, 
-        Material*> OutFuel; 
+typedef pair< std::string, Material*> InFuel;
+typedef pair< std::string, Material*> OutFuel; 
 
 class RecipeReactor : public FacilityModel  {
 /* --------------------
@@ -227,7 +227,7 @@ protected:
     /**
      * The RecipeReactor has pairs of input and output fuel
      */
-    deque< pair< pair<Commodity*, Material*>, pair<Commodity*, Material*> > > 
+    deque< pair< pair<std::string, Material*>, pair<std::string, Material*> > > 
       fuelPairs_;
 
     /**

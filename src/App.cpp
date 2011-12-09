@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include "boost/program_options.hpp"
+#include "boost/shared_ptr.hpp"
 
 #include "Model.h"
 #include "Logician.h"

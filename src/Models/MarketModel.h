@@ -4,14 +4,12 @@
 
 #include <deque>
 #include <set>
+#include <vector>
 
 #include "Model.h"
 #include "Communicator.h"
 
-/// forward declaration to resolve recursion
-class Commodity;
-
-/**
+/*!
    @brief Markets are used to allocate transactions between agents. Each 
    Market is associated with one resource or commodity.
    
@@ -47,12 +45,13 @@ class Commodity;
  */
 
 //-----------------------------------------------------------------------------
-class MarketModel : public Model, public Communicator
-{
+class MarketModel : public Model, public Communicator {
+private:
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+ static std::vector<MarketModel*> markets_;
 
 public:
   MarketModel();
@@ -60,6 +59,16 @@ public:
   /// MarketModels should not be indestructible.
   virtual ~MarketModel() {};
   
+  /**
+   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in question and not in any 
+   * inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
+   */
+  static MarketModel* marketForCommod(std::string commod);
+
   // every model needs a method to initialize from XML
   virtual void init(xmlNodePtr cur);
 
@@ -79,12 +88,9 @@ public:
   // every model should be able to print a verbose description
   virtual void print();
 
-public:
   /// default MarketModel receiver simply logs the offer/request
   virtual void receiveMessage(Message* msg) 
   { messages_.insert(msg); };
-
-protected:
 
 /* --------------------
  * all MARKETMODEL classes have these members
@@ -92,7 +98,7 @@ protected:
  */
 public:
   /// every market should provide its commodity
-  Commodity* getCommodity() { return commodity_; } ;
+  std::string commodity() { return commodity_; } ;
 
   // Primary MarketModel methods
 
@@ -105,7 +111,7 @@ public:
 
 protected: 
   /// every market has a commodity
-  Commodity* commodity_;
+  std::string commodity_;
 
   /// every market collects offers & requests
   std::set<Message*> messages_;

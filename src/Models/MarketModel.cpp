@@ -4,22 +4,41 @@
 #include "MarketModel.h"
 #include "InputXML.h"
 #include "CycException.h"
-#include "Logician.h"
 #include "Timer.h"
 
-#include <iostream>
 #include "Logger.h"
 #include <string>
 
 using namespace std;
 
+std::vector<MarketModel*> MarketModel::markets_;
+
 MarketModel::MarketModel() {
   setModelType("Market");
+
   TI->registerResolveListener(this);
+  markets_.push_back(this);
+
 };
+
+MarketModel* MarketModel::marketForCommod(std::string commod) {
+  MarketModel* market = NULL;
+  for (int i = 0; i < markets_.size(); i++) {
+    if (markets_.at(i)->commodity() == commod) {
+      market = markets_.at(i);
+      break;
+    }
+  }
+
+  if (market == NULL) {
+    std::string err_msg = "No market found for commodity '";
+    err_msg += commod + "'.";
+    throw CycIndexException(err_msg);
+  }
+  return market;
+}
   
-void MarketModel::init(xmlNodePtr cur)
-{
+void MarketModel::init(xmlNodePtr cur) {
   Model::init(cur);
   
   /** 
@@ -27,10 +46,7 @@ void MarketModel::init(xmlNodePtr cur)
    */
 
   /// all markets require commodities
-  string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
-  commodity_ = Commodity::getCommodity(commod_name);
-  
-  commodity_->setMarket(this);
+  commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
 }
 
 void MarketModel::copy(MarketModel* src) {
@@ -41,20 +57,13 @@ void MarketModel::copy(MarketModel* src) {
    *  Specific initialization for MarketModels
    */
 
-  commodity_ = src->commodity_;
-  LI->addModel(this, MARKET);
+  commodity_ = src->commodity();
 }
 
 void MarketModel::print() { 
   Model::print(); 
 
-  LOG(LEV_DEBUG2) << "    trades commodity " 
-      << commodity_->name();
+  LOG(LEV_DEBUG2) << "    trades commodity " << commodity_;
 
 };
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
 

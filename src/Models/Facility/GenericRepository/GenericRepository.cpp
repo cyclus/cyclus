@@ -45,8 +45,6 @@
  *
  *
  */
-
-
  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(xmlNodePtr cur)
@@ -75,15 +73,12 @@ void GenericRepository::init(xmlNodePtr cur)
   // This will be a list
 
   /// all facilities require commodities - possibly many
-  string commod_name;
-  Commodity* new_commod;
+  std::string commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
 
-  for (int i=0;i<nodes->nodeNr;i++)
-  {
-    commod_name = (const char*)(nodes->nodeTab[i]->children->content);
-    new_commod = Commodity::getCommodity(commod_name);
-    in_commods_.push_back(new_commod);
+  for (int i=0;i<nodes->nodeNr;i++) {
+    commod = (const char*)(nodes->nodeTab[i]->children->content);
+    in_commods_.push_back(commod);
   }
 
 
@@ -131,6 +126,7 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
 
   // they will have allowed subcomponents (think russian doll)
   xmlNodeSetPtr allowed_sub_nodes;
+  std::string allowed_commod;
 
   switch(toRet->getComponentType(comp_type)) {
     case BUFFER:
@@ -145,9 +141,7 @@ Component* GenericRepository::initComponent(xmlNodePtr cur){
       // get allowed waste commodities
       allowed_sub_nodes = XMLinput->get_xpath_elements(cur,"allowedcommod");
       for (int i=0;i<allowed_sub_nodes->nodeNr;i++) {
-        Commodity* allowed_commod = NULL;
-        allowed_commod = Commodity::getCommodity((const 
-              char*)(allowed_sub_nodes->nodeTab[i]->children->content));
+        allowed_commod = (const char*)(allowed_sub_nodes->nodeTab[i]->children->content);
         commod_wf_map_.insert(make_pair(allowed_commod, toRet));
       }
       wf_templates_.push_back(toRet);
@@ -233,7 +227,7 @@ void GenericRepository::print() {
     << "}, wf {"
     << wf_templates_.front()->name()
     << "} which stores commodity {"
-    << in_commods_.front()->name()
+    << in_commods_.front()
     << "} among others.";
 };
 
@@ -294,7 +288,7 @@ void GenericRepository::makeRequests(int time){
  
   // right now it picks one commodity per month and asks for that.
   // It chooses the next incommodity in the preference lineup
-  Commodity* in_commod;
+  std::string in_commod;
   in_commod = in_commods_.front();
 
   // It then moves that commodity from the front to the back of the preference 
@@ -315,8 +309,8 @@ void GenericRepository::makeRequests(int time){
   if (requestAmt == 0){
     // don't request anything
   } else {
-    Communicator* recipient = 
-      dynamic_cast<Communicator*>(in_commod->getMarket());
+    MarketModel* market = MarketModel::marketForCommod(in_commod);
+    Communicator* recipient = dynamic_cast<Communicator*>(market);
 
     // build the transaction and message
     Transaction trans;
@@ -333,7 +327,7 @@ void GenericRepository::makeRequests(int time){
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass GenericRepository::getCapacity(Commodity* commod){
+Mass GenericRepository::getCapacity(std::string commod){
   Mass toRet;
   // if the overall repo has a legislative limit, report it
   // we need a heat model
@@ -361,7 +355,7 @@ Mass GenericRepository::checkInventory(){
   // material unit is in each object.
   for (deque< WasteStream >::iterator iter = inventory_.begin(); iter != 
       inventory_.end(); iter ++){
-    total += (*iter).first->getTotMass();
+    total += iter->first->getTotMass();
   }
 
   return total;
@@ -375,8 +369,8 @@ Mass GenericRepository::checkStocks(){
 
   if(!stocks_.empty()){
     for (deque< WasteStream >::iterator iter = stocks_.begin(); iter != 
-        stocks_.end(); iter ++){
-        total += (*iter).first->getTotMass();
+        stocks_.end(); iter ++) {
+        total += iter->first->getTotMass();
     };
   };
   return total;
@@ -385,10 +379,10 @@ Mass GenericRepository::checkStocks(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::emplaceWaste(){
   // if there's anything in the stocks, try to emplace it
-  if(!stocks_.empty()){
+  if(!stocks_.empty()) {
     // for each waste stream in the stocks
     for (deque< WasteStream >::const_iterator iter = stocks_.begin(); iter != 
-        stocks_.end(); iter ++){
+        stocks_.end(); iter ++) {
       // -- put the waste stream in the waste form
       // -- associate the waste stream with the waste form
       conditionWaste((*iter));
@@ -455,7 +449,7 @@ Component* GenericRepository::conditionWaste(WasteStream waste_stream){
   chosen_wf_template = commod_wf_map_[waste_stream.second];
   if(chosen_wf_template == NULL){
     string err_msg = "The commodity '";
-    err_msg += (waste_stream.second)->name();
+    err_msg += waste_stream.second;
     err_msg +="' does not have a matching WF in the GenericRepository.";
     throw CycException(err_msg);
   }

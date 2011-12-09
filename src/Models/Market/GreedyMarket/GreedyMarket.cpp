@@ -173,3 +173,17 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   return (requestAmt == 0);
 }
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+extern "C" Model* construct() {
+  return new GreedyMarket();
+}
+
+extern "C" void destruct(Model* p) {
+  delete p;
+}
+
+/* -------------------- */
+
