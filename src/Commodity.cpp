@@ -34,16 +34,6 @@ Commodity::Commodity(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Commodity::load_commodities() {
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/commodity");
-  
-  // Logician maintains a list of commods retrievable as needed by sim Agents
-  for (int i=0;i<nodes->nodeNr;i++) {
-    new Commodity(nodes->nodeTab[i]);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Commodity::getMarket() {
   if (market_ == NULL) {
     string err_msg = "Attempted to retrieve an uninitialized market pointer";

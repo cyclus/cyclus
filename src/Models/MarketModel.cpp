@@ -15,8 +15,27 @@ using namespace std;
 
 MarketModel::MarketModel() {
   setModelType("Market");
+
   TI->registerResolveListener(this);
+  MarketModel::markets.push_back(this);
 };
+
+MarketModel* marketForCommod(std::string commod) {
+  MarketModel* market = NULL;
+  for (int i = 0; i < MarketModel::markets.size(); i++) {
+    if (MarketModel::markets.at(i).commodity() == commod) {
+      market = MarketModel::markets.at(i);
+      break;
+    }
+  }
+
+  if (market == NULL) {
+    std::string err_msg = "No market found for commodity '";
+    err_msg += commod + "'.";
+    throw CycNullException(err_msg);
+  }
+  return market;
+}
   
 void MarketModel::init(xmlNodePtr cur)
 {
@@ -28,6 +47,7 @@ void MarketModel::init(xmlNodePtr cur)
 
   /// all markets require commodities
   string commod_name = XMLinput->get_xpath_content(cur,"mktcommodity");
+  MarketModel::
   commodity_ = Commodity::getCommodity(commod_name);
   
   commodity_->setMarket(this);
