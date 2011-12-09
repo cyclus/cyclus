@@ -16,9 +16,20 @@ typedef std::map<int, Model*> ModelList;
 typedef std::map<std::string, Material*> RecipeList;
 
 /**
- * A (singleton) simulation logician class. This class sends tick messages
- * and collects and processes requests from simulation objects. 
+   @brief A (singleton) simulation logician class. This class sends tick 
+   messages and collects and processes requests from simulation objects. 
+
+   @section intro Introduction
+   The Logician currently holds lists of models and recipes. We expect the 
+   Logician to soon be depricated and removed.
+
+   @section params Model Parameters
+   - map<ModelType, ModelList> model_lists_: A list of all models in the 
+   simulation
+   - map<string, Material*> recipes_: A list of all recipes in the simulation
+   - vector<Material*> materials_: A list of all materials in the simulation
  */
+
 class Logician {
 
   private:

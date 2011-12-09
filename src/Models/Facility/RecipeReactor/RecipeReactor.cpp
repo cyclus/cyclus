@@ -70,7 +70,6 @@ void RecipeReactor::init(xmlNodePtr cur)
   // for each fuel pair, there is an in and an out commodity
   for (int i = 0; i < nodes->nodeNr; i++){
     xmlNodePtr pair_node = nodes->nodeTab[i];
-    in_commod = out_commod = NULL;
     in_recipe = out_recipe = NULL; 
 
     // get commods

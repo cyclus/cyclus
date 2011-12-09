@@ -7,12 +7,31 @@
 #include "MarketModel.h"
 
 /**
- * The NullMarket class inherits from the MarketModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This market will take a set of requests and match the biggest requests with
- * the biggest offers first.
- *
+  @brief The NullMarket class inherits from the MarketModel class and is 
+  dynamically loaded by the Model class when requested.
+  
+  This market will take a set of requests and match the biggest requests with
+  the biggest offers first.
+
+  @section intro Introduction
+  The NullMarket is a market type in Cyclus which matches the first offer 
+  with the first request for its characteristic commodity. The NullMarket is 
+  instantiated at the beginning of the simulation and exists until the end of 
+  the simulation.
+
+  @section modelParams Model Parameters
+  NullMarket behavior is comprehensively defined by the following parameters:
+  - Commodity* commod: The type of commodity for which this market accepts 
+  offers and requests.
+
+  @section behavior Detailed Behavior
+  The NullMarket starts operation at the beginning of the simulation and ends 
+  operation at the end of the simulation. It collects offers and requests for 
+  its characteristic commodity and matches offers and requests according to 
+  the simplest of algorithms, matching the first offerer with the first 
+  requester and setting the amount to be the smallest of the two. Once 
+  matches are made, the market dictates the matches back down to the 
+  facilities.
  */
 class NullMarket : public MarketModel  
 {

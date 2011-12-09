@@ -190,12 +190,12 @@ protected:
     /**
      * The EnrichmentFacility has one input commodity
      */
-    Commodity* in_commod_;
+    std::string in_commod_;
 
     /**
      * The EnrichmentFacility has one output commodity
      */
-    Commodity* out_commod_;
+    std::string out_commod_;
 
     /**
      * The EnrichmentFacility has a limit to how material it can process.

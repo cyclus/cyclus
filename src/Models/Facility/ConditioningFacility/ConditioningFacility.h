@@ -199,7 +199,7 @@ protected:
     std::vector<stream_t> stream_vec_;
 
     /// the stocks are where the processed material is kept
-    std::deque<std::pair<Commodity*,Material*> >stocks_;
+    std::deque<std::pair<std::string, Material*> > stocks_;
 
     /// the inventory is where the processed material is kept
     std::deque<Material*> inventory_;

@@ -34,6 +34,9 @@
    @section anticipatedCoreImpl Anticipated Core Implementations
    - DeploymentInst: This institution deploys allowed facilities 
    according to a demand curve.
+
+   @section thirdPartyImpl Third Party Implementations
+   (None)
 */
 
 class InstModel : public TimeAgent, public Communicator {

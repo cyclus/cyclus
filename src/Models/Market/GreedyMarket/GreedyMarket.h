@@ -7,14 +7,40 @@
 
 #include "MarketModel.h"
 
+
 /**
- * The GreedyMarket class inherits from the MarketModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This market will take a set of requests and match the biggest requests with
- * the biggest offers first.
- *
- */
+   @brief The GreedyMarket class inherits from the MarketModel class and is 
+   dynamically loaded by the Model class when requested.
+
+   @section introduction Introduction
+   The GreedyMarket is a market type in Cyclus which, when given a list of 
+   offers and requests for its characteristic commodity, matches the largest 
+   requests first with largest remaining offers. It only matches complete 
+   requests and fails only if the full request can't be matched. When these 
+   matches are made, it issues an order to the sending and receiving 
+   facilities that the offer has been matched with a request. The 
+   facilities then conduct the appropriate shipment based on the order 
+   message issued to them by the market.
+
+   @section modelParams Model Parameters
+   GreedyMarket behavior is comprehensively defined by the following parameter:
+   - Commodity* commod : The characteristic commodity of this market
+
+   @section behavior Detailed Behavior
+   All GreedyMarket instantiations occur at the start of the simulation. At 
+   each Tick of the timer, the GreedyMarket will receive any offer and
+   request messages associated with its characteristic commodity. When the 
+   list of offers and requests are compiled, it handles the offers and 
+   requests by descending size. Unless the largest offer is incapable of 
+   filling the largest request, the two are matched. Any remaining quantity 
+   of the large offer is refiled in the ordered list of offers according to 
+   its new size. If the largest offer is smaller than the largest request, 
+   the GreedyMarket tries again to match it with the second largest request, 
+   and so on. The GreedyMarket proceeds through the ordered list of offers 
+   until the largest offer is not big enough to fill the smallest outstanding 
+   request.
+*/   
+
 class GreedyMarket : public MarketModel  
 {
 /* --------------------

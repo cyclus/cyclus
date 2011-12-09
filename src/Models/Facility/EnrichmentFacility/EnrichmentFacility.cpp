@@ -10,6 +10,7 @@
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+#include "MarketModel.h"
 
 /*
  * TICK
@@ -36,20 +37,12 @@ void EnrichmentFacility::init(xmlNodePtr cur)
 { 
   FacilityModel::init(cur);
   
-  in_commod_ = out_commod_ = NULL; 
-  
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/EnrichmentFacility");
 
   // all facilities require commodities - possibly many
-  string commod_name;
-  Commodity* new_commod;
-  
-  commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = Commodity::getCommodity(commod_name);
-  
-  commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = Commodity::getCommodity(commod_name);
+  in_commod_ = XMLinput->get_xpath_content(cur,"incommodity");
+  out_commod_ = XMLinput->get_xpath_content(cur,"outcommodity");
 
   // get inventory size
   inventory_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
@@ -99,9 +92,9 @@ void EnrichmentFacility::print()
 { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2) << "    converts commodity {"
-      << in_commod_->name()
+      << in_commod_
       << "} into commodity {"
-      << out_commod_->name()
+      << out_commod_
       << "}, and has an inventory that holds " 
       << inventory_size << " materials";
 };
@@ -125,7 +118,8 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
   Transaction trans = msg->getTrans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
-    throw CycException("EnrichmentFacility can only send out_commod_ materials.");
+    throw CycException("EnrichmentFacility can only send '" +  out_commod_ + 
+                       "' materials.");
   }
 
   Mass newAmt = 0;
@@ -307,7 +301,8 @@ void EnrichmentFacility::makeRequests(){
       requestAmt = capacity_ - sto;
     }
 
-    Communicator* recipient = dynamic_cast<Communicator*>(in_commod_->getMarket());
+    MarketModel* market = MarketModel::marketForCommod(in_commod_);
+    Communicator* recipient = dynamic_cast<Communicator*>(market);
 
     // build the transaction and message
     Transaction trans;
@@ -342,7 +337,8 @@ void EnrichmentFacility::makeOffers()
   double commod_price = 0;
   
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(out_commod_->getMarket());
+  MarketModel* market = MarketModel::marketForCommod(out_commod_);
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
 
   // build the transaction and message
   Transaction trans;

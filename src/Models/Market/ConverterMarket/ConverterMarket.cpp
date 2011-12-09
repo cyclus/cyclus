@@ -1,17 +1,17 @@
 // ConverterMarket.cpp
 // Implements the ConverterMarket class
-#include <iostream>
-#include "Logger.h"
-
 #include "ConverterMarket.h"
-#include "ConverterModel.h"
 
+#include <iostream>
+
+#include "ConverterModel.h"
+#include "Logger.h"
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConverterMarket::init(xmlNodePtr cur)
-{ 
+void ConverterMarket::init(xmlNodePtr cur) { 
   MarketModel::init(cur);  /// get facility list
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/ConverterMarket/converter");
   
@@ -28,15 +28,8 @@ void ConverterMarket::init(xmlNodePtr cur)
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
-  string commod_name = XMLinput->get_xpath_content(cur,"offercommodity");
-  offer_commod_ = Commodity::getCommodity(commod_name);
-  
-  offer_commod_->setMarket(this);
-  
-  commod_name = XMLinput->get_xpath_content(cur,"reqcommodity");
-  req_commod_ = Commodity::getCommodity(commod_name);
-  
-  req_commod_->setMarket(this);
+  offer_commod_ = XMLinput->get_xpath_content(cur,"offercommodity");
+  req_commod_ = XMLinput->get_xpath_content(cur,"reqcommodity");
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -44,9 +37,7 @@ void ConverterMarket::copy(ConverterMarket* src)
 { 
   MarketModel::copy(src);
   offer_commod_ = src->offer_commod_;
-  offer_commod_->setMarket(this);
   req_commod_ = src->req_commod_;
-  req_commod_->setMarket(this);
   conv_name_ = src->conv_name_;
 }
 
@@ -61,9 +52,9 @@ void ConverterMarket::print()
 { 
   MarketModel::print();
   LOG(LEV_DEBUG2) << "where the offer commodity is {"
-      << offer_commod_->name()
+      << offer_commod_
       << "}, the request commodity is {"
-      << req_commod_->name()
+      << req_commod_
       << "}. ";
 }
 
@@ -239,4 +230,17 @@ void ConverterMarket::resolve()
   }
   orders_.clear();
 }
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+extern "C" Model* construct() {
+  return new ConverterMarket();
+}
+
+extern "C" void destruct(Model* p) {
+  delete p;
+}
+/* -------------------- */
 

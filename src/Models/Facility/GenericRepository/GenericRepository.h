@@ -11,7 +11,7 @@
 /**
  * type definition for waste stream objects
  */
-typedef pair<Material*, Commodity*> WasteStream;
+typedef pair<Material*, std::string> WasteStream;
 
 /**
   \class GenericRepository
@@ -181,7 +181,7 @@ protected:
     /**
      * The GenericRepository has many input commodities
      */
-    deque<Commodity*> in_commods_;
+    deque<std::string> in_commods_;
 
     /**
      * A limit to how quickly the GenericRepository can accept waste.
@@ -303,9 +303,9 @@ protected:
     deque<Component*> waste_forms_;
 
     /**
-     * Each Commodity is associated with a waste form.
+     * Each commodity is associated with a waste form.
      */
-    map<Commodity*, Component*> commod_wf_map_;
+    map<std::string, Component*> commod_wf_map_;
 
     /**
      * Each waste form associated with a waste package.
@@ -394,7 +394,7 @@ protected:
      *
      * @param commod the commodity
      */
-    Mass getCapacity(Commodity* commod) ;
+    Mass getCapacity(std::string commod) ;
 
 
 /* ------------------- */ 

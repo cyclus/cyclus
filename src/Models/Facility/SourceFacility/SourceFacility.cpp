@@ -7,6 +7,7 @@
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+#include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility(){ }

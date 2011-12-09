@@ -1,11 +1,12 @@
 // NullFacility.cpp
 // Implements the NullFacility class
-#include <iostream>
-#include "Logger.h"
-
 #include "NullFacility.h"
 
+#include <iostream>
+
+#include "Logger.h"
 #include "Logician.h"
+#include "MarketModel.h"
 #include "CycException.h"
 #include "InputXML.h"
 

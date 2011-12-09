@@ -69,8 +69,91 @@ struct Transaction {
 
 
 /**
- * A Message class for inter-entity communication.
+   @brief A Message class for inter-entity communication.
+
+   @section intro Introduction
+   The MessageClass describes the structure of messages that 
+   CommunicatorClass models pass during the simulation.
+
+   @section msgStructure Message Data Structure
+   Messages have a path and contain a transaction data structure. The path 
+   directs the movement of the message through the appropriate channels and 
+   the transaction includes information about the material order to be 
+   offered, requested, or filled.
+
+   @section path Path
+   A message contains a reference (pointer) to its originator and the 
+   intended receiver. The message class is designed to facilitate a two leg 
+   path. The first leg, the message is in an "outgoing" state. The originator 
+   will specify the next stop (next communicator) to receive the message and 
+   invoke the sendOn() method of the message. The next stop communicator 
+   receives the message, does necessary processing, sets the message's next 
+   "next stop", and invokes the message's sendOn() method. This process is 
+   repeated until the message direction is flipped to the incoming (return 
+   leg) state. When in the incomming state, a communicator invokes the 
+   sendOn() method and the message is sent to the communicator from which 
+   this communicator received the message. An example of the message passing 
+   is outlined below:
+
+   - Up/outgoing message:
+     -# Inside originator
+       -# msg->setNextDest(next_stop)
+     -# msg->sendOn()
+     -# message object invokes receiveMessage(this) for next_stop
+     -# Inside stop A
+       -# msg->setNextDest(next_stop)
+       -# msg->sendOn()
+     -# message object invokes receiveMessage(this) for next_stop
+     -# Inside stop B
+       -# msg->setNextDest(next_stop)
+       -# msg->sendOn()
+     -# message object invokes receiveMessage(this) for next_stop
+     -# Inside stop C
+       -# flip message direction
+   - Down/incoming message:
+     -# Inside stop C
+       -# msg->sendOn()
+     -# message object invokes receiveMessage(this) for stop B
+     -# Inside stop B
+       -# msg->sendOn()
+     -# message object invokes receiveMessage(this) for stop A
+     -# message arrives back at its originating communicator.
+
+   Note that all attempts to specify a "next stop" for a down/incoming 
+   message are ignored. Incoming messages simply follow their upward path in 
+   reverse order. This paradigm allows for an arbitrary communicator to 
+   communicator path (for the outgoing leg). The message is also guaranteed 
+   to retrace its path on an incoming leg provided each communicator invokes 
+   the message's sendOn() method.
+
+   In order for a message to arrive at the destination as intended by its 
+   originator, each communicator may check to see if it is the recipient. If 
+   not, it should continue forwarding the message in some defined way 
+   (usually up a hierarchy). Attempts to invoke sendOn() without first 
+   specifying a next stop will throw an exception (this helps prevent 
+   circular/recursive messaging). An exception is also thrown if a 
+   communicator attempts to send a message after the message has completed an 
+   entire 2-leg round trip
+
+   @section transaction Transaction
+   The transaction contains information about the material order to be 
+   offered, requested, or filled. Sufficient information for specifying the 
+   transaction follows:
+   - the amount of the given Commodity being offered/requested
+   - the minimum amount acceptible for this transaction
+   - the price of the Commodity
+   - the specific composition of the material to be traded
+   
+   Communicator classes which should utilize the MessageClass interface 
+   include RegionModel, InstModel, FacilityModel and MarketModel classes. 
+   These model classes pass messages during the simulation.
+
+   @section seeAlso See Also
+   The CommunicatorClass describes the class of models that pass messages 
+   during the simulation.. The StubCommModel provides an example of a Message 
+   model implementation.
  */
+
 class Message {
   private:
     /**

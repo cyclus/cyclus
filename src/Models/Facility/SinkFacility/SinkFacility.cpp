@@ -8,6 +8,7 @@
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+#include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SinkFacility::SinkFacility(){
@@ -28,14 +29,12 @@ void SinkFacility::init(xmlNodePtr cur)
 {
   FacilityModel::init(cur);
 
-  /** 
-   *  Allow a Sink Facility to have many input/output commodities
-   */
-
+  /// Sink facilities can have many input/output commodities
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SinkFacility");
 
   /// all facilities require commodities - possibly many
+  std::string commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
   for (int i=0;i<nodes->nodeNr;i++) {
     commod = (const char*)(nodes->nodeTab[i]->children->content);
