@@ -26,9 +26,9 @@
    @section modelParams Model Parameters
    ConverterMarket behavior is comprehensively defined by the following 
    parameters:
-   -list<Commodity*> commods: The types of commodity for which this 
+   - list<Commodity*> commods: The types of commodity for which this 
    market accepts offers and requests.
-   -ConverterModel* converter: The converter that will be called to 
+   - ConverterModel* converter: The converter that will be called to 
    translate an offer or request in one commodity into another 
    equivalent commodity.
       
