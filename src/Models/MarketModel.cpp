@@ -11,18 +11,20 @@
 
 using namespace std;
 
+std::vector<MarketModel*> MarketModel::markets_;
+
 MarketModel::MarketModel() {
   setModelType("Market");
 
   TI->registerResolveListener(this);
-  MarketModel::markets.push_back(this);
+  markets_.push_back(this);
 };
 
-MarketModel* marketForCommod(std::string commod) {
+MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
-  for (int i = 0; i < MarketModel::markets.size(); i++) {
-    if (MarketModel::markets.at(i).commodity() == commod) {
-      market = MarketModel::markets.at(i);
+  for (int i = 0; i < markets_.size(); i++) {
+    if (markets_.at(i)->commodity() == commod) {
+      market = markets_.at(i);
       break;
     }
   }
@@ -30,7 +32,7 @@ MarketModel* marketForCommod(std::string commod) {
   if (market == NULL) {
     std::string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
-    throw CycNullException(err_msg);
+    throw CycIndexException(err_msg);
   }
   return market;
 }

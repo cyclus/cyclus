@@ -9,9 +9,6 @@
 #include "Model.h"
 #include "Communicator.h"
 
-/// forward declaration to resolve recursion
-class Commodity;
-
 //----------------------------------------------------------------------------
 /*!
    @brief Markets are used to allocate transactions between agents. Each 
@@ -54,7 +51,7 @@ private:
  * all MODEL classes have these members
  * --------------------
  */
- static std::vector<MarketModel*> markets;
+ static std::vector<MarketModel*> markets_;
 
 public:
   MarketModel();

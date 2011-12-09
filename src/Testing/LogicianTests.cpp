@@ -2,7 +2,6 @@
 #include "Logician.h"
 #include "Model.h"
 #include "Material.h"
-#include "Commodity.h"
 
 #include <string>
 #include <map>
@@ -88,17 +87,7 @@ TEST_F(LogicianTest, AddRetrieveModels) {
   EXPECT_TRUE(true);
 }
 
-TEST_F(LogicianTest, AddRetrieveCommodity) {
-  // finish writing test
-  EXPECT_TRUE(true);
-}
-
 TEST_F(LogicianTest, AddRetrieveMaterial) {
-  // finish writing test
-  EXPECT_TRUE(true);
-}
-
-TEST_F(LogicianTest, CommodityRegistration) {
   // finish writing test
   EXPECT_TRUE(true);
 }

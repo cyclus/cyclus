@@ -4,9 +4,10 @@
 #if !defined(_MESSAGE)
 #define _MESSAGE
 
-#include "Commodity.h"
+#include "Model.h"
 #include "Material.h"
 #include <vector>
+#include <string>
 
 class Communicator;
 
@@ -22,9 +23,9 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 
 struct Transaction {
   /**
-   * The Commodity that is being requested or offered in this Message.
+   * The commodity that is being requested or offered in this Message.
    */
-  Commodity* commod;
+  std::string commod;
 
   /**
    * The amount of the specified commodity being requested or offered. 
@@ -244,21 +245,21 @@ class Message {
     Transaction getTrans() const;
 
     /**
-     * Returns the Commodity requested or offered in this Message.
+     * Returns the commodity requested or offered in this Message.
      *
-     * @return the Commodity
+     * @return commodity for this transaction
      */
-    Commodity* getCommod() const;
+    std::string commod() const;
 
     /**
-     * Sets the Commodity requested or offered in this Message.
+     * Sets the commodity requested or offered in this Message.
      *
-     * @param newCommod the Commodity
+     * @param newCommod the commodity associated with this message/transaction
      */
-    void setCommod(Commodity* newCommod);
+    void setCommod(std::string newCommod);
 
     /**
-     * Returns the amount of some Commodity being requested or offered in 
+     * Returns the amount of some commodity being requested or offered in 
      * this message.
      *
      * @return the amount (units vary)
@@ -266,7 +267,7 @@ class Message {
     double getAmount() const;
 
     /**
-     * Sets the amount of some Commodity being requested or offered in this 
+     * Sets the amount of some commodity being requested or offered in this 
      * Message. 
      *
      * @param newAmount the updated amount

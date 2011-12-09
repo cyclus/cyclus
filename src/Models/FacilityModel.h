@@ -10,7 +10,6 @@
 #include "InstModel.h"
 
 /// forward declaration to resolve recursion
-class Commodity;
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 

@@ -19,7 +19,6 @@ Message::Message(Communicator* sender) {
   sender_ = sender;
   recipient_ = NULL;
 
-  trans_.commod = NULL;
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.amount = 0;
@@ -33,7 +32,6 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   sender_ = sender;
   recipient_ = receiver;
 
-  trans_.commod = NULL;
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.amount = 0;
@@ -147,7 +145,8 @@ void Message::setDir(MessageDir newDir) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getMarket() {
-  return dynamic_cast<Communicator*>(trans_.commod->getMarket());
+  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
+  return dynamic_cast<Communicator*>(market);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -196,12 +195,12 @@ Transaction Message::getTrans() const{
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Commodity* Message::getCommod() const {
+std::string Message::commod() const {
   return trans_.commod;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setCommod(Commodity* newCommod) {
+void Message::setCommod(std::string newCommod) {
   trans_.commod = newCommod;
 }
 

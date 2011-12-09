@@ -39,7 +39,6 @@ SET( CYCLUS_SRC
      Logician.cpp
      Material.cpp
      IsoVector.cpp
-     Commodity.cpp
      Message.cpp
      Utility/BookKeeper.cpp 
      Utility/CycException.cpp 

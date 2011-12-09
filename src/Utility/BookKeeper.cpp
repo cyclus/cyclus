@@ -154,7 +154,7 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
     toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();
      
-    strcpy(toRegister.commodName, msg->getCommod()->name().c_str());
+    strcpy(toRegister.commodName, msg->commod().c_str());
     transactions_.push_back(toRegister);
   };
 };

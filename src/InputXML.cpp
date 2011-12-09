@@ -10,7 +10,6 @@
 #include "Env.h"
 #include "CycException.h"
 #include "Model.h"
-#include "Commodity.h"
 #include "Material.h"
 #include "Logger.h"
 
@@ -108,11 +107,6 @@ void InputXML::load_file(std::string filename) {
     fprintf(stderr,"Error: unable to create new xpath context \n");
   }
 
-  // Commodities
-  LOG(LEV_DEBUG3) << "Begin loading commodities";
-  Commodity::load_commodities();
-  LOG(LEV_DEBUG3) << "End loading commodities";
-  
   // Recipes
   LOG(LEV_DEBUG3) << "Begin loading recipes";
   Material::load_recipes();
