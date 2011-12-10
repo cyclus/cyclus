@@ -18,6 +18,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <include href="../Models/Inst/DeployInst/DeployInst.rng"/>
   <include href="../Models/Inst/FixedInst/FixedInst.rng"/>
   <include href="../Models/Converter/StubConverter/StubConverter.rng"/>
+  <include href="../Models/Converter/SWUeUF6Converter/SWUeUF6Converter.rng"/>
   <include href="../Models/Market/NullMarket/NullMarket.rng"/>
   <include href="../Models/Market/StubMarket/StubMarket.rng"/>
   <include href="../Models/Market/ConverterMarket/ConverterMarket.rng"/>
@@ -379,6 +380,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice>
+        <ref name="SWUeUF6Converter"/>
         <ref name="StubConverter"/>
         <!-- insert ref to new ConverterModels here -->
       </choice>

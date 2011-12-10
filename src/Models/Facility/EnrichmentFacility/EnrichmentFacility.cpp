@@ -47,7 +47,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   // get inventory size
   inventory_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   // get capacity_
-  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity_"), NULL);
+  capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
   // get default tails fraction
   default_xw_ = strtod(XMLinput->get_xpath_content(cur,"tailsassay"), NULL);
 

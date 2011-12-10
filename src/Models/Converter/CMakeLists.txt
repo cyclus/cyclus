@@ -1,3 +1,3 @@
 ADD_SUBDIRECTORY( StubConverter )
-#ADD_SUBDIRECTORY( SWUeUF6Converter )
+ADD_SUBDIRECTORY( SWUeUF6Converter )
 

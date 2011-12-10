@@ -23,9 +23,9 @@
    @section modelParams Model Parameters
    SWUeUF6Converter behavior is comprehensively defined by the following 
    parameters:
-   - Commodity* in_commod : The commodity that the converter will translate 
+   - string in_commod : The commodity that the converter will translate 
    into the out_commod.
-   - Commodity* out_commod : The commodity that the converter will translate 
+   - string out_commod : The commodity that the converter will translate 
    the in_commod into.
 
    @section optionalParams Optional Parameters
@@ -132,12 +132,12 @@ protected:
     /**
      * The SWUeUF6Converter has one input commodity
      */
-    Commodity* in_commod_;
+    std::string in_commod_;
 
     /**
      * The SWUeUF6Converter has one output commodity
      */
-    Commodity* out_commod_;
+    std::string out_commod_;
 
 /* ------------------- */ 
 

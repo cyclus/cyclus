@@ -18,14 +18,9 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
   cur = XMLinput->get_xpath_element(cur,"model/SWUeUF6Converter");
 
   // all converters require commodities - possibly many
-  string commod_name;
-  Commodity* new_commod;
+  in_commod_ = XMLinput->get_xpath_content(cur,"incommodity");
   
-  commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-  in_commod_ = Commodity::getCommodity(commod_name);
-  
-  commod_name = XMLinput->get_xpath_content(cur,"outcommodity");
-  out_commod_ = Commodity::getCommodity(commod_name);
+  out_commod_ = XMLinput->get_xpath_content(cur,"outcommodity");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -49,9 +44,9 @@ void SWUeUF6Converter::print()
 { 
   ConverterModel::print(); 
   LOG(LEV_DEBUG2) << "converts offers of commodity {"
-      << in_commod_->name()
+      << in_commod_
       << "} into offers of commodity {"
-      << out_commod_->name()
+      << out_commod_
       << "}.";
 };
 
@@ -86,8 +81,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   CompMap comp;
 
   // determine which direction we're converting
-  if (in_commod_ == Commodity::getCommodity("SWUs") &&
-      out_commod_ == Commodity::getCommodity("eUF6")){
+  if (in_commod_ == "SWUs" && out_commod_ == "eUF6"){
     // the enricher is the supplier in the convMsg
     enr = convMsg->getSupplier();
     if (0 == enr){
@@ -97,8 +91,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     comp = refMsg->getComp();
   }
 
-  else if (in_commod_ == Commodity::getCommodity("eUF6") &&
-      out_commod_ == Commodity::getCommodity("SWUs")){ 
+  else if (in_commod_ == "eUF6" && out_commod_ == "SWUs"){ 
     // the enricher is the supplier in the refMsg
     enr = refMsg->getSupplier();
     if (0 == enr){
@@ -127,11 +120,11 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   massProdU = SWUs/(term1 + term2 - term3);
   SWUs = massProdU*(term1 + term2 - term3);
 
-  if(out_commod_ == Commodity::getCommodity("eUF6")){
+  if(out_commod_ == "eUF6"){
     toRet = convMsg->clone();
     toRet->setAmount(massProdU); 
   }
-  else if(out_commod_ == Commodity::getCommodity("SWUs")){
+  else if(out_commod_ == "SWUs"){
     toRet = convMsg->clone();
     toRet->setAmount(SWUs); 
   }
