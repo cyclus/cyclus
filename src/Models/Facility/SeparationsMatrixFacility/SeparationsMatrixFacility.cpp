@@ -43,8 +43,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   /// initialize any SeparationsMatrixFacility-specific datamembers here
 
   // all facilities require commodities - possibly many
-  string commod_name;
-  Commodity* new_commod;
+  string new_commod;
 
   // Hack Force!!
   // Forcing Separations Matrix to know ahead of time the number of streams to be processed.
@@ -57,8 +56,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   {
     xmlNodePtr commod = nodes->nodeTab[i];
 
-    commod_name = XMLinput->get_xpath_content(cur,"incommodity");
-    new_commod = Commodity::getCommodity(commod_name);
+    new_commod = XMLinput->get_xpath_content(cur,"incommodity");
     in_commod_.push_back(new_commod);
   }
 
@@ -68,8 +66,8 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
   // get capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
-  // get Stream
-  nodes = XMLinput->get_xpath_elements(cur,"Stream");
+  // get stream
+  nodes = XMLinput->get_xpath_elements(cur,"stream");
   // See nodeForce Hack Above
 
   for (int i=0;i<nodeForce_;i++)
@@ -77,21 +75,19 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
 
     xmlNodePtr stream = nodes->nodeTab[i];
 
-    string stream_commod = XMLinput->get_xpath_content(stream,"outcommodity");
-    new_commod = Commodity::getCommodity(stream_commod);
+    string new_commod = XMLinput->get_xpath_content(stream,"outcommodity");
     out_commod_.push_back(new_commod);
 
-    int stream_Z = strtol(XMLinput->get_xpath_content(stream,"Z"), NULL, 10);
+    int stream_Z = strtol(XMLinput->get_xpath_content(stream,"z"), NULL, 10);
     double stream_eff = strtod(XMLinput->get_xpath_content(stream,"eff"), NULL);
-    stream_set_.insert(make_pair(new_commod,
-                                make_pair(stream_Z, stream_eff)));
-    LOG(LEV_DEBUG2) << "Name = " << stream_commod;
+    stream_set_.insert(make_pair(new_commod, make_pair(stream_Z, stream_eff)));
+    LOG(LEV_DEBUG2) << "Name = " << new_commod;
     LOG(LEV_DEBUG2) << "Z = " << stream_Z;
     LOG(LEV_DEBUG2) << "Eff = " << stream_eff;
   };
 
-  inventory_ = deque<pair<Commodity*,Material*> >();
-  stocks_ = deque<pair<Commodity*,Material*> >();
+  inventory_ = deque<pair<string,Material*> >();
+  stocks_ = deque<pair<string,Material*> >();
   ordersWaiting_ = deque<Message*>();
   ordersExecuting_ = ProcessLine();
 
@@ -130,18 +126,18 @@ void SeparationsMatrixFacility::print()
   FacilityModel::print();
   LOG(LEV_DEBUG2) << "converts commodities {";
  
-  for(vector<Commodity*>::const_iterator iter = in_commod_.begin(); 
+  for(vector<string>::const_iterator iter = in_commod_.begin(); 
        iter != in_commod_.end(); 
        iter ++){
-    LOG(LEV_DEBUG2) << (*iter)->name();
+    LOG(LEV_DEBUG2) << (*iter);
   };
 
   LOG(LEV_DEBUG2) << "} into commodities {";
 
-  for (vector<Commodity*>::iterator iter = out_commod_.begin(); 
+  for (vector<string>::iterator iter = out_commod_.begin(); 
        iter != out_commod_.end(); 
        iter ++){
-    LOG(LEV_DEBUG2) << (*iter)->name();
+    LOG(LEV_DEBUG2) << (*iter);
   }; 
   LOG(LEV_DEBUG2) << "}, and has an inventory that holds " 
       << inventory_size_ << " materials"
@@ -335,7 +331,7 @@ Mass SeparationsMatrixFacility::checkStocks(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SeparationsMatrixFacility::makeRequests(){
 
-  for (vector<Commodity*>::iterator iter = in_commod_.begin(); 
+  for (vector<string>::iterator iter = in_commod_.begin(); 
        iter != in_commod_.end(); 
        iter ++){
     // The separations facility should ask for at least as much SNF as it is 
@@ -362,7 +358,7 @@ void SeparationsMatrixFacility::makeRequests(){
     }
     else if (space < capacity_){
       int total = checkStocks();
-      Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(MarketModel::marketForCommod(*iter));
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
       // recall that requests have a negative amount
@@ -381,7 +377,7 @@ void SeparationsMatrixFacility::makeRequests(){
     // otherwise, the upper bound is the monthly acceptance capacity 
     // minus the amount in stocks.
     else if (space >= capacity_){
-      Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
+      Communicator* recipient = dynamic_cast<Communicator*>(MarketModel::marketForCommod(*iter));
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity_ - sto;
 
@@ -403,7 +399,7 @@ void SeparationsMatrixFacility::makeRequests(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::makeOffers()
 {
-  for (vector<Commodity*>::iterator iter = out_commod_.begin(); 
+  for (vector<string>::iterator iter = out_commod_.begin(); 
        iter != out_commod_.end(); 
        iter ++){
     // decide how much to offer
@@ -421,7 +417,7 @@ void SeparationsMatrixFacility::makeOffers()
     double commod_price = 0;
   
     // decide what market to offer to
-    Communicator* recipient = dynamic_cast<Communicator*>((*iter)->getMarket());
+    Communicator* recipient = dynamic_cast<Communicator*>(MarketModel::marketForCommod(*iter));
 
     // build the transaction and message
     Transaction trans;
@@ -479,7 +475,7 @@ void SeparationsMatrixFacility::separate()
        !iter = stream_set_.end(); 
        iter++){            
      firstpair = inventory_.pop_front();
-     Commodity* firstcommodity = firstpair.first();
+     string firstcommodity = firstpair.first();
      Material* firstmaterial = firstpair.second();
      // Multiply Amount of Element by Separation Efficieny and then add
      // it to the stock of material for that Element

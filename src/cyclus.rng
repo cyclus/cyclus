@@ -5,6 +5,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <include href="../Models/Facility/EnrichmentFacility/EnrichmentFacility.rng"/>
   <include href="../Models/Facility/GenericRepository/GenericRepository.rng"/>
   <include href="../Models/Facility/NullFacility/NullFacility.rng"/>
+  <include href="../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacility.rng"/>
   <include href="../Models/Facility/SinkFacility/SinkFacility.rng"/>
   <include href="../Models/Facility/SourceFacility/SourceFacility.rng"/>
   <include href="../Models/Facility/StubFacility/StubFacility.rng"/>
@@ -198,6 +199,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <ref name="GenericRepository"/>
         <ref name="NullFacility"/>
         <ref name="RecipeReactor"/>
+        <ref name="SeparationsMatrixFacility"/>
         <ref name="SinkFacility"/>
         <ref name="SourceFacility"/>
         <ref name="StubFacility"/>
@@ -442,20 +444,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </element>
   </define>
   <!-- end section for recipes -->
-
-  <!-- begin section for Stream -->
-  <!-- SepMatrix Stream List Arrangement Command -->
-  <define name="Stream">
-    <element name= "Stream">
-      <list>
-        <oneOrMore>
-          <data type = "integer"/>
-          <data type = "double"/> 
-        </oneOrMore>
-      </list>                            
-    </element>
-  </define>
-  <!-- end section for Stream -->
 
 </grammar>
 

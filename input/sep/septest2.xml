@@ -50,11 +50,11 @@
     <model>
       <SeparationsMatrixFacility>
         <incommodity>snf</incommodity>
-        <Stream>
+        <stream>
           <outcommodity>UPu</outcommodity>
-          <Z>92</Z>
+          <z>92</z>
           <eff>0.95</eff>
-        </Stream>
+        </stream>
         <inventorysize>1e6</inventorysize>
         <capacity>1</capacity>
       </SeparationsMatrixFacility>

@@ -79,8 +79,8 @@
    of each element across all streams.
  */
 
-typedef pair< Commodity*, Material*> InSep;
-typedef pair< Commodity*, Material*> OutSep;
+typedef pair<std::string, Material*> InSep;
+typedef pair<std::string, Material*> OutSep;
 
 class SeparationsMatrixFacility : public FacilityModel  {
 /* --------------------
@@ -205,12 +205,12 @@ protected:
     /**
      *  Vector of incoming material
      */
-    vector<Commodity*> in_commod_;
+    vector<std::string> in_commod_;
 
     /**
      *  Vector of outgoing material
      */
-    vector<Commodity*> out_commod_;
+    vector<std::string> out_commod_;
 
     /**
      * The SeparationsMatrixFacility has a limit to how material it can process.
@@ -221,22 +221,22 @@ protected:
     /**
      * This is the structure for each stream.
      */
-    map<Commodity*,pair<int, double> > stream_set_;
+    map<std::string,pair<int, double> > stream_set_;
 
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<pair<Commodity*,Material*> > stocks_;
+    deque<pair<std::string,Material*> > stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<pair<Commodity*,Material*> > inventory_;
+    deque<pair<std::string,Material*> > inventory_;
 
     /**
      * The inventory of waste material.
      */
-    deque<pair<Commodity*,Material*> > wastes_;
+    deque<pair<std::string,Material*> > wastes_;
 
         /**
      * The total mass flow required to process all outstanding orders this 

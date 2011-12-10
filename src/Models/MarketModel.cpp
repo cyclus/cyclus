@@ -13,6 +13,8 @@ using namespace std;
 
 std::vector<MarketModel*> MarketModel::markets_;
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
   setModelType("Market");
 
@@ -21,6 +23,7 @@ MarketModel::MarketModel() {
 
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
   for (int i = 0; i < markets_.size(); i++) {
@@ -38,6 +41,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   return market;
 }
   
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::init(xmlNodePtr cur) {
   Model::init(cur);
   
@@ -49,6 +53,7 @@ void MarketModel::init(xmlNodePtr cur) {
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::copy(MarketModel* src) {
   Model::copy(src);
   Communicator::copy(src);
@@ -60,6 +65,7 @@ void MarketModel::copy(MarketModel* src) {
   commodity_ = src->commodity();
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::print() { 
   Model::print(); 
 
