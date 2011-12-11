@@ -354,35 +354,42 @@ void EnrichmentFacility::makeOffers()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentFacility::enrich()
 {
-	// Get iterators that define the boundaries of the ordersExecuting that are 
-	// currently ready.~
-	int time = TI->getTime();
+  // Get iterators that define the boundaries of the ordersExecuting that are 
+  // currently ready.~
+  int time = TI->getTime();
 
   pair<ProcessLine::iterator,
-		ProcessLine::iterator> iters;
-	iters = ordersExecuting_.equal_range(time);
+    ProcessLine::iterator> iters;
+  iters = ordersExecuting_.equal_range(time);
 
-	ProcessLine::iterator curr, omega;
-	curr = iters.first;
-	omega = iters.second;
+  ProcessLine::iterator curr, omega;
+  curr = iters.first;
+  omega = iters.second;
 
-	// Create and send Materials corresponding to each order that's ready to go.
-	while (curr != omega) {
+  // Create and send Materials corresponding to each order that's ready to go.
+  while (curr != omega) {
 
-		// Get the info we need to make the enriched Material.
-		Message* mess = (curr->second).first;
-		Material* mat = (curr->second).second;
+    // Get the info we need to make the enriched Material.
+    Message* mess = (curr->second).first;
+    Material* mat = (curr->second).second;
 
-		// Find out what we're trying to make.
-		map<Iso, Atoms> compToMake = mess->getComp();
+    // Find out what we're trying to make.
+    //
+    map<Iso, Atoms> compToMake; 
+    try{
+      compToMake = dynamic_cast<Material*>(mess->getResource())->getAtomComp();
+    } catch (exception& e) {
+      string err = "The Enrichment Facility may only receive a Material-type Resource";
+      throw CycException(err);
+    }
 
-		// Do the enrichment math.
-		double P = Material::getEltMass(92, compToMake);
-		double xp = Material::getIsoMass(922350, compToMake) / P;
-		double F = mat->getEltMass(92);
-		double xf = Material::getIsoMass(922350, mat->getAtomComp()) / F;
-		double W = F - P;
-		double xw = (F * xf - P * xp) / W;
+    // Do the enrichment math.
+    double P = Material::getEltMass(92, compToMake);
+    double xp = Material::getIsoMass(922350, compToMake) / P;
+    double F = mat->getEltMass(92);
+    double xf = Material::getIsoMass(922350, mat->getAtomComp()) / F;
+    double W = F - P;
+    double xw = (F * xf - P * xp) / W;
 
     // Make the product
     CompMap pComp;
@@ -435,45 +442,45 @@ void EnrichmentFacility::enrich()
         ATOMBASED,
         false);
 
-		// CONSERVATION OF MASS CHECKS:
-		if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 
-						 - mat->getEltMass(92)) > EPS_KG)
-			throw CycException("Conservation of mass violation at Enrichment!!");
+    // CONSERVATION OF MASS CHECKS:
+    if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 
+          - mat->getEltMass(92)) > EPS_KG)
+      throw CycException("Conservation of mass violation at Enrichment!!");
 
-		if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
-         Material::getIsoMass(922350, theTails->getAtomComp()) 
+    if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
+          Material::getIsoMass(922350, theTails->getAtomComp()) 
           - Material::getIsoMass(922350, mat->getAtomComp())) > EPS_KG)
-			throw CycException("Conservation of mass violation at Enrichment!!");
+      throw CycException("Conservation of mass violation at Enrichment!!");
 
-		// Don't forget to decrement outstMF before sending.
-		outstMF_ -= this->calcSWUs(P, xp, xf);
+    // Don't forget to decrement outstMF before sending.
+    outstMF_ -= this->calcSWUs(P, xp, xf);
 
     mess->setAmount(theProd->getTotMass());
-    mess->setComp(pComp);
+    mess->setResource(dynamic_cast<Resource*>(theProd));
 
-		this->sendMaterial(mess, mess->getSender());
-		wastes_.push_back(theTails);
+    this->sendMaterial(mess, mess->getSender());
+    wastes_.push_back(theTails);
 
-		delete mat;
-		curr ++;
-	}
+    delete mat;
+    curr ++;
+  }
 
-	ordersExecuting_.erase(time);
+  ordersExecuting_.erase(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, double xw)
 {
-	double term1 = (2 * xp - 1) * log(xp / (1 - xp));
-	double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
-	double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
+  double term1 = (2 * xp - 1) * log(xp / (1 - xp));
+  double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
+  double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
 
-	return massProdU * (term1 + term2 - term3);
+  return massProdU * (term1 + term2 - term3);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
 {
-	return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
+  return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
 }
 
 /* --------------------
@@ -482,11 +489,11 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
  */
 
 extern "C" Model* construct() {
-    return new EnrichmentFacility();
+  return new EnrichmentFacility();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* ------------------- */ 

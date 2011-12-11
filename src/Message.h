@@ -5,7 +5,7 @@
 #define _MESSAGE
 
 #include "Model.h"
-#include "Material.h"
+#include "Resource.h"
 #include <vector>
 #include <string>
 
@@ -29,7 +29,7 @@ struct Transaction {
 
   /**
    * The amount of the specified commodity being requested or offered. 
-   * Units vary. 
+   * This will be in the base units of the resource?
    * 
    * Note: positive amounts mean you want something, negative amounts 
    * mean you want to get rid of something.
@@ -51,9 +51,9 @@ struct Transaction {
   double price;
 
   /**
-   * A specific composition, if this transaction requires one.
+   * A specific resource this transaction is concerned with 
    */
-  CompMap comp;
+  Resource* resource;
 
   /**
    * @brief supplier in this transaction.
@@ -142,7 +142,7 @@ struct Transaction {
    - the amount of the given Commodity being offered/requested
    - the minimum amount acceptible for this transaction
    - the price of the Commodity
-   - the specific composition of the material to be traded
+   - the specific resource to be traded
    
    Communicator classes which should utilize the MessageClass interface 
    include RegionModel, InstModel, FacilityModel and MarketModel classes. 
@@ -381,18 +381,18 @@ class Message {
     double getPrice() const;
 
     /**
-     * Returns the CompMap being requested or offered in this message.
+     * Returns the Resource being requested or offered in this message.
      *
-     * @return the CompMap (map <iso, atoms>)
+     * @return the Resource  (i.e. Material object) 
      */
-    CompMap getComp() const;
+    Resource* getResource() const;
 
     /**
-     * Sets the assigned composition to a new composition
+     * Sets the assigned resource to a new resource
      *
-     * @param newComp is the new composition in the transaction
+     * @param newResource is the new Resource in the transaction
      */
-    void setComp(CompMap newComp);
+    void setResource(Resource* newResource);
 
 };
 #endif

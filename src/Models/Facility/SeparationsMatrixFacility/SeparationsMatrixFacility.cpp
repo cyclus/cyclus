@@ -456,7 +456,13 @@ void SeparationsMatrixFacility::separate()
     Material* mat = (curr->second).second;
 
     // Find out what we're trying to make.
-    map<Iso, Atoms> compToMake = mess->getComp();
+    try{
+      map<Iso, Atoms> compToMake =  dynamic_cast<Material*>(mess->getResource())->getAtomComp();
+    } catch (exception& e) {
+      string err = "The Resource sent to the SeparationsMatrixFacility \
+                    must be a Material type Resource" ;
+      throw CycException(err);
+    }
 
     ordersExecuting_.erase(time);
   }

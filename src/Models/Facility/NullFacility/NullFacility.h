@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 /**
    @brief The NullFacility class inherits from the FacilityModel class and is 

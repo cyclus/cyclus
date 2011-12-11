@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 /**
    @class SeparationsMatrixFacility

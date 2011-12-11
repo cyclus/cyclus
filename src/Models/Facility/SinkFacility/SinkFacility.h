@@ -8,6 +8,7 @@
 #include <string>
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 /**
    @class SinkFacility

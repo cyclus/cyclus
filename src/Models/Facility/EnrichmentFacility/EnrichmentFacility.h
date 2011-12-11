@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 /**
   \class EnrichmentFacility

@@ -71,6 +71,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   Model* enr;
   Model* castEnr;
   Message* toRet;
+  Material* mat;
 
   double P;
   double xp;
@@ -80,6 +81,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   double massProdU;
   CompMap comp;
 
+
   // determine which direction we're converting
   if (in_commod_ == "SWUs" && out_commod_ == "eUF6"){
     // the enricher is the supplier in the convMsg
@@ -88,7 +90,14 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
       throw CycException("SWUs offered by non-Model");
     }
     SWUs = convMsg->getAmount();
-    comp = refMsg->getComp();
+    try{
+      mat = dynamic_cast<Material*>(refMsg->getResource());
+      comp = mat->getAtomComp();
+    } catch (exception& e) {
+      string err = "The Resource sent to the SWUeUF6Converter must be a \
+                    Material type resource.";
+      throw CycException(err);
+    }
   }
 
   else if (in_commod_ == "eUF6" && out_commod_ == "SWUs"){ 
@@ -97,7 +106,14 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
-    comp = convMsg->getComp();
+    try{
+      mat = dynamic_cast<Material*>(convMsg->getResource());
+      comp = mat->getAtomComp();
+    } catch (exception& e) {
+      string err = "The Resource sent to the SWUeUF6Converter must be a \
+                    Material type resource.";
+      throw CycException(err);
+    }
   }
   
   // Figure out xp the enrichment of the UF6 object
@@ -128,9 +144,9 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     toRet = convMsg->clone();
     toRet->setAmount(SWUs); 
   }
-
+  
   toRet->setCommod(out_commod_);
-  toRet->setComp(comp);
+  toRet->setResource(dynamic_cast<Material*>(mat));
 
   return toRet;
 }    

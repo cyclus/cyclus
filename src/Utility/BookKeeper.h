@@ -13,7 +13,7 @@
 #include "Message.h"
 
 #define BI BookKeeper::Instance()
-#define NUMISOS 1000
+#define NUMISOS 100
 
 using namespace H5;
 

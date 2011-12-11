@@ -5,7 +5,6 @@
 
 #include "CycException.h"
 #include "Logician.h"
-#include "Material.h"
 #include "Communicator.h"
 #include "FacilityModel.h"
 #include "MarketModel.h"
@@ -21,6 +20,7 @@ Message::Message(Communicator* sender) {
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
+  trans_.resource = NULL;
   trans_.amount = 0;
   trans_.min = 0;
   trans_.price = 0;
@@ -34,6 +34,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
+  trans_.resource = NULL;
   trans_.amount = 0;
   trans_.min = 0;
   trans_.price = 0;
@@ -225,12 +226,12 @@ double Message::getPrice() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CompMap Message::getComp() const {
-  return trans_.comp;
+Resource* Message::getResource() const {
+  return trans_.resource;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setComp(CompMap newComp) {
-  trans_.comp = newComp;
+void Message::setResource(Resource* newResource) {
+  trans_.resource= newResource;
 }
 
