@@ -189,11 +189,9 @@ enum Basis {ATOMBASED, MASSBASED};
  */
 #define EPS_KG 1e-6
 
-class Material {
+class Material : public Resource {
 
 public:
-  
-
   /**
    * primary constructor reads input from XML node
    *
@@ -213,7 +211,6 @@ public:
    */
   Material(CompMap comp, std::string mat_unit, std::string rec_name, 
             double scale, Basis type, bool is_template);
-
   
   /** 
    * Default destructor does nothing.
@@ -237,6 +234,21 @@ public:
    * @param comp_map is the map between isotopes and mass
    */
   void printComp(std::string header, CompMap comp_map);
+
+  /**
+   * Resource class method
+   */
+  bool checkQuality(Resource* first, Resource* second);
+
+  /**
+   * Resource class method
+   */
+  bool checkQuantityEqual(Resource* first, Resource* second);
+
+  /**
+   * Resource class method
+   */
+  bool checkQuantityGT(Resource* first, Resource* second);
 
   /**
    * get material ID

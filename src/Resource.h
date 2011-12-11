@@ -3,6 +3,7 @@
 #define _RESOURCE_H
 
 class Resource {
+public:
   /**
    * A boolean comparing the quality of the second resource 
    * to the quality of the first 
@@ -54,6 +55,25 @@ class Resource {
     (checkQuality(first,second) && checkQuantityEqual(first,second)) ? toRet = true : toRet = false;
     return toRet;
   }
+
+  /**
+   * Sets the commodity of this Resource
+   *
+   * @param commod the new commodity_ value
+   */
+  virtual void* setCommodity(std::string commod){commodity_=commod;}
+
+  /**
+   * Gets the commodity of this Resource
+   */
+  virtual std::string getCommodity(){return commodity_;}
+
+protected:
+  /**
+   * The commodity, which this resource will be traded as.
+   */
+  std::string commodity_;
+
 };
 
 #endif
