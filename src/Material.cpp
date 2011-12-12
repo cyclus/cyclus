@@ -591,10 +591,13 @@ bool Material::checkQuantityEqual(Resource* rec1, Resource* rec2){
 
   // Make sure these are both materials
   try{
+    // check total_atoms values
     Atoms first_tot_atoms = dynamic_cast<Material*>(rec1)->getTotAtoms();
     Atoms second_tot_atoms = dynamic_cast<Material*>(rec2)->getTotAtoms();
-    // check total_atoms values
-    toRet = (first_tot_atoms == second_tot_atoms);
+    // check total_mass values
+    Mass first_tot_mass = dynamic_cast<Material*>(rec1)->getTotMass();
+    Mass second_tot_mass = dynamic_cast<Material*>(rec2)->getTotMass();
+    toRet = ( first_tot_mass - second_tot_mass < EPS_KG && first_tot_atoms == second_tot_atoms);
   } catch (Exception& e) {
     toRet = false;
   }
@@ -611,10 +614,13 @@ bool Material::checkQuantityGT(Resource* rec1, Resource* rec2){
 
   // Make sure these are both materials
   try{
+    // check total_atoms values
     Atoms first_tot_atoms = dynamic_cast<Material*>(rec1)->getTotAtoms();
     Atoms second_tot_atoms = dynamic_cast<Material*>(rec2)->getTotAtoms();
-    // check total_atoms values
-    toRet = (second_tot_atoms > first_tot_atoms);
+    // check total_mass values
+    Mass first_tot_mass = dynamic_cast<Material*>(rec1)->getTotMass();
+    Mass second_tot_mass = dynamic_cast<Material*>(rec2)->getTotMass();
+    toRet = ( second_tot_mass - first_tot_mass > EPS_KG && second_tot_atoms  > first_tot_atoms);
   } catch (Exception& e){
     toRet = false;
   }
