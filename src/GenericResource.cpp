@@ -11,24 +11,24 @@ GenericResource::GenericResource(std::string units, std::string quality, double 
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GenericResource::checkQuality(Resource* first, Resource* second){
+bool GenericResource::checkQuality(Resource* other){
   bool toRet = false;
-  toRet = first->getResourceUnits() == second->getResourceUnits();
+  toRet = (units_== other->getResourceUnits());
   return toRet;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityEqual(Resource* first, Resource* second) {
+bool GenericResource::checkQuantityEqual(Resource* other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
-  toRet =( checkQuality(first,second) && first->getQuantity() == second->getQuantity());
+  toRet =( checkQuality(other) && quantity_ == other->getQuantity());
   return toRet;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityGT(Resource* first, Resource* second) {
+bool GenericResource::checkQuantityGT(Resource* other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
-  toRet = ( checkQuality(first,second) && first->getQuantity() < second->getQuantity());
+  toRet = ( checkQuality(other) && quantity_ < other->getQuantity());
   return toRet;
 }

@@ -15,16 +15,15 @@ public:
   GenericResource(std::string units, std::string quality, double quantity);
 
   /**
-   * A boolean comparing the quality of the second resource 
-   * to the quality of the first 
+   * A boolean comparing the quality of the other resource 
+   * to the quality of the base
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate against the base
    *
-   * @return True if second is sufficiently equal in quality to 
-   * first, False otherwise.
+   * @return True if other is sufficiently equal in quality to 
+   * the base, False otherwise.
    */
-  virtual bool checkQuality(Resource* first, Resource* second);
+  virtual bool checkQuality(Resource* other);
 
   /**
    * Returns the total quantity of this resource in its base unit 
@@ -51,28 +50,26 @@ public:
   void setQuality(std::string new_quality){quality_ = new_quality;};
     
   /**
-   * A boolean comparing the quantity of the second resource is 
-   * to the quantity of the first 
+   * A boolean comparing the quantity of the other resource is 
+   * to the quantity of the base 
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate against the base
    *
-   * @return True if second is sufficiently equal in quantity to 
-   * first, False otherwise.
+   * @return True if other is sufficiently equal in quantity to 
+   * the base, False otherwise.
    */
-  virtual bool checkQuantityEqual(Resource* first, Resource* second);
+  virtual bool checkQuantityEqual(Resource* other);
 
   /**
-   * Returns true if the quantity of the second resource is 
-   * greater than the quantity of the first 
+   * Returns true if the quantity of the other resource is 
+   * greater than the quantity of the base 
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate against the base
    *
    * @return True if second is sufficiently equal in quantity to 
    * first, False otherwise.
    */
-  virtual bool checkQuantityGT(Resource* first, Resource* second);
+  virtual bool checkQuantityGT(Resource* second);
 
 protected:
   /**

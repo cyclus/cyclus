@@ -253,17 +253,17 @@ public:
   /**
    * Resource class method
    */
-  bool checkQuality(Resource* first, Resource* second);
+  bool checkQuality(Resource* other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityEqual(Resource* first, Resource* second);
+  bool checkQuantityEqual(Resource* other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityGT(Resource* first, Resource* second);
+  bool checkQuantityGT(Resource* other);
 
   /**
    * get material ID

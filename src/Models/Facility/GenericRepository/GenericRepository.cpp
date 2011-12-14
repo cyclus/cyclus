@@ -335,7 +335,7 @@ void GenericRepository::makeRequests(int time){
 Mass GenericRepository::getCapacity(std::string commod){
   Mass toRet;
   // if the overall repo has a legislative limit, report it
-  // we need a heat model
+  // eventually, this will report the commodity dependent capacity
   // The GenericRepository should ask for material unless it's full
   Mass inv = this->checkInventory();
   // including how much is already in its stocks

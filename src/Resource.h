@@ -6,16 +6,15 @@
 class Resource {
 public:
   /**
-   * A boolean comparing the quality of the second resource 
-   * to the quality of the first 
+   * A boolean comparing the quality of the other resource 
+   * to the quality of the base 
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate against the base
    *
-   * @return True if second is sufficiently equal in quality to 
-   * first, False otherwise.
+   * @return True if other is sufficiently equal in quality to 
+   * the base, False otherwise.
    */
-  virtual bool checkQuality(Resource* first, Resource* second)=0;
+  virtual bool checkQuality(Resource* other) =0;
 
   /**
    * Returns the base unit of this resource 
@@ -37,42 +36,39 @@ public:
   virtual void setQuantity(double new_quantity) = 0;
     
   /**
-   * A boolean comparing the quantity of the second resource is 
-   * to the quantity of the first 
+   * A boolean comparing the quantity of the other resource is 
+   * to the quantity of the base
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate against the base
+   *
+   * @return True if other is sufficiently equal in quantity to 
+   * the base, False otherwise.
+   */
+  virtual bool checkQuantityEqual(Resource* other)=0;
+
+  /**
+   * Returns true if the quantity of the other resource is 
+   * greater than the quantity of the base 
+   *
+   * @param other The resource to evaluate against the base
    *
    * @return True if second is sufficiently equal in quantity to 
    * first, False otherwise.
    */
-  virtual bool checkQuantityEqual(Resource* first, Resource* second)=0;
+  virtual bool checkQuantityGT(Resource* other)=0;
 
   /**
-   * Returns true if the quantity of the second resource is 
-   * greater than the quantity of the first 
+   * Compares the quantity and quality of the other resource  
+   * to the base
    *
-   * @param first The base resource
-   * @param second The resource to evaluate
+   * @param other The resource to evaluate
    *
-   * @return True if second is sufficiently equal in quantity to 
-   * first, False otherwise.
-   */
-  virtual bool checkQuantityGT(Resource* first, Resource* second)=0;
-
-  /**
-   * Compares the quantity and quality of the second resource  
-   * to the first 
-   *
-   * @param first The base resource
-   * @param second The resource to evaluate
-   *
-   * @return True if second is sufficiently equal to the first, 
+   * @return True if other is sufficiently equal to the base, 
    * False otherwise.
    */
-  virtual bool checkEquality(Resource* first, Resource* second){
+  virtual bool checkEquality(Resource* other){
     bool toRet;
-    (checkQuality(first,second) && checkQuantityEqual(first,second)) ? toRet = true : toRet = false;
+    (this->checkQuality(other) && this->checkQuantityEqual(other)) ? toRet = true : toRet = false;
     return toRet; };
 
 };

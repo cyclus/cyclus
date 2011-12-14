@@ -15,19 +15,18 @@ void ConverterMarket::init(xmlNodePtr cur) {
   MarketModel::init(cur);  /// get facility list
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/ConverterMarket/converter");
   
+  // Find out what convertermodel matches the name given
   xmlNodePtr conv_node = nodes->nodeTab[0];
   conv_name_ = XMLinput->get_xpath_content(conv_node,"type");
-  
-  Model* converter; 
-  converter = LI->getModelByName(conv_name_, CONVERTER);
+  Model* converter = LI->getModelByName(conv_name_, CONVERTER);
 
+  // make one
   Model* new_converter = Model::create(converter);
-
-  // The commodity initialized as the mktcommodity is the request commodity.
 
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/ConverterMarket");
 
+  // The commodity initialized as the mktcommodity is the request commodity.
   offer_commod_ = XMLinput->get_xpath_content(cur,"offercommodity");
   req_commod_ = XMLinput->get_xpath_content(cur,"reqcommodity");
 
@@ -130,65 +129,67 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
     // get a new offer
     offer = offers_.end();
     offer--;
-    offerMsg = (this->getConverter())->convert((*offer).second, (*request).second);
+    // convert it
+    offerMsg = (this->getConverter())->convert((*offer).second, requestMsg);
     offerAmt = offerMsg->getResource()->getQuantity();
 
     // pop off this offer
     offers_.erase(offer);
-  
-    if (requestAmt > offerAmt) { 
-      // put a new message in the order stack
-      // it goes down to supplier
-      offerMsg->setRequester(requestMsg->getRequester());
+    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
+      if (requestAmt > offerAmt) { 
+        // put a new message in the order stack
+        // it goes down to supplier
+        offerMsg->setRequester(requestMsg->getRequester());
 
-      // tenatively queue a new order (don't execute yet)
-      matchedOffers_.insert(offerMsg);
+        // tenatively queue a new order (don't execute yet)
+        matchedOffers_.insert(offerMsg);
 
-      orders_.push_back(offerMsg);
+        orders_.push_back(offerMsg);
 
-      LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
+        LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
           << offerMsg->getSupplier()->ID()
           << " to "
           << offerMsg->getRequester()->ID()
           << " for the amount:  " 
           << offerMsg->getResource()->getQuantity();
 
-      requestAmt -= offerAmt;
-    } 
-    else {
-      // split offer
+        requestAmt -= offerAmt;
+      } 
+      else {
+        // split offer
 
-      // queue a new order
-      Message* maybe_offer = offerMsg->clone();
-      maybe_offer->getResource()->setQuantity(requestAmt);
-      maybe_offer->setRequester(requestMsg->getRequester());
+        // queue a new order
+        Message* maybe_offer = offerMsg->clone();
+        maybe_offer->getResource()->setQuantity(requestAmt);
+        maybe_offer->setRequester(requestMsg->getRequester());
 
-      matchedOffers_.insert(offerMsg);
+        matchedOffers_.insert(offerMsg);
 
-      orders_.push_back(maybe_offer);
+        orders_.push_back(maybe_offer);
 
-      LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
+        LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
           << maybe_offer->getSupplier()->ID()
           << " to "
           << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
           << maybe_offer->getResource()->getQuantity();
 
-      // reduce the offer amount
-      offerAmt -= requestAmt;
+        // reduce the offer amount
+        offerAmt -= requestAmt;
 
-      // if the residual is above threshold,
-      // make a new offer with reduced amount
+        // if the residual is above threshold,
+        // make a new offer with reduced amount
 
-      if(offerAmt > EPS_KG){
-        Message *new_offer = offerMsg->clone();
-        new_offer->getResource()->setQuantity(offerAmt);
-        // call this method for consistency
-        receiveMessage(new_offer);
+        if(offerAmt > EPS_KG){
+          Message *new_offer = offerMsg->clone();
+          new_offer->getResource()->setQuantity(offerAmt);
+          // call this method for consistency
+          receiveMessage(new_offer);
+        }
+
+        // zero out request
+        requestAmt = 0;
       }
-      
-      // zero out request
-      requestAmt = 0;
     }
   }
 
