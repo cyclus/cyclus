@@ -86,8 +86,7 @@ void SourceFacility::print()
       << out_commod_ << "} with recipe '" 
       << recipe_->name() << "' at a capacity of "
       << capacity_ << " " << recipe_->getUnits() << " per time step."
-      << " It has a max inventory of " << inventory_size_ << " " 
-      << recipe_->getUnits() <<  ".";
+      << " It has a max inventory of " << inventory_size_ << " kg.";
   
 }
 
@@ -117,7 +116,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
 
   while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     // start with an empty material
-    Material* newMat = new Material(CompMap(), 
+    Material* newMat = new Material(recipe_->getMassComp(), 
                                   recipe_->getUnits(),
                                   recipe_->name(), 
                                   0, 
@@ -152,13 +151,13 @@ void SourceFacility::handleTick(int time){
   // decide how much to offer
   Mass offer_amt;
   Mass inv = this->checkInventory();
-  Mass possInv = inv+capacity_*recipe_->getTotMass(); 
+  Mass possInv = inv+capacity_*(recipe_->getTotMass()); 
 
-  if (possInv < inventory_size_*recipe_->getTotMass()){
+  if (possInv < inventory_size_*(recipe_->getTotMass())){
     offer_amt = possInv;
   }
   else {
-    offer_amt = inventory_size_*recipe_->getTotMass(); 
+    offer_amt = inventory_size_*(recipe_->getTotMass()); 
   }
 
   // there is no minimum amount a source facility may send
@@ -207,7 +206,7 @@ void SourceFacility::handleTock(int time){
                                     recipe_->getUnits(), 
                                     recipe_->name(),
                                     space,
-                                    ATOMBASED,
+                                    MASSBASED,
                                     false);
     LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
     newMat->print();
@@ -217,10 +216,16 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
+    Material* order_mat = new Material(recipe_->getMassComp(), 
+                                    recipe_->getUnits(), 
+                                    recipe_->name(),
+                                    order->getResource()->getQuantity(),
+                                    MASSBASED,
+                                    true);
+    order->setResource(order_mat);
     sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
-  // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
   LOG(LEV_DEBUG2) << "SourceFacility " << this->ID()
                   << " is holding " << this->checkInventory()

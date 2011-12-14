@@ -63,7 +63,7 @@ void NullMarket::process_request()
 bool NullMarket::match_request(sortedMsgList::iterator request)
 {
   sortedMsgList::iterator offer;
-  double requestAmt,offerAmt, toRet;
+  double requestAmt, offerAmt, toRet;
   Message *offerMsg, *requestMsg;
 
   requestAmt = request->first;

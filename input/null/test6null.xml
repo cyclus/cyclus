@@ -52,7 +52,7 @@
         <incommodity>uo2</incommodity>
         <outcommodity>rod</outcommodity>
         <inventorysize>1e4</inventorysize>
-        <capacity>.5</capacity>
+        <capacity>500</capacity>
       </NullFacility>
     </model>
   </facility>
@@ -64,7 +64,7 @@
         <incommodity>uo2</incommodity>
         <outcommodity>rod</outcommodity>
         <inventorysize>1e4</inventorysize>
-        <capacity>.5</capacity>
+        <capacity>500</capacity>
       </NullFacility>
     </model>
   </facility>
@@ -74,7 +74,7 @@
     <model>
       <SinkFacility>
         <incommodity>rod</incommodity>
-        <capacity>1</capacity>
+        <capacity>1e3</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>

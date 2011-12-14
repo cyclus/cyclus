@@ -100,10 +100,9 @@ void SinkFacility::handleTick(int time){
   // subtract from max size to get total empty space
   Mass emptiness = inventory_size_ - fullness;
 
-  if (emptiness == 0){
+  if (emptiness == 0 || emptiness <0 ){
     // don't request anything
-  }
-  else if (emptiness < capacity_){
+  } else if (emptiness < capacity_){
   // if empty space is less than monthly acceptance capacity, request it,
     // for each commodity, request emptiness/(no commodities)
     for (vector<std::string>::iterator commod = in_commods_.begin();
@@ -141,8 +140,8 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       requestAmt = capacity_/in_commods_.size();
 
-      // build a material
-      Material* request_mat = new Material(CompMap(), "", "", requestAmt, MASSBASED, true);
+      // create a generic resource
+      GenericResource* request_res = new GenericResource((*commod), "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;
@@ -150,7 +149,7 @@ void SinkFacility::handleTick(int time){
       trans.minfrac = minAmt/requestAmt;
       trans.is_offer = false;
       trans.price = commod_price_;
-      trans.resource = request_mat;
+      trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
@@ -176,7 +175,7 @@ void SinkFacility::handleTock(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest){
-
+  
   // grab each material object off of the manifest
   // and move it into the inventory.
   for (vector<Material*>::iterator thisMat=manifest.begin();
