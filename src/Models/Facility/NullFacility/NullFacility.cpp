@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "GenericResource.h"
 #include "Logger.h"
 #include "Logician.h"
 #include "MarketModel.h"
@@ -111,7 +112,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     Material* m = inventory_.front();
 
     // start with an empty material
@@ -123,14 +124,14 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
                                   false);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.amount - newAmt)){
+    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
       inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
@@ -183,12 +184,16 @@ void NullFacility::handleTick(int time)
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
 
+    // create a resource
+    GenericResource* request_res = new GenericResource(in_commod_,"kg",requestAmt);
+
     // build the transaction and message
     Transaction trans;
     trans.commod = in_commod_;
-    trans.min = minAmt;
+    trans.minfrac = minAmt/requestAmt;
+    trans.is_offer = false;
     trans.price = commod_price;
-    trans.amount = -requestAmt; // requests have a negative amount
+    trans.resource = request_res;
 
     Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
@@ -202,12 +207,16 @@ void NullFacility::handleTick(int time)
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity_ - sto;
 
+    // create a resource
+    GenericResource* request_res = new GenericResource(in_commod_,"kg",requestAmt);
+
     // build the transaction and message
     Transaction trans;
     trans.commod = in_commod_;
-    trans.min = minAmt;
+    trans.minfrac = minAmt/requestAmt;
+    trans.is_offer = false;
     trans.price = commod_price;
-    trans.amount = -requestAmt; // requests have a negative amount
+    trans.resource = request_res;
 
     Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
@@ -233,12 +242,16 @@ void NullFacility::handleTick(int time)
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
+  // create a material
+  Material* offer_mat = new Material(CompMap(), "", "", offer_amt, MASSBASED, true);
+
   // build the transaction and message
   Transaction trans;
   trans.commod = out_commod_;
-  trans.min = min_amt;
+  trans.minfrac = min_amt/offer_amt;
+  trans.is_offer = true;
   trans.price = commod_price;
-  trans.amount = offer_amt; // requests have a negative amount
+  trans.resource = dynamic_cast<Resource*>(offer_mat);
 
   Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());

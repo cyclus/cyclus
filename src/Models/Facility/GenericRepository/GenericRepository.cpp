@@ -5,6 +5,7 @@
 
 #include "GenericRepository.h"
 
+#include "GenericResource.h"
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -312,12 +313,16 @@ void GenericRepository::makeRequests(int time){
     MarketModel* market = MarketModel::marketForCommod(in_commod);
     Communicator* recipient = dynamic_cast<Communicator*>(market);
 
+    // create a generic resource
+    GenericResource* request_res = new GenericResource(in_commod,"kg",requestAmt);
+
     // build the transaction and message
     Transaction trans;
     trans.commod = in_commod;
-    trans.min = minAmt;
+    trans.is_offer = false;;
+    trans.minfrac = minAmt/requestAmt;
     trans.price = commod_price;
-    trans.amount = -requestAmt; // requests have a negative amount
+    trans.resource = request_res; 
 
     Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());

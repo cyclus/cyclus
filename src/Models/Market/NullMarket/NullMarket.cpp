@@ -15,11 +15,12 @@ using namespace std;
 void NullMarket::receiveMessage(Message *msg) {
   messages_.insert(msg);
 
-  if (msg->getAmount() > 0){
-    offers_.insert(indexedMsg(msg->getAmount(),msg));
+  // offers and requests are ordered by amount
+  if (msg->isOffer()){
+    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
   }
-  else{
-    requests_.insert(indexedMsg(-msg->getAmount(),msg));
+  else if (!msg->isOffer()){
+    requests_.insert(indexedMsg(-msg->getResource()->getQuantity(),msg));
   }
 }
 
@@ -38,7 +39,7 @@ void NullMarket::reject_request(sortedMsgList::iterator request)
   while (matchedOffers_.size() > 0)
   {
     Message* msg = *(matchedOffers_.begin());
-    offers_.insert(indexedMsg(msg->getAmount(),msg));
+    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
     matchedOffers_.erase(msg);
   }
 
@@ -99,7 +100,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
           << " to "
           << offerMsg->getRequester()->ID()
           << " for the amount:  " 
-          << offerMsg->getAmount();
+          << offerMsg->getResource()->getQuantity();
 
       requestAmt -= offerAmt;
     } 
@@ -108,7 +109,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
       // queue a new order
       Message* maybe_offer = offerMsg->clone();
-      maybe_offer->setAmount(requestAmt);
+      maybe_offer->getResource()->setQuantity(requestAmt);
       maybe_offer->setRequester(requestMsg->getRequester());
 
       matchedOffers_.insert(offerMsg);
@@ -120,7 +121,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
           << " to "
           << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
-          << maybe_offer->getAmount();
+          << maybe_offer->getResource()->getQuantity();
 
       // reduce the offer amount
       offerAmt -= requestAmt;
@@ -130,7 +131,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
       if(offerAmt > EPS_KG){
         Message* new_offer = offerMsg->clone();
-        new_offer->setAmount(offerAmt);
+        new_offer->getResource()->setQuantity(offerAmt);
         // call this method for consistency
         receiveMessage(new_offer);
       }

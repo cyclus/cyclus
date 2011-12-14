@@ -26,7 +26,10 @@ Matrix Material::decayMatrix_ = Matrix();
 int Material::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0){
+Material::Material(): Resource() {
+  atomEqualsMass_ = true;
+  total_mass_ = 0;
+  total_atoms_ = 0;
   is_template_= true;
   ID_ = nextID_++;
   facHist_ = FacHistory() ;
@@ -38,7 +41,7 @@ Material::Material(): atomEqualsMass_(true), total_mass_(0), total_atoms_(0){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(xmlNodePtr cur) {
+Material::Material(xmlNodePtr cur) : Resource(){
   is_template_ = true;
 
   ID_ = nextID_++;
@@ -68,7 +71,7 @@ Material::Material(xmlNodePtr cur) {
   } else {
     rationalize_A2M();
   }
-
+  
   facHist_ = FacHistory() ;
   BI->registerMatChange(this);
 }
@@ -473,7 +476,7 @@ bool Material::isAtomicNumValid(Iso tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extractMass(Mass amt) {
   CompMap comp = this->getMassComp();
-  bool is_template = false;
+  bool is_template = this->isTemplate();
   Material* newMat = new Material(comp , units_, " ", amt, MASSBASED, is_template);
   this->extract(newMat);
   return newMat;
@@ -553,6 +556,25 @@ void Material::printComp(std::string header, CompMap comp_map) {
        iso != comp_map.end();
        iso++) {
     LOG(LEV_DEBUG3) << "    " << (*iso).first << " : " <<  (*iso).second;
+  }
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void Material::setQuantity(double new_quantity){
+  // this function should only be used through the resource interface.
+  if (new_quantity < total_mass_){
+    extractMass(total_mass_ - new_quantity);
+  } else if (new_quantity > total_mass_ && is_template_) { 
+    // KDHFLAG what if this material is empty?
+    // need to have some generic material.
+    total_mass_=new_quantity;
+    rationalize_M2A();
+  } else if (new_quantity > total_mass_ && !is_template_) { 
+    string err = "Concrete material : ";
+    err += ID_;
+    err += " grow from nothing.";
+    throw CycException(err);
   }
 }
 

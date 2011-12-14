@@ -5,6 +5,7 @@
 
 #include "SinkFacility.h"
 
+#include "GenericResource.h"
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -113,12 +114,16 @@ void SinkFacility::handleTick(int time){
       // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods_.size());
 
+      // create a generic resource
+      GenericResource* request_res = new GenericResource((*commod), "kg", requestAmt);
+
       // build the transaction and message
       Transaction trans;
       trans.commod = *commod;
-      trans.min = minAmt;
+      trans.minfrac = minAmt/requestAmt;
+      trans.is_offer = false;
       trans.price = commod_price_;
-      trans.amount = -requestAmt; // requests have a negative amount
+      trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
@@ -137,12 +142,16 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       requestAmt = capacity_/in_commods_.size();
 
+      // build a material
+      Material* request_mat = new Material(CompMap(), "", "", requestAmt, MASSBASED, true);
+
       // build the transaction and message
       Transaction trans;
       trans.commod = *commod;
-      trans.min = minAmt;
+      trans.minfrac = minAmt/requestAmt;
+      trans.is_offer = false;
       trans.price = commod_price_;
-      trans.amount = -requestAmt; // requests have a negative amount
+      trans.resource = request_mat;
 
       Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());

@@ -126,12 +126,12 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
 
   Mass newAmt = 0;
 
-  // pull materials off of the inventory stack until you get the trans amount
+  // pull materials off of the inventory stack until you get the transaction amount
 
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     Material* m = inventory_.front();
 
     // start with an empty material
@@ -143,14 +143,14 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
                                   false);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.amount - newAmt)){
+    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
       inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }

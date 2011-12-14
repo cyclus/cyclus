@@ -8,6 +8,7 @@
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+#include "GenericResource.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SWUeUF6Converter::init(xmlNodePtr cur)
@@ -89,7 +90,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
-    SWUs = convMsg->getAmount();
+    SWUs = convMsg->getResource()->getQuantity();
     try{
       mat = dynamic_cast<Material*>(refMsg->getResource());
       comp = mat->getAtomComp();
@@ -137,16 +138,17 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   SWUs = massProdU*(term1 + term2 - term3);
 
   if(out_commod_ == "eUF6"){
+    mat = new Material(comp, "", "", massProdU, MASSBASED,true);
     toRet = convMsg->clone();
-    toRet->setAmount(massProdU); 
+    toRet->setResource(mat);
   }
   else if(out_commod_ == "SWUs"){
     toRet = convMsg->clone();
-    toRet->setAmount(SWUs); 
+    GenericResource* conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
+    toRet->setResource(conv_res);
   }
   
   toRet->setCommod(out_commod_);
-  toRet->setResource(dynamic_cast<Material*>(mat));
 
   return toRet;
 }    

@@ -5,6 +5,7 @@
 
 #include "RecipeReactor.h"
 
+#include "GenericResource.h"
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -219,7 +220,7 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
   vector<Material*> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while(trans.amount > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     for (deque<OutFuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -234,14 +235,14 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
             ATOMBASED, 
             false);
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if(m->getTotMass() <= (trans.amount - newAmt)){
+        if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
           newAmt += m->getTotMass();
           newMat->absorb(m);
           inventory_.pop_front();
         }
         else{ 
           // if the inventory obj is larger than the remaining need, split it.
-          Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+          Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
           newAmt += toAbsorb->getTotMass();
           newMat->absorb(toAbsorb);
         }
@@ -315,13 +316,17 @@ void RecipeReactor::handleTick(int time)
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
+      
+      // request a generic resource
+      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;
       trans.commod = in_commod;
-      trans.min = minAmt;
+      trans.minfrac = minAmt/requestAmt;
+      trans.is_offer = false;
       trans.price = commod_price;
-      trans.amount = -requestAmt; // requests have a negative amount
+      trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
@@ -334,12 +339,16 @@ void RecipeReactor::handleTick(int time)
       // if empty space is more than monthly acceptance capacity
       requestAmt = capacity_ - sto;
 
+      // request a generic resource
+      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+
       // build the transaction and message
       Transaction trans;
       trans.commod = in_commod;
-      trans.min = minAmt;
+      trans.minfrac = minAmt/requestAmt;
+      trans.is_offer = false;
       trans.price = commod_price;
-      trans.amount = -requestAmt; // requests have a negative amount
+      trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
       request->setNextDest(getFacInst());
@@ -373,12 +382,16 @@ void RecipeReactor::handleTick(int time)
     // get amt
     offer_amt = iter->second->getTotMass();
 
+    // make a material to offer
+    Material* offer_mat = new Material(CompMap(),"","",offer_amt,MASSBASED,true);
+
     // build the transaction and message
     Transaction trans;
     trans.commod = commod;
-    trans.min = min_amt;
+    trans.minfrac = min_amt/offer_amt;
+    trans.is_offer = true;
     trans.price = commod_price;
-    trans.amount = offer_amt; // requests have a negative amount
+    trans.resource = offer_mat;
 
     Message* msg = new Message(this, recipient, trans); 
     msg->setNextDest(getFacInst());

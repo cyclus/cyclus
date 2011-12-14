@@ -11,6 +11,7 @@
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
+#include "GenericResource.h"
 
 /*
  * TICK
@@ -129,7 +130,7 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     Material* m = inventory_.front();
 
     // start with an empty material
@@ -141,14 +142,14 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
                                   false);
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.amount - newAmt)){
+    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
       inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
@@ -304,12 +305,16 @@ void EnrichmentFacility::makeRequests(){
     MarketModel* market = MarketModel::marketForCommod(in_commod_);
     Communicator* recipient = dynamic_cast<Communicator*>(market);
 
+    // request a generic object
+    Resource* req_res = new GenericResource(in_commod_,"kg",requestAmt);
+
     // build the transaction and message
     Transaction trans;
     trans.commod = in_commod_;
-    trans.min = minAmt;
+    trans.is_offer = false;
+    trans.minfrac = minAmt/requestAmt;
     trans.price = commod_price;
-    trans.amount = -requestAmt; // requests have a negative amount
+    trans.resource = req_res;
 
     Message* request = new Message(this, recipient, trans); 
     request->setNextDest(getFacInst());
@@ -325,7 +330,7 @@ void EnrichmentFacility::makeOffers()
   Mass spotCapacity = capacity_ - outstMF_;
 
   // and offer no more than the spotCapacity_ allows you to produce
-    offer_amt = spotCapacity; 
+  offer_amt = spotCapacity; 
 
   // there is no minimum amount a enrichment facility may send
   double min_amt = 0;
@@ -340,12 +345,15 @@ void EnrichmentFacility::makeOffers()
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
+  GenericResource* offer_res = new GenericResource(out_commod_,"SWUs",offer_amt);
+
   // build the transaction and message
   Transaction trans;
   trans.commod = out_commod_;
-  trans.min = min_amt;
+  trans.is_offer = true;;
+  trans.minfrac = min_amt/offer_amt;
   trans.price = commod_price;
-  trans.amount = offer_amt; // offers have a positive amount
+  trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
@@ -455,7 +463,7 @@ void EnrichmentFacility::enrich()
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    mess->setAmount(theProd->getTotMass());
+    mess->getResource()->setQuantity(theProd->getTotMass());
     mess->setResource(dynamic_cast<Resource*>(theProd));
 
     this->sendMaterial(mess, mess->getSender());

@@ -21,8 +21,8 @@ Message::Message(Communicator* sender) {
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.resource = NULL;
-  trans_.amount = 0;
-  trans_.min = 0;
+  trans_.is_offer = NULL;
+  trans_.minfrac = 0;
   trans_.price = 0;
 }
 
@@ -35,8 +35,8 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.resource = NULL;
-  trans_.amount = 0;
-  trans_.min = 0;
+  trans_.is_offer = NULL;
+  trans_.minfrac = 0;
   trans_.price = 0;
 }
 
@@ -48,15 +48,11 @@ Message::Message(Communicator* sender, Communicator* receiver,
   sender_ = sender;
   recipient_ = receiver;
 
-  // if amt is positive this message is an offer and 
-  // the sender is the supplier
-  if (trans_.amount > 0) {
+  if (trans_.is_offer) {
+    // if this message is an offer, the sender is the supplier
     setSupplier(dynamic_cast<Model*>(sender_));
-  }
-
-  // if amt is negative this message is a request and
-  // the sender is the requester
-  if (trans_.amount < 0){
+  } else if (!trans_.is_offer) {
+    // if this message is a request, the sender is the requester
     setRequester(dynamic_cast<Model*>(sender_));
   }
 }
@@ -151,11 +147,6 @@ Communicator* Message::getMarket() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getSender() const {
-	return sender_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getRecipient() const {
   if (recipient_ == NULL) {
     string err_msg = "Uninitilized message recipient.";
@@ -176,11 +167,6 @@ Model* Message::getSupplier() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplier(Model* supplier) {
-  trans_.supplier = supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Message::getRequester() const {
   if (trans_.requester == NULL) {
     string err_msg = "Uninitilized message requester.";
@@ -188,50 +174,5 @@ Model* Message::getRequester() const {
   }
 
   return trans_.requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction Message::getTrans() const{
-  return trans_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Message::commod() const {
-  return trans_.commod;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setCommod(std::string newCommod) {
-  trans_.commod = newCommod;
-}
-
-//- - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::getAmount() const {
-  return trans_.amount;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setAmount(double newAmount) {
-  trans_.amount = newAmount;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRequester(Model* requester) {
-  trans_.requester = requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::getPrice() const {
-  return trans_.price;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource* Message::getResource() const {
-  return trans_.resource;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setResource(Resource* newResource) {
-  trans_.resource= newResource;
 }
 

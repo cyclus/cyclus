@@ -34,29 +34,30 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add any new source files to this list.
 SET( CYCLUS_SRC 
-     App.cpp 
-     InputXML.cpp
-     Logician.cpp
-     Material.cpp
-     IsoVector.cpp
-     Message.cpp
-     Utility/BookKeeper.cpp 
-     Utility/CycException.cpp 
-     Utility/LMatrix.cpp 
-     Utility/MassTable.cpp 
-     Utility/Timer.cpp
-     Utility/UniformTaylor.cpp 
-     Utility/Env.cpp
-     Utility/Logger.cpp 
-     Models/Model.cpp 
-        Models/StubTimeAgent.cpp 
-        Models/StubModel.cpp 
-        Models/StubCommModel.cpp 
-        Models/ConverterModel.cpp 
-        Models/MarketModel.cpp 
-        Models/FacilityModel.cpp 
-				Models/RegionModel.cpp
-				Models/InstModel.cpp)
+  App.cpp 
+  InputXML.cpp
+  IsoVector.cpp
+  Logician.cpp
+  Material.cpp
+  Message.cpp
+  GenericResource.cpp
+  Utility/BookKeeper.cpp 
+  Utility/CycException.cpp 
+  Utility/LMatrix.cpp 
+  Utility/MassTable.cpp 
+  Utility/Timer.cpp
+  Utility/UniformTaylor.cpp 
+  Utility/Env.cpp
+  Utility/Logger.cpp 
+  Models/Model.cpp 
+  Models/StubTimeAgent.cpp 
+  Models/StubModel.cpp 
+  Models/StubCommModel.cpp 
+  Models/ConverterModel.cpp 
+  Models/MarketModel.cpp 
+  Models/FacilityModel.cpp 
+  Models/RegionModel.cpp
+  Models/InstModel.cpp)
 
 set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )

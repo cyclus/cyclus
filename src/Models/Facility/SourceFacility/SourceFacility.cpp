@@ -114,7 +114,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.amount > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     // start with an empty material
     Material* newMat = new Material(CompMap(), 
                                   recipe_->getUnits(),
@@ -125,14 +125,14 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
 
     Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.amount - newAmt)){
+    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
       newMat->absorb(m);
       inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.amount - newAmt);
+      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
       newAmt += toAbsorb->getTotMass();
       newMat->absorb(toAbsorb);
     }
@@ -168,12 +168,16 @@ void SourceFacility::handleTick(int time){
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
 
+  // build a material to offer
+  Material* offer_mat = new Material(CompMap(),"","",offer_amt,MASSBASED,true);
+
   // build the transaction and message
   Transaction trans;
   trans.commod = out_commod_;
-  trans.min = min_amt;
+  trans.minfrac = min_amt/offer_amt;
+  trans.is_offer = true;
   trans.price = commod_price_;
-  trans.amount = offer_amt; // offers have a positive amount
+  trans.resource = offer_mat;
 
   Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());

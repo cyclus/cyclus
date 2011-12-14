@@ -1,6 +1,7 @@
 // Resource.h
 #if !defined(_RESOURCE_H)
 #define _RESOURCE_H
+#include <string>
 
 class Resource {
 public:
@@ -16,6 +17,25 @@ public:
    */
   virtual bool checkQuality(Resource* first, Resource* second)=0;
 
+  /**
+   * Returns the base unit of this resource 
+   *
+   * @return resource_unit_ the base unit of this resource
+   */
+  virtual std::string getResourceUnits() = 0;
+    
+  /**
+   * Returns the total quantity of this resource in its base unit 
+   *
+   * @return the total quantity of this resource in its base unit
+   */
+  virtual double getQuantity() = 0;
+    
+  /**
+   * Sets the total quantity of this resource in its base unit 
+   */
+  virtual void setQuantity(double new_quantity) = 0;
+    
   /**
    * A boolean comparing the quantity of the second resource is 
    * to the quantity of the first 
@@ -53,26 +73,7 @@ public:
   virtual bool checkEquality(Resource* first, Resource* second){
     bool toRet;
     (checkQuality(first,second) && checkQuantityEqual(first,second)) ? toRet = true : toRet = false;
-    return toRet;
-  }
-
-  /**
-   * Sets the commodity of this Resource
-   *
-   * @param commod the new commodity_ value
-   */
-  virtual void* setCommodity(std::string commod){commodity_=commod;}
-
-  /**
-   * Gets the commodity of this Resource
-   */
-  virtual std::string getCommodity(){return commodity_;}
-
-protected:
-  /**
-   * The commodity, which this resource will be traded as.
-   */
-  std::string commodity_;
+    return toRet; };
 
 };
 

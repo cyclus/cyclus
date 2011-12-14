@@ -238,6 +238,21 @@ public:
   /**
    * Resource class method
    */
+  double getQuantity(){return this->getTotMass();};
+
+  /**
+   * Resource class method
+   */
+  void setQuantity(double quantity);
+
+  /**
+   * Resource class method
+   */
+  std::string getResourceUnits(){return "kg";};
+
+  /**
+   * Resource class method
+   */
   bool checkQuality(Resource* first, Resource* second);
 
   /**
@@ -272,12 +287,12 @@ public:
   std::string getUnits() { return units_; };
 
   /**
-   * returns the total mass of this material object PER UNIT
+   * returns the total mass of this material object in kg 
    */
   const Mass getTotMass() const {return total_mass_;};
 
   /**
-   * Returns the total mass of the given composition vector.
+   * Returns the total mass of the given composition vector in kg.
    * 
    * @param comp the composition vector
    * @return the mass (in tons)
