@@ -20,7 +20,7 @@ void NullMarket::receiveMessage(Message *msg) {
     offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
   }
   else if (!msg->isOffer()){
-    requests_.insert(indexedMsg(-msg->getResource()->getQuantity(),msg));
+    requests_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
   }
 }
 

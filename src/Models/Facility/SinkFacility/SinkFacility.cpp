@@ -111,7 +111,6 @@ void SinkFacility::handleTick(int time){
        commod++) {
       MarketModel* market = MarketModel::marketForCommod(*commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
-      // recall that requests have a negative amount
       requestAmt = (emptiness/in_commods_.size());
 
       // create a generic resource

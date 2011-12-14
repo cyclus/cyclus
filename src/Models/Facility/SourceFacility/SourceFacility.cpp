@@ -4,6 +4,7 @@
 #include "Logger.h"
 
 #include "SourceFacility.h"
+#include "GenericResource.h"
 #include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -168,8 +169,8 @@ void SourceFacility::handleTick(int time){
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
 
-  // build a material to offer
-  Material* offer_mat = new Material(CompMap(),"","",offer_amt,MASSBASED,true);
+  // build a generic resource to offer
+  GenericResource* offer_res = new GenericResource(out_commod_,"kg",offer_amt);
 
   // build the transaction and message
   Transaction trans;
@@ -177,7 +178,7 @@ void SourceFacility::handleTick(int time){
   trans.minfrac = min_amt/offer_amt;
   trans.is_offer = true;
   trans.price = commod_price_;
-  trans.resource = offer_mat;
+  trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
