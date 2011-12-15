@@ -55,7 +55,7 @@ TEST_F(MaterialTest, ManualConstructor) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ChangeComp) {
-  test_mat->changeAtomComp(decay_comp,TI->getTime());
+  test_mat->changeComp(decay_comp,ATOMBASED,TI->getTime());
   ASSERT_NEAR(     test_mat->getTotMass(),      2.315,            0.001); // 10mol U235+Th228 ~= 2.315kg
   ASSERT_NEAR(     test_mat->getMassComp(u235), 0.508,            0.001); // normalized 
   ASSERT_NEAR(     test_mat->getAtomComp(u235),     0.5,              0.001); // normalized 

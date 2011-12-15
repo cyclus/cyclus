@@ -286,21 +286,29 @@ void Material::changeComp(Iso tope, Atoms change, int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::changeAtomComp(CompMap newComp, int time) {
-  // To replace the whole composition, we first erase that entry
-  compHist_.erase(time);
-  // then we insert the new composition
-  compHist_.insert(make_pair(time, newComp));
-  rationalize_A2M();
-}
+void Material::changeComp(CompMap newComp, Basis base, int time) {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::changeMassComp(CompMap newComp, int time) {
-  // To replace the whole composition, we first erase that entry
-  massHist_.erase(time);
-  // then we insert the new composition
-  massHist_.insert(make_pair(time, newComp));
-  rationalize_M2A();
+  switch(base){
+    case ATOMBASED :
+      // To replace the whole composition, we first erase that entry
+      compHist_.erase(time);
+      // then we insert the new composition
+      compHist_.insert(make_pair(time, newComp));
+      rationalize_A2M();
+      BI->registerMatChange(this);
+      break;
+    case MASSBASED :
+      // To replace the whole composition, we first erase that entry
+      massHist_.erase(time);
+      // then we insert the new composition
+      massHist_.insert(make_pair(time, newComp));
+      rationalize_M2A();
+      BI->registerMatChange(this);
+      break;
+    default : 
+      throw CycException("Basis value not recognized. Choices are ATOMBASED and MASSBASED.");
+      break;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -363,24 +371,6 @@ double Material::getAtomComp(Iso tope, const CompMap& comp) {
     atoms = (*searchIso).second;
   }
   return atoms;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const CompMap Material::getFracComp(double frac) const {
-  // Create a new composition object.
-  CompMap newComp;
-
-  // Iterate through the current composition vector and add to the new object 
-  // the specified fraction of each isotope.
-  CompMap currComp = this->getAtomComp();
-  CompMap::iterator iter = currComp.begin();
-
-  while (iter != currComp.end()) {
-    newComp[iter->first] = iter->second * frac;
-    iter ++;
-  }
-
-  return newComp;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -824,7 +814,7 @@ void Material::decay(double months) {
 
   // assigns the new composition map to this Material object
   int time = Timer::Instance()->getTime();
-  this->changeAtomComp(newComp,time);
+  this->changeComp(newComp, ATOMBASED, time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

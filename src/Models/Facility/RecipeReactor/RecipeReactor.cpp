@@ -187,7 +187,7 @@ void RecipeReactor::endCycle()
   };
 
   // change the composition to the compositon of the spent fuel type
-  batchMat->changeAtomComp(outMat->getAtomComp(), TI->getTime());
+  batchMat->changeComp(outMat->getAtomComp(), ATOMBASED, TI->getTime());
 
   // move converted material into Inventory
   OutFuel outBatch;

@@ -354,17 +354,6 @@ public:
   static double getAtomComp(Iso tope, const CompMap& comp);
  
   /**
-   * Returns an isotopic vector corresponding to the given fraction of this 
-   * Material's current composition.
-   *
-   * @param frac the fraction of this Material's composition to return (we 
-   * hold the stoichiometry constant, so you can think of this as a weight 
-   * fraction OR an atom fraction)
-   * @return the fractional composition vector
-   */
-  const virtual CompMap getFracComp(double frac) const;
-
-  /**
    * Returns the current number density of the given isotope, or zero if 
    * that isotope isn't present.
    *
@@ -412,17 +401,10 @@ public:
    * Changes the atomic composition to a new composition
    *
    * @param newComp is the new atom composition vector
+   * @param base indicating the composition basis (ATOMBASED or MASSBASED
    * @param time is the time at which this takes place
    */
-  virtual void changeAtomComp(CompMap newComp, int time);
-
-  /**
-   * Changes the mass composition to a new composition
-   *
-   * @param newComp is the new atom composition vector
-   * @param time is the time at which this takes place
-   */
-  virtual void changeMassComp(CompMap newComp, int time);
+  virtual void changeComp(CompMap newComp, Basis base, int time);
 
   /**
    * Returns the mass of the given element in this Material.
