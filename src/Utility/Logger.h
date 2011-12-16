@@ -2,8 +2,7 @@
 @file Logger.h
 
 Code providing rudimentary logging capability for the Cyclus core. Details
-outlining proper use of this logging functionality are outlined in @ref
-logging "Using the Logger".
+outlining proper use of this logging functionality are outlined @ref Log "here".
 
 */
 
@@ -15,12 +14,12 @@ logging "Using the Logger".
 
 @brief allows easy logging via the streaming operator similar to std::cout
 
-This is the primary way to use the Log class. This macro returns an
-anonymous instance of the Log class (not assigned to any variable) that can be
-streamed into just like any string stream (e.g.  std::cout).  This macro does a
-check on the given #LogLevel 'level' argument; if the specified level is not within
-the report-level range, the macro does nothing, limiting the performance impact
-of logging statements.
+This is the primary way to use the Log class. This macro returns an anonymous
+instance of the Log class (not assigned to any variable) that can be streamed
+into just like any string stream (e.g.  std::cout).  This macro does a check on
+the given #LogLevel 'level' argument; if the specified level is not higher than
+or equal to the report-level cutoff, the macro does nothing, limiting the
+performance impact of logging statements.
 
 @param level #LogLevel category or type of log statement.
 
@@ -29,8 +28,8 @@ of logging statements.
 
 */
 #define LOG(level) \
-if (level > Log::ReportLevel()) ; \
-else Log().Get(level)
+if (level > Logger::ReportLevel()) ; \
+else Logger().Get(level)
 
 #include <iostream>
 #include <string>
@@ -141,35 +140,90 @@ void henrysFunction() {
 
 @endcode
 */
-class Log {
+class Logger {
 
   public:
-    Log() {};
-    virtual ~Log();
+    Logger() {};
+    virtual ~Logger();
 
+    /*!
+    @brief Returns a string stream by reference that is flushed to stdout by
+    the Log class destructor.
+    */
     std::ostringstream& Get(LogLevel level);
 
+    /*!
+    @brief Returns the report level cutoff by reference for printing
+    LOG(level) statements
+    */
     static LogLevel& ReportLevel() {return report_level;};
+
+    /*!
+    @brief Converts a string into a corresponding LogLevel value.
+
+    For strings that do not correspond to any particular LogLevel enum value,
+    the method returns the LogLevel value `LEV_ERROR`.  This method is
+    primarily intended for translating command line verbosity argument(s) into
+    appropriate report levels.  LOG(level) statements
+    */
     static LogLevel ToLogLevel(std::string text);
+
+    /*!
+    @brief Converts a LogLevel enum value into a corrsponding string.
+
+    For a level argments that have no corresponding string value, the string
+    `BAD_LEVEL` is returned.  This method is primarily intended for translating
+    LOG(level) statement levels into appropriate strings for output to stdout.
+     */
     static std::string ToString(LogLevel level);
 
   protected:
     std::ostringstream os;
 
   private:
-    Log(const Log&);
-    Log& operator =(const Log&);
+    Logger(const Logger&);
+    Logger& operator =(const Logger&);
 
+    /*!
+    Cuttoff for outputing LOG(level) statement content.  Statments where
+    level==report_level will print.
+    */
     static LogLevel report_level;
+
+    /*!
+    Used to map LogLevel enum values into strings
+    */
     static std::vector<std::string> level_to_string;
+
+    /*!
+    Used to map strings into LogLevel enum values
+    */
     static std::map<std::string, LogLevel> string_to_level;
 
+    /*!
+    Used to populate the level_to_string and string_to_level vector/map before
+    cyclus code execution begins
+    */
     static void initialize();
+    
+    /*!
+    Used by the initialize method to populate the level_to_string and
+    string_to_level static variables.
+    */
     static void addLevel(LogLevel level, std::string text);
 
+    /*!
+    The number of spaces indentation between different LogLevel enum values.
+    */
     static int spc_per_lev_;
-    static int field_width_;
-};
+
+    /*!
+    The width (in characters) of the printed LOG(level) statements' prefixes.
+    This should be equal to or greater than the length of the longest LogLevel enum
+    value converted to a string (i.e. `LEV_WARNING` is the longest with 11
+    characters).
+    */
+    static int field_width_; };
 
 #endif
 

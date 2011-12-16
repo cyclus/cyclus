@@ -75,9 +75,9 @@ int main(int argc, char* argv[]) {
   if (vm.count("verbosity")) {
     std::string v_level = vm["verbosity"].as<string>();
     if (v_level.length() < 3) {
-      Log::ReportLevel() = (LogLevel)strtol(v_level.c_str(), NULL, 10);
+      Logger::ReportLevel() = (LogLevel)strtol(v_level.c_str(), NULL, 10);
     } else {
-      Log::ReportLevel() = Log::ToLogLevel(v_level);
+      Logger::ReportLevel() = Logger::ToLogLevel(v_level);
     }
   }
 
