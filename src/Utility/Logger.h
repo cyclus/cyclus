@@ -2,7 +2,7 @@
 @file Logger.h
 
 Code providing rudimentary logging capability for the Cyclus core. Details
-outlining proper use of this logging functionality are outlined @ref Log "here".
+outlining proper use of this logging functionality are outlined @ref Logger "here".
 
 */
 
@@ -14,8 +14,8 @@ outlining proper use of this logging functionality are outlined @ref Log "here".
 
 @brief allows easy logging via the streaming operator similar to std::cout
 
-This is the primary way to use the Log class. This macro returns an anonymous
-instance of the Log class (not assigned to any variable) that can be streamed
+This is the primary way to use the Logger class. This macro returns an anonymous
+instance of the Logger class (not assigned to any variable) that can be streamed
 into just like any string stream (e.g.  std::cout).  This macro does a check on
 the given #LogLevel 'level' argument; if the specified level is not higher than
 or equal to the report-level cutoff, the macro does nothing, limiting the
@@ -59,8 +59,8 @@ enum LogLevel {
 
 Built-in logging functionality has been provided to aid debugging.  @e std::cout
 statements should be generally avoided.  The LOG(level) macro should be used
-for all logging/debugging needs.  The LOG macro uses the Log class to
-provide this functionality.  The Log class should generally not be accessed
+for all logging/debugging needs.  The LOG macro uses the Logger class to
+provide this functionality.  The Logger class should generally not be accessed
 directly.   The macro returns a string stream object that can be used
 exactlyl as @e std::cout for printing output.  Streamed in content is flushed
 to stdout as soon as execution passes beyond the terminating semi-colon of
@@ -148,7 +148,7 @@ class Logger {
 
     /*!
     @brief Returns a string stream by reference that is flushed to stdout by
-    the Log class destructor.
+    the Logger class destructor.
     */
     std::ostringstream& Get(LogLevel level);
 
