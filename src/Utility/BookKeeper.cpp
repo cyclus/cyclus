@@ -18,10 +18,9 @@
 #include "Logician.h"
 #include "Model.h"
 
-
 BookKeeper* BookKeeper::instance_ = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper* BookKeeper::Instance() {
   // If we haven't created a BookKeeper yet, create and return it.
   if (0 == instance_)
@@ -29,13 +28,13 @@ BookKeeper* BookKeeper::Instance() {
   return instance_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
   dbExists_ = false;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB() {
   createDB("cyclus.h5");
 };
@@ -61,33 +60,6 @@ void BookKeeper::createDB(std::string name) {
     error.printError();
   }
 };
-
-// This function is not currently used (MJG)
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// DataSet BookKeeper::createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string dsName){
-//   DataSet dataset;
-//   try{
-//     // create the dataspace from rank and dimension information
-//     DataSpace* dataspace = new DataSpace(rank, dims);
-
-//     // create a dataset to match the dataspace
-//     dataset = this->getDB()->createDataSet(dsName, type, *dataspace) ; 
-
-//   }
-//   catch( FileIException error )
-//   {
-//     error.printError();
-//   }
-//   catch( DataSetIException error )
-//   {
-//     error.printError();
-//   }
-//   catch( GroupIException error )
-//   {
-//     error.printError();
-//   }
-//   return dataset;
-// };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 H5File* BookKeeper::getDB()
@@ -241,6 +213,8 @@ void BookKeeper::writeModelList(ModelType type) {
   const H5std_string ID_memb = "ID";
   const H5std_string name_memb = "name";
   const H5std_string modelImpl_memb = "modelImpl";
+  const H5std_string parentID_memb = "parentID";
+  const H5std_string parentType_memb = "parentType";
   const H5std_string output_name = "/output";
 
   std::string subgroup_name;
@@ -298,34 +272,19 @@ void BookKeeper::writeModelList(ModelType type) {
     strcpy(modelList[0].name, str2.c_str()); 
   };
 
-  // Work in Progress (MJG)
-  // setUpModelWrite(type,ID_memb, name_memb, modelImpl_memb,  \
-  //       output_name, subgroup_name, dataset_name,  \
-  //       numStructs, numModels, modelList);
-
   model_t *pModelList = modelList;
   doModelWrite(ID_memb, name_memb, modelImpl_memb, \
          output_name, subgroup_name, dataset_name, \
          numStructs, numModels, pModelList);
 };
 
-// Work in Progress (MJG)
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// void BookKeeper::setUpModelWrite(ModelType type,       \
-//                      H5std_string ID_memb, H5std_string name_memb, \
-//                      H5std_string modelImpl_memb, H5std_string output_name, \
-//          std::string subgroup_name, std::string dataset_name, \
-//                 int numStructs, int numModels, model_t modelList[]){
-//   try{
-//   } catch (Exception error) {
-//     error.printError();
-//   }
-// };
-
-void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb,  \
-                              H5std_string modelImpl_memb, H5std_string output_name, \
-                              std::string subgroup_name, std::string dataset_name, \
-                              int numStructs, int numModels, model_t* modelList){
+void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb, 
+                              H5std_string modelImpl_memb, 
+                              H5std_string output_name, 
+                              std::string subgroup_name, 
+                              std::string dataset_name,
+                              int numStructs, int numModels, 
+                              model_t* modelList){
   try{
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately

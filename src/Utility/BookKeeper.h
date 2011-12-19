@@ -76,21 +76,21 @@ class BookKeeper {
 private:
   /**
    * A pointer to this BookKeeper once it has been initialized.
-     */
+   */
   static BookKeeper* instance_;
-        
+  
   /**
    * The HDF5 output database for the simulation this BookKeeper is 
    * responsible for.
-     */
+   */
   H5File* myDB_;
-        
+  
   /**
    * Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
-     */
+   */
   std::string dbName_;
-
+  
   /**
    * True iff the db is open.
    */
@@ -105,50 +105,88 @@ protected:
   /**
    * The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
-     */
+   */
   BookKeeper();
-  
-  // facility or institution model struct
-  typedef struct model_t{
-    int ID;                 /**< An integer indicating the model ID **/
-    char name[64];            /**< A std::string indicating the name of the template **/ 
-    char modelImpl[64];       /**< A std::string indicating the model implementation **/
-    int parentID; /**< An integer of the model's parent's ID **/
-  } model_t;
 
+  // an agent struct
+  typedef struct model_t{
+    int ID;                 /**< 
+                               An integer indicating the agent ID **/
+    char name[64];          /**< 
+                               A std::string indicating the name of the 
+                               template **/ 
+    char modelImpl[64];     /**< 
+                               A std::string indicating the agent 
+                               implementation **/
+    int parentID;           /**< 
+                               An integer of the agent's parent's ID **/
+    int bornOn;           /**< 
+                               An integer of the agents born on date **/
+    int diedOn;           /**< 
+                               An integer of the agents died on date **/
+  } model_t;
+  
   // facility, market, converter, or institution model struct
   typedef struct trans_t{
-    int supplierID;         /**< An integer indicating the supplier model ID **/
-    int requesterID;        /**< An integer indicating the requester model ID **/
-    int materialID;         /**< An integer indicating the material object ID **/
-    int timestamp;          /**< An integer indicating the month **/
-    double price;           /**< A double indicating the transaction price **/   
-    char commodName[64];   /**< the name of the commodity **/
+    int supplierID;         /**< 
+                               An integer indicating the supplier model ID **/
+    int requesterID;        /**< 
+                               An integer indicating the requester model ID **/
+    int materialID;         /**< 
+                               An integer indicating the material object ID **/
+    int timestamp;          /**< 
+                               An integer indicating the month **/
+    double price;           /**< 
+                               A double indicating the transaction price **/   
+    char commodName[64];   /**< 
+                              The name of the commodity **/
   } trans_t;
-
+  
   // material history struct
   typedef struct mat_hist_t{
-    int materialID;         /**< An integer indicating the material object ID **/
-    int timestamp;          /**< An integer indicating the timestamp **/
-    int iso[NUMISOS];               /**< An integer indicating the nuclide ID **/   
-    double comp[NUMISOS];          /**< The kg or moles of the iso in the material at that time **/
+    int materialID;         /**< 
+                               An integer indicating the material object ID **/
+    int timestamp;          /**< 
+                               An integer indicating the timestamp **/
+    int iso[NUMISOS];       /**< 
+                               An integer indicating the nuclide ID **/   
+    double comp[NUMISOS];   /**< 
+                               The kg or moles of the iso in the material at 
+                               that time **/
   } mat_hist_t;
-
+  
   // generic repository component struct
   typedef struct repo_component_t{
-    int ID;                 /**< An integer indicating the model ID **/
-    char name[64];          /**< A std::string indicating the name of the template **/ 
-    char thermalModel[64];  /**< A std::string indicating the thermal model implementation **/
-    char nuclideModel[64];  /**< A std::string indicating the nuclide model implementation **/
-    int parentID; /**< An integer of the model's parent's ID **/
-    double innerRadius; /**< An integer of the component's inner radius **/
-    double outerRadius; /**< An integer of the model's parent's ID **/
-    double x; /**< The x component of the component placement centroid. **/
-    double y; /**< The y component of the component placement centroid. **/
-    double z; /**< The z component of the component placement centroid. **/
-    int timestamp; /**< The time at which the component was emplaced **/
+    int ID;                 /**< 
+                               An integer indicating the model ID **/
+    char name[64];          /**< 
+                               A std::string indicating the name of the 
+                               template **/ 
+    char thermalModel[64];  /**< 
+                               A std::string indicating the thermal model 
+                               implementation **/
+    char nuclideModel[64];  /**< 
+                               A std::string indicating the nuclide model 
+                               implementation **/
+    int parentID;           /**< 
+                               An integer of the model's parent's ID **/
+    double innerRadius;     /**< 
+                               An integer of the component's inner radius **/
+    double outerRadius;     /**< 
+                               An integer of the model's parent's ID **/
+    double x;               /**< 
+                               The x component of the component placement 
+                               centroid. **/
+    double y;               /**< 
+                               The y component of the component placement 
+                               centroid. **/
+    double z;               /**< 
+                               The z component of the component placement 
+                               centroid. **/
+    int timestamp;          /**< 
+                               The time at which the component was emplaced **/
   } repo_component_t;
-
+  
   /**
    * Stores the transactions that have taken place during the simulation.
    */
@@ -175,49 +213,38 @@ public:
    * Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
    * Like the Highlander, there can be only one.
-     *
+   *
    * @return a pointer to the BookKeeper
-     */
+   */
   static BookKeeper* Instance();
-        
+  
   /**
    * Creates a database file with the default name, cyclus.h5. 
-     */
+   */
   void createDB();
 
   /**
    * Creates a database file with the name indicated. 
-     *
+   *
    * @param name is the name of the hdf5 database file. Should end in .h5
-     */
+   */
   void createDB(std::string name);
-
-  /* function not currently used (MJG) */
-  /* /\** */
-  /*  * Creates a dataset with the name,type, and dimesions indicated  */
-  /*    * */
-  /*  * @param rank is the rank of the dataset */
-  /*  * @param dims are the dimensions of the dataset  */
-  /*  * @param type is type of data to be placed in the dataspace */
-  /*  * @param name is the name of the dataset  */
-  /*    *\/ */
-  /* DataSet createDataSet(hsize_t rank, hsize_t* dims, DataType type, std::string name); */
-
+  
   /**
    * Returns a handle to the database this BookKeeper is maintaining.
-     *
+   *
    * @return the handle to the database
-     */
+   */
   H5File* getDB();
 
   /**
    * Opens the output database in memory space.
-     */
+   */
   void openDB();
 
   /**
    * Closes the database this BookKeeper is maintaining.
-     */
+   */
   void closeDB();
   
   /**
@@ -264,9 +291,11 @@ public:
    * Register the materialin the BookKeeper's map of material changes
    *
    */
-  void registerRepoComponent(int ID, std::string name, std::string thermalModel, 
-      std::string nuclideModel, int parentID, double innerRadius, 
-      double outerRadius, double x, double y, double z);
+  void registerRepoComponent(int ID, std::string name, 
+                             std::string thermalModel, 
+                             std::string nuclideModel, int parentID, 
+                             double innerRadius, double outerRadius, double x,
+                             double y, double z);
 
   /**
    * Write a list of the facility/inst/market models in the simulation
@@ -279,27 +308,6 @@ public:
    * Write a list of the components in the generic repository if there is onen
    */
   void writeRepoComponents();
-
-  /* Work in Progress (MJG) */
-  /* /\** */
-  /*  * Set up parameters to write the model list to a .h5 file */
-  /*  * @param type the model type (as above) */
-  /*  * @param ID_memb id hdf5 string */
-  /*  * @param name_memb name hdf5 string */
-  /*  * @param modelImpl_memb implementation hdf5 string */
-  /*  * @param output_name output hdf5 string */
-  /*  * @param subgroup_name subgroup name std::string */
-  /*  * @param dataset_name dataset name std::string */
-  /*  * @param numStructs number of models to write (if numModels = 0; numStructs = 1) */
-  /*  * @param numModels number of models to write */
-  /*  * we use numStrucs and numModels so that HDF5 behaves well when numModels = 0 */
-  /*  * @param modelList the list of models to write (created by setUpModelList) */
-  /*  *\/ */
-  /* void setUpModelWrite(ModelType type,       \ */
-  /*            H5std_string ID_memb, H5std_string name_memb,  \ */
-  /*            H5std_string modelImpl_memb, H5std_string output_name, \ */
-  /*            std::string subgroup_name, std::string dataset_name, \ */
-  /*            int numStructs, int numModels, model_t* modelList); */
 
   /**
    * Given information from the set-up, write the model list
@@ -448,6 +456,7 @@ public:
    * @param out_data is the vector to write to
    */
    void readData(std::string name, intData3d& out_data);
+
   /**
    * Reads data from the dataset indicated.
    *
