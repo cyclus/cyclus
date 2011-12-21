@@ -115,30 +115,22 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester)
   while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     Material* m = inventory_.front();
 
-    // start with an empty material
-    Material* newMat = new Material(CompMap(), 
-                                  m->getUnits(),
-                                  m->name(), 
-                                  0, 
-                                  ATOMBASED,
-                                  false);
-
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
-      newMat->absorb(m);
       inventory_.pop_front();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-      newAmt += toAbsorb->getTotMass();
-      newMat->absorb(toAbsorb);
+      Material* leftover = m->extractMass(trans.resource->getQuantity() - newAmt);
+      newAmt += m->getTotMass();
+      inventory_.pop_front();
+      inventory_.push_back(leftover);
     }
 
-    toSend.push_back(newMat);
+    toSend.push_back(m);
     LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass();
+      <<"  is sending a mat with mass: "<< m->getTotMass();
   }    
   FacilityModel::sendMaterial( order, toSend );
 }
@@ -162,6 +154,13 @@ void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
 void NullFacility::handleTick(int time)
 {
   // MAKE A REQUEST
+  makeRequests();
+  // MAKE OFFERS 
+  makeOffers();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::makeRequests(){
   // The null facility should ask for as much stuff as it can reasonably receive.
   Mass requestAmt;
   // And it can accept amounts no matter how small
@@ -222,10 +221,14 @@ void NullFacility::handleTick(int time)
     request->setNextDest(getFacInst());
     request->sendOn();
   }
-  
-  // MAKE OFFERS
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void NullFacility::makeOffers(){
+
   // decide how much to offer
-  Mass offer_amt;
+  Mass offer_amt, inv;
+  inv = this->checkInventory();
   Mass possInv = inv + capacity_;
 
   if (possInv < inventory_size_){
@@ -237,13 +240,15 @@ void NullFacility::handleTick(int time)
 
   // there is no minimum amount a null facility may send
   double min_amt = 0;
+  // and it's free
+  double commod_price = 0;
 
   // decide what market to offer to
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
-  // create a material
-  Material* offer_mat = new Material(CompMap(), "", "", offer_amt, MASSBASED, true);
+  // create a Resource
+  GenericResource* offer_res = new GenericResource(out_commod_, "kg", offer_amt);
 
   // build the transaction and message
   Transaction trans;
@@ -251,12 +256,14 @@ void NullFacility::handleTick(int time)
   trans.minfrac = min_amt/offer_amt;
   trans.is_offer = true;
   trans.price = commod_price;
-  trans.resource = dynamic_cast<Resource*>(offer_mat);
+  trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
   msg->setNextDest(getFacInst());
   msg->sendOn();
+
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::handleTock(int time)
 {
@@ -265,31 +272,23 @@ void NullFacility::handleTock(int time)
 
   Mass complete = 0;
 
+  // while there's still capacity left and stuff in the stocks
   while(capacity_ > complete && !stocks_.empty() ){
     Material* m = stocks_.front();
 
-    // start with an empty material
-    Material* newMat = new Material(CompMap(), 
-                                  m->getUnits(),
-                                  m->name(), 
-                                  0, 
-                                  ATOMBASED, 
-                                  false);
-
-    // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (capacity_ - complete)){
+      // if the mass of the material is less than the remaining capacity
       complete += m->getTotMass();
-      newMat->absorb(m);
       stocks_.pop_front();
-    }
-    else{ 
-      // if the stocks obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(capacity_ - complete);
-      complete += toAbsorb->getTotMass();
-      newMat->absorb(toAbsorb);
+    } else { 
+      // if the mass is too bit, split the stocks object 
+      Material* leftover = m->extractMass(capacity_ - complete);
+      complete += m->getTotMass();
+      stocks_.pop_front();
+      stocks_.push_back(leftover);
     }
 
-    inventory_.push_back(newMat);
+    inventory_.push_back(m);
   }    
 
   // check what orders are waiting, 

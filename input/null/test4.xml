@@ -50,7 +50,7 @@
     <model>
       <SinkFacility>
         <incommodity>uo2</incommodity>
-        <capacity>.5</capacity>
+        <capacity>500</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
@@ -62,7 +62,7 @@
     <model>
       <SinkFacility>
         <incommodity>uo2</incommodity>
-        <capacity>.5</capacity>
+        <capacity>500</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>

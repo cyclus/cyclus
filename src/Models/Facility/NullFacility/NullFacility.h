@@ -253,6 +253,13 @@ protected:
      */
     Material* out_recipe_;
 
+private : 
+    /// Makes requests of the input commodity based on current capacity
+    void makeRequests();
+
+    /// Makes offers of the output commodity based on current inventory
+    void makeOffers();
+
 /* ------------------- */ 
 
 };
