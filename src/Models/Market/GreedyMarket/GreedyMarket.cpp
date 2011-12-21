@@ -39,6 +39,11 @@ void GreedyMarket::resolve() {
     
     if(match_request(request)) {
       process_request();
+    } else {
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->ID()
+          << " for the amount " << (*request).first 
+          << " rejected. ";
+      reject_request(request);
     }
 
     // remove this request
@@ -106,7 +111,6 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
     // pop off this offer
     offers_.erase(offer);
     if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
-
       if (requestAmt > offerAmt) { 
         // put a new message in the order stack
         // it goes down to supplier
@@ -114,6 +118,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
         // tenatively queue a new order (don't execute yet)
         matchedOffers_.insert(offerMsg);
+
+
+
 
         orders_.push_back(offerMsg);
 
@@ -125,12 +132,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
           << offerMsg->getResource()->getQuantity();
 
         requestAmt -= offerAmt;
-      } else {
+      } else if(offerAmt >= requestAmt) {
         // split offer
-        if (NULL == offerMsg) {
-          throw CycException("offer message does not exist in market '" 
-              + name() + "'.");
-        }
 
         // queue a new order
         Message* maybe_offer = offerMsg->clone();
@@ -153,6 +156,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
         // if the residual is above threshold,
         // make a new offer with reduced amount
+
         if(offerAmt > EPS_KG) {
           Message* new_offer = offerMsg->clone();
           new_offer->getResource()->setQuantity(offerAmt);

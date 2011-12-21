@@ -15,7 +15,6 @@ using namespace std;
 void NullMarket::receiveMessage(Message *msg) {
   messages_.insert(msg);
 
-  // offers and requests are ordered by amount
   if (msg->isOffer()){
     offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
   }
@@ -27,7 +26,6 @@ void NullMarket::receiveMessage(Message *msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void NullMarket::reject_request(sortedMsgList::iterator request)
 {
-
   // delete the tentative orders
   while ( orders_.size() > firmOrders_)
   {
@@ -42,7 +40,6 @@ void NullMarket::reject_request(sortedMsgList::iterator request)
     offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
     matchedOffers_.erase(msg);
   }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -105,7 +102,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         requestAmt -= offerAmt;
       } 
-      else {
+      else if (offerAmt >= requestAmt){
         // split offer
 
         // queue a new order
@@ -133,7 +130,6 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
         if(offerAmt > EPS_KG){
           Message* new_offer = offerMsg->clone();
           new_offer->getResource()->setQuantity(offerAmt);
-          // call this method for consistency
           receiveMessage(new_offer);
         }
 

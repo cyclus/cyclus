@@ -86,7 +86,7 @@ void SinkFacility::print()
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2) << msg << inventory_size_ << " units.";
+  LOG(LEV_DEBUG2) << msg << inventory_size_ << " kg.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -95,7 +95,7 @@ void SinkFacility::handleTick(int time){
   Mass requestAmt = getRequestAmt(); 
   Mass minAmt = 0;
 
-  if (requestAmt!=0){
+  if (requestAmt>EPS_KG){
     // for each potential commodity, make a request
     for (vector<std::string>::iterator commod = in_commods_.begin();
         commod != in_commods_.end();

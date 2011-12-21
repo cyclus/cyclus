@@ -115,32 +115,30 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
   vector<Material*> toSend;
 
   while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
-    // start with an empty material
-    Material* newMat = new Material(recipe_->getMassComp(), 
-                                  recipe_->getUnits(),
-                                  recipe_->name(), 
-                                  0, 
-                                  MASSBASED,
-                                  false);
 
     Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
       newAmt += m->getTotMass();
-      newMat->absorb(m);
+      toSend.push_back(m);
       inventory_.pop_front();
+      LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
+        <<"  has decided not to split the object with size :  "<< m->getTotMass();
     }
     else{ 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-      newAmt += toAbsorb->getTotMass();
-      newMat->absorb(toAbsorb);
+      Material* leftover = m->extractMass(trans.resource->getQuantity() - newAmt);
+      newAmt += m->getTotMass();
+      LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
+        <<"  has decided to split the object to size :  "<< m->getTotMass();
+      toSend.push_back(m);
+      inventory_.pop_front();
+      inventory_.push_back(leftover);
     }
 
-    toSend.push_back(newMat);
     LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass();
-    (newMat)->print();
+      <<"  is sending a mat with mass: "<< m->getTotMass();
+    (m)->print();
   }    
   FacilityModel::sendMaterial(msg, toSend);
 }
@@ -216,13 +214,6 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    Material* order_mat = new Material(recipe_->getMassComp(), 
-                                    recipe_->getUnits(), 
-                                    recipe_->name(),
-                                    order->getResource()->getQuantity(),
-                                    MASSBASED,
-                                    true);
-    order->setResource(order_mat);
     sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
