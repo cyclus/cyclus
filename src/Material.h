@@ -266,6 +266,11 @@ public:
   bool checkQuantityGT(Resource* other);
 
   /**
+   * Resource class method
+   */
+  ResourceType getResourceType(){return MATERIAL_RES;};
+
+  /**
    * get material ID
    *
    * @return ID

@@ -196,6 +196,10 @@ protected:
   /// commodity price
   double commod_price_;
 
+private:
+  /// determines the amount to request 
+  const Mass getRequestAmt() ;
+
 
 /* ------------------- */ 
 

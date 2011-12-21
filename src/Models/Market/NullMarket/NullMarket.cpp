@@ -82,66 +82,68 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
     // pop off this offer
     offers_.erase(offer);
   
-    if (requestAmt > offerAmt) { 
-      // put a new message in the order stack
-      // it goes down to supplier
-      offerMsg->setRequester(requestMsg->getRequester());
+    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
+      if (requestAmt > offerAmt) { 
+        // put a new message in the order stack
+        // it goes down to supplier
+        offerMsg->setRequester(requestMsg->getRequester());
 
-      // Queue an order
-      matchedOffers_.insert(offerMsg);
-      // Zero out the boolean. 
-      // At least some of the request will be met.
-      toRet = 0;
+        // Queue an order
+        matchedOffers_.insert(offerMsg);
+        // Zero out the boolean. 
+        // At least some of the request will be met.
+        toRet = 0;
 
-      orders_.push_back(offerMsg);
+        orders_.push_back(offerMsg);
 
-      LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
+        LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
           << offerMsg->getSupplier()->ID()
           << " to "
           << offerMsg->getRequester()->ID()
           << " for the amount:  " 
           << offerMsg->getResource()->getQuantity();
 
-      requestAmt -= offerAmt;
-    } 
-    else {
-      // split offer
+        requestAmt -= offerAmt;
+      } 
+      else {
+        // split offer
 
-      // queue a new order
-      Message* maybe_offer = offerMsg->clone();
-      maybe_offer->getResource()->setQuantity(requestAmt);
-      maybe_offer->setRequester(requestMsg->getRequester());
+        // queue a new order
+        Message* maybe_offer = offerMsg->clone(); 
+        maybe_offer->getResource()->setQuantity(requestAmt);
+        maybe_offer->setRequester(requestMsg->getRequester());
 
-      matchedOffers_.insert(offerMsg);
+        matchedOffers_.insert(offerMsg);
 
-      orders_.push_back(maybe_offer);
+        orders_.push_back(maybe_offer);
 
-      LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
+        LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
           << maybe_offer->getSupplier()->ID()
           << " to "
           << maybe_offer->getRequester()->ID()
           << " for the amount:  " 
           << maybe_offer->getResource()->getQuantity();
 
-      // reduce the offer amount
-      offerAmt -= requestAmt;
+        // reduce the offer amount
+        offerAmt -= requestAmt;
 
-      // if the residual is above threshold,
-      // make a new offer with reduced amount
+        // if the residual is above threshold,
+        // make a new offer with reduced amount
 
-      if(offerAmt > EPS_KG){
-        Message* new_offer = offerMsg->clone();
-        new_offer->getResource()->setQuantity(offerAmt);
-        // call this method for consistency
-        receiveMessage(new_offer);
+        if(offerAmt > EPS_KG){
+          Message* new_offer = offerMsg->clone();
+          new_offer->getResource()->setQuantity(offerAmt);
+          // call this method for consistency
+          receiveMessage(new_offer);
+        }
+
+        // zero out request
+        requestAmt = 0;
+
+        // Zero out the boolean. 
+        // All of the request will be met.
+        toRet = 0;
       }
-      
-      // zero out request
-      requestAmt = 0;
-
-      // Zero out the boolean. 
-      // All of the request will be met.
-      toRet = 0;
     }
   }
 

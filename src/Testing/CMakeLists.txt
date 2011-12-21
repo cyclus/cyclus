@@ -13,6 +13,7 @@ set ( TestSource
   #  ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
   ../Models/Facility/GenericRepository/GenericRepositoryTests.cpp
   ../InputXML.cpp
+  ../GenericResource.cpp
   ../Logician.cpp
   ../Material.cpp
   ../IsoVector.cpp

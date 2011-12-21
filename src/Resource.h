@@ -3,6 +3,9 @@
 #define _RESOURCE_H
 #include <string>
 
+/// A list of concrete types of resource
+enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES }; 
+
 class Resource {
 public:
   /**
@@ -69,7 +72,13 @@ public:
   virtual bool checkEquality(Resource* other){
     bool toRet;
     (this->checkQuality(other) && this->checkQuantityEqual(other)) ? toRet = true : toRet = false;
-    return toRet; };
+    return toRet; 
+  };
+
+  /**
+   * Returns the concrete resource type, an enum
+   */
+  virtual ResourceType getResourceType()=0;
 
 };
 

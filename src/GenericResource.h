@@ -71,6 +71,11 @@ public:
    */
   virtual bool checkQuantityGT(Resource* second);
 
+  /**
+   * Returns the concrete type of this resource
+   */
+  virtual ResourceType getResourceType(){return GENERIC_RES;};
+
 protected:
   /**
    * The quality distinguishing this resource will be traded as.

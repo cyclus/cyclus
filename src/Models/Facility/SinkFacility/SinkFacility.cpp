@@ -91,26 +91,17 @@ void SinkFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
-  // The sink facility should ask for as much stuff as it can reasonably receive.
-  Mass requestAmt;
-  // And it can accept amounts no matter how small
-  Mass minAmt = 0;
-  // check how full its inventory is
-  Mass fullness = this->checkInventory();
-  // subtract from max size to get total empty space
-  Mass emptiness = inventory_size_ - fullness;
 
-  if (emptiness == 0 || emptiness <0 ){
-    // don't request anything
-  } else if (emptiness < capacity_){
-  // if empty space is less than monthly acceptance capacity, request it,
-    // for each commodity, request emptiness/(no commodities)
+  Mass requestAmt = getRequestAmt(); 
+  Mass minAmt = 0;
+
+  if (requestAmt!=0){
+    // for each potential commodity, make a request
     for (vector<std::string>::iterator commod = in_commods_.begin();
-       commod != in_commods_.end();
-       commod++) {
+        commod != in_commods_.end();
+        commod++) {
       MarketModel* market = MarketModel::marketForCommod(*commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
-      requestAmt = (emptiness/in_commods_.size());
 
       // create a generic resource
       GenericResource* request_res = new GenericResource((*commod), "kg", requestAmt);
@@ -130,35 +121,6 @@ void SinkFacility::handleTick(int time){
       LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: "<< requestAmt << ".";
     }
   }
-  // otherwise, the upper bound is the monthly acceptance capacity, request cap.
-  else if (emptiness >= capacity_){
-    // for each commodity, request capacity/(noCommodities)
-    for (vector<std::string>::iterator commod = in_commods_.begin();
-       commod != in_commods_.end();
-       commod++) {
-      MarketModel* market = MarketModel::marketForCommod(*commod);
-      Communicator* recipient = dynamic_cast<Communicator*>(market);
-      requestAmt = capacity_/in_commods_.size();
-
-      // create a generic resource
-      GenericResource* request_res = new GenericResource((*commod), "kg", requestAmt);
-
-      // build the transaction and message
-      Transaction trans;
-      trans.commod = *commod;
-      trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price_;
-      trans.resource = request_res;
-
-      Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
-      request->sendOn();
-
-      LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: " << requestAmt << ".";
-    }
-  }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -202,6 +164,23 @@ Mass SinkFacility::checkInventory(){
     total += (*iter)->getTotMass();
 
   return total;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+const Mass SinkFacility::getRequestAmt(){
+  // The sink facility should ask for as much stuff as it can reasonably receive.
+  Mass requestAmt;
+  // get current capacity
+  Mass emptiness = (inventory_size_- this->checkInventory());
+
+  if (emptiness == 0 || emptiness < 0 ){
+    requestAmt=0;
+  } else if (emptiness < capacity_){
+    requestAmt = emptiness/in_commods_.size();
+  } else if (emptiness >= capacity_){
+    requestAmt = capacity_/in_commods_.size();
+  }
+  return requestAmt;
 }
 
 /* --------------------

@@ -9,6 +9,7 @@
 #include "FacilityModel.h"
 #include "MarketModel.h"
 #include "InstModel.h"
+#include "GenericResource.h"
 
 #include <iostream>
 
@@ -67,6 +68,17 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
+  Message* toRet = new Message(*this);
+  switch( trans_.resource->getResourceType()){
+    case MATERIAL_RES :
+      toRet->setResource(new Material(*(dynamic_cast<Material*>(trans_.resource))));
+      break;
+    case GENERIC_RES :
+      toRet->setResource(new GenericResource(*(dynamic_cast<GenericResource*>(trans_.resource))));
+      break;
+    default :
+      CycException("ResourceType not recognized.");
+  }
   return new Message(*this);
 }
 
