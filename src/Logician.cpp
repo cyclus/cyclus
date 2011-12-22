@@ -133,32 +133,3 @@ void Logician::printModelList(ModelType model_type) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::addRecipe(std::string name, Material* new_mat) { 
-  recipes_[name] = new_mat; 
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logician::printRecipes() {
-  for (RecipeList::iterator recipe=recipes_.begin();
-      recipe != recipes_.end();
-      recipe++){
-    LOG(LEV_DEBUG2) << "Recipe " << (*recipe).first;
-    recipe->second->print();
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Logician::getNumRecipes() { 
-  return recipes_.size(); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Logician::getRecipe(std::string name) { 
-  if (recipes_.count(name) == 0) {
-      throw CycIndexException("Recipe '" + name 
-          + "' does not exist.");
-  }
-  return recipes_[name];
-} 
-  

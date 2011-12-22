@@ -79,11 +79,11 @@ void RecipeReactor::init(xmlNodePtr cur)
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    in_recipe = LI->getRecipe(recipe_name);
+    in_recipe = IsoVector::recipe(recipe_name);
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    out_recipe = LI->getRecipe(recipe_name);
+    out_recipe = IsoVector::recipe(recipe_name);
 
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
           make_pair(out_commod, out_recipe)));
@@ -453,11 +453,11 @@ Mass RecipeReactor::checkStocks(){
  */
 
 extern "C" Model* construct() {
-    return new RecipeReactor();
+  return new RecipeReactor();
 }
 
 extern "C" void destruct(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* ------------------- */ 

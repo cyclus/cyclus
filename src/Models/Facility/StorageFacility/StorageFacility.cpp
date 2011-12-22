@@ -198,7 +198,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
 
     // recipe
     recipe_name = XMLinput->get_xpath_content(entry_node,"recipe");
-    recipe = LI->getRecipe(recipe_name);
+    recipe = IsoVector::recipe(recipe_name);
 
     // amount
     amount = strtod(XMLinput->get_xpath_content(entry_node,"amount"), NULL);

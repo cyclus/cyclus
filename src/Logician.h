@@ -137,31 +137,6 @@ class Logician {
      */
     void printModelList(ModelType model_type);	
 
-    /**
-     * add a recipe to the list
-     *
-     * @param name the name of the recipe to add 
-     * @param new_mat the material object to add to the recipes list
-     */
-    void addRecipe(std::string name, Material* new_mat);
-
-    /**
-     * print list of recipes
-     */
-    void printRecipes();
-
-    /**
-     * get number of recipes
-     */
-    int getNumRecipes();                                  
-
-    /**
-     * get a pointer to the recipe based on its name
-     *
-     * @param name the name of the recipe for which to return a material pointer.
-     */
-    Material* getRecipe(std::string name);                      
-    
 };
 
 #endif

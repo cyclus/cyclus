@@ -41,7 +41,7 @@ void SourceFacility::init(xmlNodePtr cur)
 
   // get recipe
   input_token = XMLinput->get_xpath_content(cur,"recipe");
-  recipe_ = LI->getRecipe(input_token);
+  recipe_ = IsoVector::recipe(input_token);
 
   // get capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);

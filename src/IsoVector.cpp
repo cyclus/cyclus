@@ -37,6 +37,88 @@ IsoVector::IsoVector(CompMap initial_comp) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector::IsoVector(xmlNodePtr cur) {
+  ID_ = nextID_++;
+  
+  recipe_name = XMLinput->get_xpath_content(cur,"name");
+  string comp_type = XMLinput->get_xpath_content(cur,"basis");
+  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+
+  double grams_per_atom;
+  int isotope;
+  xmlNodePtr iso_node;
+  for (int i = 0; i < isotopes->nodeNr; i++) {
+    iso_node = isotopes->nodeTab[i];
+    isotope = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
+
+    grams_per_atom = MT->getMassInGrams(isotope);
+    atom_count = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
+
+    if ( "atom" != comp_type) {
+      atom_count *= grams_per_atom;
+    }
+
+    atom_comp_[isotope] = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
+  }
+
+  IsoVector::recipes_[recipe_name] = this;
+  atom_comp_ = normalized();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void IsoVector::load_recipes() {
+
+  /// load recipes from file
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
+  std::string name;
+  for (int i = 0; i < nodes->nodeNr; i++) {
+    name = XMLinput->getCurNS() + 
+                  XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+    recipes_[name] = new IsoVector(nodes->nodeTab[i]);
+  }
+
+  /// load recipes from databases
+  nodes = XMLinput->get_xpath_elements("/*/recipebook");
+
+  for (int i = 0; i < nodes->nodeNr; i++) {
+    filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
+    ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
+    format = XMLinput->get_xpath_content(nodes->nodeTab[i], "format");
+    XMLinput->extendCurNS(ns);
+
+    if ("xml" == format) {
+      XMLinput->load_recipebook(filename);
+    } else {
+      throw CycRangeException(format + "is not a supported recipebook format.");
+    }
+    XMLinput->stripCurNS();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+IsoVector* IsoVector::recipe(std::string name) { 
+  if (recipes_.count(name) == 0) {
+      throw CycIndexException("Recipe '" + name 
+          + "' does not exist.");
+  }
+  return recipes_[name];
+} 
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::printRecipes() {
+  for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
+      recipe != recipes_.end();
+      recipe++){
+    LOG(LEV_DEBUG2) << "Recipe " << recipe->first;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int IsoVector::recipeCount() { 
+  return recipes_.size(); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
   int isotope;
   double rhs_atoms;
@@ -156,7 +238,16 @@ void IsoVector::loadDecayInfo() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass() {
-  return 0;
+  double mass = 0;
+  int isotope;
+
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    mass += mass(isotope);
+    iter++;
+  }
+  return mass;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

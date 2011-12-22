@@ -109,7 +109,7 @@ void InputXML::load_file(std::string filename) {
 
   // Recipes
   LOG(LEV_DEBUG3) << "Begin loading recipes";
-  Material::load_recipes();
+  IsoVector::load_recipes();
   LOG(LEV_DEBUG3) << "End loading recipes";
   
   //Models
@@ -148,7 +148,7 @@ void InputXML::load_recipebook(std::string filename) {
   recipebook.doc = validate_file(&recipebook);
   recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
-  Material::load_recipes();
+  IsoVector::load_recipes();
 
   // get rid of recipebook, freeing memory
   delete curFilePtr;
