@@ -60,12 +60,9 @@ public:
   virtual ~MarketModel() {};
   
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * Queries the list of known markets for one associated with the commodity
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
-   *
-   * @param src the pointer to the original (initialized ?) model to be copied
+   * @param commod a string naming the commodity whose market is of interest
    */
   static MarketModel* marketForCommod(std::string commod);
 
