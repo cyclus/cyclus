@@ -93,7 +93,9 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         orders_.push_back(offerMsg);
 
-        LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
+        LOG(LEV_DEBUG2) 
+	  << "NullMarket has resolved a transaction "
+	  << " which is a match from "
           << offerMsg->getSupplier()->ID()
           << " to "
           << offerMsg->getRequester()->ID()

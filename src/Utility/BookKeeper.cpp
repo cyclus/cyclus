@@ -120,6 +120,8 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
        thisMat++)
   {
     trans_t toRegister;
+    msg->setID();
+    toRegister.transID=msg->getID();
     toRegister.requesterID=msg->getRequester()->ID();
     toRegister.supplierID=msg->getSupplier()->ID();
     toRegister.materialID=(*thisMat)->ID(); 
@@ -128,12 +130,16 @@ void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
      
     strcpy(toRegister.commodName, msg->commod().c_str());
     transactions_.push_back(toRegister);
+    // checking msg and transaction equality
+    // msg->printTrans();
+    // printTrans(toRegister);
   };
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::printTrans(trans_t trans){
   std::cout << "Transaction info (via BookKeeper):" << std::endl <<
+    "    Transaction ID: " << trans.transID << std::endl <<
     "    Requester ID: " << trans.requesterID << std::endl <<
     "    Supplier ID: " << trans.supplierID << std::endl <<
     "    Material ID: " << trans.materialID << std::endl <<
@@ -341,6 +347,7 @@ void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb,
 void BookKeeper::writeTransList(){
 
   // define some useful variables.
+  const H5std_string transID_memb = "transID";
   const H5std_string supplierID_memb = "supplierID";
   const H5std_string requesterID_memb = "requesterID";
   const H5std_string materialID_memb = "materialID";
@@ -362,6 +369,7 @@ void BookKeeper::writeTransList(){
   // create an array of the model structs
   trans_t transList[numStructs];
   for (int i=0; i<numTrans; i++){
+    transList[i].transID = transactions_[i].transID; 
     transList[i].supplierID = transactions_[i].supplierID;
     transList[i].requesterID = transactions_[i].requesterID;
     transList[i].materialID = transactions_[i].materialID;
@@ -372,6 +380,7 @@ void BookKeeper::writeTransList(){
   // If there are no transactions, make a null transaction entry
   if(numTrans==0){
     std::string str1="";
+    transList[0].transID=0;
     transList[0].supplierID=0;
     transList[0].requesterID=0;
     transList[0].materialID=0;
@@ -392,6 +401,7 @@ void BookKeeper::writeTransList(){
     hsize_t dim[] = {numStructs};
     // if there's only one model, the dataspace is a vector, which  
     // hdf5 doesn't like to think of as a matrix 
+    // (MJG) - what does this do? rank = 1 or rank = 1 ??
     int rank;
     if(numTrans <= 1)
       rank = 1;
@@ -411,6 +421,7 @@ void BookKeeper::writeTransList(){
    
     // Create a datatype for models based on the struct
     CompType mtype( sizeof(trans_t) );
+    mtype.insertMember( transID_memb, HOFFSET(trans_t, transID), PredType::NATIVE_INT); 
     mtype.insertMember( supplierID_memb, HOFFSET(trans_t, supplierID), PredType::NATIVE_INT); 
     mtype.insertMember( requesterID_memb, HOFFSET(trans_t, requesterID), PredType::NATIVE_INT); 
     mtype.insertMember( materialID_memb, HOFFSET(trans_t, materialID), PredType::NATIVE_INT); 
