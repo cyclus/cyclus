@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "SourceFacility.h"
+#include "CycException.h"
 #include "Message.h"
 #include "MarketModel.h"
 
@@ -60,19 +61,22 @@ class InfiniteDump : public FacilityModel {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodMarket : public MarketModel {
   public :
-    CommodMarket(std::string commod) : MarketModel() {
+    CommodMarket(std::string commod) {
       commodity_ = commod;
     }
-    void receiveMessage(Message* msg) {
+    virtual void receiveMessage(Message* msg) {
     }
-    void resolve() {
+    virtual void resolve() {
     }
-    void copy(CommodMarket* src){
+    virtual void copy(CommodMarket* src){
       commodity_ = src->commodity_;
     }
     void copyFreshModel(Model* src){
       copy(dynamic_cast<CommodMarket*>(src));
     }
+    virtual ~CommodMarket() {
+    }
+
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -102,6 +106,7 @@ class SourceFacilityTest : public ::testing::Test {
       src_facility->setParent(new TransactionMaker());
       new_facility = new FakeSourceFacility();
       commod_market = new CommodMarket(src_facility->getOutCommod());
+      commod_market->copyFreshModel(commod_market);
     };
 
     virtual void TearDown() {
@@ -146,6 +151,7 @@ TEST_F(SourceFacilityTest, ReceiveMessage) {
   int time = 1;
   EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
   EXPECT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_THROW(src_facility->receiveMessage(msg), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

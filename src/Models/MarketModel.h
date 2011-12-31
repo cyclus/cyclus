@@ -4,7 +4,7 @@
 
 #include <deque>
 #include <set>
-#include <vector>
+#include <list>
 
 #include "Model.h"
 #include "Communicator.h"
@@ -51,13 +51,13 @@ private:
  * all MODEL classes have these members
  * --------------------
  */
- static std::vector<MarketModel*> markets_;
+ static std::list<MarketModel*> markets_;
 
 public:
   MarketModel();
   
   /// MarketModels should not be indestructible.
-  virtual ~MarketModel() {};
+  virtual ~MarketModel();
   
   /**
    * Queries the list of known markets for one associated with the commodity
