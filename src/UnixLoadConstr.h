@@ -1,5 +1,7 @@
 // UnixLoadConstr.h
 // This is the dynamic loading implementation for UNIX machines
+#if !defined(_UNIX_LOAD_CONSTR_H)
+#define _UNIX_LOAD_CONSTR_H
 #include "suffix.h"
 
 #include "CycException.h"
@@ -44,3 +46,4 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
   }
   return new_model;
 }
+#endif

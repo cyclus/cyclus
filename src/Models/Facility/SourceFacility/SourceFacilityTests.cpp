@@ -1,9 +1,10 @@
+// SourceFacilityTests.cpp
 #include <gtest/gtest.h>
 
 #include "SourceFacility.h"
 #include "CycException.h"
 #include "Message.h"
-#include "MarketModel.h"
+#include "FacilityModelTests.h"
 
 #include <string>
 #include <queue>
@@ -14,7 +15,7 @@ using namespace std;
 class FakeSourceFacility : public SourceFacility {
   public:
     FakeSourceFacility() : SourceFacility() {
-      out_commod_ = "my-commod";
+      out_commod_ = "out-commod";
 
       CompMap test_comp;
 
@@ -30,7 +31,7 @@ class FakeSourceFacility : public SourceFacility {
       recipe_ = new Material(test_comp, test_mat_unit, test_rec_name, test_size, 
           test_type, test_template); 
 
-      capacity_ = 25;
+      capacity_ = 2;
       inventory_size_ = 50;
       commod_price_ = 5000;
 
@@ -59,53 +60,17 @@ class InfiniteDump : public FacilityModel {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CommodMarket : public MarketModel {
-  public :
-    CommodMarket(std::string commod) {
-      commodity_ = commod;
-    }
-    virtual void receiveMessage(Message* msg) {
-    }
-    virtual void resolve() {
-    }
-    virtual void copy(CommodMarket* src){
-      commodity_ = src->commodity_;
-    }
-    void copyFreshModel(Model* src){
-      copy(dynamic_cast<CommodMarket*>(src));
-    }
-    virtual ~CommodMarket() {
-    }
-
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class TransactionMaker : public InstModel {
-  
-  void receiveMessage(Message* msg) {
-    msg->setDir(DOWN_MSG);
-
-    Model* what_model = NULL;
-
-    msg->setRequester(what_model);
-
-  }
-
-  void copyFreshModel(Model* model) { }
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SourceFacilityTest : public ::testing::Test {
   protected:
     FakeSourceFacility* src_facility;
     FakeSourceFacility* new_facility; 
-    CommodMarket* commod_market;
+    TestMarket* commod_market;
 
     virtual void SetUp(){
       src_facility = new FakeSourceFacility();
-      src_facility->setParent(new TransactionMaker());
+      src_facility->setParent(new TestInst());
       new_facility = new FakeSourceFacility();
-      commod_market = new CommodMarket(src_facility->getOutCommod());
+      commod_market = new TestMarket(src_facility->getOutCommod());
       commod_market->copyFreshModel(commod_market);
     };
 
@@ -145,25 +110,36 @@ TEST_F(SourceFacilityTest, Print) {
   EXPECT_NO_THROW(src_facility->print());
 }
 
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, ReceiveMessage) {
   Message* msg;
-  int time = 1;
-  EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
-  EXPECT_NO_THROW(src_facility->handleTick(time));
   EXPECT_THROW(src_facility->receiveMessage(msg), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Tick) {
   int time = 1;
+  EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
   EXPECT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Tock) {
   int time = 1;
+  EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
   EXPECT_NO_THROW(src_facility->handleTock(time));
+  EXPECT_GT(src_facility->fakeCheckInventory(),0.0);
+  EXPECT_LE(src_facility->getCapacity(),src_facility->fakeCheckInventory());
+  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe()->getTotMass(); 
+  if (expected_inventory > src_facility->getInvSize()) {
+    expected_inventory = src_facility->getInvSize();
+  }
+  EXPECT_DOUBLE_EQ(expected_inventory, src_facility->fakeCheckInventory());
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests, Values(dynamic_cast<FacilityModel*>(new FakeSourceFacility())));
 
 
