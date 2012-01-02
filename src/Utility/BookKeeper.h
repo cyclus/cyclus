@@ -128,6 +128,8 @@ protected:
   
   // facility, market, converter, or institution model struct
   typedef struct trans_t{
+    int transID;            /**< 
+                               An integer indicating the transaction ID **/
     int supplierID;         /**< 
                                An integer indicating the supplier model ID **/
     int requesterID;        /**< 

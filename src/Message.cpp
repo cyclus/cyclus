@@ -13,8 +13,12 @@
 
 #include <iostream>
 
+// initialize static variables
+int Message::nextID_ = 1;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
+
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
@@ -28,6 +32,7 @@ Message::Message(Communicator* sender) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
+
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
@@ -42,6 +47,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
+
   dir_ = UP_MSG;
   trans_ = thisTrans;
   sender_ = sender;
@@ -59,6 +65,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
   std::cout << "Transaction info (via Message):" << std::endl <<
+    "    Transaction ID: " << trans_.ID << std::endl <<
     "    Requester ID: " << trans_.requester->ID() << std::endl <<
     "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
     "    Price: "  << trans_.price << std::endl;
@@ -66,7 +73,8 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
-  return new Message(*this);
+  // shouldnt we be returning the toRet message?
+  return toRet;//new Message(*this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

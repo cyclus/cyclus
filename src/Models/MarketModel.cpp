@@ -11,8 +11,7 @@
 
 using namespace std;
 
-std::vector<MarketModel*> MarketModel::markets_;
-
+list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
@@ -24,11 +23,22 @@ MarketModel::MarketModel() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+MarketModel::~MarketModel() {
+  std::list<MarketModel*>::iterator mkt;
+  for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
+    if (this == *mkt) {
+      markets_.erase(mkt);
+    }
+  };
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
-  for (int i = 0; i < markets_.size(); i++) {
-    if (markets_.at(i)->commodity() == commod) {
-      market = markets_.at(i);
+  std::list<MarketModel*>::iterator mkt;
+  for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
+    if ((*mkt)->commodity() == commod) {
+      market = *mkt;
       break;
     }
   }

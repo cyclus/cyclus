@@ -4,7 +4,7 @@
 
 #include <deque>
 #include <set>
-#include <vector>
+#include <list>
 
 #include "Model.h"
 #include "Communicator.h"
@@ -51,21 +51,18 @@ private:
  * all MODEL classes have these members
  * --------------------
  */
- static std::vector<MarketModel*> markets_;
+ static std::list<MarketModel*> markets_;
 
 public:
   MarketModel();
   
   /// MarketModels should not be indestructible.
-  virtual ~MarketModel() {};
+  virtual ~MarketModel();
   
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * Queries the list of known markets for one associated with the commodity
    *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
-   *
-   * @param src the pointer to the original (initialized ?) model to be copied
+   * @param commod a string naming the commodity whose market is of interest
    */
   static MarketModel* marketForCommod(std::string commod);
 
