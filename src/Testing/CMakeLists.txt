@@ -23,6 +23,14 @@ set ( TestSource
   ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
   ../Models/Facility/StubFacility/StubFacility.cpp
   ../Models/Facility/StubFacility/StubFacilityTests.cpp
+  ../Models/Inst/BuildInst/BuildInst.cpp
+  ../Models/Inst/BuildInst/BuildInstTests.cpp
+  ../Models/Inst/DeployInst/DeployInst.cpp
+  ../Models/Inst/DeployInst/DeployInstTests.cpp
+  ../Models/Inst/FixedInst/FixedInst.cpp
+  ../Models/Inst/FixedInst/FixedInstTests.cpp
+  ../Models/Inst/StubInst/StubInst.cpp
+  ../Models/Inst/StubInst/StubInstTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp
@@ -42,11 +50,12 @@ set ( TestSource
   ../Models/StubModel.cpp 
   ../Models/StubCommModel.cpp 
   ../Models/ConverterModel.cpp 
-  ../Models/MarketModel.cpp 
-  ../Models/FacilityModelTests.cpp 
   ../Models/FacilityModel.cpp 
-  ../Models/RegionModel.cpp
+  ../Models/FacilityModelTests.cpp 
   ../Models/InstModel.cpp
+  ../Models/InstModelTests.cpp 
+  ../Models/MarketModel.cpp 
+  ../Models/RegionModel.cpp
   )
 
 
