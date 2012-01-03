@@ -56,4 +56,20 @@ void StubInst::receiveMessage(Message* msg) {};
 
 
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructStubInst() {
+  return new StubInst();
+}
+
+extern "C" void destructStubInst(Model* p) {
+  delete p;
+}
+
+/* ------------------- */ 
+
+
 

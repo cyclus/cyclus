@@ -452,11 +452,11 @@ Mass RecipeReactor::checkStocks(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructRecipeReactor() {
     return new RecipeReactor();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructRecipeReactor(Model* p) {
     delete p;
 }
 

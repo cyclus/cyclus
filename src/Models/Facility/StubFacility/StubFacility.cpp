@@ -85,11 +85,11 @@ void handleTock(int time){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructStubFacility() {
   return new StubFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructStubFacility(Model* p) {
   delete p;
 }
 

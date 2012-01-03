@@ -90,3 +90,18 @@ void DeployInst::handleTick(int time) {
   };
 };
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructDeployInst() {
+  return new DeployInst();
+}
+
+extern "C" void destructDeployInst(Model* p) {
+  delete p;
+}
+
+/* ------------------- */ 
+

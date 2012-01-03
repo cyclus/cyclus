@@ -106,11 +106,11 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructBuildInst() {
     return new BuildInst();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructBuildInst(Model* p) {
     delete p;
 }
 

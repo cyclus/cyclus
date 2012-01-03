@@ -163,18 +163,4 @@ private:
 
 };
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-extern "C" Model* construct() {
-  return new NullMarket();
-}
-
-extern "C" void destruct(Model* p) {
-  delete p;
-}
-
-/* -------------------- */
-
 #endif

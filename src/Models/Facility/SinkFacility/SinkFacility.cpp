@@ -188,11 +188,11 @@ const Mass SinkFacility::getRequestAmt(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSinkFacility() {
   return new SinkFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSinkFacility(Model* p) {
   delete p;
 }
 

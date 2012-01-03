@@ -115,11 +115,11 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructStubConverter() {
     return new StubConverter();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructStubConverter(Model* p) {
     delete p;
 }
 

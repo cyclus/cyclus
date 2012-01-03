@@ -231,3 +231,20 @@ void CapacityRegion::handleTick(int time)
   // After we finish building, call the normal handleTick for a region
   RegionModel::handleTick(time);
 }
+
+
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructCapacityRegion() {
+    return new CapacityRegion();
+}
+
+extern "C" void destructCapacityRegion(Model* p) {
+    delete p;
+}
+
+/* -------------------- */

@@ -496,11 +496,11 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructEnrichmentFacility() {
   return new EnrichmentFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructEnrichementFacility(Model* p) {
   delete p;
 }
 

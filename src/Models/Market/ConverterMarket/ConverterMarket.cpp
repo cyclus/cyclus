@@ -236,11 +236,11 @@ void ConverterMarket::resolve()
  * all MODEL classes have these members
  * --------------------
  */
-extern "C" Model* construct() {
+extern "C" Model* constructConverterMarket() {
   return new ConverterMarket();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructConverterMarket(Model* p) {
   delete p;
 }
 /* -------------------- */

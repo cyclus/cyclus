@@ -137,4 +137,20 @@ void BuildRegion::handleTick(int time)
   
   // After we finish building, call the normal handleTick for a region
   RegionModel::handleTick(time);
+
 }
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructBuildRegion() {
+    return new BuildRegion();
+}
+
+extern "C" void destructBuildRegion(Model* p) {
+    delete p;
+}
+
+/* -------------------- */

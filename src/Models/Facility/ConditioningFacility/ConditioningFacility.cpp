@@ -199,19 +199,6 @@ void ConditioningFacility::handleTock(int time){
 };
 
 /* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" Model* construct() {
-  return new ConditioningFacility();
-}
-
-extern "C" void destruct(Model* p) {
-  delete p;
-}
-
-/* --------------------
  * this FACILITYMODEL class has these members
  * --------------------
  */
@@ -409,4 +396,20 @@ void ConditioningFacility::conditionMaterials(){
 void ConditioningFacility::processOrders(){
 }
 
+
+
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructConditioningFacility() {
+  return new ConditioningFacility();
+}
+
+extern "C" void destructConditioningFacility(Model* p) {
+  delete p;
+}
+
+/* ------------------- */ 
 

@@ -400,11 +400,11 @@ Mass StorageFacility::checkStocks(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructStorageFacility() {
     return new StorageFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructStorageFacility(Model* p) {
     delete p;
 }
 

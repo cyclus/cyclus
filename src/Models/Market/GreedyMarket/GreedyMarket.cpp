@@ -185,12 +185,12 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-extern "C" Model* construct() {
+extern "C" Model* constructGreedyMarket() {
   return new GreedyMarket();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-extern "C" void destruct(Model* p) {
+extern "C" void destructGreedyMarket(Model* p) {
   delete p;
 }
 

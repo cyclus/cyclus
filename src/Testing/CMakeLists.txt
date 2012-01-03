@@ -9,9 +9,10 @@ set ( TestSource
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp
+  ../Models/Facility/SinkFacility/SinkFacility.cpp
+  ../Models/Facility/SinkFacility/SinkFacilityTests.cpp
   ../Models/Facility/SourceFacility/SourceFacility.cpp
   ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
-  ../Models/Facility/GenericRepository/GenericRepositoryTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp

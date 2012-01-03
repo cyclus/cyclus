@@ -11,7 +11,8 @@
 #include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::SourceFacility(){ }
+SourceFacility::SourceFacility(){ 
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::~SourceFacility(){
@@ -248,11 +249,11 @@ Mass SourceFacility::checkInventory(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSourceFacility() {
   return new SourceFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSourceFacility(Model* p) {
   delete p;
 }
 

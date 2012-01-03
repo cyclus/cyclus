@@ -337,11 +337,11 @@ Mass NullFacility::checkStocks(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructNullFacility() {
     return new NullFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructNullFacility(Model* p) {
     delete p;
 }
 

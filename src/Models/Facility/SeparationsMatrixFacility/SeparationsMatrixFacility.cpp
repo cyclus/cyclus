@@ -505,11 +505,11 @@ void SeparationsMatrixFacility::separate()
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSeparationsMatrixFacility() {
   return new SeparationsMatrixFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSeparationsMatrixFacility(Model* p) {
   delete p;
 }
 
