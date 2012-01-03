@@ -77,7 +77,7 @@ void StubFacility::handleTick(int time){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void handleTock(int time){
+void StubFacility::handleTock(int time){
 };
 
 /* --------------------

@@ -9,10 +9,20 @@ set ( TestSource
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp
+  ../Models/Facility/EnrichmentFacility/EnrichmentFacility.cpp
+  ../Models/Facility/EnrichmentFacility/EnrichmentFacilityTests.cpp
+  ../Models/Facility/NullFacility/NullFacility.cpp
+  ../Models/Facility/NullFacility/NullFacilityTests.cpp
+  ../Models/Facility/RecipeReactor/RecipeReactor.cpp
+  ../Models/Facility/RecipeReactor/RecipeReactorTests.cpp
+  ../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacility.cpp
+  ../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacilityTests.cpp
   ../Models/Facility/SinkFacility/SinkFacility.cpp
   ../Models/Facility/SinkFacility/SinkFacilityTests.cpp
   ../Models/Facility/SourceFacility/SourceFacility.cpp
   ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
+  ../Models/Facility/StubFacility/StubFacility.cpp
+  ../Models/Facility/StubFacility/StubFacilityTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp

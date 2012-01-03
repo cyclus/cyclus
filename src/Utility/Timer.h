@@ -148,7 +148,7 @@ public:
    * @param decay interval between decay calculations in months. <=0 if decay is off 
    * (default = 0)
    */
-  void initialize(int dur, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
+  void initialize(int dur = 1, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
 
   /**
    * Runs the simulation.

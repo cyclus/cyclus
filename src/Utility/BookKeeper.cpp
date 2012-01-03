@@ -23,8 +23,9 @@ BookKeeper* BookKeeper::instance_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper* BookKeeper::Instance() {
   // If we haven't created a BookKeeper yet, create and return it.
-  if (0 == instance_)
+  if (0 == instance_){
     instance_ = new BookKeeper();  
+  }
   return instance_;
 };
 
@@ -36,6 +37,7 @@ BookKeeper::BookKeeper() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB() {
+  /// @todo make the output database name optional (khuff)
   createDB("cyclus.h5");
 };
 

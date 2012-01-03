@@ -147,6 +147,7 @@ Timer* Timer::Instance() {
   // either way.
   if (0 == instance_) {
     instance_ = new Timer();
+    instance_->initialize();
   }
 
   return instance_;
