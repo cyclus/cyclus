@@ -31,6 +31,14 @@ set ( TestSource
   ../Models/Inst/FixedInst/FixedInstTests.cpp
   ../Models/Inst/StubInst/StubInst.cpp
   ../Models/Inst/StubInst/StubInstTests.cpp
+  ../Models/Market/ConverterMarket/ConverterMarket.cpp
+  ../Models/Market/ConverterMarket/ConverterMarketTests.cpp
+  ../Models/Market/GreedyMarket/GreedyMarket.cpp
+  ../Models/Market/GreedyMarket/GreedyMarketTests.cpp
+  ../Models/Market/NullMarket/NullMarket.cpp
+  ../Models/Market/NullMarket/NullMarketTests.cpp
+  ../Models/Market/StubMarket/StubMarket.cpp
+  ../Models/Market/StubMarket/StubMarketTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp
@@ -55,6 +63,7 @@ set ( TestSource
   ../Models/InstModel.cpp
   ../Models/InstModelTests.cpp 
   ../Models/MarketModel.cpp 
+  ../Models/MarketModelTests.cpp 
   ../Models/RegionModel.cpp
   )
 
