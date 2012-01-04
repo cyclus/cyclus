@@ -8,6 +8,7 @@
 #include "Env.h"
 #include "InputXML.h"
 #include "Logician.h"
+#include "Timer.h"
 
 #include "RegionModel.h"
 
@@ -51,8 +52,14 @@ void* Model::destroy(Model* model) {
   mdl_dtor* model_destructor = destroy_map_[model->getModelImpl()];
 
   model_destructor(model);
-
+  
   return model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Model::decommission(){  
+  // set the died on date for book keeping
+  this->setDiedOn( TI->getTime() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -115,7 +122,7 @@ void Model::load_regions() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Model::load_institutions() {
 
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
@@ -125,14 +132,15 @@ void Model::load_institutions() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   handle_ = this->generateHandle();
+  this->setBornOn( TI->getTime() );
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* model_orig) {
   if (model_orig->getModelType() != model_type_ && 
        model_orig->getModelImpl() != model_impl_) {
@@ -186,6 +194,7 @@ void Model::setParent(Model* parent){
   if (parent_ != this){
     parent_->addChild(this);
   }
+  parentID_ = parent_->ID();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -200,9 +209,10 @@ Model* Model::parent(){
   return parent_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
-  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() << " has added child " \
-		  << child->name() << " ID " << child->ID() << " to its list of children.";
+  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
+		  << " has added child " << child->name() << " ID " 
+		  << child->ID() << " to its list of children.";
   children_.push_back(child); 
 };

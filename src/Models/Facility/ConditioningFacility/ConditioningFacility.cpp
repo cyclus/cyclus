@@ -194,8 +194,13 @@ void ConditioningFacility::handleTock(int time){
   // transactions by preparing and sending material from its stocks
   // all material in its stocks up to its monthly processing 
   // capacity.
+  
   conditionMaterials();
   processOrders();
+
+  // call the facility model's handle tock 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 };
 
 /* --------------------

@@ -214,7 +214,7 @@ void BookKeeper::registerRepoComponent(int ID, std::string name,
   repo_components_.push_back(toRegister);
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeModelList(ModelType type) {
 
   // define some useful variables.
@@ -222,7 +222,8 @@ void BookKeeper::writeModelList(ModelType type) {
   const H5std_string name_memb = "name";
   const H5std_string modelImpl_memb = "modelImpl";
   const H5std_string parentID_memb = "parentID";
-  const H5std_string parentType_memb = "parentType";
+  const H5std_string bornOn_memb = "bornOn";
+  const H5std_string diedOn_memb = "diedOn";
   const H5std_string output_name = "/output";
 
   std::string subgroup_name;
@@ -268,6 +269,9 @@ void BookKeeper::writeModelList(ModelType type) {
        model_iter++) {
     Model* theModel = model_iter->second;
     modelList[i].ID = theModel->ID();
+    modelList[i].parentID = theModel->parentID();
+    modelList[i].bornOn = theModel->bornOn();
+    modelList[i].diedOn = theModel->diedOn();
     strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
     strcpy(modelList[i].name, theModel->name().c_str()); 
     i++;
@@ -281,13 +285,17 @@ void BookKeeper::writeModelList(ModelType type) {
   };
 
   model_t *pModelList = modelList;
-  doModelWrite(ID_memb, name_memb, modelImpl_memb, \
-         output_name, subgroup_name, dataset_name, \
-         numStructs, numModels, pModelList);
+  doModelWrite(ID_memb, name_memb, modelImpl_memb, parentID_memb, 
+	       bornOn_memb, diedOn_memb, output_name, subgroup_name, 
+	       dataset_name, numStructs, numModels, pModelList);
 };
 
-void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb, 
-                              H5std_string modelImpl_memb, 
+void BookKeeper::doModelWrite(H5std_string ID_memb,
+			      H5std_string name_memb,
+                              H5std_string modelImpl_memb,
+			      H5std_string parentID_memb,
+			      H5std_string bornOn_memb,
+			      H5std_string diedOn_memb,
                               H5std_string output_name, 
                               std::string subgroup_name, 
                               std::string dataset_name,
@@ -326,12 +334,21 @@ void BookKeeper::doModelWrite(H5std_string ID_memb, H5std_string name_memb,
    
     // Create a datatype for models based on the struct
     CompType mtype( sizeof(model_t) );
-    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), PredType::NATIVE_INT); 
+    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), 
+			PredType::NATIVE_INT); 
+    mtype.insertMember( parentID_memb, HOFFSET(model_t, parentID), 
+			PredType::NATIVE_INT); 
+    mtype.insertMember( bornOn_memb, HOFFSET(model_t, bornOn), 
+			PredType::NATIVE_INT); 
+    mtype.insertMember( diedOn_memb, HOFFSET(model_t, diedOn), 
+			PredType::NATIVE_INT); 
     mtype.insertMember( name_memb, HOFFSET(model_t, name), strtype);
-    mtype.insertMember( modelImpl_memb, HOFFSET(model_t, modelImpl), strtype);
+    mtype.insertMember( modelImpl_memb, HOFFSET(model_t, modelImpl), 
+			strtype);
 
     DataSet* dataset;
-    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+    dataset = new DataSet(subgroup->createDataSet( dataset_name , 
+						   mtype , *dataspace ));
 
     // write it, finally 
     dataset->write( modelList , mtype );

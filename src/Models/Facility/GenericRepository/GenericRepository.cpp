@@ -279,6 +279,9 @@ void GenericRepository::handleTock(int time) {
   // calculate the nuclide transport
   transportNuclides();
   
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

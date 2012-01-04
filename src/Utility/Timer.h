@@ -206,6 +206,20 @@ public:
    * @return the end date as a datetime object
    */
   boost::gregorian::date endDate(){return endDate_;}
+
+  /**
+   * Returns true if it is the ending date of the simulation
+   *
+   * @return whether it is the last day of the simulation
+   */
+  bool checkEndDate() {return (date_ == endDate_);}
+
+  /**
+   * Returns true if it is the ending month of the simulation
+   *
+   * @return whether it is the last day of the simulation
+   */
+  bool checkEndMonth() {return ( date_.month() == endDate_.month() );}
   
   /**
    * Given the current date, returns the last day of the current month

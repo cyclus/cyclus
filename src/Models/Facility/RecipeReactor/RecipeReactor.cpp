@@ -413,6 +413,10 @@ void RecipeReactor::handleTock(int time)
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;
+
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

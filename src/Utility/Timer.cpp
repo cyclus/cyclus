@@ -15,7 +15,7 @@ using namespace std;
 
 Timer* Timer::instance_ = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::runSim() {
   time_ = -1;
   handlePreHistory();
@@ -47,7 +47,9 @@ void Timer::runSim() {
 }
 
 int Timer::lastDayOfMonth(){
-  int lastDay = boost::gregorian::gregorian_calendar::end_of_month_day(date_.year(),date_.month());
+  int lastDay = 
+    boost::gregorian::gregorian_calendar::end_of_month_day(date_.year(),
+							   date_.month());
   return lastDay;
 }
 
