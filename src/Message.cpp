@@ -22,6 +22,8 @@ Message::Message(Communicator* sender) {
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
+  path_stack_ = vector<Communicator*>();
+  current_owner_ = sender;
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
@@ -86,8 +88,7 @@ Message* Message::clone() {
     default :
       CycException("ResourceType not recognized.");
   }
-  // shouldnt we be returning the toRet message?
-  return toRet;//new Message(*this);
+  return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
