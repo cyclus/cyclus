@@ -39,6 +39,10 @@ set ( TestSource
   ../Models/Market/NullMarket/NullMarketTests.cpp
   ../Models/Market/StubMarket/StubMarket.cpp
   ../Models/Market/StubMarket/StubMarketTests.cpp
+  ../Models/Stub/StubStub/StubStub.cpp
+  ../Models/Stub/StubStub/StubStubTests.cpp
+  ../Models/Region/StubRegion/StubRegion.cpp
+  ../Models/Region/StubRegion/StubRegionTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp
@@ -56,6 +60,7 @@ set ( TestSource
   ../Models/Model.cpp 
   ../Models/StubTimeAgent.cpp 
   ../Models/StubModel.cpp 
+  ../Models/StubModelTests.cpp 
   ../Models/StubCommModel.cpp 
   ../Models/ConverterModel.cpp 
   ../Models/FacilityModel.cpp 
@@ -65,6 +70,7 @@ set ( TestSource
   ../Models/MarketModel.cpp 
   ../Models/MarketModelTests.cpp 
   ../Models/RegionModel.cpp
+  ../Models/RegionModelTests.cpp 
   )
 
 

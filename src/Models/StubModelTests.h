@@ -1,10 +1,8 @@
-// InstModelTests.h
+// StubModelTests.h
 #include <gtest/gtest.h>
 
-#include "InstModel.h"
+#include "StubModel.h"
 #include "suffix.h"
-#include "Testing/TestRegion.h"
-#include "Testing/TestMarket.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -14,25 +12,24 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete InstModel instance 
-typedef InstModel* InstModelConstructor();
+// parameter is a pointer to a concrete StubModel stubance 
+typedef StubModel* StubModelConstructor();
 
-class InstModelTests : public TestWithParam<InstModelConstructor*> {
+class StubModelTests : public TestWithParam<StubModelConstructor*> {
   public:
-    virtual ~InstModelTests() {
+    virtual ~StubModelTests() {
     }
 
     //virtual void SetUp() { 
-    InstModelTests() {
-      inst_model_ = (*GetParam())();
-      inst_model_->setParent(new TestRegion());
+    StubModelTests() {
+      stub_model_ = (*GetParam())();
     }
     virtual void TearDown(){ 
-      delete inst_model_;
+      delete stub_model_;
     }
 
   protected:
-    InstModel* inst_model_;
+    StubModel* stub_model_;
 
 };
 
