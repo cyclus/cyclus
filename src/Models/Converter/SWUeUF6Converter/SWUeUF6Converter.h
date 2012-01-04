@@ -148,11 +148,11 @@ protected:
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSWUeUF6Converter() {
     return new SWUeUF6Converter();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSWUeUF6Converter(Model* p) {
     delete p;
 }
 

@@ -297,6 +297,10 @@ void NullFacility::handleTock(int time)
     sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
+
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
   
 }
 
@@ -337,11 +341,11 @@ Mass NullFacility::checkStocks(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructNullFacility() {
     return new NullFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructNullFacility(Model* p) {
     delete p;
 }
 

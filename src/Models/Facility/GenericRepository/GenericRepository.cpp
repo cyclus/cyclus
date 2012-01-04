@@ -279,6 +279,9 @@ void GenericRepository::handleTock(int time) {
   // calculate the nuclide transport
   transportNuclides();
   
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -617,11 +620,11 @@ void GenericRepository::transportNuclides(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructGenericRepository() {
     return new GenericRepository();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructGenericRepository(Model* p) {
     delete p;
 }
 

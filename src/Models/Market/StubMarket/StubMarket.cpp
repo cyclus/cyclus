@@ -52,3 +52,16 @@ void StubMarket::receiveMessage(Message* msg) {};
 
 void StubMarket::resolve() {};
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+extern "C" Model* constructStubMarket() {
+  return new StubMarket();
+}
+
+extern "C" void destructStubMarket(Model* p) {
+  delete p;
+}
+
+/* -------------------- */

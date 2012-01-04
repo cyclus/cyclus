@@ -40,7 +40,6 @@ class FakeSourceFacility : public SourceFacility {
     }
 
     virtual ~FakeSourceFacility() {
-      delete recipe_;
     }
 
     double fakeCheckInventory() { return checkInventory(); }
@@ -53,11 +52,9 @@ class FakeSourceFacility : public SourceFacility {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class InfiniteDump : public FacilityModel {
-  void receiveMessage(Message* msg) {
-
-  }
-};
+FacilityModel* SourceFacilityConstructor(){
+  return dynamic_cast<FacilityModel*>(new FakeSourceFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SourceFacilityTest : public ::testing::Test {
@@ -76,7 +73,6 @@ class SourceFacilityTest : public ::testing::Test {
 
     virtual void TearDown() {
       delete src_facility;
-      delete commod_market;
     }
 };
 
@@ -140,6 +136,5 @@ TEST_F(SourceFacilityTest, Tock) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests, Values(dynamic_cast<FacilityModel*>(new FakeSourceFacility())));
-
+INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests, Values(&SourceFacilityConstructor));
 

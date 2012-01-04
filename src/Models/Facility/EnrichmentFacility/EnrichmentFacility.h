@@ -325,7 +325,7 @@ protected:
      * The EnrichmentFacility must stop processing the material in its stocks 
      * when its inventory is full.
      */
-    int inventory_size;
+    int inventory_size_;
 
     /**
      * The receipe of input materials.

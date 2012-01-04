@@ -125,7 +125,6 @@ void SinkFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTock(int time){
-
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
@@ -133,6 +132,10 @@ void SinkFacility::handleTock(int time){
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
+
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -188,11 +191,11 @@ const Mass SinkFacility::getRequestAmt(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSinkFacility() {
   return new SinkFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSinkFacility(Model* p) {
   delete p;
 }
 

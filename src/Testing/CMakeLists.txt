@@ -9,9 +9,36 @@ set ( TestSource
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp
+  ../Models/Facility/EnrichmentFacility/EnrichmentFacility.cpp
+  ../Models/Facility/EnrichmentFacility/EnrichmentFacilityTests.cpp
+  ../Models/Facility/NullFacility/NullFacility.cpp
+  ../Models/Facility/NullFacility/NullFacilityTests.cpp
+  ../Models/Facility/RecipeReactor/RecipeReactor.cpp
+  ../Models/Facility/RecipeReactor/RecipeReactorTests.cpp
+  ../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacility.cpp
+  ../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacilityTests.cpp
+  ../Models/Facility/SinkFacility/SinkFacility.cpp
+  ../Models/Facility/SinkFacility/SinkFacilityTests.cpp
   ../Models/Facility/SourceFacility/SourceFacility.cpp
   ../Models/Facility/SourceFacility/SourceFacilityTests.cpp
-  ../Models/Facility/GenericRepository/GenericRepositoryTests.cpp
+  ../Models/Facility/StubFacility/StubFacility.cpp
+  ../Models/Facility/StubFacility/StubFacilityTests.cpp
+  ../Models/Inst/BuildInst/BuildInst.cpp
+  ../Models/Inst/BuildInst/BuildInstTests.cpp
+  ../Models/Inst/DeployInst/DeployInst.cpp
+  ../Models/Inst/DeployInst/DeployInstTests.cpp
+  ../Models/Inst/FixedInst/FixedInst.cpp
+  ../Models/Inst/FixedInst/FixedInstTests.cpp
+  ../Models/Inst/StubInst/StubInst.cpp
+  ../Models/Inst/StubInst/StubInstTests.cpp
+  ../Models/Market/ConverterMarket/ConverterMarket.cpp
+  ../Models/Market/ConverterMarket/ConverterMarketTests.cpp
+  ../Models/Market/GreedyMarket/GreedyMarket.cpp
+  ../Models/Market/GreedyMarket/GreedyMarketTests.cpp
+  ../Models/Market/NullMarket/NullMarket.cpp
+  ../Models/Market/NullMarket/NullMarketTests.cpp
+  ../Models/Market/StubMarket/StubMarket.cpp
+  ../Models/Market/StubMarket/StubMarketTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp
@@ -31,11 +58,13 @@ set ( TestSource
   ../Models/StubModel.cpp 
   ../Models/StubCommModel.cpp 
   ../Models/ConverterModel.cpp 
-  ../Models/MarketModel.cpp 
-  ../Models/FacilityModelTests.cpp 
   ../Models/FacilityModel.cpp 
-  ../Models/RegionModel.cpp
+  ../Models/FacilityModelTests.cpp 
   ../Models/InstModel.cpp
+  ../Models/InstModelTests.cpp 
+  ../Models/MarketModel.cpp 
+  ../Models/MarketModelTests.cpp 
+  ../Models/RegionModel.cpp
   )
 
 

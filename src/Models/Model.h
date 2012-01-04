@@ -68,6 +68,12 @@ public:
    * @param model a pointer to the model being destroyed
    */
   static void* destroy(Model* model);
+
+  /**
+     @brief Do activities related to decommisioning the model at the end
+     of its life.
+   */
+  void decommission();
   
   /**
    * loads the market models available to the simulation
@@ -192,6 +198,21 @@ public:
   Model* parent();
 
   /**
+     return the parent' id
+   */
+  int parentID() {return parentID_;};
+
+  /**
+   * return the born on date of this model
+   */
+  int bornOn() {return bornOn_;};
+
+  /**
+   * return the died on of this model
+   */
+  int diedOn() {return diedOn_;};
+
+  /**
    * add a child to the list of children
    */
   void addChild(Model* child);
@@ -199,12 +220,22 @@ public:
   /**
    * Return the number of children the model has
    */
-  int nChildren(){return children_.size();}
+  int nChildren() {return children_.size();}
 
   /**
    * set the parent of this model
    */
   void setParent(Model* parent);
+
+  /**
+   * set the bornOn date of this model
+   */
+  void setBornOn(int date) {bornOn_ = date;};
+
+  /**
+   * set the died on date of this model
+   */
+  void setDiedOn(int date) {diedOn_ = date;};
 
   /**
    * return the ith child
@@ -224,6 +255,23 @@ private:
    * parent of this model
    */
   Model* parent_;
+
+  /**
+     parent's ID of this model
+     Note: we keep the parent id in the model so we can reference it
+     even if the parent is deallocated.
+   */
+  int parentID_;
+
+  /**
+     born on date of this model
+   */
+  int bornOn_;
+
+  /**
+     died on date of this model
+   */
+  int diedOn_;
   
   /**
    * map of constructor methods for each loaded model

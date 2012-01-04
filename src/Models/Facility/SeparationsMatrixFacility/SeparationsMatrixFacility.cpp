@@ -292,6 +292,10 @@ void SeparationsMatrixFacility::handleTock(int time)
     sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
+  
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -505,11 +509,11 @@ void SeparationsMatrixFacility::separate()
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSeparationsMatrixFacility() {
   return new SeparationsMatrixFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSeparationsMatrixFacility(Model* p) {
   delete p;
 }
 

@@ -3,6 +3,7 @@
 
 #include "FacilityModel.h"
 
+#include "Timer.h"
 #include "Logician.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
@@ -26,6 +27,7 @@ void FacilityModel::init(xmlNodePtr cur) {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
    
   for (int i=0;i<nodes->nodeNr;i++){
+    // MJGFLAG this inst name stuff needs to be depricated
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     this->setInstName(inst_name_);
     LOG(LEV_DEBUG2) << "Facility " << ID() << " has just set its inst to " << inst_name_;
@@ -81,6 +83,9 @@ void FacilityModel::handleTock(int time){
   // send the appropriate materials, 
   // receive any materials the market has found a source for, 
   // and record all material transfers.
+
+  // if its the last month, decommission the facility
+  if (TI->checkEndMonth()) {this->decommission();}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

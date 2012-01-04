@@ -11,7 +11,8 @@
 #include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::SourceFacility(){ }
+SourceFacility::SourceFacility(){ 
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::~SourceFacility(){
@@ -184,6 +185,7 @@ void SourceFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
+
   // if there's room in the inventory, process material at capacity
   Mass space = inventory_size_ - this->checkInventory(); 
   if(capacity_*recipe_->getTotMass() <= space){
@@ -223,6 +225,9 @@ void SourceFacility::handleTock(int time){
                   << " units of material at the close of month " << time
                   << ".";
 
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 
@@ -248,11 +253,11 @@ Mass SourceFacility::checkInventory(){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructSourceFacility() {
   return new SourceFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructSourceFacility(Model* p) {
   delete p;
 }
 

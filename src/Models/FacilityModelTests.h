@@ -15,28 +15,31 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete FacilityModel instance 
+typedef FacilityModel* FacilityModelConstructor();
 
-typedef Model* mdl_ctor();
-class FacilityModelTests : public TestWithParam<FacilityModel*> {
- public:
-  virtual void SetUp() { 
-    facility_model_ = GetParam();
-    facility_model_->setParent(new TestInst());
-    test_out_market_ = new TestMarket("out-commod");
-    test_out_market_->copyFreshModel(test_out_market_);
-    test_in_market_ = new TestMarket("in-commod");
-    test_in_market_->copyFreshModel(test_in_market_);
-  }
-  virtual void TearDown(){ 
-    delete facility_model_;
-    delete test_out_market_;
-    delete test_in_market_;
-  }
+class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
+  public:
+    virtual ~FacilityModelTests() {
+    }
 
- protected:
-  FacilityModel* facility_model_;
-  TestMarket* test_out_market_;
-  TestMarket* test_in_market_;
+    //virtual void SetUp() { 
+    FacilityModelTests() {
+      facility_model_ = (*GetParam())();
+      facility_model_->setParent(new TestInst());
+      test_out_market_ = new TestMarket("out-commod");
+      test_out_market_->copyFreshModel(test_out_market_);
+      test_in_market_ = new TestMarket("in-commod");
+      test_in_market_->copyFreshModel(test_in_market_);
+    }
+    virtual void TearDown(){ 
+      delete facility_model_;
+    }
+
+  protected:
+    FacilityModel* facility_model_;
+    TestMarket* test_out_market_;
+    TestMarket* test_in_market_;
+    TestInst* test_inst_;
 
 };
 

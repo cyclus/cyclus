@@ -77,7 +77,10 @@ void StubFacility::handleTick(int time){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void handleTock(int time){
+void StubFacility::handleTock(int time){
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 };
 
 /* --------------------
@@ -85,11 +88,11 @@ void handleTock(int time){
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructStubFacility() {
   return new StubFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructStubFacility(Model* p) {
   delete p;
 }
 

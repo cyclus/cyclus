@@ -324,10 +324,12 @@ public:
    * we use numStrucs and numModels so that HDF5 behaves well when numModels = 0
    * @param modelList the list of models to write (created by setUpModelList)
    */
-  void doModelWrite(H5std_string ID_memb, H5std_string name_memb,  \
-        H5std_string modelImpl_memb, H5std_string output_name, \
-        std::string subgroup_name, std::string dataset_name, \
-        int numStructs, int numModels, model_t* modelList);
+  void doModelWrite(H5std_string ID_memb, H5std_string name_memb,
+		    H5std_string modelImpl_memb, 
+		    H5std_string parentID_memb, H5std_string bornOn_memb,
+		    H5std_string diedOn_memb, H5std_string output_name,
+		    std::string subgroup_name, std::string dataset_name,
+		    int numStructs, int numModels, model_t* modelList);
 
   /**
    * Write a list of the transactions in the simulation

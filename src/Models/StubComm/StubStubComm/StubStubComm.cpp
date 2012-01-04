@@ -49,9 +49,17 @@ void StubStubComm::receiveMessage(Message* msg) {};
 
 
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
+extern "C" Model* constructStubStubComm() {
+    return new StubStubComm();
+}
 
+extern "C" void destructStubStubComm(Model* p) {
+    delete p;
+}
 
-
-
-
+/* -------------------- */

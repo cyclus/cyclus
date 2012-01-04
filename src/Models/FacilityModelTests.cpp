@@ -3,14 +3,6 @@
 
 #include "FacilityModelTests.h"
 
-// As a general rule, to prevent a test from affecting the tests that come
-// after it, you should create and destroy the tested objects for each test
-// instead of reusing them.  In this sample we will define a simple factory
-// function for FacilityModel objects.  We will instantiate objects in test's
-// SetUp() method and delete them in TearDown() method.
-
-//class FacilityModelTests : public TestWithParam<CreateFacilityModelFunc*>{
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(FacilityModelTests, Print) {
   int time = 1;
@@ -19,7 +11,7 @@ TEST_P(FacilityModelTests, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(FacilityModelTests, CopyFacility) {
-  FacilityModel* new_facility;
+  FacilityModel* new_facility = facility_model_;
   EXPECT_NO_THROW(new_facility->copy(facility_model_)); 
 }
 

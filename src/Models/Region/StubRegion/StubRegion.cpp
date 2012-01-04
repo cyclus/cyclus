@@ -52,7 +52,17 @@ void StubRegion::receiveMessage(Message* msg) {};
 
 
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
+extern "C" Model* constructStubRegion() {
+    return new StubRegion();
+}
 
+extern "C" void destructStubRegion(Model* p) {
+    delete p;
+}
 
-
+/* -------------------- */

@@ -46,7 +46,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   out_commod_ = XMLinput->get_xpath_content(cur,"outcommodity");
 
   // get inventory size
-  inventory_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   // get capacity_
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
   // get default tails fraction
@@ -68,7 +68,7 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 
   in_commod_ = src->in_commod_;
   out_commod_ = src->out_commod_;
-  inventory_size = src->inventory_size;
+  inventory_size_ = src->inventory_size_;
   capacity_ = src->capacity_;
   default_xw_ = src->default_xw_;
 
@@ -97,7 +97,7 @@ void EnrichmentFacility::print()
       << "} into commodity {"
       << out_commod_
       << "}, and has an inventory that holds " 
-      << inventory_size << " materials";
+      << inventory_size_ << " materials";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -230,6 +230,10 @@ void EnrichmentFacility::handleTock(int time)
     sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
     ordersWaiting_.pop_front();
   }
+  
+  // call the facility model's handle tock last 
+  // to check for decommissioning
+  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -277,7 +281,7 @@ void EnrichmentFacility::makeRequests(){
   Mass sto = this->checkStocks(); 
   // subtract inv and sto from inventory max size to get total empty space
   // the request cannot exceed the space available
-  Mass space = inventory_size - inv - sto;
+  Mass space = inventory_size_ - inv - sto;
 
   // this will be a request for free stuff
   // until cyclus has a working notion of default pricing
@@ -496,11 +500,11 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
  * --------------------
  */
 
-extern "C" Model* construct() {
+extern "C" Model* constructEnrichmentFacility() {
   return new EnrichmentFacility();
 }
 
-extern "C" void destruct(Model* p) {
+extern "C" void destructEnrichementFacility(Model* p) {
   delete p;
 }
 
