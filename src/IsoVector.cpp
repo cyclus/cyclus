@@ -109,7 +109,16 @@ void IsoVector::printRecipes() {
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    LOG(LEV_DEBUG2) << "Recipe " << recipe->first;
+    LOG(LEV_DEBUG2) << "Recipe " << recipe->first << ":";
+    recipe->second->print();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::print() {
+  CompMap::iterator entry;
+  for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
+    LOG(LEV_DEBUG2) << entry->first << ": " << entry->second << " atoms";
   }
 }
 
@@ -154,6 +163,10 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
 
     if (diff_comp.count(isotope) == 0) {
       diff_comp[isotope] = 0;
+    }
+
+    if (rhs_atoms > diff_comp[isotope]) {
+      throw CyclusRangeException("Attempted to extract more than exists.");
     }
     diff_comp[isotope] -= rhs_atoms;
   }
@@ -248,6 +261,19 @@ double IsoVector::mass() {
     iter++;
   }
   return mass;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::setMass(double new_mass) {
+  int isotope;
+  double ratio = new_mass / mass()
+
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
+    iter++;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

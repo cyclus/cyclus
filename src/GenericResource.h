@@ -42,7 +42,7 @@ public:
   /**
    * Sets the total quantity of this resource in its base unit 
    */
-  virtual void setQuantity(double new_quantity){quantity_ = new_quantity;};
+  void setQuantity(double new_quantity){quantity_ = new_quantity;};
 
   /**
    * Sets the quality of this resource

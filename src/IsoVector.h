@@ -85,6 +85,8 @@ public:
 
   void printRecipes();
 
+  void print();
+
   int recipeCount();                                  
 
   static std::map<std::string, IsoVector*> recipes_;
@@ -135,6 +137,11 @@ public:
    @return the mass of the given isotope within the material, or zero
    */
   double mass(int tope);
+
+  /*!
+   Sets the mass of the entire IsoVector
+   */
+  void setMass(double new_mass);
 
   /*!
    returns the total atoms in this material object 

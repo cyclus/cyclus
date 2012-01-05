@@ -52,7 +52,7 @@ struct Transaction {
   /**
    * A specific resource this transaction is concerned with 
    */
-  Resource resource;
+  Resource* resource;
 
   /**
    * @brief supplier in this transaction.
@@ -517,14 +517,14 @@ class Message {
      *
      * @return the Resource  (i.e. Material object) 
      */
-    Resource* getResource() const {return & trans_.resource;};
+    Resource* getResource() const {return trans_.resource;};
 
     /**
      * Sets the assigned resource to a new resource
      *
      * @param new_resource is the new Resource in the transaction
      */
-    void setResource(Resource new_resource) {trans_.resource = new_resource;};
+    void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
 
 };
 #endif
