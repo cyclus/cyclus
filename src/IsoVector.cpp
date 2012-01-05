@@ -6,6 +6,7 @@
 #include "Env.h"
 #include "UniformTaylor.h"
 #include "Logger.h"
+#include "InputXML.h"
 
 #include <iostream>
 #include <fstream>
@@ -40,11 +41,11 @@ IsoVector::IsoVector(CompMap initial_comp) {
 IsoVector::IsoVector(xmlNodePtr cur) {
   ID_ = nextID_++;
   
-  recipe_name = XMLinput->get_xpath_content(cur,"name");
+  string recipe_name = XMLinput->get_xpath_content(cur,"name");
   string comp_type = XMLinput->get_xpath_content(cur,"basis");
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
-  double grams_per_atom;
+  double atom_count, grams_per_atom;
   int isotope;
   xmlNodePtr iso_node;
   for (int i = 0; i < isotopes->nodeNr; i++) {
@@ -79,6 +80,7 @@ void IsoVector::load_recipes() {
 
   /// load recipes from databases
   nodes = XMLinput->get_xpath_elements("/*/recipebook");
+  std::string filename, ns, format;
 
   for (int i = 0; i < nodes->nodeNr; i++) {
     filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
@@ -124,7 +126,7 @@ void IsoVector::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::recipeCount() { 
-  return recipes_.size(); 
+  return IsoVector::recipes_.size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -166,7 +168,7 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
     }
 
     if (rhs_atoms > diff_comp[isotope]) {
-      throw CyclusRangeException("Attempted to extract more than exists.");
+      throw CycRangeException("Attempted to extract more than exists.");
     }
     diff_comp[isotope] -= rhs_atoms;
   }
@@ -251,29 +253,16 @@ void IsoVector::loadDecayInfo() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass() {
-  double mass = 0;
+  double mass_val = 0;
   int isotope;
 
   map<int, double>::const_iterator iter = atom_comp_.begin();
   while (iter != atom_comp_.end()) {
     isotope = iter->first;
-    mass += mass(isotope);
+    mass_val += mass(isotope);
     iter++;
   }
-  return mass;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setMass(double new_mass) {
-  int isotope;
-  double ratio = new_mass / mass()
-
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
-    iter++;
-  }
+  return mass_val;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -286,6 +275,19 @@ double IsoVector::mass(int tope) {
     grams_per_atom = MT->getMassInGrams(tope);
 
     return atom_comp_[tope] * grams_per_atom / grams_per_kg;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::setMass(double new_mass) {
+  int isotope;
+  double ratio = new_mass / mass();
+
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
+    iter++;
   }
 }
 
@@ -412,8 +414,9 @@ void IsoVector::buildDecayMatrix() {
  
     // processes the vector in the daughters map if it is not empty
     if ( !daughters_.find(jcol)->second.empty() ) {
-      // makes an iterator that points to the first daughter in the vector
-      vector< pair<Iso,BranchRatio> >::const_iterator
+      // an iterator that points to 1st daughter in the vector
+      // pair<isotope,branchratio>
+      vector< pair<int, double> >::const_iterator
         iso_iter = daughters_.find(jcol)->second.begin();
 
       // processes all daughters of the parent

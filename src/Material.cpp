@@ -41,7 +41,7 @@ void Material::absorb(Material* matToAdd) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extract(double mass) {
-  IsoVector new_comp = IsoVector(&comp_);
+  IsoVector new_comp = comp_;
   new_comp.setMass(mass);
 
   comp_ = comp_ - new_comp;
@@ -51,8 +51,7 @@ Material* Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::extract(Material* matToRem) {
-  IsoVector rem_comp = matToRem->comp();
+Material* Material::extract(IsoVector rem_comp) {
   comp_ = comp_ - rem_comp;
   return new Material(rem_comp);
   //BI->registerMatChange(this);
@@ -63,8 +62,8 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material* clone() {
-  return new Material(this);
+Material* Material::clone() {
+  return new Material(*this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -74,16 +73,15 @@ bool Material::checkQuality(Resource* other){
 
   // Make sure the other is a material
   try{
-    CompMap second_comp_map = dynamic_cast<Material*>(other)->getAtomComp();
+    IsoVector second_comp = dynamic_cast<Material*>(other)->comp();
     // We need to check the recipe, isotope by isotope
-    bool found_mismatch = false;
-    CompMap::const_iterator iso = this->getAtomComp().begin();
-    while (iso != this->getAtomComp().end() && !found_mismatch){
-      if( second_comp_map.find((*iso).first)->second != (*iso).second){
-        found_mismatch=true;
+    CompMap::const_iterator iso_iter = comp().comp().begin();
+    while (iso_iter != comp().comp().end()){
+      if( second_comp.atomCount(iso_iter->first) != iso_iter->second){
         toRet = false;
+        break;
       }
-      iso++;
+      iso_iter++;
     }
   } catch (Exception& e) {
     toRet = false;
@@ -94,19 +92,15 @@ bool Material::checkQuality(Resource* other){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuantityEqual(Resource* other){
-  // Here, we check that second.total_atoms_ = first.total_atoms
   // This will be true until proven false
-  bool toRet = true;
+  bool toRet = false;
 
   // Make sure the other is a material
   try{
-    // check total_atoms values
-    Atoms second_tot_atoms = dynamic_cast<Material*>(other)->getTotAtoms();
-    // check total_mass values
-    Mass second_tot_mass = dynamic_cast<Material*>(other)->getTotMass();
-    toRet = ( total_mass_ - second_tot_mass < EPS_KG && total_atoms_ == second_tot_atoms);
+    // check mass values
+    double second_qty = dynamic_cast<Material*>(other)->getQuantity();
+    toRet = getQuantity() - second_qty < EPS_KG;
   } catch (Exception& e) {
-    toRet = false;
   }
 
   return toRet;
@@ -115,19 +109,15 @@ bool Material::checkQuantityEqual(Resource* other){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuantityGT(Resource* other){
   // true if the total atoms in the other is greater than in the base.
-  // Here, we check whether second.total_atoms_ > first.total_atoms
   // This will be true until proven false
-  bool toRet = true;
+  bool toRet = false;
 
   // Make sure the other is a material
   try{
-    // check total_atoms values
-    Atoms second_tot_atoms = dynamic_cast<Material*>(other)->getTotAtoms();
-    // check total_mass values
-    Mass second_tot_mass = dynamic_cast<Material*>(other)->getTotMass();
-    toRet = ( second_tot_mass - total_mass_ < EPS_KG && second_tot_atoms > total_atoms_);
+    // check mass values
+    double second_qty = dynamic_cast<Material*>(other)->getQuantity();
+    toRet = second_qty - getQuantity() > EPS_KG;
   } catch (Exception& e){
-    toRet = false;
   }
 
   return toRet;

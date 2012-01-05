@@ -58,9 +58,6 @@ class Logician {
     /// map of model types to model lists. Used by [add/get]Model methods)
     std::map<ModelType, ModelList> model_lists_;
     
-    /// list of material templates
-    RecipeList recipes_;
-    
     /// list of materialss
     std::vector<Material*> materials_;
     

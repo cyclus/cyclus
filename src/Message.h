@@ -324,207 +324,99 @@ class Message {
     @return message (transaction) ID
    */
   int getID() const {return trans_.ID;};
-    
-    /**
-     * Creates an empty upward message from some communicator.
-     *
-     * @param sender the sender of this Message
-     */
-    Message(Communicator* sender);
 
-    /**
-     * Creates an upward message using the given
-     * sender, and recipient.
-     *
-     * @param sender sender of this Message
-     * @param receiver recipient of this Message
-     */
-    Message(Communicator* sender, Communicator* receiver);
+  /**
+   * Returns the supplier in this Message.
+   *
+   * @return pointer to the supplier
+   */
+  Model* getSupplier() const;
 
-    /**
-     * Creates an upward message using the given sender, 
-     * recipient, and transaction.
-     *
-     * @param sender sender of this Message
-     * @param receiver recipient of this Message
-     * @param trans the message's transaction specifics
-     */
-    Message(Communicator* sender, Communicator* receiver, Transaction trans);
+  /**
+   * Sets the assigned supplier of the material for the 
+   * transaction in this message. 
+   *
+   * @param supplier pointer to the new supplier
+   */
+  void setSupplier(Model* supplier){trans_.supplier = supplier;};
 
-    /**
-     * @brief Send this message to the next communicator in it's path
-     *
-     * Messages heading up (UP_MSG) are forwareded to the communicator
-     * designated by the setNextDest(Communicator*) function. Messages
-     * heading down (DOWN_MSG) are sent successively to each communicator
-     * in reverse order of their 'upward' sequence.
-     *
-     * @exception CycException attempted to send message with
-     *            with no designated receiver (next dest is undefined)
-     *
-     * @exception CycException attempted to send a message to the message
-     *            sender (circular messaging)
-     */
-    virtual void sendOn();
+  /**
+   * Returns the requester in this Message.
+   *
+   * @return pointer to the requester
+   */
+  Model* getRequester() const;
 
-    /**
-     * @brief designate the next object to receive this message
-     * 
-     * Calls to this method are ignored when the message direction is
-     * down.
-     *
-     * @param next_stop the next communicator to receive this message
-     *
-     */
-    void setNextDest(Communicator* next_stop);
+  /**
+   * Sets the assigned requester to receive the material
+   * for the transaction in this message.
+   *
+   * @param requester pointer to the new requester
+   */
+  void setRequester(Model* requester){trans_.requester = requester;};
 
-    /**
-     * Creates a new message by copying the current one and
-     * returns a reference to it.
-     *
-     * @warning don't forget to delete the pointer when you're done.
-     */
-    Message* clone();
+  /**
+   * Returns the transaction associated with this message.
+   *
+   * @return the Transaction
+   */
+  Transaction getTrans() const {return trans_;};
 
-    /**
-     * Reverses the direction this Message is being sent (so, for 
-     * instance, the Manager can forward a message back down the hierarchy 
-     * to an appropriate handler.
-     */
-    void reverseDirection();
+  /**
+   * Returns the commodity requested or offered in this Message.
+   *
+   * @return commodity for this transaction
+   */
+  std::string commod() const {return trans_.commod;};
 
-    /**
-     * Returns the direction this Message is traveling.
-     */
-    MessageDir getDir() const;
+  /**
+   * Sets the commodity requested or offered in this Message.
+   *
+   * @param new_commod the commodity associated with this message/transaction
+   */
+  void setCommod(std::string new_commod) {trans_.commod = new_commod;};
 
-    /**
-     * Sets the direction of the message
-     *
-     * @param newDir is the new direction
-     */
-    void setDir(MessageDir newDir);
+  /**
+   * True if the transaction is an offer, false if it's a request
+   *
+   * @return true if the transaction is an offer, false if it's a request
+   */
+  double isOffer() const {return trans_.is_offer;};
 
-    /**
-     * @brief Get the market corresponding to the transaction commodity
-     *
-     * @return market corresponding to this msg's transaction's commodity
-     *
-     */
-    Communicator* getMarket();
+  /**
+   * True if the transaction is an offer, false if it's a request
+   *
+   * @return true if the transaction is an offer, false if it's a request
+   */
+  void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
 
-    /**
-     * Prints the transaction data.
-     *
-     */
-    void printTrans();
+  /**
+   * Returns the price being requested or offered in this message.
+   *
+   * @return the price (in dollars)
+   */
+  double getPrice() const {return trans_.price;};
 
-    /**
-     * Returns the sender of this Message.
-     *
-     * @return the sender
-     */
-    Communicator* getSender() const {return sender_;};
+  /**
+   * Returns the price being requested or offered in this message.
+   *
+   * @param new_price the new price (in dollars)
+   */
+  void setPrice(double new_price) {trans_.price = new_price;};
 
-    /**
-     * Returns the recipient of this Message.
-     *
-     * @return the recipient
-     */
-    Communicator* getRecipient() const;
+  /**
+   * Returns the Resource being requested or offered in this message.
+   *
+   * @return the Resource  (i.e. Material object) 
+   */
+  Resource* getResource() const {return trans_.resource;};
 
-    /**
-     * Returns the supplier in this Message.
-     *
-     * @return pointer to the supplier
-     */
-    Model* getSupplier() const;
-
-    /**
-     * Sets the assigned supplier of the material for the 
-     * transaction in this message. 
-     *
-     * @param supplier pointer to the new supplier
-     */
-    void setSupplier(Model* supplier){trans_.supplier = supplier;};
-
-    /**
-     * Returns the requester in this Message.
-     *
-     * @return pointer to the requester
-     */
-    Model* getRequester() const;
-
-    /**
-     * Sets the assigned requester to receive the material
-     * for the transaction in this message.
-     *
-     * @param requester pointer to the new requester
-     */
-    void setRequester(Model* requester){trans_.requester = requester;};
-
-    /**
-     * Returns the transaction associated with this message.
-     *
-     * @return the Transaction
-     */
-    Transaction getTrans() const {return trans_;};
-
-    /**
-     * Returns the commodity requested or offered in this Message.
-     *
-     * @return commodity for this transaction
-     */
-    std::string commod() const {return trans_.commod;};
-
-    /**
-     * Sets the commodity requested or offered in this Message.
-     *
-     * @param new_commod the commodity associated with this message/transaction
-     */
-    void setCommod(std::string new_commod) {trans_.commod = new_commod;};
-
-    /**
-     * True if the transaction is an offer, false if it's a request
-     *
-     * @return true if the transaction is an offer, false if it's a request
-     */
-    double isOffer() const {return trans_.is_offer;};
-
-    /**
-     * True if the transaction is an offer, false if it's a request
-     *
-     * @return true if the transaction is an offer, false if it's a request
-     */
-    void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
-
-    /**
-     * Returns the price being requested or offered in this message.
-     *
-     * @return the price (in dollars)
-     */
-    double getPrice() const {return trans_.price;};
-
-    /**
-     * Returns the price being requested or offered in this message.
-     *
-     * @param new_price the new price (in dollars)
-     */
-    void setPrice(double new_price) {trans_.price = new_price;};
-
-    /**
-     * Returns the Resource being requested or offered in this message.
-     *
-     * @return the Resource  (i.e. Material object) 
-     */
-    Resource* getResource() const {return trans_.resource;};
-
-    /**
-     * Sets the assigned resource to a new resource
-     *
-     * @param new_resource is the new Resource in the transaction
-     */
-    void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
+  /**
+   * Sets the assigned resource to a new resource
+   *
+   * @param new_resource is the new Resource in the transaction
+   */
+  void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
 
 };
 #endif

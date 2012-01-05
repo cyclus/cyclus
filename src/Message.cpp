@@ -75,7 +75,7 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
-  Message* new_msg = new Message(this);
+  Message* new_msg = new Message(*this);
   new_msg->setResource(getResource());
   return new_msg;
 }

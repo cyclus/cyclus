@@ -11,6 +11,7 @@
 
 #include "UseMatrixLib.h"
 #include "Resource.h"
+#include "IsoVector.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
@@ -122,7 +123,7 @@ public:
   /**
    * Resource class method
    */
-  double getQuantity(){return this->getTotMass();};
+  double getQuantity(){return comp_.mass();};
 
   /**
    * Resource class method
@@ -177,12 +178,12 @@ public:
   /**
    * Extracts from this material a composition specified by the given IsoVector
    *
-   * @param comp the composition/amount of material that will be removed
+   * @param rem_comp the composition/amount of material that will be removed
    * against this Material
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(IsoVector* comp);
+  virtual Material* extract(IsoVector rem_comp);
 
   /**
    * Extracts a specified mass from this material creating a new material

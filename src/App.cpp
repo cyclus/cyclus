@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
   LI->printModelList(FACILITY);
   LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(REGION) << " regions:";
   LI->printModelList(REGION);
-  LOG(LEV_DEBUG2) << "Here is a list of " << IsoVector->recipeCount() << " recipes:";
+  LOG(LEV_DEBUG2) << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
   IsoVector::printRecipes();
   
   // Run the simulation 

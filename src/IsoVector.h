@@ -67,7 +67,7 @@ public:
   /*!
   Used for reading in and initizliaing material recipes.
   */
-  IsoVector(xmlNodePtr cur) {
+  IsoVector(xmlNodePtr cur);
 
   ~IsoVector() {};
 
@@ -83,11 +83,11 @@ public:
    */
   IsoVector* recipe(std::string name);                      
 
-  void printRecipes();
+  static void printRecipes();
 
   void print();
 
-  int recipeCount();                                  
+  static int recipeCount();                                  
 
   static std::map<std::string, IsoVector*> recipes_;
   
@@ -172,6 +172,8 @@ public:
    @param time_change the number of months to decay
    */
   void executeDecay(double time_change);
+
+  CompMap comp() {return atom_comp_;}
   
 private:
   /*!
