@@ -155,11 +155,11 @@ void BookKeeper::registerMatChange(Material* mat){
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);
 
-  double total = mat->getTotMass();
+  double total = mat->getQuantity();
   toRegister.materialID = mat->ID(); 
   /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
   toRegister.timestamp = TI->getTime();
-  CompMap comp = mat->getMassComp();
+  CompMap comp = mat->comp().comp();
   CompMap::const_iterator it = comp.begin();
   int i=0;
   for(it=comp.begin(); it != comp.end(); it++){

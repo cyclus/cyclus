@@ -121,14 +121,16 @@ public:
   void print(); 
     
   /**
-   * Resource class method
+   * Change/set the mass of the resource object. Note that this does make
+   * matter (dis)appear and should only be used on objects that are not part of
+   * any actual tracked inventory.
    */
-  double getQuantity(){return comp_.mass();};
+  void setQuantity(double quantity) {comp_.setMass(quantity);};
 
   /**
    * Resource class method
    */
-  void setQuantity(double quantity);
+  double getQuantity(){return comp_.mass();};
 
   /**
    * Resource class method

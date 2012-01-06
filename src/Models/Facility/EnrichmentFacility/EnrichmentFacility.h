@@ -34,8 +34,8 @@
   - double tails fraction
   - int startDate : The date on which the facility begins to operate (months).
   - int lifeTime : The length of time that the facility operates (months).
-  - Mass inventorysize: the maximum quantity of material to be held in the 
-  inventory
+  - double inventorysize: the maximum mass quantity of material to be held in
+    the inventory
   - string name : A non-generic name for this facility. 
   
   \section Optional Parameters  
@@ -251,14 +251,14 @@ protected:
      *
      * @return the total mass of the materials in storage
      */
-    Mass checkInventory();
+    double checkInventory();
 
     /**
      * get the total mass of the stuff in the inventory
      *
      * @return the total mass of the materials in storage
      */
-    Mass checkStocks();
+    double checkStocks();
     
     /**
      * Enriches all material waiting in the ordersExecuting ProcessLine

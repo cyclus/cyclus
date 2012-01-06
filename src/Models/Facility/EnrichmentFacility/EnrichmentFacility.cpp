@@ -123,40 +123,34 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
                        "' materials.");
   }
 
-  Mass newAmt = 0;
+  double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
 
     // start with an empty material
-    Material* newMat = new Material(CompMap(), 
-                                  m->getUnits(),
-                                  m->name(), 
-                                  0, 
-                                  ATOMBASED,
-                                  false);
+    Material* newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
-      newAmt += m->getTotMass();
+    if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
+      newAmt += m->getQuantity();
       newMat->absorb(m);
       inventory_.pop_front();
-    }
-    else{ 
+    } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-      newAmt += toAbsorb->getTotMass();
+      Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
       newMat->absorb(toAbsorb);
+      newAmt += toAbsorb->getQuantity();
     }
 
     toSend.push_back(newMat);
     LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass();
+      <<"  is sending a mat with mass: "<< newMat->getQuantity();
   }    
   FacilityModel::sendMaterial(msg, toSend);
 }
@@ -171,7 +165,7 @@ void EnrichmentFacility::receiveMaterial(Transaction trans, vector<Material*> ma
        thisMat++)
   {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
+        << (*thisMat)->getQuantity();
     stocks_.push_back(*thisMat);
   }
 }
@@ -195,29 +189,24 @@ void EnrichmentFacility::handleTock(int time)
   // at rate allowed by capacity_, convert material in Stocks to out_commod_ type
   // move converted material into Inventory
 
-  Mass complete = 0;
+  double complete = 0;
 
   while(capacity_ > complete && !stocks_.empty() ){
     Material* m = stocks_.front();
 
     // start with an empty material
-    Material* newMat = new Material(CompMap(), 
-                                  m->getUnits(),
-                                  m->name(), 
-                                  0, 
-                                  ATOMBASED,
-                                  false);
+    Material* newMat = new Material();
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (capacity_ - complete)){
-      complete += m->getTotMass();
+    if(m->getQuantity() <= (capacity_ - complete)){
+      complete += m->getQuantity();
       newMat->absorb(m);
       stocks_.pop_front();
     }
     else{ 
       // if the stocks obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(capacity_ - complete);
-      complete += toAbsorb->getTotMass();
+      Material* toAbsorb = m->extract(capacity_ - complete);
+      complete += toAbsorb->getQuantity();
       newMat->absorb(toAbsorb);
     }
 
@@ -237,8 +226,8 @@ void EnrichmentFacility::handleTock(int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass EnrichmentFacility::checkInventory(){
-  Mass total = 0;
+double EnrichmentFacility::checkInventory(){
+  double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
@@ -246,14 +235,14 @@ Mass EnrichmentFacility::checkInventory(){
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getTotMass();
+    total += (*iter)->getQuantity();
   }
 
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass EnrichmentFacility::checkStocks(){
-  Mass total = 0;
+double EnrichmentFacility::checkStocks(){
+  double total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
@@ -262,7 +251,7 @@ Mass EnrichmentFacility::checkStocks(){
   for (deque<Material*>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
-    total += (*iter)->getTotMass();
+    total += (*iter)->getQuantity();
   }
 
   return total;
@@ -272,16 +261,16 @@ Mass EnrichmentFacility::checkStocks(){
 void EnrichmentFacility::makeRequests(){
   // The enrichment facility should ask for at least as much feed as it is 
   // already committed to using this month.
-  Mass requestAmt;
+  double requestAmt;
   // In a constrained market, it happily accepts amounts no matter how small
-  Mass minAmt = 0;
+  double minAmt = 0;
   // check how full its inventory is
-  Mass inv = this->checkInventory();
+  double inv = this->checkInventory();
   // and how much is already in its stocks
-  Mass sto = this->checkStocks(); 
+  double sto = this->checkStocks(); 
   // subtract inv and sto from inventory max size to get total empty space
   // the request cannot exceed the space available
-  Mass space = inventory_size_ - inv - sto;
+  double space = inventory_size_ - inv - sto;
 
   // this will be a request for free stuff
   // until cyclus has a working notion of default pricing
@@ -290,7 +279,7 @@ void EnrichmentFacility::makeRequests(){
   double commod_price = 0;
   
   // spotCapacity represents unaccounted for capacity_
-  Mass spotCapacity = capacity_ - outstMF_;
+  double spotCapacity = capacity_ - outstMF_;
 
   if (space == 0){
     // don't request anything
@@ -330,8 +319,8 @@ void EnrichmentFacility::makeRequests(){
 void EnrichmentFacility::makeOffers()
 {
   // decide how much to offer
-  Mass offer_amt;
-  Mass spotCapacity = capacity_ - outstMF_;
+  double offer_amt;
+  double spotCapacity = capacity_ - outstMF_;
 
   // and offer no more than the spotCapacity_ allows you to produce
   offer_amt = spotCapacity; 
@@ -385,30 +374,31 @@ void EnrichmentFacility::enrich()
     Message* mess = (curr->second).first;
     Material* mat = (curr->second).second;
 
+    IsoVector mat_iso, compToMake;
+    mat_iso = mat->comp();
+
     // Find out what we're trying to make.
     //
-    map<Iso, Atoms> compToMake; 
-    try{
-      compToMake = dynamic_cast<Material*>(mess->getResource())->getAtomComp();
+    try {
+      compToMake = dynamic_cast<Material*>(mess->getResource())->comp();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
     }
 
     // Do the enrichment math.
-    double P = Material::getEltMass(92, compToMake);
-    double xp = Material::getIsoMass(922350, compToMake) / P;
-    double F = mat->getEltMass(92);
-    double xf = Material::getIsoMass(922350, mat->getAtomComp()) / F;
+    double P = compToMake.eltMass(92);
+    double xp = compToMake.mass(922350) / P;
+    double F = mat_iso.eltMass(92);
+    double xf = mat_iso.mass(922350) / F;
     double W = F - P;
     double xw = (F * xf - P * xp) / W;
 
     // Make the product
-    CompMap pComp;
-    Atoms atoms235;
-    Atoms atoms238;
-    Atoms atoms19;
-    Mass grams92;
+    double atoms235;
+    double atoms238;
+    double atoms19;
+    double grams92;
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = P * 1E6;
@@ -418,20 +408,13 @@ void EnrichmentFacility::enrich()
     // The stoich for this one's easy:
     atoms19 = (atoms235 + atoms238) * 6;
 
-    pComp[922350] = atoms235;
-    pComp[922380] = atoms238;
-    pComp[ 90190] = atoms19;
+    IsoVector pComp;
+    pComp.setAtomCount(922350, atoms235);
+    pComp.setAtomCount(922380, atoms238);
+    pComp.setAtomCount(90190, atoms19);
+    pComp.setMass(mat->getQuantity());
 
-    string pName = string("eUF6%f",xp);
-    Material* theProd = new Material(pComp, 
-        mat->getUnits(), 
-        pName,
-        mat->getTotAtoms(), 
-        ATOMBASED, 
-        false);
-
-    // Make the tails
-    CompMap wComp;
+    Material* theProd = new Material(pComp);
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = W * 1E6;
@@ -441,33 +424,30 @@ void EnrichmentFacility::enrich()
     // The stoich for this one's easy:
     atoms19 = (atoms235 + atoms238) * 6;
 
-    wComp[922350] = atoms235;
-    wComp[922380] = atoms238;
-    wComp[ 90190] = atoms19;
+    IsoVector wComp;
+    wComp.setAtomCount(922350, atoms235);
+    wComp.setAtomCount(922380, atoms238);
+    wComp.setAtomCount(90190, atoms19);
+    wComp.setMass(mat->getQuantity());
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
-    string wName = string("dUF6%f",xw);
-    Material* theTails = new Material(wComp, 
-        mat->getUnits(),
-        wName, 
-        mat->getTotAtoms(), 
-        ATOMBASED,
-        false);
+    Material* theTails = new Material(wComp);
 
     // CONSERVATION OF MASS CHECKS:
-    if (fabs(theProd->getEltMass(92) + theTails->getEltMass(92) 
-          - mat->getEltMass(92)) > EPS_KG)
+    if (fabs(pComp.eltMass(92) + wComp.eltMass(92) 
+          - mat_iso.eltMass(92)) > EPS_KG)
       throw CycException("Conservation of mass violation at Enrichment!!");
 
-    if (fabs(Material::getIsoMass(922350, theProd->getAtomComp()) +
-          Material::getIsoMass(922350, theTails->getAtomComp()) 
-          - Material::getIsoMass(922350, mat->getAtomComp())) > EPS_KG)
+    if (fabs(pComp.mass(922350) +
+          wComp.mass(922350) 
+          - mat_iso.mass(922350)) > EPS_KG)
       throw CycException("Conservation of mass violation at Enrichment!!");
 
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    mess->getResource()->setQuantity(theProd->getTotMass());
+    Material* rsrc = dynamic_cast<Material*>(mess->getResource());
+    rsrc->setQuantity(theProd->getQuantity());
     mess->setResource(dynamic_cast<Resource*>(theProd));
 
     this->sendMaterial(mess, mess->getSender());

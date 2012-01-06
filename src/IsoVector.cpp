@@ -21,6 +21,7 @@ ParentMap IsoVector::parent_ = ParentMap();
 DaughtersMap IsoVector::daughters_ = DaughtersMap();
 Matrix IsoVector::decayMatrix_ = Matrix();
 int IsoVector::nextID_ = 0;
+std::map<std::string, IsoVector*> IsoVector::recipes_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
@@ -292,6 +293,28 @@ void IsoVector::setMass(double new_mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::setMass(int tope, double new_mass) {
+  double grams_per_atom;
+  int grams_per_kg = 1000;
+  grams_per_atom = MT->getMassInGrams(tope);
+  atom_comp_[tope] = new_mass * grams_per_kg / grams_per_atom;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::atomCount() {
+  double count = 0;
+  int isotope;
+
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    count += atomCount(isotope);
+    iter++;
+  }
+  return count;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::atomCount(int tope) {
   // If the isotope isn't currently present, return 0. Else return the 
   // isotope's current number density.
@@ -300,6 +323,24 @@ double IsoVector::atomCount(int tope) {
   } else {
     return atom_comp_[tope];
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::setAtomCount(double new_count) {
+  int isotope;
+  double ratio = new_count / atomCount();
+
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
+    iter++;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::setAtomCount(int tope, double new_count) {
+  atom_comp_[tope] = new_count;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -482,9 +523,10 @@ bool IsoVector::isZero(int tope) {
 CompMap IsoVector::normalized() {
   CompMap normalized_comp;
   CompMap::iterator entry;
+  double atom_count = atomCount();
 
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
-    normalized_comp[entry->first] = entry->second / total_atoms_;
+    normalized_comp[entry->first] = entry->second / atom_count;
   }
   return normalized_comp;
 }

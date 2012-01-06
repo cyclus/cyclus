@@ -3,12 +3,17 @@
 #include "GenericResource.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-GenericResource::GenericResource(std::string units, std::string quality, double quantity)
-  : Resource() {
+GenericResource::GenericResource(std::string units,
+            std::string quality, double quantity) : Resource() {
     units_ = units;
     quality_ = quality;
     quantity_ = quantity;
   }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+GenericResource* GenericResource::clone() {
+  return new GenericResource(*this);
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 bool GenericResource::checkQuality(Resource* other){

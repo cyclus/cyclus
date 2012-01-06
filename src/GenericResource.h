@@ -15,6 +15,11 @@ public:
   GenericResource(std::string units, std::string quality, double quantity);
 
   /**
+   * Returns a reference to a newly allocated copy of this resource object.
+   */
+  virtual GenericResource* clone();
+
+  /**
    * A boolean comparing the quality of the other resource 
    * to the quality of the base
    *

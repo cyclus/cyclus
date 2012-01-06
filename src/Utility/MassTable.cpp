@@ -38,8 +38,8 @@ MassTable::~MassTable() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Mass MassTable::getMassInGrams(int tope) {
-  Mass toRet = nuclide_vec_[isoIndex_[tope]].mass;
+double MassTable::getMassInGrams(int tope) {
+  double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };
 

@@ -160,7 +160,8 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         // queue a new order
         Message* maybe_offer = offerMsg->clone();
-        maybe_offer->getResource()->setQuantity(requestAmt);
+
+        dynamic_cast<Material*>(maybe_offer->getResource())->setQuantity(requestAmt);
         maybe_offer->setRequester(requestMsg->getRequester());
 
         matchedOffers_.insert(offerMsg);
@@ -182,7 +183,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         if(offerAmt > EPS_KG){
           Message *new_offer = offerMsg->clone();
-          new_offer->getResource()->setQuantity(offerAmt);
+          dynamic_cast<Material*>(new_offer->getResource())->setQuantity(offerAmt);
           // call this method for consistency
           receiveMessage(new_offer);
         }

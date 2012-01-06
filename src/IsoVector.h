@@ -139,14 +139,19 @@ public:
   double mass(int tope);
 
   /*!
-   Sets the mass of the entire IsoVector
+   Sets the total mass of the entire IsoVector maintaining isotopic ratios.
    */
   void setMass(double new_mass);
 
   /*!
+   Sets the mass of the specified isotope.
+   */
+  void setMass(int tope, double new_mass);
+
+  /*!
    returns the total atoms in this material object 
    */
-  double atomCount() {return total_atoms_;};
+  double atomCount();
 
   /*!
    Returns the current number density of the given isotope, or zero if 
@@ -156,6 +161,16 @@ public:
    @return the number density of the given isotope, or zero
    */
   double atomCount(int tope);
+
+  /*!
+   Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
+   */
+  void setAtomCount(double new_count);
+
+  /*!
+   Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
+   */
+  void setAtomCount(int tope, double new_count);
 
   /*!
    Returns the mass of the given element in this Material.
