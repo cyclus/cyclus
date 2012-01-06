@@ -41,6 +41,7 @@ class SeparationsMatrixFacilityTest : public ::testing::Test {
 
     virtual void TearDown() {
       delete src_facility;
+      delete new_facility;
       // for facilities that trade commodities, delete appropriate markets here
     }
 };

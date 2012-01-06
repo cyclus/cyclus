@@ -17,11 +17,7 @@ typedef StubModel* StubModelConstructor();
 
 class StubModelTests : public TestWithParam<StubModelConstructor*> {
   public:
-    virtual ~StubModelTests() {
-    }
-
-    //virtual void SetUp() { 
-    StubModelTests() {
+    virtual void SetUp() { 
       stub_model_ = (*GetParam())();
     }
     virtual void TearDown(){ 

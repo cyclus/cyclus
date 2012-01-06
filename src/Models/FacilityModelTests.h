@@ -19,20 +19,18 @@ typedef FacilityModel* FacilityModelConstructor();
 
 class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
   public:
-    virtual ~FacilityModelTests() {
-    }
-
-    //virtual void SetUp() { 
-    FacilityModelTests() {
+    virtual void SetUp() { 
       facility_model_ = (*GetParam())();
-      facility_model_->setParent(new TestInst());
+      test_inst_ = new TestInst();
+      facility_model_->setParent(test_inst_);
       test_out_market_ = new TestMarket("out-commod");
-      test_out_market_->copyFreshModel(test_out_market_);
       test_in_market_ = new TestMarket("in-commod");
-      test_in_market_->copyFreshModel(test_in_market_);
     }
     virtual void TearDown(){ 
       delete facility_model_;
+      delete test_inst_;
+      delete test_out_market_;
+      delete test_in_market_;
     }
 
   protected:

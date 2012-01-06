@@ -52,11 +52,11 @@ class SinkFacilityTest : public ::testing::Test {
       sink_facility->setParent(new TestInst());
       new_facility = new FakeSinkFacility();
       commod_market = new TestMarket(sink_facility->getInCommod());
-      commod_market->copyFreshModel(commod_market);
     };
 
     virtual void TearDown() {
       delete sink_facility;
+      delete new_facility;
     }
 };
 

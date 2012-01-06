@@ -95,20 +95,6 @@ public:
 
 public:
     /**
-     * The handleTick function specific to the SWUeUF6Converter.
-     *
-     * @param time the time of the tick
-     */
-    virtual void handleTick(int time);
-
-    /**
-     * The handleTick function specific to the SWUeUF6Converter.
-     *
-     * @param time the time of the tock
-     */
-    virtual void handleTock(int time);
-
-    /**
      * The convert function specific to the SWUeUF6Converter
      * Converts between amounts of two commodities
      *

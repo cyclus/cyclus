@@ -71,20 +71,6 @@ public:
 
 public:
     /**
-     * The handleTick function specific to the StubConverter.
-     *
-     * @param time the time of the tick
-     */
-    virtual void handleTick(int time);
-
-    /**
-     * The handleTick function specific to the StubConverter.
-     *
-     * @param time the time of the tock
-     */
-    virtual void handleTock(int time);
-
-    /**
      * The convert function specific to the StubConverter
      * Converts between amounts of two commodities
      *

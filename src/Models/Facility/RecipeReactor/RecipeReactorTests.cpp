@@ -77,12 +77,13 @@ class FakeRecipeReactor : public RecipeReactor {
       currCore_ = deque< pair<std::string, Material* > >();
       inventory_ = deque< pair<std::string, Material*> >();
       ordersWaiting_ = deque< Message*>();
-
     }
 
     virtual ~FakeRecipeReactor() {
     }
 
+    string getInCommod(){return fuelPairs_.front().first.first ;}
+    string getOutCommod(){return fuelPairs_.front().second.first ;}
     double fakeCheckInventory() { return checkInventory(); }
     double getCapacity() {return capacity_;}
     double getInvSize() {return inventory_size_;}
@@ -98,17 +99,22 @@ class RecipeReactorTest : public ::testing::Test {
   protected:
     FakeRecipeReactor* src_facility;
     FakeRecipeReactor* new_facility; 
+    TestMarket* out_market_;
+    TestMarket* in_market_;
 
     virtual void SetUp(){
       src_facility = new FakeRecipeReactor();
       src_facility->setParent(new TestInst());
       new_facility = new FakeRecipeReactor();
-      // for facilities that trade commodities, create appropriate markets here
-    };
+      in_market_ = new TestMarket(src_facility->getInCommod());
+      out_market_ = new TestMarket(src_facility->getOutCommod());
+    }
 
     virtual void TearDown() {
       delete src_facility;
-      // for facilities that trade commodities, delete appropriate markets here
+      delete new_facility;
+      delete in_market_;
+      delete out_market_;
     }
 };
 

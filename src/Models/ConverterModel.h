@@ -5,7 +5,6 @@
 #include <string>
 #include <list>
 
-#include "TimeAgent.h"
 #include "Message.h"
 
 // forward declare Material class to avoid full inclusion and dependency
@@ -48,7 +47,7 @@ class Material;
 */
 
 //-----------------------------------------------------------------------------
-class ConverterModel : public TimeAgent {
+class ConverterModel : public Model{
 
 public:
   /// Default constructor for ConverterModel Class
@@ -83,7 +82,7 @@ protected:
   std::string conv_name_;
 
   /// each converter needs a list of equivalent commodities it converts
-  list<std::string> commodities_; 
+  std::list<std::string> commodities_; 
 
 public:
 
@@ -106,36 +105,6 @@ public:
    * @return the converted message
    */
   virtual Message* convert(Message* convMsg, Message* refMsg); 
-
-    /**
-   * Each converter may be prompted to do its beginning-of-time-step
-   * stuff at the tick of the timer.
-   *
-   * @param time is the time to perform the tick
-   */
-  virtual void handleTick(int time);
-
-  /**
-   * Each converter may be prompted to its end-of-time-step
-   * stuff on the tock of the timer.
-   * 
-   * @param time is the time to perform the tock
-   */
-  virtual void handleTock(int time);
-
-  /**
-   * Each converter may be prompted to do its begining of life setup
-   * 
-   */
-  virtual void handlePreHistory() {}
-
-  /**
-   * Each converter may be prompted to do its daily tasks
-   * 
-   * @param time is the month since the start of the simulation
-   * @param day is the current day of the month
-   */
-  virtual void handleDailyTasks(int time, int day);
 
 /* ------------------- */ 
   

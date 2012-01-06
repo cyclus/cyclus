@@ -4,7 +4,6 @@
 #include "InstModel.h"
 #include "suffix.h"
 #include "Testing/TestRegion.h"
-#include "Testing/TestMarket.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -19,20 +18,19 @@ typedef InstModel* InstModelConstructor();
 
 class InstModelTests : public TestWithParam<InstModelConstructor*> {
   public:
-    virtual ~InstModelTests() {
-    }
-
-    //virtual void SetUp() { 
-    InstModelTests() {
+    virtual void SetUp() { 
       inst_model_ = (*GetParam())();
-      inst_model_->setParent(new TestRegion());
+      test_region_ = new TestRegion();
+      inst_model_->setParent(test_region_);
     }
     virtual void TearDown(){ 
       delete inst_model_;
+      delete test_region_;
     }
 
   protected:
     InstModel* inst_model_;
+    TestRegion* test_region_;
 
 };
 

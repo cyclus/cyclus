@@ -68,11 +68,12 @@ class SourceFacilityTest : public ::testing::Test {
       src_facility->setParent(new TestInst());
       new_facility = new FakeSourceFacility();
       commod_market = new TestMarket(src_facility->getOutCommod());
-      commod_market->copyFreshModel(commod_market);
     };
 
     virtual void TearDown() {
       delete src_facility;
+      delete new_facility;
+      delete commod_market;
     }
 };
 

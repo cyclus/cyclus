@@ -19,11 +19,7 @@ typedef MarketModel* MarketModelConstructor();
 
 class MarketModelTests : public TestWithParam<MarketModelConstructor*> {
   public:
-    virtual ~MarketModelTests() {
-    }
-
-    //virtual void SetUp() { 
-    MarketModelTests() {
+    virtual void SetUp() { 
       market_model_ = (*GetParam())();
     }
     virtual void TearDown(){ 

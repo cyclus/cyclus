@@ -131,13 +131,13 @@ private:
   /**
    * The messages that have been indexed
    */
-  typedef pair<double,Message*> indexedMsg;
+  typedef std::pair<double,Message*> indexedMsg;
 
   /**
    * The messages of both offer and request types that have been sorted
    * according to thie size.
    */
-  typedef multimap<double,Message*> sortedMsgList;
+  typedef std::multimap<double,Message*> sortedMsgList;
   
   /** 
    * The requests that have been sorted according to their size.
@@ -152,7 +152,7 @@ private:
   /**
    * The set of pointers to offers that have been matched.
    */
-  set<Message*> matchedOffers_;
+  std::set<Message*> matchedOffers_;
   
   /**
    * This function adds an Message object to the list of matchedOffers
@@ -191,7 +191,7 @@ private:
   /**
    * The name of the converter model that this market relies on to make conversions.
    */
-  string conv_name_;
+  std::string conv_name_;
 
 };
 
