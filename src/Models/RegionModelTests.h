@@ -13,16 +13,12 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete RegionModel regionance 
+// parameter is a pointer to a concrete RegionModel instance 
 typedef RegionModel* RegionModelConstructor();
 
 class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
   public:
-    virtual ~RegionModelTests() {
-    }
-
-    //virtual void SetUp() { 
-    RegionModelTests() {
+    virtual void SetUp() { 
       region_model_ = (*GetParam())();
     }
     virtual void TearDown(){ 

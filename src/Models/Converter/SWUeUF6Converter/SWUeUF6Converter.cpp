@@ -9,6 +9,7 @@
 #include "CycException.h"
 #include "InputXML.h"
 #include "GenericResource.h"
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SWUeUF6Converter::init(xmlNodePtr cur)
@@ -50,18 +51,6 @@ void SWUeUF6Converter::print()
       << out_commod_
       << "}.";
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-
-void SWUeUF6Converter::handleTick(int time)
-{
-  // The SWUeUF6Converter isn't terribly interested in the tick.
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SWUeUF6Converter::handleTock(int time)
-{
-  // The SWUeUF6Converter isn't terribly interested in the tock.
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)

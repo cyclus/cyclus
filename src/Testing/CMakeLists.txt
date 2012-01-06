@@ -41,8 +41,14 @@ set ( TestSource
   ../Models/Market/StubMarket/StubMarketTests.cpp
   ../Models/Stub/StubStub/StubStub.cpp
   ../Models/Stub/StubStub/StubStubTests.cpp
+  ../Models/Region/CapacityRegion/CapacityRegion.cpp
+  ../Models/Region/CapacityRegion/CapacityRegionTests.cpp
+  ../Models/Region/BuildRegion/BuildRegion.cpp
+  ../Models/Region/BuildRegion/BuildRegionTests.cpp
   ../Models/Region/StubRegion/StubRegion.cpp
   ../Models/Region/StubRegion/StubRegionTests.cpp
+  ../Models/Region/NullRegion/NullRegion.cpp
+  ../Models/Region/NullRegion/NullRegionTests.cpp
   ../InputXML.cpp
   ../GenericResource.cpp
   ../Logician.cpp

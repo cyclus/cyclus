@@ -44,11 +44,6 @@ FacilityModel* EnrichmentFacilityConstructor(){
 class EnrichmentFacilityTest : public ::testing::Test {
 
   public: 
-  virtual ~EnrichmentFacilityTest(){
-    delete src_facility_;
-    delete new_facility_;
-  }
-
   virtual void SetUp(){
     src_facility_ = new FakeEnrichmentFacility();
     test_inst_ = new TestInst();
@@ -60,9 +55,10 @@ class EnrichmentFacilityTest : public ::testing::Test {
 
   virtual void TearDown() {
     delete src_facility_;
-    src_facility_ = NULL;
     delete new_facility_;
-    new_facility_ = NULL;
+    delete test_inst_;
+    delete out_market_;
+    delete in_market_;
   }
 
   protected:

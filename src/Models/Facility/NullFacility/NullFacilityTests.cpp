@@ -25,6 +25,9 @@ class FakeNullFacility : public NullFacility {
       ordersWaiting_ = deque<Message*>();
     }
 
+    string getOutCommod(){ return out_commod_;}
+    string getInCommod(){ return in_commod_;}
+
     virtual ~FakeNullFacility() {
     }
 };
@@ -39,16 +42,23 @@ class NullFacilityTest : public ::testing::Test {
   protected:
     FakeNullFacility* src_facility;
     FakeNullFacility* new_facility; 
+    TestMarket* out_market_;
+    TestMarket* in_market_;
 
     virtual void SetUp(){
       src_facility = new FakeNullFacility();
       src_facility->setParent(new TestInst());
       new_facility = new FakeNullFacility();
+      out_market_ = new TestMarket(src_facility->getOutCommod());
+      in_market_ = new TestMarket(src_facility->getInCommod());
       // for facilities that trade commodities, create appropriate markets here
     };
 
     virtual void TearDown() {
       delete src_facility;
+      delete new_facility;
+      delete in_market_;
+      delete out_market_;
       // for facilities that trade commodities, delete appropriate markets here
     }
 };

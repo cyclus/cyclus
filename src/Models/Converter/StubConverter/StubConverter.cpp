@@ -43,16 +43,6 @@ void StubConverter::print() {
  * all CONVERTERMODEL classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubConverter::handleTick(int time)
-{
-  // The StubConverter isn't terribly interested in the tick.
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubConverter::handleTock(int time)
-{
-  // The StubConverter isn't terribly interested in the tock.
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Message* convert(Message* convMsg, Message* refMsg)

@@ -1,7 +1,7 @@
-// StubRegionTests.cpp
+// NullRegionTests.cpp
 #include <gtest/gtest.h>
 
-#include "StubRegion.h"
+#include "NullRegion.h"
 #include "CycException.h"
 #include "Message.h"
 #include "RegionModelTests.h"
@@ -12,29 +12,29 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class FakeStubRegion : public StubRegion {
+class FakeNullRegion : public NullRegion {
   public:
-    FakeStubRegion() : StubRegion() {
+    FakeNullRegion() : NullRegion() {
     }
 
-    virtual ~FakeStubRegion() {
+    virtual ~FakeNullRegion() {
     }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel* StubRegionConstructor(){
-  return dynamic_cast<RegionModel*>(new FakeStubRegion());
+RegionModel* NullRegionConstructor(){
+  return dynamic_cast<RegionModel*>(new FakeNullRegion());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class StubRegionTest : public ::testing::Test {
+class NullRegionTest : public ::testing::Test {
   protected:
-    FakeStubRegion* src_region_;
-    FakeStubRegion* new_region_; 
+    FakeNullRegion* src_region_;
+    FakeNullRegion* new_region_; 
 
     virtual void SetUp(){
-      src_region_ = new FakeStubRegion();
-      new_region_ = new FakeStubRegion();
+      src_region_ = new FakeNullRegion();
+      new_region_ = new FakeNullRegion();
     };
 
     virtual void TearDown() {
@@ -45,30 +45,30 @@ class StubRegionTest : public ::testing::Test {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubRegionTest, InitialState) {
+TEST_F(NullRegionTest, InitialState) {
   // Test things about the initial state of the region here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubRegionTest, CopyFreshModel) {
+TEST_F(NullRegionTest, CopyFreshModel) {
   new_region_->copyFreshModel(dynamic_cast<Model*>(src_region_)); // deep copy
-  EXPECT_NO_THROW(dynamic_cast<StubRegion*>(new_region_)); // still a stub region
-  EXPECT_NO_THROW(dynamic_cast<FakeStubRegion*>(new_region_)); // still a fake stub region
-  // Test that StubRegion specific parameters are initialized in the deep copy method here
+  EXPECT_NO_THROW(dynamic_cast<NullRegion*>(new_region_)); // still a null region
+  EXPECT_NO_THROW(dynamic_cast<FakeNullRegion*>(new_region_)); // still a fake null region
+  // Test that NullRegion specific parameters are initialized in the deep copy method here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubRegionTest, Print) {
+TEST_F(NullRegionTest, Print) {
   EXPECT_NO_THROW(src_region_->print());
-  // Test StubRegion specific aspects of the print method here
+  // Test NullRegion specific aspects of the print method here
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubRegionTest, ReceiveMessage) {
-  // Test StubRegion specific behaviors of the receiveMessage function here
+TEST_F(NullRegionTest, ReceiveMessage) {
+  // Test NullRegion specific behaviors of the receiveMessage function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-INSTANTIATE_TEST_CASE_P(StubRegion, RegionModelTests, Values(&StubRegionConstructor));
+INSTANTIATE_TEST_CASE_P(NullRegion, RegionModelTests, Values(&NullRegionConstructor));
 
