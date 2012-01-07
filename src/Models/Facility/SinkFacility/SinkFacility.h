@@ -185,20 +185,20 @@ protected:
    *
    * @return the total mass of the materials in storage
    */
-  Mass checkInventory();
+  double checkInventory();
 
   /// maximum inventory size
-  Mass inventory_size_;
+  double inventory_size_;
 
   /// monthly acceptance capacity
-  Mass capacity_;
+  double capacity_;
 
   /// commodity price
   double commod_price_;
 
 private:
   /// determines the amount to request 
-  const Mass getRequestAmt() ;
+  const double getRequestAmt() ;
 
 
 /* ------------------- */ 

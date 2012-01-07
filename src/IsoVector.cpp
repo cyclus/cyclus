@@ -310,6 +310,17 @@ void IsoVector::setMass(int tope, double new_mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::multMass(double factor) {
+  int isotope;
+  map<int, double>::const_iterator iter = atom_comp_.begin();
+  while (iter != atom_comp_.end()) {
+    isotope = iter->first;
+    atom_comp_[isotope] = atom_comp_[isotope] * factor;
+    iter++;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::atomCount() {
   double count = 0;
   int isotope;

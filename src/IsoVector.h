@@ -149,6 +149,12 @@ public:
   void setMass(int tope, double new_mass);
 
   /*!
+   Multiplies the total mass of the entire IsoVector by 'factor' maintaining
+   isotopic ratios.
+   */
+  void multMass(double factor);
+
+  /*!
    returns the total atoms in this material object 
    */
   double atomCount();
