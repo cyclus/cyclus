@@ -9,6 +9,11 @@ set ( TestSource
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp
+  StubModelTests.cpp 
+  FacilityModelTests.cpp 
+  InstModelTests.cpp 
+  MarketModelTests.cpp 
+  RegionModelTests.cpp 
   ../Models/Facility/EnrichmentFacility/EnrichmentFacility.cpp
   ../Models/Facility/EnrichmentFacility/EnrichmentFacilityTests.cpp
   ../Models/Facility/NullFacility/NullFacility.cpp
@@ -66,17 +71,12 @@ set ( TestSource
   ../Models/Model.cpp 
   ../Models/StubTimeAgent.cpp 
   ../Models/StubModel.cpp 
-  ../Models/StubModelTests.cpp 
   ../Models/StubCommModel.cpp 
   ../Models/ConverterModel.cpp 
   ../Models/FacilityModel.cpp 
-  ../Models/FacilityModelTests.cpp 
   ../Models/InstModel.cpp
-  ../Models/InstModelTests.cpp 
   ../Models/MarketModel.cpp 
-  ../Models/MarketModelTests.cpp 
   ../Models/RegionModel.cpp
-  ../Models/RegionModelTests.cpp 
   )
 
 
