@@ -99,12 +99,12 @@ void IsoVector::load_recipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector* IsoVector::recipe(std::string name) { 
+IsoVector IsoVector::recipe(std::string name) { 
   if (recipes_.count(name) == 0) {
       throw CycIndexException("Recipe '" + name 
           + "' does not exist.");
   }
-  return recipes_[name];
+  return *(recipes_[name]);
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

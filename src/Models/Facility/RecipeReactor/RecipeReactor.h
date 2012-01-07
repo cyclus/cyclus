@@ -111,6 +111,9 @@
 typedef pair< std::string, Material*> InFuel;
 typedef pair< std::string, Material*> OutFuel; 
 
+typedef pair< std::string, IsoVector> InRecipe;
+typedef pair< std::string, IsoVector> OutRecipe; 
+
 class RecipeReactor : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
@@ -228,7 +231,7 @@ protected:
     /**
      * The RecipeReactor has pairs of input and output fuel
      */
-    deque< pair< pair<std::string, Material*>, pair<std::string, Material*> > > 
+    deque< pair< pair<std::string, IsoVector>, pair<std::string, IsoVector> > > 
       fuelPairs_;
 
     /**
@@ -262,14 +265,14 @@ protected:
      *
      * @return the total mass of the processed materials in storage
      */
-    Mass checkInventory();
+    double checkInventory();
 
     /**
      * get the total mass of the stuff in the stocks
      *
      * @return the total mass of the raw materials in storage
      */
-    Mass checkStocks();
+    double checkStocks();
 
     /**
      * The time between batch reloadings.
@@ -301,7 +304,7 @@ protected:
      * The RecipeReactor must stop processing the material in its stocks when 
      * its inventory is full.
      */
-    Mass inventory_size_;
+    double inventory_size_;
 
     /**
      * The number of months that a facility stays operational.
@@ -364,12 +367,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe_;
+    IsoVector in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe_;
+    IsoVector out_recipe_;
 
 /* ------------------- */ 
 

@@ -81,7 +81,7 @@ public:
    *
    * @param name the name of the recipe for which to return a material pointer.
    */
-  IsoVector* recipe(std::string name);                      
+  static IsoVector recipe(std::string name);                      
 
   static void printRecipes();
 
