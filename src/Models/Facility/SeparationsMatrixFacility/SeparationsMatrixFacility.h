@@ -31,7 +31,7 @@
    - double capacity: The production capacity of the facility (TBD).
    - int startDate: The date on which the facility begins to operate (months).
    - int lifeTime: The length of time that the facility operates (months).
-   - Mass inventorysize: the maximum quantity of material to be held in the 
+   - double inventorysize: the maximum quantity of material to be held in the 
    inventory
    - string name: A non-generic name for this facility.  
    - matrix sepMatrix: The separations matrix
@@ -264,14 +264,14 @@ protected:
      *
      * @return the total mass of the materials in storage
      */
-    Mass checkInventory();
+    double checkInventory();
 
     /**
      * get the total mass of the stuff in the inventory
      *
      * @return the total mass of the materials in storage
      */
-    Mass checkStocks();
+    double checkStocks();
     
     /**
      * Separates all material waiting in the ordersExecuting ProcessLine

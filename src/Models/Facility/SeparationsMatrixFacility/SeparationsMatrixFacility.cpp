@@ -163,7 +163,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
 {
   Transaction trans = msg->getTrans();
 
-  Mass newAmt = 0;
+  double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
 
@@ -177,29 +177,24 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
       Material* m = inventory_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material(CompMap(), 
-          m->getUnits(),
-          m->name(), 
-          0, 
-          ATOMBASED, 
-          false);
+      Material* newMat = new Material();
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
-      if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
-        newAmt += m->getTotMass();
+      if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)){
+        newAmt += m->getQuantity();
         newMat->absorb(m);
         inventory_.pop_front();
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-        newAmt += toAbsorb->getTotMass();
+        Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
+        newAmt += toAbsorb->getQuantity();
         newMat->absorb(toAbsorb);
       }
 
       toSend.push_back(newMat);
       LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
-        <<"  is sending a mat with mass: "<< newMat->getTotMass();
+        <<"  is sending a mat with mass: "<< newMat->getQuantity();
     }    
 
   }
@@ -222,7 +217,7 @@ void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Materi
       thisMat++)
   {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
-      << (*thisMat)->getTotMass();
+      << (*thisMat)->getQuantity();
     stocks_.push_back(make_pair(trans.commod, *thisMat));
   }
 }
@@ -251,7 +246,7 @@ void SeparationsMatrixFacility::handleTock(int time)
 
   // Mass complete as in completely full inventory stored by SeparationsMatrix
   // Facility
-  Mass complete = 0;
+  double complete = 0;
 
   while(capacity_ > complete && !stocks_.empty() ){
     for (deque<OutSep>::iterator iter = stocks_.begin(); 
@@ -260,23 +255,18 @@ void SeparationsMatrixFacility::handleTock(int time)
       Material* m = stocks_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material(CompMap(), 
-          m->getUnits(),
-          m->name(), 
-          0, 
-          ATOMBASED, 
-          false);
+      Material* newMat = new Material();
 
       // if the stocks obj isn't larger than the remaining need, send it as is.
-      if(m->getTotMass() <= (capacity_ - complete)){
-        complete += m->getTotMass();
+      if(m->getQuantity() <= (capacity_ - complete)){
+        complete += m->getQuantity();
         newMat->absorb(m);
         stocks_.pop_front();
       }
       else{ 
         // if the stocks obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extractMass(capacity_ - complete);
-        complete += toAbsorb->getTotMass();
+        Material* toAbsorb = m->extract(capacity_ - complete);
+        complete += toAbsorb->getQuantity();
         newMat->absorb(toAbsorb);
       }
       // stocks.push_back(make_pair(trans.commod, *thisMat));
@@ -299,8 +289,8 @@ void SeparationsMatrixFacility::handleTock(int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass SeparationsMatrixFacility::checkInventory(){
-  Mass total = 0;
+double SeparationsMatrixFacility::checkInventory(){
+  double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
@@ -308,14 +298,14 @@ Mass SeparationsMatrixFacility::checkInventory(){
   for (deque<InSep>::iterator iter = inventory_.begin(); 
       iter != inventory_.end(); 
       iter ++){
-    total += (*iter).second->getTotMass();
+    total += (*iter).second->getQuantity();
   }
 
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass SeparationsMatrixFacility::checkStocks(){
-  Mass total = 0;
+double SeparationsMatrixFacility::checkStocks(){
+  double total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
@@ -324,7 +314,7 @@ Mass SeparationsMatrixFacility::checkStocks(){
   for (deque<OutSep>::iterator iter = stocks_.begin(); 
       iter != stocks_.end(); 
       iter ++){
-    total += (*iter).second->getTotMass();
+    total += (*iter).second->getQuantity();
   }
 
   return total;
@@ -337,22 +327,22 @@ void SeparationsMatrixFacility::makeRequests(){
       iter ++){
     // The separations facility should ask for at least as much SNF as it is 
     // already committed to using this month.
-    Mass requestAmt;
+    double requestAmt;
     // In a constrained market, it happily accepts amounts no matter how small
-    Mass minAmt = 0;
+    double minAmt = 0;
     // check how full its inventory is
-    Mass inv = this->checkInventory();
+    double inv = this->checkInventory();
     // and how much is already in its stocks
-    Mass sto = this->checkStocks(); 
+    double sto = this->checkStocks(); 
     // subtract inv and sto from inventory max size to get total empty space
     // the request cannot exceed the space available
-    Mass space = inventory_size_ - inv - sto;
+    double space = inventory_size_ - inv - sto;
 
     // Currently, no pricing information included for Separations Facility
     double commod_price = 0;
 
     // spotCapacity represents unaccounted for capacity
-    Mass spotCapacity = capacity_ - outstMF_;
+    double spotCapacity = capacity_ - outstMF_;
 
     if (space == 0){
       // don't request anything
@@ -405,14 +395,13 @@ void SeparationsMatrixFacility::makeRequests(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::makeOffers()
-{
+void SeparationsMatrixFacility::makeOffers() {
   for (vector<string>::iterator iter = out_commod_.begin(); 
       iter != out_commod_.end(); 
       iter ++){
     // decide how much to offer
-    Mass offer_amt;
-    Mass spotCapacity = capacity_ - outstMF_;
+    double offer_amt;
+    double spotCapacity = capacity_ - outstMF_;
 
     // and offer no more than the spotCapacity allows you to produce
     offer_amt = spotCapacity; 
@@ -428,7 +417,9 @@ void SeparationsMatrixFacility::makeOffers()
     Communicator* recipient = dynamic_cast<Communicator*>(MarketModel::marketForCommod(*iter));
 
     // build a material
-    Material* offer_mat = new Material(CompMap(), "", "", offer_amt, MASSBASED, true);
+    IsoVector comp;
+    comp.setMass(1001, offer_amt);
+    Material* offer_mat = new Material(comp);
 
     // build the transaction and message
     Transaction trans;
@@ -461,15 +452,14 @@ void SeparationsMatrixFacility::separate()
   omega = iters.second;
 
   // Create and send Materials corresponding to each order that's ready to go.
-  while (curr != omega) 
-  {
+  while (curr != omega) {
     // Get the info we need to make the separated Material.
     Message* mess = (curr->second).first;
     Material* mat = (curr->second).second;
 
     // Find out what we're trying to make.
-    try{
-      map<Iso, Atoms> compToMake =  dynamic_cast<Material*>(mess->getResource())->getAtomComp();
+    try {
+      IsoVector compToMake =  dynamic_cast<Material*>(mess->getResource())->comp();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;

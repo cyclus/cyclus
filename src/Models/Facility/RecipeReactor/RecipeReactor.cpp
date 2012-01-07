@@ -365,7 +365,8 @@ void RecipeReactor::handleTick(int time) {
     offer_amt = iter->second->getQuantity();
 
     // make a material to offer
-    Material* offer_mat = new Material();
+    Material* offer_mat = new Material(out_recipe_);
+    offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
     Transaction trans;
