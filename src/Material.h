@@ -219,7 +219,12 @@ public:
 
 protected:
 
+  /// all isotopic details of this material object
   IsoVector comp_;
+
+  /// last time this material object's state was accurate (e.g. time of last
+  /// decay, etc.)
+  int last_update_time_;
 
   /** 
    * The serial number for this Material.

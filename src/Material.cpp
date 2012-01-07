@@ -23,10 +23,13 @@ using namespace std;
 int Material::nextID_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material() { };
+Material::Material() {
+  last_update_time_ = TI->getTime();
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
+  last_update_time_ = TI->getTime();
   comp_ = comp;
   //BI->registerMatChange(this);
 };
@@ -125,5 +128,11 @@ bool Material::checkQuantityGT(Resource* other){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay() {
+  int curr_time = TI->getTime();
+  int delta_time = curr_time - last_update_time_;
+  
+  comp_.executeDecay(delta_time);
+
+  last_update_time_ = curr_time;
 }
 
