@@ -263,6 +263,7 @@ double IsoVector::mass() {
     mass_val += mass(isotope);
     iter++;
   }
+
   return mass_val;
 }
 
@@ -282,6 +283,14 @@ double IsoVector::mass(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::setMass(double new_mass) {
   int isotope;
+  double curr_mass = mass();
+
+  if (curr_mass < EPS_KG) {
+    string err_msg = "Cannot set mass for IsoVector with ";
+    err_msg += "undefined (zero mass) composition.";
+    throw CycRangeException(err_msg);
+  }
+
   double ratio = new_mass / mass();
 
   map<int, double>::const_iterator iter = atom_comp_.begin();
