@@ -249,7 +249,7 @@ void GenericRepository::receiveMaterial(Transaction trans, vector<Material*>
        thisMat++)
   {
     LOG(LEV_DEBUG2) <<"GenericRepository " << ID() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
+        << (*thisMat)->getQuantity();
     stocks_.push_front(make_pair(*thisMat, trans.commod));
   }
 }
@@ -301,11 +301,11 @@ void GenericRepository::makeRequests(int time){
   in_commods_.pop_front();
 
   // It can accept amounts however small
-  Mass minAmt = 0;
+  double minAmt = 0;
   // this will be a request for free stuff
   double commod_price = 0;
   // It will need to figure out its capacity
-  Mass requestAmt;
+  double requestAmt;
   // Perform the task of figuring out the capacity for this commod
   requestAmt = getCapacity(in_commod);
   
@@ -335,16 +335,16 @@ void GenericRepository::makeRequests(int time){
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass GenericRepository::getCapacity(std::string commod){
-  Mass toRet;
+double GenericRepository::getCapacity(std::string commod){
+  double toRet;
   // if the overall repo has a legislative limit, report it
   // eventually, this will report the commodity dependent capacity
   // The GenericRepository should ask for material unless it's full
-  Mass inv = this->checkInventory();
+  double inv = this->checkInventory();
   // including how much is already in its stocks
-  Mass sto = this->checkStocks(); 
+  double sto = this->checkStocks(); 
   // subtract inv and sto from inventory max size to get total empty space
-  Mass space = inventory_size_- inv - sto;
+  double space = inventory_size_- inv - sto;
   // if empty space is less than monthly acceptance capacity
   if (space <= capacity_){
     toRet = space;
@@ -356,21 +356,21 @@ Mass GenericRepository::getCapacity(std::string commod){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass GenericRepository::checkInventory(){
-  Mass total = 0;
+double GenericRepository::checkInventory(){
+  double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
   for (deque< WasteStream >::iterator iter = inventory_.begin(); iter != 
       inventory_.end(); iter ++){
-    total += iter->first->getTotMass();
+    total += iter->first->getQuantity();
   }
 
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass GenericRepository::checkStocks(){
-  Mass total = 0;
+double GenericRepository::checkStocks(){
+  double total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
@@ -378,7 +378,7 @@ Mass GenericRepository::checkStocks(){
   if(!stocks_.empty()){
     for (deque< WasteStream >::iterator iter = stocks_.begin(); iter != 
         stocks_.end(); iter ++) {
-        total += iter->first->getTotMass();
+        total += iter->first->getQuantity();
     };
   };
   return total;

@@ -35,24 +35,24 @@ public:
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual double getQuantity(){return quantity_;};
+  virtual double getQuantity() {return quantity_;};
     
   /**
    * Returns the total quantity of this resource in its base unit 
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual std::string getResourceUnits(){return units_;};
+  virtual std::string getResourceUnits() {return units_;};
     
   /**
    * Sets the total quantity of this resource in its base unit 
    */
-  void setQuantity(double new_quantity){quantity_ = new_quantity;};
+  void setQuantity(double new_quantity) {quantity_ = new_quantity;};
 
   /**
    * Sets the quality of this resource
    */
-  void setQuality(std::string new_quality){quality_ = new_quality;};
+  void setQuality(std::string new_quality) {quality_ = new_quality;};
     
   /**
    * A boolean comparing the quantity of the other resource is 

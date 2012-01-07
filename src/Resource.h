@@ -32,6 +32,12 @@ public:
    * @return the total quantity of this resource in its base unit
    */
   virtual double getQuantity() = 0;
+
+  /**
+   * Set the quantity of the resource in its default units to 'val'.
+   *
+   */
+  virtual void setQuantity(double val) = 0;
     
   /**
    * A boolean comparing the quantity of the other resource is 

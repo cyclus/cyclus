@@ -27,7 +27,7 @@ typedef double Concentration;
 /**
  * type definition for ConcMap 
  */
-typedef std::map<Iso, Concentration> ConcMap;
+typedef std::map<int, Concentration> ConcMap;
 
 
 /** 

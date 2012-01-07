@@ -13,7 +13,6 @@
 #define LI Logician::Instance()
 
 typedef std::map<int, Model*> ModelList;
-typedef std::map<std::string, Material*> RecipeList;
 
 /**
    @brief A (singleton) simulation logician class. This class sends tick 
