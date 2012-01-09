@@ -11,6 +11,9 @@
 #include "H5Cpp.h"
 #include "H5Exception.h"
 
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_Version.hpp"
+
 #include "Timer.h"
 #include "CycException.h"
 #include "Material.h"
@@ -26,6 +29,7 @@ BookKeeper* BookKeeper::Instance() {
   if (0 == instance_){
     instance_ = new BookKeeper();  
   }
+  std::cout << "\n\n\n " << Teuchos::Teuchos_Version() << "\n\n\n" << std::endl;
   return instance_;
 };
 
