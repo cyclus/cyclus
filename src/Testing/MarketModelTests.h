@@ -3,8 +3,8 @@
 
 #include "MarketModel.h"
 #include "suffix.h"
-#include "Testing/TestInst.h"
-#include "Testing/TestMarket.h"
+#include "TestInst.h"
+#include "TestMarket.h"
 
 #if GTEST_HAS_PARAM_TEST
 

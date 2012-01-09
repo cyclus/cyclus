@@ -3,7 +3,7 @@
 
 #include "InstModel.h"
 #include "suffix.h"
-#include "Testing/TestRegion.h"
+#include "TestRegion.h"
 
 #if GTEST_HAS_PARAM_TEST
 
