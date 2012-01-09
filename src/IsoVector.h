@@ -95,6 +95,8 @@ public:
 
   IsoVector operator- (IsoVector rhs_vector);
 
+  bool operator== (IsoVector rhs_vector);
+
   /*!
    Returns the atomic number of the isotope with the given identifier.
    

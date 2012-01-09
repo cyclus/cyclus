@@ -179,6 +179,32 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool IsoVector::operator== (IsoVector rhs_vector) {
+  int isotope;
+  double mass_diff;
+  CompMap this_comp(atom_comp_);
+  CompMap rhs_comp = rhs_vector.atom_comp_;
+
+  CompMap::iterator rhs_iter, this_iter;
+  for (rhs_iter = rhs_comp.begin(); rhs_iter != rhs_comp.end(); rhs_iter++) {
+    isotope = rhs_iter->first;
+    mass_diff = fabs(rhs_vector.mass(isotope) - mass(isotope));
+    if (mass_diff > EPS_KG) {
+      return false;
+    }
+  }
+
+  for (this_iter = this_comp.begin(); this_iter != this_comp.end(); this_iter++) {
+    isotope = this_iter->first;
+    mass_diff = fabs(rhs_vector.mass(isotope) - mass(isotope));
+    if (mass_diff > EPS_KG) {
+      return false;
+    }
+  }
+  return true;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(int tope) {
   validateAtomicNumber(tope);
   return tope / 1000; // integer division
