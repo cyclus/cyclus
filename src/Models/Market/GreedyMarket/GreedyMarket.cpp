@@ -16,10 +16,9 @@ void GreedyMarket::receiveMessage(Message *msg)
 {
   messages_.insert(msg);
 
-  if (msg->isOffer()){
+  if (msg->isOffer()) {
     offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
-  }
-  else{
+  } else {
     requests_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
   }
 }
@@ -62,15 +61,13 @@ void GreedyMarket::resolve() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GreedyMarket::reject_request(sortedMsgList::iterator request) {
   // delete the tentative orders
-  while ( orders_.size() > firmOrders_)
-  {
+  while ( orders_.size() > firmOrders_) {
     delete orders_.back();
     orders_.pop_back();
   }
 
   // put all matched offers_ back in the sorted list
-  while (matchedOffers_.size() > 0)
-  {
+  while (matchedOffers_.size() > 0) {
     Message *msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
     matchedOffers_.erase(msg);
@@ -82,8 +79,7 @@ void GreedyMarket::process_request() {
   // update pointer to firm orders
   firmOrders_ = orders_.size();
 
-  while (matchedOffers_.size() > 0)
-  {
+  while (matchedOffers_.size() > 0) {
     Message *msg = *(matchedOffers_.begin());
     messages_.erase(msg);
     matchedOffers_.erase(msg);
@@ -96,22 +92,25 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   double requestAmt,offerAmt;
   Message *offerMsg, *requestMsg;
 
-  requestAmt = (*request).first;
-  requestMsg = (*request).second;
+  requestAmt = request->first;
+  requestMsg = request->second;
   
   // if this request is not yet satisfied &&
   // there are more offers_ left
-  while ( requestAmt > 0 && offers_.size() > 0) {
+  while ( fabs(requestAmt) > EPS_KG && offers_.size() > 0) {
     // get a new offer
     offer = offers_.end();
     offer--;
     offerAmt = offer->first;
     offerMsg = offer->second;
 
+    LOG(LEV_DEBUG2) << "offeramt=" << offerAmt
+                    << ", requestamt=" << requestAmt;
+
     // pop off this offer
     offers_.erase(offer);
-    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
-      if (requestAmt > offerAmt) { 
+    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())) {
+      if (requestAmt - offerAmt > EPS_KG) { 
         // put a new message in the order stack
         // it goes down to supplier
         offerMsg->setRequester(requestMsg->getRequester());
@@ -131,7 +130,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
           << offerMsg->getResource()->getQuantity();
 
         requestAmt -= offerAmt;
-      } else if(offerAmt >= requestAmt) {
+      } else {
         // split offer
 
         // queue a new order

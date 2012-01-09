@@ -1,6 +1,7 @@
 // Resource.cpp
 // Implements the Resource Class
 #include "GenericResource.h"
+#include "Logger.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource::GenericResource(std::string units,
@@ -12,13 +13,19 @@ GenericResource::GenericResource(std::string units,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource* GenericResource::clone() {
+  LOG(LEV_DEBUG2) << "resource was cloned";
   return new GenericResource(*this);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 bool GenericResource::checkQuality(Resource* other){
   bool toRet = false;
-  toRet = (units_== other->getResourceUnits());
+  LOG(LEV_DEBUG2) << "other resource = " << other;
+  if (other == NULL) {
+    LOG(LEV_DEBUG2) << "other resource == NULL: true";
+  }
+
+  toRet = (units_ == other->getResourceUnits());
   return toRet;
 }
 

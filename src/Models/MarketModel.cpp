@@ -24,12 +24,16 @@ MarketModel::MarketModel() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
+  LOG(LEV_DEBUG2) << "removing market from static list of markets...";
   std::list<MarketModel*>::iterator mkt;
-  for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
+  for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt) {
     if (this == *mkt) {
+      LOG(LEV_DEBUG2) << "  found match in static list";
       markets_.erase(mkt);
+      LOG(LEV_DEBUG2) << "  match is removed";
+      break;
     }
-  };
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -63,8 +63,14 @@ IsoVector::IsoVector(xmlNodePtr cur) {
     atom_comp_[isotope] = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
   }
 
+  double total_qty = strtol(XMLinput->get_xpath_content(cur,"total"), NULL, 10);
+  if ("atom" == comp_type) {
+    setAtomCount(total_qty);
+  } else {
+    setMass(total_qty);
+  }
+
   IsoVector::recipes_[recipe_name] = this;
-  atom_comp_ = normalized();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -120,8 +126,12 @@ void IsoVector::printRecipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
   CompMap::iterator entry;
+  int isotope;
+  LOG(LEV_DEBUG2) << "    mass " << mass() << " kg";
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
-    LOG(LEV_DEBUG2) << entry->first << ": " << entry->second << " atoms";
+    isotope = entry->first;
+    LOG(LEV_DEBUG2) << "    " << isotope << ": "
+                    << mass(isotope) << "kg";
   }
 }
 
@@ -290,6 +300,10 @@ double IsoVector::mass() {
     iter++;
   }
 
+  if (mass_val < EPS_KG) {
+    mass_val = 0;
+  }
+
   return mass_val;
 }
 
@@ -302,7 +316,11 @@ double IsoVector::mass(int tope) {
     int grams_per_kg = 1000;
     grams_per_atom = MT->getMassInGrams(tope);
 
-    return atom_comp_[tope] * grams_per_atom / grams_per_kg;
+    double iso_mass = atom_comp_[tope] * grams_per_atom / grams_per_kg;
+    if (iso_mass < EPS_KG) {
+      iso_mass = 0;
+    }
+    return iso_mass;
   }
 }
 

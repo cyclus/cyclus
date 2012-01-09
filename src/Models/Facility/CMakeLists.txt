@@ -8,3 +8,5 @@ ADD_SUBDIRECTORY( SeparationsMatrixFacility )
 ADD_SUBDIRECTORY( SinkFacility )
 ADD_SUBDIRECTORY( StubFacility )
 ADD_SUBDIRECTORY( SourceFacility )
+
+SET(TestSource ${TestSource} PARENT_SCOPE)

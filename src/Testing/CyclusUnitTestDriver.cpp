@@ -3,12 +3,14 @@
 
 #include <gtest/gtest.h>
 #include "Env.h"
+#include "Logger.h"
 
 int main(int argc, char* argv[]) {
 
   // tell ENV the path between the cwd and the cyclus executable
   std::string path = ENV->pathBase(argv[0]) + "/..";
   ENV->setCyclusPath(path);
+  Logger::ReportLevel() = LEV_ERROR;
   
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];

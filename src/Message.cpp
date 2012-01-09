@@ -10,6 +10,7 @@
 #include "MarketModel.h"
 #include "InstModel.h"
 #include "GenericResource.h"
+#include "Logger.h"
 
 #include <iostream>
 
@@ -28,6 +29,7 @@ Message::Message(Communicator* sender) {
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.is_offer = NULL;
+  trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
 }
@@ -42,6 +44,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   trans_.supplier = NULL;
   trans_.requester = NULL;
   trans_.is_offer = NULL;
+  trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
 }

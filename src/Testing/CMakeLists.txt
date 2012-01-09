@@ -6,6 +6,7 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # added to ctest.
 set ( TestSource
   MaterialTests.cpp
+  IsoVectorTests.cpp
   BookKeeperTests.cpp
   LogicianTests.cpp
   MessageTests.cpp

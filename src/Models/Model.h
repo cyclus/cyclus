@@ -170,7 +170,7 @@ public:
   /**
    * get model implementation name
    */
-  const std::string getModelImpl() {return model_impl_; };
+  const std::string getModelImpl();
 
   /**
    * get model type
