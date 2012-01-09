@@ -9,16 +9,16 @@ rm -rf CMakeCache.txt
 
 ##---------------------------------------------------------------------------##
 
-#
-# Note that the user must change /path/to/trilinos/source to the correct path
-#
-
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=RELEASE \
     -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
     -D Trilinos_ENABLE_TESTS:BOOL=OFF \
     -D Trilinos_ENABLE_Teuchos:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
-    -D CMAKE_INSTALL_PREFIX:PATH=/usr/local/ \
+    -D BLAS_LIBRARY_DIRS:PATH=/home/gidden/work/software/lapack-3.4.0 \
+    -D BLAS_LIBRARY_NAMES:STRING="blas" \
+    -D LAPACK_LIBRARY_DIRS:PATH=/home/gidden/work/software/lapack-3.4.0 \
+    -D LAPACK_LIBRARY_NAMES:STRING="lapack" \
+    -D CMAKE_INSTALL_PREFIX:PATH=$PWD \
     $EXTRA_ARGS \
-    /path/to/trilinos/source
+    /home/gidden/work/software/trilinos-10.8.4-Source
