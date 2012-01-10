@@ -9,4 +9,4 @@ ADD_SUBDIRECTORY( SinkFacility )
 ADD_SUBDIRECTORY( StubFacility )
 ADD_SUBDIRECTORY( SourceFacility )
 
-SET(TestSource ${TestSource} PARENT_SCOPE)
+SET(ModelTestSource ${ModelTestSource} ${FacilityTestSource} PARENT_SCOPE)

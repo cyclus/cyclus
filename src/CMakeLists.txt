@@ -32,9 +32,8 @@ SET(CYCLUS_INCLUDE_DIR
 
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
-# Add any new source files to this list.
-SET( CYCLUS_SRC 
-  App.cpp 
+# Add any new core source files to this list.
+SET( CYCLUS_CORE
   InputXML.cpp
   IsoVector.cpp
   Logician.cpp
@@ -57,12 +56,16 @@ SET( CYCLUS_SRC
   Models/MarketModel.cpp 
   Models/FacilityModel.cpp 
   Models/RegionModel.cpp
-  Models/InstModel.cpp)
+  Models/InstModel.cpp
+  )
+
+SET( CYCLUS_SRC
+  ${CYCLUS_CORE}
+  App.cpp
+  )
 
 set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
-
-
 
 # Copy Data
 CONFIGURE_FILE(
@@ -80,11 +83,6 @@ ${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
 ${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
 COPYONLY
 )
-
-# Be sure to clear these each time
-set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -142,22 +140,68 @@ ELSE (DOXYGEN_FOUND)
 	MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
-# Alerts CMake to any tests we need to worry about
-INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
-
-# Create an executable for all the gtests
-
-# Options for testing
-option ( USE_TESTING "Build testing" ON )
-if ( USE_TESTING )
-  enable_testing()
-  subdirs ( Testing )
-  include(CTest)
-endif()
-
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
 
+# ----- Cyclus Unit Test Driver ------
 
+# Be sure to clear these each time
+set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
+set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
+set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
+
+# The gtest include file directories.
+SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
+
+# The gtest library directories.
+SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/Testing")
+
+# Alerts CMake to any tests we need to worry about
+INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+
+# Create an executable for all the gtests
+# Options for testing
+option ( USE_TESTING "Build testing" ON )
+if ( USE_TESTING )
+  enable_testing()
+  include(CTest)
+endif()
+
+ADD_SUBDIRECTORY(Testing)
+SET(TestSource 
+  ${TestSource} 
+  ${CYCLUS_CORE}
+  ${CYCLUS_TEST_CORE}
+  )
+
+# Build Google Test
+find_package(Threads)
+if (CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
+  set(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
+endif()
+
+# Build Google Testing
+set ( GTest
+  Testing/GoogleTest/gtest/gtest-all.cc
+)
+include_directories ( Testing ) # necessary?
+
+add_library(gtest ${GTest})
+if (CMAKE_USE_PTHREADS_INIT)
+  target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+INCLUDE_DIRECTORIES(Testing/Googletest) # necessary?
+add_executable(Testing/CyclusUnitTestDriver
+  Testing/CyclusUnitTestDriver.cpp ${TestSource}
+  ${GENERATED_TEST_SOURCE}
+)
+
+target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
+  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
+
+# Here we add all the tests
+add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
+  ${INTERFACE_LIBRARIES})
 
