@@ -12,4 +12,4 @@ ADD_SUBDIRECTORY( Region )
 ADD_SUBDIRECTORY( Inst )
 ADD_SUBDIRECTORY( Converter )
 
-SET( TestSource ${TestSource} PARENT_SCOPE )
+SET( TestSource ${ModelTestSource} PARENT_SCOPE )

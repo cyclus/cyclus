@@ -4,3 +4,4 @@ ADD_SUBDIRECTORY( StubRegion )
 ADD_SUBDIRECTORY( BuildRegion )
 ADD_SUBDIRECTORY( CapacityRegion )
 
+SET(ModelTestSource ${ModelTestSource} ${RegionTestSource} PARENT_SCOPE)
