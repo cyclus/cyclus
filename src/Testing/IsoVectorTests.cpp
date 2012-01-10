@@ -303,3 +303,17 @@ TEST_F(IsoVectorTest, SetIsotopeAtomCount) {
   EXPECT_DOUBLE_EQ(vect1.atomCount(), v1_a1 * factor + v1_a2 + v1_a3);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- -    
+TEST_F(IsoVectorTest, Decay){
+  IsoVector::loadDecayInfo();
+//  test_mat->decay(2);
+//  ASSERT_NEAR(test_mat->getAtomComp(u235), 1, 0.001);
+//  ASSERT_NEAR(decay_mat->getAtomComp(u235),  0.5, 0.001);
+//  ASSERT_NEAR(decay_mat->getAtomComp(th228), 0.5, 0.001);
+//
+//  decay_mat->decay(th228_halflife);
+//
+//  ASSERT_NEAR(decay_mat->getAtomComp(th228),  0.25, 0.01);
+//  ASSERT_NEAR(decay_mat->getAtomComp(pb208),  0.25, 0.01);
+}
