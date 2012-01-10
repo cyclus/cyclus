@@ -39,17 +39,20 @@ class StubMarketTest : public ::testing::Test {
 
     virtual void TearDown() {
       delete src_market;
+      delete new_market;
     }
 };
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, InitialState) {
+  EXPECT_TRUE(true);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, CopyMarket) {
   new_market->copy(src_market); 
+  EXPECT_TRUE(true);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

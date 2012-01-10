@@ -22,17 +22,15 @@ class FakeRecipeReactor : public RecipeReactor {
 
       CompMap test_comp;
 
-      Iso u235 = 92235;
-      Atoms one = 1.0;
+      int u235 = 92235;
+      double one = 1.0;
       test_comp[u235]=one;
       string test_mat_unit = "test_mat_unit";
       string test_rec_name = "test_rec_name";
       double test_size = 10.0;
-      Basis test_type = ATOMBASED;
       bool test_template = true;
-
-      Material* recipe = new Material(test_comp, test_mat_unit, test_rec_name, test_size, 
-          test_type, test_template); 
+      IsoVector recipe(test_comp);
+      recipe.setMass(test_size);
 
       capacity_ = 2;
       inventory_size_ = 50;
@@ -53,8 +51,8 @@ class FakeRecipeReactor : public RecipeReactor {
       string recipe_name;
       std::string in_commod;
       std::string out_commod;
-      Material* in_recipe;
-      Material* out_recipe;
+      IsoVector in_recipe;
+      IsoVector out_recipe;
 
       // for each fuel pair, there is an in and an out commodity
       int pairs = 1;
@@ -79,8 +77,7 @@ class FakeRecipeReactor : public RecipeReactor {
       ordersWaiting_ = deque< Message*>();
     }
 
-    virtual ~FakeRecipeReactor() {
-    }
+    virtual ~FakeRecipeReactor() { }
 
     string getInCommod(){return fuelPairs_.front().first.first ;}
     string getOutCommod(){return fuelPairs_.front().second.first ;}

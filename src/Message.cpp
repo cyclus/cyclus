@@ -10,6 +10,7 @@
 #include "MarketModel.h"
 #include "InstModel.h"
 #include "GenericResource.h"
+#include "Logger.h"
 
 #include <iostream>
 
@@ -27,8 +28,8 @@ Message::Message(Communicator* sender) {
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
-  trans_.resource = NULL;
   trans_.is_offer = NULL;
+  trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
 }
@@ -42,8 +43,8 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
-  trans_.resource = NULL;
   trans_.is_offer = NULL;
+  trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
 }
@@ -77,18 +78,9 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
-  Message* toRet = new Message(*this);
-  switch( trans_.resource->getResourceType()){
-    case MATERIAL_RES :
-      toRet->setResource(new Material(*(dynamic_cast<Material*>(trans_.resource))));
-      break;
-    case GENERIC_RES :
-      toRet->setResource(new GenericResource(*(dynamic_cast<GenericResource*>(trans_.resource))));
-      break;
-    default :
-      CycException("ResourceType not recognized.");
-  }
-  return toRet;
+  Message* new_msg = new Message(*this);
+  new_msg->setResource(getResource());
+  return new_msg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

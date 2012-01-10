@@ -13,7 +13,6 @@
 #define LI Logician::Instance()
 
 typedef std::map<int, Model*> ModelList;
-typedef std::map<std::string, Material*> RecipeList;
 
 /**
    @brief A (singleton) simulation logician class. This class sends tick 
@@ -57,9 +56,6 @@ class Logician {
     
     /// map of model types to model lists. Used by [add/get]Model methods)
     std::map<ModelType, ModelList> model_lists_;
-    
-    /// list of material templates
-    RecipeList recipes_;
     
     /// list of materialss
     std::vector<Material*> materials_;
@@ -137,31 +133,6 @@ class Logician {
      */
     void printModelList(ModelType model_type);	
 
-    /**
-     * add a recipe to the list
-     *
-     * @param name the name of the recipe to add 
-     * @param new_mat the material object to add to the recipes list
-     */
-    void addRecipe(std::string name, Material* new_mat);
-
-    /**
-     * print list of recipes
-     */
-    void printRecipes();
-
-    /**
-     * get number of recipes
-     */
-    int getNumRecipes();                                  
-
-    /**
-     * get a pointer to the recipe based on its name
-     *
-     * @param name the name of the recipe for which to return a material pointer.
-     */
-    Material* getRecipe(std::string name);                      
-    
 };
 
 #endif

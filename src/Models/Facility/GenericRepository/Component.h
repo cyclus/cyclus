@@ -15,6 +15,20 @@
 #include "ThermalModel.h"
 #include "NuclideModel.h"
 
+/*!
+A map for storing the composition history of a material.
+
+@TODO IsoVector should be used instead of this
+*/
+typedef std::map<int, std::map<int, double> > CompHistory;
+
+/*!
+A map for storing the mass history of a material.
+
+@TODO IsoVector should be used instead of this
+*/
+typedef std::map<int, std::map<int, double> > MassHistory;
+
 /// type definition for Radius in meters
 typedef double Radius;
 
@@ -25,9 +39,9 @@ typedef double Tox;
 typedef double Concentration;
 
 /// type definition for ConcMap 
-typedef std::map<Iso, Concentration> ConcMap;
+typedef std::map<int, Concentration> ConcMap;
 
-/// type definition for Temperature in Kelvin
+/// type definition for Temperature in Kelvin map for storing the composition history of a material.
 typedef double Temp;
 
 /// type definition for Power in Watts

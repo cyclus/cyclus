@@ -17,19 +17,16 @@ class FakeSourceFacility : public SourceFacility {
     FakeSourceFacility() : SourceFacility() {
       out_commod_ = "out-commod";
 
-      CompMap test_comp;
-
-      Iso u235 = 92235;
-      Atoms one = 1.0;
-      test_comp[u235]=one;
+      int u235 = 92235;
+      double one = 1.0;
       string test_mat_unit = "test_mat_unit";
       string test_rec_name = "test_rec_name";
       double test_size = 10.0;
-      Basis test_type = ATOMBASED;
       bool test_template = true;
+      IsoVector test_comp;
+      test_comp.setMass(u235, one);
 
-      recipe_ = new Material(test_comp, test_mat_unit, test_rec_name, test_size, 
-          test_type, test_template); 
+      recipe_ = IsoVector(test_comp);
 
       capacity_ = 2;
       inventory_size_ = 50;
@@ -48,7 +45,7 @@ class FakeSourceFacility : public SourceFacility {
     double getCapacity() {return capacity_;}
     double getInvSize() {return inventory_size_;}
     double getCommodPrice() {return commod_price_;}
-    Material* getRecipe() {return recipe_;}
+    IsoVector getRecipe() {return recipe_;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,7 +96,7 @@ TEST_F(SourceFacilityTest, CopyFreshModel) {
   EXPECT_EQ(src_facility->getCapacity(), new_facility->getCapacity());
   EXPECT_EQ(src_facility->getInvSize(), new_facility->getInvSize());
   EXPECT_EQ(src_facility->getCommodPrice(), new_facility->getCommodPrice());
-  EXPECT_EQ(src_facility->getRecipe(), new_facility->getRecipe());
+  EXPECT_DOUBLE_EQ(src_facility->getRecipe().mass(), new_facility->getRecipe().mass());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -129,7 +126,7 @@ TEST_F(SourceFacilityTest, Tock) {
   EXPECT_NO_THROW(src_facility->handleTock(time));
   EXPECT_GT(src_facility->fakeCheckInventory(),0.0);
   EXPECT_LE(src_facility->getCapacity(),src_facility->fakeCheckInventory());
-  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe()->getTotMass(); 
+  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe().mass(); 
   if (expected_inventory > src_facility->getInvSize()) {
     expected_inventory = src_facility->getInvSize();
   }

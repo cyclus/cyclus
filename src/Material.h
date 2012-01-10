@@ -11,6 +11,7 @@
 
 #include "UseMatrixLib.h"
 #include "Resource.h"
+#include "IsoVector.h"
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
@@ -96,131 +97,23 @@
    are provided by many public member functions of the MaterialClass.
 */
 
-/**
- * type definition for isotopes
- */
-typedef int Iso;
-
-/**
- * type definition for elements
- */
-typedef int Elt;
-
-/**
- * type definition for atom count
- */
-typedef double Atoms;
-
-/**
- * type definition for mass
- */
-typedef double Mass;
-
-/**
- * Spectra for which average cross-section data are available.
- */
-enum Spectrum {THERMAL, FAST};
-
-/**
- * Represents a decay constant of a parent isotope.
- */
-typedef double DecayConst;
-
-/**
- * Represents a branching ratio of a daughter isotope.
- */
-typedef double BranchRatio;
-
-/**
- * Represents a column of the decay matrix.
- */
-typedef int Col;
-
-/**
- * A map type to represent all of the parent isotopes tracked.  The key for
- * this map type is the parent's Iso number, and the value is a pair that
- * contains the corresponding decay matrix column and decay constant
- * associated with that parent.
- */
-typedef std::map< Iso, std::pair<Col, DecayConst> > ParentMap;
-
-/**
- * A map type to represent all of the daughter isotopes tracked.  The key for
- * this map type is the decay matrix column associated with the parent, and the
- * value is a vector of pairs of all the daughters for that parent. Each of the
- * daughters are represented by a pair that contains the daughter's Iso number
- * and its branching ratio.
- */
-typedef std::map<Col, std::vector<std::pair<Iso, BranchRatio> > > DaughtersMap;
-
-/**
- * map integers to doubles: Iso => (Atoms|Mass)
- */
-typedef std::map<Iso, double> CompMap;
-
-/**
- * A map for storing the composition history of a material.
- */
-typedef std::map<int, std::map<Iso, Atoms> > CompHistory;
-
-/**
- * A map for storing the mass history of a material.
- */
-typedef std::map<int, std::map<Iso, Mass> > MassHistory;
-
-/**
- * A map for storing the facility history of a material.
- */
-typedef std::map<int, std::pair<int, int> > FacHistory;
-
-/**
- * An enumeration for different types of recipe bases
- **/
-enum Basis {ATOMBASED, MASSBASED};
-
-/**
- * we will always need Avogadro's number somewhere
- */
-#define AVOGADRO 6.02e23
-
-/**
- * we should define this numerical threshold as a simulation parameter
- * its units are kg.
- */
-#define EPS_KG 1e-6
-
 class Material : public Resource {
 
 public:
-  /**
-   * primary constructor reads input from XML node
-   *
-   * @param cur input XML node
-   */
-  Material(xmlNodePtr cur);
+  Material();
 
   /**
    * a constructor for making a material object from a known recipe and size.
    *
-   * @param comp a map from isotopes to number of atoms
-   * @param mat_unit the units for this material
-   * @param rec_name name of this recipe
-   * @param scale is the size of this material
-   * @param type indicates whether comp and scale are in mass or atom units
-   * @param is_template indicates whether comp and scale are in mass or atom units
+   * @param comp isotopic makeup of this material object
    */
-  Material(CompMap comp, std::string mat_unit, std::string rec_name, 
-            double scale, Basis type, bool is_template);
+  Material(IsoVector comp);
   
   /** 
    * Default destructor does nothing.
    */
   ~Material() {};
 
-  /**
-   * loads the recipes from the input file
-   */
-  static void load_recipes();
   
   /**
    * standard verbose printer includes both an atom and mass composition output
@@ -228,22 +121,16 @@ public:
   void print(); 
     
   /**
-   * verbose printer for a single type of composition
-   *
-   * @param header is the description to precede the composition 
-   * @param comp_map is the map between isotopes and mass
+   * Change/set the mass of the resource object. Note that this does make
+   * matter (dis)appear and should only be used on objects that are not part of
+   * any actual tracked inventory.
    */
-  void printComp(std::string header, CompMap comp_map);
+  void setQuantity(double quantity) {comp_.setMass(quantity);};
 
   /**
    * Resource class method
    */
-  double getQuantity(){return this->getTotMass();};
-
-  /**
-   * Resource class method
-   */
-  void setQuantity(double quantity);
+  double getQuantity(){return comp_.mass();};
 
   /**
    * Resource class method
@@ -268,183 +155,20 @@ public:
   /**
    * Resource class method
    */
-  ResourceType getResourceType(){return MATERIAL_RES;};
+  ResourceType getResourceType() {return MATERIAL_RES;};
+
+  /**
+   * Resource class method
+   */
+  Material* clone();
 
   /**
    * get material ID
    *
    * @return ID
    */
-  const int ID(){return ID_;};
+  const int ID() {return ID_;};
 
-  /**
-   * returns the name of the recipe
-   *
-   * @return recipeName
-   */
-  std::string name() { return recipeName_; };
-
-  /**
-   * returns the units of the recipe, a string
-   *
-   * @return units
-   */
-  std::string getUnits() { return units_; };
-
-  /**
-   * returns the total mass of this material object in kg 
-   */
-  const Mass getTotMass() const {return total_mass_;};
-
-  /**
-   * Returns the total mass of the given composition vector in kg.
-   * 
-   * @param comp the composition vector
-   * @return the mass (in tons)
-   */
-  static double getTotMass(const CompMap& comp);
-
-  /**
-   * returns the total atoms in this material object 
-   */
-  const Atoms getTotAtoms() const {return total_atoms_;};
-
-  /**
-   * Returns the total atoms in the given composition vector.
-   * 
-   * @param comp the composition vector
-   * @return the total atoms
-   */
-  static Atoms getTotAtoms(const CompMap& comp);
-
-  /**
-   * Returns the entire (current) mass vector for this Material.
-   *
-   * @return the current mass composition
-   */
-  virtual const CompMap getMassComp() const;
-
-  /**
-   * Returns the current mass of the given isotope, or zero if 
-   * that isotope isn't present.
-   *
-   * @param tope the isotope whose mass in the material will be returned
-   * @return the mass of the given isotope within the material, or zero
-   */
-  const virtual Mass getMassComp(Iso tope) const;
-
-  /**
-   * Returns the mass of the given isotope in the given composition vector.
-   *
-   * @param tope the atomic number of the element
-   * @param comp the composition vector
-   * @return the mass
-   */
-  static double getMassComp(Iso tope, const CompMap& comp);
-
-  /**
-   * Returns the entire (current) isotopic vector for this Material.
-   *
-   * @return the current composition
-   */
-  virtual const CompMap getAtomComp() const;
-
-  /**
-   * Returns the atoms of the given isotope in the given composition vector.
-   *
-   * @param tope the atomic number of the element
-   * @param comp the composition vector
-   * @return the number of atoms
-   */
-  static double getAtomComp(Iso tope, const CompMap& comp);
- 
-  /**
-   * Returns the current number density of the given isotope, or zero if 
-   * that isotope isn't present.
-   *
-   * @param tope the isotope whose number density will be returned
-   * @return the number density of the given isotope, or zero
-   */
-  const virtual Atoms getAtomComp(Iso tope) const;
-
-  /**
-   * Returns the atomic number of the isotope with the given identifier.
-   *
-   * @param tope the isotope whose atomic number is being returned
-   * @return the atomic number
-   */
-  static int getAtomicNum(Iso tope);
-
-  /**
-   * Returns the mass number of the isotope with the given identifier.
-   *
-   * @param tope the isotope whose mass number is being returned
-   * @return the mass number
-   */
-  static int getMassNum(Iso tope);
-
-  /**
-   * Returns the atomic mass of the isotope with the given identifier.
-   *
-   * @param tope the isotope whose mass is being returned
-   * @return the atomic mass (g/mol) 
-   */
-  static Mass getAtomicMass(Iso tope);
-
-  /**
-   * Adds (or subtracts) from the number density of the given isotope by 
-   * the amount.
-   *
-   * @param tope the isotope whose number density we want to change
-   * @param change if positive, the amount to add to the given isotopes 
-   * number density; if negative, the amount to subtract
-   * @param time the time at which this takes place.
-   */
-  virtual void changeComp(Iso tope, Atoms change, int time);
-
-  /**
-   * Changes the atomic composition to a new composition
-   *
-   * @param newComp is the new atom composition vector
-   * @param base indicating the composition basis (ATOMBASED or MASSBASED
-   * @param time is the time at which this takes place
-   */
-  virtual void changeComp(CompMap newComp, Basis base, int time);
-
-  /**
-   * Returns the mass of the given element in this Material.
-   *
-   * @param elt the element
-   * @return the mass of the element (in tons)
-   */
-  const virtual double getEltMass(int elt) const;
-
-  /**
-   * Returns the mass of the given element in the given composition vector.
-   *
-   * @param elt the atomic number of the element
-   * @param comp the composition vector
-   * @return the mass (in tons)
-   */
-  static double getEltMass(int elt, const std::map<Iso, Atoms>& comp);
-
-  /**
-   * Returns the mass of the given isotope in this Material.
-   *
-   * @param tope the isotope
-   * @return the mass of the element (in tons)
-   */
-  const virtual double getIsoMass(Iso tope) const;
-
-  /**
-   * Returns the mass of the given isotope in the given composition vector.
-   *
-   * @param tope the atomic number of the element
-   * @param comp the composition vector
-   * @return the mass (in tons)
-   */
-  static double getIsoMass(Iso tope, const CompMap& comp);
- 
   /**
    * Absorbs the contents of the given Material into this Material and deletes 
    * the given Material. 
@@ -454,32 +178,24 @@ public:
   virtual void absorb(Material* matToAdd);
 
   /**
-   * Extracts the contents of the given Material from this Material. Use this 
-   * function for decrementing a Facility's inventory after constructing a new 
-   * Material to send to another Facility to execute an order, or for similar 
-   * tasks.
+   * Extracts from this material a composition specified by the given IsoVector
    *
-   * @param matToRem the Material whose composition we want to decrement 
+   * @param rem_comp the composition/amount of material that will be removed
    * against this Material
-   */
-  virtual void extract(Material* matToRem);
-
-  /**
-   * Extracts a material object of the given mass from the material.
-   * The stoichiometry of the extracted object is the same as the parent
-   * and the mass of the parent is altered to reflect the change. 
-   *
-   * @param extract the mass to extract.
-   * @return the new material object
-   */
-  virtual Material* extractMass(Mass extract);
-
-  /**
-   * Normalizes the composition vector it is provided.
    * 
-   * @param comp_map the vector to normalize
+   * @return the extracted material as a newly allocated material object
    */
-  void normalize(CompMap &comp_map);
+  virtual Material* extract(IsoVector rem_comp);
+
+  /**
+   * Extracts a specified mass from this material creating a new material
+   * object with the same isotopic ratios.
+   *
+   * @param the amount (mass) of material that will be removed
+   * 
+   * @return the extracted material as a newly allocated material object
+   */
+  virtual Material* extract(double mass);
 
   /**
    * Decays this Material object for the given number of months and updates
@@ -496,24 +212,19 @@ public:
    */
   void decay();
 
-  /**
-   * Reads the decay information found in the 'decayInfo.dat' file into the
-   * parent and daughters maps.Uses these maps to create the decay matrix.
-   */
-  static void loadDecayInfo();
-
-  /**
-   * Returns true if this material is a template, false otherwise
-   *
-   * @return is_template_
-   */
-  bool isTemplate() const {return is_template_;};
+  /*!
+  Returns a copy of this material's isotopic composition
+  */
+  IsoVector comp() {return comp_;}
 
 protected:
-  /**
-   * Default constructor for the material class. Creates an empty material.
-   */
-  Material(); 
+
+  /// all isotopic details of this material object
+  IsoVector comp_;
+
+  /// last time this material object's state was accurate (e.g. time of last
+  /// decay, etc.)
+  int last_update_time_;
 
   /** 
    * The serial number for this Material.
@@ -525,152 +236,6 @@ protected:
    */
   static int nextID_;
 
-  /** 
-   * True if this Material is a template, not to be kept in the records or 
-   * traded between facilities. False otherwise.
-   */
-  bool is_template_;
-
-  /**
-   * Returns true if the given isotope's number density is for some reason 
-   * negative, false otherwise. We define number densities that are negative by 
-   * less than the conservation of mass tolerance as positive.
-   *
-   * @param tope the isotope in question
-   * @return true iff nd(tope) < 0
-   */
-  const bool isNeg(Iso tope) const;
-
-  /**
-   * Returns true if the given isotope's number density is less than the 
-   * conservation of mass tolerance.
-   *
-   * @param tope the isotope in question
-   * @return true iff nd(tope) == 0
-   */
-  const bool isZero(Iso tope) const;
-
-  /**
-   * The composition history of this Material, in the form of a map whose
-   * keys are integers representing the time at which this Material had a 
-   * particular composition and whose values are the corresponding 
-   * compositions. A composition is a map of isotopes and their 
-   * corresponding number of atoms.
-   */
-  CompHistory compHist_;
-
-  /**
-   * The mass history of this Material, in the form of a map whose
-   * keys are integers representing the time at which this Material had a 
-   * particular composition and whose values are the corresponding mass 
-   * compositions. A composition is a map of isotopes and the corresponding
-   * masses.
-   */
-  MassHistory massHist_;
-    
-  /**
-   * The facility history of this Material. The form is a map whose keys 
-   * are integers representing the time of a transfer and whose values 
-   * are pairs storing (first) the SN of the originating facility and 
-   * (second) the SN of the destination facility.
-   */
-  FacHistory facHist_;
-
-  /**
-   * Builds the decay matrix needed for the decay calculations from the parent
-   * and daughters map variables.  The resulting matrix is stored in the static
-   * variable decayMatrix.
-   */
-  static void makeDecayMatrix();
-
-  /**
-   * Returns a mathematical Vector representation of the Material's current
-   * composition map.
-   *
-   * @return the mathematical Vector 
-   */
-  Vector makeCompVector() const;
-
-  /**
-   * Converts the given mathematical Vector representation of the Material's 
-   * isotopic composition back into the map representation.
-   *
-   * @param compVector the mathematical Vector
-   * @return the composition map
-   */
-  static std::map<Iso, Atoms> makeCompMap(const Vector & compVector);
-
-private:
-  /**
-   * loads a recipebook full of recipes
-   *
-   * @param filename the name of the recipebook file, including the 
-   * extension
-   * @param ns the namespace under which these recipes will reside
-   * @param format the format of the recipebook
-   */
-  static void load_recipebook(std::string filename, std::string ns, 
-                               std::string format);
-
-  /**
-   * @brief Used to determine validity of isotope defnition.
-   * @param tope 
-   * @return true if isotope (number) is valid, false otherwise
-   */
-  static bool isAtomicNumValid(Iso tope);
-
-  /**
-   * total mass of this material object PER UNIT
-   */
-  Mass total_mass_;
-
-  /**
-   * total number of atoms in this material object PER UNIT
-   */
-  Atoms total_atoms_;
-
-  /**
-   * Keeps track of whether or not the mass & atom count is still consistent
-   */
-  bool atomEqualsMass_;
-
-  /**
-   * units for this material
-   */
-  std::string units_;
-
-  /*
-   * name of this recipe
-   */
-  std::string recipeName_;
-  
-  /**
-   * convert an atom composition into a consitent mass composition
-   */
-  void rationalize_A2M();
-
-  /**
-   * convert mass composition into a consitent atom composition
-   */
-  void rationalize_M2A();
-  
-  /**
-   *
-   */
-  static ParentMap parent_; 
-  
-  /**
-   *
-   */
-  static DaughtersMap daughters_; 
-  
-  /**
-   *
-   */
-  static Matrix decayMatrix_; 
 };
-
-
-
 
 #endif

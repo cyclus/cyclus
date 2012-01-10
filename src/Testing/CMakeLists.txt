@@ -6,6 +6,7 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
   ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/LogicianTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp

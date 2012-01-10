@@ -52,7 +52,7 @@ public:
    *
    * @return int the atomic number of the tope isotope.
    */
-  int getAtomicNum(Iso tope);
+  int getAtomicNum(int tope);
 
   /**
    * get the Mass, a double, of an isotope according to its
@@ -62,7 +62,7 @@ public:
    *
    * @return the mass, a double, of the tope isotope.
    */
-   Mass getMassInGrams(Iso tope);
+   double getMassInGrams(int tope);
 
 protected:
   /**
@@ -91,7 +91,7 @@ protected:
   /** 
    * a map for index lookup in the nuclide vector.
    */
-  std::map<Iso, int> isoIndex_;
+  std::map<int, int> isoIndex_;
 
   /** 
    * a function to initialize a large array of nuclide_t structs via the 

@@ -158,38 +158,36 @@ void BookKeeper::registerMatChange(Material* mat){
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);
 
-  if (!(mat->isTemplate())){
-    double total = mat->getTotMass();
-    toRegister.materialID = mat->ID(); 
-    /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
-    toRegister.timestamp = TI->getTime();
-    CompMap comp = mat->getMassComp();
-    CompMap::const_iterator it = comp.begin();
-    int i=0;
-    for(it=comp.begin(); it != comp.end(); it++){
-      toRegister.iso[i] = it->first;
-      toRegister.comp[i] = (it->second)*(total);
-      i++;
-    }
-    // if this material has registered 
-    if (last_mat_idx_.find(toRegister.materialID)!=last_mat_idx_.end()){
-      // in this timestamp
-      if ((materials_[last_mat_idx_[toRegister.materialID]]).timestamp == toRegister.timestamp){
-        //replace the entry.
-        materials_.at(last_mat_idx_[toRegister.materialID])=toRegister;
-        // the index of the last registeration stays the same
-      } else {
-        // if it's registered in some other timestamp, register the material 
-        materials_.push_back(toRegister);
-        // set the new last registeration index for this material 
-        last_mat_idx_[toRegister.materialID]= (materials_.size()-1);
-      }
-    }else{
-      // if it's never been registed, register the material anew
+  double total = mat->getQuantity();
+  toRegister.materialID = mat->ID(); 
+  /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
+  toRegister.timestamp = TI->getTime();
+  CompMap comp = mat->comp().comp();
+  CompMap::const_iterator it = comp.begin();
+  int i=0;
+  for(it=comp.begin(); it != comp.end(); it++){
+    toRegister.iso[i] = it->first;
+    toRegister.comp[i] = (it->second)*(total);
+    i++;
+  }
+  // if this material has registered 
+  if (last_mat_idx_.find(toRegister.materialID)!=last_mat_idx_.end()){
+    // in this timestamp
+    if ((materials_[last_mat_idx_[toRegister.materialID]]).timestamp == toRegister.timestamp){
+      //replace the entry.
+      materials_.at(last_mat_idx_[toRegister.materialID])=toRegister;
+      // the index of the last registeration stays the same
+    } else {
+      // if it's registered in some other timestamp, register the material 
       materials_.push_back(toRegister);
-      // set the index of the newly registered material
-      last_mat_idx_[toRegister.materialID] = (materials_.size()-1);
+      // set the new last registeration index for this material 
+      last_mat_idx_[toRegister.materialID]= (materials_.size()-1);
     }
+  }else{
+    // if it's never been registed, register the material anew
+    materials_.push_back(toRegister);
+    // set the index of the newly registered material
+    last_mat_idx_[toRegister.materialID] = (materials_.size()-1);
   }
 };
 

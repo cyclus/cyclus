@@ -1,0 +1,319 @@
+#include <gtest/gtest.h>
+#include "IsoVector.h"
+#include "InputXML.h"
+#include "MassTable.h"
+#include "CycException.h"
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+class IsoVectorTest : public ::testing::Test {
+  protected:
+    IsoVector vect0, vect1, vect2;
+
+    int v1_e1, v1_e2, v1_e3;
+    int v2_e1, v2_e2, v2_e3;
+
+    double v1_m1, v1_m2, v1_m3;
+    double v2_m1, v2_m2, v2_m3;
+
+    double v1_a1, v1_a2, v1_a3;
+    double v2_a1, v2_a2, v2_a3;
+
+    double total_mass1;
+    double total_mass2;
+    double total_moles1;
+    double total_moles2;
+
+    int isotope_lower_limit;
+    int isotope_upper_limit;
+    int isotope_not_present;
+
+    CompMap comp_map;
+
+    virtual void SetUp() {
+      double grams_per_kg = 1000;
+      isotope_lower_limit = 1001;
+      isotope_upper_limit = 1182949;
+      isotope_not_present = 9001;
+
+      v1_e1 = 8001;
+      v1_e2 = 92235;
+      v1_e3 = 92238;
+
+      v2_e1 = 8001;
+      v2_e2 = 92235;
+      v2_e3 = 94240;
+
+      v1_m1 = 1;
+      v1_m2 = 10;
+      v1_m3 = 100;
+
+      v2_m1 = 2;
+      v2_m2 = 20;
+      v2_m3 = 2000;
+
+      v1_a1 = v1_m1 * grams_per_kg / MT->getMassInGrams(v1_e1);
+      v1_a2 = v1_m2 * grams_per_kg / MT->getMassInGrams(v1_e2);
+      v1_a3 = v1_m3 * grams_per_kg / MT->getMassInGrams(v1_e3);
+
+      v2_a1 = v2_m1 * grams_per_kg / MT->getMassInGrams(v2_e1);
+      v2_a2 = v2_m2 * grams_per_kg / MT->getMassInGrams(v2_e2);
+      v2_a3 = v2_m3 * grams_per_kg / MT->getMassInGrams(v2_e3);
+
+      total_mass1 = v1_m1 + v1_m2 + v1_m3;
+      total_mass2 = v2_m1 + v2_m2 + v2_m3;
+      total_moles1 = v1_a1 + v1_a2 + v1_a3;
+      total_moles2 = v2_a1 + v2_a2 + v2_a3;
+
+      comp_map[v2_e1] = v2_a1;
+      comp_map[v2_e2] = v2_a2;
+      comp_map[v2_e3] = v2_a3;
+
+      vect1.setMass(v1_e1, v1_m1);
+      vect1.setMass(v1_e2, v1_m2);
+      vect1.setMass(v1_e3, v1_m3);
+
+      vect2 = CompMap(comp_map);
+    }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, ZeroMassOnInit) {
+
+  EXPECT_DOUBLE_EQ(vect0.mass(), 0.0);
+  EXPECT_DOUBLE_EQ(vect0.mass(1001), 0.0);
+
+  EXPECT_DOUBLE_EQ(vect0.atomCount(), 0.0);
+  EXPECT_DOUBLE_EQ(vect0.atomCount(1001), 0.0);
+
+  CompMap empty_map;
+  vect0 = IsoVector(empty_map);
+  
+  EXPECT_DOUBLE_EQ(vect0.mass(), 0.0);
+  EXPECT_DOUBLE_EQ(vect0.mass(1001), 0.0);
+
+  EXPECT_DOUBLE_EQ(vect0.atomCount(), 0.0);
+  EXPECT_DOUBLE_EQ(vect0.atomCount(1001), 0.0);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DefaultConstructor) {
+  EXPECT_TRUE(true);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, CompMapConstructor) {
+  EXPECT_TRUE(true);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_XMlConstructor){
+  std::string mystr;
+  mystr += "<recipe>\n";
+  mystr += "  <name>fresh_50gwd</name>\n";
+  mystr += "  <basis>mass</basis>\n";
+  mystr += "  <unit>assembly</unit>\n";
+  mystr += "  <total>1000</total>\n";
+  mystr += "  <isotope>\n";
+  mystr += "    <id>92235</id>\n";
+  mystr += "    <comp>0.05</comp>\n";
+  mystr += "  </isotope>\n";
+  mystr += "  <isotope>\n";
+  mystr += "    <id>92238</id>\n";
+  mystr += "    <comp>0.95</comp>\n";
+  mystr += "  </isotope>\n";
+  mystr += "  <isotope>\n";
+  mystr += "    <id>08016</id>\n";
+  mystr += "    <comp>0.13</comp>\n";
+  mystr += "  </isotope>\n";
+  mystr += "</recipe>\n";
+
+  const char* xmlcontent = mystr.c_str();
+  xmlDocPtr xml_doc = xmlParseMemory(xmlcontent, strlen(xmlcontent));
+  xmlNodePtr recipe_node = xml_doc->children;
+
+  IsoVector vect(recipe_node);
+
+  EXPECT_DOUBLE_EQ(vect.mass(), 1000.0);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_RecipeLoadAndRetrieve){
+  EXPECT_TRUE(true);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetTotalMass) {
+  EXPECT_NO_THROW(vect1.mass());
+
+  EXPECT_DOUBLE_EQ(vect1.mass(), total_mass1);
+  EXPECT_DOUBLE_EQ(vect2.mass(), total_mass2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetIsotopeMassExceptions) {
+  EXPECT_NO_THROW(vect1.mass(isotope_lower_limit));
+  EXPECT_NO_THROW(vect1.mass(isotope_upper_limit));
+  EXPECT_THROW(vect1.mass(isotope_lower_limit - 1), CycRangeException);
+  EXPECT_THROW(vect1.mass(isotope_upper_limit + 1), CycRangeException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetIsotopeMass) {
+  EXPECT_DOUBLE_EQ(vect1.mass(isotope_not_present), 0);
+  EXPECT_DOUBLE_EQ(vect2.mass(isotope_not_present), 0);
+
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e1), v1_m1);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e2), v1_m2);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e3), v1_m3);
+
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e1), v2_m1);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e2), v2_m2);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e3), v2_m3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetTotalMassExceptions) {
+  // should not be able to call setMass on a zero-mass IsoVector
+  EXPECT_THROW(vect0.setMass(1), CycRangeException);
+  EXPECT_THROW(vect0.setMass(0), CycRangeException);
+
+  EXPECT_THROW(vect1.setMass(-1), CycRangeException);
+  EXPECT_NO_THROW(vect1.setMass(2));
+  EXPECT_NO_THROW(vect1.setMass(0));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetTotalMass) {
+  // change the mass
+  double factor = 2;
+  vect1.setMass(total_mass1 * factor);
+
+  // check new total mass
+  EXPECT_DOUBLE_EQ(vect1.mass(), total_mass1 * factor);
+
+  // check constituent masses
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e1), v1_m1 * factor);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e2), v1_m2 * factor);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e3), v1_m3 * factor);
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetIsotopeMassExceptions) {
+  EXPECT_NO_THROW(vect1.setMass(v1_e1, 0));
+  EXPECT_NO_THROW(vect1.setMass(v1_e1, 2));
+  EXPECT_THROW(vect1.setMass(v1_e1, -1), CycRangeException);
+
+  EXPECT_NO_THROW(vect1.setMass(isotope_lower_limit, 1));
+  EXPECT_NO_THROW(vect1.setMass(isotope_upper_limit, 1));
+  EXPECT_NO_THROW(vect1.setMass(v1_e1, 1));
+  EXPECT_THROW(vect1.setMass(isotope_lower_limit - 1, 1), CycRangeException);
+  EXPECT_THROW(vect1.setMass(isotope_upper_limit + 1, 1), CycRangeException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetIsotopeMass) {
+  double factor = 2;
+  vect1.setMass(v1_e1, v1_m1 * factor);
+
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e1), v1_m1 * factor);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e2), v1_m2);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e3), v1_m3);
+  EXPECT_DOUBLE_EQ(vect1.mass(), v1_m1 * factor + v1_m2 + v1_m3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetTotalAtomCount) {
+  EXPECT_NO_THROW(vect1.atomCount());
+
+  EXPECT_DOUBLE_EQ(vect1.atomCount(), total_moles1);
+  EXPECT_DOUBLE_EQ(vect2.atomCount(), total_moles2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetIsotopeAtomCountExceptions) {
+  EXPECT_NO_THROW(vect1.atomCount(isotope_lower_limit));
+  EXPECT_NO_THROW(vect1.atomCount(isotope_upper_limit));
+  EXPECT_THROW(vect1.atomCount(isotope_lower_limit - 1), CycRangeException);
+  EXPECT_THROW(vect1.atomCount(isotope_upper_limit + 1), CycRangeException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, GetIsotopeAtomCount) {
+  EXPECT_DOUBLE_EQ(vect1.atomCount(isotope_not_present), 0);
+  EXPECT_DOUBLE_EQ(vect2.atomCount(isotope_not_present), 0);
+
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e1), v1_a1);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e2), v1_a2);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e3), v1_a3);
+
+  EXPECT_DOUBLE_EQ(vect2.atomCount(v2_e1), v2_a1);
+  EXPECT_DOUBLE_EQ(vect2.atomCount(v2_e2), v2_a2);
+  EXPECT_DOUBLE_EQ(vect2.atomCount(v2_e3), v2_a3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetTotalAtomCountExceptions) {
+  // should not be able to call setMass on a zero-mass IsoVector
+  EXPECT_THROW(vect0.setAtomCount(1), CycRangeException);
+  EXPECT_THROW(vect0.setAtomCount(0), CycRangeException);
+
+  EXPECT_THROW(vect1.setAtomCount(-1), CycRangeException);
+  EXPECT_NO_THROW(vect1.setAtomCount(2));
+  EXPECT_NO_THROW(vect1.setAtomCount(0));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetTotalAtomCount) {
+  // change the mass
+  double factor = 2;
+  vect1.setAtomCount(total_moles1 * factor);
+
+  // check new total mass
+  EXPECT_DOUBLE_EQ(vect1.atomCount(), total_moles1 * factor);
+
+  // check constituent masses
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e1), v1_a1 * factor);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e2), v1_a2 * factor);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e3), v1_a3 * factor);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetIsotopeAtomCountExceptions) {
+  EXPECT_NO_THROW(vect1.setAtomCount(v1_e1, 0));
+  EXPECT_NO_THROW(vect1.setAtomCount(v1_e1, 2));
+  EXPECT_THROW(vect1.setAtomCount(v1_e1, -1), CycRangeException);
+
+  EXPECT_NO_THROW(vect1.setAtomCount(isotope_lower_limit, 1));
+  EXPECT_NO_THROW(vect1.setAtomCount(isotope_upper_limit, 1));
+  EXPECT_NO_THROW(vect1.setAtomCount(v1_e1, 1));
+  EXPECT_THROW(vect1.setAtomCount(isotope_lower_limit - 1, 1), CycRangeException);
+  EXPECT_THROW(vect1.setAtomCount(isotope_upper_limit + 1, 1), CycRangeException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, SetIsotopeAtomCount) {
+  double factor = 2;
+  vect1.setAtomCount(v1_e1, v1_a1 * factor);
+
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e1), v1_a1 * factor);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e2), v1_a2);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(v1_e3), v1_a3);
+  EXPECT_DOUBLE_EQ(vect1.atomCount(), v1_a1 * factor + v1_a2 + v1_a3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- -    
+TEST_F(IsoVectorTest, Decay){
+  IsoVector::loadDecayInfo();
+//  test_mat->decay(2);
+//  ASSERT_NEAR(test_mat->getAtomComp(u235), 1, 0.001);
+//  ASSERT_NEAR(decay_mat->getAtomComp(u235),  0.5, 0.001);
+//  ASSERT_NEAR(decay_mat->getAtomComp(th228), 0.5, 0.001);
+//
+//  decay_mat->decay(th228_halflife);
+//
+//  ASSERT_NEAR(decay_mat->getAtomComp(th228),  0.25, 0.01);
+//  ASSERT_NEAR(decay_mat->getAtomComp(pb208),  0.25, 0.01);
+}

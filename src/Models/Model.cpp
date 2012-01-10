@@ -216,3 +216,8 @@ void Model::addChild(Model* child){
 		  << child->ID() << " to its list of children.";
   children_.push_back(child); 
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const std::string Model::getModelImpl() {
+  return model_impl_;
+}

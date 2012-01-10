@@ -221,14 +221,14 @@ protected:
      *
      * @return the total mass of the processed materials in storage
      */
-    Mass checkInventory();
+    double checkInventory();
 
     /**
      * get the total mass of the stuff in the stocks
      *
      * @return the total mass of the raw materials in storage
      */
-    Mass checkStocks();
+    double checkStocks();
 
 
     /**
@@ -241,7 +241,7 @@ protected:
      * The NullFacility must stop processing the material in its stocks when its 
      * inventory is full.
      */
-    Mass inventory_size_;
+    double inventory_size_;
 
     /**
      * The receipe of input materials.

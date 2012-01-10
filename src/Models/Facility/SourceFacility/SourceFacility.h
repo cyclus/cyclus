@@ -36,7 +36,7 @@
    (months).
    -  int lifeTime: The length of time that the facility operates (months).
    -  std::string outCommod: the commodity that this facility produces
-   -  Mass inventorysize: the maximum quantity of material to be held in the 
+   -  double inventorysize: the maximum quantity of material to be held in the 
    inventory
    -  double commodprice: the price of the output material PER UNIT
    -  map<Isos, NumDens> outComp 
@@ -191,10 +191,11 @@ protected:
    */
   std::string out_commod_;
   
-  /**
-   * This facility has a specific recipe for its output
-   */
-  Material* recipe_;
+  /// This facility has a specific recipe for its output
+  IsoVector recipe_;
+  
+  /// Name of the recipe this facility uses.
+  std::string recipe_name_;
   
   /**
    *  The capacity is defined in terms of the number of units of the recipe
@@ -235,7 +236,7 @@ protected:
    * return the total mass of the material objects in the inventory
    * the units vary and are associated with with material type
    */
-  Mass checkInventory();
+  double checkInventory();
 
 
 /* ------------------- */ 

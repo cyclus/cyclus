@@ -160,6 +160,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         // queue a new order
         Message* maybe_offer = offerMsg->clone();
+
         maybe_offer->getResource()->setQuantity(requestAmt);
         maybe_offer->setRequester(requestMsg->getRequester());
 
@@ -180,7 +181,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // if the residual is above threshold,
         // make a new offer with reduced amount
 
-        if(offerAmt > EPS_KG){
+        if(offerAmt > EPS_KG) {
           Message *new_offer = offerMsg->clone();
           new_offer->getResource()->setQuantity(offerAmt);
           // call this method for consistency

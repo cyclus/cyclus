@@ -35,8 +35,7 @@
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::init(xmlNodePtr cur)
-{ 
+void RecipeReactor::init(xmlNodePtr cur) { 
   FacilityModel::init(cur);
   
   // set the current month in cycle to 1, it's the first month.
@@ -61,17 +60,14 @@ void RecipeReactor::init(xmlNodePtr cur)
   CF_ = strtod(XMLinput->get_xpath_content(cur,"elecCF"), NULL);
 
   // all facilities require commodities - possibly many
-  string recipe_name;
+  std::string recipe_name;
   std::string in_commod;
   std::string out_commod;
-  Material* in_recipe;
-  Material* out_recipe;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "fuelpair");
 
   // for each fuel pair, there is an in and an out commodity
   for (int i = 0; i < nodes->nodeNr; i++){
     xmlNodePtr pair_node = nodes->nodeTab[i];
-    in_recipe = out_recipe = NULL; 
 
     // get commods
     in_commod = XMLinput->get_xpath_content(pair_node,"incommodity");
@@ -79,25 +75,24 @@ void RecipeReactor::init(xmlNodePtr cur)
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    in_recipe = LI->getRecipe(recipe_name);
+    in_recipe_ = IsoVector::recipe(recipe_name);
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    out_recipe = LI->getRecipe(recipe_name);
+    out_recipe_ = IsoVector::recipe(recipe_name);
 
-    fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
-          make_pair(out_commod, out_recipe)));
+    fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
+          make_pair(out_commod, out_recipe_)));
   };
 
   stocks_ = deque<InFuel>();
-  currCore_ = deque< pair<std::string, Material* > >();
-  inventory_ = deque< pair<std::string, Material*> >();
-  ordersWaiting_ = deque< Message*>();
+  currCore_ = deque<InFuel>();
+  inventory_ = deque<OutFuel>();
+  ordersWaiting_ = deque<Message*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeReactor::copy(RecipeReactor* src)
-{
+void RecipeReactor::copy(RecipeReactor* src) {
 
   FacilityModel::copy(src);
 
@@ -123,15 +118,13 @@ void RecipeReactor::copy(RecipeReactor* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::copyFreshModel(Model* src)
-{
+void RecipeReactor::copyFreshModel(Model* src) {
   copy(dynamic_cast<RecipeReactor*>(src));
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::print() 
-{ 
+void RecipeReactor::print() { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2) << "    converts commodity {"
       << fuelPairs_.front().first.first
@@ -141,9 +134,8 @@ void RecipeReactor::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::beginCycle()
-{
-  if( !stocks_.empty() ){
+void RecipeReactor::beginCycle() {
+  if ( !stocks_.empty() ) {
     // move stocks batch to currCore
     std::string batchCommod = stocks_.front().first;
     Material* batchMat = stocks_.front().second;
@@ -153,8 +145,7 @@ void RecipeReactor::beginCycle()
     currCore_.push_back(inBatch);
     // reset month_in_cycle_ clock
     month_in_cycle_ = 1;
-  }
-  else{
+  } else{
     // wait for a successful transaction to fill the stocks.
     // reset the cycle month to zero 
     month_in_cycle_=0;
@@ -162,8 +153,7 @@ void RecipeReactor::beginCycle()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::endCycle()
-{
+void RecipeReactor::endCycle() {
   // move a batch out of the core 
   std::string batchCommod = currCore_.front().first;
   Material* batchMat = currCore_.front().second;
@@ -171,23 +161,20 @@ void RecipeReactor::endCycle()
 
   // figure out the spent fuel commodity and material
   std::string outCommod;
-  Material* outMat;
+  IsoVector outComp;
 
-  bool found = false;
-  while(!found){
-    for(deque< pair< InFuel , OutFuel> >::iterator iter = fuelPairs_.begin();
-        iter != fuelPairs_.end();
-        iter++){
-      if(iter->first.first == batchCommod){
-        outCommod = iter->second.first;
-        outMat = iter->second.second;
-        found = true;
-      };
-    };
-  };
+  for (deque< pair< InRecipe , OutRecipe> >::iterator iter = fuelPairs_.begin();
+      iter != fuelPairs_.end();
+      iter++) {
+    if (iter->first.first == batchCommod) {
+      outCommod = iter->second.first;
+      outComp = iter->second.second;
+      break;
+    }
+  }
 
   // change the composition to the compositon of the spent fuel type
-  batchMat->changeComp(outMat->getAtomComp(), ATOMBASED, TI->getTime());
+  batchMat = new Material(outComp);
 
   // move converted material into Inventory
   OutFuel outBatch;
@@ -196,8 +183,7 @@ void RecipeReactor::endCycle()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::receiveMessage(Message* msg)
-{
+void RecipeReactor::receiveMessage(Message* msg) {
   // is this a message from on high? 
   if(msg->getSupplier()==this){
     // file the order
@@ -213,42 +199,41 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
 {
   Transaction trans = msg->getTrans();
 
-  Mass newAmt = 0;
+  double newAmt = 0;
 
+  Material* m;
+  Material* newMat;
+  Material* toAbsorb;
 
   // start with an empty manifest
   vector<Material*> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
+  while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
     for (deque<OutFuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
       // be sure to get the right commodity
-      if(iter->first == trans.commod){
-        Material* m = iter->second;
+      if (iter->first == trans.commod) {
+        m = iter->second;
+
         // start with an empty material
-        Material* newMat = new Material(CompMap(), 
-            m->getUnits(),
-            m->name(), 
-            0, 
-            ATOMBASED, 
-            false);
+        newMat = new Material();
+
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
-          newAmt += m->getTotMass();
+        if (m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
+          newAmt += m->getQuantity();
           newMat->absorb(m);
           inventory_.pop_front();
-        }
-        else{ 
+        } else { 
           // if the inventory obj is larger than the remaining need, split it.
-          Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-          newAmt += toAbsorb->getTotMass();
+          toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
+          newAmt += toAbsorb->getQuantity();
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
         LOG(LEV_DEBUG2) <<"RecipeReactor "<< ID()
-          <<"  is sending a mat with mass: "<< newMat->getTotMass();
+          <<"  is sending a mat with mass: "<< newMat->getQuantity();
       }
     }
   }    
@@ -265,14 +250,13 @@ void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifes
        thisMat++)
   {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
+        << (*thisMat)->getQuantity();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::handleTick(int time)
-{
+void RecipeReactor::handleTick(int time) {
   // if at beginning of cycle, beginCycle()
   // if stocks are empty, ask for a batch
   // offer anything in the inventory
@@ -286,32 +270,31 @@ void RecipeReactor::handleTick(int time)
   if(this->checkStocks() == 0){
     // if(stocks.front().first == NULL){
     // It chooses the next in/out commodity pair in the preference lineup
-    InFuel request_commod_pair;
-    OutFuel offer_commod_pair;
+    InRecipe request_commod_pair;
+    OutRecipe offer_commod_pair;
     request_commod_pair = fuelPairs_.front().first;
     offer_commod_pair = fuelPairs_.front().second;
     std::string in_commod = request_commod_pair.first;
-    Material* in_recipe = request_commod_pair.second;
+    IsoVector in_recipe = request_commod_pair.second;
 
     // It then moves that pair from the front to the back of the preference lineup
     fuelPairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
     fuelPairs_.pop_front();
   
     // It can accept only a whole batch
-    Mass requestAmt;
-    Mass minAmt = in_recipe->getTotMass();
+    double requestAmt;
+    double minAmt = in_recipe.mass();
     // The Recipe Reactor should ask for an batch if there isn't one in stock.
-    Mass sto = this->checkStocks(); 
+    double sto = this->checkStocks(); 
     // subtract sto from batch size to get total empty space. 
     // Hopefully the result is either 0 or the batch size 
-    Mass space = minAmt - sto; // KDHFLAG get minAmt from the input ?
+    double space = minAmt - sto; // KDHFLAG get minAmt from the input ?
     // this will be a request for free stuff
     double commod_price = 0;
   
-    if (space == 0){
+    if (space == 0) {
       // don't request anything
-    }
-    else if (space <= minAmt){
+    } else if (space <= minAmt) {
       MarketModel* market = MarketModel::marketForCommod(in_commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       // if empty space is less than monthly acceptance capacity
@@ -333,7 +316,7 @@ void RecipeReactor::handleTick(int time)
       request->sendOn();
     // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
-    } else if (space >= minAmt){
+    } else if (space >= minAmt) {
       MarketModel* market = MarketModel::marketForCommod(in_commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       // if empty space is more than monthly acceptance capacity
@@ -365,12 +348,11 @@ void RecipeReactor::handleTick(int time)
   double commod_price = 0;
 
   // there are potentially many types of batch in the inventory stack
-  Mass inv = this->checkInventory();
+  double inv = this->checkInventory();
   // send an offer for each material on the stack 
-  Material* m;
   std::string commod;
   Communicator* recipient;
-  Mass offer_amt;
+  double offer_amt;
   for (deque<pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
@@ -380,10 +362,11 @@ void RecipeReactor::handleTick(int time)
     // decide what market to offer to
     recipient = dynamic_cast<Communicator*>(market);
     // get amt
-    offer_amt = iter->second->getTotMass();
+    offer_amt = iter->second->getQuantity();
 
     // make a material to offer
-    Material* offer_mat = new Material(CompMap(),"","",offer_amt,MASSBASED,true);
+    Material* offer_mat = new Material(out_recipe_);
+    offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
     Transaction trans;
@@ -420,8 +403,8 @@ void RecipeReactor::handleTock(int time)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass RecipeReactor::checkInventory(){
-  Mass total = 0;
+double RecipeReactor::checkInventory(){
+  double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
@@ -429,14 +412,14 @@ Mass RecipeReactor::checkInventory(){
   for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += iter->second->getTotMass();
+    total += iter->second->getQuantity();
   }
 
   return total;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass RecipeReactor::checkStocks(){
-  Mass total = 0;
+double RecipeReactor::checkStocks(){
+  double total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
   // material unit is in each object.
@@ -445,7 +428,7 @@ Mass RecipeReactor::checkStocks(){
     for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
-        total += iter->second->getTotMass();
+        total += iter->second->getQuantity();
     };
   };
   return total;
@@ -457,11 +440,11 @@ Mass RecipeReactor::checkStocks(){
  */
 
 extern "C" Model* constructRecipeReactor() {
-    return new RecipeReactor();
+  return new RecipeReactor();
 }
 
 extern "C" void destructRecipeReactor(Model* p) {
-    delete p;
+  delete p;
 }
 
 /* ------------------- */ 

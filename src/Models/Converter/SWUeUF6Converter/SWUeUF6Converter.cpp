@@ -69,7 +69,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   double xw;
   double SWUs;
   double massProdU;
-  CompMap comp;
+  IsoVector comp;
 
 
   // determine which direction we're converting
@@ -80,25 +80,23 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
       throw CycException("SWUs offered by non-Model");
     }
     SWUs = convMsg->getResource()->getQuantity();
-    try{
+    try {
       mat = dynamic_cast<Material*>(refMsg->getResource());
-      comp = mat->getAtomComp();
+      comp = mat->comp();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
                     Material type resource.";
       throw CycException(err);
     }
-  }
-
-  else if (in_commod_ == "eUF6" && out_commod_ == "SWUs"){ 
+  } else if (in_commod_ == "eUF6" && out_commod_ == "SWUs") {
     // the enricher is the supplier in the refMsg
     enr = refMsg->getSupplier();
-    if (0 == enr){
+    if (0 == enr) {
       throw CycException("SWUs offered by non-Model");
     }
     try{
       mat = dynamic_cast<Material*>(convMsg->getResource());
-      comp = mat->getAtomComp();
+      comp = mat->comp();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
                     Material type resource.";
@@ -107,8 +105,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   }
   
   // Figure out xp the enrichment of the UF6 object
-  P = Material::getEltMass(92, comp);
-  xp = Material::getIsoMass(922350, comp) / P; 
+  P = comp.eltMass(92);
+  xp = comp.mass(922350) / P; 
 
   // Figure out xf, the enrichment of the feed material
   // xf = castEnr->getFeedFrac();
@@ -126,12 +124,12 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   massProdU = SWUs/(term1 + term2 - term3);
   SWUs = massProdU*(term1 + term2 - term3);
 
-  if(out_commod_ == "eUF6"){
-    mat = new Material(comp, "", "", massProdU, MASSBASED,true);
+  if (out_commod_ == "eUF6"){
+    comp.setMass(massProdU);
+    mat = new Material(comp);
     toRet = convMsg->clone();
     toRet->setResource(mat);
-  }
-  else if(out_commod_ == "SWUs"){
+  } else if (out_commod_ == "SWUs") {
     toRet = convMsg->clone();
     GenericResource* conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
     toRet->setResource(conv_res);

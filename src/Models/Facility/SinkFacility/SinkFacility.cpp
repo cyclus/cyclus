@@ -92,8 +92,8 @@ void SinkFacility::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
 
-  Mass requestAmt = getRequestAmt(); 
-  Mass minAmt = 0;
+  double requestAmt = getRequestAmt(); 
+  double minAmt = 0;
 
   if (requestAmt>EPS_KG){
     // for each potential commodity, make a request
@@ -148,15 +148,15 @@ void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest
        thisMat++)
   {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
+        << (*thisMat)->getQuantity();
     (*thisMat)->print();
     inventory_.push_back(*thisMat);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Mass SinkFacility::checkInventory(){
-  Mass total = 0;
+double SinkFacility::checkInventory(){
+  double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
@@ -164,17 +164,17 @@ Mass SinkFacility::checkInventory(){
   deque<Material*>::iterator iter;
 
   for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
-    total += (*iter)->getTotMass();
+    total += (*iter)->getQuantity();
 
   return total;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-const Mass SinkFacility::getRequestAmt(){
+const double SinkFacility::getRequestAmt(){
   // The sink facility should ask for as much stuff as it can reasonably receive.
-  Mass requestAmt;
+  double requestAmt;
   // get current capacity
-  Mass emptiness = (inventory_size_- this->checkInventory());
+  double emptiness = (inventory_size_- this->checkInventory());
 
   if (emptiness == 0 || emptiness < 0 ){
     requestAmt=0;

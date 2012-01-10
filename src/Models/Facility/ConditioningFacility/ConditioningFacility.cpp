@@ -124,40 +124,34 @@ void ConditioningFacility::sendMaterial(Message* order, const Communicator* rece
 
   Transaction trans = order->getTrans();
 
-  Mass newAmt = 0;
+  double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the transaction amount
 
   // start with an empty manifest
   vector<Material*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
+  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
 
     // start with an empty material
-    Material* newMat = new Material(CompMap(), 
-                                  m->getUnits(),
-                                  m->name(), 
-                                  0, 
-                                  ATOMBASED,
-                                  false);
+    Material* newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (trans.resource->getQuantity() - newAmt)){
-      newAmt += m->getTotMass();
+    if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
+      newAmt += m->getQuantity();
       newMat->absorb(m);
       inventory_.pop_front();
-    }
-    else{ 
+    } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extractMass(trans.resource->getQuantity() - newAmt);
-      newAmt += toAbsorb->getTotMass();
+      Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
       newMat->absorb(toAbsorb);
+      newAmt += toAbsorb->getQuantity();
     }
 
     toSend.push_back(newMat);
     LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getTotMass();
+      <<"  is sending a mat with mass: "<< newMat->getQuantity();
   }    
   FacilityModel::sendMaterial( order, toSend );
 };
@@ -169,10 +163,9 @@ void ConditioningFacility::receiveMaterial(Transaction trans, vector<Material*> 
   // and move it into the stocks.
   for (vector<Material*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
+        << (*thisMat)->getQuantity();
     stocks_.push_front(make_pair(trans.commod, *thisMat));
   } 
 };

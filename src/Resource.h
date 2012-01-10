@@ -32,11 +32,12 @@ public:
    * @return the total quantity of this resource in its base unit
    */
   virtual double getQuantity() = 0;
-    
+
   /**
-   * Sets the total quantity of this resource in its base unit 
+   * Set the quantity of the resource in its default units to 'val'.
+   *
    */
-  virtual void setQuantity(double new_quantity) = 0;
+  virtual void setQuantity(double val) = 0;
     
   /**
    * A boolean comparing the quantity of the other resource is 
@@ -79,6 +80,11 @@ public:
    * Returns the concrete resource type, an enum
    */
   virtual ResourceType getResourceType()=0;
+
+  /**
+   * Returns a newly allocated copy of the resource
+   */
+  virtual Resource* clone()=0;
 
 };
 

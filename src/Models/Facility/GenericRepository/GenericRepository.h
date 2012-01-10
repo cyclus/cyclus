@@ -214,7 +214,7 @@ protected:
      * The GenericRepository must stop processing the material in its stocks 
      * when its inventory is full. (YMRLegislative = 70,000tHM) 
      */
-    Mass inventory_size_;
+    double inventory_size_;
 
     /**
      * The number of months that a facility stays operational.
@@ -317,14 +317,14 @@ protected:
      *
      * @return the total mass of the processed materials in storage
      */
-    Mass checkInventory();
+    double checkInventory();
 
     /**
      * get the total mass of the stuff in the stocks
      *
      * @return the total mass of the raw materials in storage
      */
-    Mass checkStocks();
+    double checkStocks();
 
     /**
      * Make requests based on capacity
@@ -394,7 +394,7 @@ protected:
      *
      * @param commod the commodity
      */
-    Mass getCapacity(std::string commod) ;
+    double getCapacity(std::string commod) ;
 
 
 /* ------------------- */ 

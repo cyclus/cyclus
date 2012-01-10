@@ -38,8 +38,8 @@ MassTable::~MassTable() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Mass MassTable::getMassInGrams(Iso tope) {
-  Mass toRet = nuclide_vec_[isoIndex_[tope]].mass;
+double MassTable::getMassInGrams(int tope) {
+  double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };
 
@@ -103,9 +103,9 @@ void MassTable::initialize() {
     copy(nuclide, nuclide + nuclide_len_, nuclide_vec_.begin() );
  
     // create a map whose indices are the Iso identifier. 
-    Iso Anum;
-    Iso Znum;
-    Iso tope;
+    int Anum;
+    int Znum;
+    int tope;
 
     for(int i = 0; i < nuclide_len_; i++) {
       Znum = nuclide[i].Z*1000;

@@ -324,14 +324,14 @@ class Message {
     @return message (transaction) ID
    */
   int getID() const {return trans_.ID;};
-    
+
   /**
    * Returns the supplier in this Message.
    *
    * @return pointer to the supplier
    */
   Model* getSupplier() const;
-  
+
   /**
    * Sets the assigned supplier of the material for the 
    * transaction in this message. 
@@ -339,14 +339,14 @@ class Message {
    * @param supplier pointer to the new supplier
    */
   void setSupplier(Model* supplier){trans_.supplier = supplier;};
-  
+
   /**
    * Returns the requester in this Message.
    *
    * @return pointer to the requester
    */
   Model* getRequester() const;
-  
+
   /**
    * Sets the assigned requester to receive the material
    * for the transaction in this message.
@@ -354,69 +354,69 @@ class Message {
    * @param requester pointer to the new requester
    */
   void setRequester(Model* requester){trans_.requester = requester;};
-  
+
   /**
    * Returns the transaction associated with this message.
    *
    * @return the Transaction
    */
   Transaction getTrans() const {return trans_;};
-  
+
   /**
    * Returns the commodity requested or offered in this Message.
    *
    * @return commodity for this transaction
    */
   std::string commod() const {return trans_.commod;};
-  
+
   /**
    * Sets the commodity requested or offered in this Message.
    *
    * @param new_commod the commodity associated with this message/transaction
    */
   void setCommod(std::string new_commod) {trans_.commod = new_commod;};
-  
+
   /**
    * True if the transaction is an offer, false if it's a request
    *
    * @return true if the transaction is an offer, false if it's a request
    */
   double isOffer() const {return trans_.is_offer;};
-  
+
   /**
    * True if the transaction is an offer, false if it's a request
    *
    * @return true if the transaction is an offer, false if it's a request
    */
   void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
-  
+
   /**
    * Returns the price being requested or offered in this message.
    *
    * @return the price (in dollars)
    */
   double getPrice() const {return trans_.price;};
-  
+
   /**
    * Returns the price being requested or offered in this message.
    *
    * @param new_price the new price (in dollars)
    */
   void setPrice(double new_price) {trans_.price = new_price;};
-  
+
   /**
    * Returns the Resource being requested or offered in this message.
    *
    * @return the Resource  (i.e. Material object) 
    */
   Resource* getResource() const {return trans_.resource;};
-  
+
   /**
    * Sets the assigned resource to a new resource
    *
    * @param new_resource is the new Resource in the transaction
    */
-  void setResource(Resource* new_resource) {trans_.resource = new_resource;};
-  
+  void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
+
 };
 #endif
