@@ -196,7 +196,7 @@ public:
    */
   void executeDecay(double time_change);
 
-  CompMap comp() {return atom_comp_;}
+  CompMap comp();
   
 private:
   /*!
@@ -249,7 +249,7 @@ private:
    @param tope isotope identifier
    @exception thrown if isotope identifier is invalid
    */
-  static void validateAtomicNumber(int tope);
+  static void validateIsotopeNumber(int tope);
 
   /*!
    Returns true if the given isotope's number density is less than the 
@@ -259,13 +259,6 @@ private:
    @return true iff nd(tope) == 0
    */
   bool isZero(int tope);
-
-  /*!
-   Normalizes the composition vector it is provided.
-   
-   @return composition normalized to 1 mole total
-   */
-  CompMap normalized();
 
   /*! 
    Unique identifier.

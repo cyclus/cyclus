@@ -107,34 +107,25 @@ FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED)
 INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
-# # Find the Teuchos library
-# SET(CMAKE_PREFIX_PATH ${CYCLUS_TEUCHOS_DIR} ${CMAKE_PREFIX_PATH})
-# MESSAGE("\n MODULE_PATH  = ${CMAKE_MODULE_PATH}")
-# MESSAGE("\n PREFIX_PATH  = ${CMAKE_PREFIX_PATH}")
-# FIND_PACKAGE( Teuchos REQUIRED )
-# # Echo trilinos build info just for fun
-# MESSAGE("\nFound Teuchos!  Here are the details: ")
-# MESSAGE("   Teuchos_DIR = ${Teuchos_DIR}")
-# MESSAGE("   Teuchos_VERSION = ${Teuchos_VERSION}")
-# MESSAGE("   Teuchos_PACKAGE_LIST = ${Teuchos_PACKAGE_LIST}")
-# MESSAGE("   Teuchos_LIBRARIES = ${Teuchos_LIBRARIES}")
-# MESSAGE("   Teuchos_INCLUDE_DIRS = ${Teuchos_INCLUDE_DIRS}")
-# MESSAGE("   Teuchos_LIBRARY_DIRS = ${Teuchos_LIBRARY_DIRS}")
-# MESSAGE("   Teuchos_TPL_LIST = ${Teuchos_TPL_LIST}")
-# MESSAGE("   Teuchos_TPL_INCLUDE_DIRS = ${Teuchos_TPL_INCLUDE_DIRS}")
-# MESSAGE("   Teuchos_TPL_LIBRARIES = ${Teuchos_TPL_LIBRARIES}")
-# MESSAGE("   Teuchos_TPL_LIBRARY_DIRS = ${Teuchos_TPL_LIBRARY_DIRS}")
-# MESSAGE("   Teuchos_BUILD_SHARED_LIBS = ${Teuchos_BUILD_SHARED_LIBS}")
-# MESSAGE("End of Teuchos details\n")
-# # Include the Teuchos Library
-# SET(CMAKE_CXX_COMPILER ${Teuchos_CXX_COMPILER} )
-# SET(CMAKE_C_COMPILER ${Teuchos_C_COMPILER} )
-# SET(CMAKE_Fortran_COMPILER ${Teuchos_Fortran_COMPILER} )
-# SET(CMAKE_CXX_FLAGS  "${Teuchos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
-# SET(CMAKE_C_FLAGS  "${Teuchos_C_COMPILER_FLAGS} ${CMAKE_C_FLAGS}")
-# SET(CMAKE_Fortran_FLAGS  "${Teuchos_Fortran_COMPILER_FLAGS} ${CMAKE_Fortran_FLAGS}")
-# INCLUDE_DIRECTORIES(${Teuchos_INCLUDE_DIRS} ${Teuchos_TPL_INCLUDE_DIRS})
-# LINK_DIRECTORIES(${Teuchos_LIBRARY_DIRS} ${Teuchos_TPL_LIBRARY_DIRS})
+# Find the Teuchos library
+FIND_PACKAGE( Teuchos REQUIRED )
+# SET(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${Teuchos_PREFIX} )
+# Echo trilinos build info just for fun
+MESSAGE("\nFound Teuchos!  Here are the details: ")
+MESSAGE("   Teuchos_DIR = ${Teuchos_DIR}")
+MESSAGE("   Teuchos_PACKAGE_LIST = ${Teuchos_PACKAGE_LIST}")
+MESSAGE("   Teuchos_LIBRARIES = ${Teuchos_LIBRARIES}")
+MESSAGE("   Teuchos_INCLUDE_DIRS = ${Teuchos_INCLUDE_DIRS}")
+MESSAGE("   Teuchos_LIBRARY_DIRS = ${Teuchos_LIBRARY_DIRS}")
+MESSAGE("   Teuchos_TPL_LIST = ${Teuchos_TPL_LIST}")
+MESSAGE("   Teuchos_TPL_LIBRARIES = ${Teuchos_TPL_LIBRARIES}")
+MESSAGE("   Teuchos_BUILD_SHARED_LIBS = ${Teuchos_BUILD_SHARED_LIBS}")
+MESSAGE("End of Teuchos details\n")
+# Include the Teuchos Library
+SET(CMAKE_CXX_COMPILER ${Teuchos_CXX_COMPILER} )
+#SET(CMAKE_CXX_FLAGS  "${Teuchos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${Teuchos_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${Teuchos_LIBRARIES} ${Teuchos_TPL_LIBRARIES})
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
@@ -166,7 +157,7 @@ endif()
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp ${Teuchos_LIBRARIES} ${Teuchos_TPL_LIBRARIES})
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
 
 
 

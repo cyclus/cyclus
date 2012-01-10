@@ -11,6 +11,9 @@
 #include "H5Cpp.h"
 #include "H5Exception.h"
 
+#include "Teuchos_ParameterList.hpp"
+#include "Teuchos_Version.hpp"
+
 #include "Timer.h"
 #include "CycException.h"
 #include "Material.h"

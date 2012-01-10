@@ -7,6 +7,7 @@
 #include "UniformTaylor.h"
 #include "Logger.h"
 #include "InputXML.h"
+#include "MassTable.h"
 
 #include <iostream>
 #include <fstream>
@@ -140,7 +141,7 @@ int IsoVector::recipeCount() {
   return IsoVector::recipes_.size(); 
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
   int isotope;
   double rhs_atoms;
@@ -162,7 +163,7 @@ IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
   return (temp);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector IsoVector::operator- (IsoVector rhs_vector) {
   int isotope;
   double rhs_atoms;
@@ -216,13 +217,13 @@ bool IsoVector::operator== (IsoVector rhs_vector) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(int tope) {
-  validateAtomicNumber(tope);
+  validateIsotopeNumber(tope);
   return tope / 1000; // integer division
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getMassNum(int tope) {
-  validateAtomicNumber(tope);
+  validateIsotopeNumber(tope);
   return tope % 1000;
 }
 
@@ -300,28 +301,21 @@ double IsoVector::mass() {
     iter++;
   }
 
-  if (mass_val < EPS_KG) {
-    mass_val = 0;
-  }
-
   return mass_val;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass(int tope) {
-  if (atom_comp_.count(tope) == 0) {
+  validateIsotopeNumber(tope);
+  if (isZero(tope)) {
     return 0;
-  } else {
-    double grams_per_atom;
-    int grams_per_kg = 1000;
-    grams_per_atom = MT->getMassInGrams(tope);
-
-    double iso_mass = atom_comp_[tope] * grams_per_atom / grams_per_kg;
-    if (iso_mass < EPS_KG) {
-      iso_mass = 0;
-    }
-    return iso_mass;
   }
+
+  double grams_per_atom;
+  int grams_per_kg = 1000;
+  double grams_per_mole = MT->getMassInGrams(tope);
+
+  return atom_comp_[tope] * grams_per_mole / grams_per_kg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -332,6 +326,9 @@ void IsoVector::setMass(double new_mass) {
   if (curr_mass < EPS_KG) {
     string err_msg = "Cannot set mass for IsoVector with ";
     err_msg += "undefined (zero mass) composition.";
+    throw CycRangeException(err_msg);
+  } else if (new_mass < -1.0 * EPS_KG) {
+    string err_msg = "Cannot set mass to a negative value.";
     throw CycRangeException(err_msg);
   }
 
@@ -347,6 +344,13 @@ void IsoVector::setMass(double new_mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::setMass(int tope, double new_mass) {
+  validateIsotopeNumber(tope);
+
+  if (new_mass < -1.0 * EPS_KG) {
+    string err_msg = "Cannot set isotope mass to a negative value.";
+    throw CycRangeException(err_msg);
+  }
+
   double grams_per_atom;
   int grams_per_kg = 1000;
   grams_per_atom = MT->getMassInGrams(tope);
@@ -380,17 +384,27 @@ double IsoVector::atomCount() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::atomCount(int tope) {
-  // If the isotope isn't currently present, return 0. Else return the 
-  // isotope's current number density.
-  if (atom_comp_.count(tope) == 0) {
+  validateIsotopeNumber(tope);
+  if (isZero(tope)) {
     return 0;
-  } else {
-    return atom_comp_[tope];
   }
+
+  return atom_comp_[tope];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::setAtomCount(double new_count) {
+  double curr_mass = mass();
+
+  if (curr_mass < EPS_KG) {
+    string err_msg = "Cannot set atom count for IsoVector with ";
+    err_msg += "undefined (zero mass) composition.";
+    throw CycRangeException(err_msg);
+  } else if (new_count < 0.0) {
+    string err_msg = "Cannot set atom count to a negative value.";
+    throw CycRangeException(err_msg);
+  }
+
   int isotope;
   double ratio = new_count / atomCount();
 
@@ -404,6 +418,13 @@ void IsoVector::setAtomCount(double new_count) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::setAtomCount(int tope, double new_count) {
+  validateIsotopeNumber(tope);
+  double grams_per_kg = 1000;
+  if (new_count * MT->getMassInGrams(tope) / grams_per_kg < -1 * EPS_KG) {
+    string err_msg = "Cannot set isotope atom count to a negative value.";
+    throw CycRangeException(err_msg);
+  }
+
   atom_comp_[tope] = new_count;
 }
 
@@ -442,6 +463,9 @@ void IsoVector::executeDecay(double time_change) {
 
   copyVectorIntoComp(N_t);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CompMap IsoVector::comp() {return atom_comp_;}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Vector IsoVector::compositionAsVector() {
@@ -552,7 +576,7 @@ void IsoVector::validateComposition() {
     tope = comp_iter->first;
     num_atoms = comp_iter->second;
 
-    validateAtomicNumber(tope);
+    validateIsotopeNumber(tope);
 
     atoms_eps =  EPS_KG * grams_per_kg / MT->getMassInGrams(tope); 
     if (num_atoms < -1 * atoms_eps) {
@@ -563,7 +587,7 @@ void IsoVector::validateComposition() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateAtomicNumber(int tope) {
+void IsoVector::validateIsotopeNumber(int tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;
 
@@ -578,20 +602,8 @@ bool IsoVector::isZero(int tope) {
   double atoms_eps = EPS_KG * grams_per_kg / MT->getMassInGrams(tope) ; 
 
   if (atom_comp_.count(tope) == 0) {
-    return 0;
+    return true;
   }
   return (fabs(atom_comp_[tope]) < atoms_eps);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-CompMap IsoVector::normalized() {
-  CompMap normalized_comp;
-  CompMap::iterator entry;
-  double atom_count = atomCount();
-
-  for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
-    normalized_comp[entry->first] = entry->second / atom_count;
-  }
-  return normalized_comp;
 }
 

@@ -1,12 +1,14 @@
 // BookKeeper.h
-#if !defined(_BOOKKEEPER)
-#define _BOOKKEEPER
+#if !defined(_BOOKKEEPER_H)
+#define _BOOKKEEPER_H
 
 #include <string>
 #include <vector>
 #include "boost/multi_array.hpp"
 #include "H5Cpp.h"
 #include "hdf5.h"
+
+#include "Teuchos_ParameterList.hpp"
 
 #include "Model.h"
 #include "Material.h"
