@@ -77,6 +77,8 @@ class IsoVectorTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - Construction- - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorTest, ZeroMassOnInit) {
 
   EXPECT_DOUBLE_EQ(vect0.mass(), 0.0);
@@ -137,10 +139,14 @@ TEST_F(IsoVectorTest, DISABLED_XMlConstructor){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - Recipe handling - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorTest, DISABLED_RecipeLoadAndRetrieve){
   EXPECT_TRUE(true);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - Mass getters/setters  - - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorTest, GetTotalMass) {
   EXPECT_NO_THROW(vect1.mass());
@@ -223,6 +229,7 @@ TEST_F(IsoVectorTest, SetIsotopeMass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - -Atom Count getters/setters - - - - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorTest, GetTotalAtomCount) {
   EXPECT_NO_THROW(vect1.atomCount());
@@ -303,9 +310,141 @@ TEST_F(IsoVectorTest, SetIsotopeAtomCount) {
   EXPECT_DOUBLE_EQ(vect1.atomCount(), v1_a1 * factor + v1_a2 + v1_a3);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//- -    
-TEST_F(IsoVectorTest, Decay){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - Operator overloading- - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorPlus) {
+  IsoVector vect3 = vect1 + vect2;
+  IsoVector vect4 = vect2 + vect1;
+ 
+  // addition didn't affect vect1 and vect2
+  EXPECT_DOUBLE_EQ(vect1.mass(), total_mass1);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e1), v1_m1);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e2), v1_m2);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e3), v1_m3);
+ 
+  EXPECT_DOUBLE_EQ(vect2.mass(), total_mass2);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e1), v2_m1);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e2), v2_m2);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e3), v2_m3);
+ 
+  // proper vect3 values
+  EXPECT_DOUBLE_EQ(vect3.mass(), total_mass1 + total_mass2);
+  EXPECT_DOUBLE_EQ(vect3.mass(v1_e1), v1_m1 + v2_m1);
+  EXPECT_DOUBLE_EQ(vect3.mass(v1_e2), v1_m2 + v2_m2);
+  EXPECT_DOUBLE_EQ(vect3.mass(v1_e3), v1_m3);
+  EXPECT_DOUBLE_EQ(vect3.mass(v2_e3), v2_m3);
+ 
+  // proper vect4 values
+  EXPECT_DOUBLE_EQ(vect4.mass(), total_mass1 + total_mass2);
+  EXPECT_DOUBLE_EQ(vect4.mass(v1_e1), v1_m1 + v2_m1);
+  EXPECT_DOUBLE_EQ(vect4.mass(v1_e2), v1_m2 + v2_m2);
+  EXPECT_DOUBLE_EQ(vect4.mass(v1_e3), v1_m3);
+  EXPECT_DOUBLE_EQ(vect4.mass(v2_e3), v2_m3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorMinusExceptions) {
+  EXPECT_THROW(vect1 - vect2, CycRangeException);
+  EXPECT_THROW(vect2 - vect1, CycRangeException);
+  EXPECT_NO_THROW(vect1 - vect1);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorMinus) {
+  double tot_mass1 = total_mass1 - v1_m3;
+  double tot_mass2 = total_mass2 - v2_m3;
+ 
+  vect1.setMass(v1_e3, 0);
+  vect2.setMass(v2_e3, 0);
+ 
+  IsoVector vect3 = vect2 - vect1;
+ 
+  // addition didn't affect vect1 and vect2
+  EXPECT_DOUBLE_EQ(vect1.mass(), tot_mass1);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e1), v1_m1);
+  EXPECT_DOUBLE_EQ(vect1.mass(v1_e2), v1_m2);
+ 
+  EXPECT_DOUBLE_EQ(vect2.mass(), tot_mass2);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e1), v2_m1);
+  EXPECT_DOUBLE_EQ(vect2.mass(v2_e2), v2_m2);
+ 
+  // proper vect3 values
+  EXPECT_DOUBLE_EQ(vect3.mass(), tot_mass2 - tot_mass1);
+  EXPECT_DOUBLE_EQ(vect3.mass(v1_e1), v2_m1 - v1_m1);
+  EXPECT_DOUBLE_EQ(vect3.mass(v1_e2), v2_m2 - v1_m2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorEQ_MisMatchIsotopes) {
+  IsoVector vect3, vect4;
+  vect3.setMass(v1_e2, v1_m2);
+  vect4.setMass(v1_e3, v1_m3);
+
+  // overlap with both having their own unique
+  EXPECT_FALSE(vect1 == vect2);
+  EXPECT_FALSE(vect2 == vect1);
+
+  // overlap with one being enclosed by the other
+  EXPECT_FALSE(vect3 == vect1);
+  EXPECT_FALSE(vect1 == vect3);
+
+  // no overlap
+  EXPECT_FALSE(vect3 == vect4);
+  EXPECT_FALSE(vect4 == vect3);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorEQ_ExactSame) {
+  vect1 = vect2;
+
+  EXPECT_TRUE(vect1 == vect1);
+  EXPECT_TRUE(vect1 == vect2);
+  EXPECT_TRUE(vect2 == vect1);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorEQ_IsotopicDeviation) {
+  vect1 = vect2;
+
+  // the same with a devaition < EPS_KG for an isotope
+  vect1.setMass(v2_e1, v2_m1 + EPS_KG * 0.9);
+  EXPECT_TRUE(vect1 == vect2);
+  EXPECT_TRUE(vect2 == vect1);
+
+  // the same with a devaition > EPS_KG for an isotope
+  vect1.setMass(v2_e1, v2_m1 + EPS_KG * 1.1);
+  EXPECT_FALSE(vect1 == vect2);
+  EXPECT_FALSE(vect2 == vect1);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, OperatorEQ_TotalDeviation) {
+  vect1 = vect2;
+
+  // the same with a total devaition < EPS_KG
+  vect1.setMass(v2_e1, v2_m1 + EPS_KG * 0.45);
+  vect1.setMass(v2_e2, v2_m2 + EPS_KG * 0.45);
+  EXPECT_TRUE(fabs(vect1.mass(v2_e1) - vect2.mass(v2_e1)) < EPS_KG);
+  EXPECT_TRUE(fabs(vect1.mass(v2_e2) - vect2.mass(v2_e2)) < EPS_KG);
+
+  EXPECT_TRUE(vect1 == vect2);
+  EXPECT_TRUE(vect2 == vect1);
+
+  // the same with a total devaition < EPS_KG
+  vect1.setMass(v2_e1, v2_m1 + EPS_KG * 0.55);
+  vect1.setMass(v2_e2, v2_m2 + EPS_KG * 0.55);
+  EXPECT_TRUE(fabs(vect1.mass(v2_e1) - vect2.mass(v2_e1)) < EPS_KG);
+  EXPECT_TRUE(fabs(vect1.mass(v2_e2) - vect2.mass(v2_e2)) < EPS_KG);
+
+  EXPECT_FALSE(vect1 == vect2);
+  EXPECT_FALSE(vect2 == vect1);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - -Decay handling - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_Decay){
   IsoVector::loadDecayInfo();
 //  test_mat->decay(2);
 //  ASSERT_NEAR(test_mat->getAtomComp(u235), 1, 0.001);

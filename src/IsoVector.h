@@ -91,10 +91,23 @@ public:
 
   static std::map<std::string, IsoVector*> recipes_;
   
+  /*!
+  @brief Adds like isotopes
+  */
   IsoVector operator+ (IsoVector rhs_vector);
 
+  /*!
+  @brief Subtracts like isotopes
+
+  @exception CycRangeException thrown if subtraction results in a negative
+  quantity for any isotope.
+  */
   IsoVector operator- (IsoVector rhs_vector);
 
+  /*!
+  Compares quantities of like isotopes returning true only if quantity for
+  every isotope is equal.
+  */
   bool operator== (IsoVector rhs_vector);
 
   /*!

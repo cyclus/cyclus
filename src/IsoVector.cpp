@@ -212,6 +212,10 @@ bool IsoVector::operator== (IsoVector rhs_vector) {
       return false;
     }
   }
+
+  if (fabs(rhs_vector.mass() - mass()) > EPS_KG) {
+    return false;
+  }
   return true;
 }
 
