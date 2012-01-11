@@ -19,6 +19,8 @@ public:
    */
   virtual GenericResource* clone();
 
+  virtual void print();
+
   /**
    * A boolean comparing the quality of the other resource 
    * to the quality of the base

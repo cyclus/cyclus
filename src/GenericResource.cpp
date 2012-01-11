@@ -18,12 +18,13 @@ GenericResource* GenericResource::clone() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void GenericResource::print() {
+
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 bool GenericResource::checkQuality(Resource* other){
   bool toRet = false;
-  LOG(LEV_DEBUG2) << "other resource = " << other;
-  if (other == NULL) {
-    LOG(LEV_DEBUG2) << "other resource == NULL: true";
-  }
 
   toRet = (units_ == other->getResourceUnits());
   return toRet;

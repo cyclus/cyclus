@@ -88,10 +88,10 @@
    sends appropriate materials of the outgoing recipe in the inventory in order
    to fill the ordersWaiting.
    
-   @subsection receivematerial receiveMaterial
+   @subsection addResource raddResource
    The RecipeReactor puts the material it receives in the stocks.
    
-   @subsection sendmaterial sendMaterial
+   @subsection removeResource removeResource
    Spent fuel of the output recipe is pulled from inventory to fulfill orders. 
    
    @subsection infinite If Infinite Capacity:
@@ -174,21 +174,22 @@ public:
 
 public:
     /**
-     * This sends material up the Inst/Region/Logician line
-     * to be passed back down to the receiver
+     * @brief Transacted resources are extracted through this method
+     * 
+     * @param order the msg/order for which resource(s) are to be prepared
+     * @return list of resources to be sent for this order
      *
-     * @param msg the Message object defining the order being filled
-     * @param receiver the ultimate facility to receive this transaction
-     */
-    virtual void sendMaterial(Message* msg, const Communicator* receiver);
-    
+     */ 
+    virtual std::vector<Resource*> removeResource(Message* order);
+
     /**
-     * The facility receives the materials other facilities have sent.
+     * Transacted resources are received through this method
      *
-     * @param trans the Transaction object defining the order being filled
-     * @param manifest the list of material objects being received
-     */
-    virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
+     * @param trans the transaction to which these resource objects belong
+     * @param manifest is the set of resources being received
+     */ 
+    virtual void addResource(Transaction trans,
+                                std::vector<Resource*> manifest);
 
     /**
      * The handleTick function specific to the RecipeReactor.

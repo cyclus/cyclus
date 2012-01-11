@@ -51,17 +51,6 @@ InstModel* FacilityModel::getFacInst() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::sendMaterial(Message* msg, std::vector<Material*> manifest) {
-  // register this transaction with the bookkeper
-  BI->registerTrans(msg, manifest);
-  // send the material by calling the receiver's receiveMaterial function
-  Model* requester = msg->getRequester();
-  dynamic_cast<FacilityModel*>(requester)->receiveMaterial(msg->getTrans(), manifest);
-  LOG(LEV_DEBUG2) << "Material sent from " << ID() << " to " 
-            << requester->ID() << ".";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handlePreHistory() {
   // facilities should override this method, unless they're very naiive.
   // this function allows the facility to set up the simulation before it begins.

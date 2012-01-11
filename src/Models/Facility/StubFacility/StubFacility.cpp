@@ -65,11 +65,11 @@ void StubFacility::receiveMessage(Message* msg) {};
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::sendMaterial(Message* order, const Communicator* receiver){
+std::vector<Resource*> StubFacility::removeResource(Message* order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::receiveMaterial(Transaction trans, vector<Material*> manifest){
+void StubFacility::addResource(Transaction trans, vector<Resource*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

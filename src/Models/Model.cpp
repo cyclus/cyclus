@@ -221,3 +221,18 @@ void Model::addChild(Model* child){
 const std::string Model::getModelImpl() {
   return model_impl_;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<Resource*> Model::removeResource(Message* order) {
+  std::string msg = "The model " + name();
+  msg += " doesn't support resource transfer.";
+  throw CycOverrideException(msg);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::addResource(Transaction trans,
+                            std::vector<Resource*> manifest) {
+  std::string msg = "The model " + name();
+  msg += " doesn't support resource transfer.";
+  throw CycOverrideException(msg);
+}

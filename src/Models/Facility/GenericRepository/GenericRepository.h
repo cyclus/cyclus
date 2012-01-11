@@ -105,6 +105,23 @@ public:
   /// Print information about this model
   virtual void print();
 
+  /**
+   * @brief Transacted resources are extracted through this method
+   * 
+   * @param order the msg/order for which resource(s) are to be prepared
+   * @return list of resources to be sent for this order
+   *
+   */ 
+  virtual std::vector<Resource*> removeResource(Message* order);
+
+  /**
+   * Transacted resources are received through this method
+   *
+   * @param trans the transaction to which these resource objects belong
+   * @param manifest is the set of resources being received
+   */ 
+  virtual void addResource(Transaction trans,
+                              std::vector<Resource*> manifest);
 /* ------------------- */ 
 
 /* --------------------
@@ -129,24 +146,6 @@ public:
  */
 
 public:
-    /**
-     * This sends material up the Inst/Region/Logician line
-     * to be passed back down to the receiver
-     *
-     * @param msg the Message defining the order being filled
-     * @param receiver the last facility to receive this transaction
-     */
-    virtual void sendMaterial(Message* msg, const Communicator* 
-        receiver) {};
-    
-    /**
-     * The facility receives the materials other facilities have sent.
-     *
-     * @param trans the Transaction defining the order being filled
-     * @param manifest the list of material objects being received
-     */
-    virtual void receiveMaterial(Transaction trans, vector<Material*> 
-        manifest);
 
     /**
      * The handleTick function specific to the GenericRepository.

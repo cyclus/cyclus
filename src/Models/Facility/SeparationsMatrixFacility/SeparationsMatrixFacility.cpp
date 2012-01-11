@@ -159,8 +159,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* requester)
-{
+std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
   Transaction trans = msg->getTrans();
 
   double newAmt = 0;
@@ -168,7 +167,7 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  vector<Resource*> toSend;
 
   while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
@@ -196,35 +195,28 @@ void SeparationsMatrixFacility::sendMaterial(Message* msg, const Communicator* r
       LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
         <<"  is sending a mat with mass: "<< newMat->getQuantity();
     }    
-
   }
-
-  FacilityModel::sendMaterial(msg, toSend);
-
-  //	LOG(LEV_DEBUG2) << "Material After Sending to Sink";
-
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
-{  
-  LOG(LEV_DEBUG2) << "Entered the receiveMaterial file ";
+void SeparationsMatrixFacility::addResource(Transaction trans,
+                                            vector<Resource*> manifest) {  
+  LOG(LEV_DEBUG2) << "Entered the addResource file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
       thisMat != manifest.end();
-      thisMat++)
-  {
+      thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->getQuantity();
-    stocks_.push_back(make_pair(trans.commod, *thisMat));
+    stocks_.push_back(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::handleTick(int time)
-{
+void SeparationsMatrixFacility::handleTick(int time) {
   // PROCESS ORDERS EXECUTING
   separate(); // not yet fully implemented in Separations Facility
 
@@ -277,9 +269,9 @@ void SeparationsMatrixFacility::handleTock(int time)
 
 
   // fill the orders that are waiting, 
-  while(!ordersWaiting_.empty()){
+  while(!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   }
   

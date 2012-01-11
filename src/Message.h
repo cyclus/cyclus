@@ -10,6 +10,7 @@
 #include <string>
 
 class Communicator;
+class Model;
 
 /**
  * An enumerative type to specify which direction (up or down the class 
@@ -417,6 +418,16 @@ class Message {
    * @param new_resource is the new Resource in the transaction
    */
   void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
+
+  /*!
+  @brief Initiate the transaction - sending/receiving of resource(s) between
+  the supplier/requester
+
+  This should be the sole method of transferring resources between simulation
+  agents/models. Book keeping of transactions (and corresponding resource
+  states) are taken care of automatically within this method.
+  */
+  void approve();
 
 };
 #endif

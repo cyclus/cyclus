@@ -7,7 +7,12 @@
 #include <libxml/tree.h>
 #include <vector>
 
+#include "Resource.h"
+#include "Message.h"
+
 class Model;
+class Message;
+struct Transaction;
 
 typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
@@ -247,6 +252,31 @@ public:
    */
   std::vector <Model*> children_;
 
+  /*!
+  @brief Transacted resources are extracted through this method.
+
+  @warning This method should never be directly invoked.  All resource
+  transfers should take place using the Message::approve() method.
+  
+  @param order the msg/order for which resource(s) are to be prepared
+  @return list of resources to be sent for this order
+  
+  */ 
+  virtual std::vector<Resource*> removeResource(Message* order);
+
+  /*!
+  Transacted resources are received through this method.
+ 
+  @warning This method should never be directly invoked.  All resource
+  transfers should take place using the Message::approve() method.
+  
+  @param trans the transaction to which these resource objects belong
+  @param manifest is the set of resources being received
+  */ 
+  virtual void addResource(Transaction trans,
+                              std::vector<Resource*> manifest);
+  
+  
 private:
   /// Stores the next available facility ID
   static int next_id_;

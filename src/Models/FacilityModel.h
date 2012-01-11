@@ -115,17 +115,6 @@ protected:
   /// each facility needs a lifetime
   int fac_lifetime_;
 
-  /**
-   * There is no default FacilityModel shipment requester Each derived class 
-   * must implement a shipment requester
-   *
-   * @param trans is the transaction being executed
-   * @param manifest is the set of materials being received
-   *
-   */ 
-  virtual void receiveMaterial(Transaction trans, std::vector<Material*> 
-      manifest) = 0;
-  
 
 public:
 
@@ -179,14 +168,6 @@ public:
    */
   double getPowerCapacity() { return 0.0; };
 
-  /**
-   * Registers the transaction with the BookKeeper and sends the material
-   *
-   * @param order contains the order being executed
-   * @param manifest is the set of materials being received
-   */ 
-  virtual void sendMaterial(Message* order, std::vector<Material*> manifest);
-  
   /**
    * Each facility is prompted to do its beginning-of-life
    * stuff.

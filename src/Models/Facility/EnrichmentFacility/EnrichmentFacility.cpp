@@ -89,8 +89,7 @@ void EnrichmentFacility::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::print() 
-{ 
+void EnrichmentFacility::print() { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2) << "    converts commodity {"
       << in_commod_
@@ -114,8 +113,7 @@ void EnrichmentFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requester)
-{
+std::vector<Resource*> EnrichmentFacility::removeResource(Message* msg) {
   Transaction trans = msg->getTrans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
@@ -128,7 +126,7 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  std::vector<Resource*> toSend;
 
   while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
@@ -152,21 +150,19 @@ void EnrichmentFacility::sendMaterial(Message* msg, const Communicator* requeste
     LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getQuantity();
   }    
-  FacilityModel::sendMaterial(msg, toSend);
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
-{
+void EnrichmentFacility::addResource(Transaction trans, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_back(*thisMat);
+    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
   }
 }
 
@@ -184,8 +180,7 @@ void EnrichmentFacility::handleTick(int time)
 
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::handleTock(int time)
-{
+void EnrichmentFacility::handleTock(int time) {
   // at rate allowed by capacity_, convert material in Stocks to out_commod_ type
   // move converted material into Inventory
 
@@ -216,7 +211,7 @@ void EnrichmentFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   }
   
@@ -353,8 +348,7 @@ void EnrichmentFacility::makeOffers()
   msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EnrichmentFacility::enrich()
-{
+void EnrichmentFacility::enrich() {
   // Get iterators that define the boundaries of the ordersExecuting that are 
   // currently ready.~
   int time = TI->getTime();
@@ -450,7 +444,7 @@ void EnrichmentFacility::enrich()
     rsrc->setQuantity(theProd->getQuantity());
     mess->setResource(dynamic_cast<Resource*>(theProd));
 
-    this->sendMaterial(mess, mess->getSender());
+    mess->approve();
     wastes_.push_back(theTails);
 
     delete mat;

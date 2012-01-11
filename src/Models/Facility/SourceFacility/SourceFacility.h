@@ -124,6 +124,16 @@ public:
    */
   virtual void print();
 
+  /**
+   * @brief Transacted resources are extracted through this method
+   * 
+   * @param order the msg/order for which resource(s) are to be prepared
+   * @return list of resources to be sent for this order
+   *
+   */ 
+  virtual std::vector<Resource*> removeResource(Message* order);
+
+
 /* ------------------- */ 
 
 /* --------------------
@@ -144,21 +154,6 @@ public:
  */
 
 public:
-  /**
-   * Sends material from this facility's inventory to another facility.
-   *
-   * @param msg is the Message object representing the order
-   * @param requester is the communicator that the transaction is sent to
-   */
-  virtual void sendMaterial(Message* msg, const Communicator* requester);
-  
-  /**
-   * Receives material sent from another facility.
-   *
-   * @param trans is the transaction object representing the order
-   * @param manifest is the set of materials to be received.
-   */
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest){};
 
   /**
    * Each facility is prompted to do its beginning-of-time-step

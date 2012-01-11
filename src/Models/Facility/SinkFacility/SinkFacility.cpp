@@ -26,8 +26,7 @@ SinkFacility::~SinkFacility(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::init(xmlNodePtr cur)
-{
+void SinkFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
   /// Sink facilities can have many input/output commodities
@@ -53,8 +52,7 @@ void SinkFacility::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::copy(SinkFacility* src)
-{
+void SinkFacility::copy(SinkFacility* src) {
   FacilityModel::copy(src);
 
   in_commods_ = src->in_commods_;
@@ -64,14 +62,12 @@ void SinkFacility::copy(SinkFacility* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::copyFreshModel(Model* src)
-{
+void SinkFacility::copyFreshModel(Model* src) {
   copy(dynamic_cast<SinkFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::print() 
-{ 
+void SinkFacility::print() {
   FacilityModel::print();
 
   std::string msg = "";
@@ -139,23 +135,22 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::receiveMaterial(Transaction trans, vector<Material*> manifest){
+void SinkFacility::addResource(Transaction trans, vector<Resource*> manifest) {
   
   // grab each material object off of the manifest
   // and move it into the inventory.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
     (*thisMat)->print();
-    inventory_.push_back(*thisMat);
+    inventory_.push_back(dynamic_cast<Material*>(*thisMat));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double SinkFacility::checkInventory(){
+double SinkFacility::checkInventory() {
   double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever

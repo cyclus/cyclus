@@ -117,19 +117,18 @@ bool BookKeeper::isGroup(std::string grp) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTrans(Message* msg, std::vector<Material*> manifest){
+void BookKeeper::registerTrans(Message* msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     trans_t toRegister;
     msg->setID();
     toRegister.transID=msg->getID();
     toRegister.requesterID=msg->getRequester()->ID();
     toRegister.supplierID=msg->getSupplier()->ID();
-    toRegister.materialID=(*thisMat)->ID(); 
+    toRegister.materialID=dynamic_cast<Material*>(*thisMat)->ID(); 
     toRegister.timestamp=TI->getTime();
     toRegister.price = msg->getPrice();
      

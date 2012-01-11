@@ -86,6 +86,8 @@ public:
    */
   virtual Resource* clone()=0;
 
+  virtual void print() = 0;
+
 };
 
 #endif

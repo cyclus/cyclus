@@ -93,7 +93,7 @@ void NullFacility::receiveMessage(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::sendMaterial(Message* order, const Communicator* requester) {
+std::vector<Resource*> NullFacility::removeResource(Message* order) {
   Transaction trans = order->getTrans();
   // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
@@ -107,7 +107,7 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  vector<Resource*> toSend;
 
   while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
@@ -128,19 +128,19 @@ void NullFacility::sendMaterial(Message* order, const Communicator* requester) {
     LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
       <<"  is sending a mat with mass: "<< m->getQuantity();
   }    
-  FacilityModel::sendMaterial( order, toSend );
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::receiveMaterial(Transaction trans, vector<Material*> manifest) {
+void NullFacility::addResource(Transaction trans, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_back(*thisMat);
+    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
   }
 }
 
@@ -282,7 +282,7 @@ void NullFacility::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   }
 

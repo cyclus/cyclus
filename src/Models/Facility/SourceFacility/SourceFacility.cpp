@@ -11,11 +11,11 @@
 #include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::SourceFacility(){ 
+SourceFacility::SourceFacility() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::~SourceFacility(){
+SourceFacility::~SourceFacility() {
   // Delete all the Material in the inventory.
   while (!inventory_.empty()) {
     Material* m = inventory_.front();
@@ -25,8 +25,7 @@ SourceFacility::~SourceFacility(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::init(xmlNodePtr cur)
-{
+void SourceFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
   LOG(LEV_DEBUG2) <<"The Source Facility is being initialized";
@@ -101,28 +100,26 @@ void SourceFacility::receiveMessage(Message* msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
-{
+vector<Resource*> SourceFacility::removeResource(Message* msg) {
   Transaction trans = msg->getTrans();
   double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  vector<Resource*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
+  while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
 
     Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)){
+    if (m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
       newAmt += m->getQuantity();
       toSend.push_back(m);
       inventory_.pop_front();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
         <<"  has decided not to split the object with size :  "<< m->getQuantity();
-    }
-    else{ 
+    } else { 
       // if the inventory obj is larger than the remaining need, split it.
       Material* leftover = m->extract(trans.resource->getQuantity() - newAmt);
       newAmt += m->getQuantity();
@@ -137,7 +134,7 @@ void SourceFacility::sendMaterial(Message* msg, const Communicator* requester)
       <<"  is sending a mat with mass: "<< m->getQuantity();
     (m)->print();
   }    
-  FacilityModel::sendMaterial(msg, toSend);
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -205,7 +202,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   }
   // For now, lets just print out what we have at each timestep.
@@ -226,8 +223,6 @@ double SourceFacility::checkInventory(){
   
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
-  
-  
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){

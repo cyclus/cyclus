@@ -117,6 +117,15 @@ public:
    */
   virtual void print();
 
+  /**
+   * Transacted resources are received through this method
+   *
+   * @param trans the transaction to which these resource objects belong
+   * @param manifest is the set of resources being received
+   */ 
+  virtual void addResource(Transaction trans,
+                              std::vector<Resource*> manifest);
+
 /* ------------------- */ 
 
 /* --------------------
@@ -136,21 +145,6 @@ public:
  */
 
 public:
-  /**
-   * Sends material from this facility's inventory to another facility.
-   *
-   * @param trans is the transaction object representing the order
-   * @param receiver is the communicator that the transaction is sent to next
-   */
-  virtual void sendMaterial(Transaction trans, Communicator* receiver){};
-  
-  /**
-   * Receives material sent from another facility.
-   *
-   * @param trans is the transaction object representing the order
-   * @param manifest is the set of materials to be received.
-   */
-  virtual void receiveMaterial(Transaction trans, vector<Material*> manifest);
 
   /**
    * The SinkFacility can handle the Tick.

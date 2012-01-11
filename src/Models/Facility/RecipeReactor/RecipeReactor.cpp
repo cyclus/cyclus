@@ -195,8 +195,7 @@ void RecipeReactor::receiveMessage(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
-{
+std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
   Transaction trans = msg->getTrans();
 
   double newAmt = 0;
@@ -206,7 +205,7 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
   Material* toAbsorb;
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  vector<Resource*> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
   while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
@@ -237,21 +236,19 @@ void RecipeReactor::sendMaterial(Message* msg, const Communicator* requester)
       }
     }
   }    
-  FacilityModel::sendMaterial(msg, toSend);
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::receiveMaterial(Transaction trans, vector<Material*> manifest)
-{
+void RecipeReactor::addResource(Transaction trans, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(trans.commod, *thisMat));
+    stocks_.push_front(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 
@@ -382,8 +379,7 @@ void RecipeReactor::handleTick(int time) {
   };
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::handleTock(int time)
-{
+void RecipeReactor::handleTock(int time) {
   // at the end of the cycle
   if (month_in_cycle_ > cycle_time_){
     this->endCycle();
@@ -392,7 +388,7 @@ void RecipeReactor::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

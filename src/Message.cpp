@@ -11,6 +11,7 @@
 #include "InstModel.h"
 #include "GenericResource.h"
 #include "Logger.h"
+#include "BookKeeper.h"
 
 #include <iostream>
 
@@ -189,3 +190,14 @@ Model* Message::getRequester() const {
   return trans_.requester;
 }
 
+void Message::approve() {
+  Model* requester = getRequester();
+  Model* supplier = getSupplier();
+  vector<Resource*> manifest = supplier->removeResource(this);
+  requester->addResource(getTrans(), manifest);
+
+  BI->registerTrans(this, manifest);
+
+  LOG(LEV_DEBUG2) << "Material sent from " << supplier->ID() << " to " 
+                  << requester->ID() << ".";
+}

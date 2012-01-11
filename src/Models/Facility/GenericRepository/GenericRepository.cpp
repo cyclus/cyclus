@@ -239,18 +239,17 @@ void GenericRepository::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void GenericRepository::receiveMaterial(Transaction trans, vector<Material*> 
-    manifest)
-{
+void GenericRepository::addResource(Transaction trans,
+                                    vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++)
   {
     LOG(LEV_DEBUG2) <<"GenericRepository " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(*thisMat, trans.commod));
+    stocks_.push_front(make_pair(dynamic_cast<Material*>(*thisMat), trans.commod));
   }
 }
 

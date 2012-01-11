@@ -109,8 +109,7 @@ void StorageFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::sendMaterial(Message* order, const Communicator* requester)
-{
+std::vector<Resource*> StorageFacility::removeResource(Message* order) {
   Transaction trans = order->getTrans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -120,20 +119,19 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
   Mass complete = 0;
 
   // start with an empty manifest
-  vector<Material*> toSend;
+  vector<Resource*> toSend;
 
   while(trans.amount > complete && !inventory_.empty() ){
     Material* m = inventory_.front();
 
     // if the inventory_ obj isn't larger than the remaining need, send it as is.
     if(m->getTotMass() <= (capacity_ - complete)){
-      complete += m->getTotMass();
+      complete += m->getQuantity();
       toSend.push_back(m);
       LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< m->getTotMass();
+        <<"  is sending a mat with mass: "<< m->getQuantity();
       inventory_.pop_front();
-    }
-    else{ 
+    } else { 
       // if the inventory_ obj is larger than the remaining need, split it.
       // start with an empty material
       Material* newMat = new Material(CompMap(), 
@@ -145,27 +143,24 @@ void StorageFacility::sendMaterial(Message* order, const Communicator* requester
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
       LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< newMat->getTotMass();
-    };
-  };    
-
-  FacilityModel::sendMaterial( order, toSend );
+        <<"  is sending a mat with mass: "<< newMat->getQuantity();
+    }
+  }    
+  return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::receiveMaterial(Transaction trans, vector<Material*> manifest)
-{
+void StorageFacility::addResource(Transaction trans, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque
-  for (vector<Material*>::iterator thisMat=manifest.begin();
+  for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
-       thisMat++)
-  {
+       thisMat++) {
     LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getTotMass();
-    stocks_.push_back(*thisMat);
-    entryTimes_.push_back(make_pair(TI->getTime(), *thisMat ));
+        << (*thisMat)->getQuantity();
+    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
+    entryTimes_.push_back(make_pair(TI->getTime(), dynamic_cast<Material*>(*thisMat) ));
   }
 }
 
@@ -231,6 +226,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.amount = newMat->getTotMass();
 
     Message* storage_history = new Message(sending_facility, this, trans); 
+    storage_history->approve();
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
@@ -357,7 +353,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    sendMaterial(order, dynamic_cast<Communicator*>(order->getRequester()));
+    order->approve();
     ordersWaiting_.pop_front();
   }
 
