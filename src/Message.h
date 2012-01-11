@@ -230,6 +230,14 @@ class Message {
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
   
   /**
+   * Creates a new message by copying the current one and
+   * returns a reference to it.
+   *
+   * @warning don't forget to delete the pointer when you're done.
+   */
+  Message* clone();
+
+  /**
    * @brief Send this message to the next communicator in it's path
    *
    * Messages heading up (UP_MSG) are forwareded to the communicator
@@ -255,14 +263,6 @@ class Message {
    *
    */
   void setNextDest(Communicator* next_stop);
-  
-  /**
-   * Creates a new message by copying the current one and
-   * returns a reference to it.
-   *
-   * @warning don't forget to delete the pointer when you're done.
-   */
-  Message* clone();
   
   /**
    * Reverses the direction this Message is being sent (so, for 
@@ -338,7 +338,7 @@ class Message {
    *
    * @param supplier pointer to the new supplier
    */
-  void setSupplier(Model* supplier){trans_.supplier = supplier;};
+  void setSupplier(Model* supplier) {trans_.supplier = supplier;};
 
   /**
    * Returns the requester in this Message.

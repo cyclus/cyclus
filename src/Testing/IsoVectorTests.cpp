@@ -77,7 +77,7 @@ class IsoVectorTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - - - - - - Construction- - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - Constructors- - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorTest, ZeroMassOnInit) {
 
@@ -442,8 +442,19 @@ TEST_F(IsoVectorTest, OperatorEQ_TotalDeviation) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - - - - - -Decay handling - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - -Misc methods - - - - - - - - - - - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_MultMass) {
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_GetComp) {
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorTest, DISABLED_IsZero) {
+}
+
 TEST_F(IsoVectorTest, DISABLED_Decay){
   IsoVector::loadDecayInfo();
 //  test_mat->decay(2);

@@ -211,6 +211,15 @@ public:
 
   CompMap comp();
   
+  /*!
+   Returns true if the given isotope's number density is less than the 
+   conservation of mass tolerance.
+   
+   @param tope the isotope in question
+   @return true iff nd(tope) == 0
+   */
+  bool isZero(int tope);
+
 private:
   /*!
    Builds the decay matrix needed for the decay calculations from the parent
@@ -263,15 +272,6 @@ private:
    @exception thrown if isotope identifier is invalid
    */
   static void validateIsotopeNumber(int tope);
-
-  /*!
-   Returns true if the given isotope's number density is less than the 
-   conservation of mass tolerance.
-   
-   @param tope the isotope in question
-   @return true iff nd(tope) == 0
-   */
-  bool isZero(int tope);
 
   /*! 
    Unique identifier.
