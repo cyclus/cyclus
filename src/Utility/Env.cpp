@@ -3,7 +3,6 @@
 
 #include "InputXML.h"
 #include "CycException.h"
-#include "Logician.h"
 
 #include <sys/stat.h>
 #include <iostream>

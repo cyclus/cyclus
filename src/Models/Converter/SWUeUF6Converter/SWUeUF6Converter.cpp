@@ -5,10 +5,12 @@
 
 #include "SWUeUF6Converter.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "GenericResource.h"
+#include "Material.h"
+#include "IsoVector.h"
+
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

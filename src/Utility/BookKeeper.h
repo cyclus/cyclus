@@ -304,9 +304,8 @@ public:
   /**
    * Write a list of the facility/inst/market models in the simulation
    *
-   * @param type the model type (i.e. insts, facilities, or markets)
    */
-  void writeModelList(ModelType type);
+  void writeModelList();
 
   /**
    * Write a list of the components in the generic repository if there is onen

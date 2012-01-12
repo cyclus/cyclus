@@ -5,7 +5,6 @@
 #include "FacilityModel.h"
 
 #include "Timer.h"
-#include "Logician.h"
 #include "InputXML.h"
 #include "CycException.h"
 
@@ -24,7 +23,7 @@ void InstModel::init(xmlNodePtr cur)
   
   /// determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
-  Model* parent = LI->getModelByName(region_name, REGION);
+  Model* parent = Model::getModelByName(region_name);
   this->setParent(parent);
 }
 
@@ -40,7 +39,6 @@ void InstModel::copy(InstModel* src)
   children_ = src->children_;
   Model* parent = src->parent();
   this->setParent(parent);
-  LI->addModel(this, INST);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

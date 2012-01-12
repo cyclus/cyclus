@@ -3,7 +3,6 @@
 
 #include "CapacityRegion.h"
 
-#include "Logician.h"
 
 #include <sstream>
 #include <iostream>
@@ -86,7 +85,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       // facility
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
       LOG(LEV_DEBUG2) << "fac_name:" << fac_name << "is on the list of repalcement facilities";
-      facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
+      facility = dynamic_cast<FacilityModel*>(Model::getModelByName(fac_name));
 
       allReplacementFacs_[i].push_back(facility);
     };
@@ -174,7 +173,7 @@ void CapacityRegion::handleTick(int time)
       // build said facility
       if (time == next_build_time) {
 	Model* inst;
-	Model* fac_to_build = LI->getModelByName(fac_name, FACILITY);
+	Model* fac_to_build = Model::getModelByName(fac_name);
 	int num_facs_to_build = next_fac_build.second;
 	int i;
 	// Build the prescribed number of facilities for this time step

@@ -18,7 +18,6 @@
 #include "CycException.h"
 #include "Material.h"
 #include "Message.h"
-#include "Logician.h"
 #include "Model.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
@@ -215,7 +214,7 @@ void BookKeeper::registerRepoComponent(int ID, std::string name,
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeModelList(ModelType type) {
+void BookKeeper::writeModelList() {
 
   // define some useful variables.
   const H5std_string ID_memb = "ID";
@@ -226,48 +225,23 @@ void BookKeeper::writeModelList(ModelType type) {
   const H5std_string diedOn_memb = "diedOn";
   const H5std_string output_name = "/output";
 
-  std::string subgroup_name;
+  std::string subgroup_name = "agents";
   std::string dataset_name;
   int numStructs, numModels;
+
+  std::vector<Model*> model_list = Model::getModelList();
   
-  numModels = LI->getNumModels(type);
+  numModels = model_list.size();
   if (numModels==0) {
     numStructs=1;
   } else {
     numStructs=numModels;
   }
   
-  // parse the cases.
-  switch( type ) {
-  case REGION:
-    subgroup_name = "regions";
-    dataset_name = "regionList"; 
-    break;
-  case INST:
-    subgroup_name = "insts";
-    dataset_name = "instList"; 
-    break;
-  case FACILITY:
-    subgroup_name = "facilities";
-    dataset_name = "facList"; 
-    break;
-  case MARKET:
-    subgroup_name = "markets";
-    dataset_name = "marketList"; 
-    break;
-  case CONVERTER: 
-    subgroup_name = "converters";
-    dataset_name = "converterList"; 
-    break;
-  };
-  
   // create an array of the model structs
   model_t modelList[numStructs];
-  int i = 0;
-  for (ModelList::iterator model_iter = LI->begin(type);
-       model_iter != LI->end(type);
-       model_iter++) {
-    Model* theModel = model_iter->second;
+  for (int i = 0; i < numModels; i++) {
+    Model* theModel = model_list.at(i);
     modelList[i].ID = theModel->ID();
     modelList[i].parentID = theModel->parentID();
     modelList[i].bornOn = theModel->bornOn();
@@ -288,7 +262,7 @@ void BookKeeper::writeModelList(ModelType type) {
   doModelWrite(ID_memb, name_memb, modelImpl_memb, parentID_memb, 
 	       bornOn_memb, diedOn_memb, output_name, subgroup_name, 
 	       dataset_name, numStructs, numModels, pModelList);
-};
+}
 
 void BookKeeper::doModelWrite(H5std_string ID_memb,
 			      H5std_string name_memb,

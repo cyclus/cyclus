@@ -6,7 +6,6 @@
 
 #include "GenericResource.h"
 #include "Logger.h"
-#include "Logician.h"
 #include "MarketModel.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -282,7 +281,7 @@ void NullFacility::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   }
 

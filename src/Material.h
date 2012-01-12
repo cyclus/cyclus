@@ -217,6 +217,20 @@ public:
   */
   IsoVector comp() {return comp_;}
 
+  /**
+   * Decays all of the materials if decay is on
+   *
+   * @todo should be private (khuff/rcarlsen)
+   *
+   * @param time is the simulation time of the tick
+   */
+  static void decayMaterials(int time);
+  
+  /*
+   * sets the decay boolean and the interval
+   */
+  static void setDecay(int dec);
+
 protected:
 
   /// all isotopic details of this material object
@@ -235,6 +249,15 @@ protected:
    * Stores the next available material ID
    */
   static int nextID_;
+
+  /// list of materialss
+  static std::vector<Material*> materials_;
+
+  /// true if decay should occur, false if not.
+  static bool decay_wanted_;
+
+  /// how many months between decay calculations
+  static int decay_interval_;
 
 };
 

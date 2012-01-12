@@ -7,7 +7,6 @@
 #include "CycException.h"
 #include "Env.h"
 #include "InputXML.h"
-#include "Logician.h"
 #include "Timer.h"
 
 #include "RegionModel.h"
@@ -18,12 +17,41 @@
 
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
-
+std::vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
 map<string, mdl_dtor*> Model::destroy_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(std::string model_type, xmlNodePtr cur) {
+Model* Model::getModelByName(std::string name) {
+  Model* found_model = NULL;
+
+  for (int i = 0; i < model_list_.size(); i++) {
+    if (name == model_list_.at(i)->name()) {
+      found_model = model_list_.at(i);
+      break;
+    }
+  }
+
+  if (found_model == NULL) {
+    string err_msg = "Model '" + name + "' doesn't exist.";
+    throw CycIndexException(err_msg);
+  }
+  return found_model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::printModelList() {
+  for (int i = 0; i < model_list_.size(); i++) {
+    model_list_.at(i)->print();
+  }
+}
+
+std::vector<Model*> Model::getModelList() {
+  return Model::model_list_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::create(std::string model_type, xmlNodePtr cur) {
   string model_impl = XMLinput->get_xpath_name(cur, "model/*");
 
   // get instance
@@ -32,8 +60,6 @@ Model* Model::create(std::string model_type, xmlNodePtr cur) {
   Model* model = model_constructor();
 
   model->init(cur);
-
-  return model;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,7 +93,7 @@ void Model::load_markets() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addModel(create("Market",nodes->nodeTab[i]), MARKET);
+    create("Market",nodes->nodeTab[i]);
   }
 }
 
@@ -77,7 +103,7 @@ void Model::load_converters() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addModel(create("Converter",nodes->nodeTab[i]), CONVERTER);
+    create("Converter",nodes->nodeTab[i]);
   }
 }
 
@@ -95,7 +121,7 @@ void Model::load_facilities() {
   nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addModel( create("Facility",nodes->nodeTab[i]), FACILITY );
+    create("Facility",nodes->nodeTab[i]);
   }
 }
 
@@ -118,7 +144,7 @@ void Model::load_regions() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addModel(create("Region",nodes->nodeTab[i]), REGION);
+    create("Region",nodes->nodeTab[i]);
   }
 }
 
@@ -128,7 +154,7 @@ void Model::load_institutions() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    LI->addModel(create("Inst",nodes->nodeTab[i]), INST);   
+    create("Inst",nodes->nodeTab[i]);   
   }
 }
 
@@ -158,7 +184,8 @@ void Model::copy(Model* model_orig) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
   ID_ = ++next_id_;
-};
+  model_list_.push_back(this);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {};
@@ -170,7 +197,7 @@ void Model::print() {
       << ", implementation = " << model_impl_
       << "  handle = " << handle_
       << " ) " ;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Model::generateHandle() {

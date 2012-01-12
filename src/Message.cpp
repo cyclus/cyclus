@@ -4,7 +4,6 @@
 #include "Message.h"
 
 #include "CycException.h"
-#include "Logician.h"
 #include "Communicator.h"
 #include "FacilityModel.h"
 #include "MarketModel.h"
@@ -190,7 +189,7 @@ Model* Message::getRequester() const {
   return trans_.requester;
 }
 
-void Message::approve() {
+void Message::approveTransfer() {
   Model* requester = getRequester();
   Model* supplier = getSupplier();
   vector<Resource*> manifest = supplier->removeResource(this);

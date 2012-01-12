@@ -10,7 +10,6 @@
 
 #include "GenericResource.h"
 #include "Timer.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -271,7 +270,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   }
   

@@ -7,7 +7,6 @@
 
 #include "FacilityModel.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -24,7 +23,7 @@ void DeployInst::init(xmlNodePtr cur)
     xmlNodePtr deploy = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(deploy,"type");
   
-    Model* facility = LI->getModelByName(fac_name, FACILITY);
+    Model* facility = Model::getModelByName(fac_name);
 
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
       std::string err_msg = "Facility '" + fac_name;
@@ -86,7 +85,6 @@ void DeployInst::handleTick(int time) {
     // this->addFacility((*next_build).second);
     to_build_map_.erase(next_build);
     next_build=to_build_map_.begin();
-    LI->addModel(new_facility, FACILITY);
   };
 };
 

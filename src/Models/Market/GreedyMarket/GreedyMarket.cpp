@@ -1,11 +1,12 @@
 // GreedyMarket.cpp
 // Implements the GreedyMarket class
 #include <iostream>
-#include "Logger.h"
+#include <cmath>
 
 #include "GreedyMarket.h"
 
-#include "Logician.h"
+#include "Logger.h"
+#include "IsoVector.h"
 #include "CycException.h"
 #include "InputXML.h"
 

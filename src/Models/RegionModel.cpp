@@ -4,7 +4,6 @@
 #include "RegionModel.h"
 #include "InstModel.h"
 #include "CycException.h"
-#include "Logician.h"
 #include "InputXML.h"
 #include "Timer.h"
 
@@ -45,7 +44,7 @@ void RegionModel::init(xmlNodePtr cur)
   
   for (int i=0;i<nodes->nodeNr;i++){
     fac_name = (const char*)nodes->nodeTab[i]->children->content;
-    new_fac = LI->getModelByName(fac_name, FACILITY);
+    new_fac = Model::getModelByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
 }
@@ -62,7 +61,6 @@ void RegionModel::copy(RegionModel* src) {
   allowedFacilities_ = src->allowedFacilities_;
   
   // don't copy institutions!
-  LI->addModel(this, REGION);
 
 }
   

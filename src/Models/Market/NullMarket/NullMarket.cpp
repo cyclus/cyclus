@@ -5,9 +5,9 @@
 
 #include "NullMarket.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
+#include "IsoVector.h"
 
 using namespace std;
 

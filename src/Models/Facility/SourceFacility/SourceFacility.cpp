@@ -5,7 +5,6 @@
 
 #include "SourceFacility.h"
 #include "GenericResource.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
@@ -202,7 +201,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   }
   // For now, lets just print out what we have at each timestep.

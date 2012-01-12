@@ -7,7 +7,6 @@
 #include "EnrichmentFacility.h"
 
 #include "Timer.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
@@ -211,7 +210,7 @@ void EnrichmentFacility::handleTock(int time) {
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   }
   
@@ -444,7 +443,7 @@ void EnrichmentFacility::enrich() {
     rsrc->setQuantity(theProd->getQuantity());
     mess->setResource(dynamic_cast<Resource*>(theProd));
 
-    mess->approve();
+    mess->approveTransfer();
     wastes_.push_back(theTails);
 
     delete mat;

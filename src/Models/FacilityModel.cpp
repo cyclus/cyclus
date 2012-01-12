@@ -4,7 +4,6 @@
 #include "FacilityModel.h"
 
 #include "Timer.h"
-#include "Logician.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
 
@@ -41,8 +40,6 @@ void FacilityModel::copy(FacilityModel* src) {
 
   // don't copy fac_name to new instance
   this->setFacName("");
-
-  LI->addModel(this, FACILITY);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

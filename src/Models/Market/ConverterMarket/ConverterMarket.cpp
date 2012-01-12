@@ -3,10 +3,11 @@
 #include "ConverterMarket.h"
 
 #include <iostream>
+#include <cmath>
 
 #include "ConverterModel.h"
+#include "IsoVector.h"
 #include "Logger.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -18,7 +19,7 @@ void ConverterMarket::init(xmlNodePtr cur) {
   // Find out what convertermodel matches the name given
   xmlNodePtr conv_node = nodes->nodeTab[0];
   conv_name_ = XMLinput->get_xpath_content(conv_node,"type");
-  Model* converter = LI->getModelByName(conv_name_, CONVERTER);
+  Model* converter = Model::getModelByName(conv_name_);
 
   // make one
   Model* new_converter = Model::create(converter);
@@ -60,7 +61,7 @@ void ConverterMarket::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 ConverterModel* ConverterMarket::getConverter() {
   Model* converter;
-  converter = LI->getModelByName(conv_name_, CONVERTER);
+  converter = Model::getModelByName(conv_name_);
 
   return dynamic_cast<ConverterModel*>(converter);
 }

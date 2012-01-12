@@ -12,7 +12,6 @@
 
 #include "RegionModel.h"
 #include "InstModel.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 

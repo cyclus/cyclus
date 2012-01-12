@@ -8,7 +8,6 @@
 #include "FacilityModel.h"
 #include "Model.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 

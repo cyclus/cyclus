@@ -5,7 +5,6 @@
 
 #include "StubConverter.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 

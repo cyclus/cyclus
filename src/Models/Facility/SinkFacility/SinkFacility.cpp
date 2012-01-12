@@ -6,7 +6,6 @@
 #include "SinkFacility.h"
 
 #include "GenericResource.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"

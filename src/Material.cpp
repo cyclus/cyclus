@@ -4,7 +4,6 @@
 #include "BookKeeper.h"
 #include "CycException.h"
 #include "MassTable.h"
-#include "Logician.h"
 #include "Timer.h"
 #include "Env.h"
 #include "UniformTaylor.h"
@@ -21,6 +20,12 @@ using namespace std;
 
 // Static variables to be initialized.
 int Material::nextID_ = 0;
+
+std::vector<Material*> Material::materials_;
+
+bool Material::decay_wanted_ = false;
+
+int Material::decay_interval_ = 1;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
@@ -136,3 +141,29 @@ void Material::decay() {
   last_update_time_ = curr_time;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::decayMaterials(int time) {
+  // if decay is on
+  if (decay_wanted_) {
+    // and if (time(mod interval)==0)
+    if (time % decay_interval_ == 0) {
+      // acquire a list of all materials
+      for (vector<Material*>::iterator mat = materials_.begin();
+          mat != materials_.end();
+          mat++){
+         // and decay each of them
+         (*mat)->decay();
+      }
+    }
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::setDecay(int dec) {
+  if ( dec <= 0 ) {
+    decay_wanted_ = false;
+  } else if ( dec > 0 ) {
+    decay_wanted_ = true;
+    decay_interval_ = dec;
+  }
+}

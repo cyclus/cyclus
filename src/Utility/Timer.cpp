@@ -3,13 +3,13 @@
 
 #include "Timer.h"
 
-#include "Logician.h"
-#include "InputXML.h"
-#include "CycException.h"
-
 #include <string>
 #include <iostream>
+
+#include "InputXML.h"
+#include "CycException.h"
 #include "Logger.h"
+#include "Material.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ void Timer::runSim() {
   while (date_ < endDate()){
     if (date_.day() == 1){
       // Tell the Logician to handle this month.
-      LI->decayMaterials(time_);
+      Material::decayMaterials(time_);
       sendTick();
       sendResolve();
 
@@ -169,7 +169,7 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 
   if (decay > dur)
     throw CycRangeException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
-  LI->setDecay(decay);
+  Material::setDecay(decay);
 
   month0_ = m0;
   year0_ = y0;

@@ -2,7 +2,6 @@
 // Implements the ConverterModel class
 
 #include "ConverterModel.h"
-#include "Logician.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConverterModel::init(xmlNodePtr cur) {
@@ -15,7 +14,6 @@ void ConverterModel::copy(ConverterModel* src) {
 
   // don't copy conv_name to new instance
   conv_name_ = "";
-  LI->addModel(this, CONVERTER);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

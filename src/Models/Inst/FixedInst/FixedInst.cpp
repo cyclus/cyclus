@@ -7,7 +7,6 @@
 
 #include "FacilityModel.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -25,8 +24,7 @@ void FixedInst::init(xmlNodePtr cur)
     xmlNodePtr fac_node = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(fac_node,"type");
   
-    Model* facility = LI->getModelByName(fac_name, FACILITY);
-
+    Model* facility = Model::getModelByName(fac_name);
     
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
       throw CycException("Facility '" 

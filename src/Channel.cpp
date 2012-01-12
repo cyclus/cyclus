@@ -1,30 +1,30 @@
-// Channel.cpp
-
-#include "Channel.h"
-
-Channel::Channel() {
-
-};
-
-void Channel::approve() {
-  approval_count_++;
-
-  if (approval_count_ > 2) {
-    transactResources();
-  }
-};
-
-void Channel::transactResources() {
-  Resource resource = msg_->resource();
-  Model* supplier = msg_->getSupplier();
-  Model* requester = msg_->getRequester();
-  
-  resource = supplier->removeResource(resource);
-
-  try {
-    requester->receiveResource(resource)
-  } catch (CycException err) {
-    supplier->replaceResource(resource);
-  }
-};
-
+()/()/() ()C()h()a()n()n()e()l().()c()p()p()
+()
+()#()i()n()c()l()u()d()e() ()"()C()h()a()n()n()e()l().()h()"()
+()
+()C()h()a()n()n()e()l():():()C()h()a()n()n()e()l()(())() (){()
+()
+()}();()
+()
+()v()o()i()d() ()C()h()a()n()n()e()l():():()a()p()p()r()o()v()e()T()r()a()n()s()f()e()r()(())()(())() (){()
+() () ()a()p()p()r()o()v()a()l()_()c()o()u()n()t()_()+()+();()
+()
+() () ()i()f() ()(()a()p()p()r()o()v()a()l()_()c()o()u()n()t()_() ()>() ()2())() (){()
+() () () () ()t()r()a()n()s()a()c()t()R()e()s()o()u()r()c()e()s()(())();()
+() () ()}()
+()}();()
+()
+()v()o()i()d() ()C()h()a()n()n()e()l():():()t()r()a()n()s()a()c()t()R()e()s()o()u()r()c()e()s()(())() (){()
+() () ()R()e()s()o()u()r()c()e() ()r()e()s()o()u()r()c()e() ()=() ()m()s()g()_()-()>()r()e()s()o()u()r()c()e()(())();()
+() () ()M()o()d()e()l()*() ()s()u()p()p()l()i()e()r() ()=() ()m()s()g()_()-()>()g()e()t()S()u()p()p()l()i()e()r()(())();()
+() () ()M()o()d()e()l()*() ()r()e()q()u()e()s()t()e()r() ()=() ()m()s()g()_()-()>()g()e()t()R()e()q()u()e()s()t()e()r()(())();()
+() () ()
+() () ()r()e()s()o()u()r()c()e() ()=() ()s()u()p()p()l()i()e()r()-()>()r()e()m()o()v()e()R()e()s()o()u()r()c()e()(()r()e()s()o()u()r()c()e())();()
+()
+() () ()t()r()y() (){()
+() () () () ()r()e()q()u()e()s()t()e()r()-()>()r()e()c()e()i()v()e()R()e()s()o()u()r()c()e()(()r()e()s()o()u()r()c()e())()
+() () ()}() ()c()a()t()c()h() ()(()C()y()c()E()x()c()e()p()t()i()o()n() ()e()r()r())() (){()
+() () () () ()s()u()p()p()l()i()e()r()-()>()r()e()p()l()a()c()e()R()e()s()o()u()r()c()e()(()r()e()s()o()u()r()c()e())();()
+() () ()}()
+()}();()
+()

@@ -44,13 +44,19 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
  */
 class Model {
 public:
+  static Model* getModelByName(std::string name);
+
+  static void printModelList();
+
+  static std::vector<Model*> getModelList();
+
   /**
    * @brief Creates a model instance for use in the simulation
    *
    * @param model_type model type (region, inst, facility, ...) to create
    * @param cur pointer to the xml input representing the model to create
    */
-  static Model* create(std::string model_type, xmlNodePtr cur);
+  static void create(std::string model_type, xmlNodePtr cur);
 
   /** 
    * @brief Create a new model object based on an existing one
@@ -256,7 +262,7 @@ public:
   @brief Transacted resources are extracted through this method.
 
   @warning This method should never be directly invoked.  All resource
-  transfers should take place using the Message::approve() method.
+  transfers should take place using the Message.approveTransfer() method.
   
   @param order the msg/order for which resource(s) are to be prepared
   @return list of resources to be sent for this order
@@ -268,7 +274,7 @@ public:
   Transacted resources are received through this method.
  
   @warning This method should never be directly invoked.  All resource
-  transfers should take place using the Message::approve() method.
+  transfers should take place using the Message.approveTransfer() method.
   
   @param trans the transaction to which these resource objects belong
   @param manifest is the set of resources being received
@@ -280,6 +286,9 @@ public:
 private:
   /// Stores the next available facility ID
   static int next_id_;
+
+  /// comprehensive list of all initialized models.
+  static std::vector<Model*> model_list_;
 
   /**
    * parent of this model

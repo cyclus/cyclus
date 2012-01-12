@@ -12,11 +12,10 @@
 #include "hdf5.h"
 #include "H5Cpp.h"
 #include "H5Exception.h"
-#include "Logician.h"
 #include "Logger.h"
+#include "Material.h"
 
 using namespace H5;
-
 
 /**
  * ConditioningFacility matches waste streams with 

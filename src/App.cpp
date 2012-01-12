@@ -6,7 +6,6 @@
 #include "boost/shared_ptr.hpp"
 
 #include "Model.h"
-#include "Logician.h"
 #include "BookKeeper.h"
 #include "Timer.h"
 #include "InputXML.h"
@@ -89,14 +88,8 @@ int main(int argc, char* argv[]) {
     return 0;
   };
 
-  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(CONVERTER) << " converters:";
-  LI->printModelList(CONVERTER);
-  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(MARKET) << " markets:";
-  LI->printModelList(MARKET);
-  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(FACILITY) << " facilities:";
-  LI->printModelList(FACILITY);
-  LOG(LEV_DEBUG2) << "Here is a list of " << LI->getNumModels(REGION) << " regions:";
-  LI->printModelList(REGION);
+  LOG(LEV_DEBUG2) << "Here is a list of models:";
+  Model::printModelList();
   LOG(LEV_DEBUG2) << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
   IsoVector::printRecipes();
   
@@ -107,10 +100,7 @@ int main(int argc, char* argv[]) {
   try {
     BI->createDB();
 
-    BI->writeModelList(INST);
-    BI->writeModelList(REGION);
-    BI->writeModelList(FACILITY);
-    BI->writeModelList(MARKET);
+    BI->writeModelList();
     BI->writeTransList();
     BI->writeMatHist();
     BI->writeRepoComponents();

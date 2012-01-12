@@ -423,11 +423,12 @@ class Message {
   @brief Initiate the transaction - sending/receiving of resource(s) between
   the supplier/requester
 
-  This should be the sole method of transferring resources between simulation
+  This should be the sole way of transferring resources between simulation
   agents/models. Book keeping of transactions (and corresponding resource
   states) are taken care of automatically within this method.
   */
-  void approve();
+  void approveTransfer();
 
 };
+
 #endif

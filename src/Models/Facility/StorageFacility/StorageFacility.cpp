@@ -5,7 +5,6 @@
 
 #include "StorageFacility.h"
 
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
@@ -185,7 +184,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility, commodity, recipe = NULL;
     // facility
     fac_name = XMLinput->get_xpath_content(entry_node,"facility");
-    sending_facility = dynamic_cast<FacilityModel*>(LI->getModelByName(fac_name, FACILITY));
+    sending_facility = dynamic_cast<FacilityModel*>(Model::getModelByName(fac_name));
 
     // commodity
     commod_name = XMLinput->get_xpath_content(entry_node,"incommodity");
@@ -226,7 +225,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.amount = newMat->getTotMass();
 
     Message* storage_history = new Message(sending_facility, this, trans); 
-    storage_history->approve();
+    storage_history->approveTransfer();
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
@@ -353,7 +352,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   }
 

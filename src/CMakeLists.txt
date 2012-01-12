@@ -36,7 +36,6 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 SET( CYCLUS_CORE
   InputXML.cpp
   IsoVector.cpp
-  Logician.cpp
   Material.cpp
   Message.cpp
   GenericResource.cpp

@@ -6,7 +6,6 @@
 #include "RecipeReactor.h"
 
 #include "GenericResource.h"
-#include "Logician.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
@@ -388,7 +387,7 @@ void RecipeReactor::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     Message* order = ordersWaiting_.front();
-    order->approve();
+    order->approveTransfer();
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

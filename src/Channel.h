@@ -1,33 +1,33 @@
-// Channel.h
-
-#if !defined(_CHANNEL)
-#define _CHANNEL
-
-#include "Model.h"
-#include "Resource.h"
-
-class Channel {
-  public:
-    Channel();
-
-    ~Channel() {};
-
-    void approve();
-
-    void setSupplier()
-
-  private:
-
-    Resource resource_;
-
-    int approval_count_;
-
-    Model* supplier_;
-
-    Model* requester_;
-
-    void transactResources();
-
-};
-
-#endif
+()/()/() ()C()h()a()n()n()e()l().()h()
+()
+()#()i()f() ()!()d()e()f()i()n()e()d()(()_()C()H()A()N()N()E()L())()
+()#()d()e()f()i()n()e() ()_()C()H()A()N()N()E()L()
+()
+()#()i()n()c()l()u()d()e() ()"()M()o()d()e()l().()h()"()
+()#()i()n()c()l()u()d()e() ()"()R()e()s()o()u()r()c()e().()h()"()
+()
+()c()l()a()s()s() ()C()h()a()n()n()e()l() (){()
+() () ()p()u()b()l()i()c():()
+() () () () ()C()h()a()n()n()e()l()(())();()
+()
+() () () () ()~()C()h()a()n()n()e()l()(())() (){()}();()
+()
+() () () () ()v()o()i()d() ()a()p()p()r()o()v()e()T()r()a()n()s()f()e()r()(())()(())();()
+()
+() () () () ()v()o()i()d() ()s()e()t()S()u()p()p()l()i()e()r()(())()
+()
+() () ()p()r()i()v()a()t()e():()
+()
+() () () () ()R()e()s()o()u()r()c()e() ()r()e()s()o()u()r()c()e()_();()
+()
+() () () () ()i()n()t() ()a()p()p()r()o()v()a()l()_()c()o()u()n()t()_();()
+()
+() () () () ()M()o()d()e()l()*() ()s()u()p()p()l()i()e()r()_();()
+()
+() () () () ()M()o()d()e()l()*() ()r()e()q()u()e()s()t()e()r()_();()
+()
+() () () () ()v()o()i()d() ()t()r()a()n()s()a()c()t()R()e()s()o()u()r()c()e()s()(())();()
+()
+()}();()
+()
+()#()e()n()d()i()f()
