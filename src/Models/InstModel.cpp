@@ -127,3 +127,10 @@ double InstModel::getPowerCapacity(){
   }
   return capacity;
 }
+
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string InstModel::outputDir_ = "/institution";

@@ -134,3 +134,10 @@ void RegionModel::handleDailyTasks(int time, int day){
     (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
   }
 }
+
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string RegionModel::outputDir_ = "/region";

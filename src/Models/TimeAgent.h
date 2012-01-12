@@ -5,19 +5,21 @@
 
 #include "Model.h"
 
+#include <string>
+
 using namespace std;
 
 class TimeAgent : public Model {
-
-public:
-
+  
+ public:
+  
   /**
    * Each simulation agent is prompted to do its beginning-of-life
    * stuff.
    *
    */
   virtual void handlePreHistory() = 0;
-
+  
   /**
    * Each simulation agent is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
@@ -41,6 +43,23 @@ public:
    * @param day is the current day of that month
    */
   virtual void handleDailyTasks(int time, int day) = 0;
+  
+  /*
+    output database info
+  */
+ public:
+  /**
+     The getter function for the time agent output dir
+  */
+  static std::string outputDir(){ return outputDir_;}
+
+ private:
+  
+  /**
+     Every time agent writes to the output database
+     location: /output/agent
+  */
+  static std::string outputDir_;
 
 };
 

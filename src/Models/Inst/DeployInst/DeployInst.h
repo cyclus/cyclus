@@ -85,6 +85,25 @@ protected:
   map<int,Model*> deployment_map_;
   map<int,Model*> to_build_map_;
 
+
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for the this inst model output dir
+  */
+  static std::string outputDir(){ 
+    return InstModel::outputDir().append(outputDir_);}
+  
+ private:
+  /**
+     Every specific inst model writes to the output database
+     location: InstModel::OutputDir_ + /inst_model_name
+  */
+  static std::string outputDir_;
+
 /* ------------------- */ 
 
 

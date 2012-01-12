@@ -5,13 +5,18 @@
 
 #include "NullRegion.h"
 
-
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string NullRegion::outputDir_ = "/null";
 
 
 /* --------------------
- *  * all MODEL classes have these members
- *   * --------------------
- *    */
+  all MODEL classes have these members
+ * --------------------
+ */
 
 extern "C" Model* constructNullRegion() {
       return new NullRegion();

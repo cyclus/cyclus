@@ -396,6 +396,24 @@ protected:
     double getCapacity(std::string commod) ;
 
 
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for this facility model output dir
+  */
+  static std::string outputDir(){ 
+    return FacilityModel::outputDir().append(outputDir_);}
+
+ private:
+  /**
+     Every specific facility model writes to the output database
+     location: FacilityModel::OutputDir_ + /this_facility's_handle
+  */
+  static std::string outputDir_;
+
 /* ------------------- */ 
 
 };

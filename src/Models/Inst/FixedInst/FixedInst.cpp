@@ -67,6 +67,13 @@ void FixedInst::print()
 };
 
 
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string FixedInst::outputDir_ = "/fixed";
+
 
 /* --------------------
  * all MODEL classes have these members

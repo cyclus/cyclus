@@ -89,6 +89,13 @@ void DeployInst::handleTick(int time) {
 };
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string DeployInst::outputDir_ = "/deploy";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

@@ -613,6 +613,15 @@ void GenericRepository::transportNuclides(){
   far_field_->transportNuclides();
 }
 
+
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string GenericRepository::outputDir_ = "/genericRepository";
+
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------

@@ -137,8 +137,26 @@ public:
   /// attempts to build another facility of type fac
   virtual bool pleaseBuild(Model* fac);
 
-protected:
-/* ------------------- */ 
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for the inst model output dir
+  */
+  static std::string outputDir(){ 
+    return TimeAgent::outputDir().append(outputDir_);}
+  
+ private:
+  /**
+     Every inst model writes to the output database
+     location: TimeAgent::OutputDir_ + /institution
+  */
+  static std::string outputDir_;
+  
+ protected:
+  /* ------------------- */ 
   
 };
 

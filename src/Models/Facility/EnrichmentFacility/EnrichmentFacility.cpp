@@ -469,6 +469,13 @@ double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string EnrichmentFacility::outputDir_ = "/enrichment";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

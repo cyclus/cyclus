@@ -62,6 +62,14 @@ bool BuildInst::pleaseBuild(Model* fac)
 
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string BuildInst::outputDir_ = "/build";
+
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

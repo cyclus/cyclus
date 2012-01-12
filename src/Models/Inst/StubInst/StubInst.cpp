@@ -54,6 +54,12 @@ void StubInst::receiveMessage(Message* msg) {};
  */
 
 
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string StubInst::outputDir_ = "/stub";
 
 
 /* --------------------

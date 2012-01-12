@@ -46,8 +46,9 @@ SET( CYCLUS_CORE
   Utility/Timer.cpp
   Utility/UniformTaylor.cpp 
   Utility/Env.cpp
-  Utility/Logger.cpp 
+  Utility/Logger.cpp
   Models/Model.cpp 
+  Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 

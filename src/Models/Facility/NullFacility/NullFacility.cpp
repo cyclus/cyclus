@@ -323,6 +323,13 @@ double NullFacility::checkStocks(){
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string NullFacility::outputDir_ = "/null";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

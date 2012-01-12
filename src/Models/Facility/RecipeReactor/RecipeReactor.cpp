@@ -429,6 +429,15 @@ double RecipeReactor::checkStocks(){
   return total;
 }
 
+
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string RecipeReactor::outputDir_ = "/recipeReactor";
+
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------

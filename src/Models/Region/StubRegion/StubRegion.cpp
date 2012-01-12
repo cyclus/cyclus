@@ -50,7 +50,12 @@ void StubRegion::receiveMessage(Message* msg) {};
  */
 
 
-
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string StubRegion::outputDir_ = "/stub";
 
 /* --------------------
  * all MODEL classes have these members

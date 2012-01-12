@@ -232,6 +232,13 @@ double SourceFacility::checkInventory(){
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SourceFacility::outputDir_ = "/source";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

@@ -79,3 +79,9 @@ void FacilityModel::handleDailyTasks(int time, int day){
   // facilities who have more intricate details should utilize this function
 }
 
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string FacilityModel::outputDir_ = "/facility";

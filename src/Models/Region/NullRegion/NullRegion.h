@@ -92,6 +92,24 @@ protected:
  * --------------------
  */
 
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for the this region model's output dir
+  */
+  static std::string outputDir(){ 
+    return RegionModel::outputDir().append(outputDir_);}
+    
+ private:
+  /**
+     Every specific region model writes to the output database
+     location: RegionModel::OutputDir_ + /this_region's_name
+  */
+  static std::string outputDir_;
+
 /* ------------------- */ 
 
 };

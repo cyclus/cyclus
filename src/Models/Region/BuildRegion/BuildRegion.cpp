@@ -140,6 +140,15 @@ void BuildRegion::handleTick(int time)
 
 }
 
+
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string BuildRegion::outputDir_ = "/build";
+
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------

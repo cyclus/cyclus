@@ -83,6 +83,14 @@ void StubFacility::handleTock(int time){
 };
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string StubFacility::outputDir_ = "/stub";
+
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

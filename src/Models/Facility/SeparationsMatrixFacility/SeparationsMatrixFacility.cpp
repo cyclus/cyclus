@@ -486,6 +486,13 @@ void SeparationsMatrixFacility::separate()
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SeparationsMatrixFacility::outputDir_ = "/separationsMatrix";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

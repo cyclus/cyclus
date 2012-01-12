@@ -232,6 +232,13 @@ void CapacityRegion::handleTick(int time)
 }
 
 
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string CapacityRegion::outputDir_ = "/capacity";
+
 
 /* --------------------
  * all MODEL classes have these members

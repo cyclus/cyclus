@@ -181,6 +181,13 @@ const double SinkFacility::getRequestAmt(){
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SinkFacility::outputDir_ = "/sink";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

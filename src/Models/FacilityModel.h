@@ -199,6 +199,26 @@ public:
    */
   virtual void handleDailyTasks(int time, int day);
 
+
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for the facility model output dir
+  */
+  static std::string outputDir(){ 
+    return TimeAgent::outputDir().append(outputDir_);}
+
+ private:
+  /**
+     Every facility model writes to the output database
+     location: TimeAgent::OutputDir_ + /facility
+  */
+  static std::string outputDir_;
+
+
 /* ------------------- */ 
   
 };

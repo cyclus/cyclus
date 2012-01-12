@@ -144,15 +144,33 @@ public:
      */
     virtual void handleDailyTasks(int time, int day);
 
-public:
+ public:
     bool isAllowedFacility(Model* test_fac) 
-    { return ( allowedFacilities_.find(test_fac) != allowedFacilities_.end() ); } ;
-
-protected:
+    { return ( allowedFacilities_.find(test_fac) 
+	       != allowedFacilities_.end() ); } ;
+    
+ protected:
     /// every region has a list of allowed facilities
     std::set<Model*> allowedFacilities_;
-/* -------------------- */
-
+  
+/* --------------------
+   output directory info
+ * --------------------
+ */
+ public:
+  /**
+     The getter function for the region model output dir
+  */
+  static std::string outputDir(){ 
+    return TimeAgent::outputDir().append(outputDir_);}
+    
+ private:
+  /**
+     Every region model writes to the output database
+     location: TimeAgent::OutputDir_ + /region
+  */
+  static std::string outputDir_;
+    
 };
 
 #endif

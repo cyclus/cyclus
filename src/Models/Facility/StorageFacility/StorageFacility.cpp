@@ -395,6 +395,13 @@ Mass StorageFacility::checkStocks(){
 }
 
 /* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string StorageFacility::outputDir_ = "/storage";
+
+/* --------------------
  * all MODEL classes have these members
  * --------------------
  */

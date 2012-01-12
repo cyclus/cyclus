@@ -394,6 +394,13 @@ void ConditioningFacility::processOrders(){
 }
 
 
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string ConditioningFacility::outputDir_ = "/conditioning";
+
 
 /* --------------------
  * all MODEL classes have these members
