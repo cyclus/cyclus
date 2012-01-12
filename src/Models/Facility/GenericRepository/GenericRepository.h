@@ -106,15 +106,6 @@ public:
   virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
-   * 
-   * @param order the msg/order for which resource(s) are to be prepared
-   * @return list of resources to be sent for this order
-   *
-   */ 
-  virtual std::vector<Resource*> removeResource(Message* order){};
-
-  /**
    * Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
