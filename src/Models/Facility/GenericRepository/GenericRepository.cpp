@@ -1,6 +1,5 @@
 // GenericRepository.cpp
 // Implements the GenericRepository class
-#include <iostream>
 #include "Logger.h"
 
 #include "GenericRepository.h"
@@ -46,6 +45,13 @@
  *
  */
  
+/* --------------------
+   output database info
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string GenericRepository::outputDir_;// = "/genericRepository";
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void GenericRepository::init(xmlNodePtr cur)
 { FacilityModel::init(cur);
@@ -613,13 +619,6 @@ void GenericRepository::transportNuclides(){
   far_field_->transportNuclides();
 }
 
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string GenericRepository::outputDir_ = "/genericRepository";
 
 
 /* --------------------

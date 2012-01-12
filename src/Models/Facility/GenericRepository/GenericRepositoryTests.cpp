@@ -70,7 +70,6 @@ class GenericRepositoryTest : public ::testing::Test {
       test_model_1->setModelType("Facility");
     };
     virtual void TearDown() {
-      delete src_facility;
     }
 };
 

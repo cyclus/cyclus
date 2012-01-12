@@ -1,9 +1,9 @@
 // GenericRepository.h
 #if !defined(_GENERICREPOSITORY_H)
 #define _GENERICREPOSITORY_H
-#include <iostream>
 #include "Logger.h"
 #include <queue>
+#include <string>
 
 #include "FacilityModel.h"
 #include "Component.h"
