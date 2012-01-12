@@ -25,8 +25,8 @@ using namespace std;
 // Static variables to be initialized.
 int Component::nextID_ = 0;
 
-string Component::thermal_type_names_[];// = {"LLNLThermal","LumpThermal","SindaThermal","StubThermal"};
-string Component::nuclide_type_names_[];// = {"LumpNuclide","MixedCellNuclide", "StubNuclide" };
+string Component::thermal_type_names_[] = {"LLNLThermal","LumpThermal","SindaThermal","StubThermal"};
+string Component::nuclide_type_names_[] = {"LumpNuclide","MixedCellNuclide", "StubNuclide" };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Component::Component(){
