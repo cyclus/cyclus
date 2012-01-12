@@ -4,12 +4,6 @@
 #include "FacilityModelTests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(FacilityModelTests, Print) {
-  int time = 1;
-  EXPECT_NO_THROW(facility_model_->print());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(FacilityModelTests, CopyFacility) {
   FacilityModel* new_facility = facility_model_;
   EXPECT_NO_THROW(new_facility->copy(facility_model_)); 

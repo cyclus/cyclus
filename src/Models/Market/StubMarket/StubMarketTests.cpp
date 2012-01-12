@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "MarketModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -22,11 +23,6 @@ class FakeStubMarket : public StubMarket {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel* StubMarketConstructor(){
-  return dynamic_cast<MarketModel*>(new FakeStubMarket());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubMarketTest : public ::testing::Test {
   protected:
     FakeStubMarket* src_market;
@@ -42,6 +38,16 @@ class StubMarketTest : public ::testing::Test {
       delete new_market;
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* StubMarketModelConstructor(){
+  return dynamic_cast<Model*>(new FakeStubMarket());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+MarketModel* StubMarketConstructor(){
+  return dynamic_cast<MarketModel*>(new FakeStubMarket());
+}
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -76,4 +82,5 @@ TEST_F(StubMarketTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubMarket, MarketModelTests, Values(&StubMarketConstructor));
+INSTANTIATE_TEST_CASE_P(StubMarket, ModelTests, Values(&StubMarketModelConstructor));
 

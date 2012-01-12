@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "RegionModelTests.h"
+#include "TestFacility.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, Print) {
@@ -10,19 +11,18 @@ TEST_P(RegionModelTests, Print) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionModelTests, CopyInst) {
-  RegionModel* new_region = region_model_;
-  EXPECT_NO_THROW(new_region->copy(region_model_)); 
+TEST_P(RegionModelTests, IsRegion) {
+  EXPECT_EQ("Region",region_model_->getModelType());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionModelTests, Tick) {
-  int time = 1;
-  EXPECT_NO_THROW(region_model_->handleTick(time));
+TEST_P(RegionModelTests, IsOwnParent) {
+  EXPECT_EQ(region_model_,region_model_->parent());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionModelTests, Tock) {
-  int time = 1;
-  EXPECT_NO_THROW(region_model_->handleTock(time));
+TEST_P(RegionModelTests, AllowedFacilityModels) {
+  TestFacility* test_fac = new TestFacility(); 
+  EXPECT_NO_THROW(region_model_->isAllowedFacility(test_fac));
 }
+

@@ -1,7 +1,7 @@
-// StubModelTests.h
+// TimeAgentTests.h
 #include <gtest/gtest.h>
 
-#include "StubModel.h"
+#include "TimeAgent.h"
 #include "suffix.h"
 
 #if GTEST_HAS_PARAM_TEST
@@ -12,20 +12,20 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete StubModel instance 
-typedef StubModel* StubModelConstructor();
+// parameter is a pointer to a concrete TimeAgent instance 
+typedef Model* TimeAgentConstructor();
 
-class StubModelTests : public TestWithParam<StubModelConstructor*> {
+class TimeAgentTests : public TestWithParam<TimeAgentConstructor*> {
   public:
     virtual void SetUp() { 
-      stub_model_ = (*GetParam())();
+      time_agent_ = dynamic_cast<TimeAgent*>((*GetParam())());
     }
     virtual void TearDown(){ 
-      delete stub_model_;
+      delete time_agent_;
     }
 
   protected:
-    StubModel* stub_model_;
+    TimeAgent* time_agent_;
 
 };
 

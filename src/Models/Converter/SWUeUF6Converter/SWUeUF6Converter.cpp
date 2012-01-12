@@ -50,7 +50,7 @@ void SWUeUF6Converter::print()
       << "} into offers of commodity {"
       << out_commod_
       << "}.";
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
@@ -139,4 +139,14 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
 
   return toRet;
 }    
+
+extern "C" Model* constructSWUeUF6Converter() {
+    return new SWUeUF6Converter();
+}
+
+extern "C" void destructSWUeUF6Converter(Model* p) {
+    delete p;
+}
+
+/* ------------------- */ 
 

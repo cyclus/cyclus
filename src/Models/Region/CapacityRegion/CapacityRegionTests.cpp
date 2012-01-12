@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "RegionModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,11 +21,6 @@ class FakeCapacityRegion : public CapacityRegion {
     virtual ~FakeCapacityRegion() {
     }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel* CapacityRegionConstructor(){
-  return dynamic_cast<RegionModel*>(new FakeCapacityRegion());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CapacityRegionTest : public ::testing::Test {
@@ -43,6 +39,15 @@ class CapacityRegionTest : public ::testing::Test {
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* CapacityRegionModelConstructor(){
+  return dynamic_cast<Model*>(new FakeCapacityRegion());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+RegionModel* CapacityRegionConstructor(){
+  return dynamic_cast<RegionModel*>(new FakeCapacityRegion());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CapacityRegionTest, InitialState) {
@@ -71,4 +76,5 @@ TEST_F(CapacityRegionTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(CapacityRegion, RegionModelTests, Values(&CapacityRegionConstructor));
+INSTANTIATE_TEST_CASE_P(CapacityRegion, ModelTests, Values(&CapacityRegionModelConstructor));
 

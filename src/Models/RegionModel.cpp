@@ -21,6 +21,9 @@ using namespace std;
 
     // register to receive time-step notifications
     TI->registerTickListener(this);
+
+    // regions are their own parent
+    this->setParent(this);
   };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -32,9 +35,6 @@ void RegionModel::init(xmlNodePtr cur)
   /** 
    *  Specific initialization for RegionModels
    */
-
-  // regions are their own parent
-  this->setParent(this);
 
   /// all regions require allowed facilities - possibly many
   xmlNodeSetPtr nodes = 

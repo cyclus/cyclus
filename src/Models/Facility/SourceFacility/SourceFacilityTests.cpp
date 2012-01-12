@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -47,6 +48,11 @@ class FakeSourceFacility : public SourceFacility {
     double getCommodPrice() {return commod_price_;}
     IsoVector getRecipe() {return recipe_;}
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* SourceFacilityModelConstructor(){
+  return dynamic_cast<Model*>(new FakeSourceFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* SourceFacilityConstructor(){
@@ -135,4 +141,5 @@ TEST_F(SourceFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests, Values(&SourceFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(SourceFac, ModelTests, Values(&SourceFacilityModelConstructor));
 

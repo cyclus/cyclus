@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -31,6 +32,11 @@ class FakeNullFacility : public NullFacility {
     virtual ~FakeNullFacility() {
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* NullModelConstructor(){
+  return dynamic_cast<Model*>(new FakeNullFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* NullFacilityConstructor(){
@@ -106,4 +112,5 @@ TEST_F(NullFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(NullFac, FacilityModelTests, Values(&NullFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(NullFac, ModelTests, Values(&NullModelConstructor));
 

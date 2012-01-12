@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,6 +21,11 @@ class FakeSeparationsMatrixFacility : public SeparationsMatrixFacility {
     virtual ~FakeSeparationsMatrixFacility() {
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* SeparationsMatrixModelConstructor(){
+  return dynamic_cast<Model*>(new FakeSeparationsMatrixFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* SeparationsMatrixFacilityConstructor(){
@@ -89,4 +95,5 @@ TEST_F(SeparationsMatrixFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(SeparationsMatrixFac, FacilityModelTests, Values(&SeparationsMatrixFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(SeparationsMatrixFac, ModelTests, Values(&SeparationsMatrixModelConstructor));
 

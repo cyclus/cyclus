@@ -12,7 +12,6 @@
 using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubNuclide::init(xmlNodePtr cur){
-  NuclideModel::init(cur);
   // move the xml pointer to the current model
   cur = XMLinput->get_xpath_element(cur,"model/StubNuclide");
   // for now, just say you've done it... 

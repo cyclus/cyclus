@@ -44,56 +44,56 @@
 
 class SWUeUF6Converter : public ConverterModel  
 {
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-public:
-  /** 
-   * Default constructor for the SWUeUF6Converter class.
+  /* --------------------
+   * all MODEL classes have these members
+   * --------------------
    */
-  SWUeUF6Converter() {};
 
-  /**
-   * Destructor for the SWUeUF6Converter class. 
-   */
-  ~SWUeUF6Converter() {};
-  
-  // different ways to populate an object after creation
-  /// initialize an object from XML input
-  virtual void init(xmlNodePtr cur);
+  public:
+    /** 
+     * Default constructor for the SWUeUF6Converter class.
+     */
+    SWUeUF6Converter() {};
 
-  /// initialize an object by copying another
-  virtual void copy(SWUeUF6Converter* src);
+    /**
+     * Destructor for the SWUeUF6Converter class. 
+     */
+    ~SWUeUF6Converter() {};
 
-  /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
-   *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
-   *
-   * @param src the pointer to the original (initialized ?) model to be copied
-   */
-  virtual void copyFreshModel(Model* src);
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur);
 
-  /**
-   * Print information about this model
-   */
-  virtual void print();
+    /// initialize an object by copying another
+    virtual void copy(SWUeUF6Converter* src);
 
-/* ------------------- */ 
+    /**
+     * This drills down the dependency tree to initialize all relevant parameters/containers.
+     *
+     * Note that this function must be defined only in the specific model in question and not in any 
+     * inherited models preceding it.
+     *
+     * @param src the pointer to the original (initialized ?) model to be copied
+     */
+    virtual void copyFreshModel(Model* src);
 
-public:
+    /**
+     * Print information about this model
+     */
+    virtual void print();
 
-/* -------------------- */
+    /* ------------------- */ 
 
-/* --------------------
- * all CONVERTERMODEL classes have these members
- * --------------------
- */
+  public:
 
-public:
+    /* -------------------- */
+
+    /* --------------------
+     * all CONVERTERMODEL classes have these members
+     * --------------------
+     */
+
+  public:
     /**
      * The convert function specific to the SWUeUF6Converter
      * Converts between amounts of two commodities
@@ -103,18 +103,18 @@ public:
      * 
      * @return the converted message
      */
- 
+
     virtual Message* convert(Message* convMsg, Message* refMsg); 
 
 
-/* ------------------- */ 
+    /* ------------------- */ 
 
-/* --------------------
- * _THIS_ CONVERTERMODEL class has these members
- * --------------------
- */
+    /* --------------------
+     * _THIS_ CONVERTERMODEL class has these members
+     * --------------------
+     */
 
-protected:
+  protected:
     /**
      * The SWUeUF6Converter has one input commodity
      */
@@ -125,7 +125,7 @@ protected:
      */
     std::string out_commod_;
 
-/* ------------------- */ 
+    /* ------------------- */ 
 
 };
 
@@ -133,15 +133,5 @@ protected:
  * all MODEL classes have these members
  * --------------------
  */
-
-extern "C" Model* constructSWUeUF6Converter() {
-    return new SWUeUF6Converter();
-}
-
-extern "C" void destructSWUeUF6Converter(Model* p) {
-    delete p;
-}
-
-/* ------------------- */ 
 
 #endif

@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "MarketModelTests.h"
 #include "GenericResource.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -52,6 +53,11 @@ class ConverterMarketTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* ConverterMarketModelConstructor(){
+  return dynamic_cast<Model*>(new FakeConverterMarket());
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* ConverterMarketConstructor(){
   return dynamic_cast<MarketModel*>(new FakeConverterMarket());
 };
@@ -85,4 +91,5 @@ TEST_F(ConverterMarketTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(ConverterMarket, MarketModelTests, Values(&ConverterMarketConstructor));
+INSTANTIATE_TEST_CASE_P(ConverterMarket, ModelTests, Values(&ConverterMarketModelConstructor));
 

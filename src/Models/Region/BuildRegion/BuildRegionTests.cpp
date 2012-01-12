@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "RegionModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -22,11 +23,6 @@ class FakeBuildRegion : public BuildRegion {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel* BuildRegionConstructor(){
-  return dynamic_cast<RegionModel*>(new FakeBuildRegion());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildRegionTest : public ::testing::Test {
   protected:
     FakeBuildRegion* src_region_;
@@ -42,6 +38,16 @@ class BuildRegionTest : public ::testing::Test {
       delete new_region_;
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* BuildRegionModelConstructor(){
+  return dynamic_cast<Model*>(new FakeBuildRegion());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+RegionModel* BuildRegionConstructor(){
+  return dynamic_cast<RegionModel*>(new FakeBuildRegion());
+}
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -70,4 +76,5 @@ TEST_F(BuildRegionTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(BuildRegion, RegionModelTests, Values(&BuildRegionConstructor));
+INSTANTIATE_TEST_CASE_P(BuildRegion, ModelTests, Values(&BuildRegionModelConstructor));
 

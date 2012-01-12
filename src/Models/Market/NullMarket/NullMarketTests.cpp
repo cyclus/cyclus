@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "MarketModelTests.h"
 #include "GenericResource.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -30,6 +31,11 @@ class FakeNullMarket : public NullMarket {
 
     Message* getMessage(){return msg_;}
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* NullMarketModelConstructor(){
+  return dynamic_cast<Model*>(new FakeNullMarket());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* NullMarketConstructor(){
@@ -82,4 +88,5 @@ TEST_F(NullMarketTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(NullMarket, MarketModelTests, Values(&NullMarketConstructor));
+INSTANTIATE_TEST_CASE_P(NullMarket, ModelTests, Values(&NullMarketModelConstructor));
 

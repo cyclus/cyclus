@@ -5,16 +5,19 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/LogicianTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/LogicianTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/TimeAgentTests.cpp
   PARENT_SCOPE)
 
 SET(INTERFACE_LIBRARIES ${CYCLUS_TEST_CORE} PARENT_SCOPE )

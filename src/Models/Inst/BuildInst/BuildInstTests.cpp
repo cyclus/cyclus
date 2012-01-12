@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "InstModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,6 +21,11 @@ class FakeBuildInst : public BuildInst {
     virtual ~FakeBuildInst() {
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* BuildInstModelConstructor(){
+  return dynamic_cast<Model*>(new FakeBuildInst());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* BuildInstConstructor(){
@@ -88,4 +94,5 @@ TEST_F(BuildInstTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(BuildInst, InstModelTests, Values(&BuildInstConstructor));
+INSTANTIATE_TEST_CASE_P(BuildInst, ModelTests, Values(&BuildInstModelConstructor));
 

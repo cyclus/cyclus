@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "MarketModelTests.h"
 #include "GenericResource.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -31,6 +32,11 @@ class FakeGreedyMarket : public GreedyMarket {
 
     Message* getMessage(){return msg_;}
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* GreedyMarketModelConstructor(){
+  return dynamic_cast<Model*>(new FakeGreedyMarket());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* GreedyMarketConstructor(){
@@ -83,4 +89,5 @@ TEST_F(GreedyMarketTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(GreedyMarket, MarketModelTests, Values(&GreedyMarketConstructor));
+INSTANTIATE_TEST_CASE_P(GreedyMarket, ModelTests, Values(&GreedyMarketModelConstructor));
 

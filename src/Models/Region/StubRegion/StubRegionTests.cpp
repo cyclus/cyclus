@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "RegionModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,11 +21,6 @@ class FakeStubRegion : public StubRegion {
     virtual ~FakeStubRegion() {
     }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel* StubRegionConstructor(){
-  return dynamic_cast<RegionModel*>(new FakeStubRegion());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubRegionTest : public ::testing::Test {
@@ -43,6 +39,15 @@ class StubRegionTest : public ::testing::Test {
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* StubRegionModelConstructor(){
+  return dynamic_cast<Model*>(new FakeStubRegion());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+RegionModel* StubRegionConstructor(){
+  return dynamic_cast<RegionModel*>(new FakeStubRegion());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubRegionTest, InitialState) {
@@ -71,4 +76,5 @@ TEST_F(StubRegionTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubRegion, RegionModelTests, Values(&StubRegionConstructor));
+INSTANTIATE_TEST_CASE_P(StubRegion, ModelTests, Values(&StubRegionModelConstructor));
 

@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "InstModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,11 +21,6 @@ class FakeStubInst : public StubInst {
     virtual ~FakeStubInst() {
     }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel* StubInstConstructor(){
-  return dynamic_cast<InstModel*>(new FakeStubInst());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubInstTest : public ::testing::Test {
@@ -44,6 +40,16 @@ class StubInstTest : public ::testing::Test {
       // for facilities that trade commodities, delete appropriate markets here
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* StubInstModelConstructor(){
+  return dynamic_cast<Model*>(new FakeStubInst());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+InstModel* StubInstConstructor(){
+  return dynamic_cast<InstModel*>(new FakeStubInst());
+}
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -88,4 +94,5 @@ TEST_F(StubInstTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubInst, InstModelTests, Values(&StubInstConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, ModelTests, Values(&StubInstModelConstructor));
 

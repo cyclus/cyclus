@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "RegionModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -20,11 +21,6 @@ class FakeNullRegion : public NullRegion {
     virtual ~FakeNullRegion() {
     }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel* NullRegionConstructor(){
-  return dynamic_cast<RegionModel*>(new FakeNullRegion());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class NullRegionTest : public ::testing::Test {
@@ -43,6 +39,15 @@ class NullRegionTest : public ::testing::Test {
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* NullRegionModelConstructor(){
+  return dynamic_cast<Model*>(new FakeNullRegion());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+RegionModel* NullRegionConstructor(){
+  return dynamic_cast<RegionModel*>(new FakeNullRegion());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullRegionTest, InitialState) {
@@ -71,4 +76,6 @@ TEST_F(NullRegionTest, ReceiveMessage) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(NullRegion, RegionModelTests, Values(&NullRegionConstructor));
+INSTANTIATE_TEST_CASE_P(NullRegion, ModelTests, Values(&NullRegionModelConstructor));
+
 

@@ -1,7 +1,7 @@
-// StubModelTests.h
+// ModelTests.h
 #include <gtest/gtest.h>
 
-#include "StubModel.h"
+#include "Model.h"
 #include "suffix.h"
 
 #if GTEST_HAS_PARAM_TEST
@@ -12,20 +12,20 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete StubModel instance 
-typedef StubModel* StubModelConstructor();
+// parameter is a pointer to a concrete Model instance 
+typedef Model* ModelConstructor();
 
-class StubModelTests : public TestWithParam<StubModelConstructor*> {
+class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
     virtual void SetUp() { 
-      stub_model_ = (*GetParam())();
+      model_ = (*GetParam())();
     }
     virtual void TearDown(){ 
-      delete stub_model_;
+      delete model_;
     }
 
   protected:
-    StubModel* stub_model_;
+    Model* model_;
 
 };
 

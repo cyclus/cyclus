@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "Model.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -34,6 +35,11 @@ class FakeSinkFacility : public SinkFacility {
     double getInvSize() {return inventory_size_;}
     double getCommodPrice() {return commod_price_;}
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* SinkFacilityModelConstructor(){
+  return dynamic_cast<Model*>(new FakeSinkFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* SinkFacilityConstructor(){
@@ -112,5 +118,6 @@ TEST_F(SinkFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(SinkFac, FacilityModelTests, Values(&SinkFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(SinkFac, ModelTests, Values(&SinkFacilityModelConstructor));
 
 

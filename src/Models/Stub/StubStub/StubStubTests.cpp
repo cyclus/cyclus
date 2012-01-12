@@ -4,6 +4,7 @@
 #include "StubStub.h"
 #include "StubModelTests.h"
 #include "CycException.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -19,11 +20,6 @@ class FakeStubStub : public StubStub {
     virtual ~FakeStubStub() {
     }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubModel* StubStubConstructor(){
-  return dynamic_cast<StubModel*>(new FakeStubStub());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubStubTest : public ::testing::Test {
@@ -42,6 +38,15 @@ class StubStubTest : public ::testing::Test {
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* StubStubModelConstructor(){
+  return dynamic_cast<Model*>(new FakeStubStub());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+StubModel* StubStubConstructor(){
+  return dynamic_cast<StubModel*>(new FakeStubStub());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubStubTest, InitialState) {
@@ -64,4 +69,5 @@ TEST_F(StubStubTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubStub, StubModelTests, Values(&StubStubConstructor));
+INSTANTIATE_TEST_CASE_P(StubStub, ModelTests, Values(&StubStubModelConstructor));
 

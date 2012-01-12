@@ -4,12 +4,6 @@
 #include "InstModelTests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(InstModelTests, Print) {
-  int time = 1;
-  EXPECT_NO_THROW(inst_model_->print());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(InstModelTests, CopyInst) {
   InstModel* new_inst = inst_model_;
   EXPECT_NO_THROW(new_inst->copy(inst_model_)); 

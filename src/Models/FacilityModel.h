@@ -123,42 +123,42 @@ public:
    *
    * @param facName is the new name of the facility
    */
-  void setFacName(std::string facName) { this->setName(facName); };
+  virtual void setFacName(std::string facName) { this->setName(facName); };
 
   /**
    * Returns the facility's name
    *
    * @return fac_name_ the name of this facility, a string
    */
-  std::string getFacName() { return this->name(); };
+  virtual std::string getFacName() { return this->name(); };
 
   /**
    * Sets this facility's instutution name 
    *
    * @param name the name of the institution associated with this facility.
    */
-  void setInstName(std::string name){ inst_name_ = name;};
+  virtual void setInstName(std::string name){ inst_name_ = name;};
 
   /**
    * Returns this facility's institution
    *
    * @return the institution assosicated with this facility
    */
-  InstModel* getFacInst();
+  virtual InstModel* getFacInst();
 
   /**
    * Sets the facility's lifetime 
    *
    * @param lifetime is the new lifetime of the facility in months
    */
-  void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
+  virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
    * Returns the facility's lifetime
    *
    * @return fac_lifetime_ the lifetime of this facility, an int, in months
    */
-  int getFacLifetime() { return fac_lifetime_; };
+  virtual int getFacLifetime() { return fac_lifetime_; };
 
   /**
    * Returns the facility's power capacity
@@ -166,7 +166,7 @@ public:
    * @return 0 by default. If the facility produces power, it will use its own 
    * function.
    */
-  double getPowerCapacity() { return 0.0; };
+  virtual double getPowerCapacity() { return 0.0; };
 
   /**
    * Each facility is prompted to do its beginning-of-life

@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -34,6 +35,11 @@ class FakeEnrichmentFacility : public EnrichmentFacility {
     virtual std::string getOutCommod(){return out_commod_;}
     virtual std::string getInCommod(){return in_commod_;}
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* EnrichmentModelConstructor(){
+  return dynamic_cast<Model*>(new FakeEnrichmentFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* EnrichmentFacilityConstructor(){
@@ -113,4 +119,5 @@ TEST_F(EnrichmentFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(EnrichmentFac, FacilityModelTests, Values(&EnrichmentFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(EnrichmentFac, ModelTests, Values(&EnrichmentModelConstructor));
 

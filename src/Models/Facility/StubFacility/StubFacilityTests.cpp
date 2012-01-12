@@ -5,6 +5,8 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
+#include "TimeAgentTests.h"
 
 #include <string>
 #include <queue>
@@ -20,6 +22,11 @@ class FakeStubFacility : public StubFacility {
     virtual ~FakeStubFacility() {
     }
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* StubFacilityModelConstructor(){
+  return dynamic_cast<Model*>(new FakeStubFacility());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* StubFacilityConstructor(){
@@ -89,4 +96,6 @@ TEST_F(StubFacilityTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubFac, FacilityModelTests, Values(&StubFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(StubFac, ModelTests, Values(&StubFacilityModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubFac, TimeAgentTests, Values(&StubFacilityModelConstructor));
 

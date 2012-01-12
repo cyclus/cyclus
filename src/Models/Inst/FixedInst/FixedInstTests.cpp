@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "InstModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -22,11 +23,6 @@ class FakeFixedInst : public FixedInst {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel* FixedInstConstructor(){
-  return dynamic_cast<InstModel*>(new FakeFixedInst());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FixedInstTest : public ::testing::Test {
   protected:
     FakeFixedInst* src_inst;
@@ -36,15 +32,22 @@ class FixedInstTest : public ::testing::Test {
       src_inst = new FakeFixedInst();
       src_inst->setParent(new TestRegion());
       new_inst = new FakeFixedInst();
-      // for facilities that trade commodities, create appropriate markets here
     };
 
     virtual void TearDown() {
       delete src_inst;
-      // for facilities that trade commodities, delete appropriate markets here
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* FixedInstModelConstructor(){
+  return dynamic_cast<Model*>(new FakeFixedInst());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+InstModel* FixedInstConstructor(){
+  return dynamic_cast<InstModel*>(new FakeFixedInst());
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(FixedInstTest, InitialState) {
@@ -88,4 +91,5 @@ TEST_F(FixedInstTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(FixedInst, InstModelTests, Values(&FixedInstConstructor));
+INSTANTIATE_TEST_CASE_P(FixedInst, ModelTests, Values(&FixedInstModelConstructor));
 

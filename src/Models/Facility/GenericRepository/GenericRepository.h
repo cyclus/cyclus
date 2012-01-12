@@ -112,7 +112,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(Message* order);
+  virtual std::vector<Resource*> removeResource(Message* order){};
 
   /**
    * Transacted resources are received through this method

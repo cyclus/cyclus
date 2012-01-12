@@ -1,7 +1,7 @@
-// StubModelTests.h
+// CommunicatorTests.h
 #include <gtest/gtest.h>
 
-#include "StubModel.h"
+#include "Communicator.h"
 #include "suffix.h"
 
 #if GTEST_HAS_PARAM_TEST
@@ -12,20 +12,20 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete StubModel instance 
-typedef StubModel* StubModelConstructor();
+// parameter is a pointer to a concrete Communicator instance 
+typedef Communicator* CommunicatorConstructor();
 
-class StubModelTests : public TestWithParam<StubModelConstructor*> {
+class CommunicatorTests : public TestWithParam<CommunicatorConstructor*> {
   public:
     virtual void SetUp() { 
-      stub_model_ = (*GetParam())();
+      comm_model_ = (*GetParam())();
     }
     virtual void TearDown(){ 
-      delete stub_model_;
+      delete comm_model_;
     }
 
   protected:
-    StubModel* stub_model_;
+    Communicator* comm_model_;
 
 };
 

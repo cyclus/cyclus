@@ -5,6 +5,7 @@
 #include "CycException.h"
 #include "Message.h"
 #include "FacilityModelTests.h"
+#include "ModelTests.h"
 
 #include <string>
 #include <queue>
@@ -87,6 +88,11 @@ class FakeRecipeReactor : public RecipeReactor {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* RecipeReactorModelConstructor(){
+  return dynamic_cast<Model*>(new FakeRecipeReactor());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel* RecipeReactorConstructor(){
   return dynamic_cast<FacilityModel*>(new FakeRecipeReactor());
 }
@@ -158,4 +164,5 @@ TEST_F(RecipeReactorTest, Tock) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(RecipeReactor, FacilityModelTests, Values(&RecipeReactorConstructor));
+INSTANTIATE_TEST_CASE_P(RecipeReactor, ModelTests, Values(&RecipeReactorModelConstructor));
 

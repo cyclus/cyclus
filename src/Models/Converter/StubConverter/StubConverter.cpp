@@ -13,12 +13,7 @@
  * all MODEL classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubConverter::StubConverter() {};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubConverter::~StubConverter() {};
-    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubConverter::init(xmlNodePtr cur) { 
   ConverterModel::init(cur); 
@@ -45,9 +40,24 @@ void StubConverter::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Message* convert(Message* convMsg, Message* refMsg)
+Message* StubConverter::convert(Message* convMsg, Message* refMsg)
 {
   throw CycException("The StubConverter should not be used to convert things.");
 }
     
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
+extern "C" Model* constructStubConverter() {
+    return new StubConverter();
+}
+
+extern "C" void destructStubConverter(Model* p) {
+    delete p;
+}
+
+/* ------------------- */ 
+
 
