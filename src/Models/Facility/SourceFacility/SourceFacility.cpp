@@ -182,7 +182,7 @@ void SourceFacility::handleTock(int time){
   if (capacity_ * recipe_.mass() <= space) {
     // add a material the size of the capacity to the inventory
     IsoVector temp = recipe_;
-    temp.multMass(capacity_);
+    temp.multBy(capacity_);
     Material* newMat = new Material(temp);
 
     LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";

@@ -362,7 +362,7 @@ void IsoVector::setMass(int tope, double new_mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::multMass(double factor) {
+void IsoVector::multBy(double factor) {
   int isotope;
   map<int, double>::const_iterator iter = atom_comp_.begin();
   while (iter != atom_comp_.end()) {
@@ -602,6 +602,8 @@ void IsoVector::validateIsotopeNumber(int tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::isZero(int tope) {
+  validateIsotopeNumber(tope);
+
   int grams_per_kg = 1000;
   double atoms_eps = EPS_KG * grams_per_kg / MT->getMassInGrams(tope) ; 
 

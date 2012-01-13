@@ -167,7 +167,7 @@ public:
    Multiplies the total mass of the entire IsoVector by 'factor' maintaining
    isotopic ratios.
    */
-  void multMass(double factor);
+  void multBy(double factor);
 
   /*!
    returns the total atoms in this material object 
