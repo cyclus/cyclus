@@ -57,6 +57,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
   trans_ = thisTrans;
   sender_ = sender;
   recipient_ = receiver;
+  setResource(thisTrans.resource);
 
   if (trans_.is_offer) {
     // if this message is an offer, the sender is the supplier

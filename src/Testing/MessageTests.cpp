@@ -2,6 +2,8 @@
 
 #include "Communicator.h"
 #include "Message.h"
+#include "Resource.h"
+#include "GenericResource.h"
 #include "CycException.h"
 
 #include <string>
@@ -74,7 +76,7 @@ class TestCommunicator : public Communicator {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class MessageTest : public ::testing::Test {
+class MessagePassingTest : public ::testing::Test {
   protected:
     TestCommunicator* comm1;
     TestCommunicator* comm2;
@@ -102,7 +104,7 @@ class MessageTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessageTest, CleanThrough) {
+TEST_F(MessagePassingTest, CleanThrough) {
   ASSERT_NO_THROW(comm1->startMessage());
 
   vector<string> stops = comm1->msg_->dest_list_;
@@ -121,7 +123,7 @@ TEST_F(MessageTest, CleanThrough) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessageTest, PassBeyondOrigin) {
+TEST_F(MessagePassingTest, PassBeyondOrigin) {
   comm1->stop_at_return_ = false;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
@@ -142,7 +144,7 @@ TEST_F(MessageTest, PassBeyondOrigin) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessageTest, ForgetToSetDest) {
+TEST_F(MessagePassingTest, ForgetToSetDest) {
   comm3->forget_set_dest_ = true;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
@@ -159,7 +161,7 @@ TEST_F(MessageTest, ForgetToSetDest) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessageTest, SendToSelf) {
+TEST_F(MessagePassingTest, SendToSelf) {
   comm3->parent_ = comm3;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
@@ -176,7 +178,7 @@ TEST_F(MessageTest, SendToSelf) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessageTest, YoYo) {
+TEST_F(MessagePassingTest, YoYo) {
   comm2->flip_down_to_up_ = true;
 
   ASSERT_NO_THROW(comm1->startMessage());
@@ -202,5 +204,87 @@ TEST_F(MessageTest, YoYo) {
   EXPECT_EQ(stops[12], "comm3");
   EXPECT_EQ(stops[13], "comm2");
   EXPECT_EQ(stops[14], "comm1");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - -Message Public Interface Testing - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class MessagePublicInterfaceTest : public ::testing::Test {
+  protected:
+
+    Resource* resource;
+    double quantity1, quantity2;
+
+    TestCommunicator* comm1;
+    Message* msg1;
+
+    virtual void SetUp(){
+      quantity1 = 1.0;
+      quantity2 = 2.0;
+      resource = new GenericResource("kg", "bananas", quantity1);
+
+      comm1 = new TestCommunicator("comm1");
+      msg1 = new Message(comm1);
+    };
+
+    virtual void TearDown() {
+      delete msg1;
+      delete comm1;
+      delete resource;
+    }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - -Constructors and Cloning - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorOne) {
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorTwo) {
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MessagePublicInterfaceTest, Cloning) {
+  msg1->setResource(resource);
+  Message* msg2 = msg1->clone();
+
+  // check proper cloning of message members
+  EXPECT_EQ(msg1->getSender(), msg2->getSender());
+
+  // check proper cloning of message's resource
+  Resource* resource2 = msg2->getResource();
+  resource2->setQuantity(quantity2);
+
+  ASSERT_DOUBLE_EQ(msg2->getResource()->getQuantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->getResource()->getQuantity(), quantity2);
+  ASSERT_NE(resource, msg1->getResource());
+  ASSERT_NE(resource, resource2);
+
+  EXPECT_DOUBLE_EQ(resource->getQuantity(), quantity1);
+  EXPECT_DOUBLE_EQ(resource2->getQuantity(), quantity2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MessagePublicInterfaceTest, GetSetResource) {
+  ASSERT_DOUBLE_EQ(resource->getQuantity(), quantity1);
+
+  msg1->setResource(resource);
+
+  ASSERT_NE(resource, msg1->getResource());
+
+  msg1->getResource()->setQuantity(quantity2);
+
+  ASSERT_DOUBLE_EQ(resource->getQuantity(), quantity1);
+  ASSERT_DOUBLE_EQ(msg1->getResource()->getQuantity(), quantity2);
 }
 
