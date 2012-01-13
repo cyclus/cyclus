@@ -30,13 +30,6 @@ class IsoVectorTest : public ::testing::Test {
 
     CompMap comp_map;
 
-    // decay stuff
-    int u235, am241, th228, pb208;
-    IsoVector vect_decay1, vect_decay2;
-    long int u235_halflife;
-    int th228_halflife;
-    double vect_decay_size;
-
     virtual void SetUp() {
       double grams_per_kg = 1000;
       isotope_lower_limit = 1001;
@@ -81,21 +74,6 @@ class IsoVectorTest : public ::testing::Test {
       vect1.setMass(v1_e3, v1_m3);
 
       vect2 = CompMap(comp_map);
-
-      // decay stuff
-      u235 = 92235;
-      am241 = 95241;
-      th228 = 90228;
-      pb208 = 82208;
-      u235_halflife = 8445600000; // approximate, in months
-      th228_halflife = 2 * 11; // approximate, in months
-      vect_decay_size = 1.0;
-
-      vect_decay1.setAtomCount(u235, vect_decay_size);
-
-      vect_decay2.setAtomCount(u235, 1.0);
-      vect_decay2.setAtomCount(th228, 1.0);
-      vect_decay2.setAtomCount(vect_decay_size);
     }
 };
 
@@ -562,7 +540,38 @@ TEST_F(IsoVectorTest, IsZero) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(IsoVectorTest, Decay){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - Decay Testing - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+
+class IsoVectorDecayTest : public ::testing::Test {
+  protected:
+    int u235, am241, th228, pb208;
+    IsoVector vect_decay1, vect_decay2;
+    long int u235_halflife;
+    int th228_halflife;
+    double vect_decay_size;
+
+    virtual void SetUp() {
+      u235 = 92235;
+      am241 = 95241;
+      th228 = 90228;
+      pb208 = 82208;
+      u235_halflife = 8445600000; // approximate, in months
+      th228_halflife = 2 * 11; // approximate, in months
+      vect_decay_size = 1.0;
+
+      vect_decay1.setAtomCount(u235, vect_decay_size);
+
+      vect_decay2.setAtomCount(u235, 1.0);
+      vect_decay2.setAtomCount(th228, 1.0);
+      vect_decay2.setAtomCount(vect_decay_size);
+    }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorDecayTest, ExecuteDecay) {
   IsoVector::loadDecayInfo();
   ASSERT_NEAR(vect_decay1.atomCount(u235), 1.0, 0.001);
   ASSERT_NEAR(vect_decay2.atomCount(u235),  0.5, 0.001);
@@ -575,3 +584,19 @@ TEST_F(IsoVectorTest, Decay){
   EXPECT_NEAR(vect_decay2.atomCount(th228),  0.25, 0.01);
   EXPECT_NEAR(vect_decay2.atomCount(pb208),  0.25, 0.01);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorDecayTest, DISABLED_BuildDecayMatrix) {
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorDecayTest, DISABLED_CompositionAsVector) {
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(IsoVectorDecayTest, DISABLED_CopyVectorIntoComp) {
+
+}
+

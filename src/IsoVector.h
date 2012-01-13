@@ -209,6 +209,7 @@ public:
    */
   void executeDecay(double time_change);
 
+  /// Return the atomic (in moles) composition as a std::map<std::string, double>
   CompMap comp();
   
   /*!
@@ -220,33 +221,13 @@ public:
    */
   bool isZero(int tope);
 
-private:
+protected:
   /*!
    Builds the decay matrix needed for the decay calculations from the parent
    and daughters map variables.  The resulting matrix is stored in the static
    variable decayMatrix.
    */
   static void buildDecayMatrix();
-
-  /*!
-   Stores the next available material ID
-   */
-  static int nextID_;
-
-  /*!
-   
-   */
-  static ParentMap parent_; 
-  
-  /*!
-   
-   */
-  static DaughtersMap daughters_; 
-  
-  /*!
-   
-   */
-  static Matrix decayMatrix_; 
 
   /*!
    Returns a mathematical Vector representation of the Material's current
@@ -264,6 +245,18 @@ private:
    */
   void copyVectorIntoComp(const Vector & compVector);
 
+  static ParentMap parent_; 
+  
+  static DaughtersMap daughters_; 
+  
+  static Matrix decayMatrix_; 
+
+private:
+  /*!
+   Stores the next available material ID
+   */
+  static int nextID_;
+
   void validateComposition();
 
   /*!
@@ -277,11 +270,6 @@ private:
    Unique identifier.
    */
   int ID_;
-
-  /*!
-   total number of atoms in this material object PER UNIT
-   */
-  double total_atoms_;
 
   /*
    Core isotope composition information stored here.

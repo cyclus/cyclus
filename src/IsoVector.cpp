@@ -27,13 +27,11 @@ std::map<std::string, IsoVector*> IsoVector::recipes_;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
-  total_atoms_ = 0;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector(CompMap initial_comp) {
   ID_ = nextID_++;
-  total_atoms_ = 0;
   atom_comp_ = initial_comp;
 
   validateComposition();
