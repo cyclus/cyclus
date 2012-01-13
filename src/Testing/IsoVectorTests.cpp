@@ -584,18 +584,3 @@ TEST_F(IsoVectorDecayTest, ExecuteDecay) {
   EXPECT_NEAR(vect_decay2.atomCount(pb208),  0.25, 0.01);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(IsoVectorDecayTest, DISABLED_BuildDecayMatrix) {
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(IsoVectorDecayTest, DISABLED_CompositionAsVector) {
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(IsoVectorDecayTest, DISABLED_CopyVectorIntoComp) {
-
-}
-
