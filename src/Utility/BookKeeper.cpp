@@ -226,7 +226,7 @@ void BookKeeper::writeModelList() {
   const H5std_string output_name = "/output";
 
   std::string subgroup_name = "agents";
-  std::string dataset_name;
+  std::string dataset_name = "agentList";
   int numStructs, numModels;
 
   std::vector<Model*> model_list = Model::getModelList();
@@ -237,7 +237,7 @@ void BookKeeper::writeModelList() {
   } else {
     numStructs=numModels;
   }
-  
+
   // create an array of the model structs
   model_t modelList[numStructs];
   for (int i = 0; i < numModels; i++) {
