@@ -6,7 +6,6 @@
 #include "Message.h"
 #include "FacilityModelTests.h"
 #include "ModelTests.h"
-#include "TimeAgentTests.h"
 
 #include <string>
 #include <queue>
@@ -97,5 +96,4 @@ TEST_F(StubFacilityTest, Tock) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(StubFac, FacilityModelTests, Values(&StubFacilityConstructor));
 INSTANTIATE_TEST_CASE_P(StubFac, ModelTests, Values(&StubFacilityModelConstructor));
-INSTANTIATE_TEST_CASE_P(StubFac, TimeAgentTests, Values(&StubFacilityModelConstructor));
 
