@@ -9,7 +9,7 @@
 #include "InputXML.h"
 #include "MassTable.h"
 
-#include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
 #include <libxml/xpath.h>
@@ -594,7 +594,10 @@ void IsoVector::validateIsotopeNumber(int tope) {
   int upper_limit = 1182949;
 
   if (tope < lower_limit || tope > upper_limit) {
-    throw CycRangeException("Invalid isotope identifier.");
+    std::stringstream st;
+    st << tope;
+    std::string isotope = st.str();
+    throw CycRangeException("Isotope identifier '" + isotope + "' is not valid.");
   }
 }
 
