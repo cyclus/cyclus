@@ -23,23 +23,6 @@
 #define EPS_KG 1e-6
 
 /*!
- A map type to represent all of the parent isotopes tracked.  The key for
- this map type is the parent's Iso number, and the value is a pair that
- contains the corresponding decay matrix column and decay constant
- associated with that parent.
- */
-typedef std::map< int, std::pair<int, double> > ParentMap;
-
-/*!
- A map type to represent all of the daughter isotopes tracked.  The key for
- this map type is the decay matrix column associated with the parent, and the
- value is a vector of pairs of all the daughters for that parent. Each of the
- daughters are represented by a pair that contains the daughter's Iso number
- and its branching ratio.
- */
-typedef std::map<int, std::vector<std::pair<int, double> > > DaughtersMap;
-
-/*!
  map isotope (int) to atoms/mass (double)
  */
 typedef std::map<int, double> CompMap;
@@ -125,12 +108,6 @@ public:
    @return the mass number
    */
   static int getMassNum(int tope);
-
-  /*!
-   Reads the decay information found in the 'decayInfo.dat' file into the
-   parent and daughters maps.Uses these maps to create the decay matrix.
-   */
-  static void loadDecayInfo();
 
   /*!
    get material ID
@@ -221,37 +198,6 @@ public:
    */
   bool isZero(int tope);
 
-protected:
-  /*!
-   Builds the decay matrix needed for the decay calculations from the parent
-   and daughters map variables.  The resulting matrix is stored in the static
-   variable decayMatrix.
-   */
-  static void buildDecayMatrix();
-
-  /*!
-   Returns a mathematical Vector representation of the Material's current
-   composition map.
-   
-   @return the mathematical Vector 
-   */
-  Vector compositionAsVector();
-
-  /*!
-   Overwrites composition with data from the given Vector.
-   
-   @param compVector Vector of data that constitutes the new composition
-   
-   */
-  void copyVectorIntoComp(const Vector & compVector);
-
-  static ParentMap parent_; 
-  
-  static DaughtersMap daughters_; 
-  
-  static Matrix decayMatrix_; 
-
-private:
   /*!
    Stores the next available material ID
    */

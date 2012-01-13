@@ -275,6 +275,9 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - Getters and Setters - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 TEST_F(MessagePublicInterfaceTest, GetSetResource) {
   ASSERT_DOUBLE_EQ(resource->getQuantity(), quantity1);
 

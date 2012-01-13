@@ -572,7 +572,6 @@ class IsoVectorDecayTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(IsoVectorDecayTest, ExecuteDecay) {
-  IsoVector::loadDecayInfo();
   ASSERT_NEAR(vect_decay1.atomCount(u235), 1.0, 0.001);
   ASSERT_NEAR(vect_decay2.atomCount(u235),  0.5, 0.001);
   ASSERT_NEAR(vect_decay2.atomCount(th228), 0.5, 0.001);

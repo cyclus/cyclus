@@ -47,6 +47,7 @@ SET( CYCLUS_CORE
   Utility/UniformTaylor.cpp 
   Utility/Env.cpp
   Utility/Logger.cpp
+  Utility/DecayHandler.cpp
   Models/Model.cpp 
   Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 

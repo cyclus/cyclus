@@ -195,8 +195,6 @@ class Message {
    */
   void validateForSend();
   
- protected:
-    
   /**
      @brief stores the next available message (transaction) ID
   */
