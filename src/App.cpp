@@ -103,7 +103,6 @@ int main(int argc, char* argv[]) {
     BI->writeModelList();
     BI->writeTransList();
     BI->writeMatHist();
-    BI->writeRepoComponents();
 
     BI->closeDB();
   } catch (CycException ge) {
