@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include "boost/multi_array.hpp"
 #include "H5Cpp.h"
 #include "hdf5.h"
 
@@ -18,26 +17,6 @@
 #define NUMISOS 100
 
 using namespace H5;
-
-// homogeneous boost multidimensional arrays 
-typedef boost::multi_array<int, 1> intData1d;
-typedef intData1d::index int1didx;
-typedef boost::multi_array<int, 2> intData2d;
-typedef intData2d::index int2didx;
-typedef boost::multi_array<int, 3> intData3d;
-typedef intData3d::index int3didx;
-typedef boost::multi_array<double, 1> dblData1d;
-typedef dblData1d::index dbl1didx;
-typedef boost::multi_array<double, 2> dblData2d;
-typedef dblData2d::index dbl2didx;
-typedef boost::multi_array<double, 3> dblData3d;
-typedef dblData3d::index dbl3didx;
-typedef boost::multi_array<std::string, 1> strData1d;
-typedef strData1d::index str1didx;
-typedef boost::multi_array<std::string, 2> strData2d;
-typedef strData2d::index str2didx;
-typedef boost::multi_array<std::string, 3> strData3d;
-typedef strData3d::index str3didx;
 
 /**
    @brief
@@ -161,38 +140,6 @@ protected:
                                that time **/
   } mat_hist_t;
   
-  // generic repository component struct
-  typedef struct repo_component_t{
-    int ID;                 /**< 
-                               An integer indicating the model ID **/
-    char name[64];          /**< 
-                               A std::string indicating the name of the 
-                               template **/ 
-    char thermalModel[64];  /**< 
-                               A std::string indicating the thermal model 
-                               implementation **/
-    char nuclideModel[64];  /**< 
-                               A std::string indicating the nuclide model 
-                               implementation **/
-    int parentID;           /**< 
-                               An integer of the model's parent's ID **/
-    double innerRadius;     /**< 
-                               An integer of the component's inner radius **/
-    double outerRadius;     /**< 
-                               An integer of the model's parent's ID **/
-    double x;               /**< 
-                               The x component of the component placement 
-                               centroid. **/
-    double y;               /**< 
-                               The y component of the component placement 
-                               centroid. **/
-    double z;               /**< 
-                               The z component of the component placement 
-                               centroid. **/
-    int timestamp;          /**< 
-                               The time at which the component was emplaced **/
-  } repo_component_t;
-  
   /**
    * Stores the transactions that have taken place during the simulation.
    */
@@ -207,11 +154,6 @@ protected:
    * Stores the materials_ vector index of the last time a material registered
    */
   std::map<int, int> last_mat_idx_;
-
-  /**
-   * Stores the components of the generic repository 
-   */
-  std::vector<repo_component_t> repo_components_;
 
 public:
         
@@ -309,11 +251,6 @@ public:
    *
    */
   void writeModelList();
-
-  /**
-   * Write a list of the components in the generic repository if there is onen
-   */
-  void writeRepoComponents();
 
   /**
    * Given information from the set-up, write the model list

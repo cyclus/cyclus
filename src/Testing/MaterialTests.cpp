@@ -63,7 +63,9 @@ TEST_F(MaterialTest, Clone) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, DISABLED_Absorb) {
-
+  // make a number of materials masses 1, 2, and 10 
+  // see that two materials with the same composition double
+  // see that two with  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
