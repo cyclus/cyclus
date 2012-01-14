@@ -76,10 +76,9 @@ Message::Message(Communicator* sender, Communicator* receiver,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setRealParticipant(Communicator* who) {
-  try {
-    dynamic_cast<Model*>(who)->isTemplate() = false;
-  } catch(...) {
-  }
+  Model* model = NULL;
+  model = dynamic_cast<Model*>(who);
+  if (model != NULL) {model->isTemplate() = false;}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
