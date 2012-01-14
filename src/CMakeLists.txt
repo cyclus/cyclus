@@ -28,9 +28,9 @@ ENDIF()
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
   ${CYCLUS_SRC_DIR}/Models
-  ${CYCLUS_SRC_DIR}/Utility )
+  ${CYCLUS_SRC_DIR}/Utility
+  )
 
-INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
@@ -65,7 +65,7 @@ SET( CYCLUS_SRC
   App.cpp
   )
 
-set ( CMAKE_MODULE_PATH "${CMAKE_DIR}/share/cmake-2.8/Modules")
+set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 
 # Copy Data
@@ -107,7 +107,7 @@ INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 # Find the Teuchos library
-FIND_PACKAGE( Teuchos REQUIRED )
+FIND_PACKAGE( Teuchos REQUIRED PATHS ${FIND_TRILINOS_DIR} )
 # SET(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${Teuchos_PREFIX} )
 # Echo trilinos build info just for fun
 MESSAGE("\nFound Teuchos!  Here are the details: ")
@@ -119,12 +119,15 @@ MESSAGE("   Teuchos_LIBRARY_DIRS = ${Teuchos_LIBRARY_DIRS}")
 MESSAGE("   Teuchos_TPL_LIST = ${Teuchos_TPL_LIST}")
 MESSAGE("   Teuchos_TPL_LIBRARIES = ${Teuchos_TPL_LIBRARIES}")
 MESSAGE("   Teuchos_BUILD_SHARED_LIBS = ${Teuchos_BUILD_SHARED_LIBS}")
+MESSAGE("   CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 MESSAGE("End of Teuchos details\n")
 # Include the Teuchos Library
 SET(CMAKE_CXX_COMPILER ${Teuchos_CXX_COMPILER} )
 #SET(CMAKE_CXX_FLAGS  "${Teuchos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${Teuchos_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Teuchos_LIBRARIES} ${Teuchos_TPL_LIBRARIES})
+
+INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
