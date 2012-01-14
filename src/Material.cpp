@@ -35,24 +35,24 @@ Material::Material() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
   last_update_time_ = TI->getTime();
-  comp_ = comp;
+  iso_vector_ = comp;
   //BI->registerMatChange(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::absorb(Material* matToAdd) {
   // Get the given Material's composition.
-  comp_ = comp_ + matToAdd->comp();
+  iso_vector_ = iso_vector_ + matToAdd->isoVector();
 
   delete matToAdd;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extract(double mass) {
-  IsoVector new_comp = comp_;
+  IsoVector new_comp = iso_vector_;
   new_comp.setMass(mass);
 
-  comp_ = comp_ - new_comp;
+  iso_vector_ = iso_vector_ - new_comp;
   
   return new Material(new_comp);
   //BI->registerMatChange(this);
@@ -60,7 +60,7 @@ Material* Material::extract(double mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extract(IsoVector rem_comp) {
-  comp_ = comp_ - rem_comp;
+  iso_vector_ = iso_vector_ - rem_comp;
   return new Material(rem_comp);
   //BI->registerMatChange(this);
 }
@@ -81,10 +81,10 @@ bool Material::checkQuality(Resource* other){
 
   // Make sure the other is a material
   try{
-    IsoVector second_comp = dynamic_cast<Material*>(other)->comp();
+    IsoVector second_comp = dynamic_cast<Material*>(other)->isoVector();
     // We need to check the recipe, isotope by isotope
-    CompMap::const_iterator iso_iter = comp().comp().begin();
-    while (iso_iter != comp().comp().end()){
+    CompMap::const_iterator iso_iter = iso_vector_.comp().begin();
+    while (iso_iter != iso_vector_.comp().end()){
       if( second_comp.atomCount(iso_iter->first) != iso_iter->second){
         toRet = false;
         break;
@@ -136,7 +136,7 @@ void Material::decay() {
   int curr_time = TI->getTime();
   int delta_time = curr_time - last_update_time_;
   
-  comp_.executeDecay(delta_time);
+  iso_vector_.executeDecay(delta_time);
 
   last_update_time_ = curr_time;
 }

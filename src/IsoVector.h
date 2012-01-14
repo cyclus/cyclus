@@ -22,10 +22,34 @@
  */
 #define EPS_KG 1e-6
 
+/** An isotope's identification number
+ * The isotope ZAID number (Z A IDentiﬁcation) contains six digits ZZZAAA 
+ * ZZZ is the atomic number Z and AAA is the atomic mass number A.
+ * Thus  235 U has a ZAID number 092235 or simply 92235.
+ */
+typedef int Iso;
+
+/*!
+ A map type to represent all of the parent isotopes tracked.  The key for
+ this map type is the parent's Iso number, and the value is a pair that
+ contains the corresponding decay matrix column and decay constant
+ associated with that parent.
+ */
+typedef std::map< Iso, std::pair<int, double> > ParentMap;
+
+/*!
+ A map type to represent all of the daughter isotopes tracked.  The key for
+ this map type is the decay matrix column associated with the parent, and the
+ value is a vector of pairs of all the daughters for that parent. Each of the
+ daughters are represented by a pair that contains the daughter's Iso number
+ and its branching ratio.
+ */
+typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
+
 /*!
  map isotope (int) to atoms/mass (double)
  */
-typedef std::map<int, double> CompMap;
+typedef std::map<Iso, double> CompMap;
 
 /*! 
  Class Material the object used to transact material objects around the system.
@@ -99,7 +123,7 @@ public:
    @param tope the isotope whose atomic number is being returned
    @return the atomic number
    */
-  static int getAtomicNum(int tope);
+  static int getAtomicNum(Iso tope);
 
   /*!
    Returns the mass number of the isotope with the given identifier.
@@ -107,7 +131,7 @@ public:
    @param tope the isotope whose mass number is being returned
    @return the mass number
    */
-  static int getMassNum(int tope);
+  static int getMassNum(Iso tope);
 
   /*!
    get material ID
@@ -128,7 +152,7 @@ public:
    @param tope the isotope whose mass in the material will be returned
    @return the mass of the given isotope within the material, or zero
    */
-  double mass(int tope);
+  double mass(Iso tope);
 
   /*!
    Sets the total mass of the entire IsoVector maintaining isotopic ratios.
@@ -138,7 +162,7 @@ public:
   /*!
    Sets the mass of the specified isotope.
    */
-  void setMass(int tope, double new_mass);
+  void setMass(Iso tope, double new_mass);
 
   /*!
    Multiplies the total mass of the entire IsoVector by 'factor' maintaining
@@ -158,7 +182,7 @@ public:
    @param tope the isotope whose number density will be returned
    @return the number density of the given isotope, or zero
    */
-  double atomCount(int tope);
+  double atomCount(Iso tope);
 
   /*!
    Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
@@ -168,7 +192,7 @@ public:
   /*!
    Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
    */
-  void setAtomCount(int tope, double new_count);
+  void setAtomCount(Iso tope, double new_count);
 
   /*!
    Returns the mass of the given element in this Material.
@@ -196,8 +220,39 @@ public:
    @param tope the isotope in question
    @return true iff nd(tope) == 0
    */
-  bool isZero(int tope);
+  bool isZero(Iso tope);
 
+protected:
+  /*!
+   Builds the decay matrix needed for the decay calculations from the parent
+   and daughters map variables.  The resulting matrix is stored in the static
+   variable decayMatrix.
+   */
+  static void buildDecayMatrix();
+
+  /*!
+   Returns a mathematical Vector representation of the Material's current
+   composition map.
+   
+   @return the mathematical Vector 
+   */
+  Vector compositionAsVector();
+
+  /*!
+   Overwrites composition with data from the given Vector.
+   
+   @param compVector Vector of data that constitutes the new composition
+   
+   */
+  void copyVectorIntoComp(const Vector & compVector);
+
+  static ParentMap parent_; 
+  
+  static DaughtersMap daughters_; 
+  
+  static Matrix decayMatrix_; 
+
+private:
   /*!
    Stores the next available material ID
    */
@@ -210,7 +265,7 @@ public:
    @param tope isotope identifier
    @exception thrown if isotope identifier is invalid
    */
-  static void validateIsotopeNumber(int tope);
+  static void validateIsotopeNumber(Iso tope);
 
   /*! 
    Unique identifier.

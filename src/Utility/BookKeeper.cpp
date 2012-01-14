@@ -160,7 +160,7 @@ void BookKeeper::registerMatChange(Material* mat){
   toRegister.materialID = mat->ID(); 
   /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
   toRegister.timestamp = TI->getTime();
-  CompMap comp = mat->comp().comp();
+  CompMap comp = (mat->isoVector()).comp();
   CompMap::const_iterator it = comp.begin();
   int i=0;
   for(it=comp.begin(); it != comp.end(); it++){
