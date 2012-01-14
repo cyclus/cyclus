@@ -367,21 +367,21 @@ void EnrichmentFacility::enrich() {
     Message* mess = (curr->second).first;
     Material* mat = (curr->second).second;
 
-    IsoVector mat_iso, compToMake;
-    mat_iso = mat->comp();
+    IsoVector mat_iso, vecToMake;
+    mat_iso = mat->isoVector();
 
     // Find out what we're trying to make.
     //
     try {
-      compToMake = dynamic_cast<Material*>(mess->getResource())->comp();
+      vecToMake = dynamic_cast<Material*>(mess->getResource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
     }
 
     // Do the enrichment math.
-    double P = compToMake.eltMass(92);
-    double xp = compToMake.mass(922350) / P;
+    double P = vecToMake.eltMass(92);
+    double xp = vecToMake.mass(922350) / P;
     double F = mat_iso.eltMass(92);
     double xf = mat_iso.mass(922350) / F;
     double W = F - P;

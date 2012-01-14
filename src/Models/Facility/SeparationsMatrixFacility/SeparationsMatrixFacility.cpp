@@ -450,7 +450,7 @@ void SeparationsMatrixFacility::separate()
 
     // Find out what we're trying to make.
     try {
-      IsoVector compToMake =  dynamic_cast<Material*>(mess->getResource())->comp();
+      IsoVector vecToMake =  dynamic_cast<Material*>(mess->getResource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;

@@ -125,12 +125,12 @@ public:
    * matter (dis)appear and should only be used on objects that are not part of
    * any actual tracked inventory.
    */
-  void setQuantity(double quantity) {comp_.setMass(quantity);};
+  void setQuantity(double quantity) {iso_vector_.setMass(quantity);};
 
   /**
    * Resource class method
    */
-  double getQuantity(){return comp_.mass();};
+  double getQuantity(){return iso_vector_.mass();};
 
   /**
    * Resource class method
@@ -215,7 +215,7 @@ public:
   /*!
   Returns a copy of this material's isotopic composition
   */
-  IsoVector comp() {return comp_;}
+  IsoVector isoVector() {return iso_vector_;}
 
   /**
    * Decays all of the materials if decay is on
@@ -234,7 +234,7 @@ public:
 protected:
 
   /// all isotopic details of this material object
-  IsoVector comp_;
+  IsoVector iso_vector_;
 
   /// last time this material object's state was accurate (e.g. time of last
   /// decay, etc.)

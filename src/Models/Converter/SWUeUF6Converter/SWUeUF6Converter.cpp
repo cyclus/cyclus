@@ -71,7 +71,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   double xw;
   double SWUs;
   double massProdU;
-  IsoVector comp;
+  IsoVector iso_vector;
 
 
   // determine which direction we're converting
@@ -84,7 +84,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     SWUs = convMsg->getResource()->getQuantity();
     try {
       mat = dynamic_cast<Material*>(refMsg->getResource());
-      comp = mat->comp();
+      iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
                     Material type resource.";
@@ -98,7 +98,7 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     }
     try{
       mat = dynamic_cast<Material*>(convMsg->getResource());
-      comp = mat->comp();
+      iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
                     Material type resource.";
@@ -107,8 +107,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   }
   
   // Figure out xp the enrichment of the UF6 object
-  P = comp.eltMass(92);
-  xp = comp.mass(922350) / P; 
+  P = iso_vector.eltMass(92);
+  xp = iso_vector.mass(922350) / P; 
 
   // Figure out xf, the enrichment of the feed material
   // xf = castEnr->getFeedFrac();
@@ -127,8 +127,8 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   SWUs = massProdU*(term1 + term2 - term3);
 
   if (out_commod_ == "eUF6"){
-    comp.setMass(massProdU);
-    mat = new Material(comp);
+    iso_vector.setMass(massProdU);
+    mat = new Material(iso_vector);
     toRet = convMsg->clone();
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {
