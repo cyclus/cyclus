@@ -58,6 +58,7 @@ void Model::create(std::string model_type, xmlNodePtr cur) {
   mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
 
   Model* model = model_constructor();
+  //model->isTemplate() = true;
 
   model->init(cur);
 }
@@ -183,12 +184,20 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+  is_template_ = false;
   ID_ = ++next_id_;
   model_list_.push_back(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model::~Model() {};
+Model::~Model() {
+  for (int i = 0; i < model_list_.size(); i++) {
+    if (model_list_[i] == this) {
+      model_list_.erase(model_list_.begin() + i);
+      break;
+    }
+  }
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
