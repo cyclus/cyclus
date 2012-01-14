@@ -152,14 +152,15 @@ void BookKeeper::printTrans(trans_t trans){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerMatChange(Material* mat){
+void BookKeeper::registerMatState(int trans_id, Material* mat){
   mat_hist_t toRegister;
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);
 
   double total = mat->getQuantity();
   toRegister.materialID = mat->ID(); 
-  /// @todo allow registerMaterialChange for arbitrary timestamp (katyhuff).
+  toRegister.transID = trans_id; 
+  /// @todo allow registerMaterialState for arbitrary timestamp (katyhuff).
   toRegister.timestamp = TI->getTime();
   CompMap comp = (mat->isoVector()).comp();
   CompMap::const_iterator it = comp.begin();
@@ -169,25 +170,8 @@ void BookKeeper::registerMatChange(Material* mat){
     toRegister.comp[i] = (it->second)*(total);
     i++;
   }
-  // if this material has registered 
-  if (last_mat_idx_.find(toRegister.materialID)!=last_mat_idx_.end()){
-    // in this timestamp
-    if ((materials_[last_mat_idx_[toRegister.materialID]]).timestamp == toRegister.timestamp){
-      //replace the entry.
-      materials_.at(last_mat_idx_[toRegister.materialID])=toRegister;
-      // the index of the last registeration stays the same
-    } else {
-      // if it's registered in some other timestamp, register the material 
-      materials_.push_back(toRegister);
-      // set the new last registeration index for this material 
-      last_mat_idx_[toRegister.materialID]= (materials_.size()-1);
-    }
-  }else{
-    // if it's never been registed, register the material anew
-    materials_.push_back(toRegister);
-    // set the index of the newly registered material
-    last_mat_idx_[toRegister.materialID] = (materials_.size()-1);
-  }
+  // if it's registered in some other timestamp, register the material 
+  materials_.push_back(toRegister);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,63 +200,53 @@ void BookKeeper::registerRepoComponent(int ID, std::string name,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeModelList() {
+  H5std_string ID_memb = "ID";
+  H5std_string name_memb = "name";
+  H5std_string modelImpl_memb = "modelImpl";
+  H5std_string parentID_memb = "parentID";
+  H5std_string bornOn_memb = "bornOn";
+  H5std_string diedOn_memb = "diedOn";
+  H5std_string output_name = "/output";
 
   // define some useful variables.
-  const H5std_string ID_memb = "ID";
-  const H5std_string name_memb = "name";
-  const H5std_string modelImpl_memb = "modelImpl";
-  const H5std_string parentID_memb = "parentID";
-  const H5std_string bornOn_memb = "bornOn";
-  const H5std_string diedOn_memb = "diedOn";
-  const H5std_string output_name = "/output";
-
   std::string subgroup_name = "agents";
   std::string dataset_name = "agentList";
-  int numStructs, numModels;
 
   std::vector<Model*> model_list = Model::getModelList();
+  std::vector<Model*> short_list;
   
-  numModels = 0;
+  // store in short_list non-template Model* only
   for (int i = 0; i < model_list.size(); i++) {
     Model* theModel = model_list.at(i);
     if (!theModel->isTemplate()) {
-      numModels++;
+      short_list.push_back(theModel);
     }
   }
 
-  if (numModels==0) {
-    numStructs=1;
+  // create an array of the model structs
+  int numStructs = std::max(1, (int)short_list.size());
+  model_t modelList[numStructs];
+  if (short_list.size() == 0) {
+    modelList[0].ID = 0;
+    strcpy(modelList[0].modelImpl, "");
+    strcpy(modelList[0].name, ""); 
   } else {
-    numStructs=numModels;
+    for (int i = 0; i < short_list.size(); i++) {
+      Model* theModel = short_list.at(i);
+
+      modelList[i].ID = theModel->ID();
+      modelList[i].parentID = theModel->parentID();
+      modelList[i].bornOn = theModel->bornOn();
+      modelList[i].diedOn = theModel->diedOn();
+      strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
+      strcpy(modelList[i].name, theModel->name().c_str()); 
+    }
   }
 
-  // create an array of the model structs
-  model_t modelList[numStructs];
-  int count = 0;
-  for (int i = 0; i < model_list.size(); i++) {
-    Model* theModel = model_list.at(i);
-    if (theModel->isTemplate()) {continue;}
-    modelList[count].ID = theModel->ID();
-    modelList[count].parentID = theModel->parentID();
-    modelList[count].bornOn = theModel->bornOn();
-    modelList[count].diedOn = theModel->diedOn();
-    strcpy(modelList[count].modelImpl, theModel->getModelImpl().c_str());
-    strcpy(modelList[count].name, theModel->name().c_str()); 
-    count++;
-  };
-
-  if(numModels==0) {
-    std::string str1="";
-    std::string str2="";
-    modelList[0].ID=0;
-    strcpy(modelList[0].modelImpl, str1.c_str());
-    strcpy(modelList[0].name, str2.c_str()); 
-  };
-
-  model_t *pModelList = modelList;
+  model_t* pModelList = modelList;
   doModelWrite(ID_memb, name_memb, modelImpl_memb, parentID_memb, 
 	       bornOn_memb, diedOn_memb, output_name, subgroup_name, 
-	       dataset_name, numStructs, numModels, pModelList);
+	       dataset_name, numStructs, short_list.size(), pModelList);
 }
 
 void BookKeeper::doModelWrite(H5std_string ID_memb,
@@ -454,6 +428,7 @@ void BookKeeper::writeMatHist(){
 
   // define some useful variables.
   const H5std_string materialID_memb = "materialID";
+  const H5std_string transID_memb = "transID";
   const H5std_string timestamp_memb = "timestamp";
   const H5std_string iso_memb = "iso";
   const H5std_string comp_memb = "comp";
@@ -475,6 +450,7 @@ void BookKeeper::writeMatHist(){
   size_t arrdoublelen = sizeof(double[NUMISOS]);
   for (int i=0; i<numHists; i++){
     matHist[i].materialID = materials_[i].materialID;
+    matHist[i].transID = materials_[i].transID;
     matHist[i].timestamp = materials_[i].timestamp;
     memcpy(matHist[i].iso, materials_[i].iso, arrintlen);
     memcpy(matHist[i].comp, materials_[i].comp, arrdoublelen);
@@ -482,6 +458,7 @@ void BookKeeper::writeMatHist(){
   // If there are no materials, make a null entry
   if(numHists==0){
     matHist[0].materialID=0;
+    matHist[0].transID=0;
     matHist[0].timestamp=0;
     fill_n(matHist[0].iso, NUMISOS, 0);
     fill_n(matHist[0].comp, NUMISOS, 0.0);
@@ -521,6 +498,7 @@ void BookKeeper::writeMatHist(){
   // Create a datatype for models based on the struct
   CompType mtype( sizeof(mat_hist_t) );
   mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
+  mtype.insertMember( transID_memb, HOFFSET(mat_hist_t, transID), PredType::NATIVE_INT); 
   mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
   mtype.insertMember( iso_memb, HOFFSET(mat_hist_t, iso), arrinttype); 
   mtype.insertMember( comp_memb, HOFFSET(mat_hist_t, comp), arrdoubletype); 

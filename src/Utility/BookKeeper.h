@@ -150,6 +150,8 @@ protected:
   typedef struct mat_hist_t{
     int materialID;         /**< 
                                An integer indicating the material object ID **/
+    int transID;         /**< 
+                               An integer indicating the associated transaction ID **/
     int timestamp;          /**< 
                                An integer indicating the timestamp **/
     int iso[NUMISOS];       /**< 
@@ -285,11 +287,12 @@ public:
   void registerTrans(Message* msg, std::vector<Resource*> manifest);
 
   /**
-   * Register the materialin the BookKeeper's map of material changes
+   * Register the material in the BookKeeper's map of material changes
    *
+   * @param trans_id the transaction ID associated with this material state
    * @param mat the material with a history
    */
-  void registerMatChange(Material* mat);
+  void registerMatState(int trans_id, Material* mat);
 
   /**
    * Register the materialin the BookKeeper's map of material changes

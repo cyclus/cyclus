@@ -29,14 +29,15 @@ int Material::decay_interval_ = 1;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
+  ID_ = nextID_++;
   last_update_time_ = TI->getTime();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
+  ID_ = nextID_++;
   last_update_time_ = TI->getTime();
   iso_vector_ = comp;
-  //BI->registerMatChange(this);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

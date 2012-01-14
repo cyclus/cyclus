@@ -214,6 +214,12 @@ void Message::approveTransfer() {
 
   BI->registerTrans(this, manifest);
 
+  for (int i = 0; i < manifest.size(); i++) {
+    try {
+      BI->registerMatState(getTrans().ID, dynamic_cast<Material*>(manifest.at(i)));
+    } catch (...) {}
+  }
+
   LOG(LEV_DEBUG2) << "Material sent from " << supplier->ID() << " to " 
                   << requester->ID() << ".";
 }
