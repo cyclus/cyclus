@@ -194,6 +194,9 @@ class Message {
    *
    */
   void validateForSend();
+
+  /// mark a Model* as a participating sim agent (not a template)
+  void setRealParticipant(Communicator* who);
   
   /**
      @brief stores the next available message (transaction) ID
