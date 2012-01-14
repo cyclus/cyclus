@@ -32,6 +32,8 @@ Message::Message(Communicator* sender) {
   trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
+
+  setRealParticipant(sender);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,6 +49,8 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   trans_.resource = NULL;
   trans_.minfrac = 0;
   trans_.price = 0;
+
+  setRealParticipant(sender);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,6 +69,16 @@ Message::Message(Communicator* sender, Communicator* receiver,
   } else if (!trans_.is_offer) {
     // if this message is a request, the sender is the requester
     setRequester(dynamic_cast<Model*>(sender_));
+  }
+
+  setRealParticipant(sender);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setRealParticipant(Communicator* who) {
+  try {
+    dynamic_cast<Model*>(who)->isTemplate() = false;
+  } catch(...) {
   }
 }
 
@@ -93,6 +107,8 @@ void Message::sendOn() {
   }
 
   Communicator* next_stop = path_stack_.back();
+
+  setRealParticipant(next_stop);
 
   current_owner_ = next_stop;
   next_stop->receiveMessage(this);

@@ -58,7 +58,6 @@ void Model::create(std::string model_type, xmlNodePtr cur) {
   mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
 
   Model* model = model_constructor();
-  //model->isTemplate() = true;
 
   model->init(cur);
 }
@@ -162,6 +161,7 @@ void Model::load_institutions() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+  LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   handle_ = this->generateHandle();
   this->setBornOn( TI->getTime() );
@@ -184,7 +184,7 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
-  is_template_ = false;
+  is_template_ = true;
   ID_ = ++next_id_;
   model_list_.push_back(this);
 }
