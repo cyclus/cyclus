@@ -281,6 +281,8 @@ public:
   */ 
   virtual void addResource(Transaction trans,
                               std::vector<Resource*> manifest);
+
+  bool& isTemplate() {return is_template_;}
   
   
 private:
@@ -352,6 +354,8 @@ private:
    * every instance of a model will have a serialized ID
    */
   int ID_;
+
+  bool is_template_;
 
 };
 

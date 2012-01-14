@@ -19,6 +19,7 @@
 #include "Material.h"
 #include "Message.h"
 #include "Model.h"
+#include "Logger.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
 
@@ -231,7 +232,14 @@ void BookKeeper::writeModelList() {
 
   std::vector<Model*> model_list = Model::getModelList();
   
-  numModels = model_list.size();
+  numModels = 0;
+  for (int i = 0; i < model_list.size(); i++) {
+    Model* theModel = model_list.at(i);
+    if (!theModel->isTemplate()) {
+      numModels++;
+    }
+  }
+
   if (numModels==0) {
     numStructs=1;
   } else {
@@ -240,16 +248,19 @@ void BookKeeper::writeModelList() {
 
   // create an array of the model structs
   model_t modelList[numStructs];
-  for (int i = 0; i < numModels; i++) {
+  int count = 0;
+  for (int i = 0; i < model_list.size(); i++) {
     Model* theModel = model_list.at(i);
-    modelList[i].ID = theModel->ID();
-    modelList[i].parentID = theModel->parentID();
-    modelList[i].bornOn = theModel->bornOn();
-    modelList[i].diedOn = theModel->diedOn();
-    strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
-    strcpy(modelList[i].name, theModel->name().c_str()); 
-    i++;
+    if (theModel->isTemplate()) {continue;}
+    modelList[count].ID = theModel->ID();
+    modelList[count].parentID = theModel->parentID();
+    modelList[count].bornOn = theModel->bornOn();
+    modelList[count].diedOn = theModel->diedOn();
+    strcpy(modelList[count].modelImpl, theModel->getModelImpl().c_str());
+    strcpy(modelList[count].name, theModel->name().c_str()); 
+    count++;
   };
+
   if(numModels==0) {
     std::string str1="";
     std::string str2="";
