@@ -2,6 +2,7 @@
 #if !defined(_CONDITIONINGFACILITY_H)
 #define _CONDITIONINGFACILITY_H
 
+#include "boost/multi_array.hpp"
 #include <iostream>
 #include "Logger.h"
 #include <queue>
