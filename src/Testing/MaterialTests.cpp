@@ -3,41 +3,41 @@
 #include "Material.h"
 #include "IsoVector.h"
 #include "Timer.h"
+#include "CycException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
   protected:
     Iso u235_, am241_, th228_, pb208_;
     int one_mol_; // atoms
-    CompMap test_comp_, decay_comp;
+    CompMap test_comp_, diff_comp;
     double test_size_;
     Material* test_mat_;
-    Material* decay_mat_;
+    Material* diff_mat_;
     long int u235_halflife_;
     int th228_halflife_;
 
     virtual void SetUp(){
-      test_mat_ = new Material(test_comp_);
       u235_ = 92235;
       am241_ = 95241;
       th228_ = 90228;
       pb208_ = 82208;
       one_mol_ = 1.0;
       test_comp_[u235_]=one_mol_;
-      decay_comp[u235_]=one_mol_;
-      decay_comp[th228_]=one_mol_;
+      diff_comp[pb208_]=one_mol_;
+      diff_comp[am241_]=one_mol_;
       test_size_ = 10.0;
       u235_halflife_ = 8445600000; // approximate, in months
       th228_halflife_ = 2*11; // approximate, in months
       int time_ = TI->getTime();
 
       test_mat_ = new Material(test_comp_);
-      decay_mat_ = new Material(decay_comp);
+      diff_mat_ = new Material(diff_comp);
     }
 
     virtual void TearDown(){
       delete test_mat_;
-      delete decay_mat_;
+      delete diff_mat_;
     }
 };
 
@@ -62,21 +62,116 @@ TEST_F(MaterialTest, Clone) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, DISABLED_Absorb) {
+TEST_F(MaterialTest, AbsorbLikeMaterial) {
   // make a number of materials masses 1, 2, and 10 
-  // see that two materials with the same composition double
-  // see that two with  
+  CompMap two_test_comp, ten_test_comp, pu_test_comp;
+  Material* one_test_mat;
+  Material* two_test_mat;
+  Material* ten_test_mat;
+  one_test_mat = new Material(test_comp_);
+
+  CompMap::iterator it;
+  for(it=test_comp_.begin(); it!=test_comp_.end(); it++){
+    two_test_comp[it->first]=2*(it->second);
+    ten_test_comp[it->first]=10*(it->second);
+  }
+  two_test_mat = new Material(two_test_comp);
+  ten_test_mat = new Material(ten_test_comp);
+
+  // see that two materials with the same composition do the right thing
+  double orig = test_mat_->getQuantity();
+  EXPECT_NO_THROW(test_mat_->absorb(one_test_mat));
+  ASSERT_FLOAT_EQ(test_mat_->getQuantity(),2*orig );
+  EXPECT_NO_THROW(test_mat_->absorb(two_test_mat));
+  ASSERT_FLOAT_EQ(test_mat_->getQuantity(),4*orig );
+  EXPECT_NO_THROW(test_mat_->absorb(ten_test_mat));
+  ASSERT_FLOAT_EQ(test_mat_->getQuantity(),14*orig );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, DISABLED_ManualConstructor) {
+TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
+  // make a number of materials masses 1, 2, and 10 
+  Material* same_as_orig_test_mat = new Material(test_comp_);
+
+  CompMap diff_test_comp;
+  diff_test_comp[pb208_]=1.0;
+  diff_test_comp[am241_]=1.0;
+  diff_test_comp[th228_]=1.0;
+  Material* diff_test_mat=new Material(diff_test_comp);
+
+  double orig = test_mat_->getQuantity();
+  double origdiff = diff_test_mat->getQuantity();
+
+  // see that materials with different compositions do the right thing
+  EXPECT_NO_THROW(test_mat_->absorb(diff_test_mat));
+  ASSERT_FLOAT_EQ(orig+origdiff, test_mat_->getQuantity() );
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, DISABLED_ChangeComp) {
+TEST_F(MaterialTest, ExtractLikeVector) {
+  // make a number of materials masses 1, 2, and 10 
+  CompMap two_test_comp, ten_test_comp, pu_test_comp;
+  Material* one_test_mat;
+  Material* two_test_mat;
+  Material* ten_test_mat;
+  one_test_mat = new Material(test_comp_);
+
+  CompMap::iterator it;
+  for(it=test_comp_.begin(); it!=test_comp_.end(); it++){
+    two_test_comp[it->first]=2*(it->second);
+    ten_test_comp[it->first]=10*(it->second);
+  }
+  two_test_mat = new Material(two_test_comp);
+  ten_test_mat = new Material(ten_test_comp);
+
+  // see that two materials with the same composition do the right thing
+  double orig = test_mat_->getQuantity();
+  EXPECT_NO_THROW(test_mat_->extract(test_comp_));
+  ASSERT_FLOAT_EQ(test_mat_->getQuantity(), 0 );
+  EXPECT_NO_THROW(ten_test_mat->extract(two_test_comp));
+  ASSERT_FLOAT_EQ(ten_test_mat->getQuantity(),8*orig );
+  EXPECT_THROW(two_test_mat->extract(ten_test_comp), CycException);
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, DISABLED_Decay){
+TEST_F(MaterialTest, ExtractUnLikeVector) {
+  Material* same_as_orig_test_mat = new Material(test_comp_);
+  CompMap half_test_comp, quarter_test_comp;
+  half_test_comp[u235_]=.5;
+  quarter_test_comp[u235_]=.25;
+
+  double orig = test_mat_->getQuantity();
+
+  // see that materials with different compositions do the right thing
+  EXPECT_NO_THROW(test_mat_->extract(half_test_comp));
+  ASSERT_FLOAT_EQ(0.5*orig, test_mat_->getQuantity() );
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  ASSERT_GT(same_as_orig_test_mat->getQuantity(), test_mat_->getQuantity());
+  
+  EXPECT_NO_THROW(test_mat_->extract(quarter_test_comp));
+  ASSERT_FLOAT_EQ(0.25*orig, test_mat_->getQuantity() );
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  ASSERT_GT(same_as_orig_test_mat->getQuantity(), test_mat_->getQuantity());
+
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, ExtractMass) {
+  // make a number of materials masses 1, 2, and 10 
+  double mass_to_rem = 0.25*(diff_mat_->getQuantity());
+  double mass_remaining = 0.75*(diff_mat_->getQuantity());
+  IsoVector* orig = new IsoVector(diff_comp);
+  double am_orig = orig->mass(am241_);
+  double pb_orig= orig->mass(pb208_);
+
+  // see that two materials with the same composition do the right thing
+  EXPECT_NO_THROW(diff_mat_->extract(mass_to_rem));
+  ASSERT_FLOAT_EQ(diff_mat_->getQuantity(), mass_remaining );
+  IsoVector remaining = diff_mat_->isoVector();
+  double am_remaining = remaining.mass(am241_);
+  double pb_remaining = remaining.mass(pb208_);
+  ASSERT_FLOAT_EQ(am_remaining/pb_remaining, am_orig/pb_orig);
 }

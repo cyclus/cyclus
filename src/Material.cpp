@@ -43,7 +43,8 @@ Material::Material(IsoVector comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::absorb(Material* matToAdd) {
   // Get the given Material's composition.
-  iso_vector_ = iso_vector_ + matToAdd->isoVector();
+  IsoVector vec_to_add = matToAdd->isoVector();
+  iso_vector_ = iso_vector_ + vec_to_add;
 
   delete matToAdd;
 }
@@ -77,21 +78,14 @@ Material* Material::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuality(Resource* other){
-  // This will be true until proven false
-  bool toRet = true;
+  // This will be false until proven true
+  bool toRet = false;
+  IsoVector lhs_vec = iso_vector_;
 
-  // Make sure the other is a material
   try{
-    IsoVector second_comp = dynamic_cast<Material*>(other)->isoVector();
-    // We need to check the recipe, isotope by isotope
-    CompMap::const_iterator iso_iter = iso_vector_.comp().begin();
-    while (iso_iter != iso_vector_.comp().end()){
-      if( second_comp.atomCount(iso_iter->first) != iso_iter->second){
-        toRet = false;
-        break;
-      }
-      iso_iter++;
-    }
+    // Make sure the other is a material
+    IsoVector rhs_vec = dynamic_cast<Material*>(other)->isoVector();
+    toRet = (lhs_vec==rhs_vec);
   } catch (Exception& e) {
     toRet = false;
   }
@@ -101,17 +95,16 @@ bool Material::checkQuality(Resource* other){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuantityEqual(Resource* other){
-  // This will be true until proven false
+  // This will be false until proven true
   bool toRet = false;
 
   // Make sure the other is a material
   try{
     // check mass values
     double second_qty = dynamic_cast<Material*>(other)->getQuantity();
-    toRet = getQuantity() - second_qty < EPS_KG;
+    toRet=( abs(getQuantity() - second_qty) < EPS_KG);
   } catch (Exception& e) {
   }
-
   return toRet;
 }
 
