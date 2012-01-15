@@ -22,6 +22,8 @@
 #include "Logger.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
+int BookKeeper::next_comp_entry_id_ = 0;
+  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper* BookKeeper::Instance() {
@@ -400,9 +402,62 @@ void BookKeeper::writeTransList(){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeMatComps(Group* subgroup){
+
+  // define some useful variables.
+  const H5std_string entryID_memb = "entryID";
+  const H5std_string stateID_memb = "stateID";
+  const H5std_string iso_memb = "iso";
+  const H5std_string comp_memb = "comp";
+
+  const H5std_string output_name = "/output";
+  const H5std_string subgroup_name = "materials";
+  const H5std_string dataset_name = "compositions";
+
+  // create an array of the model structs
+  comp_entry_t comp_entries[(int)comp_entries_.size()];
+  for (int i = 0; i < comp_entries_.size(); i++) {
+    comp_entries[i].entryID = comp_entries_.at(i).entryID;
+    comp_entries[i].stateID = comp_entries_.at(i).stateID;
+    comp_entries[i].iso = comp_entries_.at(i).iso;
+    comp_entries[i].comp = comp_entries_.at(i).comp;
+  }
+
+  // Create a datatype for models based on the struct
+  CompType mtype( sizeof(comp_entry_t) );
+  mtype.insertMember( entryID_memb, HOFFSET(comp_entry_t, entryID), PredType::NATIVE_INT); 
+  mtype.insertMember( stateID_memb, HOFFSET(comp_entry_t, stateID), PredType::NATIVE_INT); 
+  mtype.insertMember( iso_memb, HOFFSET(comp_entry_t, iso), PredType::NATIVE_INT); 
+  mtype.insertMember( comp_memb, HOFFSET(comp_entry_t, comp), PredType::NATIVE_DOUBLE); 
+
+  // Open the file and the dataset.
+  this->openDB();
+
+  // describe the data in an hdf5-y way
+  hsize_t dim[] = {(int)comp_entries_.size()};
+
+  // if there's only one model, the dataspace is a vector, which  
+  // hdf5 doesn't like to think of as a matrix 
+  int rank = 1;
+
+  DataSpace* dataspace;
+  dataspace = new DataSpace( rank, dim );
+
+  DataSet* dataset;
+  dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
+
+  // write it, finally 
+  dataset->write( comp_entries , mtype );
+
+  delete dataspace;
+  delete dataset;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeMatHist(){
 
   // define some useful variables.
+  const H5std_string stateID_memb = "stateID";
   const H5std_string materialID_memb = "materialID";
   const H5std_string transID_memb = "transID";
   const H5std_string timestamp_memb = "timestamp";
@@ -410,7 +465,7 @@ void BookKeeper::writeMatHist(){
   const H5std_string comp_memb = "comp";
   const H5std_string output_name = "/output";
   const H5std_string subgroup_name = "materials";
-  const H5std_string dataset_name = "matHist";
+  const H5std_string dataset_name = "material_states";
 
   int numHists = materials_.size();
 
@@ -422,41 +477,12 @@ void BookKeeper::writeMatHist(){
 
   // create an array of the model structs
   mat_hist_t matHist[numStructs];
-  size_t arrintlen = sizeof(int[NUMISOS]);
-  size_t arrdoublelen = sizeof(double[NUMISOS]);
-  for (int i=0; i<numHists; i++){
-    matHist[i].materialID = materials_[i].materialID;
-    matHist[i].transID = materials_[i].transID;
-    matHist[i].timestamp = materials_[i].timestamp;
-    memcpy(matHist[i].iso, materials_[i].iso, arrintlen);
-    memcpy(matHist[i].comp, materials_[i].comp, arrdoublelen);
-  };
-  // If there are no materials, make a null entry
-  if(numHists==0){
-    matHist[0].materialID=0;
-    matHist[0].transID=0;
-    matHist[0].timestamp=0;
-    fill_n(matHist[0].iso, NUMISOS, 0);
-    fill_n(matHist[0].comp, NUMISOS, 0.0);
-  };
-
-  //try{
-  // Turn off the auto-printing when failure occurs so that we can
-  // handle the errors appropriately
-  //Exception::dontPrint();
-
-  // Open the file and the dataset.
-  this->openDB();
 
   // describe the data in an hdf5-y way
   hsize_t dim[] = {numStructs};
   // if there's only one model, the dataspace is a vector, which  
   // hdf5 doesn't like to think of as a matrix 
-  int rank;
-  if(numHists <= 1)
-    rank = 1;
-  else
-    rank = 1;
+  int rank = 1;
 
   Group* outputgroup;
   outputgroup = new Group(this->getDB()->openGroup(output_name));
@@ -465,19 +491,47 @@ void BookKeeper::writeMatHist(){
   DataSpace* dataspace;
   dataspace = new DataSpace( rank, dim );
 
+  int numComps = NUMISOS;
+  for (int i=0; i<numHists; i++){
+    matHist[i].stateID = i;
+    matHist[i].materialID = materials_[i].materialID;
+    matHist[i].transID = materials_[i].transID;
+    matHist[i].timestamp = materials_[i].timestamp;
+
+    comp_entry_t comp_entry;
+    for (int j = 0; j < numComps; j++) {
+      comp_entry.entryID = next_comp_entry_id_++;
+      comp_entry.stateID = i;
+      comp_entry.iso = materials_[i].iso[j];
+      comp_entry.comp = materials_[i].comp[j];
+
+      comp_entries_.push_back(comp_entry);
+    }
+  }
+  writeMatComps(subgroup);
+
+  // If there are no materials, make a null entry
+  if(numHists==0){
+    matHist[0].stateID=0;
+    matHist[0].materialID=0;
+    matHist[0].transID=0;
+    matHist[0].timestamp=0;
+
+  };
+
+  // Open the file and the dataset.
+  this->openDB();
+
   // create an array type
   // describe the data in an hdf5-y way
   hsize_t arraydim[] = {NUMISOS};
-  ArrayType arrinttype(PredType::NATIVE_INT , 1, arraydim ); 
-  ArrayType arrdoubletype(PredType::IEEE_F64LE, 1, arraydim ); 
 
   // Create a datatype for models based on the struct
   CompType mtype( sizeof(mat_hist_t) );
+  mtype.insertMember( stateID_memb, HOFFSET(mat_hist_t, stateID), PredType::NATIVE_INT); 
   mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
   mtype.insertMember( transID_memb, HOFFSET(mat_hist_t, transID), PredType::NATIVE_INT); 
   mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
-  mtype.insertMember( iso_memb, HOFFSET(mat_hist_t, iso), arrinttype); 
-  mtype.insertMember( comp_memb, HOFFSET(mat_hist_t, comp), arrdoubletype); 
 
   DataSet* dataset;
   dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
@@ -497,7 +551,7 @@ void BookKeeper::writeMatHist(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::prepareSpaces(std::string dsname, DataType type, DataSpace &memspace, 
-    DataSpace &filespace, DataSet &dataset){
+    DataSpace &filespace, DataSet &dataset) {
     
     // define the dataset to match the dataspace
     dataset = this->getDB()->createDataSet(dsname, type, memspace) ; 
