@@ -2,7 +2,6 @@
 // Implements the ConditioningFacility class
 #include <iostream>
 #include <fstream>
-#include "boost/multi_array.hpp"
 
 #include "ConditioningFacility.h"
 
@@ -149,7 +148,7 @@ std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
+    LOG(LEV_DEBUG2) <<"ConditioningFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->getQuantity();
   }    
   return toSend;
