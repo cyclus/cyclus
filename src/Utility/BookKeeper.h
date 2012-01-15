@@ -59,6 +59,8 @@ private:
    * A pointer to this BookKeeper once it has been initialized.
    */
   static BookKeeper* instance_;
+
+  static int next_comp_entry_id_;
   
   /**
    * The HDF5 output database for the simulation this BookKeeper is 
@@ -127,6 +129,8 @@ protected:
   
   // material history struct
   typedef struct mat_hist_t{
+    int stateID;         /**< 
+                               An integer indicating the material state ID **/
     int materialID;         /**< 
                                An integer indicating the material object ID **/
     int transID;         /**< 
@@ -139,6 +143,19 @@ protected:
                                The kg or moles of the iso in the material at 
                                that time **/
   } mat_hist_t;
+
+  // material composition history struct
+  typedef struct comp_entry_t {
+    int entryID;         /**< 
+                               An integer indicating the comp entry ID **/
+    int stateID;         /**< 
+                               An integer indicating the material state ID **/
+    int iso;       /**< 
+                               An integer indicating the nuclide ID **/   
+    double comp;   /**< 
+                               The kg or moles of the iso in the material at 
+                               that time **/
+  } comp_entry_t;
   
   /**
    * Stores the transactions that have taken place during the simulation.
@@ -149,6 +166,11 @@ protected:
    * Stores the material changes that have taken place during the simulation.
    */
   std::vector<mat_hist_t> materials_;
+  
+  /**
+   * Stores the material changes that have taken place during the simulation.
+   */
+  std::vector<comp_entry_t> comp_entries_;
 
   /**
    * Stores the materials_ vector index of the last time a material registered
@@ -283,6 +305,8 @@ public:
    *
    */
   void writeMatHist();
+
+  void writeMatComps(Group* subgroup);
 
   /**
    * Prepares file and memory dataspaces for homogeneous data 
