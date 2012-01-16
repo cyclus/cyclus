@@ -113,26 +113,11 @@ void InputXML::load_file(std::string filename) {
   LOG(LEV_DEBUG3) << "End loading recipes";
   
   //Models
-  LOG(LEV_DEBUG3) << "Begin loading models - converters";
-  Model::load_converters();
-  LOG(LEV_DEBUG3) << "End loading models - converters";
-  LOG(LEV_DEBUG3) << "Begin loading models - markets";
-  Model::load_markets();
-  LOG(LEV_DEBUG3) << "End loading models - markets";
-  LOG(LEV_DEBUG3) << "Begin loading models - facilities";
-  Model::load_facilities();
-  LOG(LEV_DEBUG3) << "End loading models - facilities";
-  LOG(LEV_DEBUG3) << "Begin loading models - regions";
-  Model::load_regions();
-  LOG(LEV_DEBUG3) << "End loading models - regions";
-  LOG(LEV_DEBUG3) << "Begin loading models - institutions";
-  Model::load_institutions();
-  LOG(LEV_DEBUG3) << "End loading models - institutions";
+  LOG(LEV_DEBUG3) << "Begin loading models";
+  Model::load_models();
+  LOG(LEV_DEBUG3) << "End loading models";
 
   TI->load_simulation();
-
-  // delete/free mem
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

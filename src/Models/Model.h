@@ -29,18 +29,18 @@ typedef void mdl_dtor(Model*);
 enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 
 /*!
- * The Model class is the abstract class used by all types of models
- * that will be available for dynamic loading.  This common interface
- * means that the basic process of loading and registering models can
- * be implemented in a single place.
- *
- * To allow serialization of different types of models in unified
- * ID space, this interface is inherited by type-specific abstract
- * classes, such as MarketModel, that has its own static integer
- * to keep track of the next available ID.
- *
- * @warning all constructors must set ID_ and increment next_id_
- * 
+ The Model class is the abstract class used by all types of models
+ that will be available for dynamic loading.  This common interface
+ means that the basic process of loading and registering models can
+ be implemented in a single place.
+ 
+ To allow serialization of different types of models in unified
+ ID space, this interface is inherited by type-specific abstract
+ classes, such as MarketModel, that has its own static integer
+ to keep track of the next available ID.
+ 
+ @warning all constructors must set ID_ and increment next_id_
+ 
  */
 class Model {
 public:
@@ -87,38 +87,11 @@ public:
   void decommission();
   
   /**
-   * loads the market models available to the simulation
+   * loads all models appropriately ordered by type
    */
-  static void load_markets();
+  static void load_models();
 
-  /**
-   * loads the converter models available to the simulation
-   */
-  static void load_converters();
-
-  /** 
-   * loads the facility models available to the simulation
-   */
   static void load_facilities();
-
-  /**
-   * loads the facilities specified in a file
-   *
-   * @param filename name of the file holding the facility specification
-   * @param ns the string to append to the current namespace modifier
-   * @param format format of the file (currently cyclus supports only xml)
-   */
-  static void load_facilitycatalog(std::string filename, std::string ns, std::string format);
-
-  /**
-   * loads the regions available to the simulation
-   */
-  static void load_regions();
-
-  /**
-   * loads the institutions available to the simulation
-   */
-  static void load_institutions();
 
   /**
    * A method to initialize the model
@@ -193,69 +166,40 @@ public:
    */
   void setModelType(std::string new_type) { model_type_ = new_type; };
 
-  /**
-   * get model instance handle
-   */
-  const std::string getHandle() const { return handle_; };
-
-  /**
-   * every model should be able to print a verbose description
-   */
+  /// every model should be able to print a verbose description
   virtual void print();
 
-  /**
-   * return parent of this model
-   */
+  /// return parent of this model
   Model* parent();
 
-  /**
-     return the parent' id
-   */
+  /// return the parent' id
   int parentID() {return parentID_;};
 
-  /**
-   * return the born on date of this model
-   */
+  /// return the born on date of this model
   int bornOn() {return bornOn_;};
 
-  /**
-   * return the died on of this model
-   */
+  /// return the died on of this model
   int diedOn() {return diedOn_;};
 
-  /**
-   * add a child to the list of children
-   */
+  /// add a child to the list of children
   void addChild(Model* child);
 
-  /**
-   * Return the number of children the model has
-   */
+  /// Return the number of children the model has
   int nChildren() {return children_.size();}
 
-  /**
-   * set the parent of this model
-   */
+  /// set the parent of this model
   void setParent(Model* parent);
 
-  /**
-   * set the bornOn date of this model
-   */
+  /// set the bornOn date of this model
   void setBornOn(int date) {bornOn_ = date;};
 
-  /**
-   * set the died on date of this model
-   */
+  /// set the died on date of this model
   void setDiedOn(int date) {diedOn_ = date;};
 
-  /**
-   * return the ith child
-   */
+  /// return the ith child
   Model* children(int i){return children_[i];}
 
-  /**
-   * children of this model
-   */
+  /// children of this model
   std::vector <Model*> children_;
 
   /*!
@@ -286,6 +230,24 @@ public:
   
   
 private:
+
+  /*!
+   loads the facilities specified in a file
+   
+   @param filename name of the file holding the facility specification
+   @param ns the string to append to the current namespace modifier
+   @param format format of the file (currently cyclus supports only xml)
+  */
+  static void load_facilitycatalog(std::string filename, std::string ns, std::string format);
+
+  static void load_markets();
+
+  static void load_converters();
+
+  static void load_regions();
+
+  static void load_institutions();
+
   /// Stores the next available facility ID
   static int next_id_;
 
@@ -324,17 +286,6 @@ private:
    */
   static std::map<std::string, mdl_dtor*> destroy_map_;
   
-  /**
-   * every instance of a model should have a handle
-   * perhaps this is redundant with name. Discuss amongst yourselves.
-   */
-  std::string handle_;
-
-  /**
-   * generate model handle
-   */
-  std::string generateHandle();
-
   /**
    * every instance of a model should have a name
    */
