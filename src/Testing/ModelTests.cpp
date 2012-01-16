@@ -33,23 +33,23 @@ TEST_P(ModelTests, SetAndGetModelType) {
     switch(i){
       case (REGION):
         EXPECT_NO_THROW(model_->setModelType("Region"));
-        EXPECT_EQ("Region", model_->getModelType());
+        EXPECT_EQ("Region", model_->modelType());
         break;
       case (INST):
         EXPECT_NO_THROW(model_->setModelType("Inst"));
-        EXPECT_EQ("Inst", model_->getModelType());
+        EXPECT_EQ("Inst", model_->modelType());
         break;
       case (FACILITY):
         EXPECT_NO_THROW(model_->setModelType("Facility"));
-        EXPECT_EQ("Facility", model_->getModelType());
+        EXPECT_EQ("Facility", model_->modelType());
         break;
       case (MARKET):
         EXPECT_NO_THROW(model_->setModelType("Market"));
-        EXPECT_EQ("Market", model_->getModelType());
+        EXPECT_EQ("Market", model_->modelType());
         break;
       case (CONVERTER):
         EXPECT_NO_THROW(model_->setModelType("Converter"));
-        EXPECT_EQ("Converter", model_->getModelType());
+        EXPECT_EQ("Converter", model_->modelType());
         break;
       default:
         FAIL();

@@ -137,7 +137,7 @@ public:
   const std::string name() const { return name_; };
 
   /**
-   * set model instance SN
+   * set model instance name
    */
   void setName(std::string name) { name_ = name; };
 
@@ -147,19 +147,14 @@ public:
   const int ID() const { return ID_; };
 
   /**
-   * set model instance SN
-   */
-  void setID(int new_id) { ID_ = new_id; };
-
-  /**
    * get model implementation name
    */
-  const std::string getModelImpl();
+  const std::string modelImpl();
 
   /**
    * get model type
    */
-  const std::string getModelType() { return model_type_; };
+  const std::string modelType() { return model_type_; };
 
   /**
    * set model type

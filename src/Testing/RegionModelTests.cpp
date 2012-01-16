@@ -12,7 +12,7 @@ TEST_P(RegionModelTests, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, IsRegion) {
-  EXPECT_EQ("Region",region_model_->getModelType());
+  EXPECT_EQ("Region",region_model_->modelType());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

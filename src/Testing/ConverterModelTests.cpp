@@ -5,7 +5,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ConverterModelTests, ConverterType) {
-  EXPECT_EQ(converter_model_->getModelType(),"Converter");
+  EXPECT_EQ(converter_model_->modelType(),"Converter");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
