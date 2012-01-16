@@ -201,7 +201,7 @@ protected:
      */
     std::vector<stream_t> stream_vec_;
 
-    /// the stocks are where the processed material is kept
+    /// the stocks are where the raw material is kept
     std::deque<std::pair<std::string, Material*> > stocks_;
 
     /// the inventory is where the processed material is kept
@@ -215,6 +215,9 @@ protected:
 
     /// Loading density table. Rows are waste streams, columns are waste forms
     boost::multi_array<double, 2> loading_densities_;
+
+    /// Matches commodity names with stream ids
+    map< std::string, int > commod_map_;
 
     /**
      * loads the table from a file of filetype type
@@ -282,6 +285,25 @@ protected:
      */
     void processOrders();
 
+private :
+    /**
+     * Condition the material provided according to the rules for this commodity
+     * 
+     * @param commod the commodity (stream) this material represents
+     * @param mat the material that is to be conditioned
+     *
+     * @return the material that remains, not enough to be conditioned
+     */
+    Material* condition(std::string commod, Material* mat);
+
+    /**
+     * Returns the stream representing the commodity. 
+     *
+     * @param commod the commodity string  whose stream is to be returned
+     * 
+     * @return the stream where the commodity matches the id in the commod_id map
+     */
+    stream_t getStream(std::string commod);
 
 /* --------------------
    output directory info
