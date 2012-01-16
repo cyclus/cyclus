@@ -73,8 +73,6 @@ TEST_F(BookKeeperTest, closeDB){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, DISABLED_WriteModelLists){
   BI->writeModelList();
-  EXPECT_TRUE(BI->isGroup("output"));
-  EXPECT_TRUE(BI->isGroup("agents"));
 }
 
 

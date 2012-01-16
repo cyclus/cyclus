@@ -68,7 +68,7 @@ struct Transaction {
 };
 
 
-/**
+/*!
    @brief A Message class for inter-entity communication.
 
    @section intro Introduction
@@ -152,8 +152,7 @@ struct Transaction {
    The CommunicatorClass describes the class of models that pass messages 
    during the simulation.. The StubCommModel provides an example of a Message 
    model implementation.
- */
-
+*/
 class Message {
  private:
   /**
@@ -162,24 +161,16 @@ class Message {
    */
   MessageDir dir_;
   
-  /**
-   * The Transaction this message is concerned with
-   */
+  /// The Transaction this message is concerned with
   Transaction trans_;
   
-  /**
-   * The Communicator who sent this Message.
-   */
+  /// The Communicator who sent this Message.
   Communicator* sender_;
   
-  /**
-   * The Communicator who will receive this Message.
-   */
+  /// The Communicator who will receive this Message.
   Communicator* recipient_;
   
-  /**
-   * Pointers to each model this message passes through.
-   */
+  /// Pointers to each model this message passes through.
   std::vector<Communicator*> path_stack_;
   
   /**
@@ -189,18 +180,13 @@ class Message {
    */
   Communicator* current_owner_;
   
-  /**
-   * @brief Checks required conditions prior to sending a message.
-   *
-   */
+  /// Checks required conditions prior to sending a message.
   void validateForSend();
 
   /// mark a Model* as a participating sim agent (not a template)
   void setRealParticipant(Communicator* who);
   
-  /**
-     @brief stores the next available message (transaction) ID
-  */
+  /// stores the next available message (transaction) ID
   static int nextID_;
 
  public:
@@ -247,23 +233,23 @@ class Message {
    * heading down (DOWN_MSG) are sent successively to each communicator
    * in reverse order of their 'upward' sequence.
    *
-   * @exception CycException attempted to send message with
+   * @exception CycMessageException attempted to send message with
    *            with no designated receiver (next dest is undefined)
    *
-   * @exception CycException attempted to send a message to the message
+   * @exception CycMessageException attempted to send a message to the message
    *            sender (circular messaging)
    */
   virtual void sendOn();
   
-  /**
-   * @brief designate the next object to receive this message
-   * 
-   * Calls to this method are ignored when the message direction is
-   * down.
-   *
-   * @param next_stop the next communicator to receive this message
-   *
-   */
+  /*!
+  @brief designate the next object to receive this message
+  
+  Calls to this method are ignored (do nothing) when the message direction is
+  down.
+  
+  @param next_stop the next communicator to receive this message
+  
+  */
   void setNextDest(Communicator* next_stop);
   
   /**

@@ -103,7 +103,6 @@ int main(int argc, char* argv[]) {
     BI->writeModelList();
     BI->writeTransList();
     BI->writeMatHist();
-
     BI->closeDB();
   } catch (CycException ge) {
     LOG(LEV_ERROR) << ge.what();
