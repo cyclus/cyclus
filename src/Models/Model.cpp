@@ -260,9 +260,9 @@ std::vector<Resource*> Model::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addResource(Transaction trans,
+void Model::addResource(Message* msg,
                             std::vector<Resource*> manifest) {
-  std::string msg = "The model " + name();
-  msg += " doesn't support resource receiving.";
-  throw CycOverrideException(msg);
+  std::string err_msg = "The model " + name();
+  err_msg += " doesn't support resource receiving.";
+  throw CycOverrideException(err_msg);
 }

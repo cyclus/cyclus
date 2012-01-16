@@ -25,11 +25,6 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 struct Transaction {
 
   /**
-     The transaction's unique ID
-   */
-  int ID;
-  
-  /**
    * The commodity that is being requested or offered in this Message.
    */
   std::string commod;
@@ -179,6 +174,9 @@ class Message {
    * Used to prevent circular messaging.
    */
   Communicator* current_owner_;
+
+  /// offer/request partner for this message (meaning only for matched offers/requests)
+  Message* partner_;
   
   /// Checks required conditions prior to sending a message.
   void validateForSend();
@@ -186,8 +184,8 @@ class Message {
   /// mark a Model* as a participating sim agent (not a template)
   void setRealParticipant(Communicator* who);
   
-  /// stores the next available message (transaction) ID
-  static int nextID_;
+  /// stores the next available transaction ID
+  static int nextTransID_;
 
  public:
   
@@ -300,20 +298,6 @@ class Message {
   Communicator* getRecipient() const;
 
   /**
-    Sets the assigned ID to the message.
-   
-    @param id is desired message unique id 
-   */
-  void setID() {trans_.ID = nextID_++;};
-
-  /**
-    Returns the Message (transaction) ID.
-   
-    @return message (transaction) ID
-   */
-  int getID() const {return trans_.ID;};
-
-  /**
    * Returns the supplier in this Message.
    *
    * @return pointer to the supplier
@@ -405,6 +389,9 @@ class Message {
    * @param new_resource is the new Resource in the transaction
    */
   void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
+
+  void setPartner(Message* partner) {partner_ = partner;};
+  Message* partner() {return partner_;};
 
   /*!
   @brief Initiate the transaction - sending/receiving of resource(s) between

@@ -122,8 +122,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
         orders_.push_back(offerMsg);
 
         LOG(LEV_DEBUG1) 
-	  << "GreedyMarket has resolved a transaction "
-	  << " which is a match from "
+          << "GreedyMarket has resolved a transaction "
+          << " which is a match from "
           << offerMsg->getSupplier()->ID()
           << " to "
           << offerMsg->getRequester()->ID()
@@ -144,8 +144,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
         orders_.push_back(maybe_offer);
 
         LOG(LEV_DEBUG1)  
-	  << "GreedyMarket has resolved a transaction "
-	  << " which is a match from "
+          << "GreedyMarket has resolved a transaction "
+          << " which is a match from "
           << maybe_offer->getSupplier()->ID()
           << " (offer split) to "
           << maybe_offer->getRequester()->ID()

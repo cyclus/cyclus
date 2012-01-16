@@ -134,7 +134,7 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(Transaction trans, vector<Resource*> manifest) {
+void SinkFacility::addResource(Message* msg, vector<Resource*> manifest) {
   
   // grab each material object off of the manifest
   // and move it into the inventory.

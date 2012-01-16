@@ -173,7 +173,7 @@ std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(Transaction trans, vector<Resource*> manifest) {
+void ConditioningFacility::addResource(Message* msg, vector<Resource*> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -182,7 +182,7 @@ void ConditioningFacility::addResource(Transaction trans, vector<Resource*> mani
        thisMat++) {
     LOG(LEV_DEBUG2) <<"ConditioningFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_front(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
   } 
 };
 

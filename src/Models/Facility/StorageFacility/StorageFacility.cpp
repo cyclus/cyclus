@@ -149,7 +149,7 @@ std::vector<Resource*> StorageFacility::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(Transaction trans, vector<Resource*> manifest) {
+void StorageFacility::addResource(Message* msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque

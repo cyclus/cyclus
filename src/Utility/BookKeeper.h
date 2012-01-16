@@ -241,10 +241,11 @@ public:
   /**
    * Register the transaction in the BookKeeper's map of transactions
    *
+   * @param id the transaction ID.
    * @param msg the message containing the transaction
    * @param manifest a vector the materials fulfilling this transaction
    */
-  void registerTrans(Message* msg, std::vector<Resource*> manifest);
+  void registerTrans(int id, Message* msg, std::vector<Resource*> manifest);
 
   /**
    * Register the material in the BookKeeper's map of material changes

@@ -239,7 +239,7 @@ std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(Transaction trans, vector<Resource*> manifest) {
+void RecipeReactor::addResource(Message* msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Resource*>::iterator thisMat=manifest.begin();
@@ -247,7 +247,7 @@ void RecipeReactor::addResource(Transaction trans, vector<Resource*> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_front(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 

@@ -108,15 +108,14 @@ void BookKeeper::closeDB()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTrans(Message* msg, std::vector<Resource*> manifest){
+void BookKeeper::registerTrans(int id, Message* msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
   for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     trans_t toRegister;
-    msg->setID();
-    toRegister.transID=msg->getID();
+    toRegister.transID=id;
     toRegister.requesterID=msg->getRequester()->ID();
     toRegister.supplierID=msg->getSupplier()->ID();
     toRegister.materialID=dynamic_cast<Material*>(*thisMat)->ID(); 

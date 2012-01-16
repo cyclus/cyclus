@@ -199,7 +199,7 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::addResource(Transaction trans,
+void SeparationsMatrixFacility::addResource(Message* msg,
                                             vector<Resource*> manifest) {  
   LOG(LEV_DEBUG2) << "Entered the addResource file ";
 
@@ -210,7 +210,7 @@ void SeparationsMatrixFacility::addResource(Transaction trans,
       thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->getQuantity();
-    stocks_.push_back(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_back(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 
