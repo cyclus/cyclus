@@ -48,7 +48,13 @@ using namespace H5;
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ConditioningFacility::ConditioningFacility() {};
+ConditioningFacility::ConditioningFacility() {
+    // Initialize allowed formats map
+    allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
+    allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
+    allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
+    allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::~ConditioningFacility() {};
@@ -61,19 +67,31 @@ void ConditioningFacility::init(xmlNodePtr cur)
     /// move XML pointer to current model
     cur = XMLinput->get_xpath_element(cur,"model/ConditioningFacility");
 
-    // Initialize allowed formats map
-    allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
-    allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
-    allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
-    allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
-
     /// initialize any ConditioningFacility-specific datamembers here
     string datafile = XMLinput->get_xpath_content(cur, "datafile");
     string fileformat = XMLinput->get_xpath_content(cur, "fileformat");
+
+    // all facilities require commodities - possibly many
+    std::string commod;
+    int commod_id;
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "commodpair");
+
+    // for each fuel pair, there is an in and an out commodity
+    for (int i = 0; i < nodes->nodeNr; i++){
+      xmlNodePtr pair_node = nodes->nodeTab[i];
+
+      // get commods
+      commod = XMLinput->get_xpath_content(pair_node,"commodity");
+
+      // get in_recipe
+      commod_id = strtol(XMLinput->get_xpath_content(pair_node,"id"), NULL, 10);
+
+      commod_map_[commod] = commod_id ; // @todo check if commod is already registered
+    };
+
     // for whatever format,
     // call loadTable
     loadTable(datafile, fileformat);
-    // commodities will be loaded by loadTable
     file_is_open_ = false;
 }
 
@@ -162,7 +180,7 @@ void ConditioningFacility::addResource(Transaction trans, vector<Resource*> mani
   for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"ConditioningFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->getQuantity();
     stocks_.push_front(make_pair(trans.commod, dynamic_cast<Material*>(*thisMat)));
   } 
@@ -212,6 +230,9 @@ void ConditioningFacility::loadTable(string datafile, string fileformat){
   map<string, void(ConditioningFacility::*)(string)>::iterator format_found;
   format_found = allowed_formats_.find(fileformat);
   (this->*format_found->second)(datafile);
+
+  // match it with commodities
+  // verify number of commodities matches number of streams
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -280,8 +301,8 @@ void ConditioningFacility::loadHDF5File(string datafile){
    * Create a datatype for stream
    */
   CompType mtype( sizeof(stream_t) );
-  mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); // Change this to int when you can make a table where this is an int. 
-  mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT); // Change this to int when you can make a table where this is an int. 
+  mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); 
+  mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT); 
   mtype.insertMember( density_memb, HOFFSET(stream_t, density), PredType::NATIVE_DOUBLE);
   mtype.insertMember( wfvol_memb, HOFFSET(stream_t, wfvol), PredType::NATIVE_DOUBLE);
   mtype.insertMember( wfmass_memb, HOFFSET(stream_t, wfmass), PredType::NATIVE_DOUBLE);
@@ -316,8 +337,8 @@ void ConditioningFacility::loadXMLFile(string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
-  // create array 
-
+  // create array
+  throw CycException("XML-based ConditioningFacility input is not yet supported.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -326,7 +347,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
   // // how many rows
   // // how many columns
   // create array
-
+  throw CycException("SQL-based ConditioningFacility input is not yet supported.");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -376,17 +397,72 @@ void ConditioningFacility::loadCSVFile(string datafile){
 void ConditioningFacility::makeRequests(){
   // The ConditioningFacility should make requests of all of the things it's 
   // capable of conditioning
+  // for each stream in the matrix
+  // calculate your capacity to condition
+  // make requests
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::makeOffers(){
+  // Offer anything that has been conditioned or can be conditioned this month.
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::conditionMaterials(){
+  // Partition the in-stream according to loading density
+  // for each stream object in stocks
+  map<string, Material*> remainders;
+  while( !stocks_.empty() ){
+    // move stocks to currMat
+    std::string currCommod = stocks_.front().first;
+    Material* currMat = stocks_.front().second;
+    if(remainders.find(currCommod)!=remainders.end()){
+      (remainders[currCommod])->absorb(condition(currCommod, currMat));
+    } else {
+      remainders[currCommod] = condition(currCommod, currMat);
+    }
+    stocks_.pop_front();
+  }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Material* ConditioningFacility::condition(string commod, Material* mat){
+  Material* mat_to_condition;
+  stream_t stream = getStream(commod);
+  double mass_to_condition = stream.wfmass;
+  double mass_remaining = mat->getQuantity();
+  while( mass_remaining > mass_to_condition) {
+    mat_to_condition = mat->extract(mass_to_condition);
+    // mat_to_condition->absorb(wf_iso_vec_[commod]);
+    inventory_.push_back(mat_to_condition);
+    mass_remaining = mat->getQuantity();
+  }
+  return mat;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
+  int stream_id =(commod_map_.find(commod))->second;
+  vector<stream_t>::const_iterator it = stream_vec_.begin();
+  bool found = false;
+  stream_t toRet;
+  while(!found){
+    if((*it).streamID == stream_id){
+      toRet = (*it);
+      found = true;
+    } else if (it == stream_vec_.end() ) {
+      string msg;
+      msg += "The stream for id ";
+      msg += stream_id;
+      msg += " was not found in the ConditioningFacility stream map.";
+      throw CycException(msg);
+    } else {
+      it++;
+    }
+  }
+  return toRet;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::processOrders(){
