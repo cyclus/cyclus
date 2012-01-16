@@ -68,7 +68,7 @@ std::vector<Resource*> StubFacility::removeResource(Message* order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::addResource(Transaction trans, vector<Resource*> manifest){
+void StubFacility::addResource(Message* msg, vector<Resource*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

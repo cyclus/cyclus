@@ -15,11 +15,12 @@
 #include <iostream>
 
 // initialize static variables
-int Message::nextID_ = 1;
+int Message::nextTransID_ = 1;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
 
+  partner_ = this;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
@@ -39,6 +40,7 @@ Message::Message(Communicator* sender) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
 
+  partner_ = this;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
@@ -57,6 +59,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
 
+  partner_ = this;
   dir_ = UP_MSG;
   trans_ = thisTrans;
   sender_ = sender;
@@ -84,7 +87,6 @@ void Message::setRealParticipant(Communicator* who) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
   std::cout << "Transaction info (via Message):" << std::endl <<
-    "    Transaction ID: " << trans_.ID << std::endl <<
     "    Requester ID: " << trans_.requester->ID() << std::endl <<
     "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
     "    Price: "  << trans_.price << std::endl;
@@ -209,18 +211,19 @@ void Message::approveTransfer() {
   Model* requester = getRequester();
   Model* supplier = getSupplier();
   vector<Resource*> manifest = supplier->removeResource(this);
-  requester->addResource(getTrans(), manifest);
+  requester->addResource(this, manifest);
 
-  BI->registerTrans(this, manifest);
+  BI->registerTrans(nextTransID_, this, manifest);
 
   for (int i = 0; i < manifest.size(); i++) {
     try {
-      BI->registerMatState(getTrans().ID, dynamic_cast<Material*>(manifest.at(i)));
+      BI->registerMatState(nextTransID_, dynamic_cast<Material*>(manifest.at(i)));
     } catch (...) {
       LOG(LEV_ERROR) << "Failed to register resource state. Resource may"
                      << " not have been of Material type.";
     }
   }
+  nextTransID_++;
 
   LOG(LEV_DEBUG2) << "Material sent from " << supplier->ID() << " to " 
                   << requester->ID() << ".";

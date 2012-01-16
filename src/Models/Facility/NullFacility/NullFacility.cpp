@@ -131,7 +131,7 @@ std::vector<Resource*> NullFacility::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(Transaction trans, vector<Resource*> manifest) {
+void NullFacility::addResource(Message* msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Resource*>::iterator thisMat=manifest.begin();

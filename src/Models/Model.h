@@ -215,10 +215,10 @@ public:
   @warning This method should never be directly invoked.  All resource
   transfers should take place using the Message.approveTransfer() method.
   
-  @param trans the transaction to which these resource objects belong
+  @param msg the sent message that corresponds with the materials being received
   @param manifest is the set of resources being received
   */ 
-  virtual void addResource(Transaction trans,
+  virtual void addResource(Message* msg,
                               std::vector<Resource*> manifest);
 
   bool& isTemplate() {return is_template_;}

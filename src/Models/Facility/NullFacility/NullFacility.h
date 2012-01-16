@@ -134,7 +134,7 @@ public:
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
    */ 
-  virtual void addResource(Transaction trans,
+  virtual void addResource(Message* msg,
                               std::vector<Resource*> manifest);
 
 /* ------------------- */ 
