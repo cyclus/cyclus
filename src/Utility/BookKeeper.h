@@ -6,6 +6,7 @@
 #include <vector>
 #include "H5Cpp.h"
 #include "hdf5.h"
+#include "hdf5_hl.h"
 
 #include "Teuchos_ParameterList.hpp"
 
@@ -156,6 +157,10 @@ protected:
                                The kg or moles of the iso in the material at 
                                that time **/
   } comp_entry_t;
+
+  typedef struct blank_table_t {
+    int id;
+  } blank_table_t;
   
   /**
    * Stores the transactions that have taken place during the simulation.
@@ -335,6 +340,52 @@ public:
    */
    void printTrans(trans_t trans);
 
+   void test();
+
+   Group* openGroup(std::string outputgroup_name,
+                      std::string subgroup_name);
+
+   typedef struct field_def_t {
+     std::string name;
+     size_t offset;
+     const PredType* type;
+   } field_def_t;
+
+   field_def_t mk_field(std::string name, size_t offset, const PredType* type) {
+    field_def_t new_def;
+    new_def.name = name;
+    new_def.offset = offset;
+    new_def.type = type;
+    return new_def;
+   }
+
+   void createTable(std::string outputgroup_name,
+                    std::string subgroup_name,
+                    std::string table_name,
+                    size_t struct_size,
+                    std::vector<field_def_t> fields);
+
+  template <class struct_t>
+  void appendRecord(Group* group, std::string table_name,
+                    struct_t record, std::vector<field_def_t> fields) {
+    
+    size_t dst_offset[fields.size()];
+    for (int i = 0; i < fields.size(); i++) {
+      dst_offset[i] = fields.at(i).offset;
+    }
+
+    struct_t records[1];
+    records[0] = record;
+
+    herr_t status;
+    DataSet* dataset = new DataSet(group->openDataSet(table_name));
+    status = H5TBappend_records(dataset->getId(), table_name.c_str(), 1, sizeof(struct_t), 
+                                dst_offset, dst_offset, &records );
+    std::cout << "status: " << status << std::endl;
+
+  }
+
 };
 
 #endif
+

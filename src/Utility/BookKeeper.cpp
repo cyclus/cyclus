@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <utility>
 #include "boost/multi_array.hpp"
 #include "hdf5.h"
 #include "H5Cpp.h"
@@ -75,21 +76,16 @@ H5File* BookKeeper::getDB()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::openDB()
-{
-  if(dbIsOpen_==false){
-    //If the database is already open, throw an exception; the caller probably 
-    // doesn't realize this.
-    try{ 
+void BookKeeper::openDB() {
+  if(! dbIsOpen_) {
+    try {
       myDB_ = new H5File(dbName_, H5F_ACC_RDWR);
       dbIsOpen_ = true;
-    }
-    catch( FileIException error )
-    {
+    } catch ( FileIException error ) {
       error.printError();
     }
-  };
-};
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB()
@@ -110,13 +106,6 @@ void BookKeeper::closeDB()
     error.printError();
   } 
 };
-
-//Function only used in tests (MJG)
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BookKeeper::isGroup(std::string grp) {
-  return true;
-};
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTrans(Message* msg, std::vector<Resource*> manifest){
@@ -227,6 +216,7 @@ void BookKeeper::writeModelList() {
 	       dataset_name, numStructs, short_list.size(), pModelList);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::doModelWrite(H5std_string ID_memb,
 			      H5std_string name_memb,
                               H5std_string modelImpl_memb,
@@ -565,3 +555,95 @@ void BookKeeper::prepareSpaces(std::string dsname, DataType type, DataSpace &mem
     // select the whole dataset as the memory dataspace
     filespace.selectAll();
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+void BookKeeper::test() {
+  std::vector<field_def_t> fields;
+  field_def_t field;
+
+  field = mk_field("entryID", HOFFSET(comp_entry_t, entryID), &PredType::NATIVE_INT);
+  fields.push_back(field);
+  field = mk_field("stateID", HOFFSET(comp_entry_t, stateID), &PredType::NATIVE_INT);
+  fields.push_back(field);
+  field = mk_field("iso", HOFFSET(comp_entry_t, iso), &PredType::NATIVE_INT);
+  fields.push_back(field);
+  field = mk_field("comp", HOFFSET(comp_entry_t, comp), &PredType::NATIVE_DOUBLE);
+  fields.push_back(field);
+
+  createTable("/output", "agents", "hello", sizeof(comp_entry_t), fields);
+
+  Group* group = openGroup("/output", "agents");
+
+  comp_entry_t entry;
+  entry.entryID = 1;
+  entry.stateID = 1;
+  entry.iso = 8001;
+  entry.comp = 2.3;
+
+  appendRecord<comp_entry_t>(group, "hello", entry, fields);
+  delete group;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Group* BookKeeper::openGroup(std::string outputgroup_name,
+                            std::string subgroup_name) {
+  Group* outputgroup;
+  Group* subgroup;
+
+  outputgroup = new Group(this->getDB()->openGroup(outputgroup_name));
+  subgroup = new Group(outputgroup->openGroup(subgroup_name));
+
+  delete outputgroup;
+  return subgroup;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::createTable(std::string outputgroup_name,
+                             std::string subgroup_name,
+                             std::string table_name,
+                             size_t struct_size,
+                             std::vector<field_def_t> fields) {
+
+  // Open the file and the dataset.
+  this->openDB();
+
+  // Create a datatype for models based on the struct
+  CompType mtype(struct_size);
+  for (int i = 0; i < fields.size(); i++) {
+    mtype.insertMember(fields.at(i).name, fields.at(i).offset, *(fields.at(i).type)); 
+  }
+
+  Group* outputgroup;
+  Group* subgroup;
+  DataSpace* dataspace;
+  DataSet* dataset;
+
+  try {
+    outputgroup = new Group(this->getDB()->openGroup(outputgroup_name));
+  } catch (GroupIException err) {
+    outputgroup = new Group(this->getDB()->createGroup(outputgroup_name));
+  }
+
+  try {
+    subgroup = new Group(outputgroup->createGroup(subgroup_name));
+  } catch (GroupIException err) {
+    subgroup = new Group(outputgroup->openGroup(subgroup_name));
+  }
+
+  // describe the data in an hdf5-y way
+  int rank = 1;
+  hsize_t dim[] = {3};
+
+  dataspace = new DataSpace(rank, dim);
+  dataset = new DataSet(subgroup->createDataSet(table_name, 
+                        mtype, *dataspace) );
+
+  delete outputgroup;
+  delete subgroup;
+  delete dataspace;
+  delete dataset;
+}
+
