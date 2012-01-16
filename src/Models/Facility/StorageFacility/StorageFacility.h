@@ -152,7 +152,7 @@ protected:
     /**
      * The StorageFacility has one commodity. It's the same in and out.
      */
-    Commodity* incommod_;
+    std::string incommod_;
 
     /**
      * The StorageFacility has a limit to how material it can process.

@@ -172,7 +172,7 @@ void Message::setDir(MessageDir newDir) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::getMarket() {
   MarketModel* market = MarketModel::marketForCommod(trans_.commod);
-  return dynamic_cast<Communicator*>(market);
+  return market;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,7 +216,10 @@ void Message::approveTransfer() {
   for (int i = 0; i < manifest.size(); i++) {
     try {
       BI->registerMatState(getTrans().ID, dynamic_cast<Material*>(manifest.at(i)));
-    } catch (...) {}
+    } catch (...) {
+      LOG(LEV_ERROR) << "Failed to register resource state. Resource may"
+                     << " not have been of Material type.";
+    }
   }
 
   LOG(LEV_DEBUG2) << "Material sent from " << supplier->ID() << " to " 

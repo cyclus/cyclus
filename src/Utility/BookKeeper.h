@@ -18,7 +18,7 @@
 
 using namespace H5;
 
-/**
+/*!
    @brief
    The BookKeeper is a (singleton) class for handling I/O.
    
@@ -51,8 +51,6 @@ using namespace H5;
    as it is generated in order to facilitate a future in which the 
    simulation might have a dynamic start and stop capability.
 */
-
-
 class BookKeeper {
 private:
   /**
@@ -74,9 +72,7 @@ private:
    */
   std::string dbName_;
   
-  /**
-   * True iff the db is open.
-   */
+  /// True iff the db is open.
   bool dbIsOpen_;
 
   /**
@@ -156,7 +152,7 @@ protected:
                                The kg or moles of the iso in the material at 
                                that time **/
   } comp_entry_t;
-  
+
   /**
    * Stores the transactions that have taken place during the simulation.
    */
@@ -338,3 +334,4 @@ public:
 };
 
 #endif
+

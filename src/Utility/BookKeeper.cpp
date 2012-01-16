@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+
 #include "boost/multi_array.hpp"
 #include "hdf5.h"
 #include "H5Cpp.h"
@@ -75,21 +76,16 @@ H5File* BookKeeper::getDB()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::openDB()
-{
-  if(dbIsOpen_==false){
-    //If the database is already open, throw an exception; the caller probably 
-    // doesn't realize this.
-    try{ 
+void BookKeeper::openDB() {
+  if(! dbIsOpen_) {
+    try {
       myDB_ = new H5File(dbName_, H5F_ACC_RDWR);
       dbIsOpen_ = true;
-    }
-    catch( FileIException error )
-    {
+    } catch ( FileIException error ) {
       error.printError();
     }
-  };
-};
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB()
@@ -110,13 +106,6 @@ void BookKeeper::closeDB()
     error.printError();
   } 
 };
-
-//Function only used in tests (MJG)
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BookKeeper::isGroup(std::string grp) {
-  return true;
-};
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTrans(Message* msg, std::vector<Resource*> manifest){
@@ -227,6 +216,7 @@ void BookKeeper::writeModelList() {
 	       dataset_name, numStructs, short_list.size(), pModelList);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::doModelWrite(H5std_string ID_memb,
 			      H5std_string name_memb,
                               H5std_string modelImpl_memb,
@@ -565,3 +555,4 @@ void BookKeeper::prepareSpaces(std::string dsname, DataType type, DataSpace &mem
     // select the whole dataset as the memory dataspace
     filespace.selectAll();
 };
+

@@ -261,10 +261,11 @@ void StorageFacility::handleTick(int time)
   // this will be a request for free stuff
   double commod_price = 0;
 
+  Communicator* recipient;
+  recipient = dynamic_cast<Communicator*>(MarketModel::marketForCommod(incommod_));
   if (space == 0){
     // don't request anything
   } else if (space < capacity_){
-    Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is less than monthly acceptance capacity
     requestAmt = space;
 
@@ -282,7 +283,6 @@ void StorageFacility::handleTick(int time)
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
   } else if (space >= capacity_){
-    Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
     // if empty space is more than monthly acceptance capacity
     requestAmt = capacity_ - sto;
 
