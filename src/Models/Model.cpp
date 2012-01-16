@@ -64,7 +64,7 @@ void Model::create(std::string model_type, xmlNodePtr cur) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::create(Model* model_orig) {
-  mdl_ctor* model_constructor = loadConstructor(model_orig->getModelType(),model_orig->getModelImpl());
+  mdl_ctor* model_constructor = loadConstructor(model_orig->modelType(),model_orig->modelImpl());
   
   Model* model_copy = model_constructor();
   
@@ -75,7 +75,7 @@ Model* Model::create(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Model::destroy(Model* model) {
-  mdl_dtor* model_destructor = destroy_map_[model->getModelImpl()];
+  mdl_dtor* model_destructor = destroy_map_[model->modelImpl()];
 
   model_destructor(model);
   
@@ -177,16 +177,16 @@ void Model::init(xmlNodePtr cur) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* model_orig) {
-  if (model_orig->getModelType() != model_type_ && 
-       model_orig->getModelImpl() != model_impl_) {
+  if (model_orig->modelType() != model_type_ && 
+       model_orig->modelImpl() != model_impl_) {
     throw CycTypeException("Cannot copy a model of type " 
-        + model_orig->getModelType() + "/" + model_orig->getModelImpl()
+        + model_orig->modelType() + "/" + model_orig->modelImpl()
         + " to an object of type "
         + model_type_ + "/" + model_impl_);
   }
 
   name_ = model_orig->name();
-  model_impl_ = model_orig->getModelImpl();
+  model_impl_ = model_orig->modelImpl();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -248,14 +248,14 @@ void Model::addChild(Model* child){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const std::string Model::getModelImpl() {
+const std::string Model::modelImpl() {
   return model_impl_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<Resource*> Model::removeResource(Message* order) {
   std::string msg = "The model " + name();
-  msg += " doesn't support resource transfer.";
+  msg += " doesn't support resource removal.";
   throw CycOverrideException(msg);
 }
 
@@ -263,6 +263,6 @@ std::vector<Resource*> Model::removeResource(Message* order) {
 void Model::addResource(Transaction trans,
                             std::vector<Resource*> manifest) {
   std::string msg = "The model " + name();
-  msg += " doesn't support resource transfer.";
+  msg += " doesn't support resource receiving.";
   throw CycOverrideException(msg);
 }

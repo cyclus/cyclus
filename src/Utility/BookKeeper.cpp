@@ -205,7 +205,7 @@ void BookKeeper::writeModelList() {
       modelList[i].parentID = theModel->parentID();
       modelList[i].bornOn = theModel->bornOn();
       modelList[i].diedOn = theModel->diedOn();
-      strcpy(modelList[i].modelImpl, theModel->getModelImpl().c_str());
+      strcpy(modelList[i].modelImpl, theModel->modelImpl().c_str());
       strcpy(modelList[i].name, theModel->name().c_str()); 
     }
   }
