@@ -89,6 +89,15 @@ void Model::decommission(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::load_models() {
+  load_converters();
+  load_markets();
+  load_facilities();
+  load_regions();
+  load_institutions();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_markets() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
   
@@ -163,7 +172,6 @@ void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  handle_ = this->generateHandle();
   this->setBornOn( TI->getTime() );
 }
 
@@ -179,7 +187,6 @@ void Model::copy(Model* model_orig) {
 
   name_ = model_orig->name();
   model_impl_ = model_orig->getModelImpl();
-  handle_ = this->generateHandle();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -204,21 +211,8 @@ void Model::print() {
   LOG(LEV_DEBUG2) << model_type_ << " " << name_ 
       << " (ID=" << ID_
       << ", implementation = " << model_impl_
-      << "  handle = " << handle_
+      << "  name = " << name_
       << " ) " ;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Model::generateHandle() {
-
-  string toRet = model_impl_;
-
-	char SNString[100];
-	sprintf(SNString, "%d", ID_); 
-
-	toRet.append(SNString);
-
-  return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
