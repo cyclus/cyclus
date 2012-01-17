@@ -36,8 +36,13 @@
     <name>BackEnd</name>
     <model>
       <ConditioningFacility>
+        <capacity>5</capacity>
         <fileformat>csv</fileformat>
         <datafile>input/cond/test.csv</datafile>
+        <commodpair>
+          <incommodity>uo2</incommodity>
+          <id>1</id>
+        </commodpair>
       </ConditioningFacility>
     </model>
   </facility>

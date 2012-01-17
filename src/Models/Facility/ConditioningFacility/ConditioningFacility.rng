@@ -3,12 +3,21 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="ConditioningFacility">
      <element name="ConditioningFacility"> 
+        <ref name="capacity"/>
         <element name="fileformat">
           <text/>
         </element>
         <element name="datafile">
           <text/>
         </element>
+        <oneOrMore>
+          <element name="commodpair">
+            <ref name="incommodity"/>
+            <element name="id">
+              <data type="nonNegativeInteger"/>
+            </element>
+          </element>
+        </oneOrMore>
      </element>
   </define>
 

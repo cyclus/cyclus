@@ -219,6 +219,12 @@ protected:
     /// Matches commodity names with stream ids
     map< std::string, int > commod_map_;
 
+    /// Processing capacity per time unit not yet consumed this tick (in kg)
+    double remaining_capacity_;
+
+    /// Processing capacity per unit time (in kg)
+    double capacity_;
+
     /**
      * loads the table from a file of filetype type
      *
@@ -281,9 +287,11 @@ protected:
     void conditionMaterials();
 
     /**
-     * processes orders on the orders_waiting_ stack and sends the materials
+     * processes orders that have come through and sends the materials
+     *
+     * @param the order to be processed
      */
-    void processOrders();
+    std::vector<Resource*> processOrder(Message* order);
 
 private :
     /**
