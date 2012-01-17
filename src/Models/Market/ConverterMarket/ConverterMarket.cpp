@@ -71,10 +71,10 @@ void ConverterMarket::receiveMessage(Message *msg)
   messages_.insert(msg);
 
   if (msg->isOffer()){
-    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
   }
   else if (!msg->isOffer()) {
-    requests_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    requests_.insert(indexedMsg(msg->resource()->quantity(),msg));
   }
 }
 
@@ -93,7 +93,7 @@ void ConverterMarket::reject_request(sortedMsgList::iterator request)
   while (matchedOffers_.size() > 0)
   {
     Message *msg = *(matchedOffers_.begin());
-    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
 
@@ -132,15 +132,15 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
     offer--;
     // convert it
     offerMsg = (this->getConverter())->convert((*offer).second, requestMsg);
-    offerAmt = offerMsg->getResource()->getQuantity();
+    offerAmt = offerMsg->resource()->quantity();
 
     // pop off this offer
     offers_.erase(offer);
-    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
+    if (requestMsg->resource()->checkQuality(offerMsg->resource())){
       if (requestAmt > offerAmt) { 
         // put a new message in the order stack
         // it goes down to supplier
-        offerMsg->setRequester(requestMsg->getRequester());
+        offerMsg->setRequester(requestMsg->requester());
 
         // tenatively queue a new order (don't execute yet)
         matchedOffers_.insert(offerMsg);
@@ -148,11 +148,11 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         orders_.push_back(offerMsg);
 
         LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
-          << offerMsg->getSupplier()->ID()
+          << offerMsg->supplier()->ID()
           << " to "
-          << offerMsg->getRequester()->ID()
+          << offerMsg->requester()->ID()
           << " for the amount:  " 
-          << offerMsg->getResource()->getQuantity();
+          << offerMsg->resource()->quantity();
 
         requestAmt -= offerAmt;
       } 
@@ -162,19 +162,19 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // queue a new order
         Message* maybe_offer = offerMsg->clone();
 
-        maybe_offer->getResource()->setQuantity(requestAmt);
-        maybe_offer->setRequester(requestMsg->getRequester());
+        maybe_offer->resource()->setQuantity(requestAmt);
+        maybe_offer->setRequester(requestMsg->requester());
 
         matchedOffers_.insert(offerMsg);
 
         orders_.push_back(maybe_offer);
 
         LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
-          << maybe_offer->getSupplier()->ID()
+          << maybe_offer->supplier()->ID()
           << " to "
-          << maybe_offer->getRequester()->ID()
+          << maybe_offer->requester()->ID()
           << " for the amount:  " 
-          << maybe_offer->getResource()->getQuantity();
+          << maybe_offer->resource()->quantity();
 
         // reduce the offer amount
         offerAmt -= requestAmt;
@@ -184,7 +184,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         if(offerAmt > EPS_KG) {
           Message *new_offer = offerMsg->clone();
-          new_offer->getResource()->setQuantity(offerAmt);
+          new_offer->resource()->setQuantity(offerAmt);
           // call this method for consistency
           receiveMessage(new_offer);
         }
@@ -216,7 +216,7 @@ void ConverterMarket::resolve()
     } 
     else {
       LOG(LEV_DEBUG2) << "The request from Requester "<< 
-          (*request).second->getRequester()->ID()
+          (*request).second->requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected by the ConverterMarket. ";
       reject_request(request);

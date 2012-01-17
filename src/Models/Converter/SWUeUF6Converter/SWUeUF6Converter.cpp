@@ -77,13 +77,13 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
   // determine which direction we're converting
   if (in_commod_ == "SWUs" && out_commod_ == "eUF6"){
     // the enricher is the supplier in the convMsg
-    enr = convMsg->getSupplier();
+    enr = convMsg->supplier();
     if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
-    SWUs = convMsg->getResource()->getQuantity();
+    SWUs = convMsg->resource()->quantity();
     try {
-      mat = dynamic_cast<Material*>(refMsg->getResource());
+      mat = dynamic_cast<Material*>(refMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -92,12 +92,12 @@ Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
     }
   } else if (in_commod_ == "eUF6" && out_commod_ == "SWUs") {
     // the enricher is the supplier in the refMsg
-    enr = refMsg->getSupplier();
+    enr = refMsg->supplier();
     if (0 == enr) {
       throw CycException("SWUs offered by non-Model");
     }
     try{
-      mat = dynamic_cast<Material*>(convMsg->getResource());
+      mat = dynamic_cast<Material*>(convMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \

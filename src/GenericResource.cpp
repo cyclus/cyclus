@@ -26,7 +26,7 @@ void GenericResource::print() {
 bool GenericResource::checkQuality(Resource* other){
   bool toRet = false;
 
-  toRet = (units_ == other->getResourceUnits());
+  toRet = (units_ == other->resourceUnits());
   return toRet;
 }
 
@@ -34,7 +34,7 @@ bool GenericResource::checkQuality(Resource* other){
 bool GenericResource::checkQuantityEqual(Resource* other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
-  toRet =( checkQuality(other) && quantity_ == other->getQuantity());
+  toRet =( checkQuality(other) && quantity_ == other->quantity());
   return toRet;
 }
 
@@ -42,6 +42,6 @@ bool GenericResource::checkQuantityEqual(Resource* other) {
 bool GenericResource::checkQuantityGT(Resource* other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
-  toRet = ( checkQuality(other) && quantity_ < other->getQuantity());
+  toRet = ( checkQuality(other) && quantity_ < other->quantity());
   return toRet;
 }

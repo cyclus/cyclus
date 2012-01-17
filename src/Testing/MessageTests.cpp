@@ -55,13 +55,13 @@ class TestCommunicator : public Communicator {
 
     void receiveMessage(Message* msg) {
       (dynamic_cast<TrackerMessage*>(msg))->dest_list_.push_back(name_);
-      if (stop_at_return_ && this == msg->getSender()) {
+      if (stop_at_return_ && this == msg->sender()) {
         return;
       } else if (flip_at_receive_) {
         msg->setDir(DOWN_MSG);
       } else if (flip_down_to_up_) {
         int max_num_flips = 2;
-        if (msg->getDir() == DOWN_MSG && down_up_count_ < max_num_flips) {
+        if (msg->dir() == DOWN_MSG && down_up_count_ < max_num_flips) {
           msg->setDir(UP_MSG);
           down_up_count_++;
         }
@@ -259,19 +259,19 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
   Message* msg2 = msg1->clone();
 
   // check proper cloning of message members
-  EXPECT_EQ(msg1->getSender(), msg2->getSender());
+  EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  Resource* resource2 = msg2->getResource();
+  Resource* resource2 = msg2->resource();
   resource2->setQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(msg2->getResource()->getQuantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->getResource()->getQuantity(), quantity2);
-  ASSERT_NE(resource, msg1->getResource());
+  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
+  ASSERT_NE(resource, msg1->resource());
   ASSERT_NE(resource, resource2);
 
-  EXPECT_DOUBLE_EQ(resource->getQuantity(), quantity1);
-  EXPECT_DOUBLE_EQ(resource2->getQuantity(), quantity2);
+  EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
+  EXPECT_DOUBLE_EQ(resource2->quantity(), quantity2);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -279,15 +279,15 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 TEST_F(MessagePublicInterfaceTest, GetSetResource) {
-  ASSERT_DOUBLE_EQ(resource->getQuantity(), quantity1);
+  ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
 
   msg1->setResource(resource);
 
-  ASSERT_NE(resource, msg1->getResource());
+  ASSERT_NE(resource, msg1->resource());
 
-  msg1->getResource()->setQuantity(quantity2);
+  msg1->resource()->setQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(resource->getQuantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->getResource()->getQuantity(), quantity2);
+  ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
+  ASSERT_DOUBLE_EQ(msg1->resource()->quantity(), quantity2);
 }
 

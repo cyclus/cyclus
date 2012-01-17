@@ -139,7 +139,7 @@ void Timer::registerResolveListener(MarketModel* agent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::getTime() {
+int Timer::time() {
   return time_;
 }
 
@@ -197,7 +197,7 @@ boost::gregorian::date Timer::getEndDate(boost::gregorian::date startDate, int s
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::getSimDur() {
+int Timer::simDur() {
   return simDur_;
 }
 

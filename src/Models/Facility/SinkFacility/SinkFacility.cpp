@@ -110,10 +110,10 @@ void SinkFacility::handleTick(int time){
       trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
+      request->setNextDest(facInst());
       request->sendOn();
 
-      LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " requests: "<< requestAmt << ".";
+      LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
     }
   }
 }
@@ -142,7 +142,7 @@ void SinkFacility::addResource(Message* msg, vector<Resource*> manifest) {
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
+        << (*thisMat)->quantity();
     (*thisMat)->print();
     inventory_.push_back(dynamic_cast<Material*>(*thisMat));
   }
@@ -158,7 +158,7 @@ double SinkFacility::checkInventory() {
   deque<Material*>::iterator iter;
 
   for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
 
   return total;
 }

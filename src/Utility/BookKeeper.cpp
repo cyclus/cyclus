@@ -116,11 +116,11 @@ void BookKeeper::registerTrans(int id, Message* msg, std::vector<Resource*> mani
        thisMat++) {
     trans_t toRegister;
     toRegister.transID=id;
-    toRegister.requesterID=msg->getRequester()->ID();
-    toRegister.supplierID=msg->getSupplier()->ID();
+    toRegister.requesterID=msg->requester()->ID();
+    toRegister.supplierID=msg->supplier()->ID();
     toRegister.materialID=dynamic_cast<Material*>(*thisMat)->ID(); 
-    toRegister.timestamp=TI->getTime();
-    toRegister.price = msg->getPrice();
+    toRegister.timestamp=TI->time();
+    toRegister.price = msg->price();
      
     strcpy(toRegister.commodName, msg->commod().c_str());
     transactions_.push_back(toRegister);
@@ -147,11 +147,11 @@ void BookKeeper::registerMatState(int trans_id, Material* mat){
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);
 
-  double total = mat->getQuantity();
+  double total = mat->quantity();
   toRegister.materialID = mat->ID(); 
   toRegister.transID = trans_id; 
   /// @todo allow registerMaterialState for arbitrary timestamp (katyhuff).
-  toRegister.timestamp = TI->getTime();
+  toRegister.timestamp = TI->time();
   CompMap comp = (mat->isoVector()).comp();
   CompMap::const_iterator it = comp.begin();
   int i=0;

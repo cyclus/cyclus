@@ -70,7 +70,7 @@ void DeployInst::print()
   for (map<int,Model*>::iterator deploy=deployment_map_.begin();
        deploy!=deployment_map_.end();
        deploy++){
-    LOG(LEV_DEBUG2) << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->getFacName()
+    LOG(LEV_DEBUG2) << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
         << " ("  << (*deploy).second->name() 
         << ") is deployed in month " << (*deploy).first;
   }

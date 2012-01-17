@@ -130,7 +130,7 @@ public:
    *
    * @return fac_name_ the name of this facility, a string
    */
-  virtual std::string getFacName() { return this->name(); };
+  virtual std::string facName() { return this->name(); };
 
   /**
    * Sets this facility's instutution name 
@@ -144,7 +144,7 @@ public:
    *
    * @return the institution assosicated with this facility
    */
-  virtual InstModel* getFacInst();
+  virtual InstModel* facInst();
 
   /**
    * Sets the facility's lifetime 
@@ -158,7 +158,7 @@ public:
    *
    * @return fac_lifetime_ the lifetime of this facility, an int, in months
    */
-  virtual int getFacLifetime() { return fac_lifetime_; };
+  virtual int facLifetime() { return fac_lifetime_; };
 
   /**
    * Returns the facility's power capacity
@@ -166,7 +166,7 @@ public:
    * @return 0 by default. If the facility produces power, it will use its own 
    * function.
    */
-  virtual double getPowerCapacity() { return 0.0; };
+  virtual double powerCapacity() { return 0.0; };
 
   /**
    * Each facility is prompted to do its beginning-of-life

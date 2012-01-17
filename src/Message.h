@@ -260,7 +260,7 @@ class Message {
   /**
    * Returns the direction this Message is traveling.
    */
-  MessageDir getDir() const;
+  MessageDir dir() const;
   
   /**
    * Sets the direction of the message
@@ -275,7 +275,7 @@ class Message {
    * @return market corresponding to this msg's transaction's commodity
    *
    */
-  Communicator* getMarket();
+  Communicator* market();
   
   /**
    * Prints the transaction data.
@@ -288,21 +288,21 @@ class Message {
    *
    * @return the sender
    */
-  Communicator* getSender() const {return sender_;};
+  Communicator* sender() const {return sender_;};
   
   /**
    * Returns the recipient of this Message.
    *
    * @return the recipient
    */
-  Communicator* getRecipient() const;
+  Communicator* recipient() const;
 
   /**
    * Returns the supplier in this Message.
    *
    * @return pointer to the supplier
    */
-  Model* getSupplier() const;
+  Model* supplier() const;
 
   /**
    * Sets the assigned supplier of the material for the 
@@ -317,7 +317,7 @@ class Message {
    *
    * @return pointer to the requester
    */
-  Model* getRequester() const;
+  Model* requester() const;
 
   /**
    * Sets the assigned requester to receive the material
@@ -332,7 +332,7 @@ class Message {
    *
    * @return the Transaction
    */
-  Transaction getTrans() const {return trans_;};
+  Transaction trans() const {return trans_;};
 
   /**
    * Returns the commodity requested or offered in this Message.
@@ -367,7 +367,7 @@ class Message {
    *
    * @return the price (in dollars)
    */
-  double getPrice() const {return trans_.price;};
+  double price() const {return trans_.price;};
 
   /**
    * Returns the price being requested or offered in this message.
@@ -381,7 +381,7 @@ class Message {
    *
    * @return the Resource  (i.e. Material object) 
    */
-  Resource* getResource() const {return trans_.resource;};
+  Resource* resource() const {return trans_.resource;};
 
   /**
    * Sets the assigned resource to a new resource
@@ -390,7 +390,16 @@ class Message {
    */
   void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
 
+  /*!
+  Used to match this message with a corresponding offer/request message after
+  matching takes place in a market.
+  */
   void setPartner(Message* partner) {partner_ = partner;};
+
+  /*!
+  returns the corresponding offer/request message assuming this message has been matched
+  in a market. Returns the 'this' pointer otherwise.
+  */
   Message* partner() {return partner_;};
 
   /*!

@@ -174,14 +174,14 @@ public:
    *
    * @return the current time
    */
-  int getTime();
+  int time();
 
   /**
    * Returns the duration of the simulation this Timer's timing.
    *
    * @return the duration, in months
    */
-  int getSimDur();
+  int simDur();
 
   /**
    * Returns the starting date of the simulation.

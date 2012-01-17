@@ -137,7 +137,7 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
-    capacity += (dynamic_cast<InstModel*>(*inst))->getPowerCapacity();
+    capacity += (dynamic_cast<InstModel*>(*inst))->powerCapacity();
   }
   return capacity;
 };
@@ -217,7 +217,7 @@ void CapacityRegion::handleTick(int time)
       // For now, catch any situation for which no facility is built.
       // ************* This should eventually be changed
       if (build_facility && !built){
-	string fac_name = (dynamic_cast<FacilityModel*>(fac_to_build))->getFacName();
+	string fac_name = (dynamic_cast<FacilityModel*>(fac_to_build))->facName();
 	std::stringstream ss1, ss2;
 	ss1 << fac_name;
 	ss2 << time;

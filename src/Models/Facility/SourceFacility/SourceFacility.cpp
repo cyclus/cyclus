@@ -89,7 +89,7 @@ void SourceFacility::print() {
 void SourceFacility::receiveMessage(Message* msg){
 
   // is this a message from on high? 
-  if(msg->getSupplier()==this){
+  if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -100,7 +100,7 @@ void SourceFacility::receiveMessage(Message* msg){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<Resource*> SourceFacility::removeResource(Message* msg) {
-  Transaction trans = msg->getTrans();
+  Transaction trans = msg->trans();
   double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
@@ -108,29 +108,29 @@ vector<Resource*> SourceFacility::removeResource(Message* msg) {
   // start with an empty manifest
   vector<Resource*> toSend;
 
-  while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
+  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
 
     Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if (m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
-      newAmt += m->getQuantity();
+    if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
+      newAmt += m->quantity();
       toSend.push_back(m);
       inventory_.pop_front();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-        <<"  has decided not to split the object with size :  "<< m->getQuantity();
+        <<"  has decided not to split the object with size :  "<< m->quantity();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* leftover = m->extract(trans.resource->getQuantity() - newAmt);
-      newAmt += m->getQuantity();
+      Material* leftover = m->extract(trans.resource->quantity() - newAmt);
+      newAmt += m->quantity();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-        <<"  has decided to split the object to size :  "<< m->getQuantity();
+        <<"  has decided to split the object to size :  "<< m->quantity();
       toSend.push_back(m);
       inventory_.pop_front();
       inventory_.push_back(leftover);
     }
 
     LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-      <<"  is sending a mat with mass: "<< m->getQuantity();
+      <<"  is sending a mat with mass: "<< m->quantity();
     (m)->print();
   }    
   return toSend;
@@ -156,7 +156,7 @@ void SourceFacility::handleTick(int time){
   // decide what market to offer to
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
-  LOG(LEV_DEBUG2) << "During handleTick, " << getFacName() << " offers: "<< offer_amt << ".";
+  LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
 
   // build a generic resource to offer
   GenericResource* offer_res = new GenericResource(out_commod_,"kg",offer_amt);
@@ -170,7 +170,7 @@ void SourceFacility::handleTick(int time){
   trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
-  msg->setNextDest(getFacInst());
+  msg->setNextDest(facInst());
   msg->sendOn();
 }
 
@@ -185,7 +185,7 @@ void SourceFacility::handleTock(int time){
     temp.multBy(capacity_);
     Material* newMat = new Material(temp);
 
-    LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
+    LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   } else if (space < capacity_*recipe_.mass() && space > 0) {
@@ -193,7 +193,7 @@ void SourceFacility::handleTock(int time){
     IsoVector temp = recipe_;
     temp.setMass(space);
     Material* newMat = new Material(temp);
-    LOG(LEV_DEBUG2) << getFacName() << ", handling the tock, has created a material:";
+    LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   }
@@ -225,7 +225,7 @@ double SourceFacility::checkInventory(){
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
   }
   
   return total;

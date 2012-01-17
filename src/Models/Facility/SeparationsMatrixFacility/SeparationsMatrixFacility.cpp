@@ -148,7 +148,7 @@ void SeparationsMatrixFacility::print()
 void SeparationsMatrixFacility::receiveMessage(Message* msg) 
 {
   // is this a message from on high? 
-  if(msg->getSupplier()==this){
+  if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -159,7 +159,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
-  Transaction trans = msg->getTrans();
+  Transaction trans = msg->trans();
 
   double newAmt = 0;
 
@@ -168,7 +168,7 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
   // start with an empty manifest
   vector<Resource*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ){
+  while(trans.resource->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -178,21 +178,21 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
       Material* newMat = new Material();
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
-      if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)){
-        newAmt += m->getQuantity();
+      if(m->quantity() <= (trans.resource->quantity() - newAmt)){
+        newAmt += m->quantity();
         newMat->absorb(m);
         inventory_.pop_front();
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
-        newAmt += toAbsorb->getQuantity();
+        Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+        newAmt += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
 
       toSend.push_back(newMat);
       LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
-        <<"  is sending a mat with mass: "<< newMat->getQuantity();
+        <<"  is sending a mat with mass: "<< newMat->quantity();
     }    
   }
   return toSend;
@@ -209,8 +209,8 @@ void SeparationsMatrixFacility::addResource(Message* msg,
       thisMat != manifest.end();
       thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
-      << (*thisMat)->getQuantity();
-    stocks_.push_back(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
+      << (*thisMat)->quantity();
+    stocks_.push_back(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 
@@ -249,15 +249,15 @@ void SeparationsMatrixFacility::handleTock(int time)
       Material* newMat = new Material();
 
       // if the stocks obj isn't larger than the remaining need, send it as is.
-      if(m->getQuantity() <= (capacity_ - complete)){
-        complete += m->getQuantity();
+      if(m->quantity() <= (capacity_ - complete)){
+        complete += m->quantity();
         newMat->absorb(m);
         stocks_.pop_front();
       }
       else{ 
         // if the stocks obj is larger than the remaining need, split it.
         Material* toAbsorb = m->extract(capacity_ - complete);
-        complete += toAbsorb->getQuantity();
+        complete += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
       // stocks.push_back(make_pair(trans.commod, *thisMat));
@@ -289,7 +289,7 @@ double SeparationsMatrixFacility::checkInventory(){
   for (deque<InSep>::iterator iter = inventory_.begin(); 
       iter != inventory_.end(); 
       iter ++){
-    total += (*iter).second->getQuantity();
+    total += (*iter).second->quantity();
   }
 
   return total;
@@ -305,7 +305,7 @@ double SeparationsMatrixFacility::checkStocks(){
   for (deque<OutSep>::iterator iter = stocks_.begin(); 
       iter != stocks_.end(); 
       iter ++){
-    total += (*iter).second->getQuantity();
+    total += (*iter).second->quantity();
   }
 
   return total;
@@ -356,7 +356,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.resource = request_res; 
 
       Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
+      request->setNextDest(facInst());
       request->sendOn();
     }
     // otherwise, the upper bound is the monthly acceptance capacity 
@@ -378,7 +378,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
+      request->setNextDest(facInst());
       request->sendOn();
     }
 
@@ -421,7 +421,7 @@ void SeparationsMatrixFacility::makeOffers() {
     trans.resource = offer_mat;
 
     Message* msg = new Message(this, recipient, trans); 
-    msg->setNextDest(getFacInst());
+    msg->setNextDest(facInst());
     msg->sendOn();
   }
 
@@ -432,7 +432,7 @@ void SeparationsMatrixFacility::separate()
 {
   // Get iterators that define the boundaries of the ordersExecuting_ that are 
   // currently ready.~
-  int time = TI->getTime();
+  int time = TI->time();
 
   pair<ProcessLine::iterator, ProcessLine::iterator> iters;
 
@@ -450,7 +450,7 @@ void SeparationsMatrixFacility::separate()
 
     // Find out what we're trying to make.
     try {
-      IsoVector vecToMake =  dynamic_cast<Material*>(mess->getResource())->isoVector();
+      IsoVector vecToMake =  dynamic_cast<Material*>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;
