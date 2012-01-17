@@ -224,9 +224,7 @@ public:
      * The RecipeReactor reports a power capacity of its capacity factor * power 
      * capacity
      */
-    double getPowerCapactiy(){ return CF_*capacity_;};
-
-    
+    double powerCapacity(){ return CF_*capacity_;};
 
 protected:
     /**

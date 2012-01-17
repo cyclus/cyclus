@@ -61,7 +61,7 @@ void FixedInst::print()
   for (vector<Model*>::iterator fac=children_.begin(); 
        fac != children_.end(); 
        fac++){
-    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
+    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
      << " (" << (*fac)->name() << ")";
   }
 };

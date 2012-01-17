@@ -98,7 +98,7 @@ void StorageFacility::print()
 void StorageFacility::receiveMessage(Message* msg)
 {
   // is this a message from on high? 
-  if(msg->getSupplier()==this){
+  if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -109,7 +109,7 @@ void StorageFacility::receiveMessage(Message* msg)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::vector<Resource*> StorageFacility::removeResource(Message* order) {
-  Transaction trans = order->getTrans();
+  Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
     throw CycException("StorageFacility can only send incommodity type materials.");
@@ -124,11 +124,11 @@ std::vector<Resource*> StorageFacility::removeResource(Message* order) {
     Material* m = inventory_.front();
 
     // if the inventory_ obj isn't larger than the remaining need, send it as is.
-    if(m->getTotMass() <= (capacity_ - complete)){
-      complete += m->getQuantity();
+    if(m->quantity() <= (capacity_ - complete)){
+      complete += m->quantity();
       toSend.push_back(m);
       LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< m->getQuantity();
+        <<"  is sending a mat with mass: "<< m->quantity();
       inventory_.pop_front();
     } else { 
       // if the inventory_ obj is larger than the remaining need, split it.
@@ -138,11 +138,11 @@ std::vector<Resource*> StorageFacility::removeResource(Message* order) {
           m->getName(), 
           0, ATOMBASED);
       Material* toAbsorb = m->extractMass(capacity_ - complete);
-      complete += toAbsorb->getTotMass();
+      complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
       LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
-        <<"  is sending a mat with mass: "<< newMat->getQuantity();
+        <<"  is sending a mat with mass: "<< newMat->quantity();
     }
   }    
   return toSend;
@@ -157,9 +157,9 @@ void StorageFacility::addResource(Message* msg, vector<Resource*> manifest) {
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
+        << (*thisMat)->quantity();
     stocks_.push_back(dynamic_cast<Material*>(*thisMat));
-    entryTimes_.push_back(make_pair(TI->getTime(), dynamic_cast<Material*>(*thisMat) ));
+    entryTimes_.push_back(make_pair(TI->time(), dynamic_cast<Material*>(*thisMat) ));
   }
 }
 
@@ -222,7 +222,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.comp = newMat->getAtomComp();
     trans.min = minAmt;
     trans.price = price;
-    trans.amount = newMat->getTotMass();
+    trans.amount = newMat->quantity();
 
     Message* storage_history = new Message(sending_facility, this, trans); 
     storage_history->approveTransfer();
@@ -277,7 +277,7 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     Message* request = new Message(this, recipient, trans); 
-    request->setNextDest(getFacInst());
+    request->setNextDest(facInst());
     request->sendOn();
 
   // otherwise, the upper bound is the monthly acceptance capacity 
@@ -294,7 +294,7 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     Message* request = new Message(this, recipient, trans); 
-    request->setNextDest(getFacInst());
+    request->setNextDest(facInst());
     request->sendOn();
   }
   
@@ -315,7 +315,7 @@ void StorageFacility::handleTick(int time)
   double min_amt = 0;
 
   // decide what market to offer to
-  Communicator* recipient = dynamic_cast<Communicator*>(incommod_->getMarket());
+  Communicator* recipient = dynamic_cast<Communicator*>(incommod_->market());
 
   // build the transaction and message
   Transaction trans;
@@ -325,7 +325,7 @@ void StorageFacility::handleTick(int time)
   trans.amount = offer_amt; // offers have a positive amount
 
   Message* msg = new Message(this, recipient, trans); 
-  msg->setNextDest(getFacInst());
+  msg->setNextDest(facInst());
   msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -337,7 +337,7 @@ void StorageFacility::handleTock(int time)
   bool someOld = true;
   while( someOld == true && !stocks_.empty()){
     Material* oldEnough = stocks_.front();
-    if(TI->getTime() - entryTimes_.front().first >= residence_time_ ){
+    if(TI->time() - entryTimes_.front().first >= residence_time_ ){
         entryTimes_.pop_front();
         // Here is is where we could add a case switch between sending
         // youngest or oldest material first
@@ -372,7 +372,7 @@ Mass StorageFacility::checkInventory(){
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getTotMass();
+    total += (*iter)->quantity();
   }
 
   return total;
@@ -388,7 +388,7 @@ Mass StorageFacility::checkStocks(){
   for (deque<Material*>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
-    total += (*iter)->getTotMass();
+    total += (*iter)->quantity();
   }
 
   return total;

@@ -184,7 +184,7 @@ void RecipeReactor::endCycle() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::receiveMessage(Message* msg) {
   // is this a message from on high? 
-  if(msg->getSupplier()==this){
+  if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -195,7 +195,7 @@ void RecipeReactor::receiveMessage(Message* msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
-  Transaction trans = msg->getTrans();
+  Transaction trans = msg->trans();
 
   double newAmt = 0;
 
@@ -207,7 +207,7 @@ std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
   vector<Resource*> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
+  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     for (deque<OutFuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -219,19 +219,19 @@ std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
         newMat = new Material();
 
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if (m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
-          newAmt += m->getQuantity();
+        if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
+          newAmt += m->quantity();
           newMat->absorb(m);
           inventory_.pop_front();
         } else { 
           // if the inventory obj is larger than the remaining need, split it.
-          toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
-          newAmt += toAbsorb->getQuantity();
+          toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+          newAmt += toAbsorb->quantity();
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
         LOG(LEV_DEBUG2) <<"RecipeReactor "<< ID()
-          <<"  is sending a mat with mass: "<< newMat->getQuantity();
+          <<"  is sending a mat with mass: "<< newMat->quantity();
       }
     }
   }    
@@ -246,8 +246,8 @@ void RecipeReactor::addResource(Message* msg, vector<Resource*> manifest) {
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
+        << (*thisMat)->quantity();
+    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
   }
 }
 
@@ -308,7 +308,7 @@ void RecipeReactor::handleTick(int time) {
       trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
+      request->setNextDest(facInst());
       request->sendOn();
     // otherwise, the upper bound is the batch size
     // minus the amount in stocks.
@@ -330,7 +330,7 @@ void RecipeReactor::handleTick(int time) {
       trans.resource = request_res;
 
       Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(getFacInst());
+      request->setNextDest(facInst());
       request->sendOn();
     }
   }
@@ -358,7 +358,7 @@ void RecipeReactor::handleTick(int time) {
     // decide what market to offer to
     recipient = dynamic_cast<Communicator*>(market);
     // get amt
-    offer_amt = iter->second->getQuantity();
+    offer_amt = iter->second->quantity();
 
     // make a material to offer
     Material* offer_mat = new Material(out_recipe_);
@@ -373,7 +373,7 @@ void RecipeReactor::handleTick(int time) {
     trans.resource = offer_mat;
 
     Message* msg = new Message(this, recipient, trans); 
-    msg->setNextDest(getFacInst());
+    msg->setNextDest(facInst());
     msg->sendOn();
   };
 }
@@ -407,7 +407,7 @@ double RecipeReactor::checkInventory(){
   for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += iter->second->getQuantity();
+    total += iter->second->quantity();
   }
 
   return total;
@@ -423,7 +423,7 @@ double RecipeReactor::checkStocks(){
     for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
-        total += iter->second->getQuantity();
+        total += iter->second->quantity();
     };
   };
   return total;

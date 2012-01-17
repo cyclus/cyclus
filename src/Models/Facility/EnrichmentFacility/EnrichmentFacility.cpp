@@ -102,7 +102,7 @@ void EnrichmentFacility::print() {
 void EnrichmentFacility::receiveMessage(Message* msg)
 {
   // is this a message from on high? 
-  if(msg->getSupplier()==this){
+  if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -113,7 +113,7 @@ void EnrichmentFacility::receiveMessage(Message* msg)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::vector<Resource*> EnrichmentFacility::removeResource(Message* msg) {
-  Transaction trans = msg->getTrans();
+  Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
     throw CycException("EnrichmentFacility can only send '" +  out_commod_ + 
@@ -127,27 +127,27 @@ std::vector<Resource*> EnrichmentFacility::removeResource(Message* msg) {
   // start with an empty manifest
   std::vector<Resource*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
+  while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
 
     // start with an empty material
     Material* newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
-      newAmt += m->getQuantity();
+    if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
+      newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
+      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
-      newAmt += toAbsorb->getQuantity();
+      newAmt += toAbsorb->quantity();
     }
 
     toSend.push_back(newMat);
     LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getQuantity();
+      <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
 }
@@ -160,7 +160,7 @@ void EnrichmentFacility::addResource(Message* msg, vector<Resource*> manifest) {
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
+        << (*thisMat)->quantity();
     stocks_.push_back(dynamic_cast<Material*>(*thisMat));
   }
 }
@@ -192,15 +192,15 @@ void EnrichmentFacility::handleTock(int time) {
     Material* newMat = new Material();
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
-    if(m->getQuantity() <= (capacity_ - complete)){
-      complete += m->getQuantity();
+    if(m->quantity() <= (capacity_ - complete)){
+      complete += m->quantity();
       newMat->absorb(m);
       stocks_.pop_front();
     }
     else{ 
       // if the stocks obj is larger than the remaining need, split it.
       Material* toAbsorb = m->extract(capacity_ - complete);
-      complete += toAbsorb->getQuantity();
+      complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
     }
 
@@ -229,7 +229,7 @@ double EnrichmentFacility::checkInventory(){
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
   }
 
   return total;
@@ -245,7 +245,7 @@ double EnrichmentFacility::checkStocks(){
   for (deque<Material*>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
   }
 
   return total;
@@ -304,7 +304,7 @@ void EnrichmentFacility::makeRequests(){
     trans.resource = req_res;
 
     Message* request = new Message(this, recipient, trans); 
-    request->setNextDest(getFacInst());
+    request->setNextDest(facInst());
     request->sendOn();
   }
 }
@@ -343,14 +343,14 @@ void EnrichmentFacility::makeOffers()
   trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
-  msg->setNextDest(getFacInst());
+  msg->setNextDest(facInst());
   msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentFacility::enrich() {
   // Get iterators that define the boundaries of the ordersExecuting that are 
   // currently ready.~
-  int time = TI->getTime();
+  int time = TI->time();
 
   pair<ProcessLine::iterator,
     ProcessLine::iterator> iters;
@@ -373,7 +373,7 @@ void EnrichmentFacility::enrich() {
     // Find out what we're trying to make.
     //
     try {
-      vecToMake = dynamic_cast<Material*>(mess->getResource())->isoVector();
+      vecToMake = dynamic_cast<Material*>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
@@ -405,7 +405,7 @@ void EnrichmentFacility::enrich() {
     pComp.setAtomCount(922350, atoms235);
     pComp.setAtomCount(922380, atoms238);
     pComp.setAtomCount(90190, atoms19);
-    pComp.setMass(mat->getQuantity());
+    pComp.setMass(mat->quantity());
 
     Material* theProd = new Material(pComp);
 
@@ -421,7 +421,7 @@ void EnrichmentFacility::enrich() {
     wComp.setAtomCount(922350, atoms235);
     wComp.setAtomCount(922380, atoms238);
     wComp.setAtomCount(90190, atoms19);
-    wComp.setMass(mat->getQuantity());
+    wComp.setMass(mat->quantity());
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
     Material* theTails = new Material(wComp);
@@ -439,8 +439,8 @@ void EnrichmentFacility::enrich() {
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    Material* rsrc = dynamic_cast<Material*>(mess->getResource());
-    rsrc->setQuantity(theProd->getQuantity());
+    Material* rsrc = dynamic_cast<Material*>(mess->resource());
+    rsrc->setQuantity(theProd->quantity());
     mess->setResource(dynamic_cast<Resource*>(theProd));
 
     mess->approveTransfer();

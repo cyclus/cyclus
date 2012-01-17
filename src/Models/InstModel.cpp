@@ -117,13 +117,13 @@ bool InstModel::pleaseBuild(Model* fac){
   return false;
 }
 
-double InstModel::getPowerCapacity(){
+double InstModel::powerCapacity(){
   // queries each facility for their power capacity
   double capacity = 0.0;
   for(vector<Model*>::iterator fac=children_.begin();
       fac != children_.end();
       fac++){
-    capacity += (dynamic_cast<FacilityModel*>(*fac))->getPowerCapacity();
+    capacity += (dynamic_cast<FacilityModel*>(*fac))->powerCapacity();
   }
   return capacity;
 }

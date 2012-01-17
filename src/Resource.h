@@ -24,14 +24,14 @@ public:
    *
    * @return resource_unit_ the base unit of this resource
    */
-  virtual std::string getResourceUnits() = 0;
+  virtual std::string resourceUnits() = 0;
     
   /**
    * Returns the total quantity of this resource in its base unit 
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual double getQuantity() = 0;
+  virtual double quantity() = 0;
 
   /**
    * Set the quantity of the resource in its default units to 'val'.
@@ -79,7 +79,7 @@ public:
   /**
    * Returns the concrete resource type, an enum
    */
-  virtual ResourceType getResourceType()=0;
+  virtual ResourceType resourceType()=0;
 
   /**
    * Returns a newly allocated copy of the resource

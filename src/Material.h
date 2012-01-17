@@ -130,12 +130,12 @@ public:
   /**
    * Resource class method
    */
-  double getQuantity(){return iso_vector_.mass();};
+  double quantity(){return iso_vector_.mass();};
 
   /**
    * Resource class method
    */
-  std::string getResourceUnits(){return "kg";};
+  std::string resourceUnits(){return "kg";};
 
   /**
    * Resource class method
@@ -155,7 +155,7 @@ public:
   /**
    * Resource class method
    */
-  ResourceType getResourceType() {return MATERIAL_RES;};
+  ResourceType resourceType() {return MATERIAL_RES;};
 
   /**
    * Resource class method
@@ -231,14 +231,14 @@ public:
    */
   static void setDecay(int dec);
 
-protected:
-
-  /// all isotopic details of this material object
-  IsoVector iso_vector_;
+private:
 
   /// last time this material object's state was accurate (e.g. time of last
   /// decay, etc.)
   int last_update_time_;
+
+  /// all isotopic details of this material object
+  IsoVector iso_vector_;
 
   /** 
    * The serial number for this Material.

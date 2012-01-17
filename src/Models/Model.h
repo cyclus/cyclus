@@ -194,9 +194,6 @@ public:
   /// return the ith child
   Model* children(int i){return children_[i];}
 
-  /// children of this model
-  std::vector <Model*> children_;
-
   /*!
   @brief Transacted resources are extracted through this method.
 
@@ -221,9 +218,12 @@ public:
   virtual void addResource(Message* msg,
                               std::vector<Resource*> manifest);
 
-  bool& isTemplate() {return is_template_;}
+  bool& isTemplate() {return is_template_;};
   
-  
+protected:
+  /// children of this model
+  std::vector <Model*> children_;
+
 private:
 
   /*!

@@ -95,7 +95,7 @@ void Message::printTrans() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
   Message* new_msg = new Message(*this);
-  new_msg->setResource(getResource());
+  new_msg->setResource(resource());
   return new_msg;
 }
 
@@ -162,7 +162,7 @@ void Message::reverseDirection() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MessageDir Message::getDir() const {
+MessageDir Message::dir() const {
   return dir_;
 }
 
@@ -172,13 +172,13 @@ void Message::setDir(MessageDir newDir) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getMarket() {
+Communicator* Message::market() {
   MarketModel* market = MarketModel::marketForCommod(trans_.commod);
   return market;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::getRecipient() const {
+Communicator* Message::recipient() const {
   if (recipient_ == NULL) {
     string err_msg = "Uninitilized message recipient.";
     throw CycMessageException(err_msg);
@@ -188,7 +188,7 @@ Communicator* Message::getRecipient() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::getSupplier() const {
+Model* Message::supplier() const {
   if (trans_.supplier == NULL) {
     string err_msg = "Uninitilized message supplier.";
     throw CycMessageException(err_msg);
@@ -198,7 +198,7 @@ Model* Message::getSupplier() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::getRequester() const {
+Model* Message::requester() const {
   if (trans_.requester == NULL) {
     string err_msg = "Uninitilized message requester.";
     throw CycMessageException(err_msg);
@@ -208,10 +208,10 @@ Model* Message::getRequester() const {
 }
 
 void Message::approveTransfer() {
-  Model* requester = getRequester();
-  Model* supplier = getSupplier();
-  vector<Resource*> manifest = supplier->removeResource(this);
-  requester->addResource(this, manifest);
+  Model* req = requester();
+  Model* sup = supplier();
+  vector<Resource*> manifest = sup->removeResource(this);
+  req->addResource(this, manifest);
 
   BI->registerTrans(nextTransID_, this, manifest);
 
@@ -225,6 +225,6 @@ void Message::approveTransfer() {
   }
   nextTransID_++;
 
-  LOG(LEV_DEBUG2) << "Material sent from " << supplier->ID() << " to " 
-                  << requester->ID() << ".";
+  LOG(LEV_DEBUG2) << "Material sent from " << sup->ID() << " to " 
+                  << req->ID() << ".";
 }

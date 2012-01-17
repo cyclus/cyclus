@@ -85,7 +85,7 @@ void* Model::destroy(Model* model) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Model::decommission(){  
   // set the died on date for book keeping
-  this->setDiedOn( TI->getTime() );
+  this->setDiedOn( TI->time() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -172,7 +172,7 @@ void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  this->setBornOn( TI->getTime() );
+  this->setBornOn( TI->time() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

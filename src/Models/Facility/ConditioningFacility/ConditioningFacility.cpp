@@ -138,7 +138,7 @@ void ConditioningFacility::receiveMessage(Message* msg) {
 std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
  // Send material from inventory to fulfill transactions
 
-  Transaction trans = order->getTrans();
+  Transaction trans = order->trans();
 
   double newAmt = 0;
 
@@ -147,27 +147,27 @@ std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
   // start with an empty manifest
   vector<Resource*> toSend;
 
-  while(trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
+  while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
 
     // start with an empty material
     Material* newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
-      newAmt += m->getQuantity();
+    if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
+      newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->getQuantity() - newAmt);
+      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
-      newAmt += toAbsorb->getQuantity();
+      newAmt += toAbsorb->quantity();
     }
 
     toSend.push_back(newMat);
     LOG(LEV_DEBUG2) <<"ConditioningFacility "<< ID()
-      <<"  is sending a mat with mass: "<< newMat->getQuantity();
+      <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
 };
@@ -181,8 +181,8 @@ void ConditioningFacility::addResource(Message* msg, vector<Resource*> manifest)
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"ConditioningFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
-    stocks_.push_front(make_pair(msg->getTrans().commod, dynamic_cast<Material*>(*thisMat)));
+        << (*thisMat)->quantity();
+    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
   } 
 };
 
@@ -431,12 +431,12 @@ Material* ConditioningFacility::condition(string commod, Material* mat){
   Material* mat_to_condition;
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
-  double mass_remaining = mat->getQuantity();
+  double mass_remaining = mat->quantity();
   while( mass_remaining > mass_to_condition) {
     mat_to_condition = mat->extract(mass_to_condition);
     // mat_to_condition->absorb(wf_iso_vec_[commod]);
     inventory_.push_back(mat_to_condition);
-    mass_remaining = mat->getQuantity();
+    mass_remaining = mat->quantity();
   }
   return mat;
 }

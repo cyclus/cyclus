@@ -132,7 +132,7 @@ public:
   int getNumFacilities(){ return this->nChildren();};
 
   /// queries the power capacity of each facility in the institution
-  double getPowerCapacity();
+  double powerCapacity();
 
   /// attempts to build another facility of type fac
   virtual bool pleaseBuild(Model* fac);

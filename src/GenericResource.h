@@ -37,14 +37,14 @@ public:
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual double getQuantity() {return quantity_;};
+  virtual double quantity() {return quantity_;};
     
   /**
    * Returns the total quantity of this resource in its base unit 
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual std::string getResourceUnits() {return units_;};
+  virtual std::string resourceUnits() {return units_;};
     
   /**
    * Sets the total quantity of this resource in its base unit 
@@ -81,7 +81,7 @@ public:
   /**
    * Returns the concrete type of this resource
    */
-  virtual ResourceType getResourceType(){return GENERIC_RES;};
+  virtual ResourceType resourceType(){return GENERIC_RES;};
 
 protected:
   /**

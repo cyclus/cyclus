@@ -37,7 +37,7 @@ void BuildInst::print()
   for (vector<Model*>::iterator fac=facilities_.begin(); 
        fac != facilities_.end(); 
        fac++){
-    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->getFacName()
+    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
      << " (" << (*fac)->name() << ")";
   }
 };
@@ -49,7 +49,7 @@ bool BuildInst::pleaseBuild(Model* fac)
   Model* new_facility=Model::create(fac);
   // !!! We need a way to determine the new facility's name
   // Set the facility name
-  string name = dynamic_cast<FacilityModel*>(fac)->getFacName()+" 2";
+  string name = dynamic_cast<FacilityModel*>(fac)->facName()+" 2";
   dynamic_cast<FacilityModel*>(new_facility)->setFacName(name);
   // Set the facility's parent institution
   dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->name());

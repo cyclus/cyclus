@@ -30,13 +30,13 @@ int Material::decay_interval_ = 1;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
   ID_ = nextID_++;
-  last_update_time_ = TI->getTime();
+  last_update_time_ = TI->time();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
   ID_ = nextID_++;
-  last_update_time_ = TI->getTime();
+  last_update_time_ = TI->time();
   iso_vector_ = comp;
 };
 
@@ -101,8 +101,8 @@ bool Material::checkQuantityEqual(Resource* other){
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<Material*>(other)->getQuantity();
-    toRet=( abs(getQuantity() - second_qty) < EPS_KG);
+    double second_qty = dynamic_cast<Material*>(other)->quantity();
+    toRet=( abs(quantity() - second_qty) < EPS_KG);
   } catch (Exception& e) {
   }
   return toRet;
@@ -117,8 +117,8 @@ bool Material::checkQuantityGT(Resource* other){
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<Material*>(other)->getQuantity();
-    toRet = second_qty - getQuantity() > EPS_KG;
+    double second_qty = dynamic_cast<Material*>(other)->quantity();
+    toRet = second_qty - quantity() > EPS_KG;
   } catch (Exception& e){
   }
 
@@ -127,7 +127,7 @@ bool Material::checkQuantityGT(Resource* other){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay() {
-  int curr_time = TI->getTime();
+  int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
   
   iso_vector_.executeDecay(delta_time);

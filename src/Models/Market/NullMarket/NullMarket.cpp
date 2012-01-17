@@ -16,10 +16,10 @@ void NullMarket::receiveMessage(Message *msg) {
   messages_.insert(msg);
 
   if (msg->isOffer()){
-    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
   }
   else if (!msg->isOffer()){
-    requests_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    requests_.insert(indexedMsg(msg->resource()->quantity(),msg));
   }
 }
 
@@ -37,7 +37,7 @@ void NullMarket::reject_request(sortedMsgList::iterator request)
   while (matchedOffers_.size() > 0)
   {
     Message* msg = *(matchedOffers_.begin());
-    offers_.insert(indexedMsg(msg->getResource()->getQuantity(),msg));
+    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
 }
@@ -79,11 +79,11 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
     // pop off this offer
     offers_.erase(offer);
   
-    if (requestMsg->getResource()->checkQuality(offerMsg->getResource())){
+    if (requestMsg->resource()->checkQuality(offerMsg->resource())){
       if (requestAmt > offerAmt) { 
         // put a new message in the order stack
         // it goes down to supplier
-        offerMsg->setRequester(requestMsg->getRequester());
+        offerMsg->setRequester(requestMsg->requester());
 
         // Queue an order
         matchedOffers_.insert(offerMsg);
@@ -96,11 +96,11 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
         LOG(LEV_DEBUG2) 
 	  << "NullMarket has resolved a transaction "
 	  << " which is a match from "
-          << offerMsg->getSupplier()->ID()
+          << offerMsg->supplier()->ID()
           << " to "
-          << offerMsg->getRequester()->ID()
+          << offerMsg->requester()->ID()
           << " for the amount:  " 
-          << offerMsg->getResource()->getQuantity();
+          << offerMsg->resource()->quantity();
 
         requestAmt -= offerAmt;
       } 
@@ -109,19 +109,19 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         // queue a new order
         Message* maybe_offer = offerMsg->clone(); 
-        maybe_offer->getResource()->setQuantity(requestAmt);
-        maybe_offer->setRequester(requestMsg->getRequester());
+        maybe_offer->resource()->setQuantity(requestAmt);
+        maybe_offer->setRequester(requestMsg->requester());
 
         matchedOffers_.insert(offerMsg);
 
         orders_.push_back(maybe_offer);
 
         LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
-          << maybe_offer->getSupplier()->ID()
+          << maybe_offer->supplier()->ID()
           << " to "
-          << maybe_offer->getRequester()->ID()
+          << maybe_offer->requester()->ID()
           << " for the amount:  " 
-          << maybe_offer->getResource()->getQuantity();
+          << maybe_offer->resource()->quantity();
 
         // reduce the offer amount
         offerAmt -= requestAmt;
@@ -131,7 +131,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         if(offerAmt > EPS_KG){
           Message* new_offer = offerMsg->clone();
-          new_offer->getResource()->setQuantity(offerAmt);
+          new_offer->resource()->setQuantity(offerAmt);
           receiveMessage(new_offer);
         }
 
@@ -166,7 +166,7 @@ void NullMarket::resolve()
       process_request();
     } 
     else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->getRequester()->ID()
+      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected. ";
       reject_request(request);

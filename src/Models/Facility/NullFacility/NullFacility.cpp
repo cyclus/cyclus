@@ -83,7 +83,7 @@ void NullFacility::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveMessage(Message* msg) {
   // is this a message from on high? 
-  if (msg->getSupplier()==this) {
+  if (msg->supplier()==this) {
     // file the order
     ordersWaiting_.push_front(msg);
   } else {
@@ -93,7 +93,7 @@ void NullFacility::receiveMessage(Message* msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::vector<Resource*> NullFacility::removeResource(Message* order) {
-  Transaction trans = order->getTrans();
+  Transaction trans = order->trans();
   // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
     std::string err_msg = "NullFacility can only send '" + out_commod_ ;
@@ -108,24 +108,24 @@ std::vector<Resource*> NullFacility::removeResource(Message* order) {
   // start with an empty manifest
   vector<Resource*> toSend;
 
-  while (trans.resource->getQuantity() > newAmt && !inventory_.empty() ) {
+  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if (m->getQuantity() <= (trans.resource->getQuantity() - newAmt)) {
-      newAmt += m->getQuantity();
+    if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
+      newAmt += m->quantity();
       inventory_.pop_front();
     } else {
       // if the inventory obj is larger than the remaining need, split it.
-      Material* leftover = m->extract(trans.resource->getQuantity() - newAmt);
-      newAmt += m->getQuantity();
+      Material* leftover = m->extract(trans.resource->quantity() - newAmt);
+      newAmt += m->quantity();
       inventory_.pop_front();
       inventory_.push_back(leftover);
     }
 
     toSend.push_back(m);
     LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
-      <<"  is sending a mat with mass: "<< m->getQuantity();
+      <<"  is sending a mat with mass: "<< m->quantity();
   }    
   return toSend;
 }
@@ -138,7 +138,7 @@ void NullFacility::addResource(Message* msg, vector<Resource*> manifest) {
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->getQuantity();
+        << (*thisMat)->quantity();
     stocks_.push_back(dynamic_cast<Material*>(*thisMat));
   }
 }
@@ -186,7 +186,7 @@ void NullFacility::makeRequests() {
     trans.resource = request_res;
 
     Message* request = new Message(this, recipient, trans); 
-    request->setNextDest(getFacInst());
+    request->setNextDest(facInst());
     request->sendOn();
   // otherwise, the upper bound is the monthly acceptance capacity 
   // minus the amount in stocks.
@@ -208,7 +208,7 @@ void NullFacility::makeRequests() {
     trans.resource = request_res;
 
     Message* request = new Message(this, recipient, trans); 
-    request->setNextDest(getFacInst());
+    request->setNextDest(facInst());
     request->sendOn();
   }
 }
@@ -248,7 +248,7 @@ void NullFacility::makeOffers() {
   trans.resource = offer_res;
 
   Message* msg = new Message(this, recipient, trans); 
-  msg->setNextDest(getFacInst());
+  msg->setNextDest(facInst());
   msg->sendOn();
 }
 
@@ -263,14 +263,14 @@ void NullFacility::handleTock(int time) {
   while(capacity_ > complete && !stocks_.empty() ) {
     Material* m = stocks_.front();
 
-    if(m->getQuantity() <= (capacity_ - complete)){
+    if(m->quantity() <= (capacity_ - complete)){
       // if the mass of the material is less than the remaining capacity
-      complete += m->getQuantity();
+      complete += m->quantity();
       stocks_.pop_front();
     } else { 
       // if the mass is too bit, split the stocks object 
       Material* leftover = m->extract(capacity_ - complete);
-      complete += m->getQuantity();
+      complete += m->quantity();
       stocks_.pop_front();
       stocks_.push_back(leftover);
     }
@@ -300,7 +300,7 @@ double NullFacility::checkInventory() {
   for (deque<Material*>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
   }
 
   return total;
@@ -316,7 +316,7 @@ double NullFacility::checkStocks(){
   for (deque<Material*>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
-    total += (*iter)->getQuantity();
+    total += (*iter)->quantity();
   }
 
   return total;
