@@ -13,6 +13,7 @@
 #include "H5Exception.h"
 #include "Logger.h"
 #include "Material.h"
+#include "GenericResource.h"
 
 using namespace H5;
 
@@ -67,6 +68,9 @@ void ConditioningFacility::init(xmlNodePtr cur)
     /// move XML pointer to current model
     cur = XMLinput->get_xpath_element(cur,"model/ConditioningFacility");
 
+    capacity_ = strtod(XMLinput->get_xpath_content(cur, "capacity"), NULL);
+    remaining_capacity_= capacity_;
+
     /// initialize any ConditioningFacility-specific datamembers here
     string datafile = XMLinput->get_xpath_content(cur, "datafile");
     string fileformat = XMLinput->get_xpath_content(cur, "fileformat");
@@ -81,7 +85,7 @@ void ConditioningFacility::init(xmlNodePtr cur)
       xmlNodePtr pair_node = nodes->nodeTab[i];
 
       // get commods
-      commod = XMLinput->get_xpath_content(pair_node,"commodity");
+      commod = XMLinput->get_xpath_content(pair_node,"incommodity");
 
       // get in_recipe
       commod_id = strtol(XMLinput->get_xpath_content(pair_node,"id"), NULL, 10);
@@ -136,6 +140,26 @@ void ConditioningFacility::receiveMessage(Message* msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
+  std::vector<Resource*> toRet = std::vector<Resource*>() ;
+  Transaction trans = order->trans();
+  double order_amount = trans.resource->quantity()*trans.minfrac;
+  if (remaining_capacity_ >= order_amount){
+    toRet = processOrder(order);
+  } else { 
+    string msg;
+    msg += "The ConditioningFacility has run out of processing capacity. ";
+    msg += "The order requested by ";
+    msg += order->requester()->name();
+    msg += " will not be sent.";
+    LOG(LEV_DEBUG2) << msg;
+    GenericResource* empty = new GenericResource("kg","kg",0);
+    toRet.push_back(empty);
+  }
+  return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<Resource*> ConditioningFacility::processOrder(Message* order) {
  // Send material from inventory to fulfill transactions
 
   Transaction trans = order->trans();
@@ -158,11 +182,13 @@ std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
       newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
+      remaining_capacity_ = remaining_capacity_ - newAmt;
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
       Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
+      remaining_capacity_ = remaining_capacity_ - newAmt;
     }
 
     toSend.push_back(newMat);
@@ -192,6 +218,7 @@ void ConditioningFacility::handleTick(int time){
   // On the tick, the ConditioningFacility makes requests for each 
   // of the waste commodities (streams) that its table addresses
   // It also makes offers of any conditioned waste it contains
+  remaining_capacity_ = capacity_;
   makeRequests();
   makeOffers();
 };
@@ -205,7 +232,6 @@ void ConditioningFacility::handleTock(int time){
   // capacity.
   
   conditionMaterials();
-  processOrders();
 
   // call the facility model's handle tock 
   // to check for decommissioning
@@ -413,7 +439,7 @@ void ConditioningFacility::conditionMaterials(){
   // Partition the in-stream according to loading density
   // for each stream object in stocks
   map<string, Material*> remainders;
-  while( !stocks_.empty() ){
+  while( !stocks_.empty() && remaining_capacity_ > 0){
     // move stocks to currMat
     std::string currCommod = stocks_.front().first;
     Material* currMat = stocks_.front().second;
@@ -432,11 +458,12 @@ Material* ConditioningFacility::condition(string commod, Material* mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
-  while( mass_remaining > mass_to_condition) {
+  while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
     mat_to_condition = mat->extract(mass_to_condition);
     // mat_to_condition->absorb(wf_iso_vec_[commod]);
     inventory_.push_back(mat_to_condition);
     mass_remaining = mat->quantity();
+    remaining_capacity_ = remaining_capacity_ - mass_to_condition;
   }
   return mat;
 }
@@ -462,10 +489,6 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
     }
   }
   return toRet;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::processOrders(){
 }
 
 

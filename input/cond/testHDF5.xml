@@ -36,8 +36,13 @@
     <name>BackEnd</name>
     <model>
       <ConditioningFacility>
+        <capacity>5</capacity>
         <fileformat>hdf5</fileformat>
         <datafile>input/cond/test.h5</datafile>
+        <commodpair>
+          <incommodity>uo2</incommodity>
+          <id>1</id>
+        </commodpair>
       </ConditioningFacility>
     </model>
   </facility>
