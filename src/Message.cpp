@@ -217,7 +217,7 @@ void Message::approveTransfer() {
 
   for (int i = 0; i < manifest.size(); i++) {
     try {
-      BI->registerMatState(nextTransID_, dynamic_cast<Material*>(manifest.at(i)));
+      BI->registerResourceState(nextTransID_, manifest.at(i));
     } catch (...) {
       LOG(LEV_ERROR) << "Failed to register resource state. Resource may"
                      << " not have been of Material type.";

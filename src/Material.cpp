@@ -18,9 +18,6 @@
 
 using namespace std;
 
-// Static variables to be initialized.
-int Material::nextID_ = 0;
-
 std::vector<Material*> Material::materials_;
 
 bool Material::decay_wanted_ = false;
@@ -29,13 +26,11 @@ int Material::decay_interval_ = 1;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
-  ID_ = nextID_++;
   last_update_time_ = TI->time();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
-  ID_ = nextID_++;
   last_update_time_ = TI->time();
   iso_vector_ = comp;
 };

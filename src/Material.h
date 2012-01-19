@@ -135,7 +135,7 @@ public:
   /**
    * Resource class method
    */
-  std::string resourceUnits(){return "kg";};
+  std::string units(){return "kg";};
 
   /**
    * Resource class method
@@ -155,19 +155,12 @@ public:
   /**
    * Resource class method
    */
-  ResourceType resourceType() {return MATERIAL_RES;};
+  ResourceType type() {return MATERIAL_RES;};
 
   /**
    * Resource class method
    */
   Material* clone();
-
-  /**
-   * get material ID
-   *
-   * @return ID
-   */
-  const int ID() {return ID_;};
 
   /**
    * Absorbs the contents of the given Material into this Material and deletes 
@@ -239,16 +232,6 @@ private:
 
   /// all isotopic details of this material object
   IsoVector iso_vector_;
-
-  /** 
-   * The serial number for this Material.
-   */
-  int ID_;
-
-  /**
-   * Stores the next available material ID
-   */
-  static int nextID_;
 
   /// list of materialss
   static std::vector<Material*> materials_;

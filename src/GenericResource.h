@@ -44,16 +44,17 @@ public:
    *
    * @return the total quantity of this resource in its base unit
    */
-  virtual std::string resourceUnits() {return units_;};
+  virtual std::string units() {return units_;};
     
   /**
    * Sets the total quantity of this resource in its base unit 
    */
   void setQuantity(double new_quantity) {quantity_ = new_quantity;};
 
-  /**
-   * Sets the quality of this resource
-   */
+  /// Gets the quality of this resource
+  std::string quality() {return quality_;};
+
+  /// Sets the quality of this resource
   void setQuality(std::string new_quality) {quality_ = new_quality;};
     
   /**
@@ -81,7 +82,7 @@ public:
   /**
    * Returns the concrete type of this resource
    */
-  virtual ResourceType resourceType(){return GENERIC_RES;};
+  virtual ResourceType type(){return GENERIC_RES;};
 
 protected:
   /**
