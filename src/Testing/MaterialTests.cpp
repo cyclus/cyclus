@@ -43,8 +43,8 @@ class MaterialTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Constructors){
-  EXPECT_EQ(test_mat_->resourceUnits(), "kg");
-  EXPECT_EQ(test_mat_->resourceType(), MATERIAL_RES);
+  EXPECT_EQ(test_mat_->units(), "kg");
+  EXPECT_EQ(test_mat_->type(), MATERIAL_RES);
   EXPECT_GE(test_mat_->ID(),0);
 }
 
@@ -54,7 +54,7 @@ TEST_F(MaterialTest, Clone) {
   EXPECT_NO_THROW(clone_mat = test_mat_->clone());
   ASSERT_EQ(test_mat_->ID(),clone_mat->ID()); // we want the IDs to be the same, yes?
   ASSERT_EQ(test_mat_->quantity(),clone_mat->quantity());
-  ASSERT_EQ(test_mat_->resourceType(),clone_mat->resourceType());
+  ASSERT_EQ(test_mat_->type(),clone_mat->type());
   ASSERT_TRUE(test_mat_->checkQuality(clone_mat));
   ASSERT_TRUE(test_mat_->checkQuantityEqual(clone_mat));
   ASSERT_TRUE(clone_mat->checkQuality(test_mat_));

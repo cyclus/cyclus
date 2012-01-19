@@ -36,9 +36,10 @@ SET(CYCLUS_INCLUDE_DIR
 SET( CYCLUS_CORE
   InputXML.cpp
   IsoVector.cpp
+  Resource.cpp
+  GenericResource.cpp
   Material.cpp
   Message.cpp
-  GenericResource.cpp
   Utility/BookKeeper.cpp 
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 

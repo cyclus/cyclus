@@ -18,9 +18,11 @@
 #include "Timer.h"
 #include "CycException.h"
 #include "Material.h"
+#include "GenericResource.h"
 #include "Message.h"
 #include "Model.h"
 #include "Logger.h"
+
 
 BookKeeper* BookKeeper::instance_ = 0;
 int BookKeeper::next_comp_entry_id_ = 0;
@@ -70,8 +72,7 @@ void BookKeeper::createDB(std::string name) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-H5File* BookKeeper::getDB()
-{
+H5File* BookKeeper::getDB() {
   return myDB_;
 };
 
@@ -111,24 +112,21 @@ void BookKeeper::closeDB()
 void BookKeeper::registerTrans(int id, Message* msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
-       thisMat != manifest.end();
-       thisMat++) {
+  for (vector<Resource*>::iterator thisResource = manifest.begin();
+       thisResource != manifest.end();
+       thisResource++) {
     trans_t toRegister;
-    toRegister.transID=id;
-    toRegister.requesterID=msg->requester()->ID();
-    toRegister.supplierID=msg->supplier()->ID();
-    toRegister.materialID=dynamic_cast<Material*>(*thisMat)->ID(); 
-    toRegister.timestamp=TI->time();
+    toRegister.transID = id;
+    toRegister.requesterID = msg->requester()->ID();
+    toRegister.supplierID = msg->supplier()->ID();
+    toRegister.materialID = (*thisResource)->ID(); 
+    toRegister.timestamp = TI->time();
     toRegister.price = msg->price();
      
     strcpy(toRegister.commodName, msg->commod().c_str());
     transactions_.push_back(toRegister);
-    // checking msg and transaction equality
-    // msg->printTrans();
-    // printTrans(toRegister);
-  };
-};
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::printTrans(trans_t trans){
@@ -142,24 +140,31 @@ void BookKeeper::printTrans(trans_t trans){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerMatState(int trans_id, Material* mat){
+void BookKeeper::registerResourceState(int trans_id, Resource* resource){
   mat_hist_t toRegister;
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);
 
-  double total = mat->quantity();
-  toRegister.materialID = mat->ID(); 
+  toRegister.materialID = resource->ID(); 
   toRegister.transID = trans_id; 
-  /// @todo allow registerMaterialState for arbitrary timestamp (katyhuff).
   toRegister.timestamp = TI->time();
-  CompMap comp = (mat->isoVector()).comp();
-  CompMap::const_iterator it = comp.begin();
-  int i=0;
-  for(it=comp.begin(); it != comp.end(); it++){
-    toRegister.iso[i] = it->first;
-    toRegister.comp[i] = (it->second)*(total);
-    i++;
+  toRegister.quantity = resource->quantity();
+  strcpy(toRegister.units, resource->units().c_str());
+
+  if (resource->type() == GENERIC_RES) {
+    strcpy(toRegister.name, dynamic_cast<GenericResource*>(resource)->quality().c_str());
+  } else if (resource->type() == MATERIAL_RES) {
+    Material* mat = dynamic_cast<Material*>(resource);
+    strcpy(toRegister.name, "Material");
+    CompMap comp = (mat->isoVector()).comp();
+    int i = 0;
+    for(CompMap::const_iterator it = comp.begin(); it != comp.end(); it++){
+      toRegister.iso[i] = it->first;
+      toRegister.comp[i] = it->second;
+      i++;
+    }
   }
+
   // if it's registered in some other timestamp, register the material 
   materials_.push_back(toRegister);
 };
@@ -218,15 +223,15 @@ void BookKeeper::writeModelList() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::doModelWrite(H5std_string ID_memb,
 			      H5std_string name_memb,
-                              H5std_string modelImpl_memb,
+            H5std_string modelImpl_memb,
 			      H5std_string parentID_memb,
 			      H5std_string bornOn_memb,
 			      H5std_string diedOn_memb,
-                              H5std_string output_name, 
-                              std::string subgroup_name, 
-                              std::string dataset_name,
-                              int numStructs, int numModels, 
-                              model_t* modelList){
+            H5std_string output_name, 
+            std::string subgroup_name, 
+            std::string dataset_name,
+            int numStructs, int numModels, 
+            model_t* modelList) {
   try{
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
@@ -286,7 +291,7 @@ void BookKeeper::doModelWrite(H5std_string ID_memb,
   } catch (Exception error) {
     error.printError();
   }
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeTransList(){
@@ -450,8 +455,10 @@ void BookKeeper::writeMatHist(){
   const H5std_string materialID_memb = "materialID";
   const H5std_string transID_memb = "transID";
   const H5std_string timestamp_memb = "timestamp";
-  const H5std_string iso_memb = "iso";
-  const H5std_string comp_memb = "comp";
+  const H5std_string quantity_memb = "quantity";
+  const H5std_string units_memb = "units";
+  const H5std_string name_memb = "name";
+
   const H5std_string output_name = "/output";
   const H5std_string subgroup_name = "materials";
   const H5std_string dataset_name = "material_states";
@@ -487,6 +494,10 @@ void BookKeeper::writeMatHist(){
     matHist[i].transID = materials_[i].transID;
     matHist[i].timestamp = materials_[i].timestamp;
 
+    matHist[i].quantity = materials_[i].quantity;
+    strcpy(matHist[i].units, materials_[i].units);
+    strcpy(matHist[i].name, materials_[i].name);
+
     comp_entry_t comp_entry;
     for (int j = 0; j < numComps; j++) {
       comp_entry.entryID = next_comp_entry_id_++;
@@ -515,12 +526,18 @@ void BookKeeper::writeMatHist(){
   // describe the data in an hdf5-y way
   hsize_t arraydim[] = {NUMISOS};
 
+  size_t charlen = sizeof(char[64]);
+  StrType strtype(PredType::C_S1,charlen);
+
   // Create a datatype for models based on the struct
   CompType mtype( sizeof(mat_hist_t) );
   mtype.insertMember( stateID_memb, HOFFSET(mat_hist_t, stateID), PredType::NATIVE_INT); 
   mtype.insertMember( materialID_memb, HOFFSET(mat_hist_t, materialID), PredType::NATIVE_INT); 
   mtype.insertMember( transID_memb, HOFFSET(mat_hist_t, transID), PredType::NATIVE_INT); 
   mtype.insertMember( timestamp_memb, HOFFSET(mat_hist_t, timestamp), PredType::NATIVE_INT); 
+  mtype.insertMember( quantity_memb, HOFFSET(mat_hist_t, quantity), PredType::NATIVE_DOUBLE);
+  mtype.insertMember( units_memb, HOFFSET(mat_hist_t, units), strtype); 
+  mtype.insertMember( name_memb, HOFFSET(mat_hist_t, name), strtype); 
 
   DataSet* dataset;
   dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));

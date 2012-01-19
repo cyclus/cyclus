@@ -26,7 +26,7 @@ void GenericResource::print() {
 bool GenericResource::checkQuality(Resource* other){
   bool toRet = false;
 
-  toRet = (units_ == other->resourceUnits());
+  toRet = (units_ == other->units());
   return toRet;
 }
 

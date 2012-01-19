@@ -133,6 +133,12 @@ protected:
                                An integer indicating the associated transaction ID **/
     int timestamp;          /**< 
                                An integer indicating the timestamp **/
+    double quantity;          /**< 
+                               An double indicating the resource quantity **/
+    char units[64];          /**< 
+                               An string indicating the units of the resource's quantity **/
+    char name[64];          /**< 
+                               An string indicating the units of the resource's quantity **/
     int iso[NUMISOS];       /**< 
                                An integer indicating the nuclide ID **/   
     double comp[NUMISOS];   /**< 
@@ -248,12 +254,12 @@ public:
   void registerTrans(int id, Message* msg, std::vector<Resource*> manifest);
 
   /**
-   * Register the material in the BookKeeper's map of material changes
+   * Register the resource in the BookKeeper's map of material changes
    *
-   * @param trans_id the transaction ID associated with this material state
-   * @param mat the material with a history
+   * @param trans_id the transaction ID associated with this resource state
+   * @param resource the resource who's state is to be recorded
    */
-  void registerMatState(int trans_id, Material* mat);
+  void registerResourceState(int trans_id, Resource* resource);
 
   /**
    * Register the materialin the BookKeeper's map of material changes
