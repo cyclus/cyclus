@@ -120,6 +120,8 @@ MESSAGE("   Teuchos_LIBRARY_DIRS = ${Teuchos_LIBRARY_DIRS}")
 MESSAGE("   Teuchos_TPL_LIST = ${Teuchos_TPL_LIST}")
 MESSAGE("   Teuchos_TPL_LIBRARIES = ${Teuchos_TPL_LIBRARIES}")
 MESSAGE("   Teuchos_BUILD_SHARED_LIBS = ${Teuchos_BUILD_SHARED_LIBS}")
+MESSAGE("   Teuchos_CXX_COMPILER = ${Teuchos_CXX_COMPILER}")
+MESSAGE("   Teuchos_FORTRAN_COMPILER = ${Teuchos_FORTRAN_COMPILER}")
 MESSAGE("   CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 MESSAGE("End of Teuchos details\n")
 # Include the Teuchos Library
@@ -144,6 +146,9 @@ IF (DOXYGEN_FOUND)
 ELSE (DOXYGEN_FOUND)
 	MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
+
+# add the gfortran linking flag for trilinos
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
