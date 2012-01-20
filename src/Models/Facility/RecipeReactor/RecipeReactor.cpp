@@ -262,9 +262,14 @@ void RecipeReactor::handleTick(int time) {
     this->beginCycle();
   };
 
+  makeRequests();
+  makeOffers();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::makeRequests(){
   // MAKE A REQUEST
   if(this->checkStocks() == 0){
-    // if(stocks.front().first == NULL){
     // It chooses the next in/out commodity pair in the preference lineup
     InRecipe request_commod_pair;
     OutRecipe offer_commod_pair;
@@ -276,18 +281,18 @@ void RecipeReactor::handleTick(int time) {
     // It then moves that pair from the front to the back of the preference lineup
     fuelPairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
     fuelPairs_.pop_front();
-  
+
     // It can accept only a whole batch
     double requestAmt;
     double minAmt = in_recipe.mass();
-    // The Recipe Reactor should ask for an batch if there isn't one in stock.
+    // The Recipe Reactor should ask for a batch if there isn't one in stock.
     double sto = this->checkStocks(); 
     // subtract sto from batch size to get total empty space. 
     // Hopefully the result is either 0 or the batch size 
     double space = minAmt - sto; // KDHFLAG get minAmt from the input ?
     // this will be a request for free stuff
     double commod_price = 0;
-  
+
     if (space == 0) {
       // don't request anything
     } else if (space <= minAmt) {
@@ -295,7 +300,7 @@ void RecipeReactor::handleTick(int time) {
       Communicator* recipient = dynamic_cast<Communicator*>(market);
       // if empty space is less than monthly acceptance capacity
       requestAmt = space;
-      
+
       // request a generic resource
       GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
 
@@ -307,11 +312,9 @@ void RecipeReactor::handleTick(int time) {
       trans.price = commod_price;
       trans.resource = request_res;
 
-      Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(facInst());
-      request->sendOn();
-    // otherwise, the upper bound is the batch size
-    // minus the amount in stocks.
+      sendMessage(recipient, trans);
+      // otherwise, the upper bound is the batch size
+      // minus the amount in stocks.
     } else if (space >= minAmt) {
       MarketModel* market = MarketModel::marketForCommod(in_commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
@@ -328,13 +331,20 @@ void RecipeReactor::handleTick(int time) {
       trans.is_offer = false;
       trans.price = commod_price;
       trans.resource = request_res;
-
-      Message* request = new Message(this, recipient, trans); 
-      request->setNextDest(facInst());
-      request->sendOn();
+      sendMessage(recipient, trans);
     }
   }
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::sendMessage(Communicator* recipient, Transaction trans){
+      Message* msg = new Message(this, recipient, trans); 
+      msg->setNextDest(facInst());
+      msg->sendOn();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::makeOffers(){
   // MAKE OFFERS
   // decide how much to offer
 
@@ -372,11 +382,10 @@ void RecipeReactor::handleTick(int time) {
     trans.price = commod_price;
     trans.resource = offer_mat;
 
-    Message* msg = new Message(this, recipient, trans); 
-    msg->setNextDest(facInst());
-    msg->sendOn();
-  };
+    sendMessage(recipient, trans);
+  }
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTock(int time) {
   // at the end of the cycle

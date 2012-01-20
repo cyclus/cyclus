@@ -392,6 +392,23 @@ protected:
   */
   static std::string outputDir_;
 
+  /**
+   * make reqests
+   */
+  void makeRequests();
+
+  /**
+   * make offers
+   */
+  void makeOffers();
+
+  /**
+   * send messages up through the institution
+   *
+   * @param recipient the final recipient
+   * @param trans the transaction to send
+   */
+  void sendMessage(Communicator* recipient, Transaction trans);
 
 /* ------------------- */ 
 
