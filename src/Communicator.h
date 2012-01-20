@@ -27,7 +27,6 @@
    of sending and receiving functions. These have default behaviors 
    defined in the CommunicatorClass, but these behaviors may be overriden 
    by the specific model implementation. These functions include:
-   - sendMessage
    - receiveMessage
    
    @section seeAlso See Also
