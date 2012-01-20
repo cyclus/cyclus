@@ -14,6 +14,7 @@
 #include "Logger.h"
 #include "Material.h"
 #include "GenericResource.h"
+#include "MarketModel.h"
 
 using namespace H5;
 
@@ -129,7 +130,6 @@ void ConditioningFacility::print()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::receiveMessage(Message* msg) {
   LOG(LEV_DEBUG2) << "Warning, the ConditioningFacility ignores messages.";
-
 };
 
 
@@ -172,7 +172,7 @@ std::vector<Resource*> ConditioningFacility::processOrder(Message* order) {
   vector<Resource*> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front();
+    Material* m = inventory_.front().second;
 
     // start with an empty material
     Material* newMat = new Material();
@@ -227,16 +227,15 @@ void ConditioningFacility::handleTick(int time){
 void ConditioningFacility::handleTock(int time){
   // TOCK
   // On the tock, the ConditioningFacility first prepares 
-  // transactions by preparing and sending material from its stocks
   // all material in its stocks up to its monthly processing 
   // capacity.
-  
   conditionMaterials();
 
-  // call the facility model's handle tock 
-  // to check for decommissioning
+  printStatus();
+
   FacilityModel::handleTock(time);
 };
+
 
 /* --------------------
  * this FACILITYMODEL class has these members
@@ -425,14 +424,154 @@ void ConditioningFacility::makeRequests(){
   // capable of conditioning
   // for each stream in the matrix
   // calculate your capacity to condition
-  // make requests
+  // MAKE A REQUEST
+  if(this->checkStocks() < remaining_capacity_){
+    // It chooses the next in/out commodity pair in the preference lineup
+    map<string, int>::const_iterator it; 
+    for(it = commod_map_.begin(); it != commod_map_.end(); it++){
+      string in_commod = (*it).first;
+      int in_id = (*it).second;
+      double requestAmt;
+      double minAmt = 0;
+    
+      // The ConditioningFacility should ask for whatever it can process .
+      double sto = this->checkStocks(); 
+      // subtract sto from remaining_capacity_ to get total empty space. 
+      double space = remaining_capacity_ - sto; 
+    
+      // this will be a request for free stuff
+      double commod_price = 0;
 
+      if (space == 0) {
+        // don't request anything
+      } else if (space <= remaining_capacity_) {
+        MarketModel* market = MarketModel::marketForCommod(in_commod);
+        Communicator* recipient = dynamic_cast<Communicator*>(market);
+      
+        // if empty space is less than monthly acceptance capacity
+        requestAmt = space;
+
+        // request a generic resource
+        GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+
+        // build the transaction and message
+        Transaction trans;
+        trans.commod = in_commod;
+        trans.minfrac = minAmt/requestAmt;
+        trans.is_offer = false;
+        trans.price = commod_price;
+        trans.resource = request_res;
+
+        sendMessage(recipient, trans);
+        // otherwise, the upper bound is the capacity
+        // minus the amount in stocks.
+      } else if (space >= remaining_capacity_) {
+        MarketModel* market = MarketModel::marketForCommod(in_commod);
+        Communicator* recipient = dynamic_cast<Communicator*>(market);
+        // if empty space is more than monthly acceptance capacity
+        requestAmt = remaining_capacity_ - sto;
+
+        // request a generic resource
+        GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+
+        // build the transaction and message
+        Transaction trans;
+        trans.commod = in_commod;
+        trans.minfrac = minAmt/requestAmt;
+        trans.is_offer = false;
+        trans.price = commod_price;
+        trans.resource = request_res;
+        sendMessage(recipient, trans);
+      }
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::makeOffers(){
   // Offer anything that has been conditioned or can be conditioned this month.
+  // this will be an offer of free stuff
+  double commod_price = 0;
+
+  // there are potentially many types of material in the inventory stack
+  double inv = this->checkInventory();
+  // send an offer for each material on the stack 
+  std::string commod;
+  Communicator* recipient;
+  double offer_amt;
+  for (deque< pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
+       iter ++){
+    // get commod
+    commod = iter->first;
+    MarketModel* market = MarketModel::marketForCommod(commod);
+    // decide what market to offer to
+    recipient = dynamic_cast<Communicator*>(market);
+    // get amt
+    offer_amt = iter->second->quantity();
+
+    // make a material to offer
+    Material* offer_mat = iter->second;
+    offer_mat->setQuantity(offer_amt);
+
+    // build the transaction and message
+    Transaction trans;
+    trans.commod = commod;
+    trans.minfrac = 1;
+    trans.is_offer = true;
+    trans.price = commod_price;
+    trans.resource = offer_mat;
+
+    sendMessage(recipient, trans);
+
+    LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
+      << offer_amt
+      << " kg of "
+      << commod 
+      << ".";
+    
+  }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void ConditioningFacility::sendMessage(Communicator* recipient, Transaction trans){
+      Message* msg = new Message(this, recipient, trans); 
+      msg->setNextDest(facInst());
+      msg->sendOn();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double ConditioningFacility::checkInventory(){
+  double total = 0;
+
+  // Iterate through the inventory and sum the amount of whatever
+  // material unit is in each object.
+
+  for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
+       iter != inventory_.end(); 
+       iter ++){
+    total += iter->second->quantity();
+  }
+
+  return total;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double ConditioningFacility::checkStocks(){
+  double total = 0;
+
+  // Iterate through the stocks and sum the amount of whatever
+  // material unit is in each object.
+
+  if(!stocks_.empty()){
+    for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
+         iter != stocks_.end(); 
+         iter ++){
+        total += iter->second->quantity();
+    };
+  };
+  return total;
+}
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::conditionMaterials(){
@@ -461,7 +600,7 @@ Material* ConditioningFacility::condition(string commod, Material* mat){
   while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
     mat_to_condition = mat->extract(mass_to_condition);
     // mat_to_condition->absorb(wf_iso_vec_[commod]);
-    inventory_.push_back(mat_to_condition);
+    inventory_.push_back(make_pair(commod, mat_to_condition));
     mass_remaining = mat->quantity();
     remaining_capacity_ = remaining_capacity_ - mass_to_condition;
   }
@@ -490,6 +629,16 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
   }
   return toRet;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::printStatus(){
+  // For now, lets just print out what we have at each timestep.
+  LOG(LEV_DEBUG2) << "ConditioningFacility " << this->ID()
+                  << " is holding " << this->checkInventory()
+                  << " units of material at the close of month " << time
+                  << ".";
+
+};
 
 
 /* --------------------

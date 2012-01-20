@@ -205,7 +205,7 @@ protected:
     std::deque<std::pair<std::string, Material*> > stocks_;
 
     /// the inventory is where the processed material is kept
-    std::deque<Material*> inventory_;
+    std::deque< pair<std::string, Material*> > inventory_;
 
     /// a map from format names to table loading function pointers
     std::map<std::string, void(ConditioningFacility:: *)(std::string)> allowed_formats_;
@@ -281,6 +281,14 @@ protected:
     void makeOffers();
 
     /**
+     * Sends a message to the recipient including the transaction
+     *
+     * @param recipient the communicator intended to receive the message
+     * @param trans the transaction to send
+     */
+    void sendMessage(Communicator* recipient, Transaction trans);
+
+    /**
      * conditions all the materials it is capable of conditioning this
      * month.
      */
@@ -292,6 +300,25 @@ protected:
      * @param the order to be processed
      */
     std::vector<Resource*> processOrder(Message* order);
+
+    /** 
+     * Checks the amount (in kg) of material in the inventory 
+     *
+     * @return the mass of the material in the inventory (in kg).
+     */
+    double checkInventory();
+
+    /** 
+     * Checks the amount (in kg) of material in the stocks. 
+     *
+     * @return the mass of the material in the stocks (in kg).
+     */
+    double checkStocks();
+
+    /**
+     * Prints the amount currently in the inventory
+     */
+    void printStatus();
 
 private :
     /**
