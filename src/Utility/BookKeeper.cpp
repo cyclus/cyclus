@@ -428,7 +428,7 @@ void BookKeeper::writeMatComps(Group* subgroup){
   this->openDB();
 
   // describe the data in an hdf5-y way
-  hsize_t dim[] = {(int)comp_entries_.size()};
+  hsize_t dim[] = {max((int)comp_entries_.size(), 1)};
 
   // if there's only one model, the dataspace is a vector, which  
   // hdf5 doesn't like to think of as a matrix 
