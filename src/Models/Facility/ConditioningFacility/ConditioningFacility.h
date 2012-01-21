@@ -317,8 +317,10 @@ protected:
 
     /**
      * Prints the amount currently in the inventory
+     *
+     * @param time the current time
      */
-    void printStatus();
+    void printStatus(int time);
 
 private :
     /**
