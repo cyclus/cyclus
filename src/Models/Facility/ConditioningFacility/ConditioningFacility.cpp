@@ -56,6 +56,9 @@ ConditioningFacility::ConditioningFacility() {
     allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
     allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
+    stocks_ = deque<pair<string, Material*> >();
+    inventory_ = deque<pair<string, Material*> >();
+
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -81,23 +84,20 @@ void ConditioningFacility::init(xmlNodePtr cur)
     int commod_id;
     xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "commodpair");
 
-    // for each fuel pair, there is an in and an out commodity
+    // for each commod pair
     for (int i = 0; i < nodes->nodeNr; i++){
       xmlNodePtr pair_node = nodes->nodeTab[i];
 
-      // get commods
+      // get name and id
       commod = XMLinput->get_xpath_content(pair_node,"incommodity");
-
-      // get in_recipe
       commod_id = strtol(XMLinput->get_xpath_content(pair_node,"id"), NULL, 10);
-
-      commod_map_[commod] = commod_id ; // @todo check if commod is already registered
+      commod_map_.insert(make_pair(commod,commod_id)) ; 
     };
 
-    // for whatever format,
-    // call loadTable
     loadTable(datafile, fileformat);
     file_is_open_ = false;
+
+    LOG(LEV_DEBUG2) << "The ConditioningFacility has been initialized.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -106,6 +106,12 @@ void ConditioningFacility::copy(ConditioningFacility* src)
     FacilityModel::copy(src);
 
     allowed_formats_ = src->allowed_formats_;
+    capacity_ = src->capacity_;
+    remaining_capacity_ = capacity_;
+    file_is_open_ = src->file_is_open_;
+    commod_map_ = src->commod_map_;
+    stream_vec_ = src->stream_vec_;
+    loading_densities_ = src->loading_densities_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -118,7 +124,15 @@ void ConditioningFacility::copyFreshModel(Model* src)
 void ConditioningFacility::print() 
 { 
     FacilityModel::print();
-    LOG(LEV_DEBUG2) << " conditions waste streams into waste forms";
+    string commods;
+    map<string, int>::const_iterator it;
+    for(it = commod_map_.begin(); it != commod_map_.end(); it++){
+      commods += (*it).first;
+      commods += ", ";
+    }
+    LOG(LEV_DEBUG2) << " conditions " 
+      << commods
+      <<" into waste forms";
 };
 
 
@@ -206,7 +220,7 @@ void ConditioningFacility::addResource(Message* msg, vector<Resource*> manifest)
   for (vector<Resource*>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"ConditioningFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
   } 
@@ -230,10 +244,8 @@ void ConditioningFacility::handleTock(int time){
   // all material in its stocks up to its monthly processing 
   // capacity.
   conditionMaterials();
-
-  printStatus();
-
   FacilityModel::handleTock(time);
+  printStatus(time);
 };
 
 
@@ -299,13 +311,6 @@ void ConditioningFacility::loadHDF5File(string datafile){
   const H5std_string wfvol_memb = "wfvol";
   const H5std_string wfmass_memb = "wfmass";
 
-  //try {
-  /*
-   * Turn off the auto-printing when failure occurs so that we can
-   * handle the errors appropriately
-   */
-  //Exception::dontPrint();
-
   /*
    * Open the file and the dataset.
    */
@@ -349,11 +354,6 @@ void ConditioningFacility::loadHDF5File(string datafile){
   LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
   LOG(LEV_DEBUG2) <<  "wfVol= " <<  stream.wfvol;;
   LOG(LEV_DEBUG2) <<  "wfMass  = " <<  stream.wfmass;;
-
-  //  } catch (Exception error) {
-  // error.printError();
-  // }
-
 
 }
 
@@ -433,56 +433,38 @@ void ConditioningFacility::makeRequests(){
       int in_id = (*it).second;
       double requestAmt;
       double minAmt = 0;
-    
+
       // The ConditioningFacility should ask for whatever it can process .
       double sto = this->checkStocks(); 
       // subtract sto from remaining_capacity_ to get total empty space. 
       double space = remaining_capacity_ - sto; 
-    
+
       // this will be a request for free stuff
       double commod_price = 0;
 
-      if (space == 0) {
-        // don't request anything
-      } else if (space <= remaining_capacity_) {
-        MarketModel* market = MarketModel::marketForCommod(in_commod);
-        Communicator* recipient = dynamic_cast<Communicator*>(market);
-      
-        // if empty space is less than monthly acceptance capacity
-        requestAmt = space;
+      MarketModel* market = MarketModel::marketForCommod(in_commod);
+      Communicator* recipient = dynamic_cast<Communicator*>(market);
 
-        // request a generic resource
-        GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+      // if empty space is less than monthly acceptance capacity
+      requestAmt = space;
 
-        // build the transaction and message
-        Transaction trans;
-        trans.commod = in_commod;
-        trans.minfrac = minAmt/requestAmt;
-        trans.is_offer = false;
-        trans.price = commod_price;
-        trans.resource = request_res;
+      // request a generic resource
+      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
 
-        sendMessage(recipient, trans);
-        // otherwise, the upper bound is the capacity
-        // minus the amount in stocks.
-      } else if (space >= remaining_capacity_) {
-        MarketModel* market = MarketModel::marketForCommod(in_commod);
-        Communicator* recipient = dynamic_cast<Communicator*>(market);
-        // if empty space is more than monthly acceptance capacity
-        requestAmt = remaining_capacity_ - sto;
+      // build the transaction and message
+      Transaction trans;
+      trans.commod = in_commod;
+      trans.minfrac = minAmt/requestAmt;
+      trans.is_offer = false;
+      trans.price = commod_price;
+      trans.resource = request_res;
 
-        // request a generic resource
-        GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
-
-        // build the transaction and message
-        Transaction trans;
-        trans.commod = in_commod;
-        trans.minfrac = minAmt/requestAmt;
-        trans.is_offer = false;
-        trans.price = commod_price;
-        trans.resource = request_res;
-        sendMessage(recipient, trans);
-      }
+      sendMessage(recipient, trans);
+      LOG(LEV_DEBUG2) << " The ConditioningFacility has requested "
+        << requestAmt 
+        << " kg of "
+        << in_commod 
+        << ".";
     }
   }
 }
@@ -585,24 +567,26 @@ void ConditioningFacility::conditionMaterials(){
     if(remainders.find(currCommod)!=remainders.end()){
       (remainders[currCommod])->absorb(condition(currCommod, currMat));
     } else {
-      remainders[currCommod] = condition(currCommod, currMat);
+      remainders.insert(make_pair(currCommod, condition(currCommod, currMat)));
     }
     stocks_.pop_front();
+  }
+  map<string, Material*>::const_iterator rem;
+  for(rem=remainders.begin(); rem!=remainders.end(); rem++){
+      stocks_.push_back(*rem);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* ConditioningFacility::condition(string commod, Material* mat){
-  Material* mat_to_condition;
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
   while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
-    mat_to_condition = mat->extract(mass_to_condition);
-    // mat_to_condition->absorb(wf_iso_vec_[commod]);
-    inventory_.push_back(make_pair(commod, mat_to_condition));
-    mass_remaining = mat->quantity();
+    inventory_.push_back(make_pair(commod, mat->extract(mass_to_condition)));
+    // mat_to_condition->absorb(wf_iso_vec_[commod]); ^^
     remaining_capacity_ = remaining_capacity_ - mass_to_condition;
+    mass_remaining = mat->quantity();
   }
   return mat;
 }
@@ -631,13 +615,15 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::printStatus(){
+void ConditioningFacility::printStatus(int time){
   // For now, lets just print out what we have at each timestep.
   LOG(LEV_DEBUG2) << "ConditioningFacility " << this->ID()
                   << " is holding " << this->checkInventory()
-                  << " units of material at the close of month " << time
+                  << " units of material in inventory, and  "
+                  << this->checkStocks() 
+                  << " in stocks at the close of month " 
+                  << time
                   << ".";
-
 };
 
 
