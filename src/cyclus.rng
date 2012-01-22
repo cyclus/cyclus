@@ -11,8 +11,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <include href="../Models/Facility/RecipeReactor/RecipeReactor.rng"/>
   <include href="../Models/Region/NullRegion/NullRegion.rng"/>
   <include href="../Models/Region/StubRegion/StubRegion.rng"/>
-<!--  <include href="../Models/Region/BuildRegion/BuildRegion.rng"/>
-  <include href="../Models/Region/CapacityRegion/CapacityRegion.rng"/> -->
+<!--  <include href="../Models/Region/BuildRegion/BuildRegion.rng"/> -->
+<!--  <include href="../Models/Region/CapacityRegion/CapacityRegion.rng"/> -->
   <include href="../Models/Inst/StubInst/StubInst.rng"/>
   <include href="../Models/Inst/BuildInst/BuildInst.rng"/>
   <include href="../Models/Inst/DeployInst/DeployInst.rng"/>
@@ -337,8 +337,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <choice>
         <ref name="StubRegion"/>
         <ref name="NullRegion"/>
-        <ref name="BuildRegion"/>
-        <ref name="CapacityRegion"/>
+<!--        <ref name="BuildRegion"/> -->
+<!--        <ref name="CapacityRegion"/> -->
         <!-- insert ref to new RegionModels here -->
       </choice>
       </element>
