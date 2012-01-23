@@ -141,7 +141,7 @@ BookKeeper::getGroupNamePair(std::string output_dir)
   return retPair;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTrans(int id, Message* msg, std::vector<Resource*> manifest){
+void BookKeeper::registerTransaction(int id, Message* msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
   for (vector<Resource*>::iterator thisResource = manifest.begin();
@@ -201,6 +201,40 @@ void BookKeeper::registerResourceState(int trans_id, Resource* resource){
   materials_.push_back(toRegister);
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeDataSet(const void *data, const DataType &data_desc, 
+                              int data_rank, const hsize_t *data_dims,
+                              std::string dataset_name, std::string output_dir){
+  try{ 
+    // Open the file
+    this->openDB();
+
+    // get the correct group names
+    std::pair <std::string,std::string> groupNames = getGroupNamePair(output_dir);
+    std::string output_name = groupNames.first;
+    std::string subgroup_name = groupNames.second;
+
+    // set up the data set
+    H5::Group* outputgroup = new Group(this->getDB()->openGroup(output_name));
+    H5::Group* subgroup = new Group(outputgroup->createGroup(subgroup_name));
+    DataSpace* dataspace = new DataSpace(data_rank, data_dims);
+    DataSet* dataset = 
+      new DataSet(subgroup->createDataSet(dataset_name, data_desc, *dataspace ));
+
+    // write it, finally 
+    dataset->write(data, data_desc);
+
+    // clean up the mess we made
+    delete outputgroup;
+    delete subgroup;
+    delete dataspace;
+    delete dataset;
+
+  } catch (Exception error) {
+    error.printError();
+  }  
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeAgentList() {
   try{
@@ -254,10 +288,10 @@ void BookKeeper::writeAgentList() {
       }
     }
     
+    // describe dataspace and write the dataset
     hsize_t data_dims[1] = {numStructs};
     int data_rank = 1;
     writeDataSet(agent_data, data_desc, data_rank, data_dims, dataset_name, output_dir);
-
 
   } catch (Exception error) {
     error.printError();
@@ -265,135 +299,66 @@ void BookKeeper::writeAgentList() {
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeDataSet(const void *data, const DataType &data_desc, 
-                              int data_rank, const hsize_t *data_dims,
-                              std::string dataset_name, std::string output_dir){
-  try{ 
-    // Open the file
-    this->openDB();
-
-    // get the correct group names
-    std::pair <std::string,std::string> groupNames = getGroupNamePair(output_dir);
-    std::string output_name = groupNames.first;
-    std::string subgroup_name = groupNames.second;
-
-    // set up the data set
-    H5::Group* outputgroup = new Group(this->getDB()->openGroup(output_name));
-    H5::Group* subgroup = new Group(outputgroup->createGroup(subgroup_name));
-    DataSpace* dataspace = new DataSpace(data_rank, data_dims);
-    DataSet* dataset = 
-      new DataSet(subgroup->createDataSet(dataset_name, data_desc, *dataspace ));
-
-    // write it, finally 
-    dataset->write(data, data_desc);
-
-    // clean up the mess we made
-    delete outputgroup;
-    delete subgroup;
-    delete dataspace;
-    delete dataset;
-
-  } catch (Exception error) {
-    error.printError();
-  }  
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeTransList(){
-
-  // define some useful variables.
-  const H5std_string transID_memb = "transID";
-  const H5std_string supplierID_memb = "supplierID";
-  const H5std_string requesterID_memb = "requesterID";
-  const H5std_string materialID_memb = "materialID";
-  const H5std_string timestamp_memb = "timestamp";
-  const H5std_string price_memb = "price";
-  const H5std_string commodName_memb = "commodName";
-  const H5std_string output_name = "/output";
-  const H5std_string subgroup_name = "transactions";
-  const H5std_string dataset_name = "transList";
-
-  int numTrans = transactions_.size();
-
-  int numStructs;
-  if(numTrans==0)
-    numStructs=1;
-  else
-    numStructs=numTrans;
-
-  // create an array of the model structs
-  trans_t transList[numStructs];
-  for (int i=0; i<numTrans; i++){
-    transList[i].transID = transactions_[i].transID; 
-    transList[i].supplierID = transactions_[i].supplierID;
-    transList[i].requesterID = transactions_[i].requesterID;
-    transList[i].materialID = transactions_[i].materialID;
-    transList[i].timestamp = transactions_[i].timestamp;
-    transList[i].price = transactions_[i].price;
-    strcpy( transList[i].commodName,transactions_[i].commodName);
-  };
-  // If there are no transactions, make a null transaction entry
-  if(numTrans==0){
-    std::string str1="";
-    transList[0].transID=0;
-    transList[0].supplierID=0;
-    transList[0].requesterID=0;
-    transList[0].materialID=0;
-    transList[0].timestamp=0;
-    transList[0].price=0;
-    strcpy(transList[0].commodName, str1.c_str());
-  };
-
   try{
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
     Exception::dontPrint();
+
+    // set output and dataset names
+    std::string output_dir = Message::outputDir();
+    std::string dataset_name = "transactionList";
     
-    // Open the file and the dataset.
-    this->openDB();
+    // describe the data type to fill this table
+    size_t trans_struct_size = sizeof(trans_t);
+    H5::CompType data_desc(trans_struct_size);
 
-    // describe the data in an hdf5-y way
-    hsize_t dim[] = {numStructs};
-    // if there's only one model, the dataspace is a vector, which  
-    // hdf5 doesn't like to think of as a matrix 
-    // (MJG) - what does this do? rank = 1 or rank = 1 ??
-    int rank;
-    if(numTrans <= 1)
-      rank = 1;
-    else
-      rank = 1;
+    data_desc.insertMember("id", HOFFSET(trans_t, transID), 
+                           PredType::NATIVE_INT); 
+    data_desc.insertMember("supplier id", HOFFSET(trans_t, supplierID), 
+                           PredType::NATIVE_INT); 
+    data_desc.insertMember("requester id", HOFFSET(trans_t, requesterID), 
+                           PredType::NATIVE_INT); 
+    data_desc.insertMember("material id", HOFFSET(trans_t, materialID), 
+                           PredType::NATIVE_INT); 
+    data_desc.insertMember("timestamp", HOFFSET(trans_t, timestamp), 
+                           PredType::NATIVE_INT); 
+    data_desc.insertMember("price", HOFFSET(trans_t, price), 
+                           PredType::IEEE_F64LE); 
+    data_desc.insertMember("commodity", HOFFSET(trans_t, commodName), 
+                           H5::StrType(0,64));
 
-    Group* outputgroup;
-    outputgroup = new Group(this->getDB()->openGroup(output_name));
-    Group* subgroup;
-    subgroup = new Group(outputgroup->createGroup(subgroup_name));
-    DataSpace* dataspace;
-    dataspace = new DataSpace( rank, dim );
+    // create an array of the transaction structs
+    int numStructs = std::max(1, (int)transactions_.size());
+    trans_t trans_data[numStructs];
+    // take care of the special case where there are no transactions
+    if(transactions_.size()==0){
+      std::string str1="";
+      trans_data[0].transID=-1;
+      trans_data[0].supplierID=-1;
+      trans_data[0].requesterID=-1;
+      trans_data[0].materialID=-1;
+      trans_data[0].timestamp=-1;
+      trans_data[0].price=-1;
+      strcpy(trans_data[0].commodName, "");
+    }
+    // take care of the normal case where there are transactions
+    else{
+      for (int i=0; i<transactions_.size(); i++){
+        trans_data[i].transID = transactions_[i].transID; 
+        trans_data[i].supplierID = transactions_[i].supplierID;
+        trans_data[i].requesterID = transactions_[i].requesterID;
+        trans_data[i].materialID = transactions_[i].materialID;
+        trans_data[i].timestamp = transactions_[i].timestamp;
+        trans_data[i].price = transactions_[i].price;
+        strcpy(trans_data[i].commodName,transactions_[i].commodName);
+      }
+    }
 
-    //create a variable length std::string types
-    size_t charlen = sizeof(char[64]);
-    StrType strtype(PredType::C_S1,charlen); 
-   
-    // Create a datatype for models based on the struct
-    CompType mtype( sizeof(trans_t) );
-    mtype.insertMember( transID_memb, HOFFSET(trans_t, transID), PredType::NATIVE_INT); 
-    mtype.insertMember( supplierID_memb, HOFFSET(trans_t, supplierID), PredType::NATIVE_INT); 
-    mtype.insertMember( requesterID_memb, HOFFSET(trans_t, requesterID), PredType::NATIVE_INT); 
-    mtype.insertMember( materialID_memb, HOFFSET(trans_t, materialID), PredType::NATIVE_INT); 
-    mtype.insertMember( timestamp_memb, HOFFSET(trans_t, timestamp), PredType::NATIVE_INT); 
-    mtype.insertMember( price_memb, HOFFSET(trans_t, price), PredType::IEEE_F64LE); 
-    mtype.insertMember( commodName_memb, HOFFSET(trans_t, commodName), strtype);
-
-    DataSet* dataset;
-    dataset = new DataSet(subgroup->createDataSet( dataset_name , mtype , *dataspace ));
-
-    // write it, finally 
-    dataset->write( transList , mtype );
-
-    delete outputgroup;
-    delete subgroup;
-    delete dataspace;
-    delete dataset;
+    // describe dataspace and write the dataset
+    hsize_t data_dims[1] = {numStructs};
+    int data_rank = 1;
+    writeDataSet(trans_data, data_desc, data_rank, data_dims, dataset_name, output_dir);
 
   } catch (Exception error) {
     error.printError();
