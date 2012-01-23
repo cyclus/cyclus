@@ -25,6 +25,7 @@ void InstModel::init(xmlNodePtr cur)
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   Model* parent = Model::getModelByName(region_name);
   this->setParent(parent);
+  this->registerModel();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

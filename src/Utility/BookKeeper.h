@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+
 #include "H5Cpp.h"
 #include "hdf5.h"
 
@@ -88,7 +89,7 @@ protected:
   BookKeeper();
 
   // an agent struct
-  typedef struct model_t{
+  typedef struct agent_t{
     int ID;                 /**< 
                                An integer indicating the agent ID **/
     char name[64];          /**< 
@@ -103,9 +104,9 @@ protected:
                                An integer of the agents born on date **/
     int diedOn;           /**< 
                                An integer of the agents died on date **/
-  } model_t;
+  } agent_t;
   
-  // facility, market, converter, or institution model struct
+  // transaction struct
   typedef struct trans_t{
     int transID;            /**< 
                                An integer indicating the transaction ID **/
@@ -245,6 +246,15 @@ public:
   std::string getDBName(){return dbName_;};
 
   /**
+     returns a pair of strings 
+     1) the output group and 
+     2) the data sub group
+     
+     @param output_dir the full output directory for the subgroup
+   */
+  std::pair <std::string, std::string> getGroupNamePair(std::string output_dir);
+
+  /**
    * Register the transaction in the BookKeeper's map of transactions
    *
    * @param id the transaction ID.
@@ -272,30 +282,10 @@ public:
                              double y, double z);
 
   /**
-   * Write a list of the facility/inst/market models in the simulation
+   * Write generic Agent information from the simulation
    *
    */
-  void writeModelList();
-
-  /**
-   * Given information from the set-up, write the model list
-   * @param ID_memb id hdf5 string
-   * @param name_memb name hdf5 string
-   * @param modelImpl_memb implementation hdf5 string
-   * @param output_name output hdf5 string
-   * @param subgroup_name subgroup name std::string
-   * @param dataset_name dataset name std::string
-   * @param numStructs number of models to write (if numModels = 0; numStructs = 1)
-   * @param numModels number of models to write
-   * we use numStrucs and numModels so that HDF5 behaves well when numModels = 0
-   * @param modelList the list of models to write (created by setUpModelList)
-   */
-  void doModelWrite(H5std_string ID_memb, H5std_string name_memb,
-		    H5std_string modelImpl_memb, 
-		    H5std_string parentID_memb, H5std_string bornOn_memb,
-		    H5std_string diedOn_memb, H5std_string output_name,
-		    std::string subgroup_name, std::string dataset_name,
-		    int numStructs, int numModels, model_t* modelList);
+  void writeAgentList();
 
   /**
    * Write a list of the transactions in the simulation

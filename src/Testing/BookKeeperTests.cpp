@@ -71,7 +71,7 @@ TEST_F(BookKeeperTest, closeDB){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(BookKeeperTest, DISABLED_WriteModelLists){
-  BI->writeModelList();
+TEST_F(BookKeeperTest, DISABLED_WriteAgentLists){
+  BI->writeAgentList();
 }
 

@@ -24,7 +24,7 @@ void FixedInst::init(xmlNodePtr cur)
     xmlNodePtr fac_node = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(fac_node,"type");
   
-    Model* facility = Model::getModelByName(fac_name);
+    Model* facility = Model::getTemplateByName(fac_name);
     
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
       throw CycException("Facility '" 
@@ -36,6 +36,7 @@ void FixedInst::init(xmlNodePtr cur)
     Model* new_facility = Model::create(facility);
 
     new_facility->setName(XMLinput->get_xpath_content(fac_node,"name"));
+    new_facility->registerModel();
     new_facility->setParent(this);
   }
 }

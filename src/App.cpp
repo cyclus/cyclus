@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
   try {
     BI->createDB();
 
-    BI->writeModelList();
+    BI->writeAgentList();
     BI->writeTransList();
     BI->writeMatHist();
     BI->closeDB();
