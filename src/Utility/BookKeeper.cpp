@@ -306,7 +306,7 @@ void BookKeeper::writeTransList(){
     Exception::dontPrint();
 
     // set output and dataset names
-    std::string output_dir = Message::outputDir();
+    std::string output_dir = "/output";
     std::string dataset_name = "transactionList";
     
     // describe the data type to fill this table

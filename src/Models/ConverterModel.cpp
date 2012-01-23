@@ -8,7 +8,6 @@ void ConverterModel::init(xmlNodePtr cur) {
   Model::init(cur);
 
   // register the model
-  this->registerModel();
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
