@@ -204,7 +204,6 @@ void BookKeeper::registerResourceState(int trans_id, Resource* resource){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeAgentList() {
   try{
-    
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
     Exception::dontPrint();
@@ -255,6 +254,21 @@ void BookKeeper::writeAgentList() {
       }
     }
     
+    hsize_t data_dims[1] = {numStructs};
+    int data_rank = 1;
+    writeDataSet(agent_data, data_desc, data_rank, data_dims, dataset_name, output_dir);
+
+
+  } catch (Exception error) {
+    error.printError();
+  }
+}  
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::writeDataSet(const void *data, const DataType &data_desc, 
+                              int data_rank, const hsize_t *data_dims,
+                              std::string dataset_name, std::string output_dir){
+  try{ 
     // Open the file
     this->openDB();
 
@@ -264,8 +278,6 @@ void BookKeeper::writeAgentList() {
     std::string subgroup_name = groupNames.second;
 
     // set up the data set
-    hsize_t data_dims[1] = {numStructs};
-    int data_rank = 1;
     H5::Group* outputgroup = new Group(this->getDB()->openGroup(output_name));
     H5::Group* subgroup = new Group(outputgroup->createGroup(subgroup_name));
     DataSpace* dataspace = new DataSpace(data_rank, data_dims);
@@ -273,7 +285,7 @@ void BookKeeper::writeAgentList() {
       new DataSet(subgroup->createDataSet(dataset_name, data_desc, *dataspace ));
 
     // write it, finally 
-    dataset->write(agent_data, data_desc);
+    dataset->write(data, data_desc);
 
     // clean up the mess we made
     delete outputgroup;
@@ -283,8 +295,8 @@ void BookKeeper::writeAgentList() {
 
   } catch (Exception error) {
     error.printError();
-  }
-}  
+  }  
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeTransList(){

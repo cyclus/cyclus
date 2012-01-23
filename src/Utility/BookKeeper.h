@@ -282,6 +282,21 @@ public:
                              double y, double z);
 
   /**
+     Write a dataset given required information. Based on the input of
+     HDF5's DataSet class' write function.
+
+     @param data buffer containing data to be written
+     @param data_desc hdf5 DataType describing the data
+     @param data_rank rank of the HDF5 DataSpace of the data to be written
+     @param data_dims dimension of the HDF5 DataSpace of the data to be written
+     @param dataset_name the name of the dataset (e.g. agentList)
+     @param output_dir the final output directory for the dataset (e.g. /output/agent)
+   */
+  void writeDataSet(const void *data, const DataType &data_desc, 
+                    int data_rank, const hsize_t *data_dims,
+                    std::string dataset_name, std::string output_dir);
+
+  /**
    * Write generic Agent information from the simulation
    *
    */
