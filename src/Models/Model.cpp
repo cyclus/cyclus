@@ -210,45 +210,36 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+  ID_ = next_id_++;
   is_template_ = true;
   template_list_.push_back(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
-  // if the model is a template, delete it from the template list
-  if (is_template_){
-    for (int i = 0; i < template_list_.size(); i++) {
-      if (template_list_[i] == this) {
-        template_list_.erase(template_list_.begin() + i);
-        break;
-      }
-    }
-  }
-  // else delete it from the model list
-  else {
-    for (int i = 0; i < model_list_.size(); i++) {
-      if (model_list_[i] == this) {
-        model_list_.erase(model_list_.begin() + i);
-        break;
-      }
-    }
-  }
+  removeFromList(this, template_list_);
+  removeFromList(this, model_list_);
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::registerModel(){
-  // model is no longer a template, remove it from the associated structures
-  is_template_ = false;
-  for (int i = 0; i < template_list_.size(); i++) {
-    if (template_list_[i] == this) {
-      template_list_.erase(template_list_.begin() + i);
+void Model::setIsTemplate(bool is_template) {
+  is_template_ = is_template;
+
+  if (!is_template) {
+    // this prevents duplicates from being stored in the list
+    removeFromList(this, model_list_);
+    model_list_.push_back(this);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
+  for (int i = 0; i < mlist.size(); i++) {
+    if (mlist[i] == model) {
+      mlist.erase(mlist.begin() + i);
       break;
     }
   }
-  // give the model an id and add it to the list
-  ID_ = ++next_id_;
-  model_list_.push_back(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -263,6 +254,7 @@ void Model::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
   // set the pointer to this model's parent
+  setIsTemplate(false);
   parent_ = parent;
   // root nodes are their own parents
   // if this node is not its own parent, add it to its parent's list of children
@@ -289,6 +281,7 @@ void Model::addChild(Model* child){
   LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
 		  << " has added child " << child->name() << " ID " 
 		  << child->ID() << " to its list of children.";
+  removeFromList(child, children_);
   children_.push_back(child); 
 };
 

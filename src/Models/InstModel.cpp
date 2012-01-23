@@ -14,8 +14,7 @@
 #include <string>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init(xmlNodePtr cur)
-{
+void InstModel::init(xmlNodePtr cur) {
   Model::init(cur);
   /** 
    *  Specific initialization for InstModels
@@ -25,12 +24,10 @@ void InstModel::init(xmlNodePtr cur)
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   Model* parent = Model::getModelByName(region_name);
   this->setParent(parent);
-  this->registerModel();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::copy(InstModel* src)
-{
+void InstModel::copy(InstModel* src) {
   Model::copy(src);
   Communicator::copy(src);
   

@@ -19,8 +19,7 @@ void FixedInst::init(xmlNodePtr cur)
   /// get facility list
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"model/FixedInst/facility");
   
-  for (int i=0;i<nodes->nodeNr;i++) 
-  {
+  for (int i = 0; i<nodes->nodeNr; i++) {
     xmlNodePtr fac_node = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(fac_node,"type");
   
@@ -36,26 +35,22 @@ void FixedInst::init(xmlNodePtr cur)
     Model* new_facility = Model::create(facility);
 
     new_facility->setName(XMLinput->get_xpath_content(fac_node,"name"));
-    new_facility->registerModel();
     new_facility->setParent(this);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::copy(FixedInst* src)
-{
+void FixedInst::copy(FixedInst* src) {
   InstModel::copy(src);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::copyFreshModel(Model* src)
-{
+void FixedInst::copyFreshModel(Model* src) {
   copy(dynamic_cast<FixedInst*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::print() 
-{ 
+void FixedInst::print() {
   InstModel::print();
 
   LOG(LEV_DEBUG2) << " and the following permanent facilities: ";

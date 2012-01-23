@@ -103,7 +103,7 @@ void InputXML::load_file(std::string filename) {
 
   /* Create xpath evaluation context */
   inputFile.xpathCtxt = xmlXPathNewContext(inputFile.doc);
-  if(inputFile.xpathCtxt == NULL) {
+  if (inputFile.xpathCtxt == NULL) {
     fprintf(stderr,"Error: unable to create new xpath context \n");
   }
 

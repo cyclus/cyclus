@@ -18,11 +18,10 @@ MarketModel::MarketModel() {
   setModelType("Market");
 
   // register the model
-  this->registerModel();
 
   TI->registerResolveListener(this);
   markets_.push_back(this);
-
+  setIsTemplate(false);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

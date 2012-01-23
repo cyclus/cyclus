@@ -180,6 +180,9 @@ class Message {
   
   /// Checks required conditions prior to sending a message.
   void validateForSend();
+
+  /// mark a Model* as a participating sim agent (not a template)
+  void setRealParticipant(Communicator* who);
   
   /// stores the next available transaction ID
   static int nextTransID_;

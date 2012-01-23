@@ -230,10 +230,8 @@ public:
   virtual void addResource(Message* msg,
                               std::vector<Resource*> manifest);
 
-  bool& isTemplate() {return is_template_;};
-  
-  /// register the model as an initalized model
-  void registerModel();
+  bool isTemplate() {return is_template_;};
+  void setIsTemplate(bool is_template);
   
 protected:
   /// children of this model
@@ -266,6 +264,9 @@ private:
 
   /// comprehensive list of all initialized models.
   static std::vector<Model*> model_list_;
+
+  /// used to remove model instance refs from static model lists
+  void removeFromList(Model* model, std::vector<Model*> &mlist);
 
   /**
    * parent of this model

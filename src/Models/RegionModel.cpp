@@ -22,15 +22,14 @@ using namespace std;
     TI->registerTickListener(this);
 
     // register the model
-    this->registerModel();
 
     // regions are their own parent
     this->setParent(this);
+    setIsTemplate(false);
   };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::init(xmlNodePtr cur)
-{
+void RegionModel::init(xmlNodePtr cur) {
  
   Model::init(cur);
 
