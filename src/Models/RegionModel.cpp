@@ -21,6 +21,9 @@ using namespace std;
     // register to receive time-step notifications
     TI->registerTickListener(this);
 
+    // register the model
+    this->registerModel();
+
     // regions are their own parent
     this->setParent(this);
   };
@@ -44,7 +47,7 @@ void RegionModel::init(xmlNodePtr cur)
   
   for (int i=0;i<nodes->nodeNr;i++){
     fac_name = (const char*)nodes->nodeTab[i]->children->content;
-    new_fac = Model::getModelByName(fac_name);
+    new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
 }

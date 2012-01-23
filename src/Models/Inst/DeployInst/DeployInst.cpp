@@ -23,7 +23,7 @@ void DeployInst::init(xmlNodePtr cur)
     xmlNodePtr deploy = nodes->nodeTab[i];
     string fac_name = XMLinput->get_xpath_content(deploy,"type");
   
-    Model* facility = Model::getModelByName(fac_name);
+    Model* facility = Model::getTemplateByName(fac_name);
 
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
       std::string err_msg = "Facility '" + fac_name;

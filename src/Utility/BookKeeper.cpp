@@ -11,6 +11,7 @@
 #include "hdf5.h"
 #include "H5Cpp.h"
 #include "H5Exception.h"
+#include "h5wrap.h"
 
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_Version.hpp"
@@ -19,9 +20,12 @@
 #include "CycException.h"
 #include "Material.h"
 #include "GenericResource.h"
+#include "TimeAgent.h"
 #include "Message.h"
 #include "Model.h"
 #include "Logger.h"
+
+#include <boost/algorithm/string.hpp>
 
 
 BookKeeper* BookKeeper::instance_ = 0;
@@ -78,8 +82,14 @@ H5File* BookKeeper::getDB() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::openDB() {
+  // see if the file has already been opened
   if(! dbIsOpen_) {
     try {
+      // check to make sure it's an hdf5 file
+      bool isH5 = H5::H5File::isHdf5(dbName_);
+      if (!isH5) 
+        throw h5wrap::FileNotHDF5(dbName_);
+      // if it is, lets open it
       myDB_ = new H5File(dbName_, H5F_ACC_RDWR);
       dbIsOpen_ = true;
     } catch ( FileIException error ) {
@@ -108,6 +118,28 @@ void BookKeeper::closeDB()
   } 
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::pair <std::string, std::string> 
+BookKeeper::getGroupNamePair(std::string output_dir)
+{
+  // split the output directory dir into two strings
+  // ex:: /output/group/dir to:
+  //      /output/group and dir
+  std::string str_to_split = output_dir;
+  std::vector<std::string> split_str;
+  boost::split(split_str,str_to_split,boost::is_any_of("/"));
+  std::string output_name = "", subgroup_name = "";
+  for (int i = 0; i < split_str.size(); i++){
+    if (i == split_str.size()-1)
+      subgroup_name.append(split_str.at(i));
+    else {
+      output_name.append("/");
+      output_name.append(split_str.at(i));
+    }
+  }  
+  std::pair <std::string,std::string> retPair (output_name,subgroup_name);
+  return retPair;
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTrans(int id, Message* msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
@@ -170,119 +202,80 @@ void BookKeeper::registerResourceState(int trans_id, Resource* resource){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::writeModelList() {
-  H5std_string ID_memb = "ID";
-  H5std_string name_memb = "name";
-  H5std_string modelImpl_memb = "modelImpl";
-  H5std_string parentID_memb = "parentID";
-  H5std_string bornOn_memb = "bornOn";
-  H5std_string diedOn_memb = "diedOn";
-  H5std_string output_name = "/output";
-
-  // define some useful variables.
-  std::string subgroup_name = "agents";
-  std::string dataset_name = "agentList";
-
-  std::vector<Model*> model_list = Model::getModelList();
-  std::vector<Model*> short_list;
-  
-  // store in short_list non-template Model* only
-  for (int i = 0; i < model_list.size(); i++) {
-    Model* theModel = model_list.at(i);
-    if (!theModel->isTemplate()) {
-      short_list.push_back(theModel);
-    }
-  }
-
-  // create an array of the model structs
-  int numStructs = std::max(1, (int)short_list.size());
-  model_t modelList[numStructs];
-  if (short_list.size() == 0) {
-    modelList[0].ID = 0;
-    strcpy(modelList[0].modelImpl, "");
-    strcpy(modelList[0].name, ""); 
-  } else {
-    for (int i = 0; i < short_list.size(); i++) {
-      Model* theModel = short_list.at(i);
-
-      modelList[i].ID = theModel->ID();
-      modelList[i].parentID = theModel->parentID();
-      modelList[i].bornOn = theModel->bornOn();
-      modelList[i].diedOn = theModel->diedOn();
-      strcpy(modelList[i].modelImpl, theModel->modelImpl().c_str());
-      strcpy(modelList[i].name, theModel->name().c_str()); 
-    }
-  }
-
-  model_t* pModelList = modelList;
-  doModelWrite(ID_memb, name_memb, modelImpl_memb, parentID_memb, 
-	       bornOn_memb, diedOn_memb, output_name, subgroup_name, 
-	       dataset_name, numStructs, short_list.size(), pModelList);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::doModelWrite(H5std_string ID_memb,
-			      H5std_string name_memb,
-            H5std_string modelImpl_memb,
-			      H5std_string parentID_memb,
-			      H5std_string bornOn_memb,
-			      H5std_string diedOn_memb,
-            H5std_string output_name, 
-            std::string subgroup_name, 
-            std::string dataset_name,
-            int numStructs, int numModels, 
-            model_t* modelList) {
+void BookKeeper::writeAgentList() {
   try{
+    
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
     Exception::dontPrint();
+
+    // set output and dataset names
+    std::string output_dir = TimeAgent::outputDir();
+    std::string dataset_name = "agentList";
     
-    // Open the file and the dataset.
+    // describe the data type to fill this table
+    size_t agent_struct_size = sizeof(agent_t);
+    H5::CompType data_desc(agent_struct_size);
+    data_desc.insertMember("id", HOFFSET(agent_t, ID), 
+                           H5::PredType::NATIVE_INT);
+    data_desc.insertMember("name", HOFFSET(agent_t, name), 
+                           H5::StrType(0,64));
+    data_desc.insertMember("model impl.",HOFFSET(agent_t, modelImpl), 
+                           H5::StrType(0,64));
+    data_desc.insertMember("parent id", HOFFSET(agent_t, parentID), 
+                           H5::PredType::NATIVE_INT);
+    data_desc.insertMember("birth date", HOFFSET(agent_t, bornOn), 
+                           H5::PredType::NATIVE_INT);
+    data_desc.insertMember("death date", HOFFSET(agent_t, diedOn), 
+                           H5::PredType::NATIVE_INT);
+    
+    // fill the agent data array from cyclus' agent list
+    std::vector<Model*> agent_list = Model::getModelList();
+    int numStructs = std::max(1, (int)agent_list.size());
+    agent_t agent_data[numStructs];
+    // take care of the special case where there are no agents
+    if (agent_list.size() == 0) {
+      agent_data[0].ID = -1;
+      agent_data[0].parentID = -1;
+      agent_data[0].bornOn = -1;
+      agent_data[0].diedOn = -1;
+      strcpy(agent_data[0].modelImpl, "");
+      strcpy(agent_data[0].name, ""); 
+    } 
+    // take care of the normal case where there are agents
+    else {
+      for (int i = 0; i < agent_list.size(); i++) {
+        Model* theAgent = agent_list.at(i);
+        agent_data[i].ID = theAgent->ID();
+        strcpy(agent_data[i].name, theAgent->name().c_str()); 
+        strcpy(agent_data[i].modelImpl, theAgent->modelImpl().c_str());
+        agent_data[i].parentID = theAgent->parentID();
+        agent_data[i].bornOn = theAgent->bornOn();
+        agent_data[i].diedOn = theAgent->diedOn();
+      }
+    }
+    
+    // Open the file
     this->openDB();
 
-    // describe the data in an hdf5-y way
-    hsize_t dim[] = {numStructs};
-    // if there's only one model, the dataspace is a vector, which  
-    // hdf5 doesn't like to think of as a matrix 
-    int rank;
-    if(numModels <= 1) {
-      rank = 1;
-    } else {
-      rank = 1;
-    }
+    // get the correct group names
+    std::pair <std::string,std::string> groupNames = getGroupNamePair(output_dir);
+    std::string output_name = groupNames.first;
+    std::string subgroup_name = groupNames.second;
 
-    Group* outputgroup;
-    outputgroup = new Group(this->getDB()->openGroup(output_name));
-    Group* subgroup;
-
-    subgroup = new Group(outputgroup->createGroup(subgroup_name));
-    DataSpace* dataspace;
-    dataspace = new DataSpace( rank, dim );
-
-    //create a variable length string types
-    size_t charlen = sizeof(char[64]);
-    StrType strtype(PredType::C_S1,charlen); 
-   
-    // Create a datatype for models based on the struct
-    CompType mtype( sizeof(model_t) );
-    mtype.insertMember( ID_memb, HOFFSET(model_t, ID), 
-			PredType::NATIVE_INT); 
-    mtype.insertMember( parentID_memb, HOFFSET(model_t, parentID), 
-			PredType::NATIVE_INT); 
-    mtype.insertMember( bornOn_memb, HOFFSET(model_t, bornOn), 
-			PredType::NATIVE_INT); 
-    mtype.insertMember( diedOn_memb, HOFFSET(model_t, diedOn), 
-			PredType::NATIVE_INT); 
-    mtype.insertMember( name_memb, HOFFSET(model_t, name), strtype);
-    mtype.insertMember( modelImpl_memb, HOFFSET(model_t, modelImpl), 
-			strtype);
-
-    DataSet* dataset;
-    dataset = new DataSet(subgroup->createDataSet( dataset_name , 
-						   mtype , *dataspace ));
+    // set up the data set
+    hsize_t data_dims[1] = {numStructs};
+    int data_rank = 1;
+    H5::Group* outputgroup = new Group(this->getDB()->openGroup(output_name));
+    H5::Group* subgroup = new Group(outputgroup->createGroup(subgroup_name));
+    DataSpace* dataspace = new DataSpace(data_rank, data_dims);
+    DataSet* dataset = 
+      new DataSet(subgroup->createDataSet(dataset_name, data_desc, *dataspace ));
 
     // write it, finally 
-    dataset->write( modelList , mtype );
+    dataset->write(agent_data, data_desc);
+
+    // clean up the mess we made
     delete outputgroup;
     delete subgroup;
     delete dataspace;
@@ -291,7 +284,7 @@ void BookKeeper::doModelWrite(H5std_string ID_memb,
   } catch (Exception error) {
     error.printError();
   }
-}
+}  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeTransList(){

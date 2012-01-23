@@ -17,9 +17,28 @@
 
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
+std::vector<Model*> Model::template_list_;
 std::vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
 map<string, mdl_dtor*> Model::destroy_map_;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::getTemplateByName(std::string name) {
+  Model* found_model = NULL;
+
+  for (int i = 0; i < template_list_.size(); i++) {
+    if (name == template_list_.at(i)->name()) {
+      found_model = template_list_.at(i);
+      break;
+    }
+  }
+
+  if (found_model == NULL) {
+    string err_msg = "Model '" + name + "' doesn't exist.";
+    throw CycIndexException(err_msg);
+  }
+  return found_model;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getModelByName(std::string name) {
@@ -192,19 +211,45 @@ void Model::copy(Model* model_orig) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
   is_template_ = true;
-  ID_ = ++next_id_;
-  model_list_.push_back(this);
+  template_list_.push_back(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
-  for (int i = 0; i < model_list_.size(); i++) {
-    if (model_list_[i] == this) {
-      model_list_.erase(model_list_.begin() + i);
+  // if the model is a template, delete it from the template list
+  if (is_template_){
+    for (int i = 0; i < template_list_.size(); i++) {
+      if (template_list_[i] == this) {
+        template_list_.erase(template_list_.begin() + i);
+        break;
+      }
+    }
+  }
+  // else delete it from the model list
+  else {
+    for (int i = 0; i < model_list_.size(); i++) {
+      if (model_list_[i] == this) {
+        model_list_.erase(model_list_.begin() + i);
+        break;
+      }
+    }
+  }
+} 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::registerModel(){
+  // model is no longer a template, remove it from the associated structures
+  is_template_ = false;
+  for (int i = 0; i < template_list_.size(); i++) {
+    if (template_list_[i] == this) {
+      template_list_.erase(template_list_.begin() + i);
       break;
     }
   }
-};
+  // give the model an id and add it to the list
+  ID_ = ++next_id_;
+  model_list_.push_back(this);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 

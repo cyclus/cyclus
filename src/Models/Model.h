@@ -44,6 +44,18 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
  */
 class Model {
 public:
+  /**
+     @brief returns a model template given the template's name
+     
+     @param name name of the template as defined in the input file
+   */
+  static Model* getTemplateByName(std::string name);
+
+  /**
+     @brief returns a model given the template's name
+     
+     @param name name of the template as defined in the input file
+   */
   static Model* getModelByName(std::string name);
 
   static void printModelList();
@@ -220,6 +232,9 @@ public:
 
   bool& isTemplate() {return is_template_;};
   
+  /// register the model as an initalized model
+  void registerModel();
+  
 protected:
   /// children of this model
   std::vector <Model*> children_;
@@ -245,6 +260,9 @@ private:
 
   /// Stores the next available facility ID
   static int next_id_;
+
+  /// comprehensive list of all templated models.
+  static std::vector<Model*> template_list_;
 
   /// comprehensive list of all initialized models.
   static std::vector<Model*> model_list_;
