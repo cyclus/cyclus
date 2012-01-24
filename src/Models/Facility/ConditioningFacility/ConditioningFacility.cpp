@@ -80,18 +80,19 @@ void ConditioningFacility::init(xmlNodePtr cur)
     string fileformat = XMLinput->get_xpath_content(cur, "fileformat");
 
     // all facilities require commodities - possibly many
-    std::string commod;
+    std::string in_commod, out_commod;
     int commod_id;
-    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "commodpair");
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "commodset");
 
     // for each commod pair
     for (int i = 0; i < nodes->nodeNr; i++){
       xmlNodePtr pair_node = nodes->nodeTab[i];
 
       // get name and id
-      commod = XMLinput->get_xpath_content(pair_node,"incommodity");
+      in_commod = XMLinput->get_xpath_content(pair_node,"incommodity");
+      out_commod = XMLinput->get_xpath_content(pair_node,"outcommodity");
       commod_id = strtol(XMLinput->get_xpath_content(pair_node,"id"), NULL, 10);
-      commod_map_.insert(make_pair(commod,commod_id)) ; 
+      commod_map_.insert(make_pair( in_commod, make_pair(commod_id, out_commod)) ); 
     };
 
     loadTable(datafile, fileformat);
@@ -124,15 +125,19 @@ void ConditioningFacility::copyFreshModel(Model* src)
 void ConditioningFacility::print() 
 { 
     FacilityModel::print();
-    string commods;
-    map<string, int>::const_iterator it;
+    string incommods, outcommods;
+    map<string, pair<int, string> >::const_iterator it;
     for(it = commod_map_.begin(); it != commod_map_.end(); it++){
-      commods += (*it).first;
-      commods += ", ";
+      incommods += (*it).first;
+      incommods += ", ";
+      outcommods += (*it).second.second;
+      outcommods += ", ";
     }
     LOG(LEV_DEBUG2) << " conditions " 
-      << commods
-      <<" into waste forms";
+      << incommods
+      <<" into forms"
+      << outcommods
+      << ".";
 };
 
 
@@ -427,10 +432,10 @@ void ConditioningFacility::makeRequests(){
   // MAKE A REQUEST
   if(this->checkStocks() < remaining_capacity_){
     // It chooses the next in/out commodity pair in the preference lineup
-    map<string, int>::const_iterator it; 
+    map<string, pair<int, string> >::const_iterator it; 
     for(it = commod_map_.begin(); it != commod_map_.end(); it++){
       string in_commod = (*it).first;
-      int in_id = (*it).second;
+      int in_id = (*it).second.first;
       double requestAmt;
       double minAmt = 0;
 
@@ -478,15 +483,15 @@ void ConditioningFacility::makeOffers(){
   // there are potentially many types of material in the inventory stack
   double inv = this->checkInventory();
   // send an offer for each material on the stack 
-  std::string commod;
+  std::string outcommod;
   Communicator* recipient;
   double offer_amt;
   for (deque< pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
-    // get commod
-    commod = iter->first;
-    MarketModel* market = MarketModel::marketForCommod(commod);
+    // get out commod
+    outcommod = iter->first;
+    MarketModel* market = MarketModel::marketForCommod(outcommod);
     // decide what market to offer to
     recipient = dynamic_cast<Communicator*>(market);
     // get amt
@@ -498,7 +503,7 @@ void ConditioningFacility::makeOffers(){
 
     // build the transaction and message
     Transaction trans;
-    trans.commod = commod;
+    trans.commod = outcommod;
     trans.minfrac = 1;
     trans.is_offer = true;
     trans.price = commod_price;
@@ -509,7 +514,7 @@ void ConditioningFacility::makeOffers(){
     LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
       << offer_amt
       << " kg of "
-      << commod 
+      << outcommod 
       << ".";
     
   }
@@ -582,8 +587,10 @@ Material* ConditioningFacility::condition(string commod, Material* mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
+  string out_commod;
   while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
-    inventory_.push_back(make_pair(commod, mat->extract(mass_to_condition)));
+    out_commod = commod_map_.find(commod)->second.second;
+    inventory_.push_back(make_pair(out_commod, mat->extract(mass_to_condition)));
     // mat_to_condition->absorb(wf_iso_vec_[commod]); ^^
     remaining_capacity_ = remaining_capacity_ - mass_to_condition;
     mass_remaining = mat->quantity();
@@ -593,7 +600,7 @@ Material* ConditioningFacility::condition(string commod, Material* mat){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
-  int stream_id =(commod_map_.find(commod))->second;
+  int stream_id =(commod_map_.find(commod))->second.first;
   vector<stream_t>::const_iterator it = stream_vec_.begin();
   bool found = false;
   stream_t toRet;

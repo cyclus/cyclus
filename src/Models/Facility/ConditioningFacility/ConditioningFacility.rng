@@ -11,8 +11,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           <text/>
         </element>
         <oneOrMore>
-          <element name="commodpair">
+          <element name="commodset">
             <ref name="incommodity"/>
+            <ref name="outcommodity"/>
             <element name="id">
               <data type="nonNegativeInteger"/>
             </element>

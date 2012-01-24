@@ -217,7 +217,10 @@ protected:
     boost::multi_array<double, 2> loading_densities_;
 
     /// Matches commodity names with stream ids
-    map< std::string, int > commod_map_;
+    map< std::string, pair< int, std::string > > commod_map_;
+
+    /// Matches commodity names with outcommodity names
+    map< std::string, std::string > out_commod_map_;
 
     /// Processing capacity per time unit not yet consumed this tick (in kg)
     double remaining_capacity_;

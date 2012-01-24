@@ -11,9 +11,21 @@
     <name>uo2</name>
   </commodity>
 
+  <commodity>
+    <name>uo2form</name>
+  </commodity>
+
   <market>
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>uo2formmarket</name>
+    <mktcommodity>uo2form</mktcommodity>
     <model>
       <NullMarket/>
     </model>
@@ -39,10 +51,11 @@
         <capacity>5</capacity>
         <fileformat>hdf5</fileformat>
         <datafile>input/cond/test.h5</datafile>
-        <commodpair>
+        <commodset>
           <incommodity>uo2</incommodity>
+          <incommodity>uo2form</incommodity>
           <id>1</id>
-        </commodpair>
+        </commodset>
       </ConditioningFacility>
     </model>
   </facility>
