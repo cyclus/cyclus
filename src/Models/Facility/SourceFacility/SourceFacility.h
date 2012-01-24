@@ -234,6 +234,12 @@ protected:
   double checkInventory();
 
 
+  /**
+   * prints the material that is on the send stack
+   */
+  void printSent(Material* mat);
+
+
 /* --------------------
    output directory info
  * --------------------
