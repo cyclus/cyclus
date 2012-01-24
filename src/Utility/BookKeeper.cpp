@@ -216,6 +216,7 @@ void BookKeeper::writeDataSet(const void *data, const DataType &data_desc,
 
     // set up the data set
     H5::Group* outputgroup = new Group(this->getDB()->openGroup(output_name));
+    // MJGFLAG add functionality: if subgroup exists, open it. if not create.
     H5::Group* subgroup = new Group(outputgroup->createGroup(subgroup_name));
     DataSpace* dataspace = new DataSpace(data_rank, data_dims);
     DataSet* dataset = 
