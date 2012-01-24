@@ -101,39 +101,40 @@ void SourceFacility::receiveMessage(Message* msg){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<Resource*> SourceFacility::removeResource(Message* msg) {
   Transaction trans = msg->trans();
-  double newAmt = 0;
+  double sent_amt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
   vector<Resource*> toSend;
 
-  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-
+  while (trans.resource->quantity() > (sent_amt+EPS_KG) && !inventory_.empty() ) {
     Material* m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
-      newAmt += m->quantity();
+    if (m->quantity() <= (trans.resource->quantity() - sent_amt)) {
+      sent_amt += m->quantity();
       toSend.push_back(m);
       inventory_.pop_front();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
         <<"  has decided not to split the object with size :  "<< m->quantity();
-    } else { 
+    } else if (m->quantity() > (trans.resource->quantity() - sent_amt)) { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* leftover = m->extract(trans.resource->quantity() - newAmt);
-      newAmt += m->quantity();
+      Material* mat_to_send = m->extract(trans.resource->quantity() - sent_amt);
+      sent_amt += mat_to_send->quantity();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-        <<"  has decided to split the object to size :  "<< m->quantity();
-      toSend.push_back(m);
-      inventory_.pop_front();
-      inventory_.push_back(leftover);
+        <<"  has decided to split the object to size :  "<< mat_to_send->quantity();
+      toSend.push_back(mat_to_send);
+      printSent(mat_to_send);
     }
-
-    LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-      <<"  is sending a mat with mass: "<< m->quantity();
-    (m)->print();
   }    
   return toSend;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SourceFacility::printSent(Material* mat){
+    LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
+      <<"  is sending a mat with mass: "<< mat->quantity();
+    (mat)->print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -97,8 +97,6 @@ void ConditioningFacility::init(xmlNodePtr cur)
 
     loadTable(datafile, fileformat);
     file_is_open_ = false;
-
-    LOG(LEV_DEBUG2) << "The ConditioningFacility has been initialized.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -133,11 +131,11 @@ void ConditioningFacility::print()
       outcommods += (*it).second.second;
       outcommods += ", ";
     }
-    LOG(LEV_DEBUG2) << " conditions " 
+    LOG(LEV_DEBUG2) << " conditions {" 
       << incommods
-      <<" into forms"
+      <<"} into forms { "
       << outcommods
-      << ".";
+      << " }.";
 };
 
 
@@ -354,11 +352,6 @@ void ConditioningFacility::loadHDF5File(string datafile){
 
   stream_t stream;
   stream = stream_vec_[1];
-  LOG(LEV_DEBUG2) <<  "streamID  = " <<  stream.streamID ;;
-  LOG(LEV_DEBUG2) <<  "formID  = " <<  stream.formID ;;
-  LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
-  LOG(LEV_DEBUG2) <<  "wfVol= " <<  stream.wfvol;;
-  LOG(LEV_DEBUG2) <<  "wfMass  = " <<  stream.wfmass;;
 
 }
 
@@ -426,11 +419,10 @@ void ConditioningFacility::loadCSVFile(string datafile){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::makeRequests(){
   // The ConditioningFacility should make requests of all of the things it's 
-  // capable of conditioning
-  // for each stream in the matrix
+  // capable of conditioning for each stream in the matrix
   // calculate your capacity to condition
   // MAKE A REQUEST
-  if(this->checkStocks() < remaining_capacity_){
+  if(this->checkStocks() <= remaining_capacity_){
     // It chooses the next in/out commodity pair in the preference lineup
     map<string, pair<int, string> >::const_iterator it; 
     for(it = commod_map_.begin(); it != commod_map_.end(); it++){
@@ -483,12 +475,12 @@ void ConditioningFacility::makeOffers(){
   // there are potentially many types of material in the inventory stack
   double inv = this->checkInventory();
   // send an offer for each material on the stack 
-  std::string outcommod;
+  std::string outcommod, offers;
   Communicator* recipient;
   double offer_amt;
   for (deque< pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
-       iter ++){
+       iter++){
     // get out commod
     outcommod = iter->first;
     MarketModel* market = MarketModel::marketForCommod(outcommod);
@@ -511,13 +503,16 @@ void ConditioningFacility::makeOffers(){
 
     sendMessage(recipient, trans);
 
-    LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
-      << offer_amt
-      << " kg of "
-      << outcommod 
-      << ".";
-    
+    offers += offer_mat->quantity();
+    offers += " kg ";
+    offers += outcommod;
+    if(inventory_.end()!=iter){ 
+      offers += " , ";
+    }
   }
+  LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
+    << offers 
+    << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
