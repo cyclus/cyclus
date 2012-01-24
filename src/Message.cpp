@@ -17,6 +17,8 @@
 // initialize static variables
 int Message::nextTransID_ = 1;
 
+std::string Message::outputDir_ = "/output/transactions";
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
 
