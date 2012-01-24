@@ -411,6 +411,23 @@ class Message {
   states) are taken care of automatically within this method.
   */
   void approveTransfer();
+  
+  /*
+    output database info
+  */
+ public:
+  /**
+     The getter function for the time agent output dir
+  */
+  static std::string outputDir(){ return outputDir_;}
+
+ private:
+  
+  /**
+     Every time agent writes to the output database
+     location: /output/agent
+  */
+  static std::string outputDir_;
 
 };
 
