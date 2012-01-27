@@ -28,27 +28,17 @@ ENDIF()
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
   ${CYCLUS_SRC_DIR}/Models
+  ${CYCLUS_SRC_DIR}/Resources
+  ${CYCLUS_SRC_DIR}/Resources/Material
+  ${CYCLUS_SRC_DIR}/Resources/GenericResource
   ${CYCLUS_SRC_DIR}/Utility
   )
-
 
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
   InputXML.cpp
   IsoVector.cpp
-  Resource.cpp
-  GenericResource.cpp
-  Material.cpp
   Message.cpp
-  Utility/BookKeeper.cpp 
-  Utility/CycException.cpp 
-  Utility/LMatrix.cpp 
-  Utility/MassTable.cpp 
-  Utility/Timer.cpp
-  Utility/UniformTaylor.cpp 
-  Utility/Env.cpp
-  Utility/Logger.cpp
-  Utility/DecayHandler.cpp
   Models/Model.cpp 
   Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
@@ -59,6 +49,16 @@ SET( CYCLUS_CORE
   Models/FacilityModel.cpp 
   Models/RegionModel.cpp
   Models/InstModel.cpp
+  Resources/Resource.cpp
+  Utility/BookKeeper.cpp 
+  Utility/CycException.cpp 
+  Utility/LMatrix.cpp 
+  Utility/MassTable.cpp 
+  Utility/Timer.cpp
+  Utility/UniformTaylor.cpp 
+  Utility/Env.cpp
+  Utility/Logger.cpp
+  Utility/DecayHandler.cpp
   )
 
 SET( CYCLUS_SRC
@@ -132,8 +132,9 @@ set(LIBS ${LIBS} ${Teuchos_LIBRARIES} ${Teuchos_TPL_LIBRARIES})
 
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
-# Add subdirs and build for the models
+# Add subdirs and build for the models and resources
 ADD_SUBDIRECTORY(Models)
+ADD_SUBDIRECTORY(Resources)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -152,7 +153,7 @@ SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5_cpp hdf5_hl hdf5 )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -209,7 +210,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5_cpp hdf5_hl hdf5 gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
