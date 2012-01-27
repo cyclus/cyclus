@@ -28,9 +28,6 @@ ENDIF()
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
   ${CYCLUS_SRC_DIR}/Models
-  ${CYCLUS_SRC_DIR}/Resources
-  ${CYCLUS_SRC_DIR}/Resources/Material
-  ${CYCLUS_SRC_DIR}/Resources/GenericResource
   ${CYCLUS_SRC_DIR}/Utility
   )
 
@@ -49,7 +46,6 @@ SET( CYCLUS_CORE
   Models/FacilityModel.cpp 
   Models/RegionModel.cpp
   Models/InstModel.cpp
-  Resources/Resource.cpp
   Utility/BookKeeper.cpp 
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 
@@ -134,7 +130,6 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add subdirs and build for the models and resources
 ADD_SUBDIRECTORY(Models)
-ADD_SUBDIRECTORY(Resources)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
