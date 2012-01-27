@@ -11,6 +11,13 @@ GenericResource::GenericResource(std::string units,
     quantity_ = quantity;
   }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+GenericResource::GenericResource(const GenericResource& other) {
+  units_ = other.units_;
+  quality_ = other.quality_;
+  quantity_ = other.quantity_;
+};
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource* GenericResource::clone() {
   LOG(LEV_DEBUG2) << "resource was cloned";

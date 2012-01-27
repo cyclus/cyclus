@@ -1,20 +1,12 @@
 // Material.cpp
 #include "Material.h"
 
-#include "BookKeeper.h"
 #include "CycException.h"
-#include "MassTable.h"
 #include "Timer.h"
-#include "Env.h"
-#include "UniformTaylor.h"
-#include "InputXML.h"
 #include "Logger.h"
 
-#include <iostream>
-#include <fstream>
+#include <cmath>
 #include <vector>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 
 using namespace std;
 
@@ -35,6 +27,12 @@ Material::Material(IsoVector comp) {
   iso_vector_ = comp;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(const Material& other) {
+  iso_vector_ = other.iso_vector_;
+  last_update_time_ = other.last_update_time_;
+};
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::absorb(Material* matToAdd) {
   // Get the given Material's composition.
@@ -52,14 +50,12 @@ Material* Material::extract(double mass) {
   iso_vector_ = iso_vector_ - new_comp;
   
   return new Material(new_comp);
-  //BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Material* Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
   return new Material(rem_comp);
-  //BI->registerMatChange(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -77,11 +73,11 @@ bool Material::checkQuality(Resource* other){
   bool toRet = false;
   IsoVector lhs_vec = iso_vector_;
 
-  try{
+  try {
     // Make sure the other is a material
     IsoVector rhs_vec = dynamic_cast<Material*>(other)->isoVector();
     toRet = (lhs_vec==rhs_vec);
-  } catch (Exception& e) {
+  } catch (std::exception& e) {
     toRet = false;
   }
 
@@ -89,7 +85,7 @@ bool Material::checkQuality(Resource* other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuantityEqual(Resource* other){
+bool Material::checkQuantityEqual(Resource* other) {
   // This will be false until proven true
   bool toRet = false;
 
@@ -98,7 +94,7 @@ bool Material::checkQuantityEqual(Resource* other){
     // check mass values
     double second_qty = dynamic_cast<Material*>(other)->quantity();
     toRet=( abs(quantity() - second_qty) < EPS_KG);
-  } catch (Exception& e) {
+  } catch (std::exception e) {
   }
   return toRet;
 }
@@ -114,7 +110,7 @@ bool Material::checkQuantityGT(Resource* other){
     // check mass values
     double second_qty = dynamic_cast<Material*>(other)->quantity();
     toRet = second_qty - quantity() > EPS_KG;
-  } catch (Exception& e){
+  } catch (std::exception& e){
   }
 
   return toRet;

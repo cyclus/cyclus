@@ -3,12 +3,11 @@
 
 #include "CycException.h"
 #include "MassTable.h"
-#include "Env.h"
 #include "Logger.h"
 #include "InputXML.h"
 #include "DecayHandler.h"
 
-#include <math.h>
+#include <cmath>
 #include <sstream>
 #include <vector>
 #include <libxml/xpath.h>

@@ -94,7 +94,11 @@ int main(int argc, char* argv[]) {
   IsoVector::printRecipes();
   
   // Run the simulation 
-  TI->runSim();
+  try {
+    TI->runSim();
+  } catch (CycException err) {
+    LOG(LEV_ERROR) << err.what();
+  }
 
   // Create the output file
   try {
