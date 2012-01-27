@@ -108,10 +108,11 @@ public:
    * @param comp isotopic makeup of this material object
    */
   Material(IsoVector comp);
+
+  /// copy constructor
+  Material(const Material& other);
   
-  /** 
-   * Default destructor does nothing.
-   */
+  /// Default destructor does nothing.
   ~Material() {};
 
   
@@ -130,12 +131,12 @@ public:
   /**
    * Resource class method
    */
-  double quantity(){return iso_vector_.mass();};
+  double quantity() {return iso_vector_.mass();};
 
   /**
    * Resource class method
    */
-  std::string units(){return "kg";};
+  std::string units() {return "kg";};
 
   /**
    * Resource class method
@@ -233,7 +234,7 @@ private:
   /// all isotopic details of this material object
   IsoVector iso_vector_;
 
-  /// list of materialss
+  /// list of materials
   static std::vector<Material*> materials_;
 
   /// true if decay should occur, false if not.

@@ -51,14 +51,17 @@ TEST_F(MaterialTest, Constructors){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Clone) {
   Material* clone_mat;
-  EXPECT_NO_THROW(clone_mat = test_mat_->clone());
-  ASSERT_EQ(test_mat_->ID(),clone_mat->ID()); // we want the IDs to be the same, yes?
-  ASSERT_EQ(test_mat_->quantity(),clone_mat->quantity());
-  ASSERT_EQ(test_mat_->type(),clone_mat->type());
-  ASSERT_TRUE(test_mat_->checkQuality(clone_mat));
-  ASSERT_TRUE(test_mat_->checkQuantityEqual(clone_mat));
-  ASSERT_TRUE(clone_mat->checkQuality(test_mat_));
-  ASSERT_TRUE(clone_mat->checkQuantityEqual(test_mat_));
+  ASSERT_NO_THROW(clone_mat = test_mat_->clone());
+
+  // in order to acommodate discrete material tracking, all ID's mush be unique
+  EXPECT_NE(test_mat_->ID(), clone_mat->ID());
+
+  EXPECT_EQ(test_mat_->quantity(), clone_mat->quantity());
+  EXPECT_EQ(test_mat_->type(), clone_mat->type());
+  EXPECT_TRUE(test_mat_->checkQuality(clone_mat));
+  EXPECT_TRUE(test_mat_->checkQuantityEqual(clone_mat));
+  EXPECT_TRUE(clone_mat->checkQuality(test_mat_));
+  EXPECT_TRUE(clone_mat->checkQuantityEqual(test_mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -71,21 +74,23 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   one_test_mat = new Material(test_comp_);
 
   CompMap::iterator it;
-  for(it=test_comp_.begin(); it!=test_comp_.end(); it++){
-    two_test_comp[it->first]=2*(it->second);
-    ten_test_comp[it->first]=10*(it->second);
+  for(it = test_comp_.begin(); it != test_comp_.end(); it++){
+    two_test_comp[it->first] = 2 * (it->second);
+    ten_test_comp[it->first] = 10 * (it->second);
   }
   two_test_mat = new Material(two_test_comp);
   ten_test_mat = new Material(ten_test_comp);
 
   // see that two materials with the same composition do the right thing
   double orig = test_mat_->quantity();
-  EXPECT_NO_THROW(test_mat_->absorb(one_test_mat));
-  ASSERT_FLOAT_EQ(test_mat_->quantity(),2*orig );
-  EXPECT_NO_THROW(test_mat_->absorb(two_test_mat));
-  ASSERT_FLOAT_EQ(test_mat_->quantity(),4*orig );
-  EXPECT_NO_THROW(test_mat_->absorb(ten_test_mat));
-  ASSERT_FLOAT_EQ(test_mat_->quantity(),14*orig );
+  ASSERT_NO_THROW(test_mat_->absorb(one_test_mat));
+  EXPECT_FLOAT_EQ(test_mat_->quantity(), 2 * orig );
+
+  ASSERT_NO_THROW(test_mat_->absorb(two_test_mat));
+  EXPECT_FLOAT_EQ(test_mat_->quantity(), 4 * orig );
+
+  ASSERT_NO_THROW(test_mat_->absorb(ten_test_mat));
+  EXPECT_FLOAT_EQ(test_mat_->quantity(), 14 * orig );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -94,19 +99,19 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   Material* same_as_orig_test_mat = new Material(test_comp_);
 
   CompMap diff_test_comp;
-  diff_test_comp[pb208_]=1.0;
-  diff_test_comp[am241_]=1.0;
-  diff_test_comp[th228_]=1.0;
-  Material* diff_test_mat=new Material(diff_test_comp);
+  diff_test_comp[pb208_] = 1.0;
+  diff_test_comp[am241_] = 1.0;
+  diff_test_comp[th228_] = 1.0;
+  Material* diff_test_mat = new Material(diff_test_comp);
 
   double orig = test_mat_->quantity();
   double origdiff = diff_test_mat->quantity();
 
   // see that materials with different compositions do the right thing
-  EXPECT_NO_THROW(test_mat_->absorb(diff_test_mat));
-  ASSERT_FLOAT_EQ(orig+origdiff, test_mat_->quantity() );
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  ASSERT_NO_THROW(test_mat_->absorb(diff_test_mat));
+  EXPECT_FLOAT_EQ(orig + origdiff, test_mat_->quantity() );
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -128,11 +133,14 @@ TEST_F(MaterialTest, ExtractLikeVector) {
 
   // see that two materials with the same composition do the right thing
   double orig = test_mat_->quantity();
-  EXPECT_NO_THROW(test_mat_->extract(test_comp_));
-  ASSERT_FLOAT_EQ(test_mat_->quantity(), 0 );
-  EXPECT_NO_THROW(ten_test_mat->extract(two_test_comp));
-  ASSERT_FLOAT_EQ(ten_test_mat->quantity(),8*orig );
-  EXPECT_THROW(two_test_mat->extract(ten_test_comp), CycException);
+
+  ASSERT_NO_THROW(test_mat_->extract(test_comp_));
+  EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
+
+  ASSERT_NO_THROW(ten_test_mat->extract(two_test_comp));
+  EXPECT_FLOAT_EQ(ten_test_mat->quantity(),8*orig );
+
+  ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -145,19 +153,20 @@ TEST_F(MaterialTest, ExtractUnLikeVector) {
   double orig = test_mat_->quantity();
 
   // see that materials with different compositions do the right thing
-  EXPECT_NO_THROW(test_mat_->extract(half_test_comp));
-  ASSERT_FLOAT_EQ(0.5*orig, test_mat_->quantity() );
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
-  ASSERT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
+  ASSERT_NO_THROW(test_mat_->extract(half_test_comp));
+  EXPECT_FLOAT_EQ(0.5*orig, test_mat_->quantity() );
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
   
-  EXPECT_NO_THROW(test_mat_->extract(quarter_test_comp));
-  ASSERT_FLOAT_EQ(0.25*orig, test_mat_->quantity() );
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  ASSERT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
-  ASSERT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
+  ASSERT_NO_THROW(test_mat_->extract(quarter_test_comp));
+  EXPECT_FLOAT_EQ(0.25*orig, test_mat_->quantity() );
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
 
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ExtractMass) {
   // make a number of materials masses 1, 2, and 10 
@@ -168,10 +177,17 @@ TEST_F(MaterialTest, ExtractMass) {
   double pb_orig= orig->mass(pb208_);
 
   // see that two materials with the same composition do the right thing
-  EXPECT_NO_THROW(diff_mat_->extract(mass_to_rem));
-  ASSERT_FLOAT_EQ(diff_mat_->quantity(), mass_remaining );
+  ASSERT_NO_THROW(diff_mat_->extract(mass_to_rem));
+  EXPECT_FLOAT_EQ(diff_mat_->quantity(), mass_remaining );
+
   IsoVector remaining = diff_mat_->isoVector();
   double am_remaining = remaining.mass(am241_);
   double pb_remaining = remaining.mass(pb208_);
-  ASSERT_FLOAT_EQ(am_remaining/pb_remaining, am_orig/pb_orig);
+
+  EXPECT_FLOAT_EQ(am_remaining/pb_remaining, am_orig/pb_orig);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, GetSetQuantity) {
+
 }

@@ -21,7 +21,6 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 /**
  * A transaction structure to include in any message.
  */
-
 struct Transaction {
 
   /**

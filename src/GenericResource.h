@@ -14,6 +14,9 @@ public:
    */
   GenericResource(std::string units, std::string quality, double quantity);
 
+  /// copy constructor
+  GenericResource(const GenericResource& other);
+
   /**
    * Returns a reference to a newly allocated copy of this resource object.
    */
