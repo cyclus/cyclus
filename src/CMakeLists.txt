@@ -150,7 +150,7 @@ SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5_cpp hdf5_hl hdf5 )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -207,7 +207,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5_cpp hdf5_hl hdf5 gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
