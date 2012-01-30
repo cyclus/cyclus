@@ -31,11 +31,24 @@ SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}/Utility
   )
 
+
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
   InputXML.cpp
   IsoVector.cpp
+  Resource.cpp
+  GenericResource.cpp
+  Material.cpp
   Message.cpp
+  Utility/BookKeeper.cpp 
+  Utility/CycException.cpp 
+  Utility/LMatrix.cpp 
+  Utility/MassTable.cpp 
+  Utility/Timer.cpp
+  Utility/UniformTaylor.cpp 
+  Utility/Env.cpp
+  Utility/Logger.cpp
+  Utility/DecayHandler.cpp
   Models/Model.cpp 
   Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
@@ -46,15 +59,6 @@ SET( CYCLUS_CORE
   Models/FacilityModel.cpp 
   Models/RegionModel.cpp
   Models/InstModel.cpp
-  Utility/BookKeeper.cpp 
-  Utility/CycException.cpp 
-  Utility/LMatrix.cpp 
-  Utility/MassTable.cpp 
-  Utility/Timer.cpp
-  Utility/UniformTaylor.cpp 
-  Utility/Env.cpp
-  Utility/Logger.cpp
-  Utility/DecayHandler.cpp
   )
 
 SET( CYCLUS_SRC
@@ -116,8 +120,6 @@ MESSAGE("   Teuchos_LIBRARY_DIRS = ${Teuchos_LIBRARY_DIRS}")
 MESSAGE("   Teuchos_TPL_LIST = ${Teuchos_TPL_LIST}")
 MESSAGE("   Teuchos_TPL_LIBRARIES = ${Teuchos_TPL_LIBRARIES}")
 MESSAGE("   Teuchos_BUILD_SHARED_LIBS = ${Teuchos_BUILD_SHARED_LIBS}")
-MESSAGE("   Teuchos_CXX_COMPILER = ${Teuchos_CXX_COMPILER}")
-MESSAGE("   Teuchos_FORTRAN_COMPILER = ${Teuchos_FORTRAN_COMPILER}")
 MESSAGE("   CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 MESSAGE("End of Teuchos details\n")
 # Include the Teuchos Library
@@ -128,7 +130,7 @@ set(LIBS ${LIBS} ${Teuchos_LIBRARIES} ${Teuchos_TPL_LIBRARIES})
 
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
-# Add subdirs and build for the models and resources
+# Add subdirs and build for the models
 ADD_SUBDIRECTORY(Models)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
@@ -143,12 +145,9 @@ ELSE (DOXYGEN_FOUND)
 	MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
-# add the gfortran linking flag for trilinos
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
-
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5_cpp hdf5_hl hdf5 )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -205,7 +204,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5_cpp hdf5_hl hdf5 gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
