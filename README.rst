@@ -56,9 +56,6 @@ The `Cyclus Homepage`_ has much more detailed guides and information.
 This Readme is intended to be a quick reference for building cyclus for the
 first time.
 
-Dependencies
-------------
-
 The Cyclus code requires the following software and libraries.
 
 ====================   ==================
@@ -75,8 +72,9 @@ Package                Minimum Version
 An overview of some more complicated package builds and installations (e.g.
 lapack, teuchos, etc.) can be found at the `Cyclus Homepage`_
 
-Build System
-------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Building and Running Cyclus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
 built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
@@ -94,7 +92,7 @@ You should see output like this::
     ...
     >> -- Configuring done
     >> -- Generating done
-    >> -- Build files have been written to: /core/build
+    >> -- Build files have been written to: .../core/build
     /core/build$ make cyclus
     >> Scanning dependencies of target cyclus
     ...
@@ -103,7 +101,7 @@ You should see output like this::
     >> Linking CXX executable cyclus
     >> [100%] Built target cyclus
 
-Now, you can make cyclus, and run it with some input file, for this example, call it input.xml::
+Now, you can make cyclus, and run it with some input file, for this example, call it `input.xml`::
 
     .../core/build$ make
     .../core/build$ ./cyclus input.xml
