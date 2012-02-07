@@ -8,9 +8,13 @@
 #include "Resource.h"
 #include <vector>
 #include <string>
+#include "boost/smart_ptr.hpp"
 
 class Communicator;
 class Model;
+class Message;
+
+typedef boost::shared_ptr<Message> msg_ptr;
 
 /**
  * An enumerative type to specify which direction (up or down the class 
@@ -175,7 +179,7 @@ class Message {
   Communicator* current_owner_;
 
   /// offer/request partner for this message (meaning only for matched offers/requests)
-  Message* partner_;
+  msg_ptr partner_;
   
   /// Checks required conditions prior to sending a message.
   void validateForSend();
@@ -220,7 +224,7 @@ class Message {
    *
    * @warning don't forget to delete the pointer when you're done.
    */
-  Message* clone();
+  msg_ptr clone();
 
   /**
    * @brief Send this message to the next communicator in it's path
@@ -393,13 +397,13 @@ class Message {
   Used to match this message with a corresponding offer/request message after
   matching takes place in a market.
   */
-  void setPartner(Message* partner) {partner_ = partner;};
+  void setPartner(msg_ptr partner) {partner_ = partner;};
 
   /*!
   returns the corresponding offer/request message assuming this message has been matched
   in a market. Returns the 'this' pointer otherwise.
   */
-  Message* partner() {return partner_;};
+  msg_ptr partner() {return partner_;};
 
   /*!
   @brief Initiate the transaction - sending/receiving of resource(s) between
