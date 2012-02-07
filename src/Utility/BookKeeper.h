@@ -261,7 +261,7 @@ public:
    * @param msg the message containing the transaction
    * @param manifest a vector the materials fulfilling this transaction
    */
-  void registerTransaction(int id, Message* msg, std::vector<Resource*> manifest);
+  void registerTransaction(int id, msg_ptr msg, std::vector<Resource*> manifest);
 
   /**
    * Register the resource in the BookKeeper's map of material changes

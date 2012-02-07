@@ -55,7 +55,7 @@ void StubFacility::print()
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::receiveMessage(Message* msg) {};
+void StubFacility::receiveMessage(msg_ptr msg) {};
 
 
 /* --------------------
@@ -64,11 +64,11 @@ void StubFacility::receiveMessage(Message* msg) {};
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> StubFacility::removeResource(Message* order) {
+std::vector<Resource*> StubFacility::removeResource(msg_ptr order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::addResource(Message* msg, vector<Resource*> manifest){
+void StubFacility::addResource(msg_ptr msg, vector<Resource*> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

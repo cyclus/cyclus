@@ -291,14 +291,14 @@ const std::string Model::modelImpl() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> Model::removeResource(Message* order) {
+std::vector<Resource*> Model::removeResource(msg_ptr order) {
   std::string msg = "The model " + name();
   msg += " doesn't support resource removal.";
   throw CycOverrideException(msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addResource(Message* msg,
+void Model::addResource(msg_ptr msg,
                             std::vector<Resource*> manifest) {
   std::string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";

@@ -109,7 +109,7 @@ void SinkFacility::handleTick(int time){
       trans.price = commod_price_;
       trans.resource = request_res;
 
-      Message* request = new Message(this, recipient, trans); 
+      msg_ptr request = new Message(this, recipient, trans); 
       request->setNextDest(facInst());
       request->sendOn();
 
@@ -134,7 +134,7 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(Message* msg, vector<Resource*> manifest) {
+void SinkFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
   
   // grab each material object off of the manifest
   // and move it into the inventory.

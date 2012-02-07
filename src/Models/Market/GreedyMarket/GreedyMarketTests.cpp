@@ -16,7 +16,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeGreedyMarket : public GreedyMarket {
   protected:
-    Message* msg_;
+    msg_ptr msg_;
 
   public:
     FakeGreedyMarket() : GreedyMarket() {
@@ -30,7 +30,7 @@ class FakeGreedyMarket : public GreedyMarket {
     virtual ~FakeGreedyMarket() {
     }
 
-    Message* getMessage(){return msg_;}
+    msg_ptr getMessage(){return msg_;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

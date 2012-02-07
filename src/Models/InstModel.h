@@ -75,7 +75,7 @@ public:
 
 public:
   /// default InstModel receiver is to ignore message.
-  virtual void receiveMessage(Message* msg);
+  virtual void receiveMessage(msg_ptr msg);
   
   /**
      Each inst is prompted to do its beginning-of-life-step

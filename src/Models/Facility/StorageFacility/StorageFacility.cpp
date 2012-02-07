@@ -52,7 +52,7 @@ void StorageFacility::init(xmlNodePtr cur)
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
   
   initialStateCur_ = cur;
 }
@@ -95,7 +95,7 @@ void StorageFacility::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::receiveMessage(Message* msg)
+void StorageFacility::receiveMessage(msg_ptr msg)
 {
   // is this a message from on high? 
   if(msg->supplier()==this){
@@ -108,7 +108,7 @@ void StorageFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> StorageFacility::removeResource(Message* order) {
+std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -149,7 +149,7 @@ std::vector<Resource*> StorageFacility::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(Message* msg, vector<Resource*> manifest) {
+void StorageFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque
@@ -224,7 +224,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.price = price;
     trans.amount = newMat->quantity();
 
-    Message* storage_history = new Message(sending_facility, this, trans); 
+    msg_ptr storage_history = new Message(sending_facility, this, trans); 
     storage_history->approveTransfer();
     sending_facility->sendMaterial(storage_history,manifest);
   }
@@ -276,7 +276,7 @@ void StorageFacility::handleTick(int time)
     trans.price = commod_price;
     trans.amount = -requestAmt; // requests have a negative amount
 
-    Message* request = new Message(this, recipient, trans); 
+    msg_ptr request = new Message(this, recipient, trans); 
     request->setNextDest(facInst());
     request->sendOn();
 
@@ -293,7 +293,7 @@ void StorageFacility::handleTick(int time)
     trans.price = commod_price;
     trans.amount = -requestAmt; // requests have a negative amount
 
-    Message* request = new Message(this, recipient, trans); 
+    msg_ptr request = new Message(this, recipient, trans); 
     request->setNextDest(facInst());
     request->sendOn();
   }
@@ -324,7 +324,7 @@ void StorageFacility::handleTick(int time)
   trans.price = commod_price;
   trans.amount = offer_amt; // offers have a positive amount
 
-  Message* msg = new Message(this, recipient, trans); 
+  msg_ptr msg = new Message(this, recipient, trans); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }
@@ -351,7 +351,7 @@ void StorageFacility::handleTock(int time)
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }

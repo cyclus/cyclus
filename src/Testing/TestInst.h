@@ -8,7 +8,7 @@
 /// This is the simplest possible Institution, for testing
 class TestInst: public InstModel {
   
-  void receiveMessage(Message* msg) {
+  void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
 
     Model* what_model = NULL;

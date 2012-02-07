@@ -16,7 +16,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeConverterMarket : public ConverterMarket {
   protected:
-    Message* msg_;
+    msg_ptr msg_;
 
   public:
     FakeConverterMarket() : ConverterMarket() {
@@ -31,7 +31,7 @@ class FakeConverterMarket : public ConverterMarket {
       delete msg_;
     }
 
-    Message* getMessage() {return msg_;}
+    msg_ptr getMessage() {return msg_;}
 
 };
 

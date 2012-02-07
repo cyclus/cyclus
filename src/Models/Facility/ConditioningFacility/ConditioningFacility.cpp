@@ -145,7 +145,7 @@ void ConditioningFacility::print()
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::receiveMessage(Message* msg) {
+void ConditioningFacility::receiveMessage(msg_ptr msg) {
   LOG(LEV_DEBUG2) << "Warning, the ConditioningFacility ignores messages.";
 };
 
@@ -156,7 +156,7 @@ void ConditioningFacility::receiveMessage(Message* msg) {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
+std::vector<Resource*> ConditioningFacility::removeResource(msg_ptr order) {
   std::vector<Resource*> toRet = std::vector<Resource*>() ;
   Transaction trans = order->trans();
   double order_amount = trans.resource->quantity()*trans.minfrac;
@@ -176,7 +176,7 @@ std::vector<Resource*> ConditioningFacility::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::processOrder(Message* order) {
+std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
  // Send material from inventory to fulfill transactions
 
   Transaction trans = order->trans();
@@ -216,7 +216,7 @@ std::vector<Resource*> ConditioningFacility::processOrder(Message* order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(Message* msg, vector<Resource*> manifest) {
+void ConditioningFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -517,7 +517,7 @@ void ConditioningFacility::makeOffers(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConditioningFacility::sendMessage(Communicator* recipient, Transaction trans){
-      Message* msg = new Message(this, recipient, trans); 
+      msg_ptr msg = new Message(this, recipient, trans); 
       msg->setNextDest(facInst());
       msg->sendOn();
 }

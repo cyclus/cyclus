@@ -16,7 +16,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeNullMarket : public NullMarket {
   protected:
-    Message* msg_;
+    msg_ptr msg_;
   public:
     FakeNullMarket() : NullMarket() {
       string kg = "kg";
@@ -29,7 +29,7 @@ class FakeNullMarket : public NullMarket {
     virtual ~FakeNullMarket() {
     }
 
-    Message* getMessage(){return msg_;}
+    msg_ptr getMessage(){return msg_;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

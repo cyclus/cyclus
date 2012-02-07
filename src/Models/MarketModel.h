@@ -86,7 +86,7 @@ public:
   virtual void print();
 
   /// default MarketModel receiver simply logs the offer/request
-  virtual void receiveMessage(Message* msg) 
+  virtual void receiveMessage(msg_ptr msg) 
   { messages_.insert(msg); };
 
 /* --------------------
@@ -111,10 +111,10 @@ protected:
   std::string commodity_;
 
   /// every market collects offers & requests
-  std::set<Message*> messages_;
+  std::set<msg_ptr> messages_;
 
   /// every market generates a set of orders
-  std::deque<Message*> orders_;
+  std::deque<msg_ptr> orders_;
   int firmOrders_;
   
 

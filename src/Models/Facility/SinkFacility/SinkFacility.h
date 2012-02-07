@@ -123,7 +123,7 @@ public:
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
    */ 
-  virtual void addResource(Message* msg,
+  virtual void addResource(msg_ptr msg,
                               std::vector<Resource*> manifest);
 
 /* ------------------- */ 
@@ -135,7 +135,7 @@ public:
 public:
   /// The sink Facility doesn't need to do anything if it gets a message.
   /// It never sends any matieral to anyone.
-  virtual void receiveMessage(Message* msg) {};
+  virtual void receiveMessage(msg_ptr msg) {};
 
 /* -------------------- */
 

@@ -45,7 +45,7 @@ void StubInst::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::receiveMessage(Message* msg) {};
+void StubInst::receiveMessage(msg_ptr msg) {};
 
 
 /* --------------------

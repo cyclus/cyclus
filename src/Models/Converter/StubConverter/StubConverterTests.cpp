@@ -76,7 +76,7 @@ TEST_F(StubConverterTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubConverterTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test StubConverter specific behaviors of the receiveMessage function here
 }
 

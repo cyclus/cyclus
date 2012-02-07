@@ -37,7 +37,7 @@ void StubStubComm::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubStubComm::receiveMessage(Message* msg) {};
+void StubStubComm::receiveMessage(msg_ptr msg) {};
 
 
 /* --------------------

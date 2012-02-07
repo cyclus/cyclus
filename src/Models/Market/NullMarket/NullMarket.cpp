@@ -36,7 +36,7 @@ void NullMarket::reject_request(sortedMsgList::iterator request)
   // put all matched offers_ back in the sorted list
   while (matchedOffers_.size() > 0)
   {
-    Message* msg = *(matchedOffers_.begin());
+    msg_ptr msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
@@ -50,7 +50,7 @@ void NullMarket::process_request()
 
   while (matchedOffers_.size() > 0)
   {
-    Message* msg = *(matchedOffers_.begin());
+    msg_ptr msg = *(matchedOffers_.begin());
     messages_.erase(msg);
     matchedOffers_.erase(msg);
   }
@@ -108,7 +108,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
         // split offer
 
         // queue a new order
-        Message* maybe_offer = offerMsg->clone(); 
+        msg_ptr maybe_offer = offerMsg->clone(); 
         maybe_offer->resource()->setQuantity(requestAmt);
         maybe_offer->setRequester(requestMsg->requester());
 
@@ -130,7 +130,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
         // make a new offer with reduced amount
 
         if(offerAmt > EPS_KG){
-          Message* new_offer = offerMsg->clone();
+          msg_ptr new_offer = offerMsg->clone();
           new_offer->resource()->setQuantity(offerAmt);
           receiveMessage(new_offer);
         }
@@ -177,7 +177,7 @@ void NullMarket::resolve()
   }
 
   for (int i = 0; i < orders_.size(); i++) {
-    Message* msg = orders_.at(i);
+    msg_ptr msg = orders_.at(i);
     msg->setDir(DOWN_MSG);
     msg->sendOn();
   }

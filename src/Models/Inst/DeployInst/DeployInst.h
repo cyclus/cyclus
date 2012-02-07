@@ -60,7 +60,7 @@ public:
  */
 public:
   /// simply ignore incoming offers/requests.
-  virtual void receiveMessage(Message* msg) {};
+  virtual void receiveMessage(msg_ptr msg) {};
 
 protected:
 

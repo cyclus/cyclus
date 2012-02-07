@@ -71,7 +71,7 @@ TEST_F(FixedInstTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(FixedInstTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test FixedInst specific behaviors of the receiveMessage function here
 }
 

@@ -163,7 +163,7 @@ public:
   /**
    * When the facility receives a message, execute any transaction therein
    */
-    virtual void receiveMessage(Message* msg);
+    virtual void receiveMessage(msg_ptr msg);
 
 /* -------------------- */
 
@@ -180,7 +180,7 @@ public:
      * @return list of resources to be sent for this order
      *
      */ 
-    virtual std::vector<Resource*> removeResource(Message* order);
+    virtual std::vector<Resource*> removeResource(msg_ptr order);
 
     /**
      * Transacted resources are received through this method
@@ -188,7 +188,7 @@ public:
      * @param trans the transaction to which these resource objects belong
      * @param manifest is the set of resources being received
      */ 
-    virtual void addResource(Message* msg,
+    virtual void addResource(msg_ptr msg,
                                 std::vector<Resource*> manifest);
 
     /**
@@ -257,7 +257,7 @@ protected:
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting_;
+    deque<msg_ptr> ordersWaiting_;
 
     /**
      * get the total mass of the stuff in the inventory

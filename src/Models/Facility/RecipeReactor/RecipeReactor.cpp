@@ -87,7 +87,7 @@ void RecipeReactor::init(xmlNodePtr cur) {
   stocks_ = deque<InFuel>();
   currCore_ = deque<InFuel>();
   inventory_ = deque<OutFuel>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -113,7 +113,7 @@ void RecipeReactor::copy(RecipeReactor* src) {
   stocks_ = deque<InFuel>();
   currCore_ = deque< pair<std::string, Material* > >();
   inventory_ = deque<OutFuel >();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -182,7 +182,7 @@ void RecipeReactor::endCycle() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::receiveMessage(Message* msg) {
+void RecipeReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
   if(msg->supplier()==this){
     // file the order
@@ -194,7 +194,7 @@ void RecipeReactor::receiveMessage(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
+std::vector<Resource*> RecipeReactor::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -239,7 +239,7 @@ std::vector<Resource*> RecipeReactor::removeResource(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(Message* msg, vector<Resource*> manifest) {
+void RecipeReactor::addResource(msg_ptr msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Resource*>::iterator thisMat=manifest.begin();
@@ -338,7 +338,7 @@ void RecipeReactor::makeRequests(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::sendMessage(Communicator* recipient, Transaction trans){
-      Message* msg = new Message(this, recipient, trans); 
+      msg_ptr msg = new Message(this, recipient, trans); 
       msg->setNextDest(facInst());
       msg->sendOn();
 }
@@ -395,7 +395,7 @@ void RecipeReactor::handleTock(int time) {
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   };

@@ -11,7 +11,7 @@ class TestMarket : public MarketModel {
     TestMarket(std::string commod) {
       commodity_ = commod;
     }
-    virtual void receiveMessage(Message* msg) {
+    virtual void receiveMessage(msg_ptr msg) {
     }
     virtual void resolve() {
     }

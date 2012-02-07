@@ -34,7 +34,7 @@ class FakeSourceFacility : public SourceFacility {
       commod_price_ = 5000;
 
       inventory_ = deque<Material*>();
-      ordersWaiting_ = deque<Message*>();
+      ordersWaiting_ = deque<msg_ptr>();
     }
 
     virtual ~FakeSourceFacility() {
@@ -113,7 +113,7 @@ TEST_F(SourceFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   EXPECT_THROW(src_facility->receiveMessage(msg), CycException);
 }
 

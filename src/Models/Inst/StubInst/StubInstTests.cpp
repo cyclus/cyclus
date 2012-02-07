@@ -74,7 +74,7 @@ TEST_F(StubInstTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test StubInst specific behaviors of the receiveMessage function here
 }
 

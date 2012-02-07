@@ -94,7 +94,7 @@ void RegionModel::print() {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::receiveMessage(Message* msg){
+void RegionModel::receiveMessage(msg_ptr msg){
   msg->setNextDest(msg->market());
   msg->sendOn();
 }

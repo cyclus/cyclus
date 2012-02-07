@@ -76,7 +76,7 @@ TEST_F(SWUeUF6ConverterTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SWUeUF6ConverterTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test SWUeUF6Converter specific behaviors of the receiveMessage function here
 }
 

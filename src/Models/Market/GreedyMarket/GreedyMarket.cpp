@@ -52,7 +52,7 @@ void GreedyMarket::resolve() {
   }
 
   for (int i = 0; i < orders_.size(); i++) {
-    Message* msg = orders_.at(i);
+    msg_ptr msg = orders_.at(i);
     msg->setDir(DOWN_MSG);
     msg->sendOn();
   }
@@ -135,7 +135,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
         // split offer
 
         // queue a new order
-        Message* maybe_offer = offerMsg->clone();
+        msg_ptr maybe_offer = offerMsg->clone();
         maybe_offer->resource()->setQuantity(requestAmt);
         maybe_offer->setRequester(requestMsg->requester());
 
@@ -159,7 +159,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
         // make a new offer with reduced amount
 
         if(offerAmt > EPS_KG) {
-          Message* new_offer = offerMsg->clone();
+          msg_ptr new_offer = offerMsg->clone();
           new_offer->resource()->setQuantity(offerAmt);
           receiveMessage(new_offer);
         }

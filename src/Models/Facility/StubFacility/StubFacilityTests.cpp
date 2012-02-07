@@ -75,7 +75,7 @@ TEST_F(StubFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test StubFacility specific behaviors of the receiveMessage function here
 }
 

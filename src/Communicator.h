@@ -51,7 +51,7 @@ private:
    *  @warning This method should never be called directly by any Model object.
    *           Message sending should be handled via methods on the Message class.
    */
-  virtual void receiveMessage(Message* msg) = 0;
+  virtual void receiveMessage(msg_ptr msg) = 0;
 
 protected:
 

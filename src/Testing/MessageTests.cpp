@@ -53,7 +53,7 @@ class TestCommunicator : public Communicator {
 
   private:
 
-    void receiveMessage(Message* msg) {
+    void receiveMessage(msg_ptr msg) {
       (dynamic_cast<TrackerMessage*>(msg))->dest_list_.push_back(name_);
       if (stop_at_return_ && this == msg->sender()) {
         return;
@@ -218,7 +218,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
-    Message* msg1;
+    msg_ptr msg1;
 
     virtual void SetUp(){
       quantity1 = 1.0;
@@ -256,7 +256,7 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
   msg1->setResource(resource);
-  Message* msg2 = msg1->clone();
+  msg_ptr msg2 = msg1->clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());

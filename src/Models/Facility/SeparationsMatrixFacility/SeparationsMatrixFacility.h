@@ -137,7 +137,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(Message* order);
+  virtual std::vector<Resource*> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -145,7 +145,7 @@ public:
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
    */ 
-  virtual void addResource(Message* msg,
+  virtual void addResource(msg_ptr msg,
                               std::vector<Resource*> manifest);
 
 
@@ -159,7 +159,7 @@ public:
   /**
    * When the facility receives a message, execute any transaction therein
    */
-    virtual void receiveMessage(Message* msg);
+    virtual void receiveMessage(msg_ptr msg);
 
 /* -------------------- */
 
@@ -203,7 +203,7 @@ protected:
      * line, that is, the black box materials sit in while they're being
      * operated on.
      */
-    typedef multimap<int, pair<Message*, Material*> > ProcessLine;
+    typedef multimap<int, pair<msg_ptr, Material*> > ProcessLine;
 
     /**
      *  Vector of incoming material
@@ -252,7 +252,7 @@ protected:
     /**
      * The list of orders to process on the Tock
      */
-    deque<Message*> ordersWaiting_;
+    deque<msg_ptr> ordersWaiting_;
 
     /**
      * A map whose keys are times at which this Facility will finish executing a 

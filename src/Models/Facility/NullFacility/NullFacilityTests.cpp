@@ -23,7 +23,7 @@ class FakeNullFacility : public NullFacility {
 
       inventory_ = deque<Material*>();
       stocks_ = deque<Material*>();
-      ordersWaiting_ = deque<Message*>();
+      ordersWaiting_ = deque<msg_ptr>();
     }
 
     string getOutCommod(){ return out_commod_;}
@@ -92,7 +92,7 @@ TEST_F(NullFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test NullFacility specific behaviors of the receiveMessage function here
 }
 

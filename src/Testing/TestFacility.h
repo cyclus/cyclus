@@ -7,7 +7,7 @@
 /// This is the simplest possible Facility, for testing
 class TestFacility: public FacilityModel {
   
-  void receiveMessage(Message* msg) {
+  void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
 
     Model* what_model = NULL;

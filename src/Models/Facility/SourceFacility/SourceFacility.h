@@ -131,7 +131,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(Message* order);
+  virtual std::vector<Resource*> removeResource(msg_ptr order);
 
 
 /* ------------------- */ 
@@ -144,7 +144,7 @@ public:
   /**
    * When this facility receives a message, execute the transaction therein.
    */
-  virtual void receiveMessage(Message* msg);
+  virtual void receiveMessage(msg_ptr msg);
 
 /* -------------------- */
 
@@ -225,7 +225,7 @@ protected:
   /**
    * A list of orders to be processed on the Tock
    */
-  deque<Message*> ordersWaiting_;
+  deque<msg_ptr> ordersWaiting_;
 
   /**
    * return the total mass of the material objects in the inventory

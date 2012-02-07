@@ -106,7 +106,7 @@ public:
    *
    *  Each derived class must implement an offer/request receiver
    */ 
-  virtual void receiveMessage(Message* msg)=0;
+  virtual void receiveMessage(msg_ptr msg)=0;
 
 protected:
   /// each facility should have an institution that manages it

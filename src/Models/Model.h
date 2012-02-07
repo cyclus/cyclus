@@ -216,7 +216,7 @@ public:
   @return list of resources to be sent for this order
   
   */ 
-  virtual std::vector<Resource*> removeResource(Message* order);
+  virtual std::vector<Resource*> removeResource(msg_ptr order);
 
   /*!
   Transacted resources are received through this method.
@@ -227,7 +227,7 @@ public:
   @param msg the sent message that corresponds with the materials being received
   @param manifest is the set of resources being received
   */ 
-  virtual void addResource(Message* msg,
+  virtual void addResource(msg_ptr msg,
                               std::vector<Resource*> manifest);
 
   bool isTemplate() {return is_template_;};

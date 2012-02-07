@@ -8,7 +8,7 @@
 /// This is the simplest possible Region, for testing
 class TestRegion: public RegionModel {
   
-  void receiveMessage(Message* msg) {
+  void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
 
     Model* what_model = NULL;

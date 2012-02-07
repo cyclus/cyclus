@@ -97,7 +97,7 @@ TEST_F(SinkFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SinkFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   EXPECT_NO_THROW(sink_facility->receiveMessage(msg));
 }
 

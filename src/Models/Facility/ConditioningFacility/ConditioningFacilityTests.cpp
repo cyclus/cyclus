@@ -86,7 +86,7 @@ TEST_F(ConditioningFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(ConditioningFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test ConditioningFacility specific behaviors of the receiveMessage function here
 }
 

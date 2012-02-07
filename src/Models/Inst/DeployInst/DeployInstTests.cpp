@@ -74,7 +74,7 @@ TEST_F(DeployInstTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(DeployInstTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test DeployInst specific behaviors of the receiveMessage function here
 }
 

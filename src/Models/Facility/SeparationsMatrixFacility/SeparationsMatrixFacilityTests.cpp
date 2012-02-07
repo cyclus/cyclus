@@ -75,7 +75,7 @@ TEST_F(SeparationsMatrixFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SeparationsMatrixFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test SeparationsMatrixFacility specific behaviors of the receiveMessage function here
 }
 

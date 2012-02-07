@@ -79,7 +79,7 @@ class StubConverter : public ConverterModel
      * 
      * @return the converted message
      */
-    virtual Message* convert(Message* convMsg, Message* refMsg); 
+    virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
 
 
     /* ------------------- */ 

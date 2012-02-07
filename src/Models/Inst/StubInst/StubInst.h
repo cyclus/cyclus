@@ -73,7 +73,7 @@ public:
     /**
      * The StubInst should ignore incoming messages
      */
-    virtual void receiveMessage(Message* msg);
+    virtual void receiveMessage(msg_ptr msg);
 
 protected:
 

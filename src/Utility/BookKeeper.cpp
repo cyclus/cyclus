@@ -141,7 +141,7 @@ BookKeeper::getGroupNamePair(std::string output_dir)
   return retPair;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTransaction(int id, Message* msg, std::vector<Resource*> manifest){
+void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<Resource*> manifest){
   // grab each material object off of the manifest
   // and add its transaction to the list
   for (vector<Resource*>::iterator thisResource = manifest.begin();

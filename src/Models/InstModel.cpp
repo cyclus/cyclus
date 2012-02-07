@@ -53,7 +53,7 @@ void InstModel::print()
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::receiveMessage(Message* msg){
+void InstModel::receiveMessage(msg_ptr msg){
   // Default institutions aren't insterested in fooling with messages.
   // Just pass them along. 
   // If it's going up, send it to the region.

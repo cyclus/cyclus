@@ -107,7 +107,7 @@ public:
 
 public:
     /// default RegionModel receiver is to ignore messages
-    virtual void receiveMessage(Message* msg);
+    virtual void receiveMessage(msg_ptr msg);
 
     /**
      * Each region is prompted to do its beginning-of-life-step

@@ -93,7 +93,7 @@ public:
    *
    * @param msg is a pointer to the message, an Message object
    */
-  virtual void receiveMessage(Message* msg);
+  virtual void receiveMessage(msg_ptr msg);
 /* -------------------- */
 
 
@@ -142,14 +142,14 @@ private:
   /**
    * The set of pointers to offers that have been matched.
    */
-  std::set<Message*> matchedOffers_;
+  std::set<msg_ptr> matchedOffers_;
   
   /**
    * This function adds an Message object to the list of matchedOffers
    *
    * @param msg a pointer to the message to add
    */
-  void add(Message* msg);
+  void add(msg_ptr msg);
 
   /**
    * A boolean that keeps track of whether requests have been matched.

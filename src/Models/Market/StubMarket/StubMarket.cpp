@@ -42,7 +42,7 @@ void StubMarket::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::receiveMessage(Message* msg) {};
+void StubMarket::receiveMessage(msg_ptr msg) {};
 
 
 /* --------------------

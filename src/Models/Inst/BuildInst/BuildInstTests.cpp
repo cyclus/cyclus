@@ -74,7 +74,7 @@ TEST_F(BuildInstTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test BuildInst specific behaviors of the receiveMessage function here
 }
 

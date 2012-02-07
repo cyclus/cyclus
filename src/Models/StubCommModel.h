@@ -78,7 +78,7 @@ public:
  */
 public:
     /// No default STUBCOMMMODEL message receiver.
-    virtual void receiveMessage(Message* msg) = 0;
+    virtual void receiveMessage(msg_ptr msg) = 0;
 
 };
 

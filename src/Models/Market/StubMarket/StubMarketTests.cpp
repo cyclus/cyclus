@@ -76,7 +76,7 @@ TEST_F(StubMarketTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   EXPECT_NO_THROW(src_market->receiveMessage(msg));
 }
 

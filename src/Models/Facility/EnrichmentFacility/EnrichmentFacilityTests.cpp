@@ -25,7 +25,7 @@ class FakeEnrichmentFacility : public EnrichmentFacility {
       
       inventory_ = deque<Material*>();
       stocks_ = deque<Material*>();
-      ordersWaiting_ = deque<Message*>();
+      ordersWaiting_ = deque<msg_ptr>();
       ordersExecuting_ = ProcessLine();
     }
 
@@ -99,7 +99,7 @@ TEST_F(EnrichmentFacilityTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(EnrichmentFacilityTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test EnrichmentFacility specific behaviors of the receiveMessage function here
 }
 

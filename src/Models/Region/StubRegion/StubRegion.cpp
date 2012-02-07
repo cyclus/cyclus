@@ -41,7 +41,7 @@ void StubRegion::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::receiveMessage(Message* msg) {};
+void StubRegion::receiveMessage(msg_ptr msg) {};
 
 
 /* --------------------

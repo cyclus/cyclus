@@ -52,7 +52,7 @@ void SourceFacility::init(xmlNodePtr cur) {
   commod_price_ = strtod(XMLinput->get_xpath_content(cur,"commodprice"), NULL);
 
   inventory_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -66,7 +66,7 @@ void SourceFacility::copy(SourceFacility* src) {
   commod_price_ = src->commod_price_;
   
   inventory_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -86,7 +86,7 @@ void SourceFacility::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::receiveMessage(Message* msg){
+void SourceFacility::receiveMessage(msg_ptr msg){
 
   // is this a message from on high? 
   if(msg->supplier()==this){
@@ -99,7 +99,7 @@ void SourceFacility::receiveMessage(Message* msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<Resource*> SourceFacility::removeResource(Message* msg) {
+vector<Resource*> SourceFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   double sent_amt = 0;
 
@@ -170,7 +170,7 @@ void SourceFacility::handleTick(int time){
   trans.price = commod_price_;
   trans.resource = offer_res;
 
-  Message* msg = new Message(this, recipient, trans); 
+  msg_ptr msg = new Message(this, recipient, trans); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }
@@ -201,7 +201,7 @@ void SourceFacility::handleTock(int time){
   // check what orders are waiting,
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }

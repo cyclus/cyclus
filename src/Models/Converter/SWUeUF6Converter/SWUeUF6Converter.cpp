@@ -55,14 +55,14 @@ void SWUeUF6Converter::print()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Message* SWUeUF6Converter::convert(Message* convMsg, Message* refMsg)
+Message* SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 {
   // Figure out what you're converting to and from
   in_commod_ = convMsg->commod();
   out_commod_ = refMsg->commod();
   Model* enr;
   Model* castEnr;
-  Message* toRet;
+  msg_ptr toRet;
   Material* mat;
 
   double P;

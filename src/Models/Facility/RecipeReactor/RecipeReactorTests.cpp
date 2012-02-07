@@ -75,7 +75,7 @@ class FakeRecipeReactor : public RecipeReactor {
       stocks_ = deque<InFuel>();
       currCore_ = deque< pair<std::string, Material* > >();
       inventory_ = deque< pair<std::string, Material*> >();
-      ordersWaiting_ = deque< Message*>();
+      ordersWaiting_ = deque< msg_ptr>();
     }
 
     virtual ~FakeRecipeReactor() { }
@@ -144,7 +144,7 @@ TEST_F(RecipeReactorTest, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(RecipeReactorTest, ReceiveMessage) {
-  Message* msg;
+  msg_ptr msg;
   // Test RecipeReactor specific behaviors of the receiveMessage function here
 }
 

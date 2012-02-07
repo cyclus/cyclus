@@ -88,7 +88,7 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
 
   inventory_ = deque<pair<string,Material*> >();
   stocks_ = deque<pair<string,Material*> >();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
   outstMF_ = 0;
@@ -106,7 +106,7 @@ void SeparationsMatrixFacility::copy(SeparationsMatrixFacility* src)
 
   inventory_ = deque<InSep>();
   stocks_ = deque<OutSep>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
   outstMF_ = 0;
@@ -145,7 +145,7 @@ void SeparationsMatrixFacility::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::receiveMessage(Message* msg) 
+void SeparationsMatrixFacility::receiveMessage(msg_ptr msg) 
 {
   // is this a message from on high? 
   if(msg->supplier()==this){
@@ -158,7 +158,7 @@ void SeparationsMatrixFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
+std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -199,7 +199,7 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::addResource(Message* msg,
+void SeparationsMatrixFacility::addResource(msg_ptr msg,
                                             vector<Resource*> manifest) {  
   LOG(LEV_DEBUG2) << "Entered the addResource file ";
 
@@ -269,7 +269,7 @@ void SeparationsMatrixFacility::handleTock(int time)
 
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()) {
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
@@ -355,7 +355,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res; 
 
-      Message* request = new Message(this, recipient, trans); 
+      msg_ptr request = new Message(this, recipient, trans); 
       request->setNextDest(facInst());
       request->sendOn();
     }
@@ -377,7 +377,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res;
 
-      Message* request = new Message(this, recipient, trans); 
+      msg_ptr request = new Message(this, recipient, trans); 
       request->setNextDest(facInst());
       request->sendOn();
     }
@@ -420,7 +420,7 @@ void SeparationsMatrixFacility::makeOffers() {
     trans.price = commod_price;
     trans.resource = offer_mat;
 
-    Message* msg = new Message(this, recipient, trans); 
+    msg_ptr msg = new Message(this, recipient, trans); 
     msg->setNextDest(facInst());
     msg->sendOn();
   }
@@ -445,7 +445,7 @@ void SeparationsMatrixFacility::separate()
   // Create and send Materials corresponding to each order that's ready to go.
   while (curr != omega) {
     // Get the info we need to make the separated Material.
-    Message* mess = (curr->second).first;
+    msg_ptr mess = (curr->second).first;
     Material* mat = (curr->second).second;
 
     // Find out what we're trying to make.

@@ -53,7 +53,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
   outstMF_ = 0;
@@ -73,7 +73,7 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
   outstMF_ = 0;
@@ -99,7 +99,7 @@ void EnrichmentFacility::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::receiveMessage(Message* msg)
+void EnrichmentFacility::receiveMessage(msg_ptr msg)
 {
   // is this a message from on high? 
   if(msg->supplier()==this){
@@ -112,7 +112,7 @@ void EnrichmentFacility::receiveMessage(Message* msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> EnrichmentFacility::removeResource(Message* msg) {
+std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
@@ -153,7 +153,7 @@ std::vector<Resource*> EnrichmentFacility::removeResource(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(Message* msg, vector<Resource*> manifest) {
+void EnrichmentFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Resource*>::iterator thisMat=manifest.begin();
@@ -209,7 +209,7 @@ void EnrichmentFacility::handleTock(int time) {
 
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
@@ -303,7 +303,7 @@ void EnrichmentFacility::makeRequests(){
     trans.price = commod_price;
     trans.resource = req_res;
 
-    Message* request = new Message(this, recipient, trans); 
+    msg_ptr request = new Message(this, recipient, trans); 
     request->setNextDest(facInst());
     request->sendOn();
   }
@@ -342,7 +342,7 @@ void EnrichmentFacility::makeOffers()
   trans.price = commod_price;
   trans.resource = offer_res;
 
-  Message* msg = new Message(this, recipient, trans); 
+  msg_ptr msg = new Message(this, recipient, trans); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }
@@ -364,7 +364,7 @@ void EnrichmentFacility::enrich() {
   while (curr != omega) {
 
     // Get the info we need to make the enriched Material.
-    Message* mess = (curr->second).first;
+    msg_ptr mess = (curr->second).first;
     Material* mat = (curr->second).second;
 
     IsoVector mat_iso, vecToMake;

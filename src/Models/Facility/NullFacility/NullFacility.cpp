@@ -42,7 +42,7 @@ void NullFacility::init(xmlNodePtr cur) {
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -58,7 +58,7 @@ void NullFacility::copy(NullFacility* src)
 
   inventory_ = deque<Material*>();
   stocks_ = deque<Material*>();
-  ordersWaiting_ = deque<Message*>();
+  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -81,7 +81,7 @@ void NullFacility::print()
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::receiveMessage(Message* msg) {
+void NullFacility::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
   if (msg->supplier()==this) {
     // file the order
@@ -92,7 +92,7 @@ void NullFacility::receiveMessage(Message* msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> NullFacility::removeResource(Message* order) {
+std::vector<Resource*> NullFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
@@ -131,7 +131,7 @@ std::vector<Resource*> NullFacility::removeResource(Message* order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(Message* msg, vector<Resource*> manifest) {
+void NullFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<Resource*>::iterator thisMat=manifest.begin();
@@ -185,7 +185,7 @@ void NullFacility::makeRequests() {
     trans.price = commod_price;
     trans.resource = request_res;
 
-    Message* request = new Message(this, recipient, trans); 
+    msg_ptr request = new Message(this, recipient, trans); 
     request->setNextDest(facInst());
     request->sendOn();
   // otherwise, the upper bound is the monthly acceptance capacity 
@@ -207,7 +207,7 @@ void NullFacility::makeRequests() {
     trans.price = commod_price;
     trans.resource = request_res;
 
-    Message* request = new Message(this, recipient, trans); 
+    msg_ptr request = new Message(this, recipient, trans); 
     request->setNextDest(facInst());
     request->sendOn();
   }
@@ -247,7 +247,7 @@ void NullFacility::makeOffers() {
   trans.price = commod_price;
   trans.resource = offer_res;
 
-  Message* msg = new Message(this, recipient, trans); 
+  msg_ptr msg = new Message(this, recipient, trans); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }
@@ -280,7 +280,7 @@ void NullFacility::handleTock(int time) {
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
-    Message* order = ordersWaiting_.front();
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
