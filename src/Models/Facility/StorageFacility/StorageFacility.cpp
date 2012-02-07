@@ -224,7 +224,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.price = price;
     trans.amount = newMat->quantity();
 
-    msg_ptr storage_history = new Message(sending_facility, this, trans); 
+    msg_ptr storage_history(new Message(sending_facility, this, trans); 
     storage_history->approveTransfer();
     sending_facility->sendMaterial(storage_history,manifest);
   }
@@ -276,7 +276,7 @@ void StorageFacility::handleTick(int time)
     trans.price = commod_price;
     trans.amount = -requestAmt; // requests have a negative amount
 
-    msg_ptr request = new Message(this, recipient, trans); 
+    msg_ptr request(new Message(this, recipient, trans)); 
     request->setNextDest(facInst());
     request->sendOn();
 
@@ -293,7 +293,7 @@ void StorageFacility::handleTick(int time)
     trans.price = commod_price;
     trans.amount = -requestAmt; // requests have a negative amount
 
-    msg_ptr request = new Message(this, recipient, trans); 
+    msg_ptr request(new Message(this, recipient, trans)); 
     request->setNextDest(facInst());
     request->sendOn();
   }
@@ -324,7 +324,7 @@ void StorageFacility::handleTick(int time)
   trans.price = commod_price;
   trans.amount = offer_amt; // offers have a positive amount
 
-  msg_ptr msg = new Message(this, recipient, trans); 
+  msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }

@@ -170,7 +170,7 @@ void SourceFacility::handleTick(int time){
   trans.price = commod_price_;
   trans.resource = offer_res;
 
-  msg_ptr msg = new Message(this, recipient, trans); 
+  msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }

@@ -96,7 +96,7 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message* Message::clone() {
-  msg_ptr new_msg = new Message(*this);
+  msg_ptr new_msg(new Message(*this);
   new_msg->setResource(resource());
   return new_msg;
 }

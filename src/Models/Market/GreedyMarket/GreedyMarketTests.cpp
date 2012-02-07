@@ -23,7 +23,7 @@ class FakeGreedyMarket : public GreedyMarket {
       string kg = "kg";
       string qual = "qual";
       GenericResource* res = new GenericResource(kg, qual, 1);
-      msg_ = new Message(this);
+      msg_(new Message(this));
       msg_->setResource(res);
     }
 

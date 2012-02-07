@@ -355,7 +355,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res; 
 
-      msg_ptr request = new Message(this, recipient, trans); 
+      msg_ptr request(new Message(this, recipient, trans)); 
       request->setNextDest(facInst());
       request->sendOn();
     }
@@ -377,7 +377,7 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res;
 
-      msg_ptr request = new Message(this, recipient, trans); 
+      msg_ptr request(new Message(this, recipient, trans)); 
       request->setNextDest(facInst());
       request->sendOn();
     }
@@ -420,7 +420,7 @@ void SeparationsMatrixFacility::makeOffers() {
     trans.price = commod_price;
     trans.resource = offer_mat;
 
-    msg_ptr msg = new Message(this, recipient, trans); 
+    msg_ptr msg(new Message(this, recipient, trans)); 
     msg->setNextDest(facInst());
     msg->sendOn();
   }

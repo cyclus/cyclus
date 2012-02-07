@@ -226,7 +226,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       resource = new GenericResource("kg", "bananas", quantity1);
 
       comm1 = new TestCommunicator("comm1");
-      msg1 = new Message(comm1);
+      msg1(new Message(comm1);
     };
 
     virtual void TearDown() {

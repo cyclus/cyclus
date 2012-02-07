@@ -185,7 +185,7 @@ void NullFacility::makeRequests() {
     trans.price = commod_price;
     trans.resource = request_res;
 
-    msg_ptr request = new Message(this, recipient, trans); 
+    msg_ptr request(new Message(this, recipient, trans)); 
     request->setNextDest(facInst());
     request->sendOn();
   // otherwise, the upper bound is the monthly acceptance capacity 
@@ -207,7 +207,7 @@ void NullFacility::makeRequests() {
     trans.price = commod_price;
     trans.resource = request_res;
 
-    msg_ptr request = new Message(this, recipient, trans); 
+    msg_ptr request(new Message(this, recipient, trans)); 
     request->setNextDest(facInst());
     request->sendOn();
   }
@@ -247,7 +247,7 @@ void NullFacility::makeOffers() {
   trans.price = commod_price;
   trans.resource = offer_res;
 
-  msg_ptr msg = new Message(this, recipient, trans); 
+  msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());
   msg->sendOn();
 }

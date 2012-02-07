@@ -109,7 +109,7 @@ void SinkFacility::handleTick(int time){
       trans.price = commod_price_;
       trans.resource = request_res;
 
-      msg_ptr request = new Message(this, recipient, trans); 
+      msg_ptr request(new Message(this, recipient, trans)); 
       request->setNextDest(facInst());
       request->sendOn();
 
