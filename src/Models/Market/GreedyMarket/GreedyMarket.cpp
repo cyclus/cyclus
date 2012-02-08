@@ -13,14 +13,13 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::receiveMessage(msg_ptr msg)
-{
+void GreedyMarket::receiveMessage(msg_ptr msg) {
   messages_.insert(msg);
 
   if (msg->isOffer()) {
-    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
+    offers_.insert(indexedMsg(msg->resource()->quantity(), msg));
   } else {
-    requests_.insert(indexedMsg(msg->resource()->quantity(),msg));
+    requests_.insert(indexedMsg(msg->resource()->quantity(), msg));
   }
 }
 

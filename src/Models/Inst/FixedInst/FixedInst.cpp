@@ -12,8 +12,7 @@
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::init(xmlNodePtr cur)
-{
+void FixedInst::init(xmlNodePtr cur) {
   InstModel::init(cur);
 
   /// get facility list
