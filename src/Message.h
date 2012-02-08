@@ -4,17 +4,23 @@
 #if !defined(_MESSAGE)
 #define _MESSAGE
 
-#include "Model.h"
-#include "Resource.h"
 #include <vector>
 #include <string>
-#include "boost/smart_ptr.hpp"
+#include "boost/intrusive_ptr.hpp"
+
+#include "Model.h"
+#include "Resource.h"
 
 class Communicator;
 class Model;
 class Message;
 
-typedef boost::shared_ptr<Message> msg_ptr;
+typedef boost::intrusive_ptr<Message> msg_ptr;
+
+namespace boost {
+  void intrusive_ptr_add_ref(Message* p);
+  void intrusive_ptr_release(Message* p);
+};
 
 /**
  * An enumerative type to specify which direction (up or down the class 
@@ -153,6 +159,11 @@ struct Transaction {
 */
 class Message {
  private:
+
+  long references;
+  friend void ::boost::intrusive_ptr_add_ref(Message* p);
+  friend void ::boost::intrusive_ptr_release(Message* p);
+
   /**
    * The direction this message is traveling (up or down the class 
    * hierarchy).
@@ -167,7 +178,7 @@ class Message {
   
   /// The Communicator who will receive this Message.
   Communicator* recipient_;
-  
+
   /// Pointers to each model this message passes through.
   std::vector<Communicator*> path_stack_;
   
@@ -433,5 +444,20 @@ class Message {
   static std::string outputDir_;
 
 };
+
+// class specific addref/release implementation
+// the two function overloads must be in the boost namespace on most compilers:
+namespace boost {
+  inline void intrusive_ptr_add_ref(Message* p) {
+    // increment reference count of object *p
+    ++(p->references);
+  }
+
+  inline void intrusive_ptr_release(Message* p) {
+    // decrement reference count, and delete object when reference count reaches 0
+    if (--(p->references) == 0)
+      delete p;
+  } 
+} // namespace boost
 
 #endif
