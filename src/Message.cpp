@@ -25,6 +25,7 @@ Message::Message(Communicator* sender) {
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
+  current_owner_ = NULL;
   path_stack_ = vector<Communicator*>();
   current_owner_ = sender;
 
@@ -44,6 +45,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
+  current_owner_ = NULL;
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
@@ -63,6 +65,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
   trans_ = thisTrans;
   sender_ = sender;
   recipient_ = receiver;
+  current_owner_ = NULL;
   setResource(thisTrans.resource);
 
   if (trans_.is_offer) {
@@ -231,3 +234,4 @@ void Message::approveTransfer() {
   LOG(LEV_DEBUG2) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 }
+

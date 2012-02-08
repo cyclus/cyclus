@@ -10,6 +10,7 @@
 
 #include "Model.h"
 #include "Resource.h"
+#include "IntrusiveBase.h"
 
 class Communicator;
 class Model;
@@ -17,10 +18,10 @@ class Message;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
-namespace boost {
-  void intrusive_ptr_add_ref(Message* p);
-  void intrusive_ptr_release(Message* p);
-};
+//namespace boost {
+//  void intrusive_ptr_add_ref(Message* p);
+//  void intrusive_ptr_release(Message* p);
+//};
 
 /**
  * An enumerative type to specify which direction (up or down the class 
@@ -157,12 +158,8 @@ struct Transaction {
    during the simulation.. The StubCommModel provides an example of a Message 
    model implementation.
 */
-class Message {
+class Message: IntrusiveBase<Message> {
  private:
-
-  long references;
-  friend void ::boost::intrusive_ptr_add_ref(Message* p);
-  friend void ::boost::intrusive_ptr_release(Message* p);
 
   /**
    * The direction this message is traveling (up or down the class 
@@ -228,6 +225,8 @@ class Message {
    * @param trans the message's transaction specifics
    */
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
+
+  virtual ~Message() { };
   
   /**
    * Creates a new message by copying the current one and
@@ -444,20 +443,5 @@ class Message {
   static std::string outputDir_;
 
 };
-
-// class specific addref/release implementation
-// the two function overloads must be in the boost namespace on most compilers:
-namespace boost {
-  inline void intrusive_ptr_add_ref(Message* p) {
-    // increment reference count of object *p
-    ++(p->references);
-  }
-
-  inline void intrusive_ptr_release(Message* p) {
-    // decrement reference count, and delete object when reference count reaches 0
-    if (--(p->references) == 0)
-      delete p;
-  } 
-} // namespace boost
 
 #endif
