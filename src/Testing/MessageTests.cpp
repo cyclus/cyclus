@@ -23,7 +23,7 @@ class TestCommunicator : public Communicator {
   public:
 
     TestCommunicator(string name) {
-      msg_ = new TrackerMessage(this);
+      msg_ = msg_ptr(new TrackerMessage(this));
 
       name_ = name;
       stop_at_return_ = true;
@@ -33,12 +33,10 @@ class TestCommunicator : public Communicator {
       down_up_count_ = 0;
     }
 
-    ~TestCommunicator() {
-      delete msg_;
-    }
+    ~TestCommunicator() { }
 
     Communicator* parent_;
-    TrackerMessage* msg_;
+    msg_ptr msg_;
 
     string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
@@ -46,7 +44,7 @@ class TestCommunicator : public Communicator {
     int down_up_count_;
 
     void startMessage() {
-      msg_->dest_list_.push_back(name_);
+      dynamic_cast<TrackerMessage*>(msg_.get())->dest_list_.push_back(name_);
       msg_->setNextDest(parent_);
       msg_->sendOn();
     }
@@ -109,7 +107,7 @@ class MessagePassingTest : public ::testing::Test {
 TEST_F(MessagePassingTest, CleanThrough) {
   ASSERT_NO_THROW(comm1->startMessage());
 
-  vector<string> stops = comm1->msg_->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
@@ -130,7 +128,7 @@ TEST_F(MessagePassingTest, PassBeyondOrigin) {
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = comm1->msg_->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
@@ -151,7 +149,7 @@ TEST_F(MessagePassingTest, ForgetToSetDest) {
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = comm1->msg_->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -168,7 +166,7 @@ TEST_F(MessagePassingTest, SendToSelf) {
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = comm1->msg_->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -185,7 +183,7 @@ TEST_F(MessagePassingTest, YoYo) {
 
   ASSERT_NO_THROW(comm1->startMessage());
 
-  vector<string> stops = comm1->msg_->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 15;
 
