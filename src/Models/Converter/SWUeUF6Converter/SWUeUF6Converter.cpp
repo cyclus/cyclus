@@ -55,7 +55,7 @@ void SWUeUF6Converter::print()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Message* SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
+msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 {
   // Figure out what you're converting to and from
   in_commod_ = convMsg->commod();

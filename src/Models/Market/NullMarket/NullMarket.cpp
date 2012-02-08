@@ -12,7 +12,7 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void NullMarket::receiveMessage(Message *msg) {
+void NullMarket::receiveMessage(msg_ptr msg) {
   messages_.insert(msg);
 
   if (msg->isOffer()){
@@ -27,15 +27,12 @@ void NullMarket::receiveMessage(Message *msg) {
 void NullMarket::reject_request(sortedMsgList::iterator request)
 {
   // delete the tentative orders
-  while ( orders_.size() > firmOrders_)
-  {
-    delete orders_.back();
+  while ( orders_.size() > firmOrders_) {
     orders_.pop_back();
   }
 
   // put all matched offers_ back in the sorted list
-  while (matchedOffers_.size() > 0)
-  {
+  while (matchedOffers_.size() > 0) {
     msg_ptr msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
@@ -61,7 +58,8 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 {
   sortedMsgList::iterator offer;
   double requestAmt, offerAmt, toRet;
-  Message *offerMsg, *requestMsg;
+  msg_ptr offerMsg;
+  msg_ptr requestMsg;
 
   requestAmt = request->first;
   requestMsg = request->second;
@@ -73,8 +71,8 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
     // get a new offer
     offer = offers_.end();
     offer--;
-    offerAmt = (*offer).first;
-    offerMsg = (*offer).second;
+    offerAmt = offer->first;
+    offerMsg = offer->second;
 
     // pop off this offer
     offers_.erase(offer);

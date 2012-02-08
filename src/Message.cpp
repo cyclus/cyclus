@@ -22,7 +22,6 @@ std::string Message::outputDir_ = "/output/transactions";
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
 
-  partner_ = this;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
@@ -42,7 +41,6 @@ Message::Message(Communicator* sender) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
 
-  partner_ = this;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
@@ -61,7 +59,6 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
 
-  partner_ = this;
   dir_ = UP_MSG;
   trans_ = thisTrans;
   sender_ = sender;
@@ -95,8 +92,8 @@ void Message::printTrans() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message* Message::clone() {
-  msg_ptr new_msg(new Message(*this);
+msg_ptr Message::clone() {
+  msg_ptr new_msg(new Message(*this));
   new_msg->setResource(resource());
   return new_msg;
 }
@@ -114,7 +111,9 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
 
   current_owner_ = next_stop;
-  next_stop->receiveMessage(this);
+
+  msg_ptr me = msg_ptr(this);
+  next_stop->receiveMessage(me);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -210,12 +209,14 @@ Model* Message::requester() const {
 }
 
 void Message::approveTransfer() {
+  msg_ptr me = msg_ptr(this);
+
   Model* req = requester();
   Model* sup = supplier();
-  vector<Resource*> manifest = sup->removeResource(this);
-  req->addResource(this, manifest);
+  vector<Resource*> manifest = sup->removeResource(me);
+  req->addResource(me, manifest);
 
-  BI->registerTransaction(nextTransID_, this, manifest);
+  BI->registerTransaction(nextTransID_, me, manifest);
 
   for (int i = 0; i < manifest.size(); i++) {
     try {

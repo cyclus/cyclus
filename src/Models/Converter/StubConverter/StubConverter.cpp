@@ -39,7 +39,7 @@ void StubConverter::print() {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Message* StubConverter::convert(msg_ptr convMsg, msg_ptr refMsg)
+msg_ptr StubConverter::convert(msg_ptr convMsg, msg_ptr refMsg)
 {
   throw CycException("The StubConverter should not be used to convert things.");
 }

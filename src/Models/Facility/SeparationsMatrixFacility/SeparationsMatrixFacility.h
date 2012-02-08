@@ -299,7 +299,7 @@ protected:
            * @param candMat the candidate material
            * @return the iterator
 	   */
-          multimap<int,Message*>::iterator checkOrdersWaiting(Material* 
+          multimap<int,msg_ptr>::iterator checkOrdersWaiting(Material* 
               candMat);
 
     /**

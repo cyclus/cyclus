@@ -7,8 +7,10 @@
 #include <libxml/tree.h>
 #include <vector>
 
-#include "Resource.h"
 #include "Message.h"
+#include "Resource.h"
+
+#include "boost/intrusive_ptr.hpp"
 
 class Model;
 class Message;
@@ -16,6 +18,7 @@ struct Transaction;
 
 typedef Model* mdl_ctor();
 typedef void mdl_dtor(Model*);
+typedef boost::intrusive_ptr<Message> msg_ptr;
 
 /*! 
  * @brief defines the possible model types

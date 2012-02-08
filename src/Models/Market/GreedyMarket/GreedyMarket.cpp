@@ -13,7 +13,7 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GreedyMarket::receiveMessage(Message *msg)
+void GreedyMarket::receiveMessage(msg_ptr msg)
 {
   messages_.insert(msg);
 
@@ -63,13 +63,12 @@ void GreedyMarket::resolve() {
 void GreedyMarket::reject_request(sortedMsgList::iterator request) {
   // delete the tentative orders
   while ( orders_.size() > firmOrders_) {
-    delete orders_.back();
     orders_.pop_back();
   }
 
   // put all matched offers_ back in the sorted list
   while (matchedOffers_.size() > 0) {
-    Message *msg = *(matchedOffers_.begin());
+    msg_ptr msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
@@ -81,7 +80,7 @@ void GreedyMarket::process_request() {
   firmOrders_ = orders_.size();
 
   while (matchedOffers_.size() > 0) {
-    Message *msg = *(matchedOffers_.begin());
+    msg_ptr msg = *(matchedOffers_.begin());
     messages_.erase(msg);
     matchedOffers_.erase(msg);
   }
@@ -91,7 +90,8 @@ void GreedyMarket::process_request() {
 bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   sortedMsgList::iterator offer;
   double requestAmt,offerAmt;
-  Message *offerMsg, *requestMsg;
+  msg_ptr offerMsg;
+  msg_ptr requestMsg;
 
   requestAmt = request->first;
   requestMsg = request->second;

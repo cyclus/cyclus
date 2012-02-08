@@ -66,7 +66,7 @@ ConverterModel* ConverterMarket::getConverter() {
   return dynamic_cast<ConverterModel*>(converter);
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void ConverterMarket::receiveMessage(Message *msg)
+void ConverterMarket::receiveMessage(msg_ptr msg)
 {
   messages_.insert(msg);
 
@@ -83,16 +83,13 @@ void ConverterMarket::reject_request(sortedMsgList::iterator request)
 {
 
   // delete the tentative orders
-  while ( orders_.size() > firmOrders_)
-  {
-    delete orders_.back();
+  while ( orders_.size() > firmOrders_) {
     orders_.pop_back();
   }
 
   // put all matched offers back in the sorted list
-  while (matchedOffers_.size() > 0)
-  {
-    Message *msg = *(matchedOffers_.begin());
+  while (matchedOffers_.size() > 0) {
+    msg_ptr msg = *(matchedOffers_.begin());
     offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
@@ -107,7 +104,7 @@ void ConverterMarket::process_request()
 
   while (matchedOffers_.size() > 0)
   {
-    Message *msg = *(matchedOffers_.begin());
+    msg_ptr msg = *(matchedOffers_.begin());
     messages_.erase(msg);
     matchedOffers_.erase(msg);
   }
@@ -118,7 +115,8 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 {
   sortedMsgList::iterator offer;
   double requestAmt,offerAmt;
-  Message *offerMsg, *requestMsg;
+  msg_ptr offerMsg;
+  msg_ptr requestMsg;
 
   requestAmt = (*request).first;
   requestMsg = (*request).second;
@@ -183,7 +181,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // make a new offer with reduced amount
 
         if(offerAmt > EPS_KG) {
-          Message *new_offer = offerMsg->clone();
+          msg_ptr new_offer = offerMsg->clone();
           new_offer->resource()->setQuantity(offerAmt);
           // call this method for consistency
           receiveMessage(new_offer);

@@ -114,13 +114,13 @@ private:
   /**
    * The messages that have been indexed
    */
-  typedef std::pair<double,Message*> indexedMsg;
+  typedef std::pair<double,msg_ptr> indexedMsg;
 
   /**
    * The messages of both offer and request types that have been sorted
    * according to thie size.
    */
-  typedef std::multimap<double,Message*> sortedMsgList;
+  typedef std::multimap<double,msg_ptr> sortedMsgList;
   
   /** 
    * The requests that have been sorted according to their size.

@@ -54,7 +54,9 @@ class TestCommunicator : public Communicator {
   private:
 
     void receiveMessage(msg_ptr msg) {
-      (dynamic_cast<TrackerMessage*>(msg))->dest_list_.push_back(name_);
+      boost::intrusive_ptr<TrackerMessage> ptr;
+      ptr = boost::intrusive_ptr<TrackerMessage>(dynamic_cast<TrackerMessage*>(msg.get()));
+      ptr->dest_list_.push_back(name_);
       if (stop_at_return_ && this == msg->sender()) {
         return;
       } else if (flip_at_receive_) {
@@ -226,11 +228,10 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       resource = new GenericResource("kg", "bananas", quantity1);
 
       comm1 = new TestCommunicator("comm1");
-      msg1(new Message(comm1);
+      msg1 = msg_ptr(new Message(comm1));
     };
 
     virtual void TearDown() {
-      delete msg1;
       delete comm1;
       delete resource;
     }

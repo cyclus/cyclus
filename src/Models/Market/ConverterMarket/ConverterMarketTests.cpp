@@ -23,12 +23,11 @@ class FakeConverterMarket : public ConverterMarket {
       string kg = "kg";
       string qual = "qual";
       GenericResource* res = new GenericResource(kg, qual, 1);
-      msg_(new Message(this));
+      msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }
 
     virtual ~FakeConverterMarket() {
-      delete msg_;
     }
 
     msg_ptr getMessage() {return msg_;}

@@ -314,7 +314,7 @@ protected:
      * @param candMat the candidate material
      * @return the iterator
      */
-    multimap<int,Message*>::iterator checkOrdersWaiting(Material* candMat);
+    multimap<int,msg_ptr>::iterator checkOrdersWaiting(Material* candMat);
 
     /**
      * The time that the stock material spends in the facility.
