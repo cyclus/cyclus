@@ -16,11 +16,14 @@
 
 // initialize static variables
 int Message::nextTransID_ = 1;
+long Message::msg_create_count_ = 0;
+long Message::msg_delete_count_ = 0;
 
 std::string Message::outputDir_ = "/output/transactions";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
+  msg_create_count_++;
 
   dir_ = UP_MSG;
   sender_ = sender;
@@ -41,6 +44,7 @@ Message::Message(Communicator* sender) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
+  msg_create_count_++;
 
   dir_ = UP_MSG;
   sender_ = sender;
@@ -60,6 +64,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
+  msg_create_count_++;
 
   dir_ = UP_MSG;
   trans_ = thisTrans;
@@ -98,6 +103,7 @@ void Message::printTrans() {
 msg_ptr Message::clone() {
   msg_ptr new_msg(new Message(*this));
   new_msg->setResource(resource());
+  msg_create_count_++;
   return new_msg;
 }
 
@@ -116,7 +122,10 @@ void Message::sendOn() {
   current_owner_ = next_stop;
 
   msg_ptr me = msg_ptr(this);
+
+  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " going to " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
   next_stop->receiveMessage(me);
+  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " returned from " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

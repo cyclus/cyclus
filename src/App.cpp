@@ -112,6 +112,9 @@ int main(int argc, char* argv[]) {
     LOG(LEV_ERROR) << ge.what();
   };
 
+  LOG(LEV_INFO) << "Messages allocated: " << Message::msg_create_count_;
+  LOG(LEV_INFO) << "Messages deleted: " << Message::msg_delete_count_;
+
   return 0;
 }
 
