@@ -36,15 +36,7 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
       throw CycIOException(err_msg);
     }
 
-    mdl_dtor* del_model = (mdl_dtor*) GetProcAddress(model, destruct_fname.c_str());
-    if (!del_model) {
-      string err_msg = "Unable to load model destructor: ";
-      err_msg += GetLastError();
-      throw CycIOException(err_msg);
-    }
-
     create_map_[model_name] = new_model;
-    destroy_map_[model_name] = del_model;
   } else {
     new_model = create_map_[model_name];
   }

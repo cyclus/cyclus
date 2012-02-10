@@ -20,7 +20,6 @@ int Model::next_id_ = 0;
 std::vector<Model*> Model::template_list_;
 std::vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
-map<string, mdl_dtor*> Model::destroy_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getTemplateByName(std::string name) {
@@ -90,15 +89,6 @@ Model* Model::create(Model* model_orig) {
   model_copy->copyFreshModel(model_orig);
 
   return model_copy;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void* Model::destroy(Model* model) {
-  mdl_dtor* model_destructor = destroy_map_[model->modelImpl()];
-
-  model_destructor(model);
-
-  return model;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

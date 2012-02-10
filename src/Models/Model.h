@@ -17,7 +17,6 @@ class Message;
 struct Transaction;
 
 typedef Model* mdl_ctor();
-typedef void mdl_dtor(Model*);
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
 /*! 
@@ -87,13 +86,6 @@ public:
    * @param model_name name of model (NullFacility, StubMarket, ...) to add
    */
   static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
-
-  /**
-   * @brief Destroy a model cleanly
-   * 
-   * @param model a pointer to the model being destroyed
-   */
-  static void* destroy(Model* model);
 
   /**
    * loads all models appropriately ordered by type
@@ -295,11 +287,6 @@ private:
    */
   static std::map<std::string, mdl_ctor*> create_map_;
 
-  /**
-   * map of destructor methods for each loaded model
-   */
-  static std::map<std::string, mdl_dtor*> destroy_map_;
-  
   /**
    * every instance of a model should have a name
    */
