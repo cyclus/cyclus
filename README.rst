@@ -149,9 +149,11 @@ Workflow Notes
     
      - Pull the most recent history from the blessed repository "master"
        and/or "develop" branches before you merge changes into your
-       corresponding local branch. Consider using `git pull --rebase
-       [remote name] [branch name]` instead of a regular pull or 'fetch and
-       merge'.
+       corresponding local branch. Consider doing a rebase pull instead of
+       a regular pull or 'fetch and merge'.  For example::
+
+         git checkout develop
+         git pull --rebase blessed develop
 
      - Only merge changes into your "master" or "develop" branch when you
        are ready for those changes to be integrated into the blessed
@@ -160,14 +162,22 @@ Workflow Notes
   * As you do development on topic branches in your own fork, consider rebasing
     the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
     repository rather than merging the pulled changes into your branch.  This
-    will help maintain a more linear (and clean) history in the blessed repository.
-    *Please see caution about rebasing below*.
+    will help maintain a more linear (and clean) history.
+    *Please see caution about rebasing below*.  For example::
+
+      git checkout [your topic branch]
+      git rebase develop
 
   * In general, **every commit** (notice this is not 'every push') to the
     "develop" and "master" branches should compile and pass tests. This
     means that when you are ready to move changes from one of your topic
-    branches into the "develop" branch, you should use `git merge --no-ff
-    [topic branch name]`.  Possible exceptions to this 'no fast-forward' merge
+    branches into the "develop" branch, you should use a fast-forward
+    merge.  For example::
+    
+      git checkout develop
+      git merge --no-ff [your topic branch]
+    
+    Possible exceptions to this 'no fast-forward' merge
     include:
 
      - your topic branch consists of only one (compileable and passes
@@ -179,6 +189,10 @@ Workflow Notes
 ~~~~~~~~~~~~~~~~~~~
 Cautions
 ~~~~~~~~~~~~~~~~~~~
+
+  * **NEVER** merge the "master" branch into the "develop"
+    branch. Changes should only flow *to* the "master" branch *from* the
+    "develop" branch.
 
   * **DO NOT** rebase any commits that have been pulled/pushed anywhere
     else other than your own fork (especially if those commits have been
