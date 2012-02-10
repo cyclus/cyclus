@@ -60,8 +60,5 @@ extern "C" Model* constructStubMarket() {
   return new StubMarket();
 }
 
-extern "C" void destructStubMarket(Model* p) {
-  delete p;
-}
 
 /* -------------------- */

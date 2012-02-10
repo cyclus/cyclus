@@ -158,8 +158,5 @@ extern "C" Model* constructBuildRegion() {
     return new BuildRegion();
 }
 
-extern "C" void destructBuildRegion(Model* p) {
-    delete p;
-}
 
 /* -------------------- */

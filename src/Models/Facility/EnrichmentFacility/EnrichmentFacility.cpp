@@ -480,9 +480,6 @@ extern "C" Model* constructEnrichmentFacility() {
   return new EnrichmentFacility();
 }
 
-extern "C" void destructEnrichmentFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

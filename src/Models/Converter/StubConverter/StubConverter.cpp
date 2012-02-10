@@ -53,9 +53,6 @@ extern "C" Model* constructStubConverter() {
     return new StubConverter();
 }
 
-extern "C" void destructStubConverter(Model* p) {
-    delete p;
-}
 
 /* ------------------- */ 
 

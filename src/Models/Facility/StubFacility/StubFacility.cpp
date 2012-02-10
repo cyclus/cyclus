@@ -96,9 +96,6 @@ extern "C" Model* constructStubFacility() {
   return new StubFacility();
 }
 
-extern "C" void destructStubFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

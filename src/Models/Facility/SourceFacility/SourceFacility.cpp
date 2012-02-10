@@ -244,9 +244,6 @@ extern "C" Model* constructSourceFacility() {
   return new SourceFacility();
 }
 
-extern "C" void destructSourceFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

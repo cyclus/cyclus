@@ -190,8 +190,5 @@ extern "C" Model* constructNullMarket() {
   return new NullMarket();
 }
 
-extern "C" void destructNullMarket(Model* p) {
-  delete p;
-}
 
 /* -------------------- */

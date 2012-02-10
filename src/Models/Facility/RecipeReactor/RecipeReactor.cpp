@@ -452,9 +452,6 @@ extern "C" Model* constructRecipeReactor() {
   return new RecipeReactor();
 }
 
-extern "C" void destructRecipeReactor(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

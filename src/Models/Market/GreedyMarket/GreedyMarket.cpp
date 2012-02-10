@@ -189,9 +189,6 @@ extern "C" Model* constructGreedyMarket() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-extern "C" void destructGreedyMarket(Model* p) {
-  delete p;
-}
 
 /* -------------------- */
 

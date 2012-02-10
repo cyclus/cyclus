@@ -58,8 +58,5 @@ extern "C" Model* constructStubStubComm() {
     return new StubStubComm();
 }
 
-extern "C" void destructStubStubComm(Model* p) {
-    delete p;
-}
 
 /* -------------------- */

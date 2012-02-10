@@ -406,9 +406,6 @@ extern "C" Model* constructStorageFacility() {
     return new StorageFacility();
 }
 
-extern "C" void destructStorageFacility(Model* p) {
-    delete p;
-}
 
 /* ------------------- */ 
 

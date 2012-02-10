@@ -334,9 +334,6 @@ extern "C" Model* constructNullFacility() {
     return new NullFacility();
 }
 
-extern "C" void destructNullFacility(Model* p) {
-    delete p;
-}
 
 /* ------------------- */ 
 

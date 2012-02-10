@@ -79,9 +79,6 @@ extern "C" Model* constructFixedInst() {
   return new FixedInst();
 }
 
-extern "C" void destructFixedInst(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

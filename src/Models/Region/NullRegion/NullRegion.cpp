@@ -22,8 +22,5 @@ extern "C" Model* constructNullRegion() {
       return new NullRegion();
 }
 
-extern "C" void destructNullRegion(Model* p) {
-      delete p;
-}
 
 /* -------------------- */

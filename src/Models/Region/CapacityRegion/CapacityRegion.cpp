@@ -249,8 +249,5 @@ extern "C" Model* constructCapacityRegion() {
     return new CapacityRegion();
 }
 
-extern "C" void destructCapacityRegion(Model* p) {
-    delete p;
-}
 
 /* -------------------- */
