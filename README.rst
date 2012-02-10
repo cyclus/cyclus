@@ -157,23 +157,23 @@ Workflow Notes
        are ready for those changes to be integrated into the blessed
        repository's corresponding branch. 
 
-   * As you do development on topic branches in your own fork, consider rebasing
-     the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
-     repository rather than merging the pulled changes into your branch.  This
-     will help maintain a more linear (and clean) history in the blessed repository.
-     *Please see caution about rebasing below*.
+  * As you do development on topic branches in your own fork, consider rebasing
+    the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
+    repository rather than merging the pulled changes into your branch.  This
+    will help maintain a more linear (and clean) history in the blessed repository.
+    *Please see caution about rebasing below*.
 
-   * In general, **every commit** (notice this is not 'every push') to the
-     "develop" and "master" branches should compile and pass tests. This
-     means that when you are ready to move changes from one of your topic
-     branches into the "develop" branch, you should use `git merge --no-ff
-     [topic branch name]`.  Possible exceptions to this 'no fast-forward' merge
-     include:
+  * In general, **every commit** (notice this is not 'every push') to the
+    "develop" and "master" branches should compile and pass tests. This
+    means that when you are ready to move changes from one of your topic
+    branches into the "develop" branch, you should use `git merge --no-ff
+    [topic branch name]`.  Possible exceptions to this 'no fast-forward' merge
+    include:
 
-      - your topic branch consists of only one (compileable and passes
-        tests) commit.
+     - your topic branch consists of only one (compileable and passes
+       tests) commit.
 
-      - every commit in your topic branch is compileable and passes tests.
+     - every commit in your topic branch is compileable and passes tests.
 
 
 ~~~~~~~~~~~~~~~~~~~
@@ -183,8 +183,8 @@ Cautions
   * **DO NOT** rebase any commits that have been pulled/pushed anywhere
     else other than your own fork (especially if those commits have been
     integrated into the blessed repository.  You should NEVER rebase
-    commits that are a part of the 'master' branch.  If you do, you will be
-    flogged publicly.
+    commits that are a part of the 'master' branch.  *If you do, you will be
+    flogged publicly*.
 
   * Make sure that you are pushing/pulling from/to the right branches.
     When in doubt, use the following syntax::
