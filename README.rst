@@ -114,13 +114,13 @@ you intend to develop for *Cyclus*, please visit it to learn more.
 
 
 --------------------------------------------------------------------------
-When Pushing to Blessed
+When Pushing to the Blessed Repository
 --------------------------------------------------------------------------
 
 *Note that "blessed" repository refers to the primary `cyclus/core` repository.*
 
 Do your development pushing only to your own fork. Push to
-the blessed repository only after:
+the blessed repository (usually the "develop" branch) only after:
 
   * You have pulled the latest changes from the blessed repository.
   * You have completed a logical set of changes.
@@ -128,41 +128,66 @@ the blessed repository only after:
   * All tests pass.
   * Cyclus input files run as expected.
   * (recommended) your code has been reviewed by another developer.
-  * you have done solid checking of your changes.  I recommend using the master-develop-topic
 
-Strong recommendations:
+Code from the develop branch generally must pass even more rigorous checks
+before being integrated into the "master" branch. Hotfixes would be a
+possible exception to this.
+
+Notes the "Pusher" workflow:
 
   * use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
-  
-  * Keep your own "master" branch in sync with the blessed repository's
-    "master" branch.
+
+  * The "develop" branch is how core developers will share (generally compilable) progress
+    when we are not yet ready for the code to become 'production'.
+
+  * Keep your own "master" and "develop" branches in sync with the blessed repository's
+    "master" and "develop" branches. The master branch should always be the 'stable'
+    or 'production' release of cyclus.
     
      - Pull the most recent history from the blessed repository "master"
-       branch before you merge your changes into your "master" branch.
+       and/or "develop" branches before you merge changes into your
+       corresponding local branch. Consider using `git pull --rebase
+       [remote name] [branch name]` instead of a regular pull or 'fetch and
+       merge'.
 
-     - Only merge changes into your "master" branch when you
+     - Only merge changes into your "master" or "develop" branch when you
        are ready for those changes to be integrated into the blessed
-       repository's "master" branch. 
+       repository's corresponding branch. 
 
-   * As you do development on branches in your own fork, consider rebasing
-     the branch onto the "master" branch after *pulls* from the blessed
-     repository instead of merging those changes into your branch.  This
-     will help maintain a linear (clean) history in the blessed repository.
+   * As you do development on topic branches in your own fork, consider rebasing
+     the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
+     repository rather than merging the pulled changes into your branch.  This
+     will help maintain a more linear (and clean) history in the blessed repository.
      *Please see caution about rebasing below*.
+
+   * In general, every commit (notice this is not 'every push') to the
+     "develop" and "master" branches should compile and pass tests. This
+     means that when you are ready to move changes from one of your topic
+     branches into the "develop" branch, you should use `git merge --no-ff
+     [topic branch name]`.  Possible exceptions to this 'no fast-forward' merge
+     include:
+
+      - your topic branch consists of only one (compileable and passes
+        tests) commit.
+
+      - every commit in your topic branch is compileable and passes tests.
+
 
 Be careful:
 
   * **DO NOT** rebase any commits that have been pulled/pushed anywhere
     else other than your own fork (especially if those commits have been
-    integrated into the blessed repository.
+    integrated into the blessed repository.  You should NEVER rebase
+    commits that are a part of the 'master' branch.  If you do, you will be
+    flogged publicly.
 
   * Make sure that you are pushing/pulling from/to the right branches.
     When in doubt, use the following syntax::
 
       git push [remote] [from-branch]:[to-branch]
 
-    and (*note that pull always merges into the current branch*)::
+    and (*note that pull always merges into the current checked out branch*)::
 
       git pull [remote] [from-branch]
 
