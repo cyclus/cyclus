@@ -49,7 +49,7 @@ class CapacityRegion : public RegionModel
     /**
      * The default destructor for the CapacityRegion
      */
-    ~CapacityRegion() {};
+    virtual ~CapacityRegion() {};
    
     // different ways to populate an object after creation
     /// initialize an object from XML input

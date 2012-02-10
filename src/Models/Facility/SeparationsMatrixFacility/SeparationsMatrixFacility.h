@@ -98,7 +98,7 @@ public:
   /**
    * every model should be destructable
    */
-  ~SeparationsMatrixFacility() {};
+  virtual ~SeparationsMatrixFacility() {};
     
   /**
    * every model needs a method to initialize from XML

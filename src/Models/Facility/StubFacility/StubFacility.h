@@ -51,7 +51,7 @@ public:
   /**
    * every model should be destructable
    */
-  ~StubFacility();
+  virtual ~StubFacility();
     
   /**
    * every model needs a method to initialize from XML

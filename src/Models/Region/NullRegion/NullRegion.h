@@ -52,7 +52,7 @@ class NullRegion : public RegionModel
     /**
      * The default destructor for the NullRegion
      */
-    ~NullRegion() {};
+    virtual ~NullRegion() {};
    
     // different ways to populate an object after creation
     /// initialize an object from XML input

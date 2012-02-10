@@ -99,7 +99,7 @@ public:
   /**
    * Destructor for the SourceFacility class
    */
-  ~SourceFacility();
+  virtual ~SourceFacility();
 
   // different ways to populate an object after creation
   /// initialize an object from XML input

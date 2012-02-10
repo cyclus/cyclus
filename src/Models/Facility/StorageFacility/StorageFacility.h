@@ -51,7 +51,7 @@ public:
   /**
    * Destructor for the StorageFacility class. 
    */
-  ~StorageFacility() {};
+  virtual ~StorageFacility() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input

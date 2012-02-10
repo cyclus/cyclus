@@ -87,7 +87,7 @@ public:
   /**
    * every model should be destructable
    */
-  ~ConditioningFacility();
+  virtual ~ConditioningFacility();
     
   /**
    * every model needs a method to initialize from XML

@@ -90,7 +90,7 @@ public:
   /**
    * Destructor for the EnrichmentFacility class. 
    */
-  ~EnrichmentFacility() {};
+  virtual ~EnrichmentFacility() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input
