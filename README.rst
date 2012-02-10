@@ -114,12 +114,12 @@ you intend to develop for *Cyclus*, please visit it to learn more.
 
 
 --------------------------------------------------------------------------
-When Pushing to the Blessed Repository
+The Developer Workflow
 --------------------------------------------------------------------------
 
 *Note that "blessed" repository refers to the primary `cyclus/core` repository.*
 
-Do your development pushing only to your own fork. Push to
+As you do your development, push primarily only to your own fork. Push to
 the blessed repository (usually the "develop" branch) only after:
 
   * You have pulled the latest changes from the blessed repository.
@@ -129,13 +129,15 @@ the blessed repository (usually the "develop" branch) only after:
   * Cyclus input files run as expected.
   * (recommended) your code has been reviewed by another developer.
 
-Code from the develop branch generally must pass even more rigorous checks
+Code from the "develop" branch generally must pass even more rigorous checks
 before being integrated into the "master" branch. Hotfixes would be a
 possible exception to this.
 
-Notes the "Pusher" workflow:
+~~~~~~~~~~~~~~~~~~~
+Workflow Notes
+~~~~~~~~~~~~~~~~~~~
 
-  * use a branching workflow similar to the one described at
+  * Use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
 
   * The "develop" branch is how core developers will share (generally compilable) progress
@@ -161,7 +163,7 @@ Notes the "Pusher" workflow:
      will help maintain a more linear (and clean) history in the blessed repository.
      *Please see caution about rebasing below*.
 
-   * In general, every commit (notice this is not 'every push') to the
+   * In general, **every commit** (notice this is not 'every push') to the
      "develop" and "master" branches should compile and pass tests. This
      means that when you are ready to move changes from one of your topic
      branches into the "develop" branch, you should use `git merge --no-ff
@@ -174,7 +176,9 @@ Notes the "Pusher" workflow:
       - every commit in your topic branch is compileable and passes tests.
 
 
-Be careful:
+~~~~~~~~~~~~~~~~~~~
+Cautions
+~~~~~~~~~~~~~~~~~~~
 
   * **DO NOT** rebase any commits that have been pulled/pushed anywhere
     else other than your own fork (especially if those commits have been
