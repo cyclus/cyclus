@@ -188,6 +188,9 @@ public:
   /// add a child to the list of children
   void addChild(Model* child);
 
+  /// add a child to the list of children
+  void removeChild(Model* child);
+
   /// Return the number of children the model has
   int nChildren() {return children_.size();}
 
@@ -232,7 +235,7 @@ public:
   
 protected:
   /// children of this model
-  std::vector <Model*> children_;
+  std::vector<Model*> children_;
 
 private:
 

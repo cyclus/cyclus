@@ -22,9 +22,6 @@ using namespace std;
     TI->registerTickListener(this);
 
     // register the model
-
-    // regions are their own parent
-    this->setParent(this);
     setIsTemplate(false);
   };
 
@@ -107,6 +104,7 @@ void RegionModel::handlePreHistory(){
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();
@@ -116,6 +114,7 @@ void RegionModel::handleTick(int time){
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTock(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();
@@ -123,8 +122,11 @@ void RegionModel::handleTock(int time){
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }
+  
+  if (TI->checkEndMonth()) {delete this;}
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleDailyTasks(int time, int day){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();

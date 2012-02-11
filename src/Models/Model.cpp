@@ -207,13 +207,22 @@ Model::Model() {
   ID_ = next_id_++;
   is_template_ = true;
   template_list_.push_back(this);
+  parent_ = NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
-} 
+
+  if (parent_ != NULL) {
+    parent_->removeChild(this);
+  }
+
+  for ( int i = 0; i < children_.size(); i++ ) {
+    delete children_.at(i);
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setIsTemplate(bool is_template) {
@@ -248,11 +257,16 @@ void Model::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
   // set the pointer to this model's parent
+  if (parent == this) {
+    throw CycIndexException("A model cannot be its own parent.");
+  }
+
   setIsTemplate(false);
   parent_ = parent;
+
   // root nodes are their own parents
   // if this node is not its own parent, add it to its parent's list of children
-  if (parent_ != this){
+  if (parent_ != NULL){
     parent_->addChild(this);
   }
 };
@@ -271,11 +285,22 @@ Model* Model::parent(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
+  if (child == this || child == NULL) {
+    return;
+  }
   LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
 		  << " has added child " << child->name() << " ID " 
 		  << child->ID() << " to its list of children.";
   removeFromList(child, children_);
   children_.push_back(child); 
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::removeChild(Model* child){
+  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
+		  << " has removed child " << child->name() << " ID " 
+		  << child->ID() << " from its list of children.";
+  removeFromList(child, children_);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
