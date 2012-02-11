@@ -97,14 +97,8 @@ void* Model::destroy(Model* model) {
   mdl_dtor* model_destructor = destroy_map_[model->modelImpl()];
 
   model_destructor(model);
-  
-  return model;
-}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Model::decommission(){  
-  // set the died on date for book keeping
-  this->setDiedOn( TI->time() );
+  return model;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -176,7 +170,7 @@ void Model::load_regions() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_institutions() {
 
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
@@ -186,7 +180,7 @@ void Model::load_institutions() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
@@ -194,7 +188,7 @@ void Model::init(xmlNodePtr cur) {
   this->setBornOn( TI->time() );
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::copy(Model* model_orig) {
   if (model_orig->modelType() != model_type_ && 
        model_orig->modelImpl() != model_impl_) {
@@ -261,7 +255,6 @@ void Model::setParent(Model* parent){
   if (parent_ != this){
     parent_->addChild(this);
   }
-  parentID_ = parent_->ID();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -276,7 +269,7 @@ Model* Model::parent(){
   return parent_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
   LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
 		  << " has added child " << child->name() << " ID " 

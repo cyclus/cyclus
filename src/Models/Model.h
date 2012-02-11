@@ -96,12 +96,6 @@ public:
   static void* destroy(Model* model);
 
   /**
-     @brief Do activities related to decommisioning the model at the end
-     of its life.
-   */
-  void decommission();
-  
-  /**
    * loads all models appropriately ordered by type
    */
   static void load_models();

@@ -247,7 +247,6 @@ void ConditioningFacility::handleTock(int time){
   // all material in its stocks up to its monthly processing 
   // capacity.
   conditionMaterials();
-  FacilityModel::handleTock(time);
   printStatus(time);
 };
 

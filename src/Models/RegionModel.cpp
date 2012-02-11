@@ -38,8 +38,7 @@ void RegionModel::init(xmlNodePtr cur) {
    */
 
   /// all regions require allowed facilities - possibly many
-  xmlNodeSetPtr nodes = 
-    XMLinput->get_xpath_elements(cur,"allowedfacility");
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
 
   string fac_name;
   Model* new_fac;
@@ -123,8 +122,6 @@ void RegionModel::handleTock(int time){
       inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
-    // if its the last month, decommission the region
-    if (TI->checkEndMonth()) {this->decommission();}
   }
 }
 

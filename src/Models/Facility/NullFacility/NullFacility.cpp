@@ -284,10 +284,6 @@ void NullFacility::handleTock(int time) {
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
-
-  // call the facility model's handle tock last 
-  // to check for decommissioning
-  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

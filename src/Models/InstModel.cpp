@@ -86,8 +86,6 @@ void InstModel::handleTock(int time){
       fac != children_.end();
       fac++){
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
-    // if its the last month, decommission the inst
-    if (TI->checkEndMonth()) {this->decommission();}
   }
 }
 

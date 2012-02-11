@@ -177,7 +177,6 @@ void SourceFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
-
   // if there's room in the inventory, process material at capacity
   double space = inventory_size_ - this->checkInventory(); 
   if (capacity_ * recipe_.mass() <= space) {
@@ -211,9 +210,6 @@ void SourceFacility::handleTock(int time){
                   << " units of material at the close of month " << time
                   << ".";
 
-  // call the facility model's handle tock last 
-  // to check for decommissioning
-  FacilityModel::handleTock(time);
 }
 
 
