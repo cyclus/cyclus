@@ -193,9 +193,6 @@ extern "C" Model* constructSinkFacility() {
   return new SinkFacility();
 }
 
-extern "C" void destructSinkFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

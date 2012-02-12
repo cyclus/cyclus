@@ -59,7 +59,7 @@ public:
   /** 
    * Destructor
    */
-  ~ConverterMarket() {};
+  virtual ~ConverterMarket() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input

@@ -92,7 +92,7 @@ public:
   /**
    * Destructor for the SinkFacility class.
    */
-  ~SinkFacility();
+  virtual ~SinkFacility();
 
   // different ways to populate an object after creation
   /// initialize an object from XML input

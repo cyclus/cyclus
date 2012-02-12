@@ -58,7 +58,7 @@ class SWUeUF6Converter : public ConverterModel
     /**
      * Destructor for the SWUeUF6Converter class. 
      */
-    ~SWUeUF6Converter() {};
+    virtual ~SWUeUF6Converter() {};
 
     // different ways to populate an object after creation
     /// initialize an object from XML input

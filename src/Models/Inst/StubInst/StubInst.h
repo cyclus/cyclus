@@ -31,7 +31,7 @@ public:
   /**
    * every model should be destructable
    */
-  ~StubInst();
+  virtual ~StubInst();
     
   /**
    * every model needs a method to initialize from XML

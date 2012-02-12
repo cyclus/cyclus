@@ -71,9 +71,6 @@ extern "C" Model* constructStubInst() {
   return new StubInst();
 }
 
-extern "C" void destructStubInst(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

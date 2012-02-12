@@ -49,7 +49,7 @@ public:
   /** 
    * Destructor
    */
-  ~NullMarket() {};
+  virtual ~NullMarket() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input

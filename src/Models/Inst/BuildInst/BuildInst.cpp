@@ -78,9 +78,6 @@ extern "C" Model* constructBuildInst() {
   return new BuildInst();
 }
 
-extern "C" void destructBuildInst(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

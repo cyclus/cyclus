@@ -497,9 +497,6 @@ extern "C" Model* constructSeparationsMatrixFacility() {
   return new SeparationsMatrixFacility();
 }
 
-extern "C" void destructSeparationsMatrixFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

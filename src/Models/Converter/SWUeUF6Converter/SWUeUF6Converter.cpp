@@ -146,9 +146,6 @@ extern "C" Model* constructSWUeUF6Converter() {
     return new SWUeUF6Converter();
 }
 
-extern "C" void destructSWUeUF6Converter(Model* p) {
-    delete p;
-}
 
 /* ------------------- */ 
 

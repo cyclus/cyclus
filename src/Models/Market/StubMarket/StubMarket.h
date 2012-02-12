@@ -30,7 +30,7 @@ public:
   /**
    * every model should be destructable
    */
-  ~StubMarket();
+  virtual ~StubMarket();
     
   /**
    * every model needs a method to initialize from XML

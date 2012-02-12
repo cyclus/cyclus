@@ -645,9 +645,6 @@ extern "C" Model* constructConditioningFacility() {
   return new ConditioningFacility();
 }
 
-extern "C" void destructConditioningFacility(Model* p) {
-  delete p;
-}
 
 /* ------------------- */ 
 

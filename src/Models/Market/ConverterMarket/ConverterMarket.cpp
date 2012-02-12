@@ -240,8 +240,5 @@ extern "C" Model* constructConverterMarket() {
   return new ConverterMarket();
 }
 
-extern "C" void destructConverterMarket(Model* p) {
-  delete p;
-}
 /* -------------------- */
 

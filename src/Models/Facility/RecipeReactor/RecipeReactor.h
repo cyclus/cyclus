@@ -128,7 +128,7 @@ public:
   /**
    * Destructor for the RecipeReactor class. 
    */
-  ~RecipeReactor() {};
+  virtual ~RecipeReactor() {};
   
   // different ways to populate an object after creation
   /// initialize an object from XML input

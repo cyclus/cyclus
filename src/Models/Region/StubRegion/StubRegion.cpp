@@ -66,8 +66,5 @@ extern "C" Model* constructStubRegion() {
     return new StubRegion();
 }
 
-extern "C" void destructStubRegion(Model* p) {
-    delete p;
-}
 
 /* -------------------- */
