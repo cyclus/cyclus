@@ -212,6 +212,7 @@ Model::~Model() {
   for ( int i = 0; i < children_.size(); i++ ) {
     delete children_.at(i);
   }
+  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
