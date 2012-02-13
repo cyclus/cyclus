@@ -123,7 +123,6 @@ void RegionModel::handleTock(int time){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
   }
   
-  if (TI->checkEndMonth()) {delete this;}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
