@@ -36,13 +36,28 @@ void Timer::runSim() {
     for (int i = 1; i < eom_day+1; i++){
       sendDailyTasks();
       if (i == eom_day){
-	LOG(LEV_DEBUG3) << "Last date of month: " << date_;
-	sendTock();
+        LOG(LEV_DEBUG3) << "Last date of month: " << date_;
+        sendTock();
       }
       date_ += boost::gregorian::days(1);
     }
 
     time_++;
+  }
+
+  // initiate deletion of models that don't have parents.
+  // dealloc will propogate through hierarchy as models delete their children
+  int count = 0;
+  while (Model::getModelList().size() > 0) {
+    Model* model = Model::getModelList().at(count);
+    try {
+      model->parent();
+    } catch (CycIndexException err) {
+      delete model;
+      count = 0;
+      continue;
+    }
+    count++;
   }
 }
 

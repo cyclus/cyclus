@@ -202,6 +202,7 @@ Model::Model() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
+  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -209,8 +210,10 @@ Model::~Model() {
     parent_->removeChild(this);
   }
 
-  for ( int i = 0; i < children_.size(); i++ ) {
-    delete children_.at(i);
+  while (children_.size() > 0) {
+    Model* child = children_.at(0);
+    LOG(LEV_DEBUG2) << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
+    delete child;
   }
   LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
 }
