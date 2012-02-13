@@ -18,54 +18,47 @@ class Message;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
-//namespace boost {
-//  void intrusive_ptr_add_ref(Message* p);
-//  void intrusive_ptr_release(Message* p);
-//};
-
-/**
- * An enumerative type to specify which direction (up or down the class 
- * hierarchy) this message is moving.
+/*!
+  An enumerative type to specify which direction (up or down the class 
+  hierarchy) this message is moving.
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 
-/**
- * A transaction structure to include in any message.
- */
+ /// A transaction structure to include in any message.
 struct Transaction {
 
-  /**
+  /*!
    * The commodity that is being requested or offered in this Message.
    */
   std::string commod;
 
-  /**
+  /*!
    * True if this is an offer, false if it's a request
    */
   bool is_offer;
 
-  /**
+  /*!
    * The minimum fraction of the specified commodity that the 
    * requester is willing to accept or the offerer is willing to send. 
    */
   double minfrac;
 
-  /**
+  /*!
    * The price per unit of the commodity being requested or offered.
    */
   double price;
 
-  /**
+  /*!
    * A specific resource this transaction is concerned with 
    */
   Resource* resource;
 
-  /**
+  /*!
    * @brief supplier in this transaction.
    */
   Model* supplier;
 
-  /**
+  /*!
    * @brief requester in this transaction.
    */
   Model* requester;
@@ -161,9 +154,9 @@ struct Transaction {
 class Message: IntrusiveBase<Message> {
  private:
 
-  /**
-   * The direction this message is traveling (up or down the class 
-   * hierarchy).
+  /*!
+   The direction this message is traveling (up or down the class 
+   hierarchy).
    */
   MessageDir dir_;
   
@@ -179,7 +172,7 @@ class Message: IntrusiveBase<Message> {
   /// Pointers to each model this message passes through.
   std::vector<Communicator*> path_stack_;
   
-  /**
+  /*!
    * @brief the most recent communicator to receive this message.
    *
    * Used to prevent circular messaging.
@@ -200,14 +193,14 @@ class Message: IntrusiveBase<Message> {
 
  public:
   
-  /**
+  /*!
    * Creates an empty upward message from some communicator.
    *
    * @param sender the sender of this Message
    */
   Message(Communicator* sender);
 
-  /**
+  /*!
    * Creates an upward message using the given
    * sender, and recipient.
    *
@@ -216,7 +209,7 @@ class Message: IntrusiveBase<Message> {
    */
   Message(Communicator* sender, Communicator* receiver);
   
-  /**
+  /*!
    * Creates an upward message using the given sender, 
    * recipient, and transaction.
    *
@@ -228,27 +221,37 @@ class Message: IntrusiveBase<Message> {
 
   virtual ~Message() { };
 
-  /**
+  /*!
    * Creates a new message by copying the current one and
    * returns a reference to it.
    */
   msg_ptr clone();
 
-  /**
-   * @brief Send this message to the next communicator in it's path
-   *
-   * Messages heading up (UP_MSG) are forwareded to the communicator
-   * designated by the setNextDest(Communicator*) function. Messages
-   * heading down (DOWN_MSG) are sent successively to each communicator
-   * in reverse order of their 'upward' sequence.
-   *
-   * @exception CycMessageException attempted to send message with
-   *            with no designated receiver (next dest is undefined)
-   *
-   * @exception CycMessageException attempted to send a message to the message
-   *            sender (circular messaging)
+  /*!
+     @brief Send this message to the next communicator in it's path
+    
+     Messages heading up (UP_MSG) are forwareded to the communicator
+     designated by the setNextDest(Communicator*) function. Messages
+     heading down (DOWN_MSG) are sent successively to each communicator
+     in reverse order of their 'upward' sequence.
+    
+     @exception CycMessageException attempted to send message with
+                with no designated receiver (next dest is undefined)
+    
+     @exception CycMessageException attempted to send a message to the message
+                sender (circular messaging)
    */
   virtual void sendOn();
+
+  /*!
+  Renders the sendOn method disfunctional.
+
+  Used to prevend messages from returning through/to deallocated model objects.
+  */
+  void kill();
+
+  /// returns true if this message has been killed - see Message::kill()
+  bool isDead() {return dead_;}
   
   /*!
   @brief designate the next object to receive this message
@@ -261,143 +264,138 @@ class Message: IntrusiveBase<Message> {
   */
   void setNextDest(Communicator* next_stop);
   
-  /**
-   * Reverses the direction this Message is being sent (so, for 
-   * instance, the Manager can forward a message back down the hierarchy 
-   * to an appropriate handler.
+  /*!
+     Reverses the direction this Message is being sent (so, for 
+     instance, the Manager can forward a message back down the hierarchy 
+     to an appropriate handler.
    */
   void reverseDirection();
   
-  /**
-   * Returns the direction this Message is traveling.
-   */
+  /// Returns the direction this Message is traveling.
   MessageDir dir() const;
   
-  /**
-   * Sets the direction of the message
-   *
-   * @param newDir is the new direction
+  /*!
+     Sets the direction of the message
+    
+     @param newDir is the new direction
    */
   void setDir(MessageDir newDir);
   
-  /**
-   * @brief Get the market corresponding to the transaction commodity
-   *
-   * @return market corresponding to this msg's transaction's commodity
-   *
+  /*!
+     @brief Get the market corresponding to the transaction commodity
+    
+     @return market corresponding to this msg's transaction's commodity
+    
    */
   Communicator* market();
   
-  /**
-   * Prints the transaction data.
-   *
-   */
+  /// Prints the transaction data.
   void printTrans();
   
-  /**
-   * Returns the sender of this Message.
-   *
-   * @return the sender
+  /*!
+     Returns the sender of this Message.
+    
+     @return the sender
    */
   Communicator* sender() const {return sender_;};
   
-  /**
-   * Returns the recipient of this Message.
-   *
-   * @return the recipient
+  /*!
+     Returns the recipient of this Message.
+    
+     @return the recipient
    */
   Communicator* recipient() const;
 
-  /**
-   * Returns the supplier in this Message.
-   *
-   * @return pointer to the supplier
+  /*!
+     Returns the supplier in this Message.
+    
+     @return pointer to the supplier
    */
   Model* supplier() const;
 
-  /**
-   * Sets the assigned supplier of the material for the 
-   * transaction in this message. 
-   *
-   * @param supplier pointer to the new supplier
+  /*!
+     Sets the assigned supplier of the material for the 
+     transaction in this message. 
+    
+     @param supplier pointer to the new supplier
    */
   void setSupplier(Model* supplier) {trans_.supplier = supplier;};
 
-  /**
-   * Returns the requester in this Message.
-   *
-   * @return pointer to the requester
+  /*!
+     Returns the requester in this Message.
+    
+     @return pointer to the requester
    */
   Model* requester() const;
 
-  /**
-   * Sets the assigned requester to receive the material
-   * for the transaction in this message.
-   *
-   * @param requester pointer to the new requester
+  /*!
+     Sets the assigned requester to receive the material
+     for the transaction in this message.
+    
+     @param requester pointer to the new requester
    */
   void setRequester(Model* requester){trans_.requester = requester;};
 
-  /**
-   * Returns the transaction associated with this message.
-   *
-   * @return the Transaction
+  /*!
+     Returns the transaction associated with this message.
+    
+     @return the Transaction
    */
   Transaction trans() const {return trans_;};
 
-  /**
-   * Returns the commodity requested or offered in this Message.
-   *
-   * @return commodity for this transaction
+  /*!
+    Returns the commodity requested or offered in this Message.
+   
+    @return commodity for this transaction
    */
   std::string commod() const {return trans_.commod;};
 
-  /**
-   * Sets the commodity requested or offered in this Message.
-   *
-   * @param new_commod the commodity associated with this message/transaction
+  /*!
+    Sets the commodity requested or offered in this Message.
+   
+    @param new_commod the commodity associated with this message/transaction
    */
   void setCommod(std::string new_commod) {trans_.commod = new_commod;};
 
-  /**
-   * True if the transaction is an offer, false if it's a request
-   *
-   * @return true if the transaction is an offer, false if it's a request
+  /*!
+    True if the transaction is an offer, false if it's a request
+   
+    @return true if the transaction is an offer, false if it's a request
    */
   double isOffer() const {return trans_.is_offer;};
 
-  /**
-   * True if the transaction is an offer, false if it's a request
-   *
-   * @return true if the transaction is an offer, false if it's a request
+  /*!
+    True if the transaction is an offer, false if it's a request
+   
+    @return true if the transaction is an offer, false if it's a request
    */
   void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
 
-  /**
-   * Returns the price being requested or offered in this message.
-   *
-   * @return the price (in dollars)
+  /*!
+    Returns the price being requested or offered in this message.
+   
+    @return the price (in dollars)
    */
   double price() const {return trans_.price;};
 
-  /**
-   * Returns the price being requested or offered in this message.
-   *
-   * @param new_price the new price (in dollars)
+  /*!
+    Returns the price being requested or offered in this message.
+   
+    @param new_price the new price (in dollars)
    */
   void setPrice(double new_price) {trans_.price = new_price;};
 
-  /**
-   * Returns the Resource being requested or offered in this message.
-   *
-   * @return the Resource  (i.e. Material object) 
+  /*!
+    Returns the Resource being requested or offered in this message.
+   
+    @return the Resource  (i.e. Material object) 
    */
   Resource* resource() const {return trans_.resource;};
 
-  /**
-   * Sets the assigned resource to a new resource
-   *
-   * @param new_resource is the new Resource in the transaction
+  /*!
+    Sets the assigned resource to a new resource
+   
+    @param new_resource is the new Resource in the transaction
    */
   void setResource(Resource* new_resource) {trans_.resource = new_resource->clone();};
 
@@ -427,14 +425,16 @@ class Message: IntrusiveBase<Message> {
     output database info
   */
  public:
-  /**
+  /*!
      The getter function for the time agent output dir
   */
   static std::string outputDir(){ return outputDir_;}
 
  private:
+
+   bool dead_;
   
-  /**
+  /*!
      Every time agent writes to the output database
      location: /output/agent
   */

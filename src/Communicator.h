@@ -37,21 +37,58 @@
 class Communicator {
   
 public:
-  virtual ~Communicator() { };
+  virtual ~Communicator() {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      tracked_messages_.at(i)->kill();
+    }
+  };
 
   friend class Message;
 
 private:
 
-  /**
-   *  @brief Models communicate desires for material, etc. by sending
-   *         and receiveing messages.
-   *
-   *  @param msg pointer to message to be received
-   *  @warning This method should never be called directly by any Model object.
-   *           Message sending should be handled via methods on the Message class.
+  /*!
+   @brief Models communicate desires for material, etc. by sending
+          and receiveing messages.
+   
+   @param msg pointer to message to be received
+   @warning This method should never be called directly by any Model object.
+            Message sending should be handled via methods on the Message class.
    */
   virtual void receiveMessage(msg_ptr msg) = 0;
+
+  std::vector<msg_ptr> tracked_messages_;
+
+  /*!
+  Add msg to a list of msgs to be killed when this communicator is deallocated
+  
+  This functionality is used to prevent messages from attempting to return
+  themselves either to or through communicator objects that have been deallocated.
+  */
+  void trackMessage(msg_ptr msg) {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      if (tracked_messages_.at(i) == msg) {
+        tracked_messages_.erase(tracked_messages_.begin() + i);
+        break;
+      }
+    }
+    tracked_messages_.push_back(msg);
+  }
+
+  /*!
+  Remove msg from a list of msgs to be killed when this communicator is deallocated
+
+  This functionality is used to prevent messages from attempting to return
+  themselves either to or through communicator objects that have been deallocated.
+  */
+  void untrackMessage(msg_ptr msg) {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      if (tracked_messages_.at(i) == msg) {
+        tracked_messages_.erase(tracked_messages_.begin() + i);
+        break;
+      }
+    }
+  }
 
 protected:
 

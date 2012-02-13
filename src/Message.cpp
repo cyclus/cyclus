@@ -21,6 +21,7 @@ std::string Message::outputDir_ = "/output/transactions";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
+  dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
@@ -40,6 +41,7 @@ Message::Message(Communicator* sender) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
+  dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
@@ -58,6 +60,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
+  dead_ = false;
   dir_ = UP_MSG;
   trans_ = thisTrans;
   sender_ = sender;
@@ -100,23 +103,34 @@ msg_ptr Message::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::sendOn() {
+  if (dead_) {return;}
+
   validateForSend();
+  msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
+    path_stack_.back()->untrackMessage(me);
     path_stack_.pop_back();
+  } else {
+    path_stack_.back()->trackMessage(me);
   }
 
   Communicator* next_stop = path_stack_.back();
-
   setRealParticipant(next_stop);
-
   current_owner_ = next_stop;
 
-  msg_ptr me = msg_ptr(this);
+  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " going to "
+                  << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " going to " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
   next_stop->receiveMessage(me);
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " returned from " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+
+  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " returned from "
+                  << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::kill() {
+  dead_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,7 +165,6 @@ void Message::setNextDest(Communicator* next_stop) {
     if (path_stack_.size() == 0) {
       path_stack_.push_back(sender_);
     }
-
     path_stack_.push_back(next_stop);
   }
 }
