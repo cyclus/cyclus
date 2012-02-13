@@ -234,8 +234,6 @@ class Message: IntrusiveBase<Message> {
   /**
    * Creates a new message by copying the current one and
    * returns a reference to it.
-   *
-   * @warning don't forget to delete the pointer when you're done.
    */
   msg_ptr clone();
 
