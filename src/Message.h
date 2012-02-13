@@ -226,11 +226,8 @@ class Message: IntrusiveBase<Message> {
    */
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
 
-  virtual ~Message() {msg_delete_count_++; };
+  virtual ~Message() { };
 
-  static long msg_create_count_;
-  static long msg_delete_count_;
-  
   /**
    * Creates a new message by copying the current one and
    * returns a reference to it.
