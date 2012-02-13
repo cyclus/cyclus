@@ -228,17 +228,7 @@ void Message::approveTransfer() {
   vector<Resource*> manifest = sup->removeResource(me);
   req->addResource(me, manifest);
 
-  BI->registerTransaction(nextTransID_, me, manifest);
-
-  for (int i = 0; i < manifest.size(); i++) {
-    try {
-      BI->registerResourceState(nextTransID_, manifest.at(i));
-    } catch (...) {
-      LOG(LEV_ERROR) << "Failed to register resource state. Resource may"
-                     << " not have been of Material type.";
-    }
-  }
-  nextTransID_++;
+  BI->registerTransaction(nextTransID_++, me, manifest);
 
   LOG(LEV_DEBUG2) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";

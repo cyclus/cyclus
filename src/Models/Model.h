@@ -192,9 +192,6 @@ public:
   /// set the bornOn date of this model
   void setBornOn(int date) {bornOn_ = date;};
 
-  /// set the died on date of this model
-  void setDiedOn(int date) {diedOn_ = date;};
-
   /// return the ith child
   Model* children(int i){return children_[i];}
 

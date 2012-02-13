@@ -13,9 +13,13 @@
 #include "Model.h"
 #include "Material.h"
 #include "Message.h"
+#include "CycException.h"
+#include "boost/any.hpp"
 
 #define BI BookKeeper::Instance()
 #define NUMISOS 100
+
+typedef std::map<std::string, boost::any> ParamMap;
 
 using namespace H5;
 
@@ -169,6 +173,12 @@ protected:
    * Stores the material changes that have taken place during the simulation.
    */
   std::vector<mat_hist_t> materials_;
+
+  /**
+   * Stores model/agent data
+   */
+  std::map<int, ParamMap> agent_data_;
+
   
   /**
    * Stores the material changes that have taken place during the simulation.
@@ -342,6 +352,32 @@ public:
    * @param trans transaction
    */
    void printTrans(trans_t trans);
+
+  template <class T>
+  void registerModelDatum(int id, std::string param, T val) {
+    ParamMap curr_agent;
+    if (agent_data_.count(id) != 0) {
+      curr_agent = agent_data_[id];
+    }
+    boost::any item = val;
+    curr_agent[param] = item;
+    agent_data_[id] = curr_agent;
+  }
+
+  template <class T>
+  T modelDatum(int id, std::string param) {
+    if (agent_data_.count(id) == 0) {
+      throw CycIndexException("That agent ID doesn't exist.");
+    }
+
+    ParamMap curr_agent = agent_data_[id];
+
+    if (curr_agent.count(param) == 0) {
+      throw CycIndexException("That agent param doesn't exist.");
+    }
+
+    return boost::any_cast<T>(curr_agent[param]);
+  }
 
 };
 
