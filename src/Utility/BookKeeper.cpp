@@ -157,6 +157,7 @@ void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<Resource*>
      
     strcpy(toRegister.commodName, msg->commod().c_str());
     transactions_.push_back(toRegister);
+    registerResourceState(id, *thisResource);
   }
 }
 
