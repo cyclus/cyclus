@@ -238,7 +238,7 @@ void BookKeeper::writeDataSet(const void *data, const DataType &data_desc,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::writeAgentList() {
-  try{
+  try {
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
     Exception::dontPrint();
@@ -264,28 +264,31 @@ void BookKeeper::writeAgentList() {
                            H5::PredType::NATIVE_INT);
     
     // fill the agent data array from cyclus' agent list
-    std::vector<Model*> agent_list = Model::getModelList();
-    int numStructs = std::max(1, (int)agent_list.size());
+    int numStructs = std::max(1, (int)agent_data_.size());
     agent_t agent_data[numStructs];
     // take care of the special case where there are no agents
-    if (agent_list.size() == 0) {
+    if (agent_data_.size() == 0) {
       agent_data[0].ID = -1;
       agent_data[0].parentID = -1;
       agent_data[0].bornOn = -1;
       agent_data[0].diedOn = -1;
       strcpy(agent_data[0].modelImpl, "");
       strcpy(agent_data[0].name, ""); 
-    } 
     // take care of the normal case where there are agents
-    else {
-      for (int i = 0; i < agent_list.size(); i++) {
-        Model* theAgent = agent_list.at(i);
-        agent_data[i].ID = theAgent->ID();
-        strcpy(agent_data[i].name, theAgent->name().c_str()); 
-        strcpy(agent_data[i].modelImpl, theAgent->modelImpl().c_str());
-        agent_data[i].parentID = theAgent->parentID();
-        agent_data[i].bornOn = theAgent->bornOn();
-        agent_data[i].diedOn = theAgent->diedOn();
+    } else {
+      std::map<int, ParamMap>::iterator iter;
+      int count = 0;
+      for (iter = agent_data_.begin(); iter != agent_data_.end(); ++iter) {
+        int id = iter->first;
+
+        agent_data[count].ID = id;
+        strcpy(agent_data[count].name, modelDatum<std::string>(id, "name").c_str()); 
+        strcpy(agent_data[count].modelImpl, modelDatum<std::string>(id, "modelImpl").c_str());
+        agent_data[count].parentID = modelDatum<int>(id, "parentID");
+        agent_data[count].bornOn = modelDatum<int>(id, "bornOn");
+        agent_data[count].diedOn = modelDatum<int>(id, "diedOn");
+
+        count++;
       }
     }
     

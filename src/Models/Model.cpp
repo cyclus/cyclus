@@ -8,8 +8,8 @@
 #include "Env.h"
 #include "InputXML.h"
 #include "Timer.h"
+#include "BookKeeper.h"
 
-#include "RegionModel.h"
 
 #include DYNAMICLOADLIB
 #include <iostream>
@@ -202,6 +202,17 @@ Model::Model() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
+  diedOn_ = TI->time();
+
+  // book-keeping
+  BI->registerModelDatum<std::string>(ID_, "name", name());
+  BI->registerModelDatum<std::string>(ID_, "modelImpl", modelImpl());
+  BI->registerModelDatum<int>(ID_, "parentID", parentID_);
+  BI->registerModelDatum<int>(ID_, "bornOn", bornOn());
+  BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
+
+  // remove references to self
+  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -209,9 +220,13 @@ Model::~Model() {
     parent_->removeChild(this);
   }
 
-  for ( int i = 0; i < children_.size(); i++ ) {
-    delete children_.at(i);
+  // delete children
+  while (children_.size() > 0) {
+    Model* child = children_.at(0);
+    LOG(LEV_DEBUG2) << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
+    delete child;
   }
+  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -253,6 +268,7 @@ void Model::setParent(Model* parent){
 
   setIsTemplate(false);
   parent_ = parent;
+  parentID_ = parent->ID();
 
   // root nodes are their own parents
   // if this node is not its own parent, add it to its parent's list of children
