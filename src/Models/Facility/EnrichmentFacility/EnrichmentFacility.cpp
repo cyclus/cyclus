@@ -51,8 +51,8 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   // get default tails fraction
   default_xw_ = strtod(XMLinput->get_xpath_content(cur,"tailsassay"), NULL);
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
@@ -71,8 +71,8 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
   capacity_ = src->capacity_;
   default_xw_ = src->default_xw_;
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
@@ -128,10 +128,10 @@ std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   std::vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -140,7 +140,7 @@ std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
     }
@@ -161,7 +161,7 @@ void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
+    stocks_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
   }
 }
 
@@ -186,10 +186,10 @@ void EnrichmentFacility::handleTock(int time) {
   double complete = 0;
 
   while(capacity_ > complete && !stocks_.empty() ){
-    Material* m = stocks_.front();
+    mat_rsrc_ptr m = stocks_.front();
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = new Material();
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (capacity_ - complete)){
@@ -199,7 +199,7 @@ void EnrichmentFacility::handleTock(int time) {
     }
     else{ 
       // if the stocks obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(capacity_ - complete);
+      mat_rsrc_ptr toAbsorb = m->extract(capacity_ - complete);
       complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
     }
@@ -222,7 +222,7 @@ double EnrichmentFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -238,7 +238,7 @@ double EnrichmentFacility::checkStocks(){
   // material unit is in each object.
 
 
-  for (deque<Material*>::iterator iter = stocks_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -361,7 +361,7 @@ void EnrichmentFacility::enrich() {
 
     // Get the info we need to make the enriched Material.
     msg_ptr mess = (curr->second).first;
-    Material* mat = (curr->second).second;
+    mat_rsrc_ptr mat = (curr->second).second;
 
     IsoVector mat_iso, vecToMake;
     mat_iso = mat->isoVector();
@@ -369,7 +369,7 @@ void EnrichmentFacility::enrich() {
     // Find out what we're trying to make.
     //
     try {
-      vecToMake = dynamic_cast<Material*>(mess->resource())->isoVector();
+      vecToMake = dynamic_cast<mat_rsrc_ptr>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
@@ -403,7 +403,7 @@ void EnrichmentFacility::enrich() {
     pComp.setAtomCount(90190, atoms19);
     pComp.setMass(mat->quantity());
 
-    Material* theProd = new Material(pComp);
+    mat_rsrc_ptr theProd = new Material(pComp);
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = W * 1E6;
@@ -420,7 +420,7 @@ void EnrichmentFacility::enrich() {
     wComp.setMass(mat->quantity());
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
-    Material* theTails = new Material(wComp);
+    mat_rsrc_ptr theTails = new Material(wComp);
 
     // CONSERVATION OF MASS CHECKS:
     if (fabs(pComp.eltMass(92) + wComp.eltMass(92) 
@@ -435,7 +435,7 @@ void EnrichmentFacility::enrich() {
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    Material* rsrc = dynamic_cast<Material*>(mess->resource());
+    mat_rsrc_ptr rsrc = dynamic_cast<mat_rsrc_ptr>(mess->resource());
     rsrc->setQuantity(theProd->quantity());
     mess->setResource(dynamic_cast<rsrc_ptr>(theProd));
 

@@ -40,8 +40,8 @@ void NullFacility::init(xmlNodePtr cur) {
   inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
 }
 
@@ -56,8 +56,8 @@ void NullFacility::copy(NullFacility* src)
   inventory_size_ = src->inventory_size_;
   capacity_ = src->capacity_;
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
 }
 
@@ -109,7 +109,7 @@ std::vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   vector<rsrc_ptr> toSend;
 
   while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -117,7 +117,7 @@ std::vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
       inventory_.pop_front();
     } else {
       // if the inventory obj is larger than the remaining need, split it.
-      Material* leftover = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr leftover = m->extract(trans.resource->quantity() - newAmt);
       newAmt += m->quantity();
       inventory_.pop_front();
       inventory_.push_back(leftover);
@@ -139,7 +139,7 @@ void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
+    stocks_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
   }
 }
 
@@ -261,7 +261,7 @@ void NullFacility::handleTock(int time) {
 
   // while there's still capacity left and stuff in the stocks
   while(capacity_ > complete && !stocks_.empty() ) {
-    Material* m = stocks_.front();
+    mat_rsrc_ptr m = stocks_.front();
 
     if(m->quantity() <= (capacity_ - complete)){
       // if the mass of the material is less than the remaining capacity
@@ -269,7 +269,7 @@ void NullFacility::handleTock(int time) {
       stocks_.pop_front();
     } else { 
       // if the mass is too bit, split the stocks object 
-      Material* leftover = m->extract(capacity_ - complete);
+      mat_rsrc_ptr leftover = m->extract(capacity_ - complete);
       complete += m->quantity();
       stocks_.pop_front();
       stocks_.push_back(leftover);
@@ -293,7 +293,7 @@ double NullFacility::checkInventory() {
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -309,7 +309,7 @@ double NullFacility::checkStocks(){
   // material unit is in_ each object.
 
 
-  for (deque<Material*>::iterator iter = stocks_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
     total += (*iter)->quantity();

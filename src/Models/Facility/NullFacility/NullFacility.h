@@ -207,12 +207,12 @@ protected:
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks_;
+    deque<mat_rsrc_ptr> stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory_;
+    deque<mat_rsrc_ptr> inventory_;
 
     /**
      * The list of orders to process on the Tock
@@ -249,12 +249,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe_;
+    mat_rsrc_ptr in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe_;
+    mat_rsrc_ptr out_recipe_;
 
 private : 
     /// Makes requests of the input commodity based on current capacity

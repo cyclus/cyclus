@@ -17,7 +17,7 @@ SourceFacility::SourceFacility() {
 SourceFacility::~SourceFacility() {
   // Delete all the Material in the inventory.
   while (!inventory_.empty()) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
     inventory_.pop_front();
     delete m;
   }
@@ -51,7 +51,7 @@ void SourceFacility::init(xmlNodePtr cur) {
   // get commodity price 
   commod_price_ = strtod(XMLinput->get_xpath_content(cur,"commodprice"), NULL);
 
-  inventory_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
 }
 
@@ -65,7 +65,7 @@ void SourceFacility::copy(SourceFacility* src) {
   inventory_size_ = src->inventory_size_;
   commod_price_ = src->commod_price_;
   
-  inventory_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
 }
 
@@ -109,7 +109,7 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
   vector<rsrc_ptr> toSend;
 
   while (trans.resource->quantity() > (sent_amt+EPS_KG) && !inventory_.empty() ) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if (m->quantity() <= (trans.resource->quantity() - sent_amt)) {
       sent_amt += m->quantity();
@@ -119,7 +119,7 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
         <<"  has decided not to split the object with size :  "<< m->quantity();
     } else if (m->quantity() > (trans.resource->quantity() - sent_amt)) { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* mat_to_send = m->extract(trans.resource->quantity() - sent_amt);
+      mat_rsrc_ptr mat_to_send = m->extract(trans.resource->quantity() - sent_amt);
       sent_amt += mat_to_send->quantity();
       LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
         <<"  has decided to split the object to size :  "<< mat_to_send->quantity();
@@ -131,7 +131,7 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::printSent(Material* mat){
+void SourceFacility::printSent(mat_rsrc_ptr mat){
     LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
       <<"  is sending a mat with mass: "<< mat->quantity();
     (mat)->print();
@@ -183,7 +183,7 @@ void SourceFacility::handleTock(int time){
     // add a material the size of the capacity to the inventory
     IsoVector temp = recipe_;
     temp.multBy(capacity_);
-    Material* newMat = new Material(temp);
+    mat_rsrc_ptr newMat = new Material(temp);
 
     LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
@@ -192,7 +192,7 @@ void SourceFacility::handleTock(int time){
     // add a material that fills the inventory
     IsoVector temp = recipe_;
     temp.setMass(space);
-    Material* newMat = new Material(temp);
+    mat_rsrc_ptr newMat = new Material(temp);
     LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
@@ -219,7 +219,7 @@ double SourceFacility::checkInventory(){
   
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
-  for (deque<Material*>::iterator iter = inventory_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();

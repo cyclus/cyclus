@@ -23,8 +23,8 @@ class FakeEnrichmentFacility : public EnrichmentFacility {
       default_xw_ = 0.3;
       outstMF_ = 0;
       
-      inventory_ = deque<Material*>();
-      stocks_ = deque<Material*>();
+      inventory_ = deque<mat_rsrc_ptr>();
+      stocks_ = deque<mat_rsrc_ptr>();
       ordersWaiting_ = deque<msg_ptr>();
       ordersExecuting_ = ProcessLine();
     }

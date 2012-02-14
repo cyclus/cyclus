@@ -163,7 +163,7 @@ public:
   /**
    * Resource class method
    */
-  Material* clone();
+  mat_rsrc_ptr clone();
 
   /**
    * Absorbs the contents of the given Material into this Material and deletes 
@@ -171,7 +171,7 @@ public:
    * 
    * @param matToAdd the Material to be absorbed (and deleted)
    */
-  virtual void absorb(Material* matToAdd);
+  virtual void absorb(mat_rsrc_ptr matToAdd);
 
   /**
    * Extracts from this material a composition specified by the given IsoVector
@@ -181,7 +181,7 @@ public:
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(IsoVector rem_comp);
+  virtual mat_rsrc_ptr extract(IsoVector rem_comp);
 
   /**
    * Extracts a specified mass from this material creating a new material
@@ -191,7 +191,7 @@ public:
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(double mass);
+  virtual mat_rsrc_ptr extract(double mass);
 
   /**
    * Decays this Material object for the given number of months and updates
@@ -237,7 +237,7 @@ private:
   IsoVector iso_vector_;
 
   /// list of materials
-  static std::vector<Material*> materials_;
+  static std::vector<mat_rsrc_ptr> materials_;
 
   /// true if decay should occur, false if not.
   static bool decay_wanted_;

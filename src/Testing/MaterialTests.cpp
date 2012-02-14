@@ -12,8 +12,8 @@ class MaterialTest : public ::testing::Test {
     int one_mol_; // atoms
     CompMap test_comp_, diff_comp;
     double test_size_;
-    Material* test_mat_;
-    Material* diff_mat_;
+    mat_rsrc_ptr test_mat_;
+    mat_rsrc_ptr diff_mat_;
     long int u235_halflife_;
     int th228_halflife_;
 
@@ -50,7 +50,7 @@ TEST_F(MaterialTest, Constructors){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Clone) {
-  Material* clone_mat;
+  mat_rsrc_ptr clone_mat;
   ASSERT_NO_THROW(clone_mat = test_mat_->clone());
 
   // in order to acommodate discrete material tracking, all ID's mush be unique
@@ -68,9 +68,9 @@ TEST_F(MaterialTest, Clone) {
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   // make a number of materials masses 1, 2, and 10 
   CompMap two_test_comp, ten_test_comp, pu_test_comp;
-  Material* one_test_mat;
-  Material* two_test_mat;
-  Material* ten_test_mat;
+  mat_rsrc_ptr one_test_mat;
+  mat_rsrc_ptr two_test_mat;
+  mat_rsrc_ptr ten_test_mat;
   one_test_mat = new Material(test_comp_);
 
   CompMap::iterator it;
@@ -96,13 +96,13 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // make a number of materials masses 1, 2, and 10 
-  Material* same_as_orig_test_mat = new Material(test_comp_);
+  mat_rsrc_ptr same_as_orig_test_mat = new Material(test_comp_);
 
   CompMap diff_test_comp;
   diff_test_comp[pb208_] = 1.0;
   diff_test_comp[am241_] = 1.0;
   diff_test_comp[th228_] = 1.0;
-  Material* diff_test_mat = new Material(diff_test_comp);
+  mat_rsrc_ptr diff_test_mat = new Material(diff_test_comp);
 
   double orig = test_mat_->quantity();
   double origdiff = diff_test_mat->quantity();
@@ -118,9 +118,9 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 TEST_F(MaterialTest, ExtractLikeVector) {
   // make a number of materials masses 1, 2, and 10 
   CompMap two_test_comp, ten_test_comp, pu_test_comp;
-  Material* one_test_mat;
-  Material* two_test_mat;
-  Material* ten_test_mat;
+  mat_rsrc_ptr one_test_mat;
+  mat_rsrc_ptr two_test_mat;
+  mat_rsrc_ptr ten_test_mat;
   one_test_mat = new Material(test_comp_);
 
   CompMap::iterator it;
@@ -145,7 +145,7 @@ TEST_F(MaterialTest, ExtractLikeVector) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ExtractUnLikeVector) {
-  Material* same_as_orig_test_mat = new Material(test_comp_);
+  mat_rsrc_ptr same_as_orig_test_mat = new Material(test_comp_);
   CompMap half_test_comp, quarter_test_comp;
   half_test_comp[u235_]=.5;
   quarter_test_comp[u235_]=.25;

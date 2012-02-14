@@ -63,7 +63,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
   Model* enr;
   Model* castEnr;
   msg_ptr toRet;
-  Material* mat;
+  mat_rsrc_ptr mat;
 
   double P;
   double xp;
@@ -83,7 +83,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     }
     SWUs = convMsg->resource()->quantity();
     try {
-      mat = dynamic_cast<Material*>(refMsg->resource());
+      mat = dynamic_cast<mat_rsrc_ptr>(refMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -97,7 +97,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
       throw CycException("SWUs offered by non-Model");
     }
     try{
-      mat = dynamic_cast<Material*>(convMsg->resource());
+      mat = dynamic_cast<mat_rsrc_ptr>(convMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \

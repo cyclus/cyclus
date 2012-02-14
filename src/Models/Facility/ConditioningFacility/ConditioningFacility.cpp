@@ -56,8 +56,8 @@ ConditioningFacility::ConditioningFacility() {
     allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
     allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
-    stocks_ = deque<pair<string, Material*> >();
-    inventory_ = deque<pair<string, Material*> >();
+    stocks_ = deque<pair<string, mat_rsrc_ptr> >();
+    inventory_ = deque<pair<string, mat_rsrc_ptr> >();
 
 };
 
@@ -189,10 +189,10 @@ std::vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
   vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front().second;
+    mat_rsrc_ptr m = inventory_.front().second;
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = new Material();
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -202,7 +202,7 @@ std::vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
       remaining_capacity_ = remaining_capacity_ - newAmt;
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
       remaining_capacity_ = remaining_capacity_ - newAmt;
@@ -225,7 +225,7 @@ void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<mat_rsrc_ptr>(*thisMat)));
   } 
 };
 
@@ -477,7 +477,7 @@ void ConditioningFacility::makeOffers(){
   std::string outcommod, offers;
   Communicator* recipient;
   double offer_amt;
-  for (deque< pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
+  for (deque< pair<std::string, mat_rsrc_ptr > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter++){
     // get out commod
@@ -489,7 +489,7 @@ void ConditioningFacility::makeOffers(){
     offer_amt = iter->second->quantity();
 
     // make a material to offer
-    Material* offer_mat = iter->second;
+    mat_rsrc_ptr offer_mat = iter->second;
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
@@ -528,7 +528,7 @@ double ConditioningFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
+  for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += iter->second->quantity();
@@ -544,7 +544,7 @@ double ConditioningFacility::checkStocks(){
   // material unit is in each object.
 
   if(!stocks_.empty()){
-    for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
+    for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
         total += iter->second->quantity();
@@ -558,11 +558,11 @@ double ConditioningFacility::checkStocks(){
 void ConditioningFacility::conditionMaterials(){
   // Partition the in-stream according to loading density
   // for each stream object in stocks
-  map<string, Material*> remainders;
+  map<string, mat_rsrc_ptr> remainders;
   while( !stocks_.empty() && remaining_capacity_ > 0){
     // move stocks to currMat
     std::string currCommod = stocks_.front().first;
-    Material* currMat = stocks_.front().second;
+    mat_rsrc_ptr currMat = stocks_.front().second;
     if(remainders.find(currCommod)!=remainders.end()){
       (remainders[currCommod])->absorb(condition(currCommod, currMat));
     } else {
@@ -570,14 +570,14 @@ void ConditioningFacility::conditionMaterials(){
     }
     stocks_.pop_front();
   }
-  map<string, Material*>::const_iterator rem;
+  map<string, mat_rsrc_ptr>::const_iterator rem;
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* ConditioningFacility::condition(string commod, Material* mat){
+mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();

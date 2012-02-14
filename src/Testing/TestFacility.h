@@ -18,7 +18,7 @@ class TestFacility: public FacilityModel {
 
   void copyFreshModel(Model* model) { }
 
-  void receiveMaterial(Transaction trans, vector<Material*> manifest) { }
+  void receiveMaterial(Transaction trans, vector<mat_rsrc_ptr> manifest) { }
 };
 
 #endif

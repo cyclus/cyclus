@@ -202,10 +202,10 @@ protected:
     std::vector<stream_t> stream_vec_;
 
     /// the stocks are where the raw material is kept
-    std::deque<std::pair<std::string, Material*> > stocks_;
+    std::deque<std::pair<std::string, mat_rsrc_ptr> > stocks_;
 
     /// the inventory is where the processed material is kept
-    std::deque< pair<std::string, Material*> > inventory_;
+    std::deque< pair<std::string, mat_rsrc_ptr> > inventory_;
 
     /// a map from format names to table loading function pointers
     std::map<std::string, void(ConditioningFacility:: *)(std::string)> allowed_formats_;
@@ -331,7 +331,7 @@ private :
      *
      * @return the material that remains, not enough to be conditioned
      */
-    Material* condition(std::string commod, Material* mat);
+    mat_rsrc_ptr condition(std::string commod, mat_rsrc_ptr mat);
 
     /**
      * Returns the stream representing the commodity. 

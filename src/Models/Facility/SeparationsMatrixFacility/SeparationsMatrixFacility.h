@@ -80,8 +80,8 @@
    of each element across all streams.
  */
 
-typedef pair<std::string, Material*> InSep;
-typedef pair<std::string, Material*> OutSep;
+typedef pair<std::string, mat_rsrc_ptr> InSep;
+typedef pair<std::string, mat_rsrc_ptr> OutSep;
 
 class SeparationsMatrixFacility : public FacilityModel  {
 /* --------------------
@@ -203,7 +203,7 @@ protected:
      * line, that is, the black box materials sit in while they're being
      * operated on.
      */
-    typedef multimap<int, pair<msg_ptr, Material*> > ProcessLine;
+    typedef multimap<int, pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
     /**
      *  Vector of incoming material
@@ -229,17 +229,17 @@ protected:
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<pair<std::string,Material*> > stocks_;
+    deque<pair<std::string,mat_rsrc_ptr> > stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<pair<std::string,Material*> > inventory_;
+    deque<pair<std::string,mat_rsrc_ptr> > inventory_;
 
     /**
      * The inventory of waste material.
      */
-    deque<pair<std::string,Material*> > wastes_;
+    deque<pair<std::string,mat_rsrc_ptr> > wastes_;
 
         /**
      * The total mass flow required to process all outstanding orders this 
@@ -299,7 +299,7 @@ protected:
            * @param candMat the candidate material
            * @return the iterator
 	   */
-          multimap<int,msg_ptr>::iterator checkOrdersWaiting(Material* 
+          multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr 
               candMat);
 
     /**
@@ -329,12 +329,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe_;
+    mat_rsrc_ptr in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe_;
+    mat_rsrc_ptr out_recipe_;
 
 /* --------------------
    output directory info

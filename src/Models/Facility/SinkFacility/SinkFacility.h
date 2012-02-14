@@ -172,7 +172,7 @@ protected:
   vector<std::string> in_commods_;
 
   /// this facility holds material in storage. 
-  deque<Material*> inventory_;
+  deque<mat_rsrc_ptr> inventory_;
 
   /**
    * get the total mass of the stuff in the inventory

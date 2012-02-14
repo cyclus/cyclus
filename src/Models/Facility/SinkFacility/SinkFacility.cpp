@@ -18,7 +18,7 @@ SinkFacility::SinkFacility(){
 SinkFacility::~SinkFacility(){
   // Delete all the Material in the inventory.
   while (!inventory_.empty()) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
     inventory_.pop_front();
     delete m;
   }
@@ -141,7 +141,7 @@ void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     (*thisMat)->print();
-    inventory_.push_back(dynamic_cast<Material*>(*thisMat));
+    inventory_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
   }
 }
 
@@ -152,7 +152,7 @@ double SinkFacility::checkInventory() {
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  deque<Material*>::iterator iter;
+  deque<mat_rsrc_ptr>::iterator iter;
 
   for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
     total += (*iter)->quantity();

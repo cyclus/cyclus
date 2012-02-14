@@ -111,7 +111,7 @@ void RecipeReactor::copy(RecipeReactor* src) {
 
 
   stocks_ = deque<InFuel>();
-  currCore_ = deque< pair<std::string, Material* > >();
+  currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
   inventory_ = deque<OutFuel >();
   ordersWaiting_ = deque<msg_ptr>();
 }
@@ -137,7 +137,7 @@ void RecipeReactor::beginCycle() {
   if ( !stocks_.empty() ) {
     // move stocks batch to currCore
     std::string batchCommod = stocks_.front().first;
-    Material* batchMat = stocks_.front().second;
+    mat_rsrc_ptr batchMat = stocks_.front().second;
     stocks_.pop_front();
     InFuel inBatch;
     inBatch = make_pair(batchCommod, batchMat);
@@ -155,7 +155,7 @@ void RecipeReactor::beginCycle() {
 void RecipeReactor::endCycle() {
   // move a batch out of the core 
   std::string batchCommod = currCore_.front().first;
-  Material* batchMat = currCore_.front().second;
+  mat_rsrc_ptr batchMat = currCore_.front().second;
   currCore_.pop_front();
 
   // figure out the spent fuel commodity and material
@@ -199,9 +199,9 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
 
   double newAmt = 0;
 
-  Material* m;
-  Material* newMat;
-  Material* toAbsorb;
+  mat_rsrc_ptr m;
+  mat_rsrc_ptr newMat;
+  mat_rsrc_ptr toAbsorb;
 
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
@@ -247,7 +247,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<mat_rsrc_ptr>(*thisMat)));
   }
 }
 
@@ -359,7 +359,7 @@ void RecipeReactor::makeOffers(){
   std::string commod;
   Communicator* recipient;
   double offer_amt;
-  for (deque<pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
+  for (deque<pair<std::string, mat_rsrc_ptr > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     // get commod
@@ -371,7 +371,7 @@ void RecipeReactor::makeOffers(){
     offer_amt = iter->second->quantity();
 
     // make a material to offer
-    Material* offer_mat = new Material(out_recipe_);
+    mat_rsrc_ptr offer_mat = new Material(out_recipe_);
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
@@ -409,7 +409,7 @@ double RecipeReactor::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
+  for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += iter->second->quantity();
@@ -425,7 +425,7 @@ double RecipeReactor::checkStocks(){
   // material unit is in each object.
 
   if(!stocks_.empty()){
-    for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
+    for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
         total += iter->second->quantity();

@@ -73,8 +73,8 @@ class FakeRecipeReactor : public RecipeReactor {
       };
 
       stocks_ = deque<InFuel>();
-      currCore_ = deque< pair<std::string, Material* > >();
-      inventory_ = deque< pair<std::string, Material*> >();
+      currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
+      inventory_ = deque< pair<std::string, mat_rsrc_ptr> >();
       ordersWaiting_ = deque< msg_ptr>();
     }
 

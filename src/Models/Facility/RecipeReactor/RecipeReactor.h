@@ -108,8 +108,8 @@
    material on a market?
 */
 
-typedef pair< std::string, Material*> InFuel;
-typedef pair< std::string, Material*> OutFuel; 
+typedef pair< std::string, mat_rsrc_ptr> InFuel;
+typedef pair< std::string, mat_rsrc_ptr> OutFuel; 
 
 typedef pair< std::string, IsoVector> InRecipe;
 typedef pair< std::string, IsoVector> OutRecipe; 

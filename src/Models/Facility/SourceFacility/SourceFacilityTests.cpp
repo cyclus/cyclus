@@ -33,7 +33,7 @@ class FakeSourceFacility : public SourceFacility {
       inventory_size_ = 50;
       commod_price_ = 5000;
 
-      inventory_ = deque<Material*>();
+      inventory_ = deque<mat_rsrc_ptr>();
       ordersWaiting_ = deque<msg_ptr>();
     }
 

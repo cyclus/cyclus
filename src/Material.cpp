@@ -10,7 +10,7 @@
 
 using namespace std;
 
-std::vector<Material*> Material::materials_;
+std::vector<mat_rsrc_ptr> Material::materials_;
 
 bool Material::decay_wanted_ = false;
 
@@ -34,7 +34,7 @@ Material::Material(const Material& other) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::absorb(Material* matToAdd) {
+void Material::absorb(mat_rsrc_ptr matToAdd) {
   // Get the given Material's composition.
   IsoVector vec_to_add = matToAdd->isoVector();
   iso_vector_ = iso_vector_ + vec_to_add;
@@ -43,7 +43,7 @@ void Material::absorb(Material* matToAdd) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::extract(double mass) {
+mat_rsrc_ptr Material::extract(double mass) {
   IsoVector new_comp = iso_vector_;
   new_comp.setMass(mass);
 
@@ -53,7 +53,7 @@ Material* Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* Material::extract(IsoVector rem_comp) {
+mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
   return new Material(rem_comp);
 }
@@ -63,7 +63,7 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material* Material::clone() {
+mat_rsrc_ptr Material::clone() {
   return new Material(*this);
 }
 
@@ -75,7 +75,7 @@ bool Material::checkQuality(rsrc_ptr other){
 
   try {
     // Make sure the other is a material
-    IsoVector rhs_vec = dynamic_cast<Material*>(other)->isoVector();
+    IsoVector rhs_vec = dynamic_cast<mat_rsrc_ptr>(other)->isoVector();
     toRet = (lhs_vec==rhs_vec);
   } catch (std::exception& e) {
     toRet = false;
@@ -92,7 +92,7 @@ bool Material::checkQuantityEqual(rsrc_ptr other) {
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<Material*>(other)->quantity();
+    double second_qty = dynamic_cast<mat_rsrc_ptr>(other)->quantity();
     toRet=( abs(quantity() - second_qty) < EPS_KG);
   } catch (std::exception e) {
   }
@@ -108,7 +108,7 @@ bool Material::checkQuantityGT(rsrc_ptr other){
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<Material*>(other)->quantity();
+    double second_qty = dynamic_cast<mat_rsrc_ptr>(other)->quantity();
     toRet = second_qty - quantity() > EPS_KG;
   } catch (std::exception& e){
   }
@@ -133,7 +133,7 @@ void Material::decayMaterials(int time) {
     // and if (time(mod interval)==0)
     if (time % decay_interval_ == 0) {
       // acquire a list of all materials
-      for (vector<Material*>::iterator mat = materials_.begin();
+      for (vector<mat_rsrc_ptr>::iterator mat = materials_.begin();
           mat != materials_.end();
           mat++){
          // and decay each of them
