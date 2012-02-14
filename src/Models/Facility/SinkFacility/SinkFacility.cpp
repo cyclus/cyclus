@@ -15,14 +15,7 @@ SinkFacility::SinkFacility(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SinkFacility::~SinkFacility(){
-  // Delete all the Material in the inventory.
-  while (!inventory_.empty()) {
-    mat_rsrc_ptr m = inventory_.front();
-    inventory_.pop_front();
-    delete m;
-  }
-}
+SinkFacility::~SinkFacility(){ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::init(xmlNodePtr cur) {
@@ -99,7 +92,7 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = dynamic_cast<Communicator*>(market);
 
       // create a generic resource
-      gen_rsrc_ptr request_res = new GenericResource((*commod), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*commod), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -141,7 +134,7 @@ void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     (*thisMat)->print();
-    inventory_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
+    inventory_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
 

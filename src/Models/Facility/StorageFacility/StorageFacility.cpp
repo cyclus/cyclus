@@ -158,8 +158,8 @@ void StorageFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
-    entryTimes_.push_back(make_pair(TI->time(), dynamic_cast<mat_rsrc_ptr>(*thisMat) ));
+    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
+    entryTimes_.push_back(make_pair(TI->time(), boost::dynamic_pointer_cast<Material>(*thisMat) ));
   }
 }
 

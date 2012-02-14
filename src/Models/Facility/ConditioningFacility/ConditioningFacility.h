@@ -4,7 +4,6 @@
 
 #include "boost/multi_array.hpp"
 #include <iostream>
-#include "Logger.h"
 #include <queue>
 #include <string>
 #include <vector>
@@ -12,9 +11,11 @@
 #include "H5Cpp.h"
 #include "hdf5.h"
 
+#include "Logger.h"
 #include "FacilityModel.h"
-using namespace H5;
+#include "Material.h"
 
+using namespace H5;
 
 /**
   \class ConditioningFacility
@@ -71,8 +72,7 @@ using namespace H5;
   Puts the material it has recieved in the stocks, to be conditioned on the tick.
 
  */
-class ConditioningFacility : public FacilityModel  
-{
+class ConditioningFacility : public FacilityModel {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

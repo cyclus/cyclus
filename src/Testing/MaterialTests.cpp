@@ -36,8 +36,6 @@ class MaterialTest : public ::testing::Test {
     }
 
     virtual void TearDown(){
-      delete test_mat_;
-      delete diff_mat_;
     }
 };
 
@@ -50,8 +48,9 @@ TEST_F(MaterialTest, Constructors){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Clone) {
-  mat_rsrc_ptr clone_mat;
+  rsrc_ptr clone_mat;
   ASSERT_NO_THROW(clone_mat = test_mat_->clone());
+
 
   // in order to acommodate discrete material tracking, all ID's mush be unique
   EXPECT_NE(test_mat_->ID(), clone_mat->ID());

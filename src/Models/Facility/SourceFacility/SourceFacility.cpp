@@ -14,14 +14,7 @@ SourceFacility::SourceFacility() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SourceFacility::~SourceFacility() {
-  // Delete all the Material in the inventory.
-  while (!inventory_.empty()) {
-    mat_rsrc_ptr m = inventory_.front();
-    inventory_.pop_front();
-    delete m;
-  }
-}
+SourceFacility::~SourceFacility() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::init(xmlNodePtr cur) {
@@ -160,7 +153,7 @@ void SourceFacility::handleTick(int time){
   LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
 
   // build a generic resource to offer
-  gen_rsrc_ptr offer_res = new GenericResource(out_commod_,"kg",offer_amt);
+  gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
 
   // build the transaction and message
   Transaction trans;

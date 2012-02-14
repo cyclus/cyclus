@@ -210,7 +210,7 @@ void SeparationsMatrixFacility::addResource(msg_ptr msg,
       thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
-    stocks_.push_back(make_pair(msg->trans().commod, dynamic_cast<mat_rsrc_ptr>(*thisMat)));
+    stocks_.push_back(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -341,7 +341,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      gen_rsrc_ptr request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -363,7 +363,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = capacity_ - sto;
 
       // request a generic resource
-      gen_rsrc_ptr request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -446,7 +446,7 @@ void SeparationsMatrixFacility::separate()
 
     // Find out what we're trying to make.
     try {
-      IsoVector vecToMake =  dynamic_cast<mat_rsrc_ptr>(mess->resource())->isoVector();
+      IsoVector vecToMake =  boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;

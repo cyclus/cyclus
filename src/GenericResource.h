@@ -23,7 +23,7 @@ public:
   /**
    * Returns a reference to a newly allocated copy of this resource object.
    */
-  virtual gen_rsrc_ptr clone();
+  virtual rsrc_ptr clone();
 
   virtual void print();
 

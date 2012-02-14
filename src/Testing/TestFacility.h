@@ -2,6 +2,7 @@
 #define _TESTFACILITY_H_
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing

@@ -169,7 +169,7 @@ std::vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
     msg += order->requester()->name();
     msg += " will not be sent.";
     LOG(LEV_DEBUG2) << msg;
-    gen_rsrc_ptr empty = new GenericResource("kg","kg",0);
+    gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
     toRet.push_back(empty);
   }
   return toRet;
@@ -225,7 +225,9 @@ void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<mat_rsrc_ptr>(*thisMat)));
+
+    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
+    stocks_.push_front(make_pair(msg->trans().commod, mat));
   } 
 };
 
@@ -445,7 +447,7 @@ void ConditioningFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      gen_rsrc_ptr request_res = new GenericResource(in_commod, "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;

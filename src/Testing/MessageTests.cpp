@@ -223,7 +223,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = new GenericResource("kg", "bananas", quantity1);
+      resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
       comm1 = new TestCommunicator("comm1");
       msg1 = msg_ptr(new Message(comm1));
@@ -231,7 +231,6 @@ class MessagePublicInterfaceTest : public ::testing::Test {
 
     virtual void TearDown() {
       delete comm1;
-      delete resource;
     }
 };
 

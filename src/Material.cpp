@@ -38,8 +38,6 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   // Get the given Material's composition.
   IsoVector vec_to_add = matToAdd->isoVector();
   iso_vector_ = iso_vector_ + vec_to_add;
-
-  delete matToAdd;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,13 +47,13 @@ mat_rsrc_ptr Material::extract(double mass) {
 
   iso_vector_ = iso_vector_ - new_comp;
   
-  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(new_comp));
+  return mat_rsrc_ptr(new Material(new_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
-  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(rem_comp));
+  return mat_rsrc_ptr(new Material(rem_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -63,8 +61,9 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-mat_rsrc_ptr Material::clone() {
-  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(*this));
+rsrc_ptr Material::clone() {
+  rsrc_ptr mat(new Material(*this));
+  return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -75,7 +74,7 @@ bool Material::checkQuality(rsrc_ptr other){
 
   try {
     // Make sure the other is a material
-    IsoVector rhs_vec = dynamic_cast<mat_rsrc_ptr>(other)->isoVector();
+    IsoVector rhs_vec = boost::dynamic_pointer_cast<Material>(other)->isoVector();
     toRet = (lhs_vec==rhs_vec);
   } catch (std::exception& e) {
     toRet = false;
@@ -92,7 +91,7 @@ bool Material::checkQuantityEqual(rsrc_ptr other) {
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<mat_rsrc_ptr>(other)->quantity();
+    double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet=( abs(quantity() - second_qty) < EPS_KG);
   } catch (std::exception e) {
   }
@@ -108,7 +107,7 @@ bool Material::checkQuantityGT(rsrc_ptr other){
   // Make sure the other is a material
   try{
     // check mass values
-    double second_qty = dynamic_cast<mat_rsrc_ptr>(other)->quantity();
+    double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet = second_qty - quantity() > EPS_KG;
   } catch (std::exception& e){
   }

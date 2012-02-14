@@ -185,9 +185,9 @@ void BookKeeper::registerResourceState(int trans_id, rsrc_ptr resource){
   strcpy(toRegister.units, resource->units().c_str());
 
   if (resource->type() == GENERIC_RES) {
-    strcpy(toRegister.name, dynamic_cast<gen_rsrc_ptr>(resource)->quality().c_str());
+    strcpy(toRegister.name, boost::dynamic_pointer_cast<GenericResource>(resource)->quality().c_str());
   } else if (resource->type() == MATERIAL_RES) {
-    mat_rsrc_ptr mat = dynamic_cast<mat_rsrc_ptr>(resource);
+    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(resource);
     strcpy(toRegister.name, "Material");
     CompMap comp = (mat->isoVector()).comp();
     int i = 0;

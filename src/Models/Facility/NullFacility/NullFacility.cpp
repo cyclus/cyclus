@@ -139,7 +139,7 @@ void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
+    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
 
@@ -175,7 +175,7 @@ void NullFacility::makeRequests() {
     requestAmt = space;
 
     // create a resource
-    gen_rsrc_ptr request_res = new GenericResource(in_commod_,"kg",requestAmt);
+    gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
 
     // build the transaction and message
     Transaction trans;
@@ -197,7 +197,7 @@ void NullFacility::makeRequests() {
     requestAmt = capacity_ - sto;
 
     // create a resource
-    gen_rsrc_ptr request_res = new GenericResource(in_commod_,"kg",requestAmt);
+    gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
 
     // build the transaction and message
     Transaction trans;
@@ -237,7 +237,7 @@ void NullFacility::makeOffers() {
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
   // create a Resource
-  gen_rsrc_ptr offer_res = new GenericResource(out_commod_, "kg", offer_amt);
+  gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_, "kg", offer_amt));
 
   // build the transaction and message
   Transaction trans;

@@ -163,7 +163,7 @@ public:
   /**
    * Resource class method
    */
-  mat_rsrc_ptr clone();
+  rsrc_ptr clone();
 
   /**
    * Absorbs the contents of the given Material into this Material and deletes 

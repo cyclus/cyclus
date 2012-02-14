@@ -19,9 +19,9 @@ GenericResource::GenericResource(const GenericResource& other) {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-gen_rsrc_ptr GenericResource::clone() {
+rsrc_ptr GenericResource::clone() {
   LOG(LEV_DEBUG2) << "resource was cloned";
-  return new GenericResource(*this);
+  return rsrc_ptr(new GenericResource(*this));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

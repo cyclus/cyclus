@@ -161,7 +161,7 @@ void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<mat_rsrc_ptr>(*thisMat));
+    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
 
@@ -289,7 +289,7 @@ void EnrichmentFacility::makeRequests(){
     Communicator* recipient = dynamic_cast<Communicator*>(market);
 
     // request a generic object
-    rsrc_ptr req_res = new GenericResource(in_commod_,"kg",requestAmt);
+    rsrc_ptr req_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
 
     // build the transaction and message
     Transaction trans;
@@ -328,7 +328,7 @@ void EnrichmentFacility::makeOffers()
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
-  gen_rsrc_ptr offer_res = new GenericResource(out_commod_,"SWUs",offer_amt);
+  gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"SWUs",offer_amt));
 
   // build the transaction and message
   Transaction trans;
@@ -369,7 +369,7 @@ void EnrichmentFacility::enrich() {
     // Find out what we're trying to make.
     //
     try {
-      vecToMake = dynamic_cast<mat_rsrc_ptr>(mess->resource())->isoVector();
+      vecToMake = boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
@@ -435,14 +435,13 @@ void EnrichmentFacility::enrich() {
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    mat_rsrc_ptr rsrc = dynamic_cast<mat_rsrc_ptr>(mess->resource());
+    mat_rsrc_ptr rsrc = boost::dynamic_pointer_cast<Material>(mess->resource());
     rsrc->setQuantity(theProd->quantity());
-    mess->setResource(dynamic_cast<rsrc_ptr>(theProd));
+    mess->setResource(boost::dynamic_pointer_cast<Resource>(theProd));
 
     mess->approveTransfer();
     wastes_.push_back(theTails);
 
-    delete mat;
     curr ++;
   }
 
