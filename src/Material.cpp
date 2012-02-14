@@ -93,8 +93,7 @@ bool Material::checkQuantityEqual(rsrc_ptr other) {
     // check mass values
     double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet=( abs(quantity() - second_qty) < EPS_KG);
-  } catch (std::exception e) {
-  }
+  } catch (std::exception e) { }
   return toRet;
 }
 
@@ -109,8 +108,7 @@ bool Material::checkQuantityGT(rsrc_ptr other){
     // check mass values
     double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet = second_qty - quantity() > EPS_KG;
-  } catch (std::exception& e){
-  }
+  } catch (std::exception& e){ }
 
   return toRet;
 }

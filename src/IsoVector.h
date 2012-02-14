@@ -11,21 +11,19 @@
 
 #include "UseMatrixLib.h"
 
-/*!
- we will always need Avogadro's number somewhere
- */
 #define AVOGADRO 6.02e23
 
 /*!
- we should define this numerical threshold as a simulation parameter
- its units are kg.
+ simulation wide numerical threshold for mass significance.
+ Its units are kg.
  */
 #define EPS_KG 1e-6
 
-/** An isotope's identification number
- * The isotope ZAID number (Z A IDentiﬁcation) contains six digits ZZZAAA 
- * ZZZ is the atomic number Z and AAA is the atomic mass number A.
- * Thus  235 U has a ZAID number 092235 or simply 92235.
+/*!
+ An isotope's identification number
+ The isotope ZAID number (Z A IDentiﬁcation) contains six digits ZZZAAA 
+ ZZZ is the atomic number Z and AAA is the atomic mass number A.
+ Thus  235 U has a ZAID number 092235 or simply 92235.
  */
 typedef int Iso;
 
@@ -46,9 +44,7 @@ typedef std::map< Iso, std::pair<int, double> > ParentMap;
  */
 typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
 
-/*!
- map isotope (int) to atoms/mass (double)
- */
+/// map isotope (int) to atoms/mass (double)
 typedef std::map<Iso, double> CompMap;
 
 /*! 
@@ -56,12 +52,20 @@ typedef std::map<Iso, double> CompMap;
  
  This class keeps track of the isotopic composition of a material using both
  the atomic fractions and the mass fractions, combined with the total number of
- atoms and total mass.
- 
- It is an important goal (requirement) that all material objects maintain an
- account of the atoms that is consistent with the account of the mass.
- 
- The default mass unit is kilograms.
+ atoms and total mass. The default mass unit is kilograms. Access to nuclide
+ data is also provided through the IsoVector class.
+
+ @section recipes Recipes
+ Input file recipes can be either mass or atom (mole) based and define an often-referenced 
+ composition vector. Recipes can be retrieved at will by any agent during the simulation via
+ the static `IsoVector::recipe(std::string name)` method.  For example:
+
+ @code
+
+ std::string recipe_name = "my-recipe-name";
+ IsoVector my_recipe = IsoVector::recipe(recipe_name);
+
+ @endcode
  */
 class IsoVector {
 
@@ -71,22 +75,18 @@ public:
 
   IsoVector(CompMap initial_comp); 
 
-  /*!
-  Used for reading in and initizliaing material recipes.
-  */
+  /// Used for reading in and initizliaing material recipes.
   IsoVector(xmlNodePtr cur);
 
   ~IsoVector() {};
 
-  /*!
-   loads the recipes from the input file
-   */
+  /// loads the recipes from the input file
   static void load_recipes();
 
-  /**
-   * get a pointer to the recipe based on its name
-   *
-   * @param name the name of the recipe for which to return a material pointer.
+  /*!
+   get a pointer to the recipe based on its name
+   
+   @param name the name of the recipe for which to return a material pointer.
    */
   static IsoVector recipe(std::string name);                      
 
@@ -98,9 +98,7 @@ public:
 
   static std::map<std::string, IsoVector*> recipes_;
   
-  /*!
-  @brief Adds like isotopes
-  */
+  /// Adds like isotopes
   IsoVector operator+ (IsoVector rhs_vector);
 
   /*!
@@ -140,9 +138,7 @@ public:
    */
   int id() {return ID_;};
 
-  /*!
-   returns the total mass of this material object PER UNIT
-   */
+  /// returns the total mass of this material object PER UNIT
   double mass();
 
   /*!
@@ -185,12 +181,14 @@ public:
   double atomCount(Iso tope);
 
   /*!
-   Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
+   Sets the total number of atoms for the entire IsoVector maintaining isotopic
+   ratios.
    */
   void setAtomCount(double new_count);
 
   /*!
-   Sets the total number of atoms for the entire IsoVector maintaining isotopic ratios.
+   Sets the total number of atoms for the entire IsoVector maintaining isotopic
+   ratios.
    */
   void setAtomCount(Iso tope, double new_count);
 
@@ -242,7 +240,6 @@ protected:
    Overwrites composition with data from the given Vector.
    
    @param compVector Vector of data that constitutes the new composition
-   
    */
   void copyVectorIntoComp(const Vector & compVector);
 
@@ -253,9 +250,8 @@ protected:
   static Matrix decayMatrix_; 
 
 private:
-  /*!
-   Stores the next available material ID
-   */
+
+  /// Stores the next available material ID
   static int nextID_;
 
   void validateComposition();
@@ -267,14 +263,10 @@ private:
    */
   static void validateIsotopeNumber(Iso tope);
 
-  /*! 
-   Unique identifier.
-   */
+  /// Unique identifier.
   int ID_;
 
-  /*
-   Core isotope composition information stored here.
-   */
+  /// Core isotope composition information stored here.
   CompMap atom_comp_;
 
 };

@@ -4,7 +4,7 @@
 
 #include "Message.h"
 
-/**
+/*!
    @brief An abstract class for deriving simulation entities 
    that can communicate via the Message class.
 

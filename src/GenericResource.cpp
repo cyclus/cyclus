@@ -6,10 +6,10 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource::GenericResource(std::string units,
             std::string quality, double quantity) : Resource() {
-    units_ = units;
-    quality_ = quality;
-    quantity_ = quantity;
-  }
+  units_ = units;
+  quality_ = quality;
+  quantity_ = quantity;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 GenericResource::GenericResource(const GenericResource& other) {

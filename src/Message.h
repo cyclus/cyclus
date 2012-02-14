@@ -24,17 +24,13 @@ typedef boost::intrusive_ptr<Message> msg_ptr;
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 
- /// A transaction structure to include in any message.
+/// A transaction structure to include in any message.
 struct Transaction {
 
-  /*!
-   * The commodity that is being requested or offered in this Message.
-   */
+  /// The commodity that is being requested or offered in this Message.
   std::string commod;
 
-  /*!
-   * True if this is an offer, false if it's a request
-   */
+  /// True if this is an offer, false if it's a request
   bool is_offer;
 
   /*!
@@ -43,24 +39,16 @@ struct Transaction {
    */
   double minfrac;
 
-  /*!
-   * The price per unit of the commodity being requested or offered.
-   */
+  /// The price per unit of the commodity being requested or offered.
   double price;
 
-  /*!
-   * A specific resource this transaction is concerned with 
-   */
+  /// A specific resource this transaction is concerned with 
   rsrc_ptr resource;
 
-  /*!
-   * @brief supplier in this transaction.
-   */
+  /// supplier in this transaction.
   Model* supplier;
 
-  /*!
-   * @brief requester in this transaction.
-   */
+  /// requester in this transaction.
   Model* requester;
 
 };
@@ -70,28 +58,30 @@ struct Transaction {
    @brief A Message class for inter-entity communication.
 
    @section intro Introduction
+
    The MessageClass describes the structure of messages that 
    CommunicatorClass models pass during the simulation.
 
    @section msgStructure Message Data Structure
+
    Messages have a path and contain a transaction data structure. The path 
    directs the movement of the message through the appropriate channels and 
    the transaction includes information about the material order to be 
    offered, requested, or filled.
 
    @section path Path
-   A message contains a reference (pointer) to its originator and the 
-   intended receiver. The message class is designed to facilitate a two leg 
-   path. The first leg, the message is in an "outgoing" state. The originator 
-   will specify the next stop (next communicator) to receive the message and 
-   invoke the sendOn() method of the message. The next stop communicator 
-   receives the message, does necessary processing, sets the message's next 
-   "next stop", and invokes the message's sendOn() method. This process is 
-   repeated until the message direction is flipped to the incoming (return 
-   leg) state. When in the incomming state, a communicator invokes the 
-   sendOn() method and the message is sent to the communicator from which 
-   this communicator received the message. An example of the message passing 
-   is outlined below:
+
+   A message contains a reference (pointer) to its originator and the intended
+   receiver. The message class is designed to facilitate a two leg path. The
+   first leg, the message is in an "outgoing" state. The originator will
+   specify the next stop (next communicator) to receive the message and invoke
+   the sendOn() method of the message. The next stop communicator receives the
+   message, does necessary processing, sets the message's "next stop", and
+   invokes the message's sendOn() method. This process is repeated until the
+   message direction is flipped to the incoming (return leg) state. When in the
+   incomming state, a communicator invokes the sendOn() method and the message
+   is sent to the communicator from which this communicator received the
+   message. An example of the message passing is outlined below:
 
    - Up/outgoing message:
      -# Inside originator
@@ -147,8 +137,9 @@ struct Transaction {
    These model classes pass messages during the simulation.
 
    @section seeAlso See Also
+
    The CommunicatorClass describes the class of models that pass messages 
-   during the simulation.. The StubCommModel provides an example of a Message 
+   during the simulation. The StubCommModel provides an example of a Message 
    model implementation.
 */
 class Message: IntrusiveBase<Message> {
@@ -173,9 +164,9 @@ class Message: IntrusiveBase<Message> {
   std::vector<Communicator*> path_stack_;
   
   /*!
-   * @brief the most recent communicator to receive this message.
-   *
-   * Used to prevent circular messaging.
+   @brief the most recent communicator to receive this message.
+   
+   Used to prevent circular messaging.
    */
   Communicator* current_owner_;
 
@@ -194,36 +185,36 @@ class Message: IntrusiveBase<Message> {
  public:
   
   /*!
-   * Creates an empty upward message from some communicator.
-   *
-   * @param sender the sender of this Message
+   Creates an empty upward message from some communicator.
+   
+   @param sender the sender of this Message
    */
   Message(Communicator* sender);
 
   /*!
-   * Creates an upward message using the given
-   * sender, and recipient.
-   *
-   * @param sender sender of this Message
-   * @param receiver recipient of this Message
+   Creates an upward message using the given
+   sender, and recipient.
+   
+   @param sender sender of this Message
+   @param receiver recipient of this Message
    */
   Message(Communicator* sender, Communicator* receiver);
   
   /*!
-   * Creates an upward message using the given sender, 
-   * recipient, and transaction.
-   *
-   * @param sender sender of this Message
-   * @param receiver recipient of this Message
-   * @param trans the message's transaction specifics
+   Creates an upward message using the given sender, 
+   recipient, and transaction.
+   
+   @param sender sender of this Message
+   @param receiver recipient of this Message
+   @param trans the message's transaction specifics
    */
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
 
   virtual ~Message() { };
 
   /*!
-   * Creates a new message by copying the current one and
-   * returns a reference to it.
+   Creates a new message by copying the current one and
+   returns a reference to it.
    */
   msg_ptr clone();
 
