@@ -140,23 +140,24 @@ BookKeeper::getGroupNamePair(std::string output_dir)
   std::pair <std::string,std::string> retPair (output_name,subgroup_name);
   return retPair;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<Resource*> manifest){
+  trans_t toRegister;
+  toRegister.transID = id;
+  toRegister.requesterID = msg->requester()->ID();
+  toRegister.supplierID = msg->supplier()->ID();
+  toRegister.timestamp = TI->time();
+  toRegister.price = msg->price();
+   
+  strcpy(toRegister.commodName, msg->commod().c_str());
+  transactions_.push_back(toRegister);
+
   // grab each material object off of the manifest
-  // and add its transaction to the list
+  // and add its state to the mat state list
   for (vector<Resource*>::iterator thisResource = manifest.begin();
        thisResource != manifest.end();
        thisResource++) {
-    trans_t toRegister;
-    toRegister.transID = id;
-    toRegister.requesterID = msg->requester()->ID();
-    toRegister.supplierID = msg->supplier()->ID();
-    toRegister.materialID = (*thisResource)->ID(); 
-    toRegister.timestamp = TI->time();
-    toRegister.price = msg->price();
-     
-    strcpy(toRegister.commodName, msg->commod().c_str());
-    transactions_.push_back(toRegister);
     registerResourceState(id, *thisResource);
   }
 }
@@ -167,7 +168,6 @@ void BookKeeper::printTrans(trans_t trans){
     "    Transaction ID: " << trans.transID << std::endl <<
     "    Requester ID: " << trans.requesterID << std::endl <<
     "    Supplier ID: " << trans.supplierID << std::endl <<
-    "    Material ID: " << trans.materialID << std::endl <<
     "    Timestamp: " << trans.timestamp << std::endl <<
     "    Price: "  << trans.price << std::endl;
 };
@@ -324,8 +324,6 @@ void BookKeeper::writeTransList(){
                            PredType::NATIVE_INT); 
     data_desc.insertMember("requester id", HOFFSET(trans_t, requesterID), 
                            PredType::NATIVE_INT); 
-    data_desc.insertMember("material id", HOFFSET(trans_t, materialID), 
-                           PredType::NATIVE_INT); 
     data_desc.insertMember("timestamp", HOFFSET(trans_t, timestamp), 
                            PredType::NATIVE_INT); 
     data_desc.insertMember("price", HOFFSET(trans_t, price), 
@@ -337,23 +335,20 @@ void BookKeeper::writeTransList(){
     int numStructs = std::max(1, (int)transactions_.size());
     trans_t trans_data[numStructs];
     // take care of the special case where there are no transactions
-    if(transactions_.size()==0){
+    if(transactions_.size()==0) {
       std::string str1="";
       trans_data[0].transID=-1;
       trans_data[0].supplierID=-1;
       trans_data[0].requesterID=-1;
-      trans_data[0].materialID=-1;
       trans_data[0].timestamp=-1;
       trans_data[0].price=-1;
       strcpy(trans_data[0].commodName, "");
-    }
     // take care of the normal case where there are transactions
-    else{
+    } else{
       for (int i=0; i<transactions_.size(); i++){
         trans_data[i].transID = transactions_[i].transID; 
         trans_data[i].supplierID = transactions_[i].supplierID;
         trans_data[i].requesterID = transactions_[i].requesterID;
-        trans_data[i].materialID = transactions_[i].materialID;
         trans_data[i].timestamp = transactions_[i].timestamp;
         trans_data[i].price = transactions_[i].price;
         strcpy(trans_data[i].commodName,transactions_[i].commodName);

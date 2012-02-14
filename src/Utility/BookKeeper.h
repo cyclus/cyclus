@@ -118,8 +118,6 @@ protected:
                                An integer indicating the supplier model ID **/
     int requesterID;        /**< 
                                An integer indicating the requester model ID **/
-    int materialID;         /**< 
-                               An integer indicating the material object ID **/
     int timestamp;          /**< 
                                An integer indicating the month **/
     double price;           /**< 
