@@ -86,8 +86,8 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     LOG(LEV_DEBUG2) << "Eff = " << stream_eff;
   };
 
-  inventory_ = deque<pair<string,Material*> >();
-  stocks_ = deque<pair<string,Material*> >();
+  inventory_ = deque<pair<string,mat_rsrc_ptr> >();
+  stocks_ = deque<pair<string,mat_rsrc_ptr> >();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
@@ -158,7 +158,7 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -166,16 +166,16 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
-      Material* m = inventory_.front().second;
+      mat_rsrc_ptr m = inventory_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (trans.resource->quantity() - newAmt)){
@@ -185,7 +185,7 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+        mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
         newAmt += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
@@ -200,17 +200,17 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::addResource(msg_ptr msg,
-                                            vector<Resource*> manifest) {  
+                                            vector<rsrc_ptr> manifest) {  
   LOG(LEV_DEBUG2) << "Entered the addResource file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
       thisMat != manifest.end();
       thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
-    stocks_.push_back(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_back(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -243,10 +243,10 @@ void SeparationsMatrixFacility::handleTock(int time)
     for (deque<OutSep>::iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
-      Material* m = stocks_.front().second;
+      mat_rsrc_ptr m = stocks_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the stocks obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (capacity_ - complete)){
@@ -256,7 +256,7 @@ void SeparationsMatrixFacility::handleTock(int time)
       }
       else{ 
         // if the stocks obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extract(capacity_ - complete);
+        mat_rsrc_ptr toAbsorb = m->extract(capacity_ - complete);
         complete += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
@@ -341,7 +341,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -363,7 +363,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = capacity_ - sto;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -406,7 +406,7 @@ void SeparationsMatrixFacility::makeOffers() {
     // build a material
     IsoVector comp;
     comp.setMass(1001, offer_amt);
-    Material* offer_mat = new Material(comp);
+    mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(comp));
 
     // build the transaction and message
     Transaction trans;
@@ -442,11 +442,11 @@ void SeparationsMatrixFacility::separate()
   while (curr != omega) {
     // Get the info we need to make the separated Material.
     msg_ptr mess = (curr->second).first;
-    Material* mat = (curr->second).second;
+    mat_rsrc_ptr mat = (curr->second).second;
 
     // Find out what we're trying to make.
     try {
-      IsoVector vecToMake =  dynamic_cast<Material*>(mess->resource())->isoVector();
+      IsoVector vecToMake =  boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;
@@ -471,7 +471,7 @@ void SeparationsMatrixFacility::separate()
      iter++){            
      firstpair = inventory_.pop_front();
      string firstcommodity = firstpair.first();
-     Material* firstmaterial = firstpair.second();
+     mat_rsrc_ptr firstmaterial = firstpair.second();
   // Multiply Amount of Element by Separation Efficieny and then add
   // it to the stock of material for that Element
   stocks_.second((*stream_set_).first) = 

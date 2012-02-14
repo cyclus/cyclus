@@ -15,14 +15,7 @@ SinkFacility::SinkFacility(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-SinkFacility::~SinkFacility(){
-  // Delete all the Material in the inventory.
-  while (!inventory_.empty()) {
-    Material* m = inventory_.front();
-    inventory_.pop_front();
-    delete m;
-  }
-}
+SinkFacility::~SinkFacility(){ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::init(xmlNodePtr cur) {
@@ -99,7 +92,7 @@ void SinkFacility::handleTick(int time){
       Communicator* recipient = dynamic_cast<Communicator*>(market);
 
       // create a generic resource
-      GenericResource* request_res = new GenericResource((*commod), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*commod), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -131,17 +124,17 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   
   // grab each material object off of the manifest
   // and move it into the inventory.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     (*thisMat)->print();
-    inventory_.push_back(dynamic_cast<Material*>(*thisMat));
+    inventory_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
 
@@ -152,7 +145,7 @@ double SinkFacility::checkInventory() {
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  deque<Material*>::iterator iter;
+  deque<mat_rsrc_ptr>::iterator iter;
 
   for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
     total += (*iter)->quantity();

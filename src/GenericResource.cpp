@@ -19,9 +19,9 @@ GenericResource::GenericResource(const GenericResource& other) {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-GenericResource* GenericResource::clone() {
+rsrc_ptr GenericResource::clone() {
   LOG(LEV_DEBUG2) << "resource was cloned";
-  return new GenericResource(*this);
+  return rsrc_ptr(new GenericResource(*this));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -30,7 +30,7 @@ void GenericResource::print() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GenericResource::checkQuality(Resource* other){
+bool GenericResource::checkQuality(rsrc_ptr other){
   bool toRet = false;
 
   toRet = (units_ == other->units());
@@ -38,7 +38,7 @@ bool GenericResource::checkQuality(Resource* other){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityEqual(Resource* other) {
+bool GenericResource::checkQuantityEqual(rsrc_ptr other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
   toRet =( checkQuality(other) && quantity_ == other->quantity());
@@ -46,7 +46,7 @@ bool GenericResource::checkQuantityEqual(Resource* other) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityGT(Resource* other) {
+bool GenericResource::checkQuantityGT(rsrc_ptr other) {
   // KDHFLAG : Should allow epsilon as a parameter to this function?
   bool toRet;
   toRet = ( checkQuality(other) && quantity_ < other->quantity());

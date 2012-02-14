@@ -131,7 +131,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
 
 /* ------------------- */ 
@@ -217,10 +217,10 @@ protected:
    * to send to others. For instance, a Reactor's inventory is its collection of 
    * old fuel assemblies that have come out of the core.
    */ 
-  deque<Material*> inventory_;
+  deque<mat_rsrc_ptr> inventory_;
   
   /// return the inventory
-  deque<Material*>* getInventory(){return &inventory_;};
+  deque<mat_rsrc_ptr>* getInventory(){return &inventory_;};
 
   /**
    * A list of orders to be processed on the Tock
@@ -237,7 +237,7 @@ protected:
   /**
    * prints the material that is on the send stack
    */
-  void printSent(Material* mat);
+  void printSent(mat_rsrc_ptr mat);
 
 
 /* --------------------

@@ -214,7 +214,7 @@ TEST_F(MessagePassingTest, YoYo) {
 class MessagePublicInterfaceTest : public ::testing::Test {
   protected:
 
-    Resource* resource;
+    rsrc_ptr resource;
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
@@ -223,7 +223,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = new GenericResource("kg", "bananas", quantity1);
+      resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
       comm1 = new TestCommunicator("comm1");
       msg1 = msg_ptr(new Message(comm1));
@@ -231,7 +231,6 @@ class MessagePublicInterfaceTest : public ::testing::Test {
 
     virtual void TearDown() {
       delete comm1;
-      delete resource;
     }
 };
 
@@ -261,7 +260,7 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  Resource* resource2 = msg2->resource();
+  rsrc_ptr resource2 = msg2->resource();
   resource2->setQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);

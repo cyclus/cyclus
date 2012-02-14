@@ -64,11 +64,11 @@ void StubFacility::receiveMessage(msg_ptr msg) {};
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> StubFacility::removeResource(msg_ptr order) {
+std::vector<rsrc_ptr> StubFacility::removeResource(msg_ptr order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::addResource(msg_ptr msg, vector<Resource*> manifest){
+void StubFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

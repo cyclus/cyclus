@@ -108,8 +108,8 @@
    material on a market?
 */
 
-typedef pair< std::string, Material*> InFuel;
-typedef pair< std::string, Material*> OutFuel; 
+typedef pair< std::string, mat_rsrc_ptr> InFuel;
+typedef pair< std::string, mat_rsrc_ptr> OutFuel; 
 
 typedef pair< std::string, IsoVector> InRecipe;
 typedef pair< std::string, IsoVector> OutRecipe; 
@@ -180,7 +180,7 @@ public:
      * @return list of resources to be sent for this order
      *
      */ 
-    virtual std::vector<Resource*> removeResource(msg_ptr order);
+    virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
     /**
      * Transacted resources are received through this method
@@ -189,7 +189,7 @@ public:
      * @param manifest is the set of resources being received
      */ 
     virtual void addResource(msg_ptr msg,
-                                std::vector<Resource*> manifest);
+                                std::vector<rsrc_ptr> manifest);
 
     /**
      * The handleTick function specific to the RecipeReactor.

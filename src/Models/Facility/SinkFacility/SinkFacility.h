@@ -124,7 +124,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
 
@@ -172,7 +172,7 @@ protected:
   vector<std::string> in_commods_;
 
   /// this facility holds material in storage. 
-  deque<Material*> inventory_;
+  deque<mat_rsrc_ptr> inventory_;
 
   /**
    * get the total mass of the stuff in the inventory

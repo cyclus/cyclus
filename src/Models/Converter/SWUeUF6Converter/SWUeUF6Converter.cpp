@@ -63,7 +63,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
   Model* enr;
   Model* castEnr;
   msg_ptr toRet;
-  Material* mat;
+  mat_rsrc_ptr mat;
 
   double P;
   double xp;
@@ -83,7 +83,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     }
     SWUs = convMsg->resource()->quantity();
     try {
-      mat = dynamic_cast<Material*>(refMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(refMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -97,7 +97,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
       throw CycException("SWUs offered by non-Model");
     }
     try{
-      mat = dynamic_cast<Material*>(convMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(convMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -128,12 +128,12 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 
   if (out_commod_ == "eUF6"){
     iso_vector.setMass(massProdU);
-    mat = new Material(iso_vector);
+    mat = mat_rsrc_ptr(new Material(iso_vector));
     toRet = convMsg->clone();
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {
     toRet = convMsg->clone();
-    GenericResource* conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
+    gen_rsrc_ptr conv_res = gen_rsrc_ptr(new GenericResource(out_commod_, out_commod_, SWUs));
     toRet->setResource(conv_res);
   }
   

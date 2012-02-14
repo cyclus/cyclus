@@ -126,7 +126,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -135,7 +135,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
 
@@ -207,12 +207,12 @@ protected:
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks_;
+    deque<mat_rsrc_ptr> stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory_;
+    deque<mat_rsrc_ptr> inventory_;
 
     /**
      * The list of orders to process on the Tock
@@ -249,12 +249,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe_;
+    mat_rsrc_ptr in_recipe_;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe_;
+    mat_rsrc_ptr out_recipe_;
 
 private : 
     /// Makes requests of the input commodity based on current capacity

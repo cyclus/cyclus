@@ -229,7 +229,7 @@ void Message::approveTransfer() {
 
   Model* req = requester();
   Model* sup = supplier();
-  vector<Resource*> manifest = sup->removeResource(me);
+  vector<rsrc_ptr> manifest = sup->removeResource(me);
   req->addResource(me, manifest);
 
   BI->registerTransaction(nextTransID_++, me, manifest);

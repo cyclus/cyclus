@@ -4,7 +4,6 @@
 
 #include "boost/multi_array.hpp"
 #include <iostream>
-#include "Logger.h"
 #include <queue>
 #include <string>
 #include <vector>
@@ -12,9 +11,11 @@
 #include "H5Cpp.h"
 #include "hdf5.h"
 
+#include "Logger.h"
 #include "FacilityModel.h"
-using namespace H5;
+#include "Material.h"
 
+using namespace H5;
 
 /**
   \class ConditioningFacility
@@ -71,8 +72,7 @@ using namespace H5;
   Puts the material it has recieved in the stocks, to be conditioned on the tick.
 
  */
-class ConditioningFacility : public FacilityModel  
-{
+class ConditioningFacility : public FacilityModel {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -125,7 +125,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -134,7 +134,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
 
@@ -202,10 +202,10 @@ protected:
     std::vector<stream_t> stream_vec_;
 
     /// the stocks are where the raw material is kept
-    std::deque<std::pair<std::string, Material*> > stocks_;
+    std::deque<std::pair<std::string, mat_rsrc_ptr> > stocks_;
 
     /// the inventory is where the processed material is kept
-    std::deque< pair<std::string, Material*> > inventory_;
+    std::deque< pair<std::string, mat_rsrc_ptr> > inventory_;
 
     /// a map from format names to table loading function pointers
     std::map<std::string, void(ConditioningFacility:: *)(std::string)> allowed_formats_;
@@ -299,7 +299,7 @@ protected:
      *
      * @param the order to be processed
      */
-    std::vector<Resource*> processOrder(msg_ptr order);
+    std::vector<rsrc_ptr> processOrder(msg_ptr order);
 
     /** 
      * Checks the amount (in kg) of material in the inventory 
@@ -331,7 +331,7 @@ private :
      *
      * @return the material that remains, not enough to be conditioned
      */
-    Material* condition(std::string commod, Material* mat);
+    mat_rsrc_ptr condition(std::string commod, mat_rsrc_ptr mat);
 
     /**
      * Returns the stream representing the commodity. 

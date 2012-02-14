@@ -142,7 +142,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -151,7 +151,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
     /**
      * The handleTick function specific to the EnrichmentFacility.
@@ -187,7 +187,7 @@ protected:
      * line, that is, the black box materials sit in while they're being
      * operated on.
      */
-    typedef multimap<int, pair<msg_ptr, Material*> > ProcessLine;
+    typedef multimap<int, pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
     /**
      * The EnrichmentFacility has one input commodity
@@ -215,17 +215,17 @@ protected:
     /**
      * The stocks of raw material available to be processed.
      */
-    deque<Material*> stocks_;
+    deque<mat_rsrc_ptr> stocks_;
     
     /**
      * The inventory of processed material.
      */
-    deque<Material*> inventory_;
+    deque<mat_rsrc_ptr> inventory_;
 
     /**
      * The inventory of waste material.
      */
-    deque<Material*> wastes_;
+    deque<mat_rsrc_ptr> wastes_;
 
      /**
      * The total mass flow required to process all outstanding orders this 
@@ -314,7 +314,7 @@ protected:
      * @param candMat the candidate material
      * @return the iterator
      */
-    multimap<int,msg_ptr>::iterator checkOrdersWaiting(Material* candMat);
+    multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr candMat);
 
     /**
      * The time that the stock material spends in the facility.
@@ -331,12 +331,12 @@ protected:
     /**
      * The receipe of input materials.
      */
-    Material* in_recipe;
+    mat_rsrc_ptr in_recipe;
 
     /**
      * The receipe of the output material.
      */
-    Material* out_recipe;
+    mat_rsrc_ptr out_recipe;
 
 /* --------------------
    output directory info

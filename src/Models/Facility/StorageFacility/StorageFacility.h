@@ -81,7 +81,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -90,7 +90,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
 
@@ -164,17 +164,17 @@ protected:
      * The stocks of entering material
      * These are not yet old enough to leave
      */
-    deque<Material*> stocks_;
+    deque<mat_rsrc_ptr> stocks_;
     
     /**
      * The inventory of material ready to exit
      */
-    deque<Material*> inventory_;
+    deque<mat_rsrc_ptr> inventory_;
 
     /**
      * The list of the entry times for each material
      */
-    deque< pair<int, Material*> > entryTimes_;
+    deque< pair<int, mat_rsrc_ptr> > entryTimes_;
 
     /**
      * The list of orders to process on the Tock

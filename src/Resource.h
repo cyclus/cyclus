@@ -2,11 +2,16 @@
 #if !defined(_RESOURCE_H)
 #define _RESOURCE_H
 #include <string>
+#include <boost/intrusive_ptr.hpp>
+#include "IntrusiveBase.h"
+
+class Resource;
+typedef boost::intrusive_ptr<Resource> rsrc_ptr;
 
 /// A list of concrete types of resource
 enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES }; 
 
-class Resource {
+class Resource: IntrusiveBase<Resource> {
 public:
 
   /**
@@ -18,7 +23,7 @@ public:
    * @return True if other is sufficiently equal in quality to 
    * the base, False otherwise.
    */
-  virtual bool checkQuality(Resource* other) =0;
+  virtual bool checkQuality(rsrc_ptr other) =0;
 
   /**
    * Returns the base unit of this resource 
@@ -49,7 +54,7 @@ public:
    * @return True if other is sufficiently equal in quantity to 
    * the base, False otherwise.
    */
-  virtual bool checkQuantityEqual(Resource* other) = 0;
+  virtual bool checkQuantityEqual(rsrc_ptr other) = 0;
 
   /**
    * Returns true if the quantity of the other resource is 
@@ -60,7 +65,7 @@ public:
    * @return True if second is sufficiently equal in quantity to 
    * first, False otherwise.
    */
-  virtual bool checkQuantityGT(Resource* other) = 0;
+  virtual bool checkQuantityGT(rsrc_ptr other) = 0;
 
   /**
    * Compares the quantity and quality of the other resource  
@@ -71,13 +76,13 @@ public:
    * @return True if other is sufficiently equal to the base, 
    * False otherwise.
    */
-  virtual bool checkEquality(Resource* other);
+  virtual bool checkEquality(rsrc_ptr other);
 
   /// Returns the concrete resource type, an enum
   virtual ResourceType type() = 0;
 
   /// Returns a newly allocated copy of the resource
-  virtual Resource* clone() = 0;
+  virtual rsrc_ptr clone() = 0;
 
   virtual void print() = 0;
 

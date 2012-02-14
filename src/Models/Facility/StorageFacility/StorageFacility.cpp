@@ -50,8 +50,8 @@ void StorageFacility::init(xmlNodePtr cur)
   residence_time_ = strtod(XMLinput->get_xpath_content(cur,"residencetime"), NULL);
 
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
   
   initialStateCur_ = cur;
@@ -108,7 +108,7 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
+std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -118,10 +118,10 @@ std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
   Mass complete = 0;
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.amount > complete && !inventory_.empty() ){
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
 
     // if the inventory_ obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (capacity_ - complete)){
@@ -133,11 +133,11 @@ std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
     } else { 
       // if the inventory_ obj is larger than the remaining need, split it.
       // start with an empty material
-      Material* newMat = new Material(CompMap(), 
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(CompMap(), 
           m->getUnits(),
           m->getName(), 
           0, ATOMBASED);
-      Material* toAbsorb = m->extractMass(capacity_ - complete);
+      mat_rsrc_ptr toAbsorb = m->extractMass(capacity_ - complete);
       complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
@@ -149,17 +149,17 @@ std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void StorageFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
-    entryTimes_.push_back(make_pair(TI->time(), dynamic_cast<Material*>(*thisMat) ));
+    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
+    entryTimes_.push_back(make_pair(TI->time(), boost::dynamic_pointer_cast<Material>(*thisMat) ));
   }
 }
 
@@ -170,7 +170,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
   string fac_name, commod_name, recipe_name;
   FacilityModel* sending_facility;
   Commodity* commodity;
-  Material* recipe;
+  mat_rsrc_ptr recipe;
   double amount, age;
   int i, nNodes = nodes->nodeNr;
   LOG(LEV_DEBUG2) << "**** nNodes = " << nNodes;
@@ -200,7 +200,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     age = strtod(XMLinput->get_xpath_content(entry_node,"age"), NULL);
 
     // make new material
-    Material* newMat = new Material(recipe->getMassComp(), 
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(recipe->getMassComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     amount, 
@@ -209,7 +209,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     // decay the material for the alloted time
     newMat->decay(age);
 
-    vector <Material*> manifest;
+    vector <mat_rsrc_ptr> manifest;
     manifest.push_back(newMat);
 
     /* this needs to be fixed */
@@ -336,7 +336,7 @@ void StorageFacility::handleTock(int time)
   // put them in the inventory_
   bool someOld = true;
   while( someOld == true && !stocks_.empty()){
-    Material* oldEnough = stocks_.front();
+    mat_rsrc_ptr oldEnough = stocks_.front();
     if(TI->time() - entryTimes_.front().first >= residence_time_ ){
         entryTimes_.pop_front();
         // Here is is where we could add a case switch between sending
@@ -365,7 +365,7 @@ Mass StorageFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -381,7 +381,7 @@ Mass StorageFacility::checkStocks(){
   // material unit is in each object.
 
 
-  for (deque<Material*>::iterator iter = stocks_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
     total += (*iter)->quantity();

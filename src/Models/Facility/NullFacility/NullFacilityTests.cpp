@@ -21,8 +21,8 @@ class FakeNullFacility : public NullFacility {
       inventory_size_ = 10;
       capacity_ = 2;
 
-      inventory_ = deque<Material*>();
-      stocks_ = deque<Material*>();
+      inventory_ = deque<mat_rsrc_ptr>();
+      stocks_ = deque<mat_rsrc_ptr>();
       ordersWaiting_ = deque<msg_ptr>();
     }
 

@@ -15,6 +15,9 @@
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
+class Material;
+typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
+
 /**
    @class Material
 
@@ -96,7 +99,6 @@
    Methods for adding and subtracting mass and isotopes from material objects 
    are provided by many public member functions of the MaterialClass.
 */
-
 class Material : public Resource {
 
 public:
@@ -141,17 +143,17 @@ public:
   /**
    * Resource class method
    */
-  bool checkQuality(Resource* other);
+  bool checkQuality(rsrc_ptr other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityEqual(Resource* other);
+  bool checkQuantityEqual(rsrc_ptr other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityGT(Resource* other);
+  bool checkQuantityGT(rsrc_ptr other);
 
   /**
    * Resource class method
@@ -161,7 +163,7 @@ public:
   /**
    * Resource class method
    */
-  Material* clone();
+  rsrc_ptr clone();
 
   /**
    * Absorbs the contents of the given Material into this Material and deletes 
@@ -169,7 +171,7 @@ public:
    * 
    * @param matToAdd the Material to be absorbed (and deleted)
    */
-  virtual void absorb(Material* matToAdd);
+  virtual void absorb(mat_rsrc_ptr matToAdd);
 
   /**
    * Extracts from this material a composition specified by the given IsoVector
@@ -179,7 +181,7 @@ public:
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(IsoVector rem_comp);
+  virtual mat_rsrc_ptr extract(IsoVector rem_comp);
 
   /**
    * Extracts a specified mass from this material creating a new material
@@ -189,7 +191,7 @@ public:
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(double mass);
+  virtual mat_rsrc_ptr extract(double mass);
 
   /**
    * Decays this Material object for the given number of months and updates
@@ -235,7 +237,7 @@ private:
   IsoVector iso_vector_;
 
   /// list of materials
-  static std::vector<Material*> materials_;
+  static std::vector<mat_rsrc_ptr> materials_;
 
   /// true if decay should occur, false if not.
   static bool decay_wanted_;
