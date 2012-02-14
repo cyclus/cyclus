@@ -49,13 +49,13 @@ mat_rsrc_ptr Material::extract(double mass) {
 
   iso_vector_ = iso_vector_ - new_comp;
   
-  return new Material(new_comp);
+  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(new_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
-  return new Material(rem_comp);
+  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(rem_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -64,7 +64,7 @@ void Material::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 mat_rsrc_ptr Material::clone() {
-  return new Material(*this);
+  return mat_rsrc_ptr = mat_rsrc_ptr(new Material(*this));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

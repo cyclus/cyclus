@@ -128,7 +128,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 
   if (out_commod_ == "eUF6"){
     iso_vector.setMass(massProdU);
-    mat = new Material(iso_vector);
+    mat = mat_rsrc_ptr(new Material(iso_vector));
     toRet = convMsg->clone();
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {

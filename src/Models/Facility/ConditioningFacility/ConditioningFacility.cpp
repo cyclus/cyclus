@@ -192,7 +192,7 @@ std::vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
     mat_rsrc_ptr m = inventory_.front().second;
 
     // start with an empty material
-    mat_rsrc_ptr newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {

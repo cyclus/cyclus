@@ -131,7 +131,7 @@ std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
     mat_rsrc_ptr m = inventory_.front();
 
     // start with an empty material
-    mat_rsrc_ptr newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -189,7 +189,7 @@ void EnrichmentFacility::handleTock(int time) {
     mat_rsrc_ptr m = stocks_.front();
 
     // start with an empty material
-    mat_rsrc_ptr newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (capacity_ - complete)){
@@ -403,7 +403,7 @@ void EnrichmentFacility::enrich() {
     pComp.setAtomCount(90190, atoms19);
     pComp.setMass(mat->quantity());
 
-    mat_rsrc_ptr theProd = new Material(pComp);
+    mat_rsrc_ptr theProd = mat_rsrc_ptr(new Material(pComp));
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = W * 1E6;
@@ -420,7 +420,7 @@ void EnrichmentFacility::enrich() {
     wComp.setMass(mat->quantity());
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
-    mat_rsrc_ptr theTails = new Material(wComp);
+    mat_rsrc_ptr theTails = mat_rsrc_ptr(new Material(wComp));
 
     // CONSERVATION OF MASS CHECKS:
     if (fabs(pComp.eltMass(92) + wComp.eltMass(92) 

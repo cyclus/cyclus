@@ -133,7 +133,7 @@ std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
     } else { 
       // if the inventory_ obj is larger than the remaining need, split it.
       // start with an empty material
-      mat_rsrc_ptr newMat = new Material(CompMap(), 
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(CompMap(), 
           m->getUnits(),
           m->getName(), 
           0, ATOMBASED);
@@ -200,7 +200,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     age = strtod(XMLinput->get_xpath_content(entry_node,"age"), NULL);
 
     // make new material
-    mat_rsrc_ptr newMat = new Material(recipe->getMassComp(), 
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(recipe->getMassComp(), 
                                     recipe->getUnits(), 
                                     recipe->getName(),
                                     amount, 

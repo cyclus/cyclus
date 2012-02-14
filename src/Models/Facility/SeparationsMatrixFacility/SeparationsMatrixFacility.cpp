@@ -175,7 +175,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
       mat_rsrc_ptr m = inventory_.front().second;
 
       // start with an empty material
-      mat_rsrc_ptr newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (trans.resource->quantity() - newAmt)){
@@ -246,7 +246,7 @@ void SeparationsMatrixFacility::handleTock(int time)
       mat_rsrc_ptr m = stocks_.front().second;
 
       // start with an empty material
-      mat_rsrc_ptr newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the stocks obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (capacity_ - complete)){
@@ -406,7 +406,7 @@ void SeparationsMatrixFacility::makeOffers() {
     // build a material
     IsoVector comp;
     comp.setMass(1001, offer_amt);
-    mat_rsrc_ptr offer_mat = new Material(comp);
+    mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(comp));
 
     // build the transaction and message
     Transaction trans;

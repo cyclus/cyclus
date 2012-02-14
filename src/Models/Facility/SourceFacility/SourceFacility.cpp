@@ -183,7 +183,7 @@ void SourceFacility::handleTock(int time){
     // add a material the size of the capacity to the inventory
     IsoVector temp = recipe_;
     temp.multBy(capacity_);
-    mat_rsrc_ptr newMat = new Material(temp);
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
 
     LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
@@ -192,7 +192,7 @@ void SourceFacility::handleTock(int time){
     // add a material that fills the inventory
     IsoVector temp = recipe_;
     temp.setMass(space);
-    mat_rsrc_ptr newMat = new Material(temp);
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
     LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);

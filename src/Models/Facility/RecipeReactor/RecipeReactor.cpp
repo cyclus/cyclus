@@ -173,7 +173,7 @@ void RecipeReactor::endCycle() {
   }
 
   // change the composition to the compositon of the spent fuel type
-  batchMat = new Material(outComp);
+  batchMat = mat_rsrc_ptr(new Material(outComp));
 
   // move converted material into Inventory
   OutFuel outBatch;
@@ -216,7 +216,7 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
         m = iter->second;
 
         // start with an empty material
-        newMat = new Material();
+        newMat = mat_rsrc_ptr(new Material());
 
         // if the inventory obj isn't larger than the remaining need, send it as is.
         if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -371,7 +371,7 @@ void RecipeReactor::makeOffers(){
     offer_amt = iter->second->quantity();
 
     // make a material to offer
-    mat_rsrc_ptr offer_mat = new Material(out_recipe_);
+    mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(out_recipe_));
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
