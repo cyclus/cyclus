@@ -158,7 +158,7 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -166,7 +166,7 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
@@ -200,12 +200,12 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::addResource(msg_ptr msg,
-                                            vector<Resource*> manifest) {  
+                                            vector<rsrc_ptr> manifest) {  
   LOG(LEV_DEBUG2) << "Entered the addResource file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
       thisMat != manifest.end();
       thisMat++) {
     LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "

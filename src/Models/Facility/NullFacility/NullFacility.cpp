@@ -92,7 +92,7 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> NullFacility::removeResource(msg_ptr order) {
+std::vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
@@ -106,7 +106,7 @@ std::vector<Resource*> NullFacility::removeResource(msg_ptr order) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
@@ -131,10 +131,10 @@ std::vector<Resource*> NullFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "

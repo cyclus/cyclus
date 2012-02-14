@@ -112,7 +112,7 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
@@ -125,7 +125,7 @@ std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  std::vector<Resource*> toSend;
+  std::vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front();
@@ -153,10 +153,10 @@ std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
@@ -289,7 +289,7 @@ void EnrichmentFacility::makeRequests(){
     Communicator* recipient = dynamic_cast<Communicator*>(market);
 
     // request a generic object
-    Resource* req_res = new GenericResource(in_commod_,"kg",requestAmt);
+    rsrc_ptr req_res = new GenericResource(in_commod_,"kg",requestAmt);
 
     // build the transaction and message
     Transaction trans;
@@ -437,7 +437,7 @@ void EnrichmentFacility::enrich() {
 
     Material* rsrc = dynamic_cast<Material*>(mess->resource());
     rsrc->setQuantity(theProd->quantity());
-    mess->setResource(dynamic_cast<Resource*>(theProd));
+    mess->setResource(dynamic_cast<rsrc_ptr>(theProd));
 
     mess->approveTransfer();
     wastes_.push_back(theTails);

@@ -142,7 +142,7 @@ BookKeeper::getGroupNamePair(std::string output_dir)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<Resource*> manifest){
+void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<rsrc_ptr> manifest){
   trans_t toRegister;
   toRegister.transID = id;
   toRegister.requesterID = msg->requester()->ID();
@@ -155,7 +155,7 @@ void BookKeeper::registerTransaction(int id, msg_ptr msg, std::vector<Resource*>
 
   // grab each material object off of the manifest
   // and add its state to the mat state list
-  for (vector<Resource*>::iterator thisResource = manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisResource = manifest.begin();
        thisResource != manifest.end();
        thisResource++) {
     registerResourceState(id, *thisResource);
@@ -173,7 +173,7 @@ void BookKeeper::printTrans(trans_t trans){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerResourceState(int trans_id, Resource* resource){
+void BookKeeper::registerResourceState(int trans_id, rsrc_ptr resource){
   mat_hist_t toRegister;
   fill_n(toRegister.iso, NUMISOS, 0);
   fill_n(toRegister.comp, NUMISOS, 0.0);

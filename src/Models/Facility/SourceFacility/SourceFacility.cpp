@@ -99,14 +99,14 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<Resource*> SourceFacility::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   double sent_amt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while (trans.resource->quantity() > (sent_amt+EPS_KG) && !inventory_.empty() ) {
     Material* m = inventory_.front();

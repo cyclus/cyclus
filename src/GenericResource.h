@@ -36,7 +36,7 @@ public:
    * @return True if other is sufficiently equal in quality to 
    * the base, False otherwise.
    */
-  virtual bool checkQuality(Resource* other);
+  virtual bool checkQuality(rsrc_ptr other);
 
   /**
    * Returns the total quantity of this resource in its base unit 
@@ -72,7 +72,7 @@ public:
    * @return True if other is sufficiently equal in quantity to 
    * the base, False otherwise.
    */
-  virtual bool checkQuantityEqual(Resource* other);
+  virtual bool checkQuantityEqual(rsrc_ptr other);
 
   /**
    * Returns true if the quantity of the other resource is 
@@ -83,7 +83,7 @@ public:
    * @return True if second is sufficiently equal in quantity to 
    * first, False otherwise.
    */
-  virtual bool checkQuantityGT(Resource* second);
+  virtual bool checkQuantityGT(rsrc_ptr second);
 
   /**
    * Returns the concrete type of this resource

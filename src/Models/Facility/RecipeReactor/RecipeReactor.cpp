@@ -194,7 +194,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> RecipeReactor::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -204,7 +204,7 @@ std::vector<Resource*> RecipeReactor::removeResource(msg_ptr msg) {
   Material* toAbsorb;
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
   while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
@@ -239,10 +239,10 @@ std::vector<Resource*> RecipeReactor::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "

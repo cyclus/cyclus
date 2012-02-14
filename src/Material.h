@@ -143,17 +143,17 @@ public:
   /**
    * Resource class method
    */
-  bool checkQuality(Resource* other);
+  bool checkQuality(rsrc_ptr other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityEqual(Resource* other);
+  bool checkQuantityEqual(rsrc_ptr other);
 
   /**
    * Resource class method
    */
-  bool checkQuantityGT(Resource* other);
+  bool checkQuantityGT(rsrc_ptr other);
 
   /**
    * Resource class method

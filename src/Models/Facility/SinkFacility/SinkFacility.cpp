@@ -131,11 +131,11 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   
   // grab each material object off of the manifest
   // and move it into the inventory.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "

@@ -125,7 +125,7 @@ public:
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
    * Transacted resources are received through this method
@@ -134,7 +134,7 @@ public:
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
 
@@ -299,7 +299,7 @@ protected:
      *
      * @param the order to be processed
      */
-    std::vector<Resource*> processOrder(msg_ptr order);
+    std::vector<rsrc_ptr> processOrder(msg_ptr order);
 
     /** 
      * Checks the amount (in kg) of material in the inventory 

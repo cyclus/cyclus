@@ -214,7 +214,7 @@ TEST_F(MessagePassingTest, YoYo) {
 class MessagePublicInterfaceTest : public ::testing::Test {
   protected:
 
-    Resource* resource;
+    rsrc_ptr resource;
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
@@ -261,7 +261,7 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  Resource* resource2 = msg2->resource();
+  rsrc_ptr resource2 = msg2->resource();
   resource2->setQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);

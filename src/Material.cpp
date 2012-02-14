@@ -68,7 +68,7 @@ Material* Material::clone() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuality(Resource* other){
+bool Material::checkQuality(rsrc_ptr other){
   // This will be false until proven true
   bool toRet = false;
   IsoVector lhs_vec = iso_vector_;
@@ -85,7 +85,7 @@ bool Material::checkQuality(Resource* other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuantityEqual(Resource* other) {
+bool Material::checkQuantityEqual(rsrc_ptr other) {
   // This will be false until proven true
   bool toRet = false;
 
@@ -100,7 +100,7 @@ bool Material::checkQuantityEqual(Resource* other) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuantityGT(Resource* other){
+bool Material::checkQuantityGT(rsrc_ptr other){
   // true if the total atoms in the other is greater than in the base.
   // This will be true until proven false
   bool toRet = false;

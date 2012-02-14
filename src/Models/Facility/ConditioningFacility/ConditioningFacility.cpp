@@ -156,8 +156,8 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::removeResource(msg_ptr order) {
-  std::vector<Resource*> toRet = std::vector<Resource*>() ;
+std::vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
+  std::vector<rsrc_ptr> toRet = std::vector<rsrc_ptr>() ;
   Transaction trans = order->trans();
   double order_amount = trans.resource->quantity()*trans.minfrac;
   if (remaining_capacity_ >= order_amount){
@@ -176,7 +176,7 @@ std::vector<Resource*> ConditioningFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
+std::vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
  // Send material from inventory to fulfill transactions
 
   Transaction trans = order->trans();
@@ -186,7 +186,7 @@ std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
   // pull materials off of the inventory stack until you get the transaction amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     Material* m = inventory_.front().second;
@@ -216,11 +216,11 @@ std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "

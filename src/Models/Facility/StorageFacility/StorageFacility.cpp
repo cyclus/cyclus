@@ -108,7 +108,7 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
+std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -118,7 +118,7 @@ std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
   Mass complete = 0;
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.amount > complete && !inventory_.empty() ){
     Material* m = inventory_.front();
@@ -149,11 +149,11 @@ std::vector<Resource*> StorageFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void StorageFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
     LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "

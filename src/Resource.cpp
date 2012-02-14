@@ -8,7 +8,7 @@ Resource::Resource() {
   ID_ = nextID_++;
 }
 
-bool Resource::checkEquality(Resource* other) {
+bool Resource::checkEquality(rsrc_ptr other) {
   bool toRet;
   (this->checkQuality(other) && this->checkQuantityEqual(other)) ? toRet = true : toRet = false;
   return toRet; 
