@@ -15,6 +15,9 @@
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
+class Material;
+typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
+
 /**
    @class Material
 
@@ -96,7 +99,6 @@
    Methods for adding and subtracting mass and isotopes from material objects 
    are provided by many public member functions of the MaterialClass.
 */
-
 class Material : public Resource {
 
 public:

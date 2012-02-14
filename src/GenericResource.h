@@ -3,6 +3,9 @@
 #define _GENERICRESOURCE_H
 #include "Resource.h"
 
+class GenericResource;
+typedef boost::intrusive_ptr<GenericResource> gen_rsrc_ptr;
+
 class GenericResource : public Resource {
 public:
   /**

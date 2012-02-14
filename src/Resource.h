@@ -2,11 +2,16 @@
 #if !defined(_RESOURCE_H)
 #define _RESOURCE_H
 #include <string>
+#include <boost/intrusive_ptr.hpp>
+#include "IntrusiveBase.h"
+
+class Resource;
+typedef boost::intrusive_ptr<Resource> rsrc_ptr;
 
 /// A list of concrete types of resource
 enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES }; 
 
-class Resource {
+class Resource: IntrusiveBase<Resource> {
 public:
 
   /**
