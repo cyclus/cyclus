@@ -341,7 +341,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = new GenericResource((*iter), "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;
@@ -363,7 +363,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = capacity_ - sto;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = new GenericResource((*iter), "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;

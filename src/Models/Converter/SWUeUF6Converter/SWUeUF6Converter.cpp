@@ -133,7 +133,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {
     toRet = convMsg->clone();
-    GenericResource* conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
+    gen_rsrc_ptr conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
     toRet->setResource(conv_res);
   }
   

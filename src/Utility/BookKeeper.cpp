@@ -185,7 +185,7 @@ void BookKeeper::registerResourceState(int trans_id, rsrc_ptr resource){
   strcpy(toRegister.units, resource->units().c_str());
 
   if (resource->type() == GENERIC_RES) {
-    strcpy(toRegister.name, dynamic_cast<GenericResource*>(resource)->quality().c_str());
+    strcpy(toRegister.name, dynamic_cast<gen_rsrc_ptr>(resource)->quality().c_str());
   } else if (resource->type() == MATERIAL_RES) {
     Material* mat = dynamic_cast<Material*>(resource);
     strcpy(toRegister.name, "Material");

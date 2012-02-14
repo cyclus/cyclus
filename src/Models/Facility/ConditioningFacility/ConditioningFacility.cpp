@@ -169,7 +169,7 @@ std::vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
     msg += order->requester()->name();
     msg += " will not be sent.";
     LOG(LEV_DEBUG2) << msg;
-    GenericResource* empty = new GenericResource("kg","kg",0);
+    gen_rsrc_ptr empty = new GenericResource("kg","kg",0);
     toRet.push_back(empty);
   }
   return toRet;
@@ -445,7 +445,7 @@ void ConditioningFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+      gen_rsrc_ptr request_res = new GenericResource(in_commod, "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;

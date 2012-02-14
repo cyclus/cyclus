@@ -302,7 +302,7 @@ void RecipeReactor::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+      gen_rsrc_ptr request_res = new GenericResource(in_commod, "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;
@@ -322,7 +322,7 @@ void RecipeReactor::makeRequests(){
       requestAmt = capacity_ - sto;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+      gen_rsrc_ptr request_res = new GenericResource(in_commod, "kg", requestAmt);
 
       // build the transaction and message
       Transaction trans;

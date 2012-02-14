@@ -175,7 +175,7 @@ void NullFacility::makeRequests() {
     requestAmt = space;
 
     // create a resource
-    GenericResource* request_res = new GenericResource(in_commod_,"kg",requestAmt);
+    gen_rsrc_ptr request_res = new GenericResource(in_commod_,"kg",requestAmt);
 
     // build the transaction and message
     Transaction trans;
@@ -197,7 +197,7 @@ void NullFacility::makeRequests() {
     requestAmt = capacity_ - sto;
 
     // create a resource
-    GenericResource* request_res = new GenericResource(in_commod_,"kg",requestAmt);
+    gen_rsrc_ptr request_res = new GenericResource(in_commod_,"kg",requestAmt);
 
     // build the transaction and message
     Transaction trans;
@@ -237,7 +237,7 @@ void NullFacility::makeOffers() {
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
   // create a Resource
-  GenericResource* offer_res = new GenericResource(out_commod_, "kg", offer_amt);
+  gen_rsrc_ptr offer_res = new GenericResource(out_commod_, "kg", offer_amt);
 
   // build the transaction and message
   Transaction trans;

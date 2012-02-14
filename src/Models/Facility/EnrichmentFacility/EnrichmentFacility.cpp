@@ -328,7 +328,7 @@ void EnrichmentFacility::makeOffers()
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
-  GenericResource* offer_res = new GenericResource(out_commod_,"SWUs",offer_amt);
+  gen_rsrc_ptr offer_res = new GenericResource(out_commod_,"SWUs",offer_amt);
 
   // build the transaction and message
   Transaction trans;

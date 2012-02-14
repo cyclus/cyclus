@@ -160,7 +160,7 @@ void SourceFacility::handleTick(int time){
   LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
 
   // build a generic resource to offer
-  GenericResource* offer_res = new GenericResource(out_commod_,"kg",offer_amt);
+  gen_rsrc_ptr offer_res = new GenericResource(out_commod_,"kg",offer_amt);
 
   // build the transaction and message
   Transaction trans;
