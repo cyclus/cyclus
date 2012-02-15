@@ -25,7 +25,8 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
-    ("core-only", "only print log entries from cyclus core code")
+    ("no-model", "only print log entries from cyclus core code")
+    ("no-mem", "exclude memory log statement from logger output")
     ("verbosity,v", po::value<string>(), "set output log verbosity level")
     ("input-file", po::value<string>(), "input file")
     ;
@@ -64,8 +65,12 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if (vm.count("core-only")) {
-    Logger::CoreOnly() = true;
+  if (vm.count("no-model")) {
+    Logger::NoModel() = true;
+  }
+
+  if (vm.count("no-mem")) {
+    Logger::NoMem() = true;
   }
 
   if (! vm.count("input-file")) {
