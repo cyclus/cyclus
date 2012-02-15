@@ -128,12 +128,12 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
   current_owner_ = next_stop;
 
-  CLOG(LEV_INFO5) << "Message " << this << " going to model"
+  CLOG(LEV_DEBUG1) << "Message " << this << " going to model"
                    << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 
   next_stop->receiveMessage(me);
 
-  CLOG(LEV_INFO5) << "Message " << this << " returned from model"
+  CLOG(LEV_DEBUG1) << "Message " << this << " returned from model"
                    << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 }
 
@@ -257,5 +257,12 @@ void Message::approveTransfer() {
 
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
+
+  CLOG(LEV_INFO4) << "Begin material transfer details:";
+  for (int i = 0; i < manifest.size(); i++) {
+    manifest.at(i)->print();
+  }
+  CLOG(LEV_INFO4) << "End material transfer details.";
+
 }
 

@@ -108,13 +108,15 @@ IsoVector IsoVector::recipe(std::string name) {
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::printRecipes() {
-  CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes:";
+  CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes.";
+  CLOG(LEV_INFO2) << "Begin recipe list:";
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
     CLOG(LEV_INFO2) << "Recipe name =  " << recipe->first;
     recipe->second->print();
   }
+  CLOG(LEV_INFO2) << "End recipe list.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

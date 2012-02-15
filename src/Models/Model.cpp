@@ -60,9 +60,11 @@ Model* Model::getModelByName(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::printModelList() {
   CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
+  CLOG(LEV_INFO2) << "Begin model list:";
   for (int i = 0; i < model_list_.size(); i++) {
     model_list_.at(i)->print();
   }
+  CLOG(LEV_INFO2) << "End model list.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
