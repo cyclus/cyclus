@@ -196,10 +196,12 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+
   ID_ = next_id_++;
   is_template_ = true;
   template_list_.push_back(this);
   parent_ = NULL;
+  MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -214,7 +216,7 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
 
   // remove references to self
-  MLOG(LEV_DEBUG3) << "Model " << name() << " ID=" << ID_ << " beginning deallocation.";
+  MLOG(LEV_DEBUG3) << "Model " << name() << " ID=" << ID_ << " beginning delete.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -225,10 +227,10 @@ Model::~Model() {
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
-    MLOG(LEV_DEBUG3) << "is deleting child model " << child->name() << "ID=" << child->ID();
+    MLOG(LEV_DEBUG4) << "deleting child model ID=" << child->ID();
     delete child;
   }
-  MLOG(LEV_DEBUG2) << "Model " << name() << " ID=" << ID_ << " now deallocated.";
+  MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << "finished delete.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

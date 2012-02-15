@@ -21,6 +21,7 @@ std::string Message::outputDir_ = "/output/transactions";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
   dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
@@ -41,6 +42,7 @@ Message::Message(Communicator* sender) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
   dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
@@ -60,6 +62,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
   dead_ = false;
   dir_ = UP_MSG;
   trans_ = thisTrans;
@@ -80,6 +83,10 @@ Message::Message(Communicator* sender, Communicator* receiver,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::~Message() {
+  MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setRealParticipant(Communicator* who) {
   Model* model = NULL;
   model = dynamic_cast<Model*>(who);
@@ -96,6 +103,8 @@ void Message::printTrans() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 msg_ptr Message::clone() {
+  CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
+
   msg_ptr new_msg(new Message(*this));
   new_msg->setResource(resource());
   return new_msg;
@@ -119,17 +128,18 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
   current_owner_ = next_stop;
 
-  MLOG(LEV_DEBUG3) << "Message " << me.get() << " going to "
-                  << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+  CLOG(LEV_INFO5) << "Message " << this << " going to model"
+                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 
   next_stop->receiveMessage(me);
 
-  MLOG(LEV_DEBUG3) << "Message " << me.get() << " returned from "
-                  << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+  CLOG(LEV_INFO5) << "Message " << this << " returned from model"
+                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::kill() {
+  CLOG(LEV_DEBUG3) << "Message " << this << "was killed.";
   dead_ = true;
 }
 
@@ -162,18 +172,26 @@ void Message::validateForSend() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
+    CLOG(LEV_DEBUG4) << "Message " << this << " next-stop set to model ID="
+                     << dynamic_cast<Model*>(next_stop)->ID();
     if (path_stack_.size() == 0) {
       path_stack_.push_back(sender_);
     }
     path_stack_.push_back(next_stop);
+    return;
   }
+  CLOG(LEV_DEBUG4) << "Message " << this
+                   << " next-stop set attempt ignored to model ID="
+                   << dynamic_cast<Model*>(next_stop)->ID();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::reverseDirection() {
   if (DOWN_MSG == dir_) {
+    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'down' to 'up'.";
     dir_ = UP_MSG; 
   } else {
+    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'up' to 'down'.";
   	dir_ = DOWN_MSG;
   }
 }
@@ -185,6 +203,9 @@ MessageDir Message::dir() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setDir(MessageDir newDir) {
+  CLOG(LEV_DEBUG4) << "Message " << this << "manually changed to "
+                   << newDir << ".";
+
   dir_ = newDir;
 }
 
@@ -234,7 +255,7 @@ void Message::approveTransfer() {
 
   BI->registerTransaction(nextTransID_++, me, manifest);
 
-  LOG(LEV_DEBUG2, "none!") << "Material sent from " << sup->ID() << " to " 
+  CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 }
 
