@@ -17,18 +17,21 @@ Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::runSim() {
+  CLOG(LEV_INFO1) << "Simulation set to run from start="
+                  << startDate_ << " to end=" << endDate_;
+
   time_ = -1;
   handlePreHistory();
   time_ = time0_;
-
+  CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()){
     if (date_.day() == 1){
+      CLOG(LEV_INFO2) << "Current date: " << date_ << " {";
+      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
+
       Material::decayMaterials(time_);
       sendTick();
       sendResolve();
-
-      CLOG(LEV_INFO2) << "Current date: " << date_;
-      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
     }
     
     int eom_day = lastDayOfMonth();
@@ -36,6 +39,7 @@ void Timer::runSim() {
       sendDailyTasks();
       if (i == eom_day){
         sendTock();
+        CLOG(LEV_INFO2) << "}";
       }
       date_ += boost::gregorian::days(1);
     }
@@ -95,12 +99,13 @@ void Timer::sendResolve() {
        agent != resolve_listeners_.end(); 
        agent++) {
     try {
-      CLOG(LEV_INFO4) << "Sending resolve to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name();
+      CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->ID()
+                      << ", name=" << (*agent)->name() << " {";
       (*agent)->resolve();
     } catch(CycException err) {
       CLOG(LEV_ERROR) << "ERROR occured in sendResolve(): " << err.what();
     }
+    CLOG(LEV_INFO3) << "}";
   }
 }
 
@@ -111,11 +116,12 @@ void Timer::sendTick() {
        agent++) {
     try {
       CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name();
+                      << ", name=" << (*agent)->name() << " {";
       (*agent)->handleTick(time_);
     } catch(CycException err) {
       CLOG(LEV_ERROR) << "ERROR occured in sendTick(): " << err.what();
     }
+    CLOG(LEV_INFO3) << "}";
   }
 }
 
@@ -126,11 +132,12 @@ void Timer::sendTock() {
        agent++) {
     try {
       CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name();
+                      << ", name=" << (*agent)->name() << " {";
       (*agent)->handleTock(time_);
     } catch(CycException err) {
       CLOG(LEV_ERROR) << "ERROR occured in sendTock(): " << err.what();
     }
+    CLOG(LEV_INFO3) << "}";
   }
 }
 
@@ -205,8 +212,6 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   endDate_ = getEndDate(startDate_,simDur_);
   date_ = boost::gregorian::date(startDate_);
 
-  CLOG(LEV_INFO1) << "Loading simulation to run from start="
-                  << startDate_ << " to " << endDate_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -262,5 +267,6 @@ void Timer::load_simulation() {
   dec = strtol(decay_str.c_str(), NULL, 10);
 
   TI->initialize(dur, m0, y0, sim0, dec);
+
 }
 
