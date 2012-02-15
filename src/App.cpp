@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
+    ("core-only", "only print log entries from cyclus core code")
     ("verbosity,v", po::value<string>(), "set output log verbosity level")
     ("input-file", po::value<string>(), "input file")
     ;
@@ -61,6 +62,11 @@ int main(int argc, char* argv[]) {
     cout << err_msg << endl;
     cout << desc << "\n";
     return 0;
+  }
+
+  if (vm.count("core-only")) {
+    Logger::CoreOnly() = true;
+    cout << Logger::CoreOnly() << endl;
   }
 
   if (! vm.count("input-file")) {

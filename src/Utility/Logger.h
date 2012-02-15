@@ -32,7 +32,7 @@ to filter the log output more readily.
 
 */
 #define LOG(level, prefix) \
-if (level > Logger::ReportLevel()) ; \
+if ((level > Logger::ReportLevel()) | Logger::CoreOnly()) ; \
 else Logger().Get(level, prefix)
 
 #define CLOG(level) \
@@ -172,6 +172,9 @@ class Logger {
     */
     static LogLevel& ReportLevel() {return report_level;};
 
+    /// Set whether or not agent/model log entries should be printed
+    static bool& CoreOnly() {return core_only;};
+
     /*!
     @brief Converts a string into a corresponding LogLevel value.
 
@@ -204,14 +207,13 @@ class Logger {
     */
     static LogLevel report_level;
 
-    /*!
-    Used to map LogLevel enum values into strings
-    */
+    /// Indicates whether or not agent/model log entries should be printed
+    static bool core_only;
+
+    /// Used to map LogLevel enum values into strings
     static std::vector<std::string> level_to_string;
 
-    /*!
-    Used to map strings into LogLevel enum values
-    */
+    /// Used to map strings into LogLevel enum values
     static std::map<std::string, LogLevel> string_to_level;
 
     /*!

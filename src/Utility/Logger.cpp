@@ -6,6 +6,7 @@
 std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
+bool Logger::core_only = false;
 
 int Logger::spc_per_lev_ = 2;
 int Logger::field_width_ = 6;
