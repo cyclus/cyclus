@@ -14,18 +14,18 @@ outlining proper use of this logging functionality are outlined @ref Logger "her
 
 @brief allows easy logging via the streaming operator similar to std::cout
 
-This is the primary way to use the Logger class. This macro returns an anonymous
-instance of the Logger class (not assigned to any variable) that can be streamed
-into just like any string stream (e.g.  std::cout).  This macro does a check on
-the given #LogLevel 'level' argument; if the specified level is not higher than
-or equal to the report-level cutoff, the macro does nothing, limiting the
-performance impact of logging statements. Each module/model should have its
-own unique prefix.  This will allow users/developers to filter the log
-output more readily.
+This is the primary way to use the Logger class. This macro returns an
+anonymous instance of the Logger class (not assigned to any variable) that can
+be streamed into just like any string stream (e.g.  std::cout).  This macro
+does a check on the given #LogLevel 'level' argument; if the specified level is
+not higher than or equal to the report-level cutoff, the macro does nothing,
+limiting the performance impact of logging statements. Each module/model should
+have its own unique prefix (up to 6 letters).  This will allow users/developers
+to filter the log output more readily.
 
 @param level #LogLevel category or type of log statement.
 @param prefix A std::string value that functions as a unique identifier for the
-              module.
+              module. Prefixes longer than 6 characters will be truncated.
 
 @warning do not place any state-changing expressions with this macro as they
          may not run if the report level excludes the specified log 'level'.
@@ -33,15 +33,15 @@ output more readily.
 */
 #define LOG(level, prefix) \
 if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level) << prefix << ": "
+else Logger().Get(level, prefix)
 
 #define CLOG(level) \
 if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level) << "cyclog: "
+else Logger().Get(level, "core")
 
 #define MLOG(level) \
 if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level) << "cyclog-mem: "
+else Logger().Get(level, "memory")
 
 #include <iostream>
 #include <string>
@@ -57,7 +57,7 @@ else Logger().Get(level) << "cyclog-mem: "
 */
 enum LogLevel {
                LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
-               LEV_WARNING, //!< Use to report questionable simulation state (use extremely sparingly)
+               LEV_WARN, //!< Use to report questionable simulation state (use extremely sparingly)
                LEV_INFO1, //!< Information helpful for simulation users and developers alike - least verbose.
                LEV_INFO2, //!< Information helpful for simulation users and developers alike.
                LEV_INFO3, //!< Information helpful for simulation users and developers alike.
@@ -84,10 +84,10 @@ to stdout as soon as execution passes beyond the terminating semi-colon of
 the log statement.
 
 A brief description of when to use which log level is given with the #LogLevel
-enum.  Developers working on models set the prefix to the
-a unique module/model-specific identifier. This will allow developers to
-more easily filter the logger output in order to isolate information most
-relevant to their work.
+enum.  Developers working on models set the prefix to the a unique
+module/model-specific identifier (up to 6 characters long). This will allow
+developers to more easily filter the logger output in order to isolate
+information most relevant to their work.
 
 @warning do not place any state-changing expressions with the LOG macro as they
          may not run if the report level excludes the specified @e level.
@@ -127,7 +127,7 @@ class Logger {
     @brief Returns a string stream by reference that is flushed to stdout by
     the Logger class destructor.
     */
-    std::ostringstream& Get(LogLevel level);
+    std::ostringstream& Get(LogLevel level, std::string prefix);
 
     /*!
     @brief Returns the report level cutoff by reference for printing
@@ -197,7 +197,7 @@ class Logger {
     /*!
     The width (in characters) of the printed LOG(level) statements' prefixes.
     This should be equal to or greater than the length of the longest LogLevel enum
-    value converted to a string (i.e. `LEV_WARNING` is the longest with 11
+    value converted to a string (i.e. `LEV_WARN` is the longest with 11
     characters).
     */
     static int field_width_; };

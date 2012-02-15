@@ -256,10 +256,10 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 void Model::print() { 
   CLOG(LEV_INFO2) << model_type_ << "_" << name_ 
       << " ( "
-      << "ID = " << ID_
-      << ", implementation = " << model_impl_
-      << ",  name = " << name_
-      << ",  parentID = " << parentID_
+      << "ID=" << ID_
+      << ", implementation=" << model_impl_
+      << ",  name=" << name_
+      << ",  parentID=" << parentID_
       << " ) " ;
 }
 

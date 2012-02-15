@@ -7,14 +7,20 @@ std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
 
-int Logger::spc_per_lev_ = 3;
-int Logger::field_width_ = 8;
+int Logger::spc_per_lev_ = 2;
+int Logger::field_width_ = 6;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::ostringstream& Logger::Get(LogLevel level) {
-  int ind_level = 0;
-  if(level > LEV_DEBUG1) {ind_level = level - LEV_DEBUG1;}
-  os << ToString(level) << ": ";
+std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
+  int ind_level = level - LEV_INFO1;
+  if (ind_level < 0) {ind_level = 0;}
+
+  int prefix_len = 6;
+  prefix = prefix.substr(0, prefix_len);
+  if (prefix.length() < prefix_len) {
+    prefix = prefix + std::string(prefix_len - prefix.length(), ' ');
+  }
+  os << ToString(level) << "(" << prefix << "):";
   os << std::string(ind_level * spc_per_lev_, ' ');
   return os;
 }
@@ -30,7 +36,7 @@ Logger::~Logger() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logger::initialize() {
   Logger::addLevel(LEV_ERROR, "LEV_ERROR");
-  Logger::addLevel(LEV_WARNING, "LEV_WARNING");
+  Logger::addLevel(LEV_WARN, "LEV_WARN");
   Logger::addLevel(LEV_INFO1, "LEV_INFO1");
   Logger::addLevel(LEV_INFO2, "LEV_INFO2");
   Logger::addLevel(LEV_INFO3, "LEV_INFO3");

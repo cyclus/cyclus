@@ -119,13 +119,36 @@ void IsoVector::printRecipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
+  CLOG(LEV_INFO3) << propString();
+
+  std::vector<std::string>::iterator entry;
+  std::vector<std::string> entries = compStrings();
+  for (entry = entries.begin(); entry != entries.end(); entry++) {
+    CLOG(LEV_INFO3) << *entry;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string IsoVector::propString() {
+  std::stringstream ss;
+  ss << "mass = " << mass() << " kg";
+  return ss.str();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> IsoVector::compStrings() {
   CompMap::iterator entry;
   int isotope;
-  CLOG(LEV_INFO3) << "mass = " << mass() << " kg";
+  std::stringstream ss;
+  std::vector<std::string> comp_strings;
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
+    ss.str("");
     isotope = entry->first;
-    CLOG(LEV_INFO3) << isotope << ": " << mass(isotope) << " kg";
+    if (mass(isotope) < EPS_KG) {continue;}
+    ss << isotope << ": " << mass(isotope) << " kg";
+    comp_strings.push_back(ss.str());
   }
+  return comp_strings;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

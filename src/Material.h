@@ -84,7 +84,7 @@ public:
    * matter (dis)appear and should only be used on objects that are not part of
    * any actual tracked inventory.
    */
-  void setQuantity(double quantity) {iso_vector_.setMass(quantity);};
+  void setQuantity(double quantity);
 
   /// Resource class method
   double quantity() {return iso_vector_.mass();};
