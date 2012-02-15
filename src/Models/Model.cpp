@@ -59,11 +59,15 @@ Model* Model::getModelByName(std::string name) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::printModelList() {
+  CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
+  CLOG(LEV_INFO3) << "Model list {";
   for (int i = 0; i < model_list_.size(); i++) {
     model_list_.at(i)->print();
   }
+  CLOG(LEV_INFO3) << "}";
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<Model*> Model::getModelList() {
   return Model::model_list_;
 }
@@ -173,7 +177,7 @@ void Model::load_institutions() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
+  CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   this->setBornOn( TI->time() );
 }
@@ -194,14 +198,18 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+
   ID_ = next_id_++;
   is_template_ = true;
   template_list_.push_back(this);
   parent_ = NULL;
+  MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
+  MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
+
   diedOn_ = TI->time();
 
   // book-keeping
@@ -212,7 +220,6 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
 
   // remove references to self
-  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -223,10 +230,11 @@ Model::~Model() {
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
-    LOG(LEV_DEBUG2) << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
+    MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->ID() << " {";
     delete child;
+    MLOG(LEV_DEBUG4) << "}";
   }
-  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
+  MLOG(LEV_DEBUG3) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -252,10 +260,12 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  LOG(LEV_DEBUG2) << model_type_ << " " << name_ 
-      << " (ID=" << ID_
-      << ", implementation = " << model_impl_
-      << "  name = " << name_
+  CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
+      << " ( "
+      << "ID=" << ID_
+      << ", implementation=" << model_impl_
+      << ",  name=" << name_
+      << ",  parentID=" << parentID_
       << " ) " ;
 }
 
@@ -294,8 +304,8 @@ void Model::addChild(Model* child){
   if (child == this || child == NULL) {
     return;
   }
-  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
-		  << " has added child " << child->name() << " ID " 
+  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
   removeFromList(child, children_);
   children_.push_back(child); 
@@ -303,8 +313,8 @@ void Model::addChild(Model* child){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeChild(Model* child){
-  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
-		  << " has removed child " << child->name() << " ID " 
+  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+		  << " has removed child '" << child->name() << "' ID=" 
 		  << child->ID() << " from its list of children.";
   removeFromList(child, children_);
 };

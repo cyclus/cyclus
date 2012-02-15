@@ -19,18 +19,30 @@ int Material::decay_interval_ = 1;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
   last_update_time_ = TI->time();
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
   last_update_time_ = TI->time();
   iso_vector_ = comp;
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(const Material& other) {
   iso_vector_ = other.iso_vector_;
   last_update_time_ = other.last_update_time_;
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,14 +50,21 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   // Get the given Material's composition.
   IsoVector vec_to_add = matToAdd->isoVector();
   iso_vector_ = iso_vector_ + vec_to_add;
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
+                   << matToAdd->ID() << ".";
+  CLOG(LEV_DEBUG3) << "New Material state:";
+  print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
+
   IsoVector new_comp = iso_vector_;
   new_comp.setMass(mass);
-
   iso_vector_ = iso_vector_ - new_comp;
+
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
+                   << " kg extracted from it. New mass=" << quantity() << " kg.";
   
   return mat_rsrc_ptr(new Material(new_comp));
 }
@@ -53,15 +72,39 @@ mat_rsrc_ptr Material::extract(double mass) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
+
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+  CLOG(LEV_DEBUG3) << "New Material state:";
+  print();
+
   return mat_rsrc_ptr(new Material(rem_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print() {
+  CLOG(LEV_INFO4) << "Material ID=" << ID_
+                   << ", quantity=" << quantity() << ", units=" << units();
+
+  CLOG(LEV_INFO5) << "Composition {";
+  std::vector<std::string>::iterator entry;
+  std::vector<std::string> entries = iso_vector_.compStrings();
+  for (entry = entries.begin(); entry != entries.end(); entry++) {
+    CLOG(LEV_INFO5) << "   " << *entry;
+  }
+  CLOG(LEV_INFO5) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void Material::setQuantity(double quantity) {
+  iso_vector_.setMass(quantity);
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
+                   << quantity << " kg";
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 rsrc_ptr Material::clone() {
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
+  print();
   rsrc_ptr mat(new Material(*this));
   return mat;
 }

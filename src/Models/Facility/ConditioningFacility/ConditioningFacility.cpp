@@ -131,7 +131,7 @@ void ConditioningFacility::print()
       outcommods += (*it).second.second;
       outcommods += ", ";
     }
-    LOG(LEV_DEBUG2) << " conditions {" 
+    LOG(LEV_DEBUG2, "none!") << " conditions {" 
       << incommods
       <<"} into forms { "
       << outcommods
@@ -146,7 +146,7 @@ void ConditioningFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::receiveMessage(msg_ptr msg) {
-  LOG(LEV_DEBUG2) << "Warning, the ConditioningFacility ignores messages.";
+  LOG(LEV_DEBUG2, "none!") << "Warning, the ConditioningFacility ignores messages.";
 };
 
 
@@ -168,7 +168,7 @@ std::vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
     msg += "The order requested by ";
     msg += order->requester()->name();
     msg += " will not be sent.";
-    LOG(LEV_DEBUG2) << msg;
+    LOG(LEV_DEBUG2, "none!") << msg;
     gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
     toRet.push_back(empty);
   }
@@ -209,7 +209,7 @@ std::vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"ConditioningFacility "<< ID()
+    LOG(LEV_DEBUG2, "none!") <<"ConditioningFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
@@ -223,7 +223,7 @@ void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
 
     mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
@@ -391,19 +391,19 @@ void ConditioningFacility::loadCSVFile(string datafile){
       getline(file, buffer, ',');
       // copy the data to the typed member of the stream struct
       stream.streamID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2) <<  "streamID  = " <<  stream.streamID ;;
+      LOG(LEV_DEBUG2, "none!") <<  "streamID  = " <<  stream.streamID ;;
       getline(file, buffer, ',');
       stream.formID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2) <<  "formID  = " <<  stream.formID ;;
+      LOG(LEV_DEBUG2, "none!") <<  "formID  = " <<  stream.formID ;;
       getline(file, buffer, ',');
       stream.density = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
+      LOG(LEV_DEBUG2, "none!") <<  "density  = " <<  stream.density ;;
       getline(file, buffer, ',');
       stream.wfvol = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "wfvol  = " <<  stream.wfvol ;;
+      LOG(LEV_DEBUG2, "none!") <<  "wfvol  = " <<  stream.wfvol ;;
       getline(file, buffer, '\n');
       stream.wfmass = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "wfmass  = " <<  stream.wfmass ;;
+      LOG(LEV_DEBUG2, "none!") <<  "wfmass  = " <<  stream.wfmass ;;
       // put the full struct into the vector of structs
       stream_vec_.push_back(stream);
     }
@@ -458,7 +458,7 @@ void ConditioningFacility::makeRequests(){
       trans.resource = request_res;
 
       sendMessage(recipient, trans);
-      LOG(LEV_DEBUG2) << " The ConditioningFacility has requested "
+      LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has requested "
         << requestAmt 
         << " kg of "
         << in_commod 
@@ -511,7 +511,7 @@ void ConditioningFacility::makeOffers(){
       offers += " , ";
     }
   }
-  LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
+  LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has offered "
     << offers 
     << ".";
 }
@@ -620,7 +620,7 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::printStatus(int time){
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "ConditioningFacility " << this->ID()
+  LOG(LEV_DEBUG2, "none!") << "ConditioningFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material in inventory, and  "
                   << this->checkStocks() 

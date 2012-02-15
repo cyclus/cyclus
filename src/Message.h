@@ -210,7 +210,7 @@ class Message: IntrusiveBase<Message> {
    */
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
 
-  virtual ~Message() { };
+  virtual ~Message();
 
   /*!
    Creates a new message by copying the current one and

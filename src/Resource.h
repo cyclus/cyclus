@@ -89,6 +89,8 @@ public:
   /// return this resource's unique ID
   const int ID() {return ID_;};
 
+  virtual ~Resource();
+
 protected:
 
   Resource();

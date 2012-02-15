@@ -39,7 +39,7 @@ void GreedyMarket::resolve() {
     if(match_request(request)) {
       process_request();
     } else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->requester()->ID()
+      LOG(LEV_DEBUG2, "none!") << "The request from Requester "<< (*request).second->requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected. ";
       reject_request(request);
@@ -104,7 +104,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
     offerAmt = offer->first;
     offerMsg = offer->second;
 
-    LOG(LEV_DEBUG2) << "offeramt=" << offerAmt
+    LOG(LEV_DEBUG2, "none!") << "offeramt=" << offerAmt
                     << ", requestamt=" << requestAmt;
 
     // pop off this offer
@@ -120,7 +120,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
         orders_.push_back(offerMsg);
 
-        LOG(LEV_DEBUG1) 
+        LOG(LEV_DEBUG1, "none!") 
           << "GreedyMarket has resolved a transaction "
           << " which is a match from "
           << offerMsg->supplier()->ID()
@@ -142,7 +142,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
         orders_.push_back(maybe_offer);
 
-        LOG(LEV_DEBUG1)  
+        LOG(LEV_DEBUG1, "none!")  
           << "GreedyMarket has resolved a transaction "
           << " which is a match from "
           << maybe_offer->supplier()->ID()
@@ -170,7 +170,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   }
 
   if (requestAmt != 0) {
-    LOG(LEV_DEBUG2) << "The request from Requester "
+    LOG(LEV_DEBUG2, "none!") << "The request from Requester "
       << requestMsg->requester()->ID()
       << " for the amount " << requestAmt << " rejected. ";
       reject_request(request);

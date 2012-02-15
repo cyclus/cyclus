@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
+    ("no-model", "only print log entries from cyclus core code")
+    ("no-mem", "exclude memory log statement from logger output")
     ("verbosity,v", po::value<string>(), "set output log verbosity level")
     ("input-file", po::value<string>(), "input file")
     ;
@@ -63,6 +65,14 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  if (vm.count("no-model")) {
+    Logger::NoModel() = true;
+  }
+
+  if (vm.count("no-mem")) {
+    Logger::NoMem() = true;
+  }
+
   if (! vm.count("input-file")) {
     string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   cyclus [path/to/input/filename]\n";
@@ -84,20 +94,18 @@ int main(int argc, char* argv[]) {
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
   } catch (CycIOException ge) {
-    LOG(LEV_ERROR) << ge.what();
+    CLOG(LEV_ERROR) << ge.what();
     return 0;
   };
 
-  LOG(LEV_DEBUG2) << "Here is a list of models:";
   Model::printModelList();
-  LOG(LEV_DEBUG2) << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
   IsoVector::printRecipes();
   
   // Run the simulation 
   try {
     TI->runSim();
   } catch (CycException err) {
-    LOG(LEV_ERROR) << err.what();
+    CLOG(LEV_ERROR) << err.what();
   }
 
   // Create the output file
@@ -109,7 +117,7 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
     BI->closeDB();
   } catch (CycException ge) {
-    LOG(LEV_ERROR) << ge.what();
+    CLOG(LEV_ERROR) << ge.what();
   };
 
   return 0;

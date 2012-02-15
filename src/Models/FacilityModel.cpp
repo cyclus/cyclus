@@ -28,7 +28,7 @@ void FacilityModel::init(xmlNodePtr cur) {
   for (int i=0;i<nodes->nodeNr;i++){
     inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     this->setInstName(inst_name_);
-    LOG(LEV_DEBUG2) << "Facility " << ID() << " has just set its inst to " << inst_name_;
+    LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just set its inst to " << inst_name_;
   }
 } 
 

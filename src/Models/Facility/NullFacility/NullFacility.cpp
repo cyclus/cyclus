@@ -72,7 +72,7 @@ void NullFacility::copyFreshModel(Model* src)
 void NullFacility::print() 
 { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2) << "    converts commodity {"
+  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"
       << out_commod_
@@ -124,7 +124,7 @@ std::vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
     }
 
     toSend.push_back(m);
-    LOG(LEV_DEBUG2) <<"NullFacility "<< ID()
+    LOG(LEV_DEBUG2, "none!") <<"NullFacility "<< ID()
       <<"  is sending a mat with mass: "<< m->quantity();
   }    
   return toSend;
@@ -137,7 +137,7 @@ void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"NullFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"NullFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }

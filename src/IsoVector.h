@@ -93,6 +93,8 @@ public:
   static void printRecipes();
 
   void print();
+  std::string propString();
+  std::vector<std::string> compStrings();
 
   static int recipeCount();                                  
 

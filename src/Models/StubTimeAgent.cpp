@@ -29,7 +29,7 @@ void StubTimeAgent::copy(StubTimeAgent* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::print() { 
   TimeAgent::print(); 
-  LOG(LEV_DEBUG2); 
+  LOG(LEV_DEBUG2, "none!"); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

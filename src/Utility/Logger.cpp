@@ -6,15 +6,23 @@
 std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
+bool Logger::no_model = false;
+bool Logger::no_mem = false;
 
-int Logger::spc_per_lev_ = 3;
-int Logger::field_width_ = 12;
+int Logger::spc_per_lev_ = 2;
+int Logger::field_width_ = 6;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::ostringstream& Logger::Get(LogLevel level) {
-  int ind_level = 0;
-  if(level > LEV_DEBUG) {ind_level = level - LEV_DEBUG;}
-  os << ToString(level) << ": ";
+std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
+  int ind_level = level - LEV_INFO1;
+  if (ind_level < 0) {ind_level = 0;}
+
+  int prefix_len = 6;
+  prefix = prefix.substr(0, prefix_len);
+  if (prefix.length() < prefix_len) {
+    prefix = prefix + std::string(prefix_len - prefix.length(), ' ');
+  }
+  os << ToString(level) << "(" << prefix << "):";
   os << std::string(ind_level * spc_per_lev_, ' ');
   return os;
 }
@@ -30,12 +38,17 @@ Logger::~Logger() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logger::initialize() {
   Logger::addLevel(LEV_ERROR, "LEV_ERROR");
-  Logger::addLevel(LEV_WARNING, "LEV_WARNING");
-  Logger::addLevel(LEV_INFO, "LEV_INFO");
-  Logger::addLevel(LEV_DEBUG, "LEV_DEBUG");
+  Logger::addLevel(LEV_WARN, "LEV_WARN");
+  Logger::addLevel(LEV_INFO1, "LEV_INFO1");
+  Logger::addLevel(LEV_INFO2, "LEV_INFO2");
+  Logger::addLevel(LEV_INFO3, "LEV_INFO3");
+  Logger::addLevel(LEV_INFO4, "LEV_INFO4");
+  Logger::addLevel(LEV_INFO5, "LEV_INFO5");
   Logger::addLevel(LEV_DEBUG1, "LEV_DEBUG1");
   Logger::addLevel(LEV_DEBUG2, "LEV_DEBUG2");
   Logger::addLevel(LEV_DEBUG3, "LEV_DEBUG3");
+  Logger::addLevel(LEV_DEBUG4, "LEV_DEBUG4");
+  Logger::addLevel(LEV_DEBUG5, "LEV_DEBUG5");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,6 +75,7 @@ std::string Logger::ToString(LogLevel level) {
 void Logger::addLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
+  text = text.substr(4);
   text = std::string(field_width_ - text.size(), ' ') + text;
   Logger::level_to_string.push_back(text);
 }

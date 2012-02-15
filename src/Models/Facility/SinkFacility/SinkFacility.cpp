@@ -68,17 +68,17 @@ void SinkFacility::print() {
 
   for (vector<std::string>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
-       commod++)
-  {
+       commod++) {
     msg += (commod == in_commods_.begin() ? "{" : ", " );
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2) << msg << inventory_size_ << " kg.";
+  LOG(LEV_DEBUG2, "SnkFac") << msg << inventory_size_ << " kg.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
+  LOG(LEV_INFO3, "SnkFac") << facName() << " is ticking {";
 
   double requestAmt = getRequestAmt(); 
   double minAmt = 0;
@@ -106,21 +106,24 @@ void SinkFacility::handleTick(int time){
       request->setNextDest(facInst());
       request->sendOn();
 
-      LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
+      LOG(LEV_INFO4, "SnkFac") << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
     }
   }
+  LOG(LEV_INFO3, "SnkFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTock(int time){
+  LOG(LEV_INFO3, "SnkFac") << facName() << " is tocking {";
 
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "SinkFacility " << this->ID()
+  LOG(LEV_INFO4, "SnkFac") << "SinkFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
+  LOG(LEV_INFO3, "SnkFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -131,9 +134,8 @@ void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "SnkFac") <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    (*thisMat)->print();
     inventory_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
