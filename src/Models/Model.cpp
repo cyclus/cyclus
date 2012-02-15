@@ -59,12 +59,13 @@ Model* Model::getModelByName(std::string name) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::printModelList() {
-  CLOG(LEV_DEBUG2) << "Here is a list of " << model_list_.size() << " models:";
+  CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
   for (int i = 0; i < model_list_.size(); i++) {
     model_list_.at(i)->print();
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<Model*> Model::getModelList() {
   return Model::model_list_;
 }
@@ -174,7 +175,7 @@ void Model::load_institutions() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  CLOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
+  CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   this->setBornOn( TI->time() );
 }
@@ -253,10 +254,12 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  CLOG(LEV_DEBUG2) << model_type_ << " " << name_ 
-      << " (ID=" << ID_
+  CLOG(LEV_INFO2) << model_type_ << "_" << name_ 
+      << " ( "
+      << "ID = " << ID_
       << ", implementation = " << model_impl_
-      << "  name = " << name_
+      << ",  name = " << name_
+      << ",  parentID = " << parentID_
       << " ) " ;
 }
 
@@ -295,8 +298,8 @@ void Model::addChild(Model* child){
   if (child == this || child == NULL) {
     return;
   }
-  CLOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
-		  << " has added child " << child->name() << " ID " 
+  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
   removeFromList(child, children_);
   children_.push_back(child); 
@@ -304,8 +307,8 @@ void Model::addChild(Model* child){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeChild(Model* child){
-  CLOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
-		  << " has removed child " << child->name() << " ID " 
+  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+		  << " has removed child '" << child->name() << "' ID=" 
 		  << child->ID() << " from its list of children.";
   removeFromList(child, children_);
 };

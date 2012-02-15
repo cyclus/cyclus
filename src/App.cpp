@@ -89,7 +89,6 @@ int main(int argc, char* argv[]) {
   };
 
   Model::printModelList();
-  CLOG(LEV_DEBUG2) << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
   IsoVector::printRecipes();
   
   // Run the simulation 

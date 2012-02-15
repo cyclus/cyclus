@@ -108,10 +108,11 @@ IsoVector IsoVector::recipe(std::string name) {
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::printRecipes() {
+  CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes:";
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    LOG(LEV_DEBUG2, "none!") << "Recipe " << recipe->first << ":";
+    CLOG(LEV_INFO2) << "Recipe name =  " << recipe->first;
     recipe->second->print();
   }
 }
@@ -120,11 +121,10 @@ void IsoVector::printRecipes() {
 void IsoVector::print() {
   CompMap::iterator entry;
   int isotope;
-  LOG(LEV_DEBUG2, "none!") << "    mass " << mass() << " kg";
+  CLOG(LEV_INFO3) << "mass = " << mass() << " kg";
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
     isotope = entry->first;
-    LOG(LEV_DEBUG2, "none!") << "    " << isotope << ": "
-                    << mass(isotope) << "kg";
+    CLOG(LEV_INFO3) << isotope << ": " << mass(isotope) << " kg";
   }
 }
 
