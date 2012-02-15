@@ -59,6 +59,7 @@ Model* Model::getModelByName(std::string name) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::printModelList() {
+  CLOG(LEV_DEBUG2) << "Here is a list of " << model_list_.size() << " models:";
   for (int i = 0; i < model_list_.size(); i++) {
     model_list_.at(i)->print();
   }
@@ -173,7 +174,7 @@ void Model::load_institutions() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  LOG(LEV_DEBUG2, "none!") << "Model '" << name_ << "' just created.";
+  CLOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   this->setBornOn( TI->time() );
 }
@@ -252,7 +253,7 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  LOG(LEV_DEBUG2, "none!") << model_type_ << " " << name_ 
+  CLOG(LEV_DEBUG2) << model_type_ << " " << name_ 
       << " (ID=" << ID_
       << ", implementation = " << model_impl_
       << "  name = " << name_
@@ -294,7 +295,7 @@ void Model::addChild(Model* child){
   if (child == this || child == NULL) {
     return;
   }
-  LOG(LEV_DEBUG3, "none!") << "Model " << this->name() << " ID " << this->ID() 
+  CLOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
 		  << " has added child " << child->name() << " ID " 
 		  << child->ID() << " to its list of children.";
   removeFromList(child, children_);
@@ -303,7 +304,7 @@ void Model::addChild(Model* child){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeChild(Model* child){
-  LOG(LEV_DEBUG3, "none!") << "Model " << this->name() << " ID " << this->ID() 
+  CLOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
 		  << " has removed child " << child->name() << " ID " 
 		  << child->ID() << " from its list of children.";
   removeFromList(child, children_);
