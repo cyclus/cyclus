@@ -212,7 +212,7 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
 
   // remove references to self
-  LOG(LEV_DEBUG2, "none!") << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
+  MLOG(LEV_DEBUG3) << "Model " << name() << " ID=" << ID_ << " beginning deallocation.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -223,10 +223,10 @@ Model::~Model() {
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
-    LOG(LEV_DEBUG2, "none!") << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
+    MLOG(LEV_DEBUG3) << "is deleting child model " << child->name() << "ID=" << child->ID();
     delete child;
   }
-  LOG(LEV_DEBUG2, "none!") << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
+  MLOG(LEV_DEBUG2) << "Model " << name() << " ID=" << ID_ << " now deallocated.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

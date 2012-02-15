@@ -119,12 +119,12 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
   current_owner_ = next_stop;
 
-  LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << me.get() << " going to "
+  MLOG(LEV_DEBUG3) << "Message " << me.get() << " going to "
                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 
   next_stop->receiveMessage(me);
 
-  LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << me.get() << " returned from "
+  MLOG(LEV_DEBUG3) << "Message " << me.get() << " returned from "
                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 }
 
