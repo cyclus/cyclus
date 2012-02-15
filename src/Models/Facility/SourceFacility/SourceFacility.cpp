@@ -20,7 +20,7 @@ SourceFacility::~SourceFacility() { }
 void SourceFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
-  LOG(LEV_DEBUG2, "none!") <<"The Source Facility is being initialized";
+  LOG(LEV_DEBUG2, "SrcFac") << "The Source Facility is being initialized";
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -71,7 +71,7 @@ void SourceFacility::copyFreshModel(Model* src) {
 void SourceFacility::print() {
   FacilityModel::print();
 
-  LOG(LEV_DEBUG2, "none!") << "    supplies commodity {"
+  LOG(LEV_DEBUG2, "SrcFac!") << "    supplies commodity {"
       << out_commod_ << "} with recipe '" 
       << recipe_name_ << "' at a capacity of "
       << capacity_ << " kg per time step."
@@ -108,26 +108,18 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
       sent_amt += m->quantity();
       toSend.push_back(m);
       inventory_.pop_front();
-      LOG(LEV_DEBUG2, "none!") <<"SourceFacility "<< ID()
+      LOG(LEV_DEBUG2, "SrcFac") <<"SourceFacility "<< ID()
         <<"  has decided not to split the object with size :  "<< m->quantity();
     } else if (m->quantity() > (trans.resource->quantity() - sent_amt)) { 
       // if the inventory obj is larger than the remaining need, split it.
       mat_rsrc_ptr mat_to_send = m->extract(trans.resource->quantity() - sent_amt);
       sent_amt += mat_to_send->quantity();
-      LOG(LEV_DEBUG2, "none!") <<"SourceFacility "<< ID()
+      LOG(LEV_DEBUG2, "SrcFac") <<"SourceFacility "<< ID()
         <<"  has decided to split the object to size :  "<< mat_to_send->quantity();
       toSend.push_back(mat_to_send);
-      printSent(mat_to_send);
     }
   }    
   return toSend;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::printSent(mat_rsrc_ptr mat){
-    LOG(LEV_DEBUG2, "none!") <<"SourceFacility "<< ID()
-      <<"  is sending a mat with mass: "<< mat->quantity();
-    (mat)->print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -150,7 +142,7 @@ void SourceFacility::handleTick(int time){
   // decide what market to offer to
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
-  LOG(LEV_DEBUG2, "none!") << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
+  LOG(LEV_DEBUG2, "SrcFac") << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
 
   // build a generic resource to offer
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
@@ -178,7 +170,7 @@ void SourceFacility::handleTock(int time){
     temp.multBy(capacity_);
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
 
-    LOG(LEV_DEBUG2, "none!") << facName() << ", handling the tock, has created a material:";
+    LOG(LEV_DEBUG2, "SrcFac") << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   } else if (space < capacity_*recipe_.mass() && space > 0) {
@@ -186,7 +178,7 @@ void SourceFacility::handleTock(int time){
     IsoVector temp = recipe_;
     temp.setMass(space);
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-    LOG(LEV_DEBUG2, "none!") << facName() << ", handling the tock, has created a material:";
+    LOG(LEV_DEBUG2, "SrcFac") << facName() << ", handling the tock, has created a material:";
     newMat->print();
     inventory_.push_front(newMat);
   }
@@ -198,7 +190,7 @@ void SourceFacility::handleTock(int time){
     ordersWaiting_.pop_front();
   }
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2, "none!") << "SourceFacility " << this->ID()
+  LOG(LEV_DEBUG2, "SrcFac") << "SourceFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
