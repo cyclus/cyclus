@@ -162,6 +162,7 @@ void SourceFacility::handleTick(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
+  LOG(LEV_INFO3, "SrcFac") << facName() << "is tocking {";
   // if there's room in the inventory, process material at capacity
   double space = inventory_size_ - this->checkInventory(); 
   if (capacity_ * recipe_.mass() <= space) {
@@ -169,17 +170,12 @@ void SourceFacility::handleTock(int time){
     IsoVector temp = recipe_;
     temp.multBy(capacity_);
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-
-    LOG(LEV_DEBUG2, "SrcFac") << facName() << ", handling the tock, has created a material:";
-    newMat->print();
     inventory_.push_front(newMat);
   } else if (space < capacity_*recipe_.mass() && space > 0) {
     // add a material that fills the inventory
     IsoVector temp = recipe_;
     temp.setMass(space);
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-    LOG(LEV_DEBUG2, "SrcFac") << facName() << ", handling the tock, has created a material:";
-    newMat->print();
     inventory_.push_front(newMat);
   }
   // check what orders are waiting,
@@ -195,6 +191,7 @@ void SourceFacility::handleTock(int time){
                   << " units of material at the close of month " << time
                   << ".";
 
+  LOG(LEV_DEBUG2, "SrcFac") << "}";
 }
 
 
