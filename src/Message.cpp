@@ -139,7 +139,7 @@ void Message::sendOn() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::kill() {
-  CLOG(LEV_DEBUG3) << "Message " << this << "was killed.";
+  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
   dead_ = true;
 }
 
