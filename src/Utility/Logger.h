@@ -116,6 +116,43 @@ LOG(LEV_DEBUG2, "module name") << "The expression myobject.setName(newname): "
 
 @endcode
 
+@section scoping Log Scoping
+
+It is recommended that you use '{' and '}' braces to indicate scope of log
+statements.  When you have log code that will be calling another function that
+might have its own log output, put an opening brace in a log statement before
+the function call and a closing brace in a log statement after the function
+call.  The LogLevel for both the opening and closing braces must be the same.  For example:
+
+@code
+
+void myfunc() {
+  ...
+  item = ...
+  ...
+
+  LOG(LEV_DEBUG4) << "Converting fuel item {";
+  convert(item);
+  LOG(LEV_DEBUG4) << "}";
+
+}
+
+void convert(Item item) {
+  LOG(LEV_DEBUG5) << "original state {";
+  item.print();
+  LOG(LEV_DEBUG5) << "}";
+
+  ...
+  ...do stuff to 'item' object.
+  ...
+
+  LOG(LEV_DEBUG5) << "converted state {";
+  item.print();
+  LOG(LEV_DEBUG5) << "}";
+}
+
+@endcode
+
 */
 class Logger {
 
