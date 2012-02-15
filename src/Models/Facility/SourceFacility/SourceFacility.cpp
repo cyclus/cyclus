@@ -124,7 +124,7 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTick(int time){
-  LOG(LEV_INFO3, "SrcFac") << facName() << " is ticking.";
+  LOG(LEV_INFO3, "SrcFac") << facName() << " is ticking {";
   // make offers
   // decide how much to offer
   double offer_amt;

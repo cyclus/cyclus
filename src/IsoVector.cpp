@@ -113,7 +113,7 @@ void IsoVector::printRecipes() {
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    CLOG(LEV_INFO2) << "Recipe name =  " << recipe->first;
+    CLOG(LEV_INFO2) << "Recipe name=" << recipe->first;
     recipe->second->print();
   }
   CLOG(LEV_INFO2) << "}";

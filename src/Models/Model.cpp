@@ -60,11 +60,11 @@ Model* Model::getModelByName(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::printModelList() {
   CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
-  CLOG(LEV_INFO2) << "Model list {";
+  CLOG(LEV_INFO3) << "Model list {";
   for (int i = 0; i < model_list_.size(); i++) {
     model_list_.at(i)->print();
   }
-  CLOG(LEV_INFO2) << "}";
+  CLOG(LEV_INFO3) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -258,7 +258,7 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  CLOG(LEV_INFO2) << model_type_ << "_" << name_ 
+  CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
       << " ( "
       << "ID=" << ID_
       << ", implementation=" << model_impl_
