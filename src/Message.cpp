@@ -95,10 +95,10 @@ void Message::setRealParticipant(Communicator* who) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
-  std::cout << "Transaction info (via Message):" << std::endl <<
-    "    Requester ID: " << trans_.requester->ID() << std::endl <<
-    "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
-    "    Price: "  << trans_.price << std::endl;
+  CLOG(LEV_INFO4) << "Transaction info {"
+                  << ", Requester ID=" << trans_.requester->ID()
+                  << ", Supplier ID=" << trans_.supplier->ID()
+                  << ", Price="  << trans_.price << " }";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -259,6 +259,7 @@ void Message::approveTransfer() {
                   << req->ID() << ".";
 
   CLOG(LEV_INFO4) << "Material transfer details {";
+  printTrans();
   for (int i = 0; i < manifest.size(); i++) {
     manifest.at(i)->print();
   }
