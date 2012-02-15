@@ -119,12 +119,12 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
   current_owner_ = next_stop;
 
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " going to "
+  LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << me.get() << " going to "
                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 
   next_stop->receiveMessage(me);
 
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " returned from "
+  LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << me.get() << " returned from "
                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
 }
 
@@ -234,7 +234,7 @@ void Message::approveTransfer() {
 
   BI->registerTransaction(nextTransID_++, me, manifest);
 
-  LOG(LEV_DEBUG2) << "Material sent from " << sup->ID() << " to " 
+  LOG(LEV_DEBUG2, "none!") << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 }
 

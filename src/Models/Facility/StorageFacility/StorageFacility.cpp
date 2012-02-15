@@ -85,7 +85,7 @@ void StorageFacility::copyFreshModel(Model* src)
 void StorageFacility::print() 
 { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2) << "    stores commodity {"
+  LOG(LEV_DEBUG2, "none!") << "    stores commodity {"
       << incommod_->getName()
       << "}, for a minimum time of " 
       << residence_time_ 
@@ -127,7 +127,7 @@ std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
     if(m->quantity() <= (capacity_ - complete)){
       complete += m->quantity();
       toSend.push_back(m);
-      LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
+      LOG(LEV_DEBUG2, "none!") <<"StorageFacility "<< getSN()
         <<"  is sending a mat with mass: "<< m->quantity();
       inventory_.pop_front();
     } else { 
@@ -141,7 +141,7 @@ std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
       complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
       toSend.push_back(newMat);
-      LOG(LEV_DEBUG2) <<"StorageFacility "<< getSN()
+      LOG(LEV_DEBUG2, "none!") <<"StorageFacility "<< getSN()
         <<"  is sending a mat with mass: "<< newMat->quantity();
     }
   }    
@@ -156,7 +156,7 @@ void StorageFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"StorageFacility " << getSN() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"StorageFacility " << getSN() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
     entryTimes_.push_back(make_pair(TI->time(), boost::dynamic_pointer_cast<Material>(*thisMat) ));
@@ -173,7 +173,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
   mat_rsrc_ptr recipe;
   double amount, age;
   int i, nNodes = nodes->nodeNr;
-  LOG(LEV_DEBUG2) << "**** nNodes = " << nNodes;
+  LOG(LEV_DEBUG2, "none!") << "**** nNodes = " << nNodes;
 
   // for each fuel pair, there is an in and an out commodity
   for (int i=0;i<nNodes;i++){
@@ -229,7 +229,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
-  LOG(LEV_DEBUG2) << "\n ** Checking initial stocks of size " << stocks_.size() << " **\n";
+  LOG(LEV_DEBUG2, "none!") << "\n ** Checking initial stocks of size " << stocks_.size() << " **\n";
   // check to make sure we got the correct initial inventory_
   for (int i=0;i<stocks_.size();i++){
     stocks_[i]->print();
@@ -255,7 +255,7 @@ void StorageFacility::handleTick(int time)
   Mass inv = this->checkInventory();
   // and how much is already in its stocks
   Mass sto = this->checkStocks(); 
-  LOG(LEV_DEBUG2) << "stocks currently at: " << sto << " " << inv;
+  LOG(LEV_DEBUG2, "none!") << "stocks currently at: " << sto << " " << inv;
   // subtract inv and sto from inventory_ max size to get total empty space
   Mass space = inventory_size_ - inv - sto;
   // this will be a request for free stuff

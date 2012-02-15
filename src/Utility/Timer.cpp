@@ -28,15 +28,15 @@ void Timer::runSim() {
       sendTick();
       sendResolve();
 
-      LOG(LEV_DEBUG1) << "Current date: " << date_;
-      LOG(LEV_DEBUG2) << "The list of current tick listeners is: " << reportListeners();
+      LOG(LEV_DEBUG1, "none!") << "Current date: " << date_;
+      LOG(LEV_DEBUG2, "none!") << "The list of current tick listeners is: " << reportListeners();
     }
     
     int eom_day = lastDayOfMonth();
     for (int i = 1; i < eom_day+1; i++){
       sendDailyTasks();
       if (i == eom_day){
-        LOG(LEV_DEBUG3) << "Last date of month: " << date_;
+        LOG(LEV_DEBUG3, "none!") << "Last date of month: " << date_;
         sendTock();
       }
       date_ += boost::gregorian::days(1);
@@ -87,7 +87,7 @@ void Timer::handlePreHistory() {
     try {
       (*agent)->handlePreHistory();
     } catch(CycException err) {
-      LOG(LEV_ERROR) << "ERROR occured in handlePreHistory(): " << err.what();
+      LOG(LEV_ERROR, "none!") << "ERROR occured in handlePreHistory(): " << err.what();
     }
   }
 }
@@ -99,7 +99,7 @@ void Timer::sendResolve() {
     try {
       (*agent)->resolve();
     } catch(CycException err) {
-      LOG(LEV_ERROR) << "ERROR occured in sendResolve(): " << err.what();
+      LOG(LEV_ERROR, "none!") << "ERROR occured in sendResolve(): " << err.what();
     }
   }
 }
@@ -112,7 +112,7 @@ void Timer::sendTick() {
     try {
       (*agent)->handleTick(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR) << "ERROR occured in sendTick(): " << err.what();
+      LOG(LEV_ERROR, "none!") << "ERROR occured in sendTick(): " << err.what();
     }
   }
 }
@@ -125,7 +125,7 @@ void Timer::sendTock() {
     try {
       (*agent)->handleTock(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR) << "ERROR occured in sendTock(): " << err.what();
+      LOG(LEV_ERROR, "none!") << "ERROR occured in sendTock(): " << err.what();
     }
   }
 }
@@ -138,7 +138,7 @@ void Timer::sendDailyTasks() {
     try {
       (*agent)->handleDailyTasks(time_,date_.day());
     } catch(CycException err) {
-      LOG(LEV_ERROR) << "ERROR occured in sendDailyTasks(): " << err.what();
+      LOG(LEV_ERROR, "none!") << "ERROR occured in sendDailyTasks(): " << err.what();
     }
   }
 }
@@ -197,9 +197,9 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   endDate_ = getEndDate(startDate_,simDur_);
   date_ = boost::gregorian::date(startDate_);
 
-  LOG(LEV_DEBUG3) << "Loading simulation to run over period:";
-  LOG(LEV_DEBUG3) << "    Start Date: " << startDate_;
-  LOG(LEV_DEBUG3) << "    End Date: " << endDate_;
+  LOG(LEV_DEBUG3, "none!") << "Loading simulation to run over period:";
+  LOG(LEV_DEBUG3, "none!") << "    Start Date: " << startDate_;
+  LOG(LEV_DEBUG3, "none!") << "    End Date: " << endDate_;
   
 }
 

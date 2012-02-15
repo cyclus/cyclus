@@ -13,18 +13,18 @@ class IntrusiveBase {
   friend void intrusive_ptr_add_ref(const Derived* p) {
     BOOST_ASSERT(p);
     if (((const IntrusiveBase*) p)->counter_ == 0) {
-      LOG(LEV_DEBUG3) << "MemAlloc: Message " << p << " created";
+      LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << p << " created";
     }
     ++((const IntrusiveBase*) p)->counter_;
     
-    LOG(LEV_DEBUG3) << "MemAlloc: Message " << p << " ref_count=" << ((const IntrusiveBase*) p)->counter_;
+    LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << p << " ref_count=" << ((const IntrusiveBase*) p)->counter_;
   }
 
   friend void intrusive_ptr_release(const Derived* p) {
     BOOST_ASSERT(p);
-    LOG(LEV_DEBUG3) << "MemAlloc: Message " << p << " ref_count=" << ((const IntrusiveBase*) p)->counter_ - 1;
+    LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << p << " ref_count=" << ((const IntrusiveBase*) p)->counter_ - 1;
     if (--((const IntrusiveBase*) p)->counter_ == 0) {
-      LOG(LEV_DEBUG3) << "MemAlloc: Message " << p << " deleted";
+      LOG(LEV_DEBUG3, "none!") << "MemAlloc: Message " << p << " deleted";
       delete p;
     }
   }

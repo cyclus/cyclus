@@ -111,7 +111,7 @@ void IsoVector::printRecipes() {
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    LOG(LEV_DEBUG2) << "Recipe " << recipe->first << ":";
+    LOG(LEV_DEBUG2, "none!") << "Recipe " << recipe->first << ":";
     recipe->second->print();
   }
 }
@@ -120,10 +120,10 @@ void IsoVector::printRecipes() {
 void IsoVector::print() {
   CompMap::iterator entry;
   int isotope;
-  LOG(LEV_DEBUG2) << "    mass " << mass() << " kg";
+  LOG(LEV_DEBUG2, "none!") << "    mass " << mass() << " kg";
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
     isotope = entry->first;
-    LOG(LEV_DEBUG2) << "    " << isotope << ": "
+    LOG(LEV_DEBUG2, "none!") << "    " << isotope << ": "
                     << mass(isotope) << "kg";
   }
 }

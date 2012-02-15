@@ -39,6 +39,10 @@ else Logger().Get(level) << prefix << ": "
 if (level > Logger::ReportLevel()) ; \
 else Logger().Get(level) << "cyclog: "
 
+#define MLOG(level) \
+if (level > Logger::ReportLevel()) ; \
+else Logger().Get(level) << "cyclog-mem: "
+
 #include <iostream>
 #include <string>
 #include <sstream>

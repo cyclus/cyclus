@@ -51,7 +51,7 @@ void ConverterMarket::copyFreshModel(Model* src)
 void ConverterMarket::print()
 { 
   MarketModel::print();
-  LOG(LEV_DEBUG2) << "where the offer commodity is {"
+  LOG(LEV_DEBUG2, "none!") << "where the offer commodity is {"
       << offer_commod_
       << "}, the request commodity is {"
       << req_commod_
@@ -145,7 +145,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         orders_.push_back(offerMsg);
 
-        LOG(LEV_DEBUG2) << "ConverterMarket has resolved a match from "
+        LOG(LEV_DEBUG2, "none!") << "ConverterMarket has resolved a match from "
           << offerMsg->supplier()->ID()
           << " to "
           << offerMsg->requester()->ID()
@@ -167,7 +167,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
 
         orders_.push_back(maybe_offer);
 
-        LOG(LEV_DEBUG2) << "ConverterMarket has resolved a partial match from "
+        LOG(LEV_DEBUG2, "none!") << "ConverterMarket has resolved a partial match from "
           << maybe_offer->supplier()->ID()
           << " to "
           << maybe_offer->requester()->ID()
@@ -213,7 +213,7 @@ void ConverterMarket::resolve()
       process_request();
     } 
     else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< 
+      LOG(LEV_DEBUG2, "none!") << "The request from Requester "<< 
           (*request).second->requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected by the ConverterMarket. ";

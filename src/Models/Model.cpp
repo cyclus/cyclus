@@ -173,7 +173,7 @@ void Model::load_institutions() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
-  LOG(LEV_DEBUG2) << "Model '" << name_ << "' just created.";
+  LOG(LEV_DEBUG2, "none!") << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
   this->setBornOn( TI->time() );
 }
@@ -212,7 +212,7 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
 
   // remove references to self
-  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
+  LOG(LEV_DEBUG2, "none!") << "MemAlloc: Model " << name() << " ID=" << ID_ << " beginning deallocation.";
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
@@ -223,10 +223,10 @@ Model::~Model() {
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
-    LOG(LEV_DEBUG2) << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
+    LOG(LEV_DEBUG2, "none!") << "MemAlloc: deleting child model " << child->name() << "ID=" << child->ID();
     delete child;
   }
-  LOG(LEV_DEBUG2) << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
+  LOG(LEV_DEBUG2, "none!") << "MemAlloc: Model " << name() << " ID=" << ID_ << " now deallocated.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -252,7 +252,7 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
-  LOG(LEV_DEBUG2) << model_type_ << " " << name_ 
+  LOG(LEV_DEBUG2, "none!") << model_type_ << " " << name_ 
       << " (ID=" << ID_
       << ", implementation = " << model_impl_
       << "  name = " << name_
@@ -294,7 +294,7 @@ void Model::addChild(Model* child){
   if (child == this || child == NULL) {
     return;
   }
-  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
+  LOG(LEV_DEBUG3, "none!") << "Model " << this->name() << " ID " << this->ID() 
 		  << " has added child " << child->name() << " ID " 
 		  << child->ID() << " to its list of children.";
   removeFromList(child, children_);
@@ -303,7 +303,7 @@ void Model::addChild(Model* child){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeChild(Model* child){
-  LOG(LEV_DEBUG3) << "Model " << this->name() << " ID " << this->ID() 
+  LOG(LEV_DEBUG3, "none!") << "Model " << this->name() << " ID " << this->ID() 
 		  << " has removed child " << child->name() << " ID " 
 		  << child->ID() << " from its list of children.";
   removeFromList(child, children_);

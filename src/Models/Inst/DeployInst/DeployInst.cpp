@@ -65,12 +65,12 @@ void DeployInst::print()
 { 
   InstModel::print();
 
-  LOG(LEV_DEBUG2) << " with deployment schedule: ";
+  LOG(LEV_DEBUG2, "none!") << " with deployment schedule: ";
 
   for (map<int,Model*>::iterator deploy=deployment_map_.begin();
        deploy!=deployment_map_.end();
        deploy++){
-    LOG(LEV_DEBUG2) << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
+    LOG(LEV_DEBUG2, "none!") << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
         << " ("  << (*deploy).second->name() 
         << ") is deployed in month " << (*deploy).first;
   }

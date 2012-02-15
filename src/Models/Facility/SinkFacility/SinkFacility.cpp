@@ -74,7 +74,7 @@ void SinkFacility::print() {
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2) << msg << inventory_size_ << " kg.";
+  LOG(LEV_DEBUG2, "none!") << msg << inventory_size_ << " kg.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -106,7 +106,7 @@ void SinkFacility::handleTick(int time){
       request->setNextDest(facInst());
       request->sendOn();
 
-      LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
+      LOG(LEV_DEBUG2, "none!") << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
     }
   }
 }
@@ -117,7 +117,7 @@ void SinkFacility::handleTock(int time){
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "SinkFacility " << this->ID()
+  LOG(LEV_DEBUG2, "none!") << "SinkFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
@@ -131,7 +131,7 @@ void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"SinkFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"SinkFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     (*thisMat)->print();
     inventory_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));

@@ -84,20 +84,20 @@ int main(int argc, char* argv[]) {
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
   } catch (CycIOException ge) {
-    LOG(LEV_ERROR) << ge.what();
+    LOG(LEV_ERROR, "none!") << ge.what();
     return 0;
   };
 
-  LOG(LEV_DEBUG2) << "Here is a list of models:";
+  LOG(LEV_DEBUG2, "none!") << "Here is a list of models:";
   Model::printModelList();
-  LOG(LEV_DEBUG2) << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
+  LOG(LEV_DEBUG2, "none!") << "Here is a list of " << IsoVector::recipeCount() << " recipes:";
   IsoVector::printRecipes();
   
   // Run the simulation 
   try {
     TI->runSim();
   } catch (CycException err) {
-    LOG(LEV_ERROR) << err.what();
+    LOG(LEV_ERROR, "none!") << err.what();
   }
 
   // Create the output file
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     BI->writeMatHist();
     BI->closeDB();
   } catch (CycException ge) {
-    LOG(LEV_ERROR) << ge.what();
+    LOG(LEV_ERROR, "none!") << ge.what();
   };
 
   return 0;
