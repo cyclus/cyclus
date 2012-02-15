@@ -19,18 +19,30 @@ int Material::decay_interval_ = 1;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
   last_update_time_ = TI->time();
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
   last_update_time_ = TI->time();
   iso_vector_ = comp;
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(const Material& other) {
   iso_vector_ = other.iso_vector_;
   last_update_time_ = other.last_update_time_;
+
+  CLOG(LEV_INFO4) << "Material created {";
+  print();
+  CLOG(LEV_INFO4) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
