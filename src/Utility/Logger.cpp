@@ -8,7 +8,7 @@ std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
 
 int Logger::spc_per_lev_ = 3;
-int Logger::field_width_ = 12;
+int Logger::field_width_ = 8;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Logger::Get(LogLevel level) {
@@ -67,6 +67,7 @@ std::string Logger::ToString(LogLevel level) {
 void Logger::addLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
+  text = text.substr(4);
   text = std::string(field_width_ - text.size(), ' ') + text;
   Logger::level_to_string.push_back(text);
 }
