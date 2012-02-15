@@ -46,11 +46,16 @@ else Logger().Get(level)
 enum LogLevel {
                LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
                LEV_WARNING, //!< Use to report questionable simulation state (use extremely sparingly)
-               LEV_INFO, //!< Information helpful for non-debugging simulation runs (use sparingly)
-               LEV_DEBUG, //!< overview debugging information (use occasionally)
-               LEV_DEBUG1, //!< debugging information (use often)
-               LEV_DEBUG2, //!< debugging information (use very often)
-               LEV_DEBUG3 //!< debugging information (use most often)
+               LEV_INFO1, //!< Information helpful for simulation users and developers alike - least verbose.
+               LEV_INFO2, //!< Information helpful for simulation users and developers alike.
+               LEV_INFO3, //!< Information helpful for simulation users and developers alike.
+               LEV_INFO4, //!< Information helpful for simulation users and developers alike.
+               LEV_INFO5, //!< Information helpful for simulation users and developers alike - most verbose.
+               LEV_DEBUG1, //!< debugging information - least verbose
+               LEV_DEBUG2, //!< debugging information
+               LEV_DEBUG3, //!< debugging information
+               LEV_DEBUG4, //!< debugging information
+               LEV_DEBUG5 //!< debugging information - most verbose
                };
 
 /*!
@@ -88,7 +93,7 @@ The command-line specified verbosity is used to determine the logger
 report-cutoff.  Available levels are described in the #LogLevel enum. In the
 above example if the command line verbosity were set to #LEV_DEBUG1, the first statement would
 print, while the second would not.  Any expression placed with a log statment
-that is not printed will not be executed. An example follows.
+that is not printed will not be executed. An example of what not to do follows:
 
 @code
 
@@ -99,46 +104,6 @@ LOG(LEV_DEBUG2) << "The expression myobject.setName(newname): "
 
 @endcode
 
-As explained above, developers should prefix log output with model-specific
-identifiers. A prefix should be present on every LOG statement in every
-file and model created.  For example, If Henry Hopless were creating a 
-model, he might use the prefix @e "HHopeless":
-
-@code
-
-void henrysFunction() {
-  ...
-  LOG(LEV_DEBUG) << "HHopeless: " << "my debugging info.";
-  LOG(LEV_DEBUG1) << "HHopeless: " << "more detailed debugging info.";
-  LOG(LEV_DEBUG1) << "HHopeless: " << "even more debugging info.";
-  ...
-}
-
-@endcode
-
-Rather than adding the prefix onto every LOG statement as per the above
-example, developers are encouraged to write their own macro identical to the
-LOG(level) macro except that it automatically adds the desired prefix.
-Something similar to the macro below could be defined at the top of Henry
-Hopeless's model.  Henry could then use his macro instead of the LOG
-macro.  The following example would give the exact same output as the previous
-example:
-
-@code
-
-#define HENRY_LOG(level) \
-if (level > Log::ReportLevel()) ; \
-else Log().Get(level) << "HHopeless:"
-
-void henrysFunction() {
-  ...
-  HENRY_LOG(LEV_DEBUG) << "my debugging info.";
-  HENRY_LOG(LEV_DEBUG1) << "more detailed debugging info.";
-  HENRY_LOG(LEV_DEBUG1) << "even more debugging info.";
-  ...
-}
-
-@endcode
 */
 class Logger {
 

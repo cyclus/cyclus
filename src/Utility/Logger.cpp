@@ -13,7 +13,7 @@ int Logger::field_width_ = 12;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Logger::Get(LogLevel level) {
   int ind_level = 0;
-  if(level > LEV_DEBUG) {ind_level = level - LEV_DEBUG;}
+  if(level > LEV_DEBUG1) {ind_level = level - LEV_DEBUG1;}
   os << ToString(level) << ": ";
   os << std::string(ind_level * spc_per_lev_, ' ');
   return os;
@@ -31,11 +31,16 @@ Logger::~Logger() {
 void Logger::initialize() {
   Logger::addLevel(LEV_ERROR, "LEV_ERROR");
   Logger::addLevel(LEV_WARNING, "LEV_WARNING");
-  Logger::addLevel(LEV_INFO, "LEV_INFO");
-  Logger::addLevel(LEV_DEBUG, "LEV_DEBUG");
+  Logger::addLevel(LEV_INFO1, "LEV_INFO1");
+  Logger::addLevel(LEV_INFO2, "LEV_INFO2");
+  Logger::addLevel(LEV_INFO3, "LEV_INFO3");
+  Logger::addLevel(LEV_INFO4, "LEV_INFO4");
+  Logger::addLevel(LEV_INFO5, "LEV_INFO5");
   Logger::addLevel(LEV_DEBUG1, "LEV_DEBUG1");
   Logger::addLevel(LEV_DEBUG2, "LEV_DEBUG2");
   Logger::addLevel(LEV_DEBUG3, "LEV_DEBUG3");
+  Logger::addLevel(LEV_DEBUG4, "LEV_DEBUG4");
+  Logger::addLevel(LEV_DEBUG5, "LEV_DEBUG5");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
