@@ -10,7 +10,7 @@ outlining proper use of this logging functionality are outlined @ref Logger "her
 #define _LOGGER_H
 
 /*!
-@def LOG(level)
+@def LOG(level, prefix)
 
 @brief allows easy logging via the streaming operator similar to std::cout
 
@@ -19,17 +19,25 @@ instance of the Logger class (not assigned to any variable) that can be streamed
 into just like any string stream (e.g.  std::cout).  This macro does a check on
 the given #LogLevel 'level' argument; if the specified level is not higher than
 or equal to the report-level cutoff, the macro does nothing, limiting the
-performance impact of logging statements.
+performance impact of logging statements. Each module/model should have its
+own unique prefix.  This will allow users/developers to filter the log
+output more readily.
 
 @param level #LogLevel category or type of log statement.
+@param prefix A std::string value that functions as a unique identifier for the
+              module.
 
 @warning do not place any state-changing expressions with this macro as they
          may not run if the report level excludes the specified log 'level'.
 
 */
-#define LOG(level) \
+#define LOG(level, prefix) \
 if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level)
+else Logger().Get(level) << prefix << ": "
+
+#define CLOG(level) \
+if (level > Logger::ReportLevel()) ; \
+else Logger().Get(level) << "cyclog: "
 
 #include <iostream>
 #include <string>
@@ -72,10 +80,10 @@ to stdout as soon as execution passes beyond the terminating semi-colon of
 the log statement.
 
 A brief description of when to use which log level is given with the #LogLevel
-enum.  Developers working on models should prefix all content streamed to the
-logger with a unique devloper-specific identifier. This will allow developers to
+enum.  Developers working on models set the prefix to the
+a unique module/model-specific identifier. This will allow developers to
 more easily filter the logger output in order to isolate information most
-relevant to their work (see @ref examples "Examples").
+relevant to their work.
 
 @warning do not place any state-changing expressions with the LOG macro as they
          may not run if the report level excludes the specified @e level.
@@ -84,8 +92,8 @@ relevant to their work (see @ref examples "Examples").
 
 @code
 
-LOG(LEV_ERROR) << "This is my error statement. " << "and more info...";
-LOG(LEV_DEBUG2) << "This is my debug statement. " << "and more info...";
+LOG(LEV_ERROR, "module name") << "This is my error statement. " << "and more info...";
+LOG(LEV_DEBUG2, "module name") << "This is my debug statement. " << "and more info...";
 
 @endcode
 
@@ -97,10 +105,10 @@ that is not printed will not be executed. An example of what not to do follows:
 
 @code
 
-LOG(LEV_DEBUG2) << "The expression myobject.setName(newname): " 
-                << myobject.setName(newname)
-                << " might not ever execute"
-                << " depending on the verbosity level.";
+LOG(LEV_DEBUG2, "module name") << "The expression myobject.setName(newname): " 
+                               << myobject.setName(newname)
+                               << " might not ever execute"
+                               << " depending on the verbosity level.";
 
 @endcode
 
