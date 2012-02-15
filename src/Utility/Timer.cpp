@@ -23,20 +23,18 @@ void Timer::runSim() {
 
   while (date_ < endDate()){
     if (date_.day() == 1){
-      // Tell the Logician to handle this month.
       Material::decayMaterials(time_);
       sendTick();
       sendResolve();
 
-      LOG(LEV_DEBUG1, "none!") << "Current date: " << date_;
-      LOG(LEV_DEBUG2, "none!") << "The list of current tick listeners is: " << reportListeners();
+      CLOG(LEV_INFO2) << "Current date: " << date_;
+      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
     }
     
     int eom_day = lastDayOfMonth();
     for (int i = 1; i < eom_day+1; i++){
       sendDailyTasks();
       if (i == eom_day){
-        LOG(LEV_DEBUG3, "none!") << "Last date of month: " << date_;
         sendTock();
       }
       date_ += boost::gregorian::days(1);
@@ -97,9 +95,11 @@ void Timer::sendResolve() {
        agent != resolve_listeners_.end(); 
        agent++) {
     try {
+      CLOG(LEV_INFO4) << "Sending resolve to Model ID=" << (*agent)->ID()
+                      << ", name=" << (*agent)->name();
       (*agent)->resolve();
     } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in sendResolve(): " << err.what();
+      CLOG(LEV_ERROR) << "ERROR occured in sendResolve(): " << err.what();
     }
   }
 }
@@ -110,9 +110,11 @@ void Timer::sendTick() {
        agent != tick_listeners_.end(); 
        agent++) {
     try {
+      CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
+                      << ", name=" << (*agent)->name();
       (*agent)->handleTick(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in sendTick(): " << err.what();
+      CLOG(LEV_ERROR) << "ERROR occured in sendTick(): " << err.what();
     }
   }
 }
@@ -123,9 +125,11 @@ void Timer::sendTock() {
        agent != tick_listeners_.end(); 
        agent++) {
     try {
+      CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
+                      << ", name=" << (*agent)->name();
       (*agent)->handleTock(time_);
     } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in sendTock(): " << err.what();
+      CLOG(LEV_ERROR) << "ERROR occured in sendTock(): " << err.what();
     }
   }
 }
@@ -138,18 +142,22 @@ void Timer::sendDailyTasks() {
     try {
       (*agent)->handleDailyTasks(time_,date_.day());
     } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in sendDailyTasks(): " << err.what();
+      CLOG(LEV_ERROR) << "ERROR occured in sendDailyTasks(): " << err.what();
     }
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::registerTickListener(TimeAgent* agent) {
+  CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
+                  << " has registered to receive 'ticks' and 'tocks'.";
   tick_listeners_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::registerResolveListener(MarketModel* agent) {
+  CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
+                  << " has registered to receive 'resolves'.";
   resolve_listeners_.push_back(agent);
 }
 
@@ -197,10 +205,8 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   endDate_ = getEndDate(startDate_,simDur_);
   date_ = boost::gregorian::date(startDate_);
 
-  LOG(LEV_DEBUG3, "none!") << "Loading simulation to run over period:";
-  LOG(LEV_DEBUG3, "none!") << "    Start Date: " << startDate_;
-  LOG(LEV_DEBUG3, "none!") << "    End Date: " << endDate_;
-  
+  CLOG(LEV_INFO1) << "Loading simulation to run from start="
+                  << startDate_ << " to " << endDate_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
