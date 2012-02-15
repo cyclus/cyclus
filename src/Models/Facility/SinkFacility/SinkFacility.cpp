@@ -78,6 +78,7 @@ void SinkFacility::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTick(int time){
+  LOG(LEV_INFO3, "SnkFac") << facName() << " is ticking {";
 
   double requestAmt = getRequestAmt(); 
   double minAmt = 0;
@@ -105,21 +106,24 @@ void SinkFacility::handleTick(int time){
       request->setNextDest(facInst());
       request->sendOn();
 
-      LOG(LEV_DEBUG2, "SnkFac") << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
+      LOG(LEV_INFO4, "SnkFac") << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
     }
   }
+  LOG(LEV_INFO3, "SnkFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::handleTock(int time){
+  LOG(LEV_INFO3, "SnkFac") << facName() << " is tocking {";
 
   // On the tock, the sink facility doesn't really do much. 
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2, "SnkFac") << "SinkFacility " << this->ID()
+  LOG(LEV_INFO4, "SnkFac") << "SinkFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
+  LOG(LEV_INFO3, "SnkFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

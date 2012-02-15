@@ -124,6 +124,7 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTick(int time){
+  LOG(LEV_INFO3, "SrcFac") << facName() << " is ticking.";
   // make offers
   // decide how much to offer
   double offer_amt;
@@ -142,7 +143,7 @@ void SourceFacility::handleTick(int time){
   // decide what market to offer to
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
-  LOG(LEV_DEBUG2, "SrcFac") << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
+  LOG(LEV_INFO4, "SrcFac") << " offers: "<< offer_amt << ".";
 
   // build a generic resource to offer
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
@@ -158,11 +159,12 @@ void SourceFacility::handleTick(int time){
   msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());
   msg->sendOn();
+  LOG(LEV_INFO3, "SrcFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
-  LOG(LEV_INFO3, "SrcFac") << facName() << "is tocking {";
+  LOG(LEV_INFO3, "SrcFac") << facName() << " is tocking {";
   // if there's room in the inventory, process material at capacity
   double space = inventory_size_ - this->checkInventory(); 
   if (capacity_ * recipe_.mass() <= space) {
@@ -186,12 +188,12 @@ void SourceFacility::handleTock(int time){
     ordersWaiting_.pop_front();
   }
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2, "SrcFac") << "SourceFacility " << this->ID()
+  LOG(LEV_INFO4, "SrcFac") << "SourceFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material at the close of month " << time
                   << ".";
 
-  LOG(LEV_DEBUG2, "SrcFac") << "}";
+  LOG(LEV_INFO3, "SrcFac") << "}";
 }
 
 

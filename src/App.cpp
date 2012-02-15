@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
 
   if (vm.count("core-only")) {
     Logger::CoreOnly() = true;
-    cout << Logger::CoreOnly() << endl;
   }
 
   if (! vm.count("input-file")) {
