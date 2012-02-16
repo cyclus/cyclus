@@ -1,4 +1,3 @@
-
 _______________________________________________________________________
 Cyclus Core
 _______________________________________________________________________
@@ -171,7 +170,7 @@ Workflow Notes
   * In general, **every commit** (notice this is not 'every push') to the
     "develop" and "master" branches should compile and pass tests. This
     means that when you are ready to move changes from one of your topic
-    branches into the "develop" branch, you should use a fast-forward
+    branches into the "develop" branch, you should use a NON-fast-forward
     merge.  For example::
     
       git checkout develop
