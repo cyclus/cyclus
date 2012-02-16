@@ -5,7 +5,7 @@
   <startmonth>1</startmonth>
   <simstart>0</simstart>
   <decay>0</decay>
-  <duration>100</duration>
+  <duration>18</duration>
 
   <!-- Commodities -->
   <commodity>
@@ -318,6 +318,23 @@
             <type>Storage</type>
             <name>Storage</name>
           </facility>
+          <facility>
+            <type>PWR_uo2_FuelFab</type>
+            <name>PWR_fuel_fab</name>
+          </facility>
+          <facility>
+            <type>BWR_uo2_FuelFab</type>
+            <name>BWR_fuel_fab</name>
+          </facility>
+          <facility>
+            <type>PWR_r_uo2_FuelFab</type>
+            <name>PWR_r_fuel_fab</name>
+          </facility>
+          <facility>
+            <type>PWR_mox_FuelFab</type>
+            <name>PWR_mox_fuel_fab</name>
+          </facility>
+
           <!-- Existing Reactors -->
           <facility>
             <type>nwtrb:Arkansas_Nuclear_One_1</type>
