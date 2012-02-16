@@ -40,7 +40,7 @@ class FakeSourceFacility : public SourceFacility {
     virtual ~FakeSourceFacility() {
     }
 
-    double fakeCheckInventory() { return checkInventory(); }
+    double fakeCheckInventory() { return inventoryMass(); }
 
     std::string getOutCommod() {return out_commod_;}
     double getCapacity() {return capacity_;}
@@ -122,7 +122,14 @@ TEST_F(SourceFacilityTest, Tick) {
   int time = 1;
   EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
   EXPECT_NO_THROW(src_facility->handleTick(time));
-  EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
+  EXPECT_LT(0.0, src_facility->fakeCheckInventory());
+  EXPECT_LE(src_facility->getCapacity(), src_facility->fakeCheckInventory());
+
+  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe().mass(); 
+  if (expected_inventory > src_facility->getInvSize()) {
+    expected_inventory = src_facility->getInvSize();
+  }
+  EXPECT_DOUBLE_EQ(expected_inventory, src_facility->fakeCheckInventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -130,13 +137,6 @@ TEST_F(SourceFacilityTest, Tock) {
   int time = 1;
   EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
   EXPECT_NO_THROW(src_facility->handleTock(time));
-  EXPECT_GT(src_facility->fakeCheckInventory(),0.0);
-  EXPECT_LE(src_facility->getCapacity(),src_facility->fakeCheckInventory());
-  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe().mass(); 
-  if (expected_inventory > src_facility->getInvSize()) {
-    expected_inventory = src_facility->getInvSize();
-  }
-  EXPECT_DOUBLE_EQ(expected_inventory, src_facility->fakeCheckInventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

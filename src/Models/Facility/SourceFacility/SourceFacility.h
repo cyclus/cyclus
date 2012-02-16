@@ -83,7 +83,6 @@
    What is the best way to allow offers of an infinite amount of material on 
    a market? 
 */
-
 class SourceFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
@@ -199,11 +198,7 @@ protected:
    */
   double capacity_;
 
-  /**
-   * The maximum size that the inventory can grow to.
-   * The NullFacility must stop processing the material in its stocks when its 
-   * inventory is full.
-   */
+  /// The maximum size (in mass) that the inventory can grow to.
   int inventory_size_;
 
   /**
@@ -219,9 +214,6 @@ protected:
    */ 
   deque<mat_rsrc_ptr> inventory_;
   
-  /// return the inventory
-  deque<mat_rsrc_ptr>* getInventory(){return &inventory_;};
-
   /**
    * A list of orders to be processed on the Tock
    */
@@ -231,7 +223,7 @@ protected:
    * return the total mass of the material objects in the inventory
    * the units vary and are associated with with material type
    */
-  double checkInventory();
+  double inventoryMass();
 
 /* --------------------
    output directory info
@@ -250,6 +242,14 @@ protected:
      location: FacilityModel::OutputDir_ + /this_facility's_handle
   */
   static std::string outputDir_;
+
+  void generateMaterial(int curr_time);
+
+  Transaction buildTransaction();
+
+  void sendOffer(Transaction trans);
+
+  int prev_time_;
 
 /* ------------------- */ 
 
