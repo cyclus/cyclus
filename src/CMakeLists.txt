@@ -44,6 +44,7 @@ SET( CYCLUS_CORE
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 
   Utility/MassTable.cpp 
+  Utility/Table.cpp
   Utility/Timer.cpp
   Utility/UniformTaylor.cpp 
   Utility/Env.cpp
