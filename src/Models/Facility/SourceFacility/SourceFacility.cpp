@@ -143,7 +143,8 @@ void SourceFacility::handleTick(int time){
   // decide what market to offer to
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
-  LOG(LEV_INFO4, "SrcFac") << " offers: "<< offer_amt << ".";
+  LOG(LEV_INFO4, "SrcFac") << "offers "<< offer_amt << " kg of "
+                           << out_commod_ << ".";
 
   // build a generic resource to offer
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));

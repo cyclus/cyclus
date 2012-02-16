@@ -88,6 +88,8 @@ void SinkFacility::handleTick(int time){
     for (vector<std::string>::iterator commod = in_commods_.begin();
         commod != in_commods_.end();
         commod++) {
+      LOG(LEV_INFO4, "SnkFac") << " requests "<< requestAmt << " kg of " << *commod << ".";
+
       MarketModel* market = MarketModel::marketForCommod(*commod);
       Communicator* recipient = dynamic_cast<Communicator*>(market);
 
@@ -106,7 +108,6 @@ void SinkFacility::handleTick(int time){
       request->setNextDest(facInst());
       request->sendOn();
 
-      LOG(LEV_INFO4, "SnkFac") << "During handleTick, " << facName() << " requests: "<< requestAmt << ".";
     }
   }
   LOG(LEV_INFO3, "SnkFac") << "}";
