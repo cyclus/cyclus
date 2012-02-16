@@ -6,6 +6,11 @@ int Resource::nextID_ = 0;
 
 Resource::Resource() {
   ID_ = nextID_++;
+  MLOG(LEV_DEBUG4) << "Resource ID=" << ID_ << ", ptr=" << this << " created.";
+}
+
+Resource::~Resource() {
+  MLOG(LEV_DEBUG4) << "Resource ID=" << ID_ << ", ptr=" << this << " deleted.";
 }
 
 bool Resource::checkEquality(rsrc_ptr other) {

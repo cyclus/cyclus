@@ -125,7 +125,7 @@ void RecipeReactor::copyFreshModel(Model* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::print() { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2) << "    converts commodity {"
+  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
       << fuelPairs_.front().first.first
       << "} into commodity {"
       << this->fuelPairs_.front().second.first
@@ -230,7 +230,7 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        LOG(LEV_DEBUG2) <<"RecipeReactor "<< ID()
+        LOG(LEV_DEBUG2, "none!") <<"RecipeReactor "<< ID()
           <<"  is sending a mat with mass: "<< newMat->quantity();
       }
     }
@@ -245,7 +245,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"RecipeReactor " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_front(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }

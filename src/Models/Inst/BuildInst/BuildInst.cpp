@@ -33,11 +33,11 @@ void BuildInst::print()
 { 
   InstModel::print();
 
-  LOG(LEV_DEBUG2) << " and the following permanent facilities: ";
+  LOG(LEV_DEBUG2, "none!") << " and the following permanent facilities: ";
   for (vector<Model*>::iterator fac=facilities_.begin(); 
        fac != facilities_.end(); 
        fac++){
-    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
+    LOG(LEV_DEBUG2, "none!") << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
      << " (" << (*fac)->name() << ")";
   }
 };

@@ -74,7 +74,7 @@ class IsoVectorTest : public ::testing::Test {
 
         vect2 = CompMap(comp_map);
       } catch (std::exception err) {
-        LOG(LEV_ERROR) << err.what();
+        LOG(LEV_ERROR, "none!") << err.what();
         FAIL() << "An exception was thrown in the fixture SetUp.";
       }
     }

@@ -101,32 +101,56 @@ void IsoVector::load_recipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector IsoVector::recipe(std::string name) { 
   if (recipes_.count(name) == 0) {
-      throw CycIndexException("Recipe '" + name 
-          + "' does not exist.");
+    throw CycIndexException("Recipe '" + name + "' does not exist.");
   }
   return *(recipes_[name]);
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::printRecipes() {
+  CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes.";
+  CLOG(LEV_INFO2) << "Recipe list {";
   for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
-    LOG(LEV_DEBUG2) << "Recipe " << recipe->first << ":";
+    CLOG(LEV_INFO2) << "Recipe name=" << recipe->first;
     recipe->second->print();
   }
+  CLOG(LEV_INFO2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
+  CLOG(LEV_INFO3) << propString();
+
+  std::vector<std::string>::iterator entry;
+  std::vector<std::string> entries = compStrings();
+  for (entry = entries.begin(); entry != entries.end(); entry++) {
+    CLOG(LEV_INFO3) << *entry;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string IsoVector::propString() {
+  std::stringstream ss;
+  ss << "mass = " << mass() << " kg";
+  return ss.str();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> IsoVector::compStrings() {
   CompMap::iterator entry;
   int isotope;
-  LOG(LEV_DEBUG2) << "    mass " << mass() << " kg";
+  std::stringstream ss;
+  std::vector<std::string> comp_strings;
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
+    ss.str("");
     isotope = entry->first;
-    LOG(LEV_DEBUG2) << "    " << isotope << ": "
-                    << mass(isotope) << "kg";
+    if (mass(isotope) < EPS_KG) {continue;}
+    ss << isotope << ": " << mass(isotope) << " kg";
+    comp_strings.push_back(ss.str());
   }
+  return comp_strings;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

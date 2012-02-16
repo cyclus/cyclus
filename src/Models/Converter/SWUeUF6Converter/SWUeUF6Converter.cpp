@@ -47,7 +47,7 @@ void SWUeUF6Converter::copyFreshModel(Model* src)
 void SWUeUF6Converter::print() 
 { 
   ConverterModel::print(); 
-  LOG(LEV_DEBUG2) << "converts offers of commodity {"
+  LOG(LEV_DEBUG2, "none!") << "converts offers of commodity {"
       << in_commod_
       << "} into offers of commodity {"
       << out_commod_

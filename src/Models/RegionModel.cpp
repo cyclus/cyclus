@@ -67,16 +67,16 @@ void RegionModel::print() {
 
   Model::print();
 
-  LOG(LEV_DEBUG2) << "allows facilities " ;
+  LOG(LEV_DEBUG2, "none!") << "allows facilities " ;
 
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2) << (fac == allowedFacilities_.begin() ? "{" : ", " )
+    LOG(LEV_DEBUG2, "none!") << (fac == allowedFacilities_.begin() ? "{" : ", " )
         << (*fac)->name();
   }
   
-  LOG(LEV_DEBUG2) << "} and has the following institutions:";
+  LOG(LEV_DEBUG2, "none!") << "} and has the following institutions:";
   
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();

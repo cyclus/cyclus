@@ -8,9 +8,11 @@
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
+#include "Timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility() {
+  prev_time_ = TI->time();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -20,7 +22,7 @@ SourceFacility::~SourceFacility() { }
 void SourceFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
-  LOG(LEV_DEBUG2) <<"The Source Facility is being initialized";
+  LOG(LEV_DEBUG2, "SrcFac") << "The Source Facility is being initialized";
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -71,7 +73,7 @@ void SourceFacility::copyFreshModel(Model* src) {
 void SourceFacility::print() {
   FacilityModel::print();
 
-  LOG(LEV_DEBUG2) << "    supplies commodity {"
+  LOG(LEV_DEBUG2, "SrcFac!") << "    supplies commodity {"
       << out_commod_ << "} with recipe '" 
       << recipe_name_ << "' at a capacity of "
       << capacity_ << " kg per time step."
@@ -82,11 +84,10 @@ void SourceFacility::print() {
 void SourceFacility::receiveMessage(msg_ptr msg){
 
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->supplier() == this){
     // file the order
     ordersWaiting_.push_front(msg);
-  }
-  else {
+  } else {
     throw CycException("SourceFacility is not the supplier of this msg.");
   }
 }
@@ -101,61 +102,74 @@ vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while (trans.resource->quantity() > (sent_amt+EPS_KG) && !inventory_.empty() ) {
+  while (trans.resource->quantity() > (sent_amt + EPS_KG) ) {
+    if (inventory_.empty()) {
+      throw CycRangeException("The source facility ran out of resources to send.");
+    }
     mat_rsrc_ptr m = inventory_.front();
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if (m->quantity() <= (trans.resource->quantity() - sent_amt)) {
       sent_amt += m->quantity();
       toSend.push_back(m);
       inventory_.pop_front();
-      LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
+      LOG(LEV_DEBUG2, "SrcFac") <<"SourceFacility "<< ID()
         <<"  has decided not to split the object with size :  "<< m->quantity();
-    } else if (m->quantity() > (trans.resource->quantity() - sent_amt)) { 
+    } else { 
       // if the inventory obj is larger than the remaining need, split it.
       mat_rsrc_ptr mat_to_send = m->extract(trans.resource->quantity() - sent_amt);
       sent_amt += mat_to_send->quantity();
-      LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
+      LOG(LEV_DEBUG2, "SrcFac") <<"SourceFacility "<< ID()
         <<"  has decided to split the object to size :  "<< mat_to_send->quantity();
       toSend.push_back(mat_to_send);
-      printSent(mat_to_send);
     }
   }    
   return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::printSent(mat_rsrc_ptr mat){
-    LOG(LEV_DEBUG2) <<"SourceFacility "<< ID()
-      <<"  is sending a mat with mass: "<< mat->quantity();
-    (mat)->print();
+void SourceFacility::handleTick(int time){
+  LOG(LEV_INFO3, "SrcFac") << facName() << " is ticking {";
+
+  generateMaterial(time);
+  Transaction trans = buildTransaction();
+
+  LOG(LEV_INFO4, "SrcFac") << "offers "<< trans.resource->quantity() << " kg of "
+                           << out_commod_ << ".";
+
+  sendOffer(trans);
+
+  LOG(LEV_INFO3, "SrcFac") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::handleTick(int time){
-  // make offers
-  // decide how much to offer
-  double offer_amt;
-  double inv = this->checkInventory();
-  double possInv = inv + capacity_ * recipe_.mass(); 
+void SourceFacility::generateMaterial(int curr_time) {
+  int time_change = curr_time - prev_time_;
+  prev_time_ = curr_time;
 
-  if (possInv < inventory_size_ * recipe_.mass()) {
-    offer_amt = possInv;
+  // if there's room in the inventory, process material at capacity
+  double empty_space = inventory_size_ - this->inventoryMass(); 
+  if (empty_space < EPS_KG) {return;}
+
+  IsoVector temp = recipe_;
+  if (capacity_ * recipe_.mass() * time_change <= empty_space) {
+    // add a material the size of the capacity to the inventory
+    temp.multBy(capacity_ * time_change);
   } else {
-    offer_amt = inventory_size_* recipe_.mass(); 
+    // add a material that fills the inventory
+    temp.setMass(empty_space);
   }
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
+  inventory_.push_front(newMat);
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Transaction SourceFacility::buildTransaction() {
   // there is no minimum amount a source facility may send
   double min_amt = 0;
+  double offer_amt = inventoryMass();
 
-  // decide what market to offer to
-  MarketModel* market = MarketModel::marketForCommod(out_commod_);
-  Communicator* recipient = dynamic_cast<Communicator*>(market);
-  LOG(LEV_DEBUG2) << "During handleTick, " << facName() << " offers: "<< offer_amt << ".";
-
-  // build a generic resource to offer
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
 
-  // build the transaction and message
   Transaction trans;
   trans.commod = out_commod_;
   trans.minfrac = min_amt/offer_amt;
@@ -163,61 +177,52 @@ void SourceFacility::handleTick(int time){
   trans.price = commod_price_;
   trans.resource = offer_res;
 
+  return trans;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void SourceFacility::sendOffer(Transaction trans) {
+  MarketModel* market = MarketModel::marketForCommod(out_commod_);
+
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
+  msg->setNextDest(dynamic_cast<Communicator*>(parent()));
   msg->sendOn();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SourceFacility::handleTock(int time){
-  // if there's room in the inventory, process material at capacity
-  double space = inventory_size_ - this->checkInventory(); 
-  if (capacity_ * recipe_.mass() <= space) {
-    // add a material the size of the capacity to the inventory
-    IsoVector temp = recipe_;
-    temp.multBy(capacity_);
-    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
+  LOG(LEV_INFO3, "SrcFac") << facName() << " is tocking {";
 
-    LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
-    newMat->print();
-    inventory_.push_front(newMat);
-  } else if (space < capacity_*recipe_.mass() && space > 0) {
-    // add a material that fills the inventory
-    IsoVector temp = recipe_;
-    temp.setMass(space);
-    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-    LOG(LEV_DEBUG2) << facName() << ", handling the tock, has created a material:";
-    newMat->print();
-    inventory_.push_front(newMat);
-  }
   // check what orders are waiting,
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
-    ordersWaiting_.pop_front();
+    if (inventoryMass() < order->resource()->quantity()) {
+      LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
+      break;
+    } else {
+      order->approveTransfer();
+      ordersWaiting_.pop_front();
+    }
   }
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "SourceFacility " << this->ID()
-                  << " is holding " << this->checkInventory()
+  LOG(LEV_INFO4, "SrcFac") << "SourceFacility " << this->ID()
+                  << " is holding " << this->inventoryMass()
                   << " units of material at the close of month " << time
                   << ".";
 
+  LOG(LEV_INFO3, "SrcFac") << "}";
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double SourceFacility::checkInventory(){
+double SourceFacility::inventoryMass() {
   double total = 0;
-  
-  // Iterate through the inventory and sum the amount of whatever
-  // material unit is in each object.
   for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();
   }
-  
   return total;
 }
 
@@ -228,15 +233,8 @@ double SourceFacility::checkInventory(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string SourceFacility::outputDir_ = "/source";
 
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 extern "C" Model* constructSourceFacility() {
   return new SourceFacility();
 }
-
-
-/* ------------------- */ 
 

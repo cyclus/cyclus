@@ -90,7 +90,7 @@ void EnrichmentFacility::copyFreshModel(Model* src)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::print() { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2) << "    converts commodity {"
+  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"
       << out_commod_
@@ -146,7 +146,7 @@ std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< ID()
+    LOG(LEV_DEBUG2, "none!") <<"EnrichmentFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
@@ -159,7 +159,7 @@ void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"EnrichmentFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }

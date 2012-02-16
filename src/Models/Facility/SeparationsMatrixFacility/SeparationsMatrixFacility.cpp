@@ -81,9 +81,9 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     int stream_Z = strtol(XMLinput->get_xpath_content(stream,"z"), NULL, 10);
     double stream_eff = strtod(XMLinput->get_xpath_content(stream,"eff"), NULL);
     stream_set_.insert(make_pair(new_commod, make_pair(stream_Z, stream_eff)));
-    LOG(LEV_DEBUG2) << "Name = " << new_commod;
-    LOG(LEV_DEBUG2) << "Z = " << stream_Z;
-    LOG(LEV_DEBUG2) << "Eff = " << stream_eff;
+    LOG(LEV_DEBUG2, "none!") << "Name = " << new_commod;
+    LOG(LEV_DEBUG2, "none!") << "Z = " << stream_Z;
+    LOG(LEV_DEBUG2, "none!") << "Eff = " << stream_eff;
   };
 
   inventory_ = deque<pair<string,mat_rsrc_ptr> >();
@@ -124,22 +124,22 @@ void SeparationsMatrixFacility::copyFreshModel(Model* src)
 void SeparationsMatrixFacility::print() 
 { 
   FacilityModel::print();
-  LOG(LEV_DEBUG2) << "converts commodities {";
+  LOG(LEV_DEBUG2, "none!") << "converts commodities {";
 
   for(vector<string>::const_iterator iter = in_commod_.begin(); 
       iter != in_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2) << (*iter);
+    LOG(LEV_DEBUG2, "none!") << (*iter);
   };
 
-  LOG(LEV_DEBUG2) << "} into commodities {";
+  LOG(LEV_DEBUG2, "none!") << "} into commodities {";
 
   for (vector<string>::iterator iter = out_commod_.begin(); 
       iter != out_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2) << (*iter);
+    LOG(LEV_DEBUG2, "none!") << (*iter);
   }; 
-  LOG(LEV_DEBUG2) << "}, and has an inventory that holds " 
+  LOG(LEV_DEBUG2, "none!") << "}, and has an inventory that holds " 
     << inventory_size_ << " materials"
     ;
 };
@@ -191,7 +191,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
       }
 
       toSend.push_back(newMat);
-      LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
+      LOG(LEV_DEBUG2, "none!") <<"SeparationsMatrixFacility "<< ID()
         <<"  is sending a mat with mass: "<< newMat->quantity();
     }    
   }
@@ -201,14 +201,14 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::addResource(msg_ptr msg,
                                             vector<rsrc_ptr> manifest) {  
-  LOG(LEV_DEBUG2) << "Entered the addResource file ";
+  LOG(LEV_DEBUG2, "none!") << "Entered the addResource file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
       thisMat != manifest.end();
       thisMat++) {
-    LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
     stocks_.push_back(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }

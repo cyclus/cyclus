@@ -110,7 +110,7 @@ void DecayHandler::setComp(Vector comp) {
       if ( atom_count != 0 )
         atom_comp_[iso] = atom_count;
     } else {
-      LOG(LEV_ERROR) << "Decay Error - invalid Vector position";
+      LOG(LEV_ERROR, "none!") << "Decay Error - invalid Vector position";
     }
 
     ++parent_iter; // get next parent

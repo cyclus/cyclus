@@ -6,10 +6,10 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource::GenericResource(std::string units,
             std::string quality, double quantity) : Resource() {
-    units_ = units;
-    quality_ = quality;
-    quantity_ = quantity;
-  }
+  units_ = units;
+  quality_ = quality;
+  quantity_ = quantity;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 GenericResource::GenericResource(const GenericResource& other) {
@@ -20,13 +20,15 @@ GenericResource::GenericResource(const GenericResource& other) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 rsrc_ptr GenericResource::clone() {
-  LOG(LEV_DEBUG2) << "resource was cloned";
+  CLOG(LEV_DEBUG2) << "GenericResource ID=" << ID_ << " was cloned.";
+  print();
   return rsrc_ptr(new GenericResource(*this));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GenericResource::print() {
-
+  CLOG(LEV_DEBUG3) << "GenericResource ID=" << ID_ << ", quality=" << quality_
+                   << ", quantity=" << quantity_ << ", units=" << units_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

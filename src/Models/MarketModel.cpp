@@ -26,13 +26,13 @@ MarketModel::MarketModel() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
-  LOG(LEV_DEBUG2) << "removing market from static list of markets...";
+  LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
   std::list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt) {
     if (this == *mkt) {
-      LOG(LEV_DEBUG2) << "  found match in static list";
+      LOG(LEV_DEBUG2, "none!") << "  found match in static list";
       markets_.erase(mkt);
-      LOG(LEV_DEBUG2) << "  match is removed";
+      LOG(LEV_DEBUG2, "none!") << "  match is removed";
       break;
     }
   }
@@ -85,7 +85,7 @@ void MarketModel::copy(MarketModel* src) {
 void MarketModel::print() { 
   Model::print(); 
 
-  LOG(LEV_DEBUG2) << "    trades commodity " << commodity_;
+  LOG(LEV_DEBUG2, "none!") << "    trades commodity " << commodity_;
 
 };
 

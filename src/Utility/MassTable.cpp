@@ -114,24 +114,6 @@ void MassTable::initialize() {
       isoIndex_.insert(make_pair(tope, i));
     };
 
-    /*
-     * Display the fields
-     */
-//    cout << endl << "Field A : " << endl;
-//    for(int i = 0; i < nuclide_len_; i++)
-//      cout << nuclide_vec_[i].A << " ";
-//    cout << endl;
-//
-//    cout << endl << "Field Z : " << endl;
-//    for(int i = 0; i < nuclide_len_; i++)
-//      cout << nuclide_vec_[i].Z << " ";
-//    cout << endl;
-//
-//    cout << endl << "Field mass : " << endl;
-//    for(int i = 0; i < nuclide_len_; i++)
-//      cout << nuclide_vec_[i].mass << " ";
-//    cout << endl;
-
     delete dataspace;
     delete group;
     delete dataset;

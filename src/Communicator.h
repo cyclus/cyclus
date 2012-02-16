@@ -3,8 +3,9 @@
 #define _COMMUNICATOR_H
 
 #include "Message.h"
+#include "Logger.h"
 
-/**
+/*!
    @brief An abstract class for deriving simulation entities 
    that can communicate via the Message class.
 
@@ -73,6 +74,7 @@ private:
       }
     }
     tracked_messages_.push_back(msg);
+    MLOG(LEV_DEBUG5) << "Model " << this << " tracks Message " << msg;
   }
 
   /*!
@@ -88,6 +90,7 @@ private:
         break;
       }
     }
+    MLOG(LEV_DEBUG5) << "Model " << this << " untracked Message " << msg;
   }
 
 protected:

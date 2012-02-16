@@ -44,7 +44,7 @@ void InstModel::print()
 {
   Model::print();
 
-  LOG(LEV_DEBUG2) << "in region " << parent()->name();
+  LOG(LEV_DEBUG2, "none!") << "in region " << parent()->name();
 }
 
 

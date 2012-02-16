@@ -108,14 +108,14 @@ void InputXML::load_file(std::string filename) {
   }
 
   // Recipes
-  LOG(LEV_DEBUG3) << "Begin loading recipes";
+  LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
   IsoVector::load_recipes();
-  LOG(LEV_DEBUG3) << "End loading recipes";
+  LOG(LEV_DEBUG3, "none!") << "End loading recipes";
   
   //Models
-  LOG(LEV_DEBUG3) << "Begin loading models";
+  LOG(LEV_DEBUG3, "none!") << "Begin loading models";
   Model::load_models();
-  LOG(LEV_DEBUG3) << "End loading models";
+  LOG(LEV_DEBUG3, "none!") << "End loading models";
 
   TI->load_simulation();
 }
@@ -159,9 +159,9 @@ void InputXML::load_facilitycatalog(std::string filename) {
   facilitycatalog.xpathCtxt = xmlXPathNewContext(facilitycatalog.doc);
 
   /// load here???
-  LOG(LEV_DEBUG3) << "Begin loading models - facilities";
+  LOG(LEV_DEBUG3, "none!") << "Begin loading models - facilities";
   Model::load_facilities();
-  LOG(LEV_DEBUG3) << "End loading models - facilities";
+  LOG(LEV_DEBUG3, "none!") << "End loading models - facilities";
 
   // get rid of facilitycatalog, freeing memory
   delete curFilePtr;

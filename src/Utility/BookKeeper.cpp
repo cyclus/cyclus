@@ -333,7 +333,7 @@ void BookKeeper::writeTransList(){
 
     // create an array of the transaction structs
     int numStructs = std::max(1, (int)transactions_.size());
-    trans_t trans_data[numStructs];
+    trans_t* trans_data = new trans_t[numStructs];
     // take care of the special case where there are no transactions
     if(transactions_.size()==0) {
       std::string str1="";
@@ -359,6 +359,7 @@ void BookKeeper::writeTransList(){
     hsize_t data_dims[1] = {numStructs};
     int data_rank = 1;
     writeDataSet(trans_data, data_desc, data_rank, data_dims, dataset_name, output_dir);
+    delete[] trans_data;
 
   } catch (Exception error) {
     error.printError();
@@ -379,8 +380,9 @@ void BookKeeper::writeMatComps(Group* subgroup){
   const H5std_string dataset_name = "compositions";
 
   // create an array of the model structs
-  comp_entry_t comp_entries[(int)comp_entries_.size()];
-  for (int i = 0; i < comp_entries_.size(); i++) {
+  int n_entries = comp_entries_.size();
+  comp_entry_t* comp_entries = new comp_entry_t[n_entries];
+  for (int i = 0; i < n_entries; i++) {
     comp_entries[i].entryID = comp_entries_.at(i).entryID;
     comp_entries[i].stateID = comp_entries_.at(i).stateID;
     comp_entries[i].iso = comp_entries_.at(i).iso;
@@ -413,6 +415,7 @@ void BookKeeper::writeMatComps(Group* subgroup){
   // write it, finally 
   dataset->write( comp_entries , mtype );
 
+  delete[] comp_entries;
   delete dataspace;
   delete dataset;
 }
@@ -441,14 +444,18 @@ void BookKeeper::writeMatHist(){
   else
     numStructs=numHists;
 
+
   // create an array of the model structs
-  mat_hist_t matHist[numStructs];
+  mat_hist_t* matHist = new mat_hist_t[numStructs];
 
   // describe the data in an hdf5-y way
   hsize_t dim[] = {numStructs};
   // if there's only one model, the dataspace is a vector, which  
   // hdf5 doesn't like to think of as a matrix 
   int rank = 1;
+
+  // Open the file and the dataset.
+  this->openDB();
 
   Group* outputgroup;
   outputgroup = new Group(this->getDB()->openGroup(output_name));
@@ -489,9 +496,6 @@ void BookKeeper::writeMatHist(){
 
   };
 
-  // Open the file and the dataset.
-  this->openDB();
-
   // create an array type
   // describe the data in an hdf5-y way
   hsize_t arraydim[] = {NUMISOS};
@@ -515,6 +519,7 @@ void BookKeeper::writeMatHist(){
   // write it, finally 
   dataset->write( matHist , mtype );
 
+  delete[] matHist;
   delete outputgroup;
   delete subgroup;
   delete dataspace;
