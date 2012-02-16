@@ -224,6 +224,7 @@ Model::Model() {
   born_ = false;
   template_list_.push_back(this);
   parent_ = NULL;
+  parentID_ = -1;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
 }
 
