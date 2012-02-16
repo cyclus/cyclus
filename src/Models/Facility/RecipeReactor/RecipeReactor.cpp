@@ -153,6 +153,8 @@ void RecipeReactor::beginCycle() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::endCycle() {
+  if (currCore_.size() == 0) {return;}
+
   // move a batch out of the core 
   std::string batchCommod = currCore_.front().first;
   mat_rsrc_ptr batchMat = currCore_.front().second;
@@ -187,6 +189,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
   if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
+    LOG(LEV_INFO5, "RReact") << name() << " just received an order.";
   }
   else {
     throw CycException("RecipeReactor is not the supplier of this msg.");
@@ -253,6 +256,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTick(int time) {
+  LOG(LEV_INFO3, "RReact") << name() << " is ticking {";
   // if at beginning of cycle, beginCycle()
   // if stocks are empty, ask for a batch
   // offer anything in the inventory
@@ -264,10 +268,12 @@ void RecipeReactor::handleTick(int time) {
 
   makeRequests();
   makeOffers();
+  LOG(LEV_INFO3, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::makeRequests(){
+  LOG(LEV_INFO4, "RReact") << " making requests {";
   // MAKE A REQUEST
   if(this->checkStocks() == 0){
     // It chooses the next in/out commodity pair in the preference lineup
@@ -334,6 +340,7 @@ void RecipeReactor::makeRequests(){
       sendMessage(recipient, trans);
     }
   }
+  LOG(LEV_INFO4, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -345,6 +352,7 @@ void RecipeReactor::sendMessage(Communicator* recipient, Transaction trans){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::makeOffers(){
+  LOG(LEV_INFO4, "RReact") << " making offers {";
   // MAKE OFFERS
   // decide how much to offer
 
@@ -372,6 +380,7 @@ void RecipeReactor::makeOffers(){
 
     // make a material to offer
     mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(out_recipe_));
+    offer_mat->print();
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
@@ -384,10 +393,12 @@ void RecipeReactor::makeOffers(){
 
     sendMessage(recipient, trans);
   }
+  LOG(LEV_INFO4, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTock(int time) {
+  LOG(LEV_INFO3, "RReact") << name() << " is tocking {";
   // at the end of the cycle
   if (month_in_cycle_ > cycle_time_){
     this->endCycle();
@@ -400,6 +411,7 @@ void RecipeReactor::handleTock(int time) {
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;
+  LOG(LEV_INFO3, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
