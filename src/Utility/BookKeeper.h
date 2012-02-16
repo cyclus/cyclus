@@ -8,8 +8,6 @@
 #include "H5Cpp.h"
 #include "hdf5.h"
 
-#include "Teuchos_ParameterList.hpp"
-
 #include "Model.h"
 #include "Material.h"
 #include "Message.h"
