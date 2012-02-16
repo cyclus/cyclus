@@ -17,6 +17,9 @@
 
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
+// Database table for agents
+Table *Model::agent_table = new Table("Agents"); 
+// Model containers
 std::vector<Model*> Model::template_list_;
 std::vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
@@ -102,6 +105,7 @@ void Model::load_models() {
   load_facilities();
   load_regions();
   load_institutions();
+  define_table();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,11 +179,34 @@ void Model::load_institutions() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::define_table() {
+  // declare the table columns
+  column agent_id("Id","INTEGER");
+  column agent_type("Type","VARCHAR(32)");
+  column parent_id("ParentId","INTEGER");
+  column bornOn("EnterDate","INTEGER");
+  column diedOn("LeaveDate","INTEGER");
+  // declare the table's primary key
+  agent_table->setPrimaryKey(agent_id);
+  // add columns to the table
+  agent_table->addColumn(agent_id);
+  agent_table->addColumn(agent_type);
+  agent_table->addColumn(parent_id);
+  agent_table->addColumn(bornOn);
+  agent_table->addColumn(diedOn);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-  this->setBornOn( TI->time() );
+
+  // // the model is "born" when it is initialized
+  // born_ = true;
+  // this->setBornOn( TI->time() );
+  // // add this model as a row to the table
+  // this->addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,9 +225,9 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
-
   ID_ = next_id_++;
   is_template_ = true;
+  born_ = false;
   template_list_.push_back(this);
   parent_ = NULL;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
@@ -209,15 +236,20 @@ Model::Model() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
-
+  
+  // set died on date and record it in the table
   diedOn_ = TI->time();
-
+  data a_don(diedOn_);
+  entry don("LeaveDate",a_don);
+  agent_table->updateRow( this->pkref(), don );
+  
   // book-keeping
   BI->registerModelDatum<std::string>(ID_, "name", name());
   BI->registerModelDatum<std::string>(ID_, "modelImpl", modelImpl());
   BI->registerModelDatum<int>(ID_, "parentID", parentID_);
   BI->registerModelDatum<int>(ID_, "bornOn", bornOn());
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
+  std::cout << model_impl_ << std::endl;
 
   // remove references to self
   removeFromList(this, template_list_);
@@ -245,6 +277,15 @@ void Model::setIsTemplate(bool is_template) {
     // this prevents duplicates from being stored in the list
     removeFromList(this, model_list_);
     model_list_.push_back(this);
+    if (!born_) {
+      //the model is "born" when it is initialized
+      born_ = true;
+      this->setBornOn( TI->time() );
+      // add this model as a row to the table
+      this->addToTable();
+
+      std::cout << model_impl_ << std::endl;
+    }
   }
 }
 
@@ -256,6 +297,25 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
       break;
     }
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::addToTable(){ 
+  // make a row
+  // declare data
+  data an_id( this->ID() ), a_type( this->modelImpl() ), 
+    a_pid( this->parentID() ), a_bod( this->bornOn() );
+  // declare entries
+  entry id("Id",an_id), type("Type",a_type), pid("ParentId",a_pid), 
+    bod("EnterDate",a_bod);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(type), aRow.push_back(pid),
+    aRow.push_back(bod);
+  // add the row
+  agent_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(id);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -271,15 +331,21 @@ void Model::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
-  // set the pointer to this model's parent
+  // A model is "born" in the world it's parent is set
   if (parent == this) {
-    throw CycIndexException("A model cannot be its own parent.");
+    throw CycIndexException("A model cannot be its own parent."); 
+    // @rwcarlsen MJG Flag what about root nodes?
   }
 
   setIsTemplate(false);
   parent_ = parent;
   parentID_ = parent->ID();
 
+  // update the parent id in the table
+  data a_pid(parentID_);
+  entry pid("ParentID",a_pid);
+  agent_table->updateRow( this->pkref(), pid );
+  
   // root nodes are their own parents
   // if this node is not its own parent, add it to its parent's list of children
   if (parent_ != NULL){

@@ -1,5 +1,7 @@
-#include "Table.h"
 #include <iostream>
+
+#include "Table.h"
+#include "Logger.h"
 
 // MJG FLAG Indexing not currently supported
 
@@ -50,6 +52,7 @@ void Table::addRow(row const r){
   (*cmd) << "INSERT INTO " << this->name() << " (" << cols->str() << ") "
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
+  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " << cmd->str();
 }
 
 // update rows
@@ -60,6 +63,7 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   (*cmd) << "SET " << e.first << "=" << stringifyData(e.second) << " ";
   (*cmd) << "WHERE " << updateRowPK(pkref) << ";";
   row_commands_.push_back(cmd);
+  LOG(LEV_DEBUG5, "table") << "Added command to row commands: " << cmd->str();
 }
 void Table::updateRow(primary_key_ref const pkref, row const r){
   int nEntries = r.size();

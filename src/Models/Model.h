@@ -9,6 +9,7 @@
 
 #include "Message.h"
 #include "Resource.h"
+#include "Table.h"
 
 #include "boost/intrusive_ptr.hpp"
 
@@ -222,6 +223,10 @@ public:
   bool isTemplate() {return is_template_;};
   void setIsTemplate(bool is_template);
   
+  // the database table and related information
+  static Table *agent_table;
+  primary_key_ref pkref(){return pkref_;}
+  
 protected:
   /// children of this model
   std::vector<Model*> children_;
@@ -245,6 +250,8 @@ private:
 
   static void load_institutions();
 
+  static void define_table();
+
   /// Stores the next available facility ID
   static int next_id_;
 
@@ -256,6 +263,9 @@ private:
 
   /// used to remove model instance refs from static model lists
   void removeFromList(Model* model, std::vector<Model*> &mlist);
+
+  /// add the model as a row in the database table
+  void addToTable();
 
   /**
    * parent of this model
@@ -305,6 +315,13 @@ private:
   int ID_;
 
   bool is_template_;
+
+  bool born_;
+
+  /*!
+    Store information about this model's primary key
+   */
+  primary_key_ref pkref_;
 
 };
 
