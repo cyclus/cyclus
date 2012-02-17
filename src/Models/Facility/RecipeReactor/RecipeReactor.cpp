@@ -128,7 +128,7 @@ void RecipeReactor::copyFreshModel(Model* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::print() { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
+  LOG(LEV_DEBUG2, "RReact") << "    converts commodity {"
       << fuelPairs_.front().first.first
       << "} into commodity {"
       << this->fuelPairs_.front().second.first
@@ -144,10 +144,12 @@ void RecipeReactor::beginCycle() {
     stocks_.pop_front();
     InFuel inBatch;
     inBatch = make_pair(batchCommod, batchMat);
+    LOG(LEV_DEBUG2, "RReact") << "Adding a new batch to the core";
     currCore_.push_back(inBatch);
     // reset month_in_cycle_ clock
     month_in_cycle_ = 1;
-  } else{
+  } else {
+    LOG(LEV_DEBUG3, "RReact") << "Beginning a cycle with an empty core. Why??";
     // wait for a successful transaction to fill the stocks.
     // reset the cycle month to zero 
     month_in_cycle_=0;
@@ -156,7 +158,12 @@ void RecipeReactor::beginCycle() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::endCycle() {
-  if (currCore_.size() == 0) {return;}
+  LOG(LEV_DEBUG2, "RReact") << "Ending a cycle.";
+  month_in_cycle_ = 0;
+  if (currCore_.size() == 0) {
+    LOG(LEV_DEBUG3, "RReact") << "Ended a cycle with an empty core. Why??";
+    return;
+  }
 
   // move a batch out of the core 
   std::string batchCommod = currCore_.front().first;
@@ -236,7 +243,7 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        LOG(LEV_DEBUG2, "none!") <<"RecipeReactor "<< ID()
+        LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor "<< ID()
           <<"  is sending a mat with mass: "<< newMat->quantity();
       }
     }
@@ -251,7 +258,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2, "none!") <<"RecipeReactor " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_front(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
@@ -267,6 +274,7 @@ void RecipeReactor::handleTick(int time) {
   
   // BEGIN CYCLE
   if(month_in_cycle_ == 1){
+    LOG(LEV_INFO4, "RReact") << " Beginning a new cycle";
     this->beginCycle();
   };
 
