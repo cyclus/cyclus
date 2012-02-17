@@ -45,6 +45,10 @@ void RegionModel::init(xmlNodePtr cur) {
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
+
+  // region models do not currently follow the template/not template
+  // paradigm of insts and facs, so log this as its own parent
+  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

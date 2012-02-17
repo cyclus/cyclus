@@ -201,12 +201,6 @@ void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
   model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-
-  // // the model is "born" when it is initialized
-  // born_ = true;
-  // this->setBornOn( TI->time() );
-  // // add this model as a row to the table
-  // this->addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -277,15 +271,6 @@ void Model::setIsTemplate(bool is_template) {
     // this prevents duplicates from being stored in the list
     removeFromList(this, model_list_);
     model_list_.push_back(this);
-    if (!born_) {
-      //the model is "born" when it is initialized
-      born_ = true;
-      this->setBornOn( TI->time() );
-      // add this model as a row to the table
-      this->addToTable();
-
-      std::cout << model_impl_ << std::endl;
-    }
   }
 }
 
@@ -332,21 +317,26 @@ void Model::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
   // A model is "born" in the world it's parent is set
+  this->setBornOn( TI->time() );
+
+  // log who the parent is
   if (parent == this) {
-    throw CycIndexException("A model cannot be its own parent."); 
-    // @rwcarlsen MJG Flag what about root nodes?
+    // root nodes are their own parent
+    parent_ = NULL; // parent pointer set to NULL for memory management
+    parentID_ = this->ID();
+  }
+  else{
+    parent_ = parent;
+    parentID_ = parent->ID();
   }
 
-  setIsTemplate(false);
-  parent_ = parent;
-  parentID_ = parent->ID();
+  // register the model with the simulation
+  this->addToTable();
 
-  // update the parent id in the table
-  data a_pid(parentID_);
-  entry pid("ParentID",a_pid);
-  agent_table->updateRow( this->pkref(), pid );
+  // the model has been registered with the simulation, 
+  // so it is no longer a template
+  setIsTemplate(false);
   
-  // root nodes are their own parents
   // if this node is not its own parent, add it to its parent's list of children
   if (parent_ != NULL){
     parent_->addChild(this);

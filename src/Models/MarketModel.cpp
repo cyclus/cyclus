@@ -67,6 +67,10 @@ void MarketModel::init(xmlNodePtr cur) {
 
   /// all markets require commodities
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
+
+  // region models do not currently follow the template/not template
+  // paradigm of insts and facs, so log this as its own parent
+  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
