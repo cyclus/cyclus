@@ -114,6 +114,9 @@ void RecipeReactor::copy(RecipeReactor* src) {
   currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
   inventory_ = deque<OutFuel >();
   ordersWaiting_ = deque<msg_ptr>();
+
+  in_recipe_ = src->in_recipe_;
+  out_recipe_ = src->out_recipe_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -257,6 +260,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTick(int time) {
   LOG(LEV_INFO3, "RReact") << name() << " is ticking {";
+
   // if at beginning of cycle, beginCycle()
   // if stocks are empty, ask for a batch
   // offer anything in the inventory
@@ -318,6 +322,8 @@ void RecipeReactor::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res;
 
+      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
+                               << " kg of " << in_commod << ".";
       sendMessage(recipient, trans);
       // otherwise, the upper bound is the batch size
       // minus the amount in stocks.
@@ -337,6 +343,9 @@ void RecipeReactor::makeRequests(){
       trans.is_offer = false;
       trans.price = commod_price;
       trans.resource = request_res;
+
+      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
+                               << " kg of " << in_commod << ".";
       sendMessage(recipient, trans);
     }
   }
@@ -390,6 +399,9 @@ void RecipeReactor::makeOffers(){
     trans.is_offer = true;
     trans.price = commod_price;
     trans.resource = offer_mat;
+
+    LOG(LEV_INFO5, "RReact") << name() << " has offered " << offer_mat->quantity()
+                             << " kg of " << commod << ".";
 
     sendMessage(recipient, trans);
   }
