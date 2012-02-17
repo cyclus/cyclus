@@ -5,7 +5,7 @@
   <startmonth>1</startmonth>
   <simstart>0</simstart>
   <decay>0</decay>
-  <duration>18</duration>
+  <duration>24</duration>
 
   <!-- Commodities -->
   <commodity>
@@ -45,7 +45,7 @@
       <SourceFacility>
         <outcommodity>fresh_PWR_uo2</outcommodity>
         <capacity>1e6</capacity>
-        <inventorysize>10e6</inventorysize>
+        <inventorysize>1e7</inventorysize>
         <commodprice>0</commodprice>
         <recipe>nwtrb:fresh_PWR_uo2</recipe>
       </SourceFacility>
@@ -57,7 +57,7 @@
     <model>
       <SinkFacility>
         <incommodity>spent_PWR_uo2</incommodity>
-        <capacity>1</capacity>
+        <capacity>1e3</capacity>
         <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
@@ -88,12 +88,6 @@
       </RecipeReactor>
     </model>
   </facility>
-
-  <facilitycatalog>
-    <filename>nwtrb.facilitycatalog.xml</filename>
-    <namespace>nwtrb</namespace>
-    <format>xml</format>
-  </facilitycatalog>
 
   <region>
     <name>USA</name>
@@ -128,36 +122,4 @@
     </institution>
   </region>
 
-  <recipe>
-    <name>fresh_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id>
-      <comp>0.05</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id>
-      <comp>0.95</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id>
-      <comp>0.13</comp>
-    </isotope>
-  </recipe>
-  <recipe>
-    <name>water</name>
-    <basis>atom</basis>
-    <unit>barrel</unit>
-    <total>1e25</total>
-    <isotope>
-      <id>1001</id>
-      <comp>2</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id>
-      <comp>1</comp>
-    </isotope>
-  </recipe>
 </simulation>
