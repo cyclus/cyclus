@@ -1,6 +1,7 @@
 // MaterialTests.cpp
 #include <gtest/gtest.h>
 #include "Material.h"
+#include "GenericResource.h"
 #include "IsoVector.h"
 #include "Timer.h"
 #include "CycException.h"
@@ -110,7 +111,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   ASSERT_NO_THROW(test_mat_->absorb(diff_test_mat));
   EXPECT_FLOAT_EQ(orig + origdiff, test_mat_->quantity() );
   EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -155,13 +156,13 @@ TEST_F(MaterialTest, ExtractUnLikeVector) {
   ASSERT_NO_THROW(test_mat_->extract(half_test_comp));
   EXPECT_FLOAT_EQ(0.5*orig, test_mat_->quantity() );
   EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
   EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
   
   ASSERT_NO_THROW(test_mat_->extract(quarter_test_comp));
   EXPECT_FLOAT_EQ(0.25*orig, test_mat_->quantity() );
   EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-  EXPECT_FALSE(same_as_orig_test_mat->checkQuality(test_mat_));
+  EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
   EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
 
 }
@@ -189,4 +190,15 @@ TEST_F(MaterialTest, ExtractMass) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, GetSetQuantity) {
 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckQuality) {
+  rsrc_ptr test(test_mat_);
+  rsrc_ptr diff(diff_mat_);
+  rsrc_ptr gen(new GenericResource("kg", "foo", 10));
+
+  EXPECT_TRUE(test->checkQuality(diff));
+  EXPECT_TRUE(diff->checkQuality(test));
+  EXPECT_FALSE(test->checkQuality(gen));
 }
