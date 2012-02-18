@@ -105,7 +105,6 @@ void Model::load_models() {
   load_facilities();
   load_regions();
   load_institutions();
-  define_table();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -206,6 +205,7 @@ Model::Model() {
   born_ = false;
   template_list_.push_back(this);
   parent_ = NULL;
+  parentID_ = -1;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
 }
 
@@ -225,7 +225,6 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "parentID", parentID_);
   BI->registerModelDatum<int>(ID_, "bornOn", bornOn());
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
-  std::cout << model_impl_ << std::endl;
 
   // remove references to self
   removeFromList(this, template_list_);
@@ -287,7 +286,7 @@ void Model::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addToTable(){ 
+void Model::addToTable(){
   // if we haven't logged an agent yet, define the table
   if ( !agent_table->defined() )
     Model::define_table();

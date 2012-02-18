@@ -114,6 +114,9 @@ void RecipeReactor::copy(RecipeReactor* src) {
   currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
   inventory_ = deque<OutFuel >();
   ordersWaiting_ = deque<msg_ptr>();
+
+  in_recipe_ = src->in_recipe_;
+  out_recipe_ = src->out_recipe_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -125,7 +128,7 @@ void RecipeReactor::copyFreshModel(Model* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::print() { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
+  LOG(LEV_DEBUG2, "RReact") << "    converts commodity {"
       << fuelPairs_.front().first.first
       << "} into commodity {"
       << this->fuelPairs_.front().second.first
@@ -141,10 +144,12 @@ void RecipeReactor::beginCycle() {
     stocks_.pop_front();
     InFuel inBatch;
     inBatch = make_pair(batchCommod, batchMat);
+    LOG(LEV_DEBUG2, "RReact") << "Adding a new batch to the core";
     currCore_.push_back(inBatch);
     // reset month_in_cycle_ clock
     month_in_cycle_ = 1;
-  } else{
+  } else {
+    LOG(LEV_DEBUG3, "RReact") << "Beginning a cycle with an empty core. Why??";
     // wait for a successful transaction to fill the stocks.
     // reset the cycle month to zero 
     month_in_cycle_=0;
@@ -153,6 +158,13 @@ void RecipeReactor::beginCycle() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::endCycle() {
+  LOG(LEV_DEBUG2, "RReact") << "Ending a cycle.";
+  month_in_cycle_ = 0;
+  if (currCore_.size() == 0) {
+    LOG(LEV_DEBUG3, "RReact") << "Ended a cycle with an empty core. Why??";
+    return;
+  }
+
   // move a batch out of the core 
   std::string batchCommod = currCore_.front().first;
   mat_rsrc_ptr batchMat = currCore_.front().second;
@@ -187,6 +199,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
   if(msg->supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
+    LOG(LEV_INFO5, "RReact") << name() << " just received an order.";
   }
   else {
     throw CycException("RecipeReactor is not the supplier of this msg.");
@@ -230,7 +243,7 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
           newMat->absorb(toAbsorb);
         }
         toSend.push_back(newMat);
-        LOG(LEV_DEBUG2, "none!") <<"RecipeReactor "<< ID()
+        LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor "<< ID()
           <<"  is sending a mat with mass: "<< newMat->quantity();
       }
     }
@@ -245,7 +258,7 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2, "none!") <<"RecipeReactor " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
     stocks_.push_front(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
@@ -253,21 +266,26 @@ void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTick(int time) {
+  LOG(LEV_INFO3, "RReact") << name() << " is ticking {";
+
   // if at beginning of cycle, beginCycle()
   // if stocks are empty, ask for a batch
   // offer anything in the inventory
   
   // BEGIN CYCLE
   if(month_in_cycle_ == 1){
+    LOG(LEV_INFO4, "RReact") << " Beginning a new cycle";
     this->beginCycle();
   };
 
   makeRequests();
   makeOffers();
+  LOG(LEV_INFO3, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::makeRequests(){
+  LOG(LEV_INFO4, "RReact") << " making requests {";
   // MAKE A REQUEST
   if(this->checkStocks() == 0){
     // It chooses the next in/out commodity pair in the preference lineup
@@ -312,6 +330,8 @@ void RecipeReactor::makeRequests(){
       trans.price = commod_price;
       trans.resource = request_res;
 
+      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
+                               << " kg of " << in_commod << ".";
       sendMessage(recipient, trans);
       // otherwise, the upper bound is the batch size
       // minus the amount in stocks.
@@ -331,9 +351,13 @@ void RecipeReactor::makeRequests(){
       trans.is_offer = false;
       trans.price = commod_price;
       trans.resource = request_res;
+
+      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
+                               << " kg of " << in_commod << ".";
       sendMessage(recipient, trans);
     }
   }
+  LOG(LEV_INFO4, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -345,6 +369,7 @@ void RecipeReactor::sendMessage(Communicator* recipient, Transaction trans){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::makeOffers(){
+  LOG(LEV_INFO4, "RReact") << " making offers {";
   // MAKE OFFERS
   // decide how much to offer
 
@@ -372,6 +397,7 @@ void RecipeReactor::makeOffers(){
 
     // make a material to offer
     mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(out_recipe_));
+    offer_mat->print();
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
@@ -382,12 +408,17 @@ void RecipeReactor::makeOffers(){
     trans.price = commod_price;
     trans.resource = offer_mat;
 
+    LOG(LEV_INFO5, "RReact") << name() << " has offered " << offer_mat->quantity()
+                             << " kg of " << commod << ".";
+
     sendMessage(recipient, trans);
   }
+  LOG(LEV_INFO4, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::handleTock(int time) {
+  LOG(LEV_INFO3, "RReact") << name() << " is tocking {";
   // at the end of the cycle
   if (month_in_cycle_ > cycle_time_){
     this->endCycle();
@@ -400,6 +431,7 @@ void RecipeReactor::handleTock(int time) {
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;
+  LOG(LEV_INFO3, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

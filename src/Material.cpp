@@ -117,11 +117,11 @@ bool Material::checkQuality(rsrc_ptr other){
 
   try {
     // Make sure the other is a material
-    IsoVector rhs_vec = boost::dynamic_pointer_cast<Material>(other)->isoVector();
-    toRet = (lhs_vec==rhs_vec);
-  } catch (std::exception& e) {
-    toRet = false;
-  }
+    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(other);
+    if (mat) {
+      toRet = true;
+    }
+  } catch (...) { }
 
   return toRet;
 }

@@ -391,7 +391,7 @@ class Message: IntrusiveBase<Message> {
    
     @param new_resource is the new Resource in the transaction
    */
-  void setResource(rsrc_ptr new_resource) {trans_.resource = new_resource->clone();};
+  void setResource(rsrc_ptr new_resource) {if (new_resource.get()) {trans_.resource = new_resource->clone();}};
 
   /*!
   Used to match this message with a corresponding offer/request message after

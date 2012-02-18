@@ -22,6 +22,7 @@ MarketModel::MarketModel() {
   TI->registerResolveListener(this);
   markets_.push_back(this);
   setIsTemplate(false);
+  commodity_ = "none";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
