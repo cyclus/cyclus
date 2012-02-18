@@ -179,24 +179,6 @@ void Model::load_institutions() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::define_table() {
-  // declare the table columns
-  column agent_id("Id","INTEGER");
-  column agent_type("Type","VARCHAR(32)");
-  column parent_id("ParentId","INTEGER");
-  column bornOn("EnterDate","INTEGER");
-  column diedOn("LeaveDate","INTEGER");
-  // declare the table's primary key
-  agent_table->setPrimaryKey(agent_id);
-  // add columns to the table
-  agent_table->addColumn(agent_id);
-  agent_table->addColumn(agent_type);
-  agent_table->addColumn(parent_id);
-  agent_table->addColumn(bornOn);
-  agent_table->addColumn(diedOn);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::init(xmlNodePtr cur) {
   name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
@@ -285,13 +267,37 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::define_table() {
+  // declare the table columns
+  column agent_id("ID","INTEGER");
+  column agent_type("Type","VARCHAR(128)");
+  column parent_id("ParentID","INTEGER");
+  column bornOn("EnterDate","INTEGER");
+  column diedOn("LeaveDate","INTEGER");
+  // declare the table's primary key
+  agent_table->setPrimaryKey(agent_id);
+  // add columns to the table
+  agent_table->addColumn(agent_id);
+  agent_table->addColumn(agent_type);
+  agent_table->addColumn(parent_id);
+  agent_table->addColumn(bornOn);
+  agent_table->addColumn(diedOn);
+  // we've now defined the table
+  agent_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addToTable(){ 
+  // if we haven't logged an agent yet, define the table
+  if ( !agent_table->defined() )
+    Model::define_table();
+
   // make a row
   // declare data
   data an_id( this->ID() ), a_type( this->modelImpl() ), 
     a_pid( this->parentID() ), a_bod( this->bornOn() );
   // declare entries
-  entry id("Id",an_id), type("Type",a_type), pid("ParentId",a_pid), 
+  entry id("ID",an_id), type("Type",a_type), pid("ParentID",a_pid), 
     bod("EnterDate",a_bod);
   // declare row
   row aRow;

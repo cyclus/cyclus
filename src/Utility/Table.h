@@ -39,6 +39,7 @@ class Table {
   std::vector<column> columns_;
   std::vector<command*> row_commands_;
   //std::vector<index> indicies_;
+  bool defined_;
 
  public:
   // constructors and destructors
@@ -47,6 +48,10 @@ class Table {
 
   // getter functions
   table_name name(){return name_;}
+  bool defined(){return defined_;}
+
+  // setter functions
+  void tableDefined();
 
   // table construction functions
   inline void addColumn(column col)

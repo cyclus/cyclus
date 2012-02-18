@@ -11,11 +11,15 @@
 #include "GenericResource.h"
 #include "Logger.h"
 #include "BookKeeper.h"
+#include "Timer.h"
 
 #include <iostream>
 
 // initialize static variables
 int Message::nextTransID_ = 1;
+// Database table for transactions
+Table *Message::trans_table = new Table("Transactions"); 
+
 
 std::string Message::outputDir_ = "/output/transactions";
 
@@ -254,6 +258,7 @@ void Message::approveTransfer() {
   req->addResource(me, manifest);
 
   BI->registerTransaction(nextTransID_++, me, manifest);
+  this->Message::addTransToTable();
 
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
@@ -267,3 +272,73 @@ void Message::approveTransfer() {
 
 }
 
+void Message::define_table(){
+  // declare the table columns
+  column sender("SenderID","INTEGER");
+  column receiver("ReceiverID","INTEGER");
+  column resource("ResourceID","INTEGER");
+  column time("Time","INTEGER");
+  column price("Price","REAL");
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("SenderID"), pk.push_back("ReceiverID"), 
+    pk.push_back("ResourceID"), pk.push_back("Time");
+  trans_table->setPrimaryKey(pk);
+  // add columns to the table
+  trans_table->addColumn(sender), trans_table->addColumn(receiver), 
+    trans_table->addColumn(resource), trans_table->addColumn(time),
+    trans_table->addColumn(price);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //   Agents table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Agents",theirk);
+  //     the sender id
+  myk.push_back("SenderID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) );
+  myk.clear();
+  //     the reciever id
+  myk.push_back("ReceiverID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) );
+  myk.clear();
+  theirk.clear();
+  //    Resource table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Resources",theirk);
+  //      the resource id
+  myk.push_back("ResourceID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) ); // resourceid references resource's id
+  // we've now defined the table
+  trans_table->tableDefined();
+}
+
+void Message::addTransToTable(){  
+  // if we haven't logged a message yet, define the table
+  if ( !trans_table->defined() )
+    Message::define_table();
+  
+  // make a row
+  // declare data
+  data a_sender( trans_.supplier->ID() ), a_receiver( trans_.requester->ID() ),
+    a_resource( trans_.resource->ID() ), a_time( TI->time() ), 
+    a_price( trans_.price );
+  // declare entries
+  entry sender("SenderID",a_sender), receiver("ReceiverID",a_receiver), 
+    resource("ResourceID",a_resource), time("Time",a_time), price("Price",a_price);
+  // declare row
+  row aRow;
+  aRow.push_back(sender), aRow.push_back(receiver), aRow.push_back(resource),
+    aRow.push_back(time),aRow.push_back(price);
+  // add the row
+  trans_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(sender);
+  pkref_.push_back(receiver);
+  pkref_.push_back(resource);
+  pkref_.push_back(time);
+}
