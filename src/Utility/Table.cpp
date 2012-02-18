@@ -30,6 +30,7 @@ void Table::setPrimaryKey(std::string const pk_string)
 void Table::tableDefined()
 {
   defined_ = true;
+  std::cout << "Table " << name_ << " is defined." << std::endl;
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
 			  << this->create();
 }
