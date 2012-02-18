@@ -260,6 +260,49 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::define_table() {
+  // declare the table columns
+  column agent_id("ID","INTEGER");
+  column agent_type("Type","VARCHAR(128)");
+  column parent_id("ParentID","INTEGER");
+  column bornOn("EnterDate","INTEGER");
+  column diedOn("LeaveDate","INTEGER");
+  // declare the table's primary key
+  agent_table->setPrimaryKey(agent_id);
+  // add columns to the table
+  agent_table->addColumn(agent_id);
+  agent_table->addColumn(agent_type);
+  agent_table->addColumn(parent_id);
+  agent_table->addColumn(bornOn);
+  agent_table->addColumn(diedOn);
+  // we've now defined the table
+  agent_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::addToTable(){
+  // if we haven't logged an agent yet, define the table
+  if ( !agent_table->defined() )
+    Model::define_table();
+
+  // make a row
+  // declare data
+  data an_id( this->ID() ), a_type( this->modelImpl() ), 
+    a_pid( this->parentID() ), a_bod( this->bornOn() );
+  // declare entries
+  entry id("ID",an_id), type("Type",a_type), pid("ParentID",a_pid), 
+    bod("EnterDate",a_bod);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(type), aRow.push_back(pid),
+    aRow.push_back(bod);
+  // add the row
+  agent_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(id);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::print() { 
   CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
       << " ( "
