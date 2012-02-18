@@ -63,8 +63,6 @@ IsoVector::IsoVector(xmlNodePtr cur) {
   } else {
     setMass(total_qty);
   }
-
-  IsoVector::recipes_[recipe_name] = this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -73,9 +71,11 @@ void IsoVector::load_recipes() {
   /// load recipes from file
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
   std::string name;
+  CLOG(LEV_DEBUG2) << "loading recipes {";
   for (int i = 0; i < nodes->nodeNr; i++) {
     name = XMLinput->getCurNS() + 
                   XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+    CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
     recipes_[name] = new IsoVector(nodes->nodeTab[i]);
   }
 
@@ -90,12 +90,14 @@ void IsoVector::load_recipes() {
     XMLinput->extendCurNS(ns);
 
     if ("xml" == format) {
+      CLOG(LEV_DEBUG2) << "going into a recipe book...";
       XMLinput->load_recipebook(filename);
     } else {
       throw CycRangeException(format + "is not a supported recipebook format.");
     }
     XMLinput->stripCurNS();
   }
+  CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

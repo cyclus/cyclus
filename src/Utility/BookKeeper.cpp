@@ -171,32 +171,32 @@ void BookKeeper::printTrans(trans_t trans){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerResourceState(int trans_id, rsrc_ptr resource){
-  mat_hist_t toRegister;
-  fill_n(toRegister.iso, NUMISOS, 0);
-  fill_n(toRegister.comp, NUMISOS, 0.0);
+  mat_hist_t* toRegister = new mat_hist_t();
+  fill_n(toRegister->iso, NUMISOS, 0);
+  fill_n(toRegister->comp, NUMISOS, 0.0);
 
-  toRegister.materialID = resource->ID(); 
-  toRegister.transID = trans_id; 
-  toRegister.timestamp = TI->time();
-  toRegister.quantity = resource->quantity();
-  strcpy(toRegister.units, resource->units().c_str());
+  toRegister->materialID = resource->ID(); 
+  toRegister->transID = trans_id; 
+  toRegister->timestamp = TI->time();
+  toRegister->quantity = resource->quantity();
+  strcpy(toRegister->units, resource->units().c_str());
 
   if (resource->type() == GENERIC_RES) {
-    strcpy(toRegister.name, boost::dynamic_pointer_cast<GenericResource>(resource)->quality().c_str());
+    strcpy(toRegister->name, boost::dynamic_pointer_cast<GenericResource>(resource)->quality().c_str());
   } else if (resource->type() == MATERIAL_RES) {
     mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(resource);
-    strcpy(toRegister.name, "Material");
+    strcpy(toRegister->name, "Material");
     CompMap comp = (mat->isoVector()).comp();
     int i = 0;
-    for(CompMap::const_iterator it = comp.begin(); it != comp.end(); it++){
-      toRegister.iso[i] = it->first;
-      toRegister.comp[i] = it->second;
+    for(CompMap::const_iterator it = comp.begin(); it != comp.end(); it++) {
+      toRegister->iso[i] = it->first;
+      toRegister->comp[i] = it->second;
       i++;
     }
   }
 
   // if it's registered in some other timestamp, register the material 
-  materials_.push_back(toRegister);
+  materials_.push_back(*toRegister);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

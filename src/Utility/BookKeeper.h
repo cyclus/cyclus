@@ -15,7 +15,7 @@
 #include "boost/any.hpp"
 
 #define BI BookKeeper::Instance()
-#define NUMISOS 100
+#define NUMISOS 1500
 
 typedef std::map<std::string, boost::any> ParamMap;
 
