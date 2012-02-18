@@ -368,7 +368,52 @@ void Message::define_trans_resource_table(){
   trans_resource_table->tableDefined();
 }
 
-void Message::addResourceToTable(int transID, int transPos, rsrc_ptr r){  
+void Message::define_table(){
+  // declare the table columns
+  column sender("SenderID","INTEGER");
+  column receiver("ReceiverID","INTEGER");
+  column resource("ResourceID","INTEGER");
+  column time("Time","INTEGER");
+  column price("Price","REAL");
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("SenderID"), pk.push_back("ReceiverID"), 
+    pk.push_back("ResourceID"), pk.push_back("Time");
+  trans_table->setPrimaryKey(pk);
+  // add columns to the table
+  trans_table->addColumn(sender), trans_table->addColumn(receiver), 
+    trans_table->addColumn(resource), trans_table->addColumn(time),
+    trans_table->addColumn(price);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //   Agents table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Agents",theirk);
+  //     the sender id
+  myk.push_back("SenderID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) );
+  myk.clear();
+  //     the reciever id
+  myk.push_back("ReceiverID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) );
+  myk.clear();
+  theirk.clear();
+  //    Resource table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Resources",theirk);
+  //      the resource id
+  myk.push_back("ResourceID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) ); // resourceid references resource's id
+  // we've now defined the table
+  trans_table->tableDefined();
+}
+
+void Message::addTransToTable(){  
   // if we haven't logged a message yet, define the table
   if ( !trans_resource_table->defined() )
     Message::define_trans_resource_table();
