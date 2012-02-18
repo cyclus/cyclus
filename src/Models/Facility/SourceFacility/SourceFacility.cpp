@@ -12,7 +12,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility() {
-  prev_time_ = TI->time();
+  prev_time_ = TI->time() - 1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -198,7 +198,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    if (inventoryMass() < order->resource()->quantity()) {
+    if (order->resource()->quantity() - inventoryMass() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {

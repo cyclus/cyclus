@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+
+<simulation>
+  <startyear>2000</startyear>
+  <startmonth>1</startmonth>
+  <simstart>0</simstart>
+  <decay>0</decay>
+  <duration>37</duration>
+
+  <!-- Commodities -->
+  <commodity>
+    <name>fresh_PWR_uo2</name>
+  </commodity>
+
+  <commodity>
+    <name>spent_PWR_uo2</name>
+  </commodity>
+
+  <!-- Markets -->
+  <market>
+    <name>fresh_PWR_uo2market</name>
+    <mktcommodity>fresh_PWR_uo2</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>spent_PWR_uo2market</name>
+    <mktcommodity>spent_PWR_uo2</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+  <recipebook>
+    <filename>nwtrb.recipebook.xml</filename>
+    <namespace>nwtrb</namespace>
+    <format>xml</format>
+  </recipebook>
+
+  <facility>
+    <name>PWR_uo2_FuelFab</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>fresh_PWR_uo2</outcommodity>
+        <capacity>2</capacity>
+        <inventorysize>500</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>nwtrb:fresh_PWR_uo2</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>Storage</name>
+    <model>
+      <SinkFacility>
+        <incommodity>spent_PWR_uo2</incommodity>
+        <capacity>483</capacity>
+        <inventorysize>1e6</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>Beaver_Valley_1</name>
+    <model>
+      <RecipeReactor>
+        <fuelpair>
+          <incommodity>fresh_PWR_uo2</incommodity>
+          <inrecipe>nwtrb:fresh_PWR_uo2</inrecipe>
+          <outcommodity>spent_PWR_uo2</outcommodity>
+          <outrecipe>nwtrb:spent_PWR_uo2</outrecipe>
+        </fuelpair>
+        <startConstrYear>1970</startConstrYear>
+        <startConstrMonth>06</startConstrMonth>
+        <startOperYear>1976</startOperYear>
+        <startOperMonth>10</startOperMonth>
+        <licExpYear>2036</licExpYear>
+        <licExpMonth>01</licExpMonth>
+        <lifetime>720</lifetime>
+        <state>PA</state>
+        <typeReac>PWR</typeReac>
+        <capacity>892</capacity>
+        <elecCF>0.92</elecCF>
+      </RecipeReactor>
+    </model>
+  </facility>
+
+  <region>
+    <name>USA</name>
+    <allowedfacility>Beaver_Valley_1</allowedfacility>
+    <allowedfacility>Storage</allowedfacility>
+    <allowedfacility>PWR_uo2_FuelFab</allowedfacility>
+    <model>
+      <NullRegion/>
+    </model>
+
+    <institution>
+      <name>OneInst</name>
+      <model>
+        <FixedInst>
+          <facility>
+            <type>Storage</type>
+            <name>Storage1</name>
+          </facility>
+          <facility>
+            <type>PWR_uo2_FuelFab</type>
+            <name>PWR_fuel_fab</name>
+          </facility>
+
+
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_1</name>
+          </facility>
+
+        </FixedInst>
+      </model>
+    </institution>
+  </region>
+
+</simulation>
