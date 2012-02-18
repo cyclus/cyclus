@@ -105,7 +105,6 @@ void Model::load_models() {
   load_facilities();
   load_regions();
   load_institutions();
-  define_table();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -287,7 +286,7 @@ void Model::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addToTable(){ 
+void Model::addToTable(){
   // if we haven't logged an agent yet, define the table
   if ( !agent_table->defined() )
     Model::define_table();
