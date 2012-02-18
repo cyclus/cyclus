@@ -222,11 +222,7 @@ public:
 
   bool isTemplate() {return is_template_;};
   void setIsTemplate(bool is_template);
-  
-  // the database table and related information
-  static Table *agent_table;
-  primary_key_ref pkref(){return pkref_;}
-  
+    
 protected:
   /// children of this model
   std::vector<Model*> children_;
@@ -250,8 +246,6 @@ private:
 
   static void load_institutions();
 
-  static void define_table();
-
   /// Stores the next available facility ID
   static int next_id_;
 
@@ -263,9 +257,6 @@ private:
 
   /// used to remove model instance refs from static model lists
   void removeFromList(Model* model, std::vector<Model*> &mlist);
-
-  /// add the model as a row in the database table
-  void addToTable();
 
   /**
    * parent of this model
@@ -318,11 +309,32 @@ private:
 
   bool born_;
 
+  /*
+    output database info
+  */
+ public:
+  // the database table and related information
+  static Table *agent_table;
+  
   /*!
-    Store information about this model's primary key
+    return the agent table's primary key
+  */
+  primary_key_ref pkref(){ return pkref_;}
+
+ private:
+  /*!
+    Define the database table on the first Message's init
+   */
+  static void define_table();
+
+  // add an agent to the transactiont table
+  void addToTable();
+
+  /*!
+    Store information about the transactions's primary key
    */
   primary_key_ref pkref_;
-
+  
 };
 
 #endif

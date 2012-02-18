@@ -11,6 +11,7 @@
 #include "Model.h"
 #include "Resource.h"
 #include "IntrusiveBase.h"
+#include "Table.h"
 
 class Communicator;
 class Model;
@@ -181,6 +182,8 @@ class Message: IntrusiveBase<Message> {
   
   /// stores the next available transaction ID
   static int nextTransID_;
+  
+  bool dead_;
 
  public:
   
@@ -416,14 +419,27 @@ class Message: IntrusiveBase<Message> {
     output database info
   */
  public:
+  // the database table and related information
+  static Table *trans_table;
+
+  // add a transaction to the transactiont table
+  void addTransToTable();
+
   /*!
      The getter function for the time agent output dir
   */
   static std::string outputDir(){ return outputDir_;}
 
  private:
+  /*!
+    Define the database table on the first Message's init
+   */
+  static void define_table();
 
-   bool dead_;
+  /*!
+    Store information about the transactions's primary key
+   */
+  primary_key_ref pkref_;
   
   /*!
      Every time agent writes to the output database

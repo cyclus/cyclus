@@ -10,6 +10,7 @@
 Table::Table(table_name name)
 {
   name_ = name;
+  defined_ = false;
 };
 
 // -----------------------------------------------------------------------
@@ -26,6 +27,12 @@ void Table::setPrimaryKey(std::string const pk_string)
   this->setPrimaryKey(pk);
 }
 
+void Table::tableDefined()
+{
+  defined_ = true;
+  LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
+			  << this->create();
+}
 // -----------------------------------------------------------------------
 // table creation functions
 void Table::addForeignKey(foreign_key const fk){
@@ -181,6 +188,7 @@ std::string Table::create(){
     cmd << ", " << this->f_keys();
   // close the create table command
   cmd << ");";
+
   // return a stringified version of the command
   //std::cout << "Command to execute: \n     " << cmd.str() << std::endl;
   return cmd.str();
