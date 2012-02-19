@@ -3,9 +3,11 @@
 #include "GenericResource.h"
 #include "Logger.h"
 
+bool GenericResource::type_is_logged_ = false;
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource::GenericResource(std::string units,
-            std::string quality, double quantity) : Resource() {
+                                 std::string quality, double quantity) : Resource() {
   units_ = units;
   quality_ = quality;
   quantity_ = quantity;
@@ -53,4 +55,10 @@ bool GenericResource::checkQuantityGT(rsrc_ptr other) {
   bool toRet;
   toRet = ( checkQuality(other) && quantity_ < other->quantity());
   return toRet;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GenericResource::setOriginatorID(int id){
+  originatorID_ = id;
+  this->Resource::addToTable();
 }

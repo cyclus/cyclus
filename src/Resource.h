@@ -3,7 +3,9 @@
 #define _RESOURCE_H
 #include <string>
 #include <boost/intrusive_ptr.hpp>
+
 #include "IntrusiveBase.h"
+#include "Table.h"
 
 class Resource;
 typedef boost::intrusive_ptr<Resource> rsrc_ptr;
@@ -89,17 +91,59 @@ public:
   /// return this resource's unique ID
   const int ID() {return ID_;};
 
+  /// return this resource's originator's ID
+  const int originatorID() {return originatorID_;}
+  
+  /// set the originator. NOTE this is when resources must
+  /// be added to their respective tables
+  virtual void setOriginatorID(int id) = 0;
+
   virtual ~Resource();
 
-protected:
-
+ protected:
+  
   Resource();
   
   int ID_;
+  
+  int originatorID_;
 
-private:
-
+ private:
+  
   static int nextID_;
+
+  // -------------------------------------------------------------
+  /*!
+    output database related members
+   */
+  
+ public:
+  // the database table and related information
+  static Table *resource_table;
+  static Table *resource_type_table;
+
+  // add a resource to table
+  void addToTable();
+
+  // all resource types must have a unit
+  virtual std::string type_name() = 0;
+  // all resource types must say if they have been logged
+  virtual bool is_resource_type_logged() = 0;
+  virtual void type_logged() = 0;
+  
+ private:
+  /*!
+    Define the database table
+   */
+  static void define_table();
+  static void define_type_table();
+  void logNewType();
+
+  /*!
+    Store information about the resource's primary key
+   */
+  primary_key_ref pkref_;
+  primary_key_ref type_pkref_;
 
 };
 

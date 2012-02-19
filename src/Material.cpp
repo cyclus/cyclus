@@ -16,6 +16,11 @@ bool Material::decay_wanted_ = false;
 
 int Material::decay_interval_ = 1;
 
+Table *Material::material_table = new Table("Material History"); 
+
+bool Material::type_is_logged_ = false;
+
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
   last_update_time_ = TI->time();
@@ -177,4 +182,49 @@ void Material::setDecay(int dec) {
     decay_wanted_ = true;
     decay_interval_ = dec;
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::define_table() {
+  // declare the table columns
+  column id("ID","INTEGER");
+  column state_id("StateID","INTEGER");
+  column time("Time","INTEGER");
+  // declare the table's primary key
+  material_table->setPrimaryKey(id);
+  // add columns to the table
+  material_table->addColumn(id);
+  material_table->addColumn(state_id);
+  material_table->addColumn(time);
+  // we've now defined the table
+  material_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::addToTable(){
+  // if we haven't logged an material yet, define the table
+  if ( !material_table->defined() )
+    Material::define_table();
+
+  // make a row
+  // declare data
+  data an_id( this->ID() ), a_state( 1 ), // @MJG FLAG need to do state recording
+    a_time( TI->time() );
+  // declare entries
+  entry id("ID",an_id), state("StateID",a_state), time("Time",a_time);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(state), aRow.push_back(time);
+  // add the row
+  material_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(id);
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Material::setOriginatorID(int id){
+  originatorID_ = id;
+  this->Resource::addToTable();
+  this->Material::addToTable();
 }
