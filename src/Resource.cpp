@@ -43,6 +43,17 @@ void Resource::define_table(){
   resource_table->addColumn(type);
   resource_table->addColumn(amt);
   resource_table->addColumn(creator);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //    Resource Types table foreign keys
+  theirk.push_back("Type");
+  fkref = new foreign_key_ref("Resource Types",theirk);
+  //      the resource id
+  myk.push_back("Type");
+  fk = new foreign_key(myk, (*fkref) );
+  resource_table->addForeignKey( (*fk) ); // type references Resource Types' type
   // we've now defined the table
   resource_table->tableDefined();
 }
