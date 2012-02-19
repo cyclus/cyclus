@@ -205,7 +205,6 @@ void Material::define_table() {
   primary_key pk;
   pk.push_back("ID"), pk.push_back("StateID");
   material_table->setPrimaryKey(pk);
-  material_table->setPrimaryKey(id);
   // add columns to the table
   material_table->addColumn(id);
   material_table->addColumn(state_id);
