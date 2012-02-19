@@ -225,7 +225,6 @@ Model::~Model() {
   BI->registerModelDatum<int>(ID_, "parentID", parentID_);
   BI->registerModelDatum<int>(ID_, "bornOn", bornOn());
   BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
-  std::cout << model_impl_ << std::endl;
 
   // remove references to self
   removeFromList(this, template_list_);
