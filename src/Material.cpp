@@ -191,18 +191,13 @@ void Material::define_table() {
   column state_id("StateID","INTEGER");
   column time("Time","INTEGER");
   // declare the table's primary key
-<<<<<<< HEAD
   primary_key pk;
   pk.push_back("ID"), pk.push_back("StateID");
   material_table->setPrimaryKey(pk);
-=======
-  material_table->setPrimaryKey(id);
->>>>>>> Three new tables are introduced: Resource, Resource Type, and Material History. Logging occurs when the generating facility sets the resource's originatorID. This is analagous to the Agent table, for which logging occurs when the setParent function is called. Both occurences happen when the object is 'born' in the simulation
   // add columns to the table
   material_table->addColumn(id);
   material_table->addColumn(state_id);
   material_table->addColumn(time);
-<<<<<<< HEAD
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -214,8 +209,6 @@ void Material::define_table() {
   myk.push_back("StateID");
   fk = new foreign_key(myk, (*fkref) );
   material_table->addForeignKey( (*fk) ); // type references Resource Types' type
-=======
->>>>>>> Three new tables are introduced: Resource, Resource Type, and Material History. Logging occurs when the generating facility sets the resource's originatorID. This is analagous to the Agent table, for which logging occurs when the setParent function is called. Both occurences happen when the object is 'born' in the simulation
   // we've now defined the table
   material_table->tableDefined();
 }
@@ -239,10 +232,7 @@ void Material::addToTable(){
   material_table->addRow(aRow);
   // record this primary key
   pkref_.push_back(id);
-<<<<<<< HEAD
   pkref_.push_back(state);
-=======
->>>>>>> Three new tables are introduced: Resource, Resource Type, and Material History. Logging occurs when the generating facility sets the resource's originatorID. This is analagous to the Agent table, for which logging occurs when the setParent function is called. Both occurences happen when the object is 'born' in the simulation
 }
 
 
