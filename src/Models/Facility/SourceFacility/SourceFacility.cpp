@@ -12,7 +12,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility() {
-  prev_time_ = TI->time();
+  prev_time_ = TI->time() - 1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -159,6 +159,7 @@ void SourceFacility::generateMaterial(int curr_time) {
     temp.setMass(empty_space);
   }
   mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
+  newMat->setOriginatorID( this->ID() );
   inventory_.push_front(newMat);
 }
 
@@ -198,7 +199,7 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    if (inventoryMass() < order->resource()->quantity()) {
+    if (order->resource()->quantity() - inventoryMass() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {

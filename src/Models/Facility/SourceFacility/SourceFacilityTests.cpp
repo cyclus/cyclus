@@ -125,7 +125,7 @@ TEST_F(SourceFacilityTest, Tick) {
   EXPECT_LT(0.0, src_facility->fakeCheckInventory());
   EXPECT_LE(src_facility->getCapacity(), src_facility->fakeCheckInventory());
 
-  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe().mass(); 
+  double expected_inventory = 2 * src_facility->getCapacity()*src_facility->getRecipe().mass(); 
   if (expected_inventory > src_facility->getInvSize()) {
     expected_inventory = src_facility->getInvSize();
   }

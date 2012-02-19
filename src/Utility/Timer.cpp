@@ -228,7 +228,9 @@ int Timer::simDur() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer::Timer() { }
+Timer::Timer() {
+  time_ = 0;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::convertDate(int month, int year) {
