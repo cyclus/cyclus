@@ -83,6 +83,18 @@ public:
 
   /// Returns the concrete type of this resource
   virtual ResourceType type(){return GENERIC_RES;};
+  
+  /// Returns the type name of this resource
+  virtual std::string type_name(){return "Generic Resource";}
+
+  /// Return if this resource type has been logged for the database
+  bool is_resource_type_logged(){return type_is_logged_;}
+  
+  /// Tells this resource that it has, indeed, been logged
+  void type_logged(){type_is_logged_ = true;}
+  
+  /// Sets the originator's id AND logs the resource
+  void setOriginatorID(int id);
 
 protected:
   /// The quality distinguishing this resource will be traded as.
@@ -94,6 +106,9 @@ protected:
   /// The quality distinguishing this resource will be traded as.
   double quantity_;
 
+ private:
+  /// A boolean to tell if the resource has been logged
+  static bool type_is_logged_;
 };
 
 #endif
