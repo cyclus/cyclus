@@ -16,7 +16,7 @@ bool Material::decay_wanted_ = false;
 
 int Material::decay_interval_ = 1;
 
-Table *Material::material_table = new Table("Material History"); 
+Table *Material::material_table = new Table("MaterialHistory"); 
 
 bool Material::type_is_logged_ = false;
 
@@ -205,11 +205,24 @@ void Material::define_table() {
   column state_id("StateID","INTEGER");
   column time("Time","INTEGER");
   // declare the table's primary key
-  material_table->setPrimaryKey(id);
+  primary_key pk;
+  pk.push_back("ID"), pk.push_back("StateID");
+  material_table->setPrimaryKey(pk);
   // add columns to the table
   material_table->addColumn(id);
   material_table->addColumn(state_id);
   material_table->addColumn(time);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //    Resource Types table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("IsotopicStates",theirk);
+  //      the resource id
+  myk.push_back("StateID");
+  fk = new foreign_key(myk, (*fkref) );
+  material_table->addForeignKey( (*fk) ); // type references Resource Types' type
   // we've now defined the table
   material_table->tableDefined();
 }
@@ -233,6 +246,7 @@ void Material::addToTable(){
   material_table->addRow(aRow);
   // record this primary key
   pkref_.push_back(id);
+  pkref_.push_back(state);
 }
 
 
