@@ -185,6 +185,42 @@ private:
   /// how many months between decay calculations
   static int decay_interval_;
 
+  // -------------------------------------------------------------
+  /*!
+    required functions via the resource class
+   */
+ public:
+  std::string type_name(){return "material";}
+  bool is_resource_type_logged(){return type_is_logged_;}
+  void type_logged(){type_is_logged_ = true;}
+  void setOriginatorID(int id);
+
+ private:
+  static bool type_is_logged_;
+
+  // -------------------------------------------------------------
+  /*!
+    output database related members
+   */
+ public:
+  // the database table and related information
+  static Table *material_table;
+
+  // add a material to table
+  void addToTable();
+
+ private:
+  /*!
+    Define the database table
+   */
+  static void define_table();
+
+  /*!
+    Store information about the material's primary key
+   */
+  primary_key_ref pkref_;
+  
+  
 };
 
 #endif
