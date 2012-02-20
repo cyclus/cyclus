@@ -323,6 +323,7 @@ private:
 
   void trackComposition();
   
+  /// returns the state id of the current composition if it is already tracked
   int compositionIsTracked();
   
 };

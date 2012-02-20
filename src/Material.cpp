@@ -164,6 +164,8 @@ void Material::decay() {
   iso_vector_.executeDecay(delta_time);
 
   last_update_time_ = curr_time;
+  // we've decayed something, so register the state change
+  this->addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -239,7 +241,7 @@ void Material::addToTable(){
 
   // make a row
   // declare data
-  data an_id( this->originalID() ), a_state( 1 ), // @MJG FLAG need to do state recording
+  data an_id( this->originalID() ), a_state( this->stateID() ), // @MJG FLAG need to do state recording
     a_time( TI->time() );
   // declare entries
   entry id("ID",an_id), state("StateID",a_state), time("Time",a_time);

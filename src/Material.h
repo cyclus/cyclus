@@ -1,3 +1,4 @@
+
 // Material.h
 #if !defined(_MATERIAL_H)
 #define _MATERIAL_H
@@ -208,6 +209,9 @@ private:
 
   // add a material to table
   void addToTable();
+
+  // return the state id for the iso vector
+  int stateID(){return iso_vector_.stateID();}
 
  private:
   /*!
