@@ -93,7 +93,6 @@ void DecayHandler::loadDecayInfo() {
 void DecayHandler::addIsoToList(int iso) {
   bool exists = (std::find(IsotopesTracked_.begin(), IsotopesTracked_.end(),iso)!=IsotopesTracked_.end());
   if (!exists){
-    std::cout << iso << std::endl;
     IsotopesTracked_.push_back(iso);
   }
 }

@@ -28,7 +28,7 @@ Table *IsoVector::iso_table = new Table("IsotopicStates");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
-  trackComposition();
+  trackComposition(); // @gidden do we want this method here? you're throwing -2s..
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -430,6 +430,7 @@ void IsoVector::executeDecay(double time_change) {
   handler.setComp(atom_comp_);
   handler.decay(years);
   atom_comp_ = handler.compAsCompMap();
+  this->trackComposition();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -492,8 +493,10 @@ int IsoVector::compositionIsTracked() {
 
   if(lb != predefinedStates_.end() && !(predefinedStates_.key_comp()(comp, lb->first)))
     return lb->second; // found, return the state
+  else if ( ( (int) comp->size() > 0 ) )
+    return -1; // not found, not empty, return a corresponding token
   else
-    return -1; // not found, return a corresponding token
+    return -2; // not found, but comp map is empty -- probably from empty constructor  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -538,19 +541,28 @@ void IsoVector::addToTable(){
   if ( !iso_table->defined() )
     IsoVector::define_table();
 
-  // // make a row
-  // // declare data
-  // data an_id( this->ID() ), a_type( this->modelImpl() ), 
-  //   a_pid( this->parentID() ), a_bod( this->bornOn() );
-  // // declare entries
-  // entry id("ID",an_id), type("Type",a_type), pid("ParentID",a_pid), 
-  //   bod("EnterDate",a_bod);
-  // // declare row
-  // row aRow;
-  // aRow.push_back(id), aRow.push_back(type), aRow.push_back(pid),
-  //   aRow.push_back(bod);
-  // // add the row
-  // agent_table->addRow(aRow);
-  // // record this primary key
-  // pkref_.push_back(id);
+  // make a row - stateid first then isotopics
+  // declare data
+  data an_id( this->stateID() );
+  // declare entries
+  entry id("ID",an_id);
+  // declare row
+  row aRow;
+  aRow.push_back(id);
+
+  // now for the composition isotopics
+  CompMap* comp = &atom_comp_;
+  for (CompMap::iterator item = comp->begin();
+       item != comp->end(); item++){
+    std::stringstream an_iso;
+    an_iso << item->first;
+    data some_data( item->second );
+    entry an_entry(an_iso.str(),some_data);
+    aRow.push_back(an_entry);
+  }
+
+  // add the row
+  iso_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(id);
 }
