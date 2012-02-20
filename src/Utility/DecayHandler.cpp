@@ -1,6 +1,7 @@
 
 #include "DecayHandler.h"
 
+#include <iostream>
 #include <string>
 #include <fstream>
 
@@ -15,6 +16,7 @@ bool DecayHandler::decay_info_loaded_ = false;
 ParentMap DecayHandler::parent_ = ParentMap();
 DaughtersMap DecayHandler::daughters_ = DaughtersMap();
 Matrix DecayHandler::decayMatrix_ = Matrix();
+IsoList DecayHandler::IsotopesTracked_ = IsoList();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DecayHandler::DecayHandler() {
@@ -49,18 +51,19 @@ void DecayHandler::loadDecayInfo() {
       // make parent
       decayInfo >> decayConst;
       decayInfo >> nDaughters;
-     
+      addIsoToList(iso);
+
       // checks for duplicate parent isotopes
       if ( parent_.find(iso) == parent_.end() ) {
         parent_[iso] = make_pair(jcol, decayConst);
            
         // make daughters
         vector< pair<int,double> > temp(nDaughters);
-   
         for ( int i = 0; i < nDaughters; ++i ) {
           decayInfo >> iso;
           decayInfo >> branchRatio;
-
+          addIsoToList(iso);
+          
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
@@ -78,11 +81,20 @@ void DecayHandler::loadDecayInfo() {
         throw CycParseException(err_msg);
       }
       decayInfo >> iso; // get next parent
-    } 
+    }
     // builds the decay matrix from the parent and daughter maps
     buildDecayMatrix();
   } else {
     throw CycIOException("Could not find file 'decayInfo.dat'.");
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void DecayHandler::addIsoToList(int iso) {
+  bool exists = (std::find(IsotopesTracked_.begin(), IsotopesTracked_.end(),iso)!=IsotopesTracked_.end());
+  if (!exists){
+    std::cout << iso << std::endl;
+    IsotopesTracked_.push_back(iso);
   }
 }
 

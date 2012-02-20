@@ -23,6 +23,8 @@ typedef std::map< int, std::pair<int, double> > ParentMap;
  */
 typedef std::map<int, std::vector<std::pair<int, double> > > DaughtersMap;
 
+typedef std::vector<int> IsoList;
+
 class DecayHandler {
   private:
 
@@ -49,6 +51,13 @@ class DecayHandler {
 
     static bool decay_info_loaded_;
 
+    static IsoList IsotopesTracked_;
+    
+    /*!
+      Add the Isotope to our list of tracked isotopes IFF it is not already in that list
+     */
+    static void addIsoToList(int iso);
+
   public:
 
     DecayHandler();
@@ -62,7 +71,10 @@ class DecayHandler {
     CompMap compAsCompMap();
 
     void decay(double years);
-
+    
+    int nTrackedIsotopes(){return IsotopesTracked_.size();}
+    
+    int trackedIsotope(int i){return IsotopesTracked_.at(i);}
 };
 
 #endif

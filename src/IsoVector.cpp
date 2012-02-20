@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <iostream>
 #include <vector>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
@@ -17,13 +18,19 @@ using namespace std;
 
 // Static variables to be initialized.
 int IsoVector::nextID_ = 0;
+int IsoVector::nextStateID_ = 0;
 std::map<std::string, IsoVector*> IsoVector::recipes_;
+StateMap IsoVector::predefinedStates_ = StateMap();
+// Database table for isotopic states
+Table *IsoVector::iso_table = new Table("IsotopicStates"); 
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
   mass_out_of_date_ = true;
   total_mass_ = 0;
+  trackComposition();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -34,6 +41,7 @@ IsoVector::IsoVector(CompMap initial_comp) {
   mass_out_of_date_ = true;
 
   validateComposition();
+  trackComposition();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -69,6 +77,7 @@ IsoVector::IsoVector(xmlNodePtr cur) {
   } else {
     setMass(total_qty);
   }
+  trackComposition();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -498,3 +507,72 @@ bool IsoVector::isZero(int tope) {
   return (atom_comp_[tope] * grams_per_mole / grams_per_kg < EPS_KG);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int IsoVector::compositionIsTracked() {
+  CompMap* comp = &atom_comp_;
+  StateMap::iterator lb = predefinedStates_.lower_bound(comp);
+
+  if(lb != predefinedStates_.end() && !(predefinedStates_.key_comp()(comp, lb->first)))
+    return lb->second; // found, return the state
+  else
+    return -1; // not found, return a corresponding token
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::trackComposition() {
+  int check = compositionIsTracked();
+  if ( check == -1 ) {
+    // this is a new composition, log it accordingly
+    CompMap* comp = &atom_comp_;
+    stateID_ = nextStateID_++;
+    predefinedStates_[comp] = stateID_;
+    IsoVector::addToTable();
+  } else {
+    // we are already tracking this composition
+    stateID_ = check;
+  } 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::define_table() {
+  // We'll need information on the isotopes we're tracking
+  DecayHandler handler;
+  int nIsotopes = handler.nTrackedIsotopes();
+  // declare the state id columns and add it to the table
+  column state_id("ID","INTEGER");
+  iso_table->addColumn(state_id);
+  // declare the table's primary key
+  iso_table->setPrimaryKey(state_id);
+  // declare each isotope column and add it to the table
+  for (int i = 0; i < nIsotopes; i++){
+    std::stringstream iso;
+    iso << handler.trackedIsotope(i);
+    column a_column(iso.str(),"REAL");
+    iso_table->addColumn(a_column);
+  }
+  // we've now defined the table
+  iso_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::addToTable(){
+  // if we haven't logged an agent yet, define the table
+  if ( !iso_table->defined() )
+    IsoVector::define_table();
+
+  // // make a row
+  // // declare data
+  // data an_id( this->ID() ), a_type( this->modelImpl() ), 
+  //   a_pid( this->parentID() ), a_bod( this->bornOn() );
+  // // declare entries
+  // entry id("ID",an_id), type("Type",a_type), pid("ParentID",a_pid), 
+  //   bod("EnterDate",a_bod);
+  // // declare row
+  // row aRow;
+  // aRow.push_back(id), aRow.push_back(type), aRow.push_back(pid),
+  //   aRow.push_back(bod);
+  // // add the row
+  // agent_table->addRow(aRow);
+  // // record this primary key
+  // pkref_.push_back(id);
+}
