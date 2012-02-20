@@ -27,9 +27,9 @@ table_ptr IsoVector::iso_table = new Table("IsotopicStates");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
-  trackComposition(); // @gidden do we want this method here? you're throwing -2s..
   mass_out_of_date_ = true;
   total_mass_ = 0;
+  trackComposition(); // @gidden do we want this method here? you're throwing -2s..
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

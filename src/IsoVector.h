@@ -291,7 +291,6 @@ private:
   /// the current state id
   int stateID(){return stateID_;}
 
-<<<<<<< HEAD
  private:
   /*!
     Define the database table on the first Message's init
@@ -327,6 +326,31 @@ private:
   /// aids in mass recalc prevention - used in conjunction with total_mass_
   bool mass_out_of_date_;
 
+ private:
+  /*!
+    Define the database table on the first Message's init
+   */
+  static void define_table();
+
+  // add an agent to the transactiont table
+  void addToTable();
+
+  /*!
+    Store information about the transactions's primary key
+   */
+  primary_key_ref pkref_;
+  
+  /// state variables
+  int stateID_;
+  static int nextStateID_;
+
+  /// a mapping of already-defined compositions to states
+  static StateMap predefinedStates_;
+
+  void trackComposition();
+  
+  int compositionIsTracked();
+  
 };
 
 #endif
