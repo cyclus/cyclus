@@ -9,6 +9,7 @@
 #include <string>
 #include <libxml/tree.h>
 
+#include "Table.h"
 #include "UseMatrixLib.h"
 
 #define AVOGADRO 6.02e23
@@ -46,6 +47,9 @@ typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
 
 /// map isotope (int) to atoms/mass (double)
 typedef std::map<Iso, double> CompMap;
+
+/// map Composition Map Pointer (CompMap*) to state (int)
+typedef std::map<CompMap*, int> StateMap;
 
 /*! 
  Class Material the object used to transact material objects around the system.
@@ -270,7 +274,48 @@ private:
 
   /// Core isotope composition information stored here.
   CompMap atom_comp_;
+  
+  
+  /*
+    output database info
+  */
+ public:
+  // the database table and related information
+  static Table *iso_table;
+  
+  /*!
+    return the agent table's primary key
+  */
+  primary_key_ref pkref(){ return pkref_;}
+  
+  /// the current state id
+  int stateID(){return stateID_;}
 
+ private:
+  /*!
+    Define the database table on the first Message's init
+   */
+  static void define_table();
+
+  // add an agent to the transactiont table
+  void addToTable();
+
+  /*!
+    Store information about the transactions's primary key
+   */
+  primary_key_ref pkref_;
+  
+  /// state variables
+  int stateID_;
+  static int nextStateID_;
+
+  /// a mapping of already-defined compositions to states
+  static StateMap predefinedStates_;
+
+  void trackComposition();
+  
+  int compositionIsTracked();
+  
 };
 
 #endif
