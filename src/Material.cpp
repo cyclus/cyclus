@@ -225,13 +225,22 @@ void Material::define_table() {
   foreign_key_ref *fkref;
   foreign_key *fk;
   key myk, theirk;
+  //    Resources table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Resources",theirk);
+  //      the resource id
+  myk.push_back("ID");
+  fk = new foreign_key(myk, (*fkref) );
+  material_table->addForeignKey( (*fk) ); // id references resources' id
+  myk.clear(), theirk.clear();
   //    IsotopicStates table foreign keys
   theirk.push_back("ID");
   fkref = new foreign_key_ref("IsotopicStates",theirk);
   //      the state id
   myk.push_back("StateID");
   fk = new foreign_key(myk, (*fkref) );
-  material_table->addForeignKey( (*fk) ); // stated id references isotopicstates' id
+  material_table->addForeignKey( (*fk) ); // stateid references isotopicstates' id
+  myk.clear(), theirk.clear();
   // we've now defined the table
   material_table->tableDefined();
 }
@@ -244,7 +253,7 @@ void Material::addToTable(){
 
   // make a row
   // declare data
-  data an_id( this->ID() ), a_state( 1 ), // @MJG FLAG need to do state recording
+  data an_id( this->originalID() ), a_state( 1 ), // @MJG FLAG need to do state recording
     a_time( TI->time() );
   // declare entries
   entry id("ID",an_id), state("StateID",a_state), time("Time",a_time);
