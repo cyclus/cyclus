@@ -51,7 +51,8 @@ Material::Material(const Material& other) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::absorb(mat_rsrc_ptr matToAdd) {
+void Material::absorb(mat_rsrc_ptr matToAdd) { 
+  // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   IsoVector vec_to_add = matToAdd->isoVector();
   iso_vector_ = iso_vector_ + vec_to_add;
@@ -71,7 +72,11 @@ mat_rsrc_ptr Material::extract(double mass) {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
                    << " kg extracted from it. New mass=" << quantity() << " kg.";
   
-  return mat_rsrc_ptr(new Material(new_comp));
+  mat_rsrc_ptr new_mat = new Material(new_comp);
+  // we just split a resource, so keep track of the original for book keeping
+  new_mat->setOriginalID( this->originalID() );
+
+  return mat_rsrc_ptr(new_mat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,7 +87,11 @@ mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   CLOG(LEV_DEBUG3) << "New Material state:";
   print();
 
-  return mat_rsrc_ptr(new Material(rem_comp));
+  mat_rsrc_ptr new_mat = new Material(rem_comp);
+  // we just split a resource, so keep track of the original for book keeping
+  new_mat->setOriginalID( this->originalID() );
+
+  return mat_rsrc_ptr(new_mat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -216,13 +225,13 @@ void Material::define_table() {
   foreign_key_ref *fkref;
   foreign_key *fk;
   key myk, theirk;
-  //    Resource Types table foreign keys
+  //    IsotopicStates table foreign keys
   theirk.push_back("ID");
   fkref = new foreign_key_ref("IsotopicStates",theirk);
-  //      the resource id
+  //      the state id
   myk.push_back("StateID");
   fk = new foreign_key(myk, (*fkref) );
-  material_table->addForeignKey( (*fk) ); // type references Resource Types' type
+  material_table->addForeignKey( (*fk) ); // stated id references isotopicstates' id
   // we've now defined the table
   material_table->tableDefined();
 }
@@ -248,7 +257,6 @@ void Material::addToTable(){
   pkref_.push_back(id);
   pkref_.push_back(state);
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::setOriginatorID(int id){

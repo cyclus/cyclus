@@ -91,6 +91,12 @@ public:
   /// return this resource's unique ID
   const int ID() {return ID_;};
 
+  /// return this resource's original ID
+  const int originalID() {return originalID_;};
+
+  /// a resource has been split, set the id to the original resource's
+  void setOriginalID(int id);
+
   /// return this resource's originator's ID
   const int originatorID() {return originatorID_;}
   
@@ -105,6 +111,8 @@ public:
   Resource();
   
   int ID_;
+
+  int originalID_;
   
   int originatorID_;
 

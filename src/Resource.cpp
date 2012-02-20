@@ -6,10 +6,11 @@ int Resource::nextID_ = 0;
 
 // Database table for resources
 Table *Resource::resource_table = new Table("Resources"); 
-Table *Resource::resource_type_table = new Table("Resource Types"); 
+Table *Resource::resource_type_table = new Table("ResourceTypes"); 
 
 Resource::Resource() {
   ID_ = nextID_++;
+  originalID_ = ID_;
   MLOG(LEV_DEBUG4) << "Resource ID=" << ID_ << ", ptr=" << this << " created.";
 }
 
@@ -23,6 +24,9 @@ bool Resource::checkEquality(rsrc_ptr other) {
   return toRet; 
 }
 
+void Resource::setOriginalID(int id){
+  originalID_ = id;
+}
 
 // -------------------------------------------------------------
 /*!
@@ -34,7 +38,7 @@ void Resource::define_table(){
   // declare the table columns
   column id("ID","INTEGER");
   column type("Type","INTEGER");
-  column amt("Quantity","REAL");
+  column amt("OriginalQuantity","REAL");
   column creator("OriginatorID","INTEGER");
   // declare the table's primary key
   resource_table->setPrimaryKey(id);
@@ -49,11 +53,20 @@ void Resource::define_table(){
   key myk, theirk;
   //    Resource Types table foreign keys
   theirk.push_back("Type");
-  fkref = new foreign_key_ref("Resource Types",theirk);
-  //      the resource id
+  fkref = new foreign_key_ref("ResourceTypes",theirk);
+  //      the resource type
   myk.push_back("Type");
   fk = new foreign_key(myk, (*fkref) );
   resource_table->addForeignKey( (*fk) ); // type references Resource Types' type
+  myk.clear(), theirk.clear();
+  //   Agents table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Agents",theirk);
+  //     the originator id
+  myk.push_back("OriginatorID");
+  fk = new foreign_key(myk, (*fkref) );
+  resource_table->addForeignKey( (*fk) ); // originatorid references Agents' id
+  myk.clear(), theirk.clear();
   // we've now defined the table
   resource_table->tableDefined();
 }

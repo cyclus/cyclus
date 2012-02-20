@@ -374,6 +374,17 @@ void Model::define_table() {
   agent_table->addColumn(parent_id);
   agent_table->addColumn(bornOn);
   agent_table->addColumn(diedOn);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //    Agent table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Agents",theirk);
+  //      the parent id
+  myk.push_back("ParentID");
+  fk = new foreign_key(myk, (*fkref) );
+  agent_table->addForeignKey( (*fk) ); // parentid references' agents' id
   // we've now defined the table
   agent_table->tableDefined();
 }
