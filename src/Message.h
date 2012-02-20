@@ -421,9 +421,7 @@ class Message: IntrusiveBase<Message> {
  public:
   // the database table and related information
   static Table *trans_table;
-
-  // add a transaction to the transactiont table
-  void addTransToTable();
+  static Table *trans_resource_table;
 
   /*!
      The getter function for the time agent output dir
@@ -432,14 +430,20 @@ class Message: IntrusiveBase<Message> {
 
  private:
   /*!
-    Define the database table on the first Message's init
+    Define the database tables
    */
-  static void define_table();
+  static void define_trans_table();
+  static void define_trans_resource_table();
+
+  // add a transaction to the transaction table
+  void addTransToTable(int id);
+  void addResourceToTable(int id, int position, rsrc_ptr resource);
 
   /*!
     Store information about the transactions's primary key
    */
-  primary_key_ref pkref_;
+  primary_key_ref pkref_trans_;
+  primary_key_ref pkref_rsrc_;
   
   /*!
      Every time agent writes to the output database
