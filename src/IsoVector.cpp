@@ -568,7 +568,6 @@ void IsoVector::addToTable(){
   CompMap* comp = &atom_comp_;
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
-    // declare row
     // decalre data
     data an_iso_id(item->first), an_iso_value(item->second);
     // declare entries
@@ -582,4 +581,10 @@ void IsoVector::addToTable(){
     pkref_.push_back(id);
     pkref_.push_back(iso_id);
   }
+
+  // add the row
+  iso_table->addRow(aRow);
+  // record this primary key
+  pkref_.push_back(id);
+>>>>>>> All tables now create and record. Records are confirmed correct for null/test1.xml. More testing and documentation to follow. HDF5 to be replaced shortly.
 }
