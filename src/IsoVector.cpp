@@ -527,7 +527,7 @@ void IsoVector::define_table() {
   // declare each isotope column and add it to the table
   for (int i = 0; i < nIsotopes; i++){
     std::stringstream iso;
-    iso << handler.trackedIsotope(i);
+    iso << "'" << handler.trackedIsotope(i) << "'";
     column a_column(iso.str(),"REAL");
     iso_table->addColumn(a_column);
   }
@@ -555,7 +555,7 @@ void IsoVector::addToTable(){
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
     std::stringstream an_iso;
-    an_iso << item->first;
+    an_iso << "'" << item->first << "'";
     data some_data( item->second );
     entry an_entry(an_iso.str(),some_data);
     aRow.push_back(an_entry);
