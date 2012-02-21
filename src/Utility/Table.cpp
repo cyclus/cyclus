@@ -32,7 +32,6 @@ void Table::tableDefined()
   defined_ = true;
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
                           << this->create();
-  std::cout << this->create() << std::endl;
 }
 
 // -----------------------------------------------------------------------
@@ -62,7 +61,6 @@ void Table::addRow(row const r){
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
   LOG(LEV_DEBUG5,"table") << "Added command to row commands: " << cmd->str();
-  std::cout << cmd->str() << std::endl;
 }
 
 // update rows
@@ -74,8 +72,8 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   (*cmd) << "WHERE " << updateRowPK(pkref) << ";";
   row_commands_.push_back(cmd);
   LOG(LEV_DEBUG5, "table") << "Added command to row commands: " << cmd->str();
-  std::cout << cmd->str() << std::endl;
 }
+
 void Table::updateRow(primary_key_ref const pkref, row const r){
   int nEntries = r.size();
   for (int i = 0; i < nEntries; i++){
@@ -194,7 +192,6 @@ std::string Table::create(){
   cmd << ");";
 
   // return a stringified version of the command
-  //std::cout << "Command to execute: \n     " << cmd.str() << std::endl;
   return cmd.str();
 }
 
@@ -209,7 +206,6 @@ std::string Table::writeRows(){
       cmd << " ";
   }
   // return a stringified version of the command
-  //std::cout << "Command to execute: \n     " << cmd.str() << std::endl;
   return cmd.str();
 }
 
