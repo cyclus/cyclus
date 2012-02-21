@@ -86,10 +86,12 @@ void Resource::addToTable(){
   data an_id( this->ID() ), a_type( (int)this->type() ), 
     an_amt( this->quantity() ), a_creator( this->originatorID() );
   // declare entries
-  entry id("ID",an_id), type("Type",a_type), amt("Quantity", an_amt), creator("OriginatorID",a_creator);
+  entry id("ID",an_id), type("Type",a_type), 
+    amt("OriginalQuantity", an_amt), creator("OriginatorID",a_creator);
   // declare row
   row aRow;
-  aRow.push_back(id), aRow.push_back(type), aRow.push_back(amt), aRow.push_back(creator);
+  aRow.push_back(id), aRow.push_back(type), 
+    aRow.push_back(amt), aRow.push_back(creator);
   // add the row
   resource_table->addRow(aRow);
   // record this primary key

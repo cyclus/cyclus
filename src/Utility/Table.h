@@ -82,6 +82,7 @@ class Table {
   std::string updateRowPK(primary_key_ref const pkref);
   std::string stringifyData(data const d);
   void flushRows(){row_commands_.clear();}
+
 };
 
 #endif // END TABLE_H
