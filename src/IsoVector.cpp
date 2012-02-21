@@ -538,21 +538,17 @@ void IsoVector::trackComposition() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::define_table() {
-  // We'll need information on the isotopes we're tracking
-  DecayHandler handler;
-  int nIsotopes = handler.nTrackedIsotopes();
   // declare the state id columns and add it to the table
   column state_id("ID","INTEGER");
+  column iso_id("IsoID","INTEGER");
+  column iso_value("Value","REAL");
   iso_table->addColumn(state_id);
+  iso_table->addColumn(iso_id);
+  iso_table->addColumn(iso_value);
   // declare the table's primary key
-  iso_table->setPrimaryKey(state_id);
-  // declare each isotope column and add it to the table
-  for (int i = 0; i < nIsotopes; i++){
-    std::stringstream iso;
-    iso << "'" << handler.trackedIsotope(i) << "'";
-    column a_column(iso.str(),"REAL");
-    iso_table->addColumn(a_column);
-  }
+  primary_key pk;
+  pk.push_back("ID"), pk.push_back("IsoID");
+  iso_table->setPrimaryKey(pk);
   // we've now defined the table
   iso_table->tableDefined();
 }
@@ -568,23 +564,23 @@ void IsoVector::addToTable(){
   data an_id( this->stateID() );
   // declare entries
   entry id("ID",an_id);
-  // declare row
-  row aRow;
-  aRow.push_back(id);
 
   // now for the composition isotopics
   CompMap* comp = &atom_comp_;
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
-    std::stringstream an_iso;
-    an_iso << "'" << item->first << "'";
-    data some_data( item->second );
-    entry an_entry(an_iso.str(),some_data);
-    aRow.push_back(an_entry);
+    // declare row
+    // decalre data
+    data an_iso_id(item->first), an_iso_value(item->second);
+    // declare entries
+    entry iso_id("IsoID",an_iso_id), iso_value("Value",an_iso_value);
+    // construct row
+    row aRow;
+    aRow.push_back(id), aRow.push_back(iso_id), aRow.push_back(iso_value);
+    // add the row
+    iso_table->addRow(aRow);
+    // record this primary key
+    pkref_.push_back(id);
+    pkref_.push_back(iso_id);
   }
-
-  // add the row
-  iso_table->addRow(aRow);
-  // record this primary key
-  pkref_.push_back(id);
 }
