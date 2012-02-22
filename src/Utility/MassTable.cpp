@@ -1,5 +1,7 @@
 // MassTable class
 
+#define db_select 1 // 0 for sqlite, 1 for hdf5
+
 #include "MassTable.h"
 
 #include "CycException.h"
@@ -29,7 +31,12 @@ MassTable* MassTable::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
   // figure out what's in the file
-  initialize();
+  if (db_select == 0)
+    initializeSQL();
+  else if (db_select == 1)
+    initializeHDF();
+  else
+    throw CycIOException("Unknown mass database type"); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,7 +51,7 @@ double MassTable::getMassInGrams(int tope) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MassTable::initialize() {
+void MassTable::initializeHDF() {
   string file_path = ENV->getCyclusPath() + "/Data/mass.h5"; 
 
   const H5std_string filename = file_path;
@@ -122,5 +129,11 @@ void MassTable::initialize() {
   } catch( Exception error ) {
      error.printError();
   }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void MassTable::initializeSQL() 
+{
+  
 };
 
