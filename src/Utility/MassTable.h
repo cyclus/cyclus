@@ -97,7 +97,13 @@ protected:
    * a function to initialize a large array of nuclide_t structs via the 
    * HDF5/C++ API
    */
-  void initialize();
+  void initializeHDF();
+
+  /** 
+   * a function to initialize a large array of nuclide_t structs via the 
+   * SQLite/C++ API
+   */
+  void initializeSQL();
 
 };
 
