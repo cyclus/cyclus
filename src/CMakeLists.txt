@@ -41,6 +41,7 @@ SET( CYCLUS_CORE
   Material.cpp
   Message.cpp
   Utility/BookKeeper.cpp 
+  Utility/Database.cpp
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 
   Utility/MassTable.cpp 
@@ -76,6 +77,13 @@ ${CYCLUS_SOURCE_DIR}/Utility/mass.h5
 ${CMAKE_CURRENT_BINARY_DIR}/Data/mass.h5
 COPYONLY
 )
+
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
+${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite
+COPYONLY
+)
+
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/cyclus.rng
 ${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
@@ -127,7 +135,7 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp sqlite3 )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -184,7 +192,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp sqlite3 gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 

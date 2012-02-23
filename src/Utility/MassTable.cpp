@@ -1,20 +1,16 @@
 // MassTable class
 
-#define db_select 1 // 0 for sqlite, 1 for hdf5
+#define DB_SELECT 1 // 0 for sqlite, 1 for hdf5
 
 #include "MassTable.h"
 
 #include "CycException.h"
 
 #include <iostream>
-#include "hdf5.h"
-#include "H5Cpp.h" 
-#include "H5CompType.h"
-#include "H5Exception.h"
+#include <stdlib.h>
 #include "Env.h"
 
 using namespace std;
-using namespace H5;
 
 MassTable* MassTable::instance_ = 0;
 
@@ -31,9 +27,9 @@ MassTable* MassTable::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
   // figure out what's in the file
-  if (db_select == 0)
+  if (DB_SELECT == 0)
     initializeSQL();
-  else if (db_select == 1)
+  else if (DB_SELECT == 1)
     initializeHDF();
   else
     throw CycIOException("Unknown mass database type"); 
@@ -49,6 +45,49 @@ double MassTable::getMassInGrams(int tope) {
   double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };
+
+// ===========================================================================
+// Only include files and function if we know sqlite3 is installed and chosen
+#if DB_SELECT == 0
+#include "Database.h"
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void MassTable::initializeSQL() 
+{
+  string file_path = ENV->getCyclusPath() + "/Data/mass.sqlite"; 
+  Database *db = new Database( file_path );
+
+  query_result result = db->query("SELECT * FROM IsotopeMasses");
+  
+  int nResults = result.size();
+  for (int i = 0; i < nResults; i++){
+    // // obtain the database row and declare the appropriate members
+    query_row row = result.at(i);
+    std::string Zstr = row.at(0), Astr = row.at(1), Mstr = row.at(2);
+    int Znum = atoi( Zstr.c_str() );
+    int Anum = atoi( Astr.c_str() );
+    double mass = atof( Mstr.c_str() );
+    // create a nuclide member and add it to the nuclide vector
+    nuclide_t n = {Znum,Anum,mass};
+    nuclide_vec_.push_back(n);
+    // create an index and log it accordingly
+    int tope = Znum*1000 + Anum;
+    isoIndex_.insert(make_pair(tope,i));
+  }
+  // set the total number of nuclides
+  nuclide_len_ = nuclide_vec_.size();
+};
+#endif
+// ===========================================================================
+
+// ===========================================================================
+// Only include files and function if we know HDF5 is installed and chosen
+#if DB_SELECT == 1
+#include "hdf5.h"
+#include "H5Cpp.h" 
+#include "H5CompType.h"
+#include "H5Exception.h"
+using namespace H5;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeHDF() {
@@ -130,10 +169,5 @@ void MassTable::initializeHDF() {
      error.printError();
   }
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MassTable::initializeSQL() 
-{
-  
-};
-
+#endif
+// ===========================================================================
