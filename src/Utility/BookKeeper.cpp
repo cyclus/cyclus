@@ -59,7 +59,8 @@ void BookKeeper::createDB(std::string name) {
     db_ = new Database(name);
     dbIsOpen_ = true; 
     dbExists_ = true;
-  } catch( CycException& error ) { 
+  }
+  catch( CycException& error ) { 
     // just throw it back for now
     // @MJG flag, do we need to change this?
     throw CycException( std::string(error.what()) );
@@ -67,13 +68,13 @@ void BookKeeper::createDB(std::string name) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::registerTable(Table* t) {
+void BookKeeper::registerTable(table_ptr t) {
   db_->registerTable(t);
   db_->createTable(t);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BookKeeper::tableAtThreshold(Table* t) {
+void BookKeeper::tableAtThreshold(table_ptr t) {
   db_->writeRows(t);
   t->flush();
 };
@@ -82,7 +83,7 @@ void BookKeeper::tableAtThreshold(Table* t) {
 void BookKeeper::closeDB() {
   // have the database print and remaining commands
   for (int i = 0; i < db_->nTables(); i++) {
-    Table* t = db_->tablePtr(i);
+    table_ptr t = db_->tablePtr(i);
     if (t->nRows() > 0)
       this->tableAtThreshold(t);
   }

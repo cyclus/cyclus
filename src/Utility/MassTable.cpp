@@ -12,7 +12,7 @@ using namespace std;
 
 MassTable* MassTable::instance_ = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable* MassTable::Instance() {
   // If we haven't created a MassTable yet, create it, and then and return it
   // either way.
@@ -22,7 +22,7 @@ MassTable* MassTable::Instance() {
   return instance_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
   // figure out what's in the file
   if (DB_SELECT == 0)
@@ -33,19 +33,20 @@ MassTable::MassTable() {
     throw CycIOException("Unknown mass database type"); 
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::~MassTable() {
   //Should close the 'mass.h5' file
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MassTable::getMassInGrams(int tope) {
   double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 };
 
-// ===========================================================================
-// Only include files and function if we know sqlite3 is installed and chosen
+// ======================================================================
+// Only include files and function if 
+// we know sqlite3 is installed and chosen
 #if DB_SELECT == 0
 #include "Database.h"
 
@@ -76,10 +77,11 @@ void MassTable::initializeSQL()
   nuclide_len_ = nuclide_vec_.size();
 };
 #endif
-// ===========================================================================
+// ======================================================================
 
-// ===========================================================================
-// Only include files and function if we know HDF5 is installed and chosen
+// ======================================================================
+// Only include files and function if 
+// we know HDF5 is installed and chosen
 #if DB_SELECT == 1
 #include "hdf5.h"
 #include "H5Cpp.h" 

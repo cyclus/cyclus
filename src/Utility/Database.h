@@ -25,20 +25,20 @@ class Database
   query_result query(std::string a_query);
   void close();
   
-  void registerTable(Table* t) {addTable(t);}
-  void createTable(Table* t);
-  void writeRows(Table* t);
+  void registerTable(table_ptr t) {addTable(t);}
+  void createTable(table_ptr t);
+  void writeRows(table_ptr t);
   
   int nTables() {return tables_.size();}
-  Table* tablePtr(int i) {return tables_.at(i);}
+  table_ptr tablePtr(int i) {return tables_.at(i);}
 
  private:
   sqlite3 *database_;
   std::string name_;
-  std::vector<Table*> tables_;
+  std::vector<table_ptr> tables_;
 
-  void addTable(Table *t){tables_.push_back(t);}
-  bool tableExists(Table *t);
+  void addTable(table_ptr t){tables_.push_back(t);}
+  bool tableExists(table_ptr t);
   void issueCommand(std::string cmd);
 };
 
