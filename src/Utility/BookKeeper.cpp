@@ -29,7 +29,7 @@ BookKeeper* BookKeeper::instance_ = 0;
 int BookKeeper::next_comp_entry_id_ = 0;
   
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 BookKeeper* BookKeeper::Instance() {
   // If we haven't created a BookKeeper yet, create and return it.
   if (0 == instance_){
@@ -38,19 +38,19 @@ BookKeeper* BookKeeper::Instance() {
   return instance_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
   dbExists_ = false;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::createDB() {
   /// @todo make the output database name optional (khuff)
   createDB("cyclus.h5");
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(std::string name) {
   dbName_ = name;
 

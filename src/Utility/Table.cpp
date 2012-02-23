@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "BookKeeper.h"
 #include "Table.h"
 #include "Logger.h"
+
+#define ROW_THRESHOLD 5
 
 // MJG FLAG Indexing not currently supported
 
@@ -30,6 +33,7 @@ void Table::setPrimaryKey(std::string const pk_string)
 void Table::tableDefined()
 {
   defined_ = true;
+  BI->registerTable(this);
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
                           << this->create();
 }
@@ -60,7 +64,10 @@ void Table::addRow(row const r){
   (*cmd) << "INSERT INTO " << this->name() << " (" << cols->str() << ") "
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
-  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " << cmd->str();
+  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " 
+			  << cmd->str();
+  if (nRows() >= ROW_THRESHOLD)
+    BI->tableAtThreshold(this);
 }
 
 // update rows
