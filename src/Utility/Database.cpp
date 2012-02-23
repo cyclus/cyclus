@@ -27,6 +27,11 @@ bool Database::open(std::string filename){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Database::registerTable(table_ptr t) {
+  tables_.push_back(t);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 query_result Database::query(std::string query){
   // declare members
   sqlite3_stmt *statement;

@@ -205,7 +205,7 @@ private:
    */
  public:
   // the database table and related information
-  static Table *material_table;
+  static table_ptr material_table;
 
   // add a material to table
   void addToTable();

@@ -53,6 +53,7 @@ class Table : IntrusiveBase<Table> {
 
   // getter functions
   table_name name(){return name_;}
+  table_ptr me();
   bool defined(){return defined_;}
   int nRows(){return row_commands_.size();}
   command* row_command(int i){return row_commands_.at(i);}
@@ -89,7 +90,6 @@ class Table : IntrusiveBase<Table> {
   std::string updateRowPK(primary_key_ref const pkref);
   std::string stringifyData(data const d);
   void flushRows(){row_commands_.clear();}
-  table_ptr me();
 
 };
 

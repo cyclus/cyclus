@@ -33,7 +33,7 @@ void Table::setPrimaryKey(std::string const pk_string)
 void Table::tableDefined()
 {
   defined_ = true;
-  BI->registerTable( me() );
+  BI->registerTable( this );
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
                           << this->create();
 }
@@ -69,7 +69,7 @@ void Table::addRow(row const r){
   // if we've reached the predefined number of row commands to execute,
   // then inform the BookKeeper as such
   if (nRows() >= ROW_THRESHOLD)
-    BI->tableAtThreshold( me() );
+    BI->tableAtThreshold( this );
 }
 
 // update rows
@@ -233,10 +233,4 @@ std::string Table::stringifyData(data const d){
   }
   //LOG(LEV_DEBUG5,"tabled") << "Data has type '" << d.type().name() << "'";
   return data.str();
-}
-
-// return a boost intrustive pointer to this
-table_ptr Table::me(){
-  table_ptr me(this);
-  return me;
 }
