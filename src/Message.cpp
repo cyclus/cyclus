@@ -10,7 +10,6 @@
 #include "InstModel.h"
 #include "GenericResource.h"
 #include "Logger.h"
-#include "BookKeeper.h"
 #include "Timer.h"
 
 #include <iostream>
@@ -259,8 +258,6 @@ void Message::approveTransfer() {
   req->addResource(me, manifest);
 
   int id = nextTransID_++;
-
-  BI->registerTransaction(id, me, manifest);
   
   // register that this transaction occured
   this->Message::addTransToTable(id);

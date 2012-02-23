@@ -7,25 +7,26 @@
 #include "Table.h"
 #include "CycException.h"
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Database::Database(std::string filename){
   database_ = NULL;
+  name_ = filename;
   open(filename);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Database::~Database(){}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::open(std::string filename){
   if(sqlite3_open(filename.c_str(), &database_) == SQLITE_OK)
     return true;
   else 
     throw CycIOException("Unable to open database " + filename); 
-  return false;   
+  return false;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 query_result Database::query(std::string query){
   // declare members
   sqlite3_stmt *statement;
@@ -65,11 +66,12 @@ query_result Database::query(std::string query){
   return results;  
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Database::tableExists(Table* t){
-  std::vector<Table*>::iterator lb = tables_.lower_bound(t);
-
-  if(lb != tables_.end() && !(tables_.key_comp()(t, lb->first))) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool Database::tableExists(Table* t){
+  bool isPresent = 
+    (std::find(tables_.begin(), tables_.end(), t) != tables_.end());
+  
+  if(isPresent) {
     // found, return true    
     return true;
   }
@@ -82,7 +84,7 @@ void Database::tableExists(Table* t){
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::createTable(Table* t){
   bool exists = tableExists(t);
   if (exists) {
@@ -92,7 +94,7 @@ void Database::createTable(Table* t){
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::writeRows(Table* t){
   bool exists = tableExists(t);
   if (exists) {
@@ -102,7 +104,7 @@ void Database::writeRows(Table* t){
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::issueCommand(std::string cmd){  
   sqlite3_stmt *statement;
   // query the database
@@ -119,7 +121,7 @@ void Database::issueCommand(std::string cmd){
 }
   
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::close(){
   sqlite3_close(database_);   
 }

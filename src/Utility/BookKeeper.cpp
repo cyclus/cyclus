@@ -10,11 +10,11 @@
 
 #include "Database.h"
 #include "Table.h"
+#include "CycException.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
-  
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 BookKeeper* BookKeeper::Instance() {
   // If we haven't created a BookKeeper yet, create and return it.
   if (0 == instance_){
@@ -29,7 +29,7 @@ BookKeeper::BookKeeper() {
   dbExists_ = false;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BookKeeper::fexists(const char *filename) {
   std::ifstream ifile(filename);
   return ifile;
@@ -42,9 +42,9 @@ void BookKeeper::createDB(std::string name) {
     // get database name and location
     char* oPath = getenv("CYCLUS_OUTPUT_DIR");
     if (oPath==NULL) {
-      std::string err = "Cyclus output path - envrionment variable: " +
-	"CYCLUS_OUTPUT_DIR - not defined" ;
-      throw CycIOError(err);
+      std::string err = std::string("Cyclus output path - envrionment ")
+	+ std::string("variable: CYCLUS_OUTPUT_DIR - not defined");
+      throw CycIOException(err);
     }
 
     // construct output file path
@@ -59,24 +59,26 @@ void BookKeeper::createDB(std::string name) {
     db_ = new Database(name);
     dbIsOpen_ = true; 
     dbExists_ = true;
-  } catch( Exception error ) {
-    error.printError();
+  } catch( CycException& error ) { 
+    // just throw it back for now
+    // @MJG flag, do we need to change this?
+    throw CycException( std::string(error.what()) );
   }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTable(Table* t) {
   db_->registerTable(t);
   db_->createTable(t);
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::tableAtThreshold(Table* t) {
   db_->writeRows(t);
   t->flush();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB() {
   // have the database print and remaining commands
   for (int i = 0; i < db_->nTables(); i++) {
