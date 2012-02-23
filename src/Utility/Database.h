@@ -15,11 +15,11 @@ typedef std::vector<query_row> query_result;
 class Database
 {
  public:
-  Database(char* filename);
+  Database(std::string filename);
   ~Database();
   
-  bool open(char* filename);
-  query_result query(char* query);
+  bool open(std::string filename);
+  query_result query(std::string a_query);
   void close();
   
  private:

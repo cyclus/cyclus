@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "hdf5.h"
 
 #include "Material.h"
 
