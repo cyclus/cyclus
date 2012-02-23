@@ -1,7 +1,5 @@
 // MassTable class
 
-#define DB_SELECT 0 // 0 for sqlite, 1 for hdf5
-
 #include "MassTable.h"
 
 #include "CycException.h"
