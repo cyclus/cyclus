@@ -201,13 +201,28 @@ public:
    * Creates a database file with the default name, cyclus.h5. 
    */
   void createDB();
-
+ 
   /**
    * Creates a database file with the name indicated. 
    *
    * @param name is the name of the hdf5 database file. Should end in .h5
    */
   void createDB(std::string name);
+
+  /**
+   * Adds a table to the vector of tables
+   *
+   * @param t is the table to be registered
+   */
+  void registerTable(Table* t){};//{myDB_->registerTable(t);}
+  
+  /**
+   * Tables alert the BookKeeper when they have maxed out their queue of
+   * row commands.
+   *
+   * @param t is the table in question
+   */
+  void tableAtThreshold(Table* t){};
   
   /**
    * Returns a handle to the database this BookKeeper is maintaining.

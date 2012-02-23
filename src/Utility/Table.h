@@ -49,6 +49,8 @@ class Table {
   // getter functions
   table_name name(){return name_;}
   bool defined(){return defined_;}
+  int nRows(){return row_commands_.size();}
+  command* row_command(int i){return row_commands_.at(i);}
 
   // setter functions
   void tableDefined();

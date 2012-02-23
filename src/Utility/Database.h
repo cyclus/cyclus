@@ -5,6 +5,7 @@
 #include <vector>
 #include <sqlite3.h>
 
+#include "Table.h"
 
 // Useful Typedefs
 //   query results
@@ -22,8 +23,16 @@ class Database
   query_result query(std::string a_query);
   void close();
   
+  void registerTable(Table* t){addTable(t);}
+  void createTable(Table* t);
+  void writeRows(Table* t);
+
  private:
-  sqlite3 *database;
+  sqlite3 *database_;
+  std::vector<Table*> tables_;
+
+  void addTable(Table *t){tables_.push_back(t);}
+  void issueCommand(std::string cmd);
 };
 
 #endif
