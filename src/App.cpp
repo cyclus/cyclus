@@ -91,6 +91,13 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  // Create the output file
+  try {
+    BI->createDB();
+  } catch (CycException ge) {
+    CLOG(LEV_ERROR) << ge.what();
+  };
+
   // read input file and setup simulation
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
@@ -102,13 +109,6 @@ int main(int argc, char* argv[]) {
   Model::printModelList();
   IsoVector::printRecipes();
   
-  // Create the output file
-  try {
-    BI->createDB();
-  } catch (CycException ge) {
-    CLOG(LEV_ERROR) << ge.what();
-  };
-
   // Run the simulation 
   try {
     TI->runSim();

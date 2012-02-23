@@ -25,7 +25,7 @@ class Database
   query_result query(std::string a_query);
   void close();
   
-  void registerTable(table_ptr t) {addTable(t);}
+  void registerTable(table_ptr t);
   void createTable(table_ptr t);
   void writeRows(table_ptr t);
   
@@ -37,7 +37,6 @@ class Database
   std::string name_;
   std::vector<table_ptr> tables_;
 
-  void addTable(table_ptr t){tables_.push_back(t);}
   bool tableExists(table_ptr t);
   void issueCommand(std::string cmd);
 };

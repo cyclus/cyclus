@@ -16,7 +16,7 @@ bool Material::decay_wanted_ = false;
 
 int Material::decay_interval_ = 1;
 
-Table *Material::material_table = new Table("MaterialHistory"); 
+table_ptr Material::material_table = new Table("MaterialHistory"); 
 
 bool Material::type_is_logged_ = false;
 

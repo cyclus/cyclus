@@ -19,7 +19,7 @@
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
 // Database table for agents
-Table *Model::agent_table = new Table("Agents"); 
+table_ptr Model::agent_table = new Table("Agents"); 
 // Model containers
 std::vector<Model*> Model::template_list_;
 std::vector<Model*> Model::model_list_;
