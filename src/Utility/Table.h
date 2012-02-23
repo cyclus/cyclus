@@ -4,10 +4,15 @@
 #include <string>
 #include <sstream>
 #include <vector>
-//#include <boost/any.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/spirit/home/support/detail/hold_any.hpp>
 
+#include "IntrusiveBase.h"
+
 // Useful Typedefs
+//   Pointers
+class Table;
+typedef boost::intrusive_ptr<Table> table_ptr;
 //   Commands
 typedef std::stringstream command;
 //   Tables
@@ -29,7 +34,7 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
 //   Indicies
 //typedef std::vector<col_name> index;
 
-class Table {
+class Table : IntrusiveBase<Table> {
  private:
   // private members
   table_name name_;
@@ -84,6 +89,7 @@ class Table {
   std::string updateRowPK(primary_key_ref const pkref);
   std::string stringifyData(data const d);
   void flushRows(){row_commands_.clear();}
+  table_ptr me();
 
 };
 

@@ -119,7 +119,7 @@ public:
    *
    * @param t is the table to be registered
    */
-  void registerTable(Table* t);
+  void registerTable(table_ptr t);
   
   /**
    * Tables alert the BookKeeper when they have maxed out their queue of
@@ -128,7 +128,7 @@ public:
    *
    * @param t is the table in question
    */
-  void tableAtThreshold(Table* t);
+  void tableAtThreshold(table_ptr t);
 
   /**
    * Returns the database this BookKeeper is maintaining.

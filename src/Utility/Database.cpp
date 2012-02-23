@@ -67,7 +67,7 @@ query_result Database::query(std::string query){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Database::tableExists(Table* t){
+bool Database::tableExists(table_ptr t){
   bool isPresent = 
     (std::find(tables_.begin(), tables_.end(), t) != tables_.end());
   
@@ -85,7 +85,7 @@ bool Database::tableExists(Table* t){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::createTable(Table* t){
+void Database::createTable(table_ptr t){
   bool exists = tableExists(t);
   if (exists) {
     // declare members
@@ -95,7 +95,7 @@ void Database::createTable(Table* t){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::writeRows(Table* t){
+void Database::writeRows(table_ptr t){
   bool exists = tableExists(t);
   if (exists) {
     // declare members
