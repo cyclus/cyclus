@@ -66,6 +66,8 @@ void Table::addRow(row const r){
   row_commands_.push_back(cmd);
   LOG(LEV_DEBUG5,"table") << "Added command to row commands: " 
 			  << cmd->str();
+  // if we've reached the predefined number of row commands to execute,
+  // then inform the BookKeeper as such
   if (nRows() >= ROW_THRESHOLD)
     BI->tableAtThreshold(this);
 }
@@ -79,6 +81,10 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   (*cmd) << "WHERE " << updateRowPK(pkref) << ";";
   row_commands_.push_back(cmd);
   LOG(LEV_DEBUG5, "table") << "Added command to row commands: " << cmd->str();
+  // if we've reached the predefined number of row commands to execute,
+  // then inform the BookKeeper as such
+  if (nRows() >= ROW_THRESHOLD)
+    BI->tableAtThreshold(this);
 }
 
 void Table::updateRow(primary_key_ref const pkref, row const r){
