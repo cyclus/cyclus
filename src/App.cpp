@@ -101,6 +101,13 @@ int main(int argc, char* argv[]) {
   Model::printModelList();
   IsoVector::printRecipes();
   
+  // Create the output file
+  try {
+    BI->createDB();
+  } catch (CycException ge) {
+    CLOG(LEV_ERROR) << ge.what();
+  };
+
   // Run the simulation 
   try {
     TI->runSim();
@@ -108,13 +115,8 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
-  // Create the output file
+  // Close the output file
   try {
-    BI->createDB();
-
-    BI->writeAgentList();
-    BI->writeTransList();
-    BI->writeMatHist();
     BI->closeDB();
   } catch (CycException ge) {
     CLOG(LEV_ERROR) << ge.what();

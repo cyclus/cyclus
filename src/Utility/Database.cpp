@@ -4,6 +4,7 @@
 #include <string>
 #include <sqlite3.h>
 
+#include "Table.h"
 #include "CycException.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,18 +66,40 @@ query_result Database::query(std::string query){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Database::tableExists(Table* t){
+  std::vector<Table*>::iterator lb = tables_.lower_bound(t);
+
+  if(lb != tables_.end() && !(tables_.key_comp()(t, lb->first))) {
+    // found, return true    
+    return true;
+  }
+  else {
+    // not found, throw an error and return false
+    std::string error = "Table: " + t->name() 
+      + " is not registered with Database " + this->name() + ".";
+    throw CycIOException(error);
+    return false;
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Database::createTable(Table* t){
-  // declare members
-  sqlite3_stmt *statement;
-  std::string query = t->create();
-  this->issueCommand(query);
+  bool exists = tableExists(t);
+  if (exists) {
+    // declare members
+    std::string query = t->create();
+    this->issueCommand(query);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Database::writeRows(Table* t){
-  // declare members
-  std::string query = t->writeRows();
-  this->issueCommand(query);
+  bool exists = tableExists(t);
+  if (exists) {
+    // declare members
+    std::string query = t->writeRows();
+    this->issueCommand(query);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
