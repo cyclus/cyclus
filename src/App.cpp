@@ -12,13 +12,14 @@
 #include "CycException.h"
 #include "Env.h"
 #include "Logger.h"
+#include "IsoVector.h"
 
 using namespace std;
 namespace po = boost::program_options;
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // Main entry point for the test application...
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
 
   // parse command line options

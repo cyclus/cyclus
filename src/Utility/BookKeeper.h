@@ -75,6 +75,12 @@ private:
    */
   bool dbExists_;
 
+  /**
+   * Utility function to determine if a file exists
+   * @param filename the name of the file to search for
+   */
+  bool fexists(const char *filename); 
+
 protected:
   /**
    * The (protected) constructor for this class, which can only be 
@@ -127,7 +133,7 @@ public:
   /**
    * Returns the database this BookKeeper is maintaining.
    */
-  Database* BookKeeper::getDB() {return db_;}
+  Database* getDB() {return db_;}
 
   /**
    * Closes the database this BookKeeper is maintaining.

@@ -19,6 +19,8 @@ class Database
   Database(std::string filename);
   ~Database();
   
+  std::string name(){return name_;}
+
   bool open(std::string filename);
   query_result query(std::string a_query);
   void close();
@@ -32,6 +34,7 @@ class Database
 
  private:
   sqlite3 *database_;
+  std::string name_;
   std::vector<Table*> tables_;
 
   void addTable(Table *t){tables_.push_back(t);}
