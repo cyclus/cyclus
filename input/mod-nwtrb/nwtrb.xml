@@ -5,7 +5,7 @@
   <startmonth>1</startmonth>
   <simstart>0</simstart>
   <decay>0</decay>
-  <duration>37</duration>
+  <duration>500</duration>
 
   <!-- Commodities -->
   <commodity>
@@ -107,14 +107,42 @@
             <name>Storage1</name>
           </facility>
           <facility>
+            <type>Storage</type>
+            <name>Storage2</name>
+          </facility>
+          <facility>
             <type>PWR_uo2_FuelFab</type>
-            <name>PWR_fuel_fab</name>
+            <name>PWR_fuel_fab1</name>
+          </facility>
+          <facility>
+            <type>PWR_uo2_FuelFab</type>
+            <name>PWR_fuel_fab2</name>
           </facility>
 
 
           <facility>
             <type>Beaver_Valley_1</type>
             <name>Beaver_Valley_1</name>
+          </facility>
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_2</name>
+          </facility>
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_3</name>
+          </facility>
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_4</name>
+          </facility>
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_5</name>
+          </facility>
+          <facility>
+            <type>Beaver_Valley_1</type>
+            <name>Beaver_Valley_6</name>
           </facility>
 
         </FixedInst>
