@@ -249,7 +249,13 @@ Model* Message::requester() const {
   return trans_.requester;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::approveTransfer() {
+  approveTransfer(true);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::approveTransfer(bool log) {
   msg_ptr me = msg_ptr(this);
 
   Model* req = requester();
@@ -258,12 +264,14 @@ void Message::approveTransfer() {
   req->addResource(me, manifest);
 
   int id = nextTransID_++;
-  
-  // register that this transaction occured
-  this->Message::addTransToTable(id);
-  int nResources = manifest.size();
-  for (int pos = 0; pos < nResources; pos++){
-    this->Message::addResourceToTable(id,pos+1,manifest.at(pos));
+
+  if (log) {
+    // register that this transaction occured
+    this->Message::addTransToTable(id);
+    int nResources = manifest.size();
+    for (int pos = 0; pos < nResources; pos++){
+      this->Message::addResourceToTable(id,pos+1,manifest.at(pos));
+    }
   }
 
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 

@@ -22,12 +22,13 @@ class FakeNullMarket : public NullMarket {
       string kg = "kg";
       string qual = "qual";
       gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
-      res->setOriginatorID(1);
+      //res->setOriginatorID(1);
       msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }
 
     virtual ~FakeNullMarket() {
+      setIsTemplate(true);
     }
 
     msg_ptr getMessage(){return msg_;}

@@ -412,6 +412,12 @@ class Message: IntrusiveBase<Message> {
   This should be the sole way of transferring resources between simulation
   agents/models. Book keeping of transactions (and corresponding resource
   states) are taken care of automatically within this method.
+  @param log whether to book keep the message or not
+  */
+  void approveTransfer(bool log);
+
+  /*!
+  @brief The default approve transfer function.
   */
   void approveTransfer();
   

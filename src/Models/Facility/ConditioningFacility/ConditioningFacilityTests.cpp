@@ -20,6 +20,7 @@ class FakeConditioningFacility : public ConditioningFacility {
     }
 
     virtual ~FakeConditioningFacility() {
+      setIsTemplate(true);
     }
 };
 
@@ -43,7 +44,7 @@ class ConditioningFacilityTest : public ::testing::Test {
 
     virtual void SetUp(){
       cond_facility = new FakeConditioningFacility();
-      cond_facility->setParent(new TestInst());
+      cond_facility->setParent(new TestInst(),false);
       new_facility = new FakeConditioningFacility();
       commods.push_back("I_stream");
       commods.push_back("CsSr_stream");
