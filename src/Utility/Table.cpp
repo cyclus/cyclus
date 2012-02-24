@@ -208,20 +208,6 @@ std::string Table::create(){
   return cmd.str();
 }
 
-// write rows
-std::string Table::writeRows(){
-  // compile all row commands into a single command
-  command cmd("");
-  int nCmds = row_commands_.size();
-  for (int i = 0; i < nCmds; i++){
-    cmd << row_commands_.at(i)->str();
-    if (i < nCmds-1)
-      cmd << " ";
-  }
-  // return a stringified version of the command
-  return cmd.str();
-}
-
 // some private utility functions
 std::string Table::stringifyData(data const d){
   command data("");

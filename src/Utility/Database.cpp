@@ -6,6 +6,7 @@
 
 #include "Table.h"
 #include "CycException.h"
+#include "Logger.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Database::Database(std::string filename){
@@ -103,9 +104,15 @@ void Database::createTable(table_ptr t){
 void Database::writeRows(table_ptr t){
   bool exists = tableExists(t);
   if (exists) {
-    // declare members
-    std::string query = t->writeRows();
-    this->issueCommand(query);
+    // write each row in the Table's row commands
+    int nRows = t->nRows();
+    for (int i = 0; i < nRows; i++){
+      std::string query = t->row_command(i)->str();
+      this->issueCommand(query);
+      LOG(LEV_DEBUG5,"db") << "Issued writeRows command to table: " 
+			   << t->name() << " with the command being " 
+			   << query;
+    }
   }
 }
 

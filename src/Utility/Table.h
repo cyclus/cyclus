@@ -80,7 +80,6 @@ class Table : IntrusiveBase<Table> {
   std::string f_keys();
   std::string p_key();
   std::string create();
-  std::string writeRows();
 
   // cleaning up
   void flush(){this->flushRows();}
