@@ -34,7 +34,6 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
 //   Indicies
 //typedef std::vector<col_name> index;
 
-
 /*!
    @brief
    The Table class is designed as part of the Cyclus Database

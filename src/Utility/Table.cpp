@@ -9,29 +9,13 @@
 // MJG FLAG Indexing not currently supported
 
 // -----------------------------------------------------------------------
-// constructors
-Table::Table(table_name name)
-{
+Table::Table(table_name name) {
   name_ = name;
   defined_ = false;
-};
+}
 
 // -----------------------------------------------------------------------
-// setter functions
-void Table::setPrimaryKey(column const col)
-{
-  setPrimaryKey(col.first);
-}
-
-void Table::setPrimaryKey(std::string const pk_string)
-{
-  primary_key pk;
-  pk.push_back(pk_string);
-  this->setPrimaryKey(pk);
-}
-
-void Table::tableDefined()
-{
+void Table::tableDefined() {
   defined_ = true;
   BI->registerTable( this );
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
@@ -39,26 +23,82 @@ void Table::tableDefined()
 }
 
 // -----------------------------------------------------------------------
-// table creation functions
+void Table::setPrimaryKey(column const col) {
+  setPrimaryKey(col.first);
+}
+
+// -----------------------------------------------------------------------
+void Table::setPrimaryKey(std::string const pk_string) {
+  primary_key pk;
+  pk.push_back(pk_string);
+  this->setPrimaryKey(pk);
+}
+
+// -----------------------------------------------------------------------
 void Table::addColumn(column col) {
   col_names_.push_back(col.first);
   columns_.push_back(col);
 }
 
-void Table::addForeignKey(foreign_key const fk){
+// -----------------------------------------------------------------------
+void Table::addForeignKey(foreign_key const fk) {
   int key_size = fk.first.size();
   int ref_size = fk.second.second.size();
-  if (key_size != ref_size){
-    // throw error
-    std::cout << "foreign key sizes don't match" << std::endl;
+  if (key_size != ref_size) {
+    std::cout err = "Attempted to reference a different foreign key.";
+    throw CyclusException(err);
   }
   foreign_keys_.push_back(fk);
 }
 
-// add and insert row command
+// -----------------------------------------------------------------------
+std::string Table::create(){
+  // create a table using this table's name
+  command cmd("");
+  cmd << "CREATE TABLE " << this->name() <<" (";
+  // for each entry, add the column name and data type
+  // and comma separate entries
+  for(std::vector<column>::iterator col = columns_.begin(); 
+      col != columns_.end(); 
+      ++col) {
+    // add the column and data type to the command
+    cmd << col->first << " " << col->second;
+    // if this is the last entry, do not comma separate
+    if (col != columns_.end() - 1)
+      cmd << ", ";
+  }
+  // add primary keys
+  if (primary_key_.size() > 0)
+    cmd << ", " << this->p_key();
+  // add foreign keys
+  if (foreign_keys_.size() > 0)
+    cmd << ", " << this->f_keys();
+  // close the create table command
+  cmd << ");";
+
+  // return a stringified version of the command
+  return cmd.str();
+}
+
+// -----------------------------------------------------------------------
+std::string Table::stringifyData(data const d){
+  command data("");
+  std::string check = "Ss";
+  if (d.type().name() == check){
+    data << "'" << d << "'";
+  } else {
+    data << d;
+  }
+  //LOG(LEV_DEBUG5,"tabled") << "Data has type '" << d.type().name() << "'";
+  return data.str();
+}
+
+// -----------------------------------------------------------------------
 void Table::addRow(row const r){
-  command *cmd = new command(""), *cols = new command(""), *values = new command("");
+  command *cmd = new command(""), *cols = new command(""), 
+    *values = new command("");
   int nEntries = r.size();
+  // collect the column name and values of each entry in the row
   for (int j = 0; j < nEntries; j++){
     (*cols) << r.at(j).first;
     (*values) << stringifyData(r.at(j).second);
@@ -66,6 +106,7 @@ void Table::addRow(row const r){
       (*cols) << ", ", (*values) << ", ";
     }
   }
+  // create the row insertion command
   (*cmd) << "INSERT INTO " << this->name() << " (" << cols->str() << ") "
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
@@ -77,8 +118,9 @@ void Table::addRow(row const r){
     BI->tableAtThreshold( this );
 }
 
-// update rows
+// -----------------------------------------------------------------------
 void Table::updateRow(primary_key_ref const pkref, entry const e){
+  // @gidden can we do this without a full pkref or full pkref storage?
   command *cmd = new command("");
   command data("");
   (*cmd) << "UPDATE " << this->name() << " ";
@@ -92,12 +134,15 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
     BI->tableAtThreshold(this);
 }
 
+// -----------------------------------------------------------------------
 void Table::updateRow(primary_key_ref const pkref, row const r){
   int nEntries = r.size();
   for (int i = 0; i < nEntries; i++){
     this->updateRow(pkref,r.at(i));
   }
 }
+
+// -----------------------------------------------------------------------
 std::string Table::updateRowPK(primary_key_ref const pkref){
   command cmd("");
   int nRefs = pkref.size();
@@ -111,11 +156,7 @@ std::string Table::updateRowPK(primary_key_ref const pkref){
   return cmd.str();
 }
 
-
 // -----------------------------------------------------------------------
-// table query strings
-
-// foreign keys
 std::string Table::f_keys(){
   // create a the foreign keys statement
   command final_cmd("");
@@ -154,13 +195,14 @@ std::string Table::f_keys(){
       if (i < nKeys -1) {
 	fKey_cmd << ", ";
       }
+
       final_cmd << fKey_cmd.str();
     }
   }
   return final_cmd.str();
 }
 
-// primary key
+// -----------------------------------------------------------------------
 std::string Table::p_key(){
   // create a the primary key statement
   command cmd("");
@@ -182,46 +224,4 @@ std::string Table::p_key(){
     cmd << ")";
   }
   return cmd.str();
-}
-
-// create table
-std::string Table::create(){
-  // create a table using this table's name
-  command cmd("");
-  cmd << "CREATE TABLE " << this->name() <<" (";
-  // for each entry, add the column name and data type
-  // and comma separate entries
-  for(std::vector<column>::iterator col = columns_.begin(); 
-      col != columns_.end(); 
-      ++col) {
-    // add the column and data type to the command
-    cmd << col->first << " " << col->second;
-    // if this is the last entry, do not comma separate
-    if (col != columns_.end() - 1)
-      cmd << ", ";
-  }
-  // add primary keys
-  if (primary_key_.size() > 0)
-    cmd << ", " << this->p_key();
-  // add foreign keys
-  if (foreign_keys_.size() > 0)
-    cmd << ", " << this->f_keys();
-  // close the create table command
-  cmd << ");";
-
-  // return a stringified version of the command
-  return cmd.str();
-}
-
-// some private utility functions
-std::string Table::stringifyData(data const d){
-  command data("");
-  std::string check = "Ss";
-  if (d.type().name() == check){
-    data << "'" << d << "'";
-  } else {
-    data << d;
-  }
-  //LOG(LEV_DEBUG5,"tabled") << "Data has type '" << d.type().name() << "'";
-  return data.str();
 }
