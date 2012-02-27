@@ -20,8 +20,8 @@ class Database
   ~Database();
   
   std::string name(){return name_;}
+  bool dbExists();
 
-  bool open(std::string filename);
   query_result query(std::string a_query);
   void close();
   
@@ -34,9 +34,11 @@ class Database
 
  private:
   sqlite3 *database_;
+  bool exists_;
   std::string name_;
   std::vector<table_ptr> tables_;
 
+  bool open(std::string filename);
   bool tableExists(table_ptr t);
   void issueCommand(std::string cmd);
 };

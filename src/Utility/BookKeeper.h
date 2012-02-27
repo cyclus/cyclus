@@ -80,6 +80,11 @@ private:
    * @param filename the name of the file to search for
    */
   bool fexists(const char *filename); 
+  
+  /**
+   * A boolean to determine if logging is on.
+   */
+  static bool logging_on_;
 
 protected:
   /**
@@ -156,6 +161,16 @@ public:
    * Returns the name of the database
    */
   std::string name(){return dbName_;};
+
+  /**
+   * Return the state of logging being on or off
+   */
+  static bool loggingIsOn(){return logging_on_;};
+
+  /**
+   * Turn off logging
+   */
+  void turnOffLogging();
 
 };
 
