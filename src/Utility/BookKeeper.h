@@ -10,7 +10,6 @@
 #include "CycException.h"
 
 #define BI BookKeeper::Instance()
-#define NUMISOS 1500
 
 /*!
    @brief
@@ -18,32 +17,31 @@
    
    @section introduction Introduction
    The Cyclus Book Keeper is a singleton member of the 
-   BookKeeperClass. The Book Keeper Instance (BI) controls 
-   reading and writing from the simulation database. The 
-   Book Keeper creates the database file (cyclus.h5) and 
-   maintains functions with which the LogicianClass and 
-   various models can write individual datasets to that file.
-   
+   BookKeeperClass. The Book Keeper Instance (BI) manages the 
+   access to the simulation's output database. Individual
+   modules create Tables as per their need, and registers them
+   with the Book Keeper. All interaction with the Database is 
+   handled by the Book Keeper.
+
    @section singletonInstance Singleton Instance
    In order to utilize the database functions stewarded by the 
    Book Keeper, a model must include the Book Keeper header file 
    and call BookKeeperClass functions via the singleton Book 
-   Keeper Instance LI.
+   Keeper Instance BI.
    
    @section writeDB Writing the Database File
    In the long term, the function that writes the output for 
-   Cyclus may be of any format. For now, the only supported format 
-   is hdf5. The Book Keeper creates a simulation data file in the 
-   build directory (called cyclus.h5) as soon as it is initialized.
+   Cyclus may be of any format. The Book Keeper API is independent
+   of data format. Currently, it interacts with the TableClass 
+   and DatabaseClass, both of which are written with respect to
+   SQL, specifically SQLite. The Book Keeper creates a simulation 
+   data file as soon as it is initialized.
 
    @section writeToDB Writing to the Database
-   It is an open question whether the data for the simulation should 
-   be kept entirely in memory until the end of the simulation. It 
-   may be best to open and write to the file all in one fluid process 
-   at the end of the simulation to save time. Alternatively though, 
-   there may be some value in writing the simulation data to the file 
-   as it is generated in order to facilitate a future in which the 
-   simulation might have a dynamic start and stop capability.
+   Under the current Book Keeper paradigm, rows of data are written 
+   at intervals described in the TableClass. When a Table reaches 
+   a threshold number of row commands, it alerts the Book Keeper,
+   who is allowed to act accordingly.
 */
 
 class BookKeeper {
@@ -66,14 +64,9 @@ private:
   std::string dbName_;
   
   /**
-   *True iff the db is open.
+   * True iff the db is open.
    */
   bool dbIsOpen_;
-
-  /**
-   * True iff the db is exists.
-   */
-  bool dbExists_;
 
   /**
    * Utility function to determine if a file exists
@@ -102,6 +95,16 @@ public:
    * @return a pointer to the BookKeeper
    */
   static BookKeeper* Instance();
+
+  /**
+   * Return the state of logging being on or off
+   */
+  bool loggingIsOn();
+
+  /**
+   * Turn off logging
+   */
+  void turnOffLogging();
   
   /**
    * Creates a database file with the default name, cyclus.sqlite. 
@@ -119,6 +122,33 @@ public:
   void createDB(std::string name);
 
   /**
+   * Returns the database this Book Keeper is maintaining.
+   */
+  Database* getDB() {return db_;}
+
+  /**
+   * Returns the name of the database
+   */
+  std::string name(){return dbName_;}
+  
+  /**
+   * Returns whether or not the database exists
+   */
+  bool dbExists();
+
+  /**
+   * Returns whether it's open (and it exists)
+   */
+  bool isOpen();
+
+  /**
+   * Closes the database this Book Keeper is maintaining.
+   * However, before issuing the close command, any Tables
+   * with row commands remaining will have those commands issued.
+   */
+  void closeDB();
+
+  /**
    * Adds a table to the database's vector of tables and then issues
    * the command to create that table.
    *
@@ -134,44 +164,7 @@ public:
    * @param t is the table in question
    */
   void tableAtThreshold(table_ptr t);
-
-  /**
-   * Returns the database this BookKeeper is maintaining.
-   */
-  Database* getDB() {return db_;}
-
-  /**
-   * Closes the database this BookKeeper is maintaining.
-   * However, before issuing the close command, any Tables
-   * with row commands remaining will have those commands issued.
-   */
-  void closeDB();
   
-  /**
-   * Returns whether it's open
-   */
-  bool isOpen(){return dbIsOpen_;};
-  
-  /**
-   * Returns whether it exists
-   */
-  bool exists(){return dbExists_;};
-
-  /**
-   * Returns the name of the database
-   */
-  std::string name(){return dbName_;};
-
-  /**
-   * Return the state of logging being on or off
-   */
-  static bool loggingIsOn(){return logging_on_;};
-
-  /**
-   * Turn off logging
-   */
-  void turnOffLogging();
-
 };
 
 #endif
