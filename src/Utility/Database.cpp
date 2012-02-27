@@ -45,6 +45,10 @@ void Database::registerTable(table_ptr t) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::createTable(table_ptr t){
+  // note that we first check for if the data base exists
+  // this is due to the fact that there is not good testing for bookkeeping
+  // i.e., we are trying to automate as much as possible, so tests
+  // currently try to access a db that is never instantiated
   if ( dbExists() ) {
     bool tExists = tableExists(t);
     if (tExists) {
@@ -54,15 +58,6 @@ void Database::createTable(table_ptr t){
     }
   }
 }
-
-
-
-
-  // note that we first check for if the data base exists
-  // this is due to the fact that there is not good testing for bookkeeping
-  // i.e., we are trying to automate as much as possible, so tests
-  // currently try to access a db that is never instantiated
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::tableExists(table_ptr t) {
