@@ -58,8 +58,10 @@ void BookKeeper::createDB(std::string name) {
 
     // create database. 
     db_ = new Database(name);
-    dbIsOpen_ = true; 
-    dbExists_ = true;
+    if ( db_->dbExists() ) {
+      dbIsOpen_ = true; 
+      dbExists_ = true;
+    }
   }
   catch( CycException& error ) { 
     // just throw it back for now
