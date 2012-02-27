@@ -19,7 +19,6 @@ class FakeStubMarket : public StubMarket {
     }
 
     virtual ~FakeStubMarket() {
-      setIsTemplate(true);
     }
 };
 

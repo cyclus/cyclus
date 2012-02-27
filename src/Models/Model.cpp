@@ -215,14 +215,11 @@ Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
   
   // set died on date and record it in the table
-  // if this model was not a template
-  if ( !isTemplate() ) {
-    diedOn_ = TI->time();
-    data a_don(diedOn_);
-    entry don("LeaveDate",a_don);
-    agent_table->updateRow( this->pkref(), don );
-  }
-
+  diedOn_ = TI->time();
+  data a_don(diedOn_);
+  entry don("LeaveDate",a_don);
+  agent_table->updateRow( this->pkref(), don );
+  
   // remove references to self
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);
@@ -273,15 +270,8 @@ void Model::print() {
       << " ) " ;
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
-  bool log = true;
-  setParent(parent,log);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::setParent(Model* parent,bool log){ 
   // A model is "born" in the world it's parent is set
   this->setBornOn( TI->time() );
 
@@ -295,10 +285,9 @@ void Model::setParent(Model* parent,bool log){
     parent_ = parent;
     parentID_ = parent->ID();
   }
-  
+
   // register the model with the simulation
-  if (log)
-    this->addToTable();
+  this->addToTable();
 
   // the model has been registered with the simulation, 
   // so it is no longer a template

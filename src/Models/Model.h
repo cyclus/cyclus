@@ -187,11 +187,8 @@ public:
   /// Return the number of children the model has
   int nChildren() {return children_.size();}
 
-  /// set the parent of this model (default)
+  /// set the parent of this model
   void setParent(Model* parent);
-
-  /// set the parent of this model (for testing)
-  void setParent(Model* parent, bool log);
 
   /// set the bornOn date of this model
   void setBornOn(int date) {bornOn_ = date;};
