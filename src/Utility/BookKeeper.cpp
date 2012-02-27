@@ -13,6 +13,7 @@
 #include "CycException.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
+bool BookKeeper::logging_on_ = true;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 BookKeeper* BookKeeper::Instance() {
@@ -68,15 +69,29 @@ void BookKeeper::createDB(std::string name) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BookKeeper::turnOffLogging() {
+  logging_on_ = false;
+  if ( db_->nTables() > 0 ) {
+    std::string err = 
+      "Logging can not be turned off once a table has already been created.";
+    throw CycException();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTable(table_ptr t) {
-  db_->registerTable(t);
-  db_->createTable(t);
+  if ( loggingIsOn() ){
+    db_->registerTable(t);
+    db_->createTable(t);
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::tableAtThreshold(table_ptr t) {
-  db_->writeRows(t);
-  t->flush();
+  if ( loggingIsOn() ){
+    db_->writeRows(t);
+    t->flush();
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
