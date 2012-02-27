@@ -10,7 +10,6 @@
 #include "InstModel.h"
 #include "GenericResource.h"
 #include "Logger.h"
-#include "BookKeeper.h"
 #include "Timer.h"
 
 #include <iostream>
@@ -18,8 +17,8 @@
 // initialize static variables
 int Message::nextTransID_ = 1;
 // Database table for transactions
-Table *Message::trans_table = new Table("Transactions"); 
-Table *Message::trans_resource_table = new Table("TransactedResources"); 
+table_ptr Message::trans_table = new Table("Transactions"); 
+table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
 
 
 std::string Message::outputDir_ = "/output/transactions";
@@ -259,8 +258,6 @@ void Message::approveTransfer() {
   req->addResource(me, manifest);
 
   int id = nextTransID_++;
-
-  BI->registerTransaction(id, me, manifest);
   
   // register that this transaction occured
   this->Message::addTransToTable(id);

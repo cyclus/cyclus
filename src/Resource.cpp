@@ -5,8 +5,8 @@
 int Resource::nextID_ = 0;
 
 // Database table for resources
-Table *Resource::resource_table = new Table("Resources"); 
-Table *Resource::resource_type_table = new Table("ResourceTypes"); 
+table_ptr Resource::resource_table = new Table("Resources"); 
+table_ptr Resource::resource_type_table = new Table("ResourceTypes"); 
 
 Resource::Resource() {
   ID_ = nextID_++;

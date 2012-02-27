@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "BookKeeper.h"
 #include "Table.h"
 #include "Logger.h"
+
+#define ROW_THRESHOLD 5
 
 // MJG FLAG Indexing not currently supported
 
@@ -30,6 +33,7 @@ void Table::setPrimaryKey(std::string const pk_string)
 void Table::tableDefined()
 {
   defined_ = true;
+  BI->registerTable( this );
   LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
                           << this->create();
 }
@@ -60,7 +64,12 @@ void Table::addRow(row const r){
   (*cmd) << "INSERT INTO " << this->name() << " (" << cols->str() << ") "
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
-  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " << cmd->str();
+  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " 
+			  << cmd->str();
+  // if we've reached the predefined number of row commands to execute,
+  // then inform the BookKeeper as such
+  if (nRows() >= ROW_THRESHOLD)
+    BI->tableAtThreshold( this );
 }
 
 // update rows
@@ -72,6 +81,10 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   (*cmd) << "WHERE " << updateRowPK(pkref) << ";";
   row_commands_.push_back(cmd);
   LOG(LEV_DEBUG5, "table") << "Added command to row commands: " << cmd->str();
+  // if we've reached the predefined number of row commands to execute,
+  // then inform the BookKeeper as such
+  if (nRows() >= ROW_THRESHOLD)
+    BI->tableAtThreshold(this);
 }
 
 void Table::updateRow(primary_key_ref const pkref, row const r){
@@ -191,20 +204,6 @@ std::string Table::create(){
   // close the create table command
   cmd << ");";
 
-  // return a stringified version of the command
-  return cmd.str();
-}
-
-// write rows
-std::string Table::writeRows(){
-  // compile all row commands into a single command
-  command cmd("");
-  int nCmds = row_commands_.size();
-  for (int i = 0; i < nCmds; i++){
-    cmd << row_commands_.at(i)->str();
-    if (i < nCmds-1)
-      cmd << " ";
-  }
   // return a stringified version of the command
   return cmd.str();
 }

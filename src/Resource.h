@@ -127,8 +127,8 @@ public:
   
  public:
   // the database table and related information
-  static Table *resource_table;
-  static Table *resource_type_table;
+  static table_ptr resource_table;
+  static table_ptr resource_type_table;
 
   // add a resource to table
   void addToTable();

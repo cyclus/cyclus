@@ -5,6 +5,7 @@
 #include <vector>
 #include <sqlite3.h>
 
+#include "Table.h"
 
 // Useful Typedefs
 //   query results
@@ -18,12 +19,28 @@ class Database
   Database(std::string filename);
   ~Database();
   
-  bool open(std::string filename);
+  std::string name(){return name_;}
+  bool dbExists();
+
   query_result query(std::string a_query);
   void close();
   
+  void registerTable(table_ptr t);
+  void createTable(table_ptr t);
+  void writeRows(table_ptr t);
+  
+  int nTables() {return tables_.size();}
+  table_ptr tablePtr(int i) {return tables_.at(i);}
+
  private:
-  sqlite3 *database;
+  sqlite3 *database_;
+  bool exists_;
+  std::string name_;
+  std::vector<table_ptr> tables_;
+
+  bool open(std::string filename);
+  bool tableExists(table_ptr t);
+  void issueCommand(std::string cmd);
 };
 
 #endif

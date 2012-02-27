@@ -8,8 +8,9 @@
 #include "Env.h"
 #include "InputXML.h"
 #include "Timer.h"
-#include "BookKeeper.h"
-
+#include "Message.h"
+#include "Resource.h"
+#include "Table.h"
 
 #include DYNAMICLOADLIB
 #include <iostream>
@@ -18,7 +19,7 @@
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
 // Database table for agents
-Table *Model::agent_table = new Table("Agents"); 
+table_ptr Model::agent_table = new Table("Agents"); 
 // Model containers
 std::vector<Model*> Model::template_list_;
 std::vector<Model*> Model::model_list_;
@@ -219,13 +220,6 @@ Model::~Model() {
   entry don("LeaveDate",a_don);
   agent_table->updateRow( this->pkref(), don );
   
-  // book-keeping
-  BI->registerModelDatum<std::string>(ID_, "name", name());
-  BI->registerModelDatum<std::string>(ID_, "modelImpl", modelImpl());
-  BI->registerModelDatum<int>(ID_, "parentID", parentID_);
-  BI->registerModelDatum<int>(ID_, "bornOn", bornOn());
-  BI->registerModelDatum<int>(ID_, "diedOn", diedOn());
-
   // remove references to self
   removeFromList(this, template_list_);
   removeFromList(this, model_list_);

@@ -22,8 +22,7 @@ int IsoVector::nextStateID_ = 0;
 std::map<std::string, IsoVector*> IsoVector::recipes_;
 StateMap IsoVector::predefinedStates_ = StateMap();
 // Database table for isotopic states
-Table *IsoVector::iso_table = new Table("IsotopicStates"); 
-
+table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
