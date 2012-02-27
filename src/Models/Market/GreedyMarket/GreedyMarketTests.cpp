@@ -26,13 +26,12 @@ class FakeGreedyMarket : public GreedyMarket {
       string kg = "kg";
       string qual = "qual";
       gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
-      //res->setOriginatorID(1);
+      res->setOriginatorID(1);
       msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }
 
     virtual ~FakeGreedyMarket() {
-      setIsTemplate(true);
     }
 
     msg_ptr getMessage(){return msg_;}
@@ -59,7 +58,7 @@ public:
   void copyFreshModel(Model* model) { };
   
   void receiveMessage(msg_ptr msg) {
-    msg->approveTransfer(false);
+    msg->approveTransfer();
   }
 
   void addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
