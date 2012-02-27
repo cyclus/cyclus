@@ -22,19 +22,18 @@ BookKeeper* BookKeeper::Instance() {
     instance_ = new BookKeeper();  
   }
   return instance_;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
-  dbExists_ = false;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BookKeeper::fexists(const char *filename) {
   std::ifstream ifile(filename);
   return ifile;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(std::string name) {
@@ -58,17 +57,32 @@ void BookKeeper::createDB(std::string name) {
 
     // create database. 
     db_ = new Database(name);
-    if ( db_->dbExists() ) {
-      dbIsOpen_ = true; 
-      dbExists_ = true;
+    if ( dbExists() ) {
+      dbIsOpen_ = true;
+      LOG(LEV_DEBUG3,"DBInfo") << "Successfully created the output database" 
+                               << " at file location: " << db_path;
     }
   }
-  catch( CycException& error ) { 
-    // just throw it back for now
-    // @MJG flag, do we need to change this?
+  catch ( CycException& error ) {
     throw CycException( std::string(error.what()) );
   }
-};
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool BookKeeper::dbExists() {
+  if ( db_ == NULL)
+    return false;
+  else
+    return db_->dbExists();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool BookKeeper::loggingIsOn() {
+  if ( dbExists() )
+    return logging_on_;
+  else
+    return false;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::turnOffLogging() {
@@ -76,25 +90,37 @@ void BookKeeper::turnOffLogging() {
   if ( db_->nTables() > 0 ) {
     std::string err = 
       "Logging can not be turned off once a table has already been created.";
-    throw CycException();
+    throw CycException(err);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::registerTable(table_ptr t) {
-  if ( loggingIsOn() ){
+  if ( loggingIsOn() ) {
     db_->registerTable(t);
     db_->createTable(t);
   }
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::tableAtThreshold(table_ptr t) {
-  if ( loggingIsOn() ){
+  if ( loggingIsOn() ) {
     db_->writeRows(t);
     t->flush();
   }
-};
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool BookKeeper::isOpen() {
+  if (!dbExists() && dbIsOpen_) {
+    std::string err = 
+      "The BookKeeper reports that the Database does NOT exist but is OPEN.";
+    throw CycException(err);
+    return false;
+  }
+  else
+    return dbIsOpen_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::closeDB() {
