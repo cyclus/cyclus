@@ -9,6 +9,7 @@
 #include "Material.h"
 
 #define MT MassTable::Instance()
+#define DB_SELECT 0 // 0 for sqlite, 1 for hdf5
 
 /**
  * The MassTable class inherits from the Material class. The Material

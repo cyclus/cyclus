@@ -8,15 +8,11 @@
 #include "CycException.h"
 #include "Env.h"
 #include "InputXML.h"
-#include "hdf5.h"
-#include "H5Cpp.h"
-#include "H5Exception.h"
 #include "Logger.h"
 #include "Material.h"
 #include "GenericResource.h"
 #include "MarketModel.h"
-
-using namespace H5;
+#include "MassTable.h" // only included to get DB_SELECT (see below)
 
 /**
  * ConditioningFacility matches waste streams with 
@@ -52,7 +48,7 @@ using namespace H5;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::ConditioningFacility() {
     // Initialize allowed formats map
-    allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
+    //allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
     allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
     allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
@@ -292,7 +288,17 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// DB_SELECT is defined in Utility/MassTable.h
+// NOTE: This is a hack! We need to come up with a better way to 
+// determine if the HDF header files are included.
+#if DB_SELECT == 1
+
+#include "hdf5.h"
+#include "H5Cpp.h"
+#include "H5Exception.h"
+using namespace H5;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void ConditioningFacility::loadHDF5File(string datafile){
   // add the current path to the file
   string file_path = ENV->getCyclusPath() + "/" + datafile; 
@@ -355,6 +361,7 @@ void ConditioningFacility::loadHDF5File(string datafile){
   stream = stream_vec_[1];
 
 }
+#endif
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadXMLFile(string datafile){

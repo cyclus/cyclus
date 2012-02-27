@@ -12,13 +12,14 @@
 #include "CycException.h"
 #include "Env.h"
 #include "Logger.h"
+#include "IsoVector.h"
 
 using namespace std;
 namespace po = boost::program_options;
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // Main entry point for the test application...
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
 
   // parse command line options
@@ -90,6 +91,13 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  // Create the output file
+  try {
+    BI->createDB();
+  } catch (CycException ge) {
+    CLOG(LEV_ERROR) << ge.what();
+  };
+
   // read input file and setup simulation
   try {
     XMLinput->load_file(vm["input-file"].as<string>()); 
@@ -108,13 +116,8 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
-  // Create the output file
+  // Close the output file
   try {
-    BI->createDB();
-
-    BI->writeAgentList();
-    BI->writeTransList();
-    BI->writeMatHist();
     BI->closeDB();
   } catch (CycException ge) {
     CLOG(LEV_ERROR) << ge.what();

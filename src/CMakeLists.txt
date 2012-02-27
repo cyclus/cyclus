@@ -97,25 +97,29 @@ COPYONLY
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
-INCLUDE_DIRECTORIES (${LIBXML2_INCLUDE_DIR})
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML_INCLUDE_DIR})
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
 set(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
-# Include the HDF5 library
-FIND_PACKAGE( HDF5 COMPONENTS CXX )
-INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIRS})
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
-ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
+# Find Sqlite3
+FIND_PACKAGE( Sqlite3 REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
+set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
+
+# # Include the HDF5 library
+# FIND_PACKAGE( HDF5 COMPONENTS CXX )
+# SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
+# ADD_DEFINITIONS(${HDF5_DEFINITIONS})
+# set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
 
 # Include the boost header files and the program_options library
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED)
-INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+# include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add subdirs and build for the models
@@ -135,7 +139,7 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp sqlite3 )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -192,7 +196,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp sqlite3 gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 

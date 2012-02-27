@@ -19,19 +19,27 @@ class Database
   Database(std::string filename);
   ~Database();
   
-  bool open(std::string filename);
+  std::string name(){return name_;}
+  bool dbExists();
+
   query_result query(std::string a_query);
   void close();
   
-  void registerTable(Table* t){addTable(t);}
-  void createTable(Table* t);
-  void writeRows(Table* t);
+  void registerTable(table_ptr t);
+  void createTable(table_ptr t);
+  void writeRows(table_ptr t);
+  
+  int nTables() {return tables_.size();}
+  table_ptr tablePtr(int i) {return tables_.at(i);}
 
  private:
   sqlite3 *database_;
-  std::vector<Table*> tables_;
+  bool exists_;
+  std::string name_;
+  std::vector<table_ptr> tables_;
 
-  void addTable(Table *t){tables_.push_back(t);}
+  bool open(std::string filename);
+  bool tableExists(table_ptr t);
   void issueCommand(std::string cmd);
 };
 

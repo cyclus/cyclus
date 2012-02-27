@@ -314,7 +314,7 @@ private:
   */
  public:
   // the database table and related information
-  static Table *agent_table;
+  static table_ptr agent_table;
   
   /*!
     return the agent table's primary key

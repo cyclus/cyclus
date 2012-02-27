@@ -281,7 +281,7 @@ private:
   */
  public:
   // the database table and related information
-  static Table *iso_table;
+  static table_ptr iso_table;
   
   /*!
     return the agent table's primary key

@@ -420,8 +420,8 @@ class Message: IntrusiveBase<Message> {
   */
  public:
   // the database table and related information
-  static Table *trans_table;
-  static Table *trans_resource_table;
+  static table_ptr trans_table;
+  static table_ptr trans_resource_table;
 
   /*!
      The getter function for the time agent output dir
