@@ -40,6 +40,11 @@ void Table::tableDefined()
 
 // -----------------------------------------------------------------------
 // table creation functions
+void Table::addColumn(column col) {
+  col_names_.push_back(col.first);
+  columns_.push_back(col);
+}
+
 void Table::addForeignKey(foreign_key const fk){
   int key_size = fk.first.size();
   int ref_size = fk.second.second.size();
