@@ -554,7 +554,7 @@ void IsoVector::define_table() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::addToTable(){
-  // if we haven't logged an agent yet, define the table
+  // if we haven't logged a composition yet, define the table
   if ( !iso_table->defined() )
     IsoVector::define_table();
 
