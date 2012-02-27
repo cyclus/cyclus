@@ -44,6 +44,27 @@ void Database::registerTable(table_ptr t) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Database::createTable(table_ptr t){
+  if ( dbExists() ) {
+    bool tExists = tableExists(t);
+    if (tExists) {
+      // declare members
+      std::string query = t->create();
+      this->issueCommand(query);
+    }
+  }
+}
+
+
+
+
+  // note that we first check for if the data base exists
+  // this is due to the fact that there is not good testing for bookkeeping
+  // i.e., we are trying to automate as much as possible, so tests
+  // currently try to access a db that is never instantiated
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::tableExists(table_ptr t) {
   // make sure the table exists before it is accessed
   bool isPresent = false;
@@ -96,22 +117,6 @@ void Database::issueCommand(std::string cmd){
   std::string error = sqlite3_errmsg(database_);
   if(error != "not an error") 
     throw CycIOException("SQL error: " + cmd + " " + error);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::createTable(table_ptr t){
-  // note that we first check for if the data base exists
-  // this is due to the fact that there is not good testing for bookkeeping
-  // i.e., we are trying to automate as much as possible, so tests
-  // currently try to access a db that is never instantiated
-  if ( dbExists() ) {
-    bool tExists = tableExists(t);
-    if (tExists) {
-      // declare members
-      std::string query = t->create();
-      this->issueCommand(query);
-    }
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
