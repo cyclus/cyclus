@@ -291,6 +291,7 @@ private:
   /// the current state id
   int stateID(){return stateID_;}
 
+<<<<<<< HEAD
  private:
   /*!
     Define the database table on the first Message's init
@@ -316,7 +317,16 @@ private:
   
   /// returns the state id of the current composition if it is already tracked
   int compositionIsTracked();
-  
+
+  /*!
+  allows calculated mass to be reused if no changes have been made 
+  since last calced.
+  */
+  double total_mass_;
+
+  /// aids in mass recalc prevention - used in conjunction with total_mass_
+  bool mass_out_of_date_;
+
 };
 
 #endif

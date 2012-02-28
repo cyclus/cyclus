@@ -24,30 +24,21 @@ bool Material::type_is_logged_ = false;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
   last_update_time_ = TI->time();
-
-  CLOG(LEV_INFO4) << "Material created {";
-  print();
-  CLOG(LEV_INFO4) << "}";
+  CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(IsoVector comp) {
   last_update_time_ = TI->time();
   iso_vector_ = comp;
-
-  CLOG(LEV_INFO4) << "Material created {";
-  print();
-  CLOG(LEV_INFO4) << "}";
+  CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(const Material& other) {
   iso_vector_ = other.iso_vector_;
   last_update_time_ = other.last_update_time_;
-
-  CLOG(LEV_INFO4) << "Material created {";
-  print();
-  CLOG(LEV_INFO4) << "}";
+  CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,8 +49,6 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   iso_vector_ = iso_vector_ + vec_to_add;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
                    << matToAdd->ID() << ".";
-  CLOG(LEV_DEBUG3) << "New Material state:";
-  print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -84,8 +73,6 @@ mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
   iso_vector_ = iso_vector_ - rem_comp;
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
-  CLOG(LEV_DEBUG3) << "New Material state:";
-  print();
 
   mat_rsrc_ptr new_mat = new Material(rem_comp);
   // we just split a resource, so keep track of the original for book keeping
@@ -118,7 +105,6 @@ void Material::setQuantity(double quantity) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 rsrc_ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
-  print();
   rsrc_ptr mat(new Material(*this));
   return mat;
 }
