@@ -29,7 +29,7 @@ IsoVector::IsoVector() {
   ID_ = nextID_++;
   mass_out_of_date_ = true;
   total_mass_ = 0;
-  trackComposition();
+  trackComposition(); // @gidden do we want this method here? you're throwing -2s..
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
