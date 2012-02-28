@@ -51,14 +51,11 @@ void Env::setCyclusPath(std::string path) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::checkEnv(std::string varname) {
-
-  string toRet;
-  if ((strlen(getenv(varname.c_str()))>0)&&(getenv(varname.c_str())!=NULL)){
-    toRet = getenv(varname.c_str());
-  }
-  else {
+  char * pVar = getenv (varname.c_str());
+  if (pVar==NULL)
     throw CycException("Environment variable " + varname + " not set.");
-  }
-  return toRet;
+  else if (strlen(pVar) == 0)
+    throw CycException("Environment variable " + varname + " set to an empty string.");
+  return pVar;
 }
 

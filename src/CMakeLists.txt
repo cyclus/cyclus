@@ -5,6 +5,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 
+# # Determine the output directory
+# IF (NOT EXISTS ENV{CYCLUS_OUT_DIR})
+#   SET( ENV{CYCLUS_OUT_DIR} ${CMAKE_CURRENT_BINARY_DIR} )
+#   MESSAGE(STATUS "CYCLUS_OUT_DIR not found, setting to ${CMAKE_CURRENT_BINARY_DIR}")
+# ENDIF(NOT EXISTS ENV{CYCLUS_OUT_DIR})
+
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
@@ -105,12 +111,6 @@ set(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 FIND_PACKAGE( Sqlite3 REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
-
-# # Include the HDF5 library
-# FIND_PACKAGE( HDF5 COMPONENTS CXX )
-# SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
-# ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-# set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
 
 # Include the boost header files and the program_options library
 set(Boost_USE_STATIC_LIBS        ON)
