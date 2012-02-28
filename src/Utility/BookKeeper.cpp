@@ -11,6 +11,7 @@
 #include "Database.h"
 #include "Table.h"
 #include "CycException.h"
+#include "Env.h"
 
 BookKeeper* BookKeeper::instance_ = 0;
 bool BookKeeper::logging_on_ = true;
@@ -39,16 +40,9 @@ bool BookKeeper::fexists(const char *filename) {
 void BookKeeper::createDB(std::string name) {
   dbName_ = name;
   try{
-    // get database name and location
-    char* oPath = getenv("CYCLUS_OUTPUT_DIR");
-    if (oPath==NULL) {
-      std::string err = std::string("Cyclus output path - envrionment ")
-	+ std::string("variable: CYCLUS_OUTPUT_DIR - not defined");
-      throw CycIOException(err);
-    }
 
     // construct output file path
-    std::string out_path(oPath);
+    std::string out_path = ENV->checkEnv("CYCLUS_OUTPUT_DIR");
     std::string db_path = out_path + "/" + name;
 
     // if the file already exists, delete it
