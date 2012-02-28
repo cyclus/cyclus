@@ -42,7 +42,7 @@ void BookKeeper::createDB(std::string name) {
   try{
 
     // construct output file path
-    std::string out_path = ENV->checkEnv("CYCLUS_OUTPUT_DIR");
+    std::string out_path = ENV->checkEnv("CYCLUS_OUT_DIR");
     std::string db_path = out_path + "/" + name;
 
     // if the file already exists, delete it
