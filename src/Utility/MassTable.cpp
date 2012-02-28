@@ -55,6 +55,7 @@ void MassTable::initializeSQL()
 {
   string file_path = ENV->getCyclusPath() + "/Data/mass.sqlite"; 
   Database *db = new Database( file_path );
+  db->open();
 
   query_result result = db->query("SELECT * FROM IsotopeMasses");
   

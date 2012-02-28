@@ -51,6 +51,7 @@ void BookKeeper::createDB(std::string name) {
 
     // create database. 
     db_ = new Database(name);
+    db_->open();
     if ( dbExists() ) {
       dbIsOpen_ = true;
       LOG(LEV_DEBUG3,"DBInfo") << "Successfully created the output database" 
