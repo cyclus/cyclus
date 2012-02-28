@@ -3,10 +3,14 @@
 #include "BookKeeper.h"
 #include "Table.h"
 #include "Logger.h"
+#include "CycException.h"
 
 #define ROW_THRESHOLD 5
 
-// MJG FLAG Indexing not currently supported
+// @gidden Indexing not currently supported
+// @gidden Make Table usage more pointer oriented
+// @gidden Make generic creation and addition functions
+// @gidden Add error checking for column names and data types
 
 // -----------------------------------------------------------------------
 Table::Table(table_name name) {
@@ -45,8 +49,8 @@ void Table::addForeignKey(foreign_key const fk) {
   int key_size = fk.first.size();
   int ref_size = fk.second.second.size();
   if (key_size != ref_size) {
-    std::cout err = "Attempted to reference a different foreign key.";
-    throw CyclusException(err);
+    std::string err = "Attempted to reference a different foreign key.";
+    throw CycException(err);
   }
   foreign_keys_.push_back(fk);
 }
