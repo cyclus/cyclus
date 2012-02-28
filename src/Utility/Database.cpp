@@ -11,28 +11,57 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Database::Database(std::string filename){
   database_ = NULL;
-  exists_ = false;
+  exists_ = true;
+  isOpen_ = false;
   name_ = filename;
-  if ( open(filename) ) 
-    exists_ = true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Database::~Database(){}
+bool Database::open() {
+  if ( dbExists() ) {
+    if(sqlite3_open(name_.c_str(), &database_) == SQLITE_OK) {
+      isOpen_ = true;
+      return true;
+    }
+    else 
+      throw CycIOException("Unable to open database " + name_); 
+  } // end if ( dbExists() )
+  else
+    throw CycIOException("Trying to open a non-existant Database"); 
+  return false;
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Database::open(std::string filename){
-  if(sqlite3_open(filename.c_str(), &database_) == SQLITE_OK)
-    return true;
-  else 
-    throw CycIOException("Unable to open database " + filename); 
+bool Database::close() {
+  if ( isOpen() ) {
+    if (sqlite3_close(database_) == SQLITE_OK) {
+      isOpen_ = false;
+      return true;
+    }
+    else
+      throw CycIOException("Error closing existing database: " + name_);
+  } // endif ( isOpen() )
+  else
+    throw CycIOException("Trying to close an already-closed database: " + name_);
+  return false;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool Database::isOpen() {
+  std::string err;
+  if ( dbExists() )
+    return isOpen_;
+  else {
+    err = "Database " + name_ + " is not open because it does not exist.";
+    throw CycIOException(err);
+  }
   return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::dbExists() {
   if (this != NULL)
-    return exists_;
+    return true;
   else
     return false;
 }
@@ -45,11 +74,7 @@ void Database::registerTable(table_ptr t) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::createTable(table_ptr t){
-  // note that we first check for if the data base exists
-  // this is due to the fact that there is not good testing for bookkeeping
-  // i.e., we are trying to automate as much as possible, so tests
-  // currently try to access a db that is never instantiated
-  if ( dbExists() ) {
+  if ( isOpen() ) {
     bool tExists = tableExists(t);
     if (tExists) {
       // declare members
@@ -100,27 +125,27 @@ bool Database::tableExists(table_ptr t) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::issueCommand(std::string cmd){  
-  sqlite3_stmt *statement;
-  // query the database
-  int check_query = 
-    sqlite3_prepare_v2(database_, cmd.c_str(), -1, &statement, 0);
-  if(check_query == SQLITE_OK) {
-    int result = sqlite3_step(statement);
-    sqlite3_finalize(statement);
+  if ( isOpen() ) {
+    sqlite3_stmt *statement;
+    // query the database
+    int check_query = 
+      sqlite3_prepare_v2(database_, cmd.c_str(), -1, &statement, 0);
+    if(check_query == SQLITE_OK) {
+      int result = sqlite3_step(statement);
+      sqlite3_finalize(statement);
+    }
+    // collect errors
+    std::string error = sqlite3_errmsg(database_);
+    if(error != "not an error") 
+      throw CycIOException("SQL error: " + cmd + " " + error);
   }
-  // collect errors
-  std::string error = sqlite3_errmsg(database_);
-  if(error != "not an error") 
-    throw CycIOException("SQL error: " + cmd + " " + error);
+  else
+    throw CycIOException("Tried to issue command to closed table: " + name_);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::writeRows(table_ptr t){
-  // note that we first check for if the data base exists
-  // this is due to the fact that there is not good testing for bookkeeping
-  // i.e., we are trying to automate as much as possible, so tests
-  // currently try to access a db that is never instantiated
-  if ( dbExists() ) {
+  if ( isOpen() ) {
     bool exists = tableExists(t);
     if (exists) {
       // write each row in the Table's row commands
@@ -141,42 +166,41 @@ query_result Database::query(std::string query){
   // declare members
   sqlite3_stmt *statement;
   query_result results;
-  // query the database
-  int check_query = 
-    sqlite3_prepare_v2(database_, query.c_str(), -1, &statement, 0);
-  if(check_query == SQLITE_OK){
-    int cols = sqlite3_column_count(statement);
-    int result = 0;
-    while(true){
-      result = sqlite3_step(statement);
-      // access the rows
-      if(result == SQLITE_ROW){
-	query_row values;
-	for(int col = 0; col < cols; col++){
-	  std::string  val;
-	  char * ptr = (char*)sqlite3_column_text(statement, col);
-	  if(ptr)
-	    val = ptr;
-	  else 
-	    val = "";
-	  values.push_back(val);  // now we will never push NULL
-	}
-	results.push_back(values);
-      }
-      else
-	break;  
-    } 
-    sqlite3_finalize(statement);
-  }
-  // collect errors
-  std::string error = sqlite3_errmsg(database_);
-  if(error != "not an error") 
-    throw CycIOException("SQL error: " + query + " " + error);
   
+  if ( isOpen() ) {
+    // query the database
+    int check_query = 
+      sqlite3_prepare_v2(database_, query.c_str(), -1, &statement, 0);
+    if(check_query == SQLITE_OK){
+      int cols = sqlite3_column_count(statement);
+      int result = 0;
+      while(true){
+	result = sqlite3_step(statement);
+	// access the rows
+	if(result == SQLITE_ROW){
+	  query_row values;
+	  for(int col = 0; col < cols; col++){
+	    std::string  val;
+	    char * ptr = (char*)sqlite3_column_text(statement, col);
+	    if(ptr)
+	      val = ptr;
+	    else 
+	      val = "";
+	    values.push_back(val);  // now we will never push NULL
+	  }
+	  results.push_back(values);
+	}
+	else
+	  break;  
+      } 
+      sqlite3_finalize(statement);
+    }
+    // collect errors
+    std::string error = sqlite3_errmsg(database_);
+    if(error != "not an error") 
+      throw CycIOException("SQL error: " + query + " " + error);
+  }
+  else
+    throw CycIOException("Attempted to query the closed database: " + name_);
   return results;  
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::close(){
-  sqlite3_close(database_);   
 }
