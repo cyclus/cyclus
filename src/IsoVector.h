@@ -271,6 +271,15 @@ private:
   /// Core isotope composition information stored here.
   CompMap atom_comp_;
 
+  /*!
+  allows calculated mass to be reused if no changes have been made 
+  since last calced.
+  */
+  double total_mass_;
+
+  /// aids in mass recalc prevention - used in conjunction with total_mass_
+  bool mass_out_of_date_;
+
 };
 
 #endif

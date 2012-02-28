@@ -263,13 +263,6 @@ void Message::approveTransfer() {
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 
-  CLOG(LEV_INFO4) << "Material transfer details {";
-  printTrans();
-  for (int i = 0; i < manifest.size(); i++) {
-    manifest.at(i)->print();
-  }
-  CLOG(LEV_INFO4) << "}";
-
 }
 
 void Message::define_table(){
