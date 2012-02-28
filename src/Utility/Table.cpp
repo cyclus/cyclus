@@ -40,14 +40,6 @@ void Table::addColumn(column col) {
   columns_.push_back(col);
 }
 
-void Table::tableDefined()
-{
-  defined_ = true;
-  std::cout << "Table " << name_ << " is defined." << std::endl;
-  LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
-			  << this->create();
-}
-
 // -----------------------------------------------------------------------
 void Table::addForeignKey(foreign_key const fk) {
   int key_size = fk.first.size();
