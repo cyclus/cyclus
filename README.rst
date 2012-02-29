@@ -224,22 +224,21 @@ three branches: "Master", "Develop", and "Work".
 Executive Summary
 =================
 
-This example assumes you have just finished working at computer1 and will move to 
-computer2 at some later time. Additionally, you have correctly updated your origin's 
-branches at the time of leaving.
+This example assumes you have a fork of the cyclus/core repository set up as a 
+remote origin and the cyclus/core repository set up as the remote upstream. 
 
 Workflow: Beginning
 -------------------
 
-Assuming you have just sat down at computer2, the following commands will fully update 
-your local branches:
+Assuming you have just sat down at your computer, the following commands will fully update 
+your local branches: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull --rebase origin develop 
-    .../cyclus_dir/$ git pull --rebase upstream develop
+    .../cyclus_dir/$ git pull origin develop 
+    .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull --rebase origin work
-    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git pull origin work
+    .../cyclus_dir/$ git merge develop
     .../cyclus_dir/$ git push origin work
 
 Workflow: End
@@ -247,14 +246,14 @@ Workflow: End
 
 Assuming you have commited some changes to the local work branch, finishing your project
 (i.e., your work branch *compiles*, *runs input files*, and *passes all tests*), you 
-will want to update your local develop branch and remote (origin) work and develop branches.
-The following commands will perform those actions:
+will want to update your local develop branch and remote origin work and develop branches.
+The following commands will perform those actions: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull --rebase upstream develop
-    .../cyclus_dir/$ git merge --no-ff work 
+    .../cyclus_dir/$ git pull upstream develop
+    .../cyclus_dir/$ git merge work
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git merge develop
     .../cyclus_dir/$ git push origin work
 
 
@@ -285,21 +284,6 @@ important now to note that you may wish to work from home or the office. If you 
 fork's branches up to date (i.e., "push" your changes before you leave), only your *local*
 copies of your branches may be different when you next sit down at the other location.
 
-Rebasing
---------
-
-It is important now to discuss rebasing. The reason why rebasing exists is because it 
-allows developers to keep a clean flow of commits. In short, rebasing allows you to 
-perform all of your changes (that you have committed on your local branch copies) 
-on the *most recent version* of a remote (origin or upstream) branch copy, *regardless* 
-of when it was initially pulled. In other words, let us say you pull from Origin's 
-Develop branch, commit some changes on your local branch, and then want to push those 
-changes back. Instead of simply pushing those changes, you should pull with the --rebase 
-tag. That will suspend all of your commits, apply any intermitent changes that have occured, 
-and replace all of your commits *on top* of the new *HEAD* of your local branch (in git 
-terminology). You will have to merge any conflicts, but you would have had to do that anyway 
-if you decided to simply push originally.
-
 Workflow: The Beginning
 -----------------------
 
@@ -308,29 +292,21 @@ but I assume that you wish to handle conflicts as often as possible (so as to ke
 number small). Let us imagine that you have been at work, finished, and successfully pushed 
 your changes to your *Origin* directory. You are now at home, perhaps after dinner (let's just 
 say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
-or a grad student). To begin, let us update our *home's local branches*:
+or a grad student). To begin, let's update our *home's local branches*: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull origin develop --rebase
-    .../cyclus_dir/$ git pull upstream develop --rebase
+    .../cyclus_dir/$ git pull origin develop 
+    .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull origin work --rebase
-    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git pull origin work
+    .../cyclus_dir/$ git merge develop
     .../cyclus_dir/$ git push origin work
 
-Perhaps a little explanation is required. We first update the develop branch. Think of this process 
-like adding train cars on to a train. We always want the front (the engine) to be the upstream or
-"blessed" branch. When you sit down at your local copy, it is the only train car and is the "engine"
-by default. We rebase on the origin branch, making it the "engine" and our local branch the "caboose",
-making our train look like "origin - local". We then rebase on the upstream branch, making our train 
-look like "upstream - origin - local". At this point, our *local develop branch* is fully up-to-date, 
-so we push it to origin.
-
-We then want to update our *local work branch*, knowing that the local develop branch is fully 
-up-to-date. First we switch over to work, so our train looks like "workLocal". Rebasing on the origin
-branch makes our train look like "workOrigin - workLocal". Finally we rebase on the local develop branch,
-because it is fully up-to-date, making our train look like "developLocal - workOrigin - workLocal."  At 
-this point, our *local develop branch* is fully up-to-date, so we push it to origin.
+Perhaps a little explanation is required. We first want to make sure that this new local copy of 
+the develop branch is up-to-date with respect to the remote origin's branch and remote upstream's
+branch. If there was a change from the remote upstream's branch, we want to push that to origin. 
+We then follow the same process to update the work branch, except we want to incorporate any changes
+which may have been introduced in the develop branch update.
 
 Workflow: The End
 -----------------
@@ -340,20 +316,16 @@ branch*). Eventually (hopefully) you come to a stopping point where you have fin
 on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
 Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
 so it's time to merge those changes with the local develop branch and push them to origin's develop
-branch:
+branch: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull upstream develop --rebase 
-    .../cyclus_dir/$ git merge work --no-ff
+    .../cyclus_dir/$ git pull upstream develop
+    .../cyclus_dir/$ git merge work 
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git merge develop
     .../cyclus_dir/$ git push origin work
 
-Here again we checkout the develop branch and rebase on the upstream branch, making our develop train 
-look like "upstream - local". We then merge the working branch using the no-fast-foward flag. Much like 
-rebasing preserves the lineage of commits when pulling, no-fast-forwarding preserves the lineage of 
-commits when merging. Additionally, in our train analogy, whereas pulling with rebase adds a car to 
-the front of the line, merging with the --no-ff flag adds a car to the back of the line. Accordingly,
-our develop branch's train now looks like "upstream - local - workLocal", exactly what we want it to look
-like! So, we push those changes back to our origin repository, and clean up by re-updating work (because 
-we might have gotten some changes with that upstream pull). Done and done!
+This time we want to update our local develop branch based on the changes we made in work. First we
+checkout and update develop in case the upstream develop branch introduced any changes. We then
+apply our changes via merging work into develop, and push that back up to origin. In case the upstream
+pull did introduce changes, we go ahead and update the work branch on origin.
