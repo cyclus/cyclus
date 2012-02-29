@@ -232,13 +232,13 @@ Workflow: Beginning
 -------------------
 
 Assuming you have just sat down at computer2, the following commands will fully update 
-your local branches:
+your local branches: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull --rebase origin develop 
-    .../cyclus_dir/$ git pull --rebase upstream develop
+    .../cyclus_dir/$ git pull origin develop 
+    .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull --rebase origin work
+    .../cyclus_dir/$ git pull origin work
     .../cyclus_dir/$ git rebase develop
     .../cyclus_dir/$ git push origin work
 
@@ -248,9 +248,9 @@ Workflow: End
 Assuming you have commited some changes to the local work branch, finishing your project
 (i.e., your work branch *compiles*, *runs input files*, and *passes all tests*), you 
 will want to update your local develop branch and remote (origin) work and develop branches.
-The following commands will perform those actions:
+The following commands will perform those actions: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull --rebase upstream develop
+    .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git merge --no-ff work 
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
@@ -308,13 +308,13 @@ but I assume that you wish to handle conflicts as often as possible (so as to ke
 number small). Let us imagine that you have been at work, finished, and successfully pushed 
 your changes to your *Origin* directory. You are now at home, perhaps after dinner (let's just 
 say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
-or a grad student). To begin, let us update our *home's local branches*:
+or a grad student). To begin, let us update our *home's local branches*: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull origin develop --rebase
-    .../cyclus_dir/$ git pull upstream develop --rebase
+    .../cyclus_dir/$ git pull origin develop 
+    .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull origin work --rebase
+    .../cyclus_dir/$ git pull origin work
     .../cyclus_dir/$ git rebase develop
     .../cyclus_dir/$ git push origin work
 
@@ -340,10 +340,10 @@ branch*). Eventually (hopefully) you come to a stopping point where you have fin
 on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
 Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
 so it's time to merge those changes with the local develop branch and push them to origin's develop
-branch:
+branch: ::
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull upstream develop --rebase 
-    .../cyclus_dir/$ git merge work --no-ff
+    .../cyclus_dir/$ git pull upstream develop
+    .../cyclus_dir/$ git merge --no-ff work 
     .../cyclus_dir/$ git push origin develop
     .../cyclus_dir/$ git checkout work
     .../cyclus_dir/$ git rebase develop
