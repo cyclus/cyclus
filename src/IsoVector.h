@@ -274,6 +274,22 @@ private:
 
   /// Core isotope composition information stored here.
   CompMap atom_comp_;
+  
+  
+  /*
+    output database info
+  */
+ public:
+  // the database table and related information
+  static table_ptr iso_table;
+  
+  /*!
+    return the agent table's primary key
+  */
+  primary_key_ref pkref(){ return pkref_;}
+  
+  /// the current state id
+  int stateID(){return stateID_;}
 
   /*!
   allows calculated mass to be reused if no changes have been made 

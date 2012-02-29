@@ -3,10 +3,14 @@
 #include "BookKeeper.h"
 #include "Table.h"
 #include "Logger.h"
+#include "CycException.h"
 
 #define ROW_THRESHOLD 5
 
-// MJG FLAG Indexing not currently supported
+// @gidden Indexing not currently supported
+// @gidden Make Table usage more pointer oriented
+// @gidden Make generic creation and addition functions
+// @gidden Add error checking for column names and data types
 
 // -----------------------------------------------------------------------
 Table::Table(table_name name) {
