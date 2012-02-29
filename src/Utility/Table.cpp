@@ -49,8 +49,8 @@ void Table::addForeignKey(foreign_key const fk) {
   int key_size = fk.first.size();
   int ref_size = fk.second.second.size();
   if (key_size != ref_size) {
-    std::cout err = "Attempted to reference a different foreign key.";
-    throw CyclusException(err);
+    std::string err = "Attempted to reference a different foreign key.";
+    throw CycException(err);
   }
   foreign_keys_.push_back(fk);
 }

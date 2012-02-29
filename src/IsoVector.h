@@ -300,21 +300,6 @@ private:
   /// aids in mass recalc prevention - used in conjunction with total_mass_
   bool mass_out_of_date_;
   
-  /*
-    output database info
-  */
- public:
-  // the database table and related information
-  static table_ptr iso_table;
-  
-  /*!
-    return the agent table's primary key
-  */
-  primary_key_ref pkref(){ return pkref_;}
-  
-  /// the current state id
-  int stateID(){return stateID_;}
-
  private:
   /*!
     Define the database table on the first Message's init
