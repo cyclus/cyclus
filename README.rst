@@ -2,7 +2,7 @@ _______________________________________________________________________
 Cyclus Core
 _______________________________________________________________________
 
-**Last Updated: 2.6.2012**
+**Last Updated: 2.28.2012**
 
 The core of the Cyclus nuclear fuel cycle simulator from the University of 
 Wisconsin - Madison is intended to be a simulation framework upon which to 
@@ -60,16 +60,10 @@ The Cyclus code requires the following software and libraries.
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
-`CMake`                2.8                 
-`HDF5`                 1.8.3           
+`CMake`                2.8
 `libxml2`              2                 
 `boost`                1.34.1            
-`lapack`               3.4.0             
-`trilinos (teuchos)`   10.8.4            
 ====================   ==================
-
-An overview of some more complicated package builds and installations (e.g.
-lapack, teuchos, etc.) can be found at the `Cyclus Homepage`_
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building and Running Cyclus
@@ -77,7 +71,7 @@ Building and Running Cyclus
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
 built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
-2.6 or higher and the CMakeLists.txt file in `src/`. It is
+2.8 or higher and the CMakeLists.txt file in `src/`. It is
 recommended that you use CMake to build the Cyclus executable external to the
 source code. To do this, execute the following steps::
 
@@ -208,3 +202,158 @@ Cautions
 
       git pull [remote] [from-branch]
 
+
+~~~~~~~~~~~~~~~~~~~
+An Example
+~~~~~~~~~~~~~~~~~~~
+
+
+Introduction
+============
+
+As this type of workflow can be complicated to converts from SVN and very complicated
+for brand new programmers, an example is provided.
+
+For the sake of simplicity, let us assume that we want a single "sandbox" branch
+in which we would like to work, i.e. where we can store all of our work that may not
+yet pass tests or even compile, but where we also want to save our progress. Let us 
+call this branch "Work". So, when all is said and done, in our fork there will be 
+three branches: "Master", "Develop", and "Work".
+
+
+Executive Summary
+=================
+
+This example assumes you have just finished working at computer1 and will move to 
+computer2 at some later time. Additionally, you have correctly updated your origin's 
+branches at the time of leaving.
+
+Workflow: Beginning
+-------------------
+
+Assuming you have just sat down at computer2, the following commands will fully update 
+your local branches:
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull --rebase origin develop 
+    .../cyclus_dir/$ git pull --rebase upstream develop
+    .../cyclus_dir/$ git push origin develop
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git pull --rebase origin work
+    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git push origin work
+
+Workflow: End
+-------------
+
+Assuming you have commited some changes to the local work branch, finishing your project
+(i.e., your work branch *compiles*, *runs input files*, and *passes all tests*), you 
+will want to update your local develop branch and remote (origin) work and develop branches.
+The following commands will perform those actions:
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull --rebase upstream develop
+    .../cyclus_dir/$ git merge --no-ff work 
+    .../cyclus_dir/$ git push origin develop
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git push origin work
+
+
+The Gory Details
+================
+
+We begin with a fork of the main ("blessed") Cyclus repository. After initially forking
+the repo, we will have two branches in our fork: "Master" and "Develop".
+
+Acquiring a Fork of the Cyclus Repository
+-----------------------------------------
+
+But hark! One may ask: What's a fork? How do I set up my fork?
+
+Lo, an easy solution exists. A fork is *your* copy of Cyclus. Github offers an excelent 
+`tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
+example assumes you have set up the "upstream" repository as cyclus/core. Note that git
+refers to your fork as "origin".
+
+We now have a copy of Cyclus in our fork. Let us create that "Work" branch:
+    .../cyclus_dir/$ git branch work
+    .../cyclus_dir/$ git push origin work
+
+We now have the following situation: there exists the "blessed" copy of the Master and
+Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
+*AND* there exists your *local* copy of the Master, Develop, and Work branches. It is 
+important now to note that you may wish to work from home or the office. If you keep your 
+fork's branches up to date (i.e., "push" your changes before you leave), only your *local*
+copies of your branches may be different when you next sit down at the other location.
+
+Rebasing
+--------
+
+It is important now to discuss rebasing. The reason why rebasing exists is because it 
+allows developers to keep a clean flow of commits. In short, rebasing allows you to 
+perform all of your changes (that you have committed on your local branch copies) 
+on the *most recent version* of a remote (origin or upstream) branch copy, *regardless* 
+of when it was initially pulled. In other words, let us say you pull from Origin's 
+Develop branch, commit some changes on your local branch, and then want to push those 
+changes back. Instead of simply pushing those changes, you should pull with the --rebase 
+tag. That will suspend all of your commits, apply any intermitent changes that have occured, 
+and replace all of your commits *on top* of the new *HEAD* of your local branch (in git 
+terminology). You will have to merge any conflicts, but you would have had to do that anyway 
+if you decided to simply push originally.
+
+Workflow: The Beginning
+-----------------------
+
+Now, for the workflow! This is by no means the only way to perform this type of workflow, 
+but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
+number small). Let us imagine that you have been at work, finished, and successfully pushed 
+your changes to your *Origin* directory. You are now at home, perhaps after dinner (let's just 
+say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
+or a grad student). To begin, let us update our *home's local branches*:
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull origin develop --rebase
+    .../cyclus_dir/$ git pull upstream develop --rebase
+    .../cyclus_dir/$ git push origin develop
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git pull origin work --rebase
+    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git push origin work
+
+Perhaps a little explanation is required. We first update the develop branch. Think of this process 
+like adding train cars on to a train. We always want the front (the engine) to be the upstream or
+"blessed" branch. When you sit down at your local copy, it is the only train car and is the "engine"
+by default. We rebase on the origin branch, making it the "engine" and our local branch the "caboose",
+making our train look like "origin - local". We then rebase on the upstream branch, making our train 
+look like "upstream - origin - local". At this point, our *local develop branch* is fully up-to-date, 
+so we push it to origin.
+
+We then want to update our *local work branch*, knowing that the local develop branch is fully 
+up-to-date. First we switch over to work, so our train looks like "workLocal". Rebasing on the origin
+branch makes our train look like "workOrigin - workLocal". Finally we rebase on the local develop branch,
+because it is fully up-to-date, making our train look like "developLocal - workOrigin - workLocal."  At 
+this point, our *local develop branch* is fully up-to-date, so we push it to origin.
+
+Workflow: The End
+-----------------
+
+As time passes, you make some changes to files, and you commit those changes (to your *local work
+branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
+on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
+Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
+so it's time to merge those changes with the local develop branch and push them to origin's develop
+branch:
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull upstream develop --rebase 
+    .../cyclus_dir/$ git merge work --no-ff
+    .../cyclus_dir/$ git push origin develop
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git rebase develop
+    .../cyclus_dir/$ git push origin work
+
+Here again we checkout the develop branch and rebase on the upstream branch, making our develop train 
+look like "upstream - local". We then merge the working branch using the no-fast-foward flag. Much like 
+rebasing preserves the lineage of commits when pulling, no-fast-forwarding preserves the lineage of 
+commits when merging. Additionally, in our train analogy, whereas pulling with rebase adds a car to 
+the front of the line, merging with the --no-ff flag adds a car to the back of the line. Accordingly,
+our develop branch's train now looks like "upstream - local - workLocal", exactly what we want it to look
+like! So, we push those changes back to our origin repository, and clean up by re-updating work (because 
+we might have gotten some changes with that upstream pull). Done and done!
