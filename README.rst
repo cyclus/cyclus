@@ -273,7 +273,7 @@ Lo, an easy solution exists. A fork is *your* copy of Cyclus. Github offers an e
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
 
-We now have a copy of Cyclus in our fork. Let us create that "Work" branch: ::
+We now have a copy of Cyclus in our fork. Let us create that "work" branch: ::
     .../cyclus_dir/$ git branch work
     .../cyclus_dir/$ git push origin work
 
