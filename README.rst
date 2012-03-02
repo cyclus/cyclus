@@ -273,10 +273,6 @@ Lo, an easy solution exists. A fork is *your* copy of Cyclus. Github offers an e
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
 
-We now have a copy of Cyclus in our fork. Let us create that "work" branch: ::
-    .../cyclus_dir/$ git branch work
-    .../cyclus_dir/$ git push origin work
-
 We now have the following situation: there exists the "blessed" copy of the Master and
 Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
 *AND* there exists your *local* copy of the Master, Develop, and Work branches. It is 
