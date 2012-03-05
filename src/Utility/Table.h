@@ -223,6 +223,11 @@ class Table : IntrusiveBase<Table> {
   //void addIndex(index i){indicies_.push_back(i);}
 
   /**
+   * Return an SQL command to create the table in string form
+   */
+  std::string create();
+
+  /**
    * Add a row to the vector of row commands
    * @param r the row to add to row_commands_
    */
@@ -253,11 +258,6 @@ class Table : IntrusiveBase<Table> {
    * Return the table's primary key as a string for writing
    */
   std::string p_key();
-
-  /**
-   * Return an SQL command to create the table in string form
-   */
-  std::string create();
 
   /**
    * Clear out all row commands because they were just sent.

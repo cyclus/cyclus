@@ -82,10 +82,12 @@ bool BookKeeper::loggingIsOn() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::turnOffLogging() {
   logging_on_ = false;
-  if ( db_->nTables() > 0 ) {
-    std::string err = 
-      "Logging can not be turned off once a table has already been created.";
-    throw CycException(err);
+  if ( dbExists() ) {
+    if ( db_->nTables() > 0 ) {
+      std::string err = 
+        "Logging can not be turned off once a table has already been created.";
+      throw CycException(err);
+    }
   }
 }
 

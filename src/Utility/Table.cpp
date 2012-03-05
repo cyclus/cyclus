@@ -150,12 +150,17 @@ void Table::updateRow(primary_key_ref const pkref, row const r){
 std::string Table::updateRowPK(primary_key_ref const pkref){
   command cmd("");
   int nRefs = pkref.size();
-  if (nRefs > 0){
+  if (nRefs > 0) {
     for (int i = 0; i < nRefs; i++){
       cmd << pkref.at(i).first << "=" << stringifyData(pkref.at(i).second);
       if (i < nRefs-1)
         cmd << " AND ";
     }
+  }
+  else {
+    //throw CycException("Cannot update a row with a non-existant primary key.");
+    // @gidden This creates an error in converter tests... not sure why
+    cmd << "";
   }
   return cmd.str();
 }
