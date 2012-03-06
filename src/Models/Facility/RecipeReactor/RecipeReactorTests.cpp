@@ -17,9 +17,7 @@ class FakeRecipeReactor : public RecipeReactor {
   public:
     FakeRecipeReactor() : RecipeReactor() {
 
-      // set the current month in cycle to 1, it's the first month.
-      month_in_cycle_ = 1;
-      cycle_time_ = 3;
+      setCycleLength(3);
 
       CompMap test_comp;
 
@@ -33,20 +31,12 @@ class FakeRecipeReactor : public RecipeReactor {
       IsoVector recipe(test_comp);
       recipe.setMass(test_size);
 
-      capacity_ = 2;
-      inventory_size_ = 50;
+      setCapacity(2);
+      setInventorySize(50);
 
       // initialize ordinary objects
-      lifetime_ = 10;
-      startConstrYr_ = 2010;
-      startConstrMo_ = 1;
-      startOpYr_ = 2010;
-      startOpMo_ = 2;
-      licExpYr_ = 2070;
-      licExpMo_ = 1;
-      state_ = "tx";
-      typeReac_ = "PWR"; 
-      CF_ = .9;
+      setFacLife(10);
+      setCapacityFactor(.9);
 
       // all facilities require commodities - possibly many
       string recipe_name;
@@ -68,23 +58,11 @@ class FakeRecipeReactor : public RecipeReactor {
         // get out_recipe
         out_recipe = recipe; 
 
-        fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe),
-              make_pair(out_commod, out_recipe)));
-      };
-
-      stocks_ = deque<InFuel>();
-      currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
-      inventory_ = deque< pair<std::string, mat_rsrc_ptr> >();
-      ordersWaiting_ = deque< msg_ptr>();
+        addFuelPair(in_commod, in_recipe, out_commod, out_recipe);
+      }
     }
 
     virtual ~FakeRecipeReactor() { }
-
-    string getInCommod(){return fuelPairs_.front().first.first ;}
-    string getOutCommod(){return fuelPairs_.front().second.first ;}
-    double fakeCheckInventory() { return checkInventory(); }
-    double getCapacity() {return capacity_;}
-    double getInvSize() {return inventory_size_;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,8 +87,8 @@ class RecipeReactorTest : public ::testing::Test {
       src_facility = new FakeRecipeReactor();
       src_facility->setParent(new TestInst());
       new_facility = new FakeRecipeReactor();
-      in_market_ = new TestMarket(src_facility->getInCommod());
-      out_market_ = new TestMarket(src_facility->getOutCommod());
+      in_market_ = new TestMarket(src_facility->inCommod());
+      out_market_ = new TestMarket(src_facility->outCommod());
     }
 
     virtual void TearDown() {

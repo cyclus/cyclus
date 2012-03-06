@@ -108,11 +108,8 @@
    material on a market?
 */
 
-typedef pair< std::string, mat_rsrc_ptr> InFuel;
-typedef pair< std::string, mat_rsrc_ptr> OutFuel; 
-
-typedef pair< std::string, IsoVector> InRecipe;
-typedef pair< std::string, IsoVector> OutRecipe; 
+typedef pair< std::string, mat_rsrc_ptr> Fuel; 
+typedef pair< std::string, IsoVector> Recipe; 
 
 class RecipeReactor : public FacilityModel  {
 /* --------------------
@@ -120,59 +117,42 @@ class RecipeReactor : public FacilityModel  {
  * --------------------
  */
 
-public:
-  /** Default constructor for the RecipeReactor class.
-   */
-  RecipeReactor() {};
+  public:
 
-  /**
-   * Destructor for the RecipeReactor class. 
-   */
-  virtual ~RecipeReactor() {};
-  
-  // different ways to populate an object after creation
-  /// initialize an object from XML input
-  virtual void init(xmlNodePtr cur);
+    RecipeReactor();
 
-  /// initialize an object by copying another
-  virtual void copy(RecipeReactor* src);
-  /**
-   * This drills down the dependency tree to initialize all relevant 
-   * parameters/containers.
-   *
-   * Note that this function must be defined only in the specific model in 
-   * question and not in any inherited models preceding it.
-   *
-   * @param src the pointer to the original (initialized ?) model to be copied
-   */
-  virtual void copyFreshModel(Model* src);
+    /**
+     * Destructor for the RecipeReactor class. 
+     */
+    virtual ~RecipeReactor() {};
+    
+    // different ways to populate an object after creation
+    /// initialize an object from XML input
+    virtual void init(xmlNodePtr cur);
 
-  /**
-   * Print information about this model
-   */
-  virtual void print();
+    /// initialize an object by copying another
+    virtual void copy(RecipeReactor* src);
+    /**
+     * This drills down the dependency tree to initialize all relevant 
+     * parameters/containers.
+     *
+     * Note that this function must be defined only in the specific model in 
+     * question and not in any inherited models preceding it.
+     *
+     * @param src the pointer to the original (initialized ?) model to be copied
+     */
+    virtual void copyFreshModel(Model* src);
 
-/* ------------------- */ 
+    /**
+     * Print information about this model
+     */
+    virtual void print();
 
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
+    /**
+     * When the facility receives a message, execute any transaction therein
+     */
+     virtual void receiveMessage(msg_ptr msg);
 
-public:
-  /**
-   * When the facility receives a message, execute any transaction therein
-   */
-    virtual void receiveMessage(msg_ptr msg);
-
-/* -------------------- */
-
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
-
-public:
     /**
      * @brief Transacted resources are extracted through this method
      * 
@@ -211,78 +191,60 @@ public:
      */
     virtual void handleTock(int time);
 
-
-/* ------------------- */ 
-
-/* --------------------
- * _THIS_ FACILITYMODEL class has these members
- * --------------------
- */
-
-public:
     /**
      * The RecipeReactor reports a power capacity of its capacity factor * power 
      * capacity
      */
     double powerCapacity(){ return CF_*capacity_;};
 
-protected:
-    /**
-     * The RecipeReactor has pairs of input and output fuel
-     */
-    deque< pair< pair<std::string, IsoVector>, pair<std::string, IsoVector> > > 
-      fuelPairs_;
+    int cycleLength();
+    void setCycleLength(int length);
 
-    /**
-     * The RecipeReactor has a limit to how material it can process.
-     * Units vary. It will be in the commodity unit per month.
-     */
-    double capacity_;
+    double capacity();
+    void setCapacity(double cap);
 
-    /**
-     * The stocks of fresh fuel assemblies available.
-     */
-    deque<InFuel> stocks_;
+    double inventorySize();
+    void setInventorySize(double size);
 
-    /**
-     * The fuel assembly currently in the core.
-     */
-    deque<InFuel> currCore_;
-    
-    /**
-     * The inventory of spent fuel assemblies.
-     */
-    deque<OutFuel> inventory_;
+    int facLife();
+    void setFacLife(int lifespan);
 
-    /**
-     * The list of orders to process on the Tock
-     */
-    deque<msg_ptr> ordersWaiting_;
+    double capacityFactor();
+    void setCapacityFactor(double cf);
+
+    IsoVector inRecipe();
+    void setInRecipe(IsoVector recipe);
+
+    IsoVector outRecipe();
+    void setOutRecipe(IsoVector recipe);
+
+    void addFuelPair(std::string incommod, IsoVector inFuel, 
+                     std::string outcommod, IsoVector outFuel);
+
+    std::string inCommod();
+    std::string outCommod();
 
     /**
      * get the total mass of the stuff in the inventory
      *
      * @return the total mass of the processed materials in storage
      */
-    double checkInventory();
+    double inventoryMass();
 
     /**
      * get the total mass of the stuff in the stocks
      *
      * @return the total mass of the raw materials in storage
      */
-    double checkStocks();
+    double stocksMass();
 
     /**
-     * The time between batch reloadings.
-     */
-    int cycle_time_;
+       The getter function for this facility model output dir
+    */
+    static std::string outputDir() { 
+      return FacilityModel::outputDir().append(outputDir_);}
 
-    /**
-     * The current month in the cycle. 1 > month_in_cycle < cycle_time)
-     */
-    int month_in_cycle_;
-
+  private:
     /**
      * Perform the actions that must occur at the begining of the cycle
      */
@@ -294,9 +256,67 @@ protected:
     void endCycle();
 
     /**
-     * The time that the stock material spends in the facility.
+     * The receipe of input materials.
      */
-    int residence_time_;
+    IsoVector in_recipe_;
+
+    /**
+     * The receipe of the output material.
+     */
+    IsoVector out_recipe_;
+
+    /// The RecipeReactor has pairs of input and output fuel
+    deque< pair< Recipe, Recipe > > fuelPairs_;
+
+    /// Fresh fuel assemblies on hand.
+    deque<Fuel> stocks_;
+
+    /// The fuel assembly currently in the core.
+    deque<Fuel> currCore_;
+    
+    /// Inventory of spent fuel assemblies.
+    deque<Fuel> inventory_;
+
+    /// The list of orders to process on the Tock
+    deque<msg_ptr> ordersWaiting_;
+
+    /// The time between batch reloadings.
+    int cycle_length_;
+
+    /**
+     * The current month in the cycle. 1 > month_in_cycle < cycle_time)
+     */
+    int month_in_cycle_;
+
+    /**
+       Every specific facility model writes to the output database
+       location: FacilityModel::OutputDir_ + /this_facility's_handle
+    */
+    static std::string outputDir_;
+
+    /**
+     * make reqests
+     */
+    void makeRequests();
+
+    /**
+     * make offers
+     */
+    void makeOffers();
+
+    /**
+     * send messages up through the institution
+     *
+     * @param recipient the final recipient
+     * @param trans the transaction to send
+     */
+    void sendMessage(Communicator* recipient, Transaction trans);
+
+    /**
+     * The RecipeReactor has a limit to how material it can process.
+     * Units vary. It will be in the commodity unit per month.
+     */
+    double capacity_;
 
     /**
      * The maximum (number of commodity units?) that the inventory can grow to.
@@ -362,55 +382,6 @@ protected:
      * (it should be less than one. Double check that.)
      */
     double CF_;
-
-    /**
-     * The receipe of input materials.
-     */
-    IsoVector in_recipe_;
-
-    /**
-     * The receipe of the output material.
-     */
-    IsoVector out_recipe_;
-
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for this facility model output dir
-  */
-  static std::string outputDir(){ 
-    return FacilityModel::outputDir().append(outputDir_);}
-
- private:
-  /**
-     Every specific facility model writes to the output database
-     location: FacilityModel::OutputDir_ + /this_facility's_handle
-  */
-  static std::string outputDir_;
-
-  /**
-   * make reqests
-   */
-  void makeRequests();
-
-  /**
-   * make offers
-   */
-  void makeOffers();
-
-  /**
-   * send messages up through the institution
-   *
-   * @param recipient the final recipient
-   * @param trans the transaction to send
-   */
-  void sendMessage(Communicator* recipient, Transaction trans);
-
-/* ------------------- */ 
 
 };
 
