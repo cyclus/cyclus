@@ -84,7 +84,24 @@ public:
   /// Returns the concrete type of this resource
   virtual ResourceType type(){return GENERIC_RES;};
 
-protected:
+  /*!
+   Absorbs the contents of the given resource into this resource
+   
+   @param other the resource to be absorbed
+   */
+  virtual void absorb(gen_rsrc_ptr other);
+
+  /*!
+   Extracts a specified mass from this material creating a new material
+   object with the same isotopic ratios.
+   
+   @param the amount (mass) of material that will be removed
+   
+   @return the extracted material as a newly allocated material object
+   */
+  virtual gen_rsrc_ptr extract(double mass);
+
+private:
   /// The quality distinguishing this resource will be traded as.
   std::string units_;
 
