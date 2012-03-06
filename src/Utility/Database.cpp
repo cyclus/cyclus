@@ -1,6 +1,7 @@
 #include "Database.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sqlite3.h>
 
@@ -14,6 +15,12 @@ Database::Database(std::string filename){
   exists_ = true;
   isOpen_ = false;
   name_ = filename;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Database::fexists(const char *filename) {
+  std::ifstream ifile(filename);
+  return ifile;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

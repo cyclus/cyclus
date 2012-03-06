@@ -30,12 +30,6 @@ BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool BookKeeper::fexists(const char *filename) {
-  std::ifstream ifile(filename);
-  return ifile;
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(std::string name) {
   dbName_ = name;
@@ -45,12 +39,13 @@ void BookKeeper::createDB(std::string name) {
     std::string out_path = ENV->checkEnv("CYCLUS_OUT_DIR");
     std::string db_path = out_path + "/" + name;
 
-    // if the file already exists, delete it
-    if( fexists( db_path.c_str() ) )
-      remove( db_path.c_str() );
-
     // create database. 
     db_ = new Database(name);
+
+    // if the file already exists, delete it
+    if( db_->fexists( db_path.c_str() ) )
+      remove( db_path.c_str() );
+
     db_->open();
     if ( dbExists() ) {
       dbIsOpen_ = true;

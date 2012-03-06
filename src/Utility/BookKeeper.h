@@ -67,12 +67,6 @@ private:
    * True iff the db is open.
    */
   bool dbIsOpen_;
-
-  /**
-   * Utility function to determine if a file exists
-   * @param filename the name of the file to search for
-   */
-  bool fexists(const char *filename); 
   
   /**
    * A boolean to determine if logging is on.

@@ -101,6 +101,12 @@ class Database
   std::string name(){return name_;}
 
   /**
+   * Utility function to determine if a file exists
+   * @param filename the name of the file to search for
+   */
+  bool fexists(const char *filename); 
+
+  /**
    * A command to open the database
    * @return whether the opening process succeded
    */
