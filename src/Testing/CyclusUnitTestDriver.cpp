@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[]) {
   // turn normal logging off, we will test it
-  BI->turnOffLogging();
+  BI->turnLoggingOff();
 
   // tell ENV the path between the cwd and the cyclus executable
   std::string path = ENV->pathBase(argv[0]) + "/..";

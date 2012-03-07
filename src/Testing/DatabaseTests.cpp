@@ -10,7 +10,7 @@
 class DatabaseTest : public ::testing::Test {
   protected:
   // declare useful data members
-  std::string dbName, tbl_name, tst_query;
+  std::string dbName, dbPath, tbl_name, tst_query;
   Database* db;
   table_ptr tbl;
   query_result qr;
@@ -49,9 +49,9 @@ class DatabaseTest : public ::testing::Test {
 
   // this sets up the fixtures
   virtual void SetUp() {
-    std::string out_path = ENV->checkEnv("CYCLUS_OUT_DIR");
-    dbName = out_path + "/Testing/testDB.sqlite";
-    db = new Database(dbName);
+    dbPath = ENV->checkEnv("CYCLUS_OUT_DIR") + "/Testing/Temporary";
+    dbName = "testDB.sqlite";
+    db = new Database(dbName,dbPath);
     tbl_name = "test_table";
     tst_query = "select * from " + tbl_name;
     r1 = 0;
@@ -84,8 +84,9 @@ TEST_F(DatabaseTest, dbOpenClose) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(DatabaseTest, testTableClassIntegration) {
   // creation
-  if ( db->fexists(dbName.c_str()) ) {
-    remove (dbName.c_str());
+  std::string full_path = dbPath + "/" + dbName;
+  if ( db->fexists(full_path.c_str()) ) {
+    remove (full_path.c_str());
   }
   EXPECT_NO_THROW( db->open() );
   EXPECT_NO_THROW( db->registerTable(tbl) );
@@ -101,5 +102,7 @@ TEST_F(DatabaseTest, testTableClassIntegration) {
   EXPECT_EQ( atof( qrow.at(1).c_str() ), r2 );
   EXPECT_EQ( qrow.at(2), r3 );
   // clean up
+  EXPECT_NO_THROW( db->removeTable(tbl) );
+  EXPECT_EQ( db->nTables(), 0 );
   EXPECT_NO_THROW( db->close() );
 }

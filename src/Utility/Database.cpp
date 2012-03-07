@@ -17,24 +17,45 @@ Database::Database(std::string filename){
   name_ = filename;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Database::Database(std::string filename, std::string file_path){
+  database_ = NULL;
+  exists_ = true;
+  isOpen_ = false;
+  name_ = filename;
+  path_ = file_path;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Database::fexists(const char *filename) {
   std::ifstream ifile(filename);
   return ifile;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Database::path() {
+  std::string full_path = "";
+  if ( !path_.empty() ) {
+    full_path += path_ + "/";
+  }
+  return full_path;
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::open() {
   if ( dbExists() ) {
-    if(sqlite3_open(name_.c_str(), &database_) == SQLITE_OK) {
+    std::string path_to_file = path() + name_;
+    if(sqlite3_open(path_to_file.c_str(), &database_) == SQLITE_OK) {
       isOpen_ = true;
       return true;
     }
-    else 
+    else {
       throw CycIOException("Unable to open database " + name_); 
+    }
   } // end if ( dbExists() )
-  else
+  else {
     throw CycIOException("Trying to open a non-existant Database"); 
+  }
   return false;
 }
 
@@ -45,12 +66,15 @@ bool Database::close() {
       isOpen_ = false;
       return true;
     }
-    else
+    else {
       throw CycIOException("Error closing existing database: " + name_);
+      return false;
+    }
   } // endif ( isOpen() )
-  else
+  else {
     throw CycIOException("Trying to close an already-closed database: " + name_);
-  return false;
+    return false;
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -67,16 +91,26 @@ bool Database::isOpen() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::dbExists() {
-  if (this != NULL)
+  if (this != NULL) {
     return true;
-  else
+  }
+  else {
     return false;
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::registerTable(table_ptr t) {
-  if ( dbExists() )
+  if ( dbExists() ) {
     tables_.push_back(t);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Database::removeTable(table_ptr t) {
+  if ( dbExists() ) {
+    tables_.erase(std::find(tables_.begin(), tables_.end(), t));
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -164,6 +198,16 @@ void Database::writeRows(table_ptr t){
 			     << t->name() << " with the command being " 
 			     << cmd_str;
       }
+    }
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Database::flush(table_ptr t){
+  if ( isOpen() ) {
+    bool exists = tableExists(t);
+    if (exists) {
+      t->flush();
     }
   }
 }
