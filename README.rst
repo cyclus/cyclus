@@ -60,9 +60,10 @@ The Cyclus code requires the following software and libraries.
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
-`CMake`                2.8
+`CMake`                2.8            
+`boost`                1.34.1
 `libxml2`              2                 
-`boost`                1.34.1            
+`sqlite3`              3.7.10            
 ====================   ==================
 
 ~~~~~~~~~~~~~~~~~~~~~
