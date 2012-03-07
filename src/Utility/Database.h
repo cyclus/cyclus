@@ -64,6 +64,11 @@ class Database
   std::string name_;
 
   /**
+   * Stores the file path to the database, declared during construction.
+   */
+  std::string path_;
+
+  /**
    * A container of pointers to each Table included in the database
    */
   std::vector<table_ptr> tables_;
@@ -86,9 +91,16 @@ class Database
  public:
   /**
    * Constructor. All Databases must have a filename.
-   * @param filename the file path to the database on disk
+   * @param filename the name of the database file
    */
   Database(std::string filename);
+  
+  /**
+   * Constructor with a specified file path.
+   * @param filename the name of the database file
+   * @param file_path the path to the named file
+   */
+  Database(std::string filename, std::string file_path);
   
   /**
    * Destructor
@@ -99,6 +111,17 @@ class Database
    * Return the name of the Database
    */
   std::string name(){return name_;}
+
+  /**
+   * Return the path to the database
+   */
+  std::string path();
+
+  /**
+   * Utility function to determine if a file exists
+   * @param filename the name of the file to search for
+   */
+  bool fexists(const char *filename); 
 
   /**
    * A command to open the database
@@ -138,6 +161,12 @@ class Database
   void registerTable(table_ptr t);
 
   /**
+   * Unregister a table with this Database, removing it from tables_
+   * @param t the Table to remove
+   */
+  void removeTable(table_ptr t);
+
+  /**
    * Issue a command to the database to create a Table
    * @param t the Table to create
    */
@@ -148,6 +177,12 @@ class Database
    * @param t the Table to which rows will be written
    */
   void writeRows(table_ptr t);
+  
+  /**
+   * Issue a command to the database to flush Table rows
+   * @param t the Table to which rows will be flushed
+   */
+  void flush(table_ptr t);
   
   /**
    * Return the number of tables registered with the Database

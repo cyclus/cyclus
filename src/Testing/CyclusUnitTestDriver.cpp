@@ -2,10 +2,14 @@
 #include <string>
 
 #include <gtest/gtest.h>
+
+#include "BookKeeper.h"
 #include "Env.h"
 #include "Logger.h"
 
 int main(int argc, char* argv[]) {
+  // turn normal logging off, we will test it
+  BI->turnLoggingOff();
 
   // tell ENV the path between the cwd and the cyclus executable
   std::string path = ENV->pathBase(argv[0]) + "/..";

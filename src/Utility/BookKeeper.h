@@ -11,6 +11,8 @@
 
 #define BI BookKeeper::Instance()
 
+typedef std::string file_path;
+
 /*!
    @brief
    The BookKeeper is a (singleton) class for handling I/O.
@@ -67,12 +69,6 @@ private:
    * True iff the db is open.
    */
   bool dbIsOpen_;
-
-  /**
-   * Utility function to determine if a file exists
-   * @param filename the name of the file to search for
-   */
-  bool fexists(const char *filename); 
   
   /**
    * A boolean to determine if logging is on.
@@ -102,9 +98,14 @@ public:
   bool loggingIsOn();
 
   /**
+   * Turn on logging
+   */
+  void turnLoggingOn();
+
+  /**
    * Turn off logging
    */
-  void turnOffLogging();
+  void turnLoggingOff();
   
   /**
    * Creates a database file with the default name, cyclus.sqlite. 
@@ -114,12 +115,20 @@ public:
   /**
    * Creates a database file with the name indicated. 
    * This function queries the environment variable CYCLUS_OUTPUT_DIR.
-   * If the named file in CYCLUS_OUTPUT_DIR already exists, this function
-   * will delete it and create a new file.
    *
    * @param name is the name of the sqlite database file. Should end in .sqlite
    */
   void createDB(std::string name);
+
+  /**
+   * Creates a database given a file_path. This is the master create function.
+   * If the named file in fpath already exists, this function
+   * will delete it and create a new file.
+   *
+   * @param name is the name of the sqlite database file. Should end in .sqlite
+   * @param fpath the path to the file
+   */
+  void createDB(std::string name, file_path fpath);
 
   /**
    * Returns the database this Book Keeper is maintaining.
@@ -129,7 +138,7 @@ public:
   /**
    * Returns the name of the database
    */
-  std::string name(){return dbName_;}
+  std::string dbName(){return dbName_;}
   
   /**
    * Returns whether or not the database exists
@@ -137,9 +146,14 @@ public:
   bool dbExists();
 
   /**
-   * Returns whether it's open (and it exists)
+   * Returns whether the database open (and it exists)
    */
-  bool isOpen();
+  bool dbIsOpen();
+
+  /**
+   * Opens the database this Book Keeper is maintaining.
+   */
+  void openDB();
 
   /**
    * Closes the database this Book Keeper is maintaining.
@@ -155,7 +169,19 @@ public:
    * @param t is the table to be registered
    */
   void registerTable(table_ptr t);
+
+  /**
+   * Unregister a table with the Book Keeper's database
+   *
+   * @param t is the table to be removed
+   */
+  void removeTable(table_ptr t);
   
+  /**
+   * Returns the number of tables registered with the BookKeeper
+   */
+  int nTables();
+
   /**
    * Tables alert the BookKeeper when they have maxed out their queue of
    * row commands. The BookKeeper then invokes the Database's writeRows

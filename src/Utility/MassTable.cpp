@@ -53,8 +53,12 @@ double MassTable::getMassInGrams(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() 
 {
-  string file_path = ENV->getCyclusPath() + "/Data/mass.sqlite"; 
-  Database *db = new Database( file_path );
+  // get the file location
+  string file_path = ENV->checkEnv("CYCLUS_OUT_DIR") + "/Data";
+  string file_name = "mass.sqlite";
+  Database *db = new Database( file_name, file_path );
+
+  // get mass info
   db->open();
 
   query_result result = db->query("SELECT * FROM IsotopeMasses");
