@@ -3,8 +3,13 @@
 # define _ENVIRONMENT
 
 #include <string>
+#include "CycException.h"
 
 #define ENV Env::Instance()
+
+class CycNoEnvVarException: public CycException {
+  public: CycNoEnvVarException(std::string msg) : CycException(msg) {};
+};
 
 /**
  * A (singleton) environment utility to help locate files and find environment settings 
