@@ -1,6 +1,7 @@
 // Resource.cpp
 // Implements the Resource Class
 #include "GenericResource.h"
+#include "CycException.h"
 #include "Logger.h"
 
 bool GenericResource::type_is_logged_ = false;
@@ -61,4 +62,25 @@ bool GenericResource::checkQuantityGT(rsrc_ptr other) {
 void GenericResource::setOriginatorID(int id){
   originatorID_ = id;
   this->Resource::addToTable();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void GenericResource::absorb(gen_rsrc_ptr other) {
+  if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {
+    throw CycTypeException("incompatible resource types.");
+  }
+
+  quantity_ += other->quantity();
+  other->setQuantity(0);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+gen_rsrc_ptr GenericResource::extract(double quantity) {
+  if (quantity > quantity_) {
+    throw CycRangeException("Attempted to extract more quantity than exists.");
+  }
+
+  quantity_ -= quantity;
+
+  return gen_rsrc_ptr(new GenericResource(units_, quality_, quantity));
 }

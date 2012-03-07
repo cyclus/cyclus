@@ -10,6 +10,8 @@
 #include "InputXML.h"
 #include "Timer.h"
 
+using namespace std;
+
 /*
  * TICK
  * if stocks are empty, ask for a batch
@@ -34,19 +36,22 @@
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+RecipeReactor::RecipeReactor() {
+  // set the current month in cycle to 1, it's the first month.
+  month_in_cycle_ = 1;
+  cycle_length_ = 3;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::init(xmlNodePtr cur) { 
   FacilityModel::init(cur);
   
-  // set the current month in cycle to 1, it's the first month.
-  month_in_cycle_ = 1;
-  cycle_time_ = 3;
-
   // move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/RecipeReactor");
 
   // initialize ordinary objects
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
-  //cycle_time_ = strtod(XMLinput->get_xpath_content(cur,"cycletime"), NULL);
+  //cycle_length_ = strtod(XMLinput->get_xpath_content(cur,"cycletime"), NULL);
   lifetime_ = strtol(XMLinput->get_xpath_content(cur,"lifetime"), NULL, 10);
   startConstrYr_ = strtol(XMLinput->get_xpath_content(cur,"startConstrYear"), NULL, 10);
   startConstrMo_ = strtol(XMLinput->get_xpath_content(cur,"startConstrMonth"), NULL, 10);
@@ -84,9 +89,9 @@ void RecipeReactor::init(xmlNodePtr cur) {
           make_pair(out_commod, out_recipe_)));
   };
 
-  stocks_ = deque<InFuel>();
-  currCore_ = deque<InFuel>();
-  inventory_ = deque<OutFuel>();
+  stocks_ = deque<Fuel>();
+  currCore_ = deque<Fuel>();
+  inventory_ = deque<Fuel>();
   ordersWaiting_ = deque<msg_ptr>();
 }
 
@@ -97,7 +102,7 @@ void RecipeReactor::copy(RecipeReactor* src) {
 
   fuelPairs_ = src->fuelPairs_;
   capacity_ = src->capacity_;
-  cycle_time_ = src->cycle_time_;
+  cycle_length_ = src->cycle_length_;
   lifetime_ = src->lifetime_;
   month_in_cycle_ = src->month_in_cycle_;
   startConstrYr_ = src->startConstrYr_;
@@ -110,9 +115,9 @@ void RecipeReactor::copy(RecipeReactor* src) {
   CF_ = src->CF_;
 
 
-  stocks_ = deque<InFuel>();
+  stocks_ = deque<Fuel>();
   currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
-  inventory_ = deque<OutFuel >();
+  inventory_ = deque<Fuel >();
   ordersWaiting_ = deque<msg_ptr>();
 
   in_recipe_ = src->in_recipe_;
@@ -123,7 +128,6 @@ void RecipeReactor::copy(RecipeReactor* src) {
 void RecipeReactor::copyFreshModel(Model* src) {
   copy(dynamic_cast<RecipeReactor*>(src));
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::print() { 
@@ -142,7 +146,7 @@ void RecipeReactor::beginCycle() {
     std::string batchCommod = stocks_.front().first;
     mat_rsrc_ptr batchMat = stocks_.front().second;
     stocks_.pop_front();
-    InFuel inBatch;
+    Fuel inBatch;
     inBatch = make_pair(batchCommod, batchMat);
     LOG(LEV_DEBUG2, "RReact") << "Adding a new batch to the core";
     currCore_.push_back(inBatch);
@@ -174,7 +178,7 @@ void RecipeReactor::endCycle() {
   std::string outCommod;
   IsoVector outComp;
 
-  for (deque< pair< InRecipe , OutRecipe> >::iterator iter = fuelPairs_.begin();
+  for (deque< pair< Recipe , Recipe> >::iterator iter = fuelPairs_.begin();
       iter != fuelPairs_.end();
       iter++) {
     if (iter->first.first == batchCommod) {
@@ -188,7 +192,7 @@ void RecipeReactor::endCycle() {
   batchMat = mat_rsrc_ptr(new Material(outComp));
 
   // move converted material into Inventory
-  OutFuel outBatch;
+  Fuel outBatch;
   outBatch = make_pair(outCommod, batchMat);
   inventory_.push_back(outBatch);
 };
@@ -221,7 +225,7 @@ std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
 
   // pull materials off of the inventory stack until you get the trans amount
   while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    for (deque<OutFuel>::iterator iter = inventory_.begin(); 
+    for (deque<Fuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
       // be sure to get the right commodity
@@ -287,10 +291,10 @@ void RecipeReactor::handleTick(int time) {
 void RecipeReactor::makeRequests(){
   LOG(LEV_INFO4, "RReact") << " making requests {";
   // MAKE A REQUEST
-  if(this->checkStocks() == 0){
+  if(this->stocksMass() == 0){
     // It chooses the next in/out commodity pair in the preference lineup
-    InRecipe request_commod_pair;
-    OutRecipe offer_commod_pair;
+    Recipe request_commod_pair;
+    Recipe offer_commod_pair;
     request_commod_pair = fuelPairs_.front().first;
     offer_commod_pair = fuelPairs_.front().second;
     std::string in_commod = request_commod_pair.first;
@@ -304,7 +308,7 @@ void RecipeReactor::makeRequests(){
     double requestAmt;
     double minAmt = in_recipe.mass();
     // The Recipe Reactor should ask for a batch if there isn't one in stock.
-    double sto = this->checkStocks(); 
+    double sto = this->stocksMass(); 
     // subtract sto from batch size to get total empty space. 
     // Hopefully the result is either 0 or the batch size 
     double space = minAmt - sto; // KDHFLAG get minAmt from the input ?
@@ -379,7 +383,7 @@ void RecipeReactor::makeOffers(){
   double commod_price = 0;
 
   // there are potentially many types of batch in the inventory stack
-  double inv = this->checkInventory();
+  double inv = this->inventoryMass();
   // send an offer for each material on the stack 
   std::string commod;
   Communicator* recipient;
@@ -420,7 +424,7 @@ void RecipeReactor::makeOffers(){
 void RecipeReactor::handleTock(int time) {
   LOG(LEV_INFO3, "RReact") << name() << " is tocking {";
   // at the end of the cycle
-  if (month_in_cycle_ > cycle_time_){
+  if (month_in_cycle_ > cycle_length_){
     this->endCycle();
   };
 
@@ -433,9 +437,96 @@ void RecipeReactor::handleTock(int time) {
   month_in_cycle_++;
   LOG(LEV_INFO3, "RReact") << "}";
 }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+
+int RecipeReactor::cycleLength() {
+  return cycle_length_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double RecipeReactor::checkInventory(){
+void RecipeReactor::setCycleLength(int length) {
+  cycle_length_ = length;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double RecipeReactor::capacity() {
+  return capacity_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setCapacity(double cap) {
+  capacity_ = cap;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double RecipeReactor::inventorySize() {
+  return inventory_size_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setInventorySize(double size) {
+  inventory_size_ = size;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+int RecipeReactor::facLife() {
+  return lifetime_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setFacLife(int lifespan) {
+  lifetime_ = lifespan;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double RecipeReactor::capacityFactor() {
+  return CF_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setCapacityFactor(double cf) {
+  CF_ = cf;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector RecipeReactor::inRecipe() {
+  return in_recipe_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setInRecipe(IsoVector recipe) {
+  in_recipe_ = recipe;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+IsoVector RecipeReactor::outRecipe() {
+  return out_recipe_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::setOutRecipe(IsoVector recipe) {
+  out_recipe_ = recipe;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void RecipeReactor::addFuelPair(string incommod, IsoVector inFuel,
+                                string outcommod, IsoVector outFuel) {
+  fuelPairs_.push_back(make_pair(make_pair(incommod, inFuel),
+                                 make_pair(outcommod, outFuel)));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string RecipeReactor::inCommod() {
+  return fuelPairs_.front().first.first ;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string RecipeReactor::outCommod() {
+  return fuelPairs_.front().second.first;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double RecipeReactor::inventoryMass(){
   double total = 0;
 
   // Iterate through the inventory and sum the amount of whatever
@@ -449,8 +540,9 @@ double RecipeReactor::checkInventory(){
 
   return total;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double RecipeReactor::checkStocks(){
+double RecipeReactor::stocksMass(){
   double total = 0;
 
   // Iterate through the stocks and sum the amount of whatever
