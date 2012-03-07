@@ -194,7 +194,7 @@ void Database::writeRows(table_ptr t){
       for (int i = 0; i < nRows; i++){
 	std::string cmd_str = t->row_command(i)->str();
 	this->issueCommand(cmd_str);
-	LOG(LEV_DEBUG5,"db") << "Issued writeRows command to table: " 
+	LOG(LEV_DEBUG4,"db") << "Issued writeRows command to table: " 
 			     << t->name() << " with the command being " 
 			     << cmd_str;
       }

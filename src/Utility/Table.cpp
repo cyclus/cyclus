@@ -8,7 +8,6 @@
 #define ROW_THRESHOLD 5
 
 // @gidden Indexing not currently supported
-// @gidden Make Table usage more pointer oriented
 // @gidden Make generic creation and addition functions
 // @gidden Add error checking for column names and data types
 
@@ -22,7 +21,7 @@ Table::Table(table_name name) {
 void Table::tableDefined() {
   defined_ = true;
   BI->registerTable( this );
-  LOG(LEV_DEBUG5,"table") << "Table is defined with creation command: " 
+  LOG(LEV_DEBUG4,"table") << "Table is defined with creation command: " 
                           << this->create();
 }
 
@@ -93,7 +92,7 @@ std::string Table::stringifyData(data const d){
   } else {
     data << d;
   }
-  //LOG(LEV_DEBUG5,"tabled") << "Data has type '" << d.type().name() << "'";
+  //LOG(LEV_DEBUG4,"tabled") << "Data has type '" << d.type().name() << "'";
   return data.str();
 }
 
@@ -114,8 +113,8 @@ void Table::addRow(row const r){
   (*cmd) << "INSERT INTO " << this->name() << " (" << cols->str() << ") "
          << "VALUES (" << values->str() << ");";
   row_commands_.push_back(cmd);
-  LOG(LEV_DEBUG5,"table") << "Added command to row commands: " 
-			  << cmd->str();
+  LOG(LEV_DEBUG4,"table") << "Added command to row commands: " 
+  			  << cmd->str();
   // if we've reached the predefined number of row commands to execute,
   // then inform the BookKeeper as such
   if (nRows() >= ROW_THRESHOLD)
@@ -131,7 +130,7 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   (*cmd) << "SET " << e.first << "=" << stringifyData(e.second) << " ";
   (*cmd) << "WHERE " << updateRowPK(pkref) << ";";
   row_commands_.push_back(cmd);
-  LOG(LEV_DEBUG5, "table") << "Added command to row commands: " << cmd->str();
+  LOG(LEV_DEBUG4, "table") << "Added command to row commands: " << cmd->str();
   // if we've reached the predefined number of row commands to execute,
   // then inform the BookKeeper as such
   if (nRows() >= ROW_THRESHOLD)

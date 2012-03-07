@@ -65,6 +65,15 @@ Package                Minimum Version
 `boost`                1.34.1            
 ====================   ==================
 
+~~~~~~~~~~~~~~~~~~~~~
+Environment Variables
+~~~~~~~~~~~~~~~~~~~~~
+
+Cyclus requires one environment variable to be set, 'CYCLUS_OUT_DIR'.
+
+This variable should point to your *build* directory, as described 
+in the following section.
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building and Running Cyclus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
