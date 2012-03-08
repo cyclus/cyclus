@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import os
+import sys
 
 # Utility functions
 def addnewlines(lines):
@@ -19,22 +20,46 @@ def iseven(number):
     else:
         return False
 
+def addBriefLines(lines,givenLine):
+    
+
 # Filename and directory info
-file_name="4dknap"
+file_front = sys.argv[1]
+file_back = sys.argv[2]
+file_name = file_front + '.' + file_back
 
-current_dir=os.getcwd()+'/'
-input=file_name+'.dat'
-mypath=current_dir+input
-fin=open(mypath,'r')
+current_dir = os.getcwd()+'/'
+mypath = current_dir+file_name
+fin = open(mypath,'r')
 
-# Get values and weights from .dat file
-# All RHS values set to 1000.0
-values,weights=fin.read().split('-')
+# read all the lines
+original_lines = fin.read()
 fin.close()
-values=values.split('[')[1].split(']')[0].split()
-weights=[weight.split() for weight in weights.split('[')[1].split(']')[0].split('\n')[1:]]
-rhs_vals=['1000.0' for value in values]
 
+# set up a new container
+new_lines = []
+
+# go through lines
+continuation = false
+for line in original_lines:
+    if line.lstrip()[0:2] == '///':
+        addBriefLines(new_lines,line)
+
+    elif line.lstrip()[0:2] == '/*!':
+        beginContinuation(new_lines,line)
+        continuation = true
+        
+    elif (line.lstrip() == '*/') and (continuation = true):
+        endContinuation(new_lines,line)
+        continuation = false
+
+    elif continuation == true:
+        moreContinuation(new_lines,line)
+    
+    else:
+        new_lines.append(line)
+    
+        
 # Create lines under Rows header
 rows=['ROWS']
 rows.append(" N R100")
@@ -42,46 +67,6 @@ for i in range(len(weights)):
     index=i+1
     row_index="R"+str(index+100)
     rows.append(" L "+row_index)
-
-# Create lines under Columns header
-columns=['COLUMNS']
-for i in range(len(values)):
-    index1=i+1
-    col_index="C"+str(index1+100)
-    for j in range(len(weights)+1):
-        index2=j
-        row_index="R"+str(index2+100)
-        if iseven(j):
-            if j==0:
-                line=' %6s %10s %16s'%(col_index,row_index,values[i])
-            else:
-                line=' %6s %10s %16s'%(col_index,row_index,weights[j-1][i])
-                if j==len(weights):
-                    columns.append(line)
-        else:
-            line+=' %6s %16s'%(row_index,weights[j-1][i])
-            columns.append(line)
-
-# Create lines under RHS header
-rhs=['RHS']
-for i in range(len(weights)):
-    index=i+1
-    row_index='R'+str(index+100)
-    if iseven(i):
-        line=' %6s %10s %16s'%('RHS',row_index,rhs_vals[i])
-        if i==len(weights):
-            rhs.append(line)
-    else:
-        line+=' %6s %16s'%(row_index,rhs_vals[i])
-        rhs.append(line)
-
-# Create lines under Bounds header
-bounds=['BOUNDS']
-for i in range(len(values)):
-    index=i+1
-    col_index="C"+str(100+index)
-    line=' %2s %3s %9s'%('BV','BIN',col_index)
-    bounds.append(line)
 
 # Get input heading info
 input=file_name+'.info'
