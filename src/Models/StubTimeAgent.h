@@ -4,13 +4,22 @@
 
 #include "TimeAgent.h"
 
-//-----------------------------------------------------------------------------
-/*
- * The StubTimeAgent class is the abstract class/interface used by all stub models
- * 
- * This StubTimeAgent is intended as a skeleton to guide the implementation of new
- * Models.
+/**
+   @brief The StubTimeAgent class is the abstract class/interface used by all stub models
+  
+   This StubModel is intended as a skeleton to guide the implementation of new
+   TimeAgent Models.
+
+   @section intro Introduction
+   The StubTimeAgent type plays no functional role in Cyclus. It is made 
+   available as a skeletal example of a new TimeAgent model type, showing 
+   the breadth and depth of available functional capabilities that must or 
+   may be specified in order to create a new TimeAgent model in Cyclus. In 
+   order to implement a new model in Cyclus StubTimeAgent.h and 
+   StubTimeAgent.cpp may be copied, renamed, and altered as discussed in the 
+   <a href="http://cyclus.github.com/devdoc/make-models/main.html">GuidelinesForImplementingNewModels</a>.
  */
+
 //-----------------------------------------------------------------------------
 class StubTimeAgent : public TimeAgent {
 /* --------------------

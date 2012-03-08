@@ -2,11 +2,7 @@
 // Implements the StubModel class
 
 #include "StubModel.h"
-
-#include <iostream>
 #include "Logger.h"
-
-using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
@@ -31,4 +27,3 @@ void StubModel::print() {
   Model::print(); 
   LOG(LEV_DEBUG2, "none!"); 
 };
-

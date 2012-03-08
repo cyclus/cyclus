@@ -66,15 +66,6 @@ Package                Minimum Version
 `sqlite3`              3.7.10            
 ====================   ==================
 
-~~~~~~~~~~~~~~~~~~~~~
-Environment Variables
-~~~~~~~~~~~~~~~~~~~~~
-
-Cyclus requires one environment variable to be set, 'CYCLUS_OUT_DIR'.
-
-This variable should point to your *build* directory, as described 
-in the following section.
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building and Running Cyclus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

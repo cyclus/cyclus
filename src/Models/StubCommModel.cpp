@@ -2,11 +2,7 @@
 // Implements the StubCommModel class
 
 #include "StubCommModel.h"
-
-#include <iostream>
 #include "Logger.h"
-
-using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
@@ -32,4 +28,3 @@ void StubCommModel::print() {
   Model::print(); 
   LOG(LEV_DEBUG2, "none!"); 
 };
-
