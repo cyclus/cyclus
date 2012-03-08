@@ -181,6 +181,12 @@ public:
    * Returns the number of tables registered with the BookKeeper
    */
   int nTables();
+  
+  /**
+   * Return the Book Keeper's current command threshold on writing
+   * rows to the database.
+   */
+  int rowThreshold();
 
   /**
    * Tables alert the BookKeeper when they have maxed out their queue of

@@ -5,8 +5,6 @@
 #include "Logger.h"
 #include "CycException.h"
 
-#define ROW_THRESHOLD 5
-
 // @gidden Indexing not currently supported
 // @gidden Make generic creation and addition functions
 // @gidden Add error checking for column names and data types
@@ -117,7 +115,7 @@ void Table::addRow(row const r){
   			  << cmd->str();
   // if we've reached the predefined number of row commands to execute,
   // then inform the BookKeeper as such
-  if (nRows() >= ROW_THRESHOLD)
+  if (nRows() >= BI->rowThreshold())
     BI->tableAtThreshold( this );
 }
 
@@ -133,7 +131,7 @@ void Table::updateRow(primary_key_ref const pkref, entry const e){
   LOG(LEV_DEBUG4, "table") << "Added command to row commands: " << cmd->str();
   // if we've reached the predefined number of row commands to execute,
   // then inform the BookKeeper as such
-  if (nRows() >= ROW_THRESHOLD)
+  if (nRows() >= BI->rowThreshold())
     BI->tableAtThreshold(this);
 }
 

@@ -13,6 +13,8 @@
 #include "CycException.h"
 #include "Env.h"
 
+#define ROW_THRESHOLD 5;
+
 BookKeeper* BookKeeper::instance_ = 0;
 bool BookKeeper::logging_on_ = true;
 
@@ -121,6 +123,11 @@ int BookKeeper::nTables() {
   else {
     return 0;
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int BookKeeper::rowThreshold() {
+  return ROW_THRESHOLD;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
