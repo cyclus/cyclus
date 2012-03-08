@@ -79,7 +79,7 @@ public:
    * standard verbose printer includes both an atom and mass composition output
    */
   void print(); 
-    
+
   /**
    * Change/set the mass of the resource object. Note that this does make
    * matter (dis)appear and should only be used on objects that are not part of
@@ -169,6 +169,9 @@ public:
   static void setDecay(int dec);
 
 private:
+
+  /// used by print() to 'hide' print code when logging is not desired
+  std::string detail(); 
 
   /// last time this material object's state was accurate (e.g. time of last
   /// decay, etc.)

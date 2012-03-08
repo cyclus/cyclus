@@ -97,7 +97,7 @@ public:
   static void printRecipes();
 
   void print();
-  std::string propString();
+
   std::vector<std::string> compStrings();
 
   static int recipeCount();                                  
@@ -256,6 +256,8 @@ protected:
   static Matrix decayMatrix_; 
 
 private:
+  /// used by print() to 'hide' print code when logging is not desired
+  std::string detail();
 
   /// Stores the next available material ID
   static int nextID_;

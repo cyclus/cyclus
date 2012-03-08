@@ -37,8 +37,6 @@ typedef std::vector<query_row> query_result;
    update rows in the tables. It assumes that the Tables themselves offer
    correct commands to perform these operations.
 */
-
-
 class Database
 {
  private:

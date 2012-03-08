@@ -87,12 +87,18 @@ void Material::print() {
                    << ", quantity=" << quantity() << ", units=" << units();
 
   CLOG(LEV_INFO5) << "Composition {";
+  CLOG(LEV_INFO5) << detail();
+  CLOG(LEV_INFO5) << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string Material::detail() {
   std::vector<std::string>::iterator entry;
   std::vector<std::string> entries = iso_vector_.compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
-  CLOG(LEV_INFO5) << "}";
+  return "";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

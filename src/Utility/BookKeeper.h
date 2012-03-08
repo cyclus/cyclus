@@ -45,7 +45,6 @@ typedef std::string file_path;
    a threshold number of row commands, it alerts the Book Keeper,
    who is allowed to act accordingly.
 */
-
 class BookKeeper {
 private:
   /**

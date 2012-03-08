@@ -128,20 +128,21 @@ void IsoVector::printRecipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
-  CLOG(LEV_INFO3) << propString();
+  CLOG(LEV_INFO3) << detail();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string IsoVector::detail() {
+  std::stringstream ss;
+  ss << "mass = " << mass() << " kg";
+  CLOG(LEV_INFO3) << ss.str();
 
   std::vector<std::string>::iterator entry;
   std::vector<std::string> entries = compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO3) << *entry;
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::propString() {
-  std::stringstream ss;
-  ss << "mass = " << mass() << " kg";
-  return ss.str();
+  return "";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -273,9 +274,6 @@ double IsoVector::mass() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass(int tope) {
   validateIsotopeNumber(tope);
-  if (isZero(tope)) {
-    return 0;
-  }
 
   double grams_per_atom;
   int grams_per_kg = 1000;
@@ -351,9 +349,6 @@ double IsoVector::atomCount() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::atomCount(int tope) {
   validateIsotopeNumber(tope);
-  if (isZero(tope)) {
-    return 0;
-  }
 
   return atom_comp_[tope];
 }
