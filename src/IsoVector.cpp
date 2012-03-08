@@ -27,7 +27,6 @@ table_ptr IsoVector::iso_table = new Table("IsotopicStates");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
-  trackComposition(); // @gidden do we want this method here? you're throwing -2s..
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -36,7 +35,6 @@ IsoVector::IsoVector(CompMap initial_comp) {
   atom_comp_ = initial_comp;
 
   validateComposition();
-  trackComposition();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -70,7 +68,6 @@ IsoVector::IsoVector(xmlNodePtr cur) {
   } else {
     setMass(total_qty);
   }
-  trackComposition();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -429,7 +426,6 @@ void IsoVector::executeDecay(double time_change) {
   handler.setComp(atom_comp_);
   handler.decay(years);
   atom_comp_ = handler.compAsCompMap();
-  this->trackComposition();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -490,16 +486,18 @@ int IsoVector::compositionIsTracked() {
   CompMap* comp = &atom_comp_;
   StateMap::iterator lb = predefinedStates_.lower_bound(comp);
 
-  if(lb != predefinedStates_.end() && !(predefinedStates_.key_comp()(comp, lb->first)))
+  if(lb != predefinedStates_.end() && 
+      !(predefinedStates_.key_comp()(comp, lb->first))) {
     return lb->second; // found, return the state
-  else if ( ( (int) comp->size() > 0 ) )
+  } else if ( ( (int) comp->size() > 0 ) ) {
     return -1; // not found, not empty, return a corresponding token
-  else
+  } else {
     return -2; // not found, but comp map is empty -- probably from empty constructor  
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::trackComposition() {
+void IsoVector::recordState() {
   int check = compositionIsTracked();
   if ( check == -1 ) {
     // this is a new composition, log it accordingly

@@ -236,8 +236,11 @@ void Material::define_table() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::addToTable(){
   // if we haven't logged an material yet, define the table
-  if ( !material_table->defined() )
+  if ( !material_table->defined() ) {
     Material::define_table();
+  }
+
+  iso_vector_.recordState();
 
   // make a row
   // declare data
