@@ -13,9 +13,9 @@
 #include "Material.h"
 #include "Logger.h"
 
-using namespace std;
-
 InputXML* InputXML::instance_ = 0;
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string InputXML::main_schema_ = "./Data/cyclus.rng";

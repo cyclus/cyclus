@@ -14,13 +14,13 @@
 
 #define AVOGADRO 6.02e23
 
-/*!
+/**
  simulation wide numerical threshold for mass significance.
  Its units are kg.
  */
 #define EPS_KG 1e-6
 
-/*!
+/**
  An isotope's identification number
  The isotope ZAID number (Z A IDentiﬁcation) contains six digits ZZZAAA 
  ZZZ is the atomic number Z and AAA is the atomic mass number A.
@@ -28,7 +28,7 @@
  */
 typedef int Iso;
 
-/*!
+/**
  A map type to represent all of the parent isotopes tracked.  The key for
  this map type is the parent's Iso number, and the value is a pair that
  contains the corresponding decay matrix column and decay constant
@@ -36,7 +36,7 @@ typedef int Iso;
  */
 typedef std::map< Iso, std::pair<int, double> > ParentMap;
 
-/*!
+/**
  A map type to represent all of the daughter isotopes tracked.  The key for
  this map type is the decay matrix column associated with the parent, and the
  value is a vector of pairs of all the daughters for that parent. Each of the
@@ -45,15 +45,23 @@ typedef std::map< Iso, std::pair<int, double> > ParentMap;
  */
 typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
 
-/// map isotope (int) to atoms/mass (double)
+/**
+ map isotope (int) to atoms/mass (double)
+ */
 typedef std::map<Iso, double> CompMap;
 
-/// map Composition Map Pointer (CompMap*) to state (int)
+/**
+ map Composition Map Pointer (CompMap*) to state (int)
+ */
 typedef std::map<CompMap*, int> StateMap;
 
-/*! 
- Class Material the object used to transact material objects around the system.
+/** 
+ @class IsoVector
  
+ @brief 
+ This class is the object used to transact material objects around the system.
+ 
+ @section intro Introduction
  This class keeps track of the isotopic composition of a material using both
  the atomic fractions and the mass fractions, combined with the total number of
  atoms and total mass. The default mass unit is kilograms. Access to nuclide
@@ -71,6 +79,7 @@ typedef std::map<CompMap*, int> StateMap;
 
  @endcode
  */
+
 class IsoVector {
 
 public:

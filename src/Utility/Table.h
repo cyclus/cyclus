@@ -34,7 +34,7 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
 //   Indicies
 //typedef std::vector<col_name> index;
 
-/*!
+/**
    @brief
    The Table class is designed as part of the Cyclus Database
    API. Tables are responsible for holding information about
@@ -69,7 +69,7 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
    is whether or not is actually a string. In this case, the
    Table class applies single quotation marks before and after
    the datum, as required by SQL languages.
-*/
+ */
 
 class Table : IntrusiveBase<Table> {
  private:
