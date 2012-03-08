@@ -2,6 +2,7 @@
 #include "Env.h"
 
 #include "InputXML.h"
+#include "Logger.h"
 
 #include <sys/stat.h>
 #include <iostream>
@@ -11,22 +12,11 @@
 
 using namespace std;
 
-Env* Env::instance_ = 0;
-string Env::path_from_cwd_to_cyclus_ = ".";
+boost::filesystem::path Env::path_from_cwd_to_cyclus_;
+boost::filesystem::path Env::cwd_ = boost::filesystem::current_path();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env::Env() { }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env* Env::Instance() {
-	// If we haven't created an ENV yet, create it, and then and return it
-	// either way.
-	if (0 == instance_) {
-		instance_ = new Env();
-	}
-
-	return instance_;
-}
+// note that this is not used - Env is a pure static class
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::pathBase(std::string path) {
@@ -40,21 +30,27 @@ std::string Env::pathBase(std::string path) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::getCyclusPath() {
-  return path_from_cwd_to_cyclus_;
+  // return the join of cwd_ and rel path to cyclus
+  CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
+                  << cwd_ / path_from_cwd_to_cyclus_;
+  return (cwd_ / path_from_cwd_to_cyclus_).string();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Env::setCyclusPath(std::string path) {
-  path_from_cwd_to_cyclus_ = path;
+void Env::setCyclusRelPath(std::string path) {
+  path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
+  CLOG(LEV_DEBUG3) << "Cyclus rel path: " << path;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::checkEnv(std::string varname) {
-  char * pVar = getenv (varname.c_str());
-  if (pVar==NULL)
+  char* pVar = getenv (varname.c_str());
+  if (pVar == NULL) {
     throw CycNoEnvVarException("Environment variable " + varname + " not set.");
-  else if (strlen(pVar) == 0)
-    throw CycNoEnvVarException("Environment variable " + varname + " set to an empty string.");
+  } else if (strlen(pVar) == 0) {
+    throw CycNoEnvVarException("Environment variable " + varname
+                               + " set to an empty string.");
+  }
   return pVar;
 }
 

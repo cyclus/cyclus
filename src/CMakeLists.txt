@@ -115,9 +115,11 @@ set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 # Include the boost header files and the program_options library
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED)
+FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )

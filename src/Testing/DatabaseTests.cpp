@@ -49,7 +49,7 @@ class DatabaseTest : public ::testing::Test {
 
   // this sets up the fixtures
   virtual void SetUp() {
-    dbPath = ENV->checkEnv("CYCLUS_OUT_DIR") + "/Testing/Temporary";
+    dbPath = Env::getCyclusPath() + "/Testing/Temporary";
     dbName = "testDB.sqlite";
     db = new Database(dbName,dbPath);
     tbl_name = "test_table";

@@ -12,8 +12,8 @@ int main(int argc, char* argv[]) {
   BI->turnLoggingOff();
 
   // tell ENV the path between the cwd and the cyclus executable
-  std::string path = ENV->pathBase(argv[0]) + "/..";
-  ENV->setCyclusPath(path);
+  std::string path = Env::pathBase(argv[0]) + "/..";
+  Env::setCyclusRelPath(path);
   Logger::ReportLevel() = LEV_ERROR;
   
   for ( int i = 0; i < argc; i++ ) {

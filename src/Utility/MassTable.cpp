@@ -53,13 +53,7 @@ double MassTable::getMassInGrams(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
   // get the file location
-  string file_path;
-  try {
-    file_path = ENV->checkEnv("CYCLUS_OUT_DIR") + "/Data";
-  } catch(CycNoEnvVarException err) {
-    file_path = ENV->getCyclusPath() + "/Data";
-    CLOG(LEV_INFO1) << err.what() << " - Using default path.";
-  }
+  string file_path = Env::getCyclusPath() + "/Data";
   string file_name = "mass.sqlite";
   Database *db = new Database( file_name, file_path );
 
@@ -101,7 +95,7 @@ using namespace H5;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeHDF() {
-  string file_path = ENV->getCyclusPath() + "/Data/mass.h5"; 
+  string file_path = Env::getCyclusPath() + "/Data/mass.h5"; 
 
   const H5std_string filename = file_path;
   const H5std_string groupname = "ame03";

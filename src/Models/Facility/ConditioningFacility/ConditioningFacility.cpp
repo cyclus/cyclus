@@ -301,7 +301,7 @@ using namespace H5;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void ConditioningFacility::loadHDF5File(string datafile){
   // add the current path to the file
-  string file_path = ENV->getCyclusPath() + "/" + datafile; 
+  string file_path = Env::getCyclusPath() + "/" + datafile; 
 
   // check if the file is an hdf5 file first.
   if (! H5File::isHdf5(file_path)) {
@@ -383,7 +383,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadCSVFile(string datafile){
-  string file_path = ENV->getCyclusPath() + "/" + datafile; 
+  string file_path = Env::getCyclusPath() + "/" + datafile; 
 
   // create an ifstream for the file
   ifstream file(file_path.c_str());
