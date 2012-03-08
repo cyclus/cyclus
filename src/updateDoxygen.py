@@ -14,14 +14,31 @@ def makewritelines(lines):
         myline+=line
     return myline
 
-def iseven(number):
-    if number%2==0:
-        return True
-    else:
-        return False
-
 def addBriefLines(lines,givenLine):
-    
+    line_halves = givenLine.split("///")
+    line1 = line_halves[0] + '/**\n'
+    line2 = line_halves[0] + ' * @brief' + line_halves[1]
+    line3 = line_halves[0] + ' */\n'
+    lines.append(line1)
+    lines.append(line2)
+    lines.append(line3)
+
+def beginContinuation(lines,givenLine):
+    line_halves = givenLine.split('/*!')
+    line = line_halves[0] + '/**' + line_halves[1]
+    lines.append(line)
+
+def moreContinuation(lines,givenLine,nspaces):
+    line = ''
+    for i in range(nspaces):
+        line += ' '
+    if (givenLine.lstrip()[0:2] != "*/"):
+        line += " * "
+    if len(givenLine.lstrip()) == 0:
+        line += givenLine.lstrip() + "\n"
+    else:
+        line += givenLine.lstrip()
+    lines.append(line)
 
 # Filename and directory info
 file_front = sys.argv[1]
@@ -33,52 +50,39 @@ mypath = current_dir+file_name
 fin = open(mypath,'r')
 
 # read all the lines
-original_lines = fin.read()
+original_lines = fin.readlines()
 fin.close()
 
 # set up a new container
 new_lines = []
 
 # go through lines
-continuation = false
+continuation = False
+nspaces = 0
+
 for line in original_lines:
-    if line.lstrip()[0:2] == '///':
-        addBriefLines(new_lines,line)
+    if ((line.lstrip()[0:2] == "*/") and (continuation == True)):
+        #moreContinuation(new_lines,line,nspaces)
+        new_lines.append(line)
+        continuation = False
 
-    elif line.lstrip()[0:2] == '/*!':
-        beginContinuation(new_lines,line)
-        continuation = true
-        
-    elif (line.lstrip() == '*/') and (continuation = true):
-        endContinuation(new_lines,line)
-        continuation = false
-
-    elif continuation == true:
-        moreContinuation(new_lines,line)
+    elif continuation == True:
+        moreContinuation(new_lines,line,nspaces)
     
+    elif line.lstrip()[0:3] == "/*!":
+        beginContinuation(new_lines,line)
+        continuation = True
+        nspaces = len(line.split("/*!")[0])
+
+    elif line.lstrip()[0:3] == "///":
+        addBriefLines(new_lines,line)
+         
     else:
         new_lines.append(line)
     
-        
-# Create lines under Rows header
-rows=['ROWS']
-rows.append(" N R100")
-for i in range(len(weights)):
-    index=i+1
-    row_index="R"+str(index+100)
-    rows.append(" L "+row_index)
-
-# Get input heading info
-input=file_name+'.info'
-mypath=current_dir+input
-infofile=open(mypath,'r')
-infolines=infofile.read().split('\n')
-infofile.close()
-
 # Add lines together and create .mps input file
-mylines=infolines[:-1]+rows+columns+rhs+bounds+['ENDATA']
-mylines=makewritelines(addnewlines(mylines))
-output=file_name+'.mps'
+mylines=makewritelines(new_lines)
+output='tmp'+file_name
 mypath=current_dir+output
 outfile=open(mypath,'w')
 outfile.write(mylines)

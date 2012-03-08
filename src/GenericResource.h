@@ -18,7 +18,7 @@ typedef boost::intrusive_ptr<GenericResource> gen_rsrc_ptr;
 
 class GenericResource : public Resource {
 public:
-   /**
+  /**
    * @brief Constructor
    *
    * @param unit is a string indicating the resource unit 
