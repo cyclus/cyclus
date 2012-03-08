@@ -1,14 +1,14 @@
 // StubStubCommComm.cpp
 // Implements the StubStubCommComm class
-#include <iostream>
-#include "Logger.h"
 
+#include "Logger.h"
 #include "StubStubComm.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubStubComm::StubStubComm() {};
 
@@ -31,6 +31,9 @@ void StubStubComm::print() {
   StubCommModel::print(); 
 };
 
+/* -------------------- */
+
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -39,14 +42,15 @@ void StubStubComm::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubStubComm::receiveMessage(msg_ptr msg) {};
 
+/* -------------------- */
+
 
 /* --------------------
  * all STUBCOMMMODEL classes have these members
  * --------------------
  */
 
-
-
+/* -------------------- */
 
 
 /* --------------------
@@ -54,9 +58,9 @@ void StubStubComm::receiveMessage(msg_ptr msg) {};
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubStubComm() {
     return new StubStubComm();
 }
-
 
 /* -------------------- */

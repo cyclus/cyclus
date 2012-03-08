@@ -1,26 +1,42 @@
 // StubRegion.h
 #if !defined(_STUBREGION_H)
 #define _STUBREGION_H
-#include <iostream>
-#include "Logger.h"
 
+#include "Logger.h"
 #include "RegionModel.h"
 
 /**
- * The StubRegion class inherits from the RegionModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This region will do nothing. This RegionModel is intended as a skeleton to guide
- * the implementation of new RegionModel models. 
- *
- */
-class StubRegion : public RegionModel  
-{
+  @class StubRegion
+  
+  @brief This RegionModel is intended 
+  as a skeleton to guide the implementation of new RegionModel models. 
+  
+  The StubRegion class inherits from the RegionModel class and is 
+  dynamically loaded by the Model class when requested.
+
+  @section intro Introduction
+  Place an introduction to the model here. 
+
+  @section modelparams Model Parameters
+  Place a description of the required input parameters which define the model 
+  implementation.
+
+  @section optionalparams Optional Parameters
+  Place a description of the optional input parameters to define the model 
+  implementation.
+
+  @section detailed Detailed Behavior
+  Place a description of the detailed behavior of the model. Consider describing 
+  the behavior at the tick and tock as well as the behavior upon sending and
+  receiving materials and messages. 
+*/
+
+class StubRegion : public RegionModel {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
 public:
   /**
    * Default constructor for StubStub Class
@@ -63,20 +79,19 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
-
-    /**
-     * The StubRegion should ignore incoming messages
-     */
-    virtual void receiveMessage(msg_ptr msg);
-
-protected:
-
+ public:   
+   /**
+    * The StubRegion should ignore incoming messages
+    */
+   virtual void receiveMessage(msg_ptr msg);
+   
 /* -------------------- */
+
 
 /* --------------------
  * all REGIONMODEL classes have these members
@@ -85,25 +100,6 @@ protected:
 
 /* ------------------- */ 
 
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for this region model's output dir
-  */
-  static std::string outputDir(){ 
-    return RegionModel::outputDir().append(outputDir_);}
-    
- private:
-  /**
-     Every specific region model writes to the output database
-     location: RegionModel::OutputDir_ + /this_region's_name
-  */
-  static std::string outputDir_;
-
 };
-
 
 #endif

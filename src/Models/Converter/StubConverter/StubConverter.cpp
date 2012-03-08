@@ -1,12 +1,10 @@
 // StubConverter.cpp
 // Implements the StubConverter class
-#include <iostream>
+
 #include "Logger.h"
-
-#include "StubConverter.h"
-
 #include "CycException.h"
 #include "InputXML.h"
+#include "StubConverter.h"
 
 /* --------------------
  * all MODEL classes have these members
@@ -33,26 +31,31 @@ void StubConverter::print() {
   ConverterModel::print(); 
 };
 
+/* ------------------- */ 
+
+
 /* --------------------
  * all CONVERTERMODEL classes have these members
  * --------------------
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-msg_ptr StubConverter::convert(msg_ptr convMsg, msg_ptr refMsg)
-{
+msg_ptr StubConverter::convert(msg_ptr convMsg, msg_ptr refMsg) {
   throw CycException("The StubConverter should not be used to convert things.");
 }
+
+/* ------------------- */ 
+
     
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubConverter() {
     return new StubConverter();
 }
-
 
 /* ------------------- */ 
 

@@ -4,6 +4,11 @@
 #include "StubModel.h"
 #include "Logger.h"
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
   setModelType("Stub");
@@ -27,3 +32,5 @@ void StubModel::print() {
   Model::print(); 
   LOG(LEV_DEBUG2, "none!"); 
 };
+
+/* ------------------- */ 

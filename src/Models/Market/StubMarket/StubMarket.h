@@ -1,26 +1,41 @@
 // StubMarket.h
 #if !defined(_STUBMARKET_H)
 #define _STUBMARKET_H
-#include <iostream>
-#include "Logger.h"
 
+#include "Logger.h"
 #include "MarketModel.h"
 
 /**
- * The StubMarket class inherits from the MarketModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This market will do nothing. This MarketModel is intended as a skeleton to
- * guide the implementation of new MarketModel models.
- *
- */
-class StubMarket : public MarketModel  
-{
+  @class StubMarket
+
+  @brief This MarketModel is intended 
+  as a skeleton to guide the implementation of new MarketModel models. 
+  
+  The StubMarket class inherits from the MarketModel class and is 
+  dynamically loaded by the Model class when requested.
+  
+  @section intro Introduction
+  Place an introduction to the model here. 
+
+  @section modelparams Model Parameters
+  Place a description of the required input parameters which define the model 
+  implementation.
+
+  @section optionalparams Optional Parameters
+  Place a description of the optional input parameters to define the model 
+  implementation.
+
+  @section detailed Detailed Behavior
+  Place a description of the detailed behavior of the model. Consider describing 
+  the behavior at the tick and tock as well as the behavior upon sending and
+  receiving materials and messages. 
+*/
+
+class StubMarket : public MarketModel {
 /* --------------------
  * all MODEL classes have these public members
  * --------------------
  */
-
 public:
   /**
    * Default constructor for StubMarket Class
@@ -63,37 +78,36 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
 public:
-
-    /**
-     * The StubMarket should ignore incoming messages
-     */
-    virtual void receiveMessage(msg_ptr msg);
-
-protected:
-
+   /**
+    * The StubMarket should ignore incoming messages
+    */
+   virtual void receiveMessage(msg_ptr msg);
+   
 /* -------------------- */
+
 
 /* --------------------
  * all MARKETMODEL classes have these members
  * --------------------
  */
-
-  /// Resolve requests with offers
-  /**
-   *  Primary funcation of a Market is to resolve the set of 
-   *  requests with the set of offers.
-   *
-   *  In this stub - do nothing!
-   */
-  virtual void resolve();
-
+ public:
+   /// Resolve requests with offers
+   /**
+    *  Primary funcation of a Market is to resolve the set of 
+    *  requests with the set of offers.
+    *
+    *  In this stub - do nothing!
+    */
+   virtual void resolve();
 
 /* -------------------- */
+
 
 /* --------------------
  * _THIS_ MARKETMODEL class these members

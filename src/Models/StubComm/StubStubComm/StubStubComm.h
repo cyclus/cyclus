@@ -1,25 +1,25 @@
 // StubStubComm.h
 #if !defined(_STUBSTUBCOMM_H)
 #define _STUBSTUBCOMM_H
-#include <iostream>
-#include "Logger.h"
 
+#include "Logger.h"
 #include "StubCommModel.h"
+
 /**
- * The StubStubComm class inherits from the StubModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This model will do nothing. This StubCommModel is intended as a skeleton to guide
- * the implementation of new StubComm models. 
- *
- */
-class StubStubComm : public StubCommModel  
-{
+   @brief 
+   The StubStubComm class inherits from the StubModel class and is dynamically
+   loaded by the Model class when requested.
+   
+   This model will do nothing. This StubCommModel is intended as a skeleton to guide
+   the implementation of new StubComm models. 
+*/
+
+class StubStubComm : public StubCommModel {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
 public:
   /**
    * Default constructor for StubStub Class
@@ -52,20 +52,19 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
 public:
-
     /**
      * The StubStubComm should ignore incoming messages
      */
     virtual void receiveMessage(msg_ptr msg);
 
-protected:
-
 /* -------------------- */
+
 
 /* --------------------
  * all STUBCOMMMODEL classes have these members

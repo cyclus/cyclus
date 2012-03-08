@@ -20,13 +20,12 @@
    <a href="http://cyclus.github.com/devdoc/make-models/main.html">GuidelinesForImplementingNewModels</a>.
  */
 
-//-----------------------------------------------------------------------------
 class StubTimeAgent : public TimeAgent {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
 public:
   /**
    * Default constructor for StubTimeAgent Class
@@ -89,6 +88,8 @@ public:
    * @param time is the time to perform the tock
    */
   virtual void handleTock(int time);
+
+/* ------------------- */ 
 
 };
 

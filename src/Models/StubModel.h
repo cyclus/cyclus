@@ -21,13 +21,12 @@
    <a href="http://code.google.com/p/cyclus/wiki/GuidelinesForImplementingNewModels">GuidelinesForImplementingNewModels</a>.
  */
 
-//-----------------------------------------------------------------------------
 class StubModel : public Model {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
 public:
   /**
    * Default constructor for StubModel Class
@@ -67,6 +66,8 @@ public:
    * every model should be able to print a verbose description
    */
    virtual void print();
+
+/* ------------------- */ 
 
 };
 

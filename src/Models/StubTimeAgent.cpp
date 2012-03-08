@@ -4,6 +4,11 @@
 #include "StubTimeAgent.h"
 #include "Logger.h"
 
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::StubTimeAgent() { 
   setModelType("Stub");
@@ -37,3 +42,4 @@ void StubTimeAgent::handleTick(int time) {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::handleTock(int time) {}
 
+/* ------------------- */ 

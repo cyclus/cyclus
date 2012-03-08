@@ -20,19 +20,13 @@
    <a href="http://code.google.com/p/cyclus/wiki/GuidelinesForImplementingNewModels">GuidelinesForImplementingNewModels</a>.
  */
 
-//-----------------------------------------------------------------------------
-/*
- * 
- */
-//-----------------------------------------------------------------------------
 class StubCommModel : public Model, public Communicator {
+  
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-  
-
-public:
+ public:
   /**
    * Default constructor for StubCommModel Class
    */
@@ -72,6 +66,9 @@ public:
    */
    virtual void print();
 
+/* ------------------- */ 
+
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -81,6 +78,8 @@ public:
     virtual void receiveMessage(msg_ptr msg) = 0;
 
 };
+
+/* ------------------- */ 
 
 #endif
 
