@@ -95,11 +95,11 @@ TEST_F(MaterialStoreTest, MakeUnlimited) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, NoSplitOver) {
+TEST_F(MaterialStoreTest, NotSplitableOver) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, NoSplitUnder) {
+TEST_F(MaterialStoreTest, NotSplitableUnder) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -107,17 +107,17 @@ TEST_F(MaterialStoreTest, Splitable) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, ExtractQty) {
+TEST_F(MaterialStoreTest, RemoveQty) {
   // returns a std::vector
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, ExtractOne) {
+TEST_F(MaterialStoreTest, RemoveOne) {
   // returns mat_rsrc_ptr
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, ExtractNum) {
+TEST_F(MaterialStoreTest, RemoveNum) {
   // returns a std::vector
 }
 
