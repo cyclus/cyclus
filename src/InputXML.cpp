@@ -27,7 +27,7 @@ InputXML::InputXML() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InputXML* InputXML::Instance() {
-  main_schema_ = ENV->getCyclusPath() + "/Data/cyclus.rng";
+  main_schema_ = Env::getCyclusPath() + "/Data/cyclus.rng";
 
   if (0 == instance_)
   instance_ = new InputXML();

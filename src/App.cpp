@@ -88,8 +88,8 @@ int main(int argc, char* argv[]) {
   }
 
   // tell ENV the path between the cwd and the cyclus executable
-  string path = ENV->pathBase(argv[0]);
-  ENV->setCyclusRelPath(path);
+  string path = Env::pathBase(argv[0]);
+  Env::setCyclusRelPath(path);
 
   // Create the output file
   try {

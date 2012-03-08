@@ -6,8 +6,6 @@
 #include "CycException.h"
 #include "boost/filesystem.hpp"
 
-#define ENV Env::Instance()
-
 class CycNoEnvVarException: public CycException {
   public: CycNoEnvVarException(std::string msg) : CycException(msg) {};
 };
@@ -18,22 +16,10 @@ class CycNoEnvVarException: public CycException {
 class Env {
 private:
 		
-	/**
-	 * A pointer to this Env once it has been initialized.
-	 */
-	static Env* instance_;
-
   static boost::filesystem::path path_from_cwd_to_cyclus_;
 
   static boost::filesystem::path cwd_;
 
-protected:
-		
-	/**
-	 * Constructs a new Env for this simulation.
-	 */
-	Env();
-	
 public:
 
   /**
@@ -55,14 +41,6 @@ public:
    *              the name of the cyclus executable)
 	 */
   static void setCyclusRelPath(std::string path);
-
-	/**
-	 * Gives all simulation objects global access to the Env by 
-	 * returning a pointer to it.
-	 *
-	 * @return a pointer to the Env
-	 */
-	static Env* Instance();
 
   /**
    * Method to check the existence of and return an environment variable

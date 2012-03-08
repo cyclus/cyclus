@@ -35,9 +35,9 @@ void BookKeeper::createDB(std::string name) {
   // construct output file path
   file_path fpath;
   try {
-    fpath = ENV->checkEnv("CYCLUS_OUT_DIR");
+    fpath = Env::checkEnv("CYCLUS_OUT_DIR");
   } catch(CycNoEnvVarException err) {
-    fpath = ENV->getCyclusPath();
+    fpath = Env::getCyclusPath();
     CLOG(LEV_INFO1) << err.what() << " - Using default path.";
   }
   createDB(name,fpath);

@@ -12,26 +12,11 @@
 
 using namespace std;
 
-Env* Env::instance_ = 0;
 boost::filesystem::path Env::path_from_cwd_to_cyclus_;
-boost::filesystem::path Env::cwd_;
+boost::filesystem::path Env::cwd_ = boost::filesystem::current_path();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env::Env() {
-  cwd_ = boost::filesystem::current_path();
-  CLOG(LEV_INFO4) << "Current working directory: " << cwd_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env* Env::Instance() {
-	// If we haven't created an ENV yet, create it, and then and return it
-	// either way.
-	if (0 == instance_) {
-		instance_ = new Env();
-	}
-
-	return instance_;
-}
+// note that this is not used - Env is a pure static class
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::pathBase(std::string path) {
@@ -46,6 +31,8 @@ std::string Env::pathBase(std::string path) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::getCyclusPath() {
   // return the join of cwd_ and rel path to cyclus
+  CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
+                  << cwd_ / path_from_cwd_to_cyclus_;
   return (cwd_ / path_from_cwd_to_cyclus_).string();
 }
 

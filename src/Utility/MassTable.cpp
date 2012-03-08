@@ -55,9 +55,9 @@ void MassTable::initializeSQL() {
   // get the file location
   string file_path;
   try {
-    file_path = ENV->checkEnv("CYCLUS_OUT_DIR") + "/Data";
+    file_path = Env::checkEnv("CYCLUS_OUT_DIR") + "/Data";
   } catch(CycNoEnvVarException err) {
-    file_path = ENV->getCyclusPath() + "/Data";
+    file_path = Env::getCyclusPath() + "/Data";
     CLOG(LEV_INFO1) << err.what() << " - Using default path.";
   }
   string file_name = "mass.sqlite";
@@ -101,7 +101,7 @@ using namespace H5;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeHDF() {
-  string file_path = ENV->getCyclusPath() + "/Data/mass.h5"; 
+  string file_path = Env::getCyclusPath() + "/Data/mass.h5"; 
 
   const H5std_string filename = file_path;
   const H5std_string groupname = "ame03";
