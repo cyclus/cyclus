@@ -53,13 +53,7 @@ double MassTable::getMassInGrams(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
   // get the file location
-  string file_path;
-  try {
-    file_path = Env::checkEnv("CYCLUS_OUT_DIR") + "/Data";
-  } catch(CycNoEnvVarException err) {
-    file_path = Env::getCyclusPath() + "/Data";
-    CLOG(LEV_INFO1) << err.what() << " - Using default path.";
-  }
+  string file_path = Env::getCyclusPath() + "/Data";
   string file_name = "mass.sqlite";
   Database *db = new Database( file_name, file_path );
 
