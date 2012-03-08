@@ -262,19 +262,12 @@ void Message::approveTransfer() {
   // register that this transaction occured
   this->Message::addTransToTable(id);
   int nResources = manifest.size();
-  for (int pos = 0; pos < nResources; pos++){
-    this->Message::addResourceToTable(id,pos+1,manifest.at(pos));
+  for (int pos = 0; pos < nResources; pos++) {
+    this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
   }
 
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
-
-  CLOG(LEV_INFO4) << "Material transfer details {";
-  printTrans();
-  for (int i = 0; i < manifest.size(); i++) {
-    manifest.at(i)->print();
-  }
-  CLOG(LEV_INFO4) << "}";
 
 }
 

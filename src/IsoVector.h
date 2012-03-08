@@ -299,6 +299,8 @@ private:
 
   /// aids in mass recalc prevention - used in conjunction with total_mass_
   bool mass_out_of_date_;
+
+  void recordState();
   
  private:
   /*!
@@ -321,8 +323,6 @@ private:
   /// a mapping of already-defined compositions to states
   static StateMap predefinedStates_;
 
-  void trackComposition();
-  
   /// returns the state id of the current composition if it is already tracked
   int compositionIsTracked();
 };
