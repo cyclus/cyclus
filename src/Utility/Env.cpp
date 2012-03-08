@@ -39,7 +39,7 @@ std::string Env::getCyclusPath() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Env::setCyclusRelPath(std::string path) {
   path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
-  CLOG(LEV_INFO4) << "Cyclus rel path: " << path;
+  CLOG(LEV_DEBUG3) << "Cyclus rel path: " << path;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
