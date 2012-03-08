@@ -2,6 +2,7 @@
 #include "Env.h"
 
 #include "InputXML.h"
+#include "Logger.h"
 
 #include <sys/stat.h>
 #include <iostream>
@@ -12,10 +13,14 @@
 using namespace std;
 
 Env* Env::instance_ = 0;
-string Env::path_from_cwd_to_cyclus_ = ".";
+boost::filesystem::path Env::path_from_cwd_to_cyclus_;
+boost::filesystem::path Env::cwd_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env::Env() { }
+Env::Env() {
+  cwd_ = boost::filesystem::current_path();
+  CLOG(LEV_INFO4) << "Current working directory: " << cwd_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Env* Env::Instance() {
@@ -40,21 +45,25 @@ std::string Env::pathBase(std::string path) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::getCyclusPath() {
-  return path_from_cwd_to_cyclus_;
+  // return the join of cwd_ and rel path to cyclus
+  return (cwd_ / path_from_cwd_to_cyclus_).string();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Env::setCyclusPath(std::string path) {
-  path_from_cwd_to_cyclus_ = path;
+void Env::setCyclusRelPath(std::string path) {
+  path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
+  CLOG(LEV_INFO4) << "Cyclus rel path: " << path;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Env::checkEnv(std::string varname) {
-  char * pVar = getenv (varname.c_str());
-  if (pVar==NULL)
+  char* pVar = getenv (varname.c_str());
+  if (pVar == NULL) {
     throw CycNoEnvVarException("Environment variable " + varname + " not set.");
-  else if (strlen(pVar) == 0)
-    throw CycNoEnvVarException("Environment variable " + varname + " set to an empty string.");
+  } else if (strlen(pVar) == 0) {
+    throw CycNoEnvVarException("Environment variable " + varname
+                               + " set to an empty string.");
+  }
   return pVar;
 }
 

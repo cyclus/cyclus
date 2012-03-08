@@ -44,10 +44,6 @@ int main(int argc, char* argv[]) {
             options(desc).positional(p).run(), vm);
   po::notify(vm);
 
-  // tell ENV the path between the cwd and the cyclus executable
-  string path = ENV->pathBase(argv[0]);
-  ENV->setCyclusPath(path);
-
   // announce yourself
   cout << endl;
   cout << "|--------------------------------------------|" << endl;
@@ -90,6 +86,10 @@ int main(int argc, char* argv[]) {
       Logger::ReportLevel() = Logger::ToLogLevel(v_level);
     }
   }
+
+  // tell ENV the path between the cwd and the cyclus executable
+  string path = ENV->pathBase(argv[0]);
+  ENV->setCyclusRelPath(path);
 
   // Create the output file
   try {

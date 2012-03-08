@@ -4,6 +4,7 @@
 
 #include <string>
 #include "CycException.h"
+#include "boost/filesystem.hpp"
 
 #define ENV Env::Instance()
 
@@ -22,7 +23,9 @@ private:
 	 */
 	static Env* instance_;
 
-  static std::string path_from_cwd_to_cyclus_;
+  static boost::filesystem::path path_from_cwd_to_cyclus_;
+
+  static boost::filesystem::path cwd_;
 
 protected:
 		
@@ -51,7 +54,7 @@ public:
    *             (i.e. the relative path from the cwd to cyclus including
    *              the name of the cyclus executable)
 	 */
-  static void setCyclusPath(std::string path);
+  static void setCyclusRelPath(std::string path);
 
 	/**
 	 * Gives all simulation objects global access to the Env by 
@@ -66,7 +69,7 @@ public:
    *
    * @param var is the variable to check and return 
    */
-  std::string checkEnv(std::string var);
+  static std::string checkEnv(std::string var);
 
 };
 
