@@ -1,8 +1,9 @@
 // StubMarket.cpp
 // Implements the StubMarket class
 
-#include "Logger.h"
 #include "StubMarket.h"
+
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members

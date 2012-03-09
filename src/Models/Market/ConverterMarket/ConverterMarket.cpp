@@ -1,9 +1,10 @@
 // ConverterMarket.cpp
 // Implements the ConverterMarket class
-#include "ConverterMarket.h"
 
 #include <iostream>
 #include <cmath>
+
+#include "ConverterMarket.h"
 
 #include "ConverterModel.h"
 #include "IsoVector.h"

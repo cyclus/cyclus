@@ -1,13 +1,14 @@
 // MarketModel.cpp
 // Implements the MarketModel Class
 
+#include <string>
+
 #include "MarketModel.h"
+
 #include "InputXML.h"
 #include "CycException.h"
 #include "Timer.h"
-
 #include "Logger.h"
-#include <string>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ MarketModel::MarketModel() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
   LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
-  std::list<MarketModel*>::iterator mkt;
+  list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt) {
     if (this == *mkt) {
       LOG(LEV_DEBUG2, "none!") << "  found match in static list";
@@ -40,9 +41,9 @@ MarketModel::~MarketModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel* MarketModel::marketForCommod(std::string commod) {
+MarketModel* MarketModel::marketForCommod(string commod) {
   MarketModel* market = NULL;
-  std::list<MarketModel*>::iterator mkt;
+  list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
     if ((*mkt)->commodity() == commod) {
       market = *mkt;
@@ -51,7 +52,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   }
 
   if (market == NULL) {
-    std::string err_msg = "No market found for commodity '";
+    string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
     throw CycIndexException(err_msg);
   }

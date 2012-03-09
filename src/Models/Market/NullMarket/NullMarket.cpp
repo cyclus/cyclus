@@ -1,10 +1,10 @@
 // NullMarket.cpp
 // Implements the NullMarket class
 #include <iostream>
-#include "Logger.h"
 
 #include "NullMarket.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "IsoVector.h"
