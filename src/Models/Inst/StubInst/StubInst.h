@@ -32,38 +32,37 @@
 */
 
 class StubInst : public InstModel {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * Default constructor for StubInst Class
+   * @brief Default constructor for StubInst Class
    */
   StubInst();
 
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubInst();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubInst* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -73,7 +72,7 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -86,7 +85,7 @@ public:
  */
  public:
    /**
-    * The StubInst should ignore incoming messages
+    * @brief The StubInst should ignore incoming messages
     */
    virtual void receiveMessage(msg_ptr msg);
    

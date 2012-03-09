@@ -1,15 +1,14 @@
 // FixedInst.cpp
 // Implements the FixedInst class
 #include <iostream>
-#include "Logger.h"
 
 #include "FixedInst.h"
 
 #include "FacilityModel.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::init(xmlNodePtr cur) {
@@ -61,15 +60,6 @@ void FixedInst::print() {
   }
 };
 
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string FixedInst::outputDir_ = "/fixed";
-
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -78,7 +68,6 @@ std::string FixedInst::outputDir_ = "/fixed";
 extern "C" Model* constructFixedInst() {
   return new FixedInst();
 }
-
 
 /* ------------------- */ 
 
