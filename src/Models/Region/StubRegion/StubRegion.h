@@ -2,8 +2,9 @@
 #if !defined(_STUBREGION_H)
 #define _STUBREGION_H
 
-#include "Logger.h"
 #include "RegionModel.h"
+
+#include "Logger.h"
 
 /**
   @class StubRegion
@@ -29,41 +30,39 @@
   Place a description of the detailed behavior of the model. Consider describing 
   the behavior at the tick and tock as well as the behavior upon sending and
   receiving materials and messages. 
-*/
-
+ */
 class StubRegion : public RegionModel {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * Default constructor for StubStub Class
+   * @brief Default constructor for StubStub Class
    */
   StubRegion();
-
+  
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubRegion();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubRegion* src) ;
-
+  
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -73,10 +72,10 @@ public:
   virtual void copyFreshModel(Model* src){copy(dynamic_cast<StubRegion*>(src));}
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
-   virtual void print();
-
+  virtual void print();
+  
 /* ------------------- */ 
 
 
@@ -85,11 +84,11 @@ public:
  * --------------------
  */
  public:   
-   /**
-    * The StubRegion should ignore incoming messages
-    */
-   virtual void receiveMessage(msg_ptr msg);
-   
+  /**
+   * @brief The StubRegion should ignore incoming messages
+   */
+  virtual void receiveMessage(msg_ptr msg);
+  
 /* -------------------- */
 
 
