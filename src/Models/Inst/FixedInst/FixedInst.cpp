@@ -10,6 +10,8 @@
 #include "CycException.h"
 #include "InputXML.h"
 
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::init(xmlNodePtr cur) {
   InstModel::init(cur);

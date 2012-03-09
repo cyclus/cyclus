@@ -1,6 +1,8 @@
 // Message.cpp
 // Implements the Message class.
 
+#include <iostream>
+
 #include "Message.h"
 
 #include "CycException.h"
@@ -12,7 +14,7 @@
 #include "Logger.h"
 #include "Timer.h"
 
-#include <iostream>
+using namespace std;
 
 // initialize static variables
 int Message::nextTransID_ = 1;

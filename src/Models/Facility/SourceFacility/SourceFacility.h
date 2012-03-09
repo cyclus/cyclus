@@ -219,12 +219,12 @@ class SourceFacility : public FacilityModel  {
    * to send to others. For instance, a Reactor's inventory is its collection of 
    * old fuel assemblies that have come out of the core.
    */ 
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
   
   /**
    * @brief A list of orders to be processed on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
    * @brief return the total mass of the material objects in the inventory

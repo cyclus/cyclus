@@ -211,17 +211,17 @@ class NullFacility : public FacilityModel {
   /**
    * @brief The stocks of raw material available to be processed.
    */
-  deque<mat_rsrc_ptr> stocks_;
+  std::deque<mat_rsrc_ptr> stocks_;
     
   /**
    * @brief The inventory of processed material.
    */
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
 
   /**
    * @brief The list of orders to process on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
    * @brief get the total mass of the stuff in the inventory

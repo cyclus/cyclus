@@ -2,8 +2,9 @@
 #if !defined(_STUBSTUBCOMM_H)
 #define _STUBSTUBCOMM_H
 
-#include "Logger.h"
 #include "StubCommModel.h"
+
+#include "Logger.h"
 
 /**
    @brief 
@@ -12,43 +13,41 @@
    
    This model will do nothing. This StubCommModel is intended as a skeleton to guide
    the implementation of new StubComm models. 
-*/
-
+ */
 class StubStubComm : public StubCommModel {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * Default constructor for StubStub Class
+   * @brief Default constructor for StubStub Class
    */
   StubStubComm();
-
+  
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubStubComm();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubStubComm* src) ;
-
+  
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
-   virtual void print();
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -57,12 +56,12 @@ public:
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
-    /**
-     * The StubStubComm should ignore incoming messages
-     */
-    virtual void receiveMessage(msg_ptr msg);
-
+ public:
+  /**
+   * @brief The StubStubComm should ignore incoming messages
+   */
+  virtual void receiveMessage(msg_ptr msg);
+  
 /* -------------------- */
 
 

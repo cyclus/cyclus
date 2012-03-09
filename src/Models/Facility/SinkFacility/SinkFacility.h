@@ -1,6 +1,7 @@
 // SinkFacility.h
 #if !defined(_SINKFACILITY_H)
 #define _SINKFACILITY_H
+
 #include <iostream>
 #include <deque>
 #include <queue>
@@ -175,12 +176,12 @@ class SinkFacility : public FacilityModel  {
   /**
    * @brief  all facilities must have at least one input commodity
    */
-  vector<std::string> in_commods_;
+  std::vector<std::string> in_commods_;
 
   /**
    * @brief  this facility holds material in storage. 
    */
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
 
   /**
    * @brief get the total mass of the stuff in the inventory

@@ -11,6 +11,8 @@
 #include "CycException.h"
 #include "InputXML.h"
 
+using namespace std;
+
 /**
   TICK
   send a request for your capacity minus your stocks.

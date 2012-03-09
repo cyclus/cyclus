@@ -13,6 +13,8 @@
 #include "CycException.h"
 #include "FacilityModel.h"
 
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
   Model::init(cur);

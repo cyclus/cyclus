@@ -13,6 +13,8 @@
 #include "CycException.h"
 #include "InputXML.h"
 
+using namespace std;
+
 /**
   TICK
   Make offers of separated material based on availabe inventory.

@@ -108,8 +108,8 @@
    material on a market?
 */
 
-typedef pair< std::string, mat_rsrc_ptr> Fuel; 
-typedef pair< std::string, IsoVector> Recipe; 
+typedef std::pair< std::string, mat_rsrc_ptr> Fuel; 
+typedef std::pair< std::string, IsoVector> Recipe; 
 
 class RecipeReactor : public FacilityModel  {
 /* --------------------
@@ -322,12 +322,6 @@ class RecipeReactor : public FacilityModel  {
    */
   double stocksMass();
 
-  /**
-   * @brief The getter function for this facility model output dir
-   */
-  static std::string outputDir() { 
-    return FacilityModel::outputDir().append(outputDir_);}
-
  private:
   /**
    * @brief Perform the actions that must occur at the begining of the cycle
@@ -352,27 +346,27 @@ class RecipeReactor : public FacilityModel  {
   /**
    * @brief  The RecipeReactor has pairs of input and output fuel
    */
-  deque< pair< Recipe, Recipe > > fuelPairs_;
+  std::deque< std::pair< Recipe, Recipe > > fuelPairs_;
 
   /**
    * @brief  Fresh fuel assemblies on hand.
    */
-  deque<Fuel> stocks_;
+  std::deque<Fuel> stocks_;
 
   /**
    * @brief  The fuel assembly currently in the core.
    */
-  deque<Fuel> currCore_;
+  std::deque<Fuel> currCore_;
     
   /**
    * @brief  Inventory of spent fuel assemblies.
    */
-  deque<Fuel> inventory_;
+  std::deque<Fuel> inventory_;
 
   /**
    * @brief  The list of orders to process on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
    * @brief  The time between batch reloadings.
@@ -383,12 +377,6 @@ class RecipeReactor : public FacilityModel  {
    * @brief The current month in the cycle. 1 > month_in_cycle < cycle_time)
    */
   int month_in_cycle_;
-
-  /**
-   * @brief Every specific facility model writes to the output database
-   * location: FacilityModel::OutputDir_ + /this_facility's_handle
-   */
-  static std::string outputDir_;
 
   /**
    * @brief make reqests
@@ -465,13 +453,13 @@ class RecipeReactor : public FacilityModel  {
   /**
    * @brief The state in which the facility exists.
    */
-  string state_;
+  std::string state_;
 
   /**
    * @brief The type of reactor that this is.
    * (this may be redundant or unnecessary information.)
    */
-  string typeReac_;
+  std::string typeReac_;
 
   /**
    * @brief The percent of the time the facility functions at 100% capacity.

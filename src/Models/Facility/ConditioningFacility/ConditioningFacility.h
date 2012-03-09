@@ -202,7 +202,7 @@ class ConditioningFacility : public FacilityModel {
   /**
    * @brief  the inventory is where the processed material is kept
    */
-  std::deque< pair<std::string, mat_rsrc_ptr> > inventory_;
+  std::deque<std::pair<std::string, mat_rsrc_ptr> > inventory_;
 
   /**
    * @brief  a map from format names to table loading function pointers
@@ -222,7 +222,7 @@ class ConditioningFacility : public FacilityModel {
   /**
    * @brief  Matches commodity names with stream ids
    */
-  map< std::string, pair< int, std::string > > commod_map_;
+  std::map< std::string, std::pair< int, std::string > > commod_map_;
 
   /**
    * @brief  Processing capacity per time unit not yet consumed this tick (in kg)

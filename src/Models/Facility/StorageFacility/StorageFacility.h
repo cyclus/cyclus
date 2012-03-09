@@ -166,22 +166,22 @@ class StorageFacility : public FacilityModel
    * @brief The stocks of entering material
    * These are not yet old enough to leave
    */
-  deque<mat_rsrc_ptr> stocks_;
+  std::deque<mat_rsrc_ptr> stocks_;
     
   /**
    * @brief The inventory of material ready to exit
    */
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
 
   /**
    * @brief The list of the entry times for each material
    */
-  deque< pair<int, mat_rsrc_ptr> > entryTimes_;
+  std::deque< std::pair<int, mat_rsrc_ptr> > entryTimes_;
 
   /**
    * @brief The list of orders to process on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
    * @brief get the total mass of the stuff in the inventory

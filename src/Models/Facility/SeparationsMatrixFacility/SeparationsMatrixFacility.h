@@ -81,8 +81,8 @@
    of each element across all streams.
  */
 
-typedef pair<std::string, mat_rsrc_ptr> InSep;
-typedef pair<std::string, mat_rsrc_ptr> OutSep;
+typedef std::pair<std::string, mat_rsrc_ptr> InSep;
+typedef std::pair<std::string, mat_rsrc_ptr> OutSep;
 
 class SeparationsMatrixFacility : public FacilityModel  {
 /* --------------------
@@ -184,17 +184,17 @@ class SeparationsMatrixFacility : public FacilityModel  {
     * line, that is, the black box materials sit in while they're being
     * operated on.
     */
-   typedef multimap<int, pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
+   typedef std::multimap<int, std::pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
    /**
     * @brief  Vector of incoming material
     */
-   vector<std::string> in_commod_;
+   std::vector<std::string> in_commod_;
 
    /**
     * @brief  Vector of outgoing material
     */
-   vector<std::string> out_commod_;
+   std::vector<std::string> out_commod_;
 
    /**
     * @brief The SeparationsMatrixFacility has a limit to how material it can process.
@@ -205,22 +205,22 @@ class SeparationsMatrixFacility : public FacilityModel  {
    /**
     * @brief This is the structure for each stream.
     */
-   map<std::string,pair<int, double> > stream_set_;
+   std::map<std::string,std::pair<int, double> > stream_set_;
 
    /**
     * @brief The stocks of raw material available to be processed.
     */
-   deque<pair<std::string,mat_rsrc_ptr> > stocks_;
+   std::deque<std::pair<std::string,mat_rsrc_ptr> > stocks_;
     
    /**
     * @brief The inventory of processed material.
     */
-   deque<pair<std::string,mat_rsrc_ptr> > inventory_;
+   std::deque<std::pair<std::string,mat_rsrc_ptr> > inventory_;
 
    /**
     * @brief The inventory of waste material.
     */
-   deque<pair<std::string,mat_rsrc_ptr> > wastes_;
+   std::deque<std::pair<std::string,mat_rsrc_ptr> > wastes_;
 
    /**
     * @brief The total mass flow required to process all outstanding orders this
@@ -233,7 +233,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
    /**
     * @brief The list of orders to process on the Tock
     */
-   deque<msg_ptr> ordersWaiting_;
+   std::deque<msg_ptr> ordersWaiting_;
 
    /**
     * @brief A map whose keys are times at which this Facility will finish executing a
@@ -280,7 +280,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
     * @param candMat the candidate material
     * @return the iterator
     */
-   multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr
+   std::multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr
 						      candMat);
 
    /**

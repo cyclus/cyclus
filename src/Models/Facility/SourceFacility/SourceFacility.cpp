@@ -11,6 +11,8 @@
 #include "MarketModel.h"
 #include "Timer.h"
 
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility() {
   prev_time_ = TI->time() - 1;

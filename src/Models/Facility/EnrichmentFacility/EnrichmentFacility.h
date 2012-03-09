@@ -192,7 +192,7 @@ class EnrichmentFacility : public FacilityModel  {
    * line, that is, the black box materials sit in while they're being
    * operated on.
    */
-  typedef multimap<int, pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
+  typedef std::multimap<int, std::pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
   /**
    * @brief The EnrichmentFacility has one input commodity
@@ -220,17 +220,17 @@ class EnrichmentFacility : public FacilityModel  {
   /**
    * @brief The stocks of raw material available to be processed.
    */
-  deque<mat_rsrc_ptr> stocks_;
+  std::deque<mat_rsrc_ptr> stocks_;
     
   /**
    * @brief The inventory of processed material.
    */
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
 
   /**
    * @brief The inventory of waste material.
    */
-  deque<mat_rsrc_ptr> wastes_;
+  std::deque<mat_rsrc_ptr> wastes_;
 
   /**
    * @brief The total mass flow required to process all outstanding orders this 
@@ -243,7 +243,7 @@ class EnrichmentFacility : public FacilityModel  {
   /**
    * @brief The list of orders to process on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
    * @brief A map whose keys are times at which this Facility will finish executing a 
@@ -319,7 +319,7 @@ class EnrichmentFacility : public FacilityModel  {
    * @param candMat the candidate material
    * @return the iterator
    */
-  multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr candMat);
+  std::multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr candMat);
 
   /**
    * @brief The time that the stock material spends in the facility.

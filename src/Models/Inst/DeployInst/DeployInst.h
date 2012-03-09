@@ -95,12 +95,12 @@ class DeployInst : public InstModel {
   /**
    * @brief a map of deployed models
    */
-  map<int,Model*> deployment_map_;
+  std::map<int,Model*> deployment_map_;
 
   /**
    * @brief a map of models to build
    */
-  map<int,Model*> to_build_map_;
+  std::map<int,Model*> to_build_map_;
   
 /* ------------------- */ 
 

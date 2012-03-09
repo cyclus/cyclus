@@ -10,6 +10,8 @@
 #include "Timer.h"
 #include "BookKeeper.h"
 
+using namespace std;
+
 /**
   TICK
   send a request for your capacity minus your stocks.
@@ -26,8 +28,6 @@
   SEND MATERIAL
   pull it from inventory, fill the transaction
  */
-
-using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::init(xmlNodePtr cur)

@@ -2,6 +2,7 @@
 // Implements the Model Class
 
 #include <iostream>
+#include <string>
 
 #include "Model.h"
 
