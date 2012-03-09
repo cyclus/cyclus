@@ -4,6 +4,8 @@
 
 #include "CycException.h"
 
+#define STORE_EPS 1e-6
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CycOverCapException: public CycException {
   public: CycOverCapException(std::string msg) : CycException(msg) {};
@@ -14,14 +16,17 @@ class CycNegQtyException: public CycException {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+typedef std::vector<mat_rsrc_ptr> MatManifest;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 /*!
 MaterialStore 
 
 Methods that begin with a "set", "make", "add", or "remove" prefix change the
 state/behavior of the store; other methods do not.
 
-Default constructed material store has zero (finite) capacity and splits
-material objects when necessary during removal.
+Default constructed material store has zero (finite) capacity.
 */
 class MaterialStore {
 
@@ -32,8 +37,8 @@ public:
   virtual ~MaterialStore();
 
   /*!
-  capacity returns the maximum quantity this store can hold (units based
-  on constituent resource objects' units). 
+  capacity returns the maximum resource quantity this store can hold (units
+  based on constituent resource objects' units). 
 
   Never throws.  Returns -1 if the store is unlimited.
   */
@@ -43,21 +48,27 @@ public:
   setCapacity sets the maximum quantity this store can hold (units based
   on constituent resource objects' units).
 
-  @throws CycOverCapException thrown if the new capacity is lower than
-  the quantity of material resources that already exist in the store.
+  @throws CycOverCapException the new capacity is lower (by STORE_EPS) than the
+  quantity of material resources that already exist in the store.
   */
   void setCapacity(double cap);
 
   /*!
-  inventory returns the total quantity of constituent material objects in the
-  store. Never throws.
+  count returns the total number of constituent material objects
+  in the store. Never throws.
   */
-  double inventory();
+  int count();
+
+  /*!
+  quantity returns the total resource quantity of constituent material objects
+  in the store. Never throws.
+  */
+  double quantity();
 
   /*!
   space returns the quantity of space remaining in this store.
 
-  It is effectively the difference between the capacity and the inventory.
+  It is effectively the difference between the capacity and the quantity.
   Never throws.  Returns -1 if the store is unlimited.
   */
   double space();
@@ -71,8 +82,8 @@ public:
   /*!
   makeLimited sets the store's capacity finite and sets it to the specified value.
 
-  @throws CycOverCapException thrown if the new capacity is lower than
-  the quantity of material resources that already exist in the store.
+  @throws CycOverCapException the new capacity is lower (by STORE_EPS) than the
+  quantity of material resources that already exist in the store.
   */
   void makeLimited(double cap);
 
@@ -80,12 +91,12 @@ public:
   removeQty removes the specified quantity of material resources from the
   store.
 
-  Materials are split or not split according to the behavior set by the
-  makeSplitable, makeNotSplitableUnder, and makeNotSplitableOver methods.
-  Materials are retrieved in the order they were added (i.e. oldest first).
+  Materials are split if necessary in order to remove the exact quantity
+  specified (within STORE_EPS).  Materials are retrieved in the order they were
+  added (i.e. oldest first).
 
-  @throws CycNegQtyException the specified removal quantity is larger than the
-  store's current inventory.
+  @throws CycNegQtyException the specified removal quantity is larger (by
+  STORE_EPS) than the store's current quantity.
   */
   std::vector<mat_rsrc_ptr> removeQty(double qty);
 
@@ -97,7 +108,7 @@ public:
   added (i.e. oldest first).
 
   @throws CycNegQtyException the specified removal number is larger than the
-  store's current inventory.
+  store's current inventoryNum.
   */
   std::vector<mat_rsrc_ptr> removeNum(int num);
 
@@ -112,7 +123,7 @@ public:
   mat_rsrc_ptr removeOne();
 
   /*!
-  addOne 
+  addOne adds a single material object to the store.
 
   Material resource objects are never combined in the store; they are stored as
   unique objects. The material object is only added to the store if it does not
@@ -124,7 +135,7 @@ public:
   void addOne(mat_rsrc_ptr mat);
 
   /*!
-  addAll 
+  addAll adds one or more material objects (as a std::vector) to the store.
 
   Material resource objects are never combined in the store; they are stored as
   unique objects. The material objects are only added to the store if they do
@@ -147,7 +158,7 @@ private:
   /// true if unsplitable retrievals should return more than request qty
   bool over_;
 
-  /// maximum inventory this store can hold
+  /// maximum quantity of material resource this store can hold
   double capacity_;
 
   /// list of constituent material objects forming the store's inventory
