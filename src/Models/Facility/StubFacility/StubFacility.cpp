@@ -1,10 +1,11 @@
 // StubFacility.cpp
 // Implements the StubFacility class
 
+#include "StubFacility.h"
+
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
-#include "StubFacility.h"
 
 using namespace std;
 
@@ -84,7 +85,6 @@ void StubFacility::handleTock(int time){}
 extern "C" Model* constructStubFacility() {
   return new StubFacility();
 }
-
 
 /* ------------------- */ 
 

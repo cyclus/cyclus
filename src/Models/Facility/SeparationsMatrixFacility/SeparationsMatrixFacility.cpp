@@ -1,36 +1,36 @@
 // SeparationsMatrixFacility.cpp
 // Implements the SeparationsMatrixFacility class
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <string.h>
 #include <vector>
 
 #include "SeparationsMatrixFacility.h"
 
+#include "Logger.h"
 #include "GenericResource.h"
 #include "Timer.h"
 #include "CycException.h"
 #include "InputXML.h"
 
-/*
- * TICK
- * Make offers of separated material based on availabe inventory.
- * If there are ordersWaiting, prepare and send an appropriate 
- * request for spent fuel material.
- * Check stocks to determine if there is capacity to produce any extra material
- * next month. If so, process as much raw (spent fuel) stock material as
- * capacity will allow.
- *
- * TOCK
- * Send appropriate separated material from inventory to fill ordersWaiting.
- *
- * RECIEVE MATERIAL
- * Put incoming spent nuclear fuel (SNF) material into stocks
- *
- * SEND MATERIAL
- * Pull separated material from inventory based on Requests
- * Decrement ordersWaiting
+/**
+  TICK
+  Make offers of separated material based on availabe inventory.
+  If there are ordersWaiting, prepare and send an appropriate 
+  request for spent fuel material.
+  Check stocks to determine if there is capacity to produce any extra material
+  next month. If so, process as much raw (spent fuel) stock material as
+  capacity will allow.
+ 
+  TOCK
+  Send appropriate separated material from inventory to fill ordersWaiting.
+ 
+  RECIEVE MATERIAL
+  Put incoming spent nuclear fuel (SNF) material into stocks
+ 
+  SEND MATERIAL
+  Pull separated material from inventory based on Requests
+  Decrement ordersWaiting
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -481,12 +481,8 @@ void SeparationsMatrixFacility::separate()
   */       
 }
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string SeparationsMatrixFacility::outputDir_ = "/separationsMatrix";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -496,7 +492,6 @@ std::string SeparationsMatrixFacility::outputDir_ = "/separationsMatrix";
 extern "C" Model* constructSeparationsMatrixFacility() {
   return new SeparationsMatrixFacility();
 }
-
 
 /* ------------------- */ 
 

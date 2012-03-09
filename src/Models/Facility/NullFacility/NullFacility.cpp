@@ -1,8 +1,9 @@
 // NullFacility.cpp
 // Implements the NullFacility class
-#include "NullFacility.h"
 
 #include <iostream>
+
+#include "NullFacility.h"
 
 #include "GenericResource.h"
 #include "Logger.h"
@@ -10,20 +11,20 @@
 #include "CycException.h"
 #include "InputXML.h"
 
-/*
- * TICK
- * send a request for your capacity minus your stocks.
- * offer stocks + capacity
- *
- * TOCK
- * process as much in stocks as your capacity will allow.
- * send appropriate materials to fill ordersWaiting.
- *
- * RECIEVE MATERIAL
- * put it in stocks
- *
- * SEND MATERIAL
- * pull it from inventory, fill the transaction
+/**
+  TICK
+  send a request for your capacity minus your stocks.
+  offer stocks + capacity
+ 
+  TOCK
+  process as much in stocks as your capacity will allow.
+  send appropriate materials to fill ordersWaiting.
+ 
+  RECIEVE MATERIAL
+  put it in stocks
+ 
+  SEND MATERIAL
+  pull it from inventory, fill the transaction
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -92,11 +93,11 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
+vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
-    std::string err_msg = "NullFacility can only send '" + out_commod_ ;
+    string err_msg = "NullFacility can only send '" + out_commod_ ;
     err_msg += + "' materials.";
     throw CycException(err_msg);
   }
@@ -301,6 +302,7 @@ double NullFacility::checkInventory() {
 
   return total;
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double NullFacility::checkStocks(){
   double total = 0;
@@ -319,13 +321,6 @@ double NullFacility::checkStocks(){
 }
 
 /* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string NullFacility::outputDir_ = "/null";
-
-/* --------------------
  * all MODEL classes have these members
  * --------------------
  */
@@ -333,7 +328,6 @@ std::string NullFacility::outputDir_ = "/null";
 extern "C" Model* constructNullFacility() {
     return new NullFacility();
 }
-
 
 /* ------------------- */ 
 

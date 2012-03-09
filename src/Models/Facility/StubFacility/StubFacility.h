@@ -30,40 +30,38 @@
   the behavior at the tick and tock as well as the behavior upon sending and
   receiving materials and messages. 
 */
-
 class StubFacility : public FacilityModel  {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * Default constructor for StubFacility Class
+   * @brief Default constructor for StubFacility Class
    */
   StubFacility();
 
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubFacility();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubFacility* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   * @brief This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -74,7 +72,7 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -88,7 +86,7 @@ public:
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * Transacted resources are received through this method
+   * @brief Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -103,9 +101,9 @@ public:
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * The StubFacility should ignore incoming messages
+   * @brief The StubFacility should ignore incoming messages
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -116,16 +114,16 @@ public:
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * The handleTick function specific to the StubFacility.
+   * @brief The handleTick function specific to the StubFacility.
    *
    * @param time the time of the tick
    */
   virtual void handleTick(int time);
 
   /**
-   * The handleTick function specific to the StubFacility.
+   * @brief The handleTick function specific to the StubFacility.
    *
    * @param time the time of the tock
    */

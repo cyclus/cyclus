@@ -12,29 +12,30 @@
 #include "MarketModel.h"
 #include "GenericResource.h"
 
-/*
- * TICK
- * If there are ordersWaiting, prepare and send an appropriate 
- * request for raw material.
- * If there is capacity to produce any extra material next month
- * prepare and send an appropriate offer of SWUs.
- *
- * TOCK
- * Process as much raw stock material as capacity will allow.
- * Send appropriate materials to fill ordersWaiting.
- *
- *
- * RECIEVE MATERIAL
- * put it in stocks
- *
- * SEND MATERIAL
- * pull it from inventory
- * decrement ordersWaiting
+using namespace std;
+
+/**
+  TICK
+  If there are ordersWaiting, prepare and send an appropriate 
+  request for raw material.
+  If there is capacity to produce any extra material next month
+  prepare and send an appropriate offer of SWUs.
+ 
+  TOCK
+  Process as much raw stock material as capacity will allow.
+  Send appropriate materials to fill ordersWaiting.
+ 
+ 
+  RECIEVE MATERIAL
+  put it in stocks
+ 
+  SEND MATERIAL
+  pull it from inventory
+  decrement ordersWaiting
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::init(xmlNodePtr cur)
-{ 
+void EnrichmentFacility::init(xmlNodePtr cur){ 
   FacilityModel::init(cur);
   
   // move XML pointer to current model
@@ -60,8 +61,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void EnrichmentFacility::copy(EnrichmentFacility* src)
-{
+void EnrichmentFacility::copy(EnrichmentFacility* src){
 
   FacilityModel::copy(src);
 
@@ -79,11 +79,8 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
   outstMF_ = 0;
 }
 
-
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::copyFreshModel(Model* src)
-{
+void EnrichmentFacility::copyFreshModel(Model* src){
   copy(dynamic_cast<EnrichmentFacility*>(src));
 }
 
@@ -99,8 +96,7 @@ void EnrichmentFacility::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::receiveMessage(msg_ptr msg)
-{
+void EnrichmentFacility::receiveMessage(msg_ptr msg){
   // is this a message from on high? 
   if(msg->supplier()==this){
     // file the order
@@ -112,7 +108,7 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
@@ -125,7 +121,7 @@ std::vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  std::vector<rsrc_ptr> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
     mat_rsrc_ptr m = inventory_.front();
@@ -166,8 +162,7 @@ void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::handleTick(int time)
-{
+void EnrichmentFacility::handleTick(int time){
   // PROCESS ORDERS EXECUTING
   enrich();
 
@@ -306,8 +301,7 @@ void EnrichmentFacility::makeRequests(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EnrichmentFacility::makeOffers()
-{
+void EnrichmentFacility::makeOffers() {
   // decide how much to offer
   double offer_amt;
   double spotCapacity = capacity_ - outstMF_;
@@ -342,6 +336,7 @@ void EnrichmentFacility::makeOffers()
   msg->setNextDest(facInst());
   msg->sendOn();
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentFacility::enrich() {
   // Get iterators that define the boundaries of the ordersExecuting that are 
@@ -449,26 +444,21 @@ void EnrichmentFacility::enrich() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, double xw)
-{
+double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, double xw) {
   double term1 = (2 * xp - 1) * log(xp / (1 - xp));
   double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
   double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
 
   return massProdU * (term1 + term2 - term3);
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
-{
+double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf) {
   return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
 }
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string EnrichmentFacility::outputDir_ = "/enrichment";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -478,7 +468,6 @@ std::string EnrichmentFacility::outputDir_ = "/enrichment";
 extern "C" Model* constructEnrichmentFacility() {
   return new EnrichmentFacility();
 }
-
 
 /* ------------------- */ 
 

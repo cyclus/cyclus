@@ -2,11 +2,11 @@
 #if !defined(_SINKFACILITY_H)
 #define _SINKFACILITY_H
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <queue>
 #include <string>
 
+#include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
 
@@ -76,33 +76,35 @@
    What is the best way to allow requests of an infinite amount of 
    material on a market? 
 */
-
 class SinkFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   /**
-   * Constructor for the SinkFacility class.
+   * @brief Constructor for the SinkFacility class.
    */
   SinkFacility();
   
   /**
-   * Destructor for the SinkFacility class.
+   * @brief Destructor for the SinkFacility class.
    */
   virtual ~SinkFacility();
 
   // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   * @brief  initialize an object from XML input
+   */
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object by copying another
+  /**
+   * @brief  initialize an object by copying another
+   */
   virtual void copy(SinkFacility* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   * @brief This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -113,12 +115,12 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * A verbose printer for the Sink Facility.
+   * @brief A verbose printer for the Sink Facility.
    */
   virtual void print();
 
   /**
-   * Transacted resources are received through this method
+   * @brief Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -128,33 +130,35 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
-  /// The sink Facility doesn't need to do anything if it gets a message.
-  /// It never sends any matieral to anyone.
+ public:
+  /**
+   * The sink Facility doesn't need to do anything if it gets a message.
+   * It never sends any matieral to anyone.
+  */
   virtual void receiveMessage(msg_ptr msg) {};
 
 /* -------------------- */
+
 
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-
-public:
-
+ public:
   /**
-   * The SinkFacility can handle the Tick.
+   * @brief The SinkFacility can handle the Tick.
    *
    * @param time the current simulation time.
    */
   virtual void handleTick(int time);
 
   /**
-   * The SinkFacility can handle the Tock.
+   * @brief The SinkFacility can handle the Tock.
    *
    * @param time the current simulation time.
    */
@@ -162,55 +166,49 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-
-protected:
-  /// all facilities must have at least one input commodity
+ protected:
+  /**
+   * @brief  all facilities must have at least one input commodity
+   */
   vector<std::string> in_commods_;
 
-  /// this facility holds material in storage. 
+  /**
+   * @brief  this facility holds material in storage. 
+   */
   deque<mat_rsrc_ptr> inventory_;
 
   /**
-   * get the total mass of the stuff in the inventory
+   * @brief get the total mass of the stuff in the inventory
    *
    * @return the total mass of the materials in storage
    */
   double checkInventory();
 
-  /// maximum inventory size
+  /**
+   * @brief  maximum inventory size
+   */
   double inventory_size_;
 
-  /// monthly acceptance capacity
+  /**
+   * @brief  monthly acceptance capacity
+   */
   double capacity_;
 
-  /// commodity price
-  double commod_price_;
-
-private:
-  /// determines the amount to request 
-  const double getRequestAmt() ;
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
   /**
-     The getter function for this facility model output dir
-  */
-  static std::string outputDir(){ 
-    return FacilityModel::outputDir().append(outputDir_);}
+   * @brief  commodity price
+   */
+  double commod_price_;
 
  private:
   /**
-     Every specific facility model writes to the output database
-     location: FacilityModel::OutputDir_ + /this_facility's_handle
-  */
-  static std::string outputDir_;
+   * @brief  determines the amount to request 
+   */
+  const double getRequestAmt() ;
 
 /* ------------------- */ 
 

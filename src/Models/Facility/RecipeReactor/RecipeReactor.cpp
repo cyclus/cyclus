@@ -1,10 +1,10 @@
 // RecipeReactor.cpp
 // Implements the RecipeReactor class
 #include <iostream>
-#include "Logger.h"
 
 #include "RecipeReactor.h"
 
+#include "Logger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -12,27 +12,26 @@
 
 using namespace std;
 
-/*
- * TICK
- * if stocks are empty, ask for a batch
- * offer anything in the inventory
- * if we're at the end of a cycle
- *    - begin the cycle
- *      - move currCore batch to inventory
- *      - move stocks batch to currCore
- *      - reset month_in_cycle clock
- *
- * TOCK
- * advance month_in_cycle
- * send appropriate materials to fill ordersWaiting.
- *
- * RECIEVE MATERIAL
- * put it in stocks
- *
- * SEND MATERIAL
- * pull it from inventory
- *
- * 
+/**
+  TICK
+  if stocks are empty, ask for a batch
+  offer anything in the inventory
+  if we're at the end of a cycle
+     - begin the cycle
+       - move currCore batch to inventory
+       - move stocks batch to currCore
+       - reset month_in_cycle clock
+ 
+  TOCK
+  advance month_in_cycle
+  send appropriate materials to fill ordersWaiting.
+ 
+  RECIEVE MATERIAL
+  put it in stocks
+ 
+  SEND MATERIAL
+  pull it from inventory
+  
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -64,9 +63,9 @@ void RecipeReactor::init(xmlNodePtr cur) {
   CF_ = strtod(XMLinput->get_xpath_content(cur,"elecCF"), NULL);
 
   // all facilities require commodities - possibly many
-  std::string recipe_name;
-  std::string in_commod;
-  std::string out_commod;
+  string recipe_name;
+  string in_commod;
+  string out_commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "fuelpair");
 
   // for each fuel pair, there is an in and an out commodity
@@ -116,7 +115,7 @@ void RecipeReactor::copy(RecipeReactor* src) {
 
 
   stocks_ = deque<Fuel>();
-  currCore_ = deque< pair<std::string, mat_rsrc_ptr > >();
+  currCore_ = deque< pair<string, mat_rsrc_ptr > >();
   inventory_ = deque<Fuel >();
   ordersWaiting_ = deque<msg_ptr>();
 
@@ -143,7 +142,7 @@ void RecipeReactor::print() {
 void RecipeReactor::beginCycle() {
   if ( !stocks_.empty() ) {
     // move stocks batch to currCore
-    std::string batchCommod = stocks_.front().first;
+    string batchCommod = stocks_.front().first;
     mat_rsrc_ptr batchMat = stocks_.front().second;
     stocks_.pop_front();
     Fuel inBatch;
@@ -170,12 +169,12 @@ void RecipeReactor::endCycle() {
   }
 
   // move a batch out of the core 
-  std::string batchCommod = currCore_.front().first;
+  string batchCommod = currCore_.front().first;
   mat_rsrc_ptr batchMat = currCore_.front().second;
   currCore_.pop_front();
 
   // figure out the spent fuel commodity and material
-  std::string outCommod;
+  string outCommod;
   IsoVector outComp;
 
   for (deque< pair< Recipe , Recipe> >::iterator iter = fuelPairs_.begin();
@@ -211,7 +210,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -297,7 +296,7 @@ void RecipeReactor::makeRequests(){
     Recipe offer_commod_pair;
     request_commod_pair = fuelPairs_.front().first;
     offer_commod_pair = fuelPairs_.front().second;
-    std::string in_commod = request_commod_pair.first;
+    string in_commod = request_commod_pair.first;
     IsoVector in_recipe = request_commod_pair.second;
 
     // It then moves that pair from the front to the back of the preference lineup
@@ -385,10 +384,10 @@ void RecipeReactor::makeOffers(){
   // there are potentially many types of batch in the inventory stack
   double inv = this->inventoryMass();
   // send an offer for each material on the stack 
-  std::string commod;
+  string commod;
   Communicator* recipient;
   double offer_amt;
-  for (deque<pair<std::string, mat_rsrc_ptr > >::iterator iter = inventory_.begin(); 
+  for (deque<pair<string, mat_rsrc_ptr > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     // get commod
@@ -516,12 +515,12 @@ void RecipeReactor::addFuelPair(string incommod, IsoVector inFuel,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string RecipeReactor::inCommod() {
+string RecipeReactor::inCommod() {
   return fuelPairs_.front().first.first ;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string RecipeReactor::outCommod() {
+string RecipeReactor::outCommod() {
   return fuelPairs_.front().second.first;
 }
 
@@ -532,7 +531,7 @@ double RecipeReactor::inventoryMass(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = inventory_.begin(); 
+  for (deque< pair<string, mat_rsrc_ptr> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += iter->second->quantity();
@@ -549,7 +548,7 @@ double RecipeReactor::stocksMass(){
   // material unit is in each object.
 
   if(!stocks_.empty()){
-    for (deque< pair<std::string, mat_rsrc_ptr> >::iterator iter = stocks_.begin(); 
+    for (deque< pair<string, mat_rsrc_ptr> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
         total += iter->second->quantity();
@@ -558,13 +557,7 @@ double RecipeReactor::stocksMass(){
   return total;
 }
 
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string RecipeReactor::outputDir_ = "/recipeReactor";
+/* ------------------- */ 
 
 
 /* --------------------
@@ -575,7 +568,6 @@ std::string RecipeReactor::outputDir_ = "/recipeReactor";
 extern "C" Model* constructRecipeReactor() {
   return new RecipeReactor();
 }
-
 
 /* ------------------- */ 
 

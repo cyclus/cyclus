@@ -2,9 +2,9 @@
 #if !defined(_RECIPEREACTOR_H)
 #define _RECIPEREACTOR_H
 #include <iostream>
-#include "Logger.h"
 #include <queue>
 
+#include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
 
@@ -116,272 +116,370 @@ class RecipeReactor : public FacilityModel  {
  * all MODEL classes have these members
  * --------------------
  */
-
-  public:
-
-    RecipeReactor();
-
-    /**
-     * Destructor for the RecipeReactor class. 
-     */
-    virtual ~RecipeReactor() {};
+ public:  
+  /**
+   * @brief Constructor for the RecipeReactor class. 
+   */
+  RecipeReactor();
+  
+  /**
+   * @brief Destructor for the RecipeReactor class. 
+   */
+  virtual ~RecipeReactor() {};
     
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
+  // different ways to populate an object after creation
+  /**
+   * @brief  initialize an object from XML input
+   */
+  virtual void init(xmlNodePtr cur);
 
-    /// initialize an object by copying another
-    virtual void copy(RecipeReactor* src);
-    /**
-     * This drills down the dependency tree to initialize all relevant 
-     * parameters/containers.
-     *
-     * Note that this function must be defined only in the specific model in 
-     * question and not in any inherited models preceding it.
-     *
-     * @param src the pointer to the original (initialized ?) model to be copied
-     */
-    virtual void copyFreshModel(Model* src);
+  /**
+   * @brief  initialize an object by copying another
+   */
+  virtual void copy(RecipeReactor* src);
 
-    /**
-     * Print information about this model
-     */
-    virtual void print();
+  /**
+   * @brief This drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
+   */
+  virtual void copyFreshModel(Model* src);
 
-    /**
-     * When the facility receives a message, execute any transaction therein
-     */
-     virtual void receiveMessage(msg_ptr msg);
+  /**
+   * @brief Print information about this model
+   */
+  virtual void print();
 
-    /**
-     * @brief Transacted resources are extracted through this method
-     * 
-     * @param order the msg/order for which resource(s) are to be prepared
-     * @return list of resources to be sent for this order
-     *
-     */ 
-    virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
+/* ------------------- */ 
 
-    /**
-     * Transacted resources are received through this method
-     *
-     * @param trans the transaction to which these resource objects belong
-     * @param manifest is the set of resources being received
-     */ 
-    virtual void addResource(msg_ptr msg,
-                                std::vector<rsrc_ptr> manifest);
 
-    /**
-     * The handleTick function specific to the RecipeReactor.
-     * At each tick, it requests as much raw inCommod as it can process this
-     * month and offers as much outCommod as it will have in its inventory by 
-     * the
-     * end of the month.
-     *
-     * @param time the time of the tick
-     */
-    virtual void handleTick(int time);
+/* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+ public:
+  /**
+   * @brief When the facility receives a message, execute any transaction therein
+   */
+  virtual void receiveMessage(msg_ptr msg);
 
-    /**
-     * The handleTick function specific to the RecipeReactor.
-     * At each tock, it processes material and handles orders, and records this
-     * month's actions.
-     *
-     * @param time the time of the tock
-     */
-    virtual void handleTock(int time);
+/* ------------------- */ 
 
-    /**
-     * The RecipeReactor reports a power capacity of its capacity factor * power 
-     * capacity
-     */
-    double powerCapacity(){ return CF_*capacity_;};
 
-    int cycleLength();
-    void setCycleLength(int length);
+/* --------------------
+ * _THIS_ MODEL class has these members
+ * --------------------
+ */
+  /**
+   * @brief Transacted resources are extracted through this method
+   * 
+   * @param order the msg/order for which resource(s) are to be prepared
+   * @return list of resources to be sent for this order
+   *
+   */ 
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
-    double capacity();
-    void setCapacity(double cap);
+  /**
+   * @brief Transacted resources are received through this method
+   *
+   * @param trans the transaction to which these resource objects belong
+   * @param manifest is the set of resources being received
+   */ 
+  virtual void addResource(msg_ptr msg,
+			   std::vector<rsrc_ptr> manifest);
 
-    double inventorySize();
-    void setInventorySize(double size);
+  /**
+   * @brief The handleTick function specific to the RecipeReactor.
+   * At each tick, it requests as much raw inCommod as it can process this
+   * month and offers as much outCommod as it will have in its inventory by 
+   * the
+   * end of the month.
+   *
+   * @param time the time of the tick
+   */
+  virtual void handleTick(int time);
 
-    int facLife();
-    void setFacLife(int lifespan);
+  /**
+   * @brief The handleTick function specific to the RecipeReactor.
+   * At each tock, it processes material and handles orders, and records this
+   * month's actions.
+   *
+   * @param time the time of the tock
+   */
+  virtual void handleTock(int time);
 
-    double capacityFactor();
-    void setCapacityFactor(double cf);
+  /**
+   * @brief The RecipeReactor reports a power capacity of its capacity factor    * capacity
+   */
+  double powerCapacity(){ return CF_*capacity_;};
 
-    IsoVector inRecipe();
-    void setInRecipe(IsoVector recipe);
+  /**
+   * @brief return the cycle length
+   */
+  int cycleLength();
 
-    IsoVector outRecipe();
-    void setOutRecipe(IsoVector recipe);
+  /**
+   * @brief set the cycle length
+   */
+  void setCycleLength(int length);
 
-    void addFuelPair(std::string incommod, IsoVector inFuel, 
-                     std::string outcommod, IsoVector outFuel);
+  /**
+   * @brief return the capacity
+   */
+  double capacity();
 
-    std::string inCommod();
-    std::string outCommod();
+  /**
+   * @brief set the capacity
+   */
+  void setCapacity(double cap);
 
-    /**
-     * get the total mass of the stuff in the inventory
-     *
-     * @return the total mass of the processed materials in storage
-     */
-    double inventoryMass();
+  /**
+   * @brief return the inventory size
+   */
+  double inventorySize();
 
-    /**
-     * get the total mass of the stuff in the stocks
-     *
-     * @return the total mass of the raw materials in storage
-     */
-    double stocksMass();
+  /**
+   * @brief set the inventory size
+   */
+  void setInventorySize(double size);
 
-    /**
-       The getter function for this facility model output dir
-    */
-    static std::string outputDir() { 
-      return FacilityModel::outputDir().append(outputDir_);}
+  /**
+   * @brief return the facility lifetime
+   */
+  int facLife();
 
-  private:
-    /**
-     * Perform the actions that must occur at the begining of the cycle
-     */
-    void beginCycle();
+  /**
+   * @brief set the facility lifetime
+   */
+  void setFacLife(int lifespan);
 
-    /**
-     * Perform the actions that must occur at the end of the cycle
-     */
-    void endCycle();
+  /**
+   * @brief return the capacity factor
+   */
+  double capacityFactor();
 
-    /**
-     * The receipe of input materials.
-     */
-    IsoVector in_recipe_;
+  /**
+   * @brief set the capacity factor
+   */
+  void setCapacityFactor(double cf);
 
-    /**
-     * The receipe of the output material.
-     */
-    IsoVector out_recipe_;
+  /**
+   * @brief return the input recipe
+   */
+  IsoVector inRecipe();
 
-    /// The RecipeReactor has pairs of input and output fuel
-    deque< pair< Recipe, Recipe > > fuelPairs_;
+  /**
+   * @brief set the input recipe
+   */
+  void setInRecipe(IsoVector recipe);
 
-    /// Fresh fuel assemblies on hand.
-    deque<Fuel> stocks_;
+  /**
+   * @brief set the cycle length
+   */
+  IsoVector outRecipe();
 
-    /// The fuel assembly currently in the core.
-    deque<Fuel> currCore_;
+  /**
+   * @brief set the output recipe
+   */
+  void setOutRecipe(IsoVector recipe);
+
+  /**
+   * @brief add a fuel pair
+   *
+   * @param incommod the input commodity
+   * @param infuel the isotopics of the input fuel
+   * @param outcommod the output commodity
+   * @param outfuel the isotopics of the output fuel
+   */
+  void addFuelPair(std::string incommod, IsoVector inFuel, 
+		   std::string outcommod, IsoVector outFuel);
+
+  /**
+   * @brief return the input commodity
+   */
+  std::string inCommod();
+
+  /**
+   * @brief return the output commodity
+   */
+  std::string outCommod();
+
+  /**
+   * @brief get the total mass of the stuff in the inventory
+   *
+   * @return the total mass of the processed materials in storage
+   */
+  double inventoryMass();
+
+  /**
+   * @brief get the total mass of the stuff in the stocks
+   *
+   * @return the total mass of the raw materials in storage
+   */
+  double stocksMass();
+
+  /**
+   * @brief The getter function for this facility model output dir
+   */
+  static std::string outputDir() { 
+    return FacilityModel::outputDir().append(outputDir_);}
+
+ private:
+  /**
+   * @brief Perform the actions that must occur at the begining of the cycle
+   */
+  void beginCycle();
+
+  /**
+   * @brief Perform the actions that must occur at the end of the cycle
+   */
+  void endCycle();
+
+  /**
+   * @brief The receipe of input materials.
+   */
+  IsoVector in_recipe_;
+
+  /**
+   * @brief The receipe of the output material.
+   */
+  IsoVector out_recipe_;
+
+  /**
+   * @brief  The RecipeReactor has pairs of input and output fuel
+   */
+  deque< pair< Recipe, Recipe > > fuelPairs_;
+
+  /**
+   * @brief  Fresh fuel assemblies on hand.
+   */
+  deque<Fuel> stocks_;
+
+  /**
+   * @brief  The fuel assembly currently in the core.
+   */
+  deque<Fuel> currCore_;
     
-    /// Inventory of spent fuel assemblies.
-    deque<Fuel> inventory_;
+  /**
+   * @brief  Inventory of spent fuel assemblies.
+   */
+  deque<Fuel> inventory_;
 
-    /// The list of orders to process on the Tock
-    deque<msg_ptr> ordersWaiting_;
+  /**
+   * @brief  The list of orders to process on the Tock
+   */
+  deque<msg_ptr> ordersWaiting_;
 
-    /// The time between batch reloadings.
-    int cycle_length_;
+  /**
+   * @brief  The time between batch reloadings.
+   */
+  int cycle_length_;
 
-    /**
-     * The current month in the cycle. 1 > month_in_cycle < cycle_time)
-     */
-    int month_in_cycle_;
+  /**
+   * @brief The current month in the cycle. 1 > month_in_cycle < cycle_time)
+   */
+  int month_in_cycle_;
 
-    /**
-       Every specific facility model writes to the output database
-       location: FacilityModel::OutputDir_ + /this_facility's_handle
-    */
-    static std::string outputDir_;
+  /**
+   * @brief Every specific facility model writes to the output database
+   * location: FacilityModel::OutputDir_ + /this_facility's_handle
+   */
+  static std::string outputDir_;
 
-    /**
-     * make reqests
-     */
-    void makeRequests();
+  /**
+   * @brief make reqests
+   */
+  void makeRequests();
 
-    /**
-     * make offers
-     */
-    void makeOffers();
+  /**
+   * @brief make offers
+   */
+  void makeOffers();
 
-    /**
-     * send messages up through the institution
-     *
-     * @param recipient the final recipient
-     * @param trans the transaction to send
-     */
-    void sendMessage(Communicator* recipient, Transaction trans);
+  /**
+   * @brief send messages up through the institution
+   *
+   * @param recipient the final recipient
+   * @param trans the transaction to send
+   */
+  void sendMessage(Communicator* recipient, Transaction trans);
 
-    /**
-     * The RecipeReactor has a limit to how material it can process.
-     * Units vary. It will be in the commodity unit per month.
-     */
-    double capacity_;
+  /**
+   * @brief The RecipeReactor has a limit to how material it can process.
+   * Units vary. It will be in the commodity unit per month.
+   */
+  double capacity_;
 
-    /**
-     * The maximum (number of commodity units?) that the inventory can grow to.
-     * The RecipeReactor must stop processing the material in its stocks when 
-     * its inventory is full.
-     */
-    double inventory_size_;
+  /**
+   * @brief The maximum (number of commodity units?) that the inventory can grow to.
+   * The RecipeReactor must stop processing the material in its stocks when 
+   * its inventory is full.
+   */
+  double inventory_size_;
 
-    /**
-     * The number of months that a facility stays operational.
-     */
-    int lifetime_;
+  /**
+   * @brief The number of months that a facility stays operational.
+   */
+  int lifetime_;
 
-    /**
-     * The year in which construction of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startConstrYr_;
+  /**
+   * @brief The year in which construction of the facility begins.
+   * (maybe this should just be in the deployment description?)
+   */
+  int startConstrYr_;
 
-    /**
-     * The month in which construction of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startConstrMo_;
+  /**
+   * @brief The month in which construction of the facility begins.
+   * (maybe this should just be in the deployment description?)
+   */
+  int startConstrMo_;
 
-    /**
-     * The year in which operation of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startOpYr_;
+  /**
+   * @brief The year in which operation of the facility begins.
+   * (maybe this should just be in the deployment description?)
+   */
+  int startOpYr_;
 
-    /**
-     * The month in which operation of the facility begins.
-     * (maybe this should just be in the deployment description?)
-     */
-    int startOpMo_;
+  /**
+   * @brief The month in which operation of the facility begins.
+   * (maybe this should just be in the deployment description?)
+   */
+  int startOpMo_;
 
-    /**
-     * The year in which the facility's lisence expires.
-     * (maybe this should just be in the deployment description?)
-     */
-    int licExpYr_;
+  /**
+   * @brief The year in which the facility's lisence expires.
+   * (maybe this should just be in the deployment description?)
+   */
+  int licExpYr_;
 
-    /**
-     * The month in which the facility's lisence expires..
-     * (maybe this should just be in the deployment description?)
-     */
-    int licExpMo_;
+  /**
+   * @brief The month in which the facility's lisence expires..
+   * (maybe this should just be in the deployment description?)
+   */
+  int licExpMo_;
 
-    /**
-     * The state in which the facility exists.
-     */
-    string state_;
+  /**
+   * @brief The state in which the facility exists.
+   */
+  string state_;
 
-    /**
-     * The type of reactor that this is.
-     * (this may be redundant or unnecessary information.)
-     */
-    string typeReac_;
+  /**
+   * @brief The type of reactor that this is.
+   * (this may be redundant or unnecessary information.)
+   */
+  string typeReac_;
 
-    /**
-     * The percent of the time the facility functions at 100% capacity.
-     * (it should be less than one. Double check that.)
-     */
-    double CF_;
+  /**
+   * @brief The percent of the time the facility functions at 100% capacity.
+   * (it should be less than one. Double check that.)
+   */
+  double CF_;
+
+/* ------------------- */ 
 
 };
 

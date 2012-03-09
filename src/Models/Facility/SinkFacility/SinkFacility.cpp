@@ -1,14 +1,16 @@
 // SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
-#include "Logger.h"
 
 #include "SinkFacility.h"
 
+#include "Logger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SinkFacility::SinkFacility(){
@@ -26,7 +28,7 @@ void SinkFacility::init(xmlNodePtr cur) {
   cur = XMLinput->get_xpath_element(cur,"model/SinkFacility");
 
   /// all facilities require commodities - possibly many
-  std::string commod;
+  string commod;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"incommodity");
   for (int i=0;i<nodes->nodeNr;i++) {
     commod = (const char*)(nodes->nodeTab[i]->children->content);
@@ -62,11 +64,11 @@ void SinkFacility::copyFreshModel(Model* src) {
 void SinkFacility::print() {
   FacilityModel::print();
 
-  std::string msg = "";
+  string msg = "";
 
   msg += "accepts commodities ";
 
-  for (vector<std::string>::iterator commod=in_commods_.begin();
+  for (vector<string>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
        commod++) {
     msg += (commod == in_commods_.begin() ? "{" : ", " );
@@ -85,7 +87,7 @@ void SinkFacility::handleTick(int time){
 
   if (requestAmt>EPS_KG){
     // for each potential commodity, make a request
-    for (vector<std::string>::iterator commod = in_commods_.begin();
+    for (vector<string>::iterator commod = in_commods_.begin();
         commod != in_commods_.end();
         commod++) {
       LOG(LEV_INFO4, "SnkFac") << " requests "<< requestAmt << " kg of " << *commod << ".";
@@ -174,13 +176,6 @@ const double SinkFacility::getRequestAmt(){
 }
 
 /* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string SinkFacility::outputDir_ = "/sink";
-
-/* --------------------
  * all MODEL classes have these members
  * --------------------
  */
@@ -188,7 +183,6 @@ std::string SinkFacility::outputDir_ = "/sink";
 extern "C" Model* constructSinkFacility() {
   return new SinkFacility();
 }
-
 
 /* ------------------- */ 
 
