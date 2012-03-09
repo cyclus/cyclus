@@ -22,6 +22,7 @@ class MaterialStoreTest : public ::testing::Test {
     MaterialStore filled_store_;
 
     double neg_cap, zero_cap, cap, low_cap;
+    double split_qty, exact_qty;
 
     virtual void SetUp() {
       try {
@@ -53,6 +54,10 @@ class MaterialStoreTest : public ::testing::Test {
         zero_cap = 0;
         cap = 334; // should be higher than mat1+mat2 masses
         low_cap = 332; // should be lower than mat1_mat2 masses
+
+        split_qty1 
+        split_qty2 = 
+        exact_qty = mat1_.quantity();
 
         filled_store_.setCapacity(cap);
         filled_store_.addOne(mat1_);
@@ -192,47 +197,8 @@ TEST_F(MaterialStoreTest, MakeLimited) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, DefaultRemoveProperties) {
-  ASSERT_NO_THROW(store_.splitable());
-  EXPECT_EQ(store_.splitable(), true);
-
-  ASSERT_NO_THROW(store_.overQtyOnremove());
-  EXPECT_EQ(store_.overQtyOnremove(), false);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, MakeSplitableAndNot) {
-  ASSERT_NO_THROW(store_.makeSplitable());
-  store_.makeSplitable();
-  EXPECT_EQ(store_.splitable(), true);
-  EXPECT_EQ(store_.overQtyOnRemove(), false);
-
-  ASSERT_NO_THROW(store_.makeNotSplitableUnder());
-  store_.makeNotSplitableUnder();
-  EXPECT_EQ(store_.splitable(), false);
-  EXPECT_EQ(store_.overQtyOnRemove(), false);
-
-  ASSERT_NO_THROW(store_.makeNotSplitableOver());
-  store_.makeNotSplitableOver();
-  EXPECT_EQ(store_.splitable(), false);
-  EXPECT_EQ(store_.overQtyOnRemove(), true);
-
-  ASSERT_NO_THROW(store_.makeSplitable());
-  store_.makeSplitable();
-  EXPECT_EQ(store_.splitable(), true);
-  EXPECT_EQ(store_.overQtyOnRemove(), false);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, RemoveQtySplitable) {
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, RemoveQtyNotSplitableOver) {
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, RemoveQtyNotSplitableUnder) {
+TEST_F(MaterialStoreTest, RemoveQty) {
+  filled_store_.removeQty(split_qty)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

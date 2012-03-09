@@ -77,58 +77,6 @@ public:
   void makeLimited(double cap);
 
   /*!
-  splitable returns true if material object splitting can occur during
-  calls to removeQty. Never throws.
-  */
-  bool splitable();
-
-  /*!
-  overQtyOnRemove returns true if material object splitting cannot occur during
-  calls to removeQty and the store will return a quantity greater than the
-  specified removal quantity.
-
-  Returns false if material object splitting cannot occur during calls to
-  removeQty and the store will return a quantity less than the specified
-  removal quantity.
-  
-  Never throws.
-  */
-  bool overQtyOnRemove();
-
-  /*!
-  makeNotSplitableOver sets removal behavior to never split resource objects
-  and to return just larger than the specified remove quantity. Never throws.
-
-  Example: If an attempt to remove quantity 10.5 from the store is made and the
-  store contains several resurce objects all of quantity 2.5, the remove method
-  would return a set of 5 resource objects totaling quantity 12.5.
-  */
-  void makeNotSplitableOver();
-
-  /*!
-  makeNotSplitableUnder sets removal behavior to never split resource objects and
-  to return just smaller than the specified remove quantity. Never Throws.
-
-  Example: If an attempt to remove quantity 10.5 from the store
-  store contains several resurce objects all of quantity 2.5, the remove
-  method would return a set of 4 resource objects totaling quantity 10.0.
-  */
-  void makeNotSplitableUnder();
-
-  /*!
-  makeSplitable sets removal behavior to split resource objects in order to
-  return the exact specified remove quantity. Never throws.
-
-  Example: If an attempt to remove quantity 10.5 from the store store contains
-  several resurce objects all of quantity 2.5, the remove method would return a
-  set of 5 resource objects totaling quantity 10.5.  The fifth resource object
-  would have to be split into ones of quantity 0.5 and 2.0.  The resource with
-  quantity 2.0 would be retained in the store while the one of quantity 0.5
-  would be the fifth of the returned resources.
-  */
-  void makeSplitable();
-
-  /*!
   removeQty removes the specified quantity of material resources from the
   store.
 
