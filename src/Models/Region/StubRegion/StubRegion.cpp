@@ -1,8 +1,9 @@
 // StubRegion.cpp
 // Implements the StubRegion class
 
-#include "Logger.h"
 #include "StubRegion.h"
+
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members

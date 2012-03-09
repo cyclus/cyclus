@@ -1,14 +1,15 @@
 // RegionModel.cpp
 // Implements the RegionModel class
 
+#include <string>
+#include <iostream>
+
 #include "RegionModel.h"
+
 #include "InstModel.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
-
-#include <string>
-#include <iostream>
 #include "Logger.h"
 
 using namespace std;
@@ -138,10 +139,3 @@ void RegionModel::handleDailyTasks(int time, int day){
     (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
   }
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string RegionModel::outputDir_ = "/region";

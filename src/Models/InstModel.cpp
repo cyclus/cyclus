@@ -1,17 +1,19 @@
 /// InstModel.cpp
 // Implements the InstModel class
 
-#include "InstModel.h"
-#include "FacilityModel.h"
+#include <iostream>
+#include <sstream>
+#include <string>
 
+#include "InstModel.h"
+
+#include "Logger.h"
 #include "Timer.h"
 #include "InputXML.h"
 #include "CycException.h"
+#include "FacilityModel.h"
 
-#include <iostream>
-#include "Logger.h"
-#include <sstream>
-#include <string>
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
@@ -106,7 +108,7 @@ void InstModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt
-  std::stringstream ss;
+  stringstream ss;
   ss << this->ID();
   throw CycOverrideException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
@@ -123,10 +125,3 @@ double InstModel::powerCapacity(){
   }
   return capacity;
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string InstModel::outputDir_ = "/institution";

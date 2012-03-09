@@ -2,6 +2,7 @@
 // Implements the StubModel class
 
 #include "StubTimeAgent.h"
+
 #include "Logger.h"
 
 /* --------------------

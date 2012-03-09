@@ -1,14 +1,16 @@
 // DeployInst.cpp
 // Implements the DeployInst class
 #include <iostream>
-#include "Logger.h"
 
 #include "DeployInst.h"
 
 #include "FacilityModel.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void DeployInst::init(xmlNodePtr cur)
@@ -26,7 +28,7 @@ void DeployInst::init(xmlNodePtr cur)
     Model* facility = Model::getTemplateByName(fac_name);
 
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
-      std::string err_msg = "Facility '" + fac_name;
+      string err_msg = "Facility '" + fac_name;
       err_msg += "' is not an allowed facility for region '";
       err_msg +=  parent()->name() +"'.";
       throw CycException(err_msg);
@@ -88,12 +90,8 @@ void DeployInst::handleTick(int time) {
   };
 };
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string DeployInst::outputDir_ = "/deploy";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -103,7 +101,6 @@ std::string DeployInst::outputDir_ = "/deploy";
 extern "C" Model* constructDeployInst() {
   return new DeployInst();
 }
-
 
 /* ------------------- */ 
 

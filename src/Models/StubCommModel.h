@@ -19,40 +19,38 @@
    StubCommModel.cpp may be copied, renamed, and altered as discussed in the 
    <a href="http://code.google.com/p/cyclus/wiki/GuidelinesForImplementingNewModels">GuidelinesForImplementingNewModels</a>.
  */
-
-class StubCommModel : public Model, public Communicator {
-  
+class StubCommModel : public Model, public Communicator {  
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
  public:
   /**
-   * Default constructor for StubCommModel Class
+   * @brief Default constructor for StubCommModel Class
    */
   StubCommModel();
 
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubCommModel();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubCommModel to copy
    */
   virtual void copy(StubCommModel* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -62,7 +60,7 @@ class StubCommModel : public Model, public Communicator {
   virtual void copyFreshModel(Model* src){};
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -73,8 +71,10 @@ class StubCommModel : public Model, public Communicator {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
-    /// No default STUBCOMMMODEL message receiver.
+ public:
+    /**
+     * @brief  No default STUBCOMMMODEL message receiver.
+     */
     virtual void receiveMessage(msg_ptr msg) = 0;
 
 };

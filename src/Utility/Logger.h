@@ -1,15 +1,15 @@
-/*!
+/**
 @file Logger.h
 
 Code providing rudimentary logging capability for the Cyclus core. Details
 outlining proper use of this logging functionality are outlined @ref Logger "here".
 
-*/
+ */
 
 #if !defined(_LOGGER_H)
 #define _LOGGER_H
 
-/*!
+/**
 @def LOG(level, prefix)
 
 @brief allows easy logging via the streaming operator similar to std::cout
@@ -30,7 +30,7 @@ to filter the log output more readily.
 @warning do not place any state-changing expressions with this macro as they
          may not run if the report level excludes the specified log 'level'.
 
-*/
+ */
 #define LOG(level, prefix) \
 if ((level > Logger::ReportLevel()) | Logger::NoModel()) ; \
 else Logger().Get(level, prefix)
@@ -49,12 +49,11 @@ else Logger().Get(level, "memory")
 #include <vector>
 #include <map>
 
-/*!
+/**
 @enum LogLevel
 
 @brief categorical (verbosity) levels for log statements.
-
-*/
+ */
 enum LogLevel {
                LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
                LEV_WARN, //!< Use to report questionable simulation state (use extremely sparingly)
@@ -70,8 +69,7 @@ enum LogLevel {
                LEV_DEBUG5 //!< debugging information - most verbose
                };
 
-/*!
-
+/**
 @brief A logging tool providing finer grained control over standard output for debugging.
 
 Built-in logging functionality has been provided to aid debugging.  @e std::cout
@@ -152,8 +150,8 @@ void convert(Item item) {
 }
 
 @endcode
+ */
 
-*/
 class Logger {
 
   public:

@@ -58,7 +58,6 @@ SET( CYCLUS_CORE
   Utility/Logger.cpp
   Utility/DecayHandler.cpp
   Models/Model.cpp 
-  Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
@@ -78,12 +77,6 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modul
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 
 # Copy Data
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/mass.h5
-${CMAKE_CURRENT_BINARY_DIR}/Data/mass.h5
-COPYONLY
-)
-
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
 ${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite

@@ -1,5 +1,6 @@
 // GreedyMarket.cpp
 // Implements the GreedyMarket class
+
 #include <iostream>
 #include <cmath>
 

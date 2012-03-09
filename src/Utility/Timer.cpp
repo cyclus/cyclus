@@ -71,8 +71,8 @@ int Timer::lastDayOfMonth(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Timer::reportListeners() {
-  std::string report = "";
+string Timer::reportListeners() {
+  string report = "";
   for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
       agent != tick_listeners_.end(); 
       agent++) {

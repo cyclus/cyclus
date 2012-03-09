@@ -9,8 +9,10 @@
 #include "CycException.h"
 #include "Logger.h"
 
+using namespace std;
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Database::Database(std::string filename){
+Database::Database(string filename){
   database_ = NULL;
   exists_ = true;
   isOpen_ = false;
@@ -18,7 +20,7 @@ Database::Database(std::string filename){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Database::Database(std::string filename, std::string file_path){
+Database::Database(string filename, string file_path){
   database_ = NULL;
   exists_ = true;
   isOpen_ = false;
@@ -28,13 +30,13 @@ Database::Database(std::string filename, std::string file_path){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Database::fexists(const char *filename) {
-  std::ifstream ifile(filename);
+  ifstream ifile(filename);
   return ifile;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Database::path() {
-  std::string full_path = "";
+string Database::path() {
+  string full_path = "";
   if ( !path_.empty() ) {
     full_path += path_ + "/";
   }
@@ -44,7 +46,7 @@ std::string Database::path() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::open() {
   if ( dbExists() ) {
-    std::string path_to_file = path() + name_;
+    string path_to_file = path() + name_;
     if(sqlite3_open(path_to_file.c_str(), &database_) == SQLITE_OK) {
       isOpen_ = true;
       return true;
@@ -79,7 +81,7 @@ bool Database::close() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Database::isOpen() {
-  std::string err;
+  string err;
   if ( dbExists() )
     return isOpen_;
   else {
@@ -109,7 +111,7 @@ void Database::registerTable(table_ptr t) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Database::removeTable(table_ptr t) {
   if ( dbExists() ) {
-    tables_.erase(std::find(tables_.begin(), tables_.end(), t));
+    tables_.erase(find(tables_.begin(), tables_.end(), t));
   }
 }
 
@@ -119,7 +121,7 @@ void Database::createTable(table_ptr t){
     bool tExists = tableExists(t);
     if (tExists) {
       // declare members
-      std::string query = t->create();
+      string query = t->create();
       this->issueCommand(query);
     }
   }
@@ -129,7 +131,7 @@ void Database::createTable(table_ptr t){
 bool Database::tableExists(table_ptr t) {
   // make sure the table exists before it is accessed
   bool isPresent = false;
-  std::string err;
+  string err;
   
   // case: the database is not null
   if ( dbExists() ) {
@@ -144,7 +146,7 @@ bool Database::tableExists(table_ptr t) {
     // case: table is defined, search for it
     else {
       isPresent = 
-	(std::find(tables_.begin(), tables_.end(), t) != tables_.end());
+	(find(tables_.begin(), tables_.end(), t) != tables_.end());
       if (!isPresent)
 	err = "Table: " + t->name() 
 	  + "  is not registered with Database " + this->name() + ".";
@@ -165,7 +167,7 @@ bool Database::tableExists(table_ptr t) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::issueCommand(std::string cmd){  
+void Database::issueCommand(string cmd){  
   if ( isOpen() ) {
     sqlite3_stmt *statement;
     // query the database
@@ -176,7 +178,7 @@ void Database::issueCommand(std::string cmd){
       sqlite3_finalize(statement);
     }
     // collect errors
-    std::string error = sqlite3_errmsg(database_);
+    string error = sqlite3_errmsg(database_);
     if(error != "not an error") 
       throw CycIOException("SQL error: " + cmd + " " + error);
   }
@@ -192,7 +194,7 @@ void Database::writeRows(table_ptr t){
       // write each row in the Table's row commands
       int nRows = t->nRows();
       for (int i = 0; i < nRows; i++){
-	std::string cmd_str = t->row_command(i)->str();
+	string cmd_str = t->row_command(i)->str();
 	this->issueCommand(cmd_str);
 	LOG(LEV_DEBUG4,"db") << "Issued writeRows command to table: " 
 			     << t->name() << " with the command being " 
@@ -213,7 +215,7 @@ void Database::flush(table_ptr t){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-query_result Database::query(std::string query){
+query_result Database::query(string query){
   // declare members
   sqlite3_stmt *statement;
   query_result results;
@@ -231,7 +233,7 @@ query_result Database::query(std::string query){
 	if(result == SQLITE_ROW){
 	  query_row values;
 	  for(int col = 0; col < cols; col++){
-	    std::string  val;
+	    string  val;
 	    char * ptr = (char*)sqlite3_column_text(statement, col);
 	    if(ptr)
 	      val = ptr;
@@ -247,7 +249,7 @@ query_result Database::query(std::string query){
       sqlite3_finalize(statement);
     }
     // collect errors
-    std::string error = sqlite3_errmsg(database_);
+    string error = sqlite3_errmsg(database_);
     if(error != "not an error") 
       throw CycIOException("SQL error: " + query + " " + error);
   }

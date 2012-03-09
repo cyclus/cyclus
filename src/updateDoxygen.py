@@ -17,7 +17,7 @@ def makewritelines(lines):
 def addBriefLines(lines,givenLine):
     line_halves = givenLine.split("///")
     line1 = line_halves[0] + '/**\n'
-    line2 = line_halves[0] + ' * @brief' + line_halves[1]
+    line2 = line_halves[0] + ' * @brief ' + line_halves[1]
     line3 = line_halves[0] + ' */\n'
     lines.append(line1)
     lines.append(line2)
@@ -40,6 +40,18 @@ def moreContinuation(lines,givenLine,nspaces):
         line += givenLine.lstrip()
     lines.append(line)
 
+def checkForBrief(lines,givenLine):
+    line_halves = givenLine.split("* ")
+    if ( (len(line_halves) > 1) and (len(line_halves[1]) > 6) ):
+        if (line_halves[1][0:6] != "@brief"):
+            line = line_halves[0] + '* @brief ' + line_halves[1]
+        else:
+            line = givenLine
+    else:
+        line = givenLine
+    lines.append(line)
+    
+
 # Filename and directory info
 file_front = sys.argv[1]
 file_back = sys.argv[2]
@@ -58,17 +70,21 @@ new_lines = []
 
 # go through lines
 continuation = False
+checkBrief = False
 nspaces = 0
 
 for line in original_lines:
     if ((line.lstrip()[0:2] == "*/") and (continuation == True)):
-        #moreContinuation(new_lines,line,nspaces)
         new_lines.append(line)
         continuation = False
-
+    
+    elif (checkBrief == True):
+        checkForBrief(new_lines,line)
+        checkBrief = False
+    
     elif continuation == True:
         moreContinuation(new_lines,line,nspaces)
-    
+        
     elif line.lstrip()[0:3] == "/*!":
         beginContinuation(new_lines,line)
         continuation = True
@@ -76,6 +92,10 @@ for line in original_lines:
 
     elif line.lstrip()[0:3] == "///":
         addBriefLines(new_lines,line)
+
+    elif line.lstrip()[0:3] == "/**":
+        new_lines.append(line)
+        checkBrief = True
          
     else:
         new_lines.append(line)

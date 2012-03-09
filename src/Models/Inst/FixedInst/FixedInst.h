@@ -1,12 +1,16 @@
 // FixedInst.h
 #if !defined(_FIXEDINST_H)
 #define _FIXEDINST_H
+
 #include <iostream>
-#include "Logger.h"
 
 #include "InstModel.h"
 
+#include "Logger.h"
+
 /**
+   @class FixedInst
+   
    @section introduction Introduction
    The FixedInst is an institution type in Cyclus which is 
    unchanging and is statically associated with facilities that are 
@@ -31,33 +35,35 @@
    any changes.
 */
 
-class FixedInst : public InstModel  
-{
+class FixedInst : public InstModel {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   /**
-   * Default constructor for the fixed inst
+   * @brief Default constructor for the fixed inst
    */
   FixedInst() {};
     
   /**
-   * Default destructor for the fixed inst
+   * @brief Default destructor for the fixed inst
    */
   virtual ~FixedInst() {};
   
   // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   * @brief  initialize an object from XML input
+   */
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object by copying another
+  /**
+   * @brief  initialize an object by copying another
+   */
   virtual void copy(FixedInst* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -67,60 +73,11 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * a print function to describe a fixedInst instantiation.
+   * @brief a print function to describe a fixedInst instantiation.
    */
   virtual void print();
 
 /* ------------------- */ 
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-public:
-
-protected:
-/* -------------------- */
-
-/* --------------------
- * all INSTMODEL classes have these members
- * --------------------
- */
-
-
-/* ------------------- */ 
-
-/* --------------------
- * This INSTMODEL classes have these members
- * --------------------
- */
-
-protected:
-
-  // vector<Model*> facilities_;
-
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for the this inst model output dir
-  */
-  static std::string outputDir(){ 
-    return InstModel::outputDir().append(outputDir_);}
-  
- private:
-  /**
-     Every specific inst model writes to the output database
-     location: InstModel::OutputDir_ + /inst_model_name
-  */
-  static std::string outputDir_;
-
-
-/* ------------------- */ 
-
 
 };
 

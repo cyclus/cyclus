@@ -1,15 +1,16 @@
 // SourceFacility.h
 #if !defined(_SOURCEFACILITY_H)
 #define _SOURCEFACILITY_H
+
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <queue>
 
+#include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
 
-/*!
+/**
    @class SourceFacility
    @brief This FacilityModel provides a simple source of some capacity 
    (possibly infinite) of some commodity/Recipe.
@@ -88,27 +89,30 @@ class SourceFacility : public FacilityModel  {
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   /**
-   * Default Constructor for the SourceFacility class
+   * @brief Default Constructor for the SourceFacility class
    */
   SourceFacility();
   
   /**
-   * Destructor for the SourceFacility class
+   * @brief Destructor for the SourceFacility class
    */
   virtual ~SourceFacility();
 
   // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   * @brief  initialize an object from XML input
+   */
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object by copying another
+  /**
+   * @brief  initialize an object by copying another
+   */
   virtual void copy(SourceFacility* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   * @brief This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -119,7 +123,7 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * Print information about this model
+   * @brief Print information about this model
    */
   virtual void print();
 
@@ -132,30 +136,29 @@ public:
    */ 
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
-
 /* ------------------- */ 
+
 
 /* --------------------
  * all COMMUNICATOR classes have these members
  * ------------------
  */
-public:
+ public:
   /**
-   * When this facility receives a message, execute the transaction therein.
+   * @brief When this facility receives a message, execute the transaction therein.
    */
   virtual void receiveMessage(msg_ptr msg);
 
 /* -------------------- */
 
+
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-
-public:
-
+ public:
   /**
-   * Each facility is prompted to do its beginning-of-time-step
+   * @brief Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -163,92 +166,91 @@ public:
   virtual void handleTick(int time);
 
   /**
-   * Each facility is prompted to its end-of-time-step
+   * @brief Each facility is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock
    */
   virtual void handleTock(int time);
 
-protected: 
-
 /* ------------------- */ 
+
 
 /* --------------------
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-
-protected:
+ protected:
   /**
-   * This facility has only one output commodity
+   * @brief This facility has only one output commodity
    */
   std::string out_commod_;
   
-  /// This facility has a specific recipe for its output
+  /**
+   * @brief  This facility has a specific recipe for its output
+   */
   IsoVector recipe_;
   
-  /// Name of the recipe this facility uses.
+  /**
+   * @brief  Name of the recipe this facility uses.
+   */
   std::string recipe_name_;
   
   /**
-   *  The capacity is defined in terms of the number of units of the recipe
+   * @brief  The capacity is defined in terms of the number of units of the recipe
    *  that can be provided each time step.  A very large number can be
    *  provided to represent infinte capacity.
    */
   double capacity_;
 
-  /// The maximum size (in mass) that the inventory can grow to.
+  /**
+   * @brief  The maximum size (in mass) that the inventory can grow to.
+   */
   int inventory_size_;
 
   /**
-   * The price that the facility will charge for its output commodity.
+   * @brief The price that the facility will charge for its output commodity.
    * Units vary and are in dollars per inventory unit.
    */
   double commod_price_;
 
   /**
-   * A collection  that holds the "product" Material this Facility has on hand 
+   * @brief A collection  that holds the "product" Material this Facility has on hand 
    * to send to others. For instance, a Reactor's inventory is its collection of 
    * old fuel assemblies that have come out of the core.
    */ 
-  deque<mat_rsrc_ptr> inventory_;
+  std::deque<mat_rsrc_ptr> inventory_;
   
   /**
-   * A list of orders to be processed on the Tock
+   * @brief A list of orders to be processed on the Tock
    */
-  deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * return the total mass of the material objects in the inventory
+   * @brief return the total mass of the material objects in the inventory
    * the units vary and are associated with with material type
    */
   double inventoryMass();
 
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
   /**
-     The getter function for this facility model output dir
-  */
-  static std::string outputDir(){ 
-    return FacilityModel::outputDir().append(outputDir_);}
-
- private:
-  /**
-     Every specific facility model writes to the output database
-     location: FacilityModel::OutputDir_ + /this_facility's_handle
-  */
-  static std::string outputDir_;
-
+   * @brief generates a material at a given time
+   * @param curr_time the current simulation time period
+   */
   void generateMaterial(int curr_time);
 
+  /**
+   * @brief builds a transaction
+   */
   Transaction buildTransaction();
 
+  /**
+   * @brief sends a transaction as an offer
+   */
   void sendOffer(Transaction trans);
 
+  /**
+   * @brief indicates the time just before the facility was built
+   */
   int prev_time_;
 
 /* ------------------- */ 

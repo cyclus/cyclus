@@ -19,40 +19,38 @@
    StubTimeAgent.cpp may be copied, renamed, and altered as discussed in the 
    <a href="http://cyclus.github.com/devdoc/make-models/main.html">GuidelinesForImplementingNewModels</a>.
  */
-
 class StubTimeAgent : public TimeAgent {
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
-   * Default constructor for StubTimeAgent Class
+   * @brief Default constructor for StubTimeAgent Class
    */
   StubTimeAgent();
 
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubTimeAgent();
     
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubTimeAgent to copy
    */
   virtual void copy(StubTimeAgent* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -62,19 +60,19 @@ public:
   virtual void copyFreshModel(Model* src){};
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
    virtual void print();
 
   /**
-   * Each simulation agent is prompted to do its beginning-of-life
+   * @brief Each simulation agent is prompted to do its beginning-of-life
    * stuff.
    *
    */
   virtual void handlePreHistory();
 
   /**
-   * Each simulation agent is prompted to do its beginning-of-time-step
+   * @brief Each simulation agent is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -82,7 +80,7 @@ public:
   virtual void handleTick(int time);
 
   /**
-   * Each simulation agent is prompted to its end-of-time-step
+   * @brief Each simulation agent is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock

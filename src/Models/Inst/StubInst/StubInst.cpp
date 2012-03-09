@@ -1,8 +1,10 @@
 // StubStubInst.cpp
 // Implements the StubStubInst class
 
-#include "Logger.h"
+
 #include "StubInst.h"
+
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members

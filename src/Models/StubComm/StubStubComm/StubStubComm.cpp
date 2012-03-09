@@ -1,8 +1,9 @@
 // StubStubCommComm.cpp
 // Implements the StubStubCommComm class
 
-#include "Logger.h"
 #include "StubStubComm.h"
+
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members

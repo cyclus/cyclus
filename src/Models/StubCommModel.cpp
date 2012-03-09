@@ -2,6 +2,7 @@
 // Implements the StubCommModel class
 
 #include "StubCommModel.h"
+
 #include "Logger.h"
   
 /* --------------------

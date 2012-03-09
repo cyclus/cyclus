@@ -1,32 +1,33 @@
 // StorageFacility.cpp
 // Implements the StorageFacility class
 #include <iostream>
-#include "Logger.h"
 
 #include "StorageFacility.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 #include "BookKeeper.h"
 
-/*
- * TICK
- * send a request for your capacity minus your stocks.
- * offer materials that have exceeded their residence times
- * offer them
- *
- * TOCK
- * send appropriate materials to fill ordersWaiting.
- *
- * RECIEVE MATERIAL
- * put it in stocks
- * add it to the deque of release times
- *
- * SEND MATERIAL
- * pull it from inventory, fill the transaction
- */
+using namespace std;
 
+/**
+  TICK
+  send a request for your capacity minus your stocks.
+  offer materials that have exceeded their residence times
+  offer them
+ 
+  TOCK
+  send appropriate materials to fill ordersWaiting.
+ 
+  RECIEVE MATERIAL
+  put it in stocks
+  add it to the deque of release times
+ 
+  SEND MATERIAL
+  pull it from inventory, fill the transaction
+ */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void StorageFacility::init(xmlNodePtr cur)
@@ -108,7 +109,7 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
+vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -389,13 +390,6 @@ Mass StorageFacility::checkStocks(){
 
   return total;
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string StorageFacility::outputDir_ = "/storage";
 
 /* --------------------
  * all MODEL classes have these members

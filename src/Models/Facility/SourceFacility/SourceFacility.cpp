@@ -1,14 +1,17 @@
 // SourceFacility.cpp
 // Implements the SourceFacility class
 #include <iostream>
-#include "Logger.h"
 
 #include "SourceFacility.h"
+
+#include "Logger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "MarketModel.h"
 #include "Timer.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 SourceFacility::SourceFacility() {
@@ -226,13 +229,6 @@ double SourceFacility::inventoryMass() {
   }
   return total;
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string SourceFacility::outputDir_ = "/source";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 extern "C" Model* constructSourceFacility() {

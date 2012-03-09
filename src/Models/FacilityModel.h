@@ -9,11 +9,9 @@
 #include "Communicator.h"
 #include "InstModel.h"
 
-/// forward declaration to resolve recursion
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 
-//-----------------------------------------------------------------------------
 /**
  @class FacilityModel
  @brief The FacilityModel class is the abstract class/interface used by all
@@ -64,30 +62,31 @@ class Material;
  @section thirdparty Third-party Implementations 
  
  Collaborators are encouraged to add to this list and link to external pages 
- that describe how to get the models and the detailed behavior of these models.
- 
-*/
+ that describe how to get the models and the detailed behavior of these models. 
+ */
 
-//-----------------------------------------------------------------------------
 class FacilityModel : public TimeAgent, public Communicator {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   FacilityModel();
-
+  
   virtual ~FacilityModel();
   
-  // every model needs a method to initialize from XML
+  /**
+   * @brief  every model needs a method to initialize from XML
+   */
   virtual void init(xmlNodePtr cur);
   
-  // every model needs a method to copy one object to another
+  /**
+   * @brief  every model needs a method to copy one object to another
+   */
   virtual void copy(FacilityModel* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   * @brief This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -97,71 +96,89 @@ public:
    */
   virtual void copyFreshModel(Model* src)=0;
 
-  // every model should be able to print a verbose description
-  virtual void print()              { Model::print(); };
-
-public:
   /**
-   *  There is no default FacilityModel receiver 
+   * @brief  every model should be able to print a verbose description
+   */
+  virtual void print() { Model::print(); };
+
+/* ------------------- */ 
+
+
+/* --------------------
+ * all COMMUNICATOR classes have these members
+ * --------------------
+ */
+ public:
+  /**
+   * @brief There is no default FacilityModel receiver 
    *
-   *  Each derived class must implement an offer/request receiver
+   * Each derived class must implement an offer/request receiver
    */ 
   virtual void receiveMessage(msg_ptr msg)=0;
 
-protected:
-  /// each facility should have an institution that manages it
+/* ------------------- */ 
+
+
+/* --------------------
+ * all FACILITYMODEL classes have these members
+ * --------------------
+ */
+ protected:
+  /**
+   * @brief  each facility should have an institution that manages it
+   */
   std::string inst_name_;
 
-  /// each facility needs a lifetime
+  /**
+   * @brief  each facility needs a lifetime
+   */
   int fac_lifetime_;
 
-
-public:
-
+ public:
   /**
-   * Sets the facility's name 
+   * @brief Sets the facility's name 
    *
    * @param facName is the new name of the facility
    */
   virtual void setFacName(std::string facName) { this->setName(facName); };
 
   /**
-   * Returns the facility's name
+   * @brief Returns the facility's name
    *
    * @return fac_name_ the name of this facility, a string
    */
   virtual std::string facName() { return this->name(); };
 
   /**
-   * Sets this facility's instutution name 
+   * @brief Sets this facility's instutution name 
    *
    * @param name the name of the institution associated with this facility.
    */
   virtual void setInstName(std::string name){ inst_name_ = name;};
 
   /**
-   * Returns this facility's institution
+   * @brief Returns this facility's institution
    *
    * @return the institution assosicated with this facility
    */
   virtual InstModel* facInst();
 
   /**
-   * Sets the facility's lifetime 
+   * @brief Sets the facility's lifetime 
    *
    * @param lifetime is the new lifetime of the facility in months
    */
   virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
-   * Returns the facility's lifetime
+   * @brief Returns the facility's lifetime
    *
    * @return fac_lifetime_ the lifetime of this facility, an int, in months
    */
   virtual int facLifetime() { return fac_lifetime_; };
 
   /**
-   * Returns the facility's power capacity
+   * @brief Returns the facility's power capacity
    *
    * @return 0 by default. If the facility produces power, it will use its own 
    * function.
@@ -169,14 +186,14 @@ public:
   virtual double powerCapacity() { return 0.0; };
 
   /**
-   * Each facility is prompted to do its beginning-of-life
+   * @brief Each facility is prompted to do its beginning-of-life
    * stuff.
    *
    */
   virtual void handlePreHistory();
 
   /**
-   * Each facility is prompted to do its beginning-of-time-step
+   * @brief Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -184,7 +201,7 @@ public:
   virtual void handleTick(int time);
 
   /**
-   * Each facility is prompted to its end-of-time-step
+   * @brief Each facility is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock
@@ -192,32 +209,12 @@ public:
   virtual void handleTock(int time);
 
   /**
-   * Each facility is prompted to do its daily tasks
+   * @brief Each facility is prompted to do its daily tasks
    * 
    * @param time is the number of months since the beginning of the simulation
    * @param day is the current day in this month
    */
   virtual void handleDailyTasks(int time, int day);
-
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for the facility model output dir
-  */
-  static std::string outputDir(){ 
-    return TimeAgent::outputDir().append(outputDir_);}
-
- private:
-  /**
-     Every facility model writes to the output database
-     location: TimeAgent::OutputDir_ + /facility
-  */
-  static std::string outputDir_;
-
 
 /* ------------------- */ 
   

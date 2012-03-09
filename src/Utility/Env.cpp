@@ -19,7 +19,7 @@ boost::filesystem::path Env::cwd_ = boost::filesystem::current_path();
 // note that this is not used - Env is a pure static class
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::pathBase(std::string path) {
+string Env::pathBase(string path) {
   string base;
   int index;
 
@@ -29,7 +29,7 @@ std::string Env::pathBase(std::string path) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::getCyclusPath() {
+string Env::getCyclusPath() {
   // return the join of cwd_ and rel path to cyclus
   CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
                   << cwd_ / path_from_cwd_to_cyclus_;
@@ -37,13 +37,13 @@ std::string Env::getCyclusPath() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Env::setCyclusRelPath(std::string path) {
+void Env::setCyclusRelPath(string path) {
   path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
   CLOG(LEV_DEBUG3) << "Cyclus rel path: " << path;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::checkEnv(std::string varname) {
+string Env::checkEnv(string varname) {
   char* pVar = getenv (varname.c_str());
   if (pVar == NULL) {
     throw CycNoEnvVarException("Environment variable " + varname + " not set.");

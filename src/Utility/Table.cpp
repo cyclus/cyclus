@@ -1,9 +1,12 @@
 #include <iostream>
 
-#include "BookKeeper.h"
 #include "Table.h"
+
+#include "BookKeeper.h"
 #include "Logger.h"
 #include "CycException.h"
+
+using namespace std;
 
 // @gidden Indexing not currently supported
 // @gidden Make generic creation and addition functions
@@ -29,7 +32,7 @@ void Table::setPrimaryKey(column const col) {
 }
 
 // -----------------------------------------------------------------------
-void Table::setPrimaryKey(std::string const pk_string) {
+void Table::setPrimaryKey(string const pk_string) {
   primary_key pk;
   pk.push_back(pk_string);
   this->setPrimaryKey(pk);
@@ -46,20 +49,20 @@ void Table::addForeignKey(foreign_key const fk) {
   int key_size = fk.first.size();
   int ref_size = fk.second.second.size();
   if (key_size != ref_size) {
-    std::string err = "Attempted to reference a different foreign key.";
+    string err = "Attempted to reference a different foreign key.";
     throw CycException(err);
   }
   foreign_keys_.push_back(fk);
 }
 
 // -----------------------------------------------------------------------
-std::string Table::create(){
+string Table::create(){
   // create a table using this table's name
   command cmd("");
   cmd << "CREATE TABLE " << this->name() <<" (";
   // for each entry, add the column name and data type
   // and comma separate entries
-  for(std::vector<column>::iterator col = columns_.begin(); 
+  for(vector<column>::iterator col = columns_.begin(); 
       col != columns_.end(); 
       ++col) {
     // add the column and data type to the command
@@ -82,9 +85,9 @@ std::string Table::create(){
 }
 
 // -----------------------------------------------------------------------
-std::string Table::stringifyData(data const d){
+string Table::stringifyData(data const d){
   command data("");
-  std::string check = "Ss";
+  string check = "Ss";
   if (d.type().name() == check){
     data << "'" << d << "'";
   } else {
@@ -144,7 +147,7 @@ void Table::updateRow(primary_key_ref const pkref, row const r){
 }
 
 // -----------------------------------------------------------------------
-std::string Table::updateRowPK(primary_key_ref const pkref){
+string Table::updateRowPK(primary_key_ref const pkref){
   command cmd("");
   int nRefs = pkref.size();
   if (nRefs > 0) {
@@ -163,7 +166,7 @@ std::string Table::updateRowPK(primary_key_ref const pkref){
 }
 
 // -----------------------------------------------------------------------
-std::string Table::f_keys(){
+string Table::f_keys(){
   // create a the foreign keys statement
   command final_cmd("");
   int nKeys = foreign_keys_.size();
@@ -209,7 +212,7 @@ std::string Table::f_keys(){
 }
 
 // -----------------------------------------------------------------------
-std::string Table::p_key(){
+string Table::p_key(){
   // create a the primary key statement
   command cmd("");
   int nCols = primary_key_.size();
@@ -218,7 +221,7 @@ std::string Table::p_key(){
     cmd << "PRIMARY KEY (";
     // for each column, add the column name to the key
     // and comma separate entries
-    for(std::vector<col_name>::iterator name = primary_key_.begin(); 
+    for(vector<col_name>::iterator name = primary_key_.begin(); 
 	name != primary_key_.end(); 
 	++name) {
       cmd << *name;
