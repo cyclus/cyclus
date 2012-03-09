@@ -1,9 +1,12 @@
 // Model.cpp
 // Implements the Model Class
 
-#include "suffix.h"
+#include <iostream>
+
 #include "Model.h"
 
+#include "Logger.h"
+#include "suffix.h"
 #include "CycException.h"
 #include "Env.h"
 #include "InputXML.h"
@@ -13,20 +16,20 @@
 #include "Table.h"
 
 #include DYNAMICLOADLIB
-#include <iostream>
-#include "Logger.h"
+
+using namespace std;
 
 // Default starting ID for all Models is zero.
 int Model::next_id_ = 0;
 // Database table for agents
 table_ptr Model::agent_table = new Table("Agents"); 
 // Model containers
-std::vector<Model*> Model::template_list_;
-std::vector<Model*> Model::model_list_;
+vector<Model*> Model::template_list_;
+vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getTemplateByName(std::string name) {
+Model* Model::getTemplateByName(string name) {
   Model* found_model = NULL;
 
   for (int i = 0; i < template_list_.size(); i++) {
@@ -44,7 +47,7 @@ Model* Model::getTemplateByName(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getModelByName(std::string name) {
+Model* Model::getModelByName(string name) {
   Model* found_model = NULL;
 
   for (int i = 0; i < model_list_.size(); i++) {
@@ -72,12 +75,12 @@ void Model::printModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Model*> Model::getModelList() {
+vector<Model*> Model::getModelList() {
   return Model::model_list_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::create(std::string model_type, xmlNodePtr cur) {
+void Model::create(string model_type, xmlNodePtr cur) {
   string model_impl = XMLinput->get_xpath_name(cur, "model/*");
 
   // get instance
@@ -146,7 +149,7 @@ void Model::load_facilities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
+void Model::load_facilitycatalog(string filename, string ns, string format){
   XMLinput->extendCurNS(ns);
 
   if ("xml" == format){
@@ -250,7 +253,7 @@ void Model::setIsTemplate(bool is_template) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
+void Model::removeFromList(Model* model, vector<Model*> &mlist) {
   for (int i = 0; i < mlist.size(); i++) {
     if (mlist[i] == model) {
       mlist.erase(mlist.begin() + i);
@@ -303,7 +306,7 @@ void Model::setParent(Model* parent){
 Model* Model::parent(){
   // if parent pointer is null, throw an error
   if (parent_ == NULL){
-    std::string null_err = "You have tried to access the parent of " +	\
+    string null_err = "You have tried to access the parent of " +	\
       this->name() + " but the parent pointer is NULL.";
     throw CycIndexException(null_err);
   }
@@ -332,21 +335,21 @@ void Model::removeChild(Model* child){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const std::string Model::modelImpl() {
+const string Model::modelImpl() {
   return model_impl_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<rsrc_ptr> Model::removeResource(msg_ptr order) {
-  std::string msg = "The model " + name();
+vector<rsrc_ptr> Model::removeResource(msg_ptr order) {
+  string msg = "The model " + name();
   msg += " doesn't support resource removal.";
   throw CycOverrideException(msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addResource(msg_ptr msg,
-                            std::vector<rsrc_ptr> manifest) {
-  std::string err_msg = "The model " + name();
+                            vector<rsrc_ptr> manifest) {
+  string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
   throw CycOverrideException(err_msg);
 }
