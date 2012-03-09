@@ -58,7 +58,6 @@ SET( CYCLUS_CORE
   Utility/Logger.cpp
   Utility/DecayHandler.cpp
   Models/Model.cpp 
-  Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
