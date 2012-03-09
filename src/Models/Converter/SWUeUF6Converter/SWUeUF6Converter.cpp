@@ -14,8 +14,7 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SWUeUF6Converter::init(xmlNodePtr cur)
-{ 
+void SWUeUF6Converter::init(xmlNodePtr cur) {
   ConverterModel::init(cur);
   
   // move XML pointer to current model
@@ -28,8 +27,7 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SWUeUF6Converter::copy(SWUeUF6Converter* src)
-{
+void SWUeUF6Converter::copy(SWUeUF6Converter* src) {
 
   ConverterModel::copy(src);
 

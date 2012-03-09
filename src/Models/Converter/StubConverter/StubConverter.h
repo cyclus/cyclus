@@ -4,8 +4,9 @@
 
 #include <queue>
 
-#include "Logger.h"
 #include "ConverterModel.h"
+
+#include "Logger.h"
 
 /**
   @class StubConverter
@@ -40,31 +41,31 @@ class StubConverter : public ConverterModel {
  */
  public:
   /**
-   * Default constructor for StubConverter Class
+   * @brief Default constructor for StubConverter Class
    */
   StubConverter() {};
 
   /**
-   * every model should be destructable
+   * @brief every model should be destructable
    */
   virtual ~StubConverter() {};
 
   /**
-   * every model needs a method to initialize from XML
+   * @brief every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * every model needs a method to copy one object to another
+   * @brief every model needs a method to copy one object to another
    *
    * @param src is the StubConverter to copy
    */
   virtual void copy(StubConverter* src) ;
 
   /**
-   * This drills down the dependency tree to initialize all relevant parameters/containers.
+   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -74,7 +75,7 @@ class StubConverter : public ConverterModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * every model should be able to print a verbose description
+   * @brief every model should be able to print a verbose description
    */
   virtual void print();
 
@@ -87,7 +88,7 @@ class StubConverter : public ConverterModel {
  */  
  public:
   /**
-   * The convert function specific to the StubConverter
+   * @brief The convert function specific to the StubConverter
    * Converts between amounts of two commodities
    *
    * @param convMsg is a message concerning one convertible commodity to convert
