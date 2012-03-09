@@ -288,11 +288,66 @@ TEST_F(MaterialStoreTest, RemoveQtySplitUnder) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, RemoveNum) {
+TEST_F(MaterialStoreTest, RemoveNum_Exceptions) {
+  MatManifest manifest;
+  ASSERT_THROW(manifest = filled_store_.removeNum(3), CycNegQtyException);
+  ASSERT_THROW(manifest = filled_store_.removeNum(-1), CycNegQtyException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, RemoveNum_Zero) {
+  MatManifest manifest;
+  double tot_qty = filled_store_.quantity();
+
+  ASSERT_NO_THROW(manifest = filled_store_.removeNum(0));
+  ASSERT_EQ(manifest.size(), 0);
+  ASSERT_EQ(filled_store_.count(), 2);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), tot_qty);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, RemoveNum_One) {
+  MatManifest manifest;
+
+  ASSERT_NO_THROW(manifest = filled_store_.removeNum(1));
+  ASSERT_EQ(manifest.size(), 1);
+  ASSERT_EQ(filled_store_.count(), 1);
+  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0), mat1_);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, RemoveNum_Two) {
+  MatManifest manifest;
+
+  ASSERT_NO_THROW(manifest = filled_store_.removeNum(2));
+  ASSERT_EQ(manifest.size(), 2);
+  ASSERT_EQ(filled_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0), mat1_);
+  EXPECT_DOUBLE_EQ(manifest.at(1).quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(1), mat2_);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialStoreTest, RemoveOne) {
+  mat_rsrc_ptr mat;
+
+  ASSERT_NO_THROW(mat = filled_store_.removeOne());
+  EXPECT_DOUBLE_EQ(mat.quantity(), mat1_.quantity());
+  EXPECT_EQ(mat, mat1_);
+  EXPECT_EQ(filled_store_.count(), 1);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+
+  ASSERT_NO_THROW(mat = filled_store_.removeOne());
+  EXPECT_DOUBLE_EQ(mat.quantity(), mat2_.quantity());
+  EXPECT_EQ(mat, mat2_);
+  EXPECT_EQ(filled_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
+
+  ASSERT_THROW(mat = filled_store_.removeOne(), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

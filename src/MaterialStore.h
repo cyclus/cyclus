@@ -3,10 +3,12 @@
 #define _MATERIALSTORE_H
 
 #include "CycException.h"
+#include "Material.h"
 
 #define STORE_EPS 1e-6
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+typedef std::vector<mat_rsrc_ptr> MatManifest;
+
 class CycOverCapException: public CycException {
   public: CycOverCapException(std::string msg) : CycException(msg) {};
 };
@@ -16,17 +18,14 @@ class CycNegQtyException: public CycException {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-typedef std::vector<mat_rsrc_ptr> MatManifest;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 /*!
-MaterialStore 
+MaterialStore is a helper function that provides semi-automated management of
+material resource buffers (e.g. model stocks and inventories).
 
 Methods that begin with a "set", "make", "add", or "remove" prefix change the
-state/behavior of the store; other methods do not.
-
-Default constructed material store has zero (finite) capacity.
+state/behavior of the store; other methods do not.  Default constructed
+material store has zero (finite) capacity. Resource removal occurs in the order
+the resources were added (i.e. oldest materials are removed first).
 */
 class MaterialStore {
 
@@ -108,7 +107,7 @@ public:
   added (i.e. oldest first).
 
   @throws CycNegQtyException the specified removal number is larger than the
-  store's current inventoryNum.
+  store's current inventoryNum or the specified number is negative.
   */
   std::vector<mat_rsrc_ptr> removeNum(int num);
 
