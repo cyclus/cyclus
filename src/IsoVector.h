@@ -350,7 +350,6 @@ private:
   CompMap atom_comp_;
     
 // -------- output database related members  -------- 
-
  public:
   /**
    * @brief the isotopics output database Table
@@ -404,6 +403,7 @@ private:
    * @brief returns the state id of the current composition if it is already tracked
    */
   int compositionIsTracked();
+// -------- output database related members  -------- 
 };
 
 #endif
