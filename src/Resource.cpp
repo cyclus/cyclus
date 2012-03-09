@@ -1,13 +1,15 @@
-
 // Resource.cpp
+
 #include "Resource.h"
 
+// Resource IDs
 int Resource::nextID_ = 0;
 
 // Database table for resources
 table_ptr Resource::resource_table = new Table("Resources"); 
 table_ptr Resource::resource_type_table = new Table("ResourceTypes"); 
 
+// -------------------------------------------------------------
 Resource::Resource() {
   ID_ = nextID_++;
   originalID_ = ID_;
@@ -29,9 +31,7 @@ void Resource::setOriginalID(int id){
 }
 
 // -------------------------------------------------------------
-/*!
-  output database related members
-*/
+// -------- output database related members  -------- 
 
 // Specific resources
 void Resource::define_table(){

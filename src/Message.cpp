@@ -20,9 +20,6 @@ int Message::nextTransID_ = 1;
 table_ptr Message::trans_table = new Table("Transactions"); 
 table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
 
-
-std::string Message::outputDir_ = "/output/transactions";
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
   MLOG(LEV_DEBUG4) << "Message " << this << " created.";

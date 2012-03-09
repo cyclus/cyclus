@@ -14,28 +14,32 @@
 #define XMLinput InputXML::Instance()
 
 /**
- *  @brief provide interface to libxml for all input parsing needs
- *
- *  This class provides a convenient set of functions to validate, load,
- *  parse, search and extract data from an XML input file.  Features include
- *  RelaxNG schema validation and nested inclusion of libraries with
- *  disambiguating namespace modifiers.
- *
- *  To facilitate the nested inclusion of libraries, a structure is defined to
- *  hold information about the current XML document.  These objects are placed
- *  on a stack to manage an infinite amount of nesting.
- *
- *  This class is implemented as a singleton with preferred access through the
- *  pre-processor-defined XMLinput macro
+   @brief provide interface to libxml for all input parsing needs
+ 
+   @section intro Introduction
+   This class provides a convenient set of functions to validate, load,
+   parse, search and extract data from an XML input file.  Features include
+   RelaxNG schema validation and nested inclusion of libraries with
+   disambiguating namespace modifiers.
+ 
+   To facilitate the nested inclusion of libraries, a structure is defined to
+   hold information about the current XML document.  These objects are placed
+   on a stack to manage an infinite amount of nesting.
+ 
+   This class is implemented as a singleton with preferred access through the
+   pre-processor-defined XMLinput macro
  */
-class InputXML {
 
+class InputXML {
 public:
-  
-  /// Method to return a pointer to the only instance
+  /**
+   * @brief Method to return a pointer to the only instance
+   */ 
   static InputXML* Instance();
-  
-  /// Method to return the current namespace modifier
+
+  /**
+   * @brief Method to return the current namespace modifier
+   */ 
   std::string getCurNS() { return cur_ns_; };
 
   /**
@@ -149,8 +153,7 @@ public:
    *  @param expression XPath expression that will be interpreted relative
    *  to the XML node pointer cur
    */
-  xmlNodeSetPtr get_xpath_elements(const char* expression)
-  {
+  xmlNodeSetPtr get_xpath_elements(const char* expression) {
     return get_xpath_elements(curFilePtr->doc->children,expression);
   };
 
@@ -176,8 +179,7 @@ public:
    *  @param expression XPath expression that will be interpreted relative
    *  to the XML node pointer cur
    */
-  xmlNodePtr get_xpath_element(const char* expression)
-  {
+  xmlNodePtr get_xpath_element(const char* expression) {
     return get_xpath_element(curFilePtr->doc->children,expression);
   };
 
@@ -200,13 +202,19 @@ public:
   const char* get_xpath_name(xmlNodePtr cur,const char* expression);
 
 private:
-  /// pointer to thie single instance of this class
+  /**
+   * @brief pointer to thie single instance of this class
+   */ 
   static InputXML* instance_;
 
-  /// default constructor
+  /**
+   * @brief default constructor
+   */ 
   InputXML();
 
-  /// default destructor
+  /**
+   * @brief default destructor
+   */ 
   ~InputXML() {};
 
   /**
@@ -217,16 +225,30 @@ private:
    *  existing XPath search context.
    */
   struct xmlFileInfo {
-    /// filename currently being processed
+    /**
+     * @brief filename currently being processed
+     */ 
     std::string filename;  
-    /// pointer to the schema URI used for this file
+
+    /**
+     * @brief pointer to the schema URI used for this file
+     */ 
     std::string* schema;   
-    /// XML doc ptr for input file
+
+    /**
+     * @brief XML doc ptr for input file
+     */ 
     xmlDocPtr doc;    
-    /// XML XPath search context
+
+    /**
+     * @brief XML XPath search context
+     */ 
     xmlXPathContextPtr xpathCtxt; 
   } 
-  /// pointer to record of the current file being processed
+
+  /**
+   * @brief pointer to record of the current file being processed
+   */ 
   *curFilePtr;
 
   /**
@@ -263,7 +285,9 @@ private:
    */
   xmlDocPtr validate_file(xmlFileInfo *fileInfo);
 
-  /// primary schema used for Cyclus processing
+  /**
+   * @brief primary schema used for Cyclus processing
+   */ 
   static std::string main_schema_; 
 
 };

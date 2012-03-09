@@ -1,14 +1,18 @@
 // Resource.cpp
 // Implements the Resource Class
+
 #include "GenericResource.h"
+
 #include "CycException.h"
 #include "Logger.h"
 
 bool GenericResource::type_is_logged_ = false;
 
+using namespace std;
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-GenericResource::GenericResource(std::string units,
-                                 std::string quality, double quantity) : Resource() {
+GenericResource::GenericResource(string units,
+                                 string quality, double quantity) : Resource() {
   units_ = units;
   quality_ = quality;
   quantity_ = quantity;

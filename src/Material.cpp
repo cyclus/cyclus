@@ -10,7 +10,7 @@
 
 using namespace std;
 
-std::vector<mat_rsrc_ptr> Material::materials_;
+vector<mat_rsrc_ptr> Material::materials_;
 
 bool Material::decay_wanted_ = false;
 
@@ -92,9 +92,9 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string Material::detail() {
-  std::vector<std::string>::iterator entry;
-  std::vector<std::string> entries = iso_vector_.compStrings();
+string Material::detail() {
+  vector<string>::iterator entry;
+  vector<string> entries = iso_vector_.compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
@@ -142,7 +142,7 @@ bool Material::checkQuantityEqual(rsrc_ptr other) {
     // check mass values
     double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet=( abs(quantity() - second_qty) < EPS_KG);
-  } catch (std::exception e) { }
+  } catch (exception e) { }
   return toRet;
 }
 
@@ -157,7 +157,7 @@ bool Material::checkQuantityGT(rsrc_ptr other){
     // check mass values
     double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
     toRet = second_qty - quantity() > EPS_KG;
-  } catch (std::exception& e){ }
+  } catch (exception& e){ }
 
   return toRet;
 }

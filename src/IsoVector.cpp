@@ -19,7 +19,7 @@ using namespace std;
 // Static variables to be initialized.
 int IsoVector::nextID_ = 0;
 int IsoVector::nextStateID_ = 0;
-std::map<std::string, IsoVector*> IsoVector::recipes_;
+map<string, IsoVector*> IsoVector::recipes_;
 StateMap IsoVector::predefinedStates_ = StateMap();
 // Database table for isotopic states
 table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
@@ -75,7 +75,7 @@ void IsoVector::load_recipes() {
 
   /// load recipes from file
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
-  std::string name;
+  string name;
   CLOG(LEV_DEBUG2) << "loading recipes {";
   for (int i = 0; i < nodes->nodeNr; i++) {
     name = XMLinput->getCurNS() + 
@@ -86,7 +86,7 @@ void IsoVector::load_recipes() {
 
   /// load recipes from databases
   nodes = XMLinput->get_xpath_elements("/*/recipebook");
-  std::string filename, ns, format;
+  string filename, ns, format;
 
   for (int i = 0; i < nodes->nodeNr; i++) {
     filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
@@ -106,7 +106,7 @@ void IsoVector::load_recipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::recipe(std::string name) { 
+IsoVector IsoVector::recipe(string name) { 
   if (recipes_.count(name) == 0) {
     throw CycIndexException("Recipe '" + name + "' does not exist.");
   }
@@ -117,7 +117,7 @@ IsoVector IsoVector::recipe(std::string name) {
 void IsoVector::printRecipes() {
   CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes.";
   CLOG(LEV_INFO2) << "Recipe list {";
-  for (std::map<std::string, IsoVector*>::iterator recipe=recipes_.begin();
+  for (map<string, IsoVector*>::iterator recipe=recipes_.begin();
       recipe != recipes_.end();
       recipe++){
     CLOG(LEV_INFO2) << "Recipe name=" << recipe->first;
@@ -132,13 +132,13 @@ void IsoVector::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::detail() {
-  std::stringstream ss;
+string IsoVector::detail() {
+  stringstream ss;
   ss << "mass = " << mass() << " kg";
   CLOG(LEV_INFO3) << ss.str();
 
-  std::vector<std::string>::iterator entry;
-  std::vector<std::string> entries = compStrings();
+  vector<string>::iterator entry;
+  vector<string> entries = compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO3) << *entry;
   }
@@ -146,11 +146,11 @@ std::string IsoVector::detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string> IsoVector::compStrings() {
+vector<string> IsoVector::compStrings() {
   CompMap::iterator entry;
   int isotope;
-  std::stringstream ss;
-  std::vector<std::string> comp_strings;
+  stringstream ss;
+  vector<string> comp_strings;
   for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
     ss.str("");
     isotope = entry->first;
@@ -456,9 +456,9 @@ void IsoVector::validateIsotopeNumber(int tope) {
   int upper_limit = 1182949;
 
   if (tope < lower_limit || tope > upper_limit) {
-    std::stringstream st;
+    stringstream st;
     st << tope;
-    std::string isotope = st.str();
+    string isotope = st.str();
     throw CycRangeException("Isotope identifier '" + isotope + "' is not valid.");
   }
 }
