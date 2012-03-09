@@ -8,19 +8,16 @@
 // To change the matrix library used:
 //
 //      #include "<Matrix Library>"
-
 #include "LMatrix.h"          
 
 // To change the matrix type: 
 //
 //      typedef <Matrix Type> Matrix;
-
 typedef LMatrix Matrix;
 
 // To change the vector type:
 //
 //      typedef <Vector Type> Vector;
-
 typedef LMatrix Vector;
 
 #endif

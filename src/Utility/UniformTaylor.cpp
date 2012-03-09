@@ -68,7 +68,7 @@ Vector UniformTaylor::getSolutionVector(const Matrix & B,
 {
   // step 3 of algorithm: calculates exp( -alpha * t)
   long double alpha_t = alpha * t;
-  long double expat = std::exp(-alpha_t);
+  long double expat = exp(-alpha_t);
    
   if ( expat == 0 ) {
     string error = "Error: exp(-alpha * t) exceeds the range of a long double.";
@@ -116,7 +116,7 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
   long double sumTerms = 1;      
   
   // calculates the lower bound of the series
-  long double lowerBound = std::exp(alpha_t);
+  long double lowerBound = exp(alpha_t);
 
   // checks to see if exp(alpha * t) is infinite
   if ( lowerBound == HUGE_VAL ) {
