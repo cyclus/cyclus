@@ -160,12 +160,6 @@ private:
   /// true if this store has an infinite capacity
   bool unlimited_;
 
-  /// true if mat retrieval splits objects to match request qty exactly
-  bool makeSplitable_;
-
-  /// true if unsplitable retrievals should return more than request qty
-  bool over_;
-
   /// maximum quantity of material resource this store can hold
   double capacity_;
 
