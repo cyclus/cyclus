@@ -89,11 +89,16 @@ To check:
 */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, SetCapacityExceptions) {
+TEST_F(MaterialStoreTest, SetCapacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
-  EXPECT_THROW(filled_store_.setCapacity(low_cap), CycOverCapException);
   EXPECT_NO_THROW(store_.setCapacity(zero_cap));
   EXPECT_NO_THROW(store_.setCapacity(cap));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, SetCapacity_ExceptionsFilled) {
+  EXPECT_THROW(filled_store_.setCapacity(low_cap), CycOverCapException);
+  EXPECT_NO_THROW(filled_store_.setCapacity(cap));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
