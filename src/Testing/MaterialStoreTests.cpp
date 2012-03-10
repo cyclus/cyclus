@@ -17,6 +17,7 @@ class MaterialStoreTest : public ::testing::Test {
 
     mat_rsrc_ptr mat1_;
     mat_rsrc_ptr mat2_;
+    MaterialManifest mats;
 
     MaterialStore store_; // default constructed mat store
     MaterialStore filled_store_;
@@ -53,6 +54,8 @@ class MaterialStoreTest : public ::testing::Test {
 
         mat1_ = mat_rsrc_ptr(new Material(vect1_));
         mat2_ = mat_rsrc_ptr(new Material(vect2_));
+        mats.push_back(mat1_);
+        mats.push_back(mat2_);
 
         neg_cap = -1;
         zero_cap = 0;
@@ -86,7 +89,7 @@ To check:
 */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialStoreTest, SetCapacity_Exceptions) {
+TEST_F(MaterialStoreTest, SetCapacityExceptions) {
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
   EXPECT_THROW(filled_store_.setCapacity(low_cap), CycOverCapException);
   EXPECT_NO_THROW(store_.setCapacity(zero_cap));
@@ -398,5 +401,68 @@ TEST_F(MaterialStoreTest, AddOne_Duplicate) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialStoreTest, AddAll) {
+  ASSERT_NO_THROW(store_.setCapacity(cap));
+  ASSERT_NO_THROW(store_.addAll(mats));
+  ASSERT_EQ(store_.count(), 2);
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, AddAll_Empty) {
+  MatManifest manifest;
+  ASSERT_NO_THROW(store_.setCapacity(cap));
+  ASSERT_NO_THROW(store_.addAll(manifest));
+  ASSERT_EQ(store_.count(), 0);
+  EXPECT_DOUBLE_EQ(store_.quantity(), 0);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, AddAll_RetrieveOrder) {
+  mat_rsrc_ptr mat;
+
+  ASSERT_NO_THROW(store_.setCapacity(cap));
+  ASSERT_NO_THROW(store_.addAll(mats));
+  ASSERT_NO_THROW(mat = store_.removeOne());
+  ASSERT_EQ(mat, mat1_);
+  ASSERT_NO_THROW(mat = store_.removeOne());
+  ASSERT_EQ(mat, mat2_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, AddAll_OverCapacity) {
+  ASSERT_NO_THROW(store_.setCapacity(cap));
+  ASSERT_NO_THROW(store_.addAll(mats));
+
+  double toadd = cap - store_.quantity();
+  mat_rsrc_ptr overmat = mat1_.clone().setQuantity(toadd + 1.1 * STORE_EPS);
+  MatManifest overmats;
+  overmats.push_back(overmat);
+
+  ASSERT_THROW(store_.addAll(overmats), CycOverCapException);
+  ASSERT_EQ(store.count(), 2);
+  ASSERT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+
+  overmat.setQuantity(toadd + 0.9 * STORE_EPS);
+  overmats.clear();
+  overmats.push_back(overmat);
+
+  ASSERT_NO_THROW(store_.addAll(overmats));
+  ASSERT_EQ(store.count(), 3);
+
+  double expected = mat1_.quantity() + mat2_.quantity() + 0.9 * STORE_EPS;
+  ASSERT_DOUBLE_EQ(store_.quantity(), expected);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialStoreTest, AddAll_Duplicate) {
+  ASSERT_NO_THROW(store_.setCapacity(cap));
+
+  ASSERT_NO_THROW(store_.addAll(mats));
+  ASSERT_THROW(store_.addOne(mat1_), CycDupMatException);
+  ASSERT_THROW(store_.addOne(mat2_), CycDupMatException);
+  ASSERT_THROW(store_.addAll(mats), CycDupMatException);
+
+  ASSERT_EQ(store_.count(), 2);
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
 }
 
