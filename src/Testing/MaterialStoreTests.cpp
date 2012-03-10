@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 #include "IsoVector.h"
-#include "Material.h"
+#include "MaterialStore.h"
 #include "CycException.h"
 #include "Logger.h"
 
@@ -17,7 +17,7 @@ class MaterialStoreTest : public ::testing::Test {
 
     mat_rsrc_ptr mat1_;
     mat_rsrc_ptr mat2_;
-    MaterialManifest mats;
+    MatManifest mats;
 
     MaterialStore store_; // default constructed mat store
     MaterialStore filled_store_;
@@ -50,7 +50,7 @@ class MaterialStoreTest : public ::testing::Test {
 
         vect2_.setMass(oxygen, v2_m_oxygen);
         vect2_.setMass(u235, v2_m_u235);
-        vect2_.setMass(u238, v2_m_u238);
+        vect2_.setMass(pu240, v2_m_pu240);
 
         mat1_ = mat_rsrc_ptr(new Material(vect1_));
         mat2_ = mat_rsrc_ptr(new Material(vect2_));
@@ -62,7 +62,7 @@ class MaterialStoreTest : public ::testing::Test {
         cap = 334; // should be higher than mat1+mat2 masses
         low_cap = 332; // should be lower than mat1_mat2 masses
 
-        exact_qty = mat1_.quantity();
+        exact_qty = mat1_->quantity();
         exact_qty_under = exact_qty - 0.9 * STORE_EPS;
         exact_qty_over = exact_qty + 0.9 * STORE_EPS;
         under_qty = exact_qty - 1.1 * STORE_EPS;
@@ -132,24 +132,24 @@ TEST_F(MaterialStoreTest, GetSpace) {
   ASSERT_NO_THROW(store_.space());
   EXPECT_DOUBLE_EQ(store_.space(), cap);
 
-  double space = cap - (mat1_.quantity() + mat2_.quantity());
+  double space = cap - (mat1_->quantity() + mat2_->quantity());
   ASSERT_NO_THROW(filled_store_.space());
   EXPECT_DOUBLE_EQ(filled_store_.space(), space);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialStoreTest, GetQuantity) {
-  ASSERT_NO_THROW(store.quantity());
+  ASSERT_NO_THROW(store_.quantity());
   EXPECT_DOUBLE_EQ(store_.quantity(), 0.0);
 
   ASSERT_NO_THROW(filled_store_.quantity());
-  double quantity = mat1_.quantity() + mat2_.quantity();
+  double quantity = mat1_->quantity() + mat2_->quantity();
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), quantity);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialStoreTest, GetCount) {
-  ASSERT_NO_THROW(store.count());
+  ASSERT_NO_THROW(store_.count());
   EXPECT_EQ(store_.count(), 0);
 
   ASSERT_NO_THROW(filled_store_.count());
@@ -191,7 +191,6 @@ TEST_F(MaterialStoreTest, MakeLimited_Exceptions) {
 
   // be sure that unlimited status doesn't change if exceptions are thrown
   EXPECT_EQ(store_.unlimited(), true);
-  EXPECT_EQ(store_.limited(), true);
 
   ASSERT_NO_THROW(store_.makeLimited(zero_cap));
   ASSERT_NO_THROW(store_.makeLimited(cap));
@@ -218,8 +217,8 @@ TEST_F(MaterialStoreTest, MakeLimited) {
 TEST_F(MaterialStoreTest, RemoveQty_Exceptions) {
   MatManifest manifest;
   double qty = cap + 1.1 * STORE_EPS;
-  ASSERT_THROW(manifest = filled_store_.removeQty(qty), CycNegQtyException)
-  ASSERT_THROW(manifest = store_.removeQty(qty), CycNegQtyException)
+  ASSERT_THROW(manifest = filled_store_.removeQty(qty), CycNegQtyException);
+  ASSERT_THROW(manifest = store_.removeQty(qty), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -229,10 +228,10 @@ TEST_F(MaterialStoreTest, RemoveQty_NoSplitExact) {
 
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(exact_qty));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -242,10 +241,10 @@ TEST_F(MaterialStoreTest, RemoveQty_NoSplitOver) {
 
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(exact_qty_over));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -255,22 +254,22 @@ TEST_F(MaterialStoreTest, RemoveQty_NoSplitUnder) {
 
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(exact_qty_under));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialStoreTest, RemoveQty_SplitOver) {
   // remove two with splitting leaving one mat in the store
   MatManifest manifest;
-  double store_final = mat1_.quantity() + mat2_.quantity() - over_qty;
+  double store_final = mat1_->quantity() + mat2_->quantity() - over_qty;
 
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(over_qty));
   ASSERT_EQ(manifest.size(), 2);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
-  EXPECT_DOUBLE_EQ(manifest.at(1).quantity(), over_qty - mat1_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(1)->quantity(), over_qty - mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
@@ -280,11 +279,11 @@ TEST_F(MaterialStoreTest, RemoveQty_SplitOver) {
 TEST_F(MaterialStoreTest, RemoveQty_SplitUnder) {
   // remove one with splitting leaving two mats in the store
   MatManifest manifest;
-  double store_final = mat1_.quantity() + mat2_.quantity() - under_qty;
+  double store_final = mat1_->quantity() + mat2_->quantity() - under_qty;
 
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(under_qty));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), under_qty);
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), under_qty);
   EXPECT_NE(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 2);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
@@ -315,9 +314,9 @@ TEST_F(MaterialStoreTest, RemoveNum_One) {
   ASSERT_NO_THROW(manifest = filled_store_.removeNum(1));
   ASSERT_EQ(manifest.size(), 1);
   ASSERT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
-  EXPECT_DOUBLE_EQ(manifest.at(0), mat1_);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
+  EXPECT_EQ(manifest.at(0), mat1_);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -327,10 +326,10 @@ TEST_F(MaterialStoreTest, RemoveNum_Two) {
   ASSERT_NO_THROW(manifest = filled_store_.removeNum(2));
   ASSERT_EQ(manifest.size(), 2);
   ASSERT_EQ(filled_store_.count(), 0);
-  EXPECT_DOUBLE_EQ(manifest.at(0).quantity(), mat1_.quantity());
-  EXPECT_DOUBLE_EQ(manifest.at(0), mat1_);
-  EXPECT_DOUBLE_EQ(manifest.at(1).quantity(), mat2_.quantity());
-  EXPECT_DOUBLE_EQ(manifest.at(1), mat2_);
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
+  EXPECT_EQ(manifest.at(0), mat1_);
+  EXPECT_DOUBLE_EQ(manifest.at(1)->quantity(), mat2_->quantity());
+  EXPECT_EQ(manifest.at(1), mat2_);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
 }
 
@@ -339,13 +338,13 @@ TEST_F(MaterialStoreTest, RemoveOne) {
   mat_rsrc_ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.removeOne());
-  EXPECT_DOUBLE_EQ(mat.quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
   EXPECT_EQ(mat, mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 
   ASSERT_NO_THROW(mat = filled_store_.removeOne());
-  EXPECT_DOUBLE_EQ(mat.quantity(), mat2_.quantity());
+  EXPECT_DOUBLE_EQ(mat->quantity(), mat2_->quantity());
   EXPECT_EQ(mat, mat2_);
   EXPECT_EQ(filled_store_.count(), 0);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
@@ -359,11 +358,11 @@ TEST_F(MaterialStoreTest, AddOne) {
 
   ASSERT_NO_THROW(store_.addOne(mat1_));
   ASSERT_EQ(store_.count(), 1);
-  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
 
   ASSERT_NO_THROW(store_.addOne(mat2_));
   ASSERT_EQ(store_.count(), 2);
-  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -374,17 +373,18 @@ TEST_F(MaterialStoreTest, AddOne_OverCapacity) {
   ASSERT_NO_THROW(store_.addOne(mat2_));
 
   double toadd = cap - store_.quantity();
-  mat_rsrc_ptr overmat = mat1_.clone().setQuantity(toadd + 1.1 * STORE_EPS);
+  mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
+  overmat->setQuantity(toadd + 1.1 * STORE_EPS);
 
   ASSERT_THROW(store_.addOne(overmat), CycOverCapException);
-  ASSERT_EQ(store.count(), 2);
-  ASSERT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+  ASSERT_EQ(store_.count(), 2);
+  ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat.setQuantity(toadd + 0.9 * STORE_EPS);
+  overmat->setQuantity(toadd + 0.9 * STORE_EPS);
   ASSERT_NO_THROW(store_.addOne(overmat));
-  ASSERT_EQ(store.count(), 3);
+  ASSERT_EQ(store_.count(), 3);
 
-  double expected = mat1_.quantity() + mat2_.quantity() + 0.9 * STORE_EPS;
+  double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
   ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
@@ -396,7 +396,7 @@ TEST_F(MaterialStoreTest, AddOne_Duplicate) {
   ASSERT_THROW(store_.addOne(mat1_), CycDupMatException);
 
   ASSERT_EQ(store_.count(), 1);
-  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity());
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -404,7 +404,7 @@ TEST_F(MaterialStoreTest, AddAll) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.addAll(mats));
   ASSERT_EQ(store_.count(), 2);
-  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -434,22 +434,23 @@ TEST_F(MaterialStoreTest, AddAll_OverCapacity) {
   ASSERT_NO_THROW(store_.addAll(mats));
 
   double toadd = cap - store_.quantity();
-  mat_rsrc_ptr overmat = mat1_.clone().setQuantity(toadd + 1.1 * STORE_EPS);
+  mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
+  overmat->setQuantity(toadd + 1.1 * STORE_EPS);
   MatManifest overmats;
   overmats.push_back(overmat);
 
   ASSERT_THROW(store_.addAll(overmats), CycOverCapException);
-  ASSERT_EQ(store.count(), 2);
-  ASSERT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+  ASSERT_EQ(store_.count(), 2);
+  ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat.setQuantity(toadd + 0.9 * STORE_EPS);
+  overmat->setQuantity(toadd + 0.9 * STORE_EPS);
   overmats.clear();
   overmats.push_back(overmat);
 
   ASSERT_NO_THROW(store_.addAll(overmats));
-  ASSERT_EQ(store.count(), 3);
+  ASSERT_EQ(store_.count(), 3);
 
-  double expected = mat1_.quantity() + mat2_.quantity() + 0.9 * STORE_EPS;
+  double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
   ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
@@ -463,6 +464,6 @@ TEST_F(MaterialStoreTest, AddAll_Duplicate) {
   ASSERT_THROW(store_.addAll(mats), CycDupMatException);
 
   ASSERT_EQ(store_.count(), 2);
-  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_.quantity() + mat2_.quantity());
+  EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 

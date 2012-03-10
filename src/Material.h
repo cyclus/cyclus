@@ -18,7 +18,7 @@
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
 
-/**
+/*!
    @class Material
   
    @brief The Cyclus Material class provides the data structure that supports 
@@ -56,7 +56,6 @@ typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
    object. An IsoVector containing the desired composition and mass properties
    should be configured prior to the material object creation 
 */
-
 class Material : public Resource {
 public:
   /**

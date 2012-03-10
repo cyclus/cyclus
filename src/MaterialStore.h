@@ -16,7 +16,7 @@ class CycNegQtyException: public CycException {
   public: CycNegQtyException(std::string msg) : CycException(msg) {};
 };
 class CycDupMatException: public CycException {
-  public: CycNegQtyException(std::string msg) : CycException(msg) {};
+  public: CycDupMatException(std::string msg) : CycException(msg) {};
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

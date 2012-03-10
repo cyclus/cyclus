@@ -10,7 +10,7 @@ MaterialStore::MaterialStore() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-virtual MaterialStore::~MaterialStore() { }
+MaterialStore::~MaterialStore() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::capacity() {
@@ -22,27 +22,30 @@ double MaterialStore::capacity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MaterialStore::setCapacity(double cap) {
-  if (cap < quantity()) {
+  if (quantity() - cap > STORE_EPS) {
     throw CycOverCapException("New capacity lower than existing quantity");
   }
-
   capacity_ = cap;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int MaterialStore::count() {
+  return mats_.size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::quantity() {
+  return 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::space() {
+  return 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool MaterialStore::unlimited() {
+  return false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,14 +58,20 @@ void MaterialStore::makeLimited(double cap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MaterialStore::removeQty(double qty) {
+  MatManifest manifest;
+  return manifest;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MaterialStore::removeNum(int num) {
+  MatManifest manifest;
+  return manifest;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr MaterialStore::removeOne() {
+  mat_rsrc_ptr mat(new Material());
+  return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
