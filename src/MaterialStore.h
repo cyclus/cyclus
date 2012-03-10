@@ -15,6 +15,9 @@ class CycOverCapException: public CycException {
 class CycNegQtyException: public CycException {
   public: CycNegQtyException(std::string msg) : CycException(msg) {};
 };
+class CycDupMatException: public CycException {
+  public: CycNegQtyException(std::string msg) : CycException(msg) {};
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -130,6 +133,9 @@ public:
 
   @throws CycOverCapException the addition of the given material object would
   cause the store to exceed its capacity.
+
+  @throws CycDupMatException the material object to be added is already present
+  in the store.
   */
   void addOne(mat_rsrc_ptr mat);
 
@@ -143,6 +149,9 @@ public:
 
   @throws CycOverCapException the addition of the given material objects would
   cause the store to exceed its capacity.
+
+  @throws CycDupMatException one or more of the material objects to be added
+  are already present in the store.
   */
   void addAll(std::vector<mat_rsrc_ptr> mats);
 
