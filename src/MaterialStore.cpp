@@ -40,20 +40,26 @@ double MaterialStore::quantity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::space() {
-  return 0;
+  if (unlimited_) {
+    return -1;
+  }
+  return capacity_ - quantity();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool MaterialStore::unlimited() {
-  return false;
+  return unlimited_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MaterialStore::makeUnlimited() {
+  unlimited_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MaterialStore::makeLimited(double cap) {
+  setCapacity(cap);
+  unlimited_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
