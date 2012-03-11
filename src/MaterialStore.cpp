@@ -35,7 +35,11 @@ int MaterialStore::count() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::quantity() {
-  return 0;
+  double tot = 0;
+  for (int i = 0; i < mats_.size(); i++) {
+    tot += mats_.at(i).quantity();
+  }
+  return tot;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
