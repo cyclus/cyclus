@@ -4,6 +4,7 @@
 
 #include "CycException.h"
 #include "Material.h"
+#include <list>
 
 #define STORE_EPS 1e-6
 
@@ -164,7 +165,7 @@ private:
   double capacity_;
 
   /// list of constituent material objects forming the store's inventory
-  std::vector<mat_rsrc_ptr> mats_;
+  std::list<mat_rsrc_ptr> mats_;
 
 };
 

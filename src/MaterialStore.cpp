@@ -36,8 +36,10 @@ int MaterialStore::count() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MaterialStore::quantity() {
   double tot = 0;
-  for (int i = 0; i < mats_.size(); i++) {
-    tot += mats_.at(i).quantity();
+  std::list<mat_rsrc_ptr>::iterator iter = mats_.begin();
+  while (iter != mats_.end()) {
+    tot += (*iter)->quantity();
+    iter++;
   }
   return tot;
 }
@@ -68,7 +70,35 @@ void MaterialStore::makeLimited(double cap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MaterialStore::removeQty(double qty) {
+  if (qty - quantity() > STORE_EPS) {
+    throw CycNegQtyException("Removal quantity larger than store tot quantity.");
+  }
+  if (qty < 0.0) {
+    throw CycNegQtyException("Removal quantity cannot be negative.");
+  }
+
   MatManifest manifest;
+  MatManifest::iterator iter;
+  mat_rsrc_ptr mat, leftover;
+  double left = qty;
+  double added = 0;
+
+  while (true) {
+    mat = mats_.front();
+    if (fabs(mat->quantity() - left) < STORE_EPS) {
+      // mat small enough to not be split
+      mats_.pop_front();
+      manifest.push_back(mat);
+      added += mat->quantity();
+    } else {
+      // split the mat before adding
+      leftover = mat->extract(mat->quantity() - left);
+      mats_.pop_front();
+      mats_.push_front(leftover);
+      manifest.push_back(mat);
+      break;
+    }
+  }
   return manifest;
 }
 
