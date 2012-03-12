@@ -302,7 +302,7 @@ TEST_F(DeckStoreTest, RemoveQty_SplitOverFilled) {
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(over_qty));
   ASSERT_EQ(manifest.size(), 2);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_DOUBLE_EQ(manifest.at(1)->quantity(), over_qty - mat1_->quantity());
+  EXPECT_NEAR(manifest.at(1)->quantity(), over_qty - mat1_->quantity(), STORE_EPS);
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
@@ -317,7 +317,7 @@ TEST_F(DeckStoreTest, RemoveQty_SplitUnderFilled) {
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(under_qty));
   ASSERT_EQ(manifest.size(), 1);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), under_qty);
-  EXPECT_NE(manifest.at(0), mat1_);
+  EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 2);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
 }
@@ -418,7 +418,7 @@ TEST_F(DeckStoreTest, AddOne_OverCapacityEmpty) {
   ASSERT_EQ(store_.count(), 3);
 
   double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
-  ASSERT_DOUBLE_EQ(store_.quantity(), expected);
+  ASSERT_NEAR(store_.quantity(), expected, STORE_EPS);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -484,7 +484,7 @@ TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
   ASSERT_EQ(store_.count(), 3);
 
   double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
-  ASSERT_DOUBLE_EQ(store_.quantity(), expected);
+  ASSERT_NEAR(store_.quantity(), expected, STORE_EPS);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

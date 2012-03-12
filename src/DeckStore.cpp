@@ -36,10 +36,9 @@ int DeckStore::count() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double DeckStore::quantity() {
   double tot = 0;
-  std::list<mat_rsrc_ptr>::iterator iter = mats_.begin();
-  while (iter != mats_.end()) {
+  std::list<mat_rsrc_ptr>::iterator iter;
+  for (iter = mats_.begin(); iter != mats_.end(); iter++) {
     tot += (*iter)->quantity();
-    iter++;
   }
   return tot;
 }
@@ -78,50 +77,87 @@ MatManifest DeckStore::removeQty(double qty) {
   }
 
   MatManifest manifest;
-  MatManifest::iterator iter;
   mat_rsrc_ptr mat, leftover;
   double left = qty;
-
-  while (true) {
+  double quan;
+  while (left > STORE_EPS) {
     mat = mats_.front();
-    if (fabs(mat->quantity() - left) < STORE_EPS) {
-      // mat small enough to not be split
-      mats_.pop_front();
+    mats_.pop_front();
+    quan = mat->quantity();
+    if ((quan - left) <= STORE_EPS) {
+      // exact match - add entire mat
       manifest.push_back(mat);
-      left -= mat->quantity();
+    } else if (quan < left) {
+      // less than remaining diff - add entire mat
+      manifest.push_back(mat);
     } else {
-      // split the mat before adding
-      leftover = mat->extract(mat->quantity() - left);
-      mats_.pop_front();
-      mats_.push_front(leftover);
+      // too big - split the mat before adding
+      leftover = mat->extract(quan - left);
       manifest.push_back(mat);
-      break;
+      mats_.push_front(leftover);
     }
+    left -= quan;
   }
   return manifest;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest DeckStore::removeNum(int num) {
+  if (mats_.size() < num) {
+    throw CycNegQtyException("Remove count larger than store count.");
+  }
+
   MatManifest manifest;
+  for (int i = 0; i < num; i++) {
+    manifest.push_back(mats_.front());
+    mats_.pop_front();
+  }
   return manifest;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr DeckStore::removeOne() {
-  mat_rsrc_ptr mat(new Material());
+  if (mats_.size() < 1) {
+    throw CycNegQtyException("Cannot remove material from an empty store.");
+  }
+  mat_rsrc_ptr mat = mats_.front();
+  mats_.pop_front();
   return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DeckStore::addOne(mat_rsrc_ptr mat) {
-  if (mat->quantity() > space() + STORE_EPS) {
+  if (mat->quantity() - space() > STORE_EPS) {
     throw CycOverCapException("Material addition breaks capacity limit.");
+  }
+  std::list<mat_rsrc_ptr>::iterator iter;
+  for (iter = mats_.begin(); iter != mats_.end(); iter++) {
+    if ((*iter) == mat) {
+      throw CycDupMatException("Duplicate material addition attempted.");
+    }
   }
   mats_.push_back(mat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DeckStore::addAll(MatManifest mats) {
+  double tot_qty = 0;
+  for (int i = 0; i < mats.size(); i++) {
+    tot_qty += mats.at(i)->quantity();
+  }
+  if (tot_qty - space() > STORE_EPS) {
+    throw CycOverCapException("Material addition breaks capacity limit.");
+  }
+  std::list<mat_rsrc_ptr>::iterator iter;
+  for (iter = mats_.begin(); iter != mats_.end(); iter++) {
+    for (int i = 0; i < mats.size(); i++) {
+      if ((*iter) == mats.at(i)) {
+        throw CycDupMatException("Duplicate material addition attempted.");
+      }
+    }
+  }
+  for (int i = 0; i < mats.size(); i++) {
+    mats_.push_back(mats.at(i));
+  }
 }
 
