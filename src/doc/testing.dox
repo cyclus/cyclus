@@ -1,0 +1,236 @@
+
+/**
+
+@page testing Testing Cyclus
+@brief A discussion of concepts and guidelines for creating tests within Cyclus. 
+
+@section googletest Google Test Framework 
+
+The Cyclus code uses the 
+<a href="http://code.google.com/p/googletest/"> Google Testing Framework.</a>
+is a tool which will assist Cyclus developers in incorporating tests for their 
+modules. The framework is integrated with `CMake` with the use of gtest.cc 
+gtest_main.cc and gtest.h.  The Google Test 
+<a href="http://code.google.com/p/googletest/wiki/Primer">primer</a>
+is recommended as an introduction to the fundamental 
+concepts of unitesting with Google Test.
+
+@section unittests Unit Tests
+  Unit tests are written for each new unit of functionality to assure 
+  correct behavior. A Cyclus unit test should:
+    * Sufficiently verify the expected behavior of a unit of functionality
+    * Sufficiently verify expected behavior for boundary cases 
+    * Be written simply 
+
+  A good tutorial on how to write good unit tests can be found at 
+  <a 
+  href="http://software-carpentry.org/4_0/test/introduction/">software-carpentry.org</a>.
+
+  
+  Cyclus test coverage should mimic the hierarchical structure of the source 
+  code. Each class should have a corresponding Test Case that challenges the 
+  robustness of its interface.
+  
+  An interface consists of the functions, 
+  constructors, and data retrievers with which the rest of the code interacts 
+  with that class. Each of these functions, constructors, and data retrievers 
+  should be challenged by a Test within the Test Case for that class. 
+  
+  
+  Many of 
+  these tests will require the use of Fixtures, which will represent canonical 
+  Cyclus objects such as Materials, Commodities, Markets, Facilities and 
+  Messages. These Fixtures will be shared by many Tests and sometimes many Test 
+  Cases.
+
+  To create a Test Case and a suite of Tests for the ToasterFacility
+
+@section acceptancetests Acceptance Tests 
+
+  If you are a developer, you may write a module that is intended to be a 
+  concrete implementation of a FacilityModel or other interface type.
+
+  To ensure that your code satisfies the basic requirements of the interface
+  which it is intended to be satisfy, the Cyclus core developers have 
+  created parameterized abstract interface tests that must be instantiated with 
+  your concrete model in order for it to be accepted into the cyclus module 
+  library. 
+
+  The interface for our ToasterFacility can be tested by including 
+  FacilityModelTests.h in the beginning of the file, ensuring that 
+  FacilityModelTests.cpp is linked to the CyclusUnitTestDriver executable, and 
+  declaring the implementation of the parameterized test by providing a 
+  reference to a constructor to a concrete ToasterFaclity.
+  
+  @code 
+  // ToasterFacilityTests.cpp
+  #include <gtest/gtest.h>
+  #include "FacilityModelTests.h"
+
+  FacilityModel* ToasterFacilityConstructor(){
+    return new ToasterFaclity();
+  }
+
+  INSTANTIATE_TEST_CASE_P(ToasterFac, 
+                          FacilityModelTests, 
+                          Values(&ToasterFacilityConstructor));
+  @endcode
+
+@section testcases Test Cases
+
+  Test Cases are logical groupings of Tests. For Cyclus, each class, such as the 
+  ToasterFacility should have its own Test Case defined within a file called 
+  ToasterFacilityTests.cpp or something similar. 
+  
+  The ToasterFacilityTests.cpp file should be placed in the 
+  appropriate directory within the code as well. Specifically, it should be 
+  placed in the trunk/src/Facility/ToasterFacility/ folder with the other 
+  ToasterFacility files. 
+
+  The Test Case is a class declared in this file. The Cyclus convention is to 
+  give the class the same name as the file. For the ToasterFacility, this class 
+  will look like:
+
+  @code
+  // ToasterFacilityTests.cpp
+  #include <gtest/gtest.h>
+  #include "ToasterFacility.h"
+
+  using namespace std;
+
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  class ToasterFacilityTest : public ::testing::Test {
+  protected:
+    virtual void SetUp(){
+    };
+
+    virtual void TearDown() {
+    }
+  };
+
+  @endcode
+
+@section tests Tests with Fixtures
+
+Tests are performed on single units of functionality within Cyclus. For Cyclus, 
+  imagine that the ToasterFacility class has a function called addHeat(double 
+  to_set) which increases the current_bread_temp_ data member value. Knowing 
+  very little about the function, we should check that if to_set is positive, 
+  the current_bread_temp_ increases, and if to_set is negative, the 
+  current_bread_temp_ decreases. 
+  
+  A test within the ToasterFacilityTest Test Case will need to utilize a 
+  concrete instance of a ToasterFacility to check this. 
+  
+  To test the internals of the ToasterFacility class, such as private data 
+  members like current_bread_temp_ a fixture needs to be created in the setup 
+  step. A very simple class is created in order to supply a public getter 
+  function for the current_bread_temp_ variable.
+
+
+  @code
+  // ToasterFacilityTests.cpp
+  #include <gtest/gtest.h>
+  #include "ToasterFacility.h"
+  #include "TestInst.h"
+  #include "CycException.h"
+
+  using namespace std;
+
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  class FakeToasterFacility : public ToasterFacility {
+    public:
+      FakeToasterFacility() : ToasterFacility() {
+      }
+
+      virtual ~FakeToasterFacility() {
+      }
+
+      double getBreadTemp(){return current_bread_temp_;
+  };
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  class ToasterFacilityTest : public ::testing::Test {
+  protected:
+    FakeToasterFacility* src_facility;
+
+    virtual void SetUp(){
+      src_facility = new FakeToasterFacility();
+      src_facility->setParent(new TestInst());
+    };
+
+    virtual void TearDown() {
+      delete src_facility;
+    }
+  };
+  @endcode 
+
+  For a tutorial on the 
+  use of Googletest for creating and using Fixtures, please see the Googletest 
+  primer section on 
+  <a href="http://code.google.com/p/googletest/wiki/Primer#Test_Fixtures:_Using_the_Same_Data_Configuration_for_Multiple_Te">fixtures</a>.
+
+Now that the fixture setup and teardown are in place, it is possible to add a
+test (with access to the fixture to ToasterFacilityTests.cpp.
+
+  @code
+  //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+  TEST_F(ToasterFacilityTest, AddingHeat) {
+    double original_temp = src_facility->getBreadTemp();
+    EXPECT_NO_THROW( src_facility->addHeat(2.0) );
+    double warm_temp = src_facility->getBreadTemp(); 
+    EXPECT_GT(warm_temp, original_temp;)
+    EXPECT_NO_THROW( src_facility->addHeat(-2.0) );
+    double cool_temp = src_facility->getBreadTemp(); 
+    EXPECT_LT(cool_temp, warm_temp;)
+  }
+  @endcode
+
+
+
+@section assertions Assertions 
+
+  As in the example above, Each test will be one or more assertions. Assertions
+  test various truth expectations for the boundary cases that might be 
+  encountered by the function.  
+  
+  With the Google Test framework, it is easy to make some assertions 
+  fatal and some nonfatal. That is, for nonfatal assertions, the test continues 
+  but for fatal assertions the test ceases to continue. In googletest, fatal 
+  assertions are called with the macros that begin with the word EXPECT 
+  (EXPECT_EQ(), EXPECT_LE(), EXPECT_GE()...). For things that absolutely must be 
+  the case for us to trust the results of following tests, 
+
+  @code
+  TEST_F(ToasterFacilityTests, addZeroHeat){
+    double original_temp = src_facility->getBreadTemp();
+    EXPECT_NO_THROW( src_facility->addHeat(0.0) );
+    double new_temp = src_facility->getBreadTemp(); 
+    EXPECT_EQ(new_temp, original_temp);
+  }
+  @endcode
+  
+  Nonfatal assertions are macros that 
+  begin with ASSERT (ASSERT_EQ(), ASSERT_LE(), ...). 
+
+  @code
+  TEST_F(FooTest, heatTransfer){
+    double original_temp = src_facility->getBreadTemp();
+    src_facility->addHeat(2.0);
+    double new_temp = src_facility->getBreadTemp(); 
+    ASSERT_EQ((original_temp+2.0),new_temp);
+  }
+  @endcode
+  
+  For more information on the googletest assertion syntax please see the 
+  Googletest primer section on <a href=http://code.google.com/p/googletest/wiki/Primer#Assertions">assertions</a>.
+
+
+@section runningtests Running the Tests 
+
+  The tests have been incorporated into the default cmake build process.
+  To run the test suite, build cyclus and run they `CyclusUnitTestDriver` 
+  executible that was built in the Testing directory within your build directory.
+  
+  */
+
+
