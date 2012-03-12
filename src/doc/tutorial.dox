@@ -1,5 +1,4 @@
-
-/*!
+/**
 @page tutorial Tutorial for Adding a New Model
 
 This tutorial will take a developer through all the steps necessary to
@@ -39,5 +38,5 @@ capacity (number of slices), power (kW).
    -# Run tests
 -# write documentation for your agent module
 
-*/
+ */
 

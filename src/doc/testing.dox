@@ -1,5 +1,4 @@
-
-/*!
+/**
 
 @page testing Testing Cyclus
 @brief A discussion of concepts and guidelines for creating tests within Cyclus. 
@@ -231,6 +230,6 @@ test (with access to the fixture to ToasterFacilityTests.cpp.
   To run the test suite, build cyclus and run they `CyclusUnitTestDriver` 
   executible that was built in the Testing directory within your build directory.
   
-  */
+ */
 
 
