@@ -27,12 +27,16 @@ table_ptr IsoVector::iso_table = new Table("IsotopicStates");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
+  mass_out_of_date_ = true;
+  total_mass_ = 0;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector(CompMap initial_comp) {
   ID_ = nextID_++;
   atom_comp_ = initial_comp;
+  total_mass_ = 0;
+  mass_out_of_date_ = true;
 
   validateComposition();
 };
@@ -40,7 +44,9 @@ IsoVector::IsoVector(CompMap initial_comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector(xmlNodePtr cur) {
   ID_ = nextID_++;
-  
+  total_mass_ = 0;
+  mass_out_of_date_ = true;
+
   string recipe_name = XMLinput->get_xpath_content(cur,"name");
   string comp_type = XMLinput->get_xpath_content(cur,"basis");
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
@@ -183,6 +189,7 @@ IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
     }
     sum_comp[isotope] += rhs_atoms;
   }
+  mass_out_of_date_ = true;
 
   IsoVector temp(sum_comp);
   return (temp);
@@ -258,24 +265,26 @@ int IsoVector::getMassNum(int tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass() {
-  double mass_val = 0;
-  int isotope;
+  if (mass_out_of_date_) {
+    total_mass_ = 0;
+    int isotope;
 
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    mass_val += mass(isotope);
-    iter++;
+    map<int, double>::const_iterator iter = atom_comp_.begin();
+    while (iter != atom_comp_.end()) {
+      isotope = iter->first;
+      total_mass_ += mass(isotope);
+      iter++;
+    }
+    mass_out_of_date_ = false;
   }
 
-  return mass_val;
+  return total_mass_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass(int tope) {
   validateIsotopeNumber(tope);
 
-  double grams_per_atom;
   int grams_per_kg = 1000;
   double grams_per_mole = MT->getMassInGrams(tope);
 
@@ -304,6 +313,8 @@ void IsoVector::setMass(double new_mass) {
     atom_comp_[isotope] = atom_comp_[isotope] * ratio;
     iter++;
   }
+  mass_out_of_date_ = false;
+  total_mass_ = new_mass;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -315,9 +326,12 @@ void IsoVector::setMass(int tope, double new_mass) {
     throw CycRangeException(err_msg);
   }
 
-  double grams_per_atom;
+  if (!mass_out_of_date_) {
+    total_mass_ += new_mass - mass(tope);
+  }
+
   int grams_per_kg = 1000;
-  grams_per_atom = MT->getMassInGrams(tope);
+  double grams_per_atom = MT->getMassInGrams(tope);
   atom_comp_[tope] = new_mass * grams_per_kg / grams_per_atom;
 }
 
@@ -329,6 +343,10 @@ void IsoVector::multBy(double factor) {
     isotope = iter->first;
     atom_comp_[isotope] = atom_comp_[isotope] * factor;
     iter++;
+  }
+
+  if (!mass_out_of_date_) {
+    total_mass_ *= factor;
   }
 }
 
@@ -375,6 +393,8 @@ void IsoVector::setAtomCount(double new_count) {
     atom_comp_[isotope] = atom_comp_[isotope] * ratio;
     iter++;
   }
+
+  mass_out_of_date_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -387,6 +407,8 @@ void IsoVector::setAtomCount(int tope, double new_count) {
   }
 
   atom_comp_[tope] = new_count;
+
+  mass_out_of_date_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -467,13 +489,14 @@ void IsoVector::validateIsotopeNumber(int tope) {
 bool IsoVector::isZero(int tope) {
   validateIsotopeNumber(tope);
 
-  int grams_per_kg = 1000;
-  double atoms_eps = EPS_KG * grams_per_kg / MT->getMassInGrams(tope) ; 
-
   if (atom_comp_.count(tope) == 0) {
     return true;
   }
-  return (fabs(atom_comp_[tope]) < atoms_eps);
+
+  int grams_per_kg = 1000;
+  double grams_per_mole = MT->getMassInGrams(tope) ; 
+
+  return (atom_comp_[tope] * grams_per_mole / grams_per_kg < EPS_KG);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
