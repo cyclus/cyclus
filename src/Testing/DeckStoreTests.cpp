@@ -417,8 +417,8 @@ TEST_F(DeckStoreTest, AddOne_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.addOne(overmat));
   ASSERT_EQ(store_.count(), 3);
 
-  double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
-  ASSERT_NEAR(store_.quantity(), expected, STORE_EPS);
+  double expected = mat1_->quantity() + mat2_->quantity() + overmat->quantity();
+  ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -483,13 +483,13 @@ TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.addAll(overmats));
   ASSERT_EQ(store_.count(), 3);
 
-  double expected = mat1_->quantity() + mat2_->quantity() + 0.9 * STORE_EPS;
-  ASSERT_NEAR(store_.quantity(), expected, STORE_EPS);
+  double expected = mat1_->quantity() + mat2_->quantity() + overmat->quantity();
+  ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(DeckStoreTest, AddAll_DuplicateEmpty) {
-  ASSERT_NO_THROW(store_.setCapacity(cap));
+  ASSERT_NO_THROW(store_.setCapacity(2 * cap));
 
   ASSERT_NO_THROW(store_.addAll(mats));
   ASSERT_THROW(store_.addOne(mat1_), CycDupMatException);
