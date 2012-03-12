@@ -116,6 +116,10 @@ mat_rsrc_ptr MaterialStore::removeOne() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MaterialStore::addOne(mat_rsrc_ptr mat) {
+  if (mat->quantity() + space() > capacity_ + STORE_EPS) {
+    throw CycOverCapException("Material addition breaks capacity limit.");
+  }
+  mats_.push_back(mat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
