@@ -1,29 +1,15 @@
-// MaterialStore.h
-#if !defined(_MATERIALSTORE_H)
-#define _MATERIALSTORE_H
+// DeckStore.h
+#if !defined(_DECKSTORE_H)
+#define _DECKSTORE_H
 
-#include "CycException.h"
-#include "Material.h"
+#include "MatStore.h"
 #include <list>
-
-#define STORE_EPS 1e-6
+#include <vector>
 
 typedef std::vector<mat_rsrc_ptr> MatManifest;
 
-class CycOverCapException: public CycException {
-  public: CycOverCapException(std::string msg) : CycException(msg) {};
-};
-class CycNegQtyException: public CycException {
-  public: CycNegQtyException(std::string msg) : CycException(msg) {};
-};
-class CycDupMatException: public CycException {
-  public: CycDupMatException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 /*!
-MaterialStore is a helper function that provides semi-automated management of
+DeckStore is a helper function that provides semi-automated management of
 material resource buffers (e.g. model stocks and inventories).
 
 Methods that begin with a "set", "make", "add", or "remove" prefix change the
@@ -31,13 +17,13 @@ state/behavior of the store; other methods do not.  Default constructed
 material store has zero (finite) capacity. Resource removal occurs in the order
 the resources were added (i.e. oldest materials are removed first).
 */
-class MaterialStore {
+class DeckStore: public MatStore {
 
 public:
 
-  MaterialStore();
+  DeckStore();
 
-  virtual ~MaterialStore();
+  virtual ~DeckStore();
 
   /*!
   capacity returns the maximum resource quantity this store can hold (units
@@ -116,7 +102,7 @@ public:
   std::vector<mat_rsrc_ptr> removeNum(int num);
 
   /*!
-  removeOne removes the one material objects from the store.
+  removeOne removes one material object from the store.
 
   Materials are not split.  Materials are retrieved in the order they were
   added (i.e. oldest first).

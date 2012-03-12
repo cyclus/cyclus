@@ -45,7 +45,7 @@ SET( CYCLUS_CORE
   Resource.cpp
   GenericResource.cpp
   Material.cpp
-  MaterialStore.cpp
+  DeckStore.cpp
   Message.cpp
   Utility/BookKeeper.cpp 
   Utility/Database.cpp
