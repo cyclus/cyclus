@@ -28,6 +28,7 @@ class DeckStoreTest : public ::testing::Test {
     double exact_qty_over; // mass in filled_store + 0.9*STORE_EPS
     double over_qty;  // mass in filled_store - 1.1*STORE_EPS
     double under_qty; // mass in filled_store + 1.1*STORE_EPS
+    double overeps, undereps;
 
     virtual void SetUp() {
       try {
@@ -62,11 +63,13 @@ class DeckStoreTest : public ::testing::Test {
         cap = 334; // should be higher than mat1+mat2 masses
         low_cap = 332; // should be lower than mat1_mat2 masses
 
+        undereps = 0.9 * STORE_EPS;
+        overeps = 1.1 * STORE_EPS;
         exact_qty = mat1_->quantity();
-        exact_qty_under = exact_qty - 0.9 * STORE_EPS;
-        exact_qty_over = exact_qty + 0.9 * STORE_EPS;
-        under_qty = exact_qty - 1.1 * STORE_EPS;
-        over_qty = exact_qty + 1.1 * STORE_EPS;
+        exact_qty_under = exact_qty - undereps;
+        exact_qty_over = exact_qty + undereps;
+        under_qty = exact_qty - overeps;
+        over_qty = exact_qty + overeps;
 
         filled_store_.setCapacity(cap);
         filled_store_.addOne(mat1_);
@@ -243,14 +246,14 @@ TEST_F(DeckStoreTest, MakeLimited_Filled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(DeckStoreTest, RemoveQty_ExceptionsEmpty) {
   MatManifest manifest;
-  double qty = cap + 1.1 * STORE_EPS;
+  double qty = cap + overeps;
   ASSERT_THROW(manifest = filled_store_.removeQty(qty), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(DeckStoreTest, RemoveQty_ExceptionsFilled) {
   MatManifest manifest;
-  double qty = cap + 1.1 * STORE_EPS;
+  double qty = cap + overeps;
   ASSERT_THROW(manifest = store_.removeQty(qty), CycNegQtyException);
 }
 
@@ -302,8 +305,9 @@ TEST_F(DeckStoreTest, RemoveQty_SplitOverFilled) {
   ASSERT_NO_THROW(manifest = filled_store_.removeQty(over_qty));
   ASSERT_EQ(manifest.size(), 2);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_NEAR(manifest.at(1)->quantity(), over_qty - mat1_->quantity(), STORE_EPS);
+  EXPECT_NEAR(manifest.at(1)->quantity(), overeps, STORE_EPS); // not sure why DOUBLE_EQ doesn't work
   EXPECT_EQ(manifest.at(0), mat1_);
+  EXPECT_EQ(manifest.at(1), mat2_);
   EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
 }
@@ -407,13 +411,13 @@ TEST_F(DeckStoreTest, AddOne_OverCapacityEmpty) {
 
   double toadd = cap - store_.quantity();
   mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
-  overmat->setQuantity(toadd + 1.1 * STORE_EPS);
+  overmat->setQuantity(toadd + overeps);
 
   ASSERT_THROW(store_.addOne(overmat), CycOverCapException);
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat->setQuantity(toadd + 0.9 * STORE_EPS);
+  overmat->setQuantity(toadd + undereps);
   ASSERT_NO_THROW(store_.addOne(overmat));
   ASSERT_EQ(store_.count(), 3);
 
@@ -468,7 +472,7 @@ TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
 
   double toadd = cap - store_.quantity();
   mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
-  overmat->setQuantity(toadd + 1.1 * STORE_EPS);
+  overmat->setQuantity(toadd + overeps);
   MatManifest overmats;
   overmats.push_back(overmat);
 
@@ -476,7 +480,7 @@ TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat->setQuantity(toadd + 0.9 * STORE_EPS);
+  overmat->setQuantity(toadd + undereps);
   overmats.clear();
   overmats.push_back(overmat);
 
