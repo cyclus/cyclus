@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
+#include "DeckStore.h"
 
 /**
    @class SourceFacility
@@ -173,8 +174,9 @@ class SourceFacility : public FacilityModel  {
    */
   virtual void handleTock(int time);
 
-/* ------------------- */ 
+  double inventory() {return inventory_.quantity();}
 
+  double capacity() {return capacity_;}
 
 /* --------------------
  * _THIS_ FACILITYMODEL class has these members
@@ -195,18 +197,6 @@ class SourceFacility : public FacilityModel  {
    * @brief  Name of the recipe this facility uses.
    */
   std::string recipe_name_;
-  
-  /**
-   * @brief  The capacity is defined in terms of the number of units of the recipe
-   *  that can be provided each time step.  A very large number can be
-   *  provided to represent infinte capacity.
-   */
-  double capacity_;
-
-  /**
-   * @brief  The maximum size (in mass) that the inventory can grow to.
-   */
-  int inventory_size_;
 
   /**
    * @brief The price that the facility will charge for its output commodity.
@@ -215,27 +205,13 @@ class SourceFacility : public FacilityModel  {
   double commod_price_;
 
   /**
-   * @brief A collection  that holds the "product" Material this Facility has on hand 
-   * to send to others. For instance, a Reactor's inventory is its collection of 
-   * old fuel assemblies that have come out of the core.
-   */ 
-  std::deque<mat_rsrc_ptr> inventory_;
-  
-  /**
    * @brief A list of orders to be processed on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * @brief return the total mass of the material objects in the inventory
-   * the units vary and are associated with with material type
-   */
-  double inventoryMass();
-
-  /**
    * @brief generates a material at a given time
-   * @param curr_time the current simulation time period
-   */
+   * @param curr_time the current simulation time period */
   void generateMaterial(int curr_time);
 
   /**
@@ -253,8 +229,21 @@ class SourceFacility : public FacilityModel  {
    */
   int prev_time_;
 
-/* ------------------- */ 
+  /**
+   * @brief  The capacity is defined in terms of the number of units of the recipe
+   *  that can be provided each time step.  A very large number can be
+   *  provided to represent infinte capacity.
+   */
+  double capacity_;
 
+private:
+
+  /**
+   * A collection  that holds the "product" Material this Facility has on hand 
+   * to send to others.
+   */ 
+  DeckStore inventory_;
+  
 };
 
 #endif
