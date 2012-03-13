@@ -22,7 +22,7 @@ MatStore is an abstract class that defines an interface for helper classes that
 provide semi-automated management of material resource buffers (e.g. model
 stocks and inventories).
 
-Methods that begin with a "set", "make", "add", or "remove" prefix change the
+Methods that begin with a "set", "make", "push", or "pop" prefix change the
 state/behavior of the store; other methods do not.
 */
 class MatStore {
@@ -71,27 +71,27 @@ public:
   virtual void makeLimited(double cap) = 0;
 
   /*!
-  removeQty removes the specified quantity of material resources from the
+  popQty pops the specified quantity of material resources from the
   store.
   */
-  virtual std::vector<mat_rsrc_ptr> removeQty(double qty) = 0;
+  virtual std::vector<mat_rsrc_ptr> popQty(double qty) = 0;
 
   /*!
-  removeNum removes the specified number or count of material objects from the
+  popNum pops the specified number or count of material objects from the
   store.
   */
-  virtual std::vector<mat_rsrc_ptr> removeNum(int num) = 0;
+  virtual std::vector<mat_rsrc_ptr> popNum(int num) = 0;
 
-  /// removeOne removes one material object from the store.
-  virtual mat_rsrc_ptr removeOne() = 0;
+  /// popOne pops one material object from the store.
+  virtual mat_rsrc_ptr popOne() = 0;
 
   /*!
-  addOne adds a single material object to the store.
+  pushOne pushs a single material object to the store.
   */
-  virtual void addOne(mat_rsrc_ptr mat) = 0;
+  virtual void pushOne(mat_rsrc_ptr mat) = 0;
 
-  /// addAll adds one or more material objects (as a std::vector) to the store.
-  virtual void addAll(std::vector<mat_rsrc_ptr> mats) = 0;
+  /// pushAll pushs one or more material objects (as a std::vector) to the store.
+  virtual void pushAll(std::vector<mat_rsrc_ptr> mats) = 0;
 
 };
 

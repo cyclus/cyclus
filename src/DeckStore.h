@@ -12,10 +12,10 @@ typedef std::vector<mat_rsrc_ptr> MatManifest;
 DeckStore is a helper function that provides semi-automated management of
 material resource buffers (e.g. model stocks and inventories).
 
-Methods that begin with a "set", "make", "add", or "remove" prefix change the
+Methods that begin with a "set", "make", "push", or "pop" prefix change the
 state/behavior of the store; other methods do not.  Default constructed
-material store has zero (finite) capacity. Resource removal occurs in the order
-the resources were added (i.e. oldest materials are removed first).
+material store has zero (finite) capacity. Resource popping occurs in the order
+the resources were pushed (i.e. oldest materials are popd first).
 */
 class DeckStore: public MatStore {
 
@@ -77,70 +77,70 @@ public:
   void makeLimited(double cap);
 
   /*!
-  removeQty removes the specified quantity of material resources from the
+  popQty pops the specified quantity of material resources from the
   store.
 
-  Materials are split if necessary in order to remove the exact quantity
+  Materials are split if necessary in order to pop the exact quantity
   specified (within STORE_EPS).  Materials are retrieved in the order they were
-  added (i.e. oldest first).
+  pushed (i.e. oldest first).
 
-  @throws CycNegQtyException the specified removal quantity is larger (by
+  @throws CycNegQtyException the specified pop quantity is larger (by
   STORE_EPS) than the store's current quantity.
   */
-  std::vector<mat_rsrc_ptr> removeQty(double qty);
+  std::vector<mat_rsrc_ptr> popQty(double qty);
 
   /*!
-  removeNum removes the specified number or count of material objects from the
+  popNum pops the specified number or count of material objects from the
   store.
 
   Materials are not split.  Materials are retrieved in the order they were
-  added (i.e. oldest first).
+  pushed (i.e. oldest first).
 
-  @throws CycNegQtyException the specified removal number is larger than the
+  @throws CycNegQtyException the specified pop number is larger than the
   store's current inventoryNum or the specified number is negative.
   */
-  std::vector<mat_rsrc_ptr> removeNum(int num);
+  std::vector<mat_rsrc_ptr> popNum(int num);
 
   /*!
-  removeOne removes one material object from the store.
+  popOne pops one material object from the store.
 
   Materials are not split.  Materials are retrieved in the order they were
-  added (i.e. oldest first).
+  pushed (i.e. oldest first).
 
   @throws CycNegQtyException the store is empty.
   */
-  mat_rsrc_ptr removeOne();
+  mat_rsrc_ptr popOne();
 
   /*!
-  addOne adds a single material object to the store.
+  pushOne pushs a single material object to the store.
 
   Material resource objects are never combined in the store; they are stored as
-  unique objects. The material object is only added to the store if it does not
+  unique objects. The material object is only pushed to the store if it does not
   cause the store to exceed its capacity
 
-  @throws CycOverCapException the addition of the given material object would
+  @throws CycOverCapException the pushition of the given material object would
   cause the store to exceed its capacity.
 
-  @throws CycDupMatException the material object to be added is already present
+  @throws CycDupMatException the material object to be pushed is already present
   in the store.
   */
-  void addOne(mat_rsrc_ptr mat);
+  void pushOne(mat_rsrc_ptr mat);
 
   /*!
-  addAll adds one or more material objects (as a std::vector) to the store.
+  pushAll pushs one or more material objects (as a std::vector) to the store.
 
   Material resource objects are never combined in the store; they are stored as
-  unique objects. The material objects are only added to the store if they do
+  unique objects. The material objects are only pushed to the store if they do
   not cause the store to exceed its capacity; otherwise none of the given
-  material objects are added to the store.
+  material objects are pushed to the store.
 
-  @throws CycOverCapException the addition of the given material objects would
+  @throws CycOverCapException the pushition of the given material objects would
   cause the store to exceed its capacity.
 
-  @throws CycDupMatException one or more of the material objects to be added
+  @throws CycDupMatException one or more of the material objects to be pushed
   are already present in the store.
   */
-  void addAll(std::vector<mat_rsrc_ptr> mats);
+  void pushAll(std::vector<mat_rsrc_ptr> mats);
 
 private:
 
