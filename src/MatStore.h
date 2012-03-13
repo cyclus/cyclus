@@ -26,6 +26,27 @@ Methods that begin with a "set", "make", "push", or "pop" prefix change the
 state/behavior of the store; other methods do not.
 */
 class MatStore {
+public:
+
+  /// toRes is a helper function for casting std::vector<Material> to
+  /// std::vector<Resource>
+  static std::vector<rsrc_ptr> toRes(std::vector<mat_rsrc_ptr> mats) {
+    std::vector<rsrc_ptr> resources;
+    for (int i = 0; i < mats.size(); i++) {
+      resources.push_back(boost::dynamic_pointer_cast<Resource>(mats.at(i)));
+    }
+    return resources;
+  }
+
+  /// toMat is a helper function for casting std::vector<Resource> to
+  /// std::vector<Material>
+  static std::vector<mat_rsrc_ptr> toMat(std::vector<rsrc_ptr> resources) {
+    std::vector<mat_rsrc_ptr> mats;
+    for (int i = 0; i < resources.size(); i++) {
+      mats.push_back(boost::dynamic_pointer_cast<Material>(resources.at(i)));
+    }
+    return mats;
+  }
 
 public:
 
