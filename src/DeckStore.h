@@ -7,6 +7,7 @@
 #include <vector>
 
 typedef std::vector<mat_rsrc_ptr> MatManifest;
+typedef std::vector<rsrc_ptr> ResManifest;
 
 /*!
 DeckStore is a helper function that provides semi-automated management of
@@ -28,8 +29,7 @@ public:
   /*!
   capacity returns the maximum resource quantity this store can hold (units
   based on constituent resource objects' units). 
-
-  Never throws.  Returns -1 if the store is unlimited.
+Never throws.  Returns -1 if the store is unlimited.
   */
   double capacity();
 

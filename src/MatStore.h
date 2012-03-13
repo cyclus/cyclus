@@ -85,14 +85,11 @@ public:
   /// popOne pops one material object from the store.
   virtual mat_rsrc_ptr popOne() = 0;
 
-  /*!
-  pushOne pushs a single material object to the store.
-  */
+  /// pushOne pushs a single material object to the store.
   virtual void pushOne(mat_rsrc_ptr mat) = 0;
 
   /// pushAll pushs one or more material objects (as a std::vector) to the store.
   virtual void pushAll(std::vector<mat_rsrc_ptr> mats) = 0;
-
 };
 
 #endif

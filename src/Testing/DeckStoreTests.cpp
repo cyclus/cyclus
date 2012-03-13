@@ -390,7 +390,7 @@ TEST_F(DeckStoreTest, RemoveOne_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddOne_Empty) {
+TEST_F(DeckStoreTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -403,7 +403,7 @@ TEST_F(DeckStoreTest, AddOne_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddOne_OverCapacityEmpty) {
+TEST_F(DeckStoreTest, PushOne_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -426,7 +426,7 @@ TEST_F(DeckStoreTest, AddOne_OverCapacityEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddOne_DuplicateEmpty) {
+TEST_F(DeckStoreTest, PushOne_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -437,7 +437,7 @@ TEST_F(DeckStoreTest, AddOne_DuplicateEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddAll_Empty) {
+TEST_F(DeckStoreTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
   ASSERT_EQ(store_.count(), 2);
@@ -445,7 +445,7 @@ TEST_F(DeckStoreTest, AddAll_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddAll_NoneEmpty) {
+TEST_F(DeckStoreTest, PushAll_NoneEmpty) {
   MatManifest manifest;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(manifest));
@@ -454,7 +454,7 @@ TEST_F(DeckStoreTest, AddAll_NoneEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddAll_RetrieveOrderEmpty) {
+TEST_F(DeckStoreTest, PushAll_RetrieveOrderEmpty) {
   mat_rsrc_ptr mat;
 
   ASSERT_NO_THROW(store_.setCapacity(cap));
@@ -466,7 +466,7 @@ TEST_F(DeckStoreTest, AddAll_RetrieveOrderEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
+TEST_F(DeckStoreTest, PushAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
 
@@ -492,7 +492,7 @@ TEST_F(DeckStoreTest, AddAll_OverCapacityEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, AddAll_DuplicateEmpty) {
+TEST_F(DeckStoreTest, PushAll_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(2 * cap));
 
   ASSERT_NO_THROW(store_.pushAll(mats));
