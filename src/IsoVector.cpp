@@ -305,7 +305,7 @@ void IsoVector::setMass(double new_mass) {
     throw CycRangeException(err_msg);
   }
 
-  double ratio = new_mass / mass();
+  double ratio = new_mass / curr_mass;
 
   map<int, double>::const_iterator iter = atom_comp_.begin();
   while (iter != atom_comp_.end()) {

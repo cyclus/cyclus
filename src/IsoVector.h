@@ -308,6 +308,7 @@ protected:
    */
   static Matrix decayMatrix_; 
 
+private:
   /**
    * @brief allows calculated mass to be reused if no changes 
    * have been made since last calculated.
@@ -319,7 +320,6 @@ protected:
    */
   bool mass_out_of_date_;
 
-private:
   /**
    * @brief used by print() to 'hide' print code when logging is not desired
    */

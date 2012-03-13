@@ -56,7 +56,7 @@ mat_rsrc_ptr Material::extract(double mass) {
 
   IsoVector new_comp = iso_vector_;
   new_comp.setMass(mass);
-  iso_vector_ = iso_vector_ - new_comp;
+  iso_vector_.setMass(iso_vector_.mass() - mass);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
                    << " kg extracted from it. New mass=" << quantity() << " kg.";
