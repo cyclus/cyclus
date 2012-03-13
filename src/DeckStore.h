@@ -28,8 +28,7 @@ public:
   /*!
   capacity returns the maximum resource quantity this store can hold (units
   based on constituent resource objects' units). 
-
-  Never throws.  Returns -1 if the store is unlimited.
+Never throws.  Returns -1 if the store is unlimited.
   */
   double capacity();
 
