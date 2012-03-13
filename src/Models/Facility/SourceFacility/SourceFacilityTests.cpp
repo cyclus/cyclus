@@ -31,6 +31,7 @@ class FakeSourceFacility : public SourceFacility {
 
       capacity_ = 2;
       commod_price_ = 5000;
+      setInventory(capacity() + 1);
     }
 
     virtual ~FakeSourceFacility() {
@@ -104,8 +105,8 @@ TEST_F(SourceFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Tick) {
   int time = 1;
-  EXPECT_DOUBLE_EQ(0.0, src_facility->inventory());
-  EXPECT_NO_THROW(src_facility->handleTick(time));
+  ASSERT_DOUBLE_EQ(0.0, src_facility->inventory());
+  ASSERT_NO_THROW(src_facility->handleTick(time));
   EXPECT_LT(0.0, src_facility->inventory());
   EXPECT_LE(src_facility->capacity(), src_facility->inventory());
 }

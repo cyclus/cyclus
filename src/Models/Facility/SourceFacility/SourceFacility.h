@@ -175,6 +175,7 @@ class SourceFacility : public FacilityModel  {
   virtual void handleTock(int time);
 
   double inventory() {return inventory_.quantity();}
+  void setInventory(double size) {inventory_.setCapacity(size);}
 
   double capacity() {return capacity_;}
 
