@@ -84,18 +84,12 @@ MatManifest DeckStore::popQty(double qty) {
     mat = mats_.front();
     mats_.pop_front();
     quan = mat->quantity();
-    if ((quan - left) <= STORE_EPS) {
-      // exact match - push entire mat
-      manifest.push_back(mat);
-    } else if (quan < left) {
-      // less than remaining diff - push entire mat
-      manifest.push_back(mat);
-    } else {
+    if ((quan - left) > STORE_EPS) {
       // too big - split the mat before pushing
       leftover = mat->extract(quan - left);
-      manifest.push_back(mat);
       mats_.push_front(leftover);
     }
+    manifest.push_back(mat);
     left -= quan;
   }
   return manifest;

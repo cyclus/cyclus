@@ -7,7 +7,6 @@
 #include <vector>
 
 typedef std::vector<mat_rsrc_ptr> MatManifest;
-typedef std::vector<rsrc_ptr> ResManifest;
 
 /*!
 DeckStore is a helper function that provides semi-automated management of
