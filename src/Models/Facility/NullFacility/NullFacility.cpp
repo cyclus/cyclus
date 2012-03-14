@@ -40,47 +40,40 @@ void NullFacility::init(xmlNodePtr cur) {
   in_commod_ = XMLinput->get_xpath_content(cur,"incommodity");
   out_commod_ = XMLinput->get_xpath_content(cur,"outcommodity");
 
-  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  inventory_.setCapacity(strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL));
+  stocks_.setCapacity(strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL));
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
-
-  inventory_ = deque<mat_rsrc_ptr>();
-  stocks_ = deque<mat_rsrc_ptr>();
-  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void NullFacility::copy(NullFacility* src)
-{
+void NullFacility::copy(NullFacility* src) {
 
   FacilityModel::copy(src);
 
   in_commod_ = src->in_commod_;
   out_commod_ = src->out_commod_;
-  inventory_size_ = src->inventory_size_;
+  inventory_.setCapacity(src->inventory_.capacity());
+  stocks_.setCapacity(src->stocks_.capacity());
   capacity_ = src->capacity_;
-
-  inventory_ = deque<mat_rsrc_ptr>();
-  stocks_ = deque<mat_rsrc_ptr>();
-  ordersWaiting_ = deque<msg_ptr>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::copyFreshModel(Model* src)
-{
+void NullFacility::copyFreshModel(Model* src) {
   copy(dynamic_cast<NullFacility*>(src));
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::print() 
-{ 
+void NullFacility::print() { 
   FacilityModel::print(); 
   LOG(LEV_DEBUG2, "NullFac") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"
       << out_commod_
       << "}, and has an inventory that holds " 
-      << inventory_size_ << " materials";
+      << inventory_.capacity() << " materials"
+      << ", and has a stock that holds " 
+      << stocks_.capacity() << " materials";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -103,47 +96,12 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
     err_msg += + "' materials.";
     throw CycException(err_msg);
   }
-
-  double newAmt = 0;
-
-  // pull materials off of the inventory stack until you get the trans amount
-
-  // start with an empty manifest
-  vector<rsrc_ptr> toSend;
-
-  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    mat_rsrc_ptr m = inventory_.front();
-
-    // if the inventory obj isn't larger than the remaining need, send it as is.
-    if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
-      newAmt += m->quantity();
-      inventory_.pop_front();
-    } else {
-      // if the inventory obj is larger than the remaining need, split it.
-      mat_rsrc_ptr leftover = m->extract(trans.resource->quantity() - newAmt);
-      newAmt += m->quantity();
-      inventory_.pop_front();
-      inventory_.push_back(leftover);
-    }
-
-    toSend.push_back(m);
-    LOG(LEV_DEBUG2, "NullFac") <<"NullFacility "<< ID()
-      <<"  is sending a mat with mass: "<< m->quantity();
-  }    
-  return toSend;
+  return MatStore::toRes(inventory_.popQty(trans.resource->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
-  // grab each material object off of the manifest
-  // and move it into the stocks.
-  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
-       thisMat != manifest.end();
-       thisMat++) {
-    LOG(LEV_DEBUG2, "NullFac") <<"NullFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->quantity();
-    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
-  }
+  stocks_.pushAll(MatStore::toMat(manifest));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -156,78 +114,50 @@ void NullFacility::handleTick(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::makeRequests() {
-  // The null facility should ask for as much stuff as it can reasonably receive.
-  double requestAmt;
-  // And it can accept amounts no matter how small
-  double minAmt = 0;
-  // check how full its inventory is
-  double inv = this->checkInventory();
-  // and how much is already in its stocks
-  double sto = this->checkStocks(); 
-  // subtract inv and sto from inventory max size to get total empty space
-  double space = inventory_size_ - inv - sto;
-  // this will be a request for free stuff
-  double commod_price = 0;
-
-  if (space == 0) {
-    // don't request anything
-  } else if (space < capacity_) {
-    MarketModel* market = MarketModel::marketForCommod(in_commod_);
-    Communicator* recipient = dynamic_cast<Communicator*>(market);
-    // if empty space is less than monthly acceptance capacity
-    requestAmt = space;
-
-    // create a resource
-    gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
-
-    // build the transaction and message
-    Transaction trans;
-    trans.commod = in_commod_;
-    trans.minfrac = minAmt/requestAmt;
-    trans.is_offer = false;
-    trans.price = commod_price;
-    trans.resource = request_res;
-
-    msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
-    request->sendOn();
-  // otherwise, the upper bound is the monthly acceptance capacity 
-  // minus the amount in stocks.
-  } else if (space >= capacity_) {
-    MarketModel* market = MarketModel::marketForCommod(in_commod_);
-    Communicator* recipient = dynamic_cast<Communicator*>(market);
-    // if empty space is more than monthly acceptance capacity
-    requestAmt = capacity_ - sto;
-
-    // create a resource
-    gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
-
-    // build the transaction and message
-    Transaction trans;
-    trans.commod = in_commod_;
-    trans.minfrac = minAmt/requestAmt;
-    trans.is_offer = false;
-    trans.price = commod_price;
-    trans.resource = request_res;
-
-    msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
-    request->sendOn();
+  double shift = inventory_.space();
+  if (shift > capacity_) {
+    shift = capacity_;
   }
+
+  double cantake = stocks_.space() + shift;
+
+  if (cantake <= 0) {
+    return;
+    // don't request anything
+  }
+
+  // build the transaction and message
+  MarketModel* market = MarketModel::marketForCommod(in_commod_);
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
+  Transaction trans = buildRequestTrans(cantake);
+  msg_ptr request(new Message(this, recipient, trans)); 
+  request->setNextDest(facInst());
+  request->sendOn();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Transaction NullFacility::buildRequestTrans(double amt) {
+  Transaction trans;
+  gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",amt));
+  trans.commod = in_commod_;
+  trans.minfrac = 0;
+  trans.is_offer = false;
+  trans.price = 0;
+  trans.resource = res;
+  return trans;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::makeOffers() {
-
   // decide how much to offer
   double offer_amt, inv;
-  inv = this->checkInventory();
+  inv = inventory_.quantity();
   double possInv = inv + capacity_;
 
-  if (possInv < inventory_size_) {
+  if (possInv < inventory_.capacity()) {
     offer_amt = possInv;
   } else {
-    offer_amt = inventory_size_; 
+    offer_amt = inventory_.capacity(); 
   }
 
   // there is no minimum amount a null facility may send
@@ -235,21 +165,18 @@ void NullFacility::makeOffers() {
   // and it's free
   double commod_price = 0;
 
-  // decide what market to offer to
-  MarketModel* market = MarketModel::marketForCommod(out_commod_);
-  Communicator* recipient = dynamic_cast<Communicator*>(market);
-
-  // create a Resource
-  gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_, "kg", offer_amt));
-
-  // build the transaction and message
+  // create a Resource and build transaction
+  gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(out_commod_, "kg", offer_amt));
   Transaction trans;
   trans.commod = out_commod_;
   trans.minfrac = min_amt/offer_amt;
   trans.is_offer = true;
   trans.price = commod_price;
-  trans.resource = offer_res;
+  trans.resource = res;
 
+  // build and send the message
+  MarketModel* market = MarketModel::marketForCommod(out_commod_);
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());
   msg->sendOn();
@@ -262,24 +189,16 @@ void NullFacility::handleTock(int time) {
 
   double complete = 0;
 
-  // while there's still capacity left and stuff in the stocks
-  while(capacity_ > complete && !stocks_.empty() ) {
-    mat_rsrc_ptr m = stocks_.front();
+  double tomake = capacity_;
+  if (inventory_.space() < tomake) {
+    tomake = inventory_.space();
+  }
+  if (stocks_.quantity() < tomake) {
+    tomake = stocks_.quantity();
+  }
 
-    if(m->quantity() <= (capacity_ - complete)){
-      // if the mass of the material is less than the remaining capacity
-      complete += m->quantity();
-      stocks_.pop_front();
-    } else { 
-      // if the mass is too bit, split the stocks object 
-      mat_rsrc_ptr leftover = m->extract(capacity_ - complete);
-      complete += m->quantity();
-      stocks_.pop_front();
-      stocks_.push_back(leftover);
-    }
-
-    inventory_.push_back(m);
-  }    
+  MatManifest mats = stocks_.popQty(tomake);
+  inventory_.pushAll(mats);
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
@@ -287,39 +206,6 @@ void NullFacility::handleTock(int time) {
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double NullFacility::checkInventory() {
-  double total = 0;
-
-  // Iterate through the inventory and sum the amount of whatever
-  // material unit is in each object.
-
-  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
-       iter != inventory_.end(); 
-       iter ++){
-    total += (*iter)->quantity();
-  }
-
-  return total;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double NullFacility::checkStocks(){
-  double total = 0;
-
-  // Iterate through the stocks and sum the amount of whatever
-  // material unit is in_ each object.
-
-
-  for (deque<mat_rsrc_ptr>::iterator iter = stocks_.begin(); 
-       iter != stocks_.end(); 
-       iter ++){
-    total += (*iter)->quantity();
-  }
-
-  return total;
 }
 
 /* --------------------
