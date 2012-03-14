@@ -10,6 +10,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
+#include "DeckStore.h"
 
 /**
    @class SinkFacility
@@ -179,23 +180,6 @@ class SinkFacility : public FacilityModel  {
   std::vector<std::string> in_commods_;
 
   /**
-   * @brief  this facility holds material in storage. 
-   */
-  std::deque<mat_rsrc_ptr> inventory_;
-
-  /**
-   * @brief get the total mass of the stuff in the inventory
-   *
-   * @return the total mass of the materials in storage
-   */
-  double checkInventory();
-
-  /**
-   * @brief  maximum inventory size
-   */
-  double inventory_size_;
-
-  /**
    * @brief  monthly acceptance capacity
    */
   double capacity_;
@@ -205,11 +189,15 @@ class SinkFacility : public FacilityModel  {
    */
   double commod_price_;
 
- private:
   /**
    * @brief  determines the amount to request 
    */
   const double getRequestAmt() ;
+
+  /**
+   * @brief this facility holds material in storage. 
+   */
+  DeckStore inventory_;
 
 /* ------------------- */ 
 

@@ -38,8 +38,8 @@ void SinkFacility::init(xmlNodePtr cur) {
   // get monthly capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
 
-  // get inventory_size_
-  inventory_size_ = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  double inv_size = strtod(XMLinput->get_xpath_content(cur,"inventorysize"), NULL);
+  inventory_.setCapacity(inv_size);
 
   // get commodity price
   commod_price_ = strtod(XMLinput->get_xpath_content(cur,"commodprice"), NULL);
@@ -51,7 +51,7 @@ void SinkFacility::copy(SinkFacility* src) {
 
   in_commods_ = src->in_commods_;
   capacity_ = src->capacity_;
-  inventory_size_ = src->inventory_size_;
+  inventory_.setCapacity(src->inventory_.capacity());
   commod_price_ = src->commod_price_;
 }
 
@@ -75,7 +75,7 @@ void SinkFacility::print() {
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2, "SnkFac") << msg << inventory_size_ << " kg.";
+  LOG(LEV_DEBUG2, "SnkFac") << msg << inventory_.capacity() << " kg.";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -123,7 +123,7 @@ void SinkFacility::handleTock(int time){
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
   LOG(LEV_INFO4, "SnkFac") << "SinkFacility " << this->ID()
-                  << " is holding " << this->checkInventory()
+                  << " is holding " << inventory_.quantity()
                   << " units of material at the close of month " << time
                   << ".";
   LOG(LEV_INFO3, "SnkFac") << "}";
@@ -131,31 +131,7 @@ void SinkFacility::handleTock(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
-  
-  // grab each material object off of the manifest
-  // and move it into the inventory.
-  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
-       thisMat != manifest.end();
-       thisMat++) {
-    LOG(LEV_DEBUG2, "SnkFac") <<"SinkFacility " << ID() << " is receiving material with mass "
-        << (*thisMat)->quantity();
-    inventory_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double SinkFacility::checkInventory() {
-  double total = 0;
-
-  // Iterate through the inventory and sum the amount of whatever
-  // material unit is in each object.
-
-  deque<mat_rsrc_ptr>::iterator iter;
-
-  for (iter = inventory_.begin(); iter != inventory_.end(); iter ++)
-    total += (*iter)->quantity();
-
-  return total;
+  inventory_.pushAll(MatStore::toMat(manifest));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -163,13 +139,13 @@ const double SinkFacility::getRequestAmt(){
   // The sink facility should ask for as much stuff as it can reasonably receive.
   double requestAmt;
   // get current capacity
-  double emptiness = (inventory_size_- this->checkInventory());
+  double space = inventory_.space();
 
-  if (emptiness == 0 || emptiness < 0 ){
+  if (space <= 0 ){
     requestAmt=0;
-  } else if (emptiness < capacity_){
-    requestAmt = emptiness/in_commods_.size();
-  } else if (emptiness >= capacity_){
+  } else if (space < capacity_){
+    requestAmt = space/in_commods_.size();
+  } else if (space >= capacity_){
     requestAmt = capacity_/in_commods_.size();
   }
   return requestAmt;
