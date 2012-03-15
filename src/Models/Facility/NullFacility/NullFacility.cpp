@@ -101,10 +101,13 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   try {
     mats = inventory_.popQty(trans.resource->quantity());
   } catch(CycNegQtyException err) {
+    LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource->quantity()
+                   << " kg failed. Inventory is only "
+                   << inventory_.quantity() << " kg.";
     throw CycException("what is going on????????????");
   }
 
-  return MatStore::toRes(inventory_.popQty(trans.resource->quantity()));
+  return MatStore::toRes(mats);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
