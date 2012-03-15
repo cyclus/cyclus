@@ -15,7 +15,7 @@
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
     <model>
-      <GreedyMarket/>
+      <StubMarket/>
     </model>
   </market>
 
@@ -33,17 +33,12 @@
     <name>oneRegion</name>
     <allowedfacility>FrontEnd</allowedfacility>
     <model>
-      <NullRegion/>
+      <StubRegion/>
     </model>
     <institution>
       <name>oneInst</name>
       <model>
-        <FixedInst>
-          <facility>
-            <type>FrontEnd</type>
-            <name>FrontEnd</name>
-          </facility>
-        </FixedInst>
+        <StubInst/>
       </model>
     </institution>
   </region>
