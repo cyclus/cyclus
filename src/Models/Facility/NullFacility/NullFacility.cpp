@@ -96,6 +96,14 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
     err_msg += + "' materials.";
     throw CycException(err_msg);
   }
+
+  MatManifest mats;
+  try {
+    mats = inventory_.popQty(trans.resource->quantity());
+  } catch(CycNegQtyException err) {
+    throw CycException("what is going on????????????");
+  }
+
   return MatStore::toRes(inventory_.popQty(trans.resource->quantity()));
 }
 
@@ -197,8 +205,7 @@ void NullFacility::handleTock(int time) {
     tomake = stocks_.quantity();
   }
 
-  MatManifest mats = stocks_.popQty(tomake);
-  inventory_.pushAll(mats);
+  inventory_.pushAll(stocks_.popQty(tomake));
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
