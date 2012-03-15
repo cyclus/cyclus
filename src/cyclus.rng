@@ -62,12 +62,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <ref name="region"/>
     </oneOrMore>
 
-    <oneOrMore>
+    <zeroOrMore>
     <choice>
     <ref name="recipe"/>
     <ref name="recipebook"/>
     </choice>
-    </oneOrMore>
+    </zeroOrMore>
 
     <zeroOrMore>
     <ref name="converter"/>
