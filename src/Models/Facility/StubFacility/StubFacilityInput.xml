@@ -43,23 +43,4 @@
     </institution>
   </region>
 
-  <recipe>
-    <name>fresh_50gwd</name>
-    <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
-    <isotope>
-      <id>92235</id>
-      <comp>0.05</comp>
-    </isotope>
-    <isotope>
-      <id>92238</id>
-      <comp>0.95</comp>
-    </isotope>
-    <isotope>
-      <id>08016</id>
-      <comp>0.13</comp>
-    </isotope>
-  </recipe>
-
 </simulation>
