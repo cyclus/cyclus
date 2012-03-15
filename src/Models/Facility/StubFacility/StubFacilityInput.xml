@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!-- 1 StubFacility FrontEnd, 1 SinkFacility BackEnd, and 1 GreedyMarket -->
+<simulation>
+  <duration>10</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+  <decay>2</decay>
+
+  <commodity>
+    <name>uo2</name>
+  </commodity>
+
+  <market>
+    <name>uo2market</name>
+    <mktcommodity>uo2</mktcommodity>
+    <model>
+      <GreedyMarket/>
+    </model>
+  </market>
+
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <StubFacility>
+        <incommodity>uo2</incommodity>
+        <outcommodity>uo2</outcommodity>
+      </StubFacility>
+    </model>
+  </facility>
+
+  <region>
+    <name>oneRegion</name>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <model>
+      <NullRegion/>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
+        <FixedInst>
+          <facility>
+            <type>FrontEnd</type>
+            <name>FrontEnd</name>
+          </facility>
+        </FixedInst>
+      </model>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+</simulation>
