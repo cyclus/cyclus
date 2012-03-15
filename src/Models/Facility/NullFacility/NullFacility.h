@@ -8,6 +8,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
+#include "DeckStore.h"
 #include "Resource.h"
 
 /**
@@ -209,46 +210,9 @@ class NullFacility : public FacilityModel {
   double capacity_;
 
   /**
-   * @brief The stocks of raw material available to be processed.
-   */
-  std::deque<mat_rsrc_ptr> stocks_;
-    
-  /**
-   * @brief The inventory of processed material.
-   */
-  std::deque<mat_rsrc_ptr> inventory_;
-
-  /**
    * @brief The list of orders to process on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
-
-  /**
-   * @brief get the total mass of the stuff in the inventory
-   *
-   * @return the total mass of the processed materials in storage
-   */
-  double checkInventory();
-
-  /**
-   * @brief get the total mass of the stuff in the stocks
-   *
-   * @return the total mass of the raw materials in storage
-   */
-  double checkStocks();
-
-
-  /**
-   * @brief The time that the stock material spends in the facility.
-   */
-  int residence_time_;
-
-  /**
-   * @brief The maximum (number of commodity units?) that the inventory can grow to.
-   * The NullFacility must stop processing the material in its stocks when its 
-   * inventory is full.
-   */
-  double inventory_size_;
 
   /**
    * @brief The receipe of input materials.
@@ -260,7 +224,20 @@ class NullFacility : public FacilityModel {
    */
   mat_rsrc_ptr out_recipe_;
 
+  /**
+   * @brief The stocks of raw material available to be processed.
+   */
+  DeckStore stocks_;
+    
+  /**
+   * @brief The inventory of processed material.
+   */
+  DeckStore inventory_;
+
  private : 
+
+  Transaction buildRequestTrans(double amt);
+
   /**
    * @brief  Makes requests of the input commodity based on current capacity
    */
