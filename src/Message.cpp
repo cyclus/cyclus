@@ -251,10 +251,18 @@ Model* Message::requester() const {
 void Message::approveTransfer() {
   msg_ptr me = msg_ptr(this);
 
+  vector<rsrc_ptr> manifest;
   Model* req = requester();
   Model* sup = supplier();
-  vector<rsrc_ptr> manifest = sup->removeResource(me);
-  req->addResource(me, manifest);
+
+  try {
+    manifest = sup->removeResource(me);
+    req->addResource(me, manifest);
+  } catch (CycException err) {
+    CLOG(LEV_ERROR) << "Material transfer failed from " 
+                    << sup->ID() << " to " << req->ID() << ": " << err.what();
+    return;
+  }
 
   int id = nextTransID_++;
   
