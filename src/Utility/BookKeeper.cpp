@@ -32,6 +32,7 @@ BookKeeper* BookKeeper::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BookKeeper::BookKeeper() {
   dbIsOpen_ = false;
+  db_=NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
