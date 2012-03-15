@@ -93,12 +93,9 @@ void BookKeeper::turnLoggingOn() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BookKeeper::turnLoggingOff() {
   logging_on_ = false;
-  if ( dbExists() ) {
-    if ( db_->nTables() > 0 ) {
-      string err = 
-        "Logging can not be turned off once a table has already been created.";
-      throw CycException(err);
-    }
+  if ( nTables() > 0 ) {
+    string err = "Logging can not be turned off once a table has already been created.";
+    throw CycException(err);
   }
 }
 
