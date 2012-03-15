@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 1 StubFacility FrontEnd, 1 SinkFacility BackEnd, and 1 GreedyMarket -->
+<!-- 1 StubFacility, 1 StubRegion, 1 StubInst, and 1 StubMarket -->
 <simulation>
   <duration>10</duration>
   <startmonth>1</startmonth>
