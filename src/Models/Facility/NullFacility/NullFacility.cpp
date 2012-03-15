@@ -90,7 +90,6 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  // it should be of out_commod_ commodity type
   if (trans.commod != out_commod_) {
     string err_msg = "NullFacility can only send '" + out_commod_ ;
     err_msg += + "' materials.";
@@ -104,7 +103,6 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
     LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource->quantity()
                    << " kg failed. Inventory is only "
                    << inventory_.quantity() << " kg.";
-    throw CycException("what is going on????????????");
   }
 
   return MatStore::toRes(mats);
@@ -112,30 +110,31 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
-  stocks_.pushAll(MatStore::toMat(manifest));
+  try {
+    stocks_.pushAll(MatStore::toMat(manifest));
+  } catch(CycOverCapException err) {
+    LOG(LEV_ERROR, "NulFac") << "addition of resources"
+                   << " to stocks failed. Stocks only has"
+                   << stocks_.space() << " kg of space.";
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::handleTick(int time) {
-  // MAKE A REQUEST
   makeRequests();
-  // MAKE OFFERS 
   makeOffers();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::makeRequests() {
-  double shift = inventory_.space();
-  if (shift > capacity_) {
-    shift = capacity_;
-  }
-
-  double cantake = stocks_.space() + shift;
-
-  if (cantake <= 0) {
+  double cantake = capacity_;
+  if (cantake > inventory_.space()) {
+    cantake = inventory_.space();
+  } else if (cantake <= 0) {
     return;
-    // don't request anything
   }
+  LOG(LEV_INFO3, "NulFac") << name() << " ID=" << ID() << " requesting "
+                           << cantake << "kg of " << in_commod_ <<".";
 
   // build the transaction and message
   MarketModel* market = MarketModel::marketForCommod(in_commod_);
@@ -161,13 +160,11 @@ Transaction NullFacility::buildRequestTrans(double amt) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::makeOffers() {
   // decide how much to offer
-  double offer_amt, inv;
-  inv = inventory_.quantity();
-  double possInv = inv + capacity_;
-
-  if (possInv < inventory_.capacity()) {
-    offer_amt = possInv;
-  } else {
+  double offer_amt = inventory_.quantity() + stocks_.quantity();
+  if (capacity_ < stocks_.quantity()) {
+    offer_amt = inventory_.quantity() + capacity_;
+  }
+  if (offer_amt >= inventory_.capacity()) {
     offer_amt = inventory_.capacity(); 
   }
 
@@ -198,8 +195,6 @@ void NullFacility::handleTock(int time) {
   // at rate allowed by capacity, convert material in Stocks to out_commod_ type
   // move converted material into Inventory
 
-  double complete = 0;
-
   double tomake = capacity_;
   if (inventory_.space() < tomake) {
     tomake = inventory_.space();
@@ -208,7 +203,19 @@ void NullFacility::handleTock(int time) {
     tomake = stocks_.quantity();
   }
 
-  inventory_.pushAll(stocks_.popQty(tomake));
+  LOG(LEV_DEBUG1, "NulFac") << "Transferring " << tomake << " kg of material from "
+                  << "stocks to inventory.";
+  try {
+    inventory_.pushAll(stocks_.popQty(tomake));
+  } catch(CycNegQtyException err) {
+    LOG(LEV_ERROR, "NulFac") << "extraction of " << tomake
+                   << " kg from stocks failed. Stocks is only "
+                   << stocks_.quantity() << " kg.";
+  } catch(CycOverCapException err) {
+    LOG(LEV_ERROR, "NulFac") << "addition of " << tomake
+                   << " kg from stocks to inventory failed. Inventory only has"
+                   << inventory_.space() << " kg of space.";
+  }
 
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
