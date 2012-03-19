@@ -93,7 +93,7 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
-  return MatStore::toRes(inventory_.popQty(trans.resource->quantity()));
+  return ResourceBuff::toRes(inventory_.popQty(trans.resource->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

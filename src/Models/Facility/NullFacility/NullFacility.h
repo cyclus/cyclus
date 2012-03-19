@@ -8,7 +8,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
-#include "DeckStore.h"
+#include "MatBuff.h"
 #include "Resource.h"
 
 /**
@@ -227,12 +227,12 @@ class NullFacility : public FacilityModel {
   /**
    * @brief The stocks of raw material available to be processed.
    */
-  DeckStore stocks_;
+  MatBuff stocks_;
     
   /**
    * @brief The inventory of processed material.
    */
-  DeckStore inventory_;
+  MatBuff inventory_;
 
  private : 
 

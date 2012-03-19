@@ -1,12 +1,12 @@
 
 #include <gtest/gtest.h>
 #include "IsoVector.h"
-#include "DeckStore.h"
+#include "ResourceBuff.h"
 #include "CycException.h"
 #include "Logger.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-class DeckStoreTest : public ::testing::Test {
+class ResourceBuffTest : public ::testing::Test {
   protected:
     IsoVector vect1_, vect2_;
 
@@ -15,12 +15,12 @@ class DeckStoreTest : public ::testing::Test {
     double v1_m_oxygen, v1_m_u235, v1_m_u238;
     double v2_m_oxygen, v2_m_u235, v2_m_pu240;
 
-    mat_rsrc_ptr mat1_;
-    mat_rsrc_ptr mat2_;
-    MatManifest mats;
+    rsrc_ptr mat1_;
+    rsrc_ptr mat2_;
+    Manifest mats;
 
-    DeckStore store_; // default constructed mat store
-    DeckStore filled_store_;
+    ResourceBuff store_; // default constructed mat store
+    ResourceBuff filled_store_;
 
     double neg_cap, zero_cap, cap, low_cap;
     double exact_qty; // mass in filled_store_
@@ -53,8 +53,8 @@ class DeckStoreTest : public ::testing::Test {
         vect2_.setMass(u235, v2_m_u235);
         vect2_.setMass(pu240, v2_m_pu240);
 
-        mat1_ = mat_rsrc_ptr(new Material(vect1_));
-        mat2_ = mat_rsrc_ptr(new Material(vect2_));
+        mat1_ = rsrc_ptr(new Material(vect1_));
+        mat2_ = rsrc_ptr(new Material(vect2_));
         mats.push_back(mat1_);
         mats.push_back(mat2_);
 
@@ -92,24 +92,24 @@ To check:
 // Test order MATTERS.  Beware of reordering.
 
 // The "Empty" suffix indicates the test uses the store_ instance of
-// DeckStore. The "Filled" suffix indicates the test uses the
-// filled_store_ instance of DeckStore.
+// ResourceBuff. The "Filled" suffix indicates the test uses the
+// filled_store_ instance of ResourceBuff.
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, SetCapacity_ExceptionsEmpty) {
+TEST_F(ResourceBuffTest, SetCapacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
   EXPECT_NO_THROW(store_.setCapacity(zero_cap));
   EXPECT_NO_THROW(store_.setCapacity(cap));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, SetCapacity_ExceptionsFilled) {
+TEST_F(ResourceBuffTest, SetCapacity_ExceptionsFilled) {
   EXPECT_THROW(filled_store_.setCapacity(low_cap), CycOverCapException);
   EXPECT_NO_THROW(filled_store_.setCapacity(cap));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetCapacity_ExceptionsEmpty) {
+TEST_F(ResourceBuffTest, GetCapacity_ExceptionsEmpty) {
   ASSERT_NO_THROW(store_.capacity());
   store_.setCapacity(zero_cap);
   ASSERT_NO_THROW(store_.capacity());
@@ -118,12 +118,12 @@ TEST_F(DeckStoreTest, GetCapacity_ExceptionsEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetCapacity_InitialEmpty) {
+TEST_F(ResourceBuffTest, GetCapacity_InitialEmpty) {
   EXPECT_DOUBLE_EQ(store_.capacity(), 0.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetSetCapacityEmpty) {
+TEST_F(ResourceBuffTest, GetSetCapacityEmpty) {
   store_.setCapacity(zero_cap);
   EXPECT_DOUBLE_EQ(store_.capacity(), zero_cap);
 
@@ -132,7 +132,7 @@ TEST_F(DeckStoreTest, GetSetCapacityEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetSpace_Empty) {
+TEST_F(ResourceBuffTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
   EXPECT_DOUBLE_EQ(store_.space(), 0.0);
 
@@ -146,65 +146,65 @@ TEST_F(DeckStoreTest, GetSpace_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetSpace_Filled) {
+TEST_F(ResourceBuffTest, GetSpace_Filled) {
   double space = cap - (mat1_->quantity() + mat2_->quantity());
   ASSERT_NO_THROW(filled_store_.space());
   EXPECT_DOUBLE_EQ(filled_store_.space(), space);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetQuantity_Empty) {
+TEST_F(ResourceBuffTest, GetQuantity_Empty) {
   ASSERT_NO_THROW(store_.quantity());
   EXPECT_DOUBLE_EQ(store_.quantity(), 0.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetQuantity_Filled) {
+TEST_F(ResourceBuffTest, GetQuantity_Filled) {
   ASSERT_NO_THROW(filled_store_.quantity());
   double quantity = mat1_->quantity() + mat2_->quantity();
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), quantity);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetCount_Empty) {
+TEST_F(ResourceBuffTest, GetCount_Empty) {
   ASSERT_NO_THROW(store_.count());
   EXPECT_EQ(store_.count(), 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetCount_Filled) {
+TEST_F(ResourceBuffTest, GetCount_Filled) {
   ASSERT_NO_THROW(filled_store_.count());
   EXPECT_DOUBLE_EQ(filled_store_.count(), 2);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetUnlimited_InitialEmpty) {
+TEST_F(ResourceBuffTest, GetUnlimited_InitialEmpty) {
   ASSERT_NO_THROW(store_.unlimited());
   EXPECT_EQ(store_.unlimited(), false);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, MakeUnlimited_Empty) {
+TEST_F(ResourceBuffTest, MakeUnlimited_Empty) {
   ASSERT_NO_THROW(store_.makeUnlimited());
   store_.makeUnlimited();
   EXPECT_EQ(store_.unlimited(), true);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetCapacity_UnlimitedEmpty) {
+TEST_F(ResourceBuffTest, GetCapacity_UnlimitedEmpty) {
   store_.makeUnlimited();
   EXPECT_NO_THROW(store_.setCapacity(cap));
   EXPECT_DOUBLE_EQ(store_.capacity(), -1.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, GetSpace_UnlimitedEmpty) {
+TEST_F(ResourceBuffTest, GetSpace_UnlimitedEmpty) {
   store_.makeUnlimited();
   EXPECT_DOUBLE_EQ(store_.space(), -1.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, MakeLimited_ExceptionsEmpty) {
+TEST_F(ResourceBuffTest, MakeLimited_ExceptionsEmpty) {
   store_.makeUnlimited();
   ASSERT_THROW(store_.makeLimited(neg_cap), CycOverCapException);
 
@@ -216,13 +216,13 @@ TEST_F(DeckStoreTest, MakeLimited_ExceptionsEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, MakeLimited_ExceptionsFilled) {
+TEST_F(ResourceBuffTest, MakeLimited_ExceptionsFilled) {
   filled_store_.makeUnlimited();
   ASSERT_THROW(filled_store_.makeLimited(low_cap), CycOverCapException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, MakeLimited_Empty) {
+TEST_F(ResourceBuffTest, MakeLimited_Empty) {
   store_.makeUnlimited();
   ASSERT_EQ(store_.unlimited(), true);
 
@@ -233,7 +233,7 @@ TEST_F(DeckStoreTest, MakeLimited_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, MakeLimited_Filled) {
+TEST_F(ResourceBuffTest, MakeLimited_Filled) {
   filled_store_.makeUnlimited();
   ASSERT_EQ(filled_store_.unlimited(), true);
 
@@ -244,23 +244,23 @@ TEST_F(DeckStoreTest, MakeLimited_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_ExceptionsEmpty) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
+  Manifest manifest;
   double qty = cap + overeps;
   ASSERT_THROW(manifest = filled_store_.popQty(qty), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_ExceptionsFilled) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
+  Manifest manifest;
   double qty = cap + overeps;
   ASSERT_THROW(manifest = store_.popQty(qty), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_NoSplitExactFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_NoSplitExactFilled) {
   // pop one no splitting leaving one mat in the store
-  MatManifest manifest;
+  Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(exact_qty));
   ASSERT_EQ(manifest.size(), 1);
@@ -271,9 +271,9 @@ TEST_F(DeckStoreTest, RemoveQty_NoSplitExactFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_NoSplitOverFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_NoSplitOverFilled) {
   // pop one no splitting leaving one mat in the store
-  MatManifest manifest;
+  Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(exact_qty_over));
   ASSERT_EQ(manifest.size(), 1);
@@ -284,9 +284,9 @@ TEST_F(DeckStoreTest, RemoveQty_NoSplitOverFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_NoSplitUnderFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_NoSplitUnderFilled) {
   // pop one no splitting leaving one mat in the store
-  MatManifest manifest;
+  Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(exact_qty_under));
   ASSERT_EQ(manifest.size(), 1);
@@ -297,9 +297,9 @@ TEST_F(DeckStoreTest, RemoveQty_NoSplitUnderFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_SplitOverFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_SplitOverFilled) {
   // pop two with splitting leaving one mat in the store
-  MatManifest manifest;
+  Manifest manifest;
   double store_final = mat1_->quantity() + mat2_->quantity() - over_qty;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(over_qty));
@@ -313,9 +313,9 @@ TEST_F(DeckStoreTest, RemoveQty_SplitOverFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveQty_SplitUnderFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_SplitUnderFilled) {
   // pop one with splitting leaving two mats in the store
-  MatManifest manifest;
+  Manifest manifest;
   double store_final = mat1_->quantity() + mat2_->quantity() - under_qty;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(under_qty));
@@ -327,15 +327,15 @@ TEST_F(DeckStoreTest, RemoveQty_SplitUnderFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveNum_ExceptionsFilled) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
+  Manifest manifest;
   ASSERT_THROW(manifest = filled_store_.popNum(3), CycNegQtyException);
   ASSERT_THROW(manifest = filled_store_.popNum(-1), CycNegQtyException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveNum_ZeroFilled) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
+  Manifest manifest;
   double tot_qty = filled_store_.quantity();
 
   ASSERT_NO_THROW(manifest = filled_store_.popNum(0));
@@ -345,8 +345,8 @@ TEST_F(DeckStoreTest, RemoveNum_ZeroFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveNum_OneFilled) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
+  Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popNum(1));
   ASSERT_EQ(manifest.size(), 1);
@@ -357,8 +357,8 @@ TEST_F(DeckStoreTest, RemoveNum_OneFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveNum_TwoFilled) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
+  Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popNum(2));
   ASSERT_EQ(manifest.size(), 2);
@@ -371,8 +371,8 @@ TEST_F(DeckStoreTest, RemoveNum_TwoFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, RemoveOne_Filled) {
-  mat_rsrc_ptr mat;
+TEST_F(ResourceBuffTest, RemoveOne_Filled) {
+  rsrc_ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.popOne());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
@@ -390,7 +390,7 @@ TEST_F(DeckStoreTest, RemoveOne_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushOne_Empty) {
+TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -403,14 +403,14 @@ TEST_F(DeckStoreTest, PushOne_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushOne_OverCapacityEmpty) {
+TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
   ASSERT_NO_THROW(store_.pushOne(mat2_));
 
   double topush = cap - store_.quantity();
-  mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
+  rsrc_ptr overmat = mat1_->clone();
   overmat->setQuantity(topush + overeps);
 
   ASSERT_THROW(store_.pushOne(overmat), CycOverCapException);
@@ -426,18 +426,18 @@ TEST_F(DeckStoreTest, PushOne_OverCapacityEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushOne_DuplicateEmpty) {
+TEST_F(ResourceBuffTest, PushOne_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
-  ASSERT_THROW(store_.pushOne(mat1_), CycDupMatException);
+  ASSERT_THROW(store_.pushOne(mat1_), CycDupResException);
 
   ASSERT_EQ(store_.count(), 1);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushAll_Empty) {
+TEST_F(ResourceBuffTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
   ASSERT_EQ(store_.count(), 2);
@@ -445,8 +445,8 @@ TEST_F(DeckStoreTest, PushAll_Empty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushAll_NoneEmpty) {
-  MatManifest manifest;
+TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
+  Manifest manifest;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(manifest));
   ASSERT_EQ(store_.count(), 0);
@@ -454,8 +454,8 @@ TEST_F(DeckStoreTest, PushAll_NoneEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushAll_RetrieveOrderEmpty) {
-  mat_rsrc_ptr mat;
+TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
+  rsrc_ptr mat;
 
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
@@ -466,14 +466,14 @@ TEST_F(DeckStoreTest, PushAll_RetrieveOrderEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushAll_OverCapacityEmpty) {
+TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
 
   double topush = cap - store_.quantity();
-  mat_rsrc_ptr overmat = boost::dynamic_pointer_cast<Material>(mat1_->clone());
+  rsrc_ptr overmat = mat1_->clone();
   overmat->setQuantity(topush + overeps);
-  MatManifest overmats;
+  Manifest overmats;
   overmats.push_back(overmat);
 
   ASSERT_THROW(store_.pushAll(overmats), CycOverCapException);
@@ -492,13 +492,13 @@ TEST_F(DeckStoreTest, PushAll_OverCapacityEmpty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DeckStoreTest, PushAll_DuplicateEmpty) {
+TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.setCapacity(2 * cap));
 
   ASSERT_NO_THROW(store_.pushAll(mats));
-  ASSERT_THROW(store_.pushOne(mat1_), CycDupMatException);
-  ASSERT_THROW(store_.pushOne(mat2_), CycDupMatException);
-  ASSERT_THROW(store_.pushAll(mats), CycDupMatException);
+  ASSERT_THROW(store_.pushOne(mat1_), CycDupResException);
+  ASSERT_THROW(store_.pushOne(mat2_), CycDupResException);
+  ASSERT_THROW(store_.pushAll(mats), CycDupResException);
 
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
