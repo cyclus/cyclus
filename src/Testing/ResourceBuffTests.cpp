@@ -446,7 +446,7 @@ TEST_F(ResourceBuffTest, PushAll_Empty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
-  MatManifest manifest;
+  Manifest manifest;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(manifest));
   ASSERT_EQ(store_.count(), 0);
@@ -473,7 +473,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   double topush = cap - store_.quantity();
   rsrc_ptr overmat = mat1_->clone();
   overmat->setQuantity(topush + overeps);
-  MatManifest overmats;
+  Manifest overmats;
   overmats.push_back(overmat);
 
   ASSERT_THROW(store_.pushAll(overmats), CycOverCapException);

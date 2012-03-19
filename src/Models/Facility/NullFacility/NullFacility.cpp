@@ -105,13 +105,13 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
                    << inventory_.quantity() << " kg.";
   }
 
-  return MatStore::toRes(mats);
+  return ResourceBuff::toRes(mats);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   try {
-    stocks_.pushAll(MatStore::toMat(manifest));
+    stocks_.pushAll(ResourceBuff::toMat(manifest));
   } catch(CycOverCapException err) {
     LOG(LEV_ERROR, "NulFac") << "addition of resources"
                    << " to stocks failed. Stocks only has"

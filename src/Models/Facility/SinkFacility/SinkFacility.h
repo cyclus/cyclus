@@ -10,7 +10,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
-#include "DeckStore.h"
+#include "MatBuff.h"
 
 /**
    @class SinkFacility
@@ -197,7 +197,7 @@ class SinkFacility : public FacilityModel  {
   /**
    * @brief this facility holds material in storage. 
    */
-  DeckStore inventory_;
+  MatBuff inventory_;
 
 /* ------------------- */ 
 

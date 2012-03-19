@@ -9,7 +9,7 @@
 #include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
-#include "DeckStore.h"
+#include "MatBuff.h"
 
 /**
    @class SourceFacility
@@ -243,7 +243,7 @@ private:
    * A collection  that holds the "product" Material this Facility has on hand 
    * to send to others.
    */ 
-  DeckStore inventory_;
+  MatBuff inventory_;
   
 };
 
