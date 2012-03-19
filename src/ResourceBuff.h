@@ -7,6 +7,18 @@
 #include <list>
 #include <vector>
 
+#define STORE_EPS 1e-6
+
+class CycOverCapException: public CycException {
+    public: CycOverCapException(std::string msg) : CycException(msg) {};
+};
+class CycNegQtyException: public CycException {
+    public: CycNegQtyException(std::string msg) : CycException(msg) {};
+};
+class CycDupResException: public CycException {
+    public: CycDupMatException(std::string msg) : CycException(msg) {};
+};
+
 typedef std::vector<rsrc_ptr> Manifest;
 
 /*!
