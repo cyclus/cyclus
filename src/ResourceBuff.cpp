@@ -68,7 +68,7 @@ void ResourceBuff::makeLimited(double cap) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MatManifest ResourceBuff::popQty(double qty) {
+Manifest ResourceBuff::popQty(double qty) {
   if (qty - quantity() > STORE_EPS) {
     throw CycNegQtyException("Removal quantity larger than store tot quantity.");
   }
@@ -76,7 +76,7 @@ MatManifest ResourceBuff::popQty(double qty) {
     throw CycNegQtyException("Removal quantity cannot be negative.");
   }
 
-  MatManifest manifest;
+  Manifest manifest;
   rsrc_ptr mat, leftover;
   double left = qty;
   double quan;
@@ -86,7 +86,9 @@ MatManifest ResourceBuff::popQty(double qty) {
     quan = mat->quantity();
     if ((quan - left) > STORE_EPS) {
       // too big - split the mat before pushing
-      leftover = mat->extract(quan - left);
+      leftover = mat->clone();
+      leftover->setQuantity(quan - left);
+      mat->setQuantity(left);
       mats_.push_front(leftover);
     }
     manifest.push_back(mat);
@@ -96,12 +98,12 @@ MatManifest ResourceBuff::popQty(double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MatManifest ResourceBuff::popNum(int num) {
+Manifest ResourceBuff::popNum(int num) {
   if (mats_.size() < num) {
     throw CycNegQtyException("Remove count larger than store count.");
   }
 
-  MatManifest manifest;
+  Manifest manifest;
   for (int i = 0; i < num; i++) {
     manifest.push_back(mats_.front());
     mats_.pop_front();
@@ -127,14 +129,14 @@ void ResourceBuff::pushOne(rsrc_ptr mat) {
   std::list<rsrc_ptr>::iterator iter;
   for (iter = mats_.begin(); iter != mats_.end(); iter++) {
     if ((*iter) == mat) {
-      throw CycDupMatException("Duplicate material pushition attempted.");
+      throw CycDupResException("Duplicate material pushition attempted.");
     }
   }
   mats_.push_back(mat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::pushAll(MatManifest mats) {
+void ResourceBuff::pushAll(Manifest mats) {
   double tot_qty = 0;
   for (int i = 0; i < mats.size(); i++) {
     tot_qty += mats.at(i)->quantity();
@@ -146,7 +148,7 @@ void ResourceBuff::pushAll(MatManifest mats) {
   for (iter = mats_.begin(); iter != mats_.end(); iter++) {
     for (int i = 0; i < mats.size(); i++) {
       if ((*iter) == mats.at(i)) {
-        throw CycDupMatException("Duplicate material pushition attempted.");
+        throw CycDupResException("Duplicate material pushition attempted.");
       }
     }
   }

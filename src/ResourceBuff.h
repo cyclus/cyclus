@@ -2,8 +2,9 @@
 #if !defined(_RESOURCEBUFF_H)
 #define _RESOURCEBUFF_H
 
-#include "MatStore.h"
 #include "Resource.h"
+#include "Material.h"
+#include "CycException.h"
 #include <list>
 #include <vector>
 
@@ -16,7 +17,7 @@ class CycNegQtyException: public CycException {
     public: CycNegQtyException(std::string msg) : CycException(msg) {};
 };
 class CycDupResException: public CycException {
-    public: CycDupMatException(std::string msg) : CycException(msg) {};
+    public: CycDupResException(std::string msg) : CycException(msg) {};
 };
 
 typedef std::vector<rsrc_ptr> Manifest;
@@ -33,6 +34,26 @@ the resources were pushed (i.e. oldest resources are popd first).
 class ResourceBuff {
 
 public:
+
+  /// toRes is a helper function for casting std::vector<Material> to
+  /// std::vector<Resource>
+  static std::vector<rsrc_ptr> toRes(std::vector<mat_rsrc_ptr> mats) {
+    std::vector<rsrc_ptr> resources;
+    for (int i = 0; i < mats.size(); i++) {
+      resources.push_back(boost::dynamic_pointer_cast<Resource>(mats.at(i)));
+    }
+    return resources;
+  }
+
+  /// toMat is a helper function for casting std::vector<Resource> to
+  /// std::vector<Material>
+  static std::vector<mat_rsrc_ptr> toMat(std::vector<rsrc_ptr> resources) {
+    std::vector<mat_rsrc_ptr> mats;
+    for (int i = 0; i < resources.size(); i++) {
+      mats.push_back(boost::dynamic_pointer_cast<Material>(resources.at(i)));
+    }
+    return mats;
+  }
 
   ResourceBuff();
 
