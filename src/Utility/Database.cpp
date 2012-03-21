@@ -52,7 +52,7 @@ bool Database::open() {
       return true;
     }
     else {
-      throw CycIOException("Unable to open database " + name_); 
+      throw CycIOException("Unable to open database " + path_to_file); 
     }
   } // end if ( dbExists() )
   else {
