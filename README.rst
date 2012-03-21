@@ -221,45 +221,8 @@ yet pass tests or even compile, but where we also want to save our progress. Let
 call this branch "Work". So, when all is said and done, in our fork there will be 
 three branches: "Master", "Develop", and "Work".
 
-
-Executive Summary
-=================
-
-This example assumes you have a fork of the cyclus/core repository set up as a 
-remote origin and the cyclus/core repository set up as the remote upstream. 
-
-Workflow: Beginning
--------------------
-
-Assuming you have just sat down at your computer, the following commands will fully update 
-your local branches: ::
-    .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull origin develop 
-    .../cyclus_dir/$ git pull upstream develop
-    .../cyclus_dir/$ git push origin develop
-    .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull origin work
-    .../cyclus_dir/$ git merge develop
-    .../cyclus_dir/$ git push origin work
-
-Workflow: End
--------------
-
-Assuming you have commited some changes to the local work branch, finishing your project
-(i.e., your work branch *compiles*, *runs input files*, and *passes all tests*), you 
-will want to update your local develop branch and remote origin work and develop branches.
-The following commands will perform those actions: ::
-    .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull upstream develop
-    .../cyclus_dir/$ git merge work
-    .../cyclus_dir/$ git push origin develop
-    .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git merge develop
-    .../cyclus_dir/$ git push origin work
-
-
-The Gory Details
-================
+Acquiring Cyclus and Workflow
+=============================
 
 We begin with a fork of the main ("blessed") Cyclus repository. After initially forking
 the repo, we will have two branches in our fork: "Master" and "Develop".
