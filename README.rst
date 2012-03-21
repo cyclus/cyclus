@@ -237,6 +237,7 @@ refers to your fork as "origin".
 
 First, let's make our "work" branch:
 ::
+
     .../cyclus_dir/$ git branch work
     .../cyclus_dir/$ git push origin work
 
@@ -254,13 +255,16 @@ Workflow: The Beginning
 Now, for the workflow! This is by no means the only way to perform this type of workflow, 
 but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
 number small). Let us imagine that you have been at work, finished, and successfully pushed 
-your changes to your *Origin* directory. You are now at home, perhaps after dinner (let's just 
+your changes to your *Origin* repository. You are now at home, perhaps after dinner (let's just 
 say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
-or a grad student). To begin, let's update our *home's local branches*: ::
+or a grad student). To begin, let's update our *home's local branches*.
+::
+
     .../cyclus_dir/$ git checkout develop
     .../cyclus_dir/$ git pull origin develop 
     .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
+
     .../cyclus_dir/$ git checkout work
     .../cyclus_dir/$ git pull origin work
     .../cyclus_dir/$ git merge develop
@@ -269,8 +273,10 @@ or a grad student). To begin, let's update our *home's local branches*: ::
 Perhaps a little explanation is required. We first want to make sure that this new local copy of 
 the develop branch is up-to-date with respect to the remote origin's branch and remote upstream's
 branch. If there was a change from the remote upstream's branch, we want to push that to origin. 
-We then follow the same process to update the work branch, except we want to incorporate any changes
-which may have been introduced in the develop branch update.
+We then follow the same process to update the work branch, except:
+
+#. we don't need to worry about the *upstream* repo because it doesn't have a work branch, and
+#. we want to incorporate any changes which may have been introduced in the develop branch update.
 
 Workflow: The End
 -----------------
@@ -281,10 +287,12 @@ on your work branch *AND* it compiles *AND* it runs input files correctly *AND* 
 Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
 so it's time to merge those changes with the local develop branch and push them to origin's develop
 branch: ::
+
     .../cyclus_dir/$ git checkout develop
     .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git merge work 
     .../cyclus_dir/$ git push origin develop
+
     .../cyclus_dir/$ git checkout work
     .../cyclus_dir/$ git merge develop
     .../cyclus_dir/$ git push origin work
