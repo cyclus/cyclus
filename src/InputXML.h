@@ -14,7 +14,7 @@
 #define XMLinput InputXML::Instance()
 
 /**
-   @brief provide interface to libxml for all input parsing needs
+    provide interface to libxml for all input parsing needs
  
    @section intro Introduction
    This class provides a convenient set of functions to validate, load,
@@ -33,24 +33,24 @@
 class InputXML {
 public:
   /**
-   * @brief Method to return a pointer to the only instance
+   *  Method to return a pointer to the only instance
    */ 
   static InputXML* Instance();
 
   /**
-   * @brief Method to return the current namespace modifier
+   *  Method to return the current namespace modifier
    */ 
   std::string getCurNS() { return cur_ns_; };
 
   /**
-   *  @brief Extend the current namespace modifier
+   *   Extend the current namespace modifier
    *
    * @param ns string to append to current namespace modifier
    */
   void extendCurNS(std::string ns) { cur_ns_ += ns + ":"; };
 
   /**
-   *  @brief Strip last namespace from namespace modifier
+   *   Strip last namespace from namespace modifier
    *
    *  This method assumes that for all cases other than a blank modifier,
    *  the namespace modifier is always delimited by a colon, including a
@@ -59,7 +59,7 @@ public:
   void stripCurNS();
 
   /**
-   *  @brief Load an XML input file
+   *   Load an XML input file
    *
    *  This method will open a file assign its information to an xmlFileInfo
    *  structure and validate the file against a given RelaxNG schema.  After
@@ -76,7 +76,7 @@ public:
   void load_file(std::string filename);
 
   /**
-   *  @brief Opens and loads a recipebook: included library of recipes
+   *   Opens and loads a recipebook: included library of recipes
    *
    *  This method will push the current xmlFileInfo strcutre onto the stack
    *  and create a new one for the recipebook library to be opened.  It will
@@ -88,7 +88,7 @@ public:
   void load_recipebook(std::string filename);
 
   /**
-   *  @brief Opens and loads a facilitycatalog: included catalog of facility
+   *   Opens and loads a facilitycatalog: included catalog of facility
    *  definitions
    *
    *  This method will push the current xmlFileInfo strcutre onto the stack
@@ -101,7 +101,7 @@ public:
   void load_facilitycatalog(std::string filename);
   
   /**
-   *  @brief Get the contents of the single element with this XPath
+   *   Get the contents of the single element with this XPath
    *  expression
    *
    *  This method will return the contents of the first element in the XML
@@ -116,7 +116,7 @@ public:
   const char* get_xpath_content(xmlNodePtr cur,const char* expression);
 
   /**
-   *  @brief Get content of single node from current XML doc that match
+   *   Get content of single node from current XML doc that match
    *  XPath expression
    *
    *  Uses the first XML node pointer in the XML doc pointer of the current
@@ -132,7 +132,7 @@ public:
   };
 
   /**
-   *  @brief Get list of nodes that match relative XPath expression
+   *   Get list of nodes that match relative XPath expression
    * 
    *  This method will return an xmlNodeSetPtr that provides a list of nodes
    *  that match the given XPath expression.
@@ -144,7 +144,7 @@ public:
   xmlNodeSetPtr get_xpath_elements(xmlNodePtr cur,const char* expression);
 
   /**
-   *  @brief Get list of nodes from current XML doc that match XPath
+   *   Get list of nodes from current XML doc that match XPath
    *  expression
    * 
    *  Uses the first XML node pointer in the XML doc pointer of the current
@@ -158,7 +158,7 @@ public:
   };
 
   /**
-   *  @brief Get a single node that matches relative XPath expression
+   *   Get a single node that matches relative XPath expression
    * 
    *  This method will return an xmlNodePtr to the single node that matches
    *  the given XPath expression.
@@ -170,7 +170,7 @@ public:
   xmlNodePtr get_xpath_element(xmlNodePtr cur, const char* expression);
 
   /**
-   *  @brief Get a single node from current XML doc that matches XPath
+   *   Get a single node from current XML doc that matches XPath
    *  expression
    * 
    *  Uses the first XML node pointer in the XML doc pointer of the current
@@ -184,7 +184,7 @@ public:
   };
 
   /**
-   *  @brief Get the name of the single element with this XPath expression
+   *   Get the name of the single element with this XPath expression
    *
    *  This method will return the name of the first element in the XML
    *  document tree that matches this XPath expression.  Ideally, this
@@ -203,22 +203,22 @@ public:
 
 private:
   /**
-   * @brief pointer to thie single instance of this class
+   *  pointer to thie single instance of this class
    */ 
   static InputXML* instance_;
 
   /**
-   * @brief default constructor
+   *  default constructor
    */ 
   InputXML();
 
   /**
-   * @brief default destructor
+   *  default destructor
    */ 
   ~InputXML() {};
 
   /**
-   *  @brief A structure to contain related info about an XML file
+   *   A structure to contain related info about an XML file
    *
    *  This structure is used to create an association between a filename,
    *  the schema used to validate it, the XML doc ptr to that file and an
@@ -226,33 +226,33 @@ private:
    */
   struct xmlFileInfo {
     /**
-     * @brief filename currently being processed
+     *  filename currently being processed
      */ 
     std::string filename;  
 
     /**
-     * @brief pointer to the schema URI used for this file
+     *  pointer to the schema URI used for this file
      */ 
     std::string* schema;   
 
     /**
-     * @brief XML doc ptr for input file
+     *  XML doc ptr for input file
      */ 
     xmlDocPtr doc;    
 
     /**
-     * @brief XML XPath search context
+     *  XML XPath search context
      */ 
     xmlXPathContextPtr xpathCtxt; 
   } 
 
   /**
-   * @brief pointer to record of the current file being processed
+   *  pointer to record of the current file being processed
    */ 
   *curFilePtr;
 
   /**
-   *  @brief Stack of information about nexted input files
+   *   Stack of information about nexted input files
    *
    *  Every time a nested input file is openned, the current fileinfo
    *  is pushed onto this stack.  Every time a nested input file is closed
@@ -261,7 +261,7 @@ private:
   std::stack<xmlFileInfo*> fileStack_;
 
   /**
-   *  @brief Current namespace modifier value
+   *   Current namespace modifier value
    *
    *  To reduce the risk of naming conflicts with included files, a
    *  namespace modifier is used in the naming of ojbects loaded from
@@ -274,7 +274,7 @@ private:
   std::string cur_ns_;
 
   /**
-   *  @brief Validate an XML file against a Relax-NG schema
+   *   Validate an XML file against a Relax-NG schema
    *
    *  Open and validate that a file matches the grammar defined in the
    *  Relax-NG schema that has been assocaited with the file in the fileinfo
@@ -286,7 +286,7 @@ private:
   xmlDocPtr validate_file(xmlFileInfo *fileInfo);
 
   /**
-   * @brief primary schema used for Cyclus processing
+   *  primary schema used for Cyclus processing
    */ 
   static std::string main_schema_; 
 

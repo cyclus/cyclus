@@ -11,7 +11,7 @@
 /**
    @class RegionModel
    
-   @brief The RegionModel class is the abstract class/interface used by all 
+    The RegionModel class is the abstract class/interface used by all 
    region models
   
    This is all that is known externally about Regions
@@ -81,27 +81,27 @@ class RegionModel : public TimeAgent, public Communicator {
  */
  public:
   /**
-   * @brief  Default constructor for RegionModel Class
+   *   Default constructor for RegionModel Class
    */
   RegionModel();
   
   /**
-   * @brief  RegionModels should not be indestructible.
+   *   RegionModels should not be indestructible.
    */
   virtual ~RegionModel() {};
     
   /**
-   * @brief  every model needs a method to initialize from XML
+   *   every model needs a method to initialize from XML
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  every model needs a method to copy one object to another
+   *   every model needs a method to copy one object to another
    */
   virtual void copy(RegionModel* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -111,18 +111,18 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void copyFreshModel(Model* src)=0;
 
   /**
-   * @brief  every model should be able to print a verbose description
+   *   every model should be able to print a verbose description
    */
   virtual void print();
 
  public:
   /**
-   * @brief  default RegionModel receiver is to ignore messages
+   *   default RegionModel receiver is to ignore messages
    */
   virtual void receiveMessage(msg_ptr msg);
 
   /**
-   * @brief Each region is prompted to do its beginning-of-life-step
+   *  Each region is prompted to do its beginning-of-life-step
    * stuff before the simulation begins.
    *
    * Normally, Regions simply hand the command down to institutions.
@@ -131,7 +131,7 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void handlePreHistory();
 
   /**
-   * @brief Each region is prompted to do its beginning-of-time-step
+   *  Each region is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    * The default behavior is to ignore the tick.
    *
@@ -140,7 +140,7 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void handleTick(int time);
 
   /**
-   * @brief Each region is prompted to do its end-of-time-step
+   *  Each region is prompted to do its end-of-time-step
    * stuff at the tock of the timer.
    * The default behavior is to ignore the tock.
    *
@@ -149,7 +149,7 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void handleTock(int time);
 
   /**
-   * @brief Each region is prompted to do its daily task.
+   *  Each region is prompted to do its daily task.
    *
    * @param time is the month since the start of the simulation
    * @param day is the current day of that month
@@ -158,7 +158,7 @@ class RegionModel : public TimeAgent, public Communicator {
 
  public:
   /**
-   * @brief  returns if the facility is in this region's allowed facs
+   *   returns if the facility is in this region's allowed facs
    */
   bool isAllowedFacility(Model* test_fac) 
   { return ( allowedFacilities_.find(test_fac) 
@@ -166,7 +166,7 @@ class RegionModel : public TimeAgent, public Communicator {
     
  protected:
   /**
-   * @brief  every region has a list of allowed facilities
+   *   every region has a list of allowed facilities
    */
   std::set<Model*> allowedFacilities_;
       

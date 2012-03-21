@@ -15,7 +15,7 @@
 
 /**
   @class ConditioningFacility
-  @brief This facility accepts material that must be conditioned into a waste form. 
+   This facility accepts material that must be conditioned into a waste form. 
  
   The ConditioningFacility class inherits from the FacilityModel class and 
   is dynamically loaded by the Model class when requested.
@@ -75,31 +75,31 @@ class ConditioningFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief Default constructor for ConditioningFacility Class
+   *  Default constructor for ConditioningFacility Class
    */
   ConditioningFacility();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~ConditioningFacility();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the ConditioningConditioning to copy
    */
   virtual void copy(ConditioningFacility* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -109,12 +109,12 @@ class ConditioningFacility : public FacilityModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -123,7 +123,7 @@ class ConditioningFacility : public FacilityModel {
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * @brief Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -140,7 +140,7 @@ class ConditioningFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief The ConditioningFacility should ignore incoming messages
+   *  The ConditioningFacility should ignore incoming messages
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -152,14 +152,14 @@ class ConditioningFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief The handleTick function specific to the ConditioningFacility.
+   *  The handleTick function specific to the ConditioningFacility.
    *
    * @param time the time of the tick
    */
   virtual void handleTick(int time);
 
   /**
-   * @brief The handleTick function specific to the ConditioningFacility.
+   *  The handleTick function specific to the ConditioningFacility.
    *
    * @param time the time of the tock
    */
@@ -173,7 +173,7 @@ class ConditioningFacility : public FacilityModel {
  * --------------------
  */
   /**
-   * @brief Defines the structure of data associated with each row entry in the 
+   *  Defines the structure of data associated with each row entry in the 
    * loading database. 
    */
   typedef struct stream_t{
@@ -185,57 +185,57 @@ class ConditioningFacility : public FacilityModel {
   } stream_t;
  
   /**
-   * @brief The integer length (number of rows) of the datafile/med/loading/ dataset 
+   *  The integer length (number of rows) of the datafile/med/loading/ dataset 
    */
   int stream_len_;
 
   /**
-   * @brief The vector of stream structs that holds the data in the datafile instance.
+   *  The vector of stream structs that holds the data in the datafile instance.
    */
   std::vector<stream_t> stream_vec_;
 
   /**
-   * @brief  the stocks are where the raw material is kept
+   *   the stocks are where the raw material is kept
    */
   std::deque<std::pair<std::string, mat_rsrc_ptr> > stocks_;
 
   /**
-   * @brief  the inventory is where the processed material is kept
+   *   the inventory is where the processed material is kept
    */
   std::deque<std::pair<std::string, mat_rsrc_ptr> > inventory_;
 
   /**
-   * @brief  a map from format names to table loading function pointers
+   *   a map from format names to table loading function pointers
    */
   std::map<std::string, void(ConditioningFacility:: *)(std::string)> allowed_formats_;
 
   /**
-   * @brief  is the datafile open?
+   *   is the datafile open?
    */
   bool file_is_open_;
 
   /**
-   * @brief  Loading density table. Rows are waste streams, columns are waste forms
+   *   Loading density table. Rows are waste streams, columns are waste forms
    */
   boost::multi_array<double, 2> loading_densities_;
 
   /**
-   * @brief  Matches commodity names with stream ids
+   *   Matches commodity names with stream ids
    */
   std::map< std::string, std::pair< int, std::string > > commod_map_;
 
   /**
-   * @brief  Processing capacity per time unit not yet consumed this tick (in kg)
+   *   Processing capacity per time unit not yet consumed this tick (in kg)
    */
   double remaining_capacity_;
 
   /**
-   * @brief  Processing capacity per unit time (in kg)
+   *   Processing capacity per unit time (in kg)
    */
   double capacity_;
 
   /**
-   * @brief loads the table from a file of filetype type
+   *  loads the table from a file of filetype type
    *
    * @param name the name of the file to load
    * @param type the type of file to load
@@ -243,7 +243,7 @@ class ConditioningFacility : public FacilityModel {
   void loadTable(std::string name, std::string type);
 
   /**
-   * @brief verifies that the table is an allowed type
+   *  verifies that the table is an allowed type
    *
    * @param name the name of the file to load
    * @param type the type of file to load
@@ -251,46 +251,46 @@ class ConditioningFacility : public FacilityModel {
   bool verifyTable(std::string name, std::string type);
 
   /**
-   * @brief loads the hdf5 file into a table of waste streams and forms
+   *  loads the hdf5 file into a table of waste streams and forms
    *
    * @param name the name of the file to load
    */
   void loadHDF5File(std::string name);
 
   /**
-   * @brief loads the sql file into a table of waste streams and forms
+   *  loads the sql file into a table of waste streams and forms
    *
    * @param name the name of the file to load
    */
   void loadSQLFile(std::string name);
 
   /**
-   * @brief loads xml file (pointer?) into a table of waste streams and forms
+   *  loads xml file (pointer?) into a table of waste streams and forms
    *
    * @param name the name of the file to load
    */
   void loadXMLFile(std::string name);
 
   /**
-   * @brief loads csv file into a table of waste streams and forms
+   *  loads csv file into a table of waste streams and forms
    *
    * @param name the name of the file to load
    */
   void loadCSVFile(std::string name);
 
   /**
-   * @brief Requests each of the commodities it can accept and condition
+   *  Requests each of the commodities it can accept and condition
    * at a level that corresponds to its monthly capacity
    */
   void makeRequests();
 
   /**
-   * @brief Offers each of the conditioned streams in its inventory
+   *  Offers each of the conditioned streams in its inventory
    */
   void makeOffers();
 
   /**
-   * @brief Sends a message to the recipient including the transaction
+   *  Sends a message to the recipient including the transaction
    *
    * @param recipient the communicator intended to receive the message
    * @param trans the transaction to send
@@ -298,34 +298,34 @@ class ConditioningFacility : public FacilityModel {
   void sendMessage(Communicator* recipient, Transaction trans);
 
   /**
-   * @brief conditions all the materials it is capable of conditioning this
+   *  conditions all the materials it is capable of conditioning this
    * month.
    */
   void conditionMaterials();
 
   /**
-   * @brief processes orders that have come through and sends the materials
+   *  processes orders that have come through and sends the materials
    *
    * @param the order to be processed
    */
   std::vector<rsrc_ptr> processOrder(msg_ptr order);
 
   /** 
-   * @brief Checks the amount (in kg) of material in the inventory 
+   *  Checks the amount (in kg) of material in the inventory 
    *
    * @return the mass of the material in the inventory (in kg).
    */
   double checkInventory();
 
   /** 
-   * @brief Checks the amount (in kg) of material in the stocks. 
+   *  Checks the amount (in kg) of material in the stocks. 
    *
    * @return the mass of the material in the stocks (in kg).
    */
   double checkStocks();
 
   /**
-   * @brief Prints the amount currently in the inventory
+   *  Prints the amount currently in the inventory
    *
    * @param time the current time
    */
@@ -333,7 +333,7 @@ class ConditioningFacility : public FacilityModel {
 
  private :
   /**
-   * @brief Condition the material provided according to the rules for this commodity
+   *  Condition the material provided according to the rules for this commodity
    * 
    * @param commod the commodity (stream) this material represents
    * @param mat the material that is to be conditioned
@@ -343,7 +343,7 @@ class ConditioningFacility : public FacilityModel {
   mat_rsrc_ptr condition(std::string commod, mat_rsrc_ptr mat);
 
   /**
-   * @brief Returns the stream representing the commodity. 
+   *  Returns the stream representing the commodity. 
    *
    * @param commod the commodity string  whose stream is to be returned
    * 

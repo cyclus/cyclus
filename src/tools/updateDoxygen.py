@@ -17,7 +17,7 @@ def makewritelines(lines):
 def addBriefLines(lines,givenLine):
     line_halves = givenLine.split("///")
     line1 = line_halves[0] + '/**\n'
-    line2 = line_halves[0] + ' * @brief ' + line_halves[1]
+    line2 = line_halves[0] + ' *  ' + line_halves[1]
     line3 = line_halves[0] + ' */\n'
     lines.append(line1)
     lines.append(line2)
@@ -43,8 +43,8 @@ def moreContinuation(lines,givenLine,nspaces):
 def checkForBrief(lines,givenLine):
     line_halves = givenLine.split("* ")
     if ( (len(line_halves) > 1) and (len(line_halves[1]) > 6) ):
-        if (line_halves[1][0:6] != "@brief"):
-            line = line_halves[0] + '* @brief ' + line_halves[1]
+        if (line_halves[1][0:6] != ""):
+            line = line_halves[0] + '*  ' + line_halves[1]
         else:
             line = givenLine
     else:

@@ -7,14 +7,14 @@
 /**
    @class UniformTaylor
    
-   @brief A class that solves the matrix exponential 
+    A class that solves the matrix exponential 
    problem using the Taylor Series with Uniformization method.
  */
 class UniformTaylor {
 
   public:
     /**
-     * @brief
+     * 
      * Solves the matrix exponential problem:
      *  
      *          dx(t)
@@ -38,7 +38,7 @@ class UniformTaylor {
 
   private:
     /**
-     * @brief Returns the diagonal element in the Matrix A 
+     *  Returns the diagonal element in the Matrix A 
      * that has the largest absolute value.
      *
      * @param A the Matrix
@@ -47,7 +47,7 @@ class UniformTaylor {
     static double maxAbsDiag(const Matrix & A);
 
     /**
-     * @brief Computes the solution Vector x_t using the Taylor Series with
+     *  Computes the solution Vector x_t using the Taylor Series with
      * Uniformization method.
      *
      * @param B the Matrix B = A + alpha * I
@@ -65,7 +65,7 @@ class UniformTaylor {
 			            double tol);
 
     /**
-     * @brief Computes the maximum number of terms needed to obtain an accuracy of
+     *  Computes the maximum number of terms needed to obtain an accuracy of
      * epsilon when using the Taylor Series with Uniformization method.
      *
      * @param alpha_t the product alpha * t

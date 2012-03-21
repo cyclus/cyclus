@@ -14,7 +14,7 @@ class Material;
 
 /**
  @class FacilityModel
- @brief The FacilityModel class is the abstract class/interface used by all
+  The FacilityModel class is the abstract class/interface used by all
  facility models
  
  This is all that is known externally about facilities
@@ -76,17 +76,17 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual ~FacilityModel();
   
   /**
-   * @brief  every model needs a method to initialize from XML
+   *   every model needs a method to initialize from XML
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief  every model needs a method to copy one object to another
+   *   every model needs a method to copy one object to another
    */
   virtual void copy(FacilityModel* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -97,7 +97,7 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual void copyFreshModel(Model* src)=0;
 
   /**
-   * @brief  every model should be able to print a verbose description
+   *   every model should be able to print a verbose description
    */
   virtual void print() { Model::print(); };
 
@@ -110,7 +110,7 @@ class FacilityModel : public TimeAgent, public Communicator {
  */
  public:
   /**
-   * @brief There is no default FacilityModel receiver 
+   *  There is no default FacilityModel receiver 
    *
    * Each derived class must implement an offer/request receiver
    */ 
@@ -125,60 +125,60 @@ class FacilityModel : public TimeAgent, public Communicator {
  */
  protected:
   /**
-   * @brief  each facility should have an institution that manages it
+   *   each facility should have an institution that manages it
    */
   std::string inst_name_;
 
   /**
-   * @brief  each facility needs a lifetime
+   *   each facility needs a lifetime
    */
   int fac_lifetime_;
 
  public:
   /**
-   * @brief Sets the facility's name 
+   *  Sets the facility's name 
    *
    * @param facName is the new name of the facility
    */
   virtual void setFacName(std::string facName) { this->setName(facName); };
 
   /**
-   * @brief Returns the facility's name
+   *  Returns the facility's name
    *
    * @return fac_name_ the name of this facility, a string
    */
   virtual std::string facName() { return this->name(); };
 
   /**
-   * @brief Sets this facility's instutution name 
+   *  Sets this facility's instutution name 
    *
    * @param name the name of the institution associated with this facility.
    */
   virtual void setInstName(std::string name){ inst_name_ = name;};
 
   /**
-   * @brief Returns this facility's institution
+   *  Returns this facility's institution
    *
    * @return the institution assosicated with this facility
    */
   virtual InstModel* facInst();
 
   /**
-   * @brief Sets the facility's lifetime 
+   *  Sets the facility's lifetime 
    *
    * @param lifetime is the new lifetime of the facility in months
    */
   virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
-   * @brief Returns the facility's lifetime
+   *  Returns the facility's lifetime
    *
    * @return fac_lifetime_ the lifetime of this facility, an int, in months
    */
   virtual int facLifetime() { return fac_lifetime_; };
 
   /**
-   * @brief Returns the facility's power capacity
+   *  Returns the facility's power capacity
    *
    * @return 0 by default. If the facility produces power, it will use its own 
    * function.
@@ -186,14 +186,14 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual double powerCapacity() { return 0.0; };
 
   /**
-   * @brief Each facility is prompted to do its beginning-of-life
+   *  Each facility is prompted to do its beginning-of-life
    * stuff.
    *
    */
   virtual void handlePreHistory();
 
   /**
-   * @brief Each facility is prompted to do its beginning-of-time-step
+   *  Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -201,7 +201,7 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual void handleTick(int time);
 
   /**
-   * @brief Each facility is prompted to its end-of-time-step
+   *  Each facility is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock
@@ -209,7 +209,7 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual void handleTock(int time);
 
   /**
-   * @brief Each facility is prompted to do its daily tasks
+   *  Each facility is prompted to do its daily tasks
    * 
    * @param time is the number of months since the beginning of the simulation
    * @param day is the current day in this month

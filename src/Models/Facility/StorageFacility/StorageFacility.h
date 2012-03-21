@@ -10,7 +10,7 @@
 
 /**
   @class StorageFacility
-  @brief This FacilityModel stores material.
+   This FacilityModel stores material.
   
   The StorageFacility class inherits from the FacilityModel class and is 
   dynamically loaded by the Model class when requested.
@@ -44,28 +44,28 @@ class StorageFacility : public FacilityModel
  */
  public:
   /** 
-   * @brief Default constructor for the StorageFacility class.
+   *  Default constructor for the StorageFacility class.
    */
   StorageFacility() {};
   
   /**
-   * @brief Destructor for the StorageFacility class. 
+   *  Destructor for the StorageFacility class. 
    */
   virtual ~StorageFacility() {};
   
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(StorageFacility* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -75,12 +75,12 @@ class StorageFacility : public FacilityModel
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief Print information about this model
+   *  Print information about this model
    */
   virtual void print();
   
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -89,7 +89,7 @@ class StorageFacility : public FacilityModel
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * @brief Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -106,7 +106,7 @@ class StorageFacility : public FacilityModel
  */
  public:
   /**
-   * @brief When the facility receives a message, execute any transaction therein
+   *  When the facility receives a message, execute any transaction therein
    */
   virtual void receiveMessage(msg_ptr msg);
   
@@ -119,13 +119,13 @@ class StorageFacility : public FacilityModel
  */
  public:
   /**
-   * @brief The handlePreHistory function specific to the StorageFacility.
+   *  The handlePreHistory function specific to the StorageFacility.
    * This function fills the StorageFacility with its initial stocks.
    */
   virtual void handlePreHistory();
 
   /**
-   * @brief The handleTick function specific to the StorageFacility.
+   *  The handleTick function specific to the StorageFacility.
    * At each tick, it requests as much raw inCommod as it can process this
    * month and offers as much outCommod as it will have in its inventory by the
    * end of the month.
@@ -135,7 +135,7 @@ class StorageFacility : public FacilityModel
   virtual void handleTick(int time);
 
   /**
-   * @brief The handleTick function specific to the StorageFacility.
+   *  The handleTick function specific to the StorageFacility.
    * At each tock, it processes material and handles orders, and records this
    * month's actions.
    *
@@ -152,70 +152,70 @@ class StorageFacility : public FacilityModel
  */
  protected:
   /**
-   * @brief The StorageFacility has one commodity. It's the same in and out.
+   *  The StorageFacility has one commodity. It's the same in and out.
    */
   std::string incommod_;
 
   /**
-   * @brief The StorageFacility has a limit to how material it can process.
+   *  The StorageFacility has a limit to how material it can process.
    * Units vary. It will be in the commodity unit per month.
    */
   double capacity_;
 
   /**
-   * @brief The stocks of entering material
+   *  The stocks of entering material
    * These are not yet old enough to leave
    */
   std::deque<mat_rsrc_ptr> stocks_;
     
   /**
-   * @brief The inventory of material ready to exit
+   *  The inventory of material ready to exit
    */
   std::deque<mat_rsrc_ptr> inventory_;
 
   /**
-   * @brief The list of the entry times for each material
+   *  The list of the entry times for each material
    */
   std::deque< std::pair<int, mat_rsrc_ptr> > entryTimes_;
 
   /**
-   * @brief The list of orders to process on the Tock
+   *  The list of orders to process on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * @brief get the total mass of the stuff in the inventory
+   *  get the total mass of the stuff in the inventory
    *
    * @return the total mass of the processed materials in storage
    */
   Mass checkInventory();
 
   /**
-   * @brief get the total mass of the stuff in the stocks
+   *  get the total mass of the stuff in the stocks
    *
    * @return the total mass of the raw materials in storage
    */
   Mass checkStocks();
 
   /**
-   * @brief The minimum time that the stock material spends in the facility.
+   *  The minimum time that the stock material spends in the facility.
    */
   int residence_time_;
 
   /**
-   * @brief The maximum (number of commodity units?) that the inventory can grow to.
+   *  The maximum (number of commodity units?) that the inventory can grow to.
    * The StorageFacility must stop processing the material in its stocks 
    * when its inventory is full.
    */
   Mass inventory_size_;
 
   /**
-   * @brief XML cursor for facility initial state information
+   *  XML cursor for facility initial state information
    */
   xmlNodePtr initialStateCur_;
 
   /**
-   * @brief This function populated the Storage Facility with some inital stocks/inventory
+   *  This function populated the Storage Facility with some inital stocks/inventory
    */
   void getInitialState(xmlNodePtr cur);
 

@@ -5,7 +5,7 @@
 #include "TimeAgent.h"
 
 /**
-   @brief The StubTimeAgent class is the abstract class/interface used by all stub models
+    The StubTimeAgent class is the abstract class/interface used by all stub models
   
    This StubModel is intended as a skeleton to guide the implementation of new
    TimeAgent Models.
@@ -26,31 +26,31 @@ class StubTimeAgent : public TimeAgent {
  */
  public:
   /**
-   * @brief Default constructor for StubTimeAgent Class
+   *  Default constructor for StubTimeAgent Class
    */
   StubTimeAgent();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubTimeAgent();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubTimeAgent to copy
    */
   virtual void copy(StubTimeAgent* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -60,19 +60,19 @@ class StubTimeAgent : public TimeAgent {
   virtual void copyFreshModel(Model* src){};
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
   /**
-   * @brief Each simulation agent is prompted to do its beginning-of-life
+   *  Each simulation agent is prompted to do its beginning-of-life
    * stuff.
    *
    */
   virtual void handlePreHistory();
 
   /**
-   * @brief Each simulation agent is prompted to do its beginning-of-time-step
+   *  Each simulation agent is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -80,7 +80,7 @@ class StubTimeAgent : public TimeAgent {
   virtual void handleTick(int time);
 
   /**
-   * @brief Each simulation agent is prompted to its end-of-time-step
+   *  Each simulation agent is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock

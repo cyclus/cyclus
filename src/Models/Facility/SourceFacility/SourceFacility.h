@@ -13,7 +13,7 @@
 
 /**
    @class SourceFacility
-   @brief This FacilityModel provides a simple source of some capacity 
+    This FacilityModel provides a simple source of some capacity 
    (possibly infinite) of some commodity/Recipe.
    
    The SourceFacility class inherits from the FacilityModel class and is 
@@ -92,28 +92,28 @@ class SourceFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Default Constructor for the SourceFacility class
+   *  Default Constructor for the SourceFacility class
    */
   SourceFacility();
   
   /**
-   * @brief Destructor for the SourceFacility class
+   *  Destructor for the SourceFacility class
    */
   virtual ~SourceFacility();
 
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(SourceFacility* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -124,12 +124,12 @@ class SourceFacility : public FacilityModel  {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief Print information about this model
+   *  Print information about this model
    */
   virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -146,7 +146,7 @@ class SourceFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief When this facility receives a message, execute the transaction therein.
+   *  When this facility receives a message, execute the transaction therein.
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -159,7 +159,7 @@ class SourceFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Each facility is prompted to do its beginning-of-time-step
+   *  Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -167,7 +167,7 @@ class SourceFacility : public FacilityModel  {
   virtual void handleTick(int time);
 
   /**
-   * @brief Each facility is prompted to its end-of-time-step
+   *  Each facility is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock
@@ -185,53 +185,53 @@ class SourceFacility : public FacilityModel  {
  */
  protected:
   /**
-   * @brief This facility has only one output commodity
+   *  This facility has only one output commodity
    */
   std::string out_commod_;
   
   /**
-   * @brief  This facility has a specific recipe for its output
+   *   This facility has a specific recipe for its output
    */
   IsoVector recipe_;
   
   /**
-   * @brief  Name of the recipe this facility uses.
+   *   Name of the recipe this facility uses.
    */
   std::string recipe_name_;
 
   /**
-   * @brief The price that the facility will charge for its output commodity.
+   *  The price that the facility will charge for its output commodity.
    * Units vary and are in dollars per inventory unit.
    */
   double commod_price_;
 
   /**
-   * @brief A list of orders to be processed on the Tock
+   *  A list of orders to be processed on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * @brief generates a material at a given time
+   *  generates a material at a given time
    * @param curr_time the current simulation time period */
   void generateMaterial(int curr_time);
 
   /**
-   * @brief builds a transaction
+   *  builds a transaction
    */
   Transaction buildTransaction();
 
   /**
-   * @brief sends a transaction as an offer
+   *  sends a transaction as an offer
    */
   void sendOffer(Transaction trans);
 
   /**
-   * @brief indicates the time just before the facility was built
+   *  indicates the time just before the facility was built
    */
   int prev_time_;
 
   /**
-   * @brief  The capacity is defined in terms of the number of units of the recipe
+   *   The capacity is defined in terms of the number of units of the recipe
    *  that can be provided each time step.  A very large number can be
    *  provided to represent infinte capacity.
    */

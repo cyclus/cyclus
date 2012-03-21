@@ -21,7 +21,7 @@ typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
 /*!
    @class Material
   
-   @brief The Cyclus Material class provides the data structure that supports 
+    The Cyclus Material class provides the data structure that supports 
    the isotopic composition of materials passed around in a Cyclus simulation 
    and the functions as the interface with which models interact 
    with materials.
@@ -59,12 +59,12 @@ typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
 class Material : public Resource {
 public:
   /**
-   * @brief default constructor
+   *  default constructor
    */
   Material();
 
   /**
-   * @brief a constructor for making a material object 
+   *  a constructor for making a material object 
    * from a known recipe and size.
    * 
    * @param comp isotopic makeup of this material object
@@ -72,7 +72,7 @@ public:
   Material(IsoVector comp);
 
   /**
-   * @brief a constructor for making a material object 
+   *  a constructor for making a material object 
    * from another material object
    * 
    * @param other the material object to copy from
@@ -80,18 +80,18 @@ public:
   Material(const Material& other);
   
   /**
-   * @brief default destructor
+   *  default destructor
    */
   ~Material() {};
   
   /**
-   * @brief standard verbose printer includes both an 
+   *  standard verbose printer includes both an 
    * atom and mass composition output
    */
   void print(); 
 
   /**
-   * @brief Change/set the mass of the resource object. 
+   *  Change/set the mass of the resource object. 
    * Note that this does make matter (dis)appear and 
    * should only be used on objects that are not part of
    * any actual tracked inventory.
@@ -99,42 +99,42 @@ public:
   void setQuantity(double quantity);
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   double quantity() {return iso_vector_.mass();};
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   std::string units() {return "kg";};
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   bool checkQuality(rsrc_ptr other);
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   bool checkQuantityEqual(rsrc_ptr other);
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   bool checkQuantityGT(rsrc_ptr other);
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   ResourceType type() {return MATERIAL_RES;};
 
   /**
-   * @brief Resource class method
+   *  Resource class method
    */
   rsrc_ptr clone();
 
   /**
-   * @brief Absorbs the contents of the given 
+   *  Absorbs the contents of the given 
    * Material into this Material and deletes 
    * the given Material. 
    * 
@@ -143,7 +143,7 @@ public:
   virtual void absorb(mat_rsrc_ptr matToAdd);
 
   /**
-   * @brief Extracts from this material a composition 
+   *  Extracts from this material a composition 
    * specified by the given IsoVector
    * 
    * @param rem_comp the composition/amount of material that will be removed
@@ -154,7 +154,7 @@ public:
   virtual mat_rsrc_ptr extract(IsoVector rem_comp);
 
   /**
-   * @brief Extracts a specified mass from this material creating a new material
+   *  Extracts a specified mass from this material creating a new material
    * object with the same isotopic ratios.
    * 
    * @param the amount (mass) of material that will be removed
@@ -164,7 +164,7 @@ public:
   virtual mat_rsrc_ptr extract(double mass);
 
   /**
-   * @brief Decays this Material object for the given number of months and updates
+   *  Decays this Material object for the given number of months and updates
    * its composition map with the new number densities.
    * 
    * @param months the number of months to decay
@@ -172,19 +172,19 @@ public:
   void decay(double months);
   
   /**
-   * @brief Decays this Material object for however 
+   *  Decays this Material object for however 
    * many months have passed since the 
    * last entry in the material history.
    */
   void decay();
 
   /**
-   * @brief Returns a copy of this material's isotopic composition
+   *  Returns a copy of this material's isotopic composition
    */
   IsoVector isoVector() {return iso_vector_;}
 
   /**
-   * @brief Decays all of the materials if decay is on
+   *  Decays all of the materials if decay is on
    * 
    * @todo should be private (khuff/rcarlsen)
    * 
@@ -193,67 +193,67 @@ public:
   static void decayMaterials(int time);
   
   /**
-   * @brief sets the decay boolean and the interval
+   *  sets the decay boolean and the interval
    */
   static void setDecay(int dec);
 
 private:
   /**
-   * @brief used by print() to 'hide' print code when logging is not desired
+   *  used by print() to 'hide' print code when logging is not desired
    */
   std::string detail(); 
 
   /**
-   * @brief last time this material object's state 
+   *  last time this material object's state 
    * was accurate (e.g. time of last decay, etc.)
    */
   int last_update_time_;
 
   /**
-   * @brief all isotopic details of this material object
+   *  all isotopic details of this material object
    */
   IsoVector iso_vector_;
 
   /**
-   * @brief list of materials
+   *  list of materials
    */
   static std::vector<mat_rsrc_ptr> materials_;
 
   /**
-   * @brief true if decay should occur, false if not.
+   *  true if decay should occur, false if not.
    */
   static bool decay_wanted_;
 
   /**
-   * @brief how many months between decay calculations
+   *  how many months between decay calculations
    */
   static int decay_interval_;
 
 // -------- resource class related members  -------- 
  public:
   /**
-   * @brief the material class resouce type
+   *  the material class resouce type
    */
   std::string type_name(){return "material";}
 
   /**
-   * @brief resouce type logging state
+   *  resouce type logging state
    */
   bool is_resource_type_logged(){return type_is_logged_;}
 
   /**
-   * @brief tells the simulation this resource type is logged
+   *  tells the simulation this resource type is logged
    */
   void type_logged(){type_is_logged_ = true;}
 
   /** 
-   * @brief set the agent who created this resource
+   *  set the agent who created this resource
    */
   void setOriginatorID(int id);
 
  private:
   /**
-   * @brief the state of logging for this resource type
+   *  the state of logging for this resource type
    */
   static bool type_is_logged_;
 // -------- resource class related members  -------- 
@@ -262,29 +262,29 @@ private:
 // -------- output database related members  -------- 
  public:
   /**
-   * @brief the table for logging material resources
+   *  the table for logging material resources
    */
   static table_ptr material_table;
 
   /**
-   * @brief add a material to table
+   *  add a material to table
    */
   void addToTable();
 
 
   /**
-   * @brief return the state id for the iso vector
+   *  return the state id for the iso vector
    */
   int stateID(){return iso_vector_.stateID();}
 
  private:
   /**
-   * @brief Define the database table
+   *  Define the database table
    */
   static void define_table();
 
   /**
-   * @brief Store information about the material's primary key
+   *  Store information about the material's primary key
    */
   primary_key_ref pkref_;
 // -------- output database related members  -------- 

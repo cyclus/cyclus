@@ -10,7 +10,7 @@
 #include "Communicator.h"
 
 /**
-   @brief Markets are used to allocate transactions between agents. Each 
+    Markets are used to allocate transactions between agents. Each 
    Market is associated with one resource or commodity.
    
    @section introduction Introduction
@@ -50,40 +50,40 @@ class MarketModel : public Model, public Communicator {
  */
  private:
   /**
-   * @brief  a list of all markets
+   *   a list of all markets
    */
   static std::list<MarketModel*> markets_;
 
  public:
   /**
-   * @brief  default constructor
+   *   default constructor
    */
   MarketModel();
   
   /**
-   * @brief  MarketModels should not be indestructible.
+   *   MarketModels should not be indestructible.
    */
   virtual ~MarketModel();
   
   /**
-   * @brief Queries the list of known markets for one associated with the commodity
+   *  Queries the list of known markets for one associated with the commodity
    *
    * @param commod a string naming the commodity whose market is of interest
    */
   static MarketModel* marketForCommod(std::string commod);
 
   /**
-   * @brief  every model needs a method to initialize from XML
+   *   every model needs a method to initialize from XML
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  every model needs a method to copy one object to another
+   *   every model needs a method to copy one object to another
    */
   virtual void copy(MarketModel* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -93,12 +93,12 @@ class MarketModel : public Model, public Communicator {
   virtual void copyFreshModel(Model* src)=0;
 
   /**
-   * @brief  every model should be able to print a verbose description
+   *   every model should be able to print a verbose description
    */
   virtual void print();
 
   /**
-   * @brief  default MarketModel receiver simply logs the offer/request
+   *   default MarketModel receiver simply logs the offer/request
    */
   virtual void receiveMessage(msg_ptr msg) 
   { messages_.insert(msg); };
@@ -112,34 +112,34 @@ class MarketModel : public Model, public Communicator {
  */
 public:
   /**
-   * @brief  every market should provide its commodity
+   *   every market should provide its commodity
    */
   std::string commodity() { return commodity_; } ;
 
   /**
-   * @brief  Primary funcation of a Market is to resolve the set of 
+   *   Primary funcation of a Market is to resolve the set of 
    *  requests with the set of offers.
    */
   virtual void resolve() = 0;
 
 protected: 
   /**
-   * @brief  every market has a commodity
+   *   every market has a commodity
    */
   std::string commodity_;
 
   /**
-   * @brief  every market collects offers & requests
+   *   every market collects offers & requests
    */
   std::set<msg_ptr> messages_;
 
   /**
-   * @brief  every market generates a set of orders
+   *   every market generates a set of orders
    */
   std::deque<msg_ptr> orders_;
 
   /**
-   * @brief  every market knows its number of firm orders
+   *   every market knows its number of firm orders
    */
   int firmOrders_;
   

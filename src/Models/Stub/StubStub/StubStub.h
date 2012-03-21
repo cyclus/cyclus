@@ -7,7 +7,7 @@
 #include "Logger.h"
 
 /**
-   @brief
+   
    The StubStub class inherits from the StubModel class and is dynamically
    loaded by the Model class when requested.
    
@@ -21,31 +21,31 @@ class StubStub : public StubModel {
  */
  public:
   /**
-   * @brief Default constructor for StubStub Class
+   *  Default constructor for StubStub Class
    */
   StubStub();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubStub();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubStub* src) ;
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 

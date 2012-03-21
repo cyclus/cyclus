@@ -19,7 +19,7 @@ typedef std::vector< std::string > DataTypes;
 typedef std::vector< boost::spirit::hold_any > Data;
 
 /**
-   @brief
+   
    The BookKeeper is a (singleton) class for handling I/O.
    
    @section introduction Introduction
@@ -53,47 +53,47 @@ typedef std::vector< boost::spirit::hold_any > Data;
 class BookKeeper {
  private:
   /**
-   * @brief A pointer to this BookKeeper once it has been initialized.
+   *  A pointer to this BookKeeper once it has been initialized.
    */
   static BookKeeper* instance_;
   
   /**
-   * @brief The output database for the simulation this BookKeeper is 
+   *  The output database for the simulation this BookKeeper is 
    * responsible for.
    */
   Database* db_;
   
   /**
-   * @brief Stores the final filename we'll use for the DB, since we use it 
+   *  Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
    */
   std::string dbName_;
   
   /**
-   * @brief True iff the db is open.
+   *  True iff the db is open.
    */
   bool dbIsOpen_;
 
   /**
-   * @brief A pointer the Tables registered with the BookKeeper
+   *  A pointer the Tables registered with the BookKeeper
    */
   static TableMap* registeredTables_;
 
   /**
-   * @brief A boolean to determine if logging is on.
+   *  A boolean to determine if logging is on.
    */
   static bool logging_on_;
 
  protected:
   /**
-   * @brief The (protected) constructor for this class, which can only be 
+   *  The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
    */
   BookKeeper();
 
  public:
   /**
-   * @brief Gives all simulation objects global access to the BookKeeper by 
+   *  Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
    * Like the Highlander, there can be only one.
    *
@@ -102,27 +102,27 @@ class BookKeeper {
   static BookKeeper* Instance();
 
   /**
-   * @brief Return the state of logging being on or off
+   *  Return the state of logging being on or off
    */
   bool loggingIsOn();
 
   /**
-   * @brief Turn on logging
+   *  Turn on logging
    */
   void turnLoggingOn();
 
   /**
-   * @brief Turn off logging
+   *  Turn off logging
    */
   void turnLoggingOff();
   
   /**
-   * @brief Creates a database file with the default name, cyclus.sqlite. 
+   *  Creates a database file with the default name, cyclus.sqlite. 
    */
   void createDB(){createDB("cyclus.sqlite");}
  
   /**
-   * @brief Creates a database file with the name indicated. 
+   *  Creates a database file with the name indicated. 
    * This function queries the environment variable CYCLUS_OUTPUT_DIR.
    *
    * @param name is the name of the sqlite database file. Should end in .sqlite
@@ -130,7 +130,7 @@ class BookKeeper {
   void createDB(std::string name);
 
   /**
-   * @brief Creates a database given a file_path. This is the master create function.
+   *  Creates a database given a file_path. This is the master create function.
    * If the named file in fpath already exists, this function
    * will delete it and create a new file.
    *
@@ -140,39 +140,39 @@ class BookKeeper {
   void createDB(std::string name, file_path fpath);
 
   /**
-   * @brief Returns the database this Book Keeper is maintaining.
+   *  Returns the database this Book Keeper is maintaining.
    */
   Database* getDB() {return db_;}
 
   /**
-   * @brief Returns the name of the database
+   *  Returns the name of the database
    */
   std::string dbName(){return dbName_;}
   
   /**
-   * @brief Returns whether or not the database exists
+   *  Returns whether or not the database exists
    */
   bool dbExists();
 
   /**
-   * @brief Returns whether the database open (and it exists)
+   *  Returns whether the database open (and it exists)
    */
   bool dbIsOpen();
 
   /**
-   * @brief Opens the database this Book Keeper is maintaining.
+   *  Opens the database this Book Keeper is maintaining.
    */
   void openDB();
 
   /**
-   * @brief Closes the database this Book Keeper is maintaining.
+   *  Closes the database this Book Keeper is maintaining.
    * However, before issuing the close command, any Tables
    * with row commands remaining will have those commands issued.
    */
   void closeDB();
 
   /**
-   * @brief Registers a new table with the Book Keeper
+   *  Registers a new table with the Book Keeper
    *
    * @param name the Table's name
    * @param columns the name of each column in the Table
@@ -182,7 +182,7 @@ class BookKeeper {
 			DataTypes dataTypes);
 
   /**
-   * @brief Adds a row to a given table
+   *  Adds a row to a given table
    *
    * @param name the Table's name
    * @param columns the name of each column in the row being added
@@ -192,7 +192,7 @@ class BookKeeper {
 		     Data data);
 
   /**
-   * @brief Updates a row of a given table
+   *  Updates a row of a given table
    *
    * @param name the Table's name
    * @param columns the name of each column in the row being updated
@@ -202,7 +202,7 @@ class BookKeeper {
 			Data data);
 
   /**
-   * @brief Adds a table to the database's vector of tables and then issues
+   *  Adds a table to the database's vector of tables and then issues
    * the command to create that table.
    *
    * @param t is the table to be registered
@@ -210,25 +210,25 @@ class BookKeeper {
   void registerTable(table_ptr t);
 
   /**
-   * @brief Unregister a table with the Book Keeper's database
+   *  Unregister a table with the Book Keeper's database
    *
    * @param t is the table to be removed
    */
   void removeTable(table_ptr t);
   
   /**
-   * @brief Returns the number of tables registered with the BookKeeper
+   *  Returns the number of tables registered with the BookKeeper
    */
   int nTables();
   
   /**
-   * @brief Return the Book Keeper's current command threshold on writing
+   *  Return the Book Keeper's current command threshold on writing
    * rows to the database.
    */
   int rowThreshold();
 
   /**
-   * @brief Tables alert the BookKeeper when they have maxed out their queue of
+   *  Tables alert the BookKeeper when they have maxed out their queue of
    * row commands. The BookKeeper then invokes the Database's writeRows
    * function and then flushes the Table's row commands container.
    *

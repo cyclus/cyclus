@@ -12,7 +12,7 @@ outlining proper use of this logging functionality are outlined @ref Logger "her
 /**
 @def LOG(level, prefix)
 
-@brief allows easy logging via the streaming operator similar to std::cout
+ allows easy logging via the streaming operator similar to std::cout
 
 This is the primary way to use the Logger class. This macro returns an
 anonymous instance of the Logger class (not assigned to any variable) that can
@@ -52,7 +52,7 @@ else Logger().Get(level, "memory")
 /**
 @enum LogLevel
 
-@brief categorical (verbosity) levels for log statements.
+ categorical (verbosity) levels for log statements.
  */
 enum LogLevel {
                LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
@@ -70,7 +70,7 @@ enum LogLevel {
                };
 
 /**
-@brief A logging tool providing finer grained control over standard output for debugging.
+ A logging tool providing finer grained control over standard output for debugging.
 
 Built-in logging functionality has been provided to aid debugging.  @e std::cout
 statements should be generally avoided.  The LOG(level) macro should be used
@@ -159,13 +159,13 @@ class Logger {
     virtual ~Logger();
 
     /*!
-    @brief Returns a string stream by reference that is flushed to stdout by
+     Returns a string stream by reference that is flushed to stdout by
     the Logger class destructor.
     */
     std::ostringstream& Get(LogLevel level, std::string prefix);
 
     /*!
-    @brief Returns the report level cutoff by reference for printing
+     Returns the report level cutoff by reference for printing
     LOG(level) statements
     */
     static LogLevel& ReportLevel() {return report_level;};
@@ -177,7 +177,7 @@ class Logger {
     static bool& NoMem() {return no_mem;};
 
     /*!
-    @brief Converts a string into a corresponding LogLevel value.
+     Converts a string into a corresponding LogLevel value.
 
     For strings that do not correspond to any particular LogLevel enum value,
     the method returns the LogLevel value `LEV_ERROR`.  This method is
@@ -187,7 +187,7 @@ class Logger {
     static LogLevel ToLogLevel(std::string text);
 
     /*!
-    @brief Converts a LogLevel enum value into a corrsponding string.
+     Converts a LogLevel enum value into a corrsponding string.
 
     For a level argments that have no corresponding string value, the string
     `BAD_LEVEL` is returned.  This method is primarily intended for translating

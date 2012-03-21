@@ -20,55 +20,55 @@ class Message;
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
 /**
- * @brief An enumerative type to specify which direction 
+ *  An enumerative type to specify which direction 
  * (up or down the class hierarchy) this message is moving.
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 
 /**
- * @brief A transaction structure to include in any message.
+ *  A transaction structure to include in any message.
  */
 struct Transaction {
   /**
-   * @brief The commodity that is being requested or offered in this Message.
+   *  The commodity that is being requested or offered in this Message.
    */
   std::string commod;
 
   /**
-   * @brief True if this is an offer, false if it's a request
+   *  True if this is an offer, false if it's a request
    */
   bool is_offer;
 
   /**
-   * @brief The minimum fraction of the specified commodity that the 
+   *  The minimum fraction of the specified commodity that the 
    * requester is willing to accept or the offerer is willing to send. 
    */
   double minfrac;
 
   /**
-   * @brief The price per unit of the commodity being requested or offered.
+   *  The price per unit of the commodity being requested or offered.
    */
   double price;
 
   /**
-   * @brief A specific resource this transaction is concerned with 
+   *  A specific resource this transaction is concerned with 
    */
   rsrc_ptr resource;
 
   /**
-   * @brief supplier in this transaction.
+   *  supplier in this transaction.
    */
   Model* supplier;
 
   /**
-   * @brief requester in this transaction.
+   *  requester in this transaction.
    */
   Model* requester;
 };
 
 
 /**
-   @brief A Message class for inter-entity communication.
+    A Message class for inter-entity communication.
 
    @section intro Introduction
 
@@ -159,73 +159,73 @@ struct Transaction {
 class Message: IntrusiveBase<Message> {
  private:
   /**
-   * @brief The direction this message is traveling 
+   *  The direction this message is traveling 
    * (up or down the class hierarchy).
    */
   MessageDir dir_;
   
   /**
-   * @brief The Transaction this message is concerned with
+   *  The Transaction this message is concerned with
    */
   Transaction trans_;
   
   /**
-   * @brief The Communicator who sent this Message.
+   *  The Communicator who sent this Message.
    */
   Communicator* sender_;
   
   /**
-   * @brief The Communicator who will receive this Message.
+   *  The Communicator who will receive this Message.
    */
   Communicator* recipient_;
 
   /**
-   * @brief Pointers to each model this message passes through.
+   *  Pointers to each model this message passes through.
    */
   std::vector<Communicator*> path_stack_;
   
   /**
-   * @brief the most recent communicator to receive this message.
+   *  the most recent communicator to receive this message.
    * 
    * Used to prevent circular messaging.
    */
   Communicator* current_owner_;
 
   /**
-   * @brief offer/request partner for this message (meaning only for matched offers/requests)
+   *  offer/request partner for this message (meaning only for matched offers/requests)
    */
   msg_ptr partner_;
   
   /**
-   * @brief Checks required conditions prior to sending a message.
+   *  Checks required conditions prior to sending a message.
    */
   void validateForSend();
 
   /**
-   * @brief mark a Model* as a participating sim agent (not a template)
+   *  mark a Model* as a participating sim agent (not a template)
    */
   void setRealParticipant(Communicator* who);
   
   /**
-   * @brief stores the next available transaction ID
+   *  stores the next available transaction ID
    */
   static int nextTransID_;
 
   /**
-   * @brief a boolean to determine if the message has completed its route
+   *  a boolean to determine if the message has completed its route
    */
   bool dead_;
 
  public:
   /**
-   * @brief Creates an empty upward message from some communicator.
+   *  Creates an empty upward message from some communicator.
    * 
    * @param sender the sender of this Message
    */
   Message(Communicator* sender);
 
   /**
-   * @brief Creates an upward message using the given
+   *  Creates an upward message using the given
    * sender, and recipient.
    * 
    * @param sender sender of this Message
@@ -234,7 +234,7 @@ class Message: IntrusiveBase<Message> {
   Message(Communicator* sender, Communicator* receiver);
   
   /**
-   * @brief Creates an upward message using the given sender, 
+   *  Creates an upward message using the given sender, 
    * recipient, and transaction.
    * 
    * @param sender sender of this Message
@@ -246,13 +246,13 @@ class Message: IntrusiveBase<Message> {
   virtual ~Message();
 
   /**
-   * @brief Creates a new message by copying the current one and
+   *  Creates a new message by copying the current one and
    * returns a reference to it.
    */
   msg_ptr clone();
 
   /**
-   * @brief Send this message to the next communicator in it's path
+   *  Send this message to the next communicator in it's path
    * 
    * Messages heading up (UP_MSG) are forwareded to the communicator
    * designated by the setNextDest(Communicator*) function. Messages
@@ -268,19 +268,19 @@ class Message: IntrusiveBase<Message> {
   virtual void sendOn();
 
   /**
-   * @brief Renders the sendOn method disfunctional.
+   *  Renders the sendOn method disfunctional.
    * 
    * Used to prevend messages from returning through/to deallocated model objects.
    */
   void kill();
 
   /**
-   * @brief returns true if this message has been killed - see Message::kill()
+   *  returns true if this message has been killed - see Message::kill()
    */
   bool isDead() {return dead_;}
   
   /**
-   * @brief designate the next object to receive this message
+   *  designate the next object to receive this message
    * 
    * Calls to this method are ignored (do nothing) when the message direction is
    * down.
@@ -298,19 +298,19 @@ class Message: IntrusiveBase<Message> {
   void reverseDirection();
   
   /**
-   * @brief Returns the direction this Message is traveling.
+   *  Returns the direction this Message is traveling.
    */
   MessageDir dir() const;
   
   /**
-   * @brief Sets the direction of the message
+   *  Sets the direction of the message
    * 
    * @param newDir is the new direction
    */
   void setDir(MessageDir newDir);
   
   /**
-   * @brief Get the market corresponding to the transaction commodity
+   *  Get the market corresponding to the transaction commodity
    * 
    * @return market corresponding to this msg's transaction's commodity
    * 
@@ -318,19 +318,19 @@ class Message: IntrusiveBase<Message> {
   Communicator* market();
   
   /**
-   * @brief Prints the transaction data.
+   *  Prints the transaction data.
    */
   void printTrans();
   
   /**
-   * @brief Returns the sender of this Message.
+   *  Returns the sender of this Message.
    * 
    * @return the sender
    */
   Communicator* sender() const {return sender_;};
   
   /**
-   * @brief Returns the recipient of this Message.
+   *  Returns the recipient of this Message.
    * 
    * @return the recipient
    */
@@ -344,7 +344,7 @@ class Message: IntrusiveBase<Message> {
   Model* supplier() const;
 
   /**
-   * @brief Sets the assigned supplier of the material for the 
+   *  Sets the assigned supplier of the material for the 
    * transaction in this message. 
    * 
    * @param supplier pointer to the new supplier
@@ -352,14 +352,14 @@ class Message: IntrusiveBase<Message> {
   void setSupplier(Model* supplier) {trans_.supplier = supplier;};
 
   /**
-   * @brief Returns the requester in this Message.
+   *  Returns the requester in this Message.
    * 
    * @return pointer to the requester
    */
   Model* requester() const;
 
   /**
-   * @brief Sets the assigned requester to receive the material
+   *  Sets the assigned requester to receive the material
    * for the transaction in this message.
    * 
    * @param requester pointer to the new requester
@@ -367,83 +367,83 @@ class Message: IntrusiveBase<Message> {
   void setRequester(Model* requester){trans_.requester = requester;};
 
   /**
-   * @brief Returns the transaction associated with this message.
+   *  Returns the transaction associated with this message.
    * 
    * @return the Transaction
    */
   Transaction trans() const {return trans_;};
 
   /**
-   * @brief Returns the commodity requested or offered in this Message.
+   *  Returns the commodity requested or offered in this Message.
    * 
    * @return commodity for this transaction
    */
   std::string commod() const {return trans_.commod;};
 
   /**
-   * @brief Sets the commodity requested or offered in this Message.
+   *  Sets the commodity requested or offered in this Message.
    * 
    * @param new_commod the commodity associated with this message/transaction
    */
   void setCommod(std::string new_commod) {trans_.commod = new_commod;};
 
   /**
-   * @brief True if the transaction is an offer, false if it's a request
+   *  True if the transaction is an offer, false if it's a request
    * 
    * @return true if the transaction is an offer, false if it's a request
    */
   double isOffer() const {return trans_.is_offer;};
 
   /**
-   * @brief True if the transaction is an offer, false if it's a request
+   *  True if the transaction is an offer, false if it's a request
    * 
    * @return true if the transaction is an offer, false if it's a request
    */
   void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
 
   /**
-   * @brief Returns the price being requested or offered in this message.
+   *  Returns the price being requested or offered in this message.
    * 
    * @return the price (in dollars)
    */
   double price() const {return trans_.price;};
 
   /**
-   * @brief Returns the price being requested or offered in this message.
+   *  Returns the price being requested or offered in this message.
    * 
    * @param new_price the new price (in dollars)
    */
   void setPrice(double new_price) {trans_.price = new_price;};
 
   /**
-   * @brief Returns the Resource being requested or offered in this message.
+   *  Returns the Resource being requested or offered in this message.
    * 
    * @return the Resource  (i.e. Material object) 
    */
   rsrc_ptr resource() const {return trans_.resource;};
 
   /**
-   * @brief Sets the assigned resource to a new resource
+   *  Sets the assigned resource to a new resource
    * 
    * @param new_resource is the new Resource in the transaction
    */
   void setResource(rsrc_ptr new_resource) {if (new_resource.get()) {trans_.resource = new_resource->clone();}};
 
   /**
-   * @brief Used to match this message with a corresponding offer/request message after
+   *  Used to match this message with a corresponding offer/request message after
    * matching takes place in a market.
   */
   void setPartner(msg_ptr partner) {partner_ = partner;};
 
   /**
-   * @brief returns the corresponding offer/request message 
+   *  returns the corresponding offer/request message 
    * assuming this message has been matched
    * in a market. Returns the 'this' pointer otherwise.
   */
   msg_ptr partner() {return partner_;};
 
   /**
-   * @brief Initiate the transaction - sending/receiving of resource(s) between
+   *  Initiate the transaction - sending/receiving of resource(s) between
    * the supplier/requester
    * 
    * This should be the sole way of transferring resources between simulation
@@ -456,34 +456,34 @@ class Message: IntrusiveBase<Message> {
 // -------- output database related members  -------- 
  public:
   /**
-   * @brief the transaction output database Table
+   *  the transaction output database Table
    */
   static table_ptr trans_table;
 
   /**
-   * @brief the transacted resource output database Table
+   *  the transacted resource output database Table
    */
   static table_ptr trans_resource_table;
 
  private:
   /**
-   * @brief Define the transaction database table
+   *  Define the transaction database table
    */
   static void define_trans_table();
 
   /**
-   * @brief Define the transacted resource database table
+   *  Define the transacted resource database table
    */
   static void define_trans_resource_table();
 
   /**
-   * @brief add a transaction to the transaction table
+   *  add a transaction to the transaction table
    * @param id the message id
    */
   void addTransToTable(int id);
 
   /**
-   * @brief add a transaction to the transaction table
+   *  add a transaction to the transaction table
    * @param id the message id
    * @param position the position in the manifest
    * @param resource the resource being transacted
@@ -491,12 +491,12 @@ class Message: IntrusiveBase<Message> {
   void addResourceToTable(int id, int position, rsrc_ptr resource);
 
   /**
-   * @brief the transaction primary key
+   *  the transaction primary key
    */
   primary_key_ref pkref_trans_;
 
   /**
-   * @brief the resource primary key
+   *  the resource primary key
    */
   primary_key_ref pkref_rsrc_;
 // -------- output database related members  --------   

@@ -11,7 +11,7 @@
 
 /**
   @class EnrichmentFacility
-  @brief The EnrichmentFacility enriches uranium. 
+   The EnrichmentFacility enriches uranium. 
   
   This class inherits from the FacilityModel class and 
   is dynamically loaded by the Model class when requested.
@@ -84,28 +84,28 @@ class EnrichmentFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Default constructor for the EnrichmentFacility class.
+   *  Default constructor for the EnrichmentFacility class.
    */
   EnrichmentFacility() {};
 
   /**
-   * @brief Destructor for the EnrichmentFacility class. 
+   *  Destructor for the EnrichmentFacility class. 
    */
   virtual ~EnrichmentFacility() {};
   
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(EnrichmentFacility* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -116,7 +116,7 @@ class EnrichmentFacility : public FacilityModel  {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief Print information about this model
+   *  Print information about this model
    */
   virtual void print();
 
@@ -129,7 +129,7 @@ class EnrichmentFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief When the facility receives a message, execute any transaction therein
+   *  When the facility receives a message, execute any transaction therein
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -142,7 +142,7 @@ class EnrichmentFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -151,7 +151,7 @@ class EnrichmentFacility : public FacilityModel  {
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * @brief Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -160,7 +160,7 @@ class EnrichmentFacility : public FacilityModel  {
                               std::vector<rsrc_ptr> manifest);
 
   /**
-   * @brief The handleTick function specific to the EnrichmentFacility.
+   *  The handleTick function specific to the EnrichmentFacility.
    * At each tick, it requests as much raw inCommod as it can process this
    * month and offers as much outCommod as it will have in its inventory by 
    * the
@@ -171,7 +171,7 @@ class EnrichmentFacility : public FacilityModel  {
   virtual void handleTick(int time);
 
   /**
-   * @brief The handleTick function specific to the EnrichmentFacility.
+   *  The handleTick function specific to the EnrichmentFacility.
    * At each tock, it processes material and handles orders, and records this
    * month's actions.
    *
@@ -188,52 +188,52 @@ class EnrichmentFacility : public FacilityModel  {
  */
  protected:
   /**
-   * @brief A typedef for the data structure representing a Facility's process
+   *  A typedef for the data structure representing a Facility's process
    * line, that is, the black box materials sit in while they're being
    * operated on.
    */
   typedef std::multimap<int, std::pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
   /**
-   * @brief The EnrichmentFacility has one input commodity
+   *  The EnrichmentFacility has one input commodity
    */
   std::string in_commod_;
 
   /**
-   * @brief The EnrichmentFacility has one output commodity
+   *  The EnrichmentFacility has one output commodity
    */
   std::string out_commod_;
 
   /**
-   * @brief The EnrichmentFacility has a limit to how material it can process.
+   *  The EnrichmentFacility has a limit to how material it can process.
    * Units vary. It will be in the commodity unit per month.
    */
   double capacity_;
 
   /**
-   * @brief The EnrichmentFacility has a default tails fraction (xw)
+   *  The EnrichmentFacility has a default tails fraction (xw)
    * to help it calculate SWUs from a desired product.
    * If it is not set in the XML input, the default value is 0.25% 
    */
   double default_xw_;
 
   /**
-   * @brief The stocks of raw material available to be processed.
+   *  The stocks of raw material available to be processed.
    */
   std::deque<mat_rsrc_ptr> stocks_;
     
   /**
-   * @brief The inventory of processed material.
+   *  The inventory of processed material.
    */
   std::deque<mat_rsrc_ptr> inventory_;
 
   /**
-   * @brief The inventory of waste material.
+   *  The inventory of waste material.
    */
   std::deque<mat_rsrc_ptr> wastes_;
 
   /**
-   * @brief The total mass flow required to process all outstanding orders this 
+   *  The total mass flow required to process all outstanding orders this 
    * Facility has already committed to. Units are tons, sometimes of uranium 
    * and sometimes of certain isotopes. For Enrichment, they're tons U SWU. 
    * For Fuel Fab, they're tons U.
@@ -241,48 +241,48 @@ class EnrichmentFacility : public FacilityModel  {
   double outstMF_;
 
   /**
-   * @brief The list of orders to process on the Tock
+   *  The list of orders to process on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * @brief A map whose keys are times at which this Facility will finish executing a 
+   *  A map whose keys are times at which this Facility will finish executing a 
    * given order and the values are pairs comprising the orders themselves and 
    * the Materials each is to be made with.
    */
   ProcessLine ordersExecuting_;
 
   /**
-   * @brief get the total mass of the stuff in the inventory
+   *  get the total mass of the stuff in the inventory
    *
    * @return the total mass of the materials in storage
    */
   double checkInventory();
 
   /**
-   * @brief get the total mass of the stuff in the inventory
+   *  get the total mass of the stuff in the inventory
    *
    * @return the total mass of the materials in storage
    */
   double checkStocks();
     
   /**
-   * @brief Enriches all material waiting in the ordersExecuting ProcessLine
+   *  Enriches all material waiting in the ordersExecuting ProcessLine
    */
   void enrich();
 
   /**
-   * @brief Makes requests according to how much spotCapacity is available.
+   *  Makes requests according to how much spotCapacity is available.
    */
   void makeRequests();
 
   /**
-   * @brief Makes offers according to how much spotCapacity is available.
+   *  Makes offers according to how much spotCapacity is available.
    */
   void makeOffers();
 
   /**
-   * @brief Calculates the separative work (in ton SWU) required to create a certain 
+   *  Calculates the separative work (in ton SWU) required to create a certain 
    * amount of enriched uranium product subject to a given enrichment scheme.
    * 
    * Note: for now, this model assumes two-component enrichment (only U-235 
@@ -297,7 +297,7 @@ class EnrichmentFacility : public FacilityModel  {
   static double calcSWUs(double massProdU, double xp, double xf, double xw);
 
   /**
-   * @brief Same as the four-argument version, but uses this Enrichment plant's 
+   *  Same as the four-argument version, but uses this Enrichment plant's 
    * default value for tails enrichment.
    * 
    * Note: for now, this function assumes two-component enrichment (only U-235 
@@ -311,7 +311,7 @@ class EnrichmentFacility : public FacilityModel  {
   double calcSWUs(double massProdU, double xp, double xf);
 
   /**
-   * @brief Checks to see if the given candidate Material can be used for enrichment
+   *  Checks to see if the given candidate Material can be used for enrichment
    * of any of the ordersWaiting for Material. If so, returns an iterator 
    * pointing to that item. If not, returns an iterator just past the last 
    * element.
@@ -322,24 +322,24 @@ class EnrichmentFacility : public FacilityModel  {
   std::multimap<int,msg_ptr>::iterator checkOrdersWaiting(mat_rsrc_ptr candMat);
 
   /**
-   * @brief The time that the stock material spends in the facility.
+   *  The time that the stock material spends in the facility.
    */
   int residence_time;
 
   /**
-   * @brief The maximum size that the inventory can grow to.
+   *  The maximum size that the inventory can grow to.
    * The EnrichmentFacility must stop processing the material in its stocks 
    * when its inventory is full.
    */
   int inventory_size_;
 
   /**
-   * @brief The receipe of input materials.
+   *  The receipe of input materials.
    */
   mat_rsrc_ptr in_recipe;
 
   /**
-   * @brief The receipe of the output material.
+   *  The receipe of the output material.
    */
   mat_rsrc_ptr out_recipe;
 

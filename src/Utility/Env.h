@@ -14,39 +14,39 @@ class CycNoEnvVarException: public CycException {
 /**
  * @class Env
  *
- * @brief A (singleton) environment utility to help locate 
+ *  A (singleton) environment utility to help locate 
  * files and find environment settings 
  */
 class Env {
 private:
   /**
-   * @brief the relative path from cwd to cyclus
+   *  the relative path from cwd to cyclus
    */
   static boost::filesystem::path path_from_cwd_to_cyclus_;
 
   /**
-   * @brief the cwd path
+   *  the cwd path
    */
   static boost::filesystem::path cwd_;
 
 public:
 
   /**
-   * @brief the path basis
+   *  the path basis
    *
    * @return path with the last item removed
    */
   static std::string pathBase(std::string path);
 
   /**
-   * @brief the relative cyclus path
+   *  the relative cyclus path
    * 
    * @return the relative path from the cwd to the cyclus executable
    */
   static std::string getCyclusPath();
   
   /**
-   * @brief Allows configuration and other files to be located independent
+   *  Allows configuration and other files to be located independent
    * of the working directory from which cyclus is executed.
    *
    * @param path this should be argv[0] as passed to the main function
@@ -56,7 +56,7 @@ public:
   static void setCyclusRelPath(std::string path);
   
   /**
-   * @brief Method to check the existence of and return an environment variable
+   *  Method to check the existence of and return an environment variable
    *
    * @param var is the variable to check and return 
    */

@@ -12,7 +12,7 @@
 
 /**
    @class SeparationsMatrixFacility
-   @brief This FacilityModel is still under construction.
+    This FacilityModel is still under construction.
    
    The SeparationsMatrixFacility class inherits from the FacilityModel 
    class and is dynamically loaded by the Model class when requested.
@@ -91,31 +91,31 @@ class SeparationsMatrixFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Default constructor for SeparationsMatrixFacility Class
+   *  Default constructor for SeparationsMatrixFacility Class
    */
   SeparationsMatrixFacility(){};
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~SeparationsMatrixFacility() {};
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(SeparationsMatrixFacility* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -126,7 +126,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -139,7 +139,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
  */
  public:
    /**
-    * @brief When the facility receives a message, execute any transaction therein
+    *  When the facility receives a message, execute any transaction therein
     */
    virtual void receiveMessage(msg_ptr msg);
    
@@ -152,7 +152,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
  */
  public:
    /**
-    * @brief The handleTick function specific to the SeparationsMatrixFacility.
+    *  The handleTick function specific to the SeparationsMatrixFacility.
     * At each tick, it requests as much raw inCommod as it can process this
     * month and offers as much outCommod as it will have in its inventory by
     * the
@@ -163,7 +163,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
    virtual void handleTick(int time);
 
    /**
-    * @brief The handleTick function specific to the SeparationsMatrixFacility.
+    *  The handleTick function specific to the SeparationsMatrixFacility.
     * At each tock, it processes material and handles orders, and records this
     * month's actions.
     *
@@ -180,50 +180,50 @@ class SeparationsMatrixFacility : public FacilityModel  {
  */
  protected:
    /**
-    * @brief A typedef for the data structure representing a Facility's process
+    *  A typedef for the data structure representing a Facility's process
     * line, that is, the black box materials sit in while they're being
     * operated on.
     */
    typedef std::multimap<int, std::pair<msg_ptr, mat_rsrc_ptr> > ProcessLine;
 
    /**
-    * @brief  Vector of incoming material
+    *   Vector of incoming material
     */
    std::vector<std::string> in_commod_;
 
    /**
-    * @brief  Vector of outgoing material
+    *   Vector of outgoing material
     */
    std::vector<std::string> out_commod_;
 
    /**
-    * @brief The SeparationsMatrixFacility has a limit to how material it can process.
+    *  The SeparationsMatrixFacility has a limit to how material it can process.
     * Units vary. It will be in the commodity unit per month.
     */
    double capacity_;
 
    /**
-    * @brief This is the structure for each stream.
+    *  This is the structure for each stream.
     */
    std::map<std::string,std::pair<int, double> > stream_set_;
 
    /**
-    * @brief The stocks of raw material available to be processed.
+    *  The stocks of raw material available to be processed.
     */
    std::deque<std::pair<std::string,mat_rsrc_ptr> > stocks_;
     
    /**
-    * @brief The inventory of processed material.
+    *  The inventory of processed material.
     */
    std::deque<std::pair<std::string,mat_rsrc_ptr> > inventory_;
 
    /**
-    * @brief The inventory of waste material.
+    *  The inventory of waste material.
     */
    std::deque<std::pair<std::string,mat_rsrc_ptr> > wastes_;
 
    /**
-    * @brief The total mass flow required to process all outstanding orders this
+    *  The total mass flow required to process all outstanding orders this
     * Facility has already committed to. Units are tons, sometimes of uranium
     * and sometimes of certain isotopes. For Enrichment, they're tons U SWU.
     * For Fuel Fab, they're tons U.
@@ -231,48 +231,48 @@ class SeparationsMatrixFacility : public FacilityModel  {
    double outstMF_;
 
    /**
-    * @brief The list of orders to process on the Tock
+    *  The list of orders to process on the Tock
     */
    std::deque<msg_ptr> ordersWaiting_;
 
    /**
-    * @brief A map whose keys are times at which this Facility will finish executing a
+    *  A map whose keys are times at which this Facility will finish executing a
     * given order and the values are pairs comprising the orders themselves and
     * the Materials each is to be made with.
     */
    ProcessLine ordersExecuting_;
 
    /**
-    * @brief get the total mass of the stuff in the inventory
+    *  get the total mass of the stuff in the inventory
     *
     * @return the total mass of the materials in storage
     */
    double checkInventory();
 
    /**
-    * @brief get the total mass of the stuff in the inventory
+    *  get the total mass of the stuff in the inventory
     *
     * @return the total mass of the materials in storage
     */
    double checkStocks();
     
    /**
-    * @brief Separates all material waiting in the ordersExecuting ProcessLine
+    *  Separates all material waiting in the ordersExecuting ProcessLine
     */
    void separate();
 
    /**
-    * @brief Makes requests according to how much spotCapacity is available.
+    *  Makes requests according to how much spotCapacity is available.
     */
    void makeRequests();
 
    /**
-    * @brief Makes offers according to how much spotCapacity is available.
+    *  Makes offers according to how much spotCapacity is available.
     */
    void makeOffers();
 
    /**
-    * @brief Checks to see if the given candidate Material can be used for separations
+    *  Checks to see if the given candidate Material can be used for separations
     * of any of the ordersWaiting for Material. If so, returns an iterator
     * pointing to that item. If not, returns an iterator just past the last
     * element.
@@ -284,19 +284,19 @@ class SeparationsMatrixFacility : public FacilityModel  {
 						      candMat);
 
    /**
-    * @brief The time that the stock material spends in the facility.
+    *  The time that the stock material spends in the facility.
     */
    int residence_time_;
 
    /**
-    * @brief The maximum size that the inventory can grow to.
+    *  The maximum size that the inventory can grow to.
     * The SeparationsMatrixFacility must stop processing the material in its
     * stocks when its inventory is full.
     */
    int inventory_size_;
 
    /**
-    * @brief Hack Force to Get Streams to operate by telling code how many streams to
+    *  Hack Force to Get Streams to operate by telling code how many streams to
     * separate
     */
    int nodeForce_;
@@ -308,18 +308,18 @@ class SeparationsMatrixFacility : public FacilityModel  {
    /* struct Stream; */
 
    /**
-    * @brief The receipe of input materials.
+    *  The receipe of input materials.
     */
    mat_rsrc_ptr in_recipe_;
 
    /**
-    * @brief The receipe of the output material.
+    *  The receipe of the output material.
     */
    mat_rsrc_ptr out_recipe_;
     
  public:
    /**
-    * @brief Transacted resources are extracted through this method
+    *  Transacted resources are extracted through this method
     * 
     * @param order the msg/order for which resource(s) are to be prepared
     * @return list of resources to be sent for this order
@@ -328,7 +328,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
    virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
    /**
-    * @brief Transacted resources are received through this method
+    *  Transacted resources are received through this method
     *
     * @param trans the transaction to which these resource objects belong
     * @param manifest is the set of resources being received

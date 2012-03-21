@@ -7,43 +7,43 @@
 
 /**
  * @class CycException
- * @brief A generic mechanism to manually manage exceptions
+ *  A generic mechanism to manually manage exceptions
  */
 class CycException: public std::exception {
 
 protected:
     /**
-     * @brief  The message associated with this exception.
+     *   The message associated with this exception.
      */
     std::string myMessage_;
     
     /**
-     * @brief  A string to prepend to all message of this class.
+     *   A string to prepend to all message of this class.
      */
     static std::string prepend_;
     
 public:
     /**
-     * @brief  Constructs a new CycException with the default message.
+     *   Constructs a new CycException with the default message.
      */
     CycException();
     
     /**
-     * @brief Constructs a new CycException with a provided message
+     *  Constructs a new CycException with a provided message
      *
      * @param msg the message
      */
     CycException(std::string  msg);
     
     /**
-     * @brief Returns the error message associated with this CycException.
+     *  Returns the error message associated with this CycException.
      *
      * @return the message
      */
     virtual const char* what() const throw();
     
     /**
-     * @brief Destroys this CycException.
+     *  Destroys this CycException.
      */
     virtual ~CycException() throw();
 };

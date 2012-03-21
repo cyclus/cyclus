@@ -35,7 +35,7 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
 //typedef std::vector<col_name> index;
 
 /**
-   @brief
+   
    The Table class is designed as part of the Cyclus Database
    API. Tables are responsible for holding information about
    themselves and keep a queue of command instructions for
@@ -74,39 +74,39 @@ typedef std::pair<key, foreign_key_ref> foreign_key;
 class Table : IntrusiveBase<Table> {
  private:
   /**
-   * @brief Stores the table's name, declared during construction.
+   *  Stores the table's name, declared during construction.
    */
   table_name name_;
   
   /**
-   * @brief A storage container for each column's title
+   *  A storage container for each column's title
    */
   std::vector<col_name> col_names_;
   
   /**
-   * @brief A storage container for each column's title and data type
+   *  A storage container for each column's title and data type
    * @gidden can we combine these two?
    */
   std::vector<column> columns_;
 
   /**
-   * @brief Every table must have a defined primary key
+   *  Every table must have a defined primary key
    */
   primary_key primary_key_;
 
   /**
-   * @brief A table can have more than one foreign key
+   *  A table can have more than one foreign key
    */
   std::vector<foreign_key> foreign_keys_;
 
   /* /\** */
-  /*  * @brief A storage container for the table's indicies */
+  /*  *  A storage container for the table's indicies */
   /*  * @gidden this needs to be supported */
   /*  *\/ */
   /* std::vector<index> indicies_; */
 
   /**
-   * @brief A storage container for each of the commands a table 
+   *  A storage container for each of the commands a table 
    * amasses during a simulation. The Book Keeper has the final say
    * on when these commands are actually executed. The Table alerts
    * the Book Keeper if the number of commands exceeds the 
@@ -115,20 +115,20 @@ class Table : IntrusiveBase<Table> {
   std::vector<command*> row_commands_;
 
   /**
-   * @brief A boolean which keeps track of when a Table is defined.
+   *  A boolean which keeps track of when a Table is defined.
    * A Table can only be defined once, and it's parameters
    * can not be changed after.
    */
   bool defined_;
 
   /**
-   * @brief Update a row's primary key, given a primary key reference
+   *  Update a row's primary key, given a primary key reference
    * @param pkref the reference to the primary key to be added
    */  
   std::string updateRowPK(primary_key_ref const pkref);
 
   /**
-   * @brief Turn a Boost::Sprirt::hold_any into a string via its stream
+   *  Turn a Boost::Sprirt::hold_any into a string via its stream
    * operator. Note: if data d IS a string, we add single quotation
    * marks to it, as is required by SQL.
    * @param d the data to be stringified
@@ -136,105 +136,105 @@ class Table : IntrusiveBase<Table> {
   std::string stringifyData(data const d);
 
   /**
-   * @brief Clear out all row commands. This is only invoked via the BookKeeper
+   *  Clear out all row commands. This is only invoked via the BookKeeper
    */  
   void flushRows(){row_commands_.clear();}
   
  public:  
   /**
-   * @brief The constructor, a table name is required
+   *  The constructor, a table name is required
    * @param name the name of the table to be constructed
    */
   Table(table_name name);
 
   /**
-   * @brief The default destructor.
+   *  The default destructor.
    */
   ~Table(){};
 
   /**
-   * @brief Return the name of the table
+   *  Return the name of the table
    */
   table_name name(){return name_;}
 
   /**
-   * @brief After a table is fully described, it must be told
+   *  After a table is fully described, it must be told
    * explicity that it is defined. This function will then register
    * that table with the Book Keeper.
    */
   void tableDefined();
   
   /**
-   * @brief A boolean recording if the table has been defined. It is set to true
+   *  A boolean recording if the table has been defined. It is set to true
    * when tableDefined() is called.
    */
   bool defined(){return defined_;}
 
   /**
-   * @brief Return the current number of row commands this table
+   *  Return the current number of row commands this table
    * is holding.
    */
   int nRows(){return row_commands_.size();}
 
   /**
-   * @brief Return a pointer to a command at position i in the 
+   *  Return a pointer to a command at position i in the 
    * row commands container.
    * @param i the integer position of the command in the container
    */
   command* row_command(int i){return row_commands_.at(i);}
 
   /**
-   * @brief Add a column to the list of this table's columns.
+   *  Add a column to the list of this table's columns.
    * @param col the column to add
    */
   void addColumn(column col);
 
   /**
-   * @brief Set the primary key given a column. This name string
+   *  Set the primary key given a column. This name string
    * is extracted and the following function is called.
    * @param col the single column making up the primary key
    */
   void setPrimaryKey(column const col);
 
   /**
-   * @brief Set the primary key given a column name. This name string
+   *  Set the primary key given a column name. This name string
    * is turned into a primary key and the following function is called.
    * @param pk_string the single column name making up the primary key
    */
   void setPrimaryKey(std::string const pk_string);
 
   /**
-   * @brief Set the primary key given a primary key.
+   *  Set the primary key given a primary key.
    * @param pk the primary key to be copied
    */
   void setPrimaryKey(primary_key const pk){primary_key_ = pk;}
 
   /**
-   * @brief Set the foreign key given a foreign key
+   *  Set the foreign key given a foreign key
    * @param fk the foreign key to be copied
    */
   void addForeignKey(foreign_key const fk);
 
   /**
-   * @brief Add an index to the list of indicies
+   *  Add an index to the list of indicies
    * @param i the index to add
    * @gidden add this functionality
    */
   //void addIndex(index i){indicies_.push_back(i);}
 
   /**
-   * @brief Return an SQL command to create the table in string form
+   *  Return an SQL command to create the table in string form
    */
   std::string create();
 
   /**
-   * @brief Add a row to the vector of row commands
+   *  Add a row to the vector of row commands
    * @param r the row to add to row_commands_
    */
   void addRow(row const r);
 
   /**
-   * @brief Given a primary key reference, update a row with some 
+   *  Given a primary key reference, update a row with some 
    * entry, e
    * @param pkref the primary key which will be updated
    * @param e the entry to update this row
@@ -242,7 +242,7 @@ class Table : IntrusiveBase<Table> {
   void updateRow(primary_key_ref const pkref, entry const e);
 
   /**
-   * @brief Given a primary key reference, update a row with some 
+   *  Given a primary key reference, update a row with some 
    * row of entries, r
    * @param pkref the primary key which will be updated
    * @param r the entry updates for this row
@@ -250,17 +250,17 @@ class Table : IntrusiveBase<Table> {
   void updateRow(primary_key_ref const pkref, row const r);
 
   /**
-   * @brief Return the table's foreign keys as a string for writing
+   *  Return the table's foreign keys as a string for writing
    */
   std::string f_keys();
 
   /**
-   * @brief Return the table's primary key as a string for writing
+   *  Return the table's primary key as a string for writing
    */
   std::string p_key();
 
   /**
-   * @brief Clear out all row commands because they were just sent.
+   *  Clear out all row commands because they were just sent.
    * This function is only called from the BookKeeper.
    */
   void flush(){this->flushRows();}

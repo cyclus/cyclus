@@ -42,28 +42,28 @@ class FixedInst : public InstModel {
  */
  public:
   /**
-   * @brief Default constructor for the fixed inst
+   *  Default constructor for the fixed inst
    */
   FixedInst() {};
     
   /**
-   * @brief Default destructor for the fixed inst
+   *  Default destructor for the fixed inst
    */
   virtual ~FixedInst() {};
   
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(FixedInst* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -73,7 +73,7 @@ class FixedInst : public InstModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief a print function to describe a fixedInst instantiation.
+   *  a print function to describe a fixedInst instantiation.
    */
   virtual void print();
 

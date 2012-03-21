@@ -7,7 +7,7 @@
 #include "RegionModel.h"
 
 /**
-   @brief The NullRegion class inherits from the RegionModel class and is 
+    The NullRegion class inherits from the RegionModel class and is 
    dynamically loaded by the Model class when requested.
   
    This region will do nothing. This RegionModel never alters any messages
@@ -43,28 +43,28 @@ class NullRegion : public RegionModel  {
  */
  public:
   /**
-   * @brief The default constructor for the NullRegion
+   *  The default constructor for the NullRegion
    */
   NullRegion() {};
 
   /**
-   * @brief The default destructor for the NullRegion
+   *  The default destructor for the NullRegion
    */
   virtual ~NullRegion() {};
    
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur)  { RegionModel::init(cur); };
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(NullRegion* src) { RegionModel::copy(src); } ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -74,7 +74,7 @@ class NullRegion : public RegionModel  {
   virtual void copyFreshModel(Model* src){ copy(dynamic_cast<NullRegion*>(src)); };
   
   /**
-   * @brief  print information about the region
+   *   print information about the region
    */
   virtual void print()               { RegionModel::print();   } ;
 
