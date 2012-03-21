@@ -11,6 +11,7 @@ using namespace std;
 // @gidden Indexing not currently supported
 // @gidden Make generic creation and addition functions
 // @gidden Add error checking for column names and data types
+// @gidden move SQL-ness to Database
 
 // -----------------------------------------------------------------------
 Table::Table(table_name name) {

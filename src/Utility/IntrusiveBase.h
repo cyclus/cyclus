@@ -56,8 +56,9 @@ template <class Derived> class IntrusiveBase {
     ++((const IntrusiveBase*) p)->counter_;
   }
 
-  /** used by boost::intrusive_ptr to decrease object's reference count and
-   * * deallocate the object if the ref count is zero.
+  /** 
+   * @brief used by boost::intrusive_ptr to decrease object's reference count and
+   * deallocate the object if the ref count is zero.
    */
   friend void intrusive_ptr_release(const Derived* p) {
     BOOST_ASSERT(p);
@@ -82,7 +83,6 @@ template <class Derived> class IntrusiveBase {
     IntrusiveBase& operator=(const IntrusiveBase&) { return *this; }
 
   private:
-
     /**
      * @brief  tracks an object's reference count
      */

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/spirit/home/support/detail/hold_any.hpp>
 
 #include "Database.h"
 #include "Table.h"
@@ -12,6 +13,10 @@
 #define BI BookKeeper::Instance()
 
 typedef std::string file_path;
+typedef std::map< std::string, table_ptr > TableMap;
+typedef std::vector< std::string > ColumnLabels;
+typedef std::vector< std::string > DataTypes;
+typedef std::vector< boost::spirit::hold_any > Data;
 
 /**
    @brief
@@ -45,9 +50,8 @@ typedef std::string file_path;
    a threshold number of row commands, it alerts the Book Keeper,
    who is allowed to act accordingly.
  */
-
 class BookKeeper {
-private:
+ private:
   /**
    * @brief A pointer to this BookKeeper once it has been initialized.
    */
@@ -69,20 +73,25 @@ private:
    * @brief True iff the db is open.
    */
   bool dbIsOpen_;
-  
+
+  /**
+   * @brief A pointer the Tables registered with the BookKeeper
+   */
+  static TableMap* registeredTables_;
+
   /**
    * @brief A boolean to determine if logging is on.
    */
   static bool logging_on_;
 
-protected:
+ protected:
   /**
    * @brief The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
    */
   BookKeeper();
 
-public:
+ public:
   /**
    * @brief Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
@@ -161,6 +170,36 @@ public:
    * with row commands remaining will have those commands issued.
    */
   void closeDB();
+
+  /**
+   * @brief Registers a new table with the Book Keeper
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the Table
+   * @param dataTypes the type of data corresponding to each column
+   */
+  void registerNewTable(std::string name, ColumnLabels columns,
+			DataTypes dataTypes);
+
+  /**
+   * @brief Adds a row to a given table
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the row being added
+   * @param data the data corresponding to each column
+   */
+  void addRowToTable(std::string name, ColumnLabels columns,
+		     Data data);
+
+  /**
+   * @brief Updates a row of a given table
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the row being updated
+   * @param data the data corresponding to each column
+   */
+  void updateRowInTable(std::string name, ColumnLabels columns,
+			Data data);
 
   /**
    * @brief Adds a table to the database's vector of tables and then issues
