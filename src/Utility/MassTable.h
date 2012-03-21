@@ -13,9 +13,8 @@
 /**
    @class MassTable
 
-   @brief The MassTable class inherits from the Material class. 
-   The Material class uses this interface to the mass.sqlite 
-   file in order to get a robust and correct mass lookup by identifier. 
+   @brief The MassTable class provides an interface to the mass.sqlite 
+   database, providing a robust and correct mass lookup by isotope identifier. 
  */
 class MassTable {
 private:
