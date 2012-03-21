@@ -230,9 +230,7 @@ the repo, we will have two branches in our fork: "Master" and "Develop".
 Acquiring a Fork of the Cyclus Repository
 -----------------------------------------
 
-But hark! One may ask: What's a fork? How do I set up my fork?
-
-Lo, an easy solution exists. A fork is *your* copy of Cyclus. Github offers an excelent 
+A fork is *your* copy of Cyclus. Github offers an excelent 
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
