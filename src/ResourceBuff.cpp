@@ -124,12 +124,12 @@ rsrc_ptr ResourceBuff::popOne() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::pushOne(rsrc_ptr mat) {
   if (mat->quantity() - space() > STORE_EPS) {
-    throw CycOverCapException("Material pushition breaks capacity limit.");
+    throw CycOverCapException("Material pushing breaks capacity limit.");
   }
   std::list<rsrc_ptr>::iterator iter;
   for (iter = mats_.begin(); iter != mats_.end(); iter++) {
     if ((*iter) == mat) {
-      throw CycDupResException("Duplicate material pushition attempted.");
+      throw CycDupResException("Duplicate material pushing attempted.");
     }
   }
   mats_.push_back(mat);
@@ -141,14 +141,14 @@ void ResourceBuff::pushAll(Manifest mats) {
   for (int i = 0; i < mats.size(); i++) {
     tot_qty += mats.at(i)->quantity();
   }
-  if (tot_qty - space() > STORE_EPS) {
-    throw CycOverCapException("Material pushition breaks capacity limit.");
+  if (tot_qty - space() > STORE_EPS && unlimited_ != true) {
+    throw CycOverCapException("Material pushing breaks capacity limit.");
   }
   std::list<rsrc_ptr>::iterator iter;
   for (iter = mats_.begin(); iter != mats_.end(); iter++) {
     for (int i = 0; i < mats.size(); i++) {
       if ((*iter) == mats.at(i)) {
-        throw CycDupResException("Duplicate material pushition attempted.");
+        throw CycDupResException("Duplicate material pushing attempted.");
       }
     }
   }
