@@ -71,7 +71,7 @@ void GenericResource::setOriginatorID(int id){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void GenericResource::absorb(gen_rsrc_ptr other) {
   if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {
-    throw CycTypeException("incompatible resource types.");
+    throw CycGenResourceIncompatible("incompatible resource types.");
   }
 
   quantity_ += other->quantity();
@@ -81,7 +81,7 @@ void GenericResource::absorb(gen_rsrc_ptr other) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 gen_rsrc_ptr GenericResource::extract(double quantity) {
   if (quantity > quantity_) {
-    throw CycRangeException("Attempted to extract more quantity than exists.");
+    throw CycGenResourceOverExtract("Attempted to extract more quantity than exists.");
   }
 
   quantity_ -= quantity;

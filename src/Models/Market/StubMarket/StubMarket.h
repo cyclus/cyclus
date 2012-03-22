@@ -8,7 +8,7 @@
 /**
   @class StubMarket
 
-  @brief This MarketModel is intended 
+   This MarketModel is intended 
   as a skeleton to guide the implementation of new MarketModel models. 
   
   The StubMarket class inherits from the MarketModel class and is 
@@ -37,31 +37,31 @@ class StubMarket : public MarketModel {
  */
  public:
   /**
-   * @brief Default constructor for StubMarket Class
+   *  Default constructor for StubMarket Class
    */
   StubMarket();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubMarket();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubMarket* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -71,7 +71,7 @@ class StubMarket : public MarketModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -84,7 +84,7 @@ class StubMarket : public MarketModel {
  */
  public:
    /**
-    * @brief The StubMarket should ignore incoming messages
+    *  The StubMarket should ignore incoming messages
     */
    virtual void receiveMessage(msg_ptr msg);
    
@@ -97,7 +97,7 @@ class StubMarket : public MarketModel {
  */
  public:
    /**
-    * @brief  Primary funcation of a Market is to resolve the set of 
+    *   Primary funcation of a Market is to resolve the set of 
     *  requests with the set of offers.
     *
     *  In this stub - do nothing!

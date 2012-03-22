@@ -14,110 +14,110 @@
 /**
    @class Timer
    
-   @brief A (singleton) timer to control a simulation with a one-month time step.
+    A (singleton) timer to control a simulation with a one-month time step.
  */
 class Timer {
  private:
   /**
-   * @brief A pointer to this Timer once it has been initialized.
+   *  A pointer to this Timer once it has been initialized.
    */
   static Timer* instance_;
 
   /**
-   * @brief The current time, measured in months from when the simulation 
+   *  The current time, measured in months from when the simulation 
    * started.
    */
   int time_;
     
   /**
-   * @brief The time at which the simulation started.
+   *  The time at which the simulation started.
    */
   int time0_;
     
   /**
-   * @brief The duration of this simulation, in months.
+   *  The duration of this simulation, in months.
    */
   int simDur_;
     
   /**
-   * @brief The start date of the simulation
+   *  The start date of the simulation
    */
   boost::gregorian::date startDate_;
     
   /**
-   * @brief The end date of the simulation
+   *  The end date of the simulation
    */
   boost::gregorian::date endDate_;
     
   /**
-   * @brief The current date of the simulation
+   *  The current date of the simulation
    */
   boost::gregorian::date date_;
 
   /**
-   * @brief The number of the month (Jan = 1, etc.) corresponding to t = 0 for the 
+   *  The number of the month (Jan = 1, etc.) corresponding to t = 0 for the 
    * scenario being run.
    */
   int month0_;
 
   /**
-   * @brief The year corresponding to t = 0 for the scenario being run.
+   *  The year corresponding to t = 0 for the scenario being run.
    */
   int year0_;
 
   /**
-   * @brief Concrete models that desire to receive tick and tock notifications
+   *  Concrete models that desire to receive tick and tock notifications
    */
   std::vector<TimeAgent*> tick_listeners_;
 
   /**
-   * @brief Returns a string of all models listening to the tick
+   *  Returns a string of all models listening to the tick
    */
   std::string reportListeners();
 
   /**
-   * @brief Concrete models that desire to receive resolve (markets) notifications
+   *  Concrete models that desire to receive resolve (markets) notifications
    */
   std::vector<MarketModel*> resolve_listeners_;
 
   /**
-   * @brief sends the resolve signal to all of the (market) models receiving
+   *  sends the resolve signal to all of the (market) models receiving
    * resolve notifications.
    */
   void sendResolve();
 
   /**
-   * @brief sends the tick signal to all of the models receiving time
+   *  sends the tick signal to all of the models receiving time
    * notifications.
    */
   void sendTick();
 
   /**
-   * @brief sends the tock signal to all of the models receiving time
+   *  sends the tock signal to all of the models receiving time
    * notifications.
    */
   void sendTock();
     
   /**
-   * @brief handles all pre-history interactions between regions,
+   *  handles all pre-history interactions between regions,
    * institutions, and facilities.
    */
   void handlePreHistory();
 
   /**
-   * @brief sends a notification to Tick listeners that a day has passed
+   *  sends a notification to Tick listeners that a day has passed
    */
   void sendDailyTasks();
 
 protected:
   /**
-   * @brief Constructs a new Timer for this simulation.
+   *  Constructs a new Timer for this simulation.
    */
   Timer();
   
 public:
   /**
-   * @brief Gives all simulation objects global access to the Timer by 
+   *  Gives all simulation objects global access to the Timer by 
    * returning a pointer to it.
    *
    * @return a pointer to the Timer
@@ -125,7 +125,7 @@ public:
   static Timer* Instance();
 
   /**
-   * @brief Initialize this Timer by setting the specs for the simulation.
+   *  Initialize this Timer by setting the specs for the simulation.
    *
    * @param dur the duration of this simulation, in months
    * @param m0 the month the simulation starts: Jan. = 1, ..., Dec. = 12
@@ -139,47 +139,47 @@ public:
   void initialize(int dur = 1, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
 
   /**
-   * @brief Runs the simulation.
+   *  Runs the simulation.
    */ 
   void runSim();
 
   /**
-   * @brief registers a sim. agent to receive time step notifications.
+   *  registers a sim. agent to receive time step notifications.
    *
    * @param agent agent that will receive time-step notifications
    */
   void registerTickListener(TimeAgent* agent);
 
   /**
-   * @brief registers a sim. agent to receive (market) resolve notifications.
+   *  registers a sim. agent to receive (market) resolve notifications.
    *
    * @param agent agent that will receive resolve notifications
    */
   void registerResolveListener(MarketModel* agent);
 
   /**
-   * @brief Returns the current time, in months since the simulation started.
+   *  Returns the current time, in months since the simulation started.
    *
    * @return the current time
    */
   int time();
 
   /**
-   * @brief Returns the duration of the simulation this Timer's timing.
+   *  Returns the duration of the simulation this Timer's timing.
    *
    * @return the duration, in months
    */
   int simDur();
 
   /**
-   * @brief Returns the starting date of the simulation.
+   *  Returns the starting date of the simulation.
    *
    * @return the start date as a datetime object
    */
   boost::gregorian::date startDate(){return startDate_;}
 
   /**
-   * @brief Calculates the ending date of the simulation.
+   *  Calculates the ending date of the simulation.
    *
    * @param startDate the starting date as specified in the input file
    * @param simDur the simulation duration as specified
@@ -189,42 +189,42 @@ public:
   boost::gregorian::date getEndDate(boost::gregorian::date startDate, int simDur);
 
   /**
-   * @brief Returns the ending date of the simulation.
+   *  Returns the ending date of the simulation.
    *
    * @return the end date as a datetime object
    */
   boost::gregorian::date endDate(){return endDate_;}
 
   /**
-   * @brief Returns true if it is the ending date of the simulation
+   *  Returns true if it is the ending date of the simulation
    *
    * @return whether it is the last day of the simulation
    */
   bool checkEndDate() {return (date_ == endDate_);}
 
   /**
-   * @brief Returns true if it is the ending month of the simulation
+   *  Returns true if it is the ending month of the simulation
    *
    * @return whether it is the last day of the simulation
    */
   bool checkEndMonth() {return ( date_.month() == endDate_.month() );}
   
   /**
-   * @brief Given the current date, returns the last day of the current month
+   *  Given the current date, returns the last day of the current month
    *
    * @return the last date of the current month
    */
   int lastDayOfMonth();
 
   /**
-   * @brief Returns the current date of the simulation.
+   *  Returns the current date of the simulation.
    *
    * @return the current date as a datetime object
    */
   boost::gregorian::date date(){return date_;}
 
   /**
-   * @brief Converts the given date into a GENIUS time.
+   *  Converts the given date into a GENIUS time.
    *
    * @param month the month corresponding to the date (Jan = 1, etc.)
    * @param year the year corresponding to the date
@@ -233,12 +233,12 @@ public:
   int convertDate(int month, int year);
 
   /**
-   * @brief Converts the given GENIUS time into a (month, year) pair.
+   *  Converts the given GENIUS time into a (month, year) pair.
    */
   std::pair<int, int> convertDate(int time);
 
   /**
-   * @brief Loads the information about the simulation timing
+   *  Loads the information about the simulation timing
    */
   static void load_simulation();
 

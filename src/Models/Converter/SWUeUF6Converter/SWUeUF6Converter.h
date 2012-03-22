@@ -10,7 +10,7 @@
 #include "Logger.h"
 
 /**
-   @brief The SWUeUF6Converter class inherits from the ConverterModel class 
+    The SWUeUF6Converter class inherits from the ConverterModel class 
    and is dynamically loaded by the Model class when requested.
    
    This converter model changes SWUs into amounts of material (and back?) 
@@ -52,28 +52,28 @@ class SWUeUF6Converter : public ConverterModel
   */
  public:
   /** 
-   * @brief Default constructor for the SWUeUF6Converter class.
+   *  Default constructor for the SWUeUF6Converter class.
    */
   SWUeUF6Converter() {};
 
   /**
-   * @brief Destructor for the SWUeUF6Converter class. 
+   *  Destructor for the SWUeUF6Converter class. 
    */
   virtual ~SWUeUF6Converter() {};
 
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(SWUeUF6Converter* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -83,7 +83,7 @@ class SWUeUF6Converter : public ConverterModel
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief Print information about this model
+   *  Print information about this model
    */
   virtual void print();
 
@@ -96,7 +96,7 @@ class SWUeUF6Converter : public ConverterModel
   */ 
  public:
   /**
-   * @brief The convert function specific to the SWUeUF6Converter
+   *  The convert function specific to the SWUeUF6Converter
    * Converts between amounts of two commodities
    *
    * @param convMsg is a message concerning one convertible commodity to convert
@@ -115,12 +115,12 @@ class SWUeUF6Converter : public ConverterModel
   */
  protected:
   /**
-   * @brief The SWUeUF6Converter has one input commodity
+   *  The SWUeUF6Converter has one input commodity
    */
   std::string in_commod_;
 
   /**
-   * @brief The SWUeUF6Converter has one output commodity
+   *  The SWUeUF6Converter has one output commodity
    */
   std::string out_commod_;
 

@@ -8,7 +8,7 @@
 /**
   @class StubInst
 
-  @brief This InstModel is intended 
+   This InstModel is intended 
   as a skeleton to guide the implementation of new InstModel models. 
   
   The StubInst class inherits from the InstModel class and is 
@@ -38,31 +38,31 @@ class StubInst : public InstModel {
  */
  public:
   /**
-   * @brief Default constructor for StubInst Class
+   *  Default constructor for StubInst Class
    */
   StubInst();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubInst();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubInst* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -72,7 +72,7 @@ class StubInst : public InstModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
@@ -85,7 +85,7 @@ class StubInst : public InstModel {
  */
  public:
    /**
-    * @brief The StubInst should ignore incoming messages
+    *  The StubInst should ignore incoming messages
     */
    virtual void receiveMessage(msg_ptr msg);
    

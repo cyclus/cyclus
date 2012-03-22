@@ -58,7 +58,7 @@ typedef std::map<CompMap*, int> StateMap;
 /** 
  @class IsoVector
  
- @brief 
+  
  This class is the object used to transact material objects around the system.
  
  @section intro Introduction
@@ -84,28 +84,28 @@ class IsoVector {
 
 public:
   /**
-   * @brief default constructor
+   *  default constructor
    */
   IsoVector(); 
 
   /**
-   * @brief constructor given some initial composition
+   *  constructor given some initial composition
    * @param initial_comp the initial composition
    */
   IsoVector(CompMap initial_comp); 
 
   /**
-   * @brief Used for reading in and initizliaing material recipes.
+   *  Used for reading in and initizliaing material recipes.
    */
   IsoVector(xmlNodePtr cur);
 
   /**
-   * @brief default destructor
+   *  default destructor
    */
   ~IsoVector() {};
 
   /**
-   * @brief loads the recipes from the input file
+   *  loads the recipes from the input file
    */
   static void load_recipes();
 
@@ -117,38 +117,38 @@ public:
   static IsoVector recipe(std::string name);                      
 
   /**
-   * @brief print all recipes
+   *  print all recipes
    */
   static void printRecipes();
 
   /**
-   * @brief print the details of this IsoVector
+   *  print the details of this IsoVector
    */
   void print();
 
   /**
-   * @brief return a vector of the composition as strings
+   *  return a vector of the composition as strings
    * @return the composition string vector
    */
   std::vector<std::string> compStrings();
 
   /**
-   * @brief the total number of recipes
+   *  the total number of recipes
    */
   static int recipeCount();        
 
   /**
-   * @brief a container of recipes
+   *  a container of recipes
    */
   static std::map<std::string, IsoVector*> recipes_;
   
   /**
-   * @brief Adds like isotopes
+   *  Adds like isotopes
    */
   IsoVector operator+ (IsoVector rhs_vector);
 
   /**
-   * @brief Subtracts like isotopes
+   *  Subtracts like isotopes
    * 
    * @exception CycRangeException thrown if subtraction results in a negative
    * quantity for any isotope.
@@ -185,7 +185,7 @@ public:
   int id() {return ID_;};
 
   /**
-   * @brief returns the total mass of this material object PER UNIT
+   *  returns the total mass of this material object PER UNIT
    */
   double mass();
 
@@ -257,7 +257,7 @@ public:
   void executeDecay(double time_change);
 
   /**
-   * @brief Return the atomic (in moles) composition as a std::map<std::string, double>
+   *  Return the atomic (in moles) composition as a std::map<std::string, double>
    */
   CompMap comp();
   
@@ -294,75 +294,75 @@ protected:
   void copyVectorIntoComp(const Vector & compVector);
 
   /**
-   * @brief the IsoVector Class' parent
+   *  the IsoVector Class' parent
    */
   static ParentMap parent_; 
   
   /**
-   * @brief the IsoVector Class' daughters
+   *  the IsoVector Class' daughters
    */
   static DaughtersMap daughters_; 
   
   /**
-   * @brief the matrix used for decay functionality
+   *  the matrix used for decay functionality
    */
   static Matrix decayMatrix_; 
 
 private:
   /**
-   * @brief allows calculated mass to be reused if no changes 
+   *  allows calculated mass to be reused if no changes 
    * have been made since last calculated.
   */
   double total_mass_;
 
   /**
-   * @brief aids in mass recalc prevention - used in conjunction with total_mass_
+   *  aids in mass recalc prevention - used in conjunction with total_mass_
    */
   bool mass_out_of_date_;
 
   /**
-   * @brief used by print() to 'hide' print code when logging is not desired
+   *  used by print() to 'hide' print code when logging is not desired
    */
   std::string detail();
 
   /**
-   * @brief Stores the next available material ID
+   *  Stores the next available material ID
    */
   static int nextID_;
 
   void validateComposition();
 
   /**
-   * @brief Used to determine validity of isotope defnition.
+   *  Used to determine validity of isotope defnition.
    * @param tope isotope identifier
    * @exception thrown if isotope identifier is invalid
    */
   static void validateIsotopeNumber(Iso tope);
 
   /**
-   * @brief Unique identifier.
+   *  Unique identifier.
    */
   int ID_;
 
   /**
-   * @brief Core isotope composition information stored here.
+   *  Core isotope composition information stored here.
    */
   CompMap atom_comp_;
     
 // -------- output database related members  -------- 
  public:
   /**
-   * @brief the isotopics output database Table
+   *  the isotopics output database Table
    */
   static table_ptr iso_table;
   
   /**
-   * @brief return the agent table's primary key
+   *  return the agent table's primary key
    */
   primary_key_ref pkref(){ return pkref_;}
   
   /**
-   * @brief the current state id
+   *  the current state id
    */
   int stateID(){return stateID_;}
 
@@ -370,37 +370,37 @@ private:
   
  private:
   /**
-   * @brief Define the database table on the first Message's init
+   *  Define the database table on the first Message's init
    */
   static void define_table();
 
   /**
-   * @brief Add an isotopic state to the table
+   *  Add an isotopic state to the table
    */
   void addToTable();
 
   /**
-   * @brief Store information about the transactions's primary key
+   *  Store information about the transactions's primary key
    */
   primary_key_ref pkref_;
   
   /**
-   * @brief this IsoVector's state
+   *  this IsoVector's state
    */
   int stateID_;
 
   /**
-   * @brief the IsoVector class' state incrementor
+   *  the IsoVector class' state incrementor
    */
   static int nextStateID_;
 
   /**
-   * @brief a mapping of already-defined compositions to states
+   *  a mapping of already-defined compositions to states
    */
   static StateMap predefinedStates_;
 
   /**
-   * @brief returns the state id of the current composition if it is already tracked
+   *  returns the state id of the current composition if it is already tracked
    */
   int compositionIsTracked();
 // -------- output database related members  -------- 

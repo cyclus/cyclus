@@ -12,20 +12,19 @@
 
 /**
    @class MassTable
-
-   @brief The MassTable class provides an interface to the mass.sqlite 
+   The MassTable class provides an interface to the mass.sqlite 
    database, providing a robust and correct mass lookup by isotope identifier. 
  */
 class MassTable {
 private:
   /**
-   * @brief A pointer to this MassTable once it has been initialized.
+   *  A pointer to this MassTable once it has been initialized.
    */
   static MassTable* instance_;
 
 public:
   /**
-   * @brief Gives all simulation objects global access to the Env by 
+   *  Gives all simulation objects global access to the Env by 
    * returning a pointer to it.
    *
    * @return a pointer to the MassTable
@@ -33,19 +32,19 @@ public:
   static MassTable* Instance();
 
   /**
-   * @brief Default constructor for the MassTable class.
+   *  Default constructor for the MassTable class.
    * Initializes the data from the provided mass.h5 file. 
    */
   MassTable();
 
   /**
-   * @brief Destructor for the NullFacility class. 
+   *  Destructor for the NullFacility class. 
    * Makes certain to delete all appropriate data on the stack.
    */
   ~MassTable();
 
   /**
-   * @brief get the Atomic Number of an isotope according to its 
+   *  get the Atomic Number of an isotope according to its 
    * identifier.
    *
    * @param tope is the isotope identifier of type Iso, which is an int typedef 
@@ -55,7 +54,7 @@ public:
   int getAtomicNum(int tope);
 
   /**
-   * @brief get the Mass, a double, of an isotope according to its
+   *  get the Mass, a double, of an isotope according to its
    * identifier.
    *
    * @param tope is the isotope identifier of type Iso, which is an int typedef 
@@ -66,7 +65,7 @@ public:
 
 protected:
   /**
-   * @brief Defines the structure of data associated with each row entry in the mass
+   *  Defines the structure of data associated with each row entry in the mass
    * database. Right now, strings are a little funky, so the names aren't there.
    */
   typedef struct nuclide_t
@@ -77,22 +76,22 @@ protected:
   } nuclide_t;
 
   /**
-   * @brief The integer length (number of rows) of the mass.h5/ame03/nuclide/ dataset 
+   *  The integer length (number of rows) of the mass.h5/ame03/nuclide/ dataset 
    */
   int nuclide_len_;
 
   /**
-   * @brief The vector of nuclide structs that holds the data in the mass table instance.
+   *  The vector of nuclide structs that holds the data in the mass table instance.
    */
   std::vector<nuclide_t> nuclide_vec_;
 
   /** 
-   * @brief a map for index lookup in the nuclide vector.
+   *  a map for index lookup in the nuclide vector.
    */
   std::map<int, int> isoIndex_;
 
   /** 
-   * @brief a function to initialize a large array of nuclide_t structs via the 
+   *  a function to initialize a large array of nuclide_t structs via the 
    * SQLite/C++ API
    */
   void initializeSQL();

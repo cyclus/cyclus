@@ -9,7 +9,7 @@
 #include "Logger.h"
 
 /**
-@brief
+
 IntrusiveBase provides a base class that fulfulls basic requirements for a
 (sub) class to be used in a boost::intrusive_ptr.
 
@@ -49,7 +49,7 @@ int main(...) {
 template <class Derived> class IntrusiveBase {
   
   /**
-   * @brief  used by boost::intrusive_ptr to increase object's reference count
+   *   used by boost::intrusive_ptr to increase object's reference count
    */
   friend void intrusive_ptr_add_ref(const Derived* p) { 
     BOOST_ASSERT(p);
@@ -57,7 +57,7 @@ template <class Derived> class IntrusiveBase {
   }
 
   /** 
-   * @brief used by boost::intrusive_ptr to decrease object's reference count and
+   *  used by boost::intrusive_ptr to decrease object's reference count and
    * deallocate the object if the ref count is zero.
    */
   friend void intrusive_ptr_release(const Derived* p) {
@@ -69,14 +69,14 @@ template <class Derived> class IntrusiveBase {
 
   protected:
     /**
-     * @brief  protected because we don't want direct instantiations of IntrusiveBase
+     *   protected because we don't want direct instantiations of IntrusiveBase
      */
     IntrusiveBase(): counter_(0) { }
 
     ~IntrusiveBase() { }
 
     /**
-     * @brief  the copy constructor must zero out the ref count
+     *   the copy constructor must zero out the ref count
      */
     IntrusiveBase(const IntrusiveBase&) : counter_(0) { }
 
@@ -84,7 +84,7 @@ template <class Derived> class IntrusiveBase {
 
   private:
     /**
-     * @brief  tracks an object's reference count
+     *   tracks an object's reference count
      */
     mutable unsigned long counter_;
 };

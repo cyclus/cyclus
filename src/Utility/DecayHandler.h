@@ -6,7 +6,7 @@
 #include "IsoVector.h"
 
 /**
- * @brief A map type to represent all of the parent isotopes tracked.  The key for
+ *  A map type to represent all of the parent isotopes tracked.  The key for
  * this map type is the parent's Iso number, and the value is a pair that
  * contains the corresponding decay matrix column and decay constant
  * associated with that parent.
@@ -14,7 +14,7 @@
 typedef std::map< int, std::pair<int, double> > ParentMap;
 
 /**
- * @brief A map type to represent all of the daughter isotopes tracked.  The key for
+ *  A map type to represent all of the daughter isotopes tracked.  The key for
  * this map type is the decay matrix column associated with the parent, and the
  * value is a vector of pairs of all the daughters for that parent. Each of the
  * daughters are represented by a pair that contains the daughter's Iso number
@@ -27,92 +27,92 @@ typedef std::vector<int> IsoList;
 class DecayHandler {
   private:
     /**
-     * @brief Builds the decay matrix needed for the decay calculations from the parent
+     *  Builds the decay matrix needed for the decay calculations from the parent
      * and daughters map variables.  The resulting matrix is stored in the static
      * variable decayMatrix.
      */
     static void buildDecayMatrix();
 
     /**
-     * @brief Reads the decay information found in the 'decayInfo.dat' file into the
+     *  Reads the decay information found in the 'decayInfo.dat' file into the
      * parent and daughters maps.Uses these maps to create the decay matrix.
      */
     static void loadDecayInfo();
 
     /**
-     * @brief The IsoVector's parent
+     *  The IsoVector's parent
      */
     static ParentMap parent_; 
     
     /**
-     * @brief The IsoVector's daughters
+     *  The IsoVector's daughters
      */
     static DaughtersMap daughters_; 
 
     /**
-     * @brief The decay matrix
+     *  The decay matrix
      */
     static Matrix decayMatrix_; 
 
     /**
-     * @brief The atomic composition map
+     *  The atomic composition map
      */
     CompMap atom_comp_;
 
     /**
-     * @brief whether the decay information is loaded
+     *  whether the decay information is loaded
      */
     static bool decay_info_loaded_;
 
     /**
-     * @brief the list of tracked isotopes
+     *  the list of tracked isotopes
      */
     static IsoList IsotopesTracked_;
     
     /**
-     * @brief Add the Isotope to our list of tracked isotopes IFF it is not already in that list
+     *  Add the Isotope to our list of tracked isotopes IFF it is not already in that list
      */
     static void addIsoToList(int iso);
 
   public:    
     /**
-     * @brief default constructor
+     *  default constructor
      */
     DecayHandler();
     
     /**
-     * @brief set the composition from a CompMap
+     *  set the composition from a CompMap
      */
     void setComp(CompMap comp);
 
     /**
-     * @brief set the composition from a composition vector
+     *  set the composition from a composition vector
      */
     void setComp(Vector comp);
 
     /**
-     * @brief return the composition as a composition vector
+     *  return the composition as a composition vector
      */ 
     Vector compAsVector();
 
     /**
-     * @brief return the composition as a composition map
+     *  return the composition as a composition map
      */ 
     CompMap compAsCompMap();
 
     /**
-     * @brief decay the material
+     *  decay the material
      * @param years the number of years to decay
      */ 
     void decay(double years);
     
     /**
-     * @brief the number of tracked isotopes
+     *  the number of tracked isotopes
      */
     int nTrackedIsotopes(){return IsotopesTracked_.size();}
 
     /**
-     * @brief the tracked isotope at position i
+     *  the tracked isotope at position i
      */
     int trackedIsotope(int i){return IsotopesTracked_.at(i);}
 };

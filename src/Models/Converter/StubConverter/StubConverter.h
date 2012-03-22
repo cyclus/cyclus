@@ -11,7 +11,7 @@
 /**
   @class StubConverter
 
-  @brief This ConverterModel is intended 
+   This ConverterModel is intended 
   as a skeleton to guide the implementation of new ConverterModel models. 
   
   The StubConverter class inherits from the ConverterModel class and is 
@@ -41,31 +41,31 @@ class StubConverter : public ConverterModel {
  */
  public:
   /**
-   * @brief Default constructor for StubConverter Class
+   *  Default constructor for StubConverter Class
    */
   StubConverter() {};
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubConverter() {};
 
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubConverter to copy
    */
   virtual void copy(StubConverter* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -75,7 +75,7 @@ class StubConverter : public ConverterModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
   virtual void print();
 
@@ -88,7 +88,7 @@ class StubConverter : public ConverterModel {
  */  
  public:
   /**
-   * @brief The convert function specific to the StubConverter
+   *  The convert function specific to the StubConverter
    * Converts between amounts of two commodities
    *
    * @param convMsg is a message concerning one convertible commodity to convert

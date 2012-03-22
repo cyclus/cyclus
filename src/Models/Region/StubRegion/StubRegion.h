@@ -9,7 +9,7 @@
 /**
   @class StubRegion
   
-  @brief This RegionModel is intended 
+   This RegionModel is intended 
   as a skeleton to guide the implementation of new RegionModel models. 
   
   The StubRegion class inherits from the RegionModel class and is 
@@ -38,31 +38,31 @@ class StubRegion : public RegionModel {
  */
  public:
   /**
-   * @brief Default constructor for StubStub Class
+   *  Default constructor for StubStub Class
    */
   StubRegion();
   
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubRegion();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubRegion* src) ;
   
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -72,7 +72,7 @@ class StubRegion : public RegionModel {
   virtual void copyFreshModel(Model* src){copy(dynamic_cast<StubRegion*>(src));}
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
   virtual void print();
   
@@ -85,7 +85,7 @@ class StubRegion : public RegionModel {
  */
  public:   
   /**
-   * @brief The StubRegion should ignore incoming messages
+   *  The StubRegion should ignore incoming messages
    */
   virtual void receiveMessage(msg_ptr msg);
   

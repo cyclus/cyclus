@@ -6,7 +6,7 @@
 #include "Logger.h"
 
 /**
-   @brief An abstract class for deriving simulation entities 
+    An abstract class for deriving simulation entities 
    that can communicate via the Message class.
 
    @section introduction Introduction
@@ -50,7 +50,7 @@ public:
 private:
 
   /**
-   * @brief Models communicate desires for material, etc. by sending
+   *  Models communicate desires for material, etc. by sending
    * and receiveing messages.
    *
    * @param msg pointer to message to be received
@@ -62,7 +62,7 @@ private:
   std::vector<msg_ptr> tracked_messages_;
 
   /** 
-   * @brief Add msg to a list of msgs to be killed when this communicator is deallocated.
+   *  Add msg to a list of msgs to be killed when this communicator is deallocated.
    * This functionality is used to prevent messages from attempting to return
    * themselves either to or through communicator objects that have been deallocated.
    *
@@ -80,7 +80,7 @@ private:
   }
 
   /**
-   * @brief Remove msg from a list of msgs to be killed when this communicator is 
+   *  Remove msg from a list of msgs to be killed when this communicator is 
    * deallocated. This functionality is used to prevent messages from attempting to return
    * themselves either to or through communicator objects that have been deallocated.
    *
@@ -98,7 +98,7 @@ private:
 
 protected:
   /**
-   * @brief Copy the base class data members from one object to another
+   *  Copy the base class data members from one object to another
    *
    * @param src the Communicator to copy
    */ 

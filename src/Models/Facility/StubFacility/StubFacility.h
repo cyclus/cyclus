@@ -8,7 +8,7 @@
 /**
   @class StubFacility
   
-  @brief This FacilityModel is intended 
+   This FacilityModel is intended 
   as a skeleton to guide the implementation of new FacilityModel models. 
   
   The StubFacility class inherits from the FacilityModel class and is 
@@ -37,31 +37,31 @@ class StubFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief Default constructor for StubFacility Class
+   *  Default constructor for StubFacility Class
    */
   StubFacility();
 
   /**
-   * @brief every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubFacility();
     
   /**
-   * @brief every model needs a method to initialize from XML
+   *  every model needs a method to initialize from XML
    *
    * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-   * @brief every model needs a method to copy one object to another
+   *  every model needs a method to copy one object to another
    *
    * @param src is the StubStub to copy
    */
   virtual void copy(StubFacility* src) ;
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -72,12 +72,12 @@ class StubFacility : public FacilityModel  {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
    virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -86,7 +86,7 @@ class StubFacility : public FacilityModel  {
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * @brief Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -103,7 +103,7 @@ class StubFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief The StubFacility should ignore incoming messages
+   *  The StubFacility should ignore incoming messages
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -116,14 +116,14 @@ class StubFacility : public FacilityModel  {
  */
  public:
   /**
-   * @brief The handleTick function specific to the StubFacility.
+   *  The handleTick function specific to the StubFacility.
    *
    * @param time the time of the tick
    */
   virtual void handleTick(int time);
 
   /**
-   * @brief The handleTick function specific to the StubFacility.
+   *  The handleTick function specific to the StubFacility.
    *
    * @param time the time of the tock
    */

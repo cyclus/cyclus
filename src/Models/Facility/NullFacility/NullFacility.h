@@ -12,7 +12,7 @@
 #include "Resource.h"
 
 /**
-   @brief The NullFacility class inherits from the FacilityModel class and is 
+    The NullFacility class inherits from the FacilityModel class and is 
    dynamically loaded by the Model class when requested.
    
    This facility model does very little.  New material is added to queue 
@@ -90,28 +90,28 @@ class NullFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief Default constructor for the NullFacility class.
+   *  Default constructor for the NullFacility class.
    */
   NullFacility() {};
 
   /**
-   * @brief Destructor for the NullFacility class. 
+   *  Destructor for the NullFacility class. 
    */
   virtual ~NullFacility() {};
   
   // different ways to populate an object after creation
   /**
-   * @brief  initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(NullFacility* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -122,12 +122,12 @@ class NullFacility : public FacilityModel {
   virtual void copyFreshModel(Model* src);
 
   /**
-   * @brief Print information about this model
+   *  Print information about this model
    */
   virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
@@ -136,7 +136,7 @@ class NullFacility : public FacilityModel {
   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
   /**
-   * @brief Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
@@ -153,7 +153,7 @@ class NullFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief When the facility receives a message, execute any transaction therein
+   *  When the facility receives a message, execute any transaction therein
    */
   virtual void receiveMessage(msg_ptr msg);
 
@@ -166,7 +166,7 @@ class NullFacility : public FacilityModel {
  */
  public:
   /**
-   * @brief The handleTick function specific to the NullFacility.
+   *  The handleTick function specific to the NullFacility.
    * At each tick, it requests as much raw inCommod as it can process this
    * month and offers as much outCommod as it will have in its inventory by 
    * the
@@ -177,7 +177,7 @@ class NullFacility : public FacilityModel {
   virtual void handleTick(int time);
 
   /**
-   * @brief The handleTick function specific to the NullFacility.
+   *  The handleTick function specific to the NullFacility.
    * At each tock, it processes material and handles orders, and records this
    * month's actions.
    *
@@ -194,43 +194,43 @@ class NullFacility : public FacilityModel {
  */
  protected:
   /**
-   * @brief The NullFacility has one input commodity
+   *  The NullFacility has one input commodity
    */
   std::string in_commod_;
 
   /**
-   * @brief The NullFacility has one output commodity
+   *  The NullFacility has one output commodity
    */
   std::string out_commod_;
 
   /**
-   * @brief The NullFacility has a limit to how material it can process.
+   *  The NullFacility has a limit to how material it can process.
    * Units vary. It will be in the commodity unit per month.
    */
   double capacity_;
 
   /**
-   * @brief The list of orders to process on the Tock
+   *  The list of orders to process on the Tock
    */
   std::deque<msg_ptr> ordersWaiting_;
 
   /**
-   * @brief The receipe of input materials.
+   *  The receipe of input materials.
    */
   mat_rsrc_ptr in_recipe_;
 
   /**
-   * @brief The receipe of the output material.
+   *  The receipe of the output material.
    */
   mat_rsrc_ptr out_recipe_;
 
   /**
-   * @brief The stocks of raw material available to be processed.
+   *  The stocks of raw material available to be processed.
    */
   MatBuff stocks_;
     
   /**
-   * @brief The inventory of processed material.
+   *  The inventory of processed material.
    */
   MatBuff inventory_;
 
@@ -239,12 +239,12 @@ class NullFacility : public FacilityModel {
   Transaction buildRequestTrans(double amt);
 
   /**
-   * @brief  Makes requests of the input commodity based on current capacity
+   *   Makes requests of the input commodity based on current capacity
    */
   void makeRequests();
 
   /**
-   * @brief  Makes offers of the output commodity based on current inventory
+   *   Makes offers of the output commodity based on current inventory
    */
   void makeOffers();
 

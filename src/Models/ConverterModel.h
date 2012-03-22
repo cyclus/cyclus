@@ -11,7 +11,7 @@
 class Material;
 
 /**
-   @brief
+   
    The ConverterModel class is the abstract class/interconve used by all
    converter models.
    
@@ -49,29 +49,29 @@ class Material;
 class ConverterModel : public Model {
  public:
   /**
-   * @brief  Default constructor for ConverterModel Class
+   *   Default constructor for ConverterModel Class
    */
   ConverterModel() {
     setModelType("Converter");
   };
 
   /**
-   * @brief  every model should be destructable
+   *   every model should be destructable
    */
   virtual ~ConverterModel() {};
   
   /**
-   * @brief  every model needs a method to initialize from XML
+   *   every model needs a method to initialize from XML
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   * @brief  every model needs a method to copy one object to another
+   *   every model needs a method to copy one object to another
    */
   virtual void copy(ConverterModel* src);
 
   /**
-   * @brief This drills down the dependency tree to initialize all relevant parameters/containers.
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
    *
    * Note that this function must be defined only in the specific model in question and not in any 
    * inherited models preceding it.
@@ -81,36 +81,36 @@ class ConverterModel : public Model {
   virtual void copyFreshModel(Model* src)=0;
 
   /**
-   * @brief  every model should be able to print a verbose description
+   *   every model should be able to print a verbose description
    */
   virtual void print() { Model::print(); };
 
 protected:
   /**
-   * @brief  each instance of a converter needs a name
+   *   each instance of a converter needs a name
    */
   std::string conv_name_;
 
   /**
-   * @brief  each converter needs a list of equivalent commodities it converts
+   *   each converter needs a list of equivalent commodities it converts
    */
   std::list<std::string> commodities_; 
 
 public:
   /**
-   * @brief Sets the converter's name 
+   *  Sets the converter's name 
    *
    * @param convName is the new name of the converter
    */
   void setConvName(std::string convName) { conv_name_ = convName; };
 
   /**
-   * @brief  Returns the converter's name
+   *   Returns the converter's name
    */
   std::string getConvName() { return conv_name_; };
 
   /**
-   * @brief Converts between amounts of two commodities
+   *  Converts between amounts of two commodities
    *
    * @param convMsg is a message concerning one convertible commodity to convert
    * @param refMsg is a message concerning the commodity to convert it to
