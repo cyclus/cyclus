@@ -15,234 +15,279 @@
 
 #define WF_U235 0.007200 // feed, natural uranium 
 
-/**
+class Material;
+typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
+
+/*!
    @class Material
-
-   @brief The Cyclus Material class provides the data structure that supports 
-   the isotopic histories of materials passed around in a Cyclus simulation 
-   and the functions that comprise the interface with which models interact 
+  
+    The Cyclus Material class provides the data structure that supports 
+   the isotopic composition of materials passed around in a Cyclus simulation 
+   and the functions as the interface with which models interact 
    with materials.
-
+  
    @section intro Introduction
-   This class keeps track of the isotopic composition of a material using both
-   the atomic fractions and the mass fractions, combined with the total number
-   of atoms and total mass.
-   
-   It is an important goal (requirement) that all material objects maintain an
-   account of the atoms that is consistent with the account of the mass.
-   
-   The default mass unit is kilograms.
-
-   @section necessaryParams Necessary Parameters
-   A fully defined material must have:
-   - Isotopic Composition in mass or atom units
-   
-   @section optionalParams Optional Parameters
-   Optional Parameters
-   - rec_name
-   - units
-   - total_atoms
-   - total_mass
-
-   @section atomTracking Atomic Tracking
-   The history of the isotope resolution atomic composition of the material 
-   is kept in a map of compositions over time. The composition at each time 
-   is a vector of pairs of Isotope identifiers and the number of Atoms of 
-   each isotope. The total atoms in a material are kept track of via a loop 
-   over each the composition at that time.
-
-   @section massTracking Mass Tracking
-   The history of the mass composition of the material is kept in a map of 
-   compositions over time. The composition at each time is a vector of pairs 
-   of Isotope identifiers and the mass it contains of each isotope. The total 
-   mass of a material is kept track of via a loop over each the composition 
-   at that time
-
-   @section recipes Recipes
-   Recipes can be in either mass or atom units and define an often referenced 
-   materal composition.
-
+  
+   This class keeps track of the isotopic composition of a material.
+   Composition can be queried as either atom-based (moles) or mass-based (kg).
+   The material state is book-kept each time a material object is transacted
+   between simulation agents.
+  
    @section dataTables Data Tables
    Material data can be added with a Table class. This is currently under 
-   development for the Mass Table.
-
-   @subsection interface Interface
-   Models in a Cyclus simulation must interact with materials in order to 
-   perform their fuel cycle tasks. Some models will need to create, destroy, 
-   query and alter materials and their compositions. In order to do this, the 
-   Material class provides an interface that supports these actions by any 
-   model that includes its header file.
-   
-   @section deleteMaterials Deleting Materials
-   Only in very rare cases should this be done. In order to conserve mass and 
-   atoms in this simulation models must maintain mass an atomic conservation. 
-   So, materials in the real world typically do not vanish. Rather, they are 
-   transmuted. This behavior is best mimicked by the implementation of your 
-   model.
-
-   That said, destruction of a material in Cyclus is done by changing the 
-   composition to zero. The composition history of the material will reflect 
-   this change and the material object will persist "under the hood" but its 
-   composition for the extent of the simulation time following this change 
-   will reflect that it was reduced to a void.
-   
-   @section queryMaterial Querying Material Objects
-   Public data access functions of the material class are used to query 
-   material composition, total mass, atoms, atom fractions, etc.
-
-   Furthmore, access to nuclide data is also done through the Material Class.
-
-   @section changingComp Changing Material Compositions
-   Methods for adding and subtracting mass and isotopes from material objects 
-   are provided by many public member functions of the MaterialClass.
+   development for the MassTable.
+  
+   @subsection interface Interface Models in a Cyclus simulation must interact
+   with materials in order to perform their fuel cycle tasks. Some models will
+   need to create, destroy, query and alter materials and their compositions.
+   In order to do this, the Material class, in concert with the IsoVector
+   class, provides an interface that supports these actions by any model that
+   includes its header file.
+  
+   @section modifyMaterials Modifying Materials
+  
+   Most interaction with material objects will take the form of checking their
+   composition properties by querying the material object's stored IsoVector.
+   The only methods available to modify the material object are the 'absorb'
+   and 'extract' methods.  Changing a material object's composition is not
+   possible.  If the composition needs to be changed, a new material object
+   will need to be created with the desired composition.  In general, the
+   setQuantity method should NOT be used to change the mass of a material
+   object. An IsoVector containing the desired composition and mass properties
+   should be configured prior to the material object creation 
 */
-
 class Material : public Resource {
-
 public:
+  /**
+   *  default constructor
+   */
   Material();
 
   /**
-   * a constructor for making a material object from a known recipe and size.
-   *
+   *  a constructor for making a material object 
+   * from a known recipe and size.
+   * 
    * @param comp isotopic makeup of this material object
    */
   Material(IsoVector comp);
 
-  /// copy constructor
+  /**
+   *  a constructor for making a material object 
+   * from another material object
+   * 
+   * @param other the material object to copy from
+   */
   Material(const Material& other);
   
-  /// Default destructor does nothing.
+  /**
+   *  default destructor
+   */
   ~Material() {};
-
   
   /**
-   * standard verbose printer includes both an atom and mass composition output
+   *  standard verbose printer includes both an 
+   * atom and mass composition output
    */
   void print(); 
-    
-  /**
-   * Change/set the mass of the resource object. Note that this does make
-   * matter (dis)appear and should only be used on objects that are not part of
-   * any actual tracked inventory.
-   */
-  void setQuantity(double quantity) {iso_vector_.setMass(quantity);};
 
   /**
-   * Resource class method
+   *  Change/set the mass of the resource object. 
+   * Note that this does make matter (dis)appear and 
+   * should only be used on objects that are not part of
+   * any actual tracked inventory.
+   */
+  void setQuantity(double quantity);
+
+  /**
+   *  Resource class method
    */
   double quantity() {return iso_vector_.mass();};
 
   /**
-   * Resource class method
+   *  Resource class method
    */
   std::string units() {return "kg";};
 
   /**
-   * Resource class method
+   *  Resource class method
    */
-  bool checkQuality(Resource* other);
+  bool checkQuality(rsrc_ptr other);
 
   /**
-   * Resource class method
+   *  Resource class method
    */
-  bool checkQuantityEqual(Resource* other);
+  bool checkQuantityEqual(rsrc_ptr other);
 
   /**
-   * Resource class method
+   *  Resource class method
    */
-  bool checkQuantityGT(Resource* other);
+  bool checkQuantityGT(rsrc_ptr other);
 
   /**
-   * Resource class method
+   *  Resource class method
    */
   ResourceType type() {return MATERIAL_RES;};
 
   /**
-   * Resource class method
+   *  Resource class method
    */
-  Material* clone();
+  rsrc_ptr clone();
 
   /**
-   * Absorbs the contents of the given Material into this Material and deletes 
+   *  Absorbs the contents of the given 
+   * Material into this Material and deletes 
    * the given Material. 
    * 
    * @param matToAdd the Material to be absorbed (and deleted)
    */
-  virtual void absorb(Material* matToAdd);
+  virtual void absorb(mat_rsrc_ptr matToAdd);
 
   /**
-   * Extracts from this material a composition specified by the given IsoVector
-   *
+   *  Extracts from this material a composition 
+   * specified by the given IsoVector
+   * 
    * @param rem_comp the composition/amount of material that will be removed
    * against this Material
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(IsoVector rem_comp);
+  virtual mat_rsrc_ptr extract(IsoVector rem_comp);
 
   /**
-   * Extracts a specified mass from this material creating a new material
+   *  Extracts a specified mass from this material creating a new material
    * object with the same isotopic ratios.
-   *
+   * 
    * @param the amount (mass) of material that will be removed
    * 
    * @return the extracted material as a newly allocated material object
    */
-  virtual Material* extract(double mass);
+  virtual mat_rsrc_ptr extract(double mass);
 
   /**
-   * Decays this Material object for the given number of months and updates
+   *  Decays this Material object for the given number of months and updates
    * its composition map with the new number densities.
-   *
+   * 
    * @param months the number of months to decay
    */
   void decay(double months);
   
   /**
-   * Decays this Material object for however many months have passed since the 
+   *  Decays this Material object for however 
+   * many months have passed since the 
    * last entry in the material history.
-   *
    */
   void decay();
 
-  /*!
-  Returns a copy of this material's isotopic composition
-  */
+  /**
+   *  Returns a copy of this material's isotopic composition
+   */
   IsoVector isoVector() {return iso_vector_;}
 
   /**
-   * Decays all of the materials if decay is on
-   *
+   *  Decays all of the materials if decay is on
+   * 
    * @todo should be private (khuff/rcarlsen)
-   *
+   * 
    * @param time is the simulation time of the tick
    */
   static void decayMaterials(int time);
   
-  /*
-   * sets the decay boolean and the interval
+  /**
+   *  sets the decay boolean and the interval
    */
   static void setDecay(int dec);
 
 private:
+  /**
+   *  used by print() to 'hide' print code when logging is not desired
+   */
+  std::string detail(); 
 
-  /// last time this material object's state was accurate (e.g. time of last
-  /// decay, etc.)
+  /**
+   *  last time this material object's state 
+   * was accurate (e.g. time of last decay, etc.)
+   */
   int last_update_time_;
 
-  /// all isotopic details of this material object
+  /**
+   *  all isotopic details of this material object
+   */
   IsoVector iso_vector_;
 
-  /// list of materials
-  static std::vector<Material*> materials_;
+  /**
+   *  list of materials
+   */
+  static std::vector<mat_rsrc_ptr> materials_;
 
-  /// true if decay should occur, false if not.
+  /**
+   *  true if decay should occur, false if not.
+   */
   static bool decay_wanted_;
 
-  /// how many months between decay calculations
+  /**
+   *  how many months between decay calculations
+   */
   static int decay_interval_;
 
+// -------- resource class related members  -------- 
+ public:
+  /**
+   *  the material class resouce type
+   */
+  std::string type_name(){return "material";}
+
+  /**
+   *  resouce type logging state
+   */
+  bool is_resource_type_logged(){return type_is_logged_;}
+
+  /**
+   *  tells the simulation this resource type is logged
+   */
+  void type_logged(){type_is_logged_ = true;}
+
+  /** 
+   *  set the agent who created this resource
+   */
+  void setOriginatorID(int id);
+
+ private:
+  /**
+   *  the state of logging for this resource type
+   */
+  static bool type_is_logged_;
+// -------- resource class related members  -------- 
+
+
+// -------- output database related members  -------- 
+ public:
+  /**
+   *  the table for logging material resources
+   */
+  static table_ptr material_table;
+
+  /**
+   *  add a material to table
+   */
+  void addToTable();
+
+
+  /**
+   *  return the state id for the iso vector
+   */
+  int stateID(){return iso_vector_.stateID();}
+
+ private:
+  /**
+   *  Define the database table
+   */
+  static void define_table();
+
+  /**
+   *  Store information about the material's primary key
+   */
+  primary_key_ref pkref_;
+// -------- output database related members  -------- 
 };
 
 #endif

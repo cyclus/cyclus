@@ -1,6 +1,8 @@
 // Message.cpp
 // Implements the Message class.
 
+#include <iostream>
+
 #include "Message.h"
 
 #include "CycException.h"
@@ -10,21 +12,20 @@
 #include "InstModel.h"
 #include "GenericResource.h"
 #include "Logger.h"
-#include "BookKeeper.h"
+#include "Timer.h"
 
-#include <iostream>
+using namespace std;
 
 // initialize static variables
 int Message::nextTransID_ = 1;
-long Message::msg_create_count_ = 0;
-long Message::msg_delete_count_ = 0;
-
-std::string Message::outputDir_ = "/output/transactions";
+// Database table for transactions
+table_ptr Message::trans_table = new Table("Transactions"); 
+table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
-  msg_create_count_++;
-
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+  dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = NULL;
@@ -44,8 +45,8 @@ Message::Message(Communicator* sender) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
-  msg_create_count_++;
-
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+  dead_ = false;
   dir_ = UP_MSG;
   sender_ = sender;
   recipient_ = receiver;
@@ -64,8 +65,8 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction thisTrans) {
-  msg_create_count_++;
-
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+  dead_ = false;
   dir_ = UP_MSG;
   trans_ = thisTrans;
   sender_ = sender;
@@ -85,6 +86,10 @@ Message::Message(Communicator* sender, Communicator* receiver,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::~Message() {
+  MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setRealParticipant(Communicator* who) {
   Model* model = NULL;
   model = dynamic_cast<Model*>(who);
@@ -93,39 +98,52 @@ void Message::setRealParticipant(Communicator* who) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::printTrans() {
-  std::cout << "Transaction info (via Message):" << std::endl <<
-    "    Requester ID: " << trans_.requester->ID() << std::endl <<
-    "    Supplier ID: " << trans_.supplier->ID() << std::endl <<
-    "    Price: "  << trans_.price << std::endl;
+  CLOG(LEV_INFO4) << "Transaction info {"
+                  << ", Requester ID=" << trans_.requester->ID()
+                  << ", Supplier ID=" << trans_.supplier->ID()
+                  << ", Price="  << trans_.price << " }";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 msg_ptr Message::clone() {
+  CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
+
   msg_ptr new_msg(new Message(*this));
   new_msg->setResource(resource());
-  msg_create_count_++;
   return new_msg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::sendOn() {
+  if (dead_) {return;}
+
   validateForSend();
+  msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
+    path_stack_.back()->untrackMessage(me);
     path_stack_.pop_back();
+  } else {
+    path_stack_.back()->trackMessage(me);
   }
 
   Communicator* next_stop = path_stack_.back();
-
   setRealParticipant(next_stop);
-
   current_owner_ = next_stop;
 
-  msg_ptr me = msg_ptr(this);
+  CLOG(LEV_DEBUG1) << "Message " << this << " going to model"
+                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID() << " {";
 
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " going to " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
   next_stop->receiveMessage(me);
-  LOG(LEV_DEBUG3) << "MemAlloc: Message " << me.get() << " returned from " << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+
+  CLOG(LEV_DEBUG1) << "} Message " << this << " returned from model"
+                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::kill() {
+  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
+  dead_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -157,19 +175,26 @@ void Message::validateForSend() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
+    CLOG(LEV_DEBUG4) << "Message " << this << " next-stop set to model ID="
+                     << dynamic_cast<Model*>(next_stop)->ID();
     if (path_stack_.size() == 0) {
       path_stack_.push_back(sender_);
     }
-
     path_stack_.push_back(next_stop);
+    return;
   }
+  CLOG(LEV_DEBUG4) << "Message " << this
+                   << " next-stop set attempt ignored to model ID="
+                   << dynamic_cast<Model*>(next_stop)->ID();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::reverseDirection() {
   if (DOWN_MSG == dir_) {
+    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'down' to 'up'.";
     dir_ = UP_MSG; 
   } else {
+    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'up' to 'down'.";
   	dir_ = DOWN_MSG;
   }
 }
@@ -181,6 +206,9 @@ MessageDir Message::dir() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setDir(MessageDir newDir) {
+  CLOG(LEV_DEBUG4) << "Message " << this << "manually changed to "
+                   << newDir << ".";
+
   dir_ = newDir;
 }
 
@@ -223,24 +251,149 @@ Model* Message::requester() const {
 void Message::approveTransfer() {
   msg_ptr me = msg_ptr(this);
 
+  vector<rsrc_ptr> manifest;
   Model* req = requester();
   Model* sup = supplier();
-  vector<Resource*> manifest = sup->removeResource(me);
-  req->addResource(me, manifest);
 
-  BI->registerTransaction(nextTransID_, me, manifest);
-
-  for (int i = 0; i < manifest.size(); i++) {
-    try {
-      BI->registerResourceState(nextTransID_, manifest.at(i));
-    } catch (...) {
-      LOG(LEV_ERROR) << "Failed to register resource state. Resource may"
-                     << " not have been of Material type.";
-    }
+  try {
+    manifest = sup->removeResource(me);
+    req->addResource(me, manifest);
+  } catch (CycException err) {
+    CLOG(LEV_ERROR) << "Material transfer failed from " 
+                    << sup->ID() << " to " << req->ID() << ": " << err.what();
+    return;
   }
-  nextTransID_++;
 
-  LOG(LEV_DEBUG2) << "Material sent from " << sup->ID() << " to " 
+  int id = nextTransID_++;
+  
+  // register that this transaction occured
+  this->Message::addTransToTable(id);
+  int nResources = manifest.size();
+  for (int pos = 0; pos < nResources; pos++) {
+    this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
+  }
+
+  CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
+
 }
 
+void Message::define_trans_table(){
+  // declare the table columns
+  column id("ID","INTEGER");
+  column sender("SenderID","INTEGER");
+  column receiver("ReceiverID","INTEGER");
+  column time("Time","INTEGER");
+  column price("Price","REAL");
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("ID");
+  trans_table->setPrimaryKey(pk);
+  // add columns to the table
+  trans_table->addColumn(id), trans_table->addColumn(sender), 
+    trans_table->addColumn(receiver), trans_table->addColumn(time),
+    trans_table->addColumn(price);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //   Agents table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Agents",theirk);
+  //     the sender id
+  myk.push_back("SenderID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) ); // sender id references agents' id
+  myk.clear();
+  //     the reciever id
+  myk.push_back("ReceiverID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) ); // receiver id references agents' id
+  myk.clear();
+  theirk.clear();
+  // we've now defined the table
+  trans_table->tableDefined();
+}
+
+void Message::addTransToTable(int transID){  
+  // if we haven't logged a message yet, define the table
+  if ( !trans_table->defined() )
+    Message::define_trans_table();
+  
+  // make a row
+  // declare data
+  data an_id(transID), a_sender( trans_.supplier->ID() ), 
+    a_receiver( trans_.requester->ID() ), a_time( TI->time() ), 
+    a_price( trans_.price );
+  // declare entries
+  entry id("ID",an_id), sender("SenderID",a_sender), 
+    receiver("ReceiverID",a_receiver), time("Time",a_time), 
+    price("Price",a_price);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(sender), aRow.push_back(receiver), 
+    aRow.push_back(time),aRow.push_back(price);
+  // add the row
+  trans_table->addRow(aRow);
+  // record this primary key
+  pkref_trans_.push_back(id);
+}
+
+void Message::define_trans_resource_table(){
+  // declare the table columns
+  column transID("TransactionID","INTEGER");
+  column transPos("Position","INTEGER");
+  column resource("ResourceID","INTEGER");
+  column amt("Quantity","REAL");
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("TransactionID"), pk.push_back("Position");
+  trans_resource_table->setPrimaryKey(pk);
+  // add columns to the table
+  trans_resource_table->addColumn(transID), trans_resource_table->addColumn(transPos), 
+    trans_resource_table->addColumn(resource), trans_resource_table->addColumn(amt);
+  // add foreign keys
+  foreign_key_ref *fkref;
+  foreign_key *fk;
+  key myk, theirk;
+  //   Transactions table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Transactions",theirk);
+  //     the transaction id
+  myk.push_back("TransactionID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_resource_table->addForeignKey( (*fk) ); // transid references transaction's id
+  myk.clear(), theirk.clear();
+  //    Resource table foreign keys
+  theirk.push_back("ID");
+  fkref = new foreign_key_ref("Resources",theirk);
+  //      the resource id
+  myk.push_back("ResourceID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_resource_table->addForeignKey( (*fk) ); // resourceid references resource's id
+  // we've now defined the table
+  trans_resource_table->tableDefined();
+}
+
+void Message::addResourceToTable(int transID, int transPos, rsrc_ptr r){  
+  // if we haven't logged a message yet, define the table
+  if ( !trans_resource_table->defined() )
+    Message::define_trans_resource_table();
+  
+  // make a row
+  // declare data
+  data an_id(transID), a_pos(transPos), 
+    a_resource(r->originalID()), an_amt(r->quantity());
+  // declare entries
+  entry id("TransactionID",an_id), pos("Position",a_pos), 
+    resource("ResourceID",a_resource), amt("Quantity",an_amt);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(pos), 
+    aRow.push_back(resource), aRow.push_back(amt);
+  // add the row
+  trans_resource_table->addRow(aRow);
+  // record this primary key
+  pkref_rsrc_.push_back(id);
+  pkref_rsrc_.push_back(pos);
+}

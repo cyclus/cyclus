@@ -18,12 +18,9 @@ class FakeNullFacility : public NullFacility {
     FakeNullFacility() : NullFacility() {
       in_commod_ = "in-commod";
       out_commod_ = "out-commod";
-      inventory_size_ = 10;
+      inventory_.setCapacity(10);
+      stocks_.setCapacity(10);
       capacity_ = 2;
-
-      inventory_ = deque<Material*>();
-      stocks_ = deque<Material*>();
-      ordersWaiting_ = deque<msg_ptr>();
     }
 
     string getOutCommod(){ return out_commod_;}

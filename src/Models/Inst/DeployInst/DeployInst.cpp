@@ -1,14 +1,16 @@
 // DeployInst.cpp
 // Implements the DeployInst class
 #include <iostream>
-#include "Logger.h"
 
 #include "DeployInst.h"
 
 #include "FacilityModel.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void DeployInst::init(xmlNodePtr cur)
@@ -26,7 +28,7 @@ void DeployInst::init(xmlNodePtr cur)
     Model* facility = Model::getTemplateByName(fac_name);
 
     if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
-      std::string err_msg = "Facility '" + fac_name;
+      string err_msg = "Facility '" + fac_name;
       err_msg += "' is not an allowed facility for region '";
       err_msg +=  parent()->name() +"'.";
       throw CycException(err_msg);
@@ -65,12 +67,12 @@ void DeployInst::print()
 { 
   InstModel::print();
 
-  LOG(LEV_DEBUG2) << " with deployment schedule: ";
+  LOG(LEV_DEBUG2, "none!") << " with deployment schedule: ";
 
   for (map<int,Model*>::iterator deploy=deployment_map_.begin();
        deploy!=deployment_map_.end();
        deploy++){
-    LOG(LEV_DEBUG2) << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
+    LOG(LEV_DEBUG2, "none!") << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
         << " ("  << (*deploy).second->name() 
         << ") is deployed in month " << (*deploy).first;
   }
@@ -88,12 +90,8 @@ void DeployInst::handleTick(int time) {
   };
 };
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string DeployInst::outputDir_ = "/deploy";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -102,10 +100,6 @@ std::string DeployInst::outputDir_ = "/deploy";
 
 extern "C" Model* constructDeployInst() {
   return new DeployInst();
-}
-
-extern "C" void destructDeployInst(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

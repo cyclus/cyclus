@@ -2,7 +2,7 @@
 #include "Env.h"
 
 #include "InputXML.h"
-#include "CycException.h"
+#include "Logger.h"
 
 #include <sys/stat.h>
 #include <iostream>
@@ -12,25 +12,14 @@
 
 using namespace std;
 
-Env* Env::instance_ = 0;
-string Env::path_from_cwd_to_cyclus_ = ".";
+boost::filesystem::path Env::path_from_cwd_to_cyclus_;
+boost::filesystem::path Env::cwd_ = boost::filesystem::current_path();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env::Env() { }
+// note that this is not used - Env is a pure static class
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Env* Env::Instance() {
-	// If we haven't created an ENV yet, create it, and then and return it
-	// either way.
-	if (0 == instance_) {
-		instance_ = new Env();
-	}
-
-	return instance_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::pathBase(std::string path) {
+string Env::pathBase(string path) {
   string base;
   int index;
 
@@ -40,25 +29,35 @@ std::string Env::pathBase(std::string path) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::getCyclusPath() {
-  return path_from_cwd_to_cyclus_;
+string Env::getCyclusPath() {
+  // return the join of cwd_ and rel path to cyclus
+  CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
+                  << cwd_ / path_from_cwd_to_cyclus_;
+
+  boost::filesystem::path path;
+  if(path_from_cwd_to_cyclus_.has_root_path()) {
+    path = path_from_cwd_to_cyclus_.normalize();
+  } else {
+    path = (cwd_ / path_from_cwd_to_cyclus_).normalize();
+  }
+  return path.string();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Env::setCyclusPath(std::string path) {
-  path_from_cwd_to_cyclus_ = path;
+void Env::setCyclusRelPath(string path) {
+  path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
+  CLOG(LEV_DEBUG3) << "Cyclus rel path: " << path;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Env::checkEnv(std::string varname) {
-
-  string toRet;
-  if ((strlen(getenv(varname.c_str()))>0)&&(getenv(varname.c_str())!=NULL)){
-    toRet = getenv(varname.c_str());
+string Env::checkEnv(string varname) {
+  char* pVar = getenv (varname.c_str());
+  if (pVar == NULL) {
+    throw CycNoEnvVarException("Environment variable " + varname + " not set.");
+  } else if (strlen(pVar) == 0) {
+    throw CycNoEnvVarException("Environment variable " + varname
+                               + " set to an empty string.");
   }
-  else {
-    throw CycException("Environment variable " + varname + " not set.");
-  }
-  return toRet;
+  return pVar;
 }
 

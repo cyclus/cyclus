@@ -1,17 +1,19 @@
 /// InstModel.cpp
 // Implements the InstModel class
 
-#include "InstModel.h"
-#include "FacilityModel.h"
+#include <iostream>
+#include <sstream>
+#include <string>
 
+#include "InstModel.h"
+
+#include "Logger.h"
 #include "Timer.h"
 #include "InputXML.h"
 #include "CycException.h"
+#include "FacilityModel.h"
 
-#include <iostream>
-#include "Logger.h"
-#include <sstream>
-#include <string>
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
@@ -44,7 +46,7 @@ void InstModel::print()
 {
   Model::print();
 
-  LOG(LEV_DEBUG2) << "in region " << parent()->name();
+  LOG(LEV_DEBUG2, "none!") << "in region " << parent()->name();
 }
 
 
@@ -86,8 +88,6 @@ void InstModel::handleTock(int time){
       fac != children_.end();
       fac++){
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
-    // if its the last month, decommission the inst
-    if (TI->checkEndMonth()) {this->decommission();}
   }
 }
 
@@ -108,7 +108,7 @@ void InstModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool InstModel::pleaseBuild(Model* fac){
   // by defualt
-  std::stringstream ss;
+  stringstream ss;
   ss << this->ID();
   throw CycOverrideException("Institution " + ss.str()
 		     + " does not have a definied facility-building fuction.");
@@ -125,10 +125,3 @@ double InstModel::powerCapacity(){
   }
   return capacity;
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string InstModel::outputDir_ = "/institution";

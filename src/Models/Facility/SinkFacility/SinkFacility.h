@@ -1,18 +1,20 @@
 // SinkFacility.h
 #if !defined(_SINKFACILITY_H)
 #define _SINKFACILITY_H
+
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <queue>
 #include <string>
 
+#include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
+#include "MatBuff.h"
 
 /**
    @class SinkFacility
-   @brief  This FacilityModel requests a finite amount of its input commodity. 
+     This FacilityModel requests a finite amount of its input commodity. 
    It offers nothing. 
    
    The SinkFacility class inherits from the FacilityModel class and is 
@@ -76,33 +78,35 @@
    What is the best way to allow requests of an infinite amount of 
    material on a market? 
 */
-
 class SinkFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   /**
-   * Constructor for the SinkFacility class.
+   *  Constructor for the SinkFacility class.
    */
   SinkFacility();
   
   /**
-   * Destructor for the SinkFacility class.
+   *  Destructor for the SinkFacility class.
    */
-  ~SinkFacility();
+  virtual ~SinkFacility();
 
   // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   *   initialize an object from XML input
+   */
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object by copying another
+  /**
+   *   initialize an object by copying another
+   */
   virtual void copy(SinkFacility* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -113,48 +117,50 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * A verbose printer for the Sink Facility.
+   *  A verbose printer for the Sink Facility.
    */
   virtual void print();
 
   /**
-   * Transacted resources are received through this method
+   *  Transacted resources are received through this method
    *
    * @param trans the transaction to which these resource objects belong
    * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
-                              std::vector<Resource*> manifest);
+                              std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
+
 
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-public:
-  /// The sink Facility doesn't need to do anything if it gets a message.
-  /// It never sends any matieral to anyone.
+ public:
+  /**
+   * The sink Facility doesn't need to do anything if it gets a message.
+   * It never sends any matieral to anyone.
+  */
   virtual void receiveMessage(msg_ptr msg) {};
 
 /* -------------------- */
+
 
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-
-public:
-
+ public:
   /**
-   * The SinkFacility can handle the Tick.
+   *  The SinkFacility can handle the Tick.
    *
    * @param time the current simulation time.
    */
   virtual void handleTick(int time);
 
   /**
-   * The SinkFacility can handle the Tock.
+   *  The SinkFacility can handle the Tock.
    *
    * @param time the current simulation time.
    */
@@ -162,55 +168,36 @@ public:
 
 /* ------------------- */ 
 
+
 /* --------------------
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-
-protected:
-  /// all facilities must have at least one input commodity
-  vector<std::string> in_commods_;
-
-  /// this facility holds material in storage. 
-  deque<Material*> inventory_;
+ protected:
+  /**
+   *   all facilities must have at least one input commodity
+   */
+  std::vector<std::string> in_commods_;
 
   /**
-   * get the total mass of the stuff in the inventory
-   *
-   * @return the total mass of the materials in storage
+   *   monthly acceptance capacity
    */
-  double checkInventory();
-
-  /// maximum inventory size
-  double inventory_size_;
-
-  /// monthly acceptance capacity
   double capacity_;
 
-  /// commodity price
+  /**
+   *   commodity price
+   */
   double commod_price_;
 
-private:
-  /// determines the amount to request 
+  /**
+   *   determines the amount to request 
+   */
   const double getRequestAmt() ;
 
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
   /**
-     The getter function for this facility model output dir
-  */
-  static std::string outputDir(){ 
-    return FacilityModel::outputDir().append(outputDir_);}
-
- private:
-  /**
-     Every specific facility model writes to the output database
-     location: FacilityModel::OutputDir_ + /this_facility's_handle
-  */
-  static std::string outputDir_;
+   *  this facility holds material in storage. 
+   */
+  MatBuff inventory_;
 
 /* ------------------- */ 
 

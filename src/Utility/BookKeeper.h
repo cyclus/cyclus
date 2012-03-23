@@ -4,343 +4,237 @@
 
 #include <string>
 #include <vector>
+#include <boost/spirit/home/support/detail/hold_any.hpp>
 
-#include "H5Cpp.h"
-#include "hdf5.h"
-
-#include "Model.h"
-#include "Material.h"
-#include "Message.h"
+#include "Database.h"
+#include "Table.h"
+#include "CycException.h"
 
 #define BI BookKeeper::Instance()
-#define NUMISOS 100
 
-using namespace H5;
+typedef std::string file_path;
+typedef std::map< std::string, table_ptr > TableMap;
+typedef std::vector< std::string > ColumnLabels;
+typedef std::vector< std::string > DataTypes;
+typedef std::vector< boost::spirit::hold_any > Data;
 
-/*!
-   @brief
+/**
+   
    The BookKeeper is a (singleton) class for handling I/O.
    
    @section introduction Introduction
    The Cyclus Book Keeper is a singleton member of the 
-   BookKeeperClass. The Book Keeper Instance (BI) controls 
-   reading and writing from the simulation database. The 
-   Book Keeper creates the database file (cyclus.h5) and 
-   maintains functions with which the LogicianClass and 
-   various models can write individual datasets to that file.
-   
+   BookKeeperClass. The Book Keeper Instance (BI) manages the 
+   access to the simulation's output database. Individual
+   modules create Tables as per their need, and registers them
+   with the Book Keeper. All interaction with the Database is 
+   handled by the Book Keeper.
+
    @section singletonInstance Singleton Instance
    In order to utilize the database functions stewarded by the 
    Book Keeper, a model must include the Book Keeper header file 
    and call BookKeeperClass functions via the singleton Book 
-   Keeper Instance LI.
+   Keeper Instance BI.
    
    @section writeDB Writing the Database File
    In the long term, the function that writes the output for 
-   Cyclus may be of any format. For now, the only supported format 
-   is hdf5. The Book Keeper creates a simulation data file in the 
-   build directory (called cyclus.h5) as soon as it is initialized.
+   Cyclus may be of any format. The Book Keeper API is independent
+   of data format. Currently, it interacts with the TableClass 
+   and DatabaseClass, both of which are written with respect to
+   SQL, specifically SQLite. The Book Keeper creates a simulation 
+   data file as soon as it is initialized.
 
    @section writeToDB Writing to the Database
-   It is an open question whether the data for the simulation should 
-   be kept entirely in memory until the end of the simulation. It 
-   may be best to open and write to the file all in one fluid process 
-   at the end of the simulation to save time. Alternatively though, 
-   there may be some value in writing the simulation data to the file 
-   as it is generated in order to facilitate a future in which the 
-   simulation might have a dynamic start and stop capability.
-*/
+   Under the current Book Keeper paradigm, rows of data are written 
+   at intervals described in the TableClass. When a Table reaches 
+   a threshold number of row commands, it alerts the Book Keeper,
+   who is allowed to act accordingly.
+ */
 class BookKeeper {
-private:
+ private:
   /**
-   * A pointer to this BookKeeper once it has been initialized.
+   *  A pointer to this BookKeeper once it has been initialized.
    */
   static BookKeeper* instance_;
-
-  static int next_comp_entry_id_;
   
   /**
-   * The HDF5 output database for the simulation this BookKeeper is 
+   *  The output database for the simulation this BookKeeper is 
    * responsible for.
    */
-  H5File* myDB_;
+  Database* db_;
   
   /**
-   * Stores the final filename we'll use for the DB, since we use it 
+   *  Stores the final filename we'll use for the DB, since we use it 
    * in multiple places and don't want there to be any ambiguity.
    */
   std::string dbName_;
   
-  /// True iff the db is open.
+  /**
+   *  True iff the db is open.
+   */
   bool dbIsOpen_;
 
   /**
-   * True iff the db is open.
+   *  A pointer the Tables registered with the BookKeeper
    */
-  bool dbExists_;
+  static TableMap* registeredTables_;
 
-protected:
   /**
-   * The (protected) constructor for this class, which can only be 
+   *  A boolean to determine if logging is on.
+   */
+  static bool logging_on_;
+
+ protected:
+  /**
+   *  The (protected) constructor for this class, which can only be 
    * called indirectly by the client.
    */
   BookKeeper();
 
-  // an agent struct
-  typedef struct agent_t{
-    int ID;                 /**< 
-                               An integer indicating the agent ID **/
-    char name[64];          /**< 
-                               A std::string indicating the name of the 
-                               template **/ 
-    char modelImpl[64];     /**< 
-                               A std::string indicating the agent 
-                               implementation **/
-    int parentID;           /**< 
-                               An integer of the agent's parent's ID **/
-    int bornOn;           /**< 
-                               An integer of the agents born on date **/
-    int diedOn;           /**< 
-                               An integer of the agents died on date **/
-  } agent_t;
-  
-  // transaction struct
-  typedef struct trans_t{
-    int transID;            /**< 
-                               An integer indicating the transaction ID **/
-    int supplierID;         /**< 
-                               An integer indicating the supplier model ID **/
-    int requesterID;        /**< 
-                               An integer indicating the requester model ID **/
-    int materialID;         /**< 
-                               An integer indicating the material object ID **/
-    int timestamp;          /**< 
-                               An integer indicating the month **/
-    double price;           /**< 
-                               A double indicating the transaction price **/   
-    char commodName[64];   /**< 
-                              The name of the commodity **/
-  } trans_t;
-  
-  // material history struct
-  typedef struct mat_hist_t{
-    int stateID;         /**< 
-                               An integer indicating the material state ID **/
-    int materialID;         /**< 
-                               An integer indicating the material object ID **/
-    int transID;         /**< 
-                               An integer indicating the associated transaction ID **/
-    int timestamp;          /**< 
-                               An integer indicating the timestamp **/
-    double quantity;          /**< 
-                               An double indicating the resource quantity **/
-    char units[64];          /**< 
-                               An string indicating the units of the resource's quantity **/
-    char name[64];          /**< 
-                               An string indicating the units of the resource's quantity **/
-    int iso[NUMISOS];       /**< 
-                               An integer indicating the nuclide ID **/   
-    double comp[NUMISOS];   /**< 
-                               The kg or moles of the iso in the material at 
-                               that time **/
-  } mat_hist_t;
-
-  // material composition history struct
-  typedef struct comp_entry_t {
-    int entryID;         /**< 
-                               An integer indicating the comp entry ID **/
-    int stateID;         /**< 
-                               An integer indicating the material state ID **/
-    int iso;       /**< 
-                               An integer indicating the nuclide ID **/   
-    double comp;   /**< 
-                               The kg or moles of the iso in the material at 
-                               that time **/
-  } comp_entry_t;
-
+ public:
   /**
-   * Stores the transactions that have taken place during the simulation.
-   */
-  std::vector<trans_t> transactions_;
-
-  /**
-   * Stores the material changes that have taken place during the simulation.
-   */
-  std::vector<mat_hist_t> materials_;
-  
-  /**
-   * Stores the material changes that have taken place during the simulation.
-   */
-  std::vector<comp_entry_t> comp_entries_;
-
-  /**
-   * Stores the materials_ vector index of the last time a material registered
-   */
-  std::map<int, int> last_mat_idx_;
-
-public:
-        
-  /**
-   * Gives all simulation objects global access to the BookKeeper by 
+   *  Gives all simulation objects global access to the BookKeeper by 
    * returning a pointer to it.
    * Like the Highlander, there can be only one.
    *
    * @return a pointer to the BookKeeper
    */
   static BookKeeper* Instance();
-  
-  /**
-   * Creates a database file with the default name, cyclus.h5. 
-   */
-  void createDB();
 
   /**
-   * Creates a database file with the name indicated. 
+   *  Return the state of logging being on or off
+   */
+  bool loggingIsOn();
+
+  /**
+   *  Turn on logging
+   */
+  void turnLoggingOn();
+
+  /**
+   *  Turn off logging
+   */
+  void turnLoggingOff();
+  
+  /**
+   *  Creates a database file with the default name, cyclus.sqlite. 
+   */
+  void createDB(){createDB("cyclus.sqlite");}
+ 
+  /**
+   *  Creates a database file with the name indicated. 
+   * This function queries the environment variable CYCLUS_OUTPUT_DIR.
    *
-   * @param name is the name of the hdf5 database file. Should end in .h5
+   * @param name is the name of the sqlite database file. Should end in .sqlite
    */
   void createDB(std::string name);
-  
-  /**
-   * Returns a handle to the database this BookKeeper is maintaining.
-   *
-   * @return the handle to the database
-   */
-  H5File* getDB();
 
   /**
-   * Opens the output database in memory space.
+   *  Creates a database given a file_path. This is the master create function.
+   * If the named file in fpath already exists, this function
+   * will delete it and create a new file.
+   *
+   * @param name is the name of the sqlite database file. Should end in .sqlite
+   * @param fpath the path to the file
+   */
+  void createDB(std::string name, file_path fpath);
+
+  /**
+   *  Returns the database this Book Keeper is maintaining.
+   */
+  Database* getDB() {return db_;}
+
+  /**
+   *  Returns the name of the database
+   */
+  std::string dbName(){return dbName_;}
+  
+  /**
+   *  Returns whether or not the database exists
+   */
+  bool dbExists();
+
+  /**
+   *  Returns whether the database open (and it exists)
+   */
+  bool dbIsOpen();
+
+  /**
+   *  Opens the database this Book Keeper is maintaining.
    */
   void openDB();
 
   /**
-   * Closes the database this BookKeeper is maintaining.
+   *  Closes the database this Book Keeper is maintaining.
+   * However, before issuing the close command, any Tables
+   * with row commands remaining will have those commands issued.
    */
   void closeDB();
+
+  /**
+   *  Registers a new table with the Book Keeper
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the Table
+   * @param dataTypes the type of data corresponding to each column
+   */
+  void registerNewTable(std::string name, ColumnLabels columns,
+			DataTypes dataTypes);
+
+  /**
+   *  Adds a row to a given table
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the row being added
+   * @param data the data corresponding to each column
+   */
+  void addRowToTable(std::string name, ColumnLabels columns,
+		     Data data);
+
+  /**
+   *  Updates a row of a given table
+   *
+   * @param name the Table's name
+   * @param columns the name of each column in the row being updated
+   * @param data the data corresponding to each column
+   */
+  void updateRowInTable(std::string name, ColumnLabels columns,
+			Data data);
+
+  /**
+   *  Adds a table to the database's vector of tables and then issues
+   * the command to create that table.
+   *
+   * @param t is the table to be registered
+   */
+  void registerTable(table_ptr t);
+
+  /**
+   *  Unregister a table with the Book Keeper's database
+   *
+   * @param t is the table to be removed
+   */
+  void removeTable(table_ptr t);
   
   /**
-   * Returns whether it's open
+   *  Returns the number of tables registered with the BookKeeper
    */
-  bool isOpen(){return dbIsOpen_;};
+  int nTables();
   
   /**
-   * Returns whether it exists
+   *  Return the Book Keeper's current command threshold on writing
+   * rows to the database.
    */
-  bool exists(){return dbExists_;};
+  int rowThreshold();
 
-  /* Function only used in tests (MJG) */
   /**
-   * Returns whether the group exists in the database
+   *  Tables alert the BookKeeper when they have maxed out their queue of
+   * row commands. The BookKeeper then invokes the Database's writeRows
+   * function and then flushes the Table's row commands container.
    *
-   * @deprecated not used at all. Needs removal (rcarlsen).
-   *
-   * @param grp the name of the group being queried
+   * @param t is the table in question
    */
-  bool isGroup(std::string grp);
-
-  /**
-   * Returns the name of the database
-   */
-  std::string getDBName(){return dbName_;};
-
-  /**
-     returns a pair of strings 
-     1) the output group and 
-     2) the data sub group
-     
-     @param output_dir the full output directory for the subgroup
-   */
-  std::pair <std::string, std::string> getGroupNamePair(std::string output_dir);
-
-  /**
-   * Register the transaction in the BookKeeper's map of transactions
-   *
-   * @param id the transaction ID.
-   * @param msg the message containing the transaction
-   * @param manifest a vector the materials fulfilling this transaction
-   */
-  void registerTransaction(int id, msg_ptr msg, std::vector<Resource*> manifest);
-
-  /**
-   * Register the resource in the BookKeeper's map of material changes
-   *
-   * @param trans_id the transaction ID associated with this resource state
-   * @param resource the resource who's state is to be recorded
-   */
-  void registerResourceState(int trans_id, Resource* resource);
-
-  /**
-   * Register the materialin the BookKeeper's map of material changes
-   *
-   */
-  void registerRepoComponent(int ID, std::string name, 
-                             std::string thermalModel, 
-                             std::string nuclideModel, int parentID, 
-                             double innerRadius, double outerRadius, double x,
-                             double y, double z);
-
-  /**
-     Write a dataset given required information. Based on the input of
-     HDF5's DataSet class' write function.
-
-     @param data buffer containing data to be written
-     @param data_desc hdf5 DataType describing the data
-     @param data_rank rank of the HDF5 DataSpace of the data to be written
-     @param data_dims dimension of the HDF5 DataSpace of the data to be written
-     @param dataset_name the name of the dataset (e.g. agentList)
-     @param output_dir the final output directory for the dataset (e.g. /output/agent)
-   */
-  void writeDataSet(const void *data, const DataType &data_desc, 
-                    int data_rank, const hsize_t *data_dims,
-                    std::string dataset_name, std::string output_dir);
-
-  /**
-   * Write generic Agent information from the simulation
-   *
-   */
-  void writeAgentList();
-
-  /**
-   * Write a list of the transactions in the simulation
-   *
-   */
-  void writeTransList();
-
-  /**
-   * Write a list of the material histories in the simulation
-   *
-   */
-  void writeMatHist();
-
-  void writeMatComps(Group* subgroup);
-
-  /**
-   * Prepares file and memory dataspaces for homogeneous data 
-   * 
-   * @param dsname is the name of the dataset/dataspace
-   * @param type is the type of data of the homogenous dataspace
-   * @param memspace is a reference to the memory space
-   * @param filespace is a reference to the file space
-   * @param dataset is the prepared, selected dataset
-   */
-  void prepareSpaces(std::string dsname, DataType type, DataSpace &memspace, 
-      DataSpace &filespace, DataSet &dataset);
-
-  /**
-   * Puts a one dimensional vector of integer data in the indicated 
-   * dataspace
-   *
-   * @param data is the data
-   * @param dsname is the dataspace
-   */
-
-  /**
-   * Prints all members of a transaction.
-   *
-   * @param trans transaction
-   */
-   void printTrans(trans_t trans);
-
+  void tableAtThreshold(table_ptr t);  
 };
 
 #endif

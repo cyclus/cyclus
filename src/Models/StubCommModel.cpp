@@ -3,10 +3,12 @@
 
 #include "StubCommModel.h"
 
-#include <iostream>
 #include "Logger.h"
-
-using namespace std;
+  
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
@@ -30,6 +32,7 @@ void StubCommModel::copy(StubCommModel* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubCommModel::print() { 
   Model::print(); 
-  LOG(LEV_DEBUG2); 
+  LOG(LEV_DEBUG2, "none!"); 
 };
 
+/* ------------------- */ 

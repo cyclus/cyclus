@@ -21,7 +21,8 @@ class FakeNullMarket : public NullMarket {
     FakeNullMarket() : NullMarket() {
       string kg = "kg";
       string qual = "qual";
-      GenericResource* res = new GenericResource(kg, qual, 1);
+      gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
+      res->setOriginatorID(1);
       msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }

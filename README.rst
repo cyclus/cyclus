@@ -2,7 +2,7 @@ _______________________________________________________________________
 Cyclus Core
 _______________________________________________________________________
 
-**Last Updated: 2.6.2012**
+**Last Updated: 2.28.2012**
 
 The core of the Cyclus nuclear fuel cycle simulator from the University of 
 Wisconsin - Madison is intended to be a simulation framework upon which to 
@@ -60,16 +60,11 @@ The Cyclus code requires the following software and libraries.
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
-`CMake`                2.8                 
-`HDF5`                 1.8.3           
+`CMake`                2.8            
+`boost`                1.34.1
 `libxml2`              2                 
-`boost`                1.34.1            
-`lapack`               3.4.0             
-`trilinos (teuchos)`   10.8.4            
+`sqlite3`              3.7.10            
 ====================   ==================
-
-An overview of some more complicated package builds and installations (e.g.
-lapack, teuchos, etc.) can be found at the `Cyclus Homepage`_
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building and Running Cyclus
@@ -77,7 +72,7 @@ Building and Running Cyclus
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
 built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
-2.6 or higher and the CMakeLists.txt file in `src/`. It is
+2.8 or higher and the CMakeLists.txt file in `src/`. It is
 recommended that you use CMake to build the Cyclus executable external to the
 source code. To do this, execute the following steps::
 
@@ -208,3 +203,101 @@ Cautions
 
       git pull [remote] [from-branch]
 
+
+~~~~~~~~~~~~~~~~~~~
+An Example
+~~~~~~~~~~~~~~~~~~~
+
+
+Introduction
+============
+
+As this type of workflow can be complicated to converts from SVN and very complicated
+for brand new programmers, an example is provided.
+
+For the sake of simplicity, let us assume that we want a single "sandbox" branch
+in which we would like to work, i.e. where we can store all of our work that may not
+yet pass tests or even compile, but where we also want to save our progress. Let us 
+call this branch "Work". So, when all is said and done, in our fork there will be 
+three branches: "Master", "Develop", and "Work".
+
+Acquiring Cyclus and Workflow
+=============================
+
+We begin with a fork of the main ("blessed") Cyclus repository. After initially forking
+the repo, we will have two branches in our fork: "Master" and "Develop".
+
+Acquiring a Fork of the Cyclus Repository
+-----------------------------------------
+
+A fork is *your* copy of Cyclus. Github offers an excelent 
+`tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
+example assumes you have set up the "upstream" repository as cyclus/core. Note that git
+refers to your fork as "origin".
+
+First, let's make our "work" branch:
+::
+
+    .../cyclus_dir/$ git branch work
+    .../cyclus_dir/$ git push origin work
+
+
+We now have the following situation: there exists the "blessed" copy of the Master and
+Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
+*AND* there exists your *local* copy of the Master, Develop, and Work branches. It is 
+important now to note that you may wish to work from home or the office. If you keep your 
+fork's branches up to date (i.e., "push" your changes before you leave), only your *local*
+copies of your branches may be different when you next sit down at the other location.
+
+Workflow: The Beginning
+-----------------------
+
+Now, for the workflow! This is by no means the only way to perform this type of workflow, 
+but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
+number small). Let us imagine that you have been at work, finished, and successfully pushed 
+your changes to your *Origin* repository. You are now at home, perhaps after dinner (let's just 
+say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
+or a grad student). To begin, let's update our *home's local branches*.
+::
+
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull origin develop 
+    .../cyclus_dir/$ git pull upstream develop
+    .../cyclus_dir/$ git push origin develop
+
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git pull origin work
+    .../cyclus_dir/$ git merge develop
+    .../cyclus_dir/$ git push origin work
+
+Perhaps a little explanation is required. We first want to make sure that this new local copy of 
+the develop branch is up-to-date with respect to the remote origin's branch and remote upstream's
+branch. If there was a change from the remote upstream's branch, we want to push that to origin. 
+We then follow the same process to update the work branch, except:
+
+#. we don't need to worry about the *upstream* repo because it doesn't have a work branch, and
+#. we want to incorporate any changes which may have been introduced in the develop branch update.
+
+Workflow: The End
+-----------------
+
+As time passes, you make some changes to files, and you commit those changes (to your *local work
+branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
+on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
+Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
+so it's time to merge those changes with the local develop branch and push them to origin's develop
+branch: ::
+
+    .../cyclus_dir/$ git checkout develop
+    .../cyclus_dir/$ git pull upstream develop
+    .../cyclus_dir/$ git merge work 
+    .../cyclus_dir/$ git push origin develop
+
+    .../cyclus_dir/$ git checkout work
+    .../cyclus_dir/$ git merge develop
+    .../cyclus_dir/$ git push origin work
+
+This time we want to update our local develop branch based on the changes we made in work. First we
+checkout and update develop in case the upstream develop branch introduced any changes. We then
+apply our changes via merging work into develop, and push that back up to origin. In case the upstream
+pull did introduce changes, we go ahead and update the work branch on origin.

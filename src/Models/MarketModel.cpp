@@ -1,13 +1,14 @@
 // MarketModel.cpp
 // Implements the MarketModel Class
 
+#include <string>
+
 #include "MarketModel.h"
+
 #include "InputXML.h"
 #include "CycException.h"
 #include "Timer.h"
-
 #include "Logger.h"
-#include <string>
 
 using namespace std;
 
@@ -22,26 +23,27 @@ MarketModel::MarketModel() {
   TI->registerResolveListener(this);
   markets_.push_back(this);
   setIsTemplate(false);
+  commodity_ = "none";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
-  LOG(LEV_DEBUG2) << "removing market from static list of markets...";
-  std::list<MarketModel*>::iterator mkt;
+  LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
+  list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt) {
     if (this == *mkt) {
-      LOG(LEV_DEBUG2) << "  found match in static list";
+      LOG(LEV_DEBUG2, "none!") << "  found match in static list";
       markets_.erase(mkt);
-      LOG(LEV_DEBUG2) << "  match is removed";
+      LOG(LEV_DEBUG2, "none!") << "  match is removed";
       break;
     }
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel* MarketModel::marketForCommod(std::string commod) {
+MarketModel* MarketModel::marketForCommod(string commod) {
   MarketModel* market = NULL;
-  std::list<MarketModel*>::iterator mkt;
+  list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
     if ((*mkt)->commodity() == commod) {
       market = *mkt;
@@ -50,7 +52,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   }
 
   if (market == NULL) {
-    std::string err_msg = "No market found for commodity '";
+    string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
     throw CycIndexException(err_msg);
   }
@@ -67,6 +69,10 @@ void MarketModel::init(xmlNodePtr cur) {
 
   /// all markets require commodities
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
+
+  // region models do not currently follow the template/not template
+  // paradigm of insts and facs, so log this as its own parent
+  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -85,7 +91,7 @@ void MarketModel::copy(MarketModel* src) {
 void MarketModel::print() { 
   Model::print(); 
 
-  LOG(LEV_DEBUG2) << "    trades commodity " << commodity_;
+  LOG(LEV_DEBUG2, "none!") << "    trades commodity " << commodity_;
 
 };
 

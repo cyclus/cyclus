@@ -1,17 +1,16 @@
 // StubStubInst.cpp
 // Implements the StubStubInst class
-#include <iostream>
-#include "Logger.h"
+
 
 #include "StubInst.h"
 
-
-
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst() {};
 
@@ -28,7 +27,6 @@ void StubInst::copy(StubInst* src) {
   InstModel::copy(src); 
 };
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::copyFreshModel(Model* src) { 
   copy(dynamic_cast<StubInst*>(src)); 
@@ -39,6 +37,9 @@ void StubInst::print() {
   InstModel::print(); 
 };
 
+/* ------------------- */ 
+
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -47,19 +48,15 @@ void StubInst::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::receiveMessage(msg_ptr msg) {};
 
+/* ------------------- */ 
+
 
 /* --------------------
  * all INSTMODEL classes have these members
  * --------------------
  */
 
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string StubInst::outputDir_ = "/stub";
+/* ------------------- */ 
 
 
 /* --------------------
@@ -67,12 +64,9 @@ std::string StubInst::outputDir_ = "/stub";
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubInst() {
   return new StubInst();
-}
-
-extern "C" void destructStubInst(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

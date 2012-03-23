@@ -61,12 +61,12 @@ void CapacityRegion::initBuild(xmlNodePtr cur)
 void CapacityRegion::initCapacity(xmlNodePtr cur)
 {
   // Get input file
-  LOG(LEV_DEBUG2) << "capacity region cur: " << cur;
+  LOG(LEV_DEBUG2, "none!") << "capacity region cur: " << cur;
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "model/CapacityRegion/capacitydemand");
   
   // for each fuel pair, there is an in and an out commodity
   for (int i=0;i<nodes->nodeNr;i++){
-    LOG(LEV_DEBUG2) << "i am in a capacity region node!";
+    LOG(LEV_DEBUG2, "none!") << "i am in a capacity region node!";
     // get xml node
     xmlNodePtr entry_node = nodes->nodeTab[i];
     // get capacity information
@@ -84,7 +84,7 @@ void CapacityRegion::initCapacity(xmlNodePtr cur)
       facility = NULL;
       // facility
       string fac_name = XMLinput->get_xpath_content(fac_node,"replacementfacility");
-      LOG(LEV_DEBUG2) << "fac_name:" << fac_name << "is on the list of repalcement facilities";
+      LOG(LEV_DEBUG2, "none!") << "fac_name:" << fac_name << "is on the list of repalcement facilities";
       facility = dynamic_cast<FacilityModel*>(Model::getModelByName(fac_name));
 
       allReplacementFacs_[i].push_back(facility);
@@ -101,7 +101,7 @@ void CapacityRegion::init(xmlNodePtr cur)
   initBuild(cur);
   // Initiate the capacity data
   initCapacity(cur);
-  LOG(LEV_DEBUG2) << "checking stage 1";
+  LOG(LEV_DEBUG2, "none!") << "checking stage 1";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -249,8 +249,5 @@ extern "C" Model* constructCapacityRegion() {
     return new CapacityRegion();
 }
 
-extern "C" void destructCapacityRegion(Model* p) {
-    delete p;
-}
 
 /* -------------------- */

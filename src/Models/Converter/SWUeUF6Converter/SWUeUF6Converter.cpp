@@ -14,8 +14,7 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SWUeUF6Converter::init(xmlNodePtr cur)
-{ 
+void SWUeUF6Converter::init(xmlNodePtr cur) {
   ConverterModel::init(cur);
   
   // move XML pointer to current model
@@ -28,8 +27,7 @@ void SWUeUF6Converter::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SWUeUF6Converter::copy(SWUeUF6Converter* src)
-{
+void SWUeUF6Converter::copy(SWUeUF6Converter* src) {
 
   ConverterModel::copy(src);
 
@@ -47,7 +45,7 @@ void SWUeUF6Converter::copyFreshModel(Model* src)
 void SWUeUF6Converter::print() 
 { 
   ConverterModel::print(); 
-  LOG(LEV_DEBUG2) << "converts offers of commodity {"
+  LOG(LEV_DEBUG2, "none!") << "converts offers of commodity {"
       << in_commod_
       << "} into offers of commodity {"
       << out_commod_
@@ -63,7 +61,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
   Model* enr;
   Model* castEnr;
   msg_ptr toRet;
-  Material* mat;
+  mat_rsrc_ptr mat;
 
   double P;
   double xp;
@@ -83,7 +81,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     }
     SWUs = convMsg->resource()->quantity();
     try {
-      mat = dynamic_cast<Material*>(refMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(refMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -97,7 +95,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
       throw CycException("SWUs offered by non-Model");
     }
     try{
-      mat = dynamic_cast<Material*>(convMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(convMsg->resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -128,12 +126,12 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 
   if (out_commod_ == "eUF6"){
     iso_vector.setMass(massProdU);
-    mat = new Material(iso_vector);
+    mat = mat_rsrc_ptr(new Material(iso_vector));
     toRet = convMsg->clone();
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {
     toRet = convMsg->clone();
-    GenericResource* conv_res = new GenericResource(out_commod_, out_commod_, SWUs);
+    gen_rsrc_ptr conv_res = gen_rsrc_ptr(new GenericResource(out_commod_, out_commod_, SWUs));
     toRet->setResource(conv_res);
   }
   
@@ -146,9 +144,6 @@ extern "C" Model* constructSWUeUF6Converter() {
     return new SWUeUF6Converter();
 }
 
-extern "C" void destructSWUeUF6Converter(Model* p) {
-    delete p;
-}
 
 /* ------------------- */ 
 

@@ -3,9 +3,10 @@
 #define _COMMUNICATOR_H
 
 #include "Message.h"
+#include "Logger.h"
 
 /**
-   @brief An abstract class for deriving simulation entities 
+    An abstract class for deriving simulation entities 
    that can communicate via the Message class.
 
    @section introduction Introduction
@@ -33,29 +34,74 @@
    The MessageClass describes the structure and interface of messages 
    passed between communicators. The StubCommModel provides an example 
    of a Communicator model implementation.
-*/
+ */
+
 class Communicator {
   
 public:
-  virtual ~Communicator() { };
+  virtual ~Communicator() {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      tracked_messages_.at(i)->kill();
+    }
+  };
 
   friend class Message;
 
 private:
 
   /**
-   *  @brief Models communicate desires for material, etc. by sending
-   *         and receiveing messages.
+   *  Models communicate desires for material, etc. by sending
+   * and receiveing messages.
    *
-   *  @param msg pointer to message to be received
-   *  @warning This method should never be called directly by any Model object.
-   *           Message sending should be handled via methods on the Message class.
+   * @param msg pointer to message to be received
+   * @warning This method should never be called directly by any Model object.
+   * Message sending should be handled via methods on the Message class.
    */
   virtual void receiveMessage(msg_ptr msg) = 0;
 
-protected:
+  std::vector<msg_ptr> tracked_messages_;
 
-  /// Copy the base class data members from one object to another
+  /** 
+   *  Add msg to a list of msgs to be killed when this communicator is deallocated.
+   * This functionality is used to prevent messages from attempting to return
+   * themselves either to or through communicator objects that have been deallocated.
+   *
+   * @param msg the Message to be tracked.
+   */
+  void trackMessage(msg_ptr msg) {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      if (tracked_messages_.at(i) == msg) {
+        tracked_messages_.erase(tracked_messages_.begin() + i);
+        break;
+      }
+    }
+    tracked_messages_.push_back(msg);
+    MLOG(LEV_DEBUG5) << "Model " << this << " tracks Message " << msg;
+  }
+
+  /**
+   *  Remove msg from a list of msgs to be killed when this communicator is 
+   * deallocated. This functionality is used to prevent messages from attempting to return
+   * themselves either to or through communicator objects that have been deallocated.
+   *
+   * @param msg the Message to untrack
+   */
+  void untrackMessage(msg_ptr msg) {
+    for (int i = 0; i < tracked_messages_.size(); i++) {
+      if (tracked_messages_.at(i) == msg) {
+        tracked_messages_.erase(tracked_messages_.begin() + i);
+        break;
+      }
+    }
+    MLOG(LEV_DEBUG5) << "Model " << this << " untracked Message " << msg;
+  }
+
+protected:
+  /**
+   *  Copy the base class data members from one object to another
+   *
+   * @param src the Communicator to copy
+   */ 
   virtual void copy(Communicator* src) { };
 
 };

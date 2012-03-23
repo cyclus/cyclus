@@ -16,11 +16,6 @@ TEST_P(RegionModelTests, IsRegion) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionModelTests, IsOwnParent) {
-  EXPECT_EQ(region_model_,region_model_->parent());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, AllowedFacilityModels) {
   TestFacility* test_fac = new TestFacility(); 
   EXPECT_NO_THROW(region_model_->isAllowedFacility(test_fac));

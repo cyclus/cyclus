@@ -1,22 +1,14 @@
-
-/*!
+/**
 @mainpage Cyclus Documentation
 
 How to get started as a Cyclus developer:
 
--# @ref getting
--# @ref building
--# @ref running
--# @ref output
--# @ref styleguide
--# Other references:
-  - @ref navigatingdoxy
-  - @ref tutorial
+- <a href="http://cyclus.github.com/devdoc/main.html">Cyclus Developer Guide</a> 
+- Other references:
   - @ref Logger "Logging"
     - Developers are encouraged to make use of the logging functionality built
       into Cyclus.
   - @ref testing "Testing"
 
-
-*/
+ */
 

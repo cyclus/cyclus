@@ -3,10 +3,12 @@
 
 #include "StubTimeAgent.h"
 
-#include <iostream>
 #include "Logger.h"
 
-using namespace std;
+/* --------------------
+ * all MODEL classes have these members
+ * --------------------
+ */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::StubTimeAgent() { 
@@ -29,7 +31,7 @@ void StubTimeAgent::copy(StubTimeAgent* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::print() { 
   TimeAgent::print(); 
-  LOG(LEV_DEBUG2); 
+  LOG(LEV_DEBUG2, "none!"); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -41,3 +43,4 @@ void StubTimeAgent::handleTick(int time) {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::handleTock(int time) {}
 
+/* ------------------- */ 

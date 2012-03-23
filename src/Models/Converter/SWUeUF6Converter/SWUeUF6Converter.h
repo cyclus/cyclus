@@ -1,14 +1,16 @@
 // SWUeUF6Converter.h
 #if !defined(_SWUEUF6CONVERTER_H)
 #define _SWUEUF6CONVERTER_H
+
 #include <iostream>
-#include "Logger.h"
 #include <queue>
 
 #include "ConverterModel.h"
 
+#include "Logger.h"
+
 /**
-   @brief The SWUeUF6Converter class inherits from the ConverterModel class 
+    The SWUeUF6Converter class inherits from the ConverterModel class 
    and is dynamically loaded by the Model class when requested.
    
    This converter model changes SWUs into amounts of material (and back?) 
@@ -44,94 +46,86 @@
 
 class SWUeUF6Converter : public ConverterModel  
 {
-  /* --------------------
-   * all MODEL classes have these members
-   * --------------------
+ /* --------------------
+  * all MODEL classes have these members
+  * --------------------
+  */
+ public:
+  /** 
+   *  Default constructor for the SWUeUF6Converter class.
+   */
+  SWUeUF6Converter() {};
+
+  /**
+   *  Destructor for the SWUeUF6Converter class. 
+   */
+  virtual ~SWUeUF6Converter() {};
+
+  // different ways to populate an object after creation
+  /**
+   *   initialize an object from XML input
+   */
+  virtual void init(xmlNodePtr cur);
+
+  /**
+   *   initialize an object by copying another
+   */
+  virtual void copy(SWUeUF6Converter* src);
+
+  /**
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in question and not in any 
+   * inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
+   */
+  virtual void copyFreshModel(Model* src);
+
+  /**
+   *  Print information about this model
+   */
+  virtual void print();
+
+ /* ------------------- */ 
+
+
+ /* --------------------
+  * all CONVERTERMODEL classes have these members
+  * --------------------
+  */ 
+ public:
+  /**
+   *  The convert function specific to the SWUeUF6Converter
+   * Converts between amounts of two commodities
+   *
+   * @param convMsg is a message concerning one convertible commodity to convert
+   * @param refMsg is a message concerning the commodity to convert it to
+   * 
+   * @return the converted message
    */
 
-  public:
-    /** 
-     * Default constructor for the SWUeUF6Converter class.
-     */
-    SWUeUF6Converter() {};
+  virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
 
-    /**
-     * Destructor for the SWUeUF6Converter class. 
-     */
-    ~SWUeUF6Converter() {};
+ /* ------------------- */ 
 
-    // different ways to populate an object after creation
-    /// initialize an object from XML input
-    virtual void init(xmlNodePtr cur);
+ /* --------------------
+  * _THIS_ CONVERTERMODEL class has these members
+  * --------------------
+  */
+ protected:
+  /**
+   *  The SWUeUF6Converter has one input commodity
+   */
+  std::string in_commod_;
 
-    /// initialize an object by copying another
-    virtual void copy(SWUeUF6Converter* src);
+  /**
+   *  The SWUeUF6Converter has one output commodity
+   */
+  std::string out_commod_;
 
-    /**
-     * This drills down the dependency tree to initialize all relevant parameters/containers.
-     *
-     * Note that this function must be defined only in the specific model in question and not in any 
-     * inherited models preceding it.
-     *
-     * @param src the pointer to the original (initialized ?) model to be copied
-     */
-    virtual void copyFreshModel(Model* src);
-
-    /**
-     * Print information about this model
-     */
-    virtual void print();
-
-    /* ------------------- */ 
-
-  public:
-
-    /* -------------------- */
-
-    /* --------------------
-     * all CONVERTERMODEL classes have these members
-     * --------------------
-     */
-
-  public:
-    /**
-     * The convert function specific to the SWUeUF6Converter
-     * Converts between amounts of two commodities
-     *
-     * @param convMsg is a message concerning one convertible commodity to convert
-     * @param refMsg is a message concerning the commodity to convert it to
-     * 
-     * @return the converted message
-     */
-
-    virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
-
-
-    /* ------------------- */ 
-
-    /* --------------------
-     * _THIS_ CONVERTERMODEL class has these members
-     * --------------------
-     */
-
-  protected:
-    /**
-     * The SWUeUF6Converter has one input commodity
-     */
-    std::string in_commod_;
-
-    /**
-     * The SWUeUF6Converter has one output commodity
-     */
-    std::string out_commod_;
-
-    /* ------------------- */ 
+ /* ------------------- */ 
 
 };
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
 
 #endif

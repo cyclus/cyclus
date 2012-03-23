@@ -8,57 +8,53 @@
 #include "CycException.h"
 #include "Env.h"
 #include "InputXML.h"
-#include "hdf5.h"
-#include "H5Cpp.h"
-#include "H5Exception.h"
 #include "Logger.h"
 #include "Material.h"
 #include "GenericResource.h"
 #include "MarketModel.h"
 
-using namespace H5;
+using namespace std;
 
 /**
- * ConditioningFacility matches waste streams with 
- * waste form loading densities and waste form 
- * material definitions. 
- * 
- * It attaches these properties to the material objects 
- * as Material Properties.
- *
- * TICK
- * On the tick, the ConditioningFacility makes requests for each 
- * of the waste commodities (streams) that its table addresses
- * It also makes offers of any conditioned waste it contains
- *
- * TOCK
- * On the tock, the ConditioningFacility first prepares 
- * transactions by preparing and sending material from its stocks
- * all material in its stocks up to its monthly processing 
- * capacity.
- *
- * RECEIVE MATERIAL
- * Puts the material received in the stocks
- *
- * SEND MATERIAL
- * Sends material from inventory to fulfill transactions
- *
+  ConditioningFacility matches waste streams with 
+  waste form loading densities and waste form 
+  material definitions. 
+  
+  It attaches these properties to the material objects 
+  as Material Properties.
+ 
+  TICK
+  On the tick, the ConditioningFacility makes requests for each 
+  of the waste commodities (streams) that its table addresses
+  It also makes offers of any conditioned waste it contains
+ 
+  TOCK
+  On the tock, the ConditioningFacility first prepares 
+  transactions by preparing and sending material from its stocks
+  all material in its stocks up to its monthly processing 
+  capacity.
+ 
+  RECEIVE MATERIAL
+  Puts the material received in the stocks
+ 
+  SEND MATERIAL
+  Sends material from inventory to fulfill transactions
+ 
  */
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::ConditioningFacility() {
     // Initialize allowed formats map
-    allowed_formats_.insert(make_pair("hdf5", &ConditioningFacility::loadHDF5File)); 
     allowed_formats_.insert(make_pair("sql", &ConditioningFacility::loadSQLFile)); 
     allowed_formats_.insert(make_pair("xml", &ConditioningFacility::loadXMLFile)); 
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
-    stocks_ = deque<pair<string, Material*> >();
-    inventory_ = deque<pair<string, Material*> >();
-
+    stocks_ = deque<pair<string, mat_rsrc_ptr> >();
+    inventory_ = deque<pair<string, mat_rsrc_ptr> >();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,7 +76,7 @@ void ConditioningFacility::init(xmlNodePtr cur)
     string fileformat = XMLinput->get_xpath_content(cur, "fileformat");
 
     // all facilities require commodities - possibly many
-    std::string in_commod, out_commod;
+    string in_commod, out_commod;
     int commod_id;
     xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "commodset");
 
@@ -131,12 +127,14 @@ void ConditioningFacility::print()
       outcommods += (*it).second.second;
       outcommods += ", ";
     }
-    LOG(LEV_DEBUG2) << " conditions {" 
+    LOG(LEV_DEBUG2, "none!") << " conditions {" 
       << incommods
       <<"} into forms { "
       << outcommods
       << " }.";
 };
+
+/* ------------------- */ 
 
 
 /* --------------------
@@ -146,8 +144,10 @@ void ConditioningFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::receiveMessage(msg_ptr msg) {
-  LOG(LEV_DEBUG2) << "Warning, the ConditioningFacility ignores messages.";
+  LOG(LEV_DEBUG2, "none!") << "Warning, the ConditioningFacility ignores messages.";
 };
+
+/* ------------------- */ 
 
 
 /* --------------------
@@ -156,8 +156,8 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::removeResource(msg_ptr order) {
-  std::vector<Resource*> toRet = std::vector<Resource*>() ;
+vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
+  vector<rsrc_ptr> toRet = vector<rsrc_ptr>() ;
   Transaction trans = order->trans();
   double order_amount = trans.resource->quantity()*trans.minfrac;
   if (remaining_capacity_ >= order_amount){
@@ -168,15 +168,15 @@ std::vector<Resource*> ConditioningFacility::removeResource(msg_ptr order) {
     msg += "The order requested by ";
     msg += order->requester()->name();
     msg += " will not be sent.";
-    LOG(LEV_DEBUG2) << msg;
-    GenericResource* empty = new GenericResource("kg","kg",0);
+    LOG(LEV_DEBUG2, "none!") << msg;
+    gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
     toRet.push_back(empty);
   }
   return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
+vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
  // Send material from inventory to fulfill transactions
 
   Transaction trans = order->trans();
@@ -186,13 +186,13 @@ std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
   // pull materials off of the inventory stack until you get the transaction amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front().second;
+    mat_rsrc_ptr m = inventory_.front().second;
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -202,30 +202,32 @@ std::vector<Resource*> ConditioningFacility::processOrder(msg_ptr order) {
       remaining_capacity_ = remaining_capacity_ - newAmt;
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
       remaining_capacity_ = remaining_capacity_ - newAmt;
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"ConditioningFacility "<< ID()
+    LOG(LEV_DEBUG2, "none!") <<"ConditioningFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"ConditiondingFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
+
+    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
+    stocks_.push_front(make_pair(msg->trans().commod, mat));
   } 
 };
 
@@ -247,7 +249,6 @@ void ConditioningFacility::handleTock(int time){
   // all material in its stocks up to its monthly processing 
   // capacity.
   conditionMaterials();
-  FacilityModel::handleTock(time);
   printStatus(time);
 };
 
@@ -292,70 +293,6 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadHDF5File(string datafile){
-  // add the current path to the file
-  string file_path = ENV->getCyclusPath() + "/" + datafile; 
-
-  // check if the file is an hdf5 file first.
-  if (! H5File::isHdf5(file_path)) {
-    string err = "The file at ";
-    err += file_path;
-    err += " is not an hdf5 file.";
-    throw CycIOException(err);
-  }
-
-  // create strings that H5Cpp can use to access the data
-  const H5std_string filename = file_path;
-  const H5std_string groupname = "/loading";
-  const H5std_string datasetname = "low";
-  const H5std_string streamID_memb = "streamID";
-  const H5std_string formID_memb = "formID";
-  const H5std_string density_memb = "density";
-  const H5std_string wfvol_memb = "wfvol";
-  const H5std_string wfmass_memb = "wfmass";
-
-  /*
-   * Open the file and the dataset.
-   */
-  H5File* file;
-  file = new H5File( filename, H5F_ACC_RDONLY );
-  Group* group;
-  group = new Group (file->openGroup( groupname ));
-  DataSet* dataset;
-  dataset = new DataSet (group->openDataSet( datasetname ));
-  DataSpace* dataspace;
-  dataspace = new DataSpace (dataset->getSpace( ));
-
-  hsize_t dims_out[2];
-  int ndims = dataspace->getSimpleExtentDims(dims_out, NULL);
-  stream_len_ = dims_out[0];
-
-  /*
-   * Create a datatype for stream
-   */
-  CompType mtype( sizeof(stream_t) );
-  mtype.insertMember( streamID_memb, HOFFSET(stream_t, streamID), PredType::NATIVE_INT); 
-  mtype.insertMember( formID_memb, HOFFSET(stream_t, formID), PredType::NATIVE_INT); 
-  mtype.insertMember( density_memb, HOFFSET(stream_t, density), PredType::NATIVE_DOUBLE);
-  mtype.insertMember( wfvol_memb, HOFFSET(stream_t, wfvol), PredType::NATIVE_DOUBLE);
-  mtype.insertMember( wfmass_memb, HOFFSET(stream_t, wfmass), PredType::NATIVE_DOUBLE);
-
-  /*
-   * Read two fields c and a from s1 dataset. Fields in the file
-   * are found by their names "c_name" and "a_name".
-   */
-  stream_t streams[stream_len_];
-  dataset->read( streams, mtype );
-
-  stream_vec_.resize(stream_len_);
-  std::copy(streams, streams + stream_len_, stream_vec_.begin() );
-
-  stream_t stream;
-  stream = stream_vec_[1];
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadXMLFile(string datafile){
   // get dimensions
   // // how many rows
@@ -375,7 +312,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::loadCSVFile(string datafile){
-  string file_path = ENV->getCyclusPath() + "/" + datafile; 
+  string file_path = Env::getCyclusPath() + "/" + datafile; 
 
   // create an ifstream for the file
   ifstream file(file_path.c_str());
@@ -390,19 +327,19 @@ void ConditioningFacility::loadCSVFile(string datafile){
       getline(file, buffer, ',');
       // copy the data to the typed member of the stream struct
       stream.streamID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2) <<  "streamID  = " <<  stream.streamID ;;
+      LOG(LEV_DEBUG2, "none!") <<  "streamID  = " <<  stream.streamID ;;
       getline(file, buffer, ',');
       stream.formID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2) <<  "formID  = " <<  stream.formID ;;
+      LOG(LEV_DEBUG2, "none!") <<  "formID  = " <<  stream.formID ;;
       getline(file, buffer, ',');
       stream.density = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "density  = " <<  stream.density ;;
+      LOG(LEV_DEBUG2, "none!") <<  "density  = " <<  stream.density ;;
       getline(file, buffer, ',');
       stream.wfvol = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "wfvol  = " <<  stream.wfvol ;;
+      LOG(LEV_DEBUG2, "none!") <<  "wfvol  = " <<  stream.wfvol ;;
       getline(file, buffer, '\n');
       stream.wfmass = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2) <<  "wfmass  = " <<  stream.wfmass ;;
+      LOG(LEV_DEBUG2, "none!") <<  "wfmass  = " <<  stream.wfmass ;;
       // put the full struct into the vector of structs
       stream_vec_.push_back(stream);
     }
@@ -446,7 +383,7 @@ void ConditioningFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource(in_commod, "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -457,7 +394,7 @@ void ConditioningFacility::makeRequests(){
       trans.resource = request_res;
 
       sendMessage(recipient, trans);
-      LOG(LEV_DEBUG2) << " The ConditioningFacility has requested "
+      LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has requested "
         << requestAmt 
         << " kg of "
         << in_commod 
@@ -475,10 +412,10 @@ void ConditioningFacility::makeOffers(){
   // there are potentially many types of material in the inventory stack
   double inv = this->checkInventory();
   // send an offer for each material on the stack 
-  std::string outcommod, offers;
+  string outcommod, offers;
   Communicator* recipient;
   double offer_amt;
-  for (deque< pair<std::string, Material* > >::iterator iter = inventory_.begin(); 
+  for (deque< pair<string, mat_rsrc_ptr > >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter++){
     // get out commod
@@ -490,7 +427,7 @@ void ConditioningFacility::makeOffers(){
     offer_amt = iter->second->quantity();
 
     // make a material to offer
-    Material* offer_mat = iter->second;
+    mat_rsrc_ptr offer_mat = iter->second;
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
@@ -510,7 +447,7 @@ void ConditioningFacility::makeOffers(){
       offers += " , ";
     }
   }
-  LOG(LEV_DEBUG2) << " The ConditioningFacility has offered "
+  LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has offered "
     << offers 
     << ".";
 }
@@ -529,7 +466,7 @@ double ConditioningFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque< pair<std::string, Material*> >::iterator iter = inventory_.begin(); 
+  for (deque< pair<string, mat_rsrc_ptr> >::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += iter->second->quantity();
@@ -545,7 +482,7 @@ double ConditioningFacility::checkStocks(){
   // material unit is in each object.
 
   if(!stocks_.empty()){
-    for (deque< pair<std::string, Material*> >::iterator iter = stocks_.begin(); 
+    for (deque< pair<string, mat_rsrc_ptr> >::iterator iter = stocks_.begin(); 
          iter != stocks_.end(); 
          iter ++){
         total += iter->second->quantity();
@@ -559,11 +496,11 @@ double ConditioningFacility::checkStocks(){
 void ConditioningFacility::conditionMaterials(){
   // Partition the in-stream according to loading density
   // for each stream object in stocks
-  map<string, Material*> remainders;
+  map<string, mat_rsrc_ptr> remainders;
   while( !stocks_.empty() && remaining_capacity_ > 0){
     // move stocks to currMat
-    std::string currCommod = stocks_.front().first;
-    Material* currMat = stocks_.front().second;
+    string currCommod = stocks_.front().first;
+    mat_rsrc_ptr currMat = stocks_.front().second;
     if(remainders.find(currCommod)!=remainders.end()){
       (remainders[currCommod])->absorb(condition(currCommod, currMat));
     } else {
@@ -571,14 +508,14 @@ void ConditioningFacility::conditionMaterials(){
     }
     stocks_.pop_front();
   }
-  map<string, Material*>::const_iterator rem;
+  map<string, mat_rsrc_ptr>::const_iterator rem;
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Material* ConditioningFacility::condition(string commod, Material* mat){
+mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
@@ -619,7 +556,7 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::printStatus(int time){
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2) << "ConditioningFacility " << this->ID()
+  LOG(LEV_DEBUG2, "none!") << "ConditioningFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material in inventory, and  "
                   << this->checkStocks() 
@@ -628,15 +565,6 @@ void ConditioningFacility::printStatus(int time){
                   << ".";
 };
 
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string ConditioningFacility::outputDir_ = "/conditioning";
-
-
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -644,10 +572,6 @@ std::string ConditioningFacility::outputDir_ = "/conditioning";
 
 extern "C" Model* constructConditioningFacility() {
   return new ConditioningFacility();
-}
-
-extern "C" void destructConditioningFacility(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

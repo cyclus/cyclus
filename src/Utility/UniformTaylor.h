@@ -1,19 +1,20 @@
 // UniformTaylor.h
-
 #ifndef UNIFORMTAYLOR_H
 #define UNIFORMTAYLOR_H
 
 #include "UseMatrixLib.h"
 
 /**
- * A class that solves the matrix exponential problem using the Taylor Series
- * with Uniformization method.
+   @class UniformTaylor
+   
+    A class that solves the matrix exponential 
+   problem using the Taylor Series with Uniformization method.
  */
 class UniformTaylor {
 
   public:
-
     /**
+     * 
      * Solves the matrix exponential problem:
      *  
      *          dx(t)
@@ -36,10 +37,9 @@ class UniformTaylor {
 				  const double t);
 
   private:
-
     /**
-     * Returns the diagonal element in the Matrix A that has the largest
-     * absolute value.
+     *  Returns the diagonal element in the Matrix A 
+     * that has the largest absolute value.
      *
      * @param A the Matrix
      * @return the diagonal element of A with the largest absolute value
@@ -47,7 +47,7 @@ class UniformTaylor {
     static double maxAbsDiag(const Matrix & A);
 
     /**
-     * Computes the solution Vector x_t using the Taylor Series with
+     *  Computes the solution Vector x_t using the Taylor Series with
      * Uniformization method.
      *
      * @param B the Matrix B = A + alpha * I
@@ -65,7 +65,7 @@ class UniformTaylor {
 			            double tol);
 
     /**
-     * Computes the maximum number of terms needed to obtain an accuracy of
+     *  Computes the maximum number of terms needed to obtain an accuracy of
      * epsilon when using the Taylor Series with Uniformization method.
      *
      * @param alpha_t the product alpha * t
@@ -74,7 +74,6 @@ class UniformTaylor {
      * @throw <string> if exp(alpha * t) exceeds range 
      */
     static int maxNumTerms(long double alpha_t, double epsilon);
-
 };
 
 #endif

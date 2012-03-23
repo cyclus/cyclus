@@ -12,29 +12,30 @@
 #include "MarketModel.h"
 #include "GenericResource.h"
 
-/*
- * TICK
- * If there are ordersWaiting, prepare and send an appropriate 
- * request for raw material.
- * If there is capacity to produce any extra material next month
- * prepare and send an appropriate offer of SWUs.
- *
- * TOCK
- * Process as much raw stock material as capacity will allow.
- * Send appropriate materials to fill ordersWaiting.
- *
- *
- * RECIEVE MATERIAL
- * put it in stocks
- *
- * SEND MATERIAL
- * pull it from inventory
- * decrement ordersWaiting
+using namespace std;
+
+/**
+  TICK
+  If there are ordersWaiting, prepare and send an appropriate 
+  request for raw material.
+  If there is capacity to produce any extra material next month
+  prepare and send an appropriate offer of SWUs.
+ 
+  TOCK
+  Process as much raw stock material as capacity will allow.
+  Send appropriate materials to fill ordersWaiting.
+ 
+ 
+  RECIEVE MATERIAL
+  put it in stocks
+ 
+  SEND MATERIAL
+  pull it from inventory
+  decrement ordersWaiting
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::init(xmlNodePtr cur)
-{ 
+void EnrichmentFacility::init(xmlNodePtr cur){ 
   FacilityModel::init(cur);
   
   // move XML pointer to current model
@@ -51,8 +52,8 @@ void EnrichmentFacility::init(xmlNodePtr cur)
   // get default tails fraction
   default_xw_ = strtod(XMLinput->get_xpath_content(cur,"tailsassay"), NULL);
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
@@ -60,8 +61,7 @@ void EnrichmentFacility::init(xmlNodePtr cur)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void EnrichmentFacility::copy(EnrichmentFacility* src)
-{
+void EnrichmentFacility::copy(EnrichmentFacility* src){
 
   FacilityModel::copy(src);
 
@@ -71,26 +71,23 @@ void EnrichmentFacility::copy(EnrichmentFacility* src)
   capacity_ = src->capacity_;
   default_xw_ = src->default_xw_;
 
-  inventory_ = deque<Material*>();
-  stocks_ = deque<Material*>();
+  inventory_ = deque<mat_rsrc_ptr>();
+  stocks_ = deque<mat_rsrc_ptr>();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
   outstMF_ = 0;
 }
 
-
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::copyFreshModel(Model* src)
-{
+void EnrichmentFacility::copyFreshModel(Model* src){
   copy(dynamic_cast<EnrichmentFacility*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::print() { 
   FacilityModel::print(); 
-  LOG(LEV_DEBUG2) << "    converts commodity {"
+  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"
       << out_commod_
@@ -99,8 +96,7 @@ void EnrichmentFacility::print() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::receiveMessage(msg_ptr msg)
-{
+void EnrichmentFacility::receiveMessage(msg_ptr msg){
   // is this a message from on high? 
   if(msg->supplier()==this){
     // file the order
@@ -112,7 +108,7 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod != out_commod_){
@@ -125,13 +121,13 @@ std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  std::vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
-    Material* m = inventory_.front();
+    mat_rsrc_ptr m = inventory_.front();
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
@@ -140,34 +136,33 @@ std::vector<Resource*> EnrichmentFacility::removeResource(msg_ptr msg) {
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2) <<"EnrichmentFacility "<< ID()
+    LOG(LEV_DEBUG2, "none!") <<"EnrichmentFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(msg_ptr msg, vector<Resource*> manifest) {
+void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2) <<"EnrichmentFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"EnrichmentFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_back(dynamic_cast<Material*>(*thisMat));
+    stocks_.push_back(boost::dynamic_pointer_cast<Material>(*thisMat));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::handleTick(int time)
-{
+void EnrichmentFacility::handleTick(int time){
   // PROCESS ORDERS EXECUTING
   enrich();
 
@@ -186,10 +181,10 @@ void EnrichmentFacility::handleTock(int time) {
   double complete = 0;
 
   while(capacity_ > complete && !stocks_.empty() ){
-    Material* m = stocks_.front();
+    mat_rsrc_ptr m = stocks_.front();
 
     // start with an empty material
-    Material* newMat = new Material();
+    mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the stocks obj isn't larger than the remaining need, send it as is.
     if(m->quantity() <= (capacity_ - complete)){
@@ -199,7 +194,7 @@ void EnrichmentFacility::handleTock(int time) {
     }
     else{ 
       // if the stocks obj is larger than the remaining need, split it.
-      Material* toAbsorb = m->extract(capacity_ - complete);
+      mat_rsrc_ptr toAbsorb = m->extract(capacity_ - complete);
       complete += toAbsorb->quantity();
       newMat->absorb(toAbsorb);
     }
@@ -213,10 +208,6 @@ void EnrichmentFacility::handleTock(int time) {
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
-  
-  // call the facility model's handle tock last 
-  // to check for decommissioning
-  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -226,7 +217,7 @@ double EnrichmentFacility::checkInventory(){
   // Iterate through the inventory and sum the amount of whatever
   // material unit is in each object.
 
-  for (deque<Material*>::iterator iter = inventory_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = inventory_.begin(); 
        iter != inventory_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -242,7 +233,7 @@ double EnrichmentFacility::checkStocks(){
   // material unit is in each object.
 
 
-  for (deque<Material*>::iterator iter = stocks_.begin(); 
+  for (deque<mat_rsrc_ptr>::iterator iter = stocks_.begin(); 
        iter != stocks_.end(); 
        iter ++){
     total += (*iter)->quantity();
@@ -293,7 +284,7 @@ void EnrichmentFacility::makeRequests(){
     Communicator* recipient = dynamic_cast<Communicator*>(market);
 
     // request a generic object
-    Resource* req_res = new GenericResource(in_commod_,"kg",requestAmt);
+    rsrc_ptr req_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
 
     // build the transaction and message
     Transaction trans;
@@ -310,8 +301,7 @@ void EnrichmentFacility::makeRequests(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EnrichmentFacility::makeOffers()
-{
+void EnrichmentFacility::makeOffers() {
   // decide how much to offer
   double offer_amt;
   double spotCapacity = capacity_ - outstMF_;
@@ -332,7 +322,7 @@ void EnrichmentFacility::makeOffers()
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
 
-  GenericResource* offer_res = new GenericResource(out_commod_,"SWUs",offer_amt);
+  gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"SWUs",offer_amt));
 
   // build the transaction and message
   Transaction trans;
@@ -346,6 +336,7 @@ void EnrichmentFacility::makeOffers()
   msg->setNextDest(facInst());
   msg->sendOn();
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentFacility::enrich() {
   // Get iterators that define the boundaries of the ordersExecuting that are 
@@ -365,7 +356,7 @@ void EnrichmentFacility::enrich() {
 
     // Get the info we need to make the enriched Material.
     msg_ptr mess = (curr->second).first;
-    Material* mat = (curr->second).second;
+    mat_rsrc_ptr mat = (curr->second).second;
 
     IsoVector mat_iso, vecToMake;
     mat_iso = mat->isoVector();
@@ -373,7 +364,7 @@ void EnrichmentFacility::enrich() {
     // Find out what we're trying to make.
     //
     try {
-      vecToMake = dynamic_cast<Material*>(mess->resource())->isoVector();
+      vecToMake = boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
@@ -407,7 +398,7 @@ void EnrichmentFacility::enrich() {
     pComp.setAtomCount(90190, atoms19);
     pComp.setMass(mat->quantity());
 
-    Material* theProd = new Material(pComp);
+    mat_rsrc_ptr theProd = mat_rsrc_ptr(new Material(pComp));
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = W * 1E6;
@@ -424,7 +415,7 @@ void EnrichmentFacility::enrich() {
     wComp.setMass(mat->quantity());
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
-    Material* theTails = new Material(wComp);
+    mat_rsrc_ptr theTails = mat_rsrc_ptr(new Material(wComp));
 
     // CONSERVATION OF MASS CHECKS:
     if (fabs(pComp.eltMass(92) + wComp.eltMass(92) 
@@ -439,14 +430,13 @@ void EnrichmentFacility::enrich() {
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    Material* rsrc = dynamic_cast<Material*>(mess->resource());
+    mat_rsrc_ptr rsrc = boost::dynamic_pointer_cast<Material>(mess->resource());
     rsrc->setQuantity(theProd->quantity());
-    mess->setResource(dynamic_cast<Resource*>(theProd));
+    mess->setResource(boost::dynamic_pointer_cast<Resource>(theProd));
 
     mess->approveTransfer();
     wastes_.push_back(theTails);
 
-    delete mat;
     curr ++;
   }
 
@@ -454,26 +444,21 @@ void EnrichmentFacility::enrich() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, double xw)
-{
+double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf, double xw) {
   double term1 = (2 * xp - 1) * log(xp / (1 - xp));
   double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
   double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
 
   return massProdU * (term1 + term2 - term3);
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf)
-{
+double EnrichmentFacility::calcSWUs(double massProdU, double xp, double xf) {
   return EnrichmentFacility::calcSWUs(massProdU, xp, xf, default_xw_);
 }
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string EnrichmentFacility::outputDir_ = "/enrichment";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -482,10 +467,6 @@ std::string EnrichmentFacility::outputDir_ = "/enrichment";
 
 extern "C" Model* constructEnrichmentFacility() {
   return new EnrichmentFacility();
-}
-
-extern "C" void destructEnrichmentFacility(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

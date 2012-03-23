@@ -1,15 +1,15 @@
 // StubMarket.cpp
 // Implements the StubMarket class
-#include <iostream>
-#include "Logger.h"
 
 #include "StubMarket.h"
 
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubMarket::StubMarket() {};
 
@@ -36,6 +36,9 @@ void StubMarket::print() {
   MarketModel::print(); 
 };
 
+/* -------------------- */
+
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -44,24 +47,29 @@ void StubMarket::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::receiveMessage(msg_ptr msg) {};
 
+/* -------------------- */
+
 
 /* --------------------
  * all MARKETMODEL classes have these members
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubMarket::resolve() {};
+
+/* -------------------- */
+
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubMarket() {
   return new StubMarket();
 }
 
-extern "C" void destructStubMarket(Model* p) {
-  delete p;
-}
-
 /* -------------------- */
+

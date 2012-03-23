@@ -2,6 +2,7 @@
 #define _TESTFACILITY_H_
 
 #include "FacilityModel.h"
+#include "Material.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing
@@ -18,7 +19,7 @@ class TestFacility: public FacilityModel {
 
   void copyFreshModel(Model* model) { }
 
-  void receiveMaterial(Transaction trans, vector<Material*> manifest) { }
+  void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) { }
 };
 
 #endif

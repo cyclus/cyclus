@@ -1,5 +1,6 @@
 // GreedyMarket.cpp
 // Implements the GreedyMarket class
+
 #include <iostream>
 #include <cmath>
 
@@ -38,11 +39,6 @@ void GreedyMarket::resolve() {
     
     if(match_request(request)) {
       process_request();
-    } else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->requester()->ID()
-          << " for the amount " << (*request).first 
-          << " rejected. ";
-      reject_request(request);
     }
 
     // remove this request
@@ -104,79 +100,77 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
     offerAmt = offer->first;
     offerMsg = offer->second;
 
-    LOG(LEV_DEBUG2) << "offeramt=" << offerAmt
+    LOG(LEV_DEBUG2, "GreedM") << "offeramt=" << offerAmt
                     << ", requestamt=" << requestAmt;
 
     // pop off this offer
     offers_.erase(offer);
-    if (requestMsg->resource()->checkQuality(offerMsg->resource())) {
-      if (requestAmt - offerAmt > EPS_KG) { 
-        // put a new message in the order stack
-        // it goes down to supplier
-        offerMsg->setRequester(requestMsg->requester());
+    if (requestAmt - offerAmt > EPS_KG) { 
+      // put a new message in the order stack
+      // it goes down to supplier
+      offerMsg->setRequester(requestMsg->requester());
 
-        // tenatively queue a new order (don't execute yet)
-        matchedOffers_.insert(offerMsg);
+      // tenatively queue a new order (don't execute yet)
+      matchedOffers_.insert(offerMsg);
 
-        orders_.push_back(offerMsg);
+      orders_.push_back(offerMsg);
 
-        LOG(LEV_DEBUG1) 
-          << "GreedyMarket has resolved a transaction "
-          << " which is a match from "
-          << offerMsg->supplier()->ID()
-          << " to "
-          << offerMsg->requester()->ID()
-          << " for the amount:  " 
-          << offerMsg->resource()->quantity();
+      LOG(LEV_DEBUG1, "GreedM") 
+        << "GreedyMarket has resolved a transaction "
+        << " which is a match from "
+        << offerMsg->supplier()->ID()
+        << " to "
+        << offerMsg->requester()->ID()
+        << " for the amount:  " 
+        << offerMsg->resource()->quantity();
 
-        requestAmt -= offerAmt;
-      } else {
-        // split offer
+      requestAmt -= offerAmt;
+    } else {
+      // split offer
 
-        // queue a new order
-        msg_ptr maybe_offer = offerMsg->clone();
-        maybe_offer->resource()->setQuantity(requestAmt);
-        maybe_offer->setRequester(requestMsg->requester());
+      // queue a new order
+      msg_ptr maybe_offer = offerMsg->clone();
+      maybe_offer->resource()->setQuantity(requestAmt);
+      maybe_offer->setRequester(requestMsg->requester());
 
-        matchedOffers_.insert(offerMsg);
+      matchedOffers_.insert(offerMsg);
 
-        orders_.push_back(maybe_offer);
+      orders_.push_back(maybe_offer);
 
-        LOG(LEV_DEBUG1)  
-          << "GreedyMarket has resolved a transaction "
-          << " which is a match from "
-          << maybe_offer->supplier()->ID()
-          << " (offer split) to "
-          << maybe_offer->requester()->ID()
-          << " for the amount:  " 
-          << maybe_offer->resource()->quantity();
+      LOG(LEV_DEBUG1, "GreedM")  
+        << "GreedyMarket has resolved a transaction "
+        << " which is a match from "
+        << maybe_offer->supplier()->ID()
+        << " (offer split) to "
+        << maybe_offer->requester()->ID()
+        << " for the amount:  " 
+        << maybe_offer->resource()->quantity();
 
-        // reduce the offer amount
-        offerAmt -= requestAmt;
+      // reduce the offer amount
+      offerAmt -= requestAmt;
 
-        // if the residual is above threshold,
-        // make a new offer with reduced amount
+      // if the residual is above threshold,
+      // make a new offer with reduced amount
 
-        if(offerAmt > EPS_KG) {
-          msg_ptr new_offer = offerMsg->clone();
-          new_offer->resource()->setQuantity(offerAmt);
-          receiveMessage(new_offer);
-        }
-
-        // zero out request
-        requestAmt = 0;
+      if(offerAmt > EPS_KG) {
+        msg_ptr new_offer = offerMsg->clone();
+        new_offer->resource()->setQuantity(offerAmt);
+        receiveMessage(new_offer);
       }
+
+      // request fulfilled via an offer larger than it.
+      requestAmt = 0;
     }
   }
 
-  if (requestAmt != 0) {
-    LOG(LEV_DEBUG2) << "The request from Requester "
+  if (fabs(requestAmt) > EPS_KG) {
+    LOG(LEV_DEBUG2, "GreedM") << "The request from Requester "
       << requestMsg->requester()->ID()
       << " for the amount " << requestAmt << " rejected. ";
       reject_request(request);
   }
 
-  return (requestAmt == 0);
+  return (fabs(requestAmt) < EPS_KG);
 }
 
 /* --------------------
@@ -189,9 +183,6 @@ extern "C" Model* constructGreedyMarket() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-extern "C" void destructGreedyMarket(Model* p) {
-  delete p;
-}
 
 /* -------------------- */
 

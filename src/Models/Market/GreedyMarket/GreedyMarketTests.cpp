@@ -7,6 +7,9 @@
 #include "MarketModelTests.h"
 #include "GenericResource.h"
 #include "ModelTests.h"
+#include "IsoVector.h"
+#include "Material.h"
+#include "FacilityModel.h"
 
 #include <string>
 #include <queue>
@@ -22,7 +25,8 @@ class FakeGreedyMarket : public GreedyMarket {
     FakeGreedyMarket() : GreedyMarket() {
       string kg = "kg";
       string qual = "qual";
-      GenericResource* res = new GenericResource(kg, qual, 1);
+      gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
+      res->setOriginatorID(1);
       msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }
@@ -43,22 +47,135 @@ MarketModel* GreedyMarketConstructor(){
   return dynamic_cast<MarketModel*>(new FakeGreedyMarket());
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+class FakeFacility: public FacilityModel {
+
+public:
+
+  std::vector<rsrc_ptr> received;
+  std::vector<rsrc_ptr> sent;
+
+  void copyFreshModel(Model* model) { };
+  
+  void receiveMessage(msg_ptr msg) {
+    msg->approveTransfer();
+  }
+
+  void addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+    for (int i = 0; i < manifest.size(); i++) {
+      received.push_back(manifest.at(i));
+    }
+  }
+
+  std::vector<rsrc_ptr> removeResource(msg_ptr msg) {
+    sent.push_back(msg->resource());
+    std::vector<rsrc_ptr> manifest;
+    manifest.push_back(msg->resource());
+    return manifest;
+  }
+};
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class GreedyMarketTest : public ::testing::Test {
   protected:
     FakeGreedyMarket* src_market;
     FakeGreedyMarket* new_market; 
 
+    IsoVector recipe;
+    Transaction trans;
+    msg_ptr offer, request;
+    FakeFacility* supplier;
+    FakeFacility* requester;
+
     virtual void SetUp(){
+      recipe.setMass(92235, 10);
+      recipe.setMass(92238, 90);
+
+      trans.commod = "none";
+      trans.minfrac = 0.1;
+      trans.price = 3;
+
       src_market = new FakeGreedyMarket();
       new_market = new FakeGreedyMarket();
+
+      Communicator* recipient = dynamic_cast<Communicator*>(src_market);
+
+      supplier = new FakeFacility();
+      requester = new FakeFacility();
+
+      trans.is_offer = false;
+      request = msg_ptr(new Message(requester, recipient, trans)); 
+      request->setNextDest(recipient);
+
+      trans.is_offer = true;
+      offer = msg_ptr(new Message(supplier, recipient, trans)); 
+      offer->setNextDest(recipient);
+
     };
 
     virtual void TearDown() {
       delete src_market;
+      delete new_market;
     }
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(GreedyMarketTest, RequestIsLarger) {
+  recipe.setMass(20);
+  rsrc_ptr resource(new Material(recipe));
+  request->setResource(resource);
+
+  recipe.setMass(15);
+  resource = rsrc_ptr(new Material(recipe));
+  offer->setResource(resource);
+
+  request->sendOn();
+  offer->sendOn();
+  src_market->resolve();
+
+  EXPECT_EQ(supplier->received.size(), 0);
+  EXPECT_EQ(supplier->sent.size(), 0);
+  EXPECT_EQ(requester->received.size(), 0);
+  EXPECT_EQ(requester->sent.size(), 0);
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(GreedyMarketTest, OfferIsLarger) {
+  recipe.setMass(15);
+  rsrc_ptr resource(new Material(recipe));
+  request->setResource(resource);
+
+  recipe.setMass(20);
+  resource = rsrc_ptr(new Material(recipe));
+  offer->setResource(resource);
+
+  request->sendOn();
+  offer->sendOn();
+  src_market->resolve();
+
+  EXPECT_EQ(supplier->received.size(), 0);
+  EXPECT_EQ(supplier->sent.size(), 1);
+  EXPECT_EQ(requester->received.size(), 1);
+  EXPECT_EQ(requester->sent.size(), 0);
+
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(GreedyMarketTest, RequestEqOffer) {
+  rsrc_ptr resource(new Material(recipe));
+  request->setResource(resource);
+  offer->setResource(resource);
+
+  request->sendOn();
+  offer->sendOn();
+  src_market->resolve();
+
+  EXPECT_EQ(supplier->received.size(), 0);
+  EXPECT_EQ(supplier->sent.size(), 1);
+  EXPECT_EQ(requester->received.size(), 1);
+  EXPECT_EQ(requester->sent.size(), 0);
+
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(GreedyMarketTest, InitialState) {
@@ -80,7 +197,6 @@ TEST_F(GreedyMarketTest, CopyFreshModel) {
 TEST_F(GreedyMarketTest, Print) {
   EXPECT_NO_THROW(src_market->print());
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(GreedyMarketTest, ReceiveMessage) {

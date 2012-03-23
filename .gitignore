@@ -1,4 +1,4 @@
-*.swp
+*.sw*
 build
 debug
 doxygen.conf

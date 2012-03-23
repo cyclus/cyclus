@@ -1,17 +1,19 @@
 // SourceFacility.h
 #if !defined(_SOURCEFACILITY_H)
 #define _SOURCEFACILITY_H
+
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <queue>
 
+#include "Logger.h"
 #include "FacilityModel.h"
 #include "Material.h"
+#include "MatBuff.h"
 
-/*!
+/**
    @class SourceFacility
-   @brief This FacilityModel provides a simple source of some capacity 
+    This FacilityModel provides a simple source of some capacity 
    (possibly infinite) of some commodity/Recipe.
    
    The SourceFacility class inherits from the FacilityModel class and is 
@@ -83,33 +85,35 @@
    What is the best way to allow offers of an infinite amount of material on 
    a market? 
 */
-
 class SourceFacility : public FacilityModel  {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
-
-public:
+ public:
   /**
-   * Default Constructor for the SourceFacility class
+   *  Default Constructor for the SourceFacility class
    */
   SourceFacility();
   
   /**
-   * Destructor for the SourceFacility class
+   *  Destructor for the SourceFacility class
    */
-  ~SourceFacility();
+  virtual ~SourceFacility();
 
   // different ways to populate an object after creation
-  /// initialize an object from XML input
+  /**
+   *   initialize an object from XML input
+   */
   virtual void init(xmlNodePtr cur);
 
-  /// initialize an object by copying another
+  /**
+   *   initialize an object by copying another
+   */
   virtual void copy(SourceFacility* src);
 
   /**
-   * This drills down the dependency tree to initialize all relevant 
+   *  This drills down the dependency tree to initialize all relevant 
    * parameters/containers.
    *
    * Note that this function must be defined only in the specific model in 
@@ -120,43 +124,42 @@ public:
   virtual void copyFreshModel(Model* src);
 
   /**
-   * Print information about this model
+   *  Print information about this model
    */
   virtual void print();
 
   /**
-   * @brief Transacted resources are extracted through this method
+   *  Transacted resources are extracted through this method
    * 
    * @param order the msg/order for which resource(s) are to be prepared
    * @return list of resources to be sent for this order
    *
    */ 
-  virtual std::vector<Resource*> removeResource(msg_ptr order);
-
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
 /* ------------------- */ 
+
 
 /* --------------------
  * all COMMUNICATOR classes have these members
  * ------------------
  */
-public:
+ public:
   /**
-   * When this facility receives a message, execute the transaction therein.
+   *  When this facility receives a message, execute the transaction therein.
    */
   virtual void receiveMessage(msg_ptr msg);
 
 /* -------------------- */
 
+
 /* --------------------
  * all FACILITYMODEL classes have these members
  * --------------------
  */
-
-public:
-
+ public:
   /**
-   * Each facility is prompted to do its beginning-of-time-step
+   *  Each facility is prompted to do its beginning-of-time-step
    * stuff at the tick of the timer.
    *
    * @param time is the time to perform the tick
@@ -164,102 +167,84 @@ public:
   virtual void handleTick(int time);
 
   /**
-   * Each facility is prompted to its end-of-time-step
+   *  Each facility is prompted to its end-of-time-step
    * stuff on the tock of the timer.
    * 
    * @param time is the time to perform the tock
    */
   virtual void handleTock(int time);
 
-protected: 
+  double inventory() {return inventory_.quantity();}
+  void setInventory(double size) {inventory_.setCapacity(size);}
 
-/* ------------------- */ 
+  double capacity() {return capacity_;}
 
 /* --------------------
  * _THIS_ FACILITYMODEL class has these members
  * --------------------
  */
-
-protected:
+ protected:
   /**
-   * This facility has only one output commodity
+   *  This facility has only one output commodity
    */
   std::string out_commod_;
   
-  /// This facility has a specific recipe for its output
+  /**
+   *   This facility has a specific recipe for its output
+   */
   IsoVector recipe_;
   
-  /// Name of the recipe this facility uses.
+  /**
+   *   Name of the recipe this facility uses.
+   */
   std::string recipe_name_;
-  
-  /**
-   *  The capacity is defined in terms of the number of units of the recipe
-   *  that can be provided each time step.  A very large number can be
-   *  provided to represent infinte capacity.
-   */
-  double capacity_;
 
   /**
-   * The maximum size that the inventory can grow to.
-   * The NullFacility must stop processing the material in its stocks when its 
-   * inventory is full.
-   */
-  int inventory_size_;
-
-  /**
-   * The price that the facility will charge for its output commodity.
+   *  The price that the facility will charge for its output commodity.
    * Units vary and are in dollars per inventory unit.
    */
   double commod_price_;
 
   /**
+   *  A list of orders to be processed on the Tock
+   */
+  std::deque<msg_ptr> ordersWaiting_;
+
+  /**
+   *  generates a material at a given time
+   * @param curr_time the current simulation time period */
+  void generateMaterial(int curr_time);
+
+  /**
+   *  builds a transaction
+   */
+  Transaction buildTransaction();
+
+  /**
+   *  sends a transaction as an offer
+   */
+  void sendOffer(Transaction trans);
+
+  /**
+   *  indicates the time just before the facility was built
+   */
+  int prev_time_;
+
+  /**
+   *   The capacity is defined in terms of the number of units of the recipe
+   *  that can be provided each time step.  A very large number can be
+   *  provided to represent infinte capacity.
+   */
+  double capacity_;
+
+private:
+
+  /**
    * A collection  that holds the "product" Material this Facility has on hand 
-   * to send to others. For instance, a Reactor's inventory is its collection of 
-   * old fuel assemblies that have come out of the core.
+   * to send to others.
    */ 
-  deque<Material*> inventory_;
+  MatBuff inventory_;
   
-  /// return the inventory
-  deque<Material*>* getInventory(){return &inventory_;};
-
-  /**
-   * A list of orders to be processed on the Tock
-   */
-  deque<msg_ptr> ordersWaiting_;
-
-  /**
-   * return the total mass of the material objects in the inventory
-   * the units vary and are associated with with material type
-   */
-  double checkInventory();
-
-
-  /**
-   * prints the material that is on the send stack
-   */
-  void printSent(Material* mat);
-
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for this facility model output dir
-  */
-  static std::string outputDir(){ 
-    return FacilityModel::outputDir().append(outputDir_);}
-
- private:
-  /**
-     Every specific facility model writes to the output database
-     location: FacilityModel::OutputDir_ + /this_facility's_handle
-  */
-  static std::string outputDir_;
-
-/* ------------------- */ 
-
 };
 
 #endif

@@ -31,7 +31,7 @@ public:
   /**
    * Default destructor for the fixed inst
    */
-  ~BuildInst() {};
+  virtual ~BuildInst() {};
    
   // different ways to populate an object after creation
   /// initialize an object from XML input

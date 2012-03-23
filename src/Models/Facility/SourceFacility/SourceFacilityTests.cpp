@@ -30,23 +30,12 @@ class FakeSourceFacility : public SourceFacility {
       recipe_ = IsoVector(test_comp);
 
       capacity_ = 2;
-      inventory_size_ = 50;
       commod_price_ = 5000;
-
-      inventory_ = deque<Material*>();
-      ordersWaiting_ = deque<msg_ptr>();
+      setInventory(capacity() + 1);
     }
 
     virtual ~FakeSourceFacility() {
     }
-
-    double fakeCheckInventory() { return checkInventory(); }
-
-    std::string getOutCommod() {return out_commod_;}
-    double getCapacity() {return capacity_;}
-    double getInvSize() {return inventory_size_;}
-    double getCommodPrice() {return commod_price_;}
-    IsoVector getRecipe() {return recipe_;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,7 +59,7 @@ class SourceFacilityTest : public ::testing::Test {
       src_facility = new FakeSourceFacility();
       src_facility->setParent(new TestInst());
       new_facility = new FakeSourceFacility();
-      commod_market = new TestMarket(src_facility->getOutCommod());
+      commod_market = new TestMarket("out-commod");
     };
 
     virtual void TearDown() {
@@ -84,13 +73,13 @@ class SourceFacilityTest : public ::testing::Test {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, InitialState) {
   int time = 1;
-  EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
+  EXPECT_DOUBLE_EQ(0.0, src_facility->inventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, CopyFacility) {
   new_facility->copy(src_facility); 
-  EXPECT_DOUBLE_EQ(0.0, new_facility->fakeCheckInventory()); // fresh inventory
+  EXPECT_DOUBLE_EQ(0.0, new_facility->inventory()); // fresh inventory
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -98,11 +87,7 @@ TEST_F(SourceFacilityTest, CopyFreshModel) {
   new_facility->copyFreshModel(dynamic_cast<Model*>(src_facility)); // deep copy
   EXPECT_NO_THROW(dynamic_cast<SourceFacility*>(new_facility)); // still a source facility
   EXPECT_NO_THROW(dynamic_cast<FakeSourceFacility*>(new_facility)); // still a fake source facility
-  EXPECT_DOUBLE_EQ(0.0, new_facility->fakeCheckInventory()); // fresh inventory
-  EXPECT_EQ(src_facility->getCapacity(), new_facility->getCapacity());
-  EXPECT_EQ(src_facility->getInvSize(), new_facility->getInvSize());
-  EXPECT_EQ(src_facility->getCommodPrice(), new_facility->getCommodPrice());
-  EXPECT_DOUBLE_EQ(src_facility->getRecipe().mass(), new_facility->getRecipe().mass());
+  EXPECT_DOUBLE_EQ(0.0, new_facility->inventory()); // fresh inventory
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -120,23 +105,17 @@ TEST_F(SourceFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Tick) {
   int time = 1;
-  EXPECT_DOUBLE_EQ(0.0, src_facility->fakeCheckInventory());
-  EXPECT_NO_THROW(src_facility->handleTick(time));
-  EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
+  ASSERT_DOUBLE_EQ(0.0, src_facility->inventory());
+  ASSERT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_LT(0.0, src_facility->inventory());
+  EXPECT_LE(src_facility->capacity(), src_facility->inventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Tock) {
   int time = 1;
-  EXPECT_DOUBLE_EQ(0.0,src_facility->fakeCheckInventory());
+  EXPECT_DOUBLE_EQ(0.0,src_facility->inventory());
   EXPECT_NO_THROW(src_facility->handleTock(time));
-  EXPECT_GT(src_facility->fakeCheckInventory(),0.0);
-  EXPECT_LE(src_facility->getCapacity(),src_facility->fakeCheckInventory());
-  double expected_inventory = src_facility->getCapacity()*src_facility->getRecipe().mass(); 
-  if (expected_inventory > src_facility->getInvSize()) {
-    expected_inventory = src_facility->getInvSize();
-  }
-  EXPECT_DOUBLE_EQ(expected_inventory, src_facility->fakeCheckInventory());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

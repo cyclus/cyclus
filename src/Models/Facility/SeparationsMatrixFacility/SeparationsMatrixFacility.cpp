@@ -1,36 +1,38 @@
 // SeparationsMatrixFacility.cpp
 // Implements the SeparationsMatrixFacility class
 #include <iostream>
-#include "Logger.h"
 #include <deque>
 #include <string.h>
 #include <vector>
 
 #include "SeparationsMatrixFacility.h"
 
+#include "Logger.h"
 #include "GenericResource.h"
 #include "Timer.h"
 #include "CycException.h"
 #include "InputXML.h"
 
-/*
- * TICK
- * Make offers of separated material based on availabe inventory.
- * If there are ordersWaiting, prepare and send an appropriate 
- * request for spent fuel material.
- * Check stocks to determine if there is capacity to produce any extra material
- * next month. If so, process as much raw (spent fuel) stock material as
- * capacity will allow.
- *
- * TOCK
- * Send appropriate separated material from inventory to fill ordersWaiting.
- *
- * RECIEVE MATERIAL
- * Put incoming spent nuclear fuel (SNF) material into stocks
- *
- * SEND MATERIAL
- * Pull separated material from inventory based on Requests
- * Decrement ordersWaiting
+using namespace std;
+
+/**
+  TICK
+  Make offers of separated material based on availabe inventory.
+  If there are ordersWaiting, prepare and send an appropriate 
+  request for spent fuel material.
+  Check stocks to determine if there is capacity to produce any extra material
+  next month. If so, process as much raw (spent fuel) stock material as
+  capacity will allow.
+ 
+  TOCK
+  Send appropriate separated material from inventory to fill ordersWaiting.
+ 
+  RECIEVE MATERIAL
+  Put incoming spent nuclear fuel (SNF) material into stocks
+ 
+  SEND MATERIAL
+  Pull separated material from inventory based on Requests
+  Decrement ordersWaiting
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -81,13 +83,13 @@ void SeparationsMatrixFacility::init(xmlNodePtr cur)
     int stream_Z = strtol(XMLinput->get_xpath_content(stream,"z"), NULL, 10);
     double stream_eff = strtod(XMLinput->get_xpath_content(stream,"eff"), NULL);
     stream_set_.insert(make_pair(new_commod, make_pair(stream_Z, stream_eff)));
-    LOG(LEV_DEBUG2) << "Name = " << new_commod;
-    LOG(LEV_DEBUG2) << "Z = " << stream_Z;
-    LOG(LEV_DEBUG2) << "Eff = " << stream_eff;
+    LOG(LEV_DEBUG2, "none!") << "Name = " << new_commod;
+    LOG(LEV_DEBUG2, "none!") << "Z = " << stream_Z;
+    LOG(LEV_DEBUG2, "none!") << "Eff = " << stream_eff;
   };
 
-  inventory_ = deque<pair<string,Material*> >();
-  stocks_ = deque<pair<string,Material*> >();
+  inventory_ = deque<pair<string,mat_rsrc_ptr> >();
+  stocks_ = deque<pair<string,mat_rsrc_ptr> >();
   ordersWaiting_ = deque<msg_ptr>();
   ordersExecuting_ = ProcessLine();
 
@@ -124,22 +126,22 @@ void SeparationsMatrixFacility::copyFreshModel(Model* src)
 void SeparationsMatrixFacility::print() 
 { 
   FacilityModel::print();
-  LOG(LEV_DEBUG2) << "converts commodities {";
+  LOG(LEV_DEBUG2, "none!") << "converts commodities {";
 
   for(vector<string>::const_iterator iter = in_commod_.begin(); 
       iter != in_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2) << (*iter);
+    LOG(LEV_DEBUG2, "none!") << (*iter);
   };
 
-  LOG(LEV_DEBUG2) << "} into commodities {";
+  LOG(LEV_DEBUG2, "none!") << "} into commodities {";
 
   for (vector<string>::iterator iter = out_commod_.begin(); 
       iter != out_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2) << (*iter);
+    LOG(LEV_DEBUG2, "none!") << (*iter);
   }; 
-  LOG(LEV_DEBUG2) << "}, and has an inventory that holds " 
+  LOG(LEV_DEBUG2, "none!") << "}, and has an inventory that holds " 
     << inventory_size_ << " materials"
     ;
 };
@@ -158,7 +160,7 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -166,16 +168,16 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   // pull materials off of the inventory stack until you get the trans amount
 
   // start with an empty manifest
-  vector<Resource*> toSend;
+  vector<rsrc_ptr> toSend;
 
   while(trans.resource->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
-      Material* m = inventory_.front().second;
+      mat_rsrc_ptr m = inventory_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (trans.resource->quantity() - newAmt)){
@@ -185,13 +187,13 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+        mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
         newAmt += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
 
       toSend.push_back(newMat);
-      LOG(LEV_DEBUG2) <<"SeparationsMatrixFacility "<< ID()
+      LOG(LEV_DEBUG2, "none!") <<"SeparationsMatrixFacility "<< ID()
         <<"  is sending a mat with mass: "<< newMat->quantity();
     }    
   }
@@ -200,17 +202,17 @@ std::vector<Resource*> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::addResource(msg_ptr msg,
-                                            vector<Resource*> manifest) {  
-  LOG(LEV_DEBUG2) << "Entered the addResource file ";
+                                            vector<rsrc_ptr> manifest) {  
+  LOG(LEV_DEBUG2, "none!") << "Entered the addResource file ";
 
   // grab each material object off of the manifest
   // and move it into the stocks.
-  for (vector<Resource*>::iterator thisMat=manifest.begin();
+  for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
       thisMat != manifest.end();
       thisMat++) {
-    LOG(LEV_DEBUG2) <<"SeparationsFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "none!") <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
-    stocks_.push_back(make_pair(msg->trans().commod, dynamic_cast<Material*>(*thisMat)));
+    stocks_.push_back(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -243,10 +245,10 @@ void SeparationsMatrixFacility::handleTock(int time)
     for (deque<OutSep>::iterator iter = stocks_.begin(); 
         iter != stocks_.end(); 
         iter ++){
-      Material* m = stocks_.front().second;
+      mat_rsrc_ptr m = stocks_.front().second;
 
       // start with an empty material
-      Material* newMat = new Material();
+      mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the stocks obj isn't larger than the remaining need, send it as is.
       if(m->quantity() <= (capacity_ - complete)){
@@ -256,7 +258,7 @@ void SeparationsMatrixFacility::handleTock(int time)
       }
       else{ 
         // if the stocks obj is larger than the remaining need, split it.
-        Material* toAbsorb = m->extract(capacity_ - complete);
+        mat_rsrc_ptr toAbsorb = m->extract(capacity_ - complete);
         complete += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
@@ -273,10 +275,6 @@ void SeparationsMatrixFacility::handleTock(int time)
     order->approveTransfer();
     ordersWaiting_.pop_front();
   }
-  
-  // call the facility model's handle tock last 
-  // to check for decommissioning
-  FacilityModel::handleTock(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -345,7 +343,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = space;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -367,7 +365,7 @@ void SeparationsMatrixFacility::makeRequests(){
       requestAmt = capacity_ - sto;
 
       // request a generic resource
-      GenericResource* request_res = new GenericResource((*iter), "kg", requestAmt);
+      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
       Transaction trans;
@@ -410,7 +408,7 @@ void SeparationsMatrixFacility::makeOffers() {
     // build a material
     IsoVector comp;
     comp.setMass(1001, offer_amt);
-    Material* offer_mat = new Material(comp);
+    mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(comp));
 
     // build the transaction and message
     Transaction trans;
@@ -446,11 +444,11 @@ void SeparationsMatrixFacility::separate()
   while (curr != omega) {
     // Get the info we need to make the separated Material.
     msg_ptr mess = (curr->second).first;
-    Material* mat = (curr->second).second;
+    mat_rsrc_ptr mat = (curr->second).second;
 
     // Find out what we're trying to make.
     try {
-      IsoVector vecToMake =  dynamic_cast<Material*>(mess->resource())->isoVector();
+      IsoVector vecToMake =  boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;
@@ -475,7 +473,7 @@ void SeparationsMatrixFacility::separate()
      iter++){            
      firstpair = inventory_.pop_front();
      string firstcommodity = firstpair.first();
-     Material* firstmaterial = firstpair.second();
+     mat_rsrc_ptr firstmaterial = firstpair.second();
   // Multiply Amount of Element by Separation Efficieny and then add
   // it to the stock of material for that Element
   stocks_.second((*stream_set_).first) = 
@@ -485,12 +483,8 @@ void SeparationsMatrixFacility::separate()
   */       
 }
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string SeparationsMatrixFacility::outputDir_ = "/separationsMatrix";
+/* ------------------- */ 
+
 
 /* --------------------
  * all MODEL classes have these members
@@ -499,10 +493,6 @@ std::string SeparationsMatrixFacility::outputDir_ = "/separationsMatrix";
 
 extern "C" Model* constructSeparationsMatrixFacility() {
   return new SeparationsMatrixFacility();
-}
-
-extern "C" void destructSeparationsMatrixFacility(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

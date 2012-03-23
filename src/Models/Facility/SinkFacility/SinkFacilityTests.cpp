@@ -19,20 +19,18 @@ class FakeSinkFacility : public SinkFacility {
     FakeSinkFacility() : SinkFacility() {
       in_commods_.push_back("in-commod");
       capacity_ = 2;
-      inventory_size_ = 50;
+      inventory_.setCapacity(50);
       commod_price_ = 5000;
-
-      inventory_ = deque<Material*>();
     }
 
     virtual ~FakeSinkFacility() {
     }
 
-    double fakeCheckInventory() { return checkInventory(); }
+    double fakeCheckInventory() { return inventory_.quantity(); }
 
     std::string getInCommod() {return in_commods_.front();}
     double getCapacity() {return capacity_;}
-    double getInvSize() {return inventory_size_;}
+    double getInvSize() {return inventory_.capacity();}
     double getCommodPrice() {return commod_price_;}
 };
 

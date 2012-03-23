@@ -1,5 +1,5 @@
 
-/*!
+/**
 
 @page testing Testing Cyclus
 @brief A discussion of concepts and guidelines for creating tests within Cyclus. 

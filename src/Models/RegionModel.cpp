@@ -1,14 +1,15 @@
 // RegionModel.cpp
 // Implements the RegionModel class
 
+#include <string>
+#include <iostream>
+
 #include "RegionModel.h"
+
 #include "InstModel.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
-
-#include <string>
-#include <iostream>
 #include "Logger.h"
 
 using namespace std;
@@ -22,9 +23,6 @@ using namespace std;
     TI->registerTickListener(this);
 
     // register the model
-
-    // regions are their own parent
-    this->setParent(this);
     setIsTemplate(false);
   };
 
@@ -38,8 +36,7 @@ void RegionModel::init(xmlNodePtr cur) {
    */
 
   /// all regions require allowed facilities - possibly many
-  xmlNodeSetPtr nodes = 
-    XMLinput->get_xpath_elements(cur,"allowedfacility");
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
 
   string fac_name;
   Model* new_fac;
@@ -49,6 +46,10 @@ void RegionModel::init(xmlNodePtr cur) {
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
+
+  // region models do not currently follow the template/not template
+  // paradigm of insts and facs, so log this as its own parent
+  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -71,16 +72,16 @@ void RegionModel::print() {
 
   Model::print();
 
-  LOG(LEV_DEBUG2) << "allows facilities " ;
+  LOG(LEV_DEBUG2, "none!") << "allows facilities " ;
 
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2) << (fac == allowedFacilities_.begin() ? "{" : ", " )
+    LOG(LEV_DEBUG2, "none!") << (fac == allowedFacilities_.begin() ? "{" : ", " )
         << (*fac)->name();
   }
   
-  LOG(LEV_DEBUG2) << "} and has the following institutions:";
+  LOG(LEV_DEBUG2, "none!") << "} and has the following institutions:";
   
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
@@ -108,6 +109,7 @@ void RegionModel::handlePreHistory(){
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTick(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();
@@ -117,17 +119,18 @@ void RegionModel::handleTick(int time){
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTock(int time){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleTock(time);
-    // if its the last month, decommission the region
-    if (TI->checkEndMonth()) {this->decommission();}
   }
+  
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleDailyTasks(int time, int day){
   // tell all of the institution models to handle the tick
   for(vector<Model*>::iterator inst=children_.begin();
@@ -136,10 +139,3 @@ void RegionModel::handleDailyTasks(int time, int day){
     (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
   }
 }
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string RegionModel::outputDir_ = "/region";

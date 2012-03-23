@@ -1,10 +1,10 @@
 // NullMarket.cpp
 // Implements the NullMarket class
 #include <iostream>
-#include "Logger.h"
 
 #include "NullMarket.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "IsoVector.h"
@@ -91,7 +91,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         orders_.push_back(offerMsg);
 
-        LOG(LEV_DEBUG2) 
+        LOG(LEV_DEBUG2, "none!") 
 	  << "NullMarket has resolved a transaction "
 	  << " which is a match from "
           << offerMsg->supplier()->ID()
@@ -114,7 +114,7 @@ bool NullMarket::match_request(sortedMsgList::iterator request)
 
         orders_.push_back(maybe_offer);
 
-        LOG(LEV_DEBUG2) << "NullMarket has resolved a match from "
+        LOG(LEV_DEBUG2, "none!") << "NullMarket has resolved a match from "
           << maybe_offer->supplier()->ID()
           << " to "
           << maybe_offer->requester()->ID()
@@ -164,7 +164,7 @@ void NullMarket::resolve()
       process_request();
     } 
     else {
-      LOG(LEV_DEBUG2) << "The request from Requester "<< (*request).second->requester()->ID()
+      LOG(LEV_DEBUG2, "none!") << "The request from Requester "<< (*request).second->requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected. ";
       reject_request(request);
@@ -190,8 +190,5 @@ extern "C" Model* constructNullMarket() {
   return new NullMarket();
 }
 
-extern "C" void destructNullMarket(Model* p) {
-  delete p;
-}
 
 /* -------------------- */

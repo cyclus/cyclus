@@ -1,15 +1,16 @@
 // FixedInst.cpp
 // Implements the FixedInst class
 #include <iostream>
-#include "Logger.h"
 
 #include "FixedInst.h"
 
 #include "FacilityModel.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::init(xmlNodePtr cur) {
@@ -52,23 +53,14 @@ void FixedInst::copyFreshModel(Model* src) {
 void FixedInst::print() {
   InstModel::print();
 
-  LOG(LEV_DEBUG2) << " and the following permanent facilities: ";
+  LOG(LEV_DEBUG2, "none!") << " and the following permanent facilities: ";
   for (vector<Model*>::iterator fac=children_.begin(); 
        fac != children_.end(); 
        fac++){
-    LOG(LEV_DEBUG2) << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
+    LOG(LEV_DEBUG2, "none!") << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
      << " (" << (*fac)->name() << ")";
   }
 };
-
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string FixedInst::outputDir_ = "/fixed";
-
 
 /* --------------------
  * all MODEL classes have these members
@@ -77,10 +69,6 @@ std::string FixedInst::outputDir_ = "/fixed";
 
 extern "C" Model* constructFixedInst() {
   return new FixedInst();
-}
-
-extern "C" void destructFixedInst(Model* p) {
-  delete p;
 }
 
 /* ------------------- */ 

@@ -5,6 +5,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 
+# # Determine the output directory
+# IF (NOT EXISTS ENV{CYCLUS_OUT_DIR})
+#   SET( ENV{CYCLUS_OUT_DIR} ${CMAKE_CURRENT_BINARY_DIR} )
+#   MESSAGE(STATUS "CYCLUS_OUT_DIR not found, setting to ${CMAKE_CURRENT_BINARY_DIR}")
+# ENDIF(NOT EXISTS ENV{CYCLUS_OUT_DIR})
+
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
@@ -39,18 +45,21 @@ SET( CYCLUS_CORE
   Resource.cpp
   GenericResource.cpp
   Material.cpp
+  ResourceBuff.cpp
+  MatBuff.cpp
   Message.cpp
   Utility/BookKeeper.cpp 
+  Utility/Database.cpp
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 
   Utility/MassTable.cpp 
+  Utility/Table.cpp
   Utility/Timer.cpp
   Utility/UniformTaylor.cpp 
   Utility/Env.cpp
   Utility/Logger.cpp
   Utility/DecayHandler.cpp
   Models/Model.cpp 
-  Models/TimeAgent.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
@@ -71,10 +80,11 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 
 # Copy Data
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/mass.h5
-${CMAKE_CURRENT_BINARY_DIR}/Data/mass.h5
+${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
+${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite
 COPYONLY
 )
+
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/cyclus.rng
 ${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
@@ -88,25 +98,25 @@ COPYONLY
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
-INCLUDE_DIRECTORIES (${LIBXML2_INCLUDE_DIR})
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML_INCLUDE_DIR})
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
 set(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
-# Include the HDF5 library
-FIND_PACKAGE( HDF5 COMPONENTS CXX )
-INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIRS})
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
-ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-set(LIBS ${LIBS} ${HDF5_CXX_LIBRARIES})
+# Find Sqlite3
+FIND_PACKAGE( Sqlite3 REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
+set(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 # Include the boost header files and the program_options library
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED)
-INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
+# include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # Add subdirs and build for the models
@@ -126,7 +136,7 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} hdf5 hdf5_hl hdf5_cpp )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} )
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -183,7 +193,7 @@ add_executable(Testing/CyclusUnitTestDriver
 )
 
 target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} hdf5 hdf5_hl hdf5_cpp gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
 
 # Here we add all the tests
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 

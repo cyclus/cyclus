@@ -1,18 +1,15 @@
 // StubRegion.cpp
 // Implements the StubRegion class
-#include <iostream>
-#include "Logger.h"
 
 #include "StubRegion.h"
 
-
-
-
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::StubRegion() {};
 
@@ -35,6 +32,9 @@ void StubRegion::print() {
   RegionModel::print(); 
 };
 
+/* ------------------- */ 
+
+
 /* --------------------
  * all COMMUNICATOR classes have these members
  * --------------------
@@ -43,31 +43,25 @@ void StubRegion::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::receiveMessage(msg_ptr msg) {};
 
+/* ------------------- */ 
+
 
 /* --------------------
  * all REGIONMODEL classes have these members
  * --------------------
  */
 
+/* ------------------- */ 
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string StubRegion::outputDir_ = "/stub";
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubRegion() {
     return new StubRegion();
 }
 
-extern "C" void destructStubRegion(Model* p) {
-    delete p;
-}
-
-/* -------------------- */
+/* ------------------- */ 

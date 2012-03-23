@@ -1,14 +1,15 @@
 // StubStub.cpp
 // Implements the StubStub class
-#include <iostream>
-#include "Logger.h"
 
 #include "StubStub.h"
+
+#include "Logger.h"
 
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubStub::StubStub() {};
 
@@ -30,20 +31,9 @@ void StubStub::print() {
   StubModel::print(); 
 };
 
-
-
-
-/* --------------------
- *  * all MODEL classes have these members
- *   * --------------------
- *    */
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" Model* constructStubStub() {
       return new StubStub();
-}
-
-extern "C" void destructStubStub(Model* p) {
-      delete p;
 }
 
 /* -------------------- */
