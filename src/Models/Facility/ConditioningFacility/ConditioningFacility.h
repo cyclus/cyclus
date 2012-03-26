@@ -331,6 +331,12 @@ class ConditioningFacility : public FacilityModel {
    */
   void printStatus(int time);
 
+  // -------- output database related members  -------- 
+  /**
+   *   the conditioning facility database table
+   */
+  static table_ptr cond_fac_table;
+
  private :
   /**
    *  Condition the material provided according to the rules for this commodity
@@ -350,6 +356,24 @@ class ConditioningFacility : public FacilityModel {
    * @return the stream where the commodity matches the id in the commod_id map
    */
   stream_t getStream(std::string commod);
+
+  // -------- output database related members  --------   
+  /**
+   *  Define the database table on the first conditioning event
+   */
+  static void define_table();
+
+  /**
+   *   add some conditioned materials to the conditioned materials table
+   */
+  void addToTable();
+
+  /**
+     Each time a material is conditioned, we keep track of that
+     resource's id (in order to make some output).
+   */
+  int current_cond_rsrc_id_;
+
 
 /* ------------------- */ 
 
