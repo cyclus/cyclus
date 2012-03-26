@@ -97,6 +97,9 @@ void ConditioningFacility::init(xmlNodePtr cur)
 
     loadTable(datafile, fileformat);
     file_is_open_ = false;
+
+    // we haven't conditioned anything yet
+    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -111,6 +114,7 @@ void ConditioningFacility::copy(ConditioningFacility* src)
     commod_map_ = src->commod_map_;
     stream_vec_ = src->stream_vec_;
     loading_densities_ = src->loading_densities_;
+    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -498,6 +502,8 @@ double ConditioningFacility::checkStocks(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::conditionMaterials(){
+
+  LOG(LEV_INFO3, "CondFac ") << facName() << " is conditioning {";
   // Partition the in-stream according to loading density
   // for each stream object in stocks
   map<string, mat_rsrc_ptr> remainders;
@@ -516,6 +522,12 @@ void ConditioningFacility::conditionMaterials(){
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
+
+  // log the fact that we just conditioned stuff
+  current_cond_rsrc_id_ = TI->time();
+  addToTable();
+ 
+  LOG(LEV_INFO3, "none!c ") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
