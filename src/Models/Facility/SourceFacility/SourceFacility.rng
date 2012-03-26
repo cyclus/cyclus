@@ -12,10 +12,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <oneOrMore>
           <ref name="inventorysize"/>
         </oneOrMore>
-        <ref name="commodprice">
+        <ref name="commodprice"/>
         <element name="recipe">
           <data type="string"/>
-          </element>
+        </element>
      </element>
   </define>
 
