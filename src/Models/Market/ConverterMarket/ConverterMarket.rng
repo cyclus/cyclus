@@ -4,19 +4,19 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="ConverterMarket">
     <element name="ConverterMarket">
         <element name="offercommodity">
-          <text/>
+          <data type="string"/>
         </element>
         <element name="reqcommodity">
-          <text/>
+          <data type="string"/>
         </element>
 
         <oneOrMore>
           <element name="converter">
             <element name="type">
-              <text/>
+              <data type="string"/>
             </element>
             <element name="name">
-              <text/>
+              <data type="string"/>
             </element>
           </element>
         </oneOrMore>       

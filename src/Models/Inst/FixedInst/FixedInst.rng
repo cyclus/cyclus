@@ -7,10 +7,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <element name="facility">
           <element name="type">
-            <text/>
+            <data type="string"/>
           </element>
           <element name="name">
-            <text/>
+            <data type="string"/>
           </element>
         </element>
       </oneOrMore>       

@@ -2,31 +2,31 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="CapacityRegion">
-     <element name="CapacityRegion">
-        <element name="input_file">
-        <text/>
-    </element>
-    <oneOrMore>
+    <element name="CapacityRegion">
+      <element name="input_file">
+        <data type="string"/>
+      </element>
+      <oneOrMore>
         <element name="capacitydemand">
-        <element name="capacitytype">
-            <text/>
-        </element>
-        <element name="capacityfunction">
-            <text/>
-        </element>
-        <element name="nominalvalue">
-            <text/>
-        </element>
-        <oneOrMore>
-        <element name="replacementlist">
+          <element name="capacitytype">
+            <data type="string"/>
+          </element>
+          <element name="capacityfunction">
+            <data type="string"/>
+          </element>
+          <element name="nominalvalue">
+            <data type="double"/>
+          </element>
+          <oneOrMore>
+          <element name="replacementlist">
             <element name="replacementfacility">
-                <text/>
+              <data type="string"/>
             </element>
+          </element>
+          </oneOrMore>
         </element>
-        </oneOrMore>
+      </oneOrMore>
     </element>
-    </oneOrMore>
-     </element>
   </define>
 
 </grammar>

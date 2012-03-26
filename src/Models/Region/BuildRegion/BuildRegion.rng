@@ -4,8 +4,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="BuildRegion">
      <element name="BuildRegion">
         <element name="input_file">
-        <text/>
-    </element>
+          <data type="string"/>
+        </element>
      </element>
   </define>
 
