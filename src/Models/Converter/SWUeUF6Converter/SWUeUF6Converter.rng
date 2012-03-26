@@ -3,12 +3,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="SWUeUF6Converter">
     <element name="SWUeUF6Converter">
-      <element name="incommodity">
-        <text/>
-      </element>
-      <element name="outcommodity">
-        <text/>
-      </element>
+      <ref name="incommodity">
+      <ref name="outcommodity">
     </element>
   </define>
 
