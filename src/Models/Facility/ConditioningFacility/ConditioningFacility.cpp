@@ -354,7 +354,7 @@ void ConditioningFacility::loadCSVFile(string datafile){
     file.close();
   }
   else {
-    string err = "XML file, ";
+    string err = "CSV file, ";
     err += file_path;
     err += ", not found.";
     throw CycException(err);
