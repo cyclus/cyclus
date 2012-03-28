@@ -1,8 +1,8 @@
 # Build the cyclus executable from the CYCLUS_SRC source files
-#ADD_LIBRARY( BuildInst      BuildInst.cpp )
+# ADD_LIBRARY( BuildInst      BuildInst.cpp )
 
-#SET( CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} BuildInst )
-#SET(InstTestSource ${InstTestSource} 
+# SET( CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} BuildInst )
+# SET(InstTestSource ${InstTestSource} 
 #  ${CMAKE_CURRENT_SOURCE_DIR}/BuildInstTests.cpp 
 #  ${CMAKE_CURRENT_SOURCE_DIR}/BuildInst.cpp 
 #  PARENT_SCOPE)
