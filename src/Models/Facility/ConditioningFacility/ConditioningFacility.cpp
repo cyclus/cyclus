@@ -59,6 +59,7 @@ ConditioningFacility::ConditioningFacility() {
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
     stocks_ = deque<pair<string, mat_rsrc_ptr> >();
     inventory_ = deque<pair<string, mat_rsrc_ptr> >();
+    file_is_open_ = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,7 +97,6 @@ void ConditioningFacility::init(xmlNodePtr cur)
     };
 
     loadTable(datafile, fileformat);
-    file_is_open_ = false;
 
     // we haven't conditioned anything yet
     current_cond_rsrc_id_ = -1;
@@ -522,11 +522,6 @@ void ConditioningFacility::conditionMaterials(){
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
-
-  // log the fact that we just conditioned stuff
-  current_cond_rsrc_id_ = TI->time();
-  addToTable();
- 
   LOG(LEV_INFO3, "CondFac ") << "}";
 }
 
@@ -539,9 +534,13 @@ mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
   while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
     out_commod = commod_map_.find(commod)->second.second;
     inventory_.push_back(make_pair(out_commod, mat->extract(mass_to_condition)));
-    // mat_to_condition->absorb(wf_iso_vec_[commod]); ^^
     remaining_capacity_ = remaining_capacity_ - mass_to_condition;
     mass_remaining = mat->quantity();
+    // log the fact that we just conditioned stuff
+    LOG(LEV_INFO3, "CondFac ") << "         " << commod << " has been conditioned into " << 
+      out_commod << " with mass : " << mass_to_condition;
+    current_cond_rsrc_id_ = TI->time();
+    addToTable();
   }
   return mat;
 }
