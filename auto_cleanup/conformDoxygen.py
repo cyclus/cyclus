@@ -23,6 +23,7 @@
 # To Do:
 # 1) Change any /*!s to /**
 # 2) Auto-remove @briefs
+# 3) Change /// to full Doxygen code blocks
 
 import os
 import sys

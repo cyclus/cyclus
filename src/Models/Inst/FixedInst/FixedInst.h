@@ -17,14 +17,7 @@
    deployed by some other entity (such as the region or the 
    logician). The FixedInst is instantiated at the beginning of the 
    simulation and exists until the end of the simulation.
-   
-   @section modelParameters Model Parameters
-   FixedInst behavior is comprehensively defined by the following 
-   parameters:
-   - Vector <Model*> facilities: The list of facilities provide via XML (or 
-   whichever other kind of) input with which this fixed institution is 
-   associated.
-   
+      
    @section detailedBehavior Detailed Behavior
    The FixedInst starts operation at the beginning of the 
    simulation and ends operation at the end of the simulation. It 
@@ -63,12 +56,11 @@ class FixedInst : public InstModel {
   virtual void copy(FixedInst* src);
 
   /**
-     This drills down the dependency tree to initialize all relevant parameters/containers.
-     
-     Note that this function must be defined only in the specific model in question and not in any 
-     inherited models preceding it.
-     
-     @param src the pointer to the original (initialized ?) model to be copied
+     This drills down the dependency tree to initialize all relevant 
+     parameters/containers.
+          
+     @param src the pointer to the original (initialized ?) model to be 
+     copied
    */
   virtual void copyFreshModel(Model* src);
 

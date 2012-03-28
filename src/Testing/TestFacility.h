@@ -7,6 +7,10 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing
 class TestFacility: public FacilityModel {
+ public:
+  TestFacility() : FacilityModel() {}
+  
+  virtual ~TestFacility() {}
   
   void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
@@ -17,9 +21,10 @@ class TestFacility: public FacilityModel {
 
   }
 
-  void copyFreshModel(Model* model) { }
+  void copyFreshModel(Model* src) { copy(dynamic_cast<TestFacility*>(src)); }
 
   void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) { }
+
 };
 
 #endif
