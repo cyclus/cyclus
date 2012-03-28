@@ -21,7 +21,7 @@
    @section modelParameters Model Parameters
    FixedInst behavior is comprehensively defined by the following 
    parameters:
-   - Vector <Model*> facilities: The list of facilities provide via XML (or 
+   > facilities: The list of facilities provide via XML (or 
    whichever other kind of) input with which this fixed institution is 
    associated.
    
@@ -42,38 +42,38 @@ class FixedInst : public InstModel {
  */
  public:
   /**
-   *  Default constructor for the fixed inst
+     Default constructor for the fixed inst
    */
   FixedInst() {};
     
   /**
-   *  Default destructor for the fixed inst
+     Default destructor for the fixed inst
    */
   virtual ~FixedInst() {};
   
   // different ways to populate an object after creation
   /**
-   *   initialize an object from XML input
+     initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-   *   initialize an object by copying another
+     initialize an object by copying another
    */
   virtual void copy(FixedInst* src);
 
   /**
-   *  This drills down the dependency tree to initialize all relevant parameters/containers.
-   *
-   * Note that this function must be defined only in the specific model in question and not in any 
-   * inherited models preceding it.
-   *
-   * @param src the pointer to the original (initialized ?) model to be copied
+     This drills down the dependency tree to initialize all relevant parameters/containers.
+     
+     Note that this function must be defined only in the specific model in question and not in any 
+     inherited models preceding it.
+     
+     @param src the pointer to the original (initialized ?) model to be copied
    */
   virtual void copyFreshModel(Model* src);
 
   /**
-   *  a print function to describe a fixedInst instantiation.
+     a print function to describe a fixedInst instantiation.
    */
   virtual void print();
 
