@@ -14,14 +14,15 @@
 
 /**
    @class SinkFacility
-   This FacilityModel requests a finite amount of its input commodity. 
+     This FacilityModel requests a finite amount of its input commodity. 
    It offers nothing. 
    
    The SinkFacility class inherits from the FacilityModel class and is 
    dynamically loaded by the Model class when requested.
    
    @section intro Introduction 
-   Cyclus   finite or infinite quantity of some commodity produced in the simulation.  
+   The SinkFacility is a facility type in *Cyclus* capable of accepting a 
+   finite or infinite quantity of some commodity produced in the simulation.  
    A SinkFacility requests an amount of that commodity from the appropriate 
    market. It then receives that commodity when the market issues an order 
    that the request has been matched with a corresponding offer.
@@ -51,7 +52,7 @@
    this facility. Default is 0 (months).
    - int decomTime: The number of months it takes to deconstruct and 
    decommission this facility. Default is 0 (months).
-   inst: The institution responsible for this facility.  
+   - Inst* inst: The institution responsible for this facility.  
    - string name: A non-generic name for this facility. 
    
    @section detailed Detailed Behavior 
@@ -84,47 +85,47 @@ class SinkFacility : public FacilityModel  {
  */
  public:
   /**
-     Constructor for the SinkFacility class.
+   *  Constructor for the SinkFacility class.
    */
   SinkFacility();
   
   /**
-     Destructor for the SinkFacility class.
+   *  Destructor for the SinkFacility class.
    */
   virtual ~SinkFacility();
 
   // different ways to populate an object after creation
   /**
-     initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-     initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(SinkFacility* src);
 
   /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers.
-     
-     Note that this function must be defined only in the specific model in 
-     question and not in any inherited models preceding it.
-     
-     @param src the pointer to the original (initialized ?) model to be copied
+   *  This drills down the dependency tree to initialize all relevant 
+   * parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in 
+   * question and not in any inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
    */
   virtual void copyFreshModel(Model* src);
 
   /**
-     A verbose printer for the Sink Facility.
+   *  A verbose printer for the Sink Facility.
    */
   virtual void print();
 
   /**
-     Transacted resources are received through this method
-     
-     @param trans the transaction to which these resource objects belong
-     @param manifest is the set of resources being received
+   *  Transacted resources are received through this method
+   *
+   * @param trans the transaction to which these resource objects belong
+   * @param manifest is the set of resources being received
    */ 
   virtual void addResource(msg_ptr msg,
                               std::vector<rsrc_ptr> manifest);
@@ -138,8 +139,8 @@ class SinkFacility : public FacilityModel  {
  */
  public:
   /**
-     The sink Facility doesn't need to do anything if it gets a message.
-     It never sends any matieral to anyone.
+   * The sink Facility doesn't need to do anything if it gets a message.
+   * It never sends any matieral to anyone.
   */
   virtual void receiveMessage(msg_ptr msg) {};
 
@@ -152,16 +153,16 @@ class SinkFacility : public FacilityModel  {
  */
  public:
   /**
-     The SinkFacility can handle the Tick.
-     
-     @param time the current simulation time.
+   *  The SinkFacility can handle the Tick.
+   *
+   * @param time the current simulation time.
    */
   virtual void handleTick(int time);
 
   /**
-     The SinkFacility can handle the Tock.
-     
-     @param time the current simulation time.
+   *  The SinkFacility can handle the Tock.
+   *
+   * @param time the current simulation time.
    */
   virtual void handleTock(int time);
 
@@ -174,27 +175,27 @@ class SinkFacility : public FacilityModel  {
  */
  protected:
   /**
-     all facilities must have at least one input commodity
+   *   all facilities must have at least one input commodity
    */
   std::vector<std::string> in_commods_;
 
   /**
-     monthly acceptance capacity
+   *   monthly acceptance capacity
    */
   double capacity_;
 
   /**
-     commodity price
+   *   commodity price
    */
   double commod_price_;
 
   /**
-     determines the amount to request 
+   *   determines the amount to request 
    */
   const double getRequestAmt() ;
 
   /**
-     this facility holds material in storage. 
+   *  this facility holds material in storage. 
    */
   MatBuff inventory_;
 

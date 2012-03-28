@@ -11,6 +11,7 @@
 class Material;
 
 /**
+   
    The ConverterModel class is the abstract class/interconve used by all
    converter models.
    
@@ -22,7 +23,7 @@ class Material;
    type altered to reflect this translation. The algorithm to determine 
    the method of translation between commodities is the primary 
    differentiator between different ConverterModel implementations.
-   
+
    Like all model implementations, there are a number of implementations 
    that are distributed as part of the core Cyclus application as well 
    as implementations contributed by third-party developers. The links 
@@ -48,73 +49,73 @@ class Material;
 class ConverterModel : public Model {
  public:
   /**
-     Default constructor for ConverterModel Class
+   *   Default constructor for ConverterModel Class
    */
   ConverterModel() {
     setModelType("Converter");
   };
 
   /**
-     every model should be destructable
+   *   every model should be destructable
    */
   virtual ~ConverterModel() {};
   
   /**
-     every model needs a method to initialize from XML
+   *   every model needs a method to initialize from XML
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-     every model needs a method to copy one object to another
+   *   every model needs a method to copy one object to another
    */
   virtual void copy(ConverterModel* src);
 
   /**
-     This drills down the dependency tree to initialize all relevant parameters/containers.
-     
-     Note that this function must be defined only in the specific model in question and not in any 
-     inherited models preceding it.
-     
-     @param src the pointer to the original (initialized ?) model to be copied
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in question and not in any 
+   * inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
    */
   virtual void copyFreshModel(Model* src)=0;
 
   /**
-     every model should be able to print a verbose description
+   *   every model should be able to print a verbose description
    */
   virtual void print() { Model::print(); };
 
 protected:
   /**
-     each instance of a converter needs a name
+   *   each instance of a converter needs a name
    */
   std::string conv_name_;
 
   /**
-     each converter needs a list of equivalent commodities it converts
+   *   each converter needs a list of equivalent commodities it converts
    */
   std::list<std::string> commodities_; 
 
 public:
   /**
-     Sets the converter's name 
-     
-     @param convName is the new name of the converter
+   *  Sets the converter's name 
+   *
+   * @param convName is the new name of the converter
    */
   void setConvName(std::string convName) { conv_name_ = convName; };
 
   /**
-     Returns the converter's name
+   *   Returns the converter's name
    */
   std::string getConvName() { return conv_name_; };
 
   /**
-     Converts between amounts of two commodities
-     
-     @param convMsg is a message concerning one convertible commodity to convert
-     @param refMsg is a message concerning the commodity to convert it to
-     
-     @return the converted message
+   *  Converts between amounts of two commodities
+   *
+   * @param convMsg is a message concerning one convertible commodity to convert
+   * @param refMsg is a message concerning the commodity to convert it to
+   * 
+   * @return the converted message
    */
   virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
   

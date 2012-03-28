@@ -6,44 +6,44 @@
 #include <string>
 
 /**
-   @class CycException
-   A generic mechanism to manually manage exceptions
+ * @class CycException
+ *  A generic mechanism to manually manage exceptions
  */
 class CycException: public std::exception {
 
 protected:
     /**
-       The message associated with this exception.
+     *   The message associated with this exception.
      */
     std::string myMessage_;
     
     /**
-       A string to prepend to all message of this class.
+     *   A string to prepend to all message of this class.
      */
     static std::string prepend_;
     
 public:
     /**
-       Constructs a new CycException with the default message.
+     *   Constructs a new CycException with the default message.
      */
     CycException();
     
     /**
-       Constructs a new CycException with a provided message
-       
-       @param msg the message
+     *  Constructs a new CycException with a provided message
+     *
+     * @param msg the message
      */
     CycException(std::string  msg);
     
     /**
-       Returns the error message associated with this CycException.
-       
-       @return the message
+     *  Returns the error message associated with this CycException.
+     *
+     * @return the message
      */
     virtual const char* what() const throw();
     
     /**
-       Destroys this CycException.
+     *  Destroys this CycException.
      */
     virtual ~CycException() throw();
 };

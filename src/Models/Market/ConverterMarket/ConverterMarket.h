@@ -11,6 +11,7 @@
 #include "Logger.h"
 
 /**
+   
    The ConverterMarket class inherits from the MarketModel 
    class and is dynamically loaded by the Model class when requested.
    
@@ -22,16 +23,16 @@
    characteristic commodity of that Market. The ConverterMarket is 
    instantiated at the beginning of the simulation and exists until 
    the end of the simulation.
-   
+
    @section modelParams Model Parameters
    ConverterMarket behavior is comprehensively defined by the following 
    parameters:
    - list<std::string> commods: The types of commodity for which this 
    market accepts offers and requests.
-   converter: The converter that will be called to 
+   - ConverterModel* converter: The converter that will be called to 
    translate an offer or request in one commodity into another 
    equivalent commodity.
-   
+      
    @section detailedBehavior Detailed Behavior
    The ConverterMarket starts operation at the beginning of the simulation 
    and ends operation at the end of the simulation. It collects offers and 
@@ -51,38 +52,38 @@ class ConverterMarket : public MarketModel {
  */
  public:
   /**
-     Default constructor
+   *  Default constructor
    */
   ConverterMarket() {};
   
   /** 
-     Destructor
+   *  Destructor
    */
   virtual ~ConverterMarket() {};
   
   // different ways to populate an object after creation
   /**
-     initialize an object from XML input
+   *   initialize an object from XML input
    */
   virtual void init(xmlNodePtr cur);
 
   /**
-     initialize an object by copying another
+   *   initialize an object by copying another
    */
   virtual void copy(ConverterMarket* src) ;
 
   /**
-     This drills down the dependency tree to initialize all relevant parameters/containers.
-     
-     Note that this function must be defined only in the specific model in question and not in any 
-     inherited models preceding it.
-     
-     @param src the pointer to the original (initialized ?) model to be copied
+   *  This drills down the dependency tree to initialize all relevant parameters/containers.
+   *
+   * Note that this function must be defined only in the specific model in question and not in any 
+   * inherited models preceding it.
+   *
+   * @param src the pointer to the original (initialized ?) model to be copied
    */
   virtual void copyFreshModel(Model* src);
 
   /** 
-     Prints information about this model.
+   *  Prints information about this model.
    */
   virtual void print() ;
 
@@ -95,10 +96,10 @@ class ConverterMarket : public MarketModel {
  */
  public:
   /**
-     The market receives an offer or request that has been passed from the
-     facility to the institution to the region.
-     
-     @param msg is a pointer to the message, an Message object
+   *  The market receives an offer or request that has been passed from the
+   * facility to the institution to the region.
+   *
+   * @param msg is a pointer to the message, an Message object
    */
   virtual void receiveMessage(msg_ptr msg);
 /* -------------------- */
@@ -110,8 +111,8 @@ class ConverterMarket : public MarketModel {
  */
  public:
   /**
-     This instructs the market to make matches with the offers and requests it
-     has on hand.
+   *  This instructs the market to make matches with the offers and requests it
+   * has on hand.
    */
   virtual void resolve();
 
@@ -124,75 +125,75 @@ class ConverterMarket : public MarketModel {
  */
  public:
   /**
-     Returns a pointer to the converter model this market relies on.
-     
-     @return converter
+   *  Returns a pointer to the converter model this market relies on.
+   * 
+   * @return converter
    */
   ConverterModel* getConverter();
 
  private:
   /**
-     The messages that have been indexed
+   *  The messages that have been indexed
    */
   typedef std::pair<double,msg_ptr> indexedMsg;
 
   /**
-     The messages of both offer and request types that have been sorted
-     according to thie size.
+   *  The messages of both offer and request types that have been sorted
+   * according to thie size.
    */
   typedef std::multimap<double,msg_ptr> sortedMsgList;
   
   /** 
-     The requests that have been sorted according to their size.
+   *  The requests that have been sorted according to their size.
    */
   sortedMsgList requests_;
 
   /**
-     The offers that have been sorted according to their size.
+   *  The offers that have been sorted according to their size.
    */
   sortedMsgList offers_;
 
   /**
-     The set of pointers to offers that have been matched.
+   *  The set of pointers to offers that have been matched.
    */
   std::set<msg_ptr> matchedOffers_;
   
   /**
-     This function adds an Message object to the list of matchedOffers
-     
-     @param msg a pointer to the message to add
+   *  This function adds an Message object to the list of matchedOffers
+   *
+   * @param msg a pointer to the message to add
    */
   void add(msg_ptr msg);
 
   /**
-     A boolean that keeps track of whether requests have been matched.
-     True if matched, false if umatched.
+   *  A boolean that keeps track of whether requests have been matched.
+   * True if matched, false if umatched.
    */
   bool match_request(sortedMsgList::iterator request);
 
   /**
-     A boolean that keeps track of whether requests have been rejected.
-     True if rejected, false if not rejected.
+   *  A boolean that keeps track of whether requests have been rejected.
+   * True if rejected, false if not rejected.
    */
   void reject_request(sortedMsgList::iterator request);
 
   /**
-     This function processes the information in a request.
+   *  This function processes the information in a request.
    */
   void process_request();
 
   /**
-     The commodity for which the market receives offers
+   *  The commodity for which the market receives offers
    */
   std::string offer_commod_;
 
   /**
-     The commodity for which the market receives requests
+   *  The commodity for which the market receives requests
    */
   std::string req_commod_;
 
   /**
-     The name of the converter model that this market relies on to make conversions.
+   *  The name of the converter model that this market relies on to make conversions.
    */
   std::string conv_name_;
 

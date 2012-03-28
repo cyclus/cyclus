@@ -7,6 +7,7 @@
 #include "Logger.h"
 
 /**
+    
    The StubStubComm class inherits from the StubModel class and is dynamically
    loaded by the Model class when requested.
    
@@ -20,31 +21,31 @@ class StubStubComm : public StubCommModel {
  */
  public:
   /**
-     Default constructor for StubStub Class
+   *  Default constructor for StubStub Class
    */
   StubStubComm();
   
   /**
-     every model should be destructable
+   *  every model should be destructable
    */
   virtual ~StubStubComm();
     
   /**
-     every model needs a method to initialize from XML
-     
-     @param cur is the pointer to the model's xml node 
+   *  every model needs a method to initialize from XML
+   *
+   * @param cur is the pointer to the model's xml node 
    */
   virtual void init(xmlNodePtr cur);
   
   /**
-     every model needs a method to copy one object to another
-     
-     @param src is the StubStub to copy
+   *  every model needs a method to copy one object to another
+   *
+   * @param src is the StubStub to copy
    */
   virtual void copy(StubStubComm* src) ;
   
   /**
-     every model should be able to print a verbose description
+   *  every model should be able to print a verbose description
    */
   virtual void print();
 
@@ -57,7 +58,7 @@ class StubStubComm : public StubCommModel {
  */
  public:
   /**
-     The StubStubComm should ignore incoming messages
+   *  The StubStubComm should ignore incoming messages
    */
   virtual void receiveMessage(msg_ptr msg);
   
