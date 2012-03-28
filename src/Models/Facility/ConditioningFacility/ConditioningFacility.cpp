@@ -12,6 +12,7 @@
 #include "Material.h"
 #include "GenericResource.h"
 #include "MarketModel.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -46,6 +47,9 @@ using namespace std;
  * all MODEL classes have these members
  * --------------------
  */
+
+// Database table for conditioned materials
+table_ptr ConditioningFacility::cond_fac_table = new Table("ConditionedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::ConditioningFacility() {
@@ -93,6 +97,9 @@ void ConditioningFacility::init(xmlNodePtr cur)
 
     loadTable(datafile, fileformat);
     file_is_open_ = false;
+
+    // we haven't conditioned anything yet
+    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -107,6 +114,7 @@ void ConditioningFacility::copy(ConditioningFacility* src)
     commod_map_ = src->commod_map_;
     stream_vec_ = src->stream_vec_;
     loading_densities_ = src->loading_densities_;
+    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -346,7 +354,7 @@ void ConditioningFacility::loadCSVFile(string datafile){
     file.close();
   }
   else {
-    string err = "XML file, ";
+    string err = "CSV file, ";
     err += file_path;
     err += ", not found.";
     throw CycException(err);
@@ -494,6 +502,8 @@ double ConditioningFacility::checkStocks(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::conditionMaterials(){
+
+  LOG(LEV_INFO3, "CondFac ") << facName() << " is conditioning {";
   // Partition the in-stream according to loading density
   // for each stream object in stocks
   map<string, mat_rsrc_ptr> remainders;
@@ -512,6 +522,12 @@ void ConditioningFacility::conditionMaterials(){
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
+
+  // log the fact that we just conditioned stuff
+  current_cond_rsrc_id_ = TI->time();
+  addToTable();
+ 
+  LOG(LEV_INFO3, "none!c ") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -564,6 +580,44 @@ void ConditioningFacility::printStatus(int time){
                   << time
                   << ".";
 };
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::define_table() {
+  // declare the table columns
+  column cond_fac_id("ID","INTEGER");
+  column time("Time","INTEGER");
+  column conditioned_rsrc_id("ConditionedRsrcID","INTEGER");  
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("ID"), pk.push_back("ConditionedRsrcID");
+  cond_fac_table->setPrimaryKey(pk);
+  // add columns to the table
+  cond_fac_table->addColumn(cond_fac_id);
+  cond_fac_table->addColumn(time);
+  cond_fac_table->addColumn(conditioned_rsrc_id);
+  // we've now defined the table
+  cond_fac_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::addToTable(){
+  // if we haven't logged some conditioned material yet, define the table
+  if ( !cond_fac_table->defined() ) {
+    ConditioningFacility::define_table();
+  }
+  // make a row
+  // declare data
+  data an_id( this->ID() ), a_time( TI->time() ), 
+    a_rsrc_id( this->current_cond_rsrc_id_ );
+  // declare entries
+  entry id("ID",an_id), time("Time",a_time), rid("ConditionedRsrcID",a_rsrc_id);
+  // declare row
+  row aRow;
+  aRow.push_back(id), aRow.push_back(time), aRow.push_back(rid);
+  // add the row
+  cond_fac_table->addRow(aRow);
+}
 
 /* --------------------
  * all MODEL classes have these members
