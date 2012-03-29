@@ -1,72 +1,109 @@
 // BuildInst.cpp
 // Implements the BuildInst class
+
 #include <iostream>
-#include "Logger.h"
+#include <string>
+#include <sstream>
 
 #include "BuildInst.h"
 
 #include "FacilityModel.h"
-#include "Model.h"
 
+#include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::copy(BuildInst* src)
-{
-  InstModel::copy(src);
+void BuildInst::init(xmlNodePtr cur) {
+  InstModel::init(cur);
 
-  facilities_ = src->facilities_;
+  // this institution must have a list of available prototypes
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"availableprototypes");
 
+  string name;
+  Model* prototype;
+  
+  for (int i=0;i<nodes->nodeNr;i++){
+    name = (const char*)nodes->nodeTab[i]->children->content;
+    prototype = Model::getTemplateByName(name);
+    prototypes_.insert(prototype);
+  }
+  totalBuildCount_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::copyFreshModel(Model* src)
-{
+void BuildInst::copy(BuildInst* src) {
+  InstModel::copy(src);
 
+  prototypes_ = src->prototypes_;
+  totalBuildCount_ = 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+void BuildInst::copyFreshModel(Model* src) {
   copy(dynamic_cast<BuildInst*>(src));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::print() 
-{ 
+void BuildInst::print() {
   InstModel::print();
 
-  LOG(LEV_DEBUG2, "none!") << " and the following permanent facilities: ";
-  for (vector<Model*>::iterator fac=facilities_.begin(); 
-       fac != facilities_.end(); 
-       fac++){
-    LOG(LEV_DEBUG2, "none!") << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
-     << " (" << (*fac)->name() << ")";
+  LOG(LEV_DEBUG2, "none!") << " and the following available prototypes: ";
+  for (set<Model*>::iterator mdl=prototypes_.begin(); 
+       mdl != prototypes_.end(); 
+       mdl++){
+    LOG(LEV_DEBUG2, "none!") << "        * " << (*mdl)->name();
   }
-};
-
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool BuildInst::pleaseBuild(Model* fac)
-{
-  Model* new_facility=Model::create(fac);
-  // !!! We need a way to determine the new facility's name
-  // Set the facility name
-  string name = dynamic_cast<FacilityModel*>(fac)->facName()+" 2";
-  dynamic_cast<FacilityModel*>(new_facility)->setFacName(name);
-  // Set the facility's parent institution
-  dynamic_cast<FacilityModel*>(new_facility)->setInstName(this->name());
-  // Add the facility to the parent inst's list of facilities
+void BuildInst::doBuild(Model* prototype, string name) {
+  Model* new_facility = Model::create(prototype);
+  new_facility->setName(name);
   new_facility->setParent(this);
+  totalBuildCount_++;
+}
 
-  // For now, by default, return true.
-  return true;
-};
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildInst::addPrototype(Model* prototype) {
+  if ( !isAvailablePrototype(prototype) ) {
+    prototypes_.insert(prototype);
+  }
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildInst::build(Model* prototype, Model* requester) {
+  // set an arbitrary name
+  stringstream name("");
+  name << prototype->name() << totalBuildCount_;
+  // call the full build function
+  this->build(prototype, requester, name.str());
+}
 
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string BuildInst::outputDir_ = "/build";
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildInst::build(Model* prototype, Model* requester, string name) {
+  if ( requester != this->parent() ) {
+    // if the requester is not this inst's parent, throw an error
+    stringstream err("");
+    err << "Model " << requester->name() << " is requesting that BuildInst "
+  	<< this->name() << " build a prototype, but is not the BuildInst's parent.";
+    throw CycOverrideException(err.str());
+  }
+  else if ( !isAvailablePrototype(prototype) ) {
+    // if the prototype is not in the set of available prototypes, throw an error
+    stringstream err("");
+    err << "Model " << requester->name() << " is requesting that BuildInst "
+  	<< this->name() << " build a prototype of type " << prototype->name() 
+  	<< " but that prototype is not available via this BuildInst.";
+    throw CycOverrideException(err.str());
+  }
+  else {
+    // if all's good, build the prototype
+    doBuild(prototype, name);
+  }
+}
 
 
 /* --------------------
@@ -77,7 +114,6 @@ std::string BuildInst::outputDir_ = "/build";
 extern "C" Model* constructBuildInst() {
   return new BuildInst();
 }
-
 
 /* ------------------- */ 
 
