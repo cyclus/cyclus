@@ -585,19 +585,14 @@ void ConditioningFacility::printStatus(int time){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::define_table() {
   // declare the table columns
-  column cond_fac_id("ID","INTEGER");
-  column time("Time","INTEGER");
-  column conditioned_rsrc_id("ConditionedRsrcID","INTEGER");  
+  vector<column> columns;
+  columns.push_back(make_pair("ID","INTEGER"));
+  columns.push_back(make_pair("Time","INTEGER"));
+  columns.push_back(make_pair("ConditionedRsrcID","INTEGER"));
   // declare the table's primary key
   primary_key pk;
   pk.push_back("ID"), pk.push_back("ConditionedRsrcID");
-  cond_fac_table->setPrimaryKey(pk);
-  // add columns to the table
-  cond_fac_table->addColumn(cond_fac_id);
-  cond_fac_table->addColumn(time);
-  cond_fac_table->addColumn(conditioned_rsrc_id);
-  // we've now defined the table
-  cond_fac_table->tableDefined();
+  cond_fac_table->defineTable(columns,pk);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
