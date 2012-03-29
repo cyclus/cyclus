@@ -8,9 +8,6 @@
 /// This is the simplest possible Facility, for testing
 class TestFacility: public FacilityModel {
  public:
-  TestFacility() : FacilityModel() {}
-  
-  virtual ~TestFacility() {}
   
   void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
