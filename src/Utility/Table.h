@@ -157,6 +157,16 @@ class Table : IntrusiveBase<Table> {
   table_name name(){return name_;}
 
   /**
+   * This function takes all of the necessary components of a table and
+   * defines that table according to them. It then calls the necessary 
+   * tableDefined() function.
+   *
+   * @param columns a vector of the columns (names and types) in this table
+   * @param pks a vector of column names holding the primary key in this table
+   */
+  void defineTable(std::vector<column> columns, primary_key pks);
+
+  /**
      After a table is fully described, it must be told
      explicity that it is defined. This function will then register
      that table with the Book Keeper.
