@@ -6,10 +6,10 @@
 #include "Message.h"
 #include "InstModelTests.h"
 #include "ModelTests.h"
-#include "TestFacility.h"
 
 #include <string>
 #include <queue>
+
 
 using namespace std;
 
@@ -32,14 +32,16 @@ protected:
   FakeBuildInst* src_inst;
   FakeBuildInst* new_inst; 
   TestRegion* tst_region;
-  TestFacility* prototype;
+  BuildInst* prototype;
   
   virtual void SetUp(){
     src_inst = new FakeBuildInst();
     tst_region = new TestRegion();
     src_inst->setParent(tst_region);
     new_inst = new FakeBuildInst();
-    prototype = new TestFacility();
+    prototype = new BuildInst();
+    prototype->setModelType("Inst");
+    prototype->setModelImpl("BuildInst");
     prototype->setName("test_prototype");
   };
   
@@ -110,7 +112,7 @@ TEST_F(BuildInstTest, AddPrototype) {
 TEST_F(BuildInstTest, BuildPrototype) {
   EXPECT_NO_THROW( src_inst->wrapAddPrototype(prototype) );
   EXPECT_EQ( src_inst->isAvailablePrototype(prototype), true );
-  //EXPECT_NO_THROW( src_inst->build(prototype,tst_region) );
+  EXPECT_NO_THROW( src_inst->build(prototype,tst_region) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

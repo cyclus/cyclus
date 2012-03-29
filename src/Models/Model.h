@@ -165,6 +165,11 @@ class Model {
   const std::string modelImpl();
 
   /**
+     set model type
+   */
+  void setModelImpl(std::string new_impl) { model_impl_ = new_impl; };
+
+  /**
      get model type
    */
   const std::string modelType() { return model_type_; };
