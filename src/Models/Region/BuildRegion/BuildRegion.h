@@ -3,11 +3,11 @@
 #define _BUILDREGION_H
 
 /**
- * The BuildRegion class inherits from the RegionModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This region will build new facilities based on the pleaseBuild() function. 
- * This RegionModel never alters any messages transmitted through it or anything else. 
+   The BuildRegion class inherits from the RegionModel class and is dynamically
+   loaded by the Model class when requested.
+   
+   This region will build new facilities based on the pleaseBuild() function. 
+   This RegionModel never alters any messages transmitted through it or anything else. 
  */
 
 #include "RegionModel.h"
@@ -27,7 +27,7 @@ class BuildRegion : public RegionModel
 
   private:
     /**
-     * Populate the build schedule
+       Populate the build schedule
      */
   void populateSchedule(FILE *infile);
 
@@ -38,12 +38,12 @@ class BuildRegion : public RegionModel
 
   public:
     /**
-     * The default constructor for the BuildRegion
+       The default constructor for the BuildRegion
      */
     BuildRegion() {};
 
     /**
-     * The default destructor for the BuildRegion
+       The default destructor for the BuildRegion
      */
     virtual ~BuildRegion() {};
    
@@ -55,12 +55,12 @@ class BuildRegion : public RegionModel
     virtual void copy(BuildRegion* src) { RegionModel::copy(src); } ;
 
     /**
-     * This drills down the dependency tree to initialize all relevant parameters/containers.
-     *
-     * Note that this function must be defined only in the specific model in question and not in any 
-     * inherited models preceding it.
-     *
-     * @param src the pointer to the original (initialized ?) model to be copied
+       This drills down the dependency tree to initialize all relevant parameters/containers.
+       
+       Note that this function must be defined only in the specific model in question and not in any 
+       inherited models preceding it.
+       
+       @param src the pointer to the original (initialized ?) model to be copied
      */
     virtual void copyFreshModel(Model* src){ copy(dynamic_cast<BuildRegion*>(src)); };
   
@@ -76,11 +76,11 @@ class BuildRegion : public RegionModel
  public:
     
     /**
-     * Each region is prompted to do its beginning-of-time-step
-     * stuff at the tick of the timer.
-     * The default behavior is to ignore the tick.
-     *
-     * @param time is the time to perform the tick
+       Each region is prompted to do its beginning-of-time-step
+       stuff at the tick of the timer.
+       The default behavior is to ignore the tick.
+       
+       @param time is the time to perform the tick
      */
     virtual void handleTick(int time);
 
@@ -113,7 +113,7 @@ class BuildRegion : public RegionModel
  public:
   /**
      The getter function for this region model's output dir
-  */
+   */
   static std::string outputDir(){ 
     return RegionModel::outputDir().append(outputDir_);}
     
@@ -121,7 +121,7 @@ class BuildRegion : public RegionModel
   /**
      Every specific region model writes to the output database
      location: RegionModel::OutputDir_ + /this_region's_name
-  */
+   */
   static std::string outputDir_;
 
 };

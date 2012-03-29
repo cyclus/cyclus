@@ -22,7 +22,7 @@ void InstModel::init(xmlNodePtr cur) {
    *  Specific initialization for InstModels
    */
   
-  /// determine the parent from the XML input
+  // determine the parent from the XML input
   string region_name = XMLinput->get_xpath_content(cur,"../name");
   Model* parent = Model::getModelByName(region_name);
   this->setParent(parent);
@@ -36,7 +36,7 @@ void InstModel::copy(InstModel* src) {
   /** 
    *  Specific initialization for InstModels
    */
-  children_ = src->children_;
+  //children_ = src->children_; // @MJGFlag should institutions copy their children??
   Model* parent = src->parent();
   this->setParent(parent);
 }
