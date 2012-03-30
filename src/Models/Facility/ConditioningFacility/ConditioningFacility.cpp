@@ -97,9 +97,6 @@ void ConditioningFacility::init(xmlNodePtr cur)
     };
 
     loadTable(datafile, fileformat);
-
-    // we haven't conditioned anything yet
-    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -114,7 +111,6 @@ void ConditioningFacility::copy(ConditioningFacility* src)
     commod_map_ = src->commod_map_;
     stream_vec_ = src->stream_vec_;
     loading_densities_ = src->loading_densities_;
-    current_cond_rsrc_id_ = -1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -539,7 +535,6 @@ mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
     // log the fact that we just conditioned stuff
     LOG(LEV_INFO3, "CondFac ") << "         " << commod << " has been conditioned into " << 
       out_commod << " with mass : " << mass_to_condition;
-    current_cond_rsrc_id_ = TI->time();
     addToTable(boost::dynamic_pointer_cast<Resource>(mat), commod, out_commod);
   }
   return mat;
