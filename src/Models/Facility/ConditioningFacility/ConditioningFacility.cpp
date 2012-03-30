@@ -540,7 +540,7 @@ mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
     LOG(LEV_INFO3, "CondFac ") << "         " << commod << " has been conditioned into " << 
       out_commod << " with mass : " << mass_to_condition;
     current_cond_rsrc_id_ = TI->time();
-    addToTable();
+    addToTable(boost::dynamic_pointer_cast<Resource>(mat), commod, out_commod);
   }
   return mat;
 }
@@ -582,33 +582,53 @@ void ConditioningFacility::printStatus(int time){
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::define_table() {
+void ConditioningFacility::defineTable() {
   // declare the table columns
   vector<column> columns;
-  columns.push_back(make_pair("ID","INTEGER"));
-  columns.push_back(make_pair("Time","INTEGER"));
+  columns.push_back(make_pair("facID","INTEGER"));
   columns.push_back(make_pair("ConditionedRsrcID","INTEGER"));
+  columns.push_back(make_pair("Time","INTEGER"));
+  columns.push_back(make_pair("streamID","INTEGER"));
+  columns.push_back(make_pair("formID","INTEGER"));
+  columns.push_back(make_pair("wfvol","FLOAT"));
+  columns.push_back(make_pair("wfmass","FLOAT"));
+  columns.push_back(make_pair("density","FLOAT"));
+  columns.push_back(make_pair("rawCommod","STRING"));
+  columns.push_back(make_pair("condCommod","STRING"));
+  columns.push_back(make_pair("totmass","FLOAT"));
   // declare the table's primary key
   primary_key pk;
-  pk.push_back("ID"), pk.push_back("ConditionedRsrcID");
+  pk.push_back("facID"), pk.push_back("ConditionedRsrcID");
   cond_fac_table->defineTable(columns,pk);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addToTable(){
+void ConditioningFacility::addToTable(rsrc_ptr rsrc, string incommod, string outcommod){
   // if we haven't logged some conditioned material yet, define the table
   if ( !cond_fac_table->defined() ) {
-    ConditioningFacility::define_table();
+    ConditioningFacility::defineTable();
   }
-  // make a row
-  // declare data
-  data an_id( this->ID() ), a_time( TI->time() ), 
-    a_rsrc_id( this->current_cond_rsrc_id_ );
-  // declare entries
-  entry id("ID",an_id), time("Time",a_time), rid("ConditionedRsrcID",a_rsrc_id);
+  // get stream 
+  stream_t stream = getStream(incommod);
+
   // declare row
   row aRow;
-  aRow.push_back(id), aRow.push_back(time), aRow.push_back(rid);
+  aRow.push_back(make_pair("facID", this->ID()));
+  aRow.push_back( make_pair("ConditionedRsrcID", rsrc->ID()));
+  aRow.push_back(make_pair("Time", TI->time()));
+  aRow.push_back( make_pair("streamID", stream.streamID));
+  aRow.push_back( make_pair("formID", stream.formID ));
+  aRow.push_back( make_pair("wfvol",stream.wfvol ));
+  aRow.push_back( make_pair("wfmass", stream.wfmass ));
+  aRow.push_back( make_pair("density", stream.density ));
+  aRow.push_back( make_pair("rawCommod", incommod));
+  aRow.push_back( make_pair("condCommod", outcommod));
+  if(rsrc->units()=="kg"){
+    aRow.push_back( make_pair("totmass", rsrc->quantity() + stream.wfmass));
+  } else {
+    aRow.push_back( make_pair("totmass", 0.0) );
+    LOG(LEV_ERROR,"CondFac")<< "Resource mass must be in units of kg for conditioning.";
+  }
   // add the row
   cond_fac_table->addRow(aRow);
 }

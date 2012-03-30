@@ -183,7 +183,7 @@ class ConditioningFacility : public FacilityModel {
     double wfvol; /**< a double indicating the canonical waste form volume >**/
     double wfmass; /**< a double indicating the mass of the not-loaded waste form >**/
   } stream_t;
- 
+
   /**
      The integer length (number of rows) of the datafile/med/loading/ dataset 
    */
@@ -361,12 +361,16 @@ class ConditioningFacility : public FacilityModel {
   /**
      Define the database table on the first conditioning event
    */
-  static void define_table();
+  static void defineTable();
 
   /**
-     add some conditioned materials to the conditioned materials table
+     add some conditioned resources to the conditioned resources table
+
+     @param rsrc is a rsrc_ptr associated with the conditioned Resource.
+     @param incommod is a string naming the commodity associated with the raw resource. 
+     @param outcommod is a string naming the commodity associated with the conditioned resource. 
    */
-  void addToTable();
+  void addToTable(rsrc_ptr rsrc, std::string incommod, std::string outcommod);
 
   /**
      Each time a material is conditioned, we keep track of that
