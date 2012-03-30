@@ -19,7 +19,7 @@ using namespace std;
 /**
   ConditioningFacility matches waste streams with 
   waste form loading densities and waste form 
-  material definitions. 
+  material definitions provided in an sql, xml, or csv input file.
   
   It attaches these properties to the material objects 
   as Material Properties.
@@ -40,6 +40,11 @@ using namespace std;
  
   SEND MATERIAL
   Sends material from inventory to fulfill transactions
+
+  OUTPUT TABLE
+  The ConditioningFacility creates a ConditionedResources output database table.
+  It contains information about the conditioned resources, the times they were 
+  conditioned, at what loading densities, etc.
  
  */
 
