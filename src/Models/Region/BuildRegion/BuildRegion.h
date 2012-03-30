@@ -17,6 +17,7 @@
 
 #include <queue>
 #include <utility>
+#include <map>
 
 class BuildRegion : public RegionModel  
 {
@@ -101,28 +102,10 @@ class BuildRegion : public RegionModel
  protected:
     int nFacs_;
     Model* chooseInstToBuildFac();
-    map <string, queue <pair <int,int> > > to_build_map_;
-    map <string, queue <pair <int,int> > > have_built_map_;
+    std::map <std::string, std::queue <std::pair <int,int> > > to_build_map_;
+    std::map <std::string, std::queue <std::pair <int,int> > > have_built_map_;
   
 /* ------------------- */ 
-
-/* --------------------
-   output directory info
- * --------------------
- */
- public:
-  /**
-     The getter function for this region model's output dir
-   */
-  static std::string outputDir(){ 
-    return RegionModel::outputDir().append(outputDir_);}
-    
- private:
-  /**
-     Every specific region model writes to the output database
-     location: RegionModel::OutputDir_ + /this_region's_name
-   */
-  static std::string outputDir_;
 
 };
 
