@@ -37,8 +37,9 @@ void InstModel::copy(InstModel* src) {
    *  Specific initialization for InstModels
    */
   //children_ = src->children_; // @MJGFlag should institutions copy their children??
-  Model* parent = src->parent();
-  this->setParent(parent);
+
+  //Model* parent = src->parent(); // @MJGFlag should institutions copy their parents??
+  //this->setParent(parent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

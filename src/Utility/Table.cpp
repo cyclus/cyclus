@@ -20,6 +20,16 @@ Table::Table(table_name name) {
 }
 
 // -----------------------------------------------------------------------
+void Table::defineTable(vector<column> cols, primary_key keys){
+  vector<column>::iterator each_col;
+  for(each_col=cols.begin(); each_col!=cols.end(); each_col++){
+    this->addColumn((*each_col));
+  }
+  this->setPrimaryKey(keys);
+  this->tableDefined();
+}
+
+// -----------------------------------------------------------------------
 void Table::tableDefined() {
   defined_ = true;
   BI->registerTable( this );

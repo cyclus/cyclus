@@ -1,4 +1,4 @@
-// FixedInst.h
+// BuildInst.h
 #if !defined(_BUILDINST_H)
 #define _BUILDINST_H
 
@@ -47,12 +47,12 @@ class BuildInst : public InstModel
 
 public:
   /**
-     Default constructor for the fixed inst
+     Default constructor for the build inst
    */
   BuildInst() {};
     
   /**
-     Default destructor for the fixed inst
+     Default destructor for the build inst
    */
   virtual ~BuildInst() {};
   
