@@ -2,7 +2,7 @@
 #if !defined(_FIXEDINST_H)
 #define _FIXEDINST_H
 
-#include <iostream>
+#include <queue>
 
 #include "InstModel.h"
 
@@ -68,6 +68,26 @@ class FixedInst : public InstModel {
      a print function to describe a fixedInst instantiation. 
    */
   virtual void print();
+
+  /**
+     This Institution will build its facilities on the tick
+     if it is the first tick of the simulation. It ignores
+     all other ticks.
+      
+     @param time is the time to perform the tick 
+   */
+  virtual void handleTick(int time);
+
+  /**
+     the facilities this inst built at time = t0
+   */
+  std::queue<Model*> facilities() { return facilities_;}
+
+ private:
+  /**
+     the list of facilities in the Fixed Inst, built at time == t0
+   */
+  std::queue<Model*> facilities_;
 
 /* ------------------- */ 
 

@@ -96,7 +96,8 @@ TEST_F(NullFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_NO_THROW();
+  src_facility->handleTick(time);
   // Test NullFacility specific behaviors of the handleTick function here
 }
 

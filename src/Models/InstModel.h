@@ -58,7 +58,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      every model needs a method to initialize from XML 
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(xmlNodePtr cur) { Model::init(cur);}
 
   /**
      every model needs a method to copy one object to another 
