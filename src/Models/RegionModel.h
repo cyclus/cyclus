@@ -3,7 +3,6 @@
 #define _REGIONMODEL_H
 
 #include <set>
-#include <vector>
 
 #include "TimeAgent.h"
 #include "Communicator.h"
@@ -17,13 +16,13 @@
    This is all that is known externally about Regions
    
    @section intro Introduction
-   The RegionModel type assists in defining the region-institution-facility 
-   hierarchy in Cyclus. A RegionModel region is an actor associated with a 
-   set of institutions or facilities for which it is responsible. A 
-   RegionModel may be used to help MarketModel implementations to make 
-   material routing decisions based on interfacility relationships. 
-   Deployment is a primary differentiator between different RegionModel 
-   implementations.
+   The RegionModel type assists in defining the 
+   region-institution-facility hierarchy in Cyclus. A RegionModel region 
+   is an actor associated with a set of institutions or facilities for 
+   which it is responsible. A RegionModel may be used to help 
+   MarketModel implementations to make material routing decisions based 
+   on interfacility relationships. Deployment is a primary differentiator
+   between different RegionModel implementations.
    
    Like all model implementations, there are a number of implementations that 
    are distributed as part of the core Cyclus application as well as 
