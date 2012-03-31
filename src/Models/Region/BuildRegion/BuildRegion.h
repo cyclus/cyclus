@@ -27,39 +27,39 @@
    parameters: 
     
    -# General Build Information (who can build what) 
-   - set <Model*> allowedfacilities: The facilities which are 
-   allowed within this region. 
+     - set <Model*> allowedfacilities: The facilities which are 
+     allowed within this region. (** defined in RegionModel.h **)
     
-   - map <CapacityType : set <Model*> > CapacitySastisfiers: A map of 
-   [capacity types] to the [prototypes] that satisfy each capacity type. 
+     - map <CapacityType : set <Model*> > CapacitySastisfiers: A map of 
+     [capacity types] to the [prototypes] that satisfy each capacity 
+     type. 
     
-   - map <Model* : set <Model*> > Builders: A map of [prototypes] to 
-   the [children] of this region that are capable of building each 
-   prototype 
+     - map <Model* : set <Model*> > Builders: A map of [prototypes] to 
+     the [children] of this region that are capable of building each 
+     prototype
     
    -# Prototype Build Information (when the number of prototypes is 
    declared explicitly) 
-   - pair <Model*,int> PrototypeDemand: A pair of [prototypes] to the 
-   [number demanded] to be built at a given time 
+     - pair <Model*,int> PrototypeDemand: A pair of [prototypes] to the 
+     [number demanded] to be built at a given time 
     
-   - pair <int, PrototypeDemand> PrototypeBuildOrder: A pair of the 
-   [time] at 
-   which a particular [PrototypeDemand] has been issued 
+     - pair <int, PrototypeDemand> PrototypeBuildOrder: A pair of the 
+     [time] at which a particular [PrototypeDemand] has been issued 
     
-   - list <PrototypeBuildOrder> PrototypeBuildOrders: A list of all the 
-   orders for specific prototypes to be built 
+     - list <PrototypeBuildOrder> PrototypeBuildOrders: A list of all 
+     the orders for specific prototypes to be built 
     
    -# Capacity Build Information (when a given capacity demand is 
    declared explicitly) 
-   - pair <CapacityType,double> CapacityDemand: A pair of 
-   [CapacityTypes] to the [total amount] required for this region at a 
-   given time 
+     - pair <CapacityType,double> CapacityDemand: A pair of 
+     [CapacityTypes] to the [total amount] required for this region at a 
+     given time 
     
-   - pair <int, CapacityDemand> CapacityBuildOrder: A pair of the [time] 
-   at which a particular [CapacityDemand] has been issued 
+     - pair <int, CapacityDemand> CapacityBuildOrder: A pair of the 
+     [time] at which a particular [CapacityDemand] has been issued 
     
-   - list <CapacityBuildOrder> CapacityBuildOrders: A list of all the 
-   orders for specific capacities to be met 
+     - list <CapacityBuildOrder> CapacityBuildOrders: A list of all the 
+     orders for specific capacities to be met 
     
    @section behavior Detailed Behavior 
    The BuildRegion is initiated at the beginning of the simulation and 
@@ -142,9 +142,8 @@ class BuildRegion : public RegionModel
  */
  public:
   /**
-     Each region is prompted to do its beginning-of-time-step 
-     stuff at the tick of the timer. 
-     The default behavior is to ignore the tick. 
+     Each region is prompted to do its beginning-of-time-step stuff at 
+     the tick of the timer. The default behavior is to ignore the tick. 
       
      @param time is the time to perform the tick 
    */
