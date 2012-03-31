@@ -64,7 +64,7 @@ class NullRegion : public RegionModel  {
 
   /**
      This drills down the dependency tree to initialize all relevant 
-     parameters/containers.  
+     parameters/containers. 
      Note that this function must be defined only in the specific model 
      in question and not in any inherited models preceding it. 
       
