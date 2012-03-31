@@ -15,16 +15,15 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-  /// Default constructor for RegionModel Class
-  RegionModel::RegionModel() {
-    setModelType("Region");
-
-    // register to receive time-step notifications
-    TI->registerTickListener(this);
-
-    // register the model
-    setIsTemplate(false);
-  };
+RegionModel::RegionModel() {
+  setModelType("Region");
+  
+  // register to receive time-step notifications
+  TI->registerTickListener(this);
+  
+  // register the model
+  setIsTemplate(false);
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::init(xmlNodePtr cur) {
@@ -36,15 +35,26 @@ void RegionModel::init(xmlNodePtr cur) {
    */
 
   /// all regions require allowed facilities - possibly many
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
+  xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
 
   string fac_name;
   Model* new_fac;
   
-  for (int i=0;i<nodes->nodeNr;i++){
-    fac_name = (const char*)nodes->nodeTab[i]->children->content;
+  // initialize facilities
+  for (int i=0;i<fac_nodes->nodeNr;i++){
+    fac_name = (const char*)fac_nodes->nodeTab[i]->children->content;
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
+  }
+
+  string inst_name;
+  Model* inst;
+  // initalize institutions
+  xmlNodeSetPtr inst_nodes = XMLinput->get_xpath_elements(cur,"institution");
+  for (int i=0;i<inst_nodes->nodeNr;i++){
+    inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
+    inst = Model::getTemplateByName(inst_name);
+    inst->setParent(this);
   }
 
   // region models do not currently follow the template/not template

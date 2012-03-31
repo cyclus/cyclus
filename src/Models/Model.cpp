@@ -108,8 +108,8 @@ void Model::load_models() {
   load_converters();
   load_markets();
   load_facilities();
-  load_regions();
   load_institutions();
+  load_regions();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

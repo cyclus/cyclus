@@ -16,19 +16,6 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init(xmlNodePtr cur) {
-  Model::init(cur);
-  /** 
-   *  Specific initialization for InstModels
-   */
-  
-  // determine the parent from the XML input
-  string region_name = XMLinput->get_xpath_content(cur,"../name");
-  Model* parent = Model::getModelByName(region_name);
-  this->setParent(parent);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::copy(InstModel* src) {
   Model::copy(src);
   Communicator::copy(src);
