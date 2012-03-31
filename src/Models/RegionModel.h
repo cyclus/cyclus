@@ -82,8 +82,19 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void init();
 
   /**
-     every model needs a method to initialize from XML 
-     this calls the generic init() method
+     populate the region's list of allowed facilities
+   */
+  virtual void initAllowedFacilities(xmlNodePtr cur);
+
+  /**
+     populate the region's list of child institutions
+   */
+  virtual void initChildren(xmlNodePtr cur);
+
+  /**
+     A region model's full initialization from XML, which is broken
+     up into Model's init, initAllowedFacility, RegionModel's init(),
+     and initChildren.
    */
   virtual void init(xmlNodePtr cur);
 

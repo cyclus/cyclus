@@ -41,24 +41,24 @@
 //   };
 // }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// void BuildRegion::init(xmlNodePtr cur)
-// {
-//   // Initiate as a region model
-//   RegionModel::init(cur);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BuildRegion::init(xmlNodePtr cur)
+{
+  // Initiate as a region model
+  RegionModel::init(cur);
 
-//   // Get input file
-//   xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
+  // Get input file
+  xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
 
-//   const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
+  const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
 
-//   FILE *input_file = fopen(input_path,"r");
+  FILE *input_file = fopen(input_path,"r");
 
-//   // Populate build schedule
-//   populateSchedule(input_file);
-//   // Close the files that you open
-//   fclose(input_file);
-// };
+  // Populate build schedule
+  populateSchedule(input_file);
+  // Close the files that you open
+  fclose(input_file);
+};
 
 // //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // bool BuildRegion::requestBuild(Model* fac, InstModel* inst) {

@@ -3,6 +3,19 @@
 #define _BUILDREGION_H
 
 #include "RegionModel.h"
+#include "Model.h"
+
+#include <set>
+#include <list>
+#include <map>
+#include <pair>
+
+// Useful Typedefs
+// Building Prototypes
+typedef std::pair<Model*,int> PrototypeDemand;
+typedef std::pair<int,PrototypeDemand> PrototypeBuildOrder;
+typedef std::list<PrototypeBuildOrder> PrototypeOrders;
+
 
 /**
    The BuildRegion class inherits from the RegionModel class and is 
@@ -46,7 +59,7 @@
      - pair <int, PrototypeDemand> PrototypeBuildOrder: A pair of the 
      [time] at which a particular [PrototypeDemand] has been issued 
     
-     - list <PrototypeBuildOrder> PrototypeBuildOrders: A list of all 
+     - list <PrototypeBuildOrder> PrototypeOrders: A list of all 
      the orders for specific prototypes to be built 
     
    -# Capacity Build Information (when a given capacity demand is 

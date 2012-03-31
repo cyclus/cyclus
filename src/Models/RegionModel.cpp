@@ -24,41 +24,38 @@ void RegionModel::init() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::init(xmlNodePtr cur) {
- 
-  Model::init(cur);
-  RegionModel::init();
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
-  /// all regions require allowed facilities - possibly many
+void RegionModel::initAllowedFacilities(xmlNodePtr cur) {   
   xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
-
   string fac_name;
   Model* new_fac;
-  
-  // initialize facilities
   for (int i=0;i<fac_nodes->nodeNr;i++){
     fac_name = (const char*)fac_nodes->nodeTab[i]->children->content;
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::initChildren(xmlNodePtr cur) {   
   string inst_name;
   Model* inst;
-  // initalize institutions
   xmlNodeSetPtr inst_nodes = XMLinput->get_xpath_elements(cur,"institution");
   for (int i=0;i<inst_nodes->nodeNr;i++){
     inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
     inst = Model::getTemplateByName(inst_name);
     inst->setParent(this);
   }
-
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::init(xmlNodePtr cur) { 
+  Model::init(cur); // name_ and model_impl_
+  RegionModel::initAllowedFacilities(cur); // allowedFacilities_
+  RegionModel::init(); // parent_ and tick listener, model 'born'
+  RegionModel::initChildren(cur); // children->setParent, requires init()
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
