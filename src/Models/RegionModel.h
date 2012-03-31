@@ -58,20 +58,7 @@
    facilities. It defers to an institution regarding facility 
    deployment, making no demands on facility type or parameter (save the 
    facility's allowability in the region). It makes no alterations to 
-   messages passed through it in either the up or down direction. 
-    
-   @section anticipatedCoreImpl Anticipated Core Implementation 
-   - <a 
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+   messages passed through it in either the up or down direction.    
  */
 class RegionModel : public TimeAgent, public Communicator {
 /* --------------------
@@ -82,7 +69,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      Default constructor for RegionModel Class 
    */
-  RegionModel();
+  RegionModel() { setModelType("Region"); }
   
   /**
      RegionModels should not be indestructible. 
@@ -90,7 +77,13 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual ~RegionModel() {};
     
   /**
+     RegionModels have generic init steps regardless of input
+   */
+  virtual void init();
+
+  /**
      every model needs a method to initialize from XML 
+     this calls the generic init() method
    */
   virtual void init(xmlNodePtr cur);
 

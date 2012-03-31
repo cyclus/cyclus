@@ -15,18 +15,6 @@ using namespace std;
 list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel::MarketModel() {
-  setModelType("Market");
-
-  // register the model
-
-  TI->registerResolveListener(this);
-  markets_.push_back(this);
-  setIsTemplate(false);
-  commodity_ = "none";
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
   LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
   list<MarketModel*>::iterator mkt;
@@ -58,21 +46,30 @@ MarketModel* MarketModel::marketForCommod(string commod) {
   }
   return market;
 }
+ 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::registerMarket(MarketModel* mkt) {
+  markets_.push_back(mkt);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::init() {  
+  // this brings the market into the simulation (all agents must have a parent)
+  this->setParent(this);
+
+  // register the model
+  TI->registerResolveListener(this);
+  MarketModel::registerMarket(this);
+}
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::init(xmlNodePtr cur) {
-  Model::init(cur);
-  
-  /** 
-   *  Specific initialization for MarketModels
-   */
+  // general initializations
+  Model::init(cur);  
+  MarketModel::init();
 
-  /// all markets require commodities
+  // specific initalizations
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
-
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

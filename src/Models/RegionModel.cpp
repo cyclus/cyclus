@@ -15,20 +15,19 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-RegionModel::RegionModel() {
-  setModelType("Region");
-  
+void RegionModel::init() {
+  // region models do not currently follow the template/not template
+  // paradigm of insts and facs, so log this as its own parent
+  this->setParent(this);
   // register to receive time-step notifications
   TI->registerTickListener(this);
-  
-  // register the model
-  setIsTemplate(false);
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::init(xmlNodePtr cur) {
  
   Model::init(cur);
+  RegionModel::init();
 
   /** 
    *  Specific initialization for RegionModels
@@ -57,9 +56,6 @@ void RegionModel::init(xmlNodePtr cur) {
     inst->setParent(this);
   }
 
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

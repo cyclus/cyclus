@@ -58,7 +58,7 @@ class MarketModel : public Model, public Communicator {
   /**
      default constructor 
    */
-  MarketModel();
+  MarketModel() { setModelType("Market"); }
   
   /**
      MarketModels should not be indestructible. 
@@ -73,7 +73,13 @@ class MarketModel : public Model, public Communicator {
   static MarketModel* marketForCommod(std::string commod);
 
   /**
+     this model has generic initalization regardless of input type
+   */
+  void init();
+
+  /**
      every model needs a method to initialize from XML 
+     this method calls the MarketModel's generic init() method
    */
   virtual void init(xmlNodePtr cur);
 
@@ -102,6 +108,15 @@ class MarketModel : public Model, public Communicator {
    */
   virtual void receiveMessage(msg_ptr msg) 
   { messages_.insert(msg); };
+
+ protected:
+  /**
+     registers a market instance with the static list
+
+     @param mkt the market to register, usually a this pointer
+     during init
+   */
+  static void registerMarket(MarketModel* mkt);
 
 /* ------------------- */ 
 
