@@ -49,7 +49,6 @@ RegionModel* BuildRegionConstructor(){
   return dynamic_cast<RegionModel*>(new FakeBuildRegion());
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildRegionTest, InitialState) {
   // Test things about the initial state of the region here

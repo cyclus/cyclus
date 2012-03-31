@@ -8,145 +8,137 @@
 #include <iostream>
 #include "Logger.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildRegion::populateSchedule(FILE *infile)
-{
-  int n_facs, n_periods=0;
-  int i, j;
-  char fac_name[20];
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// void BuildRegion::populateSchedule(FILE *infile)
+// {
+//   int n_facs, n_periods=0;
+//   int i, j;
+//   char fac_name[20];
 
-  // Read the total number of types of facilities which will be build
-  fscanf(infile, "%d", &n_facs);
+//   // Read the total number of types of facilities which will be build
+//   fscanf(infile, "%d", &n_facs);
 
-  // For each type of facility, populate the build schedul
-  for (i=0;i<n_facs;i++){
-    // Read in the facility name and number of periods during which builds occur
-    fscanf(infile, "%s", fac_name);
-    fscanf(infile, "%d", &n_periods);
-    queue <pair <int, int> > schedule;
+//   // For each type of facility, populate the build schedul
+//   for (i=0;i<n_facs;i++){
+//     // Read in the facility name and number of periods during which builds occur
+//     fscanf(infile, "%s", fac_name);
+//     fscanf(infile, "%d", &n_periods);
+//     queue <pair <int, int> > schedule;
 
-    // For each building period, populate the facility's schedule
-    for (j=0;j<n_periods;j++){
-      pair <int, int> time_step_to_build;
-      int time, number;
-      fscanf(infile, "%d %d", &time, &number);
-      time_step_to_build.first = time;
-      time_step_to_build.second = number;
-      schedule.push(time_step_to_build);
-    };
+//     // For each building period, populate the facility's schedule
+//     for (j=0;j<n_periods;j++){
+//       pair <int, int> time_step_to_build;
+//       int time, number;
+//       fscanf(infile, "%d %d", &time, &number);
+//       time_step_to_build.first = time;
+//       time_step_to_build.second = number;
+//       schedule.push(time_step_to_build);
+//     };
     
-    // Populate the to_build_map_ for the given facility
-    string fac_str (fac_name);
-    to_build_map_[fac_str]=schedule;
-  };
-}
+//     // Populate the to_build_map_ for the given facility
+//     string fac_str (fac_name);
+//     to_build_map_[fac_str]=schedule;
+//   };
+// }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildRegion::init(xmlNodePtr cur)
-{
-  // Initiate as a region model
-  RegionModel::init(cur);
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// void BuildRegion::init(xmlNodePtr cur)
+// {
+//   // Initiate as a region model
+//   RegionModel::init(cur);
 
-  // Get input file
-  xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
+//   // Get input file
+//   xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
 
-  const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
+//   const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
 
-  FILE *input_file = fopen(input_path,"r");
+//   FILE *input_file = fopen(input_path,"r");
 
-  // Populate build schedule
-  populateSchedule(input_file);
-  // Close the files that you open
-  fclose(input_file);
-};
+//   // Populate build schedule
+//   populateSchedule(input_file);
+//   // Close the files that you open
+//   fclose(input_file);
+// };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool BuildRegion::requestBuild(Model* fac, InstModel* inst) {
-  bool test_build;
-  // Request that Institution inst build Facility fac
-  test_build=inst->pleaseBuild(fac);
-  // If it is not built by the inst for whatever reason, test_build returns false
-  return test_build;
-};
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// bool BuildRegion::requestBuild(Model* fac, InstModel* inst) {
+//   bool test_build;
+//   // Request that Institution inst build Facility fac
+//   test_build=inst->pleaseBuild(fac);
+//   // If it is not built by the inst for whatever reason, test_build returns false
+//   return test_build;
+// };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int BuildRegion::nFacs()
-{
-  // Return the total number of facilities which will be built
-  return nFacs_;
-};
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// int BuildRegion::nFacs()
+// {
+//   // Return the total number of facilities which will be built
+//   return nFacs_;
+// };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Model* BuildRegion::chooseInstToBuildFac()
-{
-  // Define the inst to build some fac
-  // By default we pick the first institution in the region's list
-  return children(0);
-};
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// Model* BuildRegion::chooseInstToBuildFac()
+// {
+//   // Define the inst to build some fac
+//   // By default we pick the first institution in the region's list
+//   return children(0);
+// };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildRegion::handleTick(int time)
-{
-  // Overwriting RegionModel's handleTick
-  // We loop through each facility that exists in the to_build_map_
-  map <string, queue <pair <int,int> > >::iterator fac;
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// void BuildRegion::handleTick(int time)
+// {
+//   // Overwriting RegionModel's handleTick
+//   // We loop through each facility that exists in the to_build_map_
+//   map <string, queue <pair <int,int> > >::iterator fac;
 
-  for (fac = to_build_map_.begin(); fac != to_build_map_.end(); ++fac){
-    // Define a few parameters
-    /* !!!! This method is not full proof... what if multiple facilities need
-			 to be built and some fail and some succeed...? !!!! */
-    bool built = false; 
-    string fac_name = fac->first;
-    queue<pair <int,int> > fac_build_queue = fac->second;
-    pair<int,int> next_fac_build = fac_build_queue.front();
-    int next_build_time = next_fac_build.first;
+//   for (fac = to_build_map_.begin(); fac != to_build_map_.end(); ++fac){
+//     // Define a few parameters
+//     /* !!!! This method is not full proof... what if multiple facilities need
+// 			 to be built and some fail and some succeed...? !!!! */
+//     bool built = false; 
+//     string fac_name = fac->first;
+//     queue<pair <int,int> > fac_build_queue = fac->second;
+//     pair<int,int> next_fac_build = fac_build_queue.front();
+//     int next_build_time = next_fac_build.first;
 
-    // Continue to loop until the facility is built
-    while (built!=true){
-      // If the current time = the next build time for a facility, 
-      // build said facility
-      if (time == next_build_time) {
-	Model* inst;
-	Model* fac_to_build = Model::getModelByName(fac_name);
-	int num_facs_to_build = next_fac_build.second;
-	int i;
-	// Build the prescribed number of facilities for this time step
-	for (i=0;i!=num_facs_to_build;i++){
-	  inst = chooseInstToBuildFac();
-	  built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
-	}
-      }
-      // If there is nothing to build at this time, consider 0 facilities built
-      else {
-	built=true;
-      }
+//     // Continue to loop until the facility is built
+//     while (built!=true){
+//       // If the current time = the next build time for a facility, 
+//       // build said facility
+//       if (time == next_build_time) {
+// 	Model* inst;
+// 	Model* fac_to_build = Model::getModelByName(fac_name);
+// 	int num_facs_to_build = next_fac_build.second;
+// 	int i;
+// 	// Build the prescribed number of facilities for this time step
+// 	for (i=0;i!=num_facs_to_build;i++){
+// 	  inst = chooseInstToBuildFac();
+// 	  built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
+// 	}
+//       }
+//       // If there is nothing to build at this time, consider 0 facilities built
+//       else {
+// 	built=true;
+//       }
       
-      // For now, catch any situation for which no facility is built.
-      // ************* This should eventually be changed
-      if (built!=true){
-	std::stringstream ss1, ss2;
-	ss1 << fac_name;
-	ss2 << time;
-	throw CycException("Facility " + ss1.str()
-			   + " could not be built at time " + ss2.str() + ".");	
-      }
+//       // For now, catch any situation for which no facility is built.
+//       // ************* This should eventually be changed
+//       if (built!=true){
+// 	std::stringstream ss1, ss2;
+// 	ss1 << fac_name;
+// 	ss2 << time;
+// 	throw CycException("Facility " + ss1.str()
+// 			   + " could not be built at time " + ss2.str() + ".");	
+//       }
       
-    } // end build loop
+//     } // end build loop
     
-  } // end facility loop
+//   } // end facility loop
   
-  // After we finish building, call the normal handleTick for a region
-  RegionModel::handleTick(time);
+//   // After we finish building, call the normal handleTick for a region
+//   RegionModel::handleTick(time);
 
-}
-
-
-/* --------------------
-   output database info
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string BuildRegion::outputDir_ = "/build";
+// }
 
 
 /* --------------------
