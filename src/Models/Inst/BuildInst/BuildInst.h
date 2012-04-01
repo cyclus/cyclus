@@ -131,7 +131,7 @@ public:
      @param prototype the prototype to be built 
      @param requester the Model requesting that the prototype be built 
    */
-  void build(Model* prototype, Model* requester);
+  virtual void build(Model* prototype, Model* requester);
 
   /**
      The build function which must be called by this BuildInst's parent. 
@@ -141,7 +141,8 @@ public:
      @param requester the Model requesting that the prototype be built 
      @param name the name for the prototype to be built 
    */
-  void build(Model* prototype, Model* requester, std::string name);
+  virtual void build(Model* prototype, Model* requester, 
+                     std::string name);
 
 /* ------------------- */ 
 

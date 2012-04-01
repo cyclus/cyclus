@@ -93,14 +93,13 @@ void InstModel::handleDailyTasks(int time, int day){
  * --------------------
  */
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool InstModel::pleaseBuild(Model* fac){
-  // by defualt
-  stringstream ss;
-  ss << this->ID();
-  throw CycOverrideException("Institution " + ss.str()
-		     + " does not have a definied facility-building fuction.");
-  return false;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::build(Model* prototype, Model* requester) {
+  // by default
+  stringstream err("");
+  err << "Institution " << this->name() << " does not have a definied " 
+      << "facility-building fuction.";
+  throw CycOverrideException(err.str());
 }
 
 double InstModel::powerCapacity(){

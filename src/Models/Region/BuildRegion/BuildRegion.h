@@ -8,14 +8,15 @@
 #include <set>
 #include <list>
 #include <map>
-#include <pair>
+#include <utility>
 
 // Useful Typedefs
 // Building Prototypes
 typedef std::pair<Model*,int> PrototypeDemand;
 typedef std::pair<int,PrototypeDemand> PrototypeBuildOrder;
 typedef std::list<PrototypeBuildOrder> PrototypeOrders;
-
+// Sorting Model Lists
+typedef std::list<Model*>::iterator ModelIterator;
 
 /**
    The BuildRegion class inherits from the RegionModel class and is 
@@ -104,6 +105,7 @@ typedef std::list<PrototypeBuildOrder> PrototypeOrders;
    as to which institution will build that prototype. This decision is 
    made greedily by selecting the first institution avialable in its 
  */
+
 class BuildRegion : public RegionModel  
 {
 /* --------------------
@@ -124,12 +126,12 @@ class BuildRegion : public RegionModel
   /**
      initialize an object from XML input 
    */
-  virtual void init(xmlNodePtr cur)  { RegionModel::init(cur); };
+  virtual void init(xmlNodePtr cur);
 
   /**
      initialize an object by copying another 
    */
-  virtual void copy(BuildRegion* src) { RegionModel::copy(src); } ;
+  virtual void copy(BuildRegion* src) { RegionModel::copy(src); };
 
   /**
      This drills down the dependency tree to initialize all relevant 
@@ -139,12 +141,13 @@ class BuildRegion : public RegionModel
       
      @param src the pointer to the original (initialized ?) model to be 
    */
-  virtual void copyFreshModel(Model* src){ copy(dynamic_cast<BuildRegion*>(src)); };
+  virtual void copyFreshModel(Model* src)
+  { copy(dynamic_cast<BuildRegion*>(src)); };
   
   /**
      print information about the region 
    */
-  virtual void print()               { RegionModel::print();   } ;
+  virtual void print() { RegionModel::print(); };
 
 /* ------------------- */ 
 
@@ -166,10 +169,60 @@ class BuildRegion : public RegionModel
 
 
 /* --------------------
- * the BuildRegion class have these members
+ * the BuildRegion class has these members
  * --------------------
  */
+ private:
+  /**
+     a container relating each prototype with a set of models (children)
+     that can build that prototype
+   */
+  std::map< Model*, std::list<Model*> > builders_;
+
+  /**
+     a container of prototype orders, sorted by the order times
+   */
+  PrototypeOrders prototypeOrders_;
   
+ protected:
+  /**
+     Given some number of prototypes have been ordered, determine which
+     child will build each prototype, and issue the order to build.
+
+     This function calls availableBuilders(), selectBuilder() and 
+     placeOrder() for each prototype in the order.
+   */
+  void handlePrototypeOrder(PrototypeDemand order);
+
+  /**
+     determine which builders are available to build a given prototype
+   */
+  std::list<ModelIterator> availableBuilders(Model* prototype);
+
+  /**
+     Determine which builder among the @param bidders will build a 
+     given @param prototype.
+
+     This function will allow for decision making analysis. In its 
+     simplest form, it determines which bidder, amongst all @param 
+     bidders, has the highest score in the set of builders for the given
+     @param prototype. That builder is chosen and moved to the bottom of
+     that prototype's set.
+
+     Because the set of bidders is constructed by iterating over the
+     list of all possible builders, the first bidder is guaranteed to 
+     have the highest score.
+     
+     @return the builder selected
+   */
+  Model* selectBuilder(Model* prototype, 
+                       std::list<ModelIterator> bidders);
+
+  /**
+     place an order for @param prototype with @param builder
+   */
+  void placeOrder(Model* prototype, Model* builder);
+
 /* ------------------- */ 
 
 };

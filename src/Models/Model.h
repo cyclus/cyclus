@@ -266,6 +266,12 @@ class Model {
      declares if the model is a template 
    */
   void setIsTemplate(bool is_template);
+
+  /**
+     Asks if a model can build a certain prototype. Returns false by
+     default.
+   */
+  virtual bool canBuild(Model* prototype) {return false;}
     
  protected:
   /**

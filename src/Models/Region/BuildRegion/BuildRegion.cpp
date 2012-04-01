@@ -2,143 +2,84 @@
 // Implements the BuildRegion class
 
 #include "BuildRegion.h"
+
 #include "InstModel.h"
 
+#include <list>
+// #include <utility>
+//#include <set>
 #include <sstream>
-#include <iostream>
+
 #include "Logger.h"
+#include "CycException.h"
+#include "InputXML.h"
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// void BuildRegion::populateSchedule(FILE *infile)
-// {
-//   int n_facs, n_periods=0;
-//   int i, j;
-//   char fac_name[20];
+using namespace std;
 
-//   // Read the total number of types of facilities which will be build
-//   fscanf(infile, "%d", &n_facs);
-
-//   // For each type of facility, populate the build schedul
-//   for (i=0;i<n_facs;i++){
-//     // Read in the facility name and number of periods during which builds occur
-//     fscanf(infile, "%s", fac_name);
-//     fscanf(infile, "%d", &n_periods);
-//     queue <pair <int, int> > schedule;
-
-//     // For each building period, populate the facility's schedule
-//     for (j=0;j<n_periods;j++){
-//       pair <int, int> time_step_to_build;
-//       int time, number;
-//       fscanf(infile, "%d %d", &time, &number);
-//       time_step_to_build.first = time;
-//       time_step_to_build.second = number;
-//       schedule.push(time_step_to_build);
-//     };
-    
-//     // Populate the to_build_map_ for the given facility
-//     string fac_str (fac_name);
-//     to_build_map_[fac_str]=schedule;
-//   };
-// }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildRegion::init(xmlNodePtr cur)
-{
-  // Initiate as a region model
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::init(xmlNodePtr cur) {
   RegionModel::init(cur);
-
-  // Get input file
-  xmlNodePtr region_node = XMLinput->get_xpath_element(cur,"model/BuildRegion");
-
-  const char* input_path = XMLinput->get_xpath_content(region_node,"input_file");
-
-  FILE *input_file = fopen(input_path,"r");
-
-  // Populate build schedule
-  populateSchedule(input_file);
-  // Close the files that you open
-  fclose(input_file);
 };
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// bool BuildRegion::requestBuild(Model* fac, InstModel* inst) {
-//   bool test_build;
-//   // Request that Institution inst build Facility fac
-//   test_build=inst->pleaseBuild(fac);
-//   // If it is not built by the inst for whatever reason, test_build returns false
-//   return test_build;
-// };
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::handleTick(int time) {
+  // build something if an order has been placed
+  while (prototypeOrders_.front().first == time) {
+    handlePrototypeOrder(prototypeOrders_.front().second);
+    prototypeOrders_.pop_front();
+  }
+  // After we finish building, call the normal handleTick for a region
+  RegionModel::handleTick(time);
+}
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// int BuildRegion::nFacs()
-// {
-//   // Return the total number of facilities which will be built
-//   return nFacs_;
-// };
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::handlePrototypeOrder(PrototypeDemand order) {
+  Model* prototype = order.first;
+  int nTotal = order.second;
+  for (int i = 0; i < nTotal; i++) {
+    list<ModelIterator> bidders = availableBuilders(prototype);
+    Model* builder = selectBuilder(prototype,bidders);
+    placeOrder(prototype,builder);
+  }
+}
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// Model* BuildRegion::chooseInstToBuildFac()
-// {
-//   // Define the inst to build some fac
-//   // By default we pick the first institution in the region's list
-//   return children(0);
-// };
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+list<ModelIterator> BuildRegion::availableBuilders(Model* prototype) {
+  list<ModelIterator> bidders;
+  for(ModelIterator child = builders_[prototype].begin();
+      child != builders_[prototype].end(); 
+      child++) {
+    if ( (*child)->canBuild(prototype) ){
+      bidders.push_back(child);
+    }
+  }
+  // if there are no bidders, throw an error for now
+  if ( bidders.empty() ) {
+    stringstream err("");
+    err << "BuildRegion " << this->name() << " is attempting to build "
+        << prototype->name() << " but none of its children are "
+        << "available to build it.";
+    throw CycOverrideException(err.str());
+  }
+  return bidders;
+}
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// void BuildRegion::handleTick(int time)
-// {
-//   // Overwriting RegionModel's handleTick
-//   // We loop through each facility that exists in the to_build_map_
-//   map <string, queue <pair <int,int> > >::iterator fac;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Model* BuildRegion::selectBuilder(Model* prototype, 
+                                  list<ModelIterator> bidders) {
+  // highest bidder guaranteed to be front -- see header file
+  ModelIterator builder = bidders.front();
+  // move builder to end of list
+  builders_[prototype].splice( builders_[prototype].end(), 
+                               builders_[prototype], builder);
+  return (*builder);
+}
 
-//   for (fac = to_build_map_.begin(); fac != to_build_map_.end(); ++fac){
-//     // Define a few parameters
-//     /* !!!! This method is not full proof... what if multiple facilities need
-// 			 to be built and some fail and some succeed...? !!!! */
-//     bool built = false; 
-//     string fac_name = fac->first;
-//     queue<pair <int,int> > fac_build_queue = fac->second;
-//     pair<int,int> next_fac_build = fac_build_queue.front();
-//     int next_build_time = next_fac_build.first;
-
-//     // Continue to loop until the facility is built
-//     while (built!=true){
-//       // If the current time = the next build time for a facility, 
-//       // build said facility
-//       if (time == next_build_time) {
-// 	Model* inst;
-// 	Model* fac_to_build = Model::getModelByName(fac_name);
-// 	int num_facs_to_build = next_fac_build.second;
-// 	int i;
-// 	// Build the prescribed number of facilities for this time step
-// 	for (i=0;i!=num_facs_to_build;i++){
-// 	  inst = chooseInstToBuildFac();
-// 	  built = requestBuild(fac_to_build,dynamic_cast<InstModel*>(inst));
-// 	}
-//       }
-//       // If there is nothing to build at this time, consider 0 facilities built
-//       else {
-// 	built=true;
-//       }
-      
-//       // For now, catch any situation for which no facility is built.
-//       // ************* This should eventually be changed
-//       if (built!=true){
-// 	std::stringstream ss1, ss2;
-// 	ss1 << fac_name;
-// 	ss2 << time;
-// 	throw CycException("Facility " + ss1.str()
-// 			   + " could not be built at time " + ss2.str() + ".");	
-//       }
-      
-//     } // end build loop
-    
-//   } // end facility loop
-  
-//   // After we finish building, call the normal handleTick for a region
-//   RegionModel::handleTick(time);
-
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::placeOrder(Model* prototype, Model* builder) {
+  // build functions must know who is placing the build order
+  dynamic_cast<InstModel*>(builder)->build(prototype,this);
+}
 
 
 /* --------------------

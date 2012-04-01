@@ -146,9 +146,22 @@ class InstModel : public TimeAgent, public Communicator {
   double powerCapacity();
 
   /**
-     attempts to build another facility of type fac 
+     builds a prototype requested by requester
+
+     by default, an error is thrown.
+
+     @param prototype the prototype to be built 
+     @param requester the Model requesting that the prototype be built 
    */
-  virtual bool pleaseBuild(Model* fac);
+  virtual void build(Model* prototype, Model* requester);
+
+  /**
+     builds a prototype with a specific name as requested by requester
+     
+     by default, it calls the simpler build function
+   */
+  virtual void build(Model* prototype, Model* requester, 
+                     std::string name) {build(prototype,requester);}
 
 /* ------------------- */ 
   
