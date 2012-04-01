@@ -4,8 +4,7 @@
   <!-- BuildRegion -->  
   <define name="BuildRegion">
     <element name="BuildRegion">
-      
-
+    
       <!-- Capacity Satisfiability -->
       <zeroOrMore>
 	<element name = "capacitytype">
@@ -45,19 +44,22 @@
 	  </element>
 
 	  <element name = "demandschedule">
-	    <list>
-	      <!-- time, value pairs -->
-	      <oneOrMore>
-		<data type="nonNegativeInteger"/>
-		<data type="double"/>
-	      </oneOrMore>
-	    </list>
+	    <!-- time, value pairs -->
+	    <oneOrMore>
+	      <element name="entry">
+		<element name="time">
+		  <data type="nonNegativeInteger"/>
+		</element>
+		<element name="value">
+		  <data type="double"/>
+		</element>
+	      </element>
+	    </oneOrMore>
 	  </element>
 
 	</element>
       </zeroOrMore>
       <!-- end Capacity Requirements -->
-      
       
       <!-- Facility Requirements -->
       <zeroOrMore>
@@ -68,28 +70,22 @@
 	  </element>
 	  
 	  <element name = "demandschedule">
-	    <list>
-	      <!-- time, value pairs -->
-	      <oneOrMore>
-		<data type="nonNegativeInteger"/>
-		<data type="nonNegativeInteger"/>
-	      </oneOrMore>
-	    </list>
+	    <!-- time, value pairs -->
+	    <oneOrMore>
+	      <element name="entry">
+		<element name="time">
+		  <data type="nonNegativeInteger"/>
+		</element>
+		<element name="number">
+		  <data type="nonNegativeInteger"/>
+		</element>
+	      </element>
+	    </oneOrMore>
 	  </element>
 
 	</element>
       </zeroOrMore>
       <!-- end Facility Requirements -->
-
-      <!-- Allowable Institutions -->
-      <oneOrMore>
-	<element name = "allowableinstitution">
-	  <choice>
-	    <value>BuildInst</value>
-	  </choice>
-	</element>	
-      </oneOrMore>
-      <!-- end Allowable Institutions -->
 
     </element>
   </define>

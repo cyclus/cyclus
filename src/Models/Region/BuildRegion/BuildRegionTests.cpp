@@ -37,12 +37,6 @@ public:
     // initialize members
     inst->setParent(this);
     fac->setParent(inst);
-    
-    // initialize builders
-    builders_ = new map<Model*,list<Model*>*>();
-    list<Model*>* a_list = new list<Model*>();
-    a_list->push_back(inst);
-    builders_->insert( pair<Model*,list<Model*>*>(fac,a_list) );
       
     // initalize orders
     PrototypeDemand d (fac,nfacs);
@@ -50,6 +44,12 @@ public:
     PrototypeBuildOrder b (time_to_build,d);
     prototypeOrders_ = new PrototypeOrders();
     prototypeOrders_->push_back(b);
+
+    // initialize builders
+    builders_ = new map<Model*,list<Model*>*>();
+    list<Model*>* a_list = new list<Model*>();
+    a_list->push_back(inst);
+    builders_->insert( pair<Model*,list<Model*>*>(fac,a_list) );
   }
 
   void initTwoInst() {

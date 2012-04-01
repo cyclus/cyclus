@@ -50,7 +50,26 @@
     <allowedfacility>FrontEnd</allowedfacility>
     <allowedfacility>BackEnd</allowedfacility>
     <model>
-      <NullRegion/>
+      <BuildRegion>
+	<prototyperequirement>
+	  <prototypename>FrontEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+	<prototyperequirement>
+	  <prototypename>BackEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+      </BuildRegion>
     </model>
     <institution>
       <name>oneInst</name>

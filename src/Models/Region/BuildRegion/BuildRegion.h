@@ -114,6 +114,11 @@ class BuildRegion : public RegionModel
      The default destructor for the BuildRegion 
    */
   virtual ~BuildRegion() {};
+
+  /**
+     generic initialization
+   */
+  virtual void init();
    
   /**
      initialize an object from XML input 
@@ -175,6 +180,31 @@ class BuildRegion : public RegionModel
      a container of prototype orders, sorted by the order times
    */
   PrototypeOrders* prototypeOrders_;
+
+  /**
+     adds orders for a given prototype to the prototypeOrders_ member.
+     this function calls addOrder() for each order in the input file
+
+     @param cur the xml node corresponding to the demand for a prototype
+  */
+  void populateOrders(xmlNodePtr cur);
+
+  /**
+     add a specific order to prototypeOrders_
+   */
+  void addOrder(Model* prototype, int number, int time);
+  
+  /**
+     sort the prototypeOrders_ by time
+   */
+  void sortOrders();
+
+  /**
+     populates the builders_ memeber. this method is called after the
+     region initializes its children so that they may populate their
+     available prototypes members.
+  */
+  void populateBuilders();
   
   /**
      Given some number of prototypes have been ordered, determine which

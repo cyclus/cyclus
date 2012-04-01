@@ -14,7 +14,7 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::init() {
   // region models do not currently follow the template/not template
   // paradigm of insts and facs, so log this as its own parent
@@ -23,9 +23,10 @@ void RegionModel::init() {
   TI->registerTickListener(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::initAllowedFacilities(xmlNodePtr cur) {   
-  xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
+  xmlNodeSetPtr fac_nodes = 
+    XMLinput->get_xpath_elements(cur,"allowedfacility");
   string fac_name;
   Model* new_fac;
   for (int i=0;i<fac_nodes->nodeNr;i++){
