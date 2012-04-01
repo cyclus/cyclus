@@ -13,7 +13,7 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeBuildInst : public BuildInst {
 public:
   FakeBuildInst() : BuildInst() {}
@@ -26,7 +26,7 @@ public:
 
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildInstTest : public ::testing::Test {
 protected:
   FakeBuildInst* src_inst;

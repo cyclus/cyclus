@@ -146,6 +146,16 @@ class InstModel : public TimeAgent, public Communicator {
   double powerCapacity();
 
   /**
+     determines if a prototype can be built by this inst at the present
+     time
+
+     by default, returns false
+
+     @param prototype the prototype to be built
+   */
+  virtual bool canBuild(Model* prototype) {return false;}
+
+  /**
      builds a prototype requested by requester
 
      by default, an error is thrown.

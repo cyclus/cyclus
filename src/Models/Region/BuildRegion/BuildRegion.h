@@ -42,36 +42,28 @@ typedef std::list<Model*>::iterator ModelIterator;
     
    -# General Build Information (who can build what) 
      - set <Model*> allowedfacilities: The facilities which are 
-     allowed within this region. (** defined in RegionModel.h **)
-    
+     allowed within this region. (** defined in RegionModel.h **)    
      - map <CapacityType : set <Model*> > CapacitySastisfiers: A map of 
      [capacity types] to the [prototypes] that satisfy each capacity 
      type. 
-    
      - map <Model* : set <Model*> > Builders: A map of [prototypes] to 
      the [children] of this region that are capable of building each 
-     prototype
-    
+     prototype.
    -# Prototype Build Information (when the number of prototypes is 
    declared explicitly) 
      - pair <Model*,int> PrototypeDemand: A pair of [prototypes] to the 
-     [number demanded] to be built at a given time 
-    
+     [number demanded] to be built at a given time.
      - pair <int, PrototypeDemand> PrototypeBuildOrder: A pair of the 
-     [time] at which a particular [PrototypeDemand] has been issued 
-    
+     [time] at which a particular [PrototypeDemand] has been issued.
      - list <PrototypeBuildOrder> PrototypeOrders: A list of all 
-     the orders for specific prototypes to be built 
-    
+     the orders for specific prototypes to be built.
    -# Capacity Build Information (when a given capacity demand is 
    declared explicitly) 
      - pair <CapacityType,double> CapacityDemand: A pair of 
      [CapacityTypes] to the [total amount] required for this region at a 
-     given time 
-    
+     given time.
      - pair <int, CapacityDemand> CapacityBuildOrder: A pair of the 
-     [time] at which a particular [CapacityDemand] has been issued 
-    
+     [time] at which a particular [CapacityDemand] has been issued.
      - list <CapacityBuildOrder> CapacityBuildOrders: A list of all the 
      orders for specific capacities to be met 
     
@@ -131,7 +123,7 @@ class BuildRegion : public RegionModel
   /**
      initialize an object by copying another 
    */
-  virtual void copy(BuildRegion* src) { RegionModel::copy(src); };
+  virtual void copy(BuildRegion* src);
 
   /**
      This drills down the dependency tree to initialize all relevant 
@@ -172,19 +164,18 @@ class BuildRegion : public RegionModel
  * the BuildRegion class has these members
  * --------------------
  */
- private:
+ protected:
   /**
      a container relating each prototype with a set of models (children)
      that can build that prototype
    */
-  std::map< Model*, std::list<Model*> > builders_;
+  std::map<Model*, std::list<Model*>*>* builders_;
 
   /**
      a container of prototype orders, sorted by the order times
    */
-  PrototypeOrders prototypeOrders_;
+  PrototypeOrders* prototypeOrders_;
   
- protected:
   /**
      Given some number of prototypes have been ordered, determine which
      child will build each prototype, and issue the order to build.
@@ -195,31 +186,39 @@ class BuildRegion : public RegionModel
   void handlePrototypeOrder(PrototypeDemand order);
 
   /**
-     determine which builders are available to build a given prototype
+     determine which builders are available to build a given prototype,
+     populating a list of bidders
+
+     @param prototype the prototype to be build
+     @param bidders a reference to a list of bidders to be populated
    */
-  std::list<ModelIterator> availableBuilders(Model* prototype);
+  void getAvailableBuilders(Model* prototype, 
+                            std::list<ModelIterator>& bidders);
 
   /**
-     Determine which builder among the @param bidders will build a 
-     given @param prototype.
+     Determine which builder among the bidders will build a 
+     given prototype.
 
      This function will allow for decision making analysis. In its 
-     simplest form, it determines which bidder, amongst all @param 
-     bidders, has the highest score in the set of builders for the given
-     @param prototype. That builder is chosen and moved to the bottom of
-     that prototype's set.
+     simplest form, it determines which bidder, amongst all bidders, has
+     the highest score in the set of builders for the given prototype. 
+     That builder is chosen and moved to the bottom of that prototype's 
+     set.
 
      Because the set of bidders is constructed by iterating over the
      list of all possible builders, the first bidder is guaranteed to 
      have the highest score.
+
+     @param prototype the prototype to be built
+     @param bidders a list of available builders of the prototype
      
      @return the builder selected
    */
   Model* selectBuilder(Model* prototype, 
-                       std::list<ModelIterator> bidders);
+                       std::list<ModelIterator>& bidders);
 
   /**
-     place an order for @param prototype with @param builder
+     place an order for a prototype with a builder
    */
   void placeOrder(Model* prototype, Model* builder);
 

@@ -124,6 +124,17 @@ public:
   };  
 
   /**
+     determines if a prototype can be built by this inst at the present
+     time
+
+     by default, returns true if in this inst's list of prototypes
+
+     @param prototype the prototype to be built
+   */
+  virtual bool canBuild(Model* prototype) 
+  {return isAvailablePrototype(prototype);}
+
+  /**
      The build function which must be called by this BuildInst's parent. 
      The BuildInst immediately builds the prototype. A random name is 
      given to the prototype and the full build function is called. 
