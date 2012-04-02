@@ -6,10 +6,9 @@
 #include "InstModel.h"
 
 #include <list>
-// #include <utility>
-//#include <set>
 #include <sstream>
 
+#include "Timer.h"
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -18,6 +17,23 @@
 
 using namespace std;
 
+/* --------------------
+ * Comparison Functors
+ * --------------------
+ */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
+  // sort by time
+  return (o1->first < o2->first);
+}
+
+/* -------------------- */
+
+
+/* --------------------
+ * BuildRegion Class Methods
+ * --------------------
+ */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::init() {
   prototypeOrders_ = new PrototypeOrders();
@@ -61,32 +77,58 @@ void BuildRegion::populateOrders(xmlNodePtr cur) {
     (const char*)XMLinput->get_xpath_content(cur, "prototypename");
   Model* prototype = Model::getTemplateByName(name);
   
-  // for each entry, get time and number and add to orders
+  // fill a set of orders with constructed orders
+  PrototypeOrders* orders = new PrototypeOrders();
+
+  // for each entry, get time and number and construct an order
   xmlNodeSetPtr entry_nodes = 
     XMLinput->get_xpath_elements(cur,"demandschedule");
   string sTime, sNumber;
   int time, number;
   for (int i=0;i<entry_nodes->nodeNr;i++){
+    // get data
     xmlNodePtr entry_node = 
       XMLinput->get_xpath_element(entry_nodes->nodeTab[i],"entry");
     sTime = XMLinput->get_xpath_content(entry_node,"time");
     sNumber = XMLinput->get_xpath_content(entry_node,"number");
     time = strtol(sTime.c_str(),NULL,10);
     number = strtol(sNumber.c_str(),NULL,10);
-    addOrder(prototype,number,time);
+    // construct
+    PrototypeBuildOrder* order = new PrototypeBuildOrder();
+    order = constructOrder(prototype,number,time);
+    // fill
+    orders->push_back(order);
+  }
+  populateOrders(orders);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+PrototypeBuildOrder* 
+BuildRegion::constructOrder(Model* prototype, int number, int time) {
+  PrototypeDemand d(prototype,number);
+  PrototypeBuildOrder* b = new PrototypeBuildOrder(time,d);
+  return b;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::populateOrders(PrototypeOrders* orders) {
+  for ( OrderIterator order = orders->begin(); 
+        order != orders->end(); order++ ) {
+    addOrder( (*order) );
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildRegion::addOrder(Model* prototype, int number, int time) {
-  PrototypeDemand d(prototype,number);
-  PrototypeBuildOrder b(time,d);
-  prototypeOrders_->push_back(b);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::sortOrders() {
-  
+  prototypeOrders_->sort(compare_order_times);
+  // error if first order is before the current time
+  if ( frontOrder()->first < TI->time() ) {
+    stringstream err("");
+    err << "BuildRegion " << this->name() << " has sorted its orders, "
+        << "and its first order has a timestamp PRECEDING the current "
+        << "time.";
+    throw CycOverrideException(err.str());    
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -96,7 +138,8 @@ void BuildRegion::populateBuilders() {
       inst != children_.end(); inst++) {
 
     // for each prototype of that child
-    for(PrototypeIterator fac = (dynamic_cast<InstModel*>(*inst))->beginPrototype();
+    for(PrototypeIterator fac = 
+          (dynamic_cast<InstModel*>(*inst))->beginPrototype();
         fac != (dynamic_cast<InstModel*>(*inst))->endPrototype(); fac++) {
       
       // if fac not in builders_
@@ -119,8 +162,8 @@ void BuildRegion::populateBuilders() {
 void BuildRegion::handleTick(int time) {
   // build something if an order has been placed
   if (!prototypeOrders_->empty()) {
-    while (prototypeOrders_->front().first == time) {
-      handlePrototypeOrder(prototypeOrders_->front().second);
+    while (!prototypeOrders_->empty() && frontOrder()->first == time) {
+      handlePrototypeOrder(frontOrder()->second);
       prototypeOrders_->pop_front();
     }
   }
@@ -177,9 +220,11 @@ void BuildRegion::placeOrder(Model* prototype, Model* builder) {
   dynamic_cast<InstModel*>(builder)->build(prototype,this);
 }
 
+/* -------------------- */
+
 
 /* --------------------
- * all MODEL classes have these members
+ * Model Class Methods
  * --------------------
  */
 
@@ -187,5 +232,5 @@ extern "C" Model* constructBuildRegion() {
     return new BuildRegion();
 }
 
-
 /* -------------------- */
+

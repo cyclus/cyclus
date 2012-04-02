@@ -14,7 +14,8 @@
 // Building Prototypes
 typedef std::pair<Model*,int> PrototypeDemand;
 typedef std::pair<int,PrototypeDemand> PrototypeBuildOrder;
-typedef std::list<PrototypeBuildOrder> PrototypeOrders;
+typedef std::list<PrototypeBuildOrder*> PrototypeOrders;
+typedef std::list<PrototypeBuildOrder*>::iterator OrderIterator;
 // Sorting Model Lists
 typedef std::list<Model*>::iterator ModelIterator;
 
@@ -138,8 +139,9 @@ class BuildRegion : public RegionModel
       
      @param src the pointer to the original (initialized ?) model to be 
    */
-  virtual void copyFreshModel(Model* src)
-  { copy(dynamic_cast<BuildRegion*>(src)); };
+  virtual void copyFreshModel(Model* src) { 
+    copy(dynamic_cast<BuildRegion*>(src)); 
+  }
   
   /**
      print information about the region 
@@ -182,23 +184,34 @@ class BuildRegion : public RegionModel
   PrototypeOrders* prototypeOrders_;
 
   /**
-     adds orders for a given prototype to the prototypeOrders_ member.
-     this function calls addOrder() for each order in the input file
+     constructs an order given a prototype, number, and time
+   */
+  PrototypeBuildOrder* constructOrder(Model* prototype, int number, int time);
+
+  /**
+     constructs a set of orders from xml and calls the general
+     populateOrders() function.
 
      @param cur the xml node corresponding to the demand for a prototype
   */
   void populateOrders(xmlNodePtr cur);
 
   /**
+     populates prototypeOrders_ given a set of orders. for each order 
+     in orders, it calls addOrder().
+  */
+  void populateOrders(PrototypeOrders* orders);
+
+  /**
      add a specific order to prototypeOrders_
    */
-  void addOrder(Model* prototype, int number, int time);
-  
+  void addOrder(PrototypeBuildOrder* b) { prototypeOrders_->push_back(b); }
+    
   /**
      sort the prototypeOrders_ by time
    */
   void sortOrders();
-
+  
   /**
      populates the builders_ memeber. this method is called after the
      region initializes its children so that they may populate their
@@ -251,6 +264,18 @@ class BuildRegion : public RegionModel
      place an order for a prototype with a builder
    */
   void placeOrder(Model* prototype, Model* builder);
+
+ public:
+  /**
+     return a pointer to the front build order
+   */
+  PrototypeBuildOrder* frontOrder() { return prototypeOrders_->front(); }
+
+  /**
+     return a pointer to the back build order
+   */
+  PrototypeBuildOrder* backOrder() { return prototypeOrders_->back(); }
+
 
 /* ------------------- */ 
 

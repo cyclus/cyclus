@@ -35,6 +35,9 @@ class TestInst: public InstModel {
   }
 
   void copyFreshModel(Model* model) { }
+
+ public:
+  void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
 };
 
 #endif
