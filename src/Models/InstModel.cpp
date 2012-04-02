@@ -93,6 +93,13 @@ void InstModel::handleDailyTasks(int time, int day){
  * --------------------
  */
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void InstModel::addPrototype(Model* prototype) {
+  if ( !isAvailablePrototype(prototype) ) {
+    prototypes_.insert(prototype);
+  }
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::build(Model* prototype, Model* requester) {
   // by default

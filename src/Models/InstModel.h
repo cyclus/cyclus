@@ -129,7 +129,26 @@ class InstModel : public TimeAgent, public Communicator {
  * all INSTMODEL classes have these members
  * --------------------
  */
+ protected:
+  /**
+     The BuildInst's list of available prototypes to build 
+   */
+  std::set<Model*> prototypes_;
+
+   /**
+     Add a prototype to the BuildInsts list of prototypes 
+   */
+  void addPrototype(Model* prototype);  
+
  public:
+  /**
+     Checks if prototype is in the prototype list 
+   */
+  bool isAvailablePrototype(Model* prototype) {
+    return ( prototypes_.find(prototype) 
+	     != prototypes_.end() ); 
+  }
+
   /**
      returns this institution's region 
    */

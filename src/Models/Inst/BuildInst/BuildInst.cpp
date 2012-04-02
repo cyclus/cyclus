@@ -69,13 +69,6 @@ void BuildInst::doBuild(Model* prototype, string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::addPrototype(Model* prototype) {
-  if ( !isAvailablePrototype(prototype) ) {
-    prototypes_.insert(prototype);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::build(Model* prototype, Model* requester) {
   // set an arbitrary name
   stringstream name("");

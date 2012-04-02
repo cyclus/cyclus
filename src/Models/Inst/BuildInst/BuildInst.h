@@ -102,27 +102,8 @@ public:
      @param name the name of that prototype 
    */
   void doBuild(Model* prototype, std::string name);
-  
- protected:  
-  /**
-     Add a prototype to the BuildInsts list of prototypes 
-   */
-  void addPrototype(Model* prototype);  
-
-  /**
-     The BuildInst's list of available prototypes to build 
-   */
-  std::set<Model*> prototypes_;
- 
+   
  public:
-  /**
-     Checks if prototype is in the prototype list 
-   */
-  bool isAvailablePrototype(Model* prototype) {
-    return ( prototypes_.find(prototype) 
-	     != prototypes_.end() ); 
-  };  
-
   /**
      determines if a prototype can be built by this inst at the present
      time
