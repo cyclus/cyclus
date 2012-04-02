@@ -13,7 +13,7 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeBuildInst : public BuildInst {
 public:
   FakeBuildInst() : BuildInst() {}
@@ -26,7 +26,7 @@ public:
 
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildInstTest : public ::testing::Test {
 protected:
   FakeBuildInst* src_inst;
@@ -36,6 +36,7 @@ protected:
   
   virtual void SetUp(){
     src_inst = new FakeBuildInst();
+    src_inst->InstModel::init();
     tst_region = new TestRegion();
     src_inst->setParent(tst_region);
     new_inst = new FakeBuildInst();
@@ -100,12 +101,6 @@ TEST_F(BuildInstTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_inst->handleTick(time));
   // Test BuildInst specific behaviors of the handleTock function here
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(BuildInstTest, AddPrototype) {
-  EXPECT_NO_THROW( src_inst->wrapAddPrototype(prototype) );
-  EXPECT_EQ( src_inst->isAvailablePrototype(prototype), true );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

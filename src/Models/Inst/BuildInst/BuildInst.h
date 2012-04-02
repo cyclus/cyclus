@@ -57,12 +57,17 @@ public:
   virtual ~BuildInst() {};
   
   /**
-     Initalize the BuildInst, populating its list of 
-     available prototypes. 
-      
+     Initalize members of BuildInst and any other non-input
+     related parameters
+   */
+  virtual void init();
+  
+  /**
+     Initalize the BuildInst from xml. Calls the init() function. 
+     
      @param cur the curren xml node pointer 
    */
-  virtual void init(xmlNodePtr cur);  //{ InstModel::init(cur); };
+  virtual void init(xmlNodePtr cur);
   
   /** 
      initialize an object by copying another 
@@ -76,7 +81,7 @@ public:
      @param src the pointer to the original (initialized ?) model to be 
      copied 
    */
-  virtual void copyFreshModel(Model* src);
+  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<BuildInst*>(src));}
 
   /**
      a print function to describe a BuildInst instantiation. 
@@ -102,26 +107,18 @@ public:
      @param name the name of that prototype 
    */
   void doBuild(Model* prototype, std::string name);
-  
- protected:  
-  /**
-     Add a prototype to the BuildInsts list of prototypes 
-   */
-  void addPrototype(Model* prototype);  
-
-  /**
-     The BuildInst's list of available prototypes to build 
-   */
-  std::set<Model*> prototypes_;
- 
+   
  public:
   /**
-     Checks if prototype is in the prototype list 
+     determines if a prototype can be built by this inst at the present
+     time
+
+     by default, returns true if in this inst's list of prototypes
+
+     @param prototype the prototype to be built
    */
-  bool isAvailablePrototype(Model* prototype) {
-    return ( prototypes_.find(prototype) 
-	     != prototypes_.end() ); 
-  };  
+  virtual bool canBuild(Model* prototype) 
+  {return isAvailablePrototype(prototype);}
 
   /**
      The build function which must be called by this BuildInst's parent. 
@@ -131,7 +128,7 @@ public:
      @param prototype the prototype to be built 
      @param requester the Model requesting that the prototype be built 
    */
-  void build(Model* prototype, Model* requester);
+  virtual void build(Model* prototype, Model* requester);
 
   /**
      The build function which must be called by this BuildInst's parent. 
@@ -141,7 +138,8 @@ public:
      @param requester the Model requesting that the prototype be built 
      @param name the name for the prototype to be built 
    */
-  void build(Model* prototype, Model* requester, std::string name);
+  virtual void build(Model* prototype, Model* requester, 
+                     std::string name);
 
 /* ------------------- */ 
 

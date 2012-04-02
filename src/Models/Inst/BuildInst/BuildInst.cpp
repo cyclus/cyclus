@@ -15,25 +15,47 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::init(xmlNodePtr cur) {
-  InstModel::init(cur);
-
-  // this institution must have a list of available prototypes
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"availableprototypes");
-
-  string name;
-  Model* prototype;
-  
-  for (int i=0;i<nodes->nodeNr;i++){
-    name = (const char*)nodes->nodeTab[i]->children->content;
-    prototype = Model::getTemplateByName(name);
-    prototypes_.insert(prototype);
-  }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildInst::init() {
   totalBuildCount_ = 0;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildInst::init(xmlNodePtr cur) {
+  // non xml inits
+  BuildInst::init();
+  // xml inits
+  InstModel::init(cur);
+
+  LOG(LEV_DEBUG2, "binst") << "A Build Inst is being initialized";
+
+  // get path to this model
+  xmlNodePtr model_cur = 
+    XMLinput->get_xpath_element(cur,"model/BuildInst");
+
+  // this institution must have a list of available prototypes
+  xmlNodeSetPtr nodes = 
+    XMLinput->get_xpath_elements(model_cur,"availableprototype");
+
+  // populate prototypes_
+  string name;
+  Model* prototype;
+  for (int i=0;i<nodes->nodeNr;i++){
+    name = (const char*)nodes->nodeTab[i]->children->content;
+    prototype = Model::getTemplateByName(name);
+    prototypes_->insert(prototype);
+  }
+
+  // yell if there are no prototypes
+  if ( prototypes_->empty() ) {
+    stringstream err("");
+    err << "BuildInst " << this->name() << " cannot be initiated "
+        << "with no available prototypes!";
+    throw CycOverrideException(err.str());
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::copy(BuildInst* src) {
   InstModel::copy(src);
 
@@ -41,24 +63,25 @@ void BuildInst::copy(BuildInst* src) {
   totalBuildCount_ = 0;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void BuildInst::copyFreshModel(Model* src) {
-  copy(dynamic_cast<BuildInst*>(src));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::print() {
   InstModel::print();
 
-  LOG(LEV_DEBUG2, "none!") << " and the following available prototypes: ";
-  for (set<Model*>::iterator mdl=prototypes_.begin(); 
-       mdl != prototypes_.end(); 
-       mdl++){
-    LOG(LEV_DEBUG2, "none!") << "        * " << (*mdl)->name();
+  if ( prototypes_ == NULL || prototypes_->empty() ){
+    LOG(LEV_DEBUG2, "binst") << name() << " has no prototypes (currently)."; 
+  }
+  else {
+    LOG(LEV_DEBUG2, "none!") << name() 
+                             << " has the following available prototypes: ";
+    for (set<Model*>::iterator mdl=prototypes_->begin(); 
+         mdl != prototypes_->end(); 
+         mdl++){
+      LOG(LEV_DEBUG2, "binst") << "        * " << (*mdl)->name();
+    }
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::doBuild(Model* prototype, string name) {
   Model* new_facility = Model::create(prototype);
   new_facility->setName(name);
@@ -66,14 +89,7 @@ void BuildInst::doBuild(Model* prototype, string name) {
   totalBuildCount_++;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BuildInst::addPrototype(Model* prototype) {
-  if ( !isAvailablePrototype(prototype) ) {
-    prototypes_.insert(prototype);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::build(Model* prototype, Model* requester) {
   // set an arbitrary name
   stringstream name("");
@@ -82,20 +98,23 @@ void BuildInst::build(Model* prototype, Model* requester) {
   this->build(prototype, requester, name.str());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::build(Model* prototype, Model* requester, string name) {
   if ( requester != this->parent() ) {
     // if the requester is not this inst's parent, throw an error
     stringstream err("");
-    err << "Model " << requester->name() << " is requesting that BuildInst "
-  	<< this->name() << " build a prototype, but is not the BuildInst's parent.";
+    err << "Model " << requester->name() << " is requesting that "
+        << "BuildInst " << this->name() << " build a prototype, but is "
+        <<"not the BuildInst's parent.";
     throw CycOverrideException(err.str());
   }
   else if ( !isAvailablePrototype(prototype) ) {
-    // if the prototype is not in the set of available prototypes, throw an error
+    // if the prototype is not in the set of available prototypes, 
+    // throw an error
     stringstream err("");
-    err << "Model " << requester->name() << " is requesting that BuildInst "
-  	<< this->name() << " build a prototype of type " << prototype->name() 
+    err << "Model " << requester->name() << " is requesting that "
+        <<"BuildInst " << this->name() << " build a prototype of type " 
+        << prototype->name() 
   	<< " but that prototype is not available via this BuildInst.";
     throw CycOverrideException(err.str());
   }

@@ -6,7 +6,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <element name="BuildInst">
 
       <oneOrMore>
-      <element name="availableprototypes">
+      <element name="availableprototype">
           <text/>
       </element>
       </oneOrMore>

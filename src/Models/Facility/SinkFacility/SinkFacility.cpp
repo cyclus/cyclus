@@ -23,6 +23,8 @@ SinkFacility::~SinkFacility(){ }
 void SinkFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
+  LOG(LEV_DEBUG2, "SnkFac") << "A Sink Facility is being initialized";
+
   /// Sink facilities can have many input/output commodities
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SinkFacility");

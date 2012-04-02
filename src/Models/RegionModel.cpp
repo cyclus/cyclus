@@ -14,63 +14,51 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::init() {
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
-  // register to receive time-step notifications
-  TI->registerTickListener(this);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::init(xmlNodePtr cur) { 
+  Model::init(cur); // name_ and model_impl_
+  RegionModel::initAllowedFacilities(cur); // allowedFacilities_
+  RegionModel::initSimInteraction(this); // parent_ and tick listener, model 'born'
+  RegionModel::initChildren(cur); // children->setParent, requires init()
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::init(xmlNodePtr cur) {
- 
-  Model::init(cur);
-  RegionModel::init();
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
-  /// all regions require allowed facilities - possibly many
-  xmlNodeSetPtr fac_nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initAllowedFacilities(xmlNodePtr cur) {   
+  xmlNodeSetPtr fac_nodes = 
+    XMLinput->get_xpath_elements(cur,"allowedfacility");
   string fac_name;
   Model* new_fac;
-  
-  // initialize facilities
   for (int i=0;i<fac_nodes->nodeNr;i++){
     fac_name = (const char*)fac_nodes->nodeTab[i]->children->content;
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initSimInteraction(RegionModel* reg) {
+  reg->setParent(reg);
+  TI->registerTickListener(reg);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::initChildren(xmlNodePtr cur) {   
   string inst_name;
   Model* inst;
-  // initalize institutions
   xmlNodeSetPtr inst_nodes = XMLinput->get_xpath_elements(cur,"institution");
   for (int i=0;i<inst_nodes->nodeNr;i++){
     inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
     inst = Model::getTemplateByName(inst_name);
     inst->setParent(this);
   }
-
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
   allowedFacilities_ = src->allowedFacilities_;
-  
-  // don't copy institutions!
-
+  RegionModel::initSimInteraction(src);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -78,21 +66,19 @@ void RegionModel::print() {
 
   Model::print();
 
-  LOG(LEV_DEBUG2, "none!") << "allows facilities " ;
+  LOG(LEV_DEBUG2, "none!") << "allows facilities:" ;
 
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2, "none!") << (fac == allowedFacilities_.begin() ? "{" : ", " )
-        << (*fac)->name();
+    LOG(LEV_DEBUG2, "none!") << "  * " << (*fac)->name();
   }
-  
-  LOG(LEV_DEBUG2, "none!") << "} and has the following institutions:";
+  LOG(LEV_DEBUG2, "none!") << "and has the following institutions:";
   
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
-    (*inst)->print();
+    LOG(LEV_DEBUG2, "none!") << "  * " << (*inst)->name();
   }
 }
 

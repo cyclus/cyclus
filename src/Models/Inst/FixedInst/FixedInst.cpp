@@ -44,13 +44,17 @@ void FixedInst::copyFreshModel(Model* src) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::print() {
   InstModel::print();
-
-  LOG(LEV_DEBUG2, "none!") << " and the following permanent facilities: ";
-  for (vector<Model*>::iterator fac=children_.begin(); 
-       fac != children_.end(); 
-       fac++){
-    LOG(LEV_DEBUG2, "none!") << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
-     << " (" << (*fac)->name() << ")";
+  if (children_.size() > 0) {
+    LOG(LEV_DEBUG2, "none!") << "has the following permanent facilities: ";
+    for (vector<Model*>::iterator fac=children_.begin(); 
+         fac != children_.end(); 
+         fac++){
+      LOG(LEV_DEBUG2, "none!") << "  * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
+                               << " (" << (*fac)->name() << ")";
+    }
+  }
+  else {
+    LOG(LEV_DEBUG2, "none!") << "has no built facilities (currently).";
   }
 };
 

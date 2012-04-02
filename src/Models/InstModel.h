@@ -5,6 +5,13 @@
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "RegionModel.h"
+#include "Model.h"
+
+#include <set>
+
+// Usefull Typedefs
+typedef std::set<Model*> PrototypeSet;
+typedef std::set<Model*>::iterator PrototypeIterator;
 
 /**
    The InstModel class is the abstract class/interface 
@@ -54,11 +61,19 @@ class InstModel : public TimeAgent, public Communicator {
      every model should be destructable 
    */
   virtual ~InstModel() {};
-  
+      
   /**
-     every model needs a method to initialize from XML 
+     Initalize members of InstModel and any other non-input
+     related parameters
    */
-  virtual void init(xmlNodePtr cur) { Model::init(cur);}
+  virtual void init();
+
+  /**
+     Initalize the InstModel from xml. Calls the init() function. 
+     
+     @param cur the current xml node pointer 
+   */
+  virtual void init(xmlNodePtr cur);
 
   /**
      every model needs a method to copy one object to another 
@@ -129,7 +144,41 @@ class InstModel : public TimeAgent, public Communicator {
  * all INSTMODEL classes have these members
  * --------------------
  */
+ protected:
+  /**
+     The Inst's set of available prototypes to build 
+   */
+  PrototypeSet* prototypes_;
+
+   /**
+     Add a prototype to the Insts list of prototypes 
+   */
+  void addPrototype(Model* prototype);  
+
  public:
+  /**
+     return the number of prototypes this inst can build
+   */
+  int nPrototypes() { return prototypes_->size(); }
+  
+  /**
+     return the first prototype
+   */
+  PrototypeIterator beginPrototype() { return prototypes_->begin(); }
+
+  /**
+     return the last prototype
+   */
+  PrototypeIterator endPrototype() { return prototypes_->end(); }
+
+  /**
+     Checks if prototype is in the prototype list 
+   */
+  bool isAvailablePrototype(Model* prototype) {
+    return ( prototypes_->find(prototype) 
+	     != prototypes_->end() ); 
+  }
+
   /**
      returns this institution's region 
    */
@@ -146,9 +195,34 @@ class InstModel : public TimeAgent, public Communicator {
   double powerCapacity();
 
   /**
-     attempts to build another facility of type fac 
+     determines if a prototype can be built by this inst at the present
+     time
+
+     by default, returns false
+
+     @param prototype the prototype to be built
    */
-  virtual bool pleaseBuild(Model* fac);
+  virtual bool canBuild(Model* prototype) {return false;}
+
+  /**
+     builds a prototype requested by requester
+
+     by default, an error is thrown.
+
+     @param prototype the prototype to be built 
+     @param requester the Model requesting that the prototype be built 
+   */
+  virtual void build(Model* prototype, Model* requester);
+
+  /**
+     builds a prototype with a specific name as requested by requester
+     
+     by default, it calls the simpler build function
+   */
+  virtual void build(Model* prototype, Model* requester, 
+                     std::string name) { 
+    build(prototype,requester); 
+  }
 
 /* ------------------- */ 
   
