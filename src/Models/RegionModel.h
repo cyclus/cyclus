@@ -77,9 +77,17 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual ~RegionModel() {};
     
   /**
-     RegionModels have generic init steps regardless of input
+     Initalize members of RegionModel and any other non-input
+     related parameters
    */
-  virtual void init();
+  virtual void init() {};
+
+  /**
+     Initalize the InstModel from xml. Calls the init() function. 
+     
+     @param cur the current xml node pointer 
+   */
+  virtual void init(xmlNodePtr cur);
 
   /**
      populate the region's list of allowed facilities
@@ -87,16 +95,17 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void initAllowedFacilities(xmlNodePtr cur);
 
   /**
+     set the parameters necessary for RegionModel to interact
+     with the simulation
+     
+     @param reg the RegionModel to initialize
+   */
+  virtual void initSimInteraction(RegionModel* reg);
+
+  /**
      populate the region's list of child institutions
    */
   virtual void initChildren(xmlNodePtr cur);
-
-  /**
-     A region model's full initialization from XML, which is broken
-     up into Model's init, initAllowedFacility, RegionModel's init(),
-     and initChildren.
-   */
-  virtual void init(xmlNodePtr cur);
 
   /**
      every model needs a method to copy one object to another 

@@ -42,6 +42,7 @@ void BuildRegion::init() {
 void BuildRegion::init(xmlNodePtr cur) {
   // non xml inits
   BuildRegion::init();
+  RegionModel::init(); // we never explicitly call RegionModel::init(cur)
   // xml inits
   Model::init(cur); // name_ and model_impl_
   RegionModel::initAllowedFacilities(cur); // allowedFacilities_
@@ -58,8 +59,10 @@ void BuildRegion::init(xmlNodePtr cur) {
   }
   sortOrders();
   
-  RegionModel::init(); // parent_ and tick listener, model 'born'
-  RegionModel::initChildren(cur); // children->setParent, requires init()
+  // parent_ and tick listener, model 'born'
+  RegionModel::initSimInteraction(this); 
+  // children->setParent, requires init()
+  RegionModel::initChildren(cur); 
   
   // populate the list of builders
   populateBuilders();

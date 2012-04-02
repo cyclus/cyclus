@@ -36,6 +36,7 @@ protected:
   
   virtual void SetUp(){
     src_inst = new FakeBuildInst();
+    src_inst->InstModel::init();
     tst_region = new TestRegion();
     src_inst->setParent(tst_region);
     new_inst = new FakeBuildInst();

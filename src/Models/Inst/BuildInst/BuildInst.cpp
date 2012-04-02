@@ -43,11 +43,11 @@ void BuildInst::init(xmlNodePtr cur) {
   for (int i=0;i<nodes->nodeNr;i++){
     name = (const char*)nodes->nodeTab[i]->children->content;
     prototype = Model::getTemplateByName(name);
-    prototypes_.insert(prototype);
+    prototypes_->insert(prototype);
   }
 
   // yell if there are no prototypes
-  if ( prototypes_.empty() ) {
+  if ( prototypes_->empty() ) {
     stringstream err("");
     err << "BuildInst " << this->name() << " cannot be initiated "
         << "with no available prototypes!";
@@ -67,12 +67,17 @@ void BuildInst::copy(BuildInst* src) {
 void BuildInst::print() {
   InstModel::print();
 
-  LOG(LEV_DEBUG2, "none!") 
-    << " and the following available prototypes: ";
-  for (set<Model*>::iterator mdl=prototypes_.begin(); 
-       mdl != prototypes_.end(); 
-       mdl++){
-    LOG(LEV_DEBUG2, "none!") << "        * " << (*mdl)->name();
+  if ( prototypes_ == NULL || prototypes_->empty() ){
+    LOG(LEV_DEBUG2, "binst") << name() << " has no prototypes (currently)."; 
+  }
+  else {
+    LOG(LEV_DEBUG2, "none!") << name() 
+                             << " has the following available prototypes: ";
+    for (set<Model*>::iterator mdl=prototypes_->begin(); 
+         mdl != prototypes_->end(); 
+         mdl++){
+      LOG(LEV_DEBUG2, "binst") << "        * " << (*mdl)->name();
+    }
   }
 }
 

@@ -33,6 +33,7 @@ public:
   void initSimple() {
     // instantiate members
     inst = new TestInst();
+    inst->init();
     fac = new TestFacility();
     nfacs = 2;
     time_to_build_ = 1;

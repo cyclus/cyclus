@@ -16,17 +16,22 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::init() {
+  prototypes_ = new PrototypeSet();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::init(xmlNodePtr cur) {
+  // non xml inits
+  InstModel::init();
+  // xml inits
+  Model::init(cur);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::copy(InstModel* src) {
   Model::copy(src);
   Communicator::copy(src);
-  
-  /** 
-   *  Specific initialization for InstModels
-   */
-  //children_ = src->children_; // @MJGFlag should institutions copy their children??
-
-  //Model* parent = src->parent(); // @MJGFlag should institutions copy their parents??
-  //this->setParent(parent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -96,7 +101,7 @@ void InstModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void InstModel::addPrototype(Model* prototype) {
   if ( !isAvailablePrototype(prototype) ) {
-    prototypes_.insert(prototype);
+    prototypes_->insert(prototype);
   }
 }
 

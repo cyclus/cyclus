@@ -61,11 +61,19 @@ class InstModel : public TimeAgent, public Communicator {
      every model should be destructable 
    */
   virtual ~InstModel() {};
-  
+      
   /**
-     every model needs a method to initialize from XML 
+     Initalize members of InstModel and any other non-input
+     related parameters
    */
-  virtual void init(xmlNodePtr cur) { Model::init(cur);}
+  virtual void init();
+
+  /**
+     Initalize the InstModel from xml. Calls the init() function. 
+     
+     @param cur the current xml node pointer 
+   */
+  virtual void init(xmlNodePtr cur);
 
   /**
      every model needs a method to copy one object to another 
@@ -140,7 +148,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      The Inst's set of available prototypes to build 
    */
-  PrototypeSet prototypes_;
+  PrototypeSet* prototypes_;
 
    /**
      Add a prototype to the Insts list of prototypes 
@@ -151,24 +159,24 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      return the number of prototypes this inst can build
    */
-  int nPrototypes() { return prototypes_.size(); }
+  int nPrototypes() { return prototypes_->size(); }
   
   /**
      return the first prototype
    */
-  PrototypeIterator beginPrototype() { return prototypes_.begin(); }
+  PrototypeIterator beginPrototype() { return prototypes_->begin(); }
 
   /**
      return the last prototype
    */
-  PrototypeIterator endPrototype() { return prototypes_.end(); }
+  PrototypeIterator endPrototype() { return prototypes_->end(); }
 
   /**
      Checks if prototype is in the prototype list 
    */
   bool isAvailablePrototype(Model* prototype) {
-    return ( prototypes_.find(prototype) 
-	     != prototypes_.end() ); 
+    return ( prototypes_->find(prototype) 
+	     != prototypes_->end() ); 
   }
 
   /**
@@ -212,7 +220,9 @@ class InstModel : public TimeAgent, public Communicator {
      by default, it calls the simpler build function
    */
   virtual void build(Model* prototype, Model* requester, 
-                     std::string name) {build(prototype,requester);}
+                     std::string name) { 
+    build(prototype,requester); 
+  }
 
 /* ------------------- */ 
   

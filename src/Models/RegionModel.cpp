@@ -14,13 +14,12 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::init() {
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
-  // register to receive time-step notifications
-  TI->registerTickListener(this);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::init(xmlNodePtr cur) { 
+  Model::init(cur); // name_ and model_impl_
+  RegionModel::initAllowedFacilities(cur); // allowedFacilities_
+  RegionModel::initSimInteraction(this); // parent_ and tick listener, model 'born'
+  RegionModel::initChildren(cur); // children->setParent, requires init()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,6 +35,12 @@ void RegionModel::initAllowedFacilities(xmlNodePtr cur) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initSimInteraction(RegionModel* reg) {
+  reg->setParent(reg);
+  TI->registerTickListener(reg);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::initChildren(xmlNodePtr cur) {   
   string inst_name;
@@ -49,18 +54,11 @@ void RegionModel::initChildren(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::init(xmlNodePtr cur) { 
-  Model::init(cur); // name_ and model_impl_
-  RegionModel::initAllowedFacilities(cur); // allowedFacilities_
-  RegionModel::init(); // parent_ and tick listener, model 'born'
-  RegionModel::initChildren(cur); // children->setParent, requires init()
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
   allowedFacilities_ = src->allowedFacilities_;
+  RegionModel::initSimInteraction(src);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
