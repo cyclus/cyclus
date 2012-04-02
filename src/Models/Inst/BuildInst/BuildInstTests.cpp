@@ -103,12 +103,6 @@ TEST_F(BuildInstTest, Tock) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(BuildInstTest, AddPrototype) {
-  EXPECT_NO_THROW( src_inst->wrapAddPrototype(prototype) );
-  EXPECT_EQ( src_inst->isAvailablePrototype(prototype), true );
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, BuildPrototype) {
   EXPECT_NO_THROW( src_inst->wrapAddPrototype(prototype) );
   EXPECT_EQ( src_inst->isAvailablePrototype(prototype), true );

@@ -91,7 +91,28 @@ void BuildRegion::sortOrders() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::populateBuilders() {
-  
+  // for each child
+  for(vector<Model*>::iterator inst = children_.begin();
+      inst != children_.end(); inst++) {
+
+    // for each prototype of that child
+    for(PrototypeIterator fac = (dynamic_cast<InstModel*>(*inst))->beginPrototype();
+        fac != (dynamic_cast<InstModel*>(*inst))->endPrototype(); fac++) {
+      
+      // if fac not in builders_
+      if ( builders_->find( (*fac) ) == builders_->end() ) {
+        list<Model*>* builder_list = new list<Model*>();
+        builder_list->push_back( (*inst) );
+        builders_->insert( pair<Model*,list<Model*>*>( (*fac), builder_list) );
+      }
+      // if fac in builders_
+      else {
+        (*builders_)[(*fac)]->push_back( (*inst) );
+      } // end builders_
+
+    }  // end prototypes
+
+  } // end children
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

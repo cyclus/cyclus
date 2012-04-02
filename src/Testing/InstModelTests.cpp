@@ -10,6 +10,14 @@ TEST_P(InstModelTests, CopyInst) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(InstModelTests, AddPrototype) {
+  FakeInstModel* new_inst = inst_model_;
+  TestFacility* prototype = test_facility_;
+  EXPECT_NO_THROW( new_inst->wrapAddPrototype(prototype) );
+  EXPECT_EQ( new_inst->isAvailablePrototype(prototype), true );
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(InstModelTests, Tick) {
   int time = 1;
   EXPECT_NO_THROW(inst_model_->handleTick(time));

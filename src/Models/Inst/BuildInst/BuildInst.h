@@ -76,7 +76,7 @@ public:
      @param src the pointer to the original (initialized ?) model to be 
      copied 
    */
-  virtual void copyFreshModel(Model* src);
+  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<BuildInst*>(src));}
 
   /**
      a print function to describe a BuildInst instantiation. 

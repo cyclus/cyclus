@@ -43,11 +43,6 @@ void BuildInst::copy(BuildInst* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::copyFreshModel(Model* src) {
-  copy(dynamic_cast<BuildInst*>(src));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::print() {
   InstModel::print();
 

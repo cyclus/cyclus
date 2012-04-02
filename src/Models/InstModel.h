@@ -5,6 +5,13 @@
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "RegionModel.h"
+#include "Model.h"
+
+#include <set>
+
+// Usefull Typedefs
+typedef std::set<Model*> PrototypeSet;
+typedef std::set<Model*>::iterator PrototypeIterator;
 
 /**
    The InstModel class is the abstract class/interface 
@@ -131,16 +138,31 @@ class InstModel : public TimeAgent, public Communicator {
  */
  protected:
   /**
-     The BuildInst's list of available prototypes to build 
+     The Inst's set of available prototypes to build 
    */
-  std::set<Model*> prototypes_;
+  PrototypeSet prototypes_;
 
    /**
-     Add a prototype to the BuildInsts list of prototypes 
+     Add a prototype to the Insts list of prototypes 
    */
   void addPrototype(Model* prototype);  
 
  public:
+  /**
+     return the number of prototypes this inst can build
+   */
+  int nPrototypes() { return prototypes_.size(); }
+  
+  /**
+     return the first prototype
+   */
+  PrototypeIterator beginPrototype() { return prototypes_.begin(); }
+
+  /**
+     return the last prototype
+   */
+  PrototypeIterator endPrototype() { return prototypes_.end(); }
+
   /**
      Checks if prototype is in the prototype list 
    */
