@@ -25,7 +25,7 @@ SourceFacility::~SourceFacility() { }
 void SourceFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
-  LOG(LEV_DEBUG2, "SrcFac") << "The Source Facility is being initialized";
+  LOG(LEV_DEBUG2, "SrcFac") << "A Source Facility is being initialized";
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");

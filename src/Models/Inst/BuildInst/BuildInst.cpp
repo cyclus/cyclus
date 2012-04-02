@@ -16,22 +16,43 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildInst::init() {
+  totalBuildCount_ = 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::init(xmlNodePtr cur) {
+  // non xml inits
+  BuildInst::init();
+  // xml inits
   InstModel::init(cur);
+
+  LOG(LEV_DEBUG2, "binst") << "A Build Inst is being initialized";
+
+  // get path to this model
+  xmlNodePtr model_cur = 
+    XMLinput->get_xpath_element(cur,"model/BuildInst");
 
   // this institution must have a list of available prototypes
   xmlNodeSetPtr nodes = 
-    XMLinput->get_xpath_elements(cur,"availableprototypes");
+    XMLinput->get_xpath_elements(model_cur,"availableprototype");
 
+  // populate prototypes_
   string name;
   Model* prototype;
-  
   for (int i=0;i<nodes->nodeNr;i++){
     name = (const char*)nodes->nodeTab[i]->children->content;
     prototype = Model::getTemplateByName(name);
     prototypes_.insert(prototype);
   }
-  totalBuildCount_ = 0;
+
+  // yell if there are no prototypes
+  if ( prototypes_.empty() ) {
+    stringstream err("");
+    err << "BuildInst " << this->name() << " cannot be initiated "
+        << "with no available prototypes!";
+    throw CycOverrideException(err.str());
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

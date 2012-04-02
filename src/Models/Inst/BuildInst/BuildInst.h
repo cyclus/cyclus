@@ -57,12 +57,17 @@ public:
   virtual ~BuildInst() {};
   
   /**
-     Initalize the BuildInst, populating its list of 
-     available prototypes. 
-      
+     Initalize members of BuildInst and any other non-input
+     related parameters
+   */
+  virtual void init();
+  
+  /**
+     Initalize the BuildInst from xml. Calls the init() function. 
+     
      @param cur the curren xml node pointer 
    */
-  virtual void init(xmlNodePtr cur);  //{ InstModel::init(cur); };
+  virtual void init(xmlNodePtr cur);
   
   /** 
      initialize an object by copying another 

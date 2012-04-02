@@ -60,15 +60,7 @@ void RegionModel::init(xmlNodePtr cur) {
 void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
   allowedFacilities_ = src->allowedFacilities_;
-  
-  // don't copy institutions!
-
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -76,21 +68,19 @@ void RegionModel::print() {
 
   Model::print();
 
-  LOG(LEV_DEBUG2, "none!") << "allows facilities " ;
+  LOG(LEV_DEBUG2, "none!") << "allows facilities:" ;
 
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2, "none!") << (fac == allowedFacilities_.begin() ? "{" : ", " )
-        << (*fac)->name();
+    LOG(LEV_DEBUG2, "none!") << "  * " << (*fac)->name();
   }
-  
-  LOG(LEV_DEBUG2, "none!") << "} and has the following institutions:";
+  LOG(LEV_DEBUG2, "none!") << "and has the following institutions:";
   
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
-    (*inst)->print();
+    LOG(LEV_DEBUG2, "none!") << "  * " << (*inst)->name();
   }
 }
 

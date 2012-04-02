@@ -26,7 +26,7 @@ void Timer::runSim() {
   CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()){
     if (date_.day() == 1){
-      CLOG(LEV_INFO2) << "Current date: " << date_ << " {";
+      CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ << " {";
       CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
 
       Material::decayMaterials(time_);

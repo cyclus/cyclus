@@ -117,12 +117,15 @@ class BuildRegion : public RegionModel
   virtual ~BuildRegion() {};
 
   /**
-     generic initialization
+     Initalize members of BuildRegion and any other non-input
+     related parameters
    */
   virtual void init();
    
   /**
-     initialize an object from XML input 
+     Initalize the BuildRegion from xml. Calls the init() function. 
+     
+     @param cur the curren xml node pointer 
    */
   virtual void init(xmlNodePtr cur);
 
@@ -146,7 +149,7 @@ class BuildRegion : public RegionModel
   /**
      print information about the region 
    */
-  virtual void print() { RegionModel::print(); };
+  virtual void print();
 
 /* ------------------- */ 
 
@@ -275,7 +278,6 @@ class BuildRegion : public RegionModel
      return a pointer to the back build order
    */
   PrototypeBuildOrder* backOrder() { return prototypeOrders_->back(); }
-
 
 /* ------------------- */ 
 

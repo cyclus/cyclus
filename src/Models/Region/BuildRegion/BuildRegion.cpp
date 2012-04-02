@@ -5,15 +5,13 @@
 
 #include "InstModel.h"
 
-#include <list>
-#include <sstream>
-
 #include "Timer.h"
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
 
-#include <iostream>
+#include <list>
+#include <sstream>
 
 using namespace std;
 
@@ -23,8 +21,7 @@ using namespace std;
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
-  // sort by time
-  return (o1->first < o2->first);
+  return (o1->first < o2->first); // sort by time
 }
 
 /* -------------------- */
@@ -36,15 +33,18 @@ bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::init() {
+  LOG(LEV_DEBUG2, "breg") << "A Build Region is being initialized";
   prototypeOrders_ = new PrototypeOrders();
   builders_ = new map<Model*, std::list<Model*>*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::init(xmlNodePtr cur) {
+  // non xml inits
+  BuildRegion::init();
+  // xml inits
   Model::init(cur); // name_ and model_impl_
   RegionModel::initAllowedFacilities(cur); // allowedFacilities_
-  BuildRegion::init(); // initializes member vars
   
   // get path to this model
   xmlNodePtr model_cur = 
@@ -68,6 +68,25 @@ void BuildRegion::init(xmlNodePtr cur) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::copy(BuildRegion* src) {
   RegionModel::copy(src);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildRegion::print() {
+  RegionModel::print();
+  if ( builders_ == NULL || builders_->empty() ){
+    LOG(LEV_DEBUG2, "breg") << name() << " has no builders (currently)."; 
+  }
+  else {
+    LOG(LEV_DEBUG2, "breg") << name() << " has the following builders: " ; 
+    for(map<Model*, list<Model*>*>::iterator mit=builders_->begin();
+        mit != builders_->end(); mit++) {
+      LOG(LEV_DEBUG2, "breg") << "  For prototype: " << mit->first->name(); 
+      for(list<Model*>::iterator inst = mit->second->begin();
+          inst != mit->second->end(); inst++) {
+        LOG(LEV_DEBUG2, "breg") << "    * " << (*inst)->name(); 
+      }
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -133,29 +152,46 @@ void BuildRegion::sortOrders() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::populateBuilders() {
+  // if there are no children, yell
+  if ( children_.empty() ) {
+    stringstream err("");
+    err << "BuildRegion " << this->name() << " cannot populate its list"
+        << " of builders because it has no children.";
+    throw CycOverrideException(err.str());
+  }
+
   // for each child
   for(vector<Model*>::iterator inst = children_.begin();
       inst != children_.end(); inst++) {
-
     // for each prototype of that child
-    for(PrototypeIterator fac = 
-          (dynamic_cast<InstModel*>(*inst))->beginPrototype();
-        fac != (dynamic_cast<InstModel*>(*inst))->endPrototype(); fac++) {
+    for(PrototypeIterator 
+          fac = (dynamic_cast<InstModel*>(*inst))->beginPrototype();
+        fac != (dynamic_cast<InstModel*>(*inst))->endPrototype(); 
+        fac++) {
       
+      list<Model*>* builder_list;
       // if fac not in builders_
       if ( builders_->find( (*fac) ) == builders_->end() ) {
-        list<Model*>* builder_list = new list<Model*>();
+        builder_list = new list<Model*>();
         builder_list->push_back( (*inst) );
-        builders_->insert( pair<Model*,list<Model*>*>( (*fac), builder_list) );
+        builders_->
+          insert( pair<Model*,list<Model*>*>( (*fac), builder_list) );
       }
       // if fac in builders_
       else {
         (*builders_)[(*fac)]->push_back( (*inst) );
-      } // end builders_
+      }
 
     }  // end prototypes
-
   } // end children
+
+  // if there are no builders, yell
+  if ( builders_->empty() ) {
+    stringstream err("");
+    err << "BuildRegion " << this->name() << " has finished populating"
+        << " its list of builders, but that list is empty.";
+    throw CycOverrideException(err.str());
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
