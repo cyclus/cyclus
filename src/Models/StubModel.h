@@ -35,7 +35,13 @@ class StubModel : public Model {
      every model should be destructable 
    */
   virtual ~StubModel();
-    
+
+  /**
+     Initalize members of StubModel and any other non-input
+     related parameters
+   */
+  virtual void init() {};
+
   /**
      every model needs a method to initialize from XML 
       

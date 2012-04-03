@@ -96,15 +96,14 @@ TEST_F(NullFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW();
-  src_facility->handleTick(time);
+  EXPECT_NO_THROW(src_facility->handleTick(time));
   // Test NullFacility specific behaviors of the handleTick function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_NO_THROW(src_facility->handleTock(time));
   // Test NullFacility specific behaviors of the handleTock function here
 }
 

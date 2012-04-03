@@ -21,6 +21,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
  public:
   virtual void SetUp() { 
     facility_model_ = (*GetParam())();
+    facility_model_->init();
     test_inst_ = new TestInst();
     facility_model_->setParent(test_inst_);
     test_out_market_ = new TestMarket("out-commod");

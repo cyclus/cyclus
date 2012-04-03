@@ -21,6 +21,7 @@ class MarketModelTests : public TestWithParam<MarketModelConstructor*> {
   public:
     virtual void SetUp() { 
       market_model_ = (*GetParam())();
+      market_model_->init();
     }
     virtual void TearDown(){ 
       delete market_model_;

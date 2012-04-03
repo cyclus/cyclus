@@ -53,20 +53,20 @@ void MarketModel::registerMarket(MarketModel* mkt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::init() {  
+void MarketModel::initSimInteraction(MarketModel* mkt) {  
   // this brings the market into the simulation (all agents must have a parent)
-  this->setParent(this);
+  mkt->setParent(mkt);
 
   // register the model
-  TI->registerResolveListener(this);
-  MarketModel::registerMarket(this);
+  TI->registerResolveListener(mkt);
+  MarketModel::registerMarket(mkt);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::init(xmlNodePtr cur) {
   // general initializations
   Model::init(cur);  
-  MarketModel::init();
+  MarketModel::initSimInteraction(this);
 
   // specific initalizations
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");

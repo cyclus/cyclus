@@ -73,13 +73,23 @@ class MarketModel : public Model, public Communicator {
   static MarketModel* marketForCommod(std::string commod);
 
   /**
-     this model has generic initalization regardless of input type
+     Initalize members of MarketModel and any other non-input
+     related parameters
    */
-  void init();
+  virtual void init() {};
+
+  /**
+     set the parameters necessary for MarketModel to interact
+     with the simulation
+     
+     @param mkt the MarketModel to initialize
+   */
+  virtual void initSimInteraction(MarketModel* mkt);
 
   /**
      every model needs a method to initialize from XML 
-     this method calls the MarketModel's generic init() method
+     this method calls the MarketModel's initSimInteraction() 
+     method
    */
   virtual void init(xmlNodePtr cur);
 

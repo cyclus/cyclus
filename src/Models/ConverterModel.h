@@ -58,9 +58,17 @@ class ConverterModel : public Model {
      every model should be destructable 
    */
   virtual ~ConverterModel() {};
-  
+
   /**
-     every model needs a method to initialize from XML 
+     Initalize members of ConverterModel and any other non-input
+     related parameters
+   */
+  virtual void init() {};
+
+  /**
+     A method to initialize the model 
+      
+     @param cur the pointer to the xml input for the model to initialize 
    */
   virtual void init(xmlNodePtr cur);
 
