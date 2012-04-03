@@ -76,7 +76,15 @@ class FacilityModel : public TimeAgent, public Communicator {
   virtual ~FacilityModel();
   
   /**
-     every model needs a method to initialize from XML 
+     Initalize members of FacilityModel and any other non-input
+     related parameters
+   */
+  virtual void init() {};
+
+  /**
+     Initalize the FacilityModel from xml. Calls the init() function. 
+     
+     @param cur the current xml node pointer 
    */
   virtual void init(xmlNodePtr cur);
   
