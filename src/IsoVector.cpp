@@ -112,7 +112,7 @@ void IsoVector::load_recipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::recipe(string name) { 
+IsoVector IsoVector::recipe(std::string name) { 
   if (recipes_.count(name) == 0) {
     throw CycIndexException("Recipe '" + name + "' does not exist.");
   }
@@ -252,13 +252,13 @@ bool IsoVector::operator== (IsoVector rhs_vector) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::getAtomicNum(int tope) {
+int IsoVector::getAtomicNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope / 1000; // integer division
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::getMassNum(int tope) {
+int IsoVector::getMassNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope % 1000;
 }
@@ -282,7 +282,7 @@ double IsoVector::mass() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::mass(int tope) {
+double IsoVector::mass(Iso tope) {
   validateIsotopeNumber(tope);
 
   int grams_per_kg = 1000;
@@ -318,7 +318,7 @@ void IsoVector::setMass(double new_mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setMass(int tope, double new_mass) {
+void IsoVector::setMass(Iso tope, double new_mass) {
   validateIsotopeNumber(tope);
 
   if (new_mass < -1.0 * EPS_KG) {
@@ -365,7 +365,7 @@ double IsoVector::atomCount() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::atomCount(int tope) {
+double IsoVector::atomCount(Iso tope) {
   validateIsotopeNumber(tope);
 
   return atom_comp_[tope];
@@ -398,7 +398,7 @@ void IsoVector::setAtomCount(double new_count) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setAtomCount(int tope, double new_count) {
+void IsoVector::setAtomCount(Iso tope, double new_count) {
   validateIsotopeNumber(tope);
   double grams_per_kg = 1000;
   if (new_count * MT->getMassInGrams(tope) / grams_per_kg < -1 * EPS_KG) {
@@ -473,7 +473,7 @@ void IsoVector::validateComposition() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateIsotopeNumber(int tope) {
+void IsoVector::validateIsotopeNumber(Iso tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;
 
@@ -486,7 +486,7 @@ void IsoVector::validateIsotopeNumber(int tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::isZero(int tope) {
+bool IsoVector::isZero(Iso tope) {
   validateIsotopeNumber(tope);
 
   if (atom_comp_.count(tope) == 0) {

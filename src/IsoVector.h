@@ -71,7 +71,7 @@ typedef std::map<CompMap*, int> StateMap;
    Input file recipes can be either mass or atom (mole) based and define 
    an often-referenced composition vector. Recipes can be retrieved at 
    will by any agent during the simulation via the static 
-   `IsoVector::recipe(std::string name)` method.  For example:  
+   \ref IsoVector::recipe(std::string name) method.  For example:  
    @code 
     
    std::string recipe_name = "my-recipe-name"; 

@@ -12,7 +12,7 @@
 using namespace std;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Database::Database(string filename){
+Database::Database(std::string filename){
   database_ = NULL;
   exists_ = true;
   isOpen_ = false;
@@ -20,7 +20,7 @@ Database::Database(string filename){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Database::Database(string filename, string file_path){
+Database::Database(std::string filename, std::string file_path){
   database_ = NULL;
   exists_ = true;
   isOpen_ = false;
@@ -167,7 +167,7 @@ bool Database::tableExists(table_ptr t) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Database::issueCommand(string cmd){  
+void Database::issueCommand(std::string cmd){  
   if ( isOpen() ) {
     sqlite3_stmt *statement;
     // query the database
@@ -215,7 +215,7 @@ void Database::flush(table_ptr t){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-query_result Database::query(string query){
+query_result Database::query(std::string query){
   // declare members
   sqlite3_stmt *statement;
   query_result results;

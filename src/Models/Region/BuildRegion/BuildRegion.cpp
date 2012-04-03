@@ -224,7 +224,7 @@ void BuildRegion::handlePrototypeOrder(PrototypeDemand order) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::getAvailableBuilders(Model* prototype, 
-                                       list<ModelIterator>& bidders) {
+                                       std::list<ModelIterator>& bidders) {
   for(ModelIterator child = (*builders_)[prototype]->begin();
       child != (*builders_)[prototype]->end(); 
       child++) {
@@ -244,7 +244,7 @@ void BuildRegion::getAvailableBuilders(Model* prototype,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Model* BuildRegion::selectBuilder(Model* prototype, 
-                                  list<ModelIterator>& bidders) {
+                                  std::list<ModelIterator>& bidders) {
   // highest bidder guaranteed to be front -- see header file
   ModelIterator builder = bidders.front();
   // move builder to end of list

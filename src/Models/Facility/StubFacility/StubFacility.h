@@ -88,7 +88,7 @@ class StubFacility : public FacilityModel  {
   /**
      Transacted resources are received through this method 
       
-     @param trans the transaction to which these resource objects belong 
+     @param msg the transaction to which these resource objects belong 
      @param manifest is the set of resources being received 
    */ 
   virtual void addResource(msg_ptr msg,

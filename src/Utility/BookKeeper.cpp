@@ -36,14 +36,14 @@ BookKeeper::BookKeeper() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(string name) {
+void BookKeeper::createDB(std::string name) {
   // construct output file path
   file_path fpath = Env::getCyclusPath();
   createDB(name,fpath);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(string name, file_path fpath) {
+void BookKeeper::createDB(std::string name, file_path fpath) {
   dbName_ = name;
 
   try{

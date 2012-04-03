@@ -202,7 +202,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SeparationsMatrixFacility::addResource(msg_ptr msg,
-                                            vector<rsrc_ptr> manifest) {  
+                                            std::vector<rsrc_ptr> manifest) {  
   LOG(LEV_DEBUG2, "none!") << "Entered the addResource file ";
 
   // grab each material object off of the manifest

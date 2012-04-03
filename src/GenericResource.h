@@ -29,7 +29,7 @@ public:
   /**
      Constructor 
       
-     @param unit is a string indicating the resource unit 
+     @param units is a string indicating the resource unit 
      @param quality is a string indicating a quality 
      @param quantity is a double indicating the quantity 
    */
@@ -107,7 +107,7 @@ public:
      Returns true if the quantity of the other resource is 
      greater than the quantity of the base 
       
-     @param other The resource to evaluate against the base 
+     @param second The resource to evaluate against the base 
       
      @return True if second is sufficiently equal in quantity to 
      first, False otherwise. 

@@ -173,7 +173,7 @@ Never throws.  Returns -1 if the store is unlimited.
   @throws CycDupMatException one or more of the resource objects to be pushed
   are already present in the store.
   */
-  void pushAll(std::vector<rsrc_ptr> mats);
+  void pushAll(Manifest mats);
 
 private:
 

@@ -157,7 +157,7 @@ public:
      Extracts a specified mass from this material creating a new 
      material object with the same isotopic ratios. 
       
-     @param the amount (mass) of material that will be removed 
+     @param mass the amount (mass) of material that will be removed 
       
      @return the extracted material as a newly allocated material object 
    */

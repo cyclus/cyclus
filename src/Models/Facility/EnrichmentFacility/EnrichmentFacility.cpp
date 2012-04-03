@@ -149,7 +149,7 @@ vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void EnrichmentFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();

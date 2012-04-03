@@ -225,7 +225,7 @@ vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void ConditioningFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
@@ -267,7 +267,7 @@ void ConditioningFacility::handleTock(int time){
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadTable(string datafile, string fileformat){
+void ConditioningFacility::loadTable(std::string datafile, std::string fileformat){
   // check that the format is supported
   // if not, throw an exception
   bool table_okay = verifyTable(datafile, fileformat);
@@ -286,7 +286,7 @@ void ConditioningFacility::loadTable(string datafile, string fileformat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool ConditioningFacility::verifyTable(string datafile, string fileformat){
+bool ConditioningFacility::verifyTable(std::string datafile, std::string fileformat){
   // start by assuming the table is bad
   bool okay = false;
   // if the fileformat is supported
@@ -302,7 +302,7 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadXMLFile(string datafile){
+void ConditioningFacility::loadXMLFile(std::string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
@@ -311,7 +311,7 @@ void ConditioningFacility::loadXMLFile(string datafile){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadSQLFile(string datafile){
+void ConditioningFacility::loadSQLFile(std::string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
@@ -320,7 +320,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadCSVFile(string datafile){
+void ConditioningFacility::loadCSVFile(std::string datafile){
   string file_path = Env::getCyclusPath() + "/" + datafile; 
 
   // create an ifstream for the file
@@ -527,7 +527,7 @@ void ConditioningFacility::conditionMaterials(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
+mat_rsrc_ptr ConditioningFacility::condition(std::string commod, mat_rsrc_ptr mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
@@ -546,7 +546,7 @@ mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
+ConditioningFacility::stream_t ConditioningFacility::getStream(std::string commod){
   int stream_id =(commod_map_.find(commod))->second.first;
   vector<stream_t>::const_iterator it = stream_vec_.begin();
   bool found = false;
@@ -603,7 +603,7 @@ void ConditioningFacility::defineTable() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addToTable(rsrc_ptr rsrc, string incommod, string outcommod){
+void ConditioningFacility::addToTable(rsrc_ptr rsrc, std::string incommod, std::string outcommod){
   // if we haven't logged some conditioned material yet, define the table
   if ( !cond_fac_table->defined() ) {
     ConditioningFacility::defineTable();

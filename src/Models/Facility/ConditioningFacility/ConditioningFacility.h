@@ -125,7 +125,7 @@ class ConditioningFacility : public FacilityModel {
   /**
      Transacted resources are received through this method 
       
-     @param trans the transaction to which these resource objects belong 
+     @param msg the transaction to which these resource objects belong 
      @param manifest is the set of resources being received 
    */ 
   virtual void addResource(msg_ptr msg,
@@ -306,7 +306,7 @@ class ConditioningFacility : public FacilityModel {
   /**
      processes orders that have come through and sends the materials 
       
-     @param the order to be processed 
+     @param order the order to be processed 
    */
   std::vector<rsrc_ptr> processOrder(msg_ptr order);
 

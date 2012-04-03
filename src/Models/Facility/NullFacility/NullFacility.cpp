@@ -109,7 +109,7 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void NullFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   try {
     stocks_.pushAll(ResourceBuff::toMat(manifest));
   } catch(CycOverCapException err) {

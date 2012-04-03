@@ -186,7 +186,7 @@ class RecipeReactor : public FacilityModel  {
   /**
      Transacted resources are received through this method 
       
-     @param trans the transaction to which these resource objects belong 
+     @param msg the transaction to which these resource objects belong 
      @param manifest is the set of resources being received 
    */ 
   virtual void addResource(msg_ptr msg,
@@ -291,9 +291,9 @@ class RecipeReactor : public FacilityModel  {
      add a fuel pair 
       
      @param incommod the input commodity 
-     @param infuel the isotopics of the input fuel 
+     @param inFuel the isotopics of the input fuel 
      @param outcommod the output commodity 
-     @param outfuel the isotopics of the output fuel 
+     @param outFuel the isotopics of the output fuel 
    */
   void addFuelPair(std::string incommod, IsoVector inFuel, 
 		   std::string outcommod, IsoVector outFuel);
@@ -445,7 +445,7 @@ class RecipeReactor : public FacilityModel  {
   int licExpYr_;
 
   /**
-     The month in which the facility's lisence expires.. 
+     The month in which the facility's lisence expires.
      (maybe this should just be in the deployment description?) 
    */
   int licExpMo_;

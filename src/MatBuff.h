@@ -28,7 +28,7 @@ public:
 
   void pushOne(mat_rsrc_ptr mat);
 
-  void pushAll(std::vector<mat_rsrc_ptr> mats);
+  void pushAll(MatManifest mats);
 };
 
 #endif

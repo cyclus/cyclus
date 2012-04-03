@@ -84,7 +84,7 @@ class Table : IntrusiveBase<Table> {
   
   /**
      A storage container for each column's title and data type 
-     @gidden can we combine these two? 
+     (\@gidden can we combine these two? )
    */
   std::vector<column> columns_;
 
@@ -100,7 +100,7 @@ class Table : IntrusiveBase<Table> {
 
   /* /\** */
   /*  *  A storage container for the table's indicies */
-  /*  * @gidden this needs to be supported */
+  /*  * (\@gidden this needs to be supported )*/
   /*  *\/ */
   /* std::vector<index> indicies_; */
 
@@ -224,10 +224,10 @@ class Table : IntrusiveBase<Table> {
    */
   void addForeignKey(foreign_key const fk);
 
-  /**
+  /*
      Add an index to the list of indicies 
      @param i the index to add 
-     @gidden add this functionality 
+     (\@gidden add this functionality )
    */
   //void addIndex(index i){indicies_.push_back(i);}
 

@@ -29,7 +29,7 @@ MarketModel::~MarketModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel* MarketModel::marketForCommod(string commod) {
+MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
   list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){

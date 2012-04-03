@@ -82,7 +82,7 @@ void BuildInst::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::doBuild(Model* prototype, string name) {
+void BuildInst::doBuild(Model* prototype, std::string name) {
   Model* new_facility = Model::create(prototype);
   new_facility->setName(name);
   new_facility->setParent(this);
@@ -99,7 +99,7 @@ void BuildInst::build(Model* prototype, Model* requester) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::build(Model* prototype, Model* requester, string name) {
+void BuildInst::build(Model* prototype, Model* requester, std::string name) {
   if ( requester != this->parent() ) {
     // if the requester is not this inst's parent, throw an error
     stringstream err("");
