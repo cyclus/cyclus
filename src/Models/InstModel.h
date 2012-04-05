@@ -55,6 +55,7 @@ class InstModel : public TimeAgent, public Communicator {
    */
   InstModel() {
     setModelType("Inst");
+    prototypes_ = new PrototypeSet();
   };
 
   /**
