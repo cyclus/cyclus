@@ -40,7 +40,7 @@ class StubModel : public Model {
      Initalize members of StubModel and any other non-input
      related parameters
    */
-  virtual void init() {};
+  virtual void init() { Model::init(); }
 
   /**
      every model needs a method to initialize from XML 

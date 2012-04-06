@@ -79,7 +79,7 @@ class FacilityModel : public TimeAgent, public Communicator {
      Initalize members of FacilityModel and any other non-input
      related parameters
    */
-  virtual void init() {};
+  virtual void init() { Model::init(); }
 
   /**
      Initalize the FacilityModel from xml. Calls the init() function. 

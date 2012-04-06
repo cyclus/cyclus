@@ -76,7 +76,7 @@ class MarketModel : public Model, public Communicator {
      Initalize members of MarketModel and any other non-input
      related parameters
    */
-  virtual void init() {};
+  virtual void init() { Model::init(); }
 
   /**
      set the parameters necessary for MarketModel to interact

@@ -34,6 +34,12 @@ class StubTimeAgent : public TimeAgent {
      every model should be destructable 
    */
   virtual ~StubTimeAgent();
+
+  /**
+     Initalize members of StubTimeAgent and any other non-input
+     related parameters
+   */
+  virtual void init() { Model::init(); }
     
   /**
      every model needs a method to initialize from XML 

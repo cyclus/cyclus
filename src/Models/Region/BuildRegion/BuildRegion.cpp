@@ -33,16 +33,16 @@ bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::init() {
-  LOG(LEV_DEBUG2, "breg") << "A Build Region is being initialized";
+  RegionModel::init();
   prototypeOrders_ = new PrototypeOrders();
   builders_ = new map<Model*, std::list<Model*>*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildRegion::init(xmlNodePtr cur) {
+  LOG(LEV_DEBUG2, "breg") << "A Build Region is being initialized";
   // non xml inits
-  BuildRegion::init();
-  RegionModel::init(); // we never explicitly call RegionModel::init(cur)
+  BuildRegion::init(); // we never explicitly call RegionModel::init(cur)
   // xml inits
   Model::init(cur); // name_ and model_impl_
   RegionModel::initAllowedFacilities(cur); // allowedFacilities_

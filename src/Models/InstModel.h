@@ -53,10 +53,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Default constructor for InstModel Class 
    */
-  InstModel() {
-    setModelType("Inst");
-    prototypes_ = new PrototypeSet();
-  };
+  InstModel() { setModelType("Inst"); }
 
   /**
      every model should be destructable 

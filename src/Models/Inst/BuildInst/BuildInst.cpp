@@ -17,6 +17,7 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::init() {
+  InstModel::init();
   totalBuildCount_ = 0;
 }
 

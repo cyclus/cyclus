@@ -80,7 +80,7 @@ class RegionModel : public TimeAgent, public Communicator {
      Initalize members of RegionModel and any other non-input
      related parameters
    */
-  virtual void init() {};
+  virtual void init() { Model::init(); }
 
   /**
      Initalize the InstModel from xml. Calls the init() function. 
