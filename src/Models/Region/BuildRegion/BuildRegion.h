@@ -109,7 +109,7 @@ class BuildRegion : public RegionModel
   /**
      The default constructor for the BuildRegion 
    */
-  BuildRegion() {};
+  BuildRegion() { init(); }
 
   /**
      The default destructor for the BuildRegion 
@@ -120,10 +120,10 @@ class BuildRegion : public RegionModel
      Initalize members of BuildRegion and any other non-input
      related parameters
    */
-  virtual void init();
+  void init();
    
   /**
-     Initalize the BuildRegion from xml. Calls the init() function. 
+     Initalize the BuildRegion from xml. Calls the init function. 
      
      @param cur the curren xml node pointer 
    */

@@ -4,6 +4,12 @@
 #include "ConverterModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ConverterModel::ConverterModel() {
+  init();
+  setModelType("Converter");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConverterModel::init(xmlNodePtr cur) {
   Model::init(cur);
 

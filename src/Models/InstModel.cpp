@@ -16,8 +16,13 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+InstModel::InstModel() {
+  init();
+  setModelType("Inst");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init() {
-  Model::init();
   prototypes_ = new PrototypeSet();
 }
 

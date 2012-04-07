@@ -16,7 +16,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeBuildInst : public BuildInst {
 public:
-  FakeBuildInst() : BuildInst() { BuildInst::init(); }
+  FakeBuildInst() : BuildInst() {}
   
   virtual ~FakeBuildInst() {}
 
@@ -37,11 +37,9 @@ protected:
   virtual void SetUp(){
     src_inst = new FakeBuildInst();
     tst_region = new TestRegion();
-    tst_region->init();
     src_inst->setParent(tst_region);
     new_inst = new FakeBuildInst();
     prototype = new BuildInst();
-    prototype->init();
     prototype->setModelType("Inst");
     prototype->setModelImpl("BuildInst");
     prototype->setName("test_prototype");

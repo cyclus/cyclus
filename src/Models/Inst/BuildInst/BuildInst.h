@@ -49,7 +49,7 @@ public:
   /**
      Default constructor for the build inst 
    */
-  BuildInst() {};
+  BuildInst() { init(); }
     
   /**
      Default destructor for the build inst 
@@ -60,10 +60,10 @@ public:
      Initalize members of BuildInst and any other non-input
      related parameters
    */
-  virtual void init();
+  void init();
   
   /**
-     Initalize the BuildInst from xml. Calls the init() function. 
+     Initalize the BuildInst from xml. Calls the init function. 
      
      @param cur the curren xml node pointer 
    */

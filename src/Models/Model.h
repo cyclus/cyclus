@@ -107,10 +107,18 @@ class Model {
   static void load_facilities();
 
   /**
+     Constructor for the Model Class 
+      
+     @warning all constructors must set ID_ and increment next_id_ 
+      
+   */
+  Model();
+
+  /**
      Initalize members of Model and any other non-input
      related parameters
    */
-  virtual void init() {};
+  void init() {};
 
   /**
      A method to initialize the model 
@@ -136,14 +144,6 @@ class Model {
      @param model_orig pointer to (usu initialized) model to be copied 
    */
   virtual void copyFreshModel(Model* model_orig)=0;
-
-  /**
-     Constructor for the Model Class 
-      
-     @warning all constructors must set ID_ and increment next_id_ 
-      
-   */
-  Model();
 
   /**
      Destructor for the Model Class 

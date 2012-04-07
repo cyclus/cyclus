@@ -39,7 +39,7 @@ class StubCommModel : public Model, public Communicator {
      Initalize members of StubCommModel and any other non-input
      related parameters
    */
-  virtual void init() { Model::init(); }
+  void init() { Model::init(); }
     
   /**
      every model needs a method to initialize from XML 

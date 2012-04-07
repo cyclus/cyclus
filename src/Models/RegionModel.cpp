@@ -15,8 +15,13 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+RegionModel::RegionModel() { 
+  init();
+  setModelType("Region");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::init(xmlNodePtr cur) { 
-  RegionModel::init(); // init any RegionModel members
   Model::init(cur); // name_ and model_impl_
   RegionModel::initAllowedFacilities(cur); // allowedFacilities_
   RegionModel::initSimInteraction(this); // parent_ and tick listener, model 'born'

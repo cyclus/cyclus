@@ -53,7 +53,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Default constructor for InstModel Class 
    */
-  InstModel() { setModelType("Inst"); }
+  InstModel();
 
   /**
      every model should be destructable 
@@ -64,10 +64,10 @@ class InstModel : public TimeAgent, public Communicator {
      Initalize members of InstModel and any other non-input
      related parameters
    */
-  virtual void init();
+  void init();
 
   /**
-     Initalize the InstModel from xml. Calls the init() function. 
+     Initalize the InstModel from xml. Calls the init function. 
      
      @param cur the current xml node pointer 
    */

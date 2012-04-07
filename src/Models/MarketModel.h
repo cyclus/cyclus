@@ -58,7 +58,7 @@ class MarketModel : public Model, public Communicator {
   /**
      default constructor 
    */
-  MarketModel() { setModelType("Market"); }
+  MarketModel();
   
   /**
      MarketModels should not be indestructible. 
@@ -76,7 +76,7 @@ class MarketModel : public Model, public Communicator {
      Initalize members of MarketModel and any other non-input
      related parameters
    */
-  virtual void init() { Model::init(); }
+  void init() {};
 
   /**
      set the parameters necessary for MarketModel to interact

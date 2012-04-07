@@ -15,6 +15,12 @@ using namespace std;
 list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+MarketModel::MarketModel() {
+  init();
+  setModelType("Market"); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
   LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
   list<MarketModel*>::iterator mkt;

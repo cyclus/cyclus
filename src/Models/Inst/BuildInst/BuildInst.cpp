@@ -17,14 +17,11 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::init() {
-  InstModel::init();
   totalBuildCount_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildInst::init(xmlNodePtr cur) {
-  // non xml inits
-  BuildInst::init();
   // xml inits
   InstModel::init(cur);
 

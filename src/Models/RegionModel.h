@@ -69,7 +69,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      Default constructor for RegionModel Class 
    */
-  RegionModel() { setModelType("Region"); }
+  RegionModel();
   
   /**
      RegionModels should not be indestructible. 
@@ -80,10 +80,10 @@ class RegionModel : public TimeAgent, public Communicator {
      Initalize members of RegionModel and any other non-input
      related parameters
    */
-  virtual void init() { Model::init(); }
+  void init() {};
 
   /**
-     Initalize the InstModel from xml. Calls the init() function. 
+     Initalize the InstModel from xml. Calls the init function. 
      
      @param cur the current xml node pointer 
    */

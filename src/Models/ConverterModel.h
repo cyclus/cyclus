@@ -50,9 +50,7 @@ class ConverterModel : public Model {
   /**
      Default constructor for ConverterModel Class 
    */
-  ConverterModel() {
-    setModelType("Converter");
-  };
+  ConverterModel();
 
   /**
      every model should be destructable 
@@ -63,7 +61,7 @@ class ConverterModel : public Model {
      Initalize members of ConverterModel and any other non-input
      related parameters
    */
-  virtual void init() { Model::init(); }
+  void init() { Model::init(); }
 
   /**
      A method to initialize the model 

@@ -111,8 +111,8 @@ class CapacityRegion : public RegionModel
     std::vector <string> capacity_type_, capacity_function_;
     std::vector <double> nominal_value_;
     AllReplacementFacs allReplacementFacs_;
-    void initBuild(xmlNodePtr cur);
-    void initCapacity(xmlNodePtr cur);
+    virtual void initBuild(xmlNodePtr cur);
+    virtual void initCapacity(xmlNodePtr cur);
     Model* chooseInstToBuildFac();
     double checkCurrentCapcity(string capacity_type);
     Model* chooseFacToBuild(ReplacementFacs facs);
