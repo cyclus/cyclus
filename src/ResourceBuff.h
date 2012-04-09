@@ -175,6 +175,11 @@ Never throws.  Returns -1 if the store is unlimited.
   */
   void pushAll(Manifest mats);
 
+  /**
+     returns true if there are no mats in mats_
+  */
+  bool empty() {return mats_.empty();}
+
 private:
 
   /// true if this store has an infinite capacity

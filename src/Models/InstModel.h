@@ -188,6 +188,11 @@ class InstModel : public TimeAgent, public Communicator {
   int getNumFacilities(){ return this->nChildren();};
 
   /**
+     decommission one of this inst's children
+   */
+  void decommission(Model* child) {delete child;}
+
+  /**
      queries the power capacity of each facility in the institution 
    */
   double powerCapacity();

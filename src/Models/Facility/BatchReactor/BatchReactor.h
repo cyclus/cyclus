@@ -20,7 +20,7 @@ typedef std::pair<Recipe, Recipe> FuelPair;
 /**
    Defines all possible phases this facility can be in
  */
-enum Phase {BEGIN, CONTINUE, REFUEL, END};
+enum Phase {BEGIN, OPERATION, REFUEL, END};
 
 /**
    @class BatchReactor 
@@ -91,39 +91,55 @@ class BatchReactor : public FacilityModel  {
 
 
 /* --------------------
+ * _THIS_ COMMUNICATOR classes have these members
+ * --------------------
+ */
+  /**
+     send messages up through the institution 
+     
+     @param recipient the final recipient 
+     @param trans the transaction to send 
+   */
+  void sendMessage(Communicator* recipient, Transaction trans);
+
+/* ------------------- */ 
+
+
+/* --------------------
  * Facility MODEL class has these members
  * --------------------
  */
-  /* /\** */
-  /*    Transacted resources are extracted through this method */
+  /**
+     Transacted resources are extracted through this method
       
-  /*    @param order the msg/order for which resource(s) are to be prepared */
-  /*    @return list of resources to be sent for this order */
-  /*  *\/ */
-  /* virtual std::vector<rsrc_ptr> removeResource(msg_ptr order); */
+     @param order the msg/order for which resource(s) are to be prepared
+     @return list of resources to be sent for this order
+   */
+  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
 
-  /* /\** */
-  /*    Transacted resources are received through this method */
+  /**
+     Transacted resources are received through this method
       
-  /*    @param msg the transaction to which these resource objects belong */
-  /*    @param manifest is the set of resources being received */
-  /*  *\/ */
-  /* virtual void addResource(msg_ptr msg, */
-  /*       		   std::vector<rsrc_ptr> manifest); */
+     @param msg the transaction to which these resource objects belong
+     @param manifest is the set of resources being received
+   */
+  virtual void addResource(msg_ptr msg,
+        		   std::vector<rsrc_ptr> manifest) 
+  {preCore_->pushAll(ResourceBuff::toMat(manifest));}
+  
+  /**
+     The handleTick function specific to the BatchReactor.
+      
+     @param time the time of the tick
+   */
+  virtual void handleTick(int time);
 
-  /* /\** */
-  /*    The handleTick function specific to the BatchReactor. */
+  /**
+     The handleTick function specific to the BatchReactor.
       
-  /*    @param time the time of the tick */
-  /*  *\/ */
-  /* virtual void handleTick(int time); */
-
-  /* /\** */
-  /*    The handleTick function specific to the BatchReactor. */
-      
-  /*    @param time the time of the tock */
-  /*  *\/ */
-  /* virtual void handleTock(int time); */
+     @param time the time of the tock
+   */
+  virtual void handleTock(int time);
 
 /* ------------------- */ 
 
@@ -183,6 +199,21 @@ class BatchReactor : public FacilityModel  {
   int lifetime() {return lifetime_;}
 
   /**
+     set the facility's time in operation 
+   */
+  void setTimeInOperation(int l) {operation_timer_ = l;}
+
+  /**
+     increase the operation timer by one time step
+   */
+  void increaseOperationTimer() {operation_timer_++;}
+
+  /**
+     return true if the facility has reached the end of its life
+   */
+  bool lifetimeReached() {return (lifetime_ <= operation_timer_);}
+
+  /**
      set the input recipe 
    */
   void setInRecipe(IsoVector r) {in_recipe_ = r;}
@@ -223,6 +254,11 @@ class BatchReactor : public FacilityModel  {
    */
   std::string outCommod() {return fuelPairs_->front().second.first;}
 
+  /**
+     get the current phase
+  */
+  Phase phase() {return phase_;}
+
  private:
   /**
      The time between batch reloadings. 
@@ -230,14 +266,19 @@ class BatchReactor : public FacilityModel  {
   int cycle_length_;
 
   /**
-     The current month in the cycle
+     The current time step in the cycle
    */
-  int month_in_cycle_;
+  int cycle_timer_;
 
   /**
      The number of months that a facility stays operational. 
    */
   int lifetime_;
+
+  /**
+     The current time step in the facility's operation
+   */
+  int operation_timer_;
 
   /**
      The number of batches per core
@@ -271,6 +312,12 @@ class BatchReactor : public FacilityModel  {
   double request_amount_;
 
   /**
+     The amout of input material received
+     at a time step
+   */
+  double received_amount_;
+
+  /**
      a matbuff for material before they enter the core
    */
   MatBuff* preCore_;
@@ -296,27 +343,108 @@ class BatchReactor : public FacilityModel  {
   std::deque<msg_ptr>* ordersWaiting_;
 
   /**
+     The current phase this facility is in
+   */
+  Phase phase_;
+
+  /**
      set the next phase
-  */
+   */
   void setPhase(Phase p);
 
   /**
-     send messages up through the institution 
-      
-     @param recipient the final recipient 
-     @param trans the transaction to send 
+     set the requested amount of fresh fuel
    */
-  void sendMessage(Communicator* recipient, Transaction trans);
+  void setRequestAmt(double a) {request_amount_ = a;}
 
   /**
-     make reqests 
-   */
-  void makeRequests();
+     resets the request amount to -1
+  */
+  void resetRequestAmt() {setRequestAmt(-1.0);}
 
   /**
-     make offers 
+     return the current request amount
+  */
+  double requestAmt() {return request_amount_;}
+
+  /**
+     set the received amount of fresh fuel
    */
-  void makeOffers();
+  void setReceivedAmt(double a) {received_amount_ = a;}
+
+  /**
+     return the current received amount
+  */
+  double receivedAmt() {return received_amount_;}
+
+  /**
+     return the amount of material requested less 
+     the amount of material received
+  */
+  bool requestMet();
+
+  /**
+     resets the cycle timer to 0
+   */
+  void resetCycleTimer() {cycle_timer_ = 0;}
+
+  /**
+     increase the cycle timer by one time step
+   */
+  void increaseCycleTimer() {cycle_timer_++;}
+
+  /**
+     return true if the cycle timer is >= the 
+     cycle length
+   */
+  bool cycleComplete() {return (cycle_timer_ >= cycle_length_);}
+
+  /**
+     move a certain amount of fuel from one buffer to another
+  */
+  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt)
+  {toBuff->pushAll(fromBuff->popQty(amt));}
+
+  /**
+     move all fuel from one buffer to another
+  */
+  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff) 
+  {moveFuel(fromBuff,toBuff,fromBuff->quantity());}
+
+  /**
+     load fuel from preCore_ into inCore_
+   */
+  void loadCore() {moveFuel(preCore_,inCore_);}
+
+  /**
+     move a batch from inCore_ to postCore_
+   */
+  void offloadBatch() {moveFuel(inCore_,postCore_,batchLoading());}
+
+  /**
+     move all material from inCore_ to postCore_
+   */
+  void offloadCore() {moveFuel(inCore_,postCore_);}
+
+  /**
+     sends a request of offer to the commodity's market
+   */
+  void interactWithMarket(std::string commod, double amt, bool offer);
+
+  /**
+     make reqest for a specific amount of fuel
+   */
+  void makeRequest(double amt) {interactWithMarket(inCommod(),amt,false);}
+
+  /**
+     offer all off-loaded fuel
+   */
+  void makeOffers() {interactWithMarket(outCommod(),postCore_->quantity(),true);}
+
+  /**
+     Processes all orders in ordersWaiting_
+   */
+  void handleOrders();
   
 /* ------------------- */ 
 
