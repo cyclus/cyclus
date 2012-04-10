@@ -287,7 +287,7 @@ void BatchReactor::moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::interactWithMarket(string commod, double amt, bool offer) {
+void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer) {
   LOG(LEV_INFO4, "BReact") << " making requests {";  
   // get the market
   MarketModel* market = MarketModel::marketForCommod(commod);
