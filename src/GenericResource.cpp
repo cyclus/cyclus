@@ -62,12 +62,6 @@ bool GenericResource::checkQuantityGT(rsrc_ptr other) {
   return toRet;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GenericResource::setOriginatorID(int id){
-  originatorID_ = id;
-  this->Resource::addToTable();
-}
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void GenericResource::absorb(gen_rsrc_ptr other) {
   if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {

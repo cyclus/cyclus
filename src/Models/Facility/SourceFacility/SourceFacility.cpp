@@ -130,7 +130,6 @@ void SourceFacility::generateMaterial(int curr_time) {
     temp.setMass(empty_space);
   }
   mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-  newMat->setOriginatorID( this->ID() );
   inventory_.pushOne(newMat);
 }
 

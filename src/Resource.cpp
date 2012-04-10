@@ -11,6 +11,7 @@ table_ptr Resource::resource_type_table = new Table("ResourceTypes");
 
 // -------------------------------------------------------------
 Resource::Resource() {
+  book_kept_ = false;
   ID_ = nextID_++;
   originalID_ = ID_;
   MLOG(LEV_DEBUG4) << "Resource ID=" << ID_ << ", ptr=" << this << " created.";
@@ -39,14 +40,12 @@ void Resource::define_table(){
   column id("ID","INTEGER");
   column type("Type","INTEGER");
   column amt("OriginalQuantity","REAL");
-  column creator("OriginatorID","INTEGER");
   // declare the table's primary key
   resource_table->setPrimaryKey(id);
   // add columns to the table
   resource_table->addColumn(id);
   resource_table->addColumn(type);
   resource_table->addColumn(amt);
-  resource_table->addColumn(creator);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -59,19 +58,16 @@ void Resource::define_table(){
   fk = new foreign_key(myk, (*fkref) );
   resource_table->addForeignKey( (*fk) ); // type references Resource Types' type
   myk.clear(), theirk.clear();
-  //   Agents table foreign keys
-  theirk.push_back("ID");
-  fkref = new foreign_key_ref("Agents",theirk);
-  //     the originator id
-  myk.push_back("OriginatorID");
-  fk = new foreign_key(myk, (*fkref) );
-  resource_table->addForeignKey( (*fk) ); // originatorid references Agents' id
-  myk.clear(), theirk.clear();
   // we've now defined the table
   resource_table->tableDefined();
 }
 
 void Resource::addToTable(){
+  if (book_kept_) {
+    return;
+  }
+  book_kept_ = true;
+
   // if we haven't logged the resource type yet, do so
   if ( !this->is_resource_type_logged() ){
     Resource::logNewType();
@@ -84,14 +80,14 @@ void Resource::addToTable(){
   // make a row
   // declare data
   data an_id( this->ID() ), a_type( (int)this->type() ), 
-    an_amt( this->quantity() ), a_creator( this->originatorID() );
+    an_amt( this->quantity() );
   // declare entries
   entry id("ID",an_id), type("Type",a_type), 
-    amt("OriginalQuantity", an_amt), creator("OriginatorID",a_creator);
+    amt("OriginalQuantity", an_amt);
   // declare row
   row aRow;
   aRow.push_back(id), aRow.push_back(type), 
-    aRow.push_back(amt), aRow.push_back(creator);
+    aRow.push_back(amt);
   // add the row
   resource_table->addRow(aRow);
   // record this primary key

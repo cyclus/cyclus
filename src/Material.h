@@ -234,22 +234,17 @@ private:
   /**
      the material class resouce type 
    */
-  std::string type_name(){return "material";}
+  std::string type_name() {return "material";}
 
   /**
      resouce type logging state 
    */
-  bool is_resource_type_logged(){return type_is_logged_;}
+  bool is_resource_type_logged() {return type_is_logged_;}
 
   /**
      tells the simulation this resource type is logged 
    */
-  void type_logged(){type_is_logged_ = true;}
-
-  /** 
-     set the agent who created this resource 
-   */
-  void setOriginatorID(int id);
+  void type_logged() {type_is_logged_ = true;}
 
  private:
   /**
@@ -269,13 +264,12 @@ private:
   /**
      add a material to table 
    */
-  void addToTable();
-
+  virtual void addToTable();
 
   /**
      return the state id for the iso vector 
    */
-  int stateID(){return iso_vector_.stateID();}
+  int stateID() {return iso_vector_.stateID();}
 
  private:
   /**

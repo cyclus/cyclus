@@ -170,8 +170,6 @@ void Material::decay() {
   iso_vector_.executeDecay(delta_time);
 
   last_update_time_ = curr_time;
-  // we've decayed something, so register the state change
-  this->addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -241,6 +239,8 @@ void Material::define_table() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::addToTable(){
+  Resource::addToTable();
+
   // if we haven't logged an material yet, define the table
   if ( !material_table->defined() ) {
     Material::define_table();
@@ -264,9 +264,3 @@ void Material::addToTable(){
   pkref_.push_back(state);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::setOriginatorID(int id){
-  originatorID_ = id;
-  this->Resource::addToTable();
-  this->Material::addToTable();
-}

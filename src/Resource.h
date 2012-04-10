@@ -129,17 +129,6 @@ public:
   void setOriginalID(int id);
 
   /**
-     return this resource's originator's ID 
-   */ 
-  const int originatorID() {return originatorID_;}
-  
-  /**
-     set the originator. NOTE this is when resources must 
-     be added to their respective tables 
-   */ 
-  virtual void setOriginatorID(int id) = 0;
-
-  /**
      Destructor 
    */
   virtual ~Resource();
@@ -159,11 +148,6 @@ public:
      After a split, this is the original resource's id 
    */
   int originalID_;
-
-  /**
-     the resource originator's id 
-   */
-  int originatorID_;
 
  private:
 
@@ -188,7 +172,7 @@ public:
   /**
      adds a resource to the resouce table 
    */
-  void addToTable();
+  virtual void addToTable();
 
   /**
      the name of the resource's type 
@@ -230,6 +214,11 @@ public:
      the primary key reference to this resource type 
    */
   primary_key_ref type_pkref_;
+
+  /**
+  True if this resource object has already been recorded to the output db
+  */
+  bool book_kept_;
 
 };
 

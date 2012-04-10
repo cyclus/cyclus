@@ -135,11 +135,6 @@ public:
   void type_logged(){type_is_logged_ = true;}
   
   /**
-     Sets the originator's id AND logs the resource 
-   */   
-  void setOriginatorID(int id);
-
-  /**
      Absorbs the contents of the given 'other' resource into this 
      resource  
      @throws CycGenResourceIncompatible 'other' resource is of a 

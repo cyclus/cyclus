@@ -270,6 +270,10 @@ void Message::approveTransfer() {
   this->Message::addTransToTable(id);
   int nResources = manifest.size();
   for (int pos = 0; pos < nResources; pos++) {
+    // record the resource with its state
+    manifest.at(pos)->addToTable();
+
+    // record that what resources belong to this transaction
     this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
   }
 
@@ -397,3 +401,4 @@ void Message::addResourceToTable(int transID, int transPos, rsrc_ptr r){
   pkref_rsrc_.push_back(id);
   pkref_rsrc_.push_back(pos);
 }
+
