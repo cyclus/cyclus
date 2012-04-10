@@ -85,6 +85,7 @@ void SourceFacility::receiveMessage(msg_ptr msg){
   if(msg->supplier() == this){
     // file the order
     ordersWaiting_.push_front(msg);
+    LOG(LEV_INFO5, "SrcFac") << name() << " just received an order.";
   } else {
     throw CycException("SourceFacility is not the supplier of this msg.");
   }

@@ -8,6 +8,7 @@
 #include "Model.h"
 
 #include <set>
+#include <list>
 
 // Usefull Typedefs
 typedef std::set<Model*> PrototypeSet;
@@ -153,6 +154,11 @@ class InstModel : public TimeAgent, public Communicator {
    */
   void addPrototype(Model* prototype);  
 
+  /**
+     A list of children to decommission
+   */
+  std::list<Model*>* decomm_;
+
  public:
   /**
      return the number of prototypes this inst can build
@@ -190,7 +196,12 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      decommission one of this inst's children
    */
-  void decommission(Model* child) {delete child;}
+  void decommission(Model* child) {decomm_->push_back(child);};
+
+  /**
+     handle decommissions
+   */
+  void handleDecommissions();
 
   /**
      queries the power capacity of each facility in the institution 

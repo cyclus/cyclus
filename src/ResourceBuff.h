@@ -7,6 +7,7 @@
 #include "CycException.h"
 #include <list>
 #include <vector>
+#include <string>
 
 #define STORE_EPS 1e-6
 
@@ -180,6 +181,16 @@ Never throws.  Returns -1 if the store is unlimited.
   */
   bool empty() {return mats_.empty();}
 
+  /**
+     sets the buffer's name
+  */
+  void setName(std::string name) {name_ = name;}
+  
+  /**
+     returns the buffer's name
+  */
+  std::string name() {return name_;}
+
 private:
 
   /// true if this store has an infinite capacity
@@ -191,6 +202,10 @@ private:
   /// list of constituent resource objects forming the store's inventory
   std::list<rsrc_ptr> mats_;
 
+  /**
+     buffer's name
+  */
+  std::string name_;
 };
 
 #endif

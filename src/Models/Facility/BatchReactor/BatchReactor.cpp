@@ -26,6 +26,12 @@ void BatchReactor::init() {
   preCore_ = new MatBuff();
   inCore_ = new MatBuff();
   postCore_ = new MatBuff();
+  preCore_->makeUnlimited();
+  inCore_->makeUnlimited();
+  postCore_->makeUnlimited();
+  preCore_->setName("preCore");
+  inCore_->setName("inCore");
+  postCore_->setName("postCore");
   ordersWaiting_ = new deque<msg_ptr>();
   fuelPairs_ = new deque<FuelPair>();
 }
@@ -43,7 +49,7 @@ void BatchReactor::init(xmlNodePtr cur) {
   setCoreLoading( strtod( XMLinput->get_xpath_content(cur,"coreloading"), NULL ) );
   setNBatches( strtol( XMLinput->get_xpath_content(cur,"batchespercore"), NULL, 10 ) ); 
   setBatchLoading( core_loading_ / batches_per_core_ );
-  setTimeInOperation(0);
+  setOperationTimer(0);
 
   // all facilities require commodities - possibly many
   string recipe_name;
@@ -86,7 +92,7 @@ void BatchReactor::copy(BatchReactor* src) {
   setBatchLoading( coreLoading() / nBatches() ); 
   setInRecipe( src->inRecipe() );
   setOutRecipe( src->outRecipe() );
-  setTimeInOperation(0);
+  setOperationTimer(0);
   fuelPairs_ = src->fuelPairs_;
 
   setPhase(BEGIN);
@@ -99,7 +105,13 @@ void BatchReactor::copyFreshModel(Model* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::print() { 
-  FacilityModel::print(); 
+  FacilityModel::print();
+  LOG(LEV_DEBUG2, "BReact") << "    has facility parmeters {";
+  LOG(LEV_DEBUG2, "BReact") << "      * Lifetime = " << lifetime();
+  LOG(LEV_DEBUG2, "BReact") << "      * Cycle Length = " << cycleLength();
+  LOG(LEV_DEBUG2, "BReact") << "      * Core Loading = " << coreLoading();
+  LOG(LEV_DEBUG2, "BReact") << "      * Batches Per Core = " << nBatches();
+  LOG(LEV_DEBUG2, "BReact") << "      * Batch Loading = " << batchLoading();
   LOG(LEV_DEBUG2, "BReact") << "    converts commodity {"
       << fuelPairs_->front().first.first
       << "} into commodity {"
@@ -137,14 +149,31 @@ void BatchReactor::handleOrders() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::addResource(msg_ptr msg,
+                               std::vector<rsrc_ptr> manifest) {
+  double preQuantity = preCore_->quantity();
+  preCore_->pushAll(ResourceBuff::toMat(manifest));
+  double added = preCore_->quantity() - preQuantity;
+  LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
+                            << added << " to its " << preCore_->name()
+                            << " buffer.";
+}
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  return ResourceBuff::toRes(postCore_->popQty(trans.resource->quantity()));
+  double amt = trans.resource->quantity();
+
+  LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
+                            << amt << " to its " << postCore_->name()
+                            << " buffer.";
+  
+  return ResourceBuff::toRes(postCore_->popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::handleTick(int time) {
-  LOG(LEV_INFO3, "BReact") << name() << " is ticking {";
+  LOG(LEV_INFO3, "BReact") << name() << " is ticking at time " << time << " {";
 
   // end the facility's life if its time
   if (lifetimeReached()) {
@@ -227,6 +256,14 @@ void BatchReactor::setPhase(Phase p) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool BatchReactor::requestMet() {
   double remaining = requestAmt() - receivedAmt();
+
+  LOG(LEV_DEBUG5, "BReact") << "BatchReactor is determining if a request is "
+                            << "met the request amount, received amout, and "
+                            << "their difference being ";
+  LOG(LEV_DEBUG5, "BReact") << "  * " << requestAmt();
+  LOG(LEV_DEBUG5, "BReact") << "  * " << receivedAmt();
+  LOG(LEV_DEBUG5, "BReact") << "  * " << remaining;
+
   if (remaining > EPS_KG) {
     return false;
   }
@@ -238,6 +275,15 @@ bool BatchReactor::requestMet() {
     throw CycOverrideException(err.str()); 
   }
   return true;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt) {
+  LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " moving " << amt
+                            << " of material from buffer " 
+                            << fromBuff->name() << " to buffer "
+                            << toBuff->name();  
+  toBuff->pushAll(fromBuff->popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -124,9 +124,7 @@ class BatchReactor : public FacilityModel  {
      @param manifest is the set of resources being received
    */
   virtual void addResource(msg_ptr msg,
-        		   std::vector<rsrc_ptr> manifest) 
-  {preCore_->pushAll(ResourceBuff::toMat(manifest));}
-  
+        		   std::vector<rsrc_ptr> manifest);
   /**
      The handleTick function specific to the BatchReactor.
       
@@ -201,7 +199,7 @@ class BatchReactor : public FacilityModel  {
   /**
      set the facility's time in operation 
    */
-  void setTimeInOperation(int l) {operation_timer_ = l;}
+  void setOperationTimer(int l) {operation_timer_ = l;}
 
   /**
      increase the operation timer by one time step
@@ -312,12 +310,6 @@ class BatchReactor : public FacilityModel  {
   double request_amount_;
 
   /**
-     The amout of input material received
-     at a time step
-   */
-  double received_amount_;
-
-  /**
      a matbuff for material before they enter the core
    */
   MatBuff* preCore_;
@@ -368,14 +360,9 @@ class BatchReactor : public FacilityModel  {
   double requestAmt() {return request_amount_;}
 
   /**
-     set the received amount of fresh fuel
-   */
-  void setReceivedAmt(double a) {received_amount_ = a;}
-
-  /**
      return the current received amount
   */
-  double receivedAmt() {return received_amount_;}
+  double receivedAmt() {return preCore_->quantity();}
 
   /**
      return the amount of material requested less 
@@ -402,8 +389,7 @@ class BatchReactor : public FacilityModel  {
   /**
      move a certain amount of fuel from one buffer to another
   */
-  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt)
-  {toBuff->pushAll(fromBuff->popQty(amt));}
+  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt);
 
   /**
      move all fuel from one buffer to another

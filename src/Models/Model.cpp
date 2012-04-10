@@ -302,6 +302,10 @@ void Model::setParent(Model* parent){
   if (parent_ != NULL){
     parent_->addChild(this);
   }
+
+  CLOG(LEV_DEBUG2) << "Created Model: {";
+  print();
+  CLOG(LEV_DEBUG2) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
