@@ -61,7 +61,7 @@ class ConverterModel : public Model {
      Initalize members of ConverterModel and any other non-input
      related parameters
    */
-  void init() { Model::init(); }
+  void init() {};
 
   /**
      A method to initialize the model 
