@@ -328,7 +328,7 @@ void Model::addChild(Model* child){
   CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
 		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
-  removeFromList(child, children_);
+  removeChild(child);
   children_.push_back(child); 
 };
 

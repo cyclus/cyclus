@@ -83,10 +83,9 @@ void InstModel::handleTick(int time){
 
 void InstModel::handleTock(int time){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
+  for (int i = 0; i < children_.size(); i++) {
+    Model* m = children_.at(i);
+    dynamic_cast<FacilityModel*>(m)->handleTock(time);
   }
 }
 
@@ -95,7 +94,7 @@ void InstModel::handleDailyTasks(int time, int day){
   for(vector<Model*>::iterator fac=children_.begin();
       fac != children_.end();
       fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleDailyTasks(time,day);
+    dynamic_cast<FacilityModel*>(*fac)->handleDailyTasks(time,day);
   }
 }
 
