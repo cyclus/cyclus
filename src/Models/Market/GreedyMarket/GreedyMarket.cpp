@@ -125,7 +125,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
         << offerMsg->resource()->quantity();
 
       requestAmt -= offerAmt;
-    } else {
+    } 
+    else {
       // split offer
 
       // queue a new order

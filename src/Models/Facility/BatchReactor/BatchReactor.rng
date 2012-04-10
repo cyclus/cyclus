@@ -1,0 +1,32 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  <define name="BatchReactor">
+     <element name="BatchReactor"> 
+
+       <!-- Material In/Out  -->
+        <oneOrMore>
+          <element name="fuelpair">
+            <ref name="incommodity"/>
+            <ref name="inrecipe"/>
+            <ref name="outcommodity"/>
+            <ref name="outrecipe"/>
+            </element>
+        </oneOrMore>
+
+	<!-- Facility Parameters -->
+        <element name="cyclelength">
+          <data type="nonNegativeInteger"/>
+	</element>
+        <ref name="lifetime"/>
+	<element name ="coreloading">
+          <data type="double"/>
+	</element>
+        <element name="batchespercore">
+          <data type="nonNegativeInteger"/>
+	</element>
+
+     </element>
+  </define>
+
+</grammar>
