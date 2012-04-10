@@ -101,15 +101,13 @@ void BuildRegion::populateOrders(xmlNodePtr cur) {
 
   // for each entry, get time and number and construct an order
   xmlNodeSetPtr entry_nodes = 
-    XMLinput->get_xpath_elements(cur,"demandschedule");
+    XMLinput->get_xpath_elements(cur,"demandschedule/entry");
   string sTime, sNumber;
   int time, number;
   for (int i=0;i<entry_nodes->nodeNr;i++){
     // get data
-    xmlNodePtr entry_node = 
-      XMLinput->get_xpath_element(entry_nodes->nodeTab[i],"entry");
-    sTime = XMLinput->get_xpath_content(entry_node,"time");
-    sNumber = XMLinput->get_xpath_content(entry_node,"number");
+    sTime = XMLinput->get_xpath_content(entry_nodes->nodeTab[i],"time");
+    sNumber = XMLinput->get_xpath_content(entry_nodes->nodeTab[i],"number");
     time = strtol(sTime.c_str(),NULL,10);
     number = strtol(sNumber.c_str(),NULL,10);
     // construct
