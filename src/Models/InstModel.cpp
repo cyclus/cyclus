@@ -24,7 +24,6 @@ InstModel::InstModel() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init() {
   prototypes_ = new PrototypeSet();
-  decomm_ = new list<Model*>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -89,9 +88,6 @@ void InstModel::handleTock(int time){
       fac++){
     (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
   }
-  if (!decomm_->empty()) {
-    handleDecommissions();
-  }
 }
 
 void InstModel::handleDailyTasks(int time, int day){
@@ -135,10 +131,3 @@ double InstModel::powerCapacity(){
   return capacity;
 }
 
-void InstModel::handleDecommissions() {
-  while (!decomm_->empty()) {
-    Model* child = decomm_->front();
-    decomm_->pop_front();
-    delete child;
-  }
-}

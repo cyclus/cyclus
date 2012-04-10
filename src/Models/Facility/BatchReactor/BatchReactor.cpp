@@ -198,27 +198,28 @@ void BatchReactor::handleTock(int time) {
   handleOrders();
 
   switch(phase()) {
-  case BEGIN:
-  case REFUEL:
-    if (requestMet()) {
-      loadCore();
-      setPhase(OPERATION);
-    }
-    else {
-      setRequestAmt(requestAmt() - receivedAmt());
-    } 
-    break; // end BEGIN || REFUEL 
-  case OPERATION:
-    increaseCycleTimer();
-    if (cycleComplete()) {
-      setPhase(REFUEL);
-    }
-    break; // end OPERATION
-  case END:
-    if (postCore_->empty()) {
-      dynamic_cast<InstModel*>(parent())->decommission(this);
-    }
-    break; // end END
+    case BEGIN:
+    case REFUEL:
+      if (requestMet()) {
+        loadCore();
+        setPhase(OPERATION);
+      }
+      else {
+        setRequestAmt(requestAmt() - receivedAmt());
+      } 
+      break; // end BEGIN || REFUEL 
+    case OPERATION:
+      increaseCycleTimer();
+      if (cycleComplete()) {
+        setPhase(REFUEL);
+      }
+      break; // end OPERATION
+    case END:
+      if (postCore_->empty()) {
+        delete this;
+        return;
+      }
+      break; // end END
   }
   increaseOperationTimer();
 
