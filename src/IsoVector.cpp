@@ -516,17 +516,11 @@ int IsoVector::compositionIsTracked() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::recordState() {
-  int check = compositionIsTracked();
-  if ( check == -1 ) {
-    // this is a new composition, log it accordingly
-    CompMap* comp = &atom_comp_;
-    stateID_ = nextStateID_++;
-    predefinedStates_[comp] = stateID_;
-    IsoVector::addToTable();
-  } else {
-    // we are already tracking this composition
-    stateID_ = check;
-  } 
+  // this is a new composition, log it accordingly
+  CompMap* comp = &atom_comp_;
+  stateID_ = nextStateID_++;
+  predefinedStates_[comp] = stateID_;
+  IsoVector::addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
