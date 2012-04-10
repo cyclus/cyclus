@@ -249,6 +249,10 @@ Model* Message::requester() const {
 }
 
 void Message::approveTransfer() {
+  if (dead_) {
+    return;
+  }
+
   msg_ptr me = msg_ptr(this);
 
   vector<rsrc_ptr> manifest;
