@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!-- 1 BuildRegion and 1 BuildInst -->
+<!-- 1 SourceFacility FrontEnd, 1 SinkFacility BackEnd, 10 BatchReactor Reactor and 1 NullMarket -->
+<simulation>
+  <duration>30</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+  <decay>2</decay>
+
+  <!-- Commodities -->
+  <commodity>
+    <name>fresh_PWR_uo2</name>
+  </commodity>
+
+  <commodity>
+    <name>spent_PWR_uo2</name>
+  </commodity>
+
+  <!-- Markets -->
+  <market>
+    <name>fresh_PWR_uo2market</name>
+    <mktcommodity>fresh_PWR_uo2</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>spent_PWR_uo2market</name>
+    <mktcommodity>spent_PWR_uo2</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <recipebook>
+    <filename>test.recipebook.xml</filename>
+    <namespace>test</namespace>
+    <format>xml</format>
+  </recipebook>
+
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>fresh_PWR_uo2</outcommodity>
+        <capacity>1e5</capacity>
+        <inventorysize>1e6</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>test:fresh_PWR_uo2</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>Reactor</name>
+    <model>
+      <BatchReactor>
+        <fuelpair>
+          <incommodity>fresh_PWR_uo2</incommodity>
+          <inrecipe>test:fresh_PWR_uo2</inrecipe>
+          <outcommodity>spent_PWR_uo2</outcommodity>
+          <outrecipe>test:spent_PWR_uo2</outrecipe>
+        </fuelpair>
+	<cyclelength>3</cyclelength>
+        <lifetime>12</lifetime>
+	<coreloading>10.0</coreloading>
+	<batchespercore>5</batchespercore>
+      </BatchReactor>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd</name>
+    <model>
+      <SinkFacility>
+        <incommodity>spent_PWR_uo2</incommodity>
+        <capacity>1e5</capacity>
+        <inventorysize>1e6</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+
+  <region>
+    <name>oneRegion</name>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <allowedfacility>Reactor</allowedfacility>
+    <allowedfacility>BackEnd</allowedfacility>
+    <model>
+      <BuildRegion>
+	<prototyperequirement>
+	  <prototypename>FrontEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+	<prototyperequirement>
+	  <prototypename>Reactor</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>1</time>
+	      <number>10</number>
+	    </entry>
+	    <entry>
+	      <time>13</time>
+	      <number>10</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+	<prototyperequirement>
+	  <prototypename>BackEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+      </BuildRegion>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
+        <BuildInst>
+	  <availableprototype>FrontEnd</availableprototype>
+	  <availableprototype>Reactor</availableprototype>
+	  <availableprototype>BackEnd</availableprototype>
+        </BuildInst>
+      </model>
+    </institution>
+  </region>
+
+</simulation>
