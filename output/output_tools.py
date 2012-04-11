@@ -349,6 +349,8 @@ class Query(object) :
                 time = row[0] - self.t0
                 fFac = row[1]
                 tFac = row[2]
+                nIso = row[3]
+                mIso = row[4]
 
                 # Get the indexes for the 'from' and 'to' dimensions.
                 d = self.conn.cursor()
@@ -363,11 +365,7 @@ class Query(object) :
                 for roe in d :
                     toInd = actList.index(roe[0])
 
-                # Get the composition.
-                comp = convNdToTons(stripLightIsos(makeCompDict(Buffer.read(row[3]))))
-
-                for i, m in comp.iteritems() :
-                    self.data[time][fromInd][toInd][self.isoToInd[i]] += m
+                self.data[time][fromInd][toInd][self.isoToInd[nIso]] += mIso
 
             # Store the labels.
             self.dataLabels[0] = range(self.t0, self.tf)
