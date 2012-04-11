@@ -371,9 +371,9 @@ class BatchReactor : public FacilityModel  {
   bool requestMet();
 
   /**
-     resets the cycle timer to 0
+     resets the cycle timer to 1
    */
-  void resetCycleTimer() {cycle_timer_ = 0;}
+  void resetCycleTimer() {cycle_timer_ = 1;}
 
   /**
      increase the cycle timer by one time step
