@@ -82,10 +82,18 @@ void InstModel::handleTick(int time){
 }
 
 void InstModel::handleTock(int time){
-  // tell all of the institution models to handle the tick
-  for (int i = 0; i < children_.size(); i++) {
+  // tell all of the institution's child models to handle the tick
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
     Model* m = children_.at(i);
     dynamic_cast<FacilityModel*>(m)->handleTock(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+      currsize = children_.size();
+    }
   }
 }
 
