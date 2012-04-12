@@ -115,23 +115,20 @@ bool CapacityRegion::requestBuild(Model* fac, InstModel* inst)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int CapacityRegion::nFacs()
-{
+int CapacityRegion::nFacs() {
   // Return the total number of facilities which will be built
   return nFacs_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Model* CapacityRegion::chooseInstToBuildFac()
-{
+Model* CapacityRegion::chooseInstToBuildFac() {
   // Define the inst to build some fac
   // By default we pick the first institution in the region's list
   return children(0);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CapacityRegion::checkCurrentCapcity(string capacity_type)
-{
+double CapacityRegion::checkCurrentCapcity(string capacity_type) {
   // for now, all capacity types will be power capacity
   double capacity = 0.0;
   for(vector<Model*>::iterator inst=children_.begin();
@@ -143,16 +140,14 @@ double CapacityRegion::checkCurrentCapcity(string capacity_type)
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Model* CapacityRegion::chooseFacToBuild(ReplacementFacs facs)
-{
+Model* CapacityRegion::chooseFacToBuild(ReplacementFacs facs) {
   // this needs to be fleshed out
   return facs[0];
 };
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void CapacityRegion::handleTick(int time)
-{
+void CapacityRegion::handleTick(int time) {
   // Overwriting RegionModel's handleTick
   // We loop through each facility that exists in the to_build_map_
   map <string, queue <pair <int,int> > >::iterator fac;

@@ -17,7 +17,7 @@ TEST_P(ModelTests, DISABLED_InitFromXML) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, Print) {
-  EXPECT_NO_THROW(model_->print());
+  EXPECT_NO_THROW(model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

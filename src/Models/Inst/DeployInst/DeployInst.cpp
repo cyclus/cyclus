@@ -1,6 +1,7 @@
 // DeployInst.cpp
 // Implements the DeployInst class
 #include <iostream>
+#include <sstream>
 
 #include "DeployInst.h"
 
@@ -63,19 +64,20 @@ void DeployInst::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void DeployInst::str() 
-{ 
-  InstModel::str();
-
-  LOG(LEV_DEBUG2, "none!") << " with deployment schedule: ";
+std::string DeployInst::str() { 
+  std::stringstream ss;
+  ss << InstModel::str()
+     << " with deployment schedule: ";
 
   for (map<int,Model*>::iterator deploy=deployment_map_.begin();
        deploy!=deployment_map_.end();
        deploy++){
-    LOG(LEV_DEBUG2, "none!") << "            Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
+     ss << " Facility " << dynamic_cast<FacilityModel*>((*deploy).second)->facName()
         << " ("  << (*deploy).second->name() 
-        << ") is deployed in month " << (*deploy).first;
+        << ") deployed month " << (*deploy).first
+        << ", ";
   }
+  return ss.str() + '.';
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

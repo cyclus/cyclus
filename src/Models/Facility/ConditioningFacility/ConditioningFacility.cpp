@@ -125,22 +125,19 @@ void ConditioningFacility::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConditioningFacility::str() 
-{ 
-    FacilityModel::str();
-    string incommods, outcommods;
-    map<string, pair<int, string> >::const_iterator it;
-    for(it = commod_map_.begin(); it != commod_map_.end(); it++){
-      incommods += (*it).first;
-      incommods += ", ";
-      outcommods += (*it).second.second;
-      outcommods += ", ";
-    }
-    LOG(LEV_DEBUG2, "CondFac") << " conditions {" 
-      << incommods
-      <<"} into forms { "
-      << outcommods
-      << " }.";
+std::string ConditioningFacility::str() { 
+  string incommods, outcommods;
+  map<string, pair<int, string> >::const_iterator it;
+  for(it = commod_map_.begin(); it != commod_map_.end(); it++){
+    incommods += (*it).first;
+    incommods += ", ";
+    outcommods += (*it).second.second;
+    outcommods += ", ";
+  }
+  std::string s = FacilityModel::str();
+  s +=  " conditions {"  + incommods;
+  s += "} into forms { " + outcommods + " }.";
+  return s;
 };
 
 /* ------------------- */ 

@@ -62,21 +62,20 @@ void BuildInst::copy(BuildInst* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::str() {
-  InstModel::str();
+std::string BuildInst::str() {
+  std::string s = InstModel::str();
 
   if ( prototypes_ == NULL || prototypes_->empty() ){
-    LOG(LEV_DEBUG2, "binst") << name() << " has no prototypes (currently)."; 
-  }
-  else {
-    LOG(LEV_DEBUG2, "none!") << name() 
-                             << " has the following available prototypes: ";
+    s += name() + " has no prototypes (currently)."; 
+  } else {
+    s += name() + " has prototypes: ";
     for (set<Model*>::iterator mdl=prototypes_->begin(); 
          mdl != prototypes_->end(); 
          mdl++){
-      LOG(LEV_DEBUG2, "binst") << "        * " << (*mdl)->name();
+      s += (*mdl)->name() + ", ";
     }
   }
+  return s;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

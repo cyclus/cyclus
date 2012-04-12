@@ -2,6 +2,7 @@
 // Implements the Model Class
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "Model.h"
@@ -70,7 +71,7 @@ void Model::printModelList() {
   CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
   CLOG(LEV_INFO3) << "Model list {";
   for (int i = 0; i < model_list_.size(); i++) {
-    model_list_.at(i)->str();
+    CLOG(LEV_INFO3) << model_list_.at(i)->str();
   }
   CLOG(LEV_INFO3) << "}";
 }
@@ -265,14 +266,16 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::str() { 
-  CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
+std::string Model::str() { 
+  std::stringstream ss;
+  ss << model_type_ << "_" << name_ 
       << " ( "
       << "ID=" << ID_
       << ", implementation=" << model_impl_
       << ",  name=" << name_
       << ",  parentID=" << parentID_
       << " ) " ;
+  return "" + ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,7 +307,7 @@ void Model::setParent(Model* parent){
   }
 
   CLOG(LEV_DEBUG2) << "Created Model: {";
-  str();
+  CLOG(LEV_DEBUG2) << str();
   CLOG(LEV_DEBUG2) << "}";
 };
 

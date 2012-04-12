@@ -71,22 +71,24 @@ void BuildRegion::copy(BuildRegion* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildRegion::str() {
-  RegionModel::str();
+std::string BuildRegion::str() {
+  std::string s = RegionModel::str();
+
   if ( builders_ == NULL || builders_->empty() ){
-    LOG(LEV_DEBUG2, "breg") << name() << " has no builders (currently)."; 
-  }
-  else {
-    LOG(LEV_DEBUG2, "breg") << name() << " has the following builders: " ; 
+    s += name() + " has no builders (currently)."; 
+  } else {
+    s += name() + " has the following builders: " ; 
     for(map<Model*, list<Model*>*>::iterator mit=builders_->begin();
         mit != builders_->end(); mit++) {
-      LOG(LEV_DEBUG2, "breg") << "  For prototype: " << mit->first->name(); 
+      s += " prototype=" + mit->first->name() + "("; 
       for(list<Model*>::iterator inst = mit->second->begin();
           inst != mit->second->end(); inst++) {
-        LOG(LEV_DEBUG2, "breg") << "    * " << (*inst)->name(); 
+        s += (*inst)->name() + ", "; 
       }
+      s += "), ";
     }
   }
+  return s;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

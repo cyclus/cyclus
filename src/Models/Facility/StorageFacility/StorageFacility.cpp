@@ -1,6 +1,7 @@
 // StorageFacility.cpp
 // Implements the StorageFacility class
 #include <iostream>
+#include <sstream>
 
 #include "StorageFacility.h"
 
@@ -83,16 +84,16 @@ void StorageFacility::copyFreshModel(Model* src)
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::str() 
-{ 
-  FacilityModel::str(); 
-  LOG(LEV_DEBUG2, "none!") << "    stores commodity {"
-      << incommod_->getName()
-      << "}, for a minimum time of " 
-      << residence_time_ 
-      << " months and has an inventory_ that holds " 
-      << inventory_size_ << " materials."
-;
+std::string StorageFacility::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " stores commodity '"
+     << incommod_->getName()
+     << "', for a min time of " 
+     << residence_time_ 
+     << " months with inventory holding " 
+     << inventory_size_ << " materials.";
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

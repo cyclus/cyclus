@@ -1,6 +1,7 @@
 // SeparationsMatrixFacility.cpp
 // Implements the SeparationsMatrixFacility class
 #include <iostream>
+#include <sstream>
 #include <deque>
 #include <string.h>
 #include <vector>
@@ -123,27 +124,26 @@ void SeparationsMatrixFacility::copyFreshModel(Model* src)
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsMatrixFacility::str() 
-{ 
-  FacilityModel::str();
-  LOG(LEV_DEBUG2, "none!") << "converts commodities {";
+std::string SeparationsMatrixFacility::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str();
 
+  ss << "converts commodities {";
   for(vector<string>::const_iterator iter = in_commod_.begin(); 
       iter != in_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2, "none!") << (*iter);
+    ss << (*iter) << ", ";
   };
 
-  LOG(LEV_DEBUG2, "none!") << "} into commodities {";
-
+  ss << "} into commodities {";
   for (vector<string>::iterator iter = out_commod_.begin(); 
       iter != out_commod_.end(); 
       iter ++){
-    LOG(LEV_DEBUG2, "none!") << (*iter);
+    ss << (*iter) << ", ";
   }; 
-  LOG(LEV_DEBUG2, "none!") << "}, and has an inventory that holds " 
-    << inventory_size_ << " materials"
-    ;
+  ss << "}, with inventory holding " 
+     << inventory_size_ << " materials";
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

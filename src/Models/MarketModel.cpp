@@ -91,10 +91,7 @@ void MarketModel::copy(MarketModel* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::str() { 
-  Model::str(); 
-
-  LOG(LEV_DEBUG2, "none!") << "    trades commodity " << commodity_;
-
+std::string MarketModel::str() { 
+  return Model::str() + " trades commodity " + commodity_; 
 };
 

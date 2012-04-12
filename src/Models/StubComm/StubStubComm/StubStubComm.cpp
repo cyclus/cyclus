@@ -28,8 +28,8 @@ void StubStubComm::copy(StubStubComm* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubStubComm::str() { 
-  StubCommModel::str(); 
+std::string StubStubComm::str() { 
+  return StubCommModel::str(); 
 };
 
 /* -------------------- */

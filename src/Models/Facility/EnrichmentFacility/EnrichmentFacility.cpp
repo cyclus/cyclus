@@ -1,6 +1,7 @@
 // EnrichmentFacility.cpp
 // Implements the EnrichmentFacility class
 #include <iostream>
+#include <sstream>
 #include "Logger.h"
 #include <deque>
 
@@ -85,14 +86,14 @@ void EnrichmentFacility::copyFreshModel(Model* src){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::str() { 
-  FacilityModel::str(); 
-  LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
-      << in_commod_
-      << "} into commodity {"
-      << out_commod_
-      << "}, and has an inventory that holds " 
-      << inventory_size_ << " materials";
+std::string EnrichmentFacility::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " converts commodity '" << in_commod_
+     << "' into commodity '" << out_commod_
+     << "', with inventory holding " 
+     << inventory_size_ << " materials.";
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

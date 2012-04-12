@@ -101,19 +101,21 @@ void BatchReactor::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::str() { 
-  FacilityModel::str();
-  LOG(LEV_DEBUG2, "BReact") << "    has facility parmeters {";
-  LOG(LEV_DEBUG2, "BReact") << "      * Lifetime = " << lifetime();
-  LOG(LEV_DEBUG2, "BReact") << "      * Cycle Length = " << cycleLength();
-  LOG(LEV_DEBUG2, "BReact") << "      * Core Loading = " << coreLoading();
-  LOG(LEV_DEBUG2, "BReact") << "      * Batches Per Core = " << nBatches();
-  LOG(LEV_DEBUG2, "BReact") << "      * Batch Loading = " << batchLoading();
-  LOG(LEV_DEBUG2, "BReact") << "    converts commodity {"
-      << fuelPairs_.front().first.first
-      << "} into commodity {"
-      << this->fuelPairs_.front().second.first
-      << "}.";
+std::string BatchReactor::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str();
+  ss << " has facility parmeters {"
+     << "Lifetime = " << lifetime()
+     << ", Cycle Length = " << cycleLength()
+     << ", Core Loading = " << coreLoading()
+     << ", Batches Per Core = " << nBatches()
+     << ", Batch Loading = " << batchLoading()
+     << ", converts commodity '"
+     << fuelPairs_.front().first.first
+     << "' into commodity '"
+     << this->fuelPairs_.front().second.first
+     << "'}";
+  return "" + ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

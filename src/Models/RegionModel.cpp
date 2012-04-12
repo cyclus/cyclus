@@ -68,24 +68,23 @@ void RegionModel::copy(RegionModel* src) {
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::str() {
+std::string RegionModel::str() {
+  std::string s = Model::str();
 
-  Model::str();
-
-  LOG(LEV_DEBUG2, "none!") << "allows facilities:" ;
-
+  s += "allows facs: ";
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2, "none!") << "  * " << (*fac)->name();
+    s += (*fac)->name() + ", ";
   }
-  LOG(LEV_DEBUG2, "none!") << "and has the following institutions:";
-  
+
+  s += ". And has insts: ";
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
-    LOG(LEV_DEBUG2, "none!") << "  * " << (*inst)->name();
+    s += (*inst)->name() + ", ";
   }
+  return s;
 }
 
 /* --------------------

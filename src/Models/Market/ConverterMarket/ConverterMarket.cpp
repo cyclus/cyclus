@@ -49,14 +49,14 @@ void ConverterMarket::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConverterMarket::str()
-{ 
-  MarketModel::str();
-  LOG(LEV_DEBUG2, "none!") << "where the offer commodity is {"
-      << offer_commod_
-      << "}, the request commodity is {"
-      << req_commod_
-      << "}. ";
+std::string ConverterMarket::str() { 
+  std::string s = MarketModel::str()
+                + "with offer commodity '"
+                + offer_commod_
+                + "' and request commodity '"
+                + req_commod_
+                + "'. ";
+  return s;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

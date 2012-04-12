@@ -6,7 +6,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(StubModelTests, Print) {
   int time = 1;
-  EXPECT_NO_THROW(stub_model_->print());
+  EXPECT_NO_THROW(stub_model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

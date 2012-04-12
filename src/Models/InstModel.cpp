@@ -41,11 +41,8 @@ void InstModel::copy(InstModel* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::str()
-{
-  Model::str();
-
-  LOG(LEV_DEBUG2, "none!") << "in region " << parent()->name();
+std::string InstModel::str() {
+  return Model::str() + "in region" + parent()->name();
 }
 
 

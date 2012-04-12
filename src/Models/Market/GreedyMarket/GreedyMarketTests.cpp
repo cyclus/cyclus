@@ -194,7 +194,7 @@ TEST_F(GreedyMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(GreedyMarketTest, Print) {
-  EXPECT_NO_THROW(src_market->str());
+  //EXPECT_NO_THROW(src_market->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

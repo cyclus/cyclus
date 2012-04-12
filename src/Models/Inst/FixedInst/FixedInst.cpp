@@ -42,20 +42,20 @@ void FixedInst::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::str() {
-  InstModel::str();
+std::string FixedInst::str() {
+  std::string s = InstModel::str();
   if (children_.size() > 0) {
-    LOG(LEV_DEBUG2, "none!") << "has the following permanent facilities: ";
+    s += "has the permanent facilities: ";
     for (vector<Model*>::iterator fac=children_.begin(); 
          fac != children_.end(); 
          fac++){
-      LOG(LEV_DEBUG2, "none!") << "  * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
-                               << " (" << (*fac)->name() << ")";
+      s += (dynamic_cast<FacilityModel*>(*fac))->facName()
+           + " (" + (*fac)->name() + "), ";
     }
+  } else {
+    s += " has no built facilities (currently).";
   }
-  else {
-    LOG(LEV_DEBUG2, "none!") << "has no built facilities (currently).";
-  }
+  return s + ".";
 };
 
 void FixedInst::handleTick(int time){

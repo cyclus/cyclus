@@ -6,7 +6,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(MarketModelTests, Print) {
   int time = 1;
-  EXPECT_NO_THROW(market_model_->print());
+  EXPECT_NO_THROW(market_model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

@@ -33,8 +33,8 @@ void StubInst::copyFreshModel(Model* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::str() { 
-  InstModel::str(); 
+std::string StubInst::str() { 
+  return InstModel::str(); 
 };
 
 /* ------------------- */ 

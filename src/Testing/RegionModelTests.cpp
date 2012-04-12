@@ -7,7 +7,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, Print) {
   int time = 1;
-  EXPECT_NO_THROW(region_model_->print());
+  EXPECT_NO_THROW(region_model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

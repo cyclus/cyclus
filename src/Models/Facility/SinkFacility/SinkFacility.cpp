@@ -1,6 +1,7 @@
 // SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
+#include <sstream>
 
 #include "SinkFacility.h"
 
@@ -63,13 +64,12 @@ void SinkFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::str() {
-  FacilityModel::str();
+std::string SinkFacility::str() {
+  std::stringstream ss;
+  ss << FacilityModel::str();
 
   string msg = "";
-
   msg += "accepts commodities ";
-
   for (vector<string>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
        commod++) {
@@ -77,7 +77,8 @@ void SinkFacility::str() {
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2, "SnkFac") << msg << inventory_.capacity() << " kg.";
+  ss << msg << inventory_.capacity() << " kg.";
+  return "" + ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
