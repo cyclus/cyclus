@@ -131,6 +131,40 @@ class Query(object) :
 
         
 ###############################################################################
+    
+    def collapseIsosToElts(self, EltsList):
+        """
+        Input:
+        -EltsList: Elements that have to be read. For instance, EltsList = 
+        ['92'] will sum all U isotopes, elt = ['92235'] will only return the 
+        U235 mass in the material, EltsList = ['92235', '92238'] will sum U235 
+        and U238 masses. 
+
+        Returns:
+        -the total mass (in tons) of asked elements/isotopes.
+        """
+        
+        isoDim=self.dataAxes.index('iso')
+        L = self.data[isoDim]
+        TotU=0
+        
+        #Loop through various isotops of the material
+        for i in range(1, int(L[0])*2,2):
+            L[i] = int(L[i])
+            iso = L[i]/10
+            N = iso%1000
+            P = iso/1000
+            
+            #Only requested isotops or elements are read
+            if iso in EltsList or P in EltsList or 'All' in EltsList:
+    
+                #The mass of that uranium isotope is added to the total mass of U of the shipment.
+                #The density number (nb of atoms) is converted into tons of Uranium
+                TotU += L[i+1]*N/6.02214e29
+    
+        return round(TotU, 3)
+
+###############################################################################
 
     def collapseIsos(self) :
         """
