@@ -126,7 +126,7 @@ class SourceFacility : public FacilityModel  {
   /**
      Print information about this model 
    */
-  virtual void str();
+  virtual std::string str();
 
   /**
      Transacted resources are extracted through this method 

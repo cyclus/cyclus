@@ -80,7 +80,7 @@ class GreedyMarket : public MarketModel {
   /** 
      Prints information about this model. 
    */
-  virtual void str()       { MarketModel::str();   } ;
+  virtual std::string str()       { MarketModel::str();   } ;
 
 /* -------------------- */
 

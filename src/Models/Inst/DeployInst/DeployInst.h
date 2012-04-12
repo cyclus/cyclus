@@ -56,7 +56,7 @@ class DeployInst : public InstModel {
   /**
      prints information about this inst 
    */
-  virtual void str();
+  virtual std::string str();
 
 /* ------------------- */ 
 

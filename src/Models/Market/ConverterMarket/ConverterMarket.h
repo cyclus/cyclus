@@ -84,7 +84,7 @@ class ConverterMarket : public MarketModel {
   /** 
      Prints information about this model. 
    */
-  virtual void str() ;
+  virtual std::string str() ;
 
 /* -------------------- */
 

@@ -149,7 +149,7 @@ class BuildRegion : public RegionModel
   /**
      print information about the region 
    */
-  virtual void str();
+  virtual std::string str();
 
 /* ------------------- */ 
 

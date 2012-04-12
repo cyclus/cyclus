@@ -68,7 +68,7 @@ class StubTimeAgent : public TimeAgent {
   /**
      every model should be able to print a verbose description 
    */
-   virtual void str();
+   virtual std::string str();
 
   /**
      Each simulation agent is prompted to do its beginning-of-life 

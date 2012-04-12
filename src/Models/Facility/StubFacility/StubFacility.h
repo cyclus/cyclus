@@ -74,7 +74,7 @@ class StubFacility : public FacilityModel  {
   /**
      every model should be able to print a verbose description 
    */
-   virtual void str();
+   virtual std::string str();
 
   /**
      Transacted resources are extracted through this method 
