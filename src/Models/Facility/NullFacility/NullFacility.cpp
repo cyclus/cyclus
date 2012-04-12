@@ -2,6 +2,7 @@
 // Implements the NullFacility class
 
 #include <iostream>
+#include <sstream>
 
 #include "NullFacility.h"
 
@@ -64,16 +65,18 @@ void NullFacility::copyFreshModel(Model* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::print() { 
-  FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "NullFac") << "    converts commodity {"
-      << in_commod_
-      << "} into commodity {"
-      << out_commod_
-      << "}, and has an inventory that holds " 
-      << inventory_.capacity() << " materials"
-      << ", and has a stock that holds " 
-      << stocks_.capacity() << " materials";
+std::string NullFacility::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " converts commodity '"
+     << in_commod_
+     << "' into commodity '"
+     << out_commod_
+     << "', with inventory holding " 
+     << inventory_.capacity() << " materials"
+     << ", and stock holding " 
+     << stocks_.capacity() << " materials";
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

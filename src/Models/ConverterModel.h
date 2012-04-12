@@ -88,7 +88,7 @@ class ConverterModel : public Model {
   /**
      every model should be able to print a verbose description 
    */
-  virtual void print() { Model::print(); };
+  virtual std::string str();
 
 protected:
   /**

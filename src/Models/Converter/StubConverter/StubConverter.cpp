@@ -27,8 +27,8 @@ void StubConverter::copyFreshModel(Model* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubConverter::print() { 
-  ConverterModel::print(); 
+std::string StubConverter::str() { 
+  return ConverterModel::str(); 
 };
 
 /* ------------------- */ 

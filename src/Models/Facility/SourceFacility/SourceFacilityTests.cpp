@@ -15,7 +15,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeSourceFacility : public SourceFacility {
   public:
-    FakeSourceFacility() : SourceFacility() {
+    FakeSourceFacility() {
       out_commod_ = "out-commod";
 
       int u235 = 92235;
@@ -92,7 +92,7 @@ TEST_F(SourceFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
 }
 
 

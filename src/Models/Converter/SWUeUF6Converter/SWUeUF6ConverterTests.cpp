@@ -69,7 +69,7 @@ TEST_F(SWUeUF6ConverterTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SWUeUF6ConverterTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
   // Test SWUeUF6Converter specific aspects of the print method here
 }
 

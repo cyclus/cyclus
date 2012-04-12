@@ -32,8 +32,8 @@ void StubMarket::copyFreshModel(Model* src){
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::print() { 
-  MarketModel::print(); 
+std::string StubMarket::str() { 
+  return MarketModel::str(); 
 };
 
 /* -------------------- */

@@ -188,7 +188,7 @@ class Model {
   /**
      every model should be able to print a verbose description 
    */
-  virtual void print();
+  virtual std::string str();
 
   /**
      return parent of this model 

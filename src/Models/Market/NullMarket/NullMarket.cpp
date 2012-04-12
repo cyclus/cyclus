@@ -12,6 +12,11 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+std::string NullMarket::str() {
+  return MarketModel::str();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void NullMarket::receiveMessage(msg_ptr msg) {
   messages_.insert(msg);
 

@@ -75,7 +75,7 @@ class NullMarket : public MarketModel
   /** 
      Prints information about this model. 
    */
-  virtual void print()       { MarketModel::print();   } ;
+  virtual std::string str();
 
 /* -------------------- */
 

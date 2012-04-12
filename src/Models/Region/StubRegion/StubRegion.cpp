@@ -28,8 +28,8 @@ void StubRegion::copy(StubRegion* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::print() { 
-  RegionModel::print(); 
+std::string StubRegion::str() { 
+  return RegionModel::str(); 
 };
 
 /* ------------------- */ 

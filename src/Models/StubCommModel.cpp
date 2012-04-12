@@ -30,9 +30,8 @@ void StubCommModel::copy(StubCommModel* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubCommModel::print() { 
-  Model::print(); 
-  LOG(LEV_DEBUG2, "none!"); 
+std::string StubCommModel::str() { 
+  return Model::str() + ""; 
 };
 
 /* ------------------- */ 
