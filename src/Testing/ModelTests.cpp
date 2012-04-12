@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "ModelTests.h"
+#include <string>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, DISABLED_CreateFromXML) {
@@ -17,7 +18,7 @@ TEST_P(ModelTests, DISABLED_InitFromXML) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, Print) {
-  EXPECT_NO_THROW(model_->print());
+  EXPECT_NO_THROW(std::string s = model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

@@ -74,7 +74,7 @@ class StubInst : public InstModel {
   /**
      every model should be able to print a verbose description 
    */
-   virtual void print();
+   virtual std::string str();
 
 /* ------------------- */ 
 

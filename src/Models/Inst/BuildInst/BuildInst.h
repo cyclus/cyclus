@@ -86,7 +86,7 @@ public:
   /**
      a print function to describe a BuildInst instantiation. 
    */
-  virtual void print();
+  virtual std::string str();
 
 /* ------------------- */ 
 

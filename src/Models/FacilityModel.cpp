@@ -43,6 +43,11 @@ void FacilityModel::copy(FacilityModel* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string FacilityModel::str() {
+  return Model::str();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::facInst() {
   return dynamic_cast<InstModel*>( parent() );
 }

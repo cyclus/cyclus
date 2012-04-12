@@ -72,7 +72,7 @@ class BatchReactor : public FacilityModel  {
   /**
      Print information about this model 
    */
-  virtual void print();
+  virtual std::string str();
 
 /* ------------------- */ 
 

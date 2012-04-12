@@ -1,6 +1,7 @@
 // SourceFacility.cpp
 // Implements the SourceFacility class
 #include <iostream>
+#include <sstream>
 
 #include "SourceFacility.h"
 
@@ -68,14 +69,15 @@ void SourceFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::print() {
-  FacilityModel::print();
-
-  LOG(LEV_DEBUG2, "SrcFac!") << "    supplies commodity {"
-      << out_commod_ << "} with recipe '" 
-      << recipe_name_ << "' at a capacity of "
-      << capacity_ << " kg per time step."
-      << " It has a max inventory of " << inventory_.capacity() << " kg.";
+std::string SourceFacility::str() {
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " supplies commodity '"
+     << out_commod_ << "' with recipe '" 
+     << recipe_name_ << "' at a capacity of "
+     << capacity_ << " kg per time step "
+     << " with max inventory of " << inventory_.capacity() << " kg.";
+  return "" + ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
