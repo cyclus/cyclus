@@ -1,6 +1,7 @@
 # query.py
 import sqlite3
 from numpy import zeros
+from numpy import cumsum
 
 ###############################################################################
 ###############################################################################
@@ -139,25 +140,48 @@ class Query(object) :
             self.dataAxes = ['time', 'from', 'to']
             self.dataUnits = ['months', 'agentID', 'agentID']
 
+
 ###############################################################################
-    def filterReceivers(self, recID) :
+    def allReceivedBy(self, recID) :
         """
         This filters the data to include only the material or resources received 
         by the model with ID = recID
         """
-        if not self.isExecuted :
-            raise QueryException, "Error: operations on the 'to' dimension can " + \
-                        "can be performed only after Query execution. If you want to " + \
-                        "limit the number of total actors, used the appropriate " + \
-                        "collapseActorsTo...() function."
         try :
             toDim = self.dataAxes.index('to')
         except ValueError :
-            print "Warning: Query data no longer have a 'from' dimension."
+            print "Warning: Query data no longer have a 'to' dimension."
             return
-        
-        receviers = self.data[toDim]
-        
+
+        if 'resource' == self.qType :
+            
+            # get the list of actors
+            actList = self.getActList()
+            numActs = len(actList)
+
+            # Initialize the list.
+            totRsrc = zeros( (self.tf - self.t0)/12. )
+
+            # Perform the SQL query.
+            c=self.conn.cursor()
+            c.execute("SELECT Transactions.Time, TransactedResources.Quantity " + \
+                "FROM Transactions, TransactedResources " + \
+                "WHERE transactions.ID == transactedresources.transactionID AND " + \
+                "transactions.receiverID == ? ", (recID,))
+
+            # Load the results into the array.
+            timeInd = -1
+            for row in c :
+                time = row[0] - self.t0
+                if (time%12-1 == 0 ):
+                  quan = row[1] 
+                  totRsrc[timeInd] += quan
+                  timeInd+=1
+            return totRsrc
+
+        else : 
+          raise QueryException, "Error: " + queryType +\
+              "cannot return all resources received at this time."
 
 
         
@@ -348,6 +372,7 @@ class Query(object) :
         # Return the array.
         return self.data
 
+###############################################################################
     def getActList(self) :
         """
         Count and record how many actors exist during the range of the
@@ -366,7 +391,6 @@ class Query(object) :
             if row[0] not in actList :
                 actList.append(row[0])
 
-        numActs = len(actList)
         actList.sort()
         return actList
 
@@ -386,6 +410,8 @@ class Query(object) :
             raise QueryException, "Error: This query has already been executed. " + \
                         "Try reExecute()."
 
+        c = self.conn.cursor()
+
         if 'material' == self.qType :
             
             # Get the array dimensions. We don't know if we've filtered or collapsed
@@ -397,6 +423,7 @@ class Query(object) :
 
             # get the list of actors
             actList = self.getActList()
+            numActs = len(actlist)
 
             # Get the list of isotopes from the hard-coded list in getIsoList. Count
             # them up and make a dictionary for mapping them into the iso dimension
@@ -446,7 +473,7 @@ class Query(object) :
             self.dataLabels[2] = actList
             self.dataLabels[3] = self.indToIso.values()
           
-          elif 'resource' == self.qType :
+        elif 'resource' == self.qType :
             
             # Get the array dimensions. We don't know if we've filtered or collapsed
             # away some of
@@ -457,6 +484,7 @@ class Query(object) :
 
             # get the list of actors
             actList = self.getActList()
+            numActs = len(actList)
 
             # Initialize the array.
             try :
@@ -492,13 +520,12 @@ class Query(object) :
                 for roe in d :
                     toInd = actList.index(roe[0])
 
-                self.data[time][fromInd][toInd][self.isoToInd[nIso]] += rsrc
+                self.data[time][fromInd][toInd] += rsrc
 
             # Store the labels.
             self.dataLabels[0] = range(self.t0, self.tf)
             self.dataLabels[1] = actList
             self.dataLabels[2] = actList
-
 
             
         self.isExecuted = True
