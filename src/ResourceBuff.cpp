@@ -72,7 +72,7 @@ Manifest ResourceBuff::popQty(double qty) {
   if (qty - quantity() > STORE_EPS) {
     throw CycNegQtyException("Removal quantity larger than store tot quantity.");
   }
-  if (qty < 0.0) {
+  if (qty < STORE_EPS) {
     throw CycNegQtyException("Removal quantity cannot be negative.");
   }
 
@@ -123,8 +123,8 @@ rsrc_ptr ResourceBuff::popOne() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::pushOne(rsrc_ptr mat) {
-  if (mat->quantity() - space() > STORE_EPS) {
-    throw CycOverCapException("Material pushing breaks capacity limit.");
+  if (mat->quantity() - space() > STORE_EPS && unlimited_ != true) {
+    throw CycOverCapException("Material pushing of breaks capacity limit.");
   }
   std::list<rsrc_ptr>::iterator iter;
   for (iter = mats_.begin(); iter != mats_.end(); iter++) {
