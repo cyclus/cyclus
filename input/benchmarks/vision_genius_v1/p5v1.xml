@@ -118,7 +118,7 @@
 	  </demandschedule>
 	</prototyperequirement>        
 	<prototyperequirement>
-          <prototype>ReactorA</prototype>
+          <prototypename>ReactorA</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -127,7 +127,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorB</prototype>
+          <prototypename>ReactorB</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -136,7 +136,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorC</prototype>
+          <prototypename>ReactorC</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -145,7 +145,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorD</prototype>
+          <prototypename>ReactorD</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -154,7 +154,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorE</prototype>
+          <prototypename>ReactorE</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -163,7 +163,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorF</prototype>
+          <prototypename>ReactorF</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -172,7 +172,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorG</prototype>
+          <prototypename>ReactorG</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -181,7 +181,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorH</prototype>
+          <prototypename>ReactorH</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -190,7 +190,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorI</prototype>
+          <prototypename>ReactorI</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -199,7 +199,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorJ</prototype>
+          <prototypename>ReactorJ</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -208,7 +208,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorK</prototype>
+          <prototypename>ReactorK</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
