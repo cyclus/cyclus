@@ -92,7 +92,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      every model should be able to print a verbose description 
    */
-  virtual void print();
+  virtual void str();
 
  public:
   /**

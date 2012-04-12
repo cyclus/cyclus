@@ -68,8 +68,8 @@ void SourceFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::print() {
-  FacilityModel::print();
+void SourceFacility::str() {
+  FacilityModel::str();
 
   LOG(LEV_DEBUG2, "SrcFac!") << "    supplies commodity {"
       << out_commod_ << "} with recipe '" 

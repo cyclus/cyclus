@@ -68,7 +68,7 @@ TEST_F(StubFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(src_facility->str());
   // Test StubFacility specific aspects of the print method here
 }
 

@@ -77,7 +77,7 @@ class StorageFacility : public FacilityModel
   /**
      Print information about this model 
    */
-  virtual void print();
+  virtual void str();
   
   /**
      Transacted resources are extracted through this method 

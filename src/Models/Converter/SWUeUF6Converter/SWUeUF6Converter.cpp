@@ -42,9 +42,9 @@ void SWUeUF6Converter::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SWUeUF6Converter::print() 
+void SWUeUF6Converter::str() 
 { 
-  ConverterModel::print(); 
+  ConverterModel::str(); 
   LOG(LEV_DEBUG2, "none!") << "converts offers of commodity {"
       << in_commod_
       << "} into offers of commodity {"

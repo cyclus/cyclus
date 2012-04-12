@@ -63,8 +63,8 @@ void SinkFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::print() {
-  FacilityModel::print();
+void SinkFacility::str() {
+  FacilityModel::str();
 
   string msg = "";
 

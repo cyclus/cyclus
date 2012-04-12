@@ -62,8 +62,8 @@ void BuildInst::copy(BuildInst* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildInst::print() {
-  InstModel::print();
+void BuildInst::str() {
+  InstModel::str();
 
   if ( prototypes_ == NULL || prototypes_->empty() ){
     LOG(LEV_DEBUG2, "binst") << name() << " has no prototypes (currently)."; 

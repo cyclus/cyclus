@@ -49,9 +49,9 @@ void ConverterMarket::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConverterMarket::print()
+void ConverterMarket::str()
 { 
-  MarketModel::print();
+  MarketModel::str();
   LOG(LEV_DEBUG2, "none!") << "where the offer commodity is {"
       << offer_commod_
       << "}, the request commodity is {"

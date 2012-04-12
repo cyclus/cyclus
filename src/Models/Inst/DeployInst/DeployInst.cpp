@@ -63,9 +63,9 @@ void DeployInst::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void DeployInst::print() 
+void DeployInst::str() 
 { 
-  InstModel::print();
+  InstModel::str();
 
   LOG(LEV_DEBUG2, "none!") << " with deployment schedule: ";
 

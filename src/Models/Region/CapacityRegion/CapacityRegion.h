@@ -69,7 +69,7 @@ class CapacityRegion : public RegionModel
     virtual void copyFreshModel(Model* src){ copy(dynamic_cast<CapacityRegion*>(src)); };
   
     // print information about the region
-    virtual void print()               { RegionModel::print();   } ;
+    virtual void str()               { RegionModel::str();   } ;
 
 /* ------------------- */ 
 

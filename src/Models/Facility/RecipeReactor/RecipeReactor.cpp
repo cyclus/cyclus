@@ -129,8 +129,8 @@ void RecipeReactor::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::print() { 
-  FacilityModel::print(); 
+void RecipeReactor::str() { 
+  FacilityModel::str(); 
   LOG(LEV_DEBUG2, "RReact") << "    converts commodity {"
       << fuelPairs_.front().first.first
       << "} into commodity {"
@@ -400,7 +400,7 @@ void RecipeReactor::makeOffers(){
 
     // make a material to offer
     mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(out_recipe_));
-    offer_mat->print();
+    offer_mat->str();
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message

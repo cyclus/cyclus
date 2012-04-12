@@ -92,7 +92,7 @@ TEST_F(EnrichmentFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(EnrichmentFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility_->print());
+  EXPECT_NO_THROW(src_facility_->str());
   // Test EnrichmentFacility specific aspects of the print method here
 }
 

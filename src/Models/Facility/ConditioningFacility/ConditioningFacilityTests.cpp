@@ -79,7 +79,7 @@ TEST_F(ConditioningFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(ConditioningFacilityTest, Print) {
-  EXPECT_NO_THROW(cond_facility->print());
+  EXPECT_NO_THROW(cond_facility->str());
   // Test ConditioningFacility specific aspects of the print method here
 }
 

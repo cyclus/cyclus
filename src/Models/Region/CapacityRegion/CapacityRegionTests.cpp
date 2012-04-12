@@ -64,7 +64,7 @@ TEST_F(CapacityRegionTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CapacityRegionTest, Print) {
-  EXPECT_NO_THROW(src_region_->print());
+  EXPECT_NO_THROW(src_region_->str());
   // Test CapacityRegion specific aspects of the print method here
 }
 

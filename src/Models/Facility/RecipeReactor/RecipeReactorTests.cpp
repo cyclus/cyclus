@@ -115,7 +115,7 @@ TEST_F(RecipeReactorTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(RecipeReactorTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(src_facility->str());
   // Test RecipeReactor specific aspects of the print method here
 }
 

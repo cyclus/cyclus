@@ -70,7 +70,7 @@ void Model::printModelList() {
   CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
   CLOG(LEV_INFO3) << "Model list {";
   for (int i = 0; i < model_list_.size(); i++) {
-    model_list_.at(i)->print();
+    model_list_.at(i)->str();
   }
   CLOG(LEV_INFO3) << "}";
 }
@@ -265,7 +265,7 @@ void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::print() { 
+void Model::str() { 
   CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
       << " ( "
       << "ID=" << ID_
@@ -304,7 +304,7 @@ void Model::setParent(Model* parent){
   }
 
   CLOG(LEV_DEBUG2) << "Created Model: {";
-  print();
+  str();
   CLOG(LEV_DEBUG2) << "}";
 };
 

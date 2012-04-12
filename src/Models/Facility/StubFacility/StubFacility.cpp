@@ -39,8 +39,8 @@ void StubFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::print() {
-  FacilityModel::print();
+void StubFacility::str() {
+  FacilityModel::str();
 };
 
 /* ------------------- */ 

@@ -85,7 +85,7 @@ class SWUeUF6Converter : public ConverterModel
   /**
      Print information about this model 
    */
-  virtual void print();
+  virtual void str();
 
  /* ------------------- */ 
 

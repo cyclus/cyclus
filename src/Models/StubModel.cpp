@@ -29,8 +29,8 @@ void StubModel::copy(StubModel* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubModel::print() { 
-  Model::print(); 
+void StubModel::str() { 
+  Model::str(); 
   LOG(LEV_DEBUG2, "none!"); 
 };
 

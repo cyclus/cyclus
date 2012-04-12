@@ -64,8 +64,8 @@ void NullFacility::copyFreshModel(Model* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::print() { 
-  FacilityModel::print(); 
+void NullFacility::str() { 
+  FacilityModel::str(); 
   LOG(LEV_DEBUG2, "NullFac") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"

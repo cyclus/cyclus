@@ -42,8 +42,8 @@ void FixedInst::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::print() {
-  InstModel::print();
+void FixedInst::str() {
+  InstModel::str();
   if (children_.size() > 0) {
     LOG(LEV_DEBUG2, "none!") << "has the following permanent facilities: ";
     for (vector<Model*>::iterator fac=children_.begin(); 

@@ -68,7 +68,7 @@ class StubCommModel : public Model, public Communicator {
   /**
      every model should be able to print a verbose description 
    */
-   virtual void print();
+   virtual void str();
 
 /* ------------------- */ 
 

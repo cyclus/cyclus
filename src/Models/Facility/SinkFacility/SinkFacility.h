@@ -119,7 +119,7 @@ class SinkFacility : public FacilityModel  {
   /**
      A verbose printer for the Sink Facility. 
    */
-  virtual void print();
+  virtual void str();
 
   /**
      Transacted resources are received through this method 

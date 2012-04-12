@@ -68,7 +68,7 @@ TEST_F(SeparationsMatrixFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SeparationsMatrixFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(src_facility->str());
   // Test SeparationsMatrixFacility specific aspects of the print method here
 }
 

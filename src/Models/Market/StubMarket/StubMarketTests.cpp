@@ -70,7 +70,7 @@ TEST_F(StubMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, Print) {
-  EXPECT_NO_THROW(src_market->print());
+  EXPECT_NO_THROW(src_market->str());
 }
 
 

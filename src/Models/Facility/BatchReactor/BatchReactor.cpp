@@ -101,8 +101,8 @@ void BatchReactor::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::print() { 
-  FacilityModel::print();
+void BatchReactor::str() { 
+  FacilityModel::str();
   LOG(LEV_DEBUG2, "BReact") << "    has facility parmeters {";
   LOG(LEV_DEBUG2, "BReact") << "      * Lifetime = " << lifetime();
   LOG(LEV_DEBUG2, "BReact") << "      * Cycle Length = " << cycleLength();

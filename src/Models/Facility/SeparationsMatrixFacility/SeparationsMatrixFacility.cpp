@@ -123,9 +123,9 @@ void SeparationsMatrixFacility::copyFreshModel(Model* src)
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SeparationsMatrixFacility::print() 
+void SeparationsMatrixFacility::str() 
 { 
-  FacilityModel::print();
+  FacilityModel::str();
   LOG(LEV_DEBUG2, "none!") << "converts commodities {";
 
   for(vector<string>::const_iterator iter = in_commod_.begin(); 

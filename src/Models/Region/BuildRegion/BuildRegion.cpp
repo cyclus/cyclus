@@ -71,8 +71,8 @@ void BuildRegion::copy(BuildRegion* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildRegion::print() {
-  RegionModel::print();
+void BuildRegion::str() {
+  RegionModel::str();
   if ( builders_ == NULL || builders_->empty() ){
     LOG(LEV_DEBUG2, "breg") << name() << " has no builders (currently)."; 
   }

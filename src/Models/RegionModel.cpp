@@ -68,9 +68,9 @@ void RegionModel::copy(RegionModel* src) {
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::print() {
+void RegionModel::str() {
 
-  Model::print();
+  Model::str();
 
   LOG(LEV_DEBUG2, "none!") << "allows facilities:" ;
 

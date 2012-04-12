@@ -85,8 +85,8 @@ void EnrichmentFacility::copyFreshModel(Model* src){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::print() { 
-  FacilityModel::print(); 
+void EnrichmentFacility::str() { 
+  FacilityModel::str(); 
   LOG(LEV_DEBUG2, "none!") << "    converts commodity {"
       << in_commod_
       << "} into commodity {"

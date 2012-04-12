@@ -79,7 +79,7 @@ TEST_F(ConverterMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(ConverterMarketTest, Print) {
-  EXPECT_NO_THROW(src_market->print());
+  EXPECT_NO_THROW(src_market->str());
 }
 
 

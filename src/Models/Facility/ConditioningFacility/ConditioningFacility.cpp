@@ -125,9 +125,9 @@ void ConditioningFacility::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConditioningFacility::print() 
+void ConditioningFacility::str() 
 { 
-    FacilityModel::print();
+    FacilityModel::str();
     string incommods, outcommods;
     map<string, pair<int, string> >::const_iterator it;
     for(it = commod_map_.begin(); it != commod_map_.end(); it++){

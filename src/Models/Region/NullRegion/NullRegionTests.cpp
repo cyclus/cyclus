@@ -64,7 +64,7 @@ TEST_F(NullRegionTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullRegionTest, Print) {
-  EXPECT_NO_THROW(src_region_->print());
+  EXPECT_NO_THROW(src_region_->str());
   // Test NullRegion specific aspects of the print method here
 }
 

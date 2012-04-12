@@ -67,7 +67,7 @@ TEST_F(DeployInstTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(DeployInstTest, Print) {
-  EXPECT_NO_THROW(src_inst->print());
+  EXPECT_NO_THROW(src_inst->str());
   // Test DeployInst specific aspects of the print method here
 }
 

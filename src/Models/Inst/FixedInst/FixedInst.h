@@ -67,7 +67,7 @@ class FixedInst : public InstModel {
   /**
      a print function to describe a fixedInst instantiation. 
    */
-  virtual void print();
+  virtual void str();
 
   /**
      This Institution will build its facilities on the tick

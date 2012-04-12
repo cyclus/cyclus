@@ -82,7 +82,7 @@ TEST_F(NullFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(src_facility->str());
   // Test NullFacility specific aspects of the print method here
 }
 

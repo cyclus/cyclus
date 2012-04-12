@@ -77,7 +77,7 @@ TEST_F(NullMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullMarketTest, Print) {
-  EXPECT_NO_THROW(src_market->print());
+  EXPECT_NO_THROW(src_market->str());
 }
 
 
