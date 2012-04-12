@@ -22,18 +22,15 @@ using namespace std;
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+BatchReactor::BatchReactor() {
+  init();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::init() { 
-  preCore_ = new MatBuff();
-  inCore_ = new MatBuff();
-  postCore_ = new MatBuff();
-  preCore_->makeUnlimited();
-  inCore_->makeUnlimited();
-  postCore_->makeUnlimited();
-  preCore_->setName("preCore");
-  inCore_->setName("inCore");
-  postCore_->setName("postCore");
-  ordersWaiting_ = new deque<msg_ptr>();
-  fuelPairs_ = new deque<FuelPair>();
+  preCore_.makeUnlimited();
+  inCore_.makeUnlimited();
+  postCore_.makeUnlimited();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -73,7 +70,7 @@ void BatchReactor::init(xmlNodePtr cur) {
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
     setOutRecipe(IsoVector::recipe(recipe_name));
 
-    fuelPairs_->push_back(make_pair(make_pair(in_commod,in_recipe_),
+    fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
   }
 
@@ -113,9 +110,9 @@ void BatchReactor::print() {
   LOG(LEV_DEBUG2, "BReact") << "      * Batches Per Core = " << nBatches();
   LOG(LEV_DEBUG2, "BReact") << "      * Batch Loading = " << batchLoading();
   LOG(LEV_DEBUG2, "BReact") << "    converts commodity {"
-      << fuelPairs_->front().first.first
+      << fuelPairs_.front().first.first
       << "} into commodity {"
-      << this->fuelPairs_->front().second.first
+      << this->fuelPairs_.front().second.first
       << "}.";
 }
 
@@ -124,7 +121,7 @@ void BatchReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
   if(msg->supplier()==this){
     // file the order
-    ordersWaiting_->push_front(msg);
+    ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "BReact") << name() << " just received an order.";
   }
   else {
@@ -141,21 +138,21 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::handleOrders() {
-  while(!ordersWaiting_->empty()){
-    msg_ptr order = ordersWaiting_->front();
+  while(!ordersWaiting_.empty()){
+    msg_ptr order = ordersWaiting_.front();
     order->approveTransfer();
-    ordersWaiting_->pop_front();
+    ordersWaiting_.pop_front();
   };
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::addResource(msg_ptr msg,
                                std::vector<rsrc_ptr> manifest) {
-  double preQuantity = preCore_->quantity();
-  preCore_->pushAll(ResourceBuff::toMat(manifest));
-  double added = preCore_->quantity() - preQuantity;
+  double preQuantity = preCore_.quantity();
+  preCore_.pushAll(ResourceBuff::toMat(manifest));
+  double added = preCore_.quantity() - preQuantity;
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
-                            << added << " to its " << preCore_->name()
+                            << added << " to its " << preCore_.name()
                             << " buffer.";
 }
   
@@ -165,11 +162,11 @@ vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   double amt = trans.resource->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
-                            << amt << " of " << postCore_->quantity() 
-                            <<" to its " << postCore_->name()
+                            << amt << " of " << postCore_.quantity() 
+                            <<" to its " << postCore_.name()
                             << " buffer.";
   
-  return ResourceBuff::toRes(postCore_->popQty(amt));
+  return ResourceBuff::toRes(postCore_.popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -185,7 +182,7 @@ void BatchReactor::handleTick(int time) {
     makeRequest(requestAmt());
   }
   // offer used fuel if needed
-  if (!postCore_->empty()) {
+  if (!postCore_.empty()) {
     makeOffers();
   }
 
@@ -217,7 +214,7 @@ void BatchReactor::handleTock(int time) {
       }
       break; // end OPERATION
     case END:
-      if (postCore_->empty()) {
+      if (postCore_.empty()) {
         delete this;
         return;
       }
@@ -282,14 +279,14 @@ bool BatchReactor::requestMet() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt) {
+void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
   //  toBuff->pushAll(fromBuff->popQty(amt));
-  vector<mat_rsrc_ptr> to_delete = fromBuff->popQty(amt);
+  vector<mat_rsrc_ptr> to_delete = fromBuff.popQty(amt);
   IsoVector* temp = &out_recipe_;
   temp->setMass(amt);
   mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
   //newMat->setMass(amt);
-  toBuff->pushOne(newMat);
+  toBuff.pushOne(newMat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -327,7 +324,7 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::addFuelPair(std::string incommod, IsoVector inFuel,
                                 std::string outcommod, IsoVector outFuel) {
-  fuelPairs_->push_back(make_pair(make_pair(incommod, inFuel),
+  fuelPairs_.push_back(make_pair(make_pair(incommod, inFuel),
                                  make_pair(outcommod, outFuel)));
 }
 
