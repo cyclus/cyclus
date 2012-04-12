@@ -107,7 +107,7 @@ class FacilityModel : public TimeAgent, public Communicator {
   /**
      every model should be able to print a verbose description 
    */
-  virtual std::string str() { Model::str(); };
+  virtual std::string str();
 
 /* ------------------- */ 
 
