@@ -12,7 +12,8 @@ TEST_P(FacilityModelTests, CopyFacility) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(FacilityModelTests, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(facility_model_->handleTick(time));
+  facility_model_->handleTick(time);
+    //EXPECT_NO_THROW();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

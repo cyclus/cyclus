@@ -165,7 +165,8 @@ vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   double amt = trans.resource->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
-                            << amt << " to its " << postCore_->name()
+                            << amt << " of " << postCore_->quantity() 
+                            <<" to its " << postCore_->name()
                             << " buffer.";
   
   return ResourceBuff::toRes(postCore_->popQty(amt));
@@ -192,8 +193,9 @@ void BatchReactor::handleTick(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::handleTock(int time) {
+void BatchReactor::handleTock(int time) { 
   LOG(LEV_INFO3, "BReact") << name() << " is tocking {";
+  LOG(LEV_DEBUG3, "BReact") << "The current phase is: " << phase();
   
   handleOrders();
 
@@ -204,7 +206,7 @@ void BatchReactor::handleTock(int time) {
         loadCore();
         setPhase(OPERATION);
       }
-      else {
+      else { 
         setRequestAmt(requestAmt() - receivedAmt());
       } 
       break; // end BEGIN || REFUEL 
@@ -228,6 +230,7 @@ void BatchReactor::handleTock(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::setPhase(Phase p) {
+  LOG(LEV_DEBUG3, "BReact") << "Setting phase to: " << p;
   switch (p) {
   case BEGIN:
     setRequestAmt(coreLoading());
@@ -280,11 +283,13 @@ bool BatchReactor::requestMet() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt) {
-  LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " moving " << amt
-                            << " of material from buffer " 
-                            << fromBuff->name() << " to buffer "
-                            << toBuff->name();  
-  toBuff->pushAll(fromBuff->popQty(amt));
+  //  toBuff->pushAll(fromBuff->popQty(amt));
+  vector<mat_rsrc_ptr> to_delete = fromBuff->popQty(amt);
+  IsoVector* temp = &out_recipe_;
+  temp->setMass(amt);
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
+  //newMat->setMass(amt);
+  toBuff->pushOne(newMat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

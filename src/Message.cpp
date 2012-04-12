@@ -273,14 +273,15 @@ void Message::approveTransfer() {
   // register that this transaction occured
   this->Message::addTransToTable(id);
   int nResources = manifest.size();
+  
   for (int pos = 0; pos < nResources; pos++) {
     // record the resource with its state
     manifest.at(pos)->addToTable();
-
+  
     // record that what resources belong to this transaction
     this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
   }
-
+  
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 

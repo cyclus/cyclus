@@ -518,9 +518,11 @@ int IsoVector::compositionIsTracked() {
 void IsoVector::recordState() {
   // this is a new composition, log it accordingly
   CompMap* comp = &atom_comp_;
-  stateID_ = nextStateID_++;
-  predefinedStates_[comp] = stateID_;
-  IsoVector::addToTable();
+  if (predefinedStates_.find(comp) == predefinedStates_.end()) {
+    stateID_ = nextStateID_++;
+    predefinedStates_[comp] = stateID_;
+    IsoVector::addToTable();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -554,8 +556,10 @@ void IsoVector::addToTable(){
 
   // now for the composition isotopics
   CompMap* comp = &atom_comp_;
+  int i = 0;
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
+    CLOG(LEV_DEBUG2) << "isotope " << i++ << " of " << comp->size();
     // declare row
     // decalre data
     data an_iso_id(item->first), an_iso_value(item->second);

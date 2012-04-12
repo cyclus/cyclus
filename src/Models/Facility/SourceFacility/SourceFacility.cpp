@@ -121,15 +121,15 @@ void SourceFacility::generateMaterial(int curr_time) {
   double empty_space = inventory_.space();
   if (empty_space < EPS_KG) {return;}
 
-  IsoVector temp = recipe_;
+  IsoVector* temp = new IsoVector(recipe_.comp());
   if (capacity_ * recipe_.mass() * time_change <= empty_space) {
     // add a material the size of the capacity to the inventory
-    temp.multBy(capacity_ * time_change);
+    temp->multBy(capacity_ * time_change);
   } else {
     // add a material that fills the inventory
-    temp.setMass(empty_space);
+    temp->setMass(empty_space);
   }
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
   inventory_.pushOne(newMat);
 }
 
