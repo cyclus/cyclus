@@ -102,7 +102,7 @@ class Query(object) :
         self.tf = tf
 
         # Check type.
-        qTypes = ['material']
+        qTypes = ['material','resource']
         if ( queryType in qTypes) :
             self.qType = queryType
         else :
@@ -111,10 +111,17 @@ class Query(object) :
 
         # Initialize the SQL.
         if 'material' == queryType :
-            self.qStmt = SqlStmt("Transactions.Time, Transactions.senderID, " + \
-                    "Transactions.receiverID, IsotopicStates.IsoID, IsotopicStates.value ", \
-                    "Transactions, IsotopicStates",  "Transactions.Time >= " + str(t0) + " AND " + \
-                    "Transactions.Time < " + str(tf) )
+          self.qStmt = SqlStmt("Transactions.Time, Transactions.senderID, " + \
+              "Transactions.receiverID, IsotopicStates.IsoID, IsotopicStates.value ", \
+              "Transactions, IsotopicStates",  "Transactions.Time >= " + str(t0) + " AND " + \
+              "Transactions.Time < " + str(tf) )  
+        elif 'resource' == queryType :
+          self.qStmt = SqlStmt("Transactions.Time, Transactions.senderID, " + \
+              "Transactions.receiverID, TransactedResources.Quantity", \
+              "Transactions, TransactedResources",  
+              "Transactions.ID == TransactedResources.TransactionID AND "\
+              "Transactions.Time >= " + str(t0) + " AND " + \
+              "Transactions.Time < " + str(tf) )
 
         self.conn = sqlite3.connect(file)
 
@@ -128,11 +135,35 @@ class Query(object) :
         if self.qType == 'material' :
             self.dataAxes = ['time', 'from', 'to', 'iso']
             self.dataUnits = ['months', 'agentID', 'agentID', 'tons']
+        elif self.qType == 'resource' :
+            self.dataAxes = ['time', 'from', 'to']
+            self.dataUnits = ['months', 'agentID', 'agentID']
+
+###############################################################################
+    def filterReceivers(self, recID) :
+        """
+        This filters the data to include only the material or resources received 
+        by the model with ID = recID
+        """
+        if not self.isExecuted :
+            raise QueryException, "Error: operations on the 'to' dimension can " + \
+                        "can be performed only after Query execution. If you want to " + \
+                        "limit the number of total actors, used the appropriate " + \
+                        "collapseActorsTo...() function."
+        try :
+            toDim = self.dataAxes.index('to')
+        except ValueError :
+            print "Warning: Query data no longer have a 'from' dimension."
+            return
+        
+        receviers = self.data[toDim]
+        
+
 
         
 ###############################################################################
     
-    def collapseIsosToElts(self, EltsList):
+    def collapseIsosToElts(self, EltsList=[92]):
         """
         Input:
         -EltsList: Elements that have to be read. For instance, EltsList = 
@@ -188,6 +219,8 @@ class Query(object) :
         self.dataLabels.pop(isoDim)
         self.dataUnits.pop(isoDim)
 
+
+
 ###############################################################################
 
     def collapseSenders(self) :
@@ -206,7 +239,7 @@ class Query(object) :
         try :
             fromDim = self.dataAxes.index('from')
         except ValueError :
-            print "Warning: Query data no longer have a 'from' dimension."
+            print "Warning: Query data no longer has a 'from' dimension."
             return
         
         self.data = sum(self.data, fromDim)
@@ -315,6 +348,28 @@ class Query(object) :
         # Return the array.
         return self.data
 
+    def getActList(self) :
+        """
+        Count and record how many actors exist during the range of the
+        calculation.
+        """
+        c = self.conn.cursor()
+
+        actList = []
+        c.execute("SELECT Agents.ID FROM Agents, Transactions " + \
+                "WHERE Agents.EnterDate + Agents.LeaveDate > ? " + \
+                "AND Agents.EnterDate <= ? AND " + \
+                "(Agents.ID = Transactions.SenderID OR " + \
+                "Agents.ID = Transactions.ReceiverID) ", (self.t0, self.tf))
+
+        for row in c :
+            if row[0] not in actList :
+                actList.append(row[0])
+
+        numActs = len(actList)
+        actList.sort()
+        return actList
+
 ###############################################################################
 
     def execute(self) :
@@ -332,34 +387,18 @@ class Query(object) :
                         "Try reExecute()."
 
         if 'material' == self.qType :
-
+            
             # Get the array dimensions. We don't know if we've filtered or collapsed
             # away some of
             # the potential result space, so we need to assume the array has the
             # following dimensions (and size).
-
             # time (tf - t0) X from (numFrom) X to (numTo) X iso (numIsos)
-            # (will add commod to this formulation at some point)
+            # or time X from X to 
 
-            # Count and record how many actors exist during the range of the
-            # calculation.
-            c = self.conn.cursor()
+            # get the list of actors
+            actList = self.getActList()
 
-            actList = []
-            c.execute("SELECT Agents.ID FROM Agents, Transactions " + \
-                    "WHERE Agents.EnterDate + Agents.LeaveDate > ? " + \
-                    "AND Agents.EnterDate <= ? AND " + \
-                    "(Agents.ID = Transactions.SenderID OR " + \
-                    "Agents.ID = Transactions.ReceiverID) ", (self.t0, self.tf))
-
-            for row in c :
-                if row[0] not in actList :
-                    actList.append(row[0])
-
-            numActs = len(actList)
-            actList.sort()
-            
-            # Get the list of isotopes from the hard-coded list in getIstList. Count
+            # Get the list of isotopes from the hard-coded list in getIsoList. Count
             # them up and make a dictionary for mapping them into the iso dimension
             # of the Query's data array.
             numIsos = len(self.indToIso)
@@ -406,6 +445,61 @@ class Query(object) :
             self.dataLabels[1] = actList
             self.dataLabels[2] = actList
             self.dataLabels[3] = self.indToIso.values()
+          
+          elif 'resource' == self.qType :
+            
+            # Get the array dimensions. We don't know if we've filtered or collapsed
+            # away some of
+            # the potential result space, so we need to assume the array has the
+            # following dimensions (and size).
+            # time (tf - t0) X from (numFrom) X to (numTo) X iso (numIsos)
+            # or time X from X to 
+
+            # get the list of actors
+            actList = self.getActList()
+
+            # Initialize the array.
+            try :
+                self.data = zeros( (self.tf - self.t0, numActs, numActs) )
+            except ValueError :
+                raise QueryException, "Error: you've executed a Query whose array " + \
+                            "representation would be " + str(self.tf - self.t0) + " x " + \
+                            str(numActs) + " x " + str(numActs) + \
+                            ". That's too large."
+
+            # Perform the SQL query.
+            c.execute(str(self.qStmt))
+
+            # Load the results into the array.
+            fromInd = -1
+            toInd = -1
+            for row in c :
+                time = row[0] - self.t0
+                fFac = row[1]
+                tFac = row[2]
+                rsrc = row[3]
+
+                # Get the indexes for the 'from' and 'to' dimensions.
+                d = self.conn.cursor()
+                d.execute("SELECT Agents.ID FROM Agents WHERE Agents.ID = ? ", (fFac,))
+                        
+                for roe in d :
+                    fromInd = actList.index(roe[0])
+
+                d.execute("SELECT Agents.ID FROM Agents " + \
+                        "WHERE Agents.ID = ? ", (tFac,))
+                        
+                for roe in d :
+                    toInd = actList.index(roe[0])
+
+                self.data[time][fromInd][toInd][self.isoToInd[nIso]] += rsrc
+
+            # Store the labels.
+            self.dataLabels[0] = range(self.t0, self.tf)
+            self.dataLabels[1] = actList
+            self.dataLabels[2] = actList
+
+
             
         self.isExecuted = True
 
