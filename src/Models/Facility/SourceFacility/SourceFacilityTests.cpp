@@ -92,7 +92,7 @@ TEST_F(SourceFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SourceFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->str());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
 }
 
 

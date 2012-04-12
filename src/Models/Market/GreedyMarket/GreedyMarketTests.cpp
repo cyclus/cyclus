@@ -22,7 +22,7 @@ class FakeGreedyMarket : public GreedyMarket {
     msg_ptr msg_;
 
   public:
-    FakeGreedyMarket() : GreedyMarket() {
+    FakeGreedyMarket() {
       string kg = "kg";
       string qual = "qual";
       gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
@@ -194,7 +194,7 @@ TEST_F(GreedyMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(GreedyMarketTest, Print) {
-  //EXPECT_NO_THROW(src_market->str());
+  EXPECT_NO_THROW(std::string s = src_market->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

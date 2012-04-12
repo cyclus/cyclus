@@ -110,12 +110,14 @@ std::string BatchReactor::str() {
      << ", Core Loading = " << coreLoading()
      << ", Batches Per Core = " << nBatches()
      << ", Batch Loading = " << batchLoading()
-     << ", converts commodity '"
-     << fuelPairs_.front().first.first
-     << "' into commodity '"
-     << this->fuelPairs_.front().second.first
-     << "'}";
-  return "" + ss.str();
+     << ", converts commodity '";
+  if (fuelPairs_.size() > 0) {
+    ss << fuelPairs_.front().first.first
+       << "' into commodity '"
+       << this->fuelPairs_.front().second.first;
+  }
+  ss << "'}";
+  return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

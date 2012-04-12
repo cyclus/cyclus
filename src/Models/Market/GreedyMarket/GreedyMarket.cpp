@@ -14,6 +14,11 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+std::string GreedyMarket::str() {
+  return MarketModel::str();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void GreedyMarket::receiveMessage(msg_ptr msg) {
   messages_.insert(msg);
 

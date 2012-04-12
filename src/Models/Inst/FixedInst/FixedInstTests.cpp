@@ -64,7 +64,7 @@ TEST_F(FixedInstTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(FixedInstTest, Print) {
-  EXPECT_NO_THROW(src_inst->str());
+  EXPECT_NO_THROW(std::string s = src_inst->str());
   // Test FixedInst specific aspects of the print method here
 }
 

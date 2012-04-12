@@ -12,6 +12,10 @@
  * --------------------
  */
 
+std::string NullRegion::str() {
+  return RegionModel::str();
+};
+
 extern "C" Model* constructNullRegion() {
       return new NullRegion();
 }

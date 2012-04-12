@@ -131,7 +131,7 @@ TEST_F(BatchReactorTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BatchReactorTest, Print) {
-  EXPECT_NO_THROW(src_facility->str());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
   //Test BatchReactor specific aspects of the print method here
 }
 

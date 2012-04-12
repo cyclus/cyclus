@@ -64,7 +64,7 @@ TEST_F(StubRegionTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubRegionTest, Print) {
-  EXPECT_NO_THROW(src_region_->str());
+  EXPECT_NO_THROW(std::string s = src_region_->str());
   // Test StubRegion specific aspects of the print method here
 }
 

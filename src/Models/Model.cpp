@@ -275,7 +275,7 @@ std::string Model::str() {
       << ",  name=" << name_
       << ",  parentID=" << parentID_
       << " ) " ;
-  return "" + ss.str();
+  return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

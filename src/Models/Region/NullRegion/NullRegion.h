@@ -75,7 +75,7 @@ class NullRegion : public RegionModel  {
   /**
      print information about the region 
    */
-  virtual std::string str()               { RegionModel::str();   } ;
+  virtual std::string str();
 
 /* ------------------- */ 
 

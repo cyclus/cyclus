@@ -78,7 +78,7 @@ TEST_F(BuildInstTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, Print) {
-  EXPECT_NO_THROW(src_inst->str());
+  EXPECT_NO_THROW(std::string s = src_inst->str());
   // Test BuildInst specific aspects of the print method here
 }
 
