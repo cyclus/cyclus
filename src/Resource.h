@@ -99,6 +99,16 @@ public:
   virtual bool checkEquality(rsrc_ptr other);
 
   /**
+  The current state of the resource object.
+
+  This can be used to prevent writing of redundant information into the output
+  database.  e.g. concrete resources only get a new stateID if they enter a
+  'state' that has not yet been recorded in the output db. Note that new states
+  should be pulled from the static Resource::nextStateID() method;
+  **/
+  virtual int stateID() = 0;
+
+  /**
      Returns the concrete resource type, an enum 
    */ 
   virtual ResourceType type() = 0;
@@ -159,6 +169,7 @@ public:
 // -------- output database related members  -------- 
   
  public:
+
   /**
      the output database table which logs resources 
    */

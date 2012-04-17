@@ -26,6 +26,7 @@ table_ptr IsoVector::iso_table = new Table("IsotopicStates");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {
   ID_ = nextID_++;
+  decayTime_ = 0;
   mass_out_of_date_ = true;
   total_mass_ = 0;
   loggedComps_ = new std::map<int, int>();
@@ -34,6 +35,7 @@ IsoVector::IsoVector() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector(CompMap initial_comp) {
   ID_ = nextID_++;
+  decayTime_ = 0;
   atom_comp_ = initial_comp;
   total_mass_ = 0;
   mass_out_of_date_ = true;
@@ -45,6 +47,7 @@ IsoVector::IsoVector(CompMap initial_comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector(xmlNodePtr cur) {
   ID_ = nextID_++;
+  decayTime_ = 0;
   total_mass_ = 0;
   mass_out_of_date_ = true;
   loggedComps_ = new std::map<int, int>();
@@ -198,6 +201,7 @@ IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
   // preserve composition parentage to prevent duplicate db recording
   if (rhs_vector.loggedComps_ == loggedComps_) {
     temp.loggedComps_ = loggedComps_;
+    temp.decayTime_ = decayTime_;
   }
 
   return (temp);
@@ -230,6 +234,7 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
   // preserve composition parentage to prevent duplicate db recording
   if (rhs_vector.loggedComps_ == loggedComps_) {
     temp.loggedComps_ = loggedComps_;
+    temp.decayTime_ = decayTime_;
   }
 
   return (temp);
@@ -349,6 +354,7 @@ void IsoVector::setMass(Iso tope, double new_mass) {
   atom_comp_[tope] = new_mass * grams_per_kg / grams_per_atom;
 
   loggedComps_ = new std::map<int, int>();
+  decayTime_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -426,6 +432,7 @@ void IsoVector::setAtomCount(Iso tope, double new_count) {
 
   mass_out_of_date_ = true;
   loggedComps_ = new std::map<int, int>();
+  decayTime_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -460,6 +467,7 @@ void IsoVector::executeDecay(double time_change) {
   handler.setComp(atom_comp_);
   handler.decay(years);
   atom_comp_ = handler.compAsCompMap();
+  decayTime_ += time_change;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -519,12 +527,14 @@ bool IsoVector::isZero(Iso tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::recordState() {
   // check loggedComps_ here
-
-  
-
-  // this is a new composition, log it accordingly
-  stateID_ = nextStateID_++;
-  IsoVector::addToTable();
+  if (loggedComps_->count(decayTime_) == 0) {
+    // this is a new composition, log it accordingly
+    stateID_ = nextStateID_++;
+    (*loggedComps_)[decayTime_] = stateID_;
+    IsoVector::addToTable();
+    return;
+  }
+  stateID_ = (*loggedComps_)[decayTime_];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

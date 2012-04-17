@@ -325,6 +325,11 @@ private:
    */
   static int nextID_;
 
+  /**
+     Stores the next available state ID 
+   */
+  static int nextStateID_;
+
   void validateComposition();
 
   /**
@@ -349,15 +354,11 @@ private:
    */
   int stateID_;
 
-  /**
-     the IsoVector class' state incrementor 
-   */
-  static int nextStateID_;
-
-  int lastDecayTime_;
+  /// delta time this COMPOSITION has been decayed since its creation
+  int decayTime_;
 
   /// map[time] = stateID. and entry exists if the comp has ben recorded
-  std::map<int, int>* loggedComps_
+  std::map<int, int>* loggedComps_;
 
 // -------- output database related members  -------- 
  public:
@@ -376,6 +377,7 @@ private:
    */
   int stateID() {return stateID_;}
 
+  // returns true if a new state was recorded, false if already in db
   void recordState();
   
  private:

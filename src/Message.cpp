@@ -275,7 +275,8 @@ void Message::approveTransfer() {
   int nResources = manifest.size();
   
   for (int pos = 0; pos < nResources; pos++) {
-    // record the resource with its state
+    // MUST PRECEDE 'addResourceToTable' call! record the resource with its state
+    // because this can potentially update the material's stateID
     manifest.at(pos)->addToTable();
   
     // record that what resources belong to this transaction
@@ -284,7 +285,6 @@ void Message::approveTransfer() {
   
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
-
 }
 
 void Message::define_trans_table(){
@@ -324,7 +324,7 @@ void Message::define_trans_table(){
   trans_table->tableDefined();
 }
 
-void Message::addTransToTable(int transID){  
+void Message::addTransToTable(int transID) {  
   // if we haven't logged a message yet, define the table
   if ( !trans_table->defined() )
     Message::define_trans_table();
@@ -353,6 +353,7 @@ void Message::define_trans_resource_table(){
   column transID("TransactionID","INTEGER");
   column transPos("Position","INTEGER");
   column resource("ResourceID","INTEGER");
+  column state("StateID","INTEGER");
   column amt("Quantity","REAL");
   // declare the table's primary key
   primary_key pk;
@@ -360,7 +361,8 @@ void Message::define_trans_resource_table(){
   trans_resource_table->setPrimaryKey(pk);
   // add columns to the table
   trans_resource_table->addColumn(transID), trans_resource_table->addColumn(transPos), 
-    trans_resource_table->addColumn(resource), trans_resource_table->addColumn(amt);
+    trans_resource_table->addColumn(resource), trans_resource_table->addColumn(state),
+    trans_resource_table->addColumn(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -392,14 +394,14 @@ void Message::addResourceToTable(int transID, int transPos, rsrc_ptr r){
   // make a row
   // declare data
   data an_id(transID), a_pos(transPos), 
-    a_resource(r->originalID()), an_amt(r->quantity());
+    a_resource(r->originalID()), a_state(r->stateID()), an_amt(r->quantity());
   // declare entries
   entry id("TransactionID",an_id), pos("Position",a_pos), 
-    resource("ResourceID",a_resource), amt("Quantity",an_amt);
+    resource("ResourceID",a_resource), state("StateID", a_state), amt("Quantity",an_amt);
   // declare row
   row aRow;
   aRow.push_back(id), aRow.push_back(pos), 
-    aRow.push_back(resource), aRow.push_back(amt);
+    aRow.push_back(resource), aRow.push_back(state), aRow.push_back(amt);
   // add the row
   trans_resource_table->addRow(aRow);
   // record this primary key
