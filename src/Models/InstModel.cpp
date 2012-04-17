@@ -42,7 +42,11 @@ void InstModel::copy(InstModel* src) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::string InstModel::str() {
-  return Model::str() + "in region" + parent()->name();
+  try {
+    return Model::str() + " in region" + parent()->name();
+  } catch (CycIndexException err) {
+    return Model::str() + " with no region.";
+  }
 }
 
 
