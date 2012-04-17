@@ -200,67 +200,8 @@ void Material::setDecay(int dec) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::define_table() {
-  // declare the table columns
-  column id("ID","INTEGER");
-  column state_id("StateID","INTEGER");
-  column time("Time","INTEGER");
-  // declare the table's primary key
-  primary_key pk;
-  pk.push_back("ID"), pk.push_back("StateID");
-  material_table->setPrimaryKey(pk);
-  // add columns to the table
-  material_table->addColumn(id);
-  material_table->addColumn(state_id);
-  material_table->addColumn(time);
-  // add foreign keys
-  foreign_key_ref *fkref;
-  foreign_key *fk;
-  key myk, theirk;
-  //    Resources table foreign keys
-  theirk.push_back("ID");
-  fkref = new foreign_key_ref("Resources",theirk);
-  //      the resource id
-  myk.push_back("ID");
-  fk = new foreign_key(myk, (*fkref) );
-  material_table->addForeignKey( (*fk) ); // id references resources' id
-  myk.clear(), theirk.clear();
-  //    IsotopicStates table foreign keys
-  theirk.push_back("ID");
-  fkref = new foreign_key_ref("IsotopicStates",theirk);
-  //      the state id
-  myk.push_back("StateID");
-  fk = new foreign_key(myk, (*fkref) );
-  material_table->addForeignKey( (*fk) ); // stateid references isotopicstates' id
-  myk.clear(), theirk.clear();
-  // we've now defined the table
-  material_table->tableDefined();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::addToTable(){
+void Material::addToTable() {
   Resource::addToTable();
-
-  // if we haven't logged an material yet, define the table
-  if ( !material_table->defined() ) {
-    Material::define_table();
-  }
-
   iso_vector_.recordState();
-
-  // make a row
-  // declare data
-  data an_id( this->originalID() ), a_state( this->stateID() ), // @MJG FLAG need to do state recording
-    a_time( TI->time() );
-  // declare entries
-  entry id("ID",an_id), state("StateID",a_state), time("Time",a_time);
-  // declare row
-  row aRow;
-  aRow.push_back(id), aRow.push_back(state), aRow.push_back(time);
-  // add the row
-  material_table->addRow(aRow);
-  // record this primary key
-  pkref_.push_back(id);
-  pkref_.push_back(state);
 }
 

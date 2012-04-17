@@ -269,7 +269,7 @@ private:
   /**
      return the state id for the iso vector 
    */
-  int stateID() {return iso_vector_.stateID();}
+  virtual int stateID() {return iso_vector_.stateID();}
 
  private:
   /**
