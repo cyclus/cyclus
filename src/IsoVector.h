@@ -50,11 +50,6 @@ typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
  */
 typedef std::map<Iso, double> CompMap;
 
-/**
-   map Composition Map Pointer (CompMap*) to state (int) 
- */
-typedef std::map<CompMap*, int> StateMap;
-
 /** 
    @class IsoVector 
     
@@ -349,6 +344,21 @@ private:
    */
   CompMap atom_comp_;
     
+  /**
+     this IsoVector's state 
+   */
+  int stateID_;
+
+  /**
+     the IsoVector class' state incrementor 
+   */
+  static int nextStateID_;
+
+  int lastDecayTime_;
+
+  /// map[time] = stateID. and entry exists if the comp has ben recorded
+  std::map<int, int>* loggedComps_
+
 // -------- output database related members  -------- 
  public:
   /**
@@ -359,12 +369,12 @@ private:
   /**
      return the agent table's primary key 
    */
-  primary_key_ref pkref(){ return pkref_;}
+  primary_key_ref pkref() { return pkref_;}
   
   /**
      the current state id 
    */
-  int stateID(){return stateID_;}
+  int stateID() {return stateID_;}
 
   void recordState();
   
@@ -384,25 +394,6 @@ private:
    */
   primary_key_ref pkref_;
   
-  /**
-     this IsoVector's state 
-   */
-  int stateID_;
-
-  /**
-     the IsoVector class' state incrementor 
-   */
-  static int nextStateID_;
-
-  /**
-     a mapping of already-defined compositions to states 
-   */
-  static StateMap predefinedStates_;
-
-  /**
-     returns the state id of the current composition if it is already 
-   */
-  int compositionIsTracked();
 // -------- output database related members  -------- 
 };
 

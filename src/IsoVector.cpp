@@ -20,7 +20,6 @@ using namespace std;
 int IsoVector::nextID_ = 0;
 int IsoVector::nextStateID_ = 0;
 map<string, IsoVector*> IsoVector::recipes_;
-StateMap IsoVector::predefinedStates_ = StateMap();
 // Database table for isotopic states
 table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
 
@@ -29,6 +28,7 @@ IsoVector::IsoVector() {
   ID_ = nextID_++;
   mass_out_of_date_ = true;
   total_mass_ = 0;
+  loggedComps_ = new std::map<int, int>();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -37,6 +37,7 @@ IsoVector::IsoVector(CompMap initial_comp) {
   atom_comp_ = initial_comp;
   total_mass_ = 0;
   mass_out_of_date_ = true;
+  loggedComps_ = new std::map<int, int>();
 
   validateComposition();
 };
@@ -46,6 +47,7 @@ IsoVector::IsoVector(xmlNodePtr cur) {
   ID_ = nextID_++;
   total_mass_ = 0;
   mass_out_of_date_ = true;
+  loggedComps_ = new std::map<int, int>();
 
   string recipe_name = XMLinput->get_xpath_content(cur,"name");
   string comp_type = XMLinput->get_xpath_content(cur,"basis");
@@ -138,7 +140,7 @@ void IsoVector::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string IsoVector::detail() {
+std::string IsoVector::detail() {
   stringstream ss;
   ss << "mass = " << mass() << " kg";
   CLOG(LEV_INFO3) << ss.str();
@@ -152,7 +154,7 @@ string IsoVector::detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<string> IsoVector::compStrings() {
+std::vector<std::string> IsoVector::compStrings() {
   CompMap::iterator entry;
   int isotope;
   stringstream ss;
@@ -192,6 +194,12 @@ IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
   mass_out_of_date_ = true;
 
   IsoVector temp(sum_comp);
+
+  // preserve composition parentage to prevent duplicate db recording
+  if (rhs_vector.loggedComps_ == loggedComps_) {
+    temp.loggedComps_ = loggedComps_;
+  }
+
   return (temp);
 }
 
@@ -218,6 +226,12 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
   }
 
   IsoVector temp(diff_comp);
+
+  // preserve composition parentage to prevent duplicate db recording
+  if (rhs_vector.loggedComps_ == loggedComps_) {
+    temp.loggedComps_ = loggedComps_;
+  }
+
   return (temp);
 }
 
@@ -333,6 +347,8 @@ void IsoVector::setMass(Iso tope, double new_mass) {
   int grams_per_kg = 1000;
   double grams_per_atom = MT->getMassInGrams(tope);
   atom_comp_[tope] = new_mass * grams_per_kg / grams_per_atom;
+
+  loggedComps_ = new std::map<int, int>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -409,6 +425,7 @@ void IsoVector::setAtomCount(Iso tope, double new_count) {
   atom_comp_[tope] = new_count;
 
   mass_out_of_date_ = true;
+  loggedComps_ = new std::map<int, int>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -500,29 +517,14 @@ bool IsoVector::isZero(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::compositionIsTracked() {
-  CompMap* comp = &atom_comp_;
-  StateMap::iterator lb = predefinedStates_.lower_bound(comp);
-
-  if(lb != predefinedStates_.end() && 
-      !(predefinedStates_.key_comp()(comp, lb->first))) {
-    return lb->second; // found, return the state
-  } else if ( ( (int) comp->size() > 0 ) ) {
-    return -1; // not found, not empty, return a corresponding token
-  } else {
-    return -2; // not found, but comp map is empty -- probably from empty constructor  
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::recordState() {
+  // check loggedComps_ here
+
+  
+
   // this is a new composition, log it accordingly
-  CompMap* comp = &atom_comp_;
-  if (predefinedStates_.find(comp) == predefinedStates_.end()) {
-    stateID_ = nextStateID_++;
-    predefinedStates_[comp] = stateID_;
-    IsoVector::addToTable();
-  }
+  stateID_ = nextStateID_++;
+  IsoVector::addToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
