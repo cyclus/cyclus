@@ -18,6 +18,7 @@ TEST_P(ModelTests, DISABLED_InitFromXML) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, Print) {
+  std::string s = model_->str();
   EXPECT_NO_THROW(std::string s = model_->str());
 }
 
