@@ -141,19 +141,19 @@ TEST_F(BatchReactorTest, ReceiveMessage) {
   //Test BatchReactor specific behaviors of the receiveMessage function here
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// TEST_F(BatchReactorTest, Tick) {
-//   int time = 1;
-//   EXPECT_NO_THROW(src_facility->handleTick(time));
-//   Test BatchReactor specific behaviors of the handleTick function here
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(BatchReactorTest, Tick) {
+  int time = 1;
+  EXPECT_NO_THROW(src_facility->handleTick(time));
+  //Test BatchReactor specific behaviors of the handleTick function here
+}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// TEST_F(BatchReactorTest, Tock) {
-//   int time = 1;
-//   EXPECT_NO_THROW(src_facility->handleTick(time));
-//   Test BatchReactor specific behaviors of the handleTock function here
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(BatchReactorTest, Tock) {
+  int time = 1;
+  EXPECT_NO_THROW(src_facility->handleTick(time));
+  //Test BatchReactor specific behaviors of the handleTock function here
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 INSTANTIATE_TEST_CASE_P(BatchReactor, FacilityModelTests, Values(&BatchReactorConstructor));

@@ -31,6 +31,10 @@ void BatchReactor::init() {
   preCore_.makeUnlimited();
   inCore_.makeUnlimited();
   postCore_.makeUnlimited();
+  request_amount_ = 0.0;
+  lifetime_ = 0;
+  operation_timer_ = -1;
+  phase_ = INIT;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -20,7 +20,7 @@ typedef std::pair<Recipe, Recipe> FuelPair;
 /**
    Defines all possible phases this facility can be in
  */
-enum Phase {BEGIN, OPERATION, REFUEL, END};
+enum Phase {INIT, BEGIN, OPERATION, REFUEL, END};
 
 /**
    @class BatchReactor 
