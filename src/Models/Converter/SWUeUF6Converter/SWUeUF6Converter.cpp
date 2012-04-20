@@ -42,14 +42,11 @@ void SWUeUF6Converter::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SWUeUF6Converter::print() 
-{ 
-  ConverterModel::print(); 
-  LOG(LEV_DEBUG2, "none!") << "converts offers of commodity {"
-      << in_commod_
-      << "} into offers of commodity {"
-      << out_commod_
-      << "}.";
+std::string SWUeUF6Converter::str() { 
+  std::string s = ConverterModel::str(); 
+  s += "converts commodity '" + in_commod_;
+  s += "' into commodity '" + out_commod_ + "'.";
+  return s;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

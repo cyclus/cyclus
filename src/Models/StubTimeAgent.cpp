@@ -29,9 +29,8 @@ void StubTimeAgent::copy(StubTimeAgent* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::print() { 
-  TimeAgent::print(); 
-  LOG(LEV_DEBUG2, "none!"); 
+std::string StubTimeAgent::str() { 
+  return TimeAgent::str() + ""; 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

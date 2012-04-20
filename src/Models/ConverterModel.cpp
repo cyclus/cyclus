@@ -35,3 +35,7 @@ msg_ptr ConverterModel::convert(msg_ptr convMsg, msg_ptr refMsg) {
   return convMsg;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string ConverterModel::str() {
+  return Model::str();
+};

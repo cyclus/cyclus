@@ -36,7 +36,7 @@ class BatchReactor : public FacilityModel  {
   /**
      Constructor for the BatchReactor class. 
    */
-  BatchReactor() {init();}
+  BatchReactor();
   
   /**
      Destructor for the BatchReactor class. 
@@ -72,7 +72,7 @@ class BatchReactor : public FacilityModel  {
   /**
      Print information about this model 
    */
-  virtual void print();
+  virtual std::string str();
 
 /* ------------------- */ 
 
@@ -245,12 +245,12 @@ class BatchReactor : public FacilityModel  {
   /**
      return the input commodity 
    */
-  std::string inCommod() {return fuelPairs_->front().first.first;}
+  std::string inCommod() {return fuelPairs_.front().first.first;}
 
   /**
      return the output commodity 
    */
-  std::string outCommod() {return fuelPairs_->front().second.first;}
+  std::string outCommod() {return fuelPairs_.front().second.first;}
 
   /**
      get the current phase
@@ -312,27 +312,27 @@ class BatchReactor : public FacilityModel  {
   /**
      a matbuff for material before they enter the core
    */
-  MatBuff* preCore_;
+  MatBuff preCore_;
 
   /**
      a matbuff for material while they are inside the core
    */
-  MatBuff* inCore_;
+  MatBuff inCore_;
 
   /**
      a matbuff for material after they exit the core
    */
-  MatBuff* postCore_;
+  MatBuff postCore_;
 
   /**
      The BatchReactor has pairs of input and output fuel 
    */
-  std::deque<FuelPair>* fuelPairs_;
+  std::deque<FuelPair> fuelPairs_;
 
   /**
      The list of orders to process on the Tock 
    */
-  std::deque<msg_ptr>* ordersWaiting_;
+  std::deque<msg_ptr> ordersWaiting_;
 
   /**
      The current phase this facility is in
@@ -362,7 +362,7 @@ class BatchReactor : public FacilityModel  {
   /**
      return the current received amount
   */
-  double receivedAmt() {return preCore_->quantity();}
+  double receivedAmt() {return preCore_.quantity();}
 
   /**
      return the amount of material requested less 
@@ -389,13 +389,13 @@ class BatchReactor : public FacilityModel  {
   /**
      move a certain amount of fuel from one buffer to another
   */
-  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff, double amt);
+  void moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt);
 
   /**
      move all fuel from one buffer to another
   */
-  void moveFuel(MatBuff* fromBuff, MatBuff* toBuff) 
-  {moveFuel(fromBuff,toBuff,fromBuff->quantity());}
+  void moveFuel(MatBuff& fromBuff, MatBuff& toBuff) 
+  {moveFuel(fromBuff,toBuff,fromBuff.quantity());}
 
   /**
      load fuel from preCore_ into inCore_
@@ -425,7 +425,7 @@ class BatchReactor : public FacilityModel  {
   /**
      offer all off-loaded fuel
    */
-  void makeOffers() {interactWithMarket(outCommod(),postCore_->quantity(),true);}
+  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),true);}
 
   /**
      Processes all orders in ordersWaiting_

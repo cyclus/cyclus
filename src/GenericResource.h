@@ -42,6 +42,8 @@ public:
    */
   GenericResource(const GenericResource& other);
 
+  virtual int stateID();
+
   /**
      Returns a reference to a newly allocated copy of this resource 
    */ 

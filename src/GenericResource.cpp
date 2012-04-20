@@ -19,6 +19,11 @@ GenericResource::GenericResource(std::string units,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+int GenericResource::stateID() {
+  return 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 GenericResource::GenericResource(const GenericResource& other) {
   units_ = other.units_;
   quality_ = other.quality_;

@@ -63,7 +63,7 @@ TEST_F(StubStubTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubStubTest, Print) {
-  EXPECT_NO_THROW(src_stub_->print());
+  EXPECT_NO_THROW(std::string s = src_stub_->str());
   // Test StubStub specific aspects of the print method here
 }
 

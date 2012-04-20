@@ -129,13 +129,14 @@ void RecipeReactor::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::print() { 
-  FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "RReact") << "    converts commodity {"
-      << fuelPairs_.front().first.first
-      << "} into commodity {"
-      << this->fuelPairs_.front().second.first
-      << "}.";
+std::string RecipeReactor::str() { 
+  std::string s = FacilityModel::str(); 
+  s += "    converts commodity '"
+    + fuelPairs_.front().first.first
+    + "' into commodity '"
+    + this->fuelPairs_.front().second.first
+    + "'.";
+  return s;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

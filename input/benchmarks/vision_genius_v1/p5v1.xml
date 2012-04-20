@@ -116,8 +116,9 @@
 	      <number>1</number>
 	    </entry>
 	  </demandschedule>
-	</prototyperequirement>        <prototyperequirement>
-          <prototype>ReactorA</prototype>
+	</prototyperequirement>        
+	<prototyperequirement>
+          <prototypename>ReactorA</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -126,7 +127,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorB</prototype>
+          <prototypename>ReactorB</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -135,7 +136,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorC</prototype>
+          <prototypename>ReactorC</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -144,7 +145,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorD</prototype>
+          <prototypename>ReactorD</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -153,7 +154,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorE</prototype>
+          <prototypename>ReactorE</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -162,7 +163,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorF</prototype>
+          <prototypename>ReactorF</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -171,7 +172,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorG</prototype>
+          <prototypename>ReactorG</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -180,7 +181,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorH</prototype>
+          <prototypename>ReactorH</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -189,7 +190,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorI</prototype>
+          <prototypename>ReactorI</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -198,7 +199,7 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorJ</prototype>
+          <prototypename>ReactorJ</prototypename>
           <demandschedule>
             <entry>
               <time>1</time>
@@ -207,34 +208,46 @@
           </demandschedule>
         </prototyperequirement>
         <prototyperequirement>
-          <prototype>ReactorK</prototype>
+          <prototypename>ReactorK</prototypename>
           <demandschedule>
             <entry>
-              <time>37</time>
+              <time>1</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>97</time>
+              <time>25</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>145</time>
+              <time>85</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>193</time>
+              <time>133</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>241</time>
+              <time>169</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>277</time>
+              <time>217</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>313</time>
+              <time>253</time>
+              <number>1</number>
+            </entry>
+            <entry>
+              <time>289</time>
+              <number>1</number>
+            </entry>
+            <entry>
+              <time>325</time>
+              <number>1</number>
+            </entry>
+            <entry>
+              <time>613</time>
               <number>1</number>
             </entry>
             <entry>
@@ -250,7 +263,7 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>697</time>
+              <time>685</time>
               <number>1</number>
             </entry>
             <entry>
@@ -258,7 +271,7 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>733</time>
+              <time>757</time>
               <number>1</number>
             </entry>
             <entry>
@@ -266,7 +279,7 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>793</time>
+              <time>805</time>
               <number>1</number>
             </entry>
             <entry>
@@ -274,7 +287,7 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>841</time>
+              <time>829</time>
               <number>1</number>
             </entry>
             <entry>
@@ -282,7 +295,11 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>877</time>
+              <time>889</time>
+              <number>1</number>
+            </entry>
+            <entry>
+              <time>901</time>
               <number>1</number>
             </entry>
             <entry>
@@ -290,15 +307,11 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>925</time>
-              <number>1</number>
-            </entry>
-            <entry>
               <time>937</time>
               <number>1</number>
             </entry>
             <entry>
-              <time>961</time>
+              <time>949</time>
               <number>1</number>
             </entry>
             <entry>
@@ -306,11 +319,15 @@
               <number>1</number>
             </entry>
             <entry>
-              <time>997</time>
+              <time>985</time>
               <number>1</number>
             </entry>
             <entry>
               <time>1009</time>
+              <number>1</number>
+            </entry>
+            <entry>
+              <time>1021</time>
               <number>1</number>
             </entry>
             <entry>
@@ -331,7 +348,7 @@
             </entry>
             <entry>
               <time>1081</time>
-              <number>1</number>
+              <number>2</number>
             </entry>
             <entry>
               <time>1093</time>
@@ -343,11 +360,11 @@
             </entry>
             <entry>
               <time>1117</time>
-              <number>2</number>
+              <number>1</number>
             </entry>
             <entry>
               <time>1129</time>
-              <number>1</number>
+              <number>2</number>
             </entry>
             <entry>
               <time>1141</time>
@@ -355,15 +372,15 @@
             </entry>
             <entry>
               <time>1153</time>
-              <number>1</number>
-            </entry>
-            <entry>
-              <time>1165</time>
               <number>2</number>
             </entry>
             <entry>
-              <time>1177</time>
+              <time>1165</time>
               <number>1</number>
+            </entry>
+            <entry>
+              <time>1177</time>
+              <number>2</number>
             </entry>
             <entry>
               <time>1189</time>

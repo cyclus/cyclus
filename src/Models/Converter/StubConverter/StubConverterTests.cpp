@@ -69,7 +69,7 @@ TEST_F(StubConverterTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubConverterTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
   // Test StubConverter specific aspects of the print method here
 }
 

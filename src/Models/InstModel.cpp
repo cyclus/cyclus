@@ -41,11 +41,12 @@ void InstModel::copy(InstModel* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::print()
-{
-  Model::print();
-
-  LOG(LEV_DEBUG2, "none!") << "in region " << parent()->name();
+std::string InstModel::str() {
+  try {
+    return Model::str() + " in region" + parent()->name();
+  } catch (CycIndexException err) {
+    return Model::str() + " with no region.";
+  }
 }
 
 
