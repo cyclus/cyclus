@@ -18,36 +18,38 @@ SET(BUILD_SHARED_LIBS true)
 IF (WIN32)
   set(suffix ".dll")
   set(dynamicloadlib "WinLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
 ELSEIF(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
   set(suffix ".dylib")
   set(dynamicloadlib "UnixLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
 ELSE()
   set(suffix ".so")
   set(dynamicloadlib "UnixLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/suffix.h.in ${CYCLUS_SRC_DIR}/suffix.h @ONLY)
+  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
 ENDIF()
 
 # Includes the directories in which there are source files. 
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
+  ${CYCLUS_SRC_DIR}/Config
+  ${CYCLUS_SRC_DIR}/Input
   ${CYCLUS_SRC_DIR}/Models
+  ${CYCLUS_SRC_DIR}/Resources
   ${CYCLUS_SRC_DIR}/Utility
   )
 
 
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
-  InputXML.cpp
-  IsoVector.cpp
-  Resource.cpp
-  GenericResource.cpp
-  Material.cpp
-  ResourceBuff.cpp
-  MatBuff.cpp
-  Message.cpp
+  Input/InputXML.cpp
+  Resources/IsoVector.cpp
+  Resources/Resource.cpp
+  Resources/GenericResource.cpp
+  Resources/Material.cpp
+  Resources/ResourceBuff.cpp
+  Resources/MatBuff.cpp
   Utility/BookKeeper.cpp 
   Utility/Database.cpp
   Utility/CycException.cpp 
@@ -60,6 +62,7 @@ SET( CYCLUS_CORE
   Utility/Logger.cpp
   Utility/DecayHandler.cpp
   Models/Model.cpp 
+  Models/Message.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
@@ -86,7 +89,7 @@ COPYONLY
 )
 
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/cyclus.rng
+${CYCLUS_SOURCE_DIR}/Input/cyclus.rng
 ${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
 COPYONLY
 )
