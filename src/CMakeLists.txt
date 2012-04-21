@@ -43,24 +43,6 @@ SET(CYCLUS_INCLUDE_DIR
 
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
-  Input/InputXML.cpp
-  Resources/IsoVector.cpp
-  Resources/Resource.cpp
-  Resources/GenericResource.cpp
-  Resources/Material.cpp
-  Resources/ResourceBuff.cpp
-  Resources/MatBuff.cpp
-  Utility/BookKeeper.cpp 
-  Utility/Database.cpp
-  Utility/CycException.cpp 
-  Utility/LMatrix.cpp 
-  Utility/MassTable.cpp 
-  Utility/Table.cpp
-  Utility/Timer.cpp
-  Utility/UniformTaylor.cpp 
-  Utility/Env.cpp
-  Utility/Logger.cpp
-  Utility/DecayHandler.cpp
   Models/Model.cpp 
   Models/Message.cpp
   Models/StubTimeAgent.cpp 
@@ -72,6 +54,10 @@ SET( CYCLUS_CORE
   Models/RegionModel.cpp
   Models/InstModel.cpp
   )
+
+ADD_SUBDIRECTORY(Input)
+ADD_SUBDIRECTORY(Resources)
+ADD_SUBDIRECTORY(Utility)
 
 SET( CYCLUS_SRC
   ${CYCLUS_CORE}
