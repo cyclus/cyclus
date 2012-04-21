@@ -12,72 +12,48 @@
 #include "Table.h"
 #include "UseMatrixLib.h"
 
-#define AVOGADRO 6.02e23
+// Useful Definitions
+#define AVOGADRO 6.02e23 // avagadro's number
+#define EPS_KG 1e-6 // smallest kilogram value
 
-/**
-   simulation wide numerical threshold for mass significance. 
-   Its units are kg. 
- */
-#define EPS_KG 1e-6
-
-/**
-   An isotope's identification number 
-   The isotope ZAID number (Z A IDentiﬁcation) contains six digits 
-   ZZZAAA ZZZ is the atomic number Z and AAA is the atomic mass number 
-   A. Thus  235 U has a ZAID number 092235 or simply 92235. 
- */
-typedef int Iso;
-
-/**
-   A map type to represent all of the parent isotopes tracked.  The key 
-   for this map type is the parent's Iso number, and the value is a pair 
-   that contains the corresponding decay matrix column and decay 
-   constant associated with that parent. 
- */
-typedef std::map< Iso, std::pair<int, double> > ParentMap;
-
-/**
-   A map type to represent all of the daughter isotopes tracked.  The 
-   key for this map type is the decay matrix column associated with the 
-   parent, and the value is a vector of pairs of all the daughters for 
-   that parent. Each of the daughters are represented by a pair that 
-   contains the daughter's Iso number and its branching ratio. 
- */
-typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
-
-/**
-   map isotope (int) to atoms/mass (double) 
- */
-typedef std::map<Iso, double> CompMap;
+// Useful Typedefs
+// Isotope integer, ZZZAAA
+typedef int Iso; 
+// a map of isotopes to composition values 
+typedef std::map<Iso, double> CompMap; 
+// a pointer to an isovector
+class IsoVector;
+typedef IsoVector* pIsoVector;
 
 /** 
    @class IsoVector 
     
-    
-   This class is the object used to transact material objects around the 
-   system.  
-   @section intro Introduction 
-   This class keeps track of the isotopic composition of a material 
-   using both the atomic fractions and the mass fractions, combined with 
-   the total number of atoms and total mass. The default mass unit is 
-   kilograms. Access to nuclide data is also provided through the 
-   IsoVector class.  
+   The IsoVector Class is an intelligent container, holding a mass-
+   based isotopic composition container. It reports normalized 
+   mass or atomic fractions, as requested.
+  
    @section recipes Recipes 
-   Input file recipes can be either mass or atom (mole) based and define 
-   an often-referenced composition vector. Recipes can be retrieved at 
-   will by any agent during the simulation via the static 
-   \ref IsoVector::recipe(std::string name) method.  For example:  
+   Recipes are pre-defined IsoVectors. Recipes will be used and decay
+   frequently, so their evolution is tracked. Original recipes are
+   the parent of their series of daughters arising from decay. All
+   IsoVectors using recipes from this process point to this class'
+   static container of recipes. A copy is only made if the composition 
+   deviates from the parent-daughter chain through a + or - operation.
+
+   Input file recipes can be either mass or atom (mole) based. 
+   Recipes can be accessed through the constructor. For example:  
    @code 
     
    std::string recipe_name = "my-recipe-name"; 
-   IsoVector my_recipe = IsoVector::recipe(recipe_name); 
-    
+   IsoVector* my_recipe = new IsoVector(recipe_name); 
+   
    @endcode 
  */
 
 class IsoVector {
 
 public:
+  /* --- Constructors and Destructors --- */
   /**
      default constructor 
    */
@@ -90,42 +66,35 @@ public:
   IsoVector(CompMap initial_comp); 
 
   /**
+     constructor given some initial composition and some
+     basis
+     @param initial_comp the initial composition 
+     @param atom true if atom-basis, false if mass basis
+   */
+  IsoVector(CompMap initial_comp, bool atom); 
+
+  /**
      Used for reading in and initizliaing material recipes. 
    */
   IsoVector(xmlNodePtr cur);
 
   /**
+     constructor given some recipe 
+     @param recipe a recipe loaded in the simulation
+   */
+  IsoVector(std::string recipe); 
+
+  /**
      default destructor 
    */
   ~IsoVector() {};
+  /* --- */
 
+  /* --- Pre-Defined Recipe Interaction  --- */
   /**
      loads the recipes from the input file 
    */
   static void load_recipes();
-
-  /**
-     get a pointer to the recipe based on its name 
-      
-     @param name the name of the recipe for which to return a material 
-   */
-  static IsoVector recipe(std::string name);                      
-
-  /**
-     print all recipes 
-   */
-  static void printRecipes();
-
-  /**
-     print the details of this IsoVector 
-   */
-  void print();
-
-  /**
-     return a vector of the composition as strings 
-     @return the composition string vector 
-   */
-  std::vector<std::string> compStrings();
 
   /**
      the total number of recipes 
@@ -136,7 +105,9 @@ public:
      a container of recipes 
    */
   static std::map<std::string, IsoVector*> recipes_;
-  
+  /* --- */
+
+  /* --- Operators  --- */
   /**
      Adds like isotopes 
    */
@@ -155,7 +126,33 @@ public:
      quantity for every isotope is equal. 
    */
   bool operator== (IsoVector rhs_vector);
+  /* --- */
 
+  /* --- Instance Interaction  --- */ 
+  /**
+     Return the mass-based composition 
+   */
+  CompMap mass_comp();
+  
+  /**
+     Returns true if the given isotope's number density is less than the 
+     conservation of mass tolerance. 
+      
+     @param tope the isotope in question 
+     @return true iff nd(tope) == 0 
+   */
+  bool isZero(Iso tope);
+
+  /**
+     Decays this Material object for the given change in time and 
+     updates its composition map with the new number densities. 
+      
+     @param time_change the number of months to decay 
+   */
+  void executeDecay(double time_change);
+  /* --- */
+
+  /* --- Isotope Wikipedia  --- */ 
   /**
      Returns the atomic number of the isotope with the given identifier. 
       
@@ -171,165 +168,65 @@ public:
      @return the mass number 
    */
   static int getMassNum(Iso tope);
+  /* --- */
+
+  /* --- Printing Functionality  --- */
+  /**
+     print all recipes 
+   */
+  static void printRecipes();
 
   /**
-     get material ID 
-      
-     @return ID 
+     print the details of this IsoVector 
    */
-  int id() {return ID_;};
+  void print();
 
   /**
-     returns the total mass of this material object PER UNIT 
+     return a vector of the composition as strings 
+     @return the composition string vector 
    */
-  double mass();
+  std::vector<std::string> compStrings();
+  /* --- */
 
-  /**
-     Returns the current mass of the given isotope, or zero if 
-     that isotope isn't present. 
-      
-     @param tope the isotope whose mass in the material will be returned 
-     @return the mass of the given isotope within the material, or zero 
-   */
-  double mass(Iso tope);
-
-  /**
-     Sets the total mass of the entire IsoVector maintaining isotopic 
-   */
-  void setMass(double new_mass);
-
-  /**
-     Sets the mass of the specified isotope. 
-   */
-  void setMass(Iso tope, double new_mass);
-
-  /**
-     Multiplies the total mass of the entire IsoVector by 'factor' 
-     maintaining isotopic ratios. 
-   */
-  void multBy(double factor);
-
-  /**
-     returns the total atoms in this material object 
-   */
-  double atomCount();
-
-  /**
-     Returns the current number density of the given isotope, or zero if 
-     that isotope isn't present. 
-      
-     @param tope the isotope whose number density will be returned 
-     @return the number density of the given isotope, or zero 
-   */
-  double atomCount(Iso tope);
-
-  /**
-     Sets the total number of atoms for the entire IsoVector maintaining 
-     isotopic ratios. 
-   */
-  void setAtomCount(double new_count);
-
-  /**
-     Sets the total number of atoms for the entire IsoVector maintaining 
-     isotopic ratios. 
-   */
-  void setAtomCount(Iso tope, double new_count);
-
-  /**
-     Returns the mass of the given element in this Material. 
-      
-     @param elt the element 
-     @return the mass of the element (in tons) 
-   */
-  double eltMass(int elt);
-
-  /**
-     Decays this Material object for the given change in time and 
-     updates its composition map with the new number densities. 
-      
-     @param time_change the number of months to decay 
-   */
-  void executeDecay(double time_change);
-
-  /**
-     Return the atomic (in moles) composition as a std::map<std::string, 
-   */
-  CompMap comp();
-  
-  /**
-     Returns true if the given isotope's number density is less than the 
-     conservation of mass tolerance. 
-      
-     @param tope the isotope in question 
-     @return true iff nd(tope) == 0 
-   */
-  bool isZero(Iso tope);
-
-protected:
-  /**
-     Builds the decay matrix needed for the decay calculations from the 
-     parent and daughters map variables.  The resulting matrix is stored 
-     in the static variable decayMatrix. 
-   */
-  static void buildDecayMatrix();
-
-  /**
-     Returns a mathematical Vector representation of the Material's 
-     current composition map. 
-      
-     @return the mathematical Vector 
-   */
-  Vector compositionAsVector();
-
-  /**
-     Overwrites composition with data from the given Vector. 
-      
-     @param compVector Vector of data that constitutes the new 
-   */
-  void copyVectorIntoComp(const Vector & compVector);
-
-  /**
-     the IsoVector Class' parent 
-   */
-  static ParentMap parent_; 
-  
-  /**
-     the IsoVector Class' daughters 
-   */
-  static DaughtersMap daughters_; 
-  
-  /**
-     the matrix used for decay functionality 
-   */
-  static Matrix decayMatrix_; 
-
-private:
-  /**
-     allows calculated mass to be reused if no changes 
-     have been made since last calculated. 
-   */
-  double total_mass_;
-
-  /**
-     aids in mass recalc prevention - used in conjunction with 
-   */
-  bool mass_out_of_date_;
-
-  /**
-     used by print() to 'hide' print code when logging is not desired 
-   */
-  std::string detail();
-
-  /**
-     Stores the next available material ID 
-   */
-  static int nextID_;
-
+ private:
+  /* --- Instance Interaction  --- */ 
   /**
      Stores the next available state ID 
    */
   static int nextStateID_;
 
+  /**
+     Unique identifier. 
+   */
+  int stateID_;
+
+  /**
+     Core isotope composition information stored here. 
+   */
+  CompMap mass_fractions_;
+
+  /**
+     mass-based normalization constant
+  */
+  double mass_normalizer_;
+
+  /**
+     atom-based normalization constant
+  */
+  double atom_normalizer_;
+
+  /**
+     a pointer to this iso vector's parent's pointer
+   */
+  pIsoVector* parent_;
+
+  /**
+     total decay time between this isovector and its parent
+  */
+  int decayTime_;
+  /* --- */
+
+  /* --- Isotope Wikipedia  --- */
   void validateComposition();
 
   /**
@@ -338,29 +235,18 @@ private:
      @exception thrown if isotope identifier is invalid 
    */
   static void validateIsotopeNumber(Iso tope);
-
+  /* --- */
+ 
+  /* --- Printing Functionality  --- */
   /**
-     Unique identifier. 
+     used by print() to 'hide' print code when logging is not desired 
    */
-  int ID_;
+  std::string detail();
+  /* --- */
+ 
 
-  /**
-     Core isotope composition information stored here. 
-   */
-  CompMap atom_comp_;
-    
-  /**
-     this IsoVector's state 
-   */
-  int stateID_;
+ /* -- Output Database Interaction  -- */ 
 
-  /// delta time this COMPOSITION has been decayed since its creation
-  int decayTime_;
-
-  /// map[time] = stateID. and entry exists if the comp has ben recorded
-  std::map<int, int>* loggedComps_;
-
-// -------- output database related members  -------- 
  public:
   /**
      the isotopics output database Table 
@@ -377,7 +263,9 @@ private:
    */
   int stateID() {return stateID_;}
 
-  // returns true if a new state was recorded, false if already in db
+  /**
+     returns true if a new state was recorded, false if already in db
+  */
   void recordState();
   
  private:
@@ -395,8 +283,8 @@ private:
      Store information about the transactions's primary key 
    */
   primary_key_ref pkref_;
-  
-// -------- output database related members  -------- 
+
+ /* -- */ 
 };
 
 #endif
