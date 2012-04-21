@@ -188,3 +188,45 @@ target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES}
 add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
   ${INTERFACE_LIBRARIES})
 
+# Here we set some components for installation with cpack
+ install(TARGETS ${INTERFACE_LIBRARIES} 
+   ARCHIVE
+   DESTINATION lib
+   COMPONENT libraries)
+ install(TARGETS cyclus
+   RUNTIME
+   DESTINATION bin
+   COMPONENT application)
+ install(FILES 
+   DESTINATION include
+   COMPONENT headers)
+
+# Here's where we package it with CPack
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
+SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "1")
+#SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
+ 
+IF(WIN32 AND NOT UNIX)
+  # There is a bug in NSI that does not handle full unix paths properly. Make
+  # sure there is at least one set of four (4) backlasshes.
+  SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
+  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} My Famous Project")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.cyclus.github.com")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\cnerg.engr.wisc.edu")
+  SET(CPACK_NSIS_CONTACT "cyclus-dev@googlegroups.com")
+  SET(CPACK_NSIS_MODIFY_PATH ON)
+ELSE(WIN32 AND NOT UNIX)
+  SET(CPACK_STRIP_FILES "bin/cyclus")
+  SET(CPACK_SOURCE_STRIP_FILES "")
+ENDIF(WIN32 AND NOT UNIX)
+SET(CPACK_PACKAGE_EXECUTABLES "cyclus")
+
+INCLUDE(CPack)
+ 
