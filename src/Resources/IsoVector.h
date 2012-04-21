@@ -3,6 +3,7 @@
 #define _ISOVECTOR_H
 
 #include <map>
+#include <set>
 #include <utility>
 #include <math.h>
 #include <vector>
@@ -12,131 +13,151 @@
 #include "Table.h"
 #include "UseMatrixLib.h"
 
+/* -- Useful Definitions -- */
+/**
+   avagadro's number
+*/
 #define AVOGADRO 6.02e23
 
 /**
-   simulation wide numerical threshold for mass significance. 
-   Its units are kg. 
- */
+   smallest kilogram value
+*/
 #define EPS_KG 1e-6
 
 /**
-   An isotope's identification number 
-   The isotope ZAID number (Z A IDentiﬁcation) contains six digits 
-   ZZZAAA ZZZ is the atomic number Z and AAA is the atomic mass number 
-   A. Thus  235 U has a ZAID number 092235 or simply 92235. 
+   smallest percent
+*/
+#define EPS_PERCENT 1e-14
+/* -- */
+
+/* -- Useful Typedefs -- */
+class IsoVector;
+
+/**
+   Isotope integer, ZZZAAA
  */
 typedef int Iso;
 
 /**
-   A map type to represent all of the parent isotopes tracked.  The key 
-   for this map type is the parent's Iso number, and the value is a pair 
-   that contains the corresponding decay matrix column and decay 
-   constant associated with that parent. 
- */
-typedef std::map< Iso, std::pair<int, double> > ParentMap;
-
-/**
-   A map type to represent all of the daughter isotopes tracked.  The 
-   key for this map type is the decay matrix column associated with the 
-   parent, and the value is a vector of pairs of all the daughters for 
-   that parent. Each of the daughters are represented by a pair that 
-   contains the daughter's Iso number and its branching ratio. 
- */
-typedef std::map<int, std::vector<std::pair<Iso, double> > > DaughtersMap;
-
-/**
-   map isotope (int) to atoms/mass (double) 
+   map of isotope integer to value (mass or atom)
  */
 typedef std::map<Iso, double> CompMap;
+
+/* --- Useful Structs --- */
+/**
+   a container fully describing the isovector's composition
+ */
+struct composition {
+  int ID;
+  CompMap* mass_fractions;
+  double mass_normalizer;
+  double atom_normalizer;
+  composition* parent;
+  int decay_time;
+  composition(CompMap* fracs, double mass_norm, double atom_norm) {
+    ID = 0;
+    mass_fractions = fracs;
+    mass_normalizer = mass_norm;
+    atom_normalizer = atom_norm;
+    parent = 0;
+    decay_time = 0;
+  }
+  bool logged() {
+    return (ID > 0);
+  }
+  void delete_map() {
+    delete mass_fractions;
+  }
+};
+/* --- */
+
+/**
+   map of recipe name to composition
+ */
+typedef std::map<std::string, composition*> RecipeMap; 
+
+/**
+   set of decay times
+ */
+typedef std::set<int> decay_times;
+
+/**
+   map of composition times decayed
+ */
+typedef std::map<composition*, decay_times*> DecayTimesMap; 
+
+/**
+   map of decay time to composition
+ */
+typedef std::map<int, composition*> DaughterMap; 
+
+/**
+   map of recipe composition to its decayed daughters
+ */
+typedef std::map<composition*, DaughterMap*> DecayChainMap; 
+/* -- */
 
 /** 
    @class IsoVector 
     
-    
-   This class is the object used to transact material objects around the 
-   system.  
-   @section intro Introduction 
-   This class keeps track of the isotopic composition of a material 
-   using both the atomic fractions and the mass fractions, combined with 
-   the total number of atoms and total mass. The default mass unit is 
-   kilograms. Access to nuclide data is also provided through the 
-   IsoVector class.  
+   The IsoVector Class is an intelligent, mass-based isotopic composition 
+   container. It reports normalized mass or atomic fractions, as requested.
+  
    @section recipes Recipes 
-   Input file recipes can be either mass or atom (mole) based and define 
-   an often-referenced composition vector. Recipes can be retrieved at 
-   will by any agent during the simulation via the static 
-   \ref IsoVector::recipe(std::string name) method.  For example:  
+   Recipes are pre-defined IsoVectors. Recipes will be used and decay
+   frequently, so their evolution is tracked. The decay of recipe-based 
+   IsoVectors is tracked through a parent-daughter relationship. Each parent
+   and daughter is stored in a static container, and all IsoVectors in the 
+   simulation using one of these recipes points to this static container. A 
+   copy is only made if the composition deviates from the parent-daughter 
+   chain through a + or - operation.
+
+   Input file recipes can be either mass or atom (mole) based. 
+   Recipes can be accessed a static map. For example:  
    @code 
     
    std::string recipe_name = "my-recipe-name"; 
-   IsoVector my_recipe = IsoVector::recipe(recipe_name); 
-    
+   IsoVector* my_recipe = IsoVector::recipe(recipe_name); 
+   
    @endcode 
  */
-
 class IsoVector {
-
 public:
+  /* --- Constructors and Destructors --- */
   /**
      default constructor 
    */
   IsoVector(); 
 
   /**
+     constructor given some previous composition 
+     basis assumed to be mass-wise
+     @param comp the previous composition 
+   */
+  IsoVector(composition* comp); 
+
+  /**
      constructor given some initial composition 
+     basis assumed to be mass-wise
      @param initial_comp the initial composition 
    */
-  IsoVector(CompMap initial_comp); 
+  IsoVector(CompMap* initial_comp); 
 
   /**
-     Used for reading in and initizliaing material recipes. 
+     constructor given some initial composition and some
+     basis
+     @param initial_comp the initial composition 
+     @param atom true if atom-basis, false if mass basis
    */
-  IsoVector(xmlNodePtr cur);
+  IsoVector(CompMap* initial_comp, bool atom); 
 
   /**
-     default destructor 
+     default destructor
    */
-  ~IsoVector() {};
+  ~IsoVector();
+  /* --- */
 
-  /**
-     loads the recipes from the input file 
-   */
-  static void load_recipes();
-
-  /**
-     get a pointer to the recipe based on its name 
-      
-     @param name the name of the recipe for which to return a material 
-   */
-  static IsoVector recipe(std::string name);                      
-
-  /**
-     print all recipes 
-   */
-  static void printRecipes();
-
-  /**
-     print the details of this IsoVector 
-   */
-  void print();
-
-  /**
-     return a vector of the composition as strings 
-     @return the composition string vector 
-   */
-  std::vector<std::string> compStrings();
-
-  /**
-     the total number of recipes 
-   */
-  static int recipeCount();        
-
-  /**
-     a container of recipes 
-   */
-  static std::map<std::string, IsoVector*> recipes_;
-  
+  /* --- Operators  --- */
   /**
      Adds like isotopes 
    */
@@ -157,6 +178,175 @@ public:
   bool operator== (IsoVector rhs_vector);
 
   /**
+     multiplication operators
+   */
+  friend IsoVector operator* (const IsoVector &v, double factor);
+  friend IsoVector operator* (double factor, const IsoVector &v);
+  friend IsoVector operator* (const IsoVector &v, int factor);
+  friend IsoVector operator* (int factor, const IsoVector &v);
+
+  /**
+     division operators
+   */
+  friend IsoVector operator/ (const IsoVector &v, double factor);
+  friend IsoVector operator/ (const IsoVector &v, int factor);
+  /* --- */
+
+  /* --- Instance Interaction  --- */ 
+  /**
+     the current state id 
+   */
+  int stateID();
+
+  /**
+     Return the mass-based composition 
+   */
+  CompMap* mass_comp();
+
+  /**
+     returns the mass normalizer for the IsoVector's composition_
+   */
+  double mass_normalizer();
+
+  /**
+     returns the decay time for the IsoVector's composition_
+   */
+  int decay_time();
+
+  /**
+     returns the parent of the IsoVector's composition_
+   */
+  composition* parent();
+
+  /**
+     calls minimizeComposition() on composition_
+   */    
+  void minimizeComposition();
+
+  /**
+     multiply the mass_normalizer by a factor; used in multiplication
+   */
+  void multMassNormBy(double factor);
+
+  /**
+     Return the mass fraction of an isotope in the composition
+   */
+  double massFraction(Iso tope);
+
+  /**
+     Return the mass fraction of an isotope in a composition
+   */
+  static double massFraction(Iso tope, composition* c);
+
+  /**
+     returns the atom fraction of an isotope in the composition
+   */
+  double atomFraction(Iso tope);
+
+  /**
+     Return the mass fraction of an isotope in a composition
+   */
+  static double atomFraction(Iso tope, composition* c);
+
+  /**
+     Returns true if the given isotope's number density is less than the 
+     conservation of mass tolerance. 
+      
+     @param tope the isotope in question 
+     @return true iff nd(tope) == 0 
+   */
+  bool isZero(Iso tope);
+
+  /**
+     Decays this Material object for the given change in time and 
+     updates its composition map with the new number densities. 
+      
+     @param time_change the number of months to decay 
+   */
+  void executeDecay(double time_change);
+  /* --- */
+
+  /* --- Global Interaction  --- */
+  /**
+     loads the recipes from the input file 
+   */
+  static void load_recipes();
+
+  /**
+     loads a specific recipe 
+   */
+  static void load_recipe(xmlNodePtr cur);
+  
+  /**
+     logs a new recipe with the simulation
+     - logs recipe with BookKeeper
+   */
+  static void logRecipe(composition* recipe);
+
+  /**
+     logs a new named recipe with the simulation
+     - adds recipe to IsoVector's static containers
+     - calls the logRecipe() method
+   */
+  static void logRecipe(std::string name, composition* recipe);
+
+  /**
+     logs a new named recipe with the simulation
+     - sets the parent of and decay time child
+     - calls the logRecipe() method
+     @param t_i -> initial time of decay
+     @param t_i -> final time of decay
+   */
+  static void logRecipeDecay(composition* parent, composition* child, 
+                             int t_i, int t_f);
+  /**
+     adds recipe to containers tracking decayed recipes
+   */
+  static void storeDecayableRecipe(composition* recipe);
+  
+  /**
+     checks if the recipe has been logged (i.e. it exists in the simulation)
+   */
+  static bool recipeLogged(std::string name);
+
+  /**
+     the total number of recipes 
+   */
+  static int recipeCount(); 
+
+  /**
+     accessing a recipe 
+   */
+  static composition* recipe(std::string name);
+
+  /**
+     accessing a set of decay times 
+   */
+  static decay_times* decayTimes(composition* parent);
+
+  /**
+     accessing the daughters of a parent
+   */
+  static DaughterMap* Daughters(composition* parent);
+
+  /**
+     accessing a specific daughter 
+   */
+  static composition* Daughter(composition* parent, int time);
+
+  /**
+     add a daughter to a map of daughters
+   */
+  static void addDaughter(DaughterMap* daughters, composition* child, int time);
+
+  /**
+     whether or not this composition is logged as a recipe
+  */
+  bool logged();
+  /* --- */
+
+  /* --- Isotope Wikipedia  --- */ 
+  /**
      Returns the atomic number of the isotope with the given identifier. 
       
      @param tope the isotope whose atomic number is being returned 
@@ -171,166 +361,141 @@ public:
      @return the mass number 
    */
   static int getMassNum(Iso tope);
+  /* --- */
+
+  /* --- Printing Functionality  --- */
+  /**
+     print all recipes 
+   */
+  static void printRecipes();
 
   /**
-     get material ID 
-      
-     @return ID 
+     print the details of a composition 
    */
-  int id() {return ID_;};
+  static void print(composition* c);
 
   /**
-     returns the total mass of this material object PER UNIT 
+     print the details of this IsoVector 
    */
-  double mass();
+  void print();
+  /* --- */
+
+ private:
+  /* --- Initializations  --- */ 
+  /**
+     initialize any required members
+   */
+  void init();
 
   /**
-     Returns the current mass of the given isotope, or zero if 
-     that isotope isn't present. 
-      
-     @param tope the isotope whose mass in the material will be returned 
-     @return the mass of the given isotope within the material, or zero 
+     Turns a list of atom-based compositions
+     to mass-based
    */
-  double mass(Iso tope);
+  void massify(CompMap* comp);
 
   /**
-     Sets the total mass of the entire IsoVector maintaining isotopic 
+     Turns a list of mass-based compositions
+     to atom-based
    */
-  void setMass(double new_mass);
+  void atomify(CompMap* comp);
 
   /**
-     Sets the mass of the specified isotope. 
-   */
-  void setMass(Iso tope, double new_mass);
+     set's the composition for this isovector
+   */    
+  void setComposition(composition* c);
 
   /**
-     Multiplies the total mass of the entire IsoVector by 'factor' 
-     maintaining isotopic ratios. 
-   */
-  void multBy(double factor);
+     constructs a composition out of comp
+     and calls setComposition()
+   */    
+  void setComposition(CompMap* comp);
 
   /**
-     returns the total atoms in this material object 
-   */
-  double atomCount();
+     sets the composition for a mass or atom based
+     composition. if atom == true, then massify()
+     is called. setComposition() for the mass-based
+     case is then called.
+   */    
+  void setComposition(CompMap* comp, bool atom);
 
   /**
-     Returns the current number density of the given isotope, or zero if 
-     that isotope isn't present. 
-      
-     @param tope the isotope whose number density will be returned 
-     @return the number density of the given isotope, or zero 
-   */
-  double atomCount(Iso tope);
+     determines the mass/atom normalizers for a composition
+   */    
+  std::pair<double,double> getNormalizers(CompMap* comp);
 
   /**
-     Sets the total number of atoms for the entire IsoVector maintaining 
-     isotopic ratios. 
-   */
-  void setAtomCount(double new_count);
+     adjusts the composition such that the mass normalizer
+     is equal to unity
+   */    
+  void minimizeComposition(composition* c);
 
   /**
-     Sets the total number of atoms for the entire IsoVector maintaining 
-     isotopic ratios. 
+     multiply the mass_normalizer of c by a factor; 
+     used in multiplication
    */
-  void setAtomCount(Iso tope, double new_count);
+  void multMassNormBy(composition* c,double factor);
+  /* --- */
 
-  /**
-     Returns the mass of the given element in this Material. 
-      
-     @param elt the element 
-     @return the mass of the element (in tons) 
-   */
-  double eltMass(int elt);
-
-  /**
-     Decays this Material object for the given change in time and 
-     updates its composition map with the new number densities. 
-      
-     @param time_change the number of months to decay 
-   */
-  void executeDecay(double time_change);
-
-  /**
-     Return the atomic (in moles) composition as a std::map<std::string, 
-   */
-  CompMap comp();
-  
-  /**
-     Returns true if the given isotope's number density is less than the 
-     conservation of mass tolerance. 
-      
-     @param tope the isotope in question 
-     @return true iff nd(tope) == 0 
-   */
-  bool isZero(Iso tope);
-
-protected:
-  /**
-     Builds the decay matrix needed for the decay calculations from the 
-     parent and daughters map variables.  The resulting matrix is stored 
-     in the static variable decayMatrix. 
-   */
-  static void buildDecayMatrix();
-
-  /**
-     Returns a mathematical Vector representation of the Material's 
-     current composition map. 
-      
-     @return the mathematical Vector 
-   */
-  Vector compositionAsVector();
-
-  /**
-     Overwrites composition with data from the given Vector. 
-      
-     @param compVector Vector of data that constitutes the new 
-   */
-  void copyVectorIntoComp(const Vector & compVector);
-
-  /**
-     the IsoVector Class' parent 
-   */
-  static ParentMap parent_; 
-  
-  /**
-     the IsoVector Class' daughters 
-   */
-  static DaughtersMap daughters_; 
-  
-  /**
-     the matrix used for decay functionality 
-   */
-  static Matrix decayMatrix_; 
-
-private:
-  /**
-     allows calculated mass to be reused if no changes 
-     have been made since last calculated. 
-   */
-  double total_mass_;
-
-  /**
-     aids in mass recalc prevention - used in conjunction with 
-   */
-  bool mass_out_of_date_;
-
-  /**
-     used by print() to 'hide' print code when logging is not desired 
-   */
-  std::string detail();
-
-  /**
-     Stores the next available material ID 
-   */
-  static int nextID_;
-
+  /* --- Instance Interaction  --- */ 
   /**
      Stores the next available state ID 
    */
   static int nextStateID_;
 
+  /**
+     a pointer to the isovector's composition
+   */
+  composition* composition_;
+
+  /**
+     deletes the composition_ pointer and composition_'s
+     CompMap of mass fractions, if it is not logged
+   */
+  void delete_comp();
+
+  /**
+     Decays a composition, assumed to be of mass-basis, for a given time. 
+      
+     @param time_change the number of months to decay 
+     @param mass_comp composition to decay
+   */
+  void executeDecay(double time_change, composition* mass_comp);
+  /* --- */
+
+  /* --- Global Interaction  --- */
+  /**
+     a memory space for new iso vectors to point to
+   */
+  static CompMap* init_comp_;
+
+  /**
+     a container of recipes 
+   */
+  static RecipeMap recipes_;
+
+  /**
+     a container of recipes in each decay chain
+   */
+  static DecayChainMap decay_chains_;
+
+  /**
+     a container of decay times that recipes have gone through
+   */
+  static DecayTimesMap decay_times_;
+  /* --- */
+
+  /* --- Isotope Wikipedia  --- */
+  /**
+     calls validateIsotopeNumber() and validateFraction() 
+     for each isotope and fraction value in this IsoVector's 
+     composition
+   */
   void validateComposition();
+
+  /**
+     throws an error if fraction < 0.0
+   */
+  static void validateFraction(double fraction);
 
   /**
      Used to determine validity of isotope defnition. 
@@ -338,46 +503,37 @@ private:
      @exception thrown if isotope identifier is invalid 
    */
   static void validateIsotopeNumber(Iso tope);
+  /* --- */
+ 
+  /* --- Printing Functionality  --- */
+  /**
+     return a pointer to a vector of the composition as strings 
+     @return the composition string vector 
+   */
+  static std::vector<std::string>* compStrings(composition* c);
 
   /**
-     Unique identifier. 
+     used by print() to 'hide' print code when logging is not desired 
    */
-  int ID_;
+  static std::string detail(composition* c);
+  /* --- */
+ 
 
-  /**
-     Core isotope composition information stored here. 
-   */
-  CompMap atom_comp_;
-    
-  /**
-     this IsoVector's state 
-   */
-  int stateID_;
-
-  /// delta time this COMPOSITION has been decayed since its creation
-  int decayTime_;
-
-  /// map[time] = stateID. and entry exists if the comp has ben recorded
-  std::map<int, int>* loggedComps_;
-
-// -------- output database related members  -------- 
+ /* -- Output Database Interaction  -- */ 
  public:
   /**
      the isotopics output database Table 
    */
   static table_ptr iso_table;
   
-  /**
-     return the agent table's primary key 
-   */
-  primary_key_ref pkref() { return pkref_;}
+  /* /\** */
+  /*    return the agent table's primary key  */
+  /*  *\/ */
+  /* primary_key_ref pkref(); */
   
   /**
-     the current state id 
-   */
-  int stateID() {return stateID_;}
-
-  // returns true if a new state was recorded, false if already in db
+     returns true if a new state was recorded, false if already in db
+  */
   void recordState();
   
  private:
@@ -389,14 +545,13 @@ private:
   /**
      Add an isotopic state to the table 
    */
-  void addToTable();
+  static void addToTable(composition* comp);
 
-  /**
-     Store information about the transactions's primary key 
-   */
-  primary_key_ref pkref_;
-  
-// -------- output database related members  -------- 
+  /* /\** */
+  /*    Store information about the transactions's primary key  */
+  /*  *\/ */
+  /* primary_key_ref pkref_; */
+ /* -- */ 
 };
 
 #endif

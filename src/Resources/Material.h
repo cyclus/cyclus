@@ -101,7 +101,7 @@ public:
   /**
      Resource class method 
    */
-  double quantity() {return iso_vector_.mass();};
+  double quantity() {};//return iso_vector_.mass();};
 
   /**
      Resource class method 

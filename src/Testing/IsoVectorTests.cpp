@@ -51,13 +51,13 @@ class IsoVectorTest : public ::testing::Test {
         v2_m_u235 = 20;
         v2_m_pu240 = 2000;
 
-        v1_a_oxygen = v1_m_oxygen * grams_per_kg / MT->getMassInGrams(oxygen);
-        v1_a_u235 = v1_m_u235 * grams_per_kg / MT->getMassInGrams(u235);
-        v1_a_u238 = v1_m_u238 * grams_per_kg / MT->getMassInGrams(u238);
+        v1_a_oxygen = v1_m_oxygen * grams_per_kg / MT->gramsPerMol(oxygen);
+        v1_a_u235 = v1_m_u235 * grams_per_kg / MT->gramsPerMol(u235);
+        v1_a_u238 = v1_m_u238 * grams_per_kg / MT->gramsPerMol(u238);
 
-        v2_a_oxygen = v2_m_oxygen * grams_per_kg / MT->getMassInGrams(oxygen);
-        v2_a_u235 = v2_m_u235 * grams_per_kg / MT->getMassInGrams(u235);
-        v2_a_pu240 = v2_m_pu240 * grams_per_kg / MT->getMassInGrams(pu240);
+        v2_a_oxygen = v2_m_oxygen * grams_per_kg / MT->gramsPerMol(oxygen);
+        v2_a_u235 = v2_m_u235 * grams_per_kg / MT->gramsPerMol(u235);
+        v2_a_pu240 = v2_m_pu240 * grams_per_kg / MT->gramsPerMol(pu240);
 
         total_mass1 = v1_m_oxygen + v1_m_u235 + v1_m_u238;
         total_mass2 = v2_m_oxygen + v2_m_u235 + v2_m_pu240;
