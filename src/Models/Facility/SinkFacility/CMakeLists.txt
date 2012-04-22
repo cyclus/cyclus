@@ -10,3 +10,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/SinkFacility/SinkFacility.rng
 ${CMAKE_CURRENT_BINARY_DIR}/SinkFacility.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Facility/SinkFacility/SinkFacility.rng'/>"
+  PARENT_SCOPE)
+SET(FAC_REFS ${FAC_REFS}
+  "<ref name='SinkFacility'/>"
+  PARENT_SCOPE)

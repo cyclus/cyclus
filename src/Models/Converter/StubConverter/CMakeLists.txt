@@ -11,3 +11,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Converter/StubConverter/StubConverter.rng
 ${CMAKE_CURRENT_BINARY_DIR}/StubConverter.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES  ${RNG_INCLUDES}
+  "<include href='../Models/Converter/StubConverter/StubConverter.rng'/>"
+  PARENT_SCOPE)
+SET(CONV_REFS ${CONV_REFS}
+  "<ref name='StubConverter'/>"
+  PARENT_SCOPE)

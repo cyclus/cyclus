@@ -13,3 +13,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Inst/BuildInst/BuildInst.rng
 ${CMAKE_CURRENT_BINARY_DIR}/BuildInst.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Inst/BuildInst/BuildInst.rng'/>"
+  PARENT_SCOPE)
+SET(INST_REFS ${INST_REFS}
+  "<ref name='BuildInst'/>"
+  PARENT_SCOPE)

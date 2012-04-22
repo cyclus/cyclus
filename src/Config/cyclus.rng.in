@@ -1,0 +1,406 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+  @RNG_INCLUDES@
+
+  <start>
+  <choice>
+
+  <!-- top level for a SIMULATION input -->
+
+  <element name="simulation">
+
+    <interleave>
+
+    <ref name="duration"/>
+
+    <ref name="startmonth"/>
+
+    <ref name="startyear"/>
+
+    <ref name="simstart"/>
+
+    <ref name="decay"/>
+
+    <oneOrMore>
+    <ref name="commodity"/>
+    </oneOrMore>
+  
+    <oneOrMore>
+    <ref name="market"/>
+    </oneOrMore>
+      
+    <oneOrMore>
+    <choice>
+    <ref name="facility"/>
+    <ref name="facilitycatalog"/>
+    </choice>
+    </oneOrMore>
+
+    <oneOrMore>
+    <ref name="region"/>
+    </oneOrMore>
+
+    <zeroOrMore>
+    <choice>
+    <ref name="recipe"/>
+    <ref name="recipebook"/>
+    </choice>
+    </zeroOrMore>
+
+    <zeroOrMore>
+    <ref name="converter"/>
+    </zeroOrMore>
+    
+    </interleave>
+
+  </element>
+
+  <!-- top level for a RECIPEBOOK input -->
+
+  <element name="recipebook">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="recipe"/>
+    </oneOrMore>
+
+  </element>
+
+  <!-- top level for a FACILITYCATALOG input -->
+
+  <element name="facilitycatalog">
+
+    <element name="name">
+      <text/>
+    </element>
+
+    <oneOrMore>
+    <ref name="facility"/>
+    </oneOrMore>
+
+  </element>
+
+  </choice>
+  </start>
+
+  <!-- begin section for simulation parameters -->
+  <define name="duration">
+    <element name="duration">
+      <data type="nonNegativeInteger"/>
+    </element>
+  </define>
+
+  <define name="startmonth">
+    <element name="startmonth">
+      <data type="nonNegativeInteger"/>
+    </element>
+  </define>
+
+  <define name="startyear">
+    <element name="startyear">
+      <data type="nonNegativeInteger"/>
+    </element>
+  </define>
+
+  <define name="simstart">
+    <element name="simstart">
+      <data type="nonNegativeInteger"/>
+    </element>
+  </define>
+
+  <define name="decay">
+    <element name="decay">
+      <data type="integer"/>
+    </element>
+  </define>
+
+  <!-- begin section for commodities -->
+  <define name="commodity">
+    <element name="commodity">
+
+      <element name="name">
+        <text/>
+      </element>
+
+    </element>
+    <optional>
+      <element name="enrichment">
+        <data type="double"/>
+      </element>
+    </optional>
+  </define>
+  <!-- end section for commodities -->
+
+  <!-- begin section for markets-->
+  <define name="market">
+    <element name="market">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="mktcommodity">
+        <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        @MKT_REFS@
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+  <!-- end section for markets-->
+
+  <!-- begin section for facilities -->
+  <define name="facility">
+    <element name="facility">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="model">
+      <choice>
+        @FAC_REFS@
+      </choice>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="facilitycatalog">
+    <element name="facilitycatalog">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="namespace">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+
+  <define name="capacity">
+      <element name="capacity">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="commodprice">
+      <element name="commodprice">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="componenttype">
+      <element name="componenttype">
+        <data type="string"/>
+      </element>
+  </define>
+
+  <define name="incommodity">
+      <element name="incommodity">
+          <text/>
+      </element>
+  </define>
+
+  <define name="innerradius">
+      <element name="innerradius">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="inrecipe">
+      <element name="inrecipe">
+          <text/>
+      </element>
+  </define>
+
+  <define name="inventorysize">
+      <element name="inventorysize">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="lifetime">
+      <element name="lifetime">
+        <data type="nonNegativeInteger"/>
+      </element>
+  </define>
+
+  <define name="name">
+      <element name="name">
+        <data type="string"/>
+      </element>
+  </define>
+
+  <define name="outcommodity">
+      <element name="outcommodity">
+         <text/>
+      </element>
+  </define>
+
+  <define name="outerradius">
+      <element name="outerradius">
+        <data type="double"/>
+      </element>
+  </define>
+
+  <define name="outrecipe">
+      <element name="outrecipe">
+          <text/>
+      </element>
+  </define>
+
+  <define name="startOperMonth">
+      <element name="startOperMonth">
+        <data type="nonNegativeInteger"/>
+      </element>
+  </define>
+
+  <define name="startOperYear">
+      <element name="startOperYear">
+        <data type="nonNegativeInteger"/>
+      </element>
+  </define>
+
+  <define name="tailsassay">
+      <element name="tailsassay">
+        <data type="double"/>
+      </element>
+  </define>
+
+
+  <!-- end section for facilities -->
+
+  <!-- begin section for regions -->
+  <define name="region">
+    <element name="region">
+
+      <element name="name">
+         <text/>
+      </element>
+
+      <oneOrMore>
+      <element name="allowedfacility">
+          <text/>
+      </element>
+      </oneOrMore>
+
+      <element name="model">
+      <choice>
+        @REG_REFS@
+      </choice>
+      </element>
+
+      <oneOrMore>
+      <ref name="institution" />
+      </oneOrMore>
+
+    </element>
+  </define>
+
+  <!-- end section for regions -->
+
+  <!-- begin section for institutions -->
+  <define name="institution">
+    <element name="institution">
+      <element name="name">
+         <text/>
+      </element>
+      <element name="model">
+      <choice>
+        @INST_REFS@
+      </choice>
+      </element>
+    </element>
+  </define>
+
+  <!-- end section for institutions -->
+
+  <!-- begin section for converters -->
+  <define name="converter">
+    <element name="converter">
+      <element name="name">
+         <text/>
+      </element>
+      <element name="model">
+      <choice>
+        @CONV_REFS@
+      </choice>
+      </element>
+    </element>
+  </define>
+
+  <!-- end section for converters -->
+
+  <!-- begin section for recipes -->
+  <define name="recipe">
+    <element name="recipe">
+
+      <element name="name">
+        <text/>
+      </element>
+
+      <element name="basis">
+        <text/>
+      </element>
+
+      <element name="unit">
+        <text/>
+      </element>
+
+      <element name="total">
+        <text/>
+      </element>
+
+      <oneOrMore>
+      <element name="isotope">
+        <element name="id">
+          <text/>
+        </element>
+        <element name="comp">
+          <text/>
+        </element>
+      </element>
+      </oneOrMore>
+
+    </element>
+  </define>
+
+  <define name="recipebook">
+    <element name="recipebook">
+
+      <element name="filename">
+        <text/>
+      </element>
+
+      <element name="namespace">
+        <text/>
+      </element>
+
+      <element name="format">
+        <text/>
+      </element>
+
+    </element>
+  </define>
+  <!-- end section for recipes -->
+
+</grammar>
+
+
+    
