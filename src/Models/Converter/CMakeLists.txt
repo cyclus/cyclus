@@ -9,4 +9,3 @@ endforeach(dir)
 
 
 SET(ModelTestSource ${ModelTestSource} ${ConverterTestSource} PARENT_SCOPE)
-

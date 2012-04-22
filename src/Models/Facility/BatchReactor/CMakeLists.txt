@@ -10,3 +10,14 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/BatchReactor/BatchReactor.rng
 ${CMAKE_CURRENT_BINARY_DIR}/BatchReactor.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES 
+  "<include href="../Models/Facility/BatchReactor/BatchReactor.rng"/>
+  @RNG_INCLUDES@")
+SET(FAC_REFS 
+  "<ref name="BatchReactor"/>
+  @CONV_REFS@")
+CONFIGURE_FILE(
+  ${PROJECT_BINARY_DIR}/Data/cyclus.rng ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY
+  )

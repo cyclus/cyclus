@@ -13,3 +13,4 @@ foreach(dir ${all_valid_subdirs})
 endforeach(dir)
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
+SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE )
