@@ -12,12 +12,9 @@ ${CMAKE_CURRENT_BINARY_DIR}/SWUeUF6Converter.rng
 COPYONLY
 )
 
-SET(RNG_INCLUDES 
-  "<include href="../Models/Converter/SWUeUF6Converter/SWUeUF6Converter.rng"/>
-  @RNG_INCLUDES@")
-SET(CONV_REFS 
-  "<ref name="SWUeUF6Converter"/>
-  @CONV_REFS@")
-CONFIGURE_FILE(
-  ${PROJECT_BINARY_DIR}/Data/cyclus.rng ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY
-  )
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Converter/SWUeUF6Converter/SWUeUF6Converter.rng'/>"
+  PARENT_SCOPE)
+SET(CONV_REFS ${CONV_REFS}
+  "<ref name='SWUeUF6Converter'/>"
+  PARENT_SCOPE)

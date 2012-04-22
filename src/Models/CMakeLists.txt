@@ -13,4 +13,5 @@ foreach(dir ${all_valid_subdirs})
 endforeach(dir)
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
-SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE )
+CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
+  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)

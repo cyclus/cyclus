@@ -10,3 +10,8 @@ endforeach(dir)
 
 
 SET(ModelTestSource ${ModelTestSource} ${StubTestSource} PARENT_SCOPE)
+#SET(STUB_REFS "")
+#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
+#  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
+SET(STUB_REFS ${STUB_REFS} PARENT_SCOPE)
+SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE)

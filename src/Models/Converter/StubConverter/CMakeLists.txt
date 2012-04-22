@@ -13,12 +13,9 @@ COPYONLY
 )
 
 
-SET(RNG_INCLUDES 
-  "<include href="../Models/Converter/StubConverter/StubConverter.rng"/>
-  @RNG_INCLUDES@")
-SET(CONV_REFS 
-  "<ref name="StubConverter"/>
-  @CONV_REFS@")
-CONFIGURE_FILE(
-  ${PROJECT_BINARY_DIR}/Data/cyclus.rng ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY
-  )
+SET(RNG_INCLUDES  ${RNG_INCLUDES}
+  "<include href='../Models/Converter/StubConverter/StubConverter.rng'/>"
+  PARENT_SCOPE)
+SET(CONV_REFS ${CONV_REFS}
+  "<ref name='StubConverter'/>"
+  PARENT_SCOPE)

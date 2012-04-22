@@ -10,3 +10,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/SeparationsMatrixFacility/SeparationsMatrix
 ${CMAKE_CURRENT_BINARY_DIR}/SeparationsMatrixFacility.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Facility/SeparationsMatrixFacility/SeparationsMatrixFacility.rng'/>"
+  PARENT_SCOPE)
+SET(FAC_REFS ${FAC_REFS} 
+  "<ref name='SeparationsMatrixFacility'/>"
+  PARENT_SCOPE)

@@ -11,12 +11,9 @@ ${CMAKE_CURRENT_BINARY_DIR}/ConditioningFacility.rng
 COPYONLY
 )
 
-SET(RNG_INCLUDES 
-  "<include href="../Models/Facility/ConditioningFacility/ConditioningFacility.rng"/>
-  @RNG_INCLUDES@")
-SET(FAC_REFS 
-  "<ref name="ConditioningFacility"/>
-  @CONV_REFS@")
-CONFIGURE_FILE(
-  ${PROJECT_BINARY_DIR}/Data/cyclus.rng ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY
-  )
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Facility/ConditioningFacility/ConditioningFacility.rng'/>"
+  PARENT_SCOPE)
+SET(FAC_REFS ${FAC_REFS}
+  "<ref name='ConditioningFacility'/>"
+  PARENT_SCOPE)

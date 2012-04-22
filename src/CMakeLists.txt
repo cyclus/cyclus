@@ -38,8 +38,8 @@ COPYONLY
 )
 
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Config/cyclus.rng
-${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
+${CYCLUS_SOURCE_DIR}/Config/cyclus.rng.in
+${PROJECT_BINARY_DIR}/Data/cyclus.rng
 COPYONLY
 )
 

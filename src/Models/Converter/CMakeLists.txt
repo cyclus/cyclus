@@ -7,5 +7,7 @@ foreach(dir ${all_valid_subdirs})
     endif()
 endforeach(dir)
 
-
 SET(ModelTestSource ${ModelTestSource} ${ConverterTestSource} PARENT_SCOPE)
+#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
+SET(CONV_REFS ${CONV_REFS} PARENT_SCOPE)
+SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE)
