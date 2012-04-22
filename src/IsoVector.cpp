@@ -19,9 +19,13 @@ using namespace std;
 // Static variables to be initialized.
 int IsoVector::nextStateID_ = 0;
 RecipeMap* IsoVector::recipes_ = new RecipeMap();
+CompMap* IsoVector::init_comp_ = new CompMap();
 DecayChainMap* IsoVector::decay_chains_ = new DecayChainMap();
 DecayTimesMap* IsoVector::decay_times_ = new DecayTimesMap();
 table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
+
+// memory for new isovectors to point to
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 IsoVector::IsoVector() {init();}
@@ -39,7 +43,11 @@ IsoVector::IsoVector(CompMap* initial_comp, bool atom) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void IsoVector::init() {}
+void IsoVector::init() {
+  composition_ = new composition(-1,init_comp_,1,1);
+  decay_parent_composition_ = new composition();
+  decay_parent_composition_->mass_fractions_ = init_comp_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool recipeLogged(std::string name) {
@@ -75,8 +83,8 @@ void IsoVector::load_recipe(xmlNodePtr cur) {
   CompMap* mass_fractions = new CompMap();
 
   // get general values from xml
-  string recipe_name = XMLinput->get_xpath_content(cur,"name");
-  string comp_type = XMLinput->get_xpath_content(cur,"basis");
+  string name = XMLinput->get_xpath_content(cur,"name");
+  string basis = XMLinput->get_xpath_content(cur,"basis");
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
   // get values needed for composition
@@ -89,10 +97,10 @@ void IsoVector::load_recipe(xmlNodePtr cur) {
     key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
     value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
 
-    if ("mass" == comp_type) {
+    if (basis == "mass") {
       atom_count += value * MT->gramsPerMol(int tope);
     }
-    else if ("atom" == comp_type) {
+    else if (basis == "atom") {
       atom_count += value;
       value = value / MT->gramsPerMol(int tope);
     }
@@ -112,7 +120,7 @@ void IsoVector::load_recipe(xmlNodePtr cur) {
   comp->atom_normalizer = atom_count;
 
   // log this composition (static members and database)
-  logRecipe(recipe_name,composition);
+  logRecipe(name,composition);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -151,7 +159,7 @@ void IsoVector::load_recipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector* IsoVector::recipe(std::string name) { 
-  if (!recipeLogged(name) ) {
+  if ( !recipeLogged(name) ) {
     throw CycIndexException("Recipe '" + name + "' does not exist.");
   }
   return new IsoVector((*recipes_)[name]->mass_fractions);

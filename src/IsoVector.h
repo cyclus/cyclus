@@ -52,6 +52,9 @@ struct composition {
   CompMap* mass_fractions;
   double mass_normalizer;
   double atom_normalizer;
+  composition(CompMap* fracs) : ID(-1), mass_normalizer(1), atom_normalizer(1) {
+    mass_fractions = fracs;
+  }
 } composition;
 /* --- */
 
@@ -283,6 +286,11 @@ public:
   /* --- */
 
   /* --- Global Interaction  --- */
+  /**
+     a memory space for new iso vectors to point to
+   */
+  static CompMap* init_comp_;
+
   /**
      a container of recipes 
    */
