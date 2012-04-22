@@ -24,43 +24,95 @@ DecayChainMap* IsoVector::decay_chains_ = new DecayChainMap();
 DecayTimesMap* IsoVector::decay_times_ = new DecayTimesMap();
 table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
 
-// memory for new isovectors to point to
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IsoVector::IsoVector() {
+  init();
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IsoVector::IsoVector(composition* comp) {
+  init();
+  setComposition(comp);
+}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-IsoVector::IsoVector() {init();}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(CompMap* initial_comp) {
   init();
-  validateComposition();
+  setComposition(initial_comp);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(CompMap* initial_comp, bool atom) {
   init();
+  if (atom) {
+    massify(initial_comp);
+  }
+  setComposition(initial_comp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::init() {
+  composition_ = new composition(-1,init_comp_,1,1);
+  decay_parent_composition_ = new composition(-1,init_comp_,1,1);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::massify(CompMap* comp) {
+  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+    ci->second *= MT->gramsPerMol(ci->first);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::setComposition(CompMap* comp) {
+  // comp guaranteed to be mass basis
+  pair<double,double> normalizers = getNormalizers(comp);  
+  composition* c = new composition(comp,normalizers.first,normalizers.second);
+  setComposition(c); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::setComposition(composition* c) {
+  minimizeComposition(c); // c guaranteed to be mass basis
+  comosition_ = c;
   validateComposition();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void IsoVector::init() {
-  composition_ = new composition(-1,init_comp_,1,1);
-  decay_parent_composition_ = new composition();
-  decay_parent_composition_->mass_fractions_ = init_comp_;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::pair<double,double> IsoVector::getNormalizers(CompMap* comp) {
+  double mass_norm = 0, atom_norm = 0;
+  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+    double value = ci->second;
+    mass_norm += value;
+    atom_norm += value * MT->gramsPerMol(ci->first);
+  }
+  pair<double,double> normalizers(mass_norm,atom_norm);
+  return normalizers;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::minimizeComposition(composition* c) {
+  CompMap* fractions = c->mass_fractions;
+  for (CompMap::iterator ci = fractions->begin(); ci != fractions->end(); 
+       ci++) {
+    ci->second /= c->mass_normalizer;
+  }
+  c->atom_normalizer /= c->mass_normalizer;
+  c->mass_normalizer = 1.0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool recipeLogged(std::string name) {
   return ( !(recipes_->count(name) == 0) ); // true iff name in recipes_
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::logRecipe(composition* recipe) {
     recipe->ID = nextStateID_++;
     addToTable(recipe);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::logRecipe(std::string name, composition* recipe) {
   if ( !recipeLogged(name) ) {
     // log this with the database
@@ -77,7 +129,7 @@ void IsoVector::logRecipe(std::string name, composition* recipe) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::load_recipe(xmlNodePtr cur) {
   // initialize comp map
   CompMap* mass_fractions = new CompMap();
@@ -114,16 +166,13 @@ void IsoVector::load_recipe(xmlNodePtr cur) {
   }
   
   // make a new composition
-  composition* comp = new composition();
-  comp->mass_fractions = mass_fractions;
-  comp->mass_normalizer = mass_count;
-  comp->atom_normalizer = atom_count;
+  composition* comp = new composition(mass_fractions,mass_count,atom_count);
 
   // log this composition (static members and database)
-  logRecipe(name,composition);
+  logRecipe(name,comp);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::load_recipes() {
   // load recipes from file
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
@@ -150,7 +199,8 @@ void IsoVector::load_recipes() {
       XMLinput->load_recipebook(filename);  // load recipe book
     } 
     else {
-      throw CycRangeException(format + "is not a supported recipebook format.");
+      throw 
+        CycRangeException(format + "is not a supported recipebook format.");
     }
     XMLinput->stripCurNS();
   }

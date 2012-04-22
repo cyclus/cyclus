@@ -52,7 +52,10 @@ struct composition {
   CompMap* mass_fractions;
   double mass_normalizer;
   double atom_normalizer;
-  composition(CompMap* fracs) : ID(-1), mass_normalizer(1), atom_normalizer(1) {
+  composition(CompMap* fracs, double mass_norm, double atom_norm) {
+    ID = 0;
+    mass_normalizer = mass_norm;
+    atom_normalizer = atom_norm;
     mass_fractions = fracs;
   }
 } composition;
