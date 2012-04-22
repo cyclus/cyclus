@@ -198,8 +198,11 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${Test
    DESTINATION bin
    COMPONENT application)
  install(FILES 
+   Input/cyclus.rng
    DESTINATION include
-   COMPONENT headers)
+   COMPONENT data)
+
+set(CPACK_COMPONENTS_ALL cyclus libraries data)
 
 # Here's where we package it with CPack
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
