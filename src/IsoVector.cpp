@@ -17,74 +17,107 @@
 using namespace std;
 
 // Static variables to be initialized.
-int IsoVector::nextID_ = 0;
 int IsoVector::nextStateID_ = 0;
-map<string, IsoVector*> IsoVector::recipes_;
-// Database table for isotopic states
+RecipeMap* IsoVector::recipes_ = new RecipeMap();
+DecayChainMap* IsoVector::decay_chains_ = new DecayChainMap();
+DecayTimesMap* IsoVector::decay_times_ = new DecayTimesMap();
 table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-IsoVector::IsoVector() {
-  ID_ = nextID_++;
-  decayTime_ = 0;
-  mass_out_of_date_ = true;
-  total_mass_ = 0;
-  loggedComps_ = new std::map<int, int>();
-};
+IsoVector::IsoVector() {init();}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-IsoVector::IsoVector(CompMap initial_comp) {
-  ID_ = nextID_++;
-  decayTime_ = 0;
-  atom_comp_ = initial_comp;
-  total_mass_ = 0;
-  mass_out_of_date_ = true;
-  loggedComps_ = new std::map<int, int>();
-
+IsoVector::IsoVector(CompMap* initial_comp) {
+  init();
   validateComposition();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-IsoVector::IsoVector(xmlNodePtr cur) {
-  ID_ = nextID_++;
-  decayTime_ = 0;
-  total_mass_ = 0;
-  mass_out_of_date_ = true;
-  loggedComps_ = new std::map<int, int>();
+IsoVector::IsoVector(CompMap* initial_comp, bool atom) {
+  init();
+  validateComposition();
+}
 
-  string recipe_name = XMLinput->get_xpath_content(cur,"name");
-  string comp_type = XMLinput->get_xpath_content(cur,"basis");
-  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void IsoVector::init() {}
 
-  double atom_count, grams_per_atom;
-  int isotope;
-  xmlNodePtr iso_node;
-  for (int i = 0; i < isotopes->nodeNr; i++) {
-    iso_node = isotopes->nodeTab[i];
-    isotope = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+bool recipeLogged(std::string name) {
+  return ( !(recipes_->count(name) == 0) ); // true iff name in recipes_
+}
 
-    grams_per_atom = MT->getMassInGrams(isotope);
-    atom_count = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void IsoVector::logRecipe(composition* recipe) {
+    recipe->ID = nextStateID_++;
+    addToTable(recipe);
+}
 
-    if ( "atom" != comp_type) {
-      atom_count *= grams_per_atom;
-    }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void IsoVector::logRecipe(std::string name, composition* recipe) {
+  if ( !recipeLogged(name) ) {
+    // log this with the database
+    logRecipe(recipe);
 
-    atom_comp_[isotope] = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
-  }
+    // initialize containers
+    set<int>* times = new set<int>();
+    map<int, composition*> daughters = new map<int,composition*>();
 
-  double total_qty = strtol(XMLinput->get_xpath_content(cur,"total"), NULL, 10);
-  if ("atom" == comp_type) {
-    setAtomCount(total_qty);
-  } else {
-    setMass(total_qty);
+    // assign containers
+    (*recipes_)[name] = recipe;
+    (*decay_times_)[recipe] = times;
+    (*decay_chains_)[recipe] = daughters;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void IsoVector::load_recipes() {
+void IsoVector::load_recipe(xmlNodePtr cur) {
+  // initialize comp map
+  CompMap* mass_fractions = new CompMap();
 
-  /// load recipes from file
+  // get general values from xml
+  string recipe_name = XMLinput->get_xpath_content(cur,"name");
+  string comp_type = XMLinput->get_xpath_content(cur,"basis");
+  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+
+  // get values needed for composition
+  double value;
+  double mass_count = 0, atom_count = 0;
+  int key;
+  xmlNodePtr iso_node;
+  for (int i = 0; i < isotopes->nodeNr; i++) {
+    iso_node = isotopes->nodeTab[i];
+    key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
+    value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
+
+    if ("mass" == comp_type) {
+      atom_count += value * MT->gramsPerMol(int tope);
+    }
+    else if ("atom" == comp_type) {
+      atom_count += value;
+      value = value / MT->gramsPerMol(int tope);
+    }
+    else {
+      throw CycIOException(comp_type + " comp type is not 'mass' or 'atom'.");
+    }
+
+    // update our mass-related values
+    mass_count += value;
+    (*mass_fractions)[isotope] = value;
+  }
+  
+  // make a new composition
+  composition* comp = new composition();
+  comp->mass_fractions = mass_fractions;
+  comp->mass_normalizer = mass_count;
+  comp->atom_normalizer = atom_count;
+
+  // log this composition (static members and database)
+  logRecipe(recipe_name,composition);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void IsoVector::load_recipes() {
+  // load recipes from file
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
   string name;
   CLOG(LEV_DEBUG2) << "loading recipes {";
@@ -92,13 +125,12 @@ void IsoVector::load_recipes() {
     name = XMLinput->getCurNS() + 
                   XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    recipes_[name] = new IsoVector(nodes->nodeTab[i]);
+    load_recipe(nodes->nodeTab[i]); // load recipe
   }
 
-  /// load recipes from databases
+  // load recipes from databases
   nodes = XMLinput->get_xpath_elements("/*/recipebook");
   string filename, ns, format;
-
   for (int i = 0; i < nodes->nodeNr; i++) {
     filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
     ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
@@ -107,8 +139,9 @@ void IsoVector::load_recipes() {
 
     if ("xml" == format) {
       CLOG(LEV_DEBUG2) << "going into a recipe book...";
-      XMLinput->load_recipebook(filename);
-    } else {
+      XMLinput->load_recipebook(filename);  // load recipe book
+    } 
+    else {
       throw CycRangeException(format + "is not a supported recipebook format.");
     }
     XMLinput->stripCurNS();
@@ -117,19 +150,19 @@ void IsoVector::load_recipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::recipe(std::string name) { 
-  if (recipes_.count(name) == 0) {
+IsoVector* IsoVector::recipe(std::string name) { 
+  if (!recipeLogged(name) ) {
     throw CycIndexException("Recipe '" + name + "' does not exist.");
   }
-  return *(recipes_[name]);
+  return new IsoVector((*recipes_)[name]->mass_fractions);
 } 
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::printRecipes() {
   CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes.";
   CLOG(LEV_INFO2) << "Recipe list {";
-  for (map<string, IsoVector*>::iterator recipe=recipes_.begin();
-      recipe != recipes_.end();
+  for (map<string, IsoVector*>::iterator recipe=recipes_->begin();
+      recipe != recipes_->end();
       recipe++){
     CLOG(LEV_INFO2) << "Recipe name=" << recipe->first;
     recipe->second->print();
@@ -145,36 +178,35 @@ void IsoVector::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string IsoVector::detail() {
   stringstream ss;
-  ss << "mass = " << mass() << " kg";
-  CLOG(LEV_INFO3) << ss.str();
-
   vector<string>::iterator entry;
-  vector<string> entries = compStrings();
-  for (entry = entries.begin(); entry != entries.end(); entry++) {
+  vector<string>* entries = compStrings();
+  for (entry = entries->begin(); entry != entries->end(); entry++) {
     CLOG(LEV_INFO3) << *entry;
   }
+  delete entries;
   return "";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string> IsoVector::compStrings() {
+std::vector<std::string>* IsoVector::compStrings() {
   CompMap::iterator entry;
   int isotope;
   stringstream ss;
-  vector<string> comp_strings;
-  for (entry = atom_comp_.begin(); entry != atom_comp_.end(); entry++) {
+  vector<string>* comp_strings = new vector<string>();
+  CompMap* comp = mass_comp();
+  for (entry = comp->begin(); entry != comp->end(); entry++) {
     ss.str("");
     isotope = entry->first;
     if (mass(isotope) < EPS_KG) {continue;}
     ss << isotope << ": " << mass(isotope) << " kg";
-    comp_strings.push_back(ss.str());
+    comp_strings->push_back(ss.str());
   }
   return comp_strings;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::recipeCount() { 
-  return IsoVector::recipes_.size(); 
+  return IsoVector::recipes_->size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -243,30 +275,26 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::operator== (IsoVector rhs_vector) {
   int isotope;
-  double mass_diff;
-  CompMap this_comp(atom_comp_);
-  CompMap rhs_comp = rhs_vector.atom_comp_;
-
-  CompMap::iterator rhs_iter, this_iter;
-  for (rhs_iter = rhs_comp.begin(); rhs_iter != rhs_comp.end(); rhs_iter++) {
-    isotope = rhs_iter->first;
-    mass_diff = fabs(rhs_vector.mass(isotope) - mass(isotope));
-    if (mass_diff > EPS_KG) {
-      return false;
-    }
-  }
-
-  for (this_iter = this_comp.begin(); this_iter != this_comp.end(); this_iter++) {
-    isotope = this_iter->first;
-    mass_diff = fabs(rhs_vector.mass(isotope) - mass(isotope));
-    if (mass_diff > EPS_KG) {
-      return false;
-    }
-  }
-
-  if (fabs(rhs_vector.mass() - mass()) > EPS_KG) {
+  double diff;
+  CompMap* this_comp = mass_comp();
+  CompMap* rhs_comp = rhs_vector.mass_comp();
+  
+  if (this_comp->size() != rhs_comp->size() ) {
     return false;
   }
+
+  CompMap::iterator rhs_iter;
+  for (rhs_iter = rhs_comp->begin(); rhs_iter != rhs_comp->end(); rhs_iter++) {
+    isotope = rhs_iter->first;
+    if (this_comp->count(isotope) == 0) {
+      return false;
+    }
+    diff = fabs(massFraction(isotope) - rhs_vector.massFraction(isotope));
+    if (diff > EPS_FRACTION) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -283,218 +311,44 @@ int IsoVector::getMassNum(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::mass() {
-  if (mass_out_of_date_) {
-    total_mass_ = 0;
-    int isotope;
-
-    map<int, double>::const_iterator iter = atom_comp_.begin();
-    while (iter != atom_comp_.end()) {
-      isotope = iter->first;
-      total_mass_ += mass(isotope);
-      iter++;
-    }
-    mass_out_of_date_ = false;
-  }
-
-  return total_mass_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::mass(Iso tope) {
-  validateIsotopeNumber(tope);
-
-  int grams_per_kg = 1000;
-  double grams_per_mole = MT->getMassInGrams(tope);
-
-  return atom_comp_[tope] * grams_per_mole / grams_per_kg;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setMass(double new_mass) {
-  int isotope;
-  double curr_mass = mass();
-
-  if (curr_mass < EPS_KG) {
-    string err_msg = "Cannot set mass for IsoVector with ";
-    err_msg += "undefined (zero mass) composition.";
-    throw CycRangeException(err_msg);
-  } else if (new_mass < -1.0 * EPS_KG) {
-    string err_msg = "Cannot set mass to a negative value.";
-    throw CycRangeException(err_msg);
-  }
-
-  double ratio = new_mass / curr_mass;
-
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
-    iter++;
-  }
-  mass_out_of_date_ = false;
-  total_mass_ = new_mass;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setMass(Iso tope, double new_mass) {
-  validateIsotopeNumber(tope);
-
-  if (new_mass < -1.0 * EPS_KG) {
-    string err_msg = "Cannot set isotope mass to a negative value.";
-    throw CycRangeException(err_msg);
-  }
-
-  if (!mass_out_of_date_) {
-    total_mass_ += new_mass - mass(tope);
-  }
-
-  int grams_per_kg = 1000;
-  double grams_per_atom = MT->getMassInGrams(tope);
-  atom_comp_[tope] = new_mass * grams_per_kg / grams_per_atom;
-
-  loggedComps_ = new std::map<int, int>();
-  decayTime_ = 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::multBy(double factor) {
-  int isotope;
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    atom_comp_[isotope] = atom_comp_[isotope] * factor;
-    iter++;
-  }
-
-  if (!mass_out_of_date_) {
-    total_mass_ *= factor;
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::atomCount() {
-  double count = 0;
-  int isotope;
-
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    count += atomCount(isotope);
-    iter++;
-  }
-  return count;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::atomCount(Iso tope) {
-  validateIsotopeNumber(tope);
-
-  return atom_comp_[tope];
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setAtomCount(double new_count) {
-  double curr_mass = mass();
-
-  if (curr_mass < EPS_KG) {
-    string err_msg = "Cannot set atom count for IsoVector with ";
-    err_msg += "undefined (zero mass) composition.";
-    throw CycRangeException(err_msg);
-  } else if (new_count < 0.0) {
-    string err_msg = "Cannot set atom count to a negative value.";
-    throw CycRangeException(err_msg);
-  }
-
-  int isotope;
-  double ratio = new_count / atomCount();
-
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-    isotope = iter->first;
-    atom_comp_[isotope] = atom_comp_[isotope] * ratio;
-    iter++;
-  }
-
-  mass_out_of_date_ = true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::setAtomCount(Iso tope, double new_count) {
-  validateIsotopeNumber(tope);
-  double grams_per_kg = 1000;
-  if (new_count * MT->getMassInGrams(tope) / grams_per_kg < -1 * EPS_KG) {
-    string err_msg = "Cannot set isotope atom count to a negative value.";
-    throw CycRangeException(err_msg);
-  }
-
-  atom_comp_[tope] = new_count;
-
-  mass_out_of_date_ = true;
-  loggedComps_ = new std::map<int, int>();
-  decayTime_ = 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::eltMass(int elt) {
-
-  double elt_mass = 0;
-  int isotope;
-  int atomic_num;
-
-  map<int, double>::const_iterator iter = atom_comp_.begin();
-  while (iter != atom_comp_.end()) {
-
-    isotope = iter->first;
-    atomic_num = IsoVector::getAtomicNum(isotope);
-
-    if (atomic_num == elt) {
-      elt_mass += mass(isotope);
-    }
-    iter++;
-  }
-
-  return elt_mass;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::executeDecay(double time_change) {
   double months_per_year = 12;
   double years = time_change / months_per_year;
 
-
   DecayHandler handler;
-  handler.setComp(atom_comp_);
+  handler.setComp(composition_->mass_fractions);
   handler.decay(years);
   atom_comp_ = handler.compAsCompMap();
   decayTime_ += time_change;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CompMap IsoVector::comp() {return atom_comp_;}
+CompMap* IsoVector::mass_comp() {
+  return composition_->mass_fractions_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::validateComposition() {
-  int grams_per_kg = 1000;
   int tope;
-  double num_atoms, atoms_eps;
-
-  CompMap::iterator comp_iter;
-  for (comp_iter = atom_comp_.begin();
-       comp_iter != atom_comp_.end();
-       comp_iter++) {
-
+  double fraction;
+  CompMap* fractions = composition_->mass_fractions;
+  for (CompMap::iterator comp_iter = fractions->begin(); 
+       comp_iter != fractions->end(); comp_iter++) {
+    // isotope number
     tope = comp_iter->first;
-    num_atoms = comp_iter->second;
-
     validateIsotopeNumber(tope);
+    // mass fraction
+    fraction = comp_iter->second;
+    validateFraction(fraction);
+  }
+}
 
-    atoms_eps =  EPS_KG * grams_per_kg / MT->getMassInGrams(tope); 
-    if (num_atoms < -1 * atoms_eps) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::validateFraction(double fraction) {
+    if (fraction < 0.0) {
       string err_msg = "Composition has negative quantity for an isotope.";
       throw CycRangeException(err_msg);
     }
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -511,30 +365,39 @@ void IsoVector::validateIsotopeNumber(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::mass_normalizer() {
+  return composition_->mass_normalizer;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::massFraction(Iso tope) {
+  double value = (*composition_->mass_fractions)[tope];
+  return value / composition_->mass_normalizer;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::atomFraction(Iso tope) {
+  double value = (*composition_->mass_fractions)[tope];
+  return value * MT->gramsPerMol(int tope) / composition_->atom_normalizer;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::isZero(Iso tope) {
   validateIsotopeNumber(tope);
-
-  if (atom_comp_.count(tope) == 0) {
+  if (composition_->mass_fractions->count(tope) == 0) {
     return true;
   }
-
-  int grams_per_kg = 1000;
-  double grams_per_mole = MT->getMassInGrams(tope) ; 
-
-  return (atom_comp_[tope] * grams_per_mole / grams_per_kg < EPS_KG);
+  else {
+    double fraction = atomFraction(tope);
+    return (fraction < EPS_PERCENT);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::recordState() {
-  // check loggedComps_ here
-  if (loggedComps_->count(decayTime_) == 0) {
-    // this is a new composition, log it accordingly
-    stateID_ = nextStateID_++;
-    (*loggedComps_)[decayTime_] = stateID_;
-    IsoVector::addToTable();
-    return;
+  if (parent_ == 0) {
+    logRecipe(composition_);
   }
-  stateID_ = (*loggedComps_)[decayTime_];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -555,19 +418,20 @@ void IsoVector::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::addToTable(){
+void IsoVector::addToTable(composition* recipe){
   // if we haven't logged a composition yet, define the table
-  if ( !iso_table->defined() )
+  if ( !iso_table->defined() ) {
     IsoVector::define_table();
+  }
 
   // make a row - stateid first then isotopics
   // declare data
-  data an_id( this->stateID() );
+  data an_id(recipe->ID);
   // declare entries
   entry id("ID",an_id);
 
   // now for the composition isotopics
-  CompMap* comp = &atom_comp_;
+  CompMap* comp = recipe->mass_fractions_;
   int i = 0;
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
