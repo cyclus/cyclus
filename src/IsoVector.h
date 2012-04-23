@@ -58,7 +58,10 @@ struct composition {
     atom_normalizer = atom_norm;
     mass_fractions = fracs;
   }
-} composition;
+  ~composition() {
+    delete mass_fractions;
+  }
+};
 /* --- */
 
 /**
@@ -79,7 +82,7 @@ typedef std::map<int, composition*> DaughterMap;
 /**
    map of recipe composition to its decayed daughters
  */
-typedef std::map<composition*, DaughterMap> DecayChainMap; 
+typedef std::map<composition*, DaughterMap*> DecayChainMap; 
 /* -- */
 
 /** 
@@ -170,14 +173,29 @@ public:
   CompMap* mass_comp();
 
   /**
+     returns the mass normalizer for the IsoVector's composition_
+   */
+  double mass_normalizer();
+
+  /**
      Return the mass fraction of an isotope in the composition
    */
   double massFraction(Iso tope);
 
   /**
+     Return the mass fraction of an isotope in a composition
+   */
+  static double massFraction(Iso tope, composition* c);
+
+  /**
      returns the atom fraction of an isotope in the composition
    */
   double atomFraction(Iso tope);
+
+  /**
+     Return the mass fraction of an isotope in a composition
+   */
+  static double atomFraction(Iso tope, composition* c);
 
   /**
      Returns true if the given isotope's number density is less than the 
@@ -262,6 +280,11 @@ public:
   static void printRecipes();
 
   /**
+     print the details of a composition 
+   */
+  static void print(composition* c);
+
+  /**
      print the details of this IsoVector 
    */
   void print();
@@ -281,18 +304,24 @@ public:
   void massify(CompMap* comp);
 
   /**
+     set's the composition for this isovector
    */    
   void setComposition(composition* c);
 
   /**
+     constructs a composition out of comp
+     and calls setComposition()
    */    
   void setComposition(CompMap* comp);
 
   /**
+     determines the mass/atom normalizers for a composition
    */    
   std::pair<double,double> getNormalizers(CompMap* comp);
 
   /**
+     adjusts the composition such that the mass normalizer
+     is equal to unity
    */    
   void minimizeComposition(composition* c);
   /* --- */
@@ -343,8 +372,9 @@ public:
 
   /* --- Isotope Wikipedia  --- */
   /**
-     calls validateIsotopeNumber() and validateFraction() for each isotope and
-     fraction value in this IsoVector's composition
+     calls validateIsotopeNumber() and validateFraction() 
+     for each isotope and fraction value in this IsoVector's 
+     composition
    */
   void validateComposition();
 
@@ -366,12 +396,12 @@ public:
      return a pointer to a vector of the composition as strings 
      @return the composition string vector 
    */
-  std::vector<std::string>* compStrings();
+  static std::vector<std::string>* compStrings(composition* c);
 
   /**
      used by print() to 'hide' print code when logging is not desired 
    */
-  std::string detail();
+  static std::string detail(composition* c);
   /* --- */
  
 
@@ -382,15 +412,15 @@ public:
    */
   static table_ptr iso_table;
   
-  /**
-     return the agent table's primary key 
-   */
-  primary_key_ref pkref(); // { return pkref_;}
+  /* /\** */
+  /*    return the agent table's primary key  */
+  /*  *\/ */
+  /* primary_key_ref pkref(); */
   
   /**
      the current state id 
    */
-  int stateID(); // {return stateID_;}
+  int stateID();
 
   /**
      returns true if a new state was recorded, false if already in db
@@ -406,12 +436,12 @@ public:
   /**
      Add an isotopic state to the table 
    */
-  void addToTable(composition* comp);
+  static void addToTable(composition* comp);
 
-  /**
-     Store information about the transactions's primary key 
-   */
-  primary_key_ref pkref_;
+  /* /\** */
+  /*    Store information about the transactions's primary key  */
+  /*  *\/ */
+  /* primary_key_ref pkref_; */
  /* -- */ 
 };
 
