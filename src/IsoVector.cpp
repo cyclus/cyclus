@@ -51,9 +51,17 @@ IsoVector::IsoVector(CompMap* initial_comp, bool atom) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IsoVector::~IsoVector() {
+  if(composition_ != init_comp_ && ID == 0) {
+    delete composition_->mass_fractions;
+    delete composition_;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::init() {
-  composition_ = new composition(-1,init_comp_,1,1);
-  decay_parent_composition_ = new composition(-1,init_comp_,1,1);
+  composition_ = new composition(init_comp_,1,1);
+  decay_parent_composition_ = new composition(init_comp_,1,1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -64,18 +72,18 @@ void IsoVector::massify(CompMap* comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::setComposition(composition* c) {
+  minimizeComposition(c); // c guaranteed to be mass basis
+  composition_ = c;
+  validateComposition();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::setComposition(CompMap* comp) {
   // comp guaranteed to be mass basis
   pair<double,double> normalizers = getNormalizers(comp);  
   composition* c = new composition(comp,normalizers.first,normalizers.second);
   setComposition(c); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::setComposition(composition* c) {
-  minimizeComposition(c); // c guaranteed to be mass basis
-  comosition_ = c;
-  validateComposition();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -99,6 +107,95 @@ void IsoVector::minimizeComposition(composition* c) {
   }
   c->atom_normalizer /= c->mass_normalizer;
   c->mass_normalizer = 1.0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
+  int isotope;
+  double rhs_atoms;
+  CompMap sum_comp(atom_comp_);
+  CompMap rhs_comp = rhs_vector.atom_comp_;
+
+  CompMap::iterator rhs;
+  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
+    isotope = rhs->first;
+    rhs_atoms = rhs->second;
+
+    if (sum_comp.count(isotope) == 0) {
+      sum_comp[isotope] = 0;
+    }
+    sum_comp[isotope] += rhs_atoms;
+  }
+  mass_out_of_date_ = true;
+
+  IsoVector temp(sum_comp);
+
+  // preserve composition parentage to prevent duplicate db recording
+  if (rhs_vector.loggedComps_ == loggedComps_) {
+    temp.loggedComps_ = loggedComps_;
+    temp.decayTime_ = decayTime_;
+  }
+
+  return (temp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+IsoVector IsoVector::operator- (IsoVector rhs_vector) {
+  int isotope;
+  double rhs_atoms;
+  CompMap diff_comp(atom_comp_);
+  CompMap rhs_comp = rhs_vector.atom_comp_;
+
+  CompMap::iterator rhs;
+  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
+    isotope = rhs->first;
+    rhs_atoms = rhs->second;
+
+    if (diff_comp.count(isotope) == 0) {
+      diff_comp[isotope] = 0;
+    }
+
+    if (rhs_atoms > diff_comp[isotope]) {
+      throw CycRangeException("Attempted to extract more than exists.");
+    }
+    diff_comp[isotope] -= rhs_atoms;
+  }
+
+  IsoVector temp(diff_comp);
+
+  // preserve composition parentage to prevent duplicate db recording
+  if (rhs_vector.loggedComps_ == loggedComps_) {
+    temp.loggedComps_ = loggedComps_;
+    temp.decayTime_ = decayTime_;
+  }
+
+  return (temp);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool IsoVector::operator== (IsoVector rhs_vector) {
+  int isotope;
+  double diff;
+  CompMap* this_comp = mass_comp();
+  CompMap* rhs_comp = rhs_vector.mass_comp();
+  
+  if (this_comp->size() != rhs_comp->size() ) {
+    return false;
+  }
+
+  CompMap::iterator rhs_iter;
+  for (rhs_iter = rhs_comp->begin(); rhs_iter != rhs_comp->end(); rhs_iter++) {
+    isotope = rhs_iter->first;
+    if (this_comp->count(isotope) == 0) {
+      return false;
+    }
+    diff = fabs(massFraction(isotope) - rhs_vector.massFraction(isotope));
+    if (diff > EPS_FRACTION) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -268,95 +365,6 @@ int IsoVector::recipeCount() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
-  int isotope;
-  double rhs_atoms;
-  CompMap sum_comp(atom_comp_);
-  CompMap rhs_comp = rhs_vector.atom_comp_;
-
-  CompMap::iterator rhs;
-  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
-    isotope = rhs->first;
-    rhs_atoms = rhs->second;
-
-    if (sum_comp.count(isotope) == 0) {
-      sum_comp[isotope] = 0;
-    }
-    sum_comp[isotope] += rhs_atoms;
-  }
-  mass_out_of_date_ = true;
-
-  IsoVector temp(sum_comp);
-
-  // preserve composition parentage to prevent duplicate db recording
-  if (rhs_vector.loggedComps_ == loggedComps_) {
-    temp.loggedComps_ = loggedComps_;
-    temp.decayTime_ = decayTime_;
-  }
-
-  return (temp);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator- (IsoVector rhs_vector) {
-  int isotope;
-  double rhs_atoms;
-  CompMap diff_comp(atom_comp_);
-  CompMap rhs_comp = rhs_vector.atom_comp_;
-
-  CompMap::iterator rhs;
-  for (rhs = rhs_comp.begin(); rhs != rhs_comp.end(); rhs++) {
-    isotope = rhs->first;
-    rhs_atoms = rhs->second;
-
-    if (diff_comp.count(isotope) == 0) {
-      diff_comp[isotope] = 0;
-    }
-
-    if (rhs_atoms > diff_comp[isotope]) {
-      throw CycRangeException("Attempted to extract more than exists.");
-    }
-    diff_comp[isotope] -= rhs_atoms;
-  }
-
-  IsoVector temp(diff_comp);
-
-  // preserve composition parentage to prevent duplicate db recording
-  if (rhs_vector.loggedComps_ == loggedComps_) {
-    temp.loggedComps_ = loggedComps_;
-    temp.decayTime_ = decayTime_;
-  }
-
-  return (temp);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::operator== (IsoVector rhs_vector) {
-  int isotope;
-  double diff;
-  CompMap* this_comp = mass_comp();
-  CompMap* rhs_comp = rhs_vector.mass_comp();
-  
-  if (this_comp->size() != rhs_comp->size() ) {
-    return false;
-  }
-
-  CompMap::iterator rhs_iter;
-  for (rhs_iter = rhs_comp->begin(); rhs_iter != rhs_comp->end(); rhs_iter++) {
-    isotope = rhs_iter->first;
-    if (this_comp->count(isotope) == 0) {
-      return false;
-    }
-    diff = fabs(massFraction(isotope) - rhs_vector.massFraction(isotope));
-    if (diff > EPS_FRACTION) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope / 1000; // integer division
@@ -447,6 +455,7 @@ bool IsoVector::isZero(Iso tope) {
   }
   else {
     double fraction = atomFraction(tope);
+    validateFraction(fraction);
     return (fraction < EPS_PERCENT);
   }
 }

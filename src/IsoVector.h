@@ -115,6 +115,13 @@ public:
   IsoVector(); 
 
   /**
+     constructor given some previous composition 
+     basis assumed to be mass-wise
+     @param comp the previous composition 
+   */
+  IsoVector(composition* comp); 
+
+  /**
      constructor given some initial composition 
      basis assumed to be mass-wise
      @param initial_comp the initial composition 
@@ -132,7 +139,7 @@ public:
   /**
      default destructor
    */
-  ~IsoVector() {};
+  ~IsoVector();
   /* --- */
 
   /* --- Operators  --- */
@@ -261,12 +268,36 @@ public:
   /* --- */
 
  private:
-  /* --- Instance Interaction  --- */ 
+  /* --- Initializations  --- */ 
   /**
      initialize any required members
    */
   void init();
 
+  /**
+     Turns a list of atom-based compositions
+     to mass-based
+   */
+  void massify(CompMap* comp);
+
+  /**
+   */    
+  void setComposition(composition* c);
+
+  /**
+   */    
+  void setComposition(CompMap* comp);
+
+  /**
+   */    
+  std::pair<double,double> getNormalizers(CompMap* comp);
+
+  /**
+   */    
+  void minimizeComposition(composition* c);
+  /* --- */
+
+  /* --- Instance Interaction  --- */ 
   /**
      Stores the next available state ID 
    */
