@@ -52,14 +52,21 @@ struct composition {
   CompMap* mass_fractions;
   double mass_normalizer;
   double atom_normalizer;
+  composition* parent;
+  int decay_time;
   composition(CompMap* fracs, double mass_norm, double atom_norm) {
     ID = 0;
+    mass_fractions = fracs;
     mass_normalizer = mass_norm;
     atom_normalizer = atom_norm;
-    mass_fractions = fracs;
+    parent = 0;
+    decay_time = 0;
   }
   ~composition() {
     delete mass_fractions;
+  }
+  bool logged() {
+    return (ID > 0);
   }
 };
 /* --- */
@@ -70,9 +77,14 @@ struct composition {
 typedef std::map<std::string, composition*> RecipeMap; 
 
 /**
+   set of decay times
+ */
+typedef std::set<int> decay_times;
+
+/**
    map of composition times decayed
  */
-typedef std::map<composition*, std::set<int>*> DecayTimesMap; 
+typedef std::map<composition*, decay_times*> DecayTimesMap; 
 
 /**
    map of decay time to composition
@@ -168,6 +180,11 @@ public:
 
   /* --- Instance Interaction  --- */ 
   /**
+     the current state id 
+   */
+  int stateID();
+
+  /**
      Return the mass-based composition 
    */
   CompMap* mass_comp();
@@ -176,6 +193,16 @@ public:
      returns the mass normalizer for the IsoVector's composition_
    */
   double mass_normalizer();
+
+  /**
+     returns the decay time for the IsoVector's composition_
+   */
+  int decay_time();
+
+  /**
+     returns the parent of the IsoVector's composition_
+   */
+  composition* parent();
 
   /**
      Return the mass fraction of an isotope in the composition
@@ -240,6 +267,16 @@ public:
   static void logRecipe(std::string name, composition* recipe);
 
   /**
+     logs a new named recipe with the simulation
+     - sets the parent of and decay time child
+     - calls the logRecipe() method
+     @param t_i -> initial time of decay
+     @param t_i -> final time of decay
+   */
+  static void logRecipeDecay(composition* parent, composition* child, 
+                             int t_i, int t_f);
+  
+  /**
      checks if the recipe has been logged (i.e. it exists in the simulation)
    */
   static bool recipeLogged(std::string name);
@@ -253,6 +290,11 @@ public:
      accessing a recipe 
    */
   static IsoVector* recipe(std::string name);
+
+  /**
+     whether or not this composition is logged as a recipe
+  */
+  bool logged();
   /* --- */
 
   /* --- Isotope Wikipedia  --- */ 
@@ -304,6 +346,12 @@ public:
   void massify(CompMap* comp);
 
   /**
+     Turns a list of mass-based compositions
+     to atom-based
+   */
+  void atomify(CompMap* comp);
+
+  /**
      set's the composition for this isovector
    */    
   void setComposition(composition* c);
@@ -313,6 +361,14 @@ public:
      and calls setComposition()
    */    
   void setComposition(CompMap* comp);
+
+  /**
+     sets the composition for a mass or atom based
+     composition. if atom == true, then massify()
+     is called. setComposition() for the mass-based
+     case is then called.
+   */    
+  void setComposition(CompMap* comp, bool atom);
 
   /**
      determines the mass/atom normalizers for a composition
@@ -338,14 +394,18 @@ public:
   composition* composition_;
 
   /**
-     a pointer to the composition of the original composition before any decay
-   */
-  composition* decay_parent_composition_;
-
-  /**
      total decay time between this isovector's composition and the parent composition
    */
   int decayTime_;
+
+  /**
+     Decays a composition, assumed to be of mass-basis, for a given time. 
+      
+     @param time_change the number of months to decay 
+     @param mass_comp composition to decay
+   */
+  void executeDecay(double time_change, composition* mass_comp);
+
   /* --- */
 
   /* --- Global Interaction  --- */
@@ -417,11 +477,6 @@ public:
   /*  *\/ */
   /* primary_key_ref pkref(); */
   
-  /**
-     the current state id 
-   */
-  int stateID();
-
   /**
      returns true if a new state was recorded, false if already in db
   */

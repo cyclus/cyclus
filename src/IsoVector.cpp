@@ -44,15 +44,12 @@ IsoVector::IsoVector(CompMap* initial_comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(CompMap* initial_comp, bool atom) {
   init();
-  if (atom) {
-    massify(initial_comp);
-  }
-  setComposition(initial_comp);
+  setComposition(initial_comp,atom);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::~IsoVector() {
-  if(composition_->mass_fractions != init_comp_ && composition_->ID == 0) {
+  if(!logged()) {
     delete composition_;
   }
 }
@@ -60,7 +57,6 @@ IsoVector::~IsoVector() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::init() {
   composition_ = new composition(init_comp_,1,1);
-  decay_parent_composition_ = new composition(init_comp_,1,1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -71,8 +67,18 @@ void IsoVector::massify(CompMap* comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::atomify(CompMap* comp) {
+  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+    ci->second /= MT->gramsPerMol(ci->first);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::setComposition(composition* c) {
   minimizeComposition(c); // c guaranteed to be mass basis
+  if (!logged()) {
+    delete composition_;
+  }
   composition_ = c;
   validateComposition();
 }
@@ -83,6 +89,14 @@ void IsoVector::setComposition(CompMap* comp) {
   pair<double,double> normalizers = getNormalizers(comp);  
   composition* c = new composition(comp,normalizers.first,normalizers.second);
   setComposition(c); 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::setComposition(CompMap* comp, bool atom) {
+  if (atom) {
+    massify(comp);
+  }
+  setComposition(comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -152,6 +166,9 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
       if ( (*sum_comp)[isotope] > value) {
         (*sum_comp)[isotope] -= value;
       }
+      else {
+        (*sum_comp)[isotope] = 0;
+      }
     }
   }
   IsoVector temp(sum_comp);
@@ -204,7 +221,7 @@ void IsoVector::logRecipe(std::string name, composition* recipe) {
     logRecipe(recipe);
 
     // initialize containers
-    set<int>* times = new set<int>();
+    decay_times* times = new decay_times();
     DaughterMap* daughters = new DaughterMap();
 
     // assign containers
@@ -212,6 +229,18 @@ void IsoVector::logRecipe(std::string name, composition* recipe) {
     (*decay_times_)[recipe] = times;
     (*decay_chains_)[recipe] = daughters;
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::logRecipeDecay(composition* parent, composition* child, 
+                               int t_i, int t_f) {
+    decay_times* times = (*decay_times_)[parent];
+    DaughterMap* daughters = (*decay_chains_)[parent];
+    times->insert(t_f);
+    (*daughters)[t_f] = child;
+    child->parent = parent;
+    child->decay_time = t_f - t_i;
+    logRecipe(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -299,7 +328,15 @@ IsoVector* IsoVector::recipe(std::string name) {
   }
   return new IsoVector((*recipes_)[name]->mass_fractions);
 } 
-  
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool IsoVector::logged() { 
+  bool condition1 = mass_comp() != init_comp_; 
+  bool condition2 = composition_->logged();
+  bool logged = condition1 && condition2;
+  return logged;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::printRecipes() {
   CLOG(LEV_INFO1) << "There are " << IsoVector::recipeCount() << " recipes.";
@@ -372,20 +409,71 @@ int IsoVector::getMassNum(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::executeDecay(double time_change) {
+  composition* p = parent();
+  if (p->logged()) { // check for duplicate decay isotopics
+    DaughterMap* daughters = (*decay_chains_)[p];
+    decay_times* times = (*decay_times_)[p];
+    int t_i = decay_time();
+    int t_f = t_i + time_change;
+    if (times->find(t_f) != times->end()) { // decay isotopics already exist
+      composition* daughter = (*daughters)[t_f];
+      this->setComposition(daughter);
+    }
+    else { // create and log new isotopics
+      executeDecay(time_change,composition_); // changes composition_
+      logRecipeDecay(p,composition_,t_i,t_f);
+    }
+  } // end p->logged
+  else {
+    executeDecay(time_change,composition_);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::executeDecay(double time_change, composition* child) {
+  // get decay time
   double months_per_year = 12;
   double years = time_change / months_per_year;
 
+  // perform decay
   DecayHandler handler;
-  handler.setComp((*composition_->mass_fractions));
+  composition* parent = child;
+  CompMap* mass_comp = child->mass_fractions; 
+  atomify(mass_comp);
+  handler.setComp(*mass_comp);
   handler.decay(years);
   CompMap* comp = new CompMap(handler.compAsCompMap());
-  this->setComposition(comp);
-  decayTime_ += time_change;
+  this->setComposition(comp,true); // changes composition_
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int IsoVector::stateID() {
+  return composition_->ID;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CompMap* IsoVector::mass_comp() {
   return composition_->mass_fractions;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+int IsoVector::decay_time() {
+  composition* child = composition_;
+  double decay_time = 0.0;
+  while (child->parent != 0) {
+    decay_time += child->decay_time;
+    child = child->parent;
+  }
+  return decay_time;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+composition* IsoVector::parent() {
+  composition* child = composition_;
+  while (child->parent != 0) {
+    child = child->parent;
+  }
+  return child;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -527,8 +615,3 @@ void IsoVector::addToTable(composition* recipe){
 // primary_key_ref IsoVector::pkref() {
 //   return pkref_;
 // }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::stateID() {
-  return composition_->ID;
-}
