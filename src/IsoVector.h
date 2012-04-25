@@ -62,11 +62,11 @@ struct composition {
     parent = 0;
     decay_time = 0;
   }
-  ~composition() {
-    delete mass_fractions;
-  }
   bool logged() {
     return (ID > 0);
+  }
+  void delete_map() {
+    delete mass_fractions;
   }
 };
 /* --- */
@@ -176,6 +176,20 @@ public:
      quantity for every isotope is equal. 
    */
   bool operator== (IsoVector rhs_vector);
+
+  /**
+     multiplication operators
+   */
+  friend IsoVector operator* (const IsoVector &v, double factor);
+  friend IsoVector operator* (double factor, const IsoVector &v);
+  friend IsoVector operator* (const IsoVector &v, int factor);
+  friend IsoVector operator* (int factor, const IsoVector &v);
+
+  /**
+     division operators
+   */
+  friend IsoVector operator/ (const IsoVector &v, double factor);
+  friend IsoVector operator/ (const IsoVector &v, int factor);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
@@ -203,6 +217,16 @@ public:
      returns the parent of the IsoVector's composition_
    */
   composition* parent();
+
+  /**
+     calls minimizeComposition() on composition_
+   */    
+  void minimizeComposition();
+
+  /**
+     multiply the mass_normalizer by a factor; used in multiplication
+   */
+  void multMassNormBy(double factor);
 
   /**
      Return the mass fraction of an isotope in the composition
@@ -275,6 +299,10 @@ public:
    */
   static void logRecipeDecay(composition* parent, composition* child, 
                              int t_i, int t_f);
+  /**
+     adds recipe to containers tracking decayed recipes
+   */
+  static void storeDecayableRecipe(composition* recipe);
   
   /**
      checks if the recipe has been logged (i.e. it exists in the simulation)
@@ -289,7 +317,27 @@ public:
   /**
      accessing a recipe 
    */
-  static IsoVector* recipe(std::string name);
+  static composition* recipe(std::string name);
+
+  /**
+     accessing a set of decay times 
+   */
+  static decay_times* decayTimes(composition* parent);
+
+  /**
+     accessing the daughters of a parent
+   */
+  static DaughterMap* Daughters(composition* parent);
+
+  /**
+     accessing a specific daughter 
+   */
+  static composition* Daughter(composition* parent, int time);
+
+  /**
+     add a daughter to a map of daughters
+   */
+  static void addDaughter(DaughterMap* daughters, composition* child, int time);
 
   /**
      whether or not this composition is logged as a recipe
@@ -380,6 +428,12 @@ public:
      is equal to unity
    */    
   void minimizeComposition(composition* c);
+
+  /**
+     multiply the mass_normalizer of c by a factor; 
+     used in multiplication
+   */
+  void multMassNormBy(composition* c,double factor);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
@@ -394,9 +448,10 @@ public:
   composition* composition_;
 
   /**
-     total decay time between this isovector's composition and the parent composition
+     deletes the composition_ pointer and composition_'s
+     CompMap of mass fractions, if it is not logged
    */
-  int decayTime_;
+  void delete_comp();
 
   /**
      Decays a composition, assumed to be of mass-basis, for a given time. 
@@ -405,7 +460,6 @@ public:
      @param mass_comp composition to decay
    */
   void executeDecay(double time_change, composition* mass_comp);
-
   /* --- */
 
   /* --- Global Interaction  --- */
@@ -417,17 +471,17 @@ public:
   /**
      a container of recipes 
    */
-  static RecipeMap* recipes_;
+  static RecipeMap recipes_;
 
   /**
      a container of recipes in each decay chain
    */
-  static DecayChainMap* decay_chains_;
+  static DecayChainMap decay_chains_;
 
   /**
      a container of decay times that recipes have gone through
    */
-  static DecayTimesMap* decay_times_;
+  static DecayTimesMap decay_times_;
   /* --- */
 
   /* --- Isotope Wikipedia  --- */
