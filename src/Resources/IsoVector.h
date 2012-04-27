@@ -10,92 +10,8 @@
 #include <string>
 #include <libxml/tree.h>
 
-#include "Table.h"
+#include "IsotopicDefinitions.h"
 #include "UseMatrixLib.h"
-
-/* -- Useful Definitions -- */
-/**
-   avagadro's number
-*/
-#define AVOGADRO 6.02e23
-
-/**
-   smallest kilogram value
-*/
-#define EPS_KG 1e-6
-
-/**
-   smallest percent
-*/
-#define EPS_PERCENT 1e-14
-/* -- */
-
-/* -- Useful Typedefs -- */
-class IsoVector;
-
-/**
-   Isotope integer, ZZZAAA
- */
-typedef int Iso;
-
-/**
-   map of isotope integer to value (mass or atom)
- */
-typedef std::map<Iso, double> CompMap;
-
-/* --- Useful Structs --- */
-/**
-   a container fully describing the isovector's composition
- */
-struct composition {
-  int ID;
-  CompMap* mass_fractions;
-  double mass_normalizer;
-  double atom_normalizer;
-  composition* parent;
-  int decay_time;
-  composition(CompMap* fracs, double mass_norm, double atom_norm) {
-    ID = 0;
-    mass_fractions = fracs;
-    mass_normalizer = mass_norm;
-    atom_normalizer = atom_norm;
-    parent = 0;
-    decay_time = 0;
-  }
-  bool logged() {
-    return (ID > 0);
-  }
-  void delete_map() {
-    delete mass_fractions;
-  }
-};
-/* --- */
-
-/**
-   map of recipe name to composition
- */
-typedef std::map<std::string, composition*> RecipeMap; 
-
-/**
-   set of decay times
- */
-typedef std::set<int> decay_times;
-
-/**
-   map of composition times decayed
- */
-typedef std::map<composition*, decay_times*> DecayTimesMap; 
-
-/**
-   map of decay time to composition
- */
-typedef std::map<int, composition*> DaughterMap; 
-
-/**
-   map of recipe composition to its decayed daughters
- */
-typedef std::map<composition*, DaughterMap*> DecayChainMap; 
-/* -- */
 
 /** 
    @class IsoVector 
@@ -134,7 +50,7 @@ public:
      basis assumed to be mass-wise
      @param comp the previous composition 
    */
-  IsoVector(composition* comp); 
+  IsoVector(comp_t* comp); 
 
   /**
      constructor given some initial composition 
@@ -204,11 +120,6 @@ public:
   CompMap* mass_comp();
 
   /**
-     returns the mass normalizer for the IsoVector's composition_
-   */
-  double mass_normalizer();
-
-  /**
      returns the decay time for the IsoVector's composition_
    */
   int decay_time();
@@ -216,7 +127,12 @@ public:
   /**
      returns the parent of the IsoVector's composition_
    */
-  composition* parent();
+  comp_t* parent();
+
+  /**
+     whether or not this composition is logged as a recipe
+  */
+  bool logged();
 
   /**
      calls minimizeComposition() on composition_
@@ -234,19 +150,9 @@ public:
   double massFraction(Iso tope);
 
   /**
-     Return the mass fraction of an isotope in a composition
-   */
-  static double massFraction(Iso tope, composition* c);
-
-  /**
      returns the atom fraction of an isotope in the composition
    */
   double atomFraction(Iso tope);
-
-  /**
-     Return the mass fraction of an isotope in a composition
-   */
-  static double atomFraction(Iso tope, composition* c);
 
   /**
      Returns true if the given isotope's number density is less than the 
@@ -264,85 +170,6 @@ public:
      @param time_change the number of months to decay 
    */
   void executeDecay(double time_change);
-  /* --- */
-
-  /* --- Global Interaction  --- */
-  /**
-     loads the recipes from the input file 
-   */
-  static void load_recipes();
-
-  /**
-     loads a specific recipe 
-   */
-  static void load_recipe(xmlNodePtr cur);
-  
-  /**
-     logs a new recipe with the simulation
-     - logs recipe with BookKeeper
-   */
-  static void logRecipe(composition* recipe);
-
-  /**
-     logs a new named recipe with the simulation
-     - adds recipe to IsoVector's static containers
-     - calls the logRecipe() method
-   */
-  static void logRecipe(std::string name, composition* recipe);
-
-  /**
-     logs a new named recipe with the simulation
-     - sets the parent of and decay time child
-     - calls the logRecipe() method
-     @param t_i -> initial time of decay
-     @param t_i -> final time of decay
-   */
-  static void logRecipeDecay(composition* parent, composition* child, 
-                             int t_i, int t_f);
-  /**
-     adds recipe to containers tracking decayed recipes
-   */
-  static void storeDecayableRecipe(composition* recipe);
-  
-  /**
-     checks if the recipe has been logged (i.e. it exists in the simulation)
-   */
-  static bool recipeLogged(std::string name);
-
-  /**
-     the total number of recipes 
-   */
-  static int recipeCount(); 
-
-  /**
-     accessing a recipe 
-   */
-  static composition* recipe(std::string name);
-
-  /**
-     accessing a set of decay times 
-   */
-  static decay_times* decayTimes(composition* parent);
-
-  /**
-     accessing the daughters of a parent
-   */
-  static DaughterMap* Daughters(composition* parent);
-
-  /**
-     accessing a specific daughter 
-   */
-  static composition* Daughter(composition* parent, int time);
-
-  /**
-     add a daughter to a map of daughters
-   */
-  static void addDaughter(DaughterMap* daughters, composition* child, int time);
-
-  /**
-     whether or not this composition is logged as a recipe
-  */
-  bool logged();
   /* --- */
 
   /* --- Isotope Wikipedia  --- */ 
@@ -364,16 +191,6 @@ public:
   /* --- */
 
   /* --- Printing Functionality  --- */
-  /**
-     print all recipes 
-   */
-  static void printRecipes();
-
-  /**
-     print the details of a composition 
-   */
-  static void print(composition* c);
-
   /**
      print the details of this IsoVector 
    */
@@ -402,7 +219,7 @@ public:
   /**
      set's the composition for this isovector
    */    
-  void setComposition(composition* c);
+  void setComposition(comp_t* c);
 
   /**
      constructs a composition out of comp
@@ -427,61 +244,20 @@ public:
      adjusts the composition such that the mass normalizer
      is equal to unity
    */    
-  void minimizeComposition(composition* c);
+  void minimizeComposition(comp_t* c);
 
   /**
      multiply the mass_normalizer of c by a factor; 
      used in multiplication
    */
-  void multMassNormBy(composition* c,double factor);
+  void multMassNormBy(comp_t* c,double factor);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
   /**
-     Stores the next available state ID 
-   */
-  static int nextStateID_;
-
-  /**
      a pointer to the isovector's composition
    */
-  composition* composition_;
-
-  /**
-     deletes the composition_ pointer and composition_'s
-     CompMap of mass fractions, if it is not logged
-   */
-  void delete_comp();
-
-  /**
-     Decays a composition, assumed to be of mass-basis, for a given time. 
-      
-     @param time_change the number of months to decay 
-     @param mass_comp composition to decay
-   */
-  void executeDecay(double time_change, composition* mass_comp);
-  /* --- */
-
-  /* --- Global Interaction  --- */
-  /**
-     a memory space for new iso vectors to point to
-   */
-  static CompMap* init_comp_;
-
-  /**
-     a container of recipes 
-   */
-  static RecipeMap recipes_;
-
-  /**
-     a container of recipes in each decay chain
-   */
-  static DecayChainMap decay_chains_;
-
-  /**
-     a container of decay times that recipes have gone through
-   */
-  static DecayTimesMap decay_times_;
+  comp_t composition_;
   /* --- */
 
   /* --- Isotope Wikipedia  --- */
@@ -510,48 +286,13 @@ public:
      return a pointer to a vector of the composition as strings 
      @return the composition string vector 
    */
-  static std::vector<std::string>* compStrings(composition* c);
+  static std::vector<std::string>* compStrings(comp_t* c);
 
   /**
      used by print() to 'hide' print code when logging is not desired 
    */
-  static std::string detail(composition* c);
+  static std::string detail(comp_t* c);
   /* --- */
- 
-
- /* -- Output Database Interaction  -- */ 
- public:
-  /**
-     the isotopics output database Table 
-   */
-  static table_ptr iso_table;
-  
-  /* /\** */
-  /*    return the agent table's primary key  */
-  /*  *\/ */
-  /* primary_key_ref pkref(); */
-  
-  /**
-     returns true if a new state was recorded, false if already in db
-  */
-  void recordState();
-  
- private:
-  /**
-     Define the database table on the first Message's init 
-   */
-  static void define_table();
-
-  /**
-     Add an isotopic state to the table 
-   */
-  static void addToTable(composition* comp);
-
-  /* /\** */
-  /*    Store information about the transactions's primary key  */
-  /*  *\/ */
-  /* primary_key_ref pkref_; */
- /* -- */ 
 };
 
 #endif
