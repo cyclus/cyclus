@@ -54,6 +54,13 @@ typedef struct composition {
   composition(CompMap* fracs) {
     init(fracs);
   }
+  composition(const composition& other) {
+    copy(other);
+  }
+  composition& operator=(const composition& other) {
+    copy(other);
+    return *this;
+  }
   ~composition() {
     if ( !logged() ) {
       delete mass_fractions;
@@ -65,6 +72,12 @@ typedef struct composition {
     mass_fractions = fracs;
     parent = 0;
     decay_time = 0;
+  }
+  void copy(const composition& other) {
+    ID = other.ID;
+    mass_fractions = other.mass_fractions;
+    parent = other.parent;
+    decay_time = other.decay_time;
   }
   bool logged() {
     return (ID > 0 && mass_fractions != 0);

@@ -41,7 +41,7 @@ SET(CYCLUS_INCLUDE_DIR
 # Add any new core source files to this list.
 SET( CYCLUS_CORE
   InputXML.cpp
-  IsoVector.cpp
+#  IsoVector.cpp
   Resource.cpp
   GenericResource.cpp
 #  Material.cpp
@@ -53,6 +53,7 @@ SET( CYCLUS_CORE
   Utility/CycException.cpp 
   Utility/LMatrix.cpp 
   Utility/MassTable.cpp 
+  Utility/RecipeLogger.cpp 
   Utility/Table.cpp
   Utility/Timer.cpp
   Utility/UniformTaylor.cpp 
