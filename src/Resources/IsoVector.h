@@ -77,7 +77,7 @@ public:
   /**
      Adds like isotopes 
    */
-  IsoVector operator+ (IsoVector rhs_vector);
+  const IsoVector operator+ (const IsoVector& rhs_vector) const;
 
   /**
      Subtracts like isotopes 
@@ -85,27 +85,27 @@ public:
      @exception CycRangeException thrown if subtraction results in a 
      negative quantity for any isotope. 
    */
-  IsoVector operator- (IsoVector rhs_vector);
+  const IsoVector operator- (const IsoVector& rhs_vector) const;
 
   /**
      Compares quantities of like isotopes returning true only if 
      quantity for every isotope is equal. 
    */
-  bool operator== (IsoVector rhs_vector);
+  bool operator== (const IsoVector& rhs_vector) const;
 
   /**
      multiplication operators
    */
-  friend IsoVector operator* (const IsoVector &v, double factor);
-  friend IsoVector operator* (double factor, const IsoVector &v);
-  friend IsoVector operator* (const IsoVector &v, int factor);
-  friend IsoVector operator* (int factor, const IsoVector &v);
+  friend const IsoVector operator* (const IsoVector &v, double factor);
+  friend const IsoVector operator* (double factor, const IsoVector &v);
+  friend const IsoVector operator* (const IsoVector &v, int factor);
+  friend const IsoVector operator* (int factor, const IsoVector &v);
 
   /**
      division operators
    */
-  friend IsoVector operator/ (const IsoVector &v, double factor);
-  friend IsoVector operator/ (const IsoVector &v, int factor);
+  friend const IsoVector operator/ (const IsoVector &v, double factor);
+  friend const IsoVector operator/ (const IsoVector &v, int factor);
   /* --- */
 
   /* --- Instance Interaction  --- */ 

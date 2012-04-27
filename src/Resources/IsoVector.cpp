@@ -127,7 +127,7 @@ void IsoVector::multMassNormBy(composition* c, double factor) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
+IsoVector IsoVector::operator+ (IsoVector& rhs_vector) {
   int isotope;
   double rhs_fracs;
   double rhs_normalizer = rhs_vector.mass_normalizer();
@@ -153,7 +153,7 @@ IsoVector IsoVector::operator+ (IsoVector rhs_vector) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator- (IsoVector rhs_vector) {
+IsoVector IsoVector::operator- (IsoVector& rhs_vector) {
   int isotope;
   double rhs_fracs;
   double rhs_normalizer = rhs_vector.mass_normalizer();
@@ -180,7 +180,7 @@ IsoVector IsoVector::operator- (IsoVector rhs_vector) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::operator== (IsoVector rhs_vector) {
+bool IsoVector::operator== (IsoVector& rhs_vector) {
   int isotope;
   double diff;
   CompMap* this_comp = mass_comp();
@@ -207,9 +207,9 @@ bool IsoVector::operator== (IsoVector rhs_vector) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector operator* (IsoVector &v, double factor) {
-  v.minimizeComposition();
-  v.multMassNormBy(factor);
-  return v;
+  IsoVector result = *this;
+  result.multMassNormBy(factor);
+  return resutl;
 }
 IsoVector operator* (double factor, IsoVector &v) {
   return operator*(v,factor);

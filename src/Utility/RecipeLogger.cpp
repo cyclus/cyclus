@@ -73,11 +73,12 @@ void RecipeLogger::load_recipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::load_recipe(xmlNodePtr cur) {
   // initialize comp map
-  CompMap* mass_fractions = new CompMap();
+  CompMap_p mass_fractions(new CompMap);
 
   // get general values from xml
   string name = XMLinput->get_xpath_content(cur,"name");
   string basis = XMLinput->get_xpath_content(cur,"basis");
+  bool atom = (basis == "atom");
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
   // get values needed for composition
@@ -89,7 +90,7 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
     key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
     value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
 
-    if (basis == "atom") {
+    if (atom) {
       value = value / MT->gramsPerMol(key);
     }
     else {
@@ -101,16 +102,16 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
   }
   
   // make a new composition
-  comp_t recipe = comp_t(mass_fractions);
+  comp_p recipe(new comp_t(mass_fractions));
 
   // log this composition (static members and database)
   logRecipe(name,recipe);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(std::string name, comp_t &recipe) {
+void RecipeLogger::logRecipe(std::string name, comp_p recipe) {
   if ( !recipeLogged(name) ) {
-    logRecipe(recipe); // log this with the database
+    logRecipe(recipe); // log this with the database, assigns id
     recipes_[name] = recipe; // store this as a named recipe, copies recipe
     storeDecayableRecipe(Recipe(name)); // store this as a decayable recipe
   }
@@ -123,33 +124,32 @@ bool RecipeLogger::recipeLogged(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(comp_t &recipe) {
-  if (!recipe.logged()) {
-    recipe.ID = nextStateID_++;
-    addToTable(recipe);
+void RecipeLogger::logRecipe(comp_p recipe) {
+  if (!recipe->logged()) {
+    recipe->ID = nextStateID_++;
+    recipe->normalize();
+    addToTable(*recipe);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-comp_t& RecipeLogger::Recipe(std::string name) {
+comp_p RecipeLogger::Recipe(std::string name) {
   checkRecipe(name);
   return recipes_[name];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::storeDecayableRecipe(comp_t &recipe) {
+void RecipeLogger::storeDecayableRecipe(comp_p recipe) {
   // initialize containers
   decay_times times;
   DaughterMap daughters;
   // assign containers
-  decay_times_.insert( pair<comp_t,decay_times>(recipe,times) );
-  //decay_times_[recipe] = times;
-  decay_chains_.insert( pair<comp_t,DaughterMap>(recipe,daughters) );
-  // decay_chains_[recipe] = daughters;
+  decay_times_.insert( pair<comp_p,decay_times>(recipe,times) );
+  decay_chains_.insert( pair<comp_p,DaughterMap>(recipe,daughters) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipeDecay(comp_t &parent, comp_t &child, int t_f) {
+void RecipeLogger::logRecipeDecay(comp_p parent, comp_p child, int t_f) {
   decayTimes(parent).insert(t_f);
   addDaughter(parent,child,t_f);
   logRecipe(child);
@@ -170,59 +170,59 @@ void RecipeLogger::checkRecipe(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDecayable(comp_t &parent) {
+void RecipeLogger::checkDecayable(comp_p parent) {
   if (!compositionDecayable(parent)) {
     stringstream err;
-    err << "RecipeLogger has not logged recipe with id:" << parent.ID
+    err << "RecipeLogger has not logged recipe with id:" << parent->ID
         << " as decayable.";
     throw CycIndexException(err.str());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDaughter(comp_t &parent, int time) {
+void RecipeLogger::checkDaughter(comp_p parent, int time) {
   if (!daughterLogged(parent,time)) {
     stringstream err;
     err << "RecipeLogger has not logged a decayed recipe for the parent " 
-        << "recipe with id:" << parent.ID << " and decay time:" << time 
+        << "recipe with id:" << parent->ID << " and decay time:" << time 
         << ".";
     throw CycIndexException(err.str());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLogger::decayTimes(comp_t &parent) {
+decay_times& RecipeLogger::decayTimes(comp_p parent) {
   checkDecayable(parent);
-  return decay_times_.find(parent)->second;
+  return decay_times_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DaughterMap& RecipeLogger::Daughters(comp_t &parent) {
+DaughterMap& RecipeLogger::Daughters(comp_p parent) {
   checkDecayable(parent);
-  return decay_chains_.find(parent)->second;
+  return decay_chains_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-comp_t* RecipeLogger::Daughter(composition &parent, int time) {
+comp_p RecipeLogger::Daughter(comp_p parent, int time) {
   checkDaughter(parent,time);
-  return &Daughters(parent)[time];
+  return Daughters(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::daughterLogged(comp_t &parent, int time) {
+bool RecipeLogger::daughterLogged(comp_p parent, int time) {
   int count = Daughters(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDaughter(comp_t &parent, comp_t& child, int time) {
-  child.parent = &parent;
-  child.decay_time = time;
+void RecipeLogger::addDaughter(comp_p parent, comp_p child, int time) {
+  child->setParent(parent);
+  child->decay_time = time;
   Daughters(parent)[time] = child; // child is copied
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::compositionDecayable(comp_t &comp) {
+bool RecipeLogger::compositionDecayable(comp_p comp) {
   int count1 = decay_times_.count(comp);
   int count2 = decay_chains_.count(comp);
   return (count1 != 0 && count2 != 0); // true iff comp in both 
@@ -259,7 +259,7 @@ void RecipeLogger::addToTable(comp_t &recipe){
   entry id("ID",an_id);
 
   // now for the composition isotopics
-  CompMap* comp = recipe.mass_fractions;
+  CompMap_p comp = recipe.mass_fractions;
   int i = 0;
   for (CompMap::iterator item = comp->begin();
        item != comp->end(); item++){
