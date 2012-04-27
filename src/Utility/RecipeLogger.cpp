@@ -152,7 +152,7 @@ void RecipeLogger::storeDecayableRecipe(comp_p recipe) {
 void RecipeLogger::logRecipeDecay(comp_p parent, comp_p child, int t_f) {
   decayTimes(parent).insert(t_f);
   addDaughter(parent,child,t_f);
-  logRecipe(*child);
+  logRecipe(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -184,7 +184,7 @@ void RecipeLogger::checkDaughter(comp_p parent, int time) {
   if (!daughterLogged(parent,time)) {
     stringstream err;
     err << "RecipeLogger has not logged a decayed recipe for the parent " 
-        << "recipe with id:" << parent.ID << " and decay time:" << time 
+        << "recipe with id:" << parent->ID << " and decay time:" << time 
         << ".";
     throw CycIndexException(err.str());
   }

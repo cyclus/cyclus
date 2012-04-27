@@ -3,7 +3,7 @@
 #define _ISOTOPICDEFINITIONS_H
 
 #include <map>
-#include "boost/smart_ptr.h"
+#include "boost/shared_ptr.hpp"
 
 /* -- Useful Definitions -- */
 /**
@@ -59,7 +59,8 @@ struct comp_t {
 
   // constructors & destructor
   comp_t() {
-    init(0);
+    CompMap_p cp(new CompMap);
+    init(cp);
   }
   comp_t(CompMap_p fracs) {
     init(fracs);
@@ -68,8 +69,8 @@ struct comp_t {
     copy(other);
   }
   ~comp_t() {
-    delete mass_fractions;
-    delete parent;
+    mass_fractions.reset();
+    parent.reset();
   }
   
   // operators
@@ -88,18 +89,16 @@ struct comp_t {
   bool operator<(const comp_t& other) const {
     return (ID < other.ID);
   }
-  bool operator<(const comp_p& other) {
+  bool operator<(const comp_p& other) const {
     return (*this < *other);
-  }
-  bool operator<(const comp_p& lhs, const comp_p& rhs) {
-    return (*lhs < *rhs);
   }
 
   // utility
   void init(CompMap_p fracs) {
+    comp_p cp(new comp_t);
     ID = 0;
     mass_fractions = fracs; // ptr copy
-    parent = 0;
+    parent = cp; // ptr copy
     decay_time = 0;
   }
   void copy(const comp_t& other) {
