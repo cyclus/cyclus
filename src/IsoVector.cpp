@@ -3,8 +3,8 @@
 
 #include "CycException.h"
 #include "MassTable.h"
+#include "RecipeLogger.h"
 #include "Logger.h"
-#include "InputXML.h"
 #include "DecayHandler.h"
 
 #include <cmath>
@@ -15,14 +15,6 @@
 #include <libxml/xpathInternals.h>
 
 using namespace std;
-
-// Static variables to be initialized.
-int IsoVector::nextStateID_ = 0;
-RecipeMap IsoVector::recipes_;
-DecayChainMap IsoVector::decay_chains_;
-DecayTimesMap IsoVector::decay_times_;
-CompMap* IsoVector::init_comp_ = new CompMap();
-table_ptr IsoVector::iso_table = new Table("IsotopicStates"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector() {
@@ -54,7 +46,6 @@ IsoVector::~IsoVector() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::init() {
-  composition_ = new composition(init_comp_,1,1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -239,131 +230,6 @@ IsoVector operator/ (IsoVector &v, int factor) {
   return operator*(v,1/f);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool IsoVector::recipeLogged(std::string name) {
-  // true iff name in recipes_
-  int count = IsoVector::recipes_.count(name);
-  return (count != 0); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::logRecipe(composition* recipe) {
-    recipe->ID = nextStateID_++;
-    addToTable(recipe);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::logRecipe(std::string name, composition* recipe) {
-  if ( !recipeLogged(name) ) {
-    // log this with the database
-    logRecipe(recipe);
-    // store this as a named recipe
-    recipes_[name] = recipe;
-    // store this as a decayable recipe
-    storeDecayableRecipe(recipe);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::storeDecayableRecipe(composition* recipe) {
-  // initialize containers
-  decay_times* times = new decay_times();
-  DaughterMap* daughters = new DaughterMap();
-  // assign containers
-  decay_times_[recipe] = times;
-  decay_chains_[recipe] = daughters;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::logRecipeDecay(composition* parent, composition* child, 
-                               int t_i, int t_f) {
-  decay_times* times = decayTimes(parent);
-  times->insert(t_f);
-  DaughterMap* daughters = Daughters(parent);
-  addDaughter(daughters,child,t_f);
-  child->parent = parent;
-  child->decay_time = t_f - t_i;
-  logRecipe(child);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::load_recipe(xmlNodePtr cur) {
-  // initialize comp map
-  CompMap* mass_fractions = new CompMap();
-
-  // get general values from xml
-  string name = XMLinput->get_xpath_content(cur,"name");
-  string basis = XMLinput->get_xpath_content(cur,"basis");
-  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
-
-  // get values needed for composition
-  double value;
-  double mass_count = 0, atom_count = 0;
-  int key;
-  xmlNodePtr iso_node;
-  for (int i = 0; i < isotopes->nodeNr; i++) {
-    iso_node = isotopes->nodeTab[i];
-    key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
-    value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
-
-    if (basis == "mass") {
-      atom_count += value * MT->gramsPerMol(key);
-    }
-    else if (basis == "atom") {
-      atom_count += value;
-      value = value / MT->gramsPerMol(key);
-    }
-    else {
-      throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
-    }
-
-    // update our mass-related values
-    mass_count += value;
-    (*mass_fractions)[key] = value;
-  }
-  
-  // make a new composition
-  composition* comp = new composition(mass_fractions,mass_count,atom_count);
-
-  // log this composition (static members and database)
-  logRecipe(name,comp);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::load_recipes() {
-  // load recipes from file
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
-  string name;
-  CLOG(LEV_DEBUG2) << "loading recipes {";
-  for (int i = 0; i < nodes->nodeNr; i++) {
-    name = XMLinput->getCurNS() + 
-                  XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
-    CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    load_recipe(nodes->nodeTab[i]); // load recipe
-  }
-
-  // load recipes from databases
-  nodes = XMLinput->get_xpath_elements("/*/recipebook");
-  string filename, ns, format;
-  for (int i = 0; i < nodes->nodeNr; i++) {
-    filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
-    ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
-    format = XMLinput->get_xpath_content(nodes->nodeTab[i], "format");
-    XMLinput->extendCurNS(ns);
-
-    if ("xml" == format) {
-      CLOG(LEV_DEBUG2) << "going into a recipe book...";
-      XMLinput->load_recipebook(filename);  // load recipe book
-    } 
-    else {
-      throw 
-        CycRangeException(format + "is not a supported recipebook format.");
-    }
-    XMLinput->stripCurNS();
-  }
-  CLOG(LEV_DEBUG2) << "}";
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::logged() { 
   bool condition1 = mass_comp() != init_comp_; 
@@ -426,39 +292,6 @@ std::vector<std::string>* IsoVector::compStrings(composition* c) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::recipeCount() { 
-  return IsoVector::recipes_.size(); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-composition* IsoVector::recipe(std::string name) { 
-  if ( !recipeLogged(name) ) {
-    throw CycIndexException("Recipe '" + name + "' does not exist.");
-  }
-  return recipes_[name];
-} 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times* IsoVector::decayTimes(composition* parent) {
-  return decay_times_[parent];
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DaughterMap* IsoVector::Daughters(composition* parent) {
-  return decay_chains_[parent];
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-composition* IsoVector::Daughter(composition* parent, int time) {
-  return (*Daughters(parent))[time];
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::addDaughter(DaughterMap* dmap, composition* d, int time) {
-  (*dmap)[time] = d;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int IsoVector::getAtomicNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope / 1000; // integer division
@@ -470,28 +303,19 @@ int IsoVector::getMassNum(Iso tope) {
   return tope % 1000;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::delete_comp() {
-  if (!logged()) {
-    composition_->delete_map();
-  }
-  delete composition_;
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::executeDecay(double time_change) {
-  composition* p = parent();
-  if (p->logged()) { // check for duplicate decay isotopics
-    decay_times* times = decayTimes(p);
+  comp_t* parent = root_comp();
+  if (parent->logged()) { // check for duplicate decay isotopics
     int t_i = decay_time();
     int t_f = t_i + time_change;
-    if (times->find(t_f) != times->end()) { // decay isotopics already exist
-      composition* daughter = Daughter(p,t_f);
-      this->setComposition(daughter);
+    bool check = RL->daughterLogged(*parent,t_f);
+    if (check) { // decay isotopics already exist
+      this->setComposition(RL->Daughter(*parent,t_f)); 
     }
     else { // create and log new isotopics
       executeDecay(time_change,composition_); // changes composition_
-      logRecipeDecay(p,composition_,t_i,t_f);
+      RL->logRecipeDecay(*parent,composition_,t_f);
     }
   } // end p->logged
   else {
@@ -538,8 +362,8 @@ int IsoVector::decay_time() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-composition* IsoVector::parent() {
-  composition* child = composition_;
+comp_t* IsoVector::root_comp() {
+  comp_t* child = composition_;
   while (child->parent != 0) {
     child = child->parent;
   }
@@ -628,60 +452,3 @@ void IsoVector::recordState() {
     logRecipe(composition_);
   }
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::define_table() {
-  // declare the state id columns and add it to the table
-  column state_id("ID","INTEGER");
-  column iso_id("IsoID","INTEGER");
-  column iso_value("Value","REAL");
-  iso_table->addColumn(state_id);
-  iso_table->addColumn(iso_id);
-  iso_table->addColumn(iso_value);
-  // declare the table's primary key
-  primary_key pk;
-  pk.push_back("ID"), pk.push_back("IsoID");
-  iso_table->setPrimaryKey(pk);
-  // we've now defined the table
-  iso_table->tableDefined();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::addToTable(composition* recipe){
-  // if we haven't logged a composition yet, define the table
-  if ( !iso_table->defined() ) {
-    IsoVector::define_table();
-  }
-
-  // make a row - stateid first then isotopics
-  // declare data
-  data an_id(recipe->ID);
-  // declare entries
-  entry id("ID",an_id);
-
-  // now for the composition isotopics
-  CompMap* comp = recipe->mass_fractions;
-  int i = 0;
-  for (CompMap::iterator item = comp->begin();
-       item != comp->end(); item++){
-    CLOG(LEV_DEBUG2) << "isotope " << i++ << " of " << comp->size();
-    // declare row
-    // decalre data
-    data an_iso_id(item->first), an_iso_value(item->second);
-    // declare entries
-    entry iso_id("IsoID",an_iso_id), iso_value("Value",an_iso_value);
-    // construct row
-    row aRow;
-    aRow.push_back(id), aRow.push_back(iso_id), aRow.push_back(iso_value);
-    // add the row
-    iso_table->addRow(aRow);
-    // // record this primary key
-    // pkref_.push_back(id);
-    // pkref_.push_back(iso_id);
-  }
-}
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// primary_key_ref IsoVector::pkref() {
-//   return pkref_;
-// }
