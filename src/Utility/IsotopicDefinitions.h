@@ -3,6 +3,7 @@
 #define _ISOTOPICDEFINITIONS_H
 
 #include <map>
+#include "boost/smart_ptr.h"
 
 /* -- Useful Definitions -- */
 /**
@@ -29,8 +30,16 @@ typedef int Iso;
 
 /**
    map of isotope integer to value (mass or atom)
+   and a pointer to said map
  */
 typedef std::map<Iso, double> CompMap;
+typedef boost::shared_ptr<CompMap> CompMap_p;
+
+/**
+   a pointer to a composition
+ */
+struct comp_t;
+typedef boost::shared_ptr<comp_t> comp_p;
 /* -- */
 
 /* -- Useful Structs -- */
@@ -41,49 +50,77 @@ typedef std::map<Iso, double> CompMap;
    mass_fractions member. this responsibility is implied through the
    logging process: a composition is given an id when it is logged.
  */
-typedef struct composition {
+struct comp_t {
   // members
   int ID;
-  CompMap* mass_fractions;
-  composition* parent;
+  CompMap_p mass_fractions;
+  comp_p parent;
   int decay_time;
+
   // constructors & destructor
-  composition() {
+  comp_t() {
     init(0);
   }
-  composition(CompMap* fracs) {
+  comp_t(CompMap_p fracs) {
     init(fracs);
   }
-  composition(const composition& other) {
+  comp_t(const comp_t& other) {
     copy(other);
   }
-  composition& operator=(const composition& other) {
-    copy(other);
-    return *this;
+  ~comp_t() {
+    delete mass_fractions;
+    delete parent;
   }
-  ~composition() {
-    if ( !logged() ) {
-      delete mass_fractions;
+  
+  // operators
+  comp_t& operator=(const comp_t& other) {
+    if (this != &other) {
+      copy(other);
     }
+    return *this;
+  };
+  bool operator==(const comp_t& other) const {
+    return (ID == other.ID);
   }
+  bool operator!=(const comp_t& other) const {
+    return !(*this == other);
+  }
+  bool operator<(const comp_t& other) const {
+    return (ID < other.ID);
+  }
+  bool operator<(const comp_p& other) {
+    return (*this < *other);
+  }
+  bool operator<(const comp_p& lhs, const comp_p& rhs) {
+    return (*lhs < *rhs);
+  }
+
   // utility
-  void init(CompMap* fracs) {
+  void init(CompMap_p fracs) {
     ID = 0;
-    mass_fractions = fracs;
+    mass_fractions = fracs; // ptr copy
     parent = 0;
     decay_time = 0;
   }
-  void copy(const composition& other) {
+  void copy(const comp_t& other) {
     ID = other.ID;
-    mass_fractions = other.mass_fractions;
-    parent = other.parent;
+    mass_fractions = other.mass_fractions; // ptr copy
+    parent = other.parent; // ptr copy
     decay_time = other.decay_time;
   }
   bool logged() {
     return (ID > 0 && mass_fractions != 0);
   }
-} comp_t;
+  void normalize() {
+    double total = 0.0;
+    for (CompMap::iterator it = mass_fractions->begin(); it != mass_fractions->end(); it++) {
+      total += it->second;
+    }
+    for (CompMap::iterator it = mass_fractions->begin(); it != mass_fractions->end(); it++) {
+      it->second /= total;
+    }
+  }
+};
 /* -- */
 
 #endif
-
