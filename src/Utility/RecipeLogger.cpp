@@ -216,7 +216,7 @@ bool RecipeLogger::daughterLogged(comp_p parent, int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::addDaughter(comp_p parent, comp_p child, int time) {
-  child->parent = parent;
+  child->setParent(parent);
   child->decay_time = time;
   Daughters(parent)[time] = child; // child is copied
 }
