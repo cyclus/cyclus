@@ -34,22 +34,22 @@ Composition::~Composition() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Composition::operator<(Composition& other) {
+bool Composition::operator<(const Composition& other) const {
   return (ID_ < other.ID());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Composition::logged() {
-  return (ID > 0);
+bool Composition::logged() const {
+  return (ID_ > 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompositionPtr Composition::me() {
-  return shared_from_this();
+int Composition::ID() const {
+  return ID_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompositionPtr Composition::parent() {
+CompositionPtr Composition::parent() const {
   if (!parent_) {
     throw 
       CycIndexException("parent pointer to composition not initialized.");
@@ -58,13 +58,18 @@ CompositionPtr Composition::parent() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Composition::decay_time() {
+double Composition::decay_time() const {
   return decay_time_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr Composition::me() {
+  return shared_from_this();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::massify(CompMap& comp) {
-  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
     ci->second *= MT->gramsPerMol(ci->first);
   }
 }
@@ -72,23 +77,24 @@ void Composition::massify(CompMap& comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::normalize(CompMap& comp) {
   double total = 0.0;
-  for (CompMap::iterator it = comp->begin(); 
-       it != comp->end(); it++) {
+  for (CompMap::iterator it = comp.begin(); 
+       it != comp.end(); it++) {
     total += it->second;
     validateEntry(it->first,it->second);
   }
   if (total != 1) { // only normalize if needed
-    for (CompMap::iterator it = comp->begin(); 
-         it != comp->end(); it++) {
+    for (CompMap::iterator it = comp.begin(); 
+         it != comp.end(); it++) {
       it->second /= total;
     }
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Composition::init(CompMap& comp) {
+void Composition::init(CompMap& comp) {
   normalize(comp);
-  composition_ = CompMapPtr(new CompMap(comp)); // comp never changes past this
+  CompMapPtr p(new CompMap(comp)); // copy comp into a unique pointer
+  composition_ = boost::interprocess::move(p); // move p to composition_
   validateComposition(composition_);
   ID_ = 0;
   decay_time_ = 0;
@@ -101,7 +107,7 @@ void Composition::setParent(Composition* p) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::setParent(CompositionPtr p) {
-  parent_.reset(p);
+  parent_ = p;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -130,13 +136,13 @@ void Composition::validateComposition(const CompMapPtr& comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::validateEntry(Iso tope, double value) {
+void Composition::validateEntry(const Iso& tope, const double& value) {
   validateIsotopeNumber(tope);
   validateValue(value);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::validateIsotopeNumber(Iso tope) {
+void Composition::validateIsotopeNumber(const Iso& tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;
   
@@ -149,7 +155,7 @@ void Composition::validateIsotopeNumber(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::validateValue(double value) {
+void Composition::validateValue(const double& value) {
   if (value < 0.0) {
     string err_msg = "Composition has negative quantity for an isotope.";
     throw CycRangeException(err_msg);

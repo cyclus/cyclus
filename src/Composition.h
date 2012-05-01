@@ -3,7 +3,8 @@
 #define _COMPOSITION_H
 
 #include <map>
-#include <boost/unique_ptr.hpp>
+#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
+//#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -35,10 +36,20 @@ typedef int Iso;
    and a pointer to said map
  */
 typedef std::map<Iso, double> CompMap;
-typedef boost::unique_ptr<CompMap> CompMapPtr;
 
 /**
-   pointer to another composition
+   We only want one such map per composition, so a unique
+   pointer is used. note that a delete class must be used.
+ */
+template<typename T> struct Deleter {
+  void operator() (T *p) {
+    delete p;
+  }
+};
+typedef boost::interprocess::unique_ptr< CompMap, Deleter<CompMap> > CompMapPtr;
+
+/**
+   shared pointer to another composition
  */
 class Composition;
 typedef boost::shared_ptr<Composition> CompositionPtr;
@@ -52,12 +63,20 @@ typedef boost::shared_ptr<Composition> CompositionPtr;
    isotopic compositions so that they may be logged with the 
    BookKeeper.
 */
-class Composition : public enable_shared_from_this<Composition> {
+class Composition : public boost::enable_shared_from_this<Composition> {
  public:
   /* --- Constructors and Destructors --- */
   /**
-     constructor given a composition. the ID_ and decaytime_
-     are initially set to 0.
+     most general constructor. constructors a composition given atom or
+     mass basis.
+     calls the specialized constuctor Composition().
+     @param comp the composition to be copied into composition_
+     @param atom true if the given composition is atom based
+   */
+  Composition(CompMap& comp, bool atom);
+
+  /**
+     specialized constructor, assuming comp is already mass based.
      @param comp the composition to be copied into composition_
    */
   Composition(CompMap& comp);
@@ -80,22 +99,26 @@ class Composition : public enable_shared_from_this<Composition> {
   /**
      returns true if the composition's id has been set
    */
-  bool logged();
+  bool logged() const;
+
+  /**
+     returns the composition's id
+   */
+  int ID() const;
+  /**
+     returns a shared pointer to this composition's parent
+   */
+  CompositionPtr parent() const;
+
+  /**
+     returns the time decayed between this Composition and its parent
+   */
+  double decay_time() const;
 
   /**
      returns a shared pointer to this composition
    */
   CompositionPtr me();
-
-  /**
-     returns a shared pointer to this composition's parent
-   */
-  CompositionPtr parent();
-
-  /**
-     returns the time decayed between this Composition and its parent
-   */
-  double decay_time();
   /* --- */
 
   /* --- Transformations --- */
