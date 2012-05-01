@@ -172,12 +172,13 @@ CompositionPtr Composition::executeDecay(CompositionPtr parent, double time) {
 
   // perform decay
   DecayHandler handler;
-  CompMapPtr child = CompMapPtr(new CompMap(*parent->comp())); // copy parent comp
-  atomify(*child);
-  handler.setComp(child);
-  handler.decay(years);
-  child.reset(handler.comp());
-  massify(*child);
+  CompMapPtr child_comp = CompMapPtr(new CompMap(*parent->comp())); // copy parent comp
+  atomify(*child_comp);
+  handler.setComp(child_comp);
+  handler.decay(years_comp);
+  child_comp.reset(handler.comp());
+  massify(*child_comp);
+  CompositionPtr child = CompositionPtr(child_comp);
   return child;
 }
 
