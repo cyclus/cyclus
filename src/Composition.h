@@ -3,8 +3,6 @@
 #define _COMPOSITION_H
 
 #include <map>
-#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
-//#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -35,18 +33,8 @@ typedef int Iso;
    map of isotope integer to value (mass or atom)
    and a pointer to said map
  */
-typedef std::map<Iso, double> CompMap;
-
-/**
-   We only want one such map per composition, so a unique
-   pointer is used. note that a delete class must be used.
- */
-template<typename T> struct Deleter {
-  void operator() (T *p) {
-    delete p;
-  }
-};
-typedef boost::interprocess::unique_ptr< CompMap, Deleter<CompMap> > CompMapPtr;
+typedef std::map<Iso,double> CompMap;
+typedef boost::shared_ptr<CompMap> CompMapPtr;
 
 /**
    shared pointer to another composition
@@ -127,6 +115,12 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @param comp the initial atom-based composition
    */
   static void massify(CompMap& comp);
+
+  /**
+     alters comp, deviding each entry by its molar weight (g/mol)
+     @param comp the initial mass-based composition
+   */
+  static void atomify(CompMap& comp);
 
   /**
      alters comp, summing the total values to 1

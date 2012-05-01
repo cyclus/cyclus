@@ -80,10 +80,10 @@ void Composition::massify(CompMap& comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::atomify(CompMap& comp) {
   double sum;
-  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
     validateEntry(ci->first,ci->second);
     ci->second /= MT->gramsPerMol(ci->first);
-    sum+= ci->second;
+    sum += ci->second;
   }
   normalize(comp,sum);
 }
@@ -104,7 +104,7 @@ void Composition::normalize(CompMap& comp, double sum) {
   if ( sum != 1) { // only normalize if needed
     for (CompMap::iterator it = comp.begin(); 
          it != comp.end(); it++) {
-      it->second /= total;
+      it->second /= sum;
     }
   }
 }
@@ -112,8 +112,7 @@ void Composition::normalize(CompMap& comp, double sum) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::init(CompMap& comp) {
   normalize(comp);
-  CompMapPtr p(new CompMap(comp)); // copy comp into a unique pointer
-  composition_ = boost::interprocess::move(p); // move p to composition_
+  composition_ = CompMapPtr(new CompMap(comp)); // copy comp into composition_
   validateComposition(composition_);
   ID_ = 0;
   decay_time_ = 0;

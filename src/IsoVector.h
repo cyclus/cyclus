@@ -2,16 +2,22 @@
 #if !defined(_ISOVECTOR_H)
 #define _ISOVECTOR_H
 
-#include <map>
-#include <set>
-#include <utility>
-#include <math.h>
-#include <vector>
-#include <string>
-#include <libxml/tree.h>
-
-#include "IsotopicDefinitions.h"
+#include "Composition.h"
 #include "UseMatrixLib.h"
+
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
+#include <string>
+#include <vector>
+
+/* -- Useful Typedefs -- */
+/**
+   shared pointer to another composition
+ */
+class IsoVector;
+typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
+/* -- */
 
 /** 
    @class IsoVector 
@@ -37,7 +43,7 @@
    
    @endcode 
  */
-class IsoVector {
+class IsoVector : public boost::enable_shared_from_this<Composition> {
 public:
   /* --- Constructors and Destructors --- */
   /**
@@ -59,6 +65,11 @@ public:
      @param atom true if atom-basis, false if mass basis
    */
   IsoVector(CompMapPtr pcomp, bool atom); 
+
+  /**
+     copy constructor
+   */
+  IsoVector(const IsoVector& other); 
 
   /**
      default destructor
@@ -83,6 +94,15 @@ public:
      quantity for every isotope is equal. 
    */
   bool operator== (const IsoVector& rhs_vector) const;
+
+  /**
+     mixes two IsoVectors with a given ratio of v1:v2
+     @param v1 the first isovector
+     @param v2 the second isovector
+     @param ratio the amount of v1 compared to v2
+     @return a shared pointer to the resulting composition
+   */
+  static IsoVectorPtr mix(const IsoVector& v1, const IsoVector& v2, double ratio);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
@@ -92,7 +112,7 @@ public:
   int stateID();
 
   /**
-     Return the mass-based composition 
+     Return the composition 
    */
   CompMapPtr comp();
 
@@ -100,11 +120,6 @@ public:
      returns the decay time for the IsoVector's composition_
    */
   int decay_time();
-
-  /**
-     returns the parent of the IsoVector's composition_
-   */
-  IsoVectorPtr parent();
 
   /**
      whether or not this composition is logged as a recipe
@@ -145,15 +160,6 @@ public:
      @param efficiency the efficiency by which to perform that separation
    */
   void separate(const IsoVector& v, double efficiency);
-
-  /**
-     mixes two IsoVectors with a given ratio of v1:v2
-     @param v1 the first isovector
-     @param v2 the second isovector
-     @param ratio the amount of v1 compared to v2
-     @return a shared pointer to the resulting composition
-   */
-  static IsoVectorPtr mix(const IsoVector& v1, const IsoVector& v2, double ratio);
   /* --- */
 
   /* --- Printing Functionality  --- */
@@ -171,27 +177,9 @@ public:
   void init();
 
   /**
-     Turns a list of atom-based compositions
-     to mass-based
-   */
-  void massify(CompMapPtr comp);
-
-  /**
-     Turns a list of mass-based compositions
-     to atom-based
-   */
-  void atomify(CompMapPtr comp);
-
-  /**
      set's the composition for this isovector
    */    
-  void setComposition(comp_t* c);
-
-  /**
-     constructs a composition out of comp
-     and calls setComposition()
-   */    
-  void setComposition(CompMap* comp);
+  void setComposition(CompMapPtr comp);
 
   /**
      sets the composition for a mass or atom based
@@ -199,31 +187,14 @@ public:
      is called. setComposition() for the mass-based
      case is then called.
    */    
-  void setComposition(CompMap* comp, bool atom);
-
-  /**
-     determines the mass/atom normalizers for a composition
-   */    
-  std::pair<double,double> getNormalizers(CompMap* comp);
-
-  /**
-     adjusts the composition such that the mass normalizer
-     is equal to unity
-   */    
-  void normalize();
+  void setComposition(CompMapPtr comp, bool atom);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
   /**
      a pointer to the isovector's composition
    */
-  CompMapPtr composition_;
-
-  /**
-     a pointer to this isovector's parent, if it has one
-  */
-  IsoVectorPtr parent_;
-  
+  CompMapPtr composition_;  
   /* --- */
  
   /* --- Printing Functionality  --- */
