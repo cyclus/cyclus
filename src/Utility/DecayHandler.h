@@ -3,7 +3,7 @@
 #define _DECAYHANDLER_H
 
 #include "UseMatrixLib.h"
-#include "IsoVector.h"
+#include "Composition.h"
 
 /**
    A map type to represent all of the parent isotopes tracked.  The key 
@@ -57,7 +57,7 @@ class DecayHandler {
     /**
        The atomic composition map 
      */
-    CompMap atom_comp_;
+    CompMapPtr atom_comp_;
 
     /**
        whether the decay information is loaded 
@@ -83,7 +83,7 @@ class DecayHandler {
     /**
        set the composition from a CompMap 
      */
-    void setComp(CompMap comp);
+    void setComp(CompMapPtr comp);
 
     /**
        set the composition from a composition vector 
@@ -98,7 +98,7 @@ class DecayHandler {
     /**
        return the composition as a composition map 
      */ 
-    CompMap compAsCompMap();
+    CompMapPtr comp();
 
     /**
        decay the material 
