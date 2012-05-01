@@ -2,17 +2,11 @@
 #include "IsoVector.h"
 
 #include "CycException.h"
-#include "MassTable.h"
 #include "RecipeLogger.h"
 #include "Logger.h"
 #include "DecayHandler.h"
 
-#include <cmath>
 #include <sstream>
-#include <iostream>
-#include <vector>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 
 using namespace std;
 
@@ -292,40 +286,7 @@ std::vector<std::string>* IsoVector::compStrings(composition* c) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::executeDecay(double time_change) {
-  comp_t* parent = root_comp();
-  if (parent->logged()) { // check for duplicate decay isotopics
-    int t_i = decay_time();
-    int t_f = t_i + time_change;
-    bool check = RL->daughterLogged(*parent,t_f);
-    if (check) { // decay isotopics already exist
-      this->setComposition(RL->Daughter(*parent,t_f)); 
-    }
-    else { // create and log new isotopics
-      executeDecay(time_change,composition_); // changes composition_
-      RL->logRecipeDecay(*parent,composition_,t_f);
-    }
-  } // end p->logged
-  else {
-    executeDecay(time_change,composition_);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::executeDecay(double time_change, composition* child) {
-  // get decay time
-  double months_per_year = 12;
-  double years = time_change / months_per_year;
-
-  // perform decay
-  DecayHandler handler;
-  composition* parent = child;
-  CompMap* mass_comp = child->mass_fractions; 
-  atomify(mass_comp);
-  handler.setComp(*mass_comp);
-  handler.decay(years);
-  CompositionPtr child(new CompMap(handler.compAsCompMap());
-  this->setComposition(child,true); // changes composition_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

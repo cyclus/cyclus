@@ -19,7 +19,7 @@ typedef std::map<std::string,CompositionPtr> RecipeMap;
 /**
    set of decay times
  */
-typedef std::set<int> decay_times;
+typedef std::set<double> decay_times;
 
 /**
    map of composition times decayed
@@ -29,7 +29,7 @@ typedef std::map<CompositionPtr,decay_times> DecayTimesMap;
 /**
    map of decay time to composition
  */
-typedef std::map<int,CompositionPtr> DaughterMap; 
+typedef std::map<double,CompositionPtr> DaughterMap; 
 
 /**
    map of recipe composition to its decayed daughters
@@ -43,7 +43,7 @@ typedef std::map<CompositionPtr,DaughterMap> DecayChainMap;
  */
 class RecipeLogger {
   /* --- Singleton Members and Methods --- */
- public:
+ public: 
   friend class Composition;
 
   /**
@@ -100,7 +100,7 @@ class RecipeLogger {
      - calls the logRecipe() method
      @param t_f -> total time decayed from parent to child
    */
-  static void logRecipeDecay(CompositionPtr parent, CompositionPtr child, int t_f);
+  static void logRecipeDecay(CompositionPtr parent, CompositionPtr child, double t_f);
   
   /**
      checks if the recipe has been logged (i.e. it exists in the simulation)
@@ -125,7 +125,7 @@ class RecipeLogger {
   /**
      checks if the parent has already been decayed by this time
    */
-  static bool daughterLogged(CompositionPtr parent, int time);
+  static bool daughterLogged(CompositionPtr parent, double time);
 
  private:
   /**
@@ -141,7 +141,7 @@ class RecipeLogger {
   /**
      add a new decay time for a parent composition
    */
-  static void addDecayTimes(CompositionPtr parent, int time);
+  static void addDecayTimes(CompositionPtr parent, double time);
 
   /**
      accessing a set of decay times 
@@ -156,12 +156,12 @@ class RecipeLogger {
   /**
      accessing a specific daughter 
    */
-  static CompositionPtr& Daughter(CompositionPtr parent, int time);
+  static CompositionPtr& Daughter(CompositionPtr parent, double time);
 
   /**
      add a daughter to a map of daughters
    */
-  static void addDaughter(CompositionPtr parent, CompositionPtr child, int time);
+  static void addDaughter(CompositionPtr parent, CompositionPtr child, double time);
 
   /**
      calls recipeLogged() and throws an error if false
@@ -176,7 +176,7 @@ class RecipeLogger {
   /**
      calls daughterLogged() and throws an error if false
    */
-  static void checkDaughter(CompositionPtr parent, int time);
+  static void checkDaughter(CompositionPtr parent, double time);
 
   /**
      Stores the next available state ID 

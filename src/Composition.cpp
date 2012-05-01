@@ -50,10 +50,6 @@ int Composition::ID() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::parent() const {
-  if (!parent_) {
-    throw 
-      CycIndexException("parent pointer to composition not initialized.");
-  }
   return parent_;
 }
 
@@ -65,6 +61,26 @@ double Composition::decay_time() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::me() {
   return shared_from_this();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CompositionPtr Composition::root_comp(CompositionPtr comp) {
+  CompositionPtr child = comp;
+  while (child->parent()) {
+    child = child->parent();
+  }
+  return child;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Composition::root_decay_time(CompositionPtr comp) {
+  CompositionPtr child = comp;
+  double time = comp->decay_time();
+  while (child->parent()) {
+    child = child->parent();
+    time += child->decay_time();
+  }
+  return time;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -110,17 +126,49 @@ void Composition::normalize(CompMap& comp, double sum) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr Composition::decay(CompositionPtr parent, double time) {
+  CompositionPtr child;
+  CompositionPtr root = root_comp(parent);
+  if (root->logged()) { 
+    int t_f = root_decay_time(parent) + time;
+    bool logged = RL->daughterLogged(root,t_f);
+    if (logged) {
+      child = RL->Daughter(root,t_f);
+    } // end logged
+    else {
+      child = executeDecay(parent,time);
+      RL->logRecipeDecay(parent,child,t_f);
+    }
+  } // end root->logged()
+  else {
+    child = executeDecay(parent,time);
+  }
+  return child;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr Composition::executeDecay(CompositionPtr parent, double time) {
+  double months_per_year = 12;
+  double years = time / months_per_year;
+
+  // perform decay
+  DecayHandler handler;
+  CompMapPtr child = CompMapPtr(new CompMap(*parent->comp())); // copy parent comp
+  atomify(*child);
+  handler.setComp(child);
+  handler.decay(years);
+  child.reset(handler.comp());
+  massify(*child);
+  return child;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::init(CompMap& comp) {
   normalize(comp);
   composition_ = CompMapPtr(new CompMap(comp)); // copy comp into composition_
   validateComposition(composition_);
   ID_ = 0;
   decay_time_ = 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::setParent(Composition* p) {
-  this->setParent(CompositionPtr(p));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

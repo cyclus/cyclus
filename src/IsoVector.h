@@ -43,7 +43,7 @@ typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
    
    @endcode 
  */
-class IsoVector : public boost::enable_shared_from_this<Composition> {
+class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 public:
   /* --- Constructors and Destructors --- */
   /**
@@ -56,7 +56,7 @@ public:
      basis assumed to be mass-wise
      @param pcomp a pointer to a composition
    */
-  IsoVector(CompMapPtr pcomp); 
+  IsoVector(CompositionPtr pcomp); 
 
   /**
      constructor given some initial composition and some
@@ -64,7 +64,7 @@ public:
      @param pcomp a pointer to a composition
      @param atom true if atom-basis, false if mass basis
    */
-  IsoVector(CompMapPtr pcomp, bool atom); 
+  IsoVector(CompMapPtr pcompmap, bool atom); 
 
   /**
      copy constructor
@@ -112,9 +112,9 @@ public:
   int stateID();
 
   /**
-     Return the composition 
+     Return a pointer to the composition 
    */
-  CompMapPtr comp();
+  CompositionPtr comp();
 
   /**
      returns the decay time for the IsoVector's composition_
@@ -179,13 +179,12 @@ public:
   /**
      set's the composition for this isovector
    */    
-  void setComposition(CompMapPtr comp);
+  void setComposition(CompositionPtr pcomp);
 
   /**
      sets the composition for a mass or atom based
-     composition. if atom == true, then massify()
-     is called. setComposition() for the mass-based
-     case is then called.
+     composition. setComposition() for the mass-based
+     case is called.
    */    
   void setComposition(CompMapPtr comp, bool atom);
   /* --- */
@@ -194,7 +193,7 @@ public:
   /**
      a pointer to the isovector's composition
    */
-  CompMapPtr composition_;  
+  CompositionPtr composition_;  
   /* --- */
  
   /* --- Printing Functionality  --- */
@@ -202,12 +201,12 @@ public:
      return a pointer to a vector of the composition as strings 
      @return the composition string vector 
    */
-  static std::vector<std::string>* compStrings(comp_t* c);
+  static std::vector<std::string> compStrings(CompositionPtr c);
 
   /**
      used by print() to 'hide' print code when logging is not desired 
    */
-  static std::string detail(comp_t* c);
+  static std::string detail(CompositionPtr c);
   /* --- */
 };
 

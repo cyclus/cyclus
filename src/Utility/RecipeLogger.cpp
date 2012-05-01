@@ -144,7 +144,7 @@ void RecipeLogger::storeDecayableRecipe(CompositionPtr recipe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipeDecay(CompositionPtr parent, CompositionPtr child, int t_f) {
+void RecipeLogger::logRecipeDecay(CompositionPtr parent, CompositionPtr child, double t_f) {
   addDecayTime(parent,t_f);
   addDaughter(parent,child,t_f);
   logRecipe(child);
@@ -175,7 +175,7 @@ void RecipeLogger::checkDecayable(CompositionPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDaughter(CompositionPtr parent, int time) {
+void RecipeLogger::checkDaughter(CompositionPtr parent, double time) {
   if (!daughterLogged(parent,time)) {
     stringstream err;
     err << "RecipeLogger has not logged a decayed recipe for the parent " 
@@ -186,7 +186,7 @@ void RecipeLogger::checkDaughter(CompositionPtr parent, int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDecayTime(CompositionPtr parent, int time) {
+void RecipeLogger::addDecayTime(CompositionPtr parent, double time) {
   checkDecayable(parent);
   decayTimes(parent).insert(time);
 }
@@ -204,19 +204,19 @@ DaughterMap& RecipeLogger::Daughters(CompositionPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompositionPtr& RecipeLogger::Daughter(CompositionPtr parent, int time) {
+CompositionPtr& RecipeLogger::Daughter(CompositionPtr parent, double time) {
   checkDaughter(parent,time);
   return Daughters(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::daughterLogged(CompositionPtr parent, int time) {
+bool RecipeLogger::daughterLogged(CompositionPtr parent, double time) {
   int count = Daughters(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDaughter(CompositionPtr parent, CompositionPtr child, int time) {
+void RecipeLogger::addDaughter(CompositionPtr parent, CompositionPtr child, double time) {
   child->setParent(parent);
   child->setDecayTime(time);
   Daughter(parent,time) = child; // child is copied

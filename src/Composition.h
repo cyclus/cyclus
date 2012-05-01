@@ -107,6 +107,19 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      returns a shared pointer to this composition
    */
   CompositionPtr me();
+
+  /**
+     drills up the child-parent tree of comp, returning the root composition
+     @return the root composition of comp
+   */
+  static CompositionPtr root_comp(CompositionPtr comp);
+
+  /**
+     drills up the child-parent tree of comp, returning sum of decay times to
+     the root composition
+     @return the total decay time between comp and its root comp
+   */
+  static double root_decay_time(CompositionPtr comp);
   /* --- */
 
   /* --- Transformations --- */
@@ -135,6 +148,19 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @param sum the value by which to normalize it
    */
   static void normalize(CompMap& comp, double sum);
+
+  /**
+     decays a composition for a given time, assumed to be in months
+     
+     this public function checks with the RecipeLogger to see if comp is
+     logged as a decayable parent. if so, it will intelligently decay comp
+     if a daughter has not already been decayed. if one has, a copy will be
+     returned.
+     @param comp the composition to be decayed
+     @param time the decay time, in months
+     @return a pointer to the result of this decay
+   */
+  static CompositionPtr decay(CompositionPtr comp, double time);
   /* --- */
   
  private:
@@ -171,12 +197,6 @@ class Composition : public boost::enable_shared_from_this<Composition> {
   void init(CompMap& comp);
 
   /**
-     sets parent_ to a shared pointer to p
-     @param p a pointer to this Composition's parent
-   */
-  void setParent(Composition* p);
-
-  /**
      sets parent_ to some other parent, p
      @param p a predefined composition pointer to p
    */
@@ -187,6 +207,15 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @param time the time to set it to
    */
   void setDecayTime(int time);
+
+  /**
+     this private function uses the DecayHandler to decay a composition
+     by a given time
+     @param comp the composition to be decayed
+     @param time the decay time, in months
+     @return a pointer to the result of this decay
+   */
+  static CompositionPtr executeDecay(CompositionPtr comp, double time);
   /* --- */
   
  public:
