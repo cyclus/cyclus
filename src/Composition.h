@@ -93,6 +93,17 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      returns the composition's id
    */
   int ID() const;
+
+  /**
+     Return the mass fraction of an isotope in the composition
+   */
+  double massFraction(const Iso& tope) const;
+
+  /**
+     returns the atom fraction of an isotope in the composition
+   */
+  double atomFraction(const Iso& tope) const;
+
   /**
      returns a shared pointer to this composition's parent
    */
@@ -136,7 +147,8 @@ class Composition : public boost::enable_shared_from_this<Composition> {
   static void atomify(CompMap& comp);
 
   /**
-     alters comp, summing the total values to 1
+     alters comp, summing the total values and calling the normalize()
+     method
      @param comp the composition to normalize
    */
   static void normalize(CompMap& comp);
@@ -172,9 +184,14 @@ class Composition : public boost::enable_shared_from_this<Composition> {
   CompMapPtr composition_;
 
   /**
+     the ratio of the mass normalizer to atom normalizer
+   */
+  double mass_to_atoms_;
+
+  /**
      the overall elapsed decay time between this Composition and its parent
    */
-  int decay_time_;
+  double decay_time_;
 
   /**
      the Composition's database ID, if it has one. default is 0.
@@ -197,6 +214,13 @@ class Composition : public boost::enable_shared_from_this<Composition> {
   void init(CompMap& comp);
 
   /**
+     loops through the a mass-based CompMap, multiplying their fraction
+     by their gram/mol value.
+     @param comp is a normalized CompMap of mass basis
+   */
+  double calculateMassAtomRatio(CompMap& comp);
+
+  /**
      sets parent_ to some other parent, p
      @param p a predefined composition pointer to p
    */
@@ -206,7 +230,7 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      sets decay_time_ to a value
      @param time the time to set it to
    */
-  void setDecayTime(int time);
+  void setDecayTime(double time);
 
   /**
      this private function uses the DecayHandler to decay a composition

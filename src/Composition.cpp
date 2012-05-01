@@ -3,6 +3,7 @@
 
 #include "CycException.h"
 #include "MassTable.h"
+#include "DecayHandler.h"
 
 using namespace std;
 
@@ -49,6 +50,24 @@ int Composition::ID() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::massFraction(const Iso& tope) const {
+  validateIsotopeNumber(tope);
+  if (composition->count(tope) == 0) {
+    throw CycIndexException("This composition has no Iso: " + tope);
+  }
+  return (*composition_)[tope];
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::atomFraction(const Iso& tope) const {
+  validateIsotopeNumber(tope);
+  if (composition->count(tope) == 0) {
+    throw CycIndexException("This composition has no Iso: " + tope);
+  }
+  return (*composition_)[tope] * MT->gramsPerMol(tope) / mass_to_atoms_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::parent() const {
   return parent_;
 }
@@ -85,7 +104,7 @@ double Composition::root_decay_time(CompositionPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::massify(CompMap& comp) {
-  double sum;
+  double sum = 0.0;
   for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
     ci->second *= MT->gramsPerMol(ci->first);
     sum+= ci->second;
@@ -95,7 +114,7 @@ void Composition::massify(CompMap& comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::atomify(CompMap& comp) {
-  double sum;
+  double sum = 0.0;
   for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
     validateEntry(ci->first,ci->second);
     ci->second /= MT->gramsPerMol(ci->first);
@@ -169,8 +188,17 @@ void Composition::init(CompMap& comp) {
   validateComposition(composition_);
   ID_ = 0;
   decay_time_ = 0;
+  mass_to_atoms_ = calculateMassAtomRatio(comp);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::calculateMassAtomRatio(CompMap& comp) {
+  double sum = 0.0;
+  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
+    sum+= ci->second;
+  }
+  return sum;
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::setParent(CompositionPtr p) {
   parent_ = p;

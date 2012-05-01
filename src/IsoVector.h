@@ -127,16 +127,6 @@ public:
   bool logged();
 
   /**
-     Return the mass fraction of an isotope in the composition
-   */
-  double massFraction(Iso tope);
-
-  /**
-     returns the atom fraction of an isotope in the composition
-   */
-  double atomFraction(Iso tope);
-
-  /**
      Returns true if the given isotope's number density is less than the 
      conservation of mass tolerance. 
       
@@ -144,14 +134,6 @@ public:
      @return true iff nd(tope) == 0 
    */
   bool isZero(Iso tope);
-
-  /**
-     Decays this Material object for the given change in time and 
-     updates its composition map with the new number densities. 
-      
-     @param time_change the number of months to decay 
-   */
-  void executeDecay(double time_change);
 
   /**
      separates a composition of isovector v from this isovector's composition
