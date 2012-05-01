@@ -133,6 +133,14 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @param comp the composition to normalize
    */
   static void normalize(CompMap& comp);
+
+  /**
+     divides each entry in a CompMap by a value labeled sum. it is assumed
+     that sum is the total of all values in the CompMap.
+     @param comp the composition to normalize
+     @param sum the value by which to normalize it
+   */
+  static void normalize(CompMap& comp, double sum);
   /* --- */
   
  private:

@@ -73,12 +73,16 @@ void RecipeLogger::load_recipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::load_recipe(xmlNodePtr cur) {
   // initialize comp map
-  CompMap mass_fractions;
+  CompMap values;
 
   // get general values from xml
   string name = XMLinput->get_xpath_content(cur,"name");
   string basis = XMLinput->get_xpath_content(cur,"basis");
   bool atom = (basis == "atom");
+  bool mass = (basis == "mass");
+  if (!atom && !mass) {
+    throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
+  }
   xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
 
   // get values needed for composition
@@ -89,20 +93,12 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
     iso_node = isotopes->nodeTab[i];
     key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
     value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
-
-    if (atom) {
-      value = value / MT->gramsPerMol(key);
-    }
-    else {
-      throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
-    }
-
     // update our mass-related values
-    mass_fractions[key] = value;
+    values[key] = value;
   }
   
   // make a new composition
-  CompositionPtr recipe(new Composition(mass_fractions));
+  CompositionPtr recipe(new Composition(values,atom));
 
   // log this composition (static members and database)
   logRecipe(name,recipe);
