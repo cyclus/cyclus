@@ -2,16 +2,22 @@
 #if !defined(_ISOVECTOR_H)
 #define _ISOVECTOR_H
 
-#include <map>
-#include <set>
-#include <utility>
-#include <math.h>
-#include <vector>
-#include <string>
-#include <libxml/tree.h>
-
-#include "IsotopicDefinitions.h"
+#include "Composition.h"
 #include "UseMatrixLib.h"
+
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
+#include <string>
+#include <vector>
+
+/* -- Useful Typedefs -- */
+/**
+   shared pointer to another composition
+ */
+class IsoVector;
+typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
+/* -- */
 
 /** 
    @class IsoVector 
@@ -37,7 +43,7 @@
    
    @endcode 
  */
-class IsoVector {
+class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 public:
   /* --- Constructors and Destructors --- */
   /**
@@ -48,24 +54,22 @@ public:
   /**
      constructor given some previous composition 
      basis assumed to be mass-wise
-     @param comp the previous composition 
+     @param pcomp a pointer to a composition
    */
-  IsoVector(comp_t* comp); 
-
-  /**
-     constructor given some initial composition 
-     basis assumed to be mass-wise
-     @param initial_comp the initial composition 
-   */
-  IsoVector(CompMap* initial_comp); 
+  IsoVector(CompositionPtr pcomp); 
 
   /**
      constructor given some initial composition and some
      basis
-     @param initial_comp the initial composition 
+     @param pcomp a pointer to a composition
      @param atom true if atom-basis, false if mass basis
    */
-  IsoVector(CompMap* initial_comp, bool atom); 
+  IsoVector(CompMapPtr pcompmap, bool atom); 
+
+  /**
+     copy constructor
+   */
+  IsoVector(const IsoVector& other); 
 
   /**
      default destructor
@@ -75,15 +79,13 @@ public:
 
   /* --- Operators  --- */
   /**
-     Adds like isotopes 
+     adds two compositions
+     uses the mix() function with a ratio of 1
    */
   const IsoVector operator+ (const IsoVector& rhs_vector) const;
 
   /**
-     Subtracts like isotopes 
-      
-     @exception CycRangeException thrown if subtraction results in a 
-     negative quantity for any isotope. 
+     subtracts two compositions
    */
   const IsoVector operator- (const IsoVector& rhs_vector) const;
 
@@ -94,18 +96,13 @@ public:
   bool operator== (const IsoVector& rhs_vector) const;
 
   /**
-     multiplication operators
+     mixes two IsoVectors with a given ratio of v1:v2
+     @param v1 the first isovector
+     @param v2 the second isovector
+     @param ratio the amount of v1 compared to v2
+     @return a shared pointer to the resulting composition
    */
-  friend const IsoVector operator* (const IsoVector &v, double factor);
-  friend const IsoVector operator* (double factor, const IsoVector &v);
-  friend const IsoVector operator* (const IsoVector &v, int factor);
-  friend const IsoVector operator* (int factor, const IsoVector &v);
-
-  /**
-     division operators
-   */
-  friend const IsoVector operator/ (const IsoVector &v, double factor);
-  friend const IsoVector operator/ (const IsoVector &v, int factor);
+  static IsoVectorPtr mix(const IsoVector& v1, const IsoVector& v2, double ratio);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
@@ -115,9 +112,9 @@ public:
   int stateID();
 
   /**
-     Return the mass-based composition 
+     Return a pointer to the composition 
    */
-  CompMap* mass_comp();
+  CompositionPtr comp();
 
   /**
      returns the decay time for the IsoVector's composition_
@@ -125,34 +122,9 @@ public:
   int decay_time();
 
   /**
-     returns the parent of the IsoVector's composition_
-   */
-  comp_t* parent();
-
-  /**
      whether or not this composition is logged as a recipe
   */
   bool logged();
-
-  /**
-     calls minimizeComposition() on composition_
-   */    
-  void minimizeComposition();
-
-  /**
-     multiply the mass_normalizer by a factor; used in multiplication
-   */
-  void multMassNormBy(double factor);
-
-  /**
-     Return the mass fraction of an isotope in the composition
-   */
-  double massFraction(Iso tope);
-
-  /**
-     returns the atom fraction of an isotope in the composition
-   */
-  double atomFraction(Iso tope);
 
   /**
      Returns true if the given isotope's number density is less than the 
@@ -164,30 +136,12 @@ public:
   bool isZero(Iso tope);
 
   /**
-     Decays this Material object for the given change in time and 
-     updates its composition map with the new number densities. 
-      
-     @param time_change the number of months to decay 
+     separates a composition of isovector v from this isovector's composition
+     at a given effiency
+     @param v the isovector defining the composition to be separated
+     @param efficiency the efficiency by which to perform that separation
    */
-  void executeDecay(double time_change);
-  /* --- */
-
-  /* --- Isotope Wikipedia  --- */ 
-  /**
-     Returns the atomic number of the isotope with the given identifier. 
-      
-     @param tope the isotope whose atomic number is being returned 
-     @return the atomic number 
-   */
-  static int getAtomicNum(Iso tope);
-
-  /**
-     Returns the mass number of the isotope with the given identifier. 
-      
-     @param tope the isotope whose mass number is being returned 
-     @return the mass number 
-   */
-  static int getMassNum(Iso tope);
+  void separate(const IsoVector& v, double efficiency);
   /* --- */
 
   /* --- Printing Functionality  --- */
@@ -205,80 +159,23 @@ public:
   void init();
 
   /**
-     Turns a list of atom-based compositions
-     to mass-based
-   */
-  void massify(CompMap* comp);
-
-  /**
-     Turns a list of mass-based compositions
-     to atom-based
-   */
-  void atomify(CompMap* comp);
-
-  /**
      set's the composition for this isovector
    */    
-  void setComposition(comp_t* c);
-
-  /**
-     constructs a composition out of comp
-     and calls setComposition()
-   */    
-  void setComposition(CompMap* comp);
+  void setComposition(CompositionPtr pcomp);
 
   /**
      sets the composition for a mass or atom based
-     composition. if atom == true, then massify()
-     is called. setComposition() for the mass-based
-     case is then called.
+     composition. setComposition() for the mass-based
+     case is called.
    */    
-  void setComposition(CompMap* comp, bool atom);
-
-  /**
-     determines the mass/atom normalizers for a composition
-   */    
-  std::pair<double,double> getNormalizers(CompMap* comp);
-
-  /**
-     adjusts the composition such that the mass normalizer
-     is equal to unity
-   */    
-  void minimizeComposition(comp_t* c);
-
-  /**
-     multiply the mass_normalizer of c by a factor; 
-     used in multiplication
-   */
-  void multMassNormBy(comp_t* c,double factor);
+  void setComposition(CompMapPtr comp, bool atom);
   /* --- */
 
   /* --- Instance Interaction  --- */ 
   /**
      a pointer to the isovector's composition
    */
-  comp_t composition_;
-  /* --- */
-
-  /* --- Isotope Wikipedia  --- */
-  /**
-     calls validateIsotopeNumber() and validateFraction() 
-     for each isotope and fraction value in this IsoVector's 
-     composition
-   */
-  void validateComposition();
-
-  /**
-     throws an error if fraction < 0.0
-   */
-  static void validateFraction(double fraction);
-
-  /**
-     Used to determine validity of isotope defnition. 
-     @param tope isotope identifier 
-     @exception thrown if isotope identifier is invalid 
-   */
-  static void validateIsotopeNumber(Iso tope);
+  CompositionPtr composition_;  
   /* --- */
  
   /* --- Printing Functionality  --- */
@@ -286,12 +183,12 @@ public:
      return a pointer to a vector of the composition as strings 
      @return the composition string vector 
    */
-  static std::vector<std::string>* compStrings(comp_t* c);
+  static std::vector<std::string> compStrings(CompositionPtr c);
 
   /**
      used by print() to 'hide' print code when logging is not desired 
    */
-  static std::string detail(comp_t* c);
+  static std::string detail(CompositionPtr c);
   /* --- */
 };
 
