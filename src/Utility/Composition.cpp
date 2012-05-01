@@ -44,12 +44,22 @@ bool Composition::logged() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr Composition::me() {
+  return shared_from_this();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::parent() {
   if (!parent_) {
     throw 
       CycIndexException("parent pointer to composition not initialized.");
   }
   return parent_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::decay_time() {
+  return decay_time_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -78,7 +88,7 @@ void Composition::normalize(CompMap& comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Composition::init(CompMap& comp) {
   normalize(comp);
-  composition_ = CompMapPtr(new CompMap(comp));
+  composition_ = CompMapPtr(new CompMap(comp)); // comp never changes past this
   validateComposition(composition_);
   ID_ = 0;
   decay_time_ = 0;
@@ -92,6 +102,11 @@ void Composition::setParent(Composition* p) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::setParent(CompositionPtr p) {
   parent_.reset(p);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::setDecayTime(int time) {
+  decay_time_ = time;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

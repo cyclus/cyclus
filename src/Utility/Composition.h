@@ -3,8 +3,9 @@
 #define _COMPOSITION_H
 
 #include <map>
-#include "boost/shared_ptr.hpp"
-#include "boost/unique_ptr.hpp"
+#include <boost/unique_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 /* -- Useful Definitions -- */
 /**
@@ -51,7 +52,7 @@ typedef boost::shared_ptr<Composition> CompositionPtr;
    isotopic compositions so that they may be logged with the 
    BookKeeper.
 */
-class Composition {
+class Composition : public enable_shared_from_this<Composition> {
  public:
   /* --- Constructors and Destructors --- */
   /**
@@ -82,9 +83,19 @@ class Composition {
   bool logged();
 
   /**
+     returns a shared pointer to this composition
+   */
+  CompositionPtr me();
+
+  /**
      returns a shared pointer to this composition's parent
    */
   CompositionPtr parent();
+
+  /**
+     returns the time decayed between this Composition and its parent
+   */
+  double decay_time();
   /* --- */
 
   /* --- Transformations --- */
@@ -145,6 +156,12 @@ class Composition {
      @param p a predefined composition pointer to p
    */
   void setParent(CompositionPtr p);
+
+  /**
+     sets decay_time_ to a value
+     @param time the time to set it to
+   */
+  void setDecayTime(int time);
   /* --- */
   
  public:

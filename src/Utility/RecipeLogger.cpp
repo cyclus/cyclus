@@ -73,7 +73,7 @@ void RecipeLogger::load_recipes() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::load_recipe(xmlNodePtr cur) {
   // initialize comp map
-  CompMap_p mass_fractions(new CompMap);
+  CompMap mass_fractions;
 
   // get general values from xml
   string name = XMLinput->get_xpath_content(cur,"name");
@@ -98,18 +98,18 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
     }
 
     // update our mass-related values
-    (*mass_fractions)[key] = value;
+    mass_fractions[key] = value;
   }
   
   // make a new composition
-  comp_p recipe(new comp_t(mass_fractions));
+  CompositionPtr recipe(new Composition(mass_fractions));
 
   // log this composition (static members and database)
   logRecipe(name,recipe);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(std::string name, comp_p recipe) {
+void RecipeLogger::logRecipe(std::string name, CompositionPtr recipe) {
   if ( !recipeLogged(name) ) {
     logRecipe(recipe); // log this with the database, assigns id
     recipes_[name] = recipe; // store this as a named recipe, copies recipe
@@ -124,33 +124,32 @@ bool RecipeLogger::recipeLogged(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(comp_p recipe) {
+void RecipeLogger::logRecipe(CompositionPtr recipe) {
   if (!recipe->logged()) {
-    recipe->ID = nextStateID_++;
-    recipe->normalize();
+    recipe->ID_ = nextStateID_++;
     addToTable(*recipe);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-comp_p RecipeLogger::Recipe(std::string name) {
+CompositionPtr RecipeLogger::Recipe(std::string name) {
   checkRecipe(name);
   return recipes_[name];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::storeDecayableRecipe(comp_p recipe) {
+void RecipeLogger::storeDecayableRecipe(CompositionPtr recipe) {
   // initialize containers
   decay_times times;
   DaughterMap daughters;
   // assign containers
-  decay_times_.insert( pair<comp_p,decay_times>(recipe,times) );
-  decay_chains_.insert( pair<comp_p,DaughterMap>(recipe,daughters) );
+  decay_times_.insert( pair<CompositionPtr,decay_times>(recipe,times) );
+  decay_chains_.insert( pair<CompositionPtr,DaughterMap>(recipe,daughters) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipeDecay(comp_p parent, comp_p child, int t_f) {
-  decayTimes(parent).insert(t_f);
+void RecipeLogger::logRecipeDecay(CompositionPtr parent, CompositionPtr child, int t_f) {
+  addDecayTime(parent,t_f);
   addDaughter(parent,child,t_f);
   logRecipe(child);
 }
@@ -170,7 +169,7 @@ void RecipeLogger::checkRecipe(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDecayable(comp_p parent) {
+void RecipeLogger::checkDecayable(CompositionPtr parent) {
   if (!compositionDecayable(parent)) {
     stringstream err;
     err << "RecipeLogger has not logged recipe with id:" << parent->ID
@@ -180,7 +179,7 @@ void RecipeLogger::checkDecayable(comp_p parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDaughter(comp_p parent, int time) {
+void RecipeLogger::checkDaughter(CompositionPtr parent, int time) {
   if (!daughterLogged(parent,time)) {
     stringstream err;
     err << "RecipeLogger has not logged a decayed recipe for the parent " 
@@ -190,39 +189,45 @@ void RecipeLogger::checkDaughter(comp_p parent, int time) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RecipeLogger::addDecayTime(CompositionPtr parent, int time) {
+  checkDecayable(parent);
+  decayTimes(parent).insert(time);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLogger::decayTimes(comp_p parent) {
+decay_times& RecipeLogger::decayTimes(CompositionPtr parent) {
   checkDecayable(parent);
   return decay_times_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DaughterMap& RecipeLogger::Daughters(comp_p parent) {
+DaughterMap& RecipeLogger::Daughters(CompositionPtr parent) {
   checkDecayable(parent);
   return decay_chains_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-comp_p RecipeLogger::Daughter(comp_p parent, int time) {
+CompositionPtr& RecipeLogger::Daughter(CompositionPtr parent, int time) {
   checkDaughter(parent,time);
   return Daughters(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::daughterLogged(comp_p parent, int time) {
+bool RecipeLogger::daughterLogged(CompositionPtr parent, int time) {
   int count = Daughters(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDaughter(comp_p parent, comp_p child, int time) {
+void RecipeLogger::addDaughter(CompositionPtr parent, CompositionPtr child, int time) {
   child->setParent(parent);
-  child->decay_time = time;
-  Daughters(parent)[time] = child; // child is copied
+  child->setDecayTime(time);
+  Daughter(parent,time) = child; // child is copied
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::compositionDecayable(comp_p comp) {
+bool RecipeLogger::compositionDecayable(CompositionPtr comp) {
   int count1 = decay_times_.count(comp);
   int count2 = decay_chains_.count(comp);
   return (count1 != 0 && count2 != 0); // true iff comp in both 
@@ -246,7 +251,7 @@ void RecipeLogger::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLogger::addToTable(comp_t &recipe){
+void RecipeLogger::addToTable(Composition& recipe){
   // if we haven't logged a composition yet, define the table
   if ( !iso_table->defined() ) {
     RecipeLogger::define_table();
