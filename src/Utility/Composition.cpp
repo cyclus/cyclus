@@ -64,20 +64,40 @@ double Composition::decay_time() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::massify(CompMap& comp) {
+  double sum;
   for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+    validateEntry(ci->first,ci->second);
     ci->second *= MT->gramsPerMol(ci->first);
+    sum+= ci->second;
   }
+  normalize(comp,sum);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::atomify(CompMap& comp) {
+  double sum;
+  for (CompMap::iterator ci = comp->begin(); ci != comp->end(); ci++) {
+    validateEntry(ci->first,ci->second);
+    ci->second /= MT->gramsPerMol(ci->first);
+    sum+= ci->second;
+  }
+  normalize(comp,sum);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::normalize(CompMap& comp) {
-  double total = 0.0;
+  double sum = 0.0;
   for (CompMap::iterator it = comp->begin(); 
        it != comp->end(); it++) {
-    total += it->second;
-    validateEntry(it->first,it->second);
+    validateEntry(ci->first,ci->second);
+    sum += it->second;
   }
-  if (total != 1) { // only normalize if needed
+  normalize(comp,sum);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::normalize(CompMap& comp, double sum) {
+  if ( sum != 1) { // only normalize if needed
     for (CompMap::iterator it = comp->begin(); 
          it != comp->end(); it++) {
       it->second /= total;

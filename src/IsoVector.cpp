@@ -292,18 +292,6 @@ std::vector<std::string>* IsoVector::compStrings(composition* c) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::getAtomicNum(Iso tope) {
-  validateIsotopeNumber(tope);
-  return tope / 1000; // integer division
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int IsoVector::getMassNum(Iso tope) {
-  validateIsotopeNumber(tope);
-  return tope % 1000;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::executeDecay(double time_change) {
   comp_t* parent = root_comp();
   if (parent->logged()) { // check for duplicate decay isotopics
@@ -336,8 +324,8 @@ void IsoVector::executeDecay(double time_change, composition* child) {
   atomify(mass_comp);
   handler.setComp(*mass_comp);
   handler.decay(years);
-  CompMap* comp = new CompMap(handler.compAsCompMap());
-  this->setComposition(comp,true); // changes composition_
+  CompositionPtr child(new CompMap(handler.compAsCompMap());
+  this->setComposition(child,true); // changes composition_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -369,43 +357,7 @@ comp_t* IsoVector::root_comp() {
   }
   return child;
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateComposition() {
-  int tope;
-  double fraction;
-  CompMap* fractions = composition_->mass_fractions;
-  for (CompMap::iterator comp_iter = fractions->begin(); 
-       comp_iter != fractions->end(); comp_iter++) {
-    // isotope number
-    tope = comp_iter->first;
-    validateIsotopeNumber(tope);
-    // mass fraction
-    fraction = comp_iter->second;
-    validateFraction(fraction);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateFraction(double fraction) {
-    if (fraction < 0.0) {
-      string err_msg = "Composition has negative quantity for an isotope.";
-      throw CycRangeException(err_msg);
-    }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::validateIsotopeNumber(Iso tope) {
-  int lower_limit = 1001;
-  int upper_limit = 1182949;
-
-  if (tope < lower_limit || tope > upper_limit) {
-    stringstream st;
-    st << tope;
-    string isotope = st.str();
-    throw CycRangeException("Isotope identifier '" + isotope + "' is not valid.");
-  }
-}
+;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::mass_normalizer() {
@@ -427,6 +379,7 @@ double IsoVector::massFraction(Iso tope, composition* c) {
 double IsoVector::atomFraction(Iso tope) {
   return atomFraction(tope,composition_);
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double IsoVector::atomFraction(Iso tope, composition* c) {
   double value = (*c->mass_fractions)[tope];
