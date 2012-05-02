@@ -121,85 +121,6 @@ void IsoVector::multMassNormBy(composition* c, double factor) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator+ (IsoVector& rhs_vector) {
-  int isotope;
-  double rhs_fracs;
-  double rhs_normalizer = rhs_vector.mass_normalizer();
-  CompMap* rhs_comp = rhs_vector.mass_comp();
-  CompMap* sum_comp = new CompMap(*mass_comp());
-
-  CompMap::iterator rhs;
-  for (rhs = rhs_comp->begin(); rhs != rhs_comp->end(); rhs++) {
-    isotope = rhs->first;
-    rhs_fracs = rhs->second;
-
-    double value = rhs_fracs * rhs_normalizer / mass_normalizer();
-    if (sum_comp->count(isotope) == 0) {
-      (*sum_comp)[isotope] = value;
-    }
-    else {
-      (*sum_comp)[isotope] += value;
-    }
-  }
-
-  IsoVector temp(sum_comp);
-  return (temp);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVector IsoVector::operator- (IsoVector& rhs_vector) {
-  int isotope;
-  double rhs_fracs;
-  double rhs_normalizer = rhs_vector.mass_normalizer();
-  CompMap* rhs_comp = rhs_vector.mass_comp();
-  CompMap* sum_comp = new CompMap(*mass_comp());
-
-  CompMap::iterator rhs;
-  for (rhs = rhs_comp->begin(); rhs != rhs_comp->end(); rhs++) {
-    isotope = rhs->first;
-    rhs_fracs = rhs->second;
-
-    double value = rhs_fracs * rhs_normalizer / mass_normalizer();
-    if (sum_comp->count(isotope) > 0) {
-      if ( (*sum_comp)[isotope] > value) {
-        (*sum_comp)[isotope] -= value;
-      }
-      else {
-        (*sum_comp)[isotope] = 0;
-      }
-    }
-  }
-  IsoVector temp(sum_comp);
-  return (temp);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::operator== (IsoVector& rhs_vector) {
-  int isotope;
-  double diff;
-  CompMap* this_comp = mass_comp();
-  CompMap* rhs_comp = rhs_vector.mass_comp();
-  
-  if (this_comp->size() != rhs_comp->size() ) {
-    return false;
-  }
-
-  CompMap::iterator rhs_iter;
-  for (rhs_iter = rhs_comp->begin(); rhs_iter != rhs_comp->end(); rhs_iter++) {
-    isotope = rhs_iter->first;
-    if (this_comp->count(isotope) == 0) {
-      return false;
-    }
-    diff = fabs(massFraction(isotope) - rhs_vector.massFraction(isotope));
-    if (diff > EPS_PERCENT) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector operator* (IsoVector &v, double factor) {
   IsoVector result = *this;
   result.multMassNormBy(factor);
@@ -246,43 +167,8 @@ void IsoVector::printRecipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::print(composition* c) {
-  CLOG(LEV_INFO3) << detail(c);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
   print(composition_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::detail(composition* c) {
-  stringstream ss;
-  vector<string>::iterator entry;
-  vector<string>* entries = compStrings(c);
-  for (entry = entries->begin(); entry != entries->end(); entry++) {
-    CLOG(LEV_INFO3) << *entry;
-  }
-  delete entries;
-  return "";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string>* IsoVector::compStrings(composition* c) {
-  CompMap::iterator entry;
-  int isotope;
-  stringstream ss;
-  vector<string>* comp_strings = new vector<string>();
-  CompMap* comp = c->mass_fractions;
-  for (entry = comp->begin(); entry != comp->end(); entry++) {
-    ss.str("");
-    isotope = entry->first;
-    if (massFraction(isotope,c) >= EPS_PERCENT) {
-      ss << isotope << ": " << entry->second / c->mass_normalizer << " % / kg";
-      comp_strings->push_back(ss.str());
-    }
-  }
-  return comp_strings;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

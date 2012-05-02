@@ -4,6 +4,10 @@
 #include "CycException.h"
 #include "MassTable.h"
 #include "DecayHandler.h"
+#include "RecipeLogger.h"
+
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -34,9 +38,61 @@ Composition::~Composition() {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator= (const Composition& rhs) {
+  composition_ = rhs.comp();
+  decay_time_ = rhs.decay_time();
+  ID_ = rhs.ID();
+  mass_to_atoms_ = rhs.mass_to_atoms();
+  parent_ = rhs.parent();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator+= (const Composition& rhs) {
+  CompositionPtr comp = mix(*this,rhs,1.0);
+  init(*comp->comp());
+  return *this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator-= (const Composition& rhs) {
+  CompositionPtr comp = separate(*this,rhs,1.0);
+  init(*comp->comp());
+  return *this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Composition Composition::operator+ (const Composition& rhs) const {
+  Composition result = *this;
+  result += rhs;
+  return result;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Composition Composition::operator- (const Composition& rhs) const {
+  Composition result = *this;
+  result -= rhs;
+  return result;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Composition::operator<(const Composition& other) const {
-  return (ID_ < other.ID());
+bool Composition::operator<(const Composition& rhs) const {
+  return (ID_ < rhs.ID());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Composition::operator== (const Composition& rhs) const {
+  return (composition_ == rhs.comp());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Composition::operator!= (const Composition& rhs) const {
+  return !(*this == rhs);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompMapPtr Composition::comp() const {
+  return composition_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -52,7 +108,7 @@ int Composition::ID() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::massFraction(const Iso& tope) const {
   validateIsotopeNumber(tope);
-  if (composition->count(tope) == 0) {
+  if (composition_->count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
   return (*composition_)[tope];
@@ -61,7 +117,7 @@ double Composition::massFraction(const Iso& tope) const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::atomFraction(const Iso& tope) const {
   validateIsotopeNumber(tope);
-  if (composition->count(tope) == 0) {
+  if (composition_->count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
   return (*composition_)[tope] * MT->gramsPerMol(tope) / mass_to_atoms_;
@@ -75,6 +131,11 @@ CompositionPtr Composition::parent() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::decay_time() const {
   return decay_time_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::mass_to_atoms() const {
+  return mass_to_atoms_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -166,30 +227,86 @@ CompositionPtr Composition::decay(CompositionPtr parent, double time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr mix(const Composition& c1, const Composition& c2, double ratio) {
+  CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
+  CompMapPtr add_map = c2.comp();
+  for (CompMap::iterator it = add_map->begin(); it != add_map->end(); it++) {
+    double value = it->second * ratio;
+    if (copy_map.count(it->first) == 0) {
+      copy_map[it->first] = value;
+    }
+    else {
+      copy_map[it->first] += value;
+    }
+  }
+  return CompositionPtr(new Composition(copy_map));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr mix(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double ratio) {
+  return mix(*p_c1,*p_c2,ratio);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr separate(const Composition& c1, const Composition& c2, double efficiency) {
+  CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
+  CompMapPtr remove_map = c2.comp();
+  for (CompMap::iterator it = remove_map->begin(); it != remove_map->end(); it++) {
+    if (copy_map.count(it->first) != 0) {
+      double value = copy_map[it->first];
+      double subtraction = efficiency * (*remove_map)[it->first];
+      double difference = value - subtraction;
+      if (difference > 0) {
+        copy_map[it->first] -= difference;
+      }
+      else {
+        copy_map.erase(it->first);
+      }
+    } // end copy_map.count(it->first) != 0
+  } // end for loop
+  return CompositionPtr(new Composition(copy_map));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr separate(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double efficiency) {
+  return separate(*p_c1,*p_c2,efficiency);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::executeDecay(CompositionPtr parent, double time) {
   double months_per_year = 12;
   double years = time / months_per_year;
-
-  // perform decay
   DecayHandler handler;
-  CompMapPtr child_comp = CompMapPtr(new CompMap(*parent->comp())); // copy parent comp
-  atomify(*child_comp);
-  handler.setComp(child_comp);
-  handler.decay(years_comp);
-  child_comp.reset(handler.comp());
-  massify(*child_comp);
-  CompositionPtr child = CompositionPtr(child_comp);
+  // copy parent comp
+  CompMapPtr to_decay = CompMapPtr( new CompMap(*parent->comp()) );
+  atomify(*to_decay);
+  handler.setComp(to_decay);
+  handler.decay(years);
+  // construct composition from atom-based comp
+  CompositionPtr child = CompositionPtr(new Composition(*handler.comp(),true));
   return child;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::init(CompMap& comp) {
-  normalize(comp);
+  this->reset();
   composition_ = CompMapPtr(new CompMap(comp)); // copy comp into composition_
-  validateComposition(composition_);
+  this->checkCompMap();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::reset() {
   ID_ = 0;
   decay_time_ = 0;
-  mass_to_atoms_ = calculateMassAtomRatio(comp);
+  parent_.reset();
+  composition_.reset();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::checkCompMap() {
+  normalize(*composition_);
+  validateComposition(composition_);
+  mass_to_atoms_ = calculateMassAtomRatio(*composition_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -206,7 +323,7 @@ void Composition::setParent(CompositionPtr p) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::setDecayTime(int time) {
+void Composition::setDecayTime(double time) {
   decay_time_ = time;
 }
 
@@ -255,4 +372,33 @@ void Composition::validateValue(const double& value) {
     string err_msg = "Composition has negative quantity for an isotope.";
     throw CycRangeException(err_msg);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Composition::print() {
+  CLOG(LEV_INFO3) << detail(this->comp());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Composition::detail(CompMapPtr c) {
+  stringstream ss;
+  vector<string> entries = compStrings(c);
+  for (vector<string>::iterator entry = entries.begin(); 
+       entry != entries.end(); entry++) {
+    CLOG(LEV_INFO3) << *entry;
+  }
+  return "";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> Composition::compStrings(CompMapPtr c) {
+  stringstream ss;
+  vector<string> comp_strings;
+  for (CompMap::iterator entry = c->begin(); 
+       entry != c->end(); entry++) {
+    ss.str("");
+    ss << entry->first << ": " << entry->second << " % / kg";
+    comp_strings.push_back(ss.str());
+  }
+  return comp_strings;
 }

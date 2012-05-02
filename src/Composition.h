@@ -3,6 +3,8 @@
 #define _COMPOSITION_H
 
 #include <map>
+#include <vector>
+#include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -77,13 +79,55 @@ class Composition : public boost::enable_shared_from_this<Composition> {
 
   /* --- Operators --- */
   /**
-     the less-than operator to allowed compositions to be stored
-     as keys in maps
+     assignment operator
    */
-  bool operator<(const Composition& other) const;
+  Composition& operator= (const Composition& rhs);
+
+  /**
+     adds two compositions
+     uses the mix() function with a ratio of 1
+   */
+  Composition& operator+= (const Composition& rhs);
+
+  /**
+     subtracts two compositions
+   */
+  Composition& operator-= (const Composition& rhs);
+
+  /**
+     adds two compositions
+     uses the mix() function with a ratio of 1
+   */
+  const Composition operator+ (const Composition& rhs) const;
+
+  /**
+     subtracts two compositions
+   */
+  const Composition operator- (const Composition& rhs) const;
+
+  /**
+     the less-than operator to allowed compositions to be stored
+     as keys in maps. compares IDs.
+   */
+  bool operator< (const Composition& other) const;
+
+  /**
+     compares composition_ to rhs.comp()
+   */
+  bool operator== (const Composition& rhs) const;
+
+  /**
+     calls the == operator preceded by not (!)
+   */
+  bool operator!= (const Composition& rhs) const;
   /* --- */
 
   /* --- Instance Access --- */
+  /**
+     return the composition map
+   */
+  CompMapPtr comp() const;
+
   /**
      returns true if the composition's id has been set
    */
@@ -113,6 +157,11 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      returns the time decayed between this Composition and its parent
    */
   double decay_time() const;
+
+  /**
+     returns the mass to atoms ratio
+   */
+  double mass_to_atoms() const;
 
   /**
      returns a shared pointer to this composition
@@ -173,6 +222,34 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @return a pointer to the result of this decay
    */
   static CompositionPtr decay(CompositionPtr comp, double time);
+
+  /**
+     mixes two Compositions with a given ratio of c1:c2
+     @param c1 the first Composition
+     @param c2 the second Composition
+     @param ratio the amount of c1 compared to c2
+     @return a shared pointer to the resulting composition
+   */
+  static CompositionPtr mix(const Composition& c1, const Composition& c2, double ratio);
+
+  /**
+     calls mix() on values of p_c1 and p_c2
+   */
+  static CompositionPtr mix(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double ratio);
+
+  /**
+     separates one Composition from another at a given efficiency
+     @param c1 the base Composition
+     @param c2 the Composition to extract from c1
+     @param efficiency the effiency of the separation
+     @return a shared pointer to the resulting composition
+   */
+  static CompositionPtr separate(const Composition& c1, const Composition& c2, double efficiency);
+
+  /**
+     calls separate() on values of p_c1 and p_c2
+   */
+  static CompositionPtr separate(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double efficiency);
   /* --- */
   
  private:
@@ -203,7 +280,7 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      this is a shared pointer to a Composition
    */
   CompositionPtr parent_;
-  
+
   /**
      initializes the Composition given some CompMap
      - sets the composition_ member
@@ -213,6 +290,17 @@ class Composition : public boost::enable_shared_from_this<Composition> {
    */
   void init(CompMap& comp);
 
+  /**
+     resets all members to their initialized values
+   */
+  void reset();
+
+  /**
+     calls normalize() and validateComposition() on composition_.
+     mass_to_atoms_ is also calculated.
+   */
+  void checkCompMap();
+  
   /**
      loops through the a mass-based CompMap, multiplying their fraction
      by their gram/mol value.
@@ -240,6 +328,26 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @return a pointer to the result of this decay
    */
   static CompositionPtr executeDecay(CompositionPtr comp, double time);
+  /* --- */
+
+ public:  
+  /* --- Printing  --- */ 
+  /**
+     pipes the result of detail() into LEV_INFO3
+   */
+  void print();
+
+  /**
+     calls compStrings() and pipes each string in the result into
+     LEV_INFO3
+   */
+  static std::string detail(CompMapPtr c);
+
+  /**
+     populates a vector, each entry being a string describing an isotope and its
+     % mass value
+   */
+  static std::vector<std::string> compStrings(CompMapPtr c);
   /* --- */
   
  public:
