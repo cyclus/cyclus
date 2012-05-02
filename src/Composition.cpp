@@ -46,15 +46,15 @@ Composition& Composition::operator= (const Composition& rhs) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Composition& Composition::operator+= (const Composition& rhs) {
-  CompositionPtr comp = mix(comp(),rhs->comp(),1.0);
-  init(*comp);
+  CompositionPtr comp = mix(*this,rhs,1.0);
+  init(*comp->comp());
   return *this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Composition& Composition::operator-= (const Composition& rhs) {
-  CompositionPtr comp = separate(comp(),rhs->comp(),1.0);
-  init(*comp);
+  CompositionPtr comp = separate(*this,rhs,1.0);
+  init(*comp->comp());
   return *this;
 }
 
@@ -78,12 +78,12 @@ bool Composition::operator<(const Composition& rhs) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Composition::operator== (Composition& rhs) const {
+bool Composition::operator== (const Composition& rhs) const {
   return (composition_ == rhs.comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Composition::operator!= (Composition& rhs) const {
+bool Composition::operator!= (const Composition& rhs) const {
   return !(*this == rhs);
 }
 
