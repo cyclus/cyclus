@@ -3,6 +3,8 @@
 #define _COMPOSITION_H
 
 #include <map>
+#include <vector>
+#include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -326,6 +328,26 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @return a pointer to the result of this decay
    */
   static CompositionPtr executeDecay(CompositionPtr comp, double time);
+  /* --- */
+
+ public:  
+  /* --- Printing  --- */ 
+  /**
+     pipes the result of detail() into LEV_INFO3
+   */
+  void print();
+
+  /**
+     calls compStrings() and pipes each string in the result into
+     LEV_INFO3
+   */
+  static std::string detail(CompMapPtr c);
+
+  /**
+     populates a vector, each entry being a string describing an isotope and its
+     % mass value
+   */
+  static std::vector<std::string> compStrings(CompMapPtr c);
   /* --- */
   
  public:

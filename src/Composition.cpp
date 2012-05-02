@@ -6,6 +6,9 @@
 #include "DecayHandler.h"
 #include "RecipeLogger.h"
 
+#include <vector>
+#include <string>
+
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -369,4 +372,33 @@ void Composition::validateValue(const double& value) {
     string err_msg = "Composition has negative quantity for an isotope.";
     throw CycRangeException(err_msg);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Composition::print() {
+  CLOG(LEV_INFO3) << detail(this->comp());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Composition::detail(CompMapPtr c) {
+  stringstream ss;
+  vector<string> entries = compStrings(c);
+  for (vector<string>::iterator entry = entries.begin(); 
+       entry != entries.end(); entry++) {
+    CLOG(LEV_INFO3) << *entry;
+  }
+  return "";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> Composition::compStrings(CompMapPtr c) {
+  stringstream ss;
+  vector<string> comp_strings;
+  for (CompMap::iterator entry = c->begin(); 
+       entry != c->end(); entry++) {
+    ss.str("");
+    ss << entry->first << ": " << entry->second << " % / kg";
+    comp_strings.push_back(ss.str());
+  }
+  return comp_strings;
 }

@@ -167,43 +167,8 @@ void IsoVector::printRecipes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::print(composition* c) {
-  CLOG(LEV_INFO3) << detail(c);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
   print(composition_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::detail(composition* c) {
-  stringstream ss;
-  vector<string>::iterator entry;
-  vector<string>* entries = compStrings(c);
-  for (entry = entries->begin(); entry != entries->end(); entry++) {
-    CLOG(LEV_INFO3) << *entry;
-  }
-  delete entries;
-  return "";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string>* IsoVector::compStrings(composition* c) {
-  CompMap::iterator entry;
-  int isotope;
-  stringstream ss;
-  vector<string>* comp_strings = new vector<string>();
-  CompMap* comp = c->mass_fractions;
-  for (entry = comp->begin(); entry != comp->end(); entry++) {
-    ss.str("");
-    isotope = entry->first;
-    if (massFraction(isotope,c) >= EPS_PERCENT) {
-      ss << isotope << ": " << entry->second / c->mass_normalizer << " % / kg";
-      comp_strings->push_back(ss.str());
-    }
-  }
-  return comp_strings;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
