@@ -78,22 +78,6 @@ public:
   /* --- */
 
   /* --- Operators  --- */
-  /**
-     adds two compositions
-     uses the mix() function with a ratio of 1
-   */
-  const IsoVector operator+ (const IsoVector& rhs_vector) const;
-
-  /**
-     subtracts two compositions
-   */
-  const IsoVector operator- (const IsoVector& rhs_vector) const;
-
-  /**
-     Compares quantities of like isotopes returning true only if 
-     quantity for every isotope is equal. 
-   */
-  bool operator== (const IsoVector& rhs_vector) const;
 
   /**
      mixes two IsoVectors with a given ratio of v1:v2

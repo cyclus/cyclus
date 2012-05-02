@@ -35,9 +35,56 @@ Composition::~Composition() {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator= (const Composition& rhs) {
+  composition_ = rhs.comp();
+  decay_time_ = rhs.decay_time();
+  ID_ = rhs.ID();
+  mass_to_atoms_ = rhs.mass_to_atoms();
+  parent_ = rhs.parent();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator+= (const Composition& rhs) {
+  CompositionPtr comp = mix(comp(),rhs->comp(),1.0);
+  init(*comp);
+  return *this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition& Composition::operator-= (const Composition& rhs) {
+  CompositionPtr comp = separate(comp(),rhs->comp(),1.0);
+  init(*comp);
+  return *this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Composition Composition::operator+ (const Composition& rhs) const {
+  Composition result = *this;
+  result += rhs;
+  return result;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+const Composition Composition::operator- (const Composition& rhs) const {
+  Composition result = *this;
+  result -= rhs;
+  return result;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Composition::operator<(const Composition& other) const {
-  return (ID_ < other.ID());
+bool Composition::operator<(const Composition& rhs) const {
+  return (ID_ < rhs.ID());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Composition::operator== (Composition& rhs) const {
+  return (composition_ == rhs.comp());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Composition::operator!= (Composition& rhs) const {
+  return !(*this == rhs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -81,6 +128,11 @@ CompositionPtr Composition::parent() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::decay_time() const {
   return decay_time_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double Composition::mass_to_atoms() const {
+  return mass_to_atoms_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -176,11 +228,12 @@ CompositionPtr mix(const Composition& c1, const Composition& c2, double ratio) {
   CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
   CompMapPtr add_map = c2.comp();
   for (CompMap::iterator it = add_map->begin(); it != add_map->end(); it++) {
+    double value = it->second * ratio;
     if (copy_map.count(it->first) == 0) {
-      copy_map[it->first] = it->second;
+      copy_map[it->first] = value;
     }
     else {
-      copy_map[it->first] += it->second;
+      copy_map[it->first] += value;
     }
   }
   return CompositionPtr(new Composition(copy_map));
@@ -199,7 +252,7 @@ CompositionPtr separate(const Composition& c1, const Composition& c2, double eff
     if (copy_map.count(it->first) != 0) {
       double value = copy_map[it->first];
       double subtraction = efficiency * (*remove_map)[it->first];
-      double difference = value- subtraction;
+      double difference = value - subtraction;
       if (difference > 0) {
         copy_map[it->first] -= difference;
       }
@@ -233,12 +286,24 @@ CompositionPtr Composition::executeDecay(CompositionPtr parent, double time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Composition::init(CompMap& comp) {
-  normalize(comp);
+  this->reset();
   composition_ = CompMapPtr(new CompMap(comp)); // copy comp into composition_
-  validateComposition(composition_);
+  this->checkCompMap();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::reset() {
   ID_ = 0;
   decay_time_ = 0;
-  mass_to_atoms_ = calculateMassAtomRatio(comp);
+  parent_.reset();
+  composition_.reset();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Composition::checkCompMap() {
+  normalize(*composition_);
+  validateComposition(composition_);
+  mass_to_atoms_ = calculateMassAtomRatio(*composition_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

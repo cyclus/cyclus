@@ -77,10 +77,47 @@ class Composition : public boost::enable_shared_from_this<Composition> {
 
   /* --- Operators --- */
   /**
-     the less-than operator to allowed compositions to be stored
-     as keys in maps
+     assignment operator
    */
-  bool operator<(const Composition& other) const;
+  Composition& operator= (const Composition& rhs);
+
+  /**
+     adds two compositions
+     uses the mix() function with a ratio of 1
+   */
+  Composition& operator+= (const Composition& rhs);
+
+  /**
+     subtracts two compositions
+   */
+  Composition& operator-= (const Composition& rhs);
+
+  /**
+     adds two compositions
+     uses the mix() function with a ratio of 1
+   */
+  const Composition operator+ (const Composition& rhs) const;
+
+  /**
+     subtracts two compositions
+   */
+  const Composition operator- (const Composition& rhs) const;
+
+  /**
+     the less-than operator to allowed compositions to be stored
+     as keys in maps. compares IDs.
+   */
+  bool operator< (const Composition& other) const;
+
+  /**
+     compares composition_ to rhs.comp()
+   */
+  bool operator== (const Composition& rhs) const;
+
+  /**
+     calls the == operator preceded by not (!)
+   */
+  bool operator!= (const Composition& rhs) const;
   /* --- */
 
   /* --- Instance Access --- */
@@ -118,6 +155,11 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      returns the time decayed between this Composition and its parent
    */
   double decay_time() const;
+
+  /**
+     returns the mass to atoms ratio
+   */
+  double mass_to_atoms() const;
 
   /**
      returns a shared pointer to this composition
@@ -236,7 +278,7 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      this is a shared pointer to a Composition
    */
   CompositionPtr parent_;
-  
+
   /**
      initializes the Composition given some CompMap
      - sets the composition_ member
@@ -246,6 +288,17 @@ class Composition : public boost::enable_shared_from_this<Composition> {
    */
   void init(CompMap& comp);
 
+  /**
+     resets all members to their initialized values
+   */
+  void reset();
+
+  /**
+     calls normalize() and validateComposition() on composition_.
+     mass_to_atoms_ is also calculated.
+   */
+  void checkCompMap();
+  
   /**
      loops through the a mass-based CompMap, multiplying their fraction
      by their gram/mol value.
