@@ -4,6 +4,7 @@
 #include "CycException.h"
 #include "MassTable.h"
 #include "DecayHandler.h"
+#include "RecipeLogger.h"
 
 using namespace std;
 
@@ -40,6 +41,11 @@ bool Composition::operator<(const Composition& other) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompMapPtr Composition::comp() const {
+  return composition_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Composition::logged() const {
   return (ID_ > 0);
 }
@@ -52,7 +58,7 @@ int Composition::ID() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::massFraction(const Iso& tope) const {
   validateIsotopeNumber(tope);
-  if (composition->count(tope) == 0) {
+  if (composition_->count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
   return (*composition_)[tope];
@@ -61,7 +67,7 @@ double Composition::massFraction(const Iso& tope) const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double Composition::atomFraction(const Iso& tope) const {
   validateIsotopeNumber(tope);
-  if (composition->count(tope) == 0) {
+  if (composition_->count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
   return (*composition_)[tope] * MT->gramsPerMol(tope) / mass_to_atoms_;
@@ -166,19 +172,62 @@ CompositionPtr Composition::decay(CompositionPtr parent, double time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr mix(const Composition& c1, const Composition& c2, double ratio) {
+  CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
+  CompMapPtr add_map = c2.comp();
+  for (CompMap::iterator it = add_map->begin(); it != add_map->end(); it++) {
+    if (copy_map.count(it->first) == 0) {
+      copy_map[it->first] = it->second;
+    }
+    else {
+      copy_map[it->first] += it->second;
+    }
+  }
+  return CompositionPtr(new Composition(copy_map));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr mix(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double ratio) {
+  return mix(*p_c1,*p_c2,ratio);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr separate(const Composition& c1, const Composition& c2, double efficiency) {
+  CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
+  CompMapPtr remove_map = c2.comp();
+  for (CompMap::iterator it = remove_map->begin(); it != remove_map->end(); it++) {
+    if (copy_map.count(it->first) != 0) {
+      double value = copy_map[it->first];
+      double subtraction = efficiency * (*remove_map)[it->first];
+      double difference = value- subtraction;
+      if (difference > 0) {
+        copy_map[it->first] -= difference;
+      }
+      else {
+        copy_map.erase(it->first);
+      }
+    } // end copy_map.count(it->first) != 0
+  } // end for loop
+  return CompositionPtr(new Composition(copy_map));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CompositionPtr separate(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double efficiency) {
+  return separate(*p_c1,*p_c2,efficiency);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompositionPtr Composition::executeDecay(CompositionPtr parent, double time) {
   double months_per_year = 12;
   double years = time / months_per_year;
-
-  // perform decay
   DecayHandler handler;
-  CompMapPtr child_comp = CompMapPtr(new CompMap(*parent->comp())); // copy parent comp
-  atomify(*child_comp);
-  handler.setComp(child_comp);
-  handler.decay(years_comp);
-  child_comp.reset(handler.comp());
-  massify(*child_comp);
-  CompositionPtr child = CompositionPtr(child_comp);
+  // copy parent comp
+  CompMapPtr to_decay = CompMapPtr( new CompMap(*parent->comp()) );
+  atomify(*to_decay);
+  handler.setComp(to_decay);
+  handler.decay(years);
+  // construct composition from atom-based comp
+  CompositionPtr child = CompositionPtr(new Composition(*handler.comp(),true));
   return child;
 }
 
@@ -206,7 +255,7 @@ void Composition::setParent(CompositionPtr p) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Composition::setDecayTime(int time) {
+void Composition::setDecayTime(double time) {
   decay_time_ = time;
 }
 

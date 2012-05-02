@@ -85,6 +85,11 @@ class Composition : public boost::enable_shared_from_this<Composition> {
 
   /* --- Instance Access --- */
   /**
+     return the composition map
+   */
+  CompMapPtr comp() const;
+
+  /**
      returns true if the composition's id has been set
    */
   bool logged() const;
@@ -173,6 +178,34 @@ class Composition : public boost::enable_shared_from_this<Composition> {
      @return a pointer to the result of this decay
    */
   static CompositionPtr decay(CompositionPtr comp, double time);
+
+  /**
+     mixes two Compositions with a given ratio of c1:c2
+     @param c1 the first Composition
+     @param c2 the second Composition
+     @param ratio the amount of c1 compared to c2
+     @return a shared pointer to the resulting composition
+   */
+  static CompositionPtr mix(const Composition& c1, const Composition& c2, double ratio);
+
+  /**
+     calls mix() on values of p_c1 and p_c2
+   */
+  static CompositionPtr mix(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double ratio);
+
+  /**
+     separates one Composition from another at a given efficiency
+     @param c1 the base Composition
+     @param c2 the Composition to extract from c1
+     @param efficiency the effiency of the separation
+     @return a shared pointer to the resulting composition
+   */
+  static CompositionPtr separate(const Composition& c1, const Composition& c2, double efficiency);
+
+  /**
+     calls separate() on values of p_c1 and p_c2
+   */
+  static CompositionPtr separate(const CompositionPtr& p_c1, const CompositionPtr& p_c2, double efficiency);
   /* --- */
   
  private:
