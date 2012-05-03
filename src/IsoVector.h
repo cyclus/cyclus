@@ -2,6 +2,7 @@
 #if !defined(_ISOVECTOR_H)
 #define _ISOVECTOR_H
 
+
 #include <map>
 #include <vector>
 #include <string>
@@ -45,6 +46,8 @@ class IsoVector;
 typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
 /* -- */
 
+#include "RecipeLogger.h"
+
 /** 
    @class IsoVector
 
@@ -53,7 +56,7 @@ typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
    isotopic compositions so that they may be logged with the 
    BookKeeper.
 */
-class IsoVector : public boost::enable_shared_from_this<IsoVector> {
+class IsoVector : public boost::enable_shared_from_this<IsoVector> {  
  public:
   /* --- Constructors and Destructors --- */
   /**
@@ -81,45 +84,45 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      assignment operator
    */
-  IsoVector& operator= (const IsoVector& rhs);
+  IsoVector& operator=(const IsoVector& rhs);
 
   /**
      adds two compositions
      uses the mix() function with a ratio of 1
    */
-  IsoVector& operator+= (const IsoVector& rhs);
+  IsoVector& operator+=(const IsoVector& rhs);
 
   /**
      subtracts two compositions
    */
-  IsoVector& operator-= (const IsoVector& rhs);
+  IsoVector& operator-=(const IsoVector& rhs);
 
   /**
      adds two compositions
      uses the mix() function with a ratio of 1
    */
-  const IsoVector operator+ (const IsoVector& rhs) const;
+  const IsoVector operator+(const IsoVector& rhs) const;
 
   /**
      subtracts two compositions
    */
-  const IsoVector operator- (const IsoVector& rhs) const;
+  const IsoVector operator-(const IsoVector& rhs) const;
 
   /**
      the less-than operator to allowed compositions to be stored
      as keys in maps. compares IDs.
    */
-  bool operator< (const IsoVector& other) const;
+  bool operator<(const IsoVector& other) const;
 
   /**
      compares composition_ to rhs.comp()
    */
-  bool operator== (const IsoVector& rhs) const;
+  bool operator==(const IsoVector& rhs) const;
 
   /**
      calls the == operator preceded by not (!)
    */
-  bool operator!= (const IsoVector& rhs) const;
+  bool operator!=(const IsoVector& rhs) const;
   /* --- */
 
   /* --- Instance Access --- */
@@ -309,6 +312,11 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   double calculateMassAtomRatio(CompMap& comp);
 
   /**
+     sets the composition's id, to be used for logging
+   */
+  void setID(int ID);
+
+  /**
      sets parent_ to some other parent, p
      @param p a predefined composition pointer to p
    */
@@ -395,6 +403,8 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   */
   static void validateValue(const double& value);  
   /* --- */
+
+  friend class RecipeLogger;
 };
 
 #endif

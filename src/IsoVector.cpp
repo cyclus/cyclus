@@ -227,7 +227,7 @@ IsoVectorPtr IsoVector::decay(IsoVectorPtr parent, double time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr mix(const IsoVector& c1, const IsoVector& c2, double ratio) {
+IsoVectorPtr IsoVector::mix(const IsoVector& c1, const IsoVector& c2, double ratio) {
   CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
   CompMapPtr add_map = c2.comp();
   for (CompMap::iterator it = add_map->begin(); it != add_map->end(); it++) {
@@ -243,12 +243,12 @@ IsoVectorPtr mix(const IsoVector& c1, const IsoVector& c2, double ratio) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr mix(const IsoVectorPtr& p_c1, const IsoVectorPtr& p_c2, double ratio) {
+IsoVectorPtr IsoVector::mix(const IsoVectorPtr& p_c1, const IsoVectorPtr& p_c2, double ratio) {
   return mix(*p_c1,*p_c2,ratio);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr separate(const IsoVector& c1, const IsoVector& c2, double efficiency) {
+IsoVectorPtr IsoVector::separate(const IsoVector& c1, const IsoVector& c2, double efficiency) {
   CompMap copy_map(CompMap(*c1.comp())); // copy c1's comp map
   CompMapPtr remove_map = c2.comp();
   for (CompMap::iterator it = remove_map->begin(); it != remove_map->end(); it++) {
@@ -268,7 +268,7 @@ IsoVectorPtr separate(const IsoVector& c1, const IsoVector& c2, double efficienc
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr separate(const IsoVectorPtr& p_c1, const IsoVectorPtr& p_c2, double efficiency) {
+IsoVectorPtr IsoVector::separate(const IsoVectorPtr& p_c1, const IsoVectorPtr& p_c2, double efficiency) {
   return separate(*p_c1,*p_c2,efficiency);
 }
 
@@ -317,6 +317,12 @@ double IsoVector::calculateMassAtomRatio(CompMap& comp) {
   }
   return sum;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::setID(int ID) {
+  ID_ = ID;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::setParent(IsoVectorPtr p) {
   parent_ = p;

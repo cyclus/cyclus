@@ -135,8 +135,8 @@ Vector DecayHandler::compAsVector() {
         
   Vector comp_vector = Vector(parent_.size(),1);
 
-  map<int, double>::const_iterator comp_iter = atom_comp_.begin();
-  while( comp_iter != atom_comp_.end() ) {
+  map<int, double>::const_iterator comp_iter = atom_comp_->begin();
+  while( comp_iter != atom_comp_->end() ) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
 

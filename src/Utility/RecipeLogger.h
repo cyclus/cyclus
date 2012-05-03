@@ -2,7 +2,7 @@
 #if !defined(_RECIPELOGGER_H)
 #define _RECIPELOGGER_H
 
-#include "Composition.h"
+#include "IsoVector.h"
 #include "Table.h"
 #include "InputXML.h"
 
@@ -14,7 +14,7 @@
 /**
    map of recipe name to composition
  */
-typedef std::map<std::string,CompositionPtr> RecipeMap; 
+typedef std::map<std::string,IsoVectorPtr> RecipeMap; 
 
 /**
    set of decay times
@@ -24,17 +24,17 @@ typedef std::set<double> decay_times;
 /**
    map of composition times decayed
  */
-typedef std::map<CompositionPtr,decay_times> DecayTimesMap; 
+typedef std::map<IsoVectorPtr,decay_times> DecayTimesMap; 
 
 /**
    map of decay time to composition
  */
-typedef std::map<double,CompositionPtr> DaughterMap; 
+typedef std::map<double,IsoVectorPtr> DaughterMap; 
 
 /**
    map of recipe composition to its decayed daughters
  */
-typedef std::map<CompositionPtr,DaughterMap> DecayChainMap; 
+typedef std::map<IsoVectorPtr,DaughterMap> DecayChainMap; 
 
 /**
    The RecipeLogger manages the list of recipes held in memory
@@ -44,8 +44,6 @@ typedef std::map<CompositionPtr,DaughterMap> DecayChainMap;
 class RecipeLogger {
   /* --- Singleton Members and Methods --- */
  public: 
-  friend class Composition;
-
   /**
      Gives all simulation objects global access to the RecipeLogger by 
      returning a pointer to it. 
@@ -85,14 +83,14 @@ class RecipeLogger {
      logs a new recipe with the simulation
      - logs recipe with BookKeeper
    */
-  static void logRecipe(CompositionPtr recipe);
+  static void logRecipe(IsoVectorPtr recipe);
 
   /**
      logs a new named recipe with the simulation
      - adds recipe to IsoVector's static containers
      - calls the logRecipe() method
    */
-  static void logRecipe(std::string name, CompositionPtr recipe);
+  static void logRecipe(std::string name, IsoVectorPtr recipe);
 
   /**
      logs a new named recipe with the simulation
@@ -100,7 +98,7 @@ class RecipeLogger {
      - calls the logRecipe() method
      @param t_f -> total time decayed from parent to child
    */
-  static void logRecipeDecay(CompositionPtr parent, CompositionPtr child, double t_f);
+  static void logRecipeDecay(IsoVectorPtr parent, IsoVectorPtr child, double t_f);
   
   /**
      checks if the recipe has been logged (i.e. it exists in the simulation)
@@ -120,48 +118,48 @@ class RecipeLogger {
   /**
      checks if the composition is logged
    */
-  static bool compositionDecayable(CompositionPtr comp);
+  static bool compositionDecayable(IsoVectorPtr comp);
 
   /**
      checks if the parent has already been decayed by this time
    */
-  static bool daughterLogged(CompositionPtr parent, double time);
+  static bool daughterLogged(IsoVectorPtr parent, double time);
 
  private:
   /**
      adds recipe to containers tracking decayed recipes
    */
-  static void storeDecayableRecipe(CompositionPtr recipe);
+  static void storeDecayableRecipe(IsoVectorPtr recipe);
 
   /**
      accessing a recipe 
    */
-  static CompositionPtr Recipe(std::string name);
+  static IsoVectorPtr Recipe(std::string name);
 
   /**
      add a new decay time for a parent composition
    */
-  static void addDecayTimes(CompositionPtr parent, double time);
+  static void addDecayTime(IsoVectorPtr parent, double time);
 
   /**
      accessing a set of decay times 
    */
-  static decay_times& decayTimes(CompositionPtr parent);
+  static decay_times& decayTimes(IsoVectorPtr parent);
 
   /**
      accessing the daughters of a parent
    */
-  static DaughterMap& Daughters(CompositionPtr parent);
+  static DaughterMap& Daughters(IsoVectorPtr parent);
 
   /**
      accessing a specific daughter 
    */
-  static CompositionPtr& Daughter(CompositionPtr parent, double time);
+  static IsoVectorPtr& Daughter(IsoVectorPtr parent, double time);
 
   /**
      add a daughter to a map of daughters
    */
-  static void addDaughter(CompositionPtr parent, CompositionPtr child, double time);
+  static void addDaughter(IsoVectorPtr parent, IsoVectorPtr child, double time);
 
   /**
      calls recipeLogged() and throws an error if false
@@ -171,12 +169,12 @@ class RecipeLogger {
   /**
      calls compositionDecayable() and throws an error if false
    */
-  static void checkDecayable(CompositionPtr parent);
+  static void checkDecayable(IsoVectorPtr parent);
 
   /**
      calls daughterLogged() and throws an error if false
    */
-  static void checkDaughter(CompositionPtr parent, double time);
+  static void checkDaughter(IsoVectorPtr parent, double time);
 
   /**
      Stores the next available state ID 
@@ -224,13 +222,16 @@ class RecipeLogger {
   /**
      Add an isotopic state to the table 
    */
-  static void addToTable(Composition& comp);
+  static void addToTable(IsoVector& comp);
 
   /* /\** */
   /*    Store information about the transactions's primary key  */
   /*  *\/ */
   /* primary_key_ref pkref_; */
  /* -- */ 
+
+
+  friend class IsoVector;
 };
 
 #endif
