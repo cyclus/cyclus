@@ -3,7 +3,7 @@
 #define _DECAYHANDLER_H
 
 #include "UseMatrixLib.h"
-#include "Composition.h"
+#include "IsoVector.h"
 
 /**
    A map type to represent all of the parent isotopes tracked.  The key 
