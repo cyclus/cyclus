@@ -105,7 +105,7 @@ void DecayHandler::setComp(CompMapPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::setComp(Vector comp) {
-  atom_comp_.reset();
+  atom_comp_.reset(new CompMap(ATOM));
 
   // loops through the ParentMap and populates the new composition map with
   // the number density from the comp parameter for each isotope
@@ -123,7 +123,6 @@ void DecayHandler::setComp(Vector comp) {
     } else {
       LOG(LEV_ERROR, "none!") << "Decay Error - invalid Vector position";
     }
-
     ++parent_iter; // get next parent
   }
 }
