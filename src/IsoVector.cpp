@@ -29,6 +29,11 @@ IsoVector::IsoVector(CompMap& comp, bool atom) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IsoVector::IsoVector(IsoVector& orig) {
+  this* = orig;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::~IsoVector() {
   if (composition_) {
     composition_.reset();

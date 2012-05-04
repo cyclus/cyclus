@@ -75,6 +75,11 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   IsoVector(CompMap& comp);
 
   /**
+     copy constructor
+   */
+  IsoVector(const IsoVector& orig);
+
+  /**
      default destructor, releases mass_fractions_ and parent_
    */
   ~IsoVector();
