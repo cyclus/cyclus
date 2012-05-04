@@ -98,14 +98,14 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
   }
   
   // make a new composition
-  IsoVectorPtr recipe(new IsoVector(values,atom));
+  CompMapPtr recipe(new CompMap(values,atom));
 
   // log this composition (static members and database)
   logRecipe(name,recipe);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(std::string name, IsoVectorPtr recipe) {
+void RecipeLogger::logRecipe(std::string name, CompMapPtr recipe) {
   if ( !recipeLogged(name) ) {
     logRecipe(recipe); // log this with the database, assigns id
     recipes_[name] = recipe; // store this as a named recipe, copies recipe
@@ -120,7 +120,7 @@ bool RecipeLogger::recipeLogged(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipe(IsoVectorPtr recipe) {
+void RecipeLogger::logRecipe(CompMapPtr recipe) {
   if (!recipe->logged()) {
     recipe->setID(nextStateID_++);
     addToTable(*recipe);
@@ -128,23 +128,23 @@ void RecipeLogger::logRecipe(IsoVectorPtr recipe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr RecipeLogger::Recipe(std::string name) {
+CompMapPtr RecipeLogger::Recipe(std::string name) {
   checkRecipe(name);
   return recipes_[name];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::storeDecayableRecipe(IsoVectorPtr recipe) {
+void RecipeLogger::storeDecayableRecipe(CompMapPtr recipe) {
   // initialize containers
   decay_times times;
   DaughterMap daughters;
   // assign containers
-  decay_times_.insert( pair<IsoVectorPtr,decay_times>(recipe,times) );
-  decay_chains_.insert( pair<IsoVectorPtr,DaughterMap>(recipe,daughters) );
+  decay_times_.insert( pair<CompMapPtr,decay_times>(recipe,times) );
+  decay_chains_.insert( pair<CompMapPtr,DaughterMap>(recipe,daughters) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::logRecipeDecay(IsoVectorPtr parent, IsoVectorPtr child, double t_f) {
+void RecipeLogger::logRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f) {
   addDecayTime(parent,t_f);
   addDaughter(parent,child,t_f);
   logRecipe(child);
@@ -165,7 +165,7 @@ void RecipeLogger::checkRecipe(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDecayable(IsoVectorPtr parent) {
+void RecipeLogger::checkDecayable(CompMapPtr parent) {
   if (!compositionDecayable(parent)) {
     stringstream err;
     err << "RecipeLogger has not logged recipe with id:" << parent->ID_
@@ -175,7 +175,7 @@ void RecipeLogger::checkDecayable(IsoVectorPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::checkDaughter(IsoVectorPtr parent, double time) {
+void RecipeLogger::checkDaughter(CompMapPtr parent, double time) {
   if (!daughterLogged(parent,time)) {
     stringstream err;
     err << "RecipeLogger has not logged a decayed recipe for the parent " 
@@ -186,44 +186,44 @@ void RecipeLogger::checkDaughter(IsoVectorPtr parent, double time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDecayTime(IsoVectorPtr parent, double time) {
+void RecipeLogger::addDecayTime(CompMapPtr parent, double time) {
   checkDecayable(parent);
   decayTimes(parent).insert(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLogger::decayTimes(IsoVectorPtr parent) {
+decay_times& RecipeLogger::decayTimes(CompMapPtr parent) {
   checkDecayable(parent);
   return decay_times_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DaughterMap& RecipeLogger::Daughters(IsoVectorPtr parent) {
+DaughterMap& RecipeLogger::Daughters(CompMapPtr parent) {
   checkDecayable(parent);
   return decay_chains_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr& RecipeLogger::Daughter(IsoVectorPtr parent, double time) {
+CompMapPtr& RecipeLogger::Daughter(CompMapPtr parent, double time) {
   checkDaughter(parent,time);
   return Daughters(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::daughterLogged(IsoVectorPtr parent, double time) {
+bool RecipeLogger::daughterLogged(CompMapPtr parent, double time) {
   int count = Daughters(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLogger::addDaughter(IsoVectorPtr parent, IsoVectorPtr child, double time) {
+void RecipeLogger::addDaughter(CompMapPtr parent, CompMapPtr child, double time) {
   child->setParent(parent);
   child->setDecayTime(time);
   Daughter(parent,time) = child; // child is copied
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLogger::compositionDecayable(IsoVectorPtr comp) {
+bool RecipeLogger::compositionDecayable(CompMapPtr comp) {
   int count1 = decay_times_.count(comp);
   int count2 = decay_chains_.count(comp);
   return (count1 != 0 && count2 != 0); // true iff comp in both 
@@ -247,7 +247,7 @@ void RecipeLogger::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLogger::addToTable(IsoVector& recipe){
+void RecipeLogger::addToTable(CompMap& recipe){
   // if we haven't logged a composition yet, define the table
   if ( !iso_table->defined() ) {
     RecipeLogger::define_table();
