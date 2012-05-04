@@ -349,13 +349,13 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      calls compStrings() and pipes each string in the result into
      LEV_INFO3
    */
-  static std::string detail(CompMapPtr c);
+  static std::string detail(const CompMap& c);
 
   /**
      populates a vector, each entry being a string describing an isotope and its
      % mass value
    */
-  static std::vector<std::string> compStrings(CompMapPtr c);
+  static std::vector<std::string> compStrings(const CompMap& c);
   /* --- */
   
  public:

@@ -382,11 +382,11 @@ void IsoVector::validateValue(const double& value) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
-  CLOG(LEV_INFO3) << detail(this->comp());
+  CLOG(LEV_INFO3) << detail(*this->comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::detail(CompMapPtr c) {
+std::string IsoVector::detail(const CompMap& c) {
   stringstream ss;
   vector<string> entries = compStrings(c);
   for (vector<string>::iterator entry = entries.begin(); 
@@ -397,11 +397,11 @@ std::string IsoVector::detail(CompMapPtr c) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string> IsoVector::compStrings(CompMapPtr c) {
+std::vector<std::string> IsoVector::compStrings(const CompMap& c) {
   stringstream ss;
   vector<string> comp_strings;
-  for (CompMap::iterator entry = c->begin(); 
-       entry != c->end(); entry++) {
+  for (CompMap::const_iterator entry = c.begin(); 
+       entry != c.end(); entry++) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
     comp_strings.push_back(ss.str());
