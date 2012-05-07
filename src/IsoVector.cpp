@@ -120,8 +120,7 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
     throw CycRangeException(ss.str());
   }
   // get base comp and comp to add
-  CompMapPtr new_comp = 
-    CompMapPtr( new CompMap(composition_->basis(),composition_->map()) );
+  CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_)); // copy
   CompMapPtr add_comp = other.comp();
   // loop over comp to add
   for (CompMap::iterator it = add_comp->begin(); it 
@@ -161,8 +160,7 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
     ss << "Efficiency: " << efficiency << " is not in [0,1].";
     throw CycRangeException(ss.str());
   }
-  CompMapPtr new_comp = 
-    CompMapPtr( new CompMap(composition_->basis(),composition_->map()) );
+  CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_));
   CompMapPtr remove_comp = other.comp();
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {

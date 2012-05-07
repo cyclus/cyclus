@@ -65,8 +65,8 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      masking Map
   */
-  typedef typename Map::iterator iterator;
-  typedef typename Map::const_iterator const_iterator;
+  typedef Map::iterator iterator;
+  typedef Map::const_iterator const_iterator;
 
  public:
   /* --- Constructors and Destructors --- */
@@ -76,9 +76,9 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   CompMap(Basis b);
 
   /**
-     constructor, given a map
+     copy constructor
    */
-  CompMap(Basis b, Map m);
+  CompMap(const CompMap& other);
 
   /**
      default destructor

@@ -14,9 +14,9 @@ CompMap::CompMap(Basis b) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMap::CompMap(Basis b, Map m) {
-  init(b);
-  map_ = m;
+CompMap::CompMap(const CompMap& other) : 
+  basis_(other.basis()), map_(other.map()) {
+  init(basis_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
