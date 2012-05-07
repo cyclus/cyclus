@@ -8,15 +8,17 @@
 
 using namespace std;
 
+LogLevel CompMap::log_level_ = LEV_INFO3;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(Basis b) {
   init(b);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMap::CompMap(Basis b, Map m) {
-  init(b);
-  map_ = m;
+CompMap::CompMap(const CompMap& other) : 
+  basis_(other.basis()), map_(other.map()) {
+  init(basis_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -35,6 +37,7 @@ CompMap::iterator CompMap::end() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double& CompMap::operator[](int tope) {
+  normalized_ = false;
   return map_.operator[](tope);
 }
 
@@ -45,6 +48,7 @@ int CompMap::count(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::erase(Iso tope) {
+  normalized_ = false;
   map_.erase(tope);
 }
 
@@ -64,11 +68,6 @@ Basis CompMap::basis() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::set_basis(Basis b) {
-  basis_ = b;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Map CompMap::map() const {
   return map_;
 }
@@ -80,20 +79,26 @@ int CompMap::ID() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::massFraction(Iso tope) {
-  validateIsotopeNumber(tope);
   if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
-  return map_[tope];
+  double factor = 1.0;
+  if (basis_ != MASS) {
+    factor = MT->gramsPerMol(tope) / mass_to_atom_ratio_;
+  }
+  return factor * map_[tope];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::atomFraction(Iso tope) {
-  validateIsotopeNumber(tope);
   if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
-  return map_[tope] * MT->gramsPerMol(tope) / mass_to_atom_ratio_;
+  double factor = 1.0;
+  if (basis_ != ATOM) {
+    factor = 1 / (MT->gramsPerMol(tope) / mass_to_atom_ratio_);
+  }
+  return factor * map_[tope];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -104,6 +109,11 @@ CompMapPtr CompMap::parent() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::decay_time() const {
   return decay_time_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::normalized() const {
+  return normalized_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -127,7 +137,7 @@ CompMapPtr CompMap::root_comp() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double CompMap::root_decay_time() {
-  CompMapPtr child = parent();
+  CompMapPtr child = me();
   double time = decay_time();
   while (child->parent()) {
     child = child->parent();
@@ -138,31 +148,34 @@ double CompMap::root_decay_time() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::massify() {
-  double sum = 0.0;
-  for (iterator it = map_.begin(); it != map_.end(); it++) {
-    it->second *= MT->gramsPerMol(it->first);
-    sum += it->second;
-  }
-  normalize(sum);
+  change_basis(MASS);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::atomify() {
-  double sum = 0.0;
-  for (iterator it = map_.begin(); it != map_.end(); it++) {
-    validateEntry(it->first,it->second);
-    it->second /= MT->gramsPerMol(it->first);
-    sum += it->second;
-  }
-  normalize(sum);
+  change_basis(ATOM);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize() {
   double sum = 0.0;
+  double other_sum = 0.0;
+  bool atom = (basis_ == ATOM);
   for (iterator it = map_.begin(); it != map_.end(); it++) {
     validateEntry(it->first,it->second);
     sum += it->second;
+    if (atom) {
+      other_sum += it->second * MT->gramsPerMol(it->first);
+    }
+    else {
+      other_sum += it->second / MT->gramsPerMol(it->first);
+    }
+  }
+  if (atom) {
+    mass_to_atom_ratio_ = other_sum / sum;
+  }
+  else {
+    mass_to_atom_ratio_ = sum / other_sum;
   }
   normalize(sum);
 }
@@ -179,12 +192,35 @@ void CompMap::init(Basis b) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CompMap::change_basis(Basis b) {
+  if (basis_ != b) { // only change if we have to
+    for (iterator it = map_.begin(); it != map_.end(); it++) {
+      switch (b) {
+      case ATOM:
+        it->second = atomFraction(it->first);
+        break;
+      case MASS:
+        it->second = massFraction(it->first);
+        break;
+      default:
+        throw CycRangeException("Basis not atom or mass.");
+        break;
+      }
+    }
+  }
+  if (!normalized()) {
+    normalize();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize(double sum) {
   if (sum != 1) { // only normalize if needed
     for (iterator it = map_.begin(); it != map_.end(); it++) {
       it->second /= sum;
     }
   }
+  normalized_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -233,7 +269,7 @@ void CompMap::validateValue(const double& value) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CompMap::print() {
-  CLOG(LEV_INFO3) << detail();
+  CLOG(log_level_) << detail();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -242,7 +278,7 @@ std::string CompMap::detail() {
   vector<string> entries = compStrings();
   for (vector<string>::iterator entry = entries.begin(); 
        entry != entries.end(); entry++) {
-    CLOG(LEV_INFO3) << *entry;
+    CLOG(log_level_) << *entry;
   }
   return "";
 }

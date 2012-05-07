@@ -2,7 +2,6 @@
 #include "IsoVector.h"
 
 #include "CycException.h"
-#include "MassTable.h"
 #include "Logger.h"
 #include "DecayHandler.h"
 #include "RecipeLogger.h"
@@ -87,12 +86,12 @@ CompMapPtr IsoVector::comp() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::massFraction(const Iso& tope) const {
+double IsoVector::massFraction(Iso tope) {
   return composition_->massFraction(tope);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::atomFraction(const Iso& tope) const {
+double IsoVector::atomFraction(Iso tope) {
   return composition_->atomFraction(tope);
 }
 
@@ -114,17 +113,17 @@ void IsoVector::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::mix(const IsoVector& other, double ratio) {
-  CompMapPtr new_comp = 
-    CompMapPtr( new CompMap(composition_->basis(),composition_->map()) );
+  if (ratio < 0) { // check ratio
+    stringstream ss("");
+    ss << "Ratio: " << ratio << " is not in [0,inf).";
+    throw CycRangeException(ss.str());
+  }
+  // get base comp and comp to add
+  CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_)); // copy
   CompMapPtr add_comp = other.comp();
+  // loop over comp to add
   for (CompMap::iterator it = add_comp->begin(); it 
          != add_comp->end(); it++) {
-    // check ratio
-    if (ratio < 0) {
-      stringstream ss("");
-      ss << "Ratio: " << ratio << " is not in [0,inf).";
-      throw CycRangeException(ss.str());
-    }
     // get correct value to add
     double value;
     if ( new_comp->basis() == add_comp->basis() ) {
@@ -145,7 +144,6 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
       (*new_comp)[it->first] = value;
     }
   }
-  new_comp->normalize();
   setComp(new_comp);
 }
 
@@ -156,27 +154,25 @@ void IsoVector::mix(const IsoVectorPtr& p_other, double ratio) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::separate(const IsoVector& other, double efficiency) {  
-  CompMapPtr new_comp = 
-    CompMapPtr( new CompMap(composition_->basis(),composition_->map()) );
+  if (efficiency > 1.0 || efficiency < 0) {  // check efficiency
+    stringstream ss("");
+    ss << "Efficiency: " << efficiency << " is not in [0,1].";
+    throw CycRangeException(ss.str());
+  }
+  CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_));
   CompMapPtr remove_comp = other.comp();
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     if (new_comp->count(it->first) != 0) {
-      if (efficiency > 1.0 || efficiency < 0) {
-        stringstream ss("");
-        ss << "Efficiency: " << efficiency << " is not in [0,1].";
-        throw CycRangeException(ss.str());
-      }
-      else if (efficiency < 1.0) {
+      if (efficiency < 1.0) {
         (*new_comp)[it->first] -= efficiency * (*new_comp)[it->first];
       }
       else {
         new_comp->erase(it->first);
       }
     }
-  } 
-  new_comp->normalize();
+  }
   setComp(new_comp);
 }
 
@@ -187,12 +183,13 @@ void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::decay(double time) {
-  CompMapPtr child;
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
   bool root_logged = root->logged();
+  Basis orig_basis = parent->basis();
+  CompMapPtr child;
   if (root_logged) { 
-    int t_f = composition_->root_decay_time() + time;
+    int t_f = parent->root_decay_time() + time;
     bool child_logged = RL->daughterLogged(parent,t_f);
     if (child_logged) {
       child = RL->Daughter(parent,t_f);
@@ -205,12 +202,15 @@ void IsoVector::decay(double time) {
   else {
     child = executeDecay(parent,time); // just do decay
   }
-  child->normalize();
+  child->change_basis(orig_basis);
   setComp(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::setComp(CompMapPtr comp) {
+  if (!comp->normalized()) {
+    comp->normalize();
+  }
   composition_ = comp;
 }
 
@@ -219,8 +219,11 @@ CompMapPtr IsoVector::executeDecay(CompMapPtr parent, double time) {
   double months_per_year = 12;
   double years = time / months_per_year;
   DecayHandler handler;
-  parent->set_basis(ATOM);
+  parent->atomify();
   handler.setComp(parent); // handler will not change parent's map
   handler.decay(years);
-  return handler.comp();
+  CompMapPtr child = handler.comp();
+  child->parent_ = parent;
+  child->decay_time_ = time;
+  return child;
 }

@@ -23,11 +23,32 @@ typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
 /* -- */
 
 /** 
-    @class IsoVector    
+    @class IsoVector
+    
+    @section Introduction
     The IsoVector class is designed to intelligently manage a given 
     isotopic composition in the form of a CompMap. Specifically, the IsoVector 
     class defines all relevant operators to manage the decay, mixing, and 
     separation of compositions.
+
+    While a CompMap stores a normalized composition, an IsoVector provides
+    methods to combine different compositions.
+
+    @section Addition
+    Addition of compositions is a specific case of the mix() method. All
+    values of a given composition are added to another at a ratio of 1:1. The
+    finalized composition is then normalized.
+
+    @section Subtraction
+    Subtraction is not the reverse of addition, because it models the process
+    of separation (and calls the separate() method). Isotopic separation removes
+    all isotopes at a given efficiency (if the efficiency is less than 1, some
+    of those isotopes remain). Subtraction, accordingly, is separation with
+    efficiency = 1. All isotopes are removed, and the remaining are normalized.
+
+    @section Decay
+    The IsoVector class manages the decay of CompMaps via the decay(time) 
+    method. New children will have their parent and decay time set accordingly.
 */
 class IsoVector : public boost::enable_shared_from_this<IsoVector> {  
  public:
@@ -102,12 +123,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(const Iso& tope) const;
+  double massFraction(Iso tope);
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(const Iso& tope) const;
+  double atomFraction(Iso tope);
 
   /**
      validates the composition_, insuring all Isotopes numbers 
@@ -193,7 +214,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
-  CompMapPtr executeDecay(CompMapPtr parent, double time);
+  static CompMapPtr executeDecay(CompMapPtr parent, double time);
   /* --- */
 };
 

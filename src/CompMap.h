@@ -10,23 +10,6 @@
 #include <boost/enable_shared_from_this.hpp>
 /* -- */
 
-/* -- Defines -- */
-/**
-   avagadro's number
-*/
-#define AVOGADRO 6.02e23
-
-/**
-   smallest kilogram value
-*/
-#define EPS_KG 1e-6
-
-/**
-   smallest percent
-*/
-#define EPS_PERCENT 1e-14
-/* -- */
-
 /* -- Typedefs -- */
 /**
    Isotope integer, ZZZAAA
@@ -55,22 +38,105 @@ enum Basis {MASS, ATOM};
 /* -- Sensitive Includes -- */
 #include "IsoVector.h"
 #include "RecipeLogger.h"
+#include "Logger.h"
 /* -- */
 
 /** 
    @class CompMap
 
    @section Introduction
-   The CompMap class in Cyclus is a wrapper class for
-   isotopic compositions so that they may be logged with the 
-   BookKeeper.
+   The CompMap class provides an intelligent wrapper for the
+   standard Cyclus Isotopic Composition map, a map of integer 
+   values (ZZZAAA) to double values.
+
+   This class forwards the relevant function calls to the actual
+   map held as a member variable. Specifically, the array index
+   operator, the begin iterator, and the end iterator can all be
+   called by a CompMap.
+
+   The CompMap also stores details about a Composition's lineage,
+   specifically whether or not a CompMap is the child of another
+   via decay, and if so how long the decay time between the two
+   is.
+
+   @section Map-Like Behavior
+   The core constituent of a CompMap is its Map member. Having to
+   explicitly call methods on this member is cumbersome, so a 
+   number of methods are provided which directly access the Map,
+   including:
+   
+   * array index operator[](key)
+
+   * iterators: begin() and end()
+
+   * count(key)
+   
+   @section Internal Storage
+   The CompMap class offers a developer the ability to store 
+   normalized compositions of isotopes and access either their
+   mass or atom fractions. The type of internal storage (either
+   mass or atom based) is largely up to the developer in order to
+   allow decisions regarding speed vs. storage to be made locally.
+
+   However, it should be noted that decay mechanisms in Cyclus require
+   atom-based compositions, and logging with the BookKeeper requires
+   mass-based compositions. Both of these operations will return the 
+   composition to its original basis.
+
+   The internal storage of the CompMap can be changed on the fly via
+   the massify() and atomify() methods. Both of which call the 
+   normalize() method.
+
+   During the normalize() method, the mass to atom ratio is calculated.
+   This ratio is the sum of all mass values divided by the sum of all
+   atom values (mass value = atom value / grams-per-mol). This factor
+   allows for quick access between the two bases.
+   
+   @section Access
+   The CompMap class offers, nominally, two ways to access atom
+   or mass fractions of a given isotope. The first is by simply using
+   the array index operator. The second are the massFraction() and 
+   atomFraction() methods. The latter will intelligently return a
+   value corrected for a different basis (i.e., if the CompMap is in
+   an atom-based state and a massFraction() call occurs, it will 
+   return the correct mass fraction).
+
+   @section Lineage/Decay
+   The CompMap class provides functionality to track the lineage of
+   parents and their children due to decay. This lineage takes the
+   form of a tree, rooted at some initial composition, with branches
+   based upon total time decayed from the root composition. 
+
+   Accordingly, any given composition stores immediate knowlege of
+   its parent and the decay time between itself and its parent. 
+   Accessing the root composition invokes climbing the parent-child
+   ladder up to the root composition. The total decay time is similarly
+   calculated by summing the decay times of each child as the tree is
+   traversed.
+
+   @section Validation
+   Isotopic integers have a limited valid range (between 1001
+   and 1182949), and all Map values must be positive (you can't 
+   have negative compostiion). Functionality is provided to
+   validate both of these numbers for all Map entries via:
+   
+   * validateEntry()
+
+   * validateIsotope()
+
+   * validateValue()
+
+   * validate() Note: this calls validateEntry() on all entries
+
+   When a CompMap is normalized, validation is performed on all
+   entries.
 */
 class CompMap : public boost::enable_shared_from_this<CompMap> {  
   /**
      masking Map
   */
-  typedef typename Map::iterator iterator;
-  typedef typename Map::const_iterator const_iterator;
+  typedef Map::iterator iterator;
+  typedef Map::const_iterator const_iterator;
 
  public:
   /* --- Constructors and Destructors --- */
@@ -80,9 +146,9 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   CompMap(Basis b);
 
   /**
-     constructor, given a map
+     copy constructor
    */
-  CompMap(Basis b, Map m);
+  CompMap(const CompMap& other);
 
   /**
      default destructor
@@ -133,11 +199,6 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   Basis basis() const;
 
   /**
-     if b is different than basis_, map_ is converted to the new basis
-   */
-  void set_basis(Basis b);
-
-  /**
      returns the current map
    */
   Map map() const;
@@ -146,6 +207,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      returns the mass to atoms ratio
    */
   double mass_to_atom_ratio() const;
+
+  /**
+     returns true if the composition has been normalized
+   */
+  bool normalized() const;
 
   /**
      Return the mass fraction of an isotope in the composition
@@ -230,6 +296,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
  private:  
   /* --- Instance Management --- */  
   /**
+     the log level for all CompMap instances
+   */
+  static LogLevel log_level_;
+
+  /**
      the actual map of isotopes to valuse
    */
   Map map_;
@@ -268,7 +339,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      initializes all relevant members
   */
   void init(Basis b);
-  
+
+  /**
+   */
+  void change_basis(Basis b);
+
   /**
      divides each entry in the map by a value labeled sum. it is assumed
      that sum is the total of all values in the map
