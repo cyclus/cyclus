@@ -54,25 +54,25 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
  public:
   /* --- Constructors and Destructors --- */
   /**
+     default constructor
+   */
+  IsoVector();
+
+  /**
      specialized constructor, assuming comp is already mass based.
      @param comp the composition to be copied into composition_
    */
   IsoVector(CompMapPtr comp);
 
   /**
-     default destructor, releases composition_
-   */
-  ~IsoVector();
-
-  /**
-     swaps members, used by copy constructor and assignment copy operator
-   */
-  friend void swap(IsoVector& v1, IsoVector& v2);
-
-  /**
      copy constructor
    */
   IsoVector(const IsoVector& other);
+
+  /**
+     default destructor, releases composition_
+   */
+  ~IsoVector();
   /* --- */
 
   /* --- Operators --- */
@@ -131,6 +131,11 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   double atomFraction(Iso tope);
 
   /**
+     calls composition_'s normalize
+  */
+  void normalize();
+
+  /**
      validates the composition_, insuring all Isotopes numbers 
      and fraction values comply
   */
@@ -145,6 +150,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      calls CompMap's printing functionality
    */
   void print();
+
+  /**
+     calls equality operator on the values of composition_ and
+     other.comp()
+   */
+  bool compEqual(const IsoVector& other);
   /* --- */
 
   /* --- Transformations --- */

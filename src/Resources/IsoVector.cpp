@@ -9,11 +9,16 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <algorithm> // std::swap
 
 using namespace std;
 
 LogLevel IsoVector::log_level_ = LEV_INFO3;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IsoVector::IsoVector() {
+  CompMapPtr comp = CompMapPtr(new CompMap(MASS));
+  setComp(comp);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(CompMapPtr comp) {
@@ -27,20 +32,14 @@ IsoVector::~IsoVector() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void swap(IsoVector& v1, IsoVector& v2) {
-  using std::swap;
-  swap(v1.composition_,v2.composition_);
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(const IsoVector& other) {
-  swap( *this, const_cast<IsoVector&>(other) );
+  setComp(other.comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector& IsoVector::operator= (IsoVector rhs) {
-  swap(*this,rhs);
+  setComp(rhs.comp());
   return *this;
 }
 
@@ -96,6 +95,11 @@ double IsoVector::atomFraction(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void IsoVector::normalize() {
+  composition_->normalize();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::validate() {
   composition_->validate();
 }
@@ -109,6 +113,11 @@ void IsoVector::reset() {
 void IsoVector::print() {
   CLOG(log_level_) << "This IsoVector manages: ";
   composition_->print();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool IsoVector::compEqual(const IsoVector& other) {
+  return (*composition_ == *other.comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

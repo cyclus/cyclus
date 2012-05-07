@@ -5,6 +5,7 @@
 #include "CycException.h"
 
 #include <sstream>
+#include <cmath> // std::abs
 
 using namespace std;
 
@@ -36,13 +37,13 @@ CompMap::iterator CompMap::end() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double& CompMap::operator[](int tope) {
+double& CompMap::operator[](const int& tope) {
   normalized_ = false;
   return map_.operator[](tope);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int CompMap::count(Iso tope) {
+int CompMap::count(Iso tope) const {
   return map_.count(tope);
 }
 
@@ -50,6 +51,39 @@ int CompMap::count(Iso tope) {
 void CompMap::erase(Iso tope) {
   normalized_ = false;
   map_.erase(tope);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CompMap::erase(CompMap::iterator position) {
+  normalized_ = false;
+  map_.erase(position);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::empty() const {
+  return map_.empty();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+int CompMap::size() const {
+  return map_.size();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::operator==(const CompMap& rhs) const {
+  if ( size() != rhs.size() ) {
+    return false;
+  }
+  for (const_iterator it = map_.begin(); it != map_.end(); it++) {
+    if (rhs.count(it->first) == 0) {
+      return false;
+    }
+    double val = rhs.massFraction(it->first) - massFraction(it->first); 
+    if (abs(val) > EPS_FRACTION) {
+      return false;
+    }
+  }
+  return true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -78,7 +112,7 @@ int CompMap::ID() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CompMap::massFraction(Iso tope) {
+double CompMap::massFraction(const Iso& tope) const {
   if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
@@ -86,11 +120,11 @@ double CompMap::massFraction(Iso tope) {
   if (basis_ != MASS) {
     factor = MT->gramsPerMol(tope) / mass_to_atom_ratio_;
   }
-  return factor * map_[tope];
+  return factor * map_.find(tope)->second;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CompMap::atomFraction(Iso tope) {
+double CompMap::atomFraction(const Iso& tope) const {
   if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
@@ -98,7 +132,7 @@ double CompMap::atomFraction(Iso tope) {
   if (basis_ != ATOM) {
     factor = 1 / (MT->gramsPerMol(tope) / mass_to_atom_ratio_);
   }
-  return factor * map_[tope];
+  return factor * map_.find(tope)->second;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -193,23 +227,24 @@ void CompMap::init(Basis b) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::change_basis(Basis b) {
+  if (!normalized()) {
+    normalize();
+  }
   if (basis_ != b) { // only change if we have to
     for (iterator it = map_.begin(); it != map_.end(); it++) {
       switch (b) {
       case ATOM:
-        it->second = atomFraction(it->first);
+        map_[it->first] = atomFraction(it->first);
         break;
       case MASS:
-        it->second = massFraction(it->first);
+        map_[it->first] = massFraction(it->first);
         break;
       default:
         throw CycRangeException("Basis not atom or mass.");
         break;
       }
     }
-  }
-  if (!normalized()) {
-    normalize();
+    basis_ = b;
   }
 }
 
