@@ -53,6 +53,17 @@ void CompMap::erase(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CompMap::erase(CompMap::iterator position) {
+  normalized_ = false;
+  map_.erase(position);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::empty() {
+  return map_.empty();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::operator<(const CompMap& rhs) const {
   return (ID_ < rhs.ID());
 }

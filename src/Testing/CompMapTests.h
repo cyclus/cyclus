@@ -8,14 +8,9 @@ class TestCompMap : public CompMap {
  public:  
  TestCompMap() : CompMap(MASS) {};
  TestCompMap(Basis b) : CompMap(b) {};
-  
-  Map map_;
+
   void setMap(Map m) {map_ = m;}
-  
-  CompMapPtr parent_;  
   void setParent(CompMapPtr p) {parent_ = p;}
-  
-  double decay_time_;
   void setDecayTime(double t) {decay_time_ = t;}
 };
 

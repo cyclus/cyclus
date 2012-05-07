@@ -132,13 +132,13 @@ enum Basis {MASS, ATOM};
    entries.
 */
 class CompMap : public boost::enable_shared_from_this<CompMap> {  
+ public:
   /**
      masking Map
   */
   typedef Map::iterator iterator;
   typedef Map::const_iterator const_iterator;
 
- public:
   /* --- Constructors and Destructors --- */
   /**
      default constructor
@@ -187,6 +187,16 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      erases tope from map
    */
   void erase(Iso tope);
+
+  /**
+     erases tope at position from map
+   */
+  void erase(CompMap::iterator position);
+
+  /**
+     returns map_.empty()
+   */
+  bool empty();
 
   /**
      returns true if the composition's id has been set
@@ -293,7 +303,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   std::string detail();
   /* --- */
 
- private:  
+ protected:  
   /* --- Instance Management --- */  
   /**
      the log level for all CompMap instances
