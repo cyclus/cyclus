@@ -36,7 +36,7 @@ typedef int Iso;
 /**
    map of isotope integer to value (mass or atom)
  */
-typedef std::map<Iso,double> Map;
+typedef std::map<Iso,double> Map;  
 
 /**
    a shared pointer to this class
@@ -66,6 +66,12 @@ enum Basis {MASS, ATOM};
    BookKeeper.
 */
 class CompMap : public boost::enable_shared_from_this<CompMap> {  
+  /**
+     masking Map
+  */
+  typedef typename Map::iterator iterator;
+  typedef typename Map::const_iterator const_iterator;
+
  public:
   /* --- Constructors and Destructors --- */
   /**
@@ -76,7 +82,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      constructor, given a map
    */
-  CompMap(Basis b, Map& m);
+  CompMap(Basis b, Map m);
 
   /**
      default destructor
@@ -84,7 +90,17 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   ~CompMap();
   /* --- */
   
-  /* --- Instance Interaction --- */  
+  /* --- Instance Interaction --- */    
+  /**
+     beginning iterator
+   */
+  CompMap::iterator begin();
+
+  /**
+     ending iterator
+   */
+  CompMap::iterator end();
+
   /**
      accesses the subscript operator of the map
    */
@@ -134,12 +150,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(const Iso& tope) const;
+  double massFraction(Iso tope);
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(const Iso& tope) const;
+  double atomFraction(Iso tope);
 
   /**
      returns the composition's id
@@ -251,7 +267,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      initializes all relevant members
   */
-  void init();
+  void init(Basis b);
   
   /**
      divides each entry in the map by a value labeled sum. it is assumed

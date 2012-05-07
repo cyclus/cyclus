@@ -3,7 +3,7 @@
 
 #include "RecipeLogger.h"
 
-#include "IsotopicDefinitions.h"
+#include "CompMap.h"
 #include "MassTable.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -72,18 +72,28 @@ void RecipeLogger::load_recipes() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::load_recipe(xmlNodePtr cur) {
-  // initialize comp map
-  CompMap values;
-
   // get general values from xml
   string name = XMLinput->get_xpath_content(cur,"name");
-  string basis = XMLinput->get_xpath_content(cur,"basis");
-  bool atom = (basis == "atom");
-  bool mass = (basis == "mass");
-  if (!atom && !mass) {
+  string basis_str = XMLinput->get_xpath_content(cur,"basis");
+  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+
+  // set basis
+  bool atom;
+  Basis basis;
+  if (basis_str == "atom") {
+    atom = true;
+    basis = ATOM;
+  }
+  else if (basis_str == "mass") {
+    atom = false;
+    basis = MASS;
+  }
+  else {
     throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
   }
-  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
+
+  // make a new composition
+  CompMapPtr recipe(new CompMap(basis));
 
   // get values needed for composition
   double value;
@@ -94,12 +104,12 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
     key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
     value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
     // update our mass-related values
-    values[key] = value;
+    (*recipe)[key] = value;
   }
-  
-  // make a new composition
-  CompMapPtr recipe(new CompMap(values,atom));
-
+  if (atom) {
+    recipe->massify();
+  }
+  recipe->normalize();
   // log this composition (static members and database)
   logRecipe(name,recipe);
 }
@@ -122,8 +132,8 @@ bool RecipeLogger::recipeLogged(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::logRecipe(CompMapPtr recipe) {
   if (!recipe->logged()) {
-    recipe->setID(nextStateID_++);
-    addToTable(*recipe);
+    recipe->ID_ = nextStateID_++;
+    addToTable(recipe);
   }
 }
 
@@ -217,8 +227,8 @@ bool RecipeLogger::daughterLogged(CompMapPtr parent, double time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLogger::addDaughter(CompMapPtr parent, CompMapPtr child, double time) {
-  child->setParent(parent);
-  child->setDecayTime(time);
+  child->parent_ = parent;
+  child->decay_time_ = time;
   Daughter(parent,time) = child; // child is copied
 }
 
@@ -247,7 +257,7 @@ void RecipeLogger::define_table() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLogger::addToTable(CompMap& recipe){
+void RecipeLogger::addToTable(CompMapPtr recipe){
   // if we haven't logged a composition yet, define the table
   if ( !iso_table->defined() ) {
     RecipeLogger::define_table();
@@ -255,16 +265,13 @@ void RecipeLogger::addToTable(CompMap& recipe){
 
   // make a row - stateid first then isotopics
   // declare data
-  data an_id(recipe.ID());
+  data an_id( recipe->ID() );
   // declare entries
   entry id("ID",an_id);
 
   // now for the composition isotopics
-  CompMapPtr comp = recipe.comp();
-  int i = 0;
-  for (CompMap::iterator item = comp->begin();
-       item != comp->end(); item++){
-    CLOG(LEV_DEBUG2) << "isotope " << i++ << " of " << comp->size();
+  for (CompMap::iterator item = recipe->begin();
+       item != recipe->end(); item++) {
     // declare row
     // decalre data
     data an_iso_id(item->first), an_iso_value(item->second);

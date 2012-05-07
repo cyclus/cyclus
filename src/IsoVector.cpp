@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include <algorithm> // std::swap
 
 using namespace std;
@@ -120,7 +121,9 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
          != add_comp->end(); it++) {
     // check ratio
     if (ratio < 0) {
-      throw CycRangeException("Ratio: " + ratio + " is not in [0,inf).");
+      stringstream ss("");
+      ss << "Ratio: " << ratio << " is not in [0,inf).";
+      throw CycRangeException(ss.str());
     }
     // get correct value to add
     double value;
@@ -161,7 +164,9 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
     // reduce isotope, if it exists in new_comp
     if (new_comp->count(it->first) != 0) {
       if (efficiency > 1.0 || efficiency < 0) {
-        throw CycRangeException("Efficiency: " + efficiency + " is not in [0,1].");
+        stringstream ss("");
+        ss << "Efficiency: " << efficiency << " is not in [0,1].";
+        throw CycRangeException(ss.str());
       }
       else if (efficiency < 1.0) {
         (*new_comp)[it->first] -= efficiency * (*new_comp)[it->first];

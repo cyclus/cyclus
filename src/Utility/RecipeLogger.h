@@ -222,16 +222,16 @@ class RecipeLogger {
   /**
      Add an isotopic state to the table 
    */
-  static void addToTable(CompMap& comp);
+  static void addToTable(CompMapPtr recipe);
 
   /* /\** */
   /*    Store information about the transactions's primary key  */
   /*  *\/ */
   /* primary_key_ref pkref_; */
  /* -- */ 
-
-
-  friend class CompMap;
+  
+  //  friend class CompMap;
+  friend class IsoVector;
 };
 
 #endif

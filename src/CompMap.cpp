@@ -1,12 +1,21 @@
+// CompMap.cpp
+#include "CompMap.h"
+
+#include "MassTable.h"
+#include "CycException.h"
+
+#include <sstream>
+
+using namespace std;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(Basis b) {
-  basis_ = b;
-  init();
+  init(b);
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(Basis b, Map m) {
-  basis_ = b;
-  init();
+  init(b);
   map_ = m;
 }
 
@@ -15,13 +24,18 @@ CompMap::~CompMap() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double& operator[](int tope) {
-  return map_.operator[](tope);
+CompMap::iterator CompMap::begin() {
+  return map_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool IsoVector::operator<(const IsoVector& rhs) const {
-  return (ID_ < rhs.ID());
+CompMap::iterator CompMap::end() {
+  return map_.end();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double& CompMap::operator[](int tope) {
+  return map_.operator[](tope);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -35,56 +49,76 @@ void CompMap::erase(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool IsoVector::logged() const {
+bool CompMap::operator<(const CompMap& rhs) const {
+  return (ID_ < rhs.ID());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::logged() const {
   return (ID_ > 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int IsoVector::ID() const {
+Basis CompMap::basis() const {
+  return basis_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CompMap::set_basis(Basis b) {
+  basis_ = b;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Map CompMap::map() const {
+  return map_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+int CompMap::ID() const {
   return ID_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::massFraction(const Iso& tope) const {
+double CompMap::massFraction(Iso tope) {
   validateIsotopeNumber(tope);
-  if (composition_->count(tope) == 0) {
+  if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
-  return (*composition_)[tope];
+  return map_[tope];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::atomFraction(const Iso& tope) const {
+double CompMap::atomFraction(Iso tope) {
   validateIsotopeNumber(tope);
-  if (composition_->count(tope) == 0) {
+  if (count(tope) == 0) {
     throw CycIndexException("This composition has no Iso: " + tope);
   }
-  return (*composition_)[tope] * MT->gramsPerMol(tope) / mass_to_atoms_;
+  return map_[tope] * MT->gramsPerMol(tope) / mass_to_atom_ratio_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr IsoVector::parent() const {
+CompMapPtr CompMap::parent() const {
   return parent_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::decay_time() const {
+double CompMap::decay_time() const {
   return decay_time_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::mass_to_atoms() const {
-  return mass_to_atoms_;
+double CompMap::mass_to_atom_ratio() const {
+  return mass_to_atom_ratio_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-IsoVectorPtr IsoVector::me() {
+CompMapPtr CompMap::me() {
   return shared_from_this();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-IsoVectorPtr IsoVector::root_comp(IsoVectorPtr comp) {
-  IsoVectorPtr child = comp;
+CompMapPtr CompMap::root_comp() {
+  CompMapPtr child = me();
   while (child->parent()) {
     child = child->parent();
   }
@@ -92,9 +126,9 @@ IsoVectorPtr IsoVector::root_comp(IsoVectorPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::root_decay_time(IsoVectorPtr comp) {
-  IsoVectorPtr child = comp;
-  double time = comp->decay_time();
+double CompMap::root_decay_time() {
+  CompMapPtr child = parent();
+  double time = decay_time();
   while (child->parent()) {
     child = child->parent();
     time += child->decay_time();
@@ -103,117 +137,109 @@ double IsoVector::root_decay_time(IsoVectorPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::massify(CompMap& comp) {
+void CompMap::massify() {
   double sum = 0.0;
-  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
-    ci->second *= MT->gramsPerMol(ci->first);
-    sum+= ci->second;
+  for (iterator it = map_.begin(); it != map_.end(); it++) {
+    it->second *= MT->gramsPerMol(it->first);
+    sum += it->second;
   }
-  normalize(comp,sum);
+  normalize(sum);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::atomify(CompMap& comp) {
+void CompMap::atomify() {
   double sum = 0.0;
-  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
-    validateEntry(ci->first,ci->second);
-    ci->second /= MT->gramsPerMol(ci->first);
-    sum += ci->second;
+  for (iterator it = map_.begin(); it != map_.end(); it++) {
+    validateEntry(it->first,it->second);
+    it->second /= MT->gramsPerMol(it->first);
+    sum += it->second;
   }
-  normalize(comp,sum);
+  normalize(sum);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::normalize(CompMap& comp) {
+void CompMap::normalize() {
   double sum = 0.0;
-  for (CompMap::iterator it = comp.begin(); 
-       it != comp.end(); it++) {
+  for (iterator it = map_.begin(); it != map_.end(); it++) {
     validateEntry(it->first,it->second);
     sum += it->second;
   }
-  normalize(comp,sum);
+  normalize(sum);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::normalize(CompMap& comp, double sum) {
-  if ( sum != 1) { // only normalize if needed
-    for (CompMap::iterator it = comp.begin(); 
-         it != comp.end(); it++) {
+void CompMap::init(Basis b) {
+  basis_ = b;
+  map_ = Map();
+  normalized_ = false;
+  mass_to_atom_ratio_ = 1;
+  ID_ = 0;
+  decay_time_ = 0;
+  parent_.reset();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CompMap::normalize(double sum) {
+  if (sum != 1) { // only normalize if needed
+    for (iterator it = map_.begin(); it != map_.end(); it++) {
       it->second /= sum;
     }
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::checkCompMap() {
-  normalize(*composition_);
-  validateIsoVector(composition_);
-  mass_to_atoms_ = calculateMassAtomRatio(*composition_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::calculateMassAtomRatio(CompMap& comp) {
-  double sum = 0.0;
-  for (CompMap::iterator ci = comp.begin(); ci != comp.end(); ci++) {
-    sum+= ci->second;
-  }
-  return sum;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int IsoVector::getAtomicNum(Iso tope) {
+int CompMap::getAtomicNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope / 1000; // integer division;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int IsoVector::getMassNum(Iso tope) {
+int CompMap::getMassNum(Iso tope) {
   validateIsotopeNumber(tope);
   return tope % 1000;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::validate() {
+void CompMap::validate() {
   for (Map::iterator it = map_.begin(); it != map_.end(); it ++) {
     validateEntry(it->first,it->second);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::validateEntry(const Iso& tope, const double& value) {
+void CompMap::validateEntry(const Iso& tope, const double& value) {
   validateIsotopeNumber(tope);
   validateValue(value);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::validateIsotopeNumber(const Iso& tope) {
+void CompMap::validateIsotopeNumber(const Iso& tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;  
   if (tope < lower_limit || tope > upper_limit) {
-    stringstream st;
-    st << tope;
-    string isotope = st.str();
-    throw CycRangeException("Isotope identifier '" + isotope + "' is not valid.");
+    stringstream ss("");
+    ss << tope;
+    throw CycRangeException("Isotope identifier '" + ss.str() + "' is not valid.");
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::validateValue(const double& value) {
+void CompMap::validateValue(const double& value) {
   if (value < 0.0) {
-    string err_msg = "IsoVector has negative quantity for an isotope.";
+    string err_msg = "CompMap has negative quantity for an isotope.";
     throw CycRangeException(err_msg);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::print() {
-  CLOG(LEV_INFO3) << detail(*this->comp());
+void CompMap::print() {
+  CLOG(LEV_INFO3) << detail();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string IsoVector::detail(const CompMap& c) {
+std::string CompMap::detail() {
   stringstream ss;
-  vector<string> entries = compStrings(c);
+  vector<string> entries = compStrings();
   for (vector<string>::iterator entry = entries.begin(); 
        entry != entries.end(); entry++) {
     CLOG(LEV_INFO3) << *entry;
@@ -222,11 +248,10 @@ std::string IsoVector::detail(const CompMap& c) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string> IsoVector::compStrings(const CompMap& c) {
+std::vector<std::string> CompMap::compStrings() {
   stringstream ss;
   vector<string> comp_strings;
-  for (CompMap::const_iterator entry = c.begin(); 
-       entry != c.end(); entry++) {
+  for (const_iterator entry = map_.begin(); entry != map_.end(); entry++) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
     comp_strings.push_back(ss.str());
