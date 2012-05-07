@@ -106,10 +106,7 @@ void RecipeLogger::load_recipe(xmlNodePtr cur) {
     // update our mass-related values
     (*recipe)[key] = value;
   }
-  if (atom) {
-    recipe->massify();
-  }
-  recipe->normalize();
+  recipe->massify();
   // log this composition (static members and database)
   logRecipe(name,recipe);
 }

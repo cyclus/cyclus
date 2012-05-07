@@ -148,6 +148,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   double mass_to_atom_ratio() const;
 
   /**
+     returns true if the composition has been normalized
+   */
+  bool normalized() const;
+
+  /**
      Return the mass fraction of an isotope in the composition
    */
   double massFraction(Iso tope);
@@ -268,7 +273,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      initializes all relevant members
   */
   void init(Basis b);
-  
+
+  /**
+   */
+  void change_basis(Basis b);
+
   /**
      divides each entry in the map by a value labeled sum. it is assumed
      that sum is the total of all values in the map

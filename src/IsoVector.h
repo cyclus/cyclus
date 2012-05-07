@@ -102,12 +102,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(const Iso& tope) const;
+  double massFraction(Iso tope);
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(const Iso& tope) const;
+  double atomFraction(Iso tope);
 
   /**
      validates the composition_, insuring all Isotopes numbers 
