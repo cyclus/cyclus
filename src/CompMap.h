@@ -3,11 +3,17 @@
 #define _COMPMAP_H
 
 /* -- Includes -- */
+#include "Logger.h"
+
 #include <map>
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+/* -- */
+
+/* -- Defines -- */
+#define EPS_FRACTION 1e-8
 /* -- */
 
 /* -- Typedefs -- */
@@ -38,7 +44,6 @@ enum Basis {MASS, ATOM};
 /* -- Sensitive Includes -- */
 #include "IsoVector.h"
 #include "RecipeLogger.h"
-#include "Logger.h"
 /* -- */
 
 /** 
@@ -170,7 +175,13 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      accesses the subscript operator of the map
    */
-  double& operator[](int tope);
+  double& operator[](const int& tope);
+
+  /**
+     returns true if both comp maps have the same isotopic entries
+     and the difference in each value is less than EPS_PERCENT
+   */
+  bool operator==(const CompMap& other) const;
 
   /**
      the less-than operator to allowed compositions to be stored
@@ -181,7 +192,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      returns number of topes in map
    */
-  int count(Iso tope);
+  int count(Iso tope) const;
 
   /**
      erases tope from map
@@ -196,7 +207,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      returns map_.empty()
    */
-  bool empty();
+  bool empty() const;
+
+  /**
+     returns map_.size()
+   */
+  int size() const;
 
   /**
      returns true if the composition's id has been set
@@ -226,12 +242,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(Iso tope);
+  double massFraction(const Iso& tope) const;
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(Iso tope);
+  double atomFraction(const Iso& tope) const;
 
   /**
      returns the composition's id

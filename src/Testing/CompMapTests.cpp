@@ -29,5 +29,55 @@ TEST_F(CompMapTests,map_interface) {
     EXPECT_EQ(map[it->first],comp[it->first]);
     comp.erase(it->first);
   }
-  EXPECT_EQ(comp.empty(),true);
+  EXPECT_TRUE(comp.empty());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,normalize) { 
+  LoadMap();
+  comp.setMap(map);
+  EXPECT_EQ(map,comp.map());
+  EXPECT_NO_THROW(comp.normalize());
+  EXPECT_EQ(massified,comp.map());
+  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
+  EXPECT_TRUE(comp.normalized());
+  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,atomize) { 
+  LoadMap();
+  comp.setMap(map);
+  EXPECT_NO_THROW(comp.atomify());
+  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
+  EXPECT_TRUE(comp.normalized());
+  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,massify) { 
+  LoadMap();
+  comp.setMap(map);
+  EXPECT_NO_THROW(comp.atomify());  
+  EXPECT_NO_THROW(comp.massify());  
+  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
+  EXPECT_TRUE(comp.normalized());
+  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,lineage) { 
+  LoadLineage();
+  EXPECT_EQ(parent,child->parent());
+  EXPECT_EQ(root,child->root_comp());
+  EXPECT_EQ(root_decay_time,child->root_decay_time());
 }
