@@ -8,6 +8,8 @@
 
 using namespace std;
 
+LogLevel CompMap::log_level_ = LEV_INFO3;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(Basis b) {
   init(b);
@@ -63,11 +65,6 @@ bool CompMap::logged() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Basis CompMap::basis() const {
   return basis_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::set_basis(Basis b) {
-  basis_ = b;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -272,7 +269,7 @@ void CompMap::validateValue(const double& value) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CompMap::print() {
-  CLOG(LEV_INFO3) << detail();
+  CLOG(log_level_) << detail();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -281,7 +278,7 @@ std::string CompMap::detail() {
   vector<string> entries = compStrings();
   for (vector<string>::iterator entry = entries.begin(); 
        entry != entries.end(); entry++) {
-    CLOG(LEV_INFO3) << *entry;
+    CLOG(log_level_) << *entry;
   }
   return "";
 }

@@ -2,7 +2,6 @@
 #include "IsoVector.h"
 
 #include "CycException.h"
-#include "MassTable.h"
 #include "Logger.h"
 #include "DecayHandler.h"
 #include "RecipeLogger.h"
@@ -224,5 +223,7 @@ CompMapPtr IsoVector::executeDecay(CompMapPtr parent, double time) {
   handler.setComp(parent); // handler will not change parent's map
   handler.decay(years);
   CompMapPtr child = handler.comp();
+  child->parent_ = parent;
+  child->decay_time_ = time;
   return child;
 }

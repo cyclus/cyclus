@@ -38,6 +38,7 @@ enum Basis {MASS, ATOM};
 /* -- Sensitive Includes -- */
 #include "IsoVector.h"
 #include "RecipeLogger.h"
+#include "Logger.h"
 /* -- */
 
 /** 
@@ -58,8 +59,77 @@ enum Basis {MASS, ATOM};
    via decay, and if so how long the decay time between the two
    is.
 
-   @section Internal Storage
+   @section Map-Like Behavior
+   The core constituent of a CompMap is its Map member. Having to
+   explicitly call methods on this member is cumbersome, so a 
+   number of methods are provided which directly access the Map,
+   including:
    
+   * array index operator[](key)
+
+   * iterators: begin() and end()
+
+   * count(key)
+   
+   @section Internal Storage
+   The CompMap class offers a developer the ability to store 
+   normalized compositions of isotopes and access either their
+   mass or atom fractions. The type of internal storage (either
+   mass or atom based) is largely up to the developer in order to
+   allow decisions regarding speed vs. storage to be made locally.
+
+   However, it should be noted that decay mechanisms in Cyclus require
+   atom-based compositions, and logging with the BookKeeper requires
+   mass-based compositions. Both of these operations will return the 
+   composition to its original basis.
+
+   The internal storage of the CompMap can be changed on the fly via
+   the massify() and atomify() methods. Both of which call the 
+   normalize() method.
+
+   During the normalize() method, the mass to atom ratio is calculated.
+   This ratio is the sum of all mass values divided by the sum of all
+   atom values (mass value = atom value / grams-per-mol). This factor
+   allows for quick access between the two bases.
+   
+   @section Access
+   The CompMap class offers, nominally, two ways to access atom
+   or mass fractions of a given isotope. The first is by simply using
+   the array index operator. The second are the massFraction() and 
+   atomFraction() methods. The latter will intelligently return a
+   value corrected for a different basis (i.e., if the CompMap is in
+   an atom-based state and a massFraction() call occurs, it will 
+   return the correct mass fraction).
+
+   @section Lineage/Decay
+   The CompMap class provides functionality to track the lineage of
+   parents and their children due to decay. This lineage takes the
+   form of a tree, rooted at some initial composition, with branches
+   based upon total time decayed from the root composition. 
+
+   Accordingly, any given composition stores immediate knowlege of
+   its parent and the decay time between itself and its parent. 
+   Accessing the root composition invokes climbing the parent-child
+   ladder up to the root composition. The total decay time is similarly
+   calculated by summing the decay times of each child as the tree is
+   traversed.
+
+   @section Validation
+   Isotopic integers have a limited valid range (between 1001
+   and 1182949), and all Map values must be positive (you can't 
+   have negative compostiion). Functionality is provided to
+   validate both of these numbers for all Map entries via:
+   
+   * validateEntry()
+
+   * validateIsotope()
+
+   * validateValue()
+
+   * validate() Note: this calls validateEntry() on all entries
+
+   When a CompMap is normalized, validation is performed on all
+   entries.
 */
 class CompMap : public boost::enable_shared_from_this<CompMap> {  
   /**
@@ -127,11 +197,6 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      returns the current basis
    */
   Basis basis() const;
-
-  /**
-     if b is different than basis_, map_ is converted to the new basis
-   */
-  void set_basis(Basis b);
 
   /**
      returns the current map
@@ -230,6 +295,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
 
  private:  
   /* --- Instance Management --- */  
+  /**
+     the log level for all CompMap instances
+   */
+  static LogLevel log_level_;
+
   /**
      the actual map of isotopes to valuse
    */
