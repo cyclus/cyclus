@@ -10,23 +10,6 @@
 #include <boost/enable_shared_from_this.hpp>
 /* -- */
 
-/* -- Defines -- */
-/**
-   avagadro's number
-*/
-#define AVOGADRO 6.02e23
-
-/**
-   smallest kilogram value
-*/
-#define EPS_KG 1e-6
-
-/**
-   smallest percent
-*/
-#define EPS_PERCENT 1e-14
-/* -- */
-
 /* -- Typedefs -- */
 /**
    Isotope integer, ZZZAAA
@@ -61,9 +44,22 @@ enum Basis {MASS, ATOM};
    @class CompMap
 
    @section Introduction
-   The CompMap class in Cyclus is a wrapper class for
-   isotopic compositions so that they may be logged with the 
-   BookKeeper.
+   The CompMap class provides an intelligent wrapper for the
+   standard Cyclus Isotopic Composition map, a map of integer 
+   values (ZZZAAA) to double values.
+
+   This class forwards the relevant function calls to the actual
+   map held as a member variable. Specifically, the array index
+   operator, the begin iterator, and the end iterator can all be
+   called by a CompMap.
+
+   The CompMap also stores details about a Composition's lineage,
+   specifically whether or not a CompMap is the child of another
+   via decay, and if so how long the decay time between the two
+   is.
+
+   @section Internal Storage
+   
 */
 class CompMap : public boost::enable_shared_from_this<CompMap> {  
   /**
