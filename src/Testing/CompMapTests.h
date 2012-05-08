@@ -28,7 +28,7 @@ class CompMapTests : public ::testing::Test {
   Map map, atomified, massified;
   Basis basis;
   double ratio;
-  int iso_base, nSpecies;
+  int nSpecies;
   std::vector<int> isotopes, masses;
 
   boost::shared_ptr<TestCompMap> child, parent;

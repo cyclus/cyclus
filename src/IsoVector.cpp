@@ -116,8 +116,13 @@ void IsoVector::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEqual(const IsoVector& other) {
-  return (*composition_ == *other.comp());
+bool IsoVector::compEquals(const IsoVector& other) {
+  return (compEquals(*other.comp()));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool IsoVector::compEquals(const CompMap& comp) {
+  return (*composition_ == comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -174,7 +179,7 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     if (new_comp->count(it->first) != 0) {
-      if (efficiency < 1.0) {
+      if (efficiency != 1.0) {
         (*new_comp)[it->first] -= efficiency * (*new_comp)[it->first];
       }
       else {
