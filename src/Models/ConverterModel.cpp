@@ -5,7 +5,6 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConverterModel::ConverterModel() {
-  init();
   setModelType("Converter");
 }
 

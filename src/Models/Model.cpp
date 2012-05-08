@@ -206,7 +206,6 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
-  Model::init();
   ID_ = next_id_++;
   is_template_ = true;
   born_ = false;

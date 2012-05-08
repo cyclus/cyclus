@@ -44,11 +44,6 @@ class BatchReactor : public FacilityModel  {
   virtual ~BatchReactor() {};
 
   /**
-     Initialize all members during construction
-   */
-  void init();
-    
-  /**
      initialize an object from XML input 
    */
   virtual void init(xmlNodePtr cur);

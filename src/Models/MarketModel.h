@@ -73,12 +73,6 @@ class MarketModel : public Model, public Communicator {
   static MarketModel* marketForCommod(std::string commod);
 
   /**
-     Initalize members of MarketModel and any other non-input
-     related parameters
-   */
-  void init() {};
-
-  /**
      set the parameters necessary for MarketModel to interact
      with the simulation
      

@@ -20,7 +20,6 @@ class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
   public:
     virtual void SetUp() { 
       region_model_ = (*GetParam())();
-      region_model_->init();
     }
     virtual void TearDown(){ 
       delete region_model_;

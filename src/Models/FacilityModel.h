@@ -74,12 +74,6 @@ class FacilityModel : public TimeAgent, public Communicator {
   FacilityModel();
   
   virtual ~FacilityModel();
-  
-  /**
-     Initalize members of FacilityModel and any other non-input
-     related parameters
-   */
-  void init() {};
 
   /**
      Initalize the FacilityModel from xml. Calls the init function. 

@@ -16,7 +16,6 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RegionModel::RegionModel() { 
-  init();
   setModelType("Region");
 }
 
