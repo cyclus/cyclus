@@ -152,10 +152,15 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void print();
 
   /**
-     calls equality operator on the values of composition_ and
-     other.comp()
+     calls compEqual on other.comp()
    */
-  bool compEqual(const IsoVector& other);
+  bool compEquals(const IsoVector& other);
+
+  /**
+     calls equality operator on the values of composition_ and
+     comp
+   */
+  bool compEquals(const CompMap& comp);
   /* --- */
 
   /* --- Transformations --- */

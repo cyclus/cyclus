@@ -1,6 +1,6 @@
 // CompMapTests.cpp 
 #include <gtest/gtest.h>
-
+#include <iostream>
 #include "CompMapTests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -80,4 +80,13 @@ TEST_F(CompMapTests,lineage) {
   EXPECT_EQ(parent,child->parent());
   EXPECT_EQ(root,child->root_comp());
   EXPECT_EQ(root_decay_time,child->root_decay_time());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,equality) {
+  LoadMap();
+  comp.setMap(map);
+  comp.normalize();
+  CompMap copy = CompMap(comp);
+  EXPECT_TRUE(copy == comp);
 }
