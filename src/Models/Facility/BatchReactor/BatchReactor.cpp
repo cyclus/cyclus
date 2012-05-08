@@ -160,8 +160,7 @@ void BatchReactor::addResource(msg_ptr msg,
   preCore_.pushAll(ResourceBuff::toMat(manifest));
   double added = preCore_.quantity() - preQuantity;
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
-                            << added << " to its " << preCore_.name()
-                            << " buffer.";
+                            << added << " to its precore buffer.";
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -171,8 +170,7 @@ vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
                             << amt << " of " << postCore_.quantity() 
-                            <<" to its " << postCore_.name()
-                            << " buffer.";
+                            << " to its postcore buffer.";
   
   return ResourceBuff::toRes(postCore_.popQty(amt));
 }
