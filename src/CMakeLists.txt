@@ -69,7 +69,7 @@ SET( CYCLUS_CORE
   IsoVector.cpp
   Resource.cpp
   GenericResource.cpp
-#  Material.cpp
+  Material.cpp
   ResourceBuff.cpp
 #  MatBuff.cpp
   Message.cpp
