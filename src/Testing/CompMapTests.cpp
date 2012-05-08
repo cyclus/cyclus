@@ -48,7 +48,7 @@ TEST_F(CompMapTests,normalize) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(CompMapTests,atomize) { 
+TEST_F(CompMapTests,atomify) { 
   LoadMap();
   comp.setMap(map);
   EXPECT_NO_THROW(comp.atomify());
