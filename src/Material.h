@@ -13,10 +13,15 @@
 #include "Resource.h"
 #include "IsoVector.h"
 
+/* -- Defines -- */
+#define EPS_KG 1e-6
 #define WF_U235 0.007200 // feed, natural uranium 
+/* -- */
 
+/* -- Typedefs -- */
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
+/* -- */
 
 /*!
    @class Material
@@ -101,7 +106,7 @@ public:
   /**
      Resource class method 
    */
-  double quantity() {};//return iso_vector_.mass();};
+  double quantity();
 
   /**
      Resource class method 
@@ -142,16 +147,16 @@ public:
    */
   virtual void absorb(mat_rsrc_ptr matToAdd);
 
-  /**
-     Extracts from this material a composition 
-     specified by the given IsoVector 
+  /* /\** */
+  /*    Extracts from this material a composition  */
+  /*    specified by the given IsoVector  */
       
-     @param rem_comp the composition/amount of material that will be 
-     removed against this Material 
+  /*    @param rem_comp the composition/amount of material that will be  */
+  /*    removed against this Material  */
       
-     @return the extracted material as a newly allocated material object 
-   */
-  virtual mat_rsrc_ptr extract(IsoVector rem_comp);
+  /*    @return the extracted material as a newly allocated material object  */
+  /*  *\/ */
+  /* virtual mat_rsrc_ptr extract(IsoVector rem_comp); */
 
   /**
      Extracts a specified mass from this material creating a new 

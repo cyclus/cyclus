@@ -116,6 +116,11 @@ void IsoVector::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void IsoVector::log() {
+  RL->logRecipe(composition_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::compEquals(const IsoVector& other) {
   return (compEquals(*other.comp()));
 }

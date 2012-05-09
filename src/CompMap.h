@@ -317,6 +317,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      LEV_INFO3
    */
   std::string detail();
+
+  /**
+     populates a vector, each entry being a string describing an isotope and its
+     % mass value
+   */
+  std::vector<std::string> compStrings();
   /* --- */
 
  protected:  
@@ -376,12 +382,6 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @param sum the value by which to normalize it
   */
   void normalize(double sum);
-
-  /**
-     populates a vector, each entry being a string describing an isotope and its
-     % mass value
-   */
-  std::vector<std::string> compStrings();
   /* --- */
 
  public:

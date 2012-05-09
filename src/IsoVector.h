@@ -152,6 +152,11 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void print();
 
   /**
+     logs composition_ with the RecipeLogger
+   */
+  void log();
+
+  /**
      calls compEqual on other.comp()
    */
   bool compEquals(const IsoVector& other);
