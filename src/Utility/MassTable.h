@@ -6,8 +6,6 @@
 #include <vector>
 #include <map>
 
-#include "Material.h"
-
 #define MT MassTable::Instance()
 
 /**

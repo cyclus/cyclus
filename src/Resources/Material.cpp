@@ -45,41 +45,41 @@ Material::Material(const Material& other) {
 void Material::absorb(mat_rsrc_ptr matToAdd) { 
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
-  IsoVector vec_to_add = matToAdd->isoVector();
-  iso_vector_ = iso_vector_ + vec_to_add;
+  double amt = matToAdd->quantity();
+  iso_vector_.mix(matToAdd->isoVector(),quantity_/amt); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
+  quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
                    << matToAdd->ID() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
-
-  IsoVector new_comp = iso_vector_;
-  new_comp.setMass(mass);
-  iso_vector_.setMass(iso_vector_.mass() - mass);
+  // remove our mass
+  quantity_ -= mass;
+  // make a new material, set its mass
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(iso_vector_));
+  new_mat->setQuantity(mass);
+  // we just split a resource, so keep track of the original for book keeping
+  new_mat->setOriginalID( this->originalID() );
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
                    << " kg extracted from it. New mass=" << quantity() << " kg.";
   
-  mat_rsrc_ptr new_mat = new Material(new_comp);
-  // we just split a resource, so keep track of the original for book keeping
-  new_mat->setOriginalID( this->originalID() );
-
-  return mat_rsrc_ptr(new_mat);
+  return new_mat;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
-  iso_vector_ = iso_vector_ - rem_comp;
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
+//   iso_vector_ = iso_vector_ - rem_comp;
 
-  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+//   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
 
-  mat_rsrc_ptr new_mat = new Material(rem_comp);
-  // we just split a resource, so keep track of the original for book keeping
-  new_mat->setOriginalID( this->originalID() );
+//   mat_rsrc_ptr new_mat = new Material(rem_comp);
+//   // we just split a resource, so keep track of the original for book keeping
+//   new_mat->setOriginalID( this->originalID() );
 
-  return mat_rsrc_ptr(new_mat);
-}
+//   return mat_rsrc_ptr(new_mat);
+// }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print() {
@@ -94,7 +94,7 @@ void Material::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 string Material::detail() {
   vector<string>::iterator entry;
-  vector<string> entries = iso_vector_.compStrings();
+  vector<string> entries = iso_vector_.comp()->compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
@@ -103,10 +103,15 @@ string Material::detail() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::setQuantity(double quantity) {
-  iso_vector_.setMass(quantity);
+  quantity_ = quantity;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
                    << quantity << " kg";
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::quantity() {
+  return quantity_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 rsrc_ptr Material::clone() {
@@ -167,7 +172,7 @@ void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
   
-  iso_vector_.executeDecay(delta_time);
+  iso_vector_.decay((double)delta_time);
 
   last_update_time_ = curr_time;
 }
@@ -202,6 +207,5 @@ void Material::setDecay(int dec) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::addToTable() {
   Resource::addToTable();
-  iso_vector_.recordState();
+  iso_vector_.log();
 }
-

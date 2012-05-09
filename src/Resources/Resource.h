@@ -150,6 +150,11 @@ public:
   Resource();
 
   /**
+     amount of a resource
+   */
+  double quantity_;
+
+  /**
      Resource ID 
    */
   int ID_;

@@ -69,9 +69,9 @@ SET( CYCLUS_CORE
   IsoVector.cpp
   Resource.cpp
   GenericResource.cpp
-  Material.cpp
+#  Material.cpp
   ResourceBuff.cpp
-#  MatBuff.cpp
+  MatBuff.cpp
   Message.cpp
   Utility/BookKeeper.cpp 
   Utility/Database.cpp
@@ -86,9 +86,9 @@ SET( CYCLUS_CORE
   Utility/Logger.cpp
   Utility/DecayHandler.cpp
   Models/Model.cpp 
-  # Models/StubTimeAgent.cpp 
-  # Models/StubModel.cpp 
-  # Models/StubCommModel.cpp 
+  Models/StubTimeAgent.cpp 
+  Models/StubModel.cpp 
+  Models/StubCommModel.cpp 
   # Models/ConverterModel.cpp 
   Models/MarketModel.cpp 
   Models/FacilityModel.cpp 
