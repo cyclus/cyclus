@@ -11,7 +11,7 @@
 #include "RecipeLogger.h"
 #include "CycException.h"
 #include "Model.h"
-#include "Material.h"
+//#include "Material.h"
 #include "Logger.h"
 
 InputXML* InputXML::instance_ = 0;

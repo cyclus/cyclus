@@ -134,7 +134,7 @@ void SinkFacility::handleTock(int time){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
-  inventory_.pushAll(ResourceBuff::toMat(manifest));
+  inventory_.pushAll(ResourceBuff::toMat(manifest)); // @MJG - you can move toMat to Material, right?
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
