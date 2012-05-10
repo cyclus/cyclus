@@ -131,19 +131,24 @@ void Message::sendOn() {
   setRealParticipant(next_stop);
   current_owner_ = next_stop;
 
-  CLOG(LEV_DEBUG1) << "Message " << this << " going to model"
-                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID() << " {";
+  CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
+                   << next_stop << " {";
 
   next_stop->receiveMessage(me);
 
-  CLOG(LEV_DEBUG1) << "} Message " << this << " returned from model"
-                   << " ID=" << dynamic_cast<Model*>(next_stop)->ID();
+  CLOG(LEV_DEBUG1) << "} Message " << this << " send to comm "
+                   << next_stop << " completed";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::kill() {
   MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
   dead_ = true;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Message::isDead() {
+  return dead_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,8 +180,8 @@ void Message::validateForSend() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
-    CLOG(LEV_DEBUG4) << "Message " << this << " next-stop set to model ID="
-                     << dynamic_cast<Model*>(next_stop)->ID();
+    CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
+                     << next_stop;
     if (path_stack_.size() == 0) {
       path_stack_.push_back(sender_);
     }
@@ -184,8 +189,7 @@ void Message::setNextDest(Communicator* next_stop) {
     return;
   }
   CLOG(LEV_DEBUG4) << "Message " << this
-                   << " next-stop set attempt ignored to model ID="
-                   << dynamic_cast<Model*>(next_stop)->ID();
+                   << " next stop set attempt ignored";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -206,7 +210,7 @@ MessageDir Message::dir() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setDir(MessageDir newDir) {
-  CLOG(LEV_DEBUG4) << "Message " << this << "manually changed to "
+  CLOG(LEV_DEBUG4) << "Message " << this << " dir manually changed to "
                    << newDir << ".";
 
   dir_ = newDir;
