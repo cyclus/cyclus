@@ -81,20 +81,14 @@ class ResourceBuffTest : public ::testing::Test {
     }
 };
 
-/*
-To check:
-
-  * after makeUnlimited:
-    * can push materials without restraint
-
-*/
-
 // Test order MATTERS.  Beware of reordering.
 
 // The "Empty" suffix indicates the test uses the store_ instance of
 // ResourceBuff. The "Filled" suffix indicates the test uses the
 // filled_store_ instance of ResourceBuff.
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, SetCapacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
@@ -244,6 +238,8 @@ TEST_F(ResourceBuffTest, MakeLimited_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
   Manifest manifest;
   double qty = cap + overeps;
@@ -390,6 +386,8 @@ TEST_F(ResourceBuffTest, RemoveOne_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
@@ -400,6 +398,21 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.pushOne(mat2_));
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(ResourceBuffTest, PushToUnlimited) {
+  store_.setCapacity(cap);
+  store_.makeUnlimited();
+  vect1_.setMass(cap);
+
+  int nMats = 5;
+  double tot = vect1_.mass() * nMats;
+  for (int i = 0; i < nMats; i++) {
+    rsrc_ptr mat = rsrc_ptr(new Material(vect1_));
+    ASSERT_NO_THROW(store_.pushOne(mat));
+  }
+  EXPECT_DOUBLE_EQ(store_.quantity(), tot);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
