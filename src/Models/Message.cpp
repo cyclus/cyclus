@@ -32,6 +32,7 @@ Message::Message(Communicator* sender) {
   current_owner_ = NULL;
   path_stack_ = vector<Communicator*>();
   current_owner_ = sender;
+  sender->trackMessage(msg_ptr(this));
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
@@ -51,6 +52,7 @@ Message::Message(Communicator* sender, Communicator* receiver) {
   sender_ = sender;
   recipient_ = receiver;
   current_owner_ = NULL;
+  sender->trackMessage(msg_ptr(this));
 
   trans_.supplier = NULL;
   trans_.requester = NULL;
@@ -73,6 +75,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
   recipient_ = receiver;
   current_owner_ = NULL;
   setResource(thisTrans.resource);
+  sender->trackMessage(msg_ptr(this));
 
   if (trans_.is_offer) {
     // if this message is an offer, the sender is the supplier
