@@ -28,9 +28,17 @@ Material::Material() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(IsoVector comp) {
+Material::Material(CompMapPtr comp) {
+  IsoVector vec = IsoVector(comp);
   last_update_time_ = TI->time();
-  iso_vector_ = comp;
+  iso_vector_ = vec;
+  CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(IsoVector vec) {
+  last_update_time_ = TI->time();
+  iso_vector_ = vec;
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
@@ -38,6 +46,7 @@ Material::Material(IsoVector comp) {
 Material::Material(const Material& other) {
   iso_vector_ = other.iso_vector_;
   last_update_time_ = other.last_update_time_;
+  quantity_ = other.quantity_;
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
@@ -117,6 +126,7 @@ double Material::quantity() {
 rsrc_ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
   rsrc_ptr mat(new Material(*this));
+  mat->setQuantity(this->quantity());
   return mat;
 }
 
