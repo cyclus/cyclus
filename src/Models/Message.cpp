@@ -213,7 +213,7 @@ MessageDir Message::dir() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setDir(MessageDir newDir) {
-  CLOG(LEV_DEBUG4) << "Message " << this << " dir manually changed to "
+  CLOG(LEV_DEBUG4) << "Message " << this << " direction manually set to "
                    << newDir << ".";
 
   dir_ = newDir;

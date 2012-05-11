@@ -40,12 +40,12 @@ class Communicator {
   
 public:
   virtual ~Communicator() {
-    MLOG(LEV_DEBUG4) << "comm " << this << " destructed";
+    MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
     for (int i = 0; i < tracked_messages_.size(); i++) {
       tracked_messages_.at(i)->kill();
       LOG(LEV_DEBUG3, "delete") << "killing tracked messages";
     }
-    MLOG(LEV_DEBUG4) << "comm " << this << " destructed";
+    MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
   };
 
   friend class Message;
@@ -79,7 +79,7 @@ private:
       }
     }
     tracked_messages_.push_back(msg);
-    MLOG(LEV_DEBUG5) << "Comm " << this << " tracks Message " << msg;
+    MLOG(LEV_DEBUG5) << "communicator " << this << " tracks Message " << msg;
   }
 
   /**
@@ -96,7 +96,7 @@ private:
         break;
       }
     }
-    MLOG(LEV_DEBUG5) << "Comm " << this << " untracked Message " << msg;
+    MLOG(LEV_DEBUG5) << "communicator " << this << " untracked Message " << msg;
   }
 
 protected:
