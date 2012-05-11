@@ -70,11 +70,19 @@ public:
 
   /**
      a constructor for making a material object 
-     from a known recipe and size. 
+     from a known recipe. 
       
      @param comp isotopic makeup of this material object 
    */
-  Material(IsoVector comp);
+  Material(CompMapPtr comp);
+
+  /**
+     a constructor for making a material object 
+     from a known isovector. 
+      
+     @param comp isotopic makeup of this material object 
+   */
+  Material(IsoVector vec);
 
   /**
      a constructor for making a material object 
@@ -182,6 +190,11 @@ public:
      last entry in the material history. 
    */
   void decay();
+
+  /**
+     returns the mass of a given isotope
+   */
+  double mass(Iso tope);
 
   /**
      Returns a copy of this material's isotopic composition 
