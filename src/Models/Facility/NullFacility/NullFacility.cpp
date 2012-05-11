@@ -171,6 +171,10 @@ void NullFacility::makeOffers() {
     offer_amt = inventory_.capacity(); 
   }
 
+  if (offer_amt < EPS_KG) {
+    return;
+  }
+
   // there is no minimum amount a null facility may send
   double min_amt = 0;
   // and it's free
