@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
     BI->createDB();
   } catch (CycException ge) {
     CLOG(LEV_ERROR) << ge.what();
-  };
+  }
 
   // read input file and setup simulation
   try {
@@ -104,7 +104,9 @@ int main(int argc, char* argv[]) {
   } catch (CycIOException ge) {
     CLOG(LEV_ERROR) << ge.what();
     return 0;
-  };
+  } catch (CycException e) {
+    CLOG(LEV_ERROR) << e.what();
+  }
 
   Model::printModelList();
   IsoVector::printRecipes();
@@ -121,7 +123,7 @@ int main(int argc, char* argv[]) {
     BI->closeDB();
   } catch (CycException ge) {
     CLOG(LEV_ERROR) << ge.what();
-  };
+  }
 
   return 0;
 }
