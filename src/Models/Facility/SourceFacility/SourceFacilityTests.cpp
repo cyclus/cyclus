@@ -25,7 +25,6 @@ class FakeSourceFacility : public SourceFacility {
       double test_size = 10.0;
       bool test_template = true;
       IsoVector test_comp;
-      test_comp.setMass(u235, one);
 
       recipe_ = IsoVector(test_comp);
 

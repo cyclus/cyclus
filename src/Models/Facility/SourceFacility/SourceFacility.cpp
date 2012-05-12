@@ -6,6 +6,7 @@
 #include "SourceFacility.h"
 
 #include "Logger.h"
+#include "RecipeLogger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -39,7 +40,7 @@ void SourceFacility::init(xmlNodePtr cur) {
 
   // get recipe
   recipe_name_ = XMLinput->get_xpath_content(cur,"recipe");
-  recipe_ = IsoVector::recipe(recipe_name_);
+  recipe_ = RecipeLogger::Recipe(recipe_name_);
 
   // get capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
@@ -96,7 +97,7 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
-  return ResourceBuff::toRes(inventory_.popQty(trans.resource->quantity()));
+  return MatBuff::toRes(inventory_.popQty(trans.resource->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -119,19 +120,18 @@ void SourceFacility::generateMaterial(int curr_time) {
   int time_change = curr_time - prev_time_;
   prev_time_ = curr_time;
 
-  // if there's room in the inventory, process material at capacity
   double empty_space = inventory_.space();
-  if (empty_space < EPS_KG) {return;}
-
-  IsoVector* temp = new IsoVector(recipe_.comp());
-  if (capacity_ * recipe_.mass() * time_change <= empty_space) {
-    // add a material the size of the capacity to the inventory
-    temp->multBy(capacity_ * time_change);
-  } else {
-    // add a material that fills the inventory
-    temp->setMass(empty_space);
+  if (empty_space < EPS_KG) {
+    return; // no room
   }
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
+
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(recipe_));
+  double amt = capacity_ * time_change;
+  if (amt <= empty_space) {
+    newMat->setQuantity(amt); // plenty of room
+  } else {
+    newMat->setQuantity(empty_space); // not enough room
+  }
   inventory_.pushOne(newMat);
 }
 
