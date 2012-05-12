@@ -65,7 +65,7 @@ SET( CYCLUS_CORE
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
-  # Models/ConverterModel.cpp 
+  Models/ConverterModel.cpp 
   Models/MarketModel.cpp 
   Models/FacilityModel.cpp 
   Models/RegionModel.cpp
