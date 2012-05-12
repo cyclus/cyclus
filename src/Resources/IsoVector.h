@@ -157,6 +157,13 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void log();
 
   /**
+     computes the total mass fraction that this isovector has in
+     common with other
+     @param other the isovector to check for intersection
+   */
+  double intersectionFraction(const IsoVector& other);
+
+  /**
      calls compEqual on other.comp()
    */
   bool compEquals(const IsoVector& other);

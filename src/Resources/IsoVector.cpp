@@ -121,6 +121,19 @@ void IsoVector::log() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double IsoVector::intersectionFraction(const IsoVector& other) {
+  double fraction = 0;
+  CompMapPtr other_comp = other.comp();
+  for (CompMap::iterator it = other_comp->begin(); it 
+         != other_comp->end(); it++) {
+    if (composition_->count(it->first) > 0) {
+      fraction += massFraction(it->first);
+    }
+  }
+  return fraction;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::compEquals(const IsoVector& other) {
   return (compEquals(*other.comp()));
 }
