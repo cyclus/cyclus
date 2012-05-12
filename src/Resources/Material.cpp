@@ -77,18 +77,25 @@ mat_rsrc_ptr Material::extract(double mass) {
   return new_mat;
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
-//   iso_vector_ = iso_vector_ - rem_comp;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mat_rsrc_ptr Material::extract(const IsoVector& other) {
+  // get the extraction paramters
+  double fraction = iso_vector_.intersectionFraction(other);
+  double amt = quantity_ * fraction;
+  IsoVector vec = iso_vector_ - other; // @MJG_FLAG previous bevaior was isovector -= other..
 
-//   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+  // make new material
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(vec));
+  new_mat->setQuantity(amt);
+  new_mat->setOriginalID( this->originalID() ); // book keeping
+  
+  // adjust old material
+  iso_vector_ -= other; // matching previous behavior
+  quantity_ -= amt;
 
-//   mat_rsrc_ptr new_mat = new Material(rem_comp);
-//   // we just split a resource, so keep track of the original for book keeping
-//   new_mat->setOriginalID( this->originalID() );
-
-//   return mat_rsrc_ptr(new_mat);
-// }
+  return new_mat;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::print() {

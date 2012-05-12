@@ -101,60 +101,17 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// TEST_F(MaterialTest, ExtractLikeVector) {
-//   make a number of materials masses 1, 2, and 10 
-//   CompMap two_test_comp, ten_test_comp, pu_test_comp;
-//   mat_rsrc_ptr one_test_mat;
-//   mat_rsrc_ptr two_test_mat;
-//   mat_rsrc_ptr ten_test_mat;
-//   one_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract) {
+  mat_rsrc_ptr m1;
+  ASSERT_NO_THROW(m1 = test_mat_->extract(test_comp_));
+  EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
+  EXPECT_FLOAT_EQ(m1->quantity(), test_size_ );
 
-//   CompMap::iterator it;
-//   for(it=test_comp_->begin(); it!=test_comp_->end(); it++){
-//     two_test_comp[it->first]=2*(it->second);
-//     ten_test_comp[it->first]=10*(it->second);
-//   }
-//   two_test_mat = mat_rsrc_ptr(new Material(two_test_comp));
-//   ten_test_mat = mat_rsrc_ptr(new Material(ten_test_comp));
+  mat_rsrc_ptr m2;
+  ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
+  EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
+  EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
 
-//   see that two materials with the same composition do the right thing
-//   double orig = test_mat_->quantity();
-
-//   ASSERT_NO_THROW(test_mat_->extract(test_comp_));
-//   EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
-
-//   ASSERT_NO_THROW(ten_test_mat->extract(two_test_comp));
-//   EXPECT_FLOAT_EQ(ten_test_mat->quantity(),8*orig );
-
-//   ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
-// }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// TEST_F(MaterialTest, ExtractUnLikeVector) {
-//   mat_rsrc_ptr same_as_orig_test_mat = mat_rsrc_ptr(new Material(test_comp_));
-//   CompMap half_test_comp, quarter_test_comp;
-//   half_test_comp[u235_]=.5;
-//   quarter_test_comp[u235_]=.25;
-
-//   double orig = test_mat_->quantity();
-
-//   // see that materials with different compositions do the right thing
-//   ASSERT_NO_THROW(test_mat_->extract(half_test_comp));
-//   EXPECT_FLOAT_EQ(0.5*orig, test_mat_->quantity() );
-//   EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-//   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
-//   EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
-  
-//   ASSERT_NO_THROW(test_mat_->extract(quarter_test_comp));
-//   EXPECT_FLOAT_EQ(0.25*orig, test_mat_->quantity() );
-//   EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
-//   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
-//   EXPECT_GT(same_as_orig_test_mat->quantity(), test_mat_->quantity());
-
-// }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// TEST_F(MaterialTest, GetSetQuantity) {
-
-// }
+  // ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
+}
