@@ -155,16 +155,17 @@ public:
    */
   virtual void absorb(mat_rsrc_ptr matToAdd);
 
-  /* /\** */
-  /*    Extracts from this material a composition  */
-  /*    specified by the given IsoVector  */
+  /**
+     Extracts from this material a composition
+     specified by the given IsoVector. This operation will change
+     the quantity_ and iso_vector_ members.
       
-  /*    @param rem_comp the composition/amount of material that will be  */
-  /*    removed against this Material  */
+     @param other the composition/amount of material that will be
+     removed against this Material
       
-  /*    @return the extracted material as a newly allocated material object  */
-  /*  *\/ */
-  /* virtual mat_rsrc_ptr extract(IsoVector rem_comp); */
+     @return the extracted material as a newly allocated material object
+   */
+  virtual mat_rsrc_ptr extract(const IsoVector& other);
 
   /**
      Extracts a specified mass from this material creating a new 

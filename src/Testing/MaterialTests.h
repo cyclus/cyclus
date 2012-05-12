@@ -12,7 +12,7 @@ class MaterialTest : public ::testing::Test {
     Iso u235_, am241_, th228_, pb208_;
     int one_mol_; // atoms
     CompMapPtr test_comp_, diff_comp;
-    double test_size_;
+    double test_size_, fraction;
     mat_rsrc_ptr test_mat_;
     mat_rsrc_ptr diff_mat_;
     long int u235_halflife_;
@@ -30,14 +30,18 @@ class MaterialTest : public ::testing::Test {
       test_comp_ = CompMapPtr(new CompMap(MASS));
       diff_comp = CompMapPtr(new CompMap(MASS));
       (*test_comp_)[u235_]=one_mol_;
+      (*diff_comp)[u235_]=one_mol_;
       (*diff_comp)[pb208_]=one_mol_;
       (*diff_comp)[am241_]=one_mol_;
+      test_size_ = 10.0;
+      fraction = 2.0 / 3.0;
       
+
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
-      test_size_ = 10.0;
       test_mat_->setQuantity(test_size_);
       diff_mat_ = mat_rsrc_ptr(new Material(diff_comp));
+      diff_mat_->setQuantity(test_size_);
 
       // test info
       u235_halflife_ = 8445600000; // approximate, in months
