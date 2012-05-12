@@ -35,6 +35,15 @@ TEST_F(IsoVectorTests,mixing) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,intersection_fraction) {
+  LoadMaps();
+  add_to_vec += to_add_vec;
+  double amt;
+  EXPECT_NO_THROW(amt = add_to_vec.intersectionFraction(to_add_vec));
+  EXPECT_DOUBLE_EQ(amt,0.5);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,subtraction) {
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec -= to_subtract_vec);
