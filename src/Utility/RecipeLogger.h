@@ -111,6 +111,11 @@ class RecipeLogger {
   static int recipeCount();   
 
   /**
+     accessing a recipe 
+   */
+  static CompMapPtr Recipe(std::string name);
+
+  /**
      print all recipes 
    */
   static void printRecipes();
@@ -130,11 +135,6 @@ class RecipeLogger {
      adds recipe to containers tracking decayed recipes
    */
   static void storeDecayableRecipe(CompMapPtr recipe);
-
-  /**
-     accessing a recipe 
-   */
-  static CompMapPtr Recipe(std::string name);
 
   /**
      add a new decay time for a parent composition
