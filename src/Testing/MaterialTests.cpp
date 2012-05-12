@@ -27,6 +27,17 @@ TEST_F(MaterialTest, Clone) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckQuality) {
+  rsrc_ptr test(test_mat_);
+  rsrc_ptr diff(diff_mat_);
+  rsrc_ptr gen(new GenericResource("kg", "foo", 10));
+
+  EXPECT_TRUE(test->checkQuality(diff));
+  EXPECT_TRUE(diff->checkQuality(test));
+  EXPECT_FALSE(test->checkQuality(gen));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   mat_rsrc_ptr one_test_mat;
   mat_rsrc_ptr two_test_mat;
@@ -78,9 +89,21 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, ExtractMass) {
+  double amt = test_size_ / 3;
+  double diff = test_size_ - amt;  
+  mat_rsrc_ptr extracted;
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
+  EXPECT_NO_THROW(extracted = test_mat_->extract(amt)); // extract an amt
+  EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
+  EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+}
+
 // //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 // TEST_F(MaterialTest, ExtractLikeVector) {
-//   // make a number of materials masses 1, 2, and 10 
+//   make a number of materials masses 1, 2, and 10 
 //   CompMap two_test_comp, ten_test_comp, pu_test_comp;
 //   mat_rsrc_ptr one_test_mat;
 //   mat_rsrc_ptr two_test_mat;
@@ -95,7 +118,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 //   two_test_mat = mat_rsrc_ptr(new Material(two_test_comp));
 //   ten_test_mat = mat_rsrc_ptr(new Material(ten_test_comp));
 
-//   // see that two materials with the same composition do the right thing
+//   see that two materials with the same composition do the right thing
 //   double orig = test_mat_->quantity();
 
 //   ASSERT_NO_THROW(test_mat_->extract(test_comp_));
@@ -132,37 +155,6 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 // }
 
 // //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// TEST_F(MaterialTest, ExtractMass) {
-//   // make a number of materials masses 1, 2, and 10 
-//   double mass_to_rem = 0.25*(diff_mat_->quantity());
-//   double mass_remaining = 0.75*(diff_mat_->quantity());
-//   IsoVector* orig = new IsoVector(diff_comp);
-//   double am_orig = orig->mass(am241_);
-//   double pb_orig= orig->mass(pb208_);
-
-//   // see that two materials with the same composition do the right thing
-//   ASSERT_NO_THROW(diff_mat_->extract(mass_to_rem));
-//   EXPECT_FLOAT_EQ(diff_mat_->quantity(), mass_remaining );
-
-//   IsoVector remaining = diff_mat_->isoVector();
-//   double am_remaining = remaining.mass(am241_);
-//   double pb_remaining = remaining.mass(pb208_);
-
-//   EXPECT_FLOAT_EQ(am_remaining/pb_remaining, am_orig/pb_orig);
-// }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 // TEST_F(MaterialTest, GetSetQuantity) {
 
-// }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-// TEST_F(MaterialTest, CheckQuality) {
-//   rsrc_ptr test(test_mat_);
-//   rsrc_ptr diff(diff_mat_);
-//   rsrc_ptr gen(new GenericResource("kg", "foo", 10));
-
-//   EXPECT_TRUE(test->checkQuality(diff));
-//   EXPECT_TRUE(diff->checkQuality(test));
-//   EXPECT_FALSE(test->checkQuality(gen));
 // }

@@ -192,6 +192,11 @@ public:
   void decay();
 
   /**
+     returns the mass of a given isotope
+   */
+  double mass(Iso tope);
+
+  /**
      Returns a copy of this material's isotopic composition 
    */
   IsoVector isoVector() {return iso_vector_;}

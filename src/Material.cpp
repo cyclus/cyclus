@@ -178,6 +178,11 @@ bool Material::checkQuantityGT(rsrc_ptr other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Material::mass(Iso tope) {
+  return iso_vector_.massFraction(tope) * quantity_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
