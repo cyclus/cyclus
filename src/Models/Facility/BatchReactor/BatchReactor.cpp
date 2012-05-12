@@ -4,6 +4,7 @@
 
 #include "Logger.h"
 #include "GenericResource.h"
+#include "RecipeLogger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
@@ -68,11 +69,11 @@ void BatchReactor::init(xmlNodePtr cur) {
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    setInRecipe(IsoVector::recipe(recipe_name));
+    setInRecipe(RecipeLogger::Recipe(recipe_name));
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    setOutRecipe(IsoVector::recipe(recipe_name));
+    setOutRecipe(RecipeLogger::Recipe(recipe_name));
 
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
@@ -157,7 +158,7 @@ void BatchReactor::handleOrders() {
 void BatchReactor::addResource(msg_ptr msg,
                                std::vector<rsrc_ptr> manifest) {
   double preQuantity = preCore_.quantity();
-  preCore_.pushAll(ResourceBuff::toMat(manifest));
+  preCore_.pushAll(MatBuff::toMat(manifest));
   double added = preCore_.quantity() - preQuantity;
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
                             << added << " to its " << preCore_.name()
@@ -174,7 +175,7 @@ vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
                             <<" to its " << postCore_.name()
                             << " buffer.";
   
-  return ResourceBuff::toRes(postCore_.popQty(amt));
+  return MatBuff::toRes(postCore_.popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -290,10 +291,8 @@ bool BatchReactor::requestMet() {
 void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
   //  toBuff->pushAll(fromBuff->popQty(amt));
   vector<mat_rsrc_ptr> to_delete = fromBuff.popQty(amt);
-  IsoVector* temp = &out_recipe_;
-  temp->setMass(amt);
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
-  //newMat->setMass(amt);
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(out_recipe_));
+  newMat->setQuantity(amt);
   toBuff.pushOne(newMat);
 }
 
