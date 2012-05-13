@@ -102,8 +102,7 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
   }
   
   // Figure out xp the enrichment of the UF6 object
-  P = iso_vector.eltMass(92);
-  xp = iso_vector.mass(922350) / P; 
+  xp = iso_vector.massFraction(922350); 
 
   // Figure out xf, the enrichment of the feed material
   // xf = castEnr->getFeedFrac();
@@ -115,15 +114,15 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 
   // Now, calculate
   double term1 = (2 * xp - 1) * log(xp / (1 - xp));
-	double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
-	double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
+  double term2 = (2 * xw - 1) * log(xw / (1 - xw)) * (xp - xf) / (xf - xw);
+  double term3 = (2 * xf - 1) * log(xf / (1 - xf)) * (xp - xw) / (xf - xw);
     
   massProdU = SWUs/(term1 + term2 - term3);
   SWUs = massProdU*(term1 + term2 - term3);
 
   if (out_commod_ == "eUF6"){
-    iso_vector.setMass(massProdU);
     mat = mat_rsrc_ptr(new Material(iso_vector));
+    mat->setQuantity(massProdU);
     toRet = convMsg->clone();
     toRet->setResource(mat);
   } else if (out_commod_ == "SWUs") {
