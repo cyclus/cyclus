@@ -3,6 +3,14 @@
 
 #include "ResourceBuffTests.h"
 
+/*
+To check:
+
+  * after makeUnlimited:
+    * can push materials without restraint
+
+*/
+
 // Test order MATTERS.  Beware of reordering.
 
 // The "Empty" suffix indicates the test uses the store_ instance of
