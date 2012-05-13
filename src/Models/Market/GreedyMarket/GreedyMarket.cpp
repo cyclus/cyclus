@@ -7,7 +7,7 @@
 #include "GreedyMarket.h"
 
 #include "Logger.h"
-#include "IsoVector.h"
+#include "Resource.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -98,7 +98,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   
   // if this request is not yet satisfied &&
   // there are more offers_ left
-  while ( fabs(requestAmt) > EPS_KG && offers_.size() > 0) {
+  while ( fabs(requestAmt) > EPS_RSRC && offers_.size() > 0) {
     // get a new offer
     offer = offers_.end();
     offer--;
@@ -110,7 +110,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
     // pop off this offer
     offers_.erase(offer);
-    if (requestAmt - offerAmt > EPS_KG) { 
+    if (requestAmt - offerAmt > EPS_RSRC) { 
       // put a new message in the order stack
       // it goes down to supplier
       offerMsg->setRequester(requestMsg->requester());
@@ -158,7 +158,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
       // if the residual is above threshold,
       // make a new offer with reduced amount
 
-      if(offerAmt > EPS_KG) {
+      if(offerAmt > EPS_RSRC) {
         msg_ptr new_offer = offerMsg->clone();
         new_offer->resource()->setQuantity(offerAmt);
         receiveMessage(new_offer);
@@ -169,14 +169,14 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
     }
   }
 
-  if (fabs(requestAmt) > EPS_KG) {
+  if (fabs(requestAmt) > EPS_RSRC) {
     LOG(LEV_DEBUG2, "GreedM") << "The request from Requester "
       << requestMsg->requester()->ID()
       << " for the amount " << requestAmt << " rejected. ";
       reject_request(request);
   }
 
-  return (fabs(requestAmt) < EPS_KG);
+  return (fabs(requestAmt) < EPS_RSRC);
 }
 
 /* --------------------

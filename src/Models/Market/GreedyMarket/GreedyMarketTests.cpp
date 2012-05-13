@@ -87,8 +87,10 @@ class GreedyMarketTest : public ::testing::Test {
     FakeFacility* requester;
 
     virtual void SetUp(){
-      recipe.setMass(92235, 10);
-      recipe.setMass(92238, 90);
+      CompMapPtr comp = CompMapPtr(new CompMap(MASS));
+      (*comp)[92235] = 10;
+      (*comp)[92238] = 90;
+      recipe = IsoVector(comp);
 
       trans.commod = "none";
       trans.minfrac = 0.1;
@@ -119,13 +121,29 @@ class GreedyMarketTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(GreedyMarketTest, RequestIsLarger) {
-  recipe.setMass(20);
+TEST_F(GreedyMarketTest, RequestEqOffer) {
   rsrc_ptr resource(new Material(recipe));
+  resource->setQuantity(10);
   request->setResource(resource);
+  offer->setResource(resource);
 
-  recipe.setMass(15);
-  resource = rsrc_ptr(new Material(recipe));
+  request->sendOn();
+  offer->sendOn();
+  src_market->resolve();
+
+  EXPECT_EQ(supplier->received.size(), 0);
+  EXPECT_EQ(supplier->sent.size(), 1);
+  EXPECT_EQ(requester->received.size(), 1);
+  EXPECT_EQ(requester->sent.size(), 0);
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(GreedyMarketTest, RequestIsLarger) {
+  rsrc_ptr resource(new Material(recipe));
+  resource->setQuantity(20);
+  request->setResource(resource);
+  resource->setQuantity(10);
   offer->setResource(resource);
 
   request->sendOn();
@@ -141,12 +159,10 @@ TEST_F(GreedyMarketTest, RequestIsLarger) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(GreedyMarketTest, OfferIsLarger) {
-  recipe.setMass(15);
   rsrc_ptr resource(new Material(recipe));
+  resource->setQuantity(10);
   request->setResource(resource);
-
-  recipe.setMass(20);
-  resource = rsrc_ptr(new Material(recipe));
+  resource->setQuantity(20);
   offer->setResource(resource);
 
   request->sendOn();
@@ -157,23 +173,6 @@ TEST_F(GreedyMarketTest, OfferIsLarger) {
   EXPECT_EQ(supplier->sent.size(), 1);
   EXPECT_EQ(requester->received.size(), 1);
   EXPECT_EQ(requester->sent.size(), 0);
-
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(GreedyMarketTest, RequestEqOffer) {
-  rsrc_ptr resource(new Material(recipe));
-  request->setResource(resource);
-  offer->setResource(resource);
-
-  request->sendOn();
-  offer->sendOn();
-  src_market->resolve();
-
-  EXPECT_EQ(supplier->received.size(), 0);
-  EXPECT_EQ(supplier->sent.size(), 1);
-  EXPECT_EQ(requester->received.size(), 1);
-  EXPECT_EQ(requester->sent.size(), 0);
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
