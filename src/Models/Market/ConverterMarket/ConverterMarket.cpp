@@ -7,7 +7,7 @@
 #include "ConverterMarket.h"
 
 #include "ConverterModel.h"
-#include "IsoVector.h"
+#include "Resource.h"
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -181,7 +181,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // if the residual is above threshold,
         // make a new offer with reduced amount
 
-        if(offerAmt > EPS_KG) {
+        if(offerAmt > EPS_RSRC) {
           msg_ptr new_offer = offerMsg->clone();
           new_offer->resource()->setQuantity(offerAmt);
           // call this method for consistency
