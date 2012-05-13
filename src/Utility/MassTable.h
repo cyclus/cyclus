@@ -6,8 +6,6 @@
 #include <vector>
 #include <map>
 
-#include "Material.h"
-
 #define MT MassTable::Instance()
 
 /**
@@ -61,7 +59,7 @@ public:
      typedef  
      @return the mass, a double, of the tope isotope. 
    */
-   double getMassInGrams(int tope);
+   double gramsPerMol(int tope);
 
 protected:
   /**

@@ -9,7 +9,6 @@
 
 #include "Logger.h"
 #include "FacilityModel.h"
-#include "Material.h"
 #include "MatBuff.h"
 
 /**

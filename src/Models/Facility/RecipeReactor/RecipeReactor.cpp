@@ -5,6 +5,7 @@
 #include "RecipeReactor.h"
 
 #include "Logger.h"
+#include "RecipeLogger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -78,11 +79,11 @@ void RecipeReactor::init(xmlNodePtr cur) {
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    in_recipe_ = IsoVector::recipe(recipe_name);
+    in_recipe_ = RecipeLogger::Recipe(recipe_name);
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    out_recipe_ = IsoVector::recipe(recipe_name);
+    out_recipe_ = RecipeLogger::Recipe(recipe_name);
 
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
