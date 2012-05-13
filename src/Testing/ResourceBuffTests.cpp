@@ -326,12 +326,12 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
 TEST_F(ResourceBuffTest, PushToUnlimited) {
   store_.setCapacity(cap);
   store_.makeUnlimited();
-  vect1_.setMass(cap);
 
   int nMats = 5;
-  double tot = vect1_.mass() * nMats;
+  double tot = cap * nMats;
   for (int i = 0; i < nMats; i++) {
     rsrc_ptr mat = rsrc_ptr(new Material(vect1_));
+    mat->setQuantity(cap);
     ASSERT_NO_THROW(store_.pushOne(mat));
   }
   EXPECT_DOUBLE_EQ(store_.quantity(), tot);
