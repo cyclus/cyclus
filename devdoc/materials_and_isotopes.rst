@@ -30,8 +30,16 @@ CompMaps are immutable objects: once constructed, they are guaranteed not to cha
 design decision provides confidence to developers and thread safety.
 
 *Cyclus* provides public API for CompMaps only through the use of boost smart pointers, 
-typedefed as "CompMapPtr"s. 
+typedefed as "CompMapPtr"s.
 
+CompMaps are constructed as either an atom-based or mass-based. An example of such a construction
+is provided: ::
+
+   CompMapPtr c_p = CompMapPtr(new CompMap(MASS));
+   (*c_p)[92235] = 10.0; // 10 g_235/ 100 g_comp
+   (*c_p)[92238] = 90.0; // 90 g_238/ 100 g_comp
+   c_p.normalize();
+ 
 IsoVectors
 ----------
 
@@ -43,7 +51,14 @@ Materials
 ---------
 
 Materials are the main constituents in *Cyclus* simulations. A Material has a quantity
-and an IsoVector, comprising its composition.
+and an IsoVector, comprising its composition. Materials are also passed around *Cyclus* functions
+in boost smart points called "mat_rsrc_ptr"s. 
+
+A Material is effectively fully initialized through construction via CompMapPtr or IsoVector and
+setting its quantity. For example: ::
+
+    mat_rsrc_ptr m_p = mat_rsrc_ptr(new Material(c_p));
+    m_p->setQuantity(10); // 10kg of c_p
 
 RecipeLogger
 ------------
