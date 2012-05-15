@@ -325,22 +325,20 @@ class Message: IntrusiveBase<Message> {
   
   /**
      Returns the sender of this Message. 
-      
-     @return the sender 
    */
   Communicator* sender() const {return sender_;};
   
   /**
      Returns the receiver of this Message. 
-      
-     @return the receiver 
+
+     @exception CycNullMsgParamException receiver is uninitialized (NULL)
    */
   Communicator* receiver() const;
 
   /**
-     Returns the supplier in this Message. 
-      
-     @return pointer to the supplier 
+     Returns a pointer to the supplier in this Message. 
+
+     @exception CycNullMsgParamException supplier is uninitialized (NULL)
    */
   Model* supplier() const;
 
@@ -353,9 +351,9 @@ class Message: IntrusiveBase<Message> {
   void setSupplier(Model* supplier) {trans_.supplier = supplier;};
 
   /**
-     Returns the requester in this Message. 
-      
-     @return pointer to the requester 
+     Returns a pointer to the requester in this Message. 
+
+     @exception CycNullMsgParamException requester is uninitialized (NULL)
    */
   Model* requester() const;
 
@@ -365,19 +363,15 @@ class Message: IntrusiveBase<Message> {
       
      @param requester pointer to the new requester 
    */
-  void setRequester(Model* requester){trans_.requester = requester;};
+  void setRequester(Model* requester) {trans_.requester = requester;};
 
   /**
      Returns the transaction associated with this message. 
-      
-     @return the Transaction 
    */
   Transaction trans() const {return trans_;};
 
   /**
      Returns the commodity requested or offered in this Message. 
-      
-     @return commodity for this transaction 
    */
   std::string commod() const {return trans_.commod;};
 
@@ -389,72 +383,59 @@ class Message: IntrusiveBase<Message> {
   void setCommod(std::string new_commod) {trans_.commod = new_commod;};
 
   /**
-     True if the transaction is an offer, false if it's a request 
-      
-     @return true if the transaction is an offer, false if it's a 
+     True if the transaction is an offer, false if it is a request.
    */
   bool isOffer() const {return trans_.is_offer;};
 
   /**
-     True if the transaction is an offer, false if it's a request 
-      
-     @return true if the transaction is an offer, false if it's a 
+     Set the transaction type (true=offer, false=request)
    */
   void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
 
   /**
-     Returns the price being requested or offered in this message. 
-      
-     @return the price (in dollars) 
+     Returns the price (in dollars) being requested or offered in this message. 
    */
   double price() const {return trans_.price;};
 
   /**
-     Returns the price being requested or offered in this message. 
-      
-     @param new_price the new price (in dollars) 
+     Set the price (in dollars) being requested or offered in this message. 
    */
   void setPrice(double new_price) {trans_.price = new_price;};
 
   /**
-     Returns the Resource being requested or offered in this message. 
-      
-     @return the Resource  (i.e. Material object) 
+     Returns a pointer to the Resource being requested or offered in this message. 
    */
   rsrc_ptr resource() const {return trans_.resource;};
 
   /**
-     Sets the assigned resource to a new resource 
-      
-     @param new_resource is the new Resource in the transaction 
+     Sets the message transaction's resource to a copy of the passed resource.
    */
   void setResource(rsrc_ptr new_resource) {if (new_resource.get()) {trans_.resource = new_resource->clone();}};
 
   /**
-     Used to match this message with a corresponding offer/request 
-     message after matching takes place in a market. 
+     Used to match this message with a corresponding offer/request message
+     after matching takes place in a market. 
 
-     Allows requesters to know which request message that they sent
-     corresponds to the resources they receive.
+     Allows requesters to know which request message that they sent corresponds
+     to the resources they receive.
 
      @TODO figure out how to make this work with markets
    */
   void setPartner(msg_ptr partner) {partner_ = partner;};
 
   /**
-     returns the corresponding offer/request message 
-     assuming this message has been matched 
-     in a market. Returns the 'this' pointer otherwise. 
+     returns the corresponding offer/request message assuming this message has
+     been matched in a market. Returns the 'this' pointer otherwise. 
    */
   msg_ptr partner() {return partner_;};
 
   /**
-     Initiate the transaction - sending/receiving of resource(s) between 
-     the supplier/requester 
+     Initiate the transaction - sending/receiving of resource(s) between the
+     supplier/requester 
       
-     This should be the sole way of transferring resources between 
-     simulation agents/models. Book keeping of transactions (and 
-     corresponding resource states) are taken care of automatically 
+     This should be the sole way of transferring resources between simulation
+     agents/models. Book keeping of transactions (and corresponding resource
+     states) are taken care of automatically 
    */
   void approveTransfer();
   
