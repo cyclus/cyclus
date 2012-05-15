@@ -162,65 +162,8 @@ struct Transaction {
    FacilityModel and MarketModel classes.
  */
 class Message: IntrusiveBase<Message> {
+
  private:
-  /**
-     The direction this message is traveling 
-     (up or down the class hierarchy). 
-   */
-  MessageDir dir_;
-  
-  /**
-     The Transaction this message is concerned with 
-   */
-  Transaction trans_;
-  
-  /**
-     The Communicator who sent this Message. 
-   */
-  Communicator* sender_;
-  
-  /**
-     The Communicator who will receive this Message. 
-   */
-  Communicator* receiver_;
-
-  /**
-     Pointers to each model this message passes through. 
-   */
-  std::vector<Communicator*> pathStack_;
-  
-  /**
-     the most recent communicator to receive this message. 
-      
-     Used to prevent circular messaging. 
-   */
-  Communicator* currentOwner_;
-
-  /**
-     offer/request partner for this message (meaning only for matched 
-   */
-  msg_ptr partner_;
-  
-  /**
-     Checks required conditions prior to sending a message. 
-   */
-  void validateForSend();
-
-  /**
-     mark a Model* as a participating sim agent (not a template) 
-   */
-  void makeRealParticipant(Communicator* who);
-  
-  /**
-     stores the next available transaction ID 
-   */
-  static int nextTransID_;
-
-  /**
-     a boolean to determine if the message has completed its route 
-   */
-  bool dead_;
-
   void constructBase(Communicator* sender);
 
  public:
@@ -439,6 +382,65 @@ class Message: IntrusiveBase<Message> {
    */
   void approveTransfer();
   
+ private:
+  /**
+     The direction this message is traveling 
+     (up or down the class hierarchy). 
+   */
+  MessageDir dir_;
+  
+  /**
+     The Transaction this message is concerned with 
+   */
+  Transaction trans_;
+  
+  /**
+     The Communicator who sent this Message. 
+   */
+  Communicator* sender_;
+  
+  /**
+     The Communicator who will receive this Message. 
+   */
+  Communicator* receiver_;
+
+  /**
+     Pointers to each model this message passes through. 
+   */
+  std::vector<Communicator*> pathStack_;
+  
+  /**
+     the most recent communicator to receive this message. 
+      
+     Used to prevent circular messaging. 
+   */
+  Communicator* currentOwner_;
+
+  /**
+     offer/request partner for this message (meaning only for matched 
+   */
+  msg_ptr partner_;
+  
+  /**
+     Checks required conditions prior to sending a message. 
+   */
+  void validateForSend();
+
+  /**
+     mark a Model* as a participating sim agent (not a template) 
+   */
+  void makeRealParticipant(Communicator* who);
+  
+  /**
+     stores the next available transaction ID 
+   */
+  static int nextTransID_;
+
+  /**
+     a boolean to determine if the message has completed its route 
+   */
+  bool dead_;
+
 
 // -------- output database related members  -------- 
  public:
