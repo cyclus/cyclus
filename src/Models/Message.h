@@ -269,7 +269,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Returns the sender of this Message. 
    */
-  Communicator* sender() const {return sender_;};
+  Communicator* sender() const;
   
   /**
      Returns the receiver of this Message. 
@@ -291,7 +291,7 @@ class Message: IntrusiveBase<Message> {
       
      @param supplier pointer to the new supplier 
    */
-  void setSupplier(Model* supplier) {trans_.supplier = supplier;};
+  void setSupplier(Model* supplier);
 
   /**
      Returns a pointer to the requester in this Message. 
@@ -306,54 +306,54 @@ class Message: IntrusiveBase<Message> {
       
      @param requester pointer to the new requester 
    */
-  void setRequester(Model* requester) {trans_.requester = requester;};
+  void setRequester(Model* requester);
 
   /**
      Returns the transaction associated with this message. 
    */
-  Transaction trans() const {return trans_;};
+  Transaction trans() const;
 
   /**
      Returns the commodity requested or offered in this Message. 
    */
-  std::string commod() const {return trans_.commod;};
+  std::string commod() const;
 
   /**
      Sets the commodity requested or offered in this Message. 
       
      @param new_commod the commodity associated with this 
    */
-  void setCommod(std::string newCommod) {trans_.commod = newCommod;};
+  void setCommod(std::string newCommod);
 
   /**
      True if the transaction is an offer, false if it is a request.
    */
-  bool isOffer() const {return trans_.is_offer;};
+  bool isOffer() const;
 
   /**
      Set the transaction type (true=offer, false=request)
    */
-  void setIsOffer(bool offer) {trans_.is_offer = offer;};
+  void setIsOffer(bool offer);
 
   /**
      Returns the price (in dollars) being requested or offered in this message. 
    */
-  double price() const {return trans_.price;};
+  double price() const;
 
   /**
      Set the price (in dollars) being requested or offered in this message. 
    */
-  void setPrice(double newPrice) {trans_.price = newPrice;};
+  void setPrice(double newPrice);
 
   /**
      Returns a pointer to the Resource being requested or offered in this message. 
    */
-  rsrc_ptr resource() const {return trans_.resource;};
+  rsrc_ptr resource() const;
 
   /**
      Sets the message transaction's resource to a copy of the passed resource.
    */
-  void setResource(rsrc_ptr newResource) {if (newResource.get()) {trans_.resource = newResource->clone();}};
+  void setResource(rsrc_ptr newResource);
 
   /**
      Used to match this message with a corresponding offer/request message
@@ -364,13 +364,13 @@ class Message: IntrusiveBase<Message> {
 
      @TODO figure out how to make this work with markets
    */
-  void setPartner(msg_ptr partner) {partner_ = partner;};
+  void setPartner(msg_ptr partner);
 
   /**
      returns the corresponding offer/request message assuming this message has
      been matched in a market. Returns the 'this' pointer otherwise. 
    */
-  msg_ptr partner() {return partner_;};
+  msg_ptr partner();
 
   /**
      Initiate the market-matched transaction - resource(s) are taken from the

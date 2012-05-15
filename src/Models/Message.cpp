@@ -194,6 +194,12 @@ MarketModel* Message::market() {
   MarketModel* market = MarketModel::marketForCommod(trans_.commod);
   return market;
 } 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::sender() const {
+  return sender_;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::receiver() const {
   if (receiver_ == NULL) {
@@ -215,6 +221,11 @@ Model* Message::supplier() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setSupplier(Model* supplier) {
+  trans_.supplier = supplier;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Message::requester() const {
   if (trans_.requester == NULL) {
     string err_msg = "Uninitilized message requester.";
@@ -224,6 +235,69 @@ Model* Message::requester() const {
   return trans_.requester;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setRequester(Model* requester) {
+  trans_.requester = requester;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Transaction Message::trans() const {
+  return trans_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Message::commod() const {
+  return trans_.commod;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setCommod(std::string newCommod) {
+  trans_.commod = newCommod;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Message::isOffer() const {
+  return trans_.is_offer;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setIsOffer(bool offer) {
+  trans_.is_offer = offer;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Message::price() const {
+  return trans_.price;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setPrice(double newPrice) {
+  trans_.price = newPrice;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+rsrc_ptr Message::resource() const {
+  return trans_.resource;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setResource(rsrc_ptr newResource) {
+  if (newResource.get()) {
+    trans_.resource = newResource->clone();
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setPartner(msg_ptr partner) {
+  partner_ = partner;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+msg_ptr Message::partner() {
+  return partner_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::approveTransfer() {
   if (dead_) {
     return;
