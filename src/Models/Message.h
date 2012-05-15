@@ -217,18 +217,18 @@ class Message: IntrusiveBase<Message> {
    */
   virtual void sendOn();
 
+ private:
   /**
-     Renders the sendOn method disfunctional. 
-      
-     Used to prevend messages from returning through/to deallocated 
+     Checks required conditions prior to sending a message. 
    */
-  void kill();
+  void validateForSend();
 
   /**
-     returns true if this message has been killed - see Message::kill() 
+     mark a Model* as a participating sim agent (not a template) 
    */
-  bool isDead();
+  void makeRealParticipant(Communicator* who);
   
+ public:
   /**
      designate the next object to receive this message 
       
@@ -241,10 +241,26 @@ class Message: IntrusiveBase<Message> {
   void setNextDest(Communicator* nextStop);
   
   /**
-     Reverses the direction this Message is being sent (up to down or down
-     to up).
+     Initiate the market-matched transaction - resource(s) are taken from the
+     supplier and sent to the requester.
+      
+     This should be the sole way of transferring resources between simulation
+     agents/models. Book keeping of transactions (and corresponding resource
+     states) are taken care of automatically.
    */
-  void reverse();
+  void approveTransfer();
+  
+  /**
+     Renders the sendOn method disfunctional. 
+      
+     Used to prevend messages from returning through/to deallocated 
+   */
+  void kill();
+
+  /**
+     returns true if this message has been killed - see Message::kill() 
+   */
+  bool isDead();
   
   /**
      Returns the direction this Message is traveling (UP_MSG or DOWN_MSG). 
@@ -259,13 +275,22 @@ class Message: IntrusiveBase<Message> {
   void setDir(MessageDir newDir);
   
   /**
-     Get the market corresponding to the transaction commodity 
-      
-     @return market corresponding to this msg's transaction's commodity 
-      
+     returns the corresponding offer/request message assuming this message has
+     been matched in a market. Returns the 'this' pointer otherwise. 
    */
-  MarketModel* market();
-  
+  msg_ptr partner();
+
+  /**
+     Used to match this message with a corresponding offer/request message
+     after matching takes place in a market. 
+
+     Allows requesters to know which request message that they sent corresponds
+     to the resources they receive.
+
+     @TODO figure out how to make this work with markets
+   */
+  void setPartner(msg_ptr partner);
+
   /**
      Returns the sender of this Message. 
    */
@@ -278,6 +303,18 @@ class Message: IntrusiveBase<Message> {
    */
   Communicator* receiver() const;
 
+///////////////////////////////////////////////////////////////////////////////
+////////////// transaction getters/setters ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+  /**
+     Get the market corresponding to the transaction commodity 
+      
+     @return market corresponding to this msg's transaction's commodity 
+      
+   */
+  MarketModel* market();
+  
   /**
      Returns a pointer to the supplier in this Message. 
 
@@ -355,33 +392,6 @@ class Message: IntrusiveBase<Message> {
    */
   void setResource(rsrc_ptr newResource);
 
-  /**
-     Used to match this message with a corresponding offer/request message
-     after matching takes place in a market. 
-
-     Allows requesters to know which request message that they sent corresponds
-     to the resources they receive.
-
-     @TODO figure out how to make this work with markets
-   */
-  void setPartner(msg_ptr partner);
-
-  /**
-     returns the corresponding offer/request message assuming this message has
-     been matched in a market. Returns the 'this' pointer otherwise. 
-   */
-  msg_ptr partner();
-
-  /**
-     Initiate the market-matched transaction - resource(s) are taken from the
-     supplier and sent to the requester.
-      
-     This should be the sole way of transferring resources between simulation
-     agents/models. Book keeping of transactions (and corresponding resource
-     states) are taken care of automatically.
-   */
-  void approveTransfer();
-  
  private:
   /**
      The direction this message is traveling 
@@ -422,16 +432,6 @@ class Message: IntrusiveBase<Message> {
   msg_ptr partner_;
   
   /**
-     Checks required conditions prior to sending a message. 
-   */
-  void validateForSend();
-
-  /**
-     mark a Model* as a participating sim agent (not a template) 
-   */
-  void makeRealParticipant(Communicator* who);
-  
-  /**
      stores the next available transaction ID 
    */
   static int nextTransID_;
@@ -441,8 +441,10 @@ class Message: IntrusiveBase<Message> {
    */
   bool dead_;
 
+///////////////////////////////////////////////////////////////////////////////
+////////////// Output db recording code ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-// -------- output database related members  -------- 
  public:
   /**
      the transaction output database Table 
@@ -488,7 +490,6 @@ class Message: IntrusiveBase<Message> {
      the resource primary key 
    */
   primary_key_ref pkref_rsrc_;
-// -------- output database related members  --------   
 };
 
 #endif

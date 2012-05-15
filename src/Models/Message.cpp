@@ -22,6 +22,27 @@ table_ptr Message::trans_table = new Table("Transactions");
 table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::constructBase(Communicator* sender) {
+  sender_ = sender;
+  currentOwner_ = sender;
+  receiver_ = NULL;
+  dead_ = false;
+  dir_ = UP_MSG;
+
+  trans_.supplier = NULL;
+  trans_.requester = NULL;
+  trans_.is_offer = NULL;
+  trans_.resource = NULL;
+  trans_.minfrac = 0;
+  trans_.price = 0;
+
+  sender->trackMessage(msg_ptr(this));
+  makeRealParticipant(sender);
+
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
   constructBase(sender);
 }
@@ -48,35 +69,8 @@ Message::Message(Communicator* sender, Communicator* receiver,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::constructBase(Communicator* sender) {
-  sender_ = sender;
-  currentOwner_ = sender;
-  receiver_ = NULL;
-  dead_ = false;
-  dir_ = UP_MSG;
-
-  trans_.supplier = NULL;
-  trans_.requester = NULL;
-  trans_.is_offer = NULL;
-  trans_.resource = NULL;
-  trans_.minfrac = 0;
-  trans_.price = 0;
-
-  sender->trackMessage(msg_ptr(this));
-  makeRealParticipant(sender);
-
-  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::~Message() {
   MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::makeRealParticipant(Communicator* who) {
-  Model* model = NULL;
-  model = dynamic_cast<Model*>(who);
-  if (model != NULL) {model->setIsTemplate(false);}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,17 +110,6 @@ void Message::sendOn() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::kill() {
-  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
-  dead_ = true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Message::isDead() {
-  return dead_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::validateForSend() {
   int nextStop_index = -1;
   bool receiver_specified = false;
@@ -151,6 +134,13 @@ void Message::validateForSend() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::makeRealParticipant(Communicator* who) {
+  Model* model = NULL;
+  model = dynamic_cast<Model*>(who);
+  if (model != NULL) {model->setIsTemplate(false);}
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* nextStop) {
   if (dir_ == UP_MSG) {
     CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
@@ -166,14 +156,54 @@ void Message::setNextDest(Communicator* nextStop) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::reverse() {
-  if (DOWN_MSG == dir_) {
-    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'down' to 'up'.";
-    dir_ = UP_MSG; 
-  } else {
-    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'up' to 'down'.";
-  	dir_ = DOWN_MSG;
+void Message::approveTransfer() {
+  if (dead_) {
+    return;
   }
+
+  msg_ptr me = msg_ptr(this);
+
+  vector<rsrc_ptr> manifest;
+  Model* req = requester();
+  Model* sup = supplier();
+
+  try {
+    manifest = sup->removeResource(me);
+    req->addResource(me, manifest);
+  } catch (CycException err) {
+    CLOG(LEV_ERROR) << "Material transfer failed from " 
+                    << sup->ID() << " to " << req->ID() << ": " << err.what();
+    return;
+  }
+
+  int id = nextTransID_++;
+  
+  // register that this transaction occured
+  this->Message::addTransToTable(id);
+  int nResources = manifest.size();
+  
+  for (int pos = 0; pos < nResources; pos++) {
+    // MUST PRECEDE 'addResourceToTable' call! record the resource with its state
+    // because this can potentially update the material's stateID
+    manifest.at(pos)->addToTable();
+  
+    // record that what resources belong to this transaction
+    this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
+  }
+  
+  CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
+                  << req->ID() << ".";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::kill() {
+  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
+  dead_ = true;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Message::isDead() {
+  return dead_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -190,10 +220,14 @@ void Message::setDir(MessageDir newDir) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel* Message::market() {
-  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
-  return market;
-} 
+msg_ptr Message::partner() {
+  return partner_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setPartner(msg_ptr partner) {
+  partner_ = partner;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::sender() const {
@@ -206,9 +240,16 @@ Communicator* Message::receiver() const {
     string err_msg = "Uninitilized message receiver.";
     throw CycNullMsgParamException(err_msg);
   }
-
   return receiver_;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+////////////// transaction getters/setters ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+MarketModel* Message::market() {
+  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
+  return market;
+} 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Message::supplier() const {
@@ -216,7 +257,6 @@ Model* Message::supplier() const {
     string err_msg = "Uninitilized message supplier.";
     throw CycNullMsgParamException(err_msg);
   }
-
   return trans_.supplier;
 }
 
@@ -231,7 +271,6 @@ Model* Message::requester() const {
     string err_msg = "Uninitilized message requester.";
     throw CycNullMsgParamException(err_msg);
   }
-
   return trans_.requester;
 }
 
@@ -287,55 +326,10 @@ void Message::setResource(rsrc_ptr newResource) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPartner(msg_ptr partner) {
-  partner_ = partner;
-}
+///////////////////////////////////////////////////////////////////////////////
+////////////// Output db recording code ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr Message::partner() {
-  return partner_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::approveTransfer() {
-  if (dead_) {
-    return;
-  }
-
-  msg_ptr me = msg_ptr(this);
-
-  vector<rsrc_ptr> manifest;
-  Model* req = requester();
-  Model* sup = supplier();
-
-  try {
-    manifest = sup->removeResource(me);
-    req->addResource(me, manifest);
-  } catch (CycException err) {
-    CLOG(LEV_ERROR) << "Material transfer failed from " 
-                    << sup->ID() << " to " << req->ID() << ": " << err.what();
-    return;
-  }
-
-  int id = nextTransID_++;
-  
-  // register that this transaction occured
-  this->Message::addTransToTable(id);
-  int nResources = manifest.size();
-  
-  for (int pos = 0; pos < nResources; pos++) {
-    // MUST PRECEDE 'addResourceToTable' call! record the resource with its state
-    // because this can potentially update the material's stateID
-    manifest.at(pos)->addToTable();
-  
-    // record that what resources belong to this transaction
-    this->Message::addResourceToTable(id, pos + 1, manifest.at(pos));
-  }
-  
-  CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
-                  << req->ID() << ".";
-}
 
 void Message::define_trans_table(){
   // declare the table columns
