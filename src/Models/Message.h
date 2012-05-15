@@ -12,10 +12,12 @@
 #include "Resource.h"
 #include "IntrusiveBase.h"
 #include "Table.h"
+#include "CycException.h"
 
 class Communicator;
 class Model;
 class Message;
+class MarketModel;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
@@ -24,6 +26,20 @@ typedef boost::intrusive_ptr<Message> msg_ptr;
    (up or down the class hierarchy) this message is moving. 
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
+
+class CycCircularMsgException: public CycException {
+  public: CycCircularMsgException() :
+      CycException("Message receiver and sender are the same.") { };
+};
+
+class CycNoMsgReceiverException: public CycException {
+  public: CycNoMsgReceiverException() : 
+      CycException("Can't send the message - must call setNextDest first") { };
+};
+
+class CycNullMsgParamException: public CycException {
+  public: CycNullMsgParamException(std::string msg) : CycException(msg) {};
+};
 
 /**
    A transaction structure to include in any message. 
@@ -129,13 +145,9 @@ struct Transaction {
     
    In order for a message to arrive at the destination as intended by 
    its originator, each communicator may check to see if it is the 
-   recipient. If not, it should continue forwarding the message in some 
-   defined way (usually up a hierarchy). Attempts to invoke sendOn() 
-   without first specifying a next stop will throw an exception (this 
-   helps prevent circular/recursive messaging). An exception is also 
-   thrown if a communicator attempts to send a message after the message 
-   has completed an entire 2-leg round trip 
-    
+   receiver. If not, it should continue forwarding the message in some 
+   defined way (usually up to its parent).
+   
    @section transaction Transaction 
    The transaction contains information about the material order to be 
    offered, requested, or filled. Sufficient information for specifying 
@@ -145,17 +157,10 @@ struct Transaction {
    - the price of the Commodity 
    - the specific resource to be traded 
     
-   Communicator classes which should utilize the MessageClass interface 
-   include RegionModel, InstModel, FacilityModel and MarketModel 
-   classes. These model classes pass messages during the simulation. 
-    
-   @section seeAlso See Also 
-    
-   The CommunicatorClass describes the class of models that pass 
-   messages during the simulation. The StubCommModel provides an example 
-   of a Message model implementation. 
+   Communicator classes that utilize the Message class to communicate with
+   each other during the simulation include RegionModel, InstModel,
+   FacilityModel and MarketModel classes.
  */
-
 class Message: IntrusiveBase<Message> {
  private:
   /**
@@ -177,7 +182,7 @@ class Message: IntrusiveBase<Message> {
   /**
      The Communicator who will receive this Message. 
    */
-  Communicator* recipient_;
+  Communicator* receiver_;
 
   /**
      Pointers to each model this message passes through. 
@@ -204,7 +209,7 @@ class Message: IntrusiveBase<Message> {
   /**
      mark a Model* as a participating sim agent (not a template) 
    */
-  void setRealParticipant(Communicator* who);
+  void makeRealParticipant(Communicator* who);
   
   /**
      stores the next available transaction ID 
@@ -216,6 +221,8 @@ class Message: IntrusiveBase<Message> {
    */
   bool dead_;
 
+  void constructBase(Communicator* sender);
+
  public:
   /**
      Creates an empty upward message from some communicator. 
@@ -226,19 +233,19 @@ class Message: IntrusiveBase<Message> {
 
   /**
      Creates an upward message using the given 
-     sender, and recipient. 
+     sender, and receiver. 
       
      @param sender sender of this Message 
-     @param receiver recipient of this Message 
+     @param receiver receiver of this Message 
    */
   Message(Communicator* sender, Communicator* receiver);
   
   /**
      Creates an upward message using the given sender, 
-     recipient, and transaction. 
+     receiver, and transaction. 
       
      @param sender sender of this Message 
-     @param receiver recipient of this Message 
+     @param receiver receiver of this Message 
      @param trans the message's transaction specifics 
    */
   Message(Communicator* sender, Communicator* receiver, Transaction trans);
@@ -259,10 +266,10 @@ class Message: IntrusiveBase<Message> {
      heading down (DOWN_MSG) are sent successively to each communicator 
      in reverse order of their 'upward' sequence. 
       
-     @exception CycMessageException attempted to send message with 
-     with no designated receiver (next dest is undefined) 
+     @exception CycNoMsgReceiverException no receiver is designated (must call
+     setNextDest first) 
       
-     @exception CycMessageException attempted to send a message to the 
+     @exception CycCircularMsgException attempted to send a message to the 
      message sender (circular messaging) 
    */
   virtual void sendOn();
@@ -291,14 +298,13 @@ class Message: IntrusiveBase<Message> {
   void setNextDest(Communicator* next_stop);
   
   /**
-     Reverses the direction this Message is being sent (so, for 
-     instance, the Manager can forward a message back down the hierarchy 
-     to an appropriate handler. 
+     Reverses the direction this Message is being sent (up to down or down
+     to up).
    */
-  void reverseDirection();
+  void reverse();
   
   /**
-     Returns the direction this Message is traveling. 
+     Returns the direction this Message is traveling (UP_MSG or DOWN_MSG). 
    */
   MessageDir dir() const;
   
@@ -315,12 +321,7 @@ class Message: IntrusiveBase<Message> {
      @return market corresponding to this msg's transaction's commodity 
       
    */
-  Communicator* market();
-  
-  /**
-     Prints the transaction data. 
-   */
-  void printTrans();
+  MarketModel* market();
   
   /**
      Returns the sender of this Message. 
@@ -330,11 +331,11 @@ class Message: IntrusiveBase<Message> {
   Communicator* sender() const {return sender_;};
   
   /**
-     Returns the recipient of this Message. 
+     Returns the receiver of this Message. 
       
-     @return the recipient 
+     @return the receiver 
    */
-  Communicator* recipient() const;
+  Communicator* receiver() const;
 
   /**
      Returns the supplier in this Message. 
@@ -392,7 +393,7 @@ class Message: IntrusiveBase<Message> {
       
      @return true if the transaction is an offer, false if it's a 
    */
-  double isOffer() const {return trans_.is_offer;};
+  bool isOffer() const {return trans_.is_offer;};
 
   /**
      True if the transaction is an offer, false if it's a request 
@@ -432,6 +433,11 @@ class Message: IntrusiveBase<Message> {
   /**
      Used to match this message with a corresponding offer/request 
      message after matching takes place in a market. 
+
+     Allows requesters to know which request message that they sent
+     corresponds to the resources they receive.
+
+     @TODO figure out how to make this work with markets
    */
   void setPartner(msg_ptr partner) {partner_ = partner;};
 
