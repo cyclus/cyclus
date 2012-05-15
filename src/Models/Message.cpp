@@ -50,7 +50,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::constructBase(Communicator* sender) {
   sender_ = sender;
-  current_owner_ = sender;
+  currentOwner_ = sender;
   receiver_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
@@ -96,23 +96,23 @@ void Message::sendOn() {
   msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
-    path_stack_.back()->untrackMessage(me);
-    path_stack_.pop_back();
+    pathStack_.back()->untrackMessage(me);
+    pathStack_.pop_back();
   } else {
-    path_stack_.back()->trackMessage(me);
+    pathStack_.back()->trackMessage(me);
   }
 
-  Communicator* next_stop = path_stack_.back();
-  makeRealParticipant(next_stop);
-  current_owner_ = next_stop;
+  Communicator* nextStop = pathStack_.back();
+  makeRealParticipant(nextStop);
+  currentOwner_ = nextStop;
 
   CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
-                   << next_stop << " {";
+                   << nextStop << " {";
 
-  next_stop->receiveMessage(me);
+  nextStop->receiveMessage(me);
 
   CLOG(LEV_DEBUG1) << "} Message " << this << " send to comm "
-                   << next_stop << " completed";
+                   << nextStop << " completed";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -128,37 +128,37 @@ bool Message::isDead() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::validateForSend() {
-  int next_stop_index = -1;
+  int nextStop_index = -1;
   bool receiver_specified = false;
-  Communicator* next_stop;
+  Communicator* nextStop;
 
   if (dir_ == UP_MSG) {
-    receiver_specified = (path_stack_.size() > 0);
-    next_stop_index = path_stack_.size() - 1;
+    receiver_specified = (pathStack_.size() > 0);
+    nextStop_index = pathStack_.size() - 1;
   } else if (dir_ == DOWN_MSG) {
-    receiver_specified = (path_stack_.size() > 1);
-    next_stop_index = path_stack_.size() - 2;
+    receiver_specified = (pathStack_.size() > 1);
+    nextStop_index = pathStack_.size() - 2;
   }
 
   if (!receiver_specified) {
     throw CycNoMsgReceiverException();
   }
 
-  next_stop = path_stack_[next_stop_index];
-  if (next_stop == current_owner_) {
+  nextStop = pathStack_[nextStop_index];
+  if (nextStop == currentOwner_) {
     throw CycCircularMsgException();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setNextDest(Communicator* next_stop) {
+void Message::setNextDest(Communicator* nextStop) {
   if (dir_ == UP_MSG) {
     CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
-                     << next_stop;
-    if (path_stack_.size() == 0) {
-      path_stack_.push_back(sender_);
+                     << nextStop;
+    if (pathStack_.size() == 0) {
+      pathStack_.push_back(sender_);
     }
-    path_stack_.push_back(next_stop);
+    pathStack_.push_back(nextStop);
     return;
   }
   CLOG(LEV_DEBUG4) << "Message " << this

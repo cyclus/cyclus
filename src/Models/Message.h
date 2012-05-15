@@ -114,17 +114,17 @@ struct Transaction {
    message. An example of the message passing is outlined below:  
    - Up/outgoing message: 
    -# Inside originator 
-   -# msg->setNextDest(next_stop) 
+   -# msg->setNextDest(nextStop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# message object invokes receiveMessage(this) for nextStop 
    -# Inside stop A 
-   -# msg->setNextDest(next_stop) 
+   -# msg->setNextDest(nextStop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# message object invokes receiveMessage(this) for nextStop 
    -# Inside stop B 
-   -# msg->setNextDest(next_stop) 
+   -# msg->setNextDest(nextStop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# message object invokes receiveMessage(this) for nextStop 
    -# Inside stop C 
    -# flip message direction 
    - Down/incoming message: 
@@ -187,14 +187,14 @@ class Message: IntrusiveBase<Message> {
   /**
      Pointers to each model this message passes through. 
    */
-  std::vector<Communicator*> path_stack_;
+  std::vector<Communicator*> pathStack_;
   
   /**
      the most recent communicator to receive this message. 
       
      Used to prevent circular messaging. 
    */
-  Communicator* current_owner_;
+  Communicator* currentOwner_;
 
   /**
      offer/request partner for this message (meaning only for matched 
@@ -292,10 +292,10 @@ class Message: IntrusiveBase<Message> {
      Calls to this method are ignored (do nothing) when the message 
      direction is down. 
       
-     @param next_stop the next communicator to receive this message 
+     @param nextStop the next communicator to receive this message 
       
    */
-  void setNextDest(Communicator* next_stop);
+  void setNextDest(Communicator* nextStop);
   
   /**
      Reverses the direction this Message is being sent (up to down or down
@@ -380,7 +380,7 @@ class Message: IntrusiveBase<Message> {
       
      @param new_commod the commodity associated with this 
    */
-  void setCommod(std::string new_commod) {trans_.commod = new_commod;};
+  void setCommod(std::string newCommod) {trans_.commod = newCommod;};
 
   /**
      True if the transaction is an offer, false if it is a request.
@@ -390,7 +390,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Set the transaction type (true=offer, false=request)
    */
-  void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
+  void setIsOffer(bool offer) {trans_.is_offer = offer;};
 
   /**
      Returns the price (in dollars) being requested or offered in this message. 
@@ -400,7 +400,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Set the price (in dollars) being requested or offered in this message. 
    */
-  void setPrice(double new_price) {trans_.price = new_price;};
+  void setPrice(double newPrice) {trans_.price = newPrice;};
 
   /**
      Returns a pointer to the Resource being requested or offered in this message. 
@@ -410,7 +410,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Sets the message transaction's resource to a copy of the passed resource.
    */
-  void setResource(rsrc_ptr new_resource) {if (new_resource.get()) {trans_.resource = new_resource->clone();}};
+  void setResource(rsrc_ptr newResource) {if (newResource.get()) {trans_.resource = newResource->clone();}};
 
   /**
      Used to match this message with a corresponding offer/request message
@@ -430,12 +430,12 @@ class Message: IntrusiveBase<Message> {
   msg_ptr partner() {return partner_;};
 
   /**
-     Initiate the transaction - sending/receiving of resource(s) between the
-     supplier/requester 
+     Initiate the market-matched transaction - resource(s) are taken from the
+     supplier and sent to the requester.
       
      This should be the sole way of transferring resources between simulation
      agents/models. Book keeping of transactions (and corresponding resource
-     states) are taken care of automatically 
+     states) are taken care of automatically.
    */
   void approveTransfer();
   
