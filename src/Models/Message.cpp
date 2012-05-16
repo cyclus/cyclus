@@ -8,7 +8,6 @@
 #include "MarketModel.h"
 
 #include "Resource.h"
-
 #include "Logger.h"
 #include "Timer.h"
 
@@ -27,13 +26,6 @@ void Message::constructBase(Communicator* sender) {
   receiver_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
-
-  trans_.supplier = NULL;
-  trans_.requester = NULL;
-  trans_.is_offer = NULL;
-  trans_.resource = NULL;
-  trans_.minfrac = 0;
-  trans_.price = 0;
 
   sender->trackMessage(msg_ptr(this));
   makeRealParticipant(sender);
@@ -56,15 +48,8 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction trans) {
   constructBase(sender);
-  trans_ = trans;
   receiver_ = receiver;
-  setResource(trans.resource);
-
-  if (trans_.is_offer) {
-    setSupplier(dynamic_cast<Model*>(sender_));
-  } else {
-    setRequester(dynamic_cast<Model*>(sender_));
-  }
+  trans_ = trans;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -242,87 +227,9 @@ Communicator* Message::receiver() const {
   return receiver_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-////////////// transaction getters/setters ////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-MarketModel* Message::market() {
-  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
-  return market;
-} 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::supplier() const {
-  if (trans_.supplier == NULL) {
-    string err_msg = "Uninitilized message supplier.";
-    throw CycNullMsgParamException(err_msg);
-  }
-  return trans_.supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplier(Model* supplier) {
-  trans_.supplier = supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::requester() const {
-  if (trans_.requester == NULL) {
-    string err_msg = "Uninitilized message requester.";
-    throw CycNullMsgParamException(err_msg);
-  }
-  return trans_.requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRequester(Model* requester) {
-  trans_.requester = requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction Message::trans() const {
+Transaction& Message::trans() const {
   return trans_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Message::commod() const {
-  return trans_.commod;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setCommod(std::string new_commod) {
-  trans_.commod = new_commod;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Message::isOffer() const {
-  return trans_.is_offer;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setIsOffer(bool offer) {
-  trans_.is_offer = offer;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::price() const {
-  return trans_.price;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPrice(double new_price) {
-  trans_.price = new_price;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr Message::resource() const {
-  return trans_.resource;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setResource(rsrc_ptr new_resource) {
-  if (new_resource.get()) {
-    trans_.resource = new_resource->clone();
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
