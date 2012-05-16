@@ -8,6 +8,12 @@
 
 #include "Model.h"
 #include "Communicator.h"
+#include "CycException.h"
+
+class CycMarketlessCommodException: public CycException {
+  public: CycMarketlessCommodException(std::string msg) :
+      CycException(msg) { };
+};
 
 /**
    Markets are used to allocate transactions between agents. Each 
@@ -68,7 +74,10 @@ class MarketModel : public Model, public Communicator {
   /**
      Queries the list of known markets for one associated with the 
      commodity  
+
      @param commod a string naming the commodity whose market is of 
+
+     @exception CycMarketlessCommodException commod has no corresponding market
    */
   static MarketModel* marketForCommod(std::string commod);
 
