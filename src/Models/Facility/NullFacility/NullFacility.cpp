@@ -93,7 +93,7 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  if (trans.commod != out_commod_) {
+  if (trans.commod() != out_commod_) {
     string err_msg = "NullFacility can only send '" + out_commod_ ;
     err_msg += + "' materials.";
     throw CycException(err_msg);
@@ -150,13 +150,11 @@ void NullFacility::makeRequests() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Transaction NullFacility::buildRequestTrans(double amt) {
-  Transaction trans;
   gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",amt));
-  trans.commod = in_commod_;
-  trans.minfrac = 0;
-  trans.is_offer = false;
-  trans.price = 0;
-  trans.resource = res;
+
+  Transaction trans(this, REQUEST);
+  trans.setCommod(in_commod_);
+  trans.setResource(res);
   return trans;
 }
 
@@ -175,19 +173,11 @@ void NullFacility::makeOffers() {
     return;
   }
 
-  // there is no minimum amount a null facility may send
-  double min_amt = 0;
-  // and it's free
-  double commod_price = 0;
-
   // create a Resource and build transaction
   gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(out_commod_, "kg", offer_amt));
-  Transaction trans;
-  trans.commod = out_commod_;
-  trans.minfrac = min_amt/offer_amt;
-  trans.is_offer = true;
-  trans.price = commod_price;
-  trans.resource = res;
+  Transaction trans(this, OFFER);
+  trans.setCommod(out_commod_);
+  trans.setResource(res);
 
   // build and send the message
   MarketModel* market = MarketModel::marketForCommod(out_commod_);

@@ -8,7 +8,6 @@
 #include "InputXML.h"
 #include "Timer.h"
 
-#include <iostream>
 #include <queue>
 #include <sstream>
 
@@ -296,7 +295,7 @@ void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer) {
+void BatchReactor::interactWithMarket(std::string commod, double amt, TransType type) {
   LOG(LEV_INFO4, "BReact") << " making requests {";  
   // get the market
   MarketModel* market = MarketModel::marketForCommod(commod);
@@ -306,15 +305,14 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
   // request a generic resource
   gen_rsrc_ptr trade_res = gen_rsrc_ptr(new GenericResource(commod, "kg", amt));
   // build the transaction and message
-  Transaction trans;
-  trans.commod = commod;
+  Transaction trans(this, type);
+  trans.setCommod(commod);
   trans.minfrac = 1.0;
-  trans.is_offer = offer;
-  trans.price = commod_price;
-  trans.resource = trade_res;
+  trans.setPrice(commod_price);
+  trans.setResource(trade_res);
   // log the event
   string text;
-  if (offer) {
+  if (type == OFFER) {
     text = " has offered ";
   }
   else {
