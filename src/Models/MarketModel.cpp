@@ -6,7 +6,6 @@
 #include "MarketModel.h"
 
 #include "InputXML.h"
-#include "CycException.h"
 #include "Timer.h"
 #include "Logger.h"
 
@@ -48,7 +47,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   if (market == NULL) {
     string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
-    throw CycIndexException(err_msg);
+    throw CycMarketlessCommodException(err_msg);
   }
   return market;
 }
