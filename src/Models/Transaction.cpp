@@ -6,7 +6,7 @@
 #include "MarketModel.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction::Transaction(Model* creator, bool isoffer) {
+Transaction::Transaction(Model* creator, TransType type) {
   minfrac_ = 0;
   price_ = 0;
 
@@ -14,8 +14,8 @@ Transaction::Transaction(Model* creator, bool isoffer) {
   requester_ = NULL;
   resource_ = NULL;
 
-  isOffer_ = isoffer;
-  if (isOffer_) {
+  type_ = type;
+  if (type == OFFER) {
     supplier_ = creator;
   } else {
     requester_ = creator
@@ -23,26 +23,16 @@ Transaction::Transaction(Model* creator, bool isoffer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction Transaction::Request(Model* requester) {
-  return *(new Transaction(supplier, false));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction Transaction::Offer(Model* supplier) {
-  return *(new Transaction(supplier, true));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction::~Transaction() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel* Transactoin::market() {
+MarketModel* Transaction::market() {
   MarketModel* market = MarketModel::marketForCommod(commod_);
   return market;
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Transactoin::supplier() const {
+Model* Transaction::supplier() const {
   if (supplier_ == NULL) {
     string err_msg = "Uninitilized message supplier.";
     throw CycNullMsgParamException(err_msg);
@@ -51,12 +41,12 @@ Model* Transactoin::supplier() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transactoin::setSupplier(Model* supplier) {
+void Transaction::setSupplier(Model* supplier) {
   supplier_ = supplier;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Transactoin::requester() const {
+Model* Transaction::requester() const {
   if (requester_ == NULL) {
     string err_msg = "Uninitilized message requester.";
     throw CycNullMsgParamException(err_msg);
@@ -65,42 +55,42 @@ Model* Transactoin::requester() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transactoin::setRequester(Model* requester) {
+void Transaction::setRequester(Model* requester) {
   requester_ = requester;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Transactoin::commod() const {
+std::string Transaction::commod() const {
   return commod_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transactoin::setCommod(std::string newCommod) {
+void Transaction::setCommod(std::string newCommod) {
   commod_ = newCommod;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Transactoin::isOffer() const {
-  return isOffer_;
+bool Transaction::isOffer() const {
+  return type_ == OFFER;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Transactoin::price() const {
+double Transaction::price() const {
   return price_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transactoin::setPrice(double newPrice) {
+void Transaction::setPrice(double newPrice) {
   price_ = newPrice;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr Transactoin::resource() const {
+rsrc_ptr Transaction::resource() const {
   return resource_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transactoin::setResource(rsrc_ptr newResource) {
+void Transaction::setResource(rsrc_ptr newResource) {
   if (newResource.get()) {
     resource_ = newResource->clone();
   }

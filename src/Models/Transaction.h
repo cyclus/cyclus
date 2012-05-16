@@ -9,20 +9,13 @@
 class MarketModel;
 class Model;
 
+enum TransType {OFFER, REQUEST};
+
 class Transaction {
-
-  private:
-
-    /// use Request() and Offer() factories to create Transaction objects
-    Transaction(Model* creator, bool isoffer);
 
   public:
 
-    /// create an transaction with 'requester' being the Model requesting 
-    static Transaction Request(Model* requester);
-
-    /// create an transaction with 'supplier' being the Model offering 
-    static Transaction Offer(Model* supplier);
+    Transaction(Model* creator, TransType type);
 
     virtual ~Transaction();
 
@@ -97,8 +90,7 @@ class Transaction {
     /// The commodity that is being requested or offered in this Message. 
     std::string commod_;
 
-    /// true if this is an offer, false if it's a request 
-    bool isOffer_;
+    TransType type_;
 
     /**
       The minimum fraction of the specified commodity that the 
