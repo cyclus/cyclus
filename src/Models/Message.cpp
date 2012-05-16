@@ -1,15 +1,14 @@
 // Message.cpp
 // Implements the Message class.
 
-#include <iostream>
-
 #include "Message.h"
 
 #include "Communicator.h"
-#include "FacilityModel.h"
+#include "Model.h"
 #include "MarketModel.h"
-#include "InstModel.h"
-#include "GenericResource.h"
+
+#include "Resource.h"
+
 #include "Logger.h"
 #include "Timer.h"
 

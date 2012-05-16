@@ -6,9 +6,7 @@
 
 #include <vector>
 #include <string>
-#include "boost/intrusive_ptr.hpp"
 
-#include "Model.h"
 #include "Resource.h"
 #include "IntrusiveBase.h"
 #include "Table.h"
@@ -18,6 +16,7 @@ class Communicator;
 class Model;
 class Message;
 class MarketModel;
+class Transaction;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
