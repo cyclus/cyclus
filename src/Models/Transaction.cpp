@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "MarketModel.h"
+#include <string>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction::Transaction(Model* creator, TransType type) {
@@ -18,12 +19,20 @@ Transaction::Transaction(Model* creator, TransType type) {
   if (type == OFFER) {
     supplier_ = creator;
   } else {
-    requester_ = creator
+    requester_ = creator;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction::~Transaction() { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Transaction* Transaction::clone() {
+  // clones resource_ and gives copy to the transaction clone
+  Transaction* trans = new Transaction(*this);
+  trans->setResource(resource_);
+  return trans;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* Transaction::market() const {
@@ -38,7 +47,7 @@ MarketModel* Transaction::market() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Transaction::supplier() const {
   if (supplier_ == NULL) {
-    string err_msg = "Uninitilized message supplier.";
+    std::string err_msg = "Uninitilized message supplier.";
     throw CycNullMsgParamException(err_msg);
   }
   return supplier_;
@@ -52,7 +61,7 @@ void Transaction::setSupplier(Model* supplier) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Transaction::requester() const {
   if (requester_ == NULL) {
-    string err_msg = "Uninitilized message requester.";
+    std::string err_msg = "Uninitilized message requester.";
     throw CycNullMsgParamException(err_msg);
   }
   return requester_;

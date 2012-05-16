@@ -27,6 +27,8 @@ class Transaction {
 
     virtual ~Transaction();
 
+    Transaction* clone();
+
     /**
        Returns the market corresponding to the transaction's commodity 
      */

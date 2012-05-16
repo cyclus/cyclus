@@ -281,6 +281,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
+    TestCommunicator* comm2;
     msg_ptr msg1;
 
     virtual void SetUp(){
@@ -288,12 +289,16 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       quantity2 = 2.0;
       resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
+      Model* foo;
+      Transaction* trans = new Transaction(foo, OFFER);
       comm1 = new TestCommunicator("comm1");
-      msg1 = msg_ptr(new Message(comm1));
+      comm2 = new TestCommunicator("comm2");
+      msg1 = msg_ptr(new Message(comm1, comm2, *trans));
     };
 
     virtual void TearDown() {
       delete comm1;
+      delete comm2;
     }
 };
 

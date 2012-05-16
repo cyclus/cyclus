@@ -147,7 +147,7 @@ class Message: IntrusiveBase<Message> {
      @param receiver receiver of this Message 
      @param trans the message's transaction specifics 
    */
-  Message(Communicator* sender, Communicator* receiver, Transaction trans);
+  Message(Communicator* sender, Communicator* receiver, Transaction& trans);
 
   virtual ~Message();
 
@@ -282,7 +282,7 @@ class Message: IntrusiveBase<Message> {
   /**
      The Transaction with which this message is concerned. 
    */
-  Transaction trans_;
+  Transaction* trans_;
   
   /**
      The Communicator who sent this Message. 

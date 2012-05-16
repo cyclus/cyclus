@@ -112,7 +112,7 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg){
 vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
-  if(trans.commod != out_commod_){
+  if(trans.commod() != out_commod_){
     throw CycException("EnrichmentFacility can only send '" +  out_commod_ + 
                        "' materials.");
   }
@@ -288,12 +288,11 @@ void EnrichmentFacility::makeRequests(){
     rsrc_ptr req_res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",requestAmt));
 
     // build the transaction and message
-    Transaction trans;
-    trans.commod = in_commod_;
-    trans.is_offer = false;
+    Transaction trans(this, REQUEST);
+    trans.setCommod(in_commod_);
     trans.minfrac = minAmt/requestAmt;
-    trans.price = commod_price;
-    trans.resource = req_res;
+    trans.setPrice(commod_price);
+    trans.setResource(req_res);
 
     msg_ptr request(new Message(this, recipient, trans)); 
     request->setNextDest(facInst());
@@ -326,12 +325,11 @@ void EnrichmentFacility::makeOffers() {
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"SWUs",offer_amt));
 
   // build the transaction and message
-  Transaction trans;
-  trans.commod = out_commod_;
-  trans.is_offer = true;;
+  Transaction trans(this, OFFER);
+  trans.setCommod(out_commod_);
   trans.minfrac = min_amt/offer_amt;
-  trans.price = commod_price;
-  trans.resource = offer_res;
+  trans.setPrice(commod_price);
+  trans.setResource(offer_res);
 
   msg_ptr msg(new Message(this, recipient, trans)); 
   msg->setNextDest(facInst());

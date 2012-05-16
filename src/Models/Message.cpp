@@ -24,6 +24,7 @@ void Message::constructBase(Communicator* sender) {
   sender_ = sender;
   curr_owner_ = sender;
   receiver_ = NULL;
+  trans_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
 
@@ -46,14 +47,17 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
-                 Transaction trans) {
+                 Transaction& trans) {
   constructBase(sender);
   receiver_ = receiver;
-  trans_ = trans;
+  trans_ = new Transaction(trans);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::~Message() {
+  if (trans_ != NULL) {
+    delete trans_;
+  }
   MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
 }
 
@@ -62,7 +66,9 @@ msg_ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   msg_ptr new_msg(new Message(*this));
-  new_msg->trans().setResource(resource());
+  try {
+    new_msg->trans_ = trans_->clone();
+  } catch(CycNullMsgParamException) { }
   return new_msg;
 }
 
@@ -148,8 +154,8 @@ void Message::approveTransfer() {
   msg_ptr me = msg_ptr(this);
 
   vector<rsrc_ptr> manifest;
-  Model* req = requester();
-  Model* sup = supplier();
+  Model* req = trans_->requester();
+  Model* sup = trans_->supplier();
 
   try {
     manifest = sup->removeResource(me);
@@ -229,7 +235,10 @@ Communicator* Message::receiver() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction& Message::trans() const {
-  return trans_;
+  if (trans_ == NULL) {
+    throw CycNullMsgParamException("Uninitialized transaction parameter.");
+  }
+  return *trans_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -281,9 +290,9 @@ void Message::addTransToTable(int transID) {
   
   // make a row
   // declare data
-  data an_id(transID), a_sender( trans_.supplier->ID() ), 
-    a_receiver( trans_.requester->ID() ), a_time( TI->time() ), 
-    a_price( trans_.price );
+  data an_id(transID), a_sender( trans_->supplier()->ID() ), 
+    a_receiver( trans_->requester()->ID() ), a_time( TI->time() ), 
+    a_price( trans_->price() );
   // declare entries
   entry id("ID",an_id), sender("SenderID",a_sender), 
     receiver("ReceiverID",a_receiver), time("Time",a_time), 
