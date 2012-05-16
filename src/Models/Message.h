@@ -51,17 +51,17 @@ struct Transaction {
   double price;
 
   /**
-     A specific resource this transaction is concerned with 
+     A specific resource with which this transaction is concerned.
    */
   rsrc_ptr resource;
 
   /**
-     supplier in this transaction. 
+     The supplier in this transaction. 
    */
   Model* supplier;
 
   /**
-     requester in this transaction. 
+     The requester in this transaction. 
    */
   Model* requester;
 };
@@ -165,7 +165,7 @@ class Message: IntrusiveBase<Message> {
   MessageDir dir_;
   
   /**
-     The Transaction this message is concerned with 
+     The Transaction with which this message is concerned 
    */
   Transaction trans_;
   
@@ -192,7 +192,7 @@ class Message: IntrusiveBase<Message> {
   Communicator* current_owner_;
 
   /**
-     offer/request partner for this message (meaning only for matched 
+     offer/request partner for this message (only for matched pairs) 
    */
   msg_ptr partner_;
   
@@ -383,21 +383,21 @@ class Message: IntrusiveBase<Message> {
   /**
      Sets the commodity requested or offered in this Message. 
       
-     @param new_commod the commodity associated with this 
+     @param new_commod the commodity associated with this Message
    */
   void setCommod(std::string new_commod) {trans_.commod = new_commod;};
 
   /**
      True if the transaction is an offer, false if it's a request 
       
-     @return true if the transaction is an offer, false if it's a 
+     @return true if the transaction is an offer, false if it's a request.
    */
   double isOffer() const {return trans_.is_offer;};
 
   /**
      True if the transaction is an offer, false if it's a request 
       
-     @return true if the transaction is an offer, false if it's a 
+     @return true if the transaction is an offer, false if it's a request.
    */
   void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
 
@@ -439,6 +439,8 @@ class Message: IntrusiveBase<Message> {
      returns the corresponding offer/request message 
      assuming this message has been matched 
      in a market. Returns the 'this' pointer otherwise. 
+
+     @return the offer/request if a matched pair, else returns 'this'.
    */
   msg_ptr partner() {return partner_;};
 
