@@ -62,7 +62,7 @@ msg_ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   msg_ptr new_msg(new Message(*this));
-  new_msg->setResource(resource());
+  new_msg->trans().setResource(resource());
   return new_msg;
 }
 

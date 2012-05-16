@@ -200,7 +200,7 @@ void RecipeReactor::endCycle() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "RReact") << name() << " just received an order.";
@@ -224,7 +224,7 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
   vector<rsrc_ptr> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
+  while (trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
     for (deque<Fuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -236,13 +236,13 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
         newMat = mat_rsrc_ptr(new Material());
 
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
+        if (m->quantity() <= (trans.resource()->quantity() - newAmt)) {
           newAmt += m->quantity();
           newMat->absorb(m);
           inventory_.pop_front();
         } else { 
           // if the inventory obj is larger than the remaining need, split it.
-          toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+          toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
           newAmt += toAbsorb->quantity();
           newMat->absorb(toAbsorb);
         }

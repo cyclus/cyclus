@@ -15,6 +15,14 @@ class Transaction {
 
   public:
 
+    /**
+    Creates a new transaction with 'creator' as either the supplier or
+    requester depending on the transaction type.
+
+    @param creator supplier if type=OFFER, requester if type=REQUEST
+
+    @param type indicates the directionality of the transaction w.r.t. the creator.
+    */
     Transaction(Model* creator, TransType type);
 
     virtual ~Transaction();
@@ -22,7 +30,7 @@ class Transaction {
     /**
        Returns the market corresponding to the transaction's commodity 
      */
-    MarketModel* market();
+    MarketModel* market() const;
     
     /**
        Returns a pointer to the supplier in this Message. 
@@ -85,18 +93,18 @@ class Transaction {
      */
     void setResource(rsrc_ptr newResource);
 
+    /**
+      The minimum fraction of the specified commodity that the 
+      requester is willing to accept or the offerer is willing to send. 
+     */
+    double minfrac;
+
   private:
 
     /// The commodity that is being requested or offered in this Message. 
     std::string commod_;
 
     TransType type_;
-
-    /**
-      The minimum fraction of the specified commodity that the 
-      requester is willing to accept or the offerer is willing to send. 
-     */
-    double minfrac_;
 
     /**
       The price per unit of the commodity being requested or offered. 

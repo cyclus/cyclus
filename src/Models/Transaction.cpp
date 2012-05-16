@@ -7,7 +7,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction::Transaction(Model* creator, TransType type) {
-  minfrac_ = 0;
+  minfrac = 0;
   price_ = 0;
 
   supplier_ = NULL;
@@ -26,8 +26,12 @@ Transaction::Transaction(Model* creator, TransType type) {
 Transaction::~Transaction() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel* Transaction::market() {
-  MarketModel* market = MarketModel::marketForCommod(commod_);
+MarketModel* Transaction::market() const {
+  //try {
+    MarketModel* market = MarketModel::marketForCommod(commod_);
+  //} catch(CycMarketlessCommodException e) {
+    //throw e;
+  //}
   return market;
 } 
 

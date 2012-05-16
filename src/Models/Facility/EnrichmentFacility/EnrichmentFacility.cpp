@@ -99,7 +99,7 @@ std::string EnrichmentFacility::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void EnrichmentFacility::receiveMessage(msg_ptr msg){
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -124,20 +124,20 @@ vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
+  while(trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
     mat_rsrc_ptr m = inventory_.front();
 
     // start with an empty material
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
+    if(m->quantity() <= (trans.resource()->quantity() - newAmt)) {
       newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
     }
@@ -365,7 +365,7 @@ void EnrichmentFacility::enrich() {
     // Find out what we're trying to make.
     //
     try {
-      vecToMake = boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
+      vecToMake = boost::dynamic_pointer_cast<Material>(mess->trans().resource())->isoVector();
     } catch (exception& e) {
       string err = "The Enrichment Facility may only receive a Material-type Resource";
       throw CycException(err);
@@ -431,9 +431,9 @@ void EnrichmentFacility::enrich() {
     // Don't forget to decrement outstMF before sending.
     outstMF_ -= this->calcSWUs(P, xp, xf);
 
-    mat_rsrc_ptr rsrc = boost::dynamic_pointer_cast<Material>(mess->resource());
+    mat_rsrc_ptr rsrc = boost::dynamic_pointer_cast<Material>(mess->trans().resource());
     rsrc->setQuantity(theProd->quantity());
-    mess->setResource(boost::dynamic_pointer_cast<Resource>(theProd));
+    mess->trans().setResource(boost::dynamic_pointer_cast<Resource>(theProd));
 
     mess->approveTransfer();
     wastes_.push_back(theTails);

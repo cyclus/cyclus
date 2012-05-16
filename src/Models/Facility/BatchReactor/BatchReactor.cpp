@@ -127,7 +127,7 @@ std::string BatchReactor::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "BReact") << name() << " just received an order.";
@@ -166,7 +166,7 @@ void BatchReactor::addResource(msg_ptr msg,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  double amt = trans.resource->quantity();
+  double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
                             << amt << " of " << postCore_.quantity() 

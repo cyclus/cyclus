@@ -82,7 +82,7 @@ std::string NullFacility::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if (msg->supplier()==this) {
+  if (msg->trans().supplier()==this) {
     // file the order
     ordersWaiting_.push_front(msg);
   } else {
@@ -101,9 +101,9 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 
   MatManifest mats;
   try {
-    mats = inventory_.popQty(trans.resource->quantity());
+    mats = inventory_.popQty(trans.resource()->quantity());
   } catch(CycNegQtyException err) {
-    LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource->quantity()
+    LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource()->quantity()
                    << " kg failed. Inventory is only "
                    << inventory_.quantity() << " kg.";
   }

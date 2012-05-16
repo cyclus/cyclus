@@ -100,7 +100,7 @@ std::string StorageFacility::str() {
 void StorageFacility::receiveMessage(msg_ptr msg)
 {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
