@@ -211,6 +211,7 @@ xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression) {
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression) {
 
   xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
