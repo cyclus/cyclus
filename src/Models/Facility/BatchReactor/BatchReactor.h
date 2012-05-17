@@ -3,6 +3,7 @@
 #define _BATCHREACTOR_H
 
 #include "FacilityModel.h"
+#include "StorageFacility.h"
 
 #include "Material.h"
 #include "MatBuff.h"
