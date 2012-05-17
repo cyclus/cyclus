@@ -132,9 +132,11 @@ void SinkFacility::handleTock(int time){
   LOG(LEV_INFO3, "SnkFac") << "}";
 }
 
+#include <iostream>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
-  inventory_.pushAll(MatBuff::toMat(manifest)); // @MJG - you can move toMat to Material, right?
+  //  std::cout << "Sink Facility adding " << manifest.size() << "rsrc ptrs" << std::endl;
+  inventory_.pushAll(manifest); // @MJG - you can move toMat to Material, right?
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -196,7 +196,7 @@ class SinkFacility : public FacilityModel  {
   /**
      this facility holds material in storage. 
    */
-  MatBuff inventory_;
+  ResourceBuff inventory_;
 
 /* ------------------- */ 
 
