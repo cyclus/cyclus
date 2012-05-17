@@ -21,79 +21,97 @@ class Transaction {
 
     @param creator supplier if type=OFFER, requester if type=REQUEST
 
-    @param type indicates the directionality of the transaction w.r.t. the creator.
+    @param type indicates the directionality of the transaction w.r.t. the creator
     */
     Transaction(Model* creator, TransType type);
 
     virtual ~Transaction();
 
+    /**
+    Deep clone of this transaction (the new clone gets a clone of this
+    transaction's resource).
+
+    @return a copy of this transaction.
+    */
     Transaction* clone();
 
     /**
-       Returns the market corresponding to the transaction's commodity 
+       @return the market that deals in this this transaction's commodity
+
+       @exception CycMarketlessCommodException the transactions commodity has
+       no corresponding market.
      */
     MarketModel* market() const;
     
     /**
-       Returns a pointer to the supplier in this Message. 
+       @return a pointer to the supplier in this transaction
 
        @exception CycNullMsgParamException supplier is uninitialized (NULL)
      */
     Model* supplier() const;
 
     /**
-       Sets the assigned supplier of the material for the 
-       transaction in this message. 
+       @param supplier the assigned supplier of the material for this
+       transaction
      */
     void setSupplier(Model* supplier);
 
     /**
-       Returns a pointer to the requester in this Message. 
+       @return a pointer to the requester in this transaction. 
 
        @exception CycNullMsgParamException requester is uninitialized (NULL)
      */
     Model* requester() const;
 
     /**
-       Sets the assigned requester to receive the material 
-       for the transaction in this message. 
+       @param requester model that will receive the material for this
+       transaction
      */
     void setRequester(Model* requester);
 
     /**
-       Returns the commodity requested or offered in this Message. 
+       @return the commodity requested or offered in this transaction. 
      */
     std::string commod() const;
 
     /**
-       Sets the commodity being requested or offered in this Message. 
+       @param new_commod the commodity to be requested or offered in this
+       transaction
      */
-    void setCommod(std::string newCommod);
+    void setCommod(std::string new_commod);
 
     /**
-       True if the transaction is an offer, false if it is a request.
+       @return true if the transaction is an offer, false if it is a request.
      */
     bool isOffer() const;
 
     /**
-       Returns the price (in dollars) being requested or offered in this message. 
-     */
+      Price for this transaction's resource.
+
+      @return the price (in dollars) being requested or offered in this
+      transaction. 
+    */
     double price() const;
 
     /**
-       Set the price (in dollars) being requested or offered in this message. 
+       Set the price being requested or offered in this transaction. 
+
+       @param new_price price in dollars
      */
-    void setPrice(double newPrice);
+    void setPrice(double new_price);
 
     /**
-       Returns a pointer to the Resource being requested or offered in this message. 
+       @return a pointer to the resource being requested or offered in this
+       transaction. 
      */
     rsrc_ptr resource() const;
 
     /**
        Sets the transaction's resource to a copy of the passed resource.
+
+       @param new_resource its clone will be stored in this transaction
      */
-    void setResource(rsrc_ptr newResource);
+    void setResource(rsrc_ptr new_resource);
 
     /**
       The minimum fraction of the specified commodity that the 
@@ -108,9 +126,7 @@ class Transaction {
 
     TransType type_;
 
-    /**
-      The price per unit of the commodity being requested or offered. 
-     */
+    /// The price per unit of the commodity being requested or offered. 
     double price_;
 
     /// A specific resource with which this transaction is concerned.

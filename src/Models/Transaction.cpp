@@ -80,8 +80,8 @@ std::string Transaction::commod() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setCommod(std::string newCommod) {
-  commod_ = newCommod;
+void Transaction::setCommod(std::string new_commod) {
+  commod_ = new_commod;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,8 +95,8 @@ double Transaction::price() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setPrice(double newPrice) {
-  price_ = newPrice;
+void Transaction::setPrice(double new_price) {
+  price_ = new_price;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,9 +105,9 @@ rsrc_ptr Transaction::resource() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setResource(rsrc_ptr newResource) {
-  if (newResource.get()) {
-    resource_ = newResource->clone();
+void Transaction::setResource(rsrc_ptr new_resource) {
+  if (new_resource.get()) {
+    resource_ = new_resource->clone();
   }
 }
 
