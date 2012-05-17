@@ -16,7 +16,7 @@
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
     <model>
-      <GreedyMarket/>
+      <NullMarket/>
     </model>
   </market>
 
@@ -85,8 +85,6 @@
   <recipe>
     <name>fresh_50gwd</name>
     <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
     <isotope>
       <id>92235</id>
       <comp>0.05</comp>

@@ -15,7 +15,7 @@
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
     <model>
-      <GreedyMarket/>
+      <NullMarket/>
     </model>
   </market>
 

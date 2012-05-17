@@ -1,0 +1,671 @@
+
+|--------------------------------------------|
+|                  Cyclus                    |
+|       a nuclear fuel cycle simulator       |
+|  from the University of Wisconsin-Madison  |
+|--------------------------------------------|
+
+DEBUG3(core  ):              Cyclus rel path: ../../build
+DEBUG3(DBInfo):              Successfully created the output database at file location: /home/gidden/work/cyclus/build/cyclus.sqlite
+DEBUG3(none! ):              Begin loading recipes
+DEBUG2(core  ):            loading recipes {
+DEBUG2(core  ):            Adding recipe 'fresh_50gwd'.
+DEBUG2(core  ):            }
+DEBUG3(none! ):              End loading recipes
+DEBUG3(none! ):              Begin loading models
+DEBUG3(memory):              Model ID=0, ptr=0x1ae9100 created.
+DEBUG1(core  ):          Model 'uo2market' just created.
+DEBUG2(core  ):            Created Model: {
+DEBUG2(core  ):            Market_uo2market ( ID=0, implementation=GreedyMarket,  name=uo2market,  parentID=0 )  trades commodity 
+DEBUG2(core  ):            }
+ INFO2(core  ):  Model ID=0, name=uo2market has registered to receive 'resolves'.
+DEBUG3(memory):              Model ID=1, ptr=0x1b85130 created.
+DEBUG1(core  ):          Model 'FrontEnd' just created.
+DEBUG2(none! ):            Facility 1 has just set its inst to oneInst
+DEBUG2(SrcFac):            A Source Facility is being initialized
+DEBUG3(memory):              Model ID=2, ptr=0x1af69e0 created.
+DEBUG1(core  ):          Model 'BackEnd' just created.
+DEBUG2(none! ):            Facility 2 has just set its inst to oneInst
+DEBUG2(SnkFac):            A Sink Facility is being initialized
+DEBUG3(memory):              Model ID=3, ptr=0x1b2b820 created.
+DEBUG1(core  ):          Model 'oneInst' just created.
+DEBUG2(binst ):            A Build Inst is being initialized
+DEBUG3(memory):              Model ID=4, ptr=0x1b2c350 created.
+DEBUG2(breg  ):            A Build Region is being initialized
+DEBUG1(core  ):          Model 'oneRegion' just created.
+DEBUG2(core  ):            Created Model: {
+DEBUG2(core  ):            Region_oneRegion ( ID=4, implementation=BuildRegion,  name=oneRegion,  parentID=4 ) allows facs: BackEnd, FrontEnd, . And has insts: oneRegion has no builders (currently).
+DEBUG2(core  ):            }
+ INFO2(core  ):  Model ID=4, name=oneRegion has registered to receive 'ticks' and 'tocks'.
+DEBUG2(core  ):            Model 'oneRegion' ID=4 has added child 'oneInst' ID=3 to its list of children.
+DEBUG2(core  ):            Model 'oneRegion' ID=4 has removed child 'oneInst' ID=3 from its list of children.
+DEBUG2(core  ):            Created Model: {
+DEBUG2(core  ):            Inst_oneInst ( ID=3, implementation=BuildInst,  name=oneInst,  parentID=4 )  in regiononeRegiononeInst has prototypes: BackEnd, FrontEnd, 
+DEBUG2(core  ):            }
+DEBUG3(none! ):              End loading models
+ INFO1(core  ):There are 3 models.
+ INFO3(core  ):    Model list {
+ INFO3(core  ):    Market_uo2market ( ID=0, implementation=GreedyMarket,  name=uo2market,  parentID=0 )  trades commodity uo2
+ INFO3(core  ):    Region_oneRegion ( ID=4, implementation=BuildRegion,  name=oneRegion,  parentID=4 ) allows facs: BackEnd, FrontEnd, . And has insts: oneInst, oneRegion has the following builders:  prototype=BackEnd(oneInst, ),  prototype=FrontEnd(oneInst, ), 
+ INFO3(core  ):    Inst_oneInst ( ID=3, implementation=BuildInst,  name=oneInst,  parentID=4 )  in regiononeRegiononeInst has prototypes: BackEnd, FrontEnd, 
+ INFO3(core  ):    }
+ INFO1(core  ):Simulation set to run from start=2000-Jan-01 to end=2000-Oct-31
+ INFO1(core  ):Beginning simulation
+ INFO2(core  ):  Current date: 2000-Jan-01 Current time: 0 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+DEBUG3(memory):              Model ID=5, ptr=0x1b24290 created.
+DEBUG2(core  ):            Model 'oneInst' ID=3 has added child 'FrontEnd0' ID=5 to its list of children.
+DEBUG2(core  ):            Model 'oneInst' ID=3 has removed child 'FrontEnd0' ID=5 from its list of children.
+DEBUG2(core  ):            Created Model: {
+DEBUG2(core  ):            Facility_FrontEnd0 ( ID=5, implementation=SourceFacility,  name=FrontEnd0,  parentID=3 )  supplies commodity 'uo2' with recipe '' at a capacity of 1 kg per time step  with max inventory of 10000 kg.
+DEBUG2(core  ):            }
+DEBUG3(memory):              Model ID=6, ptr=0x1b1f2a0 created.
+DEBUG2(core  ):            Model 'oneInst' ID=3 has added child 'BackEnd1' ID=6 to its list of children.
+DEBUG2(core  ):            Model 'oneInst' ID=3 has removed child 'BackEnd1' ID=6 from its list of children.
+DEBUG2(core  ):            Created Model: {
+DEBUG2(core  ):            Facility_BackEnd1 ( ID=6, implementation=SinkFacility,  name=BackEnd1,  parentID=3 ) accepts commodities {uo2} until its inventory is full at 10000 kg.
+DEBUG2(core  ):            }
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=0 was created.
+DEBUG2(core  ):            Material ID=0 had mass set to1 kg
+ INFO4(SrcFac):      offers 1 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=1 was cloned.
+DEBUG3(core  ):              GenericResource ID=1, quality=kg, quantity=1, units=uo2
+DEBUG1(core  ):          Message 0x1b238b0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b238b0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b238b0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b238b0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b238b0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b238b0 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=3 was cloned.
+DEBUG3(core  ):              GenericResource ID=3, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b23ca0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b23ca0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b23ca0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b23ca0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b23ca0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b23ca0 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=1, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 999 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 1 units of material at the close of month 0.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 0.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Feb-01 Current time: 1 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=5 was created.
+DEBUG2(core  ):            Material ID=5 had mass set to1 kg
+ INFO4(SrcFac):      offers 2 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=6 was cloned.
+DEBUG3(core  ):              GenericResource ID=6, quality=kg, quantity=2, units=uo2
+DEBUG1(core  ):          Message 0x1b23d70 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b23d70 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b23d70 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b23d70 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b23d70 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b23d70 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=8 was cloned.
+DEBUG3(core  ):              GenericResource ID=8, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b1feb0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b1feb0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b1feb0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b1feb0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b1feb0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b1feb0 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=2, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=998
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 997 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 2 units of material at the close of month 1.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 1.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Mar-01 Current time: 2 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=10 was created.
+DEBUG2(core  ):            Material ID=10 had mass set to1 kg
+ INFO4(SrcFac):      offers 3 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=11 was cloned.
+DEBUG3(core  ):              GenericResource ID=11, quality=kg, quantity=3, units=uo2
+DEBUG1(core  ):          Message 0x1b1ff80 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b1ff80 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b1ff80 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b1ff80 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b1ff80 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b1ff80 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=13 was cloned.
+DEBUG3(core  ):              GenericResource ID=13, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b205f0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b205f0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b205f0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b205f0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b205f0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b205f0 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=3, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=997
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=995
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 994 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 3 units of material at the close of month 2.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 2.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Apr-01 Current time: 3 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=15 was created.
+DEBUG2(core  ):            Material ID=15 had mass set to1 kg
+ INFO4(SrcFac):      offers 4 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=16 was cloned.
+DEBUG3(core  ):              GenericResource ID=16, quality=kg, quantity=4, units=uo2
+DEBUG1(core  ):          Message 0x1b80880 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b80880 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b80880 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b80880 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b80880 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b80880 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=18 was cloned.
+DEBUG3(core  ):              GenericResource ID=18, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b80600 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b80600 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b80600 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b80600 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b80600 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b80600 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=4, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=996
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=993
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=991
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 990 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 4 units of material at the close of month 3.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 3.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-May-01 Current time: 4 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=20 was created.
+DEBUG2(core  ):            Material ID=20 had mass set to1 kg
+ INFO4(SrcFac):      offers 5 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=21 was cloned.
+DEBUG3(core  ):              GenericResource ID=21, quality=kg, quantity=5, units=uo2
+DEBUG1(core  ):          Message 0x1b80710 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b80710 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b80710 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b80710 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b80710 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b80710 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=23 was cloned.
+DEBUG3(core  ):              GenericResource ID=23, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b80f90 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b80f90 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b80f90 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b80f90 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b80f90 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b80f90 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=5, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=995
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=991
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=988
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=986
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 985 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 5 units of material at the close of month 4.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 4.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Jun-01 Current time: 5 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=25 was created.
+DEBUG2(core  ):            Material ID=25 had mass set to1 kg
+ INFO4(SrcFac):      offers 6 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=26 was cloned.
+DEBUG3(core  ):              GenericResource ID=26, quality=kg, quantity=6, units=uo2
+DEBUG1(core  ):          Message 0x1b812d0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b812d0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b812d0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b812d0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b812d0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b812d0 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=28 was cloned.
+DEBUG3(core  ):              GenericResource ID=28, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b81060 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81060 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81060 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81060 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81060 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81060 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=6, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  6
+DEBUG2(GreedM):            offeramt=5, requestamt=994
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=989
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=985
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=982
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=980
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 979 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 6 units of material at the close of month 5.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 5.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Jul-01 Current time: 6 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=30 was created.
+DEBUG2(core  ):            Material ID=30 had mass set to1 kg
+ INFO4(SrcFac):      offers 7 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=31 was cloned.
+DEBUG3(core  ):              GenericResource ID=31, quality=kg, quantity=7, units=uo2
+DEBUG1(core  ):          Message 0x1b81170 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81170 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81170 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81170 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81170 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81170 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=33 was cloned.
+DEBUG3(core  ):              GenericResource ID=33, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b81570 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81570 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81570 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81570 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81570 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81570 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=7, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  7
+DEBUG2(GreedM):            offeramt=6, requestamt=993
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  6
+DEBUG2(GreedM):            offeramt=5, requestamt=987
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=982
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=978
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=975
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=973
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 972 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 7 units of material at the close of month 6.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 6.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Aug-01 Current time: 7 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=35 was created.
+DEBUG2(core  ):            Material ID=35 had mass set to1 kg
+ INFO4(SrcFac):      offers 8 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=36 was cloned.
+DEBUG3(core  ):              GenericResource ID=36, quality=kg, quantity=8, units=uo2
+DEBUG1(core  ):          Message 0x1b81680 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81680 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81680 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81680 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81680 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81680 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=38 was cloned.
+DEBUG3(core  ):              GenericResource ID=38, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b81a00 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81a00 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81a00 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81a00 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81a00 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81a00 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=8, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  8
+DEBUG2(GreedM):            offeramt=7, requestamt=992
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  7
+DEBUG2(GreedM):            offeramt=6, requestamt=985
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  6
+DEBUG2(GreedM):            offeramt=5, requestamt=979
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=974
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=970
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=967
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=965
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 964 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 8 units of material at the close of month 7.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 7.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Sep-01 Current time: 8 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=40 was created.
+DEBUG2(core  ):            Material ID=40 had mass set to1 kg
+ INFO4(SrcFac):      offers 9 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=41 was cloned.
+DEBUG3(core  ):              GenericResource ID=41, quality=kg, quantity=9, units=uo2
+DEBUG1(core  ):          Message 0x1b81ad0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b81ad0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b81ad0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b81ad0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b81ad0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b81ad0 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=43 was cloned.
+DEBUG3(core  ):              GenericResource ID=43, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b7e6f0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b7e6f0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b7e6f0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b7e6f0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b7e6f0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b7e6f0 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=9, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  9
+DEBUG2(GreedM):            offeramt=8, requestamt=991
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  8
+DEBUG2(GreedM):            offeramt=7, requestamt=983
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  7
+DEBUG2(GreedM):            offeramt=6, requestamt=976
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  6
+DEBUG2(GreedM):            offeramt=5, requestamt=970
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=965
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=961
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=958
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=956
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 955 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 9 units of material at the close of month 8.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 8.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+ INFO2(core  ):  Current date: 2000-Oct-01 Current time: 9 {
+DEBUG3(core  ):              The list of current tick listeners is: oneRegion 
+ INFO3(core  ):    Sending tick to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is ticking {
+ INFO4(core  ):      Material ID=45 was created.
+DEBUG2(core  ):            Material ID=45 had mass set to1 kg
+ INFO4(SrcFac):      offers 10 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=46 was cloned.
+DEBUG3(core  ):              GenericResource ID=46, quality=kg, quantity=10, units=uo2
+DEBUG1(core  ):          Message 0x1b7ea70 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b7ea70 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b7ea70 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b7ea70 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b7ea70 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b7ea70 send to comm 0x1b2b890 completed
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is ticking {
+ INFO4(SnkFac):       requests 1000 kg of uo2.
+DEBUG2(core  ):            GenericResource ID=48 was cloned.
+DEBUG3(core  ):              GenericResource ID=48, quality=kg, quantity=1000, units=uo2
+DEBUG1(core  ):          Message 0x1b7e7c0 going to comm 0x1b2b890 {
+DEBUG1(core  ):          Message 0x1b7e7c0 going to comm 0x1b2c3c0 {
+DEBUG1(core  ):          Message 0x1b7e7c0 going to comm 0x1ae9170 {
+DEBUG1(core  ):          } Message 0x1b7e7c0 send to comm 0x1ae9170 completed
+DEBUG1(core  ):          } Message 0x1b7e7c0 send to comm 0x1b2c3c0 completed
+DEBUG1(core  ):          } Message 0x1b7e7c0 send to comm 0x1b2b890 completed
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending resolve to Model ID=0, name=uo2market {
+DEBUG2(GreedM):            offeramt=10, requestamt=1000
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  10
+DEBUG2(GreedM):            offeramt=9, requestamt=990
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  9
+DEBUG2(GreedM):            offeramt=8, requestamt=981
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  8
+DEBUG2(GreedM):            offeramt=7, requestamt=973
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  7
+DEBUG2(GreedM):            offeramt=6, requestamt=966
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  6
+DEBUG2(GreedM):            offeramt=5, requestamt=960
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  5
+DEBUG2(GreedM):            offeramt=4, requestamt=955
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  4
+DEBUG2(GreedM):            offeramt=3, requestamt=951
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  3
+DEBUG2(GreedM):            offeramt=2, requestamt=948
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  2
+DEBUG2(GreedM):            offeramt=1, requestamt=946
+DEBUG1(GreedM):          GreedyMarket has resolved a transaction  which is a match from 5 to 6 for the amount:  1
+DEBUG2(GreedM):            The request from Requester 6 for the amount 945 rejected. 
+ INFO3(core  ):    }
+ INFO3(core  ):    Sending tock to Model ID=4, name=oneRegion {
+ INFO3(SrcFac):    FrontEnd0 is tocking {
+ INFO4(SrcFac):      SourceFacility 5 is holding 10 units of material at the close of month 9.
+ INFO3(SrcFac):    }
+ INFO3(SnkFac):    BackEnd1 is tocking {
+ INFO4(SnkFac):      SinkFacility 6 is holding 0 units of material at the close of month 9.
+ INFO3(SnkFac):    }
+ INFO3(core  ):    }
+ INFO2(core  ):  }
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(memory):              Deleting model 'oneRegion' ID=4 {
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(memory):              Deleting model 'oneInst' ID=3 {
+DEBUG2(core  ):            Model 'oneRegion' ID=4 has removed child 'oneInst' ID=3 from its list of children.
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(memory):              Deleting model 'FrontEnd0' ID=5 {
+DEBUG2(core  ):            Model 'oneInst' ID=3 has removed child 'FrontEnd0' ID=5 from its list of children.
+DEBUG3(memory):              }
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(memory):              Deleting model 'BackEnd1' ID=6 {
+DEBUG2(core  ):            Model 'oneInst' ID=3 has removed child 'BackEnd1' ID=6 from its list of children.
+DEBUG3(memory):              }
+DEBUG3(memory):              }
+DEBUG3(memory):              }
+DEBUG2(none! ):            removing market from static list of markets...
+DEBUG2(none! ):              found match in static list
+DEBUG2(none! ):              match is removed
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(delete):              killing tracked messages
+DEBUG3(memory):              Deleting model 'uo2market' ID=0 {
+DEBUG3(memory):              }
