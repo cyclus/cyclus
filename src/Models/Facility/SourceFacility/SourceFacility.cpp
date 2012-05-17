@@ -1,6 +1,7 @@
 // SourceFacility.cpp
 // Implements the SourceFacility class
 #include <iostream>
+#include <sstream>
 
 #include "SourceFacility.h"
 
@@ -25,7 +26,7 @@ SourceFacility::~SourceFacility() { }
 void SourceFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
 
-  LOG(LEV_DEBUG2, "SrcFac") << "The Source Facility is being initialized";
+  LOG(LEV_DEBUG2, "SrcFac") << "A Source Facility is being initialized";
 
   /// move XML pointer to current model
   cur = XMLinput->get_xpath_element(cur,"model/SourceFacility");
@@ -68,14 +69,15 @@ void SourceFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SourceFacility::print() {
-  FacilityModel::print();
-
-  LOG(LEV_DEBUG2, "SrcFac!") << "    supplies commodity {"
-      << out_commod_ << "} with recipe '" 
-      << recipe_name_ << "' at a capacity of "
-      << capacity_ << " kg per time step."
-      << " It has a max inventory of " << inventory_.capacity() << " kg.";
+std::string SourceFacility::str() {
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " supplies commodity '"
+     << out_commod_ << "' with recipe '" 
+     << recipe_name_ << "' at a capacity of "
+     << capacity_ << " kg per time step "
+     << " with max inventory of " << inventory_.capacity() << " kg.";
+  return "" + ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -85,6 +87,7 @@ void SourceFacility::receiveMessage(msg_ptr msg){
   if(msg->supplier() == this){
     // file the order
     ordersWaiting_.push_front(msg);
+    LOG(LEV_INFO5, "SrcFac") << name() << " just received an order.";
   } else {
     throw CycException("SourceFacility is not the supplier of this msg.");
   }
@@ -120,16 +123,15 @@ void SourceFacility::generateMaterial(int curr_time) {
   double empty_space = inventory_.space();
   if (empty_space < EPS_KG) {return;}
 
-  IsoVector temp = recipe_;
+  IsoVector* temp = new IsoVector(recipe_.comp());
   if (capacity_ * recipe_.mass() * time_change <= empty_space) {
     // add a material the size of the capacity to the inventory
-    temp.multBy(capacity_ * time_change);
+    temp->multBy(capacity_ * time_change);
   } else {
     // add a material that fills the inventory
-    temp.setMass(empty_space);
+    temp->setMass(empty_space);
   }
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(temp));
-  newMat->setOriginatorID( this->ID() );
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
   inventory_.pushOne(newMat);
 }
 

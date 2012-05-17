@@ -1,13 +1,96 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
-datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-
+	 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  
+  <!-- BuildRegion -->  
   <define name="BuildRegion">
-     <element name="BuildRegion">
-        <element name="input_file">
-        <text/>
+    <element name="BuildRegion">
+    
+      <!-- Capacity Satisfiability -->
+      <zeroOrMore>
+	<element name = "capacitytype">
+	  
+	  <element name = "name">
+	    <text/>
+	  </element>
+	  
+	  <oneOrMore>
+	    <element name = "satisfyingprototype">
+	      <text/>
+	    </element>
+	  </oneOrMore>
+	  
+	</element>
+      </zeroOrMore>
+      <!-- end Capacity Satisfiability -->
+
+      
+      <!-- Capacity Requirements -->
+      <zeroOrMore>
+	<element name = "capacityrequirement">
+	  
+	  <element name = "capacityname">
+	    <text/>
+	  </element>
+
+	  <element name = "demandtype">
+	    <choice>
+	      <value>amount</value>
+	      <value>rate</value>
+	    </choice>
+	  </element>
+
+	  <element name = "demandunits">
+	    <text/>
+	  </element>
+
+	  <element name = "demandschedule">
+	    <!-- time, value pairs -->
+	    <oneOrMore>
+	      <element name="entry">
+		<element name="time">
+		  <data type="nonNegativeInteger"/>
+		</element>
+		<element name="value">
+		  <data type="double"/>
+		</element>
+	      </element>
+	    </oneOrMore>
+	  </element>
+
+	</element>
+      </zeroOrMore>
+      <!-- end Capacity Requirements -->
+      
+      <!-- Facility Requirements -->
+      <zeroOrMore>
+	<element name = "prototyperequirement">
+	  
+	  <element name = "prototypename">
+	    <text/>
+	  </element>
+	  
+	  <element name = "demandschedule">
+	    <!-- time, value pairs -->
+	    <oneOrMore>
+	      <element name="entry">
+		<element name="time">
+		  <data type="nonNegativeInteger"/>
+		</element>
+		<element name="number">
+		  <data type="nonNegativeInteger"/>
+		</element>
+	      </element>
+	    </oneOrMore>
+	  </element>
+
+	</element>
+      </zeroOrMore>
+      <!-- end Facility Requirements -->
+
     </element>
-     </element>
   </define>
-
-
+  <!-- end BuildRegion -->  
+  
+  
 </grammar>
+  

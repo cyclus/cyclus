@@ -15,7 +15,7 @@ int Logger::spc_per_lev_ = 2;
 int Logger::field_width_ = 6;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ostringstream& Logger::Get(LogLevel level, string prefix) {
+ostringstream& Logger::Get(LogLevel level, std::string prefix) {
   int ind_level = level - LEV_INFO1;
   if (ind_level < 0) {ind_level = 0;}
 
@@ -54,7 +54,7 @@ void Logger::initialize() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-LogLevel Logger::ToLogLevel(string text) {
+LogLevel Logger::ToLogLevel(std::string text) {
   if (string_to_level.count(text) > 0) {
     return string_to_level[text];
   } else {
@@ -74,7 +74,7 @@ string Logger::ToString(LogLevel level) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logger::addLevel(LogLevel level, string text) {
+void Logger::addLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
   text = text.substr(4);

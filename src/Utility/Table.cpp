@@ -20,6 +20,16 @@ Table::Table(table_name name) {
 }
 
 // -----------------------------------------------------------------------
+void Table::defineTable(std::vector<column> cols, primary_key keys){
+  vector<column>::iterator each_col;
+  for(each_col=cols.begin(); each_col!=cols.end(); each_col++){
+    this->addColumn((*each_col));
+  }
+  this->setPrimaryKey(keys);
+  this->tableDefined();
+}
+
+// -----------------------------------------------------------------------
 void Table::tableDefined() {
   defined_ = true;
   BI->registerTable( this );
@@ -33,7 +43,7 @@ void Table::setPrimaryKey(column const col) {
 }
 
 // -----------------------------------------------------------------------
-void Table::setPrimaryKey(string const pk_string) {
+void Table::setPrimaryKey(std::string const pk_string) {
   primary_key pk;
   pk.push_back(pk_string);
   this->setPrimaryKey(pk);

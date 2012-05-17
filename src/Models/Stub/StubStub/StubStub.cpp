@@ -27,8 +27,8 @@ void StubStub::copy(StubStub* src) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubStub::print() { 
-  StubModel::print(); 
+std::string StubStub::str() { 
+  return StubModel::str(); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

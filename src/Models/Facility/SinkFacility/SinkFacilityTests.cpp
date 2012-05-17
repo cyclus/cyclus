@@ -90,7 +90,7 @@ TEST_F(SinkFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SinkFacilityTest, Print) {
-  EXPECT_NO_THROW(sink_facility->print());
+  EXPECT_NO_THROW(std::string s = sink_facility->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

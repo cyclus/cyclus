@@ -129,13 +129,14 @@ void RecipeReactor::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::print() { 
-  FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "RReact") << "    converts commodity {"
-      << fuelPairs_.front().first.first
-      << "} into commodity {"
-      << this->fuelPairs_.front().second.first
-      << "}.";
+std::string RecipeReactor::str() { 
+  std::string s = FacilityModel::str(); 
+  s += "    converts commodity '"
+    + fuelPairs_.front().first.first
+    + "' into commodity '"
+    + this->fuelPairs_.front().second.first
+    + "'.";
+  return s;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -255,7 +256,7 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void RecipeReactor::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
@@ -508,8 +509,8 @@ void RecipeReactor::setOutRecipe(IsoVector recipe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addFuelPair(string incommod, IsoVector inFuel,
-                                string outcommod, IsoVector outFuel) {
+void RecipeReactor::addFuelPair(std::string incommod, IsoVector inFuel,
+                                std::string outcommod, IsoVector outFuel) {
   fuelPairs_.push_back(make_pair(make_pair(incommod, inFuel),
                                  make_pair(outcommod, outFuel)));
 }

@@ -16,37 +16,37 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+InstModel::InstModel() {
+  init();
+  setModelType("Inst");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::init() {
+  prototypes_ = new PrototypeSet();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
+  // non xml inits
+  InstModel::init();
+  // xml inits
   Model::init(cur);
-  /** 
-   *  Specific initialization for InstModels
-   */
-  
-  /// determine the parent from the XML input
-  string region_name = XMLinput->get_xpath_content(cur,"../name");
-  Model* parent = Model::getModelByName(region_name);
-  this->setParent(parent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::copy(InstModel* src) {
   Model::copy(src);
   Communicator::copy(src);
-  
-  /** 
-   *  Specific initialization for InstModels
-   */
-  children_ = src->children_;
-  Model* parent = src->parent();
-  this->setParent(parent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::print()
-{
-  Model::print();
-
-  LOG(LEV_DEBUG2, "none!") << "in region " << parent()->name();
+std::string InstModel::str() {
+  try {
+    return Model::str() + " in region" + parent()->name();
+  } catch (CycIndexException err) {
+    return Model::str() + " with no region.";
+  }
 }
 
 
@@ -73,21 +73,35 @@ void InstModel::handlePreHistory(){
   }
 }
 
-void InstModel::handleTick(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
+void InstModel::handleTick(int time) {
+  // tell all of the institution's child models to handle the tick
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<FacilityModel*>(m)->handleTick(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
 }
 
-void InstModel::handleTock(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleTock(time);
+void InstModel::handleTock(int time) {
+  // tell all of the institution's child models to handle the tock
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<FacilityModel*>(m)->handleTock(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
 }
 
@@ -96,7 +110,7 @@ void InstModel::handleDailyTasks(int time, int day){
   for(vector<Model*>::iterator fac=children_.begin();
       fac != children_.end();
       fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleDailyTasks(time,day);
+    dynamic_cast<FacilityModel*>(*fac)->handleDailyTasks(time,day);
   }
 }
 
@@ -105,14 +119,20 @@ void InstModel::handleDailyTasks(int time, int day){
  * --------------------
  */
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool InstModel::pleaseBuild(Model* fac){
-  // by defualt
-  stringstream ss;
-  ss << this->ID();
-  throw CycOverrideException("Institution " + ss.str()
-		     + " does not have a definied facility-building fuction.");
-  return false;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void InstModel::addPrototype(Model* prototype) {
+  if ( !isAvailablePrototype(prototype) ) {
+    prototypes_->insert(prototype);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::build(Model* prototype, Model* requester) {
+  // by default
+  stringstream err("");
+  err << "Institution " << this->name() << " does not have a definied " 
+      << "facility-building fuction.";
+  throw CycOverrideException(err.str());
 }
 
 double InstModel::powerCapacity(){
@@ -125,3 +145,4 @@ double InstModel::powerCapacity(){
   }
   return capacity;
 }
+

@@ -30,10 +30,12 @@ class TestCommunicator : public Communicator {
       flip_at_receive_ = false;
       flip_down_to_up_ = false;
       forget_set_dest_ = false;
+      keep_ = false;
+      kill_ = false;
       down_up_count_ = 0;
     }
 
-    ~TestCommunicator() { }
+    virtual ~TestCommunicator() { }
 
     Communicator* parent_;
     msg_ptr msg_;
@@ -41,11 +43,20 @@ class TestCommunicator : public Communicator {
     string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
     bool flip_down_to_up_;
+    bool keep_;
     int down_up_count_;
+    bool kill_;
 
     void startMessage() {
       dynamic_cast<TrackerMessage*>(msg_.get())->dest_list_.push_back(name_);
       msg_->setNextDest(parent_);
+      msg_->sendOn();
+    }
+
+    void returnMessage() {
+      if (!keep_) {
+        return;
+      }
       msg_->sendOn();
     }
 
@@ -55,6 +66,13 @@ class TestCommunicator : public Communicator {
       boost::intrusive_ptr<TrackerMessage> ptr;
       ptr = boost::intrusive_ptr<TrackerMessage>(dynamic_cast<TrackerMessage*>(msg.get()));
       ptr->dest_list_.push_back(name_);
+      if (keep_) {
+        msg_ = msg;
+        return;
+      }
+      if (kill_) {
+        msg->kill();
+      }
       if (stop_at_return_ && this == msg->sender()) {
         return;
       } else if (flip_at_receive_) {
@@ -76,6 +94,10 @@ class TestCommunicator : public Communicator {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - Message Passing Tests - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class MessagePassingTest : public ::testing::Test {
   protected:
     TestCommunicator* comm1;
@@ -96,14 +118,10 @@ class MessagePassingTest : public ::testing::Test {
     };
 
     virtual void TearDown() {
-      delete comm1;
-      delete comm2;
-      delete comm3;
-      delete comm4;
+
     }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, CleanThrough) {
   ASSERT_NO_THROW(comm1->startMessage());
 
@@ -204,6 +222,51 @@ TEST_F(MessagePassingTest, YoYo) {
   EXPECT_EQ(stops[12], "comm3");
   EXPECT_EQ(stops[13], "comm2");
   EXPECT_EQ(stops[14], "comm1");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessagePassingTest, KillByDeletingSender) {
+  msg_ptr msg = comm1->msg_;
+  comm3->keep_ = true;
+
+  ASSERT_NO_THROW(comm1->startMessage());
+  ASSERT_FALSE(msg->isDead());
+  delete comm1;
+  ASSERT_TRUE(msg->isDead());
+  ASSERT_NO_THROW(comm3->returnMessage());
+
+  vector<string> stops = dynamic_cast<TrackerMessage*>(msg.get())->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 3;
+
+  ASSERT_EQ(num_stops, expected_num_stops);
+
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessagePassingTest, KillSendOn) {
+  comm3->kill_ = true;
+  ASSERT_NO_THROW(comm1->startMessage());
+
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 3;
+
+  ASSERT_EQ(num_stops, expected_num_stops);
+
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(MessagePassingTest, KillApproveTransfer) {
+  // if this doesn't segfault, the test passes
+  comm1->msg_->kill();
+  comm1->msg_->approveTransfer();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

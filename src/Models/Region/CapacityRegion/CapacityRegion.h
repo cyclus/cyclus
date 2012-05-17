@@ -3,11 +3,11 @@
 #define _CAPACITYREGION_H
 
 /**
- * The CapacityRegion class inherits from the RegionModel class and is dynamically
- * loaded by the Model class when requested.
- * 
- * This region will build new facilities based on the pleaseBuild() function. 
- * This RegionModel never alters any messages transmitted through it or anything else. 
+   The CapacityRegion class inherits from the RegionModel class and is 
+   dynamically loaded by the Model class when requested. 
+    
+   This region will build new facilities based on the pleaseBuild() 
+   function. This RegionModel never alters any messages transmitted 
  */
 
 #include "RegionModel.h"
@@ -31,7 +31,7 @@ class CapacityRegion : public RegionModel
 
   private:
     /**
-     * Populate the build schedule
+       Populate the build schedule 
      */
   void populateSchedule(FILE *infile);
 
@@ -42,12 +42,12 @@ class CapacityRegion : public RegionModel
 
   public:
     /**
-     * The default constructor for the CapacityRegion
+       The default constructor for the CapacityRegion 
      */
     CapacityRegion() {};
 
     /**
-     * The default destructor for the CapacityRegion
+       The default destructor for the CapacityRegion 
      */
     virtual ~CapacityRegion() {};
    
@@ -59,17 +59,17 @@ class CapacityRegion : public RegionModel
     virtual void copy(CapacityRegion* src) { RegionModel::copy(src); } ;
 
     /**
-     * This drills down the dependency tree to initialize all relevant parameters/containers.
-     *
-     * Note that this function must be defined only in the specific model in question and not in any 
-     * inherited models preceding it.
-     *
-     * @param src the pointer to the original (initialized ?) model to be copied
+       This drills down the dependency tree to initialize all relevant 
+       parameters/containers.  
+       Note that this function must be defined only in the specific 
+       model in question and not in any inherited models preceding it. 
+        
+       @param src the pointer to the original (initialized ?) model to 
      */
     virtual void copyFreshModel(Model* src){ copy(dynamic_cast<CapacityRegion*>(src)); };
   
     // print information about the region
-    virtual void print()               { RegionModel::print();   } ;
+    virtual std::string str()               { RegionModel::str();   } ;
 
 /* ------------------- */ 
 
@@ -80,11 +80,11 @@ class CapacityRegion : public RegionModel
  public:
     
     /**
-     * Each region is prompted to do its beginning-of-time-step
-     * stuff at the tick of the timer.
-     * The default behavior is to ignore the tick.
-     *
-     * @param time is the time to perform the tick
+       Each region is prompted to do its beginning-of-time-step 
+       stuff at the tick of the timer. 
+       The default behavior is to ignore the tick. 
+        
+       @param time is the time to perform the tick 
      */
     virtual void handleTick(int time);
 
@@ -111,8 +111,8 @@ class CapacityRegion : public RegionModel
     std::vector <string> capacity_type_, capacity_function_;
     std::vector <double> nominal_value_;
     AllReplacementFacs allReplacementFacs_;
-    void initBuild(xmlNodePtr cur);
-    void initCapacity(xmlNodePtr cur);
+    virtual void initBuild(xmlNodePtr cur);
+    virtual void initCapacity(xmlNodePtr cur);
     Model* chooseInstToBuildFac();
     double checkCurrentCapcity(string capacity_type);
     Model* chooseFacToBuild(ReplacementFacs facs);
@@ -127,16 +127,16 @@ class CapacityRegion : public RegionModel
  */
  public:
   /**
-     The getter function for the capacity region model's output dir
-  */
+     The getter function for the capacity region model's output dir 
+   */
   static std::string outputDir(){ 
     return RegionModel::outputDir().append(outputDir_);}
     
  private:
   /**
-     Every specific region model writes to the output database
-     location: RegionModel::OutputDir_ + /this_region's_name
-  */
+     Every specific region model writes to the output database 
+     location: RegionModel::OutputDir_ + /this_region's_name 
+   */
   static std::string outputDir_;
 
 };

@@ -89,7 +89,7 @@ long double & LMatrix::operator()(int i, int j) {
 
 // adds a row at the end of the Matrix if it contains the same number of
 // elements as the number of columns in the Matrix
-void LMatrix::addRow(vector<long double> row) {
+void LMatrix::addRow(std::vector<long double> row) {
   int size = row.size();
   if ( size == cols_ ) {
     M_.push_back(row);

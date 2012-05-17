@@ -28,10 +28,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           </element>
         <ref name="lifetime"/>
         <element name="state">
-          <text/>
+          <data type="string"/>
           </element>
         <element name="typeReac">
-          <text/>
+          <data type="string"/>
           </element>
         <ref name="capacity"/>
         <element name="elecCF">

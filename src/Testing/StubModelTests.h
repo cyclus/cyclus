@@ -19,6 +19,7 @@ class StubModelTests : public TestWithParam<StubModelConstructor*> {
   public:
     virtual void SetUp() { 
       stub_model_ = (*GetParam())();
+      stub_model_->init();
     }
     virtual void TearDown(){ 
       delete stub_model_;

@@ -2,6 +2,7 @@
 // Implements the Model Class
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "Model.h"
@@ -30,7 +31,7 @@ vector<Model*> Model::model_list_;
 map<string, mdl_ctor*> Model::create_map_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getTemplateByName(string name) {
+Model* Model::getTemplateByName(std::string name) {
   Model* found_model = NULL;
 
   for (int i = 0; i < template_list_.size(); i++) {
@@ -48,7 +49,7 @@ Model* Model::getTemplateByName(string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getModelByName(string name) {
+Model* Model::getModelByName(std::string name) {
   Model* found_model = NULL;
 
   for (int i = 0; i < model_list_.size(); i++) {
@@ -70,7 +71,7 @@ void Model::printModelList() {
   CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
   CLOG(LEV_INFO3) << "Model list {";
   for (int i = 0; i < model_list_.size(); i++) {
-    model_list_.at(i)->print();
+    CLOG(LEV_INFO3) << model_list_.at(i)->str();
   }
   CLOG(LEV_INFO3) << "}";
 }
@@ -81,7 +82,7 @@ vector<Model*> Model::getModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::create(string model_type, xmlNodePtr cur) {
+void Model::create(std::string model_type, xmlNodePtr cur) {
   string model_impl = XMLinput->get_xpath_name(cur, "model/*");
 
   // get instance
@@ -108,8 +109,8 @@ void Model::load_models() {
   load_converters();
   load_markets();
   load_facilities();
-  load_regions();
   load_institutions();
+  load_regions();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -150,7 +151,7 @@ void Model::load_facilities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilitycatalog(string filename, string ns, string format){
+void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
   XMLinput->extendCurNS(ns);
 
   if ("xml" == format){
@@ -205,6 +206,7 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+  Model::init();
   ID_ = next_id_++;
   is_template_ = true;
   born_ = false;
@@ -254,7 +256,7 @@ void Model::setIsTemplate(bool is_template) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::removeFromList(Model* model, vector<Model*> &mlist) {
+void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
   for (int i = 0; i < mlist.size(); i++) {
     if (mlist[i] == model) {
       mlist.erase(mlist.begin() + i);
@@ -264,14 +266,16 @@ void Model::removeFromList(Model* model, vector<Model*> &mlist) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::print() { 
-  CLOG(LEV_INFO3) << model_type_ << "_" << name_ 
+std::string Model::str() { 
+  std::stringstream ss;
+  ss << model_type_ << "_" << name_ 
       << " ( "
       << "ID=" << ID_
       << ", implementation=" << model_impl_
       << ",  name=" << name_
       << ",  parentID=" << parentID_
       << " ) " ;
+  return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -301,6 +305,10 @@ void Model::setParent(Model* parent){
   if (parent_ != NULL){
     parent_->addChild(this);
   }
+
+  CLOG(LEV_DEBUG2) << "Created Model: {";
+  CLOG(LEV_DEBUG2) << str();
+  CLOG(LEV_DEBUG2) << "}";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -323,7 +331,7 @@ void Model::addChild(Model* child){
   CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
 		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
-  removeFromList(child, children_);
+  removeChild(child);
   children_.push_back(child); 
 };
 
@@ -349,7 +357,7 @@ vector<rsrc_ptr> Model::removeResource(msg_ptr order) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addResource(msg_ptr msg,
-                            vector<rsrc_ptr> manifest) {
+			std::vector<rsrc_ptr> manifest) {
   string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
   throw CycOverrideException(err_msg);

@@ -16,15 +16,9 @@ list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
-  setModelType("Market");
-
-  // register the model
-
-  TI->registerResolveListener(this);
-  markets_.push_back(this);
-  setIsTemplate(false);
-  commodity_ = "none";
-};
+  init();
+  setModelType("Market"); 
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
@@ -41,7 +35,7 @@ MarketModel::~MarketModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel* MarketModel::marketForCommod(string commod) {
+MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
   list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
@@ -58,21 +52,30 @@ MarketModel* MarketModel::marketForCommod(string commod) {
   }
   return market;
 }
+ 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::registerMarket(MarketModel* mkt) {
+  markets_.push_back(mkt);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::initSimInteraction(MarketModel* mkt) {  
+  // this brings the market into the simulation (all agents must have a parent)
+  mkt->setParent(mkt);
+
+  // register the model
+  TI->registerResolveListener(mkt);
+  MarketModel::registerMarket(mkt);
+}
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::init(xmlNodePtr cur) {
-  Model::init(cur);
-  
-  /** 
-   *  Specific initialization for MarketModels
-   */
+  // general initializations
+  Model::init(cur);  
+  MarketModel::initSimInteraction(this);
 
-  /// all markets require commodities
+  // specific initalizations
   commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
-
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -88,10 +91,7 @@ void MarketModel::copy(MarketModel* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::print() { 
-  Model::print(); 
-
-  LOG(LEV_DEBUG2, "none!") << "    trades commodity " << commodity_;
-
+std::string MarketModel::str() { 
+  return Model::str() + " trades commodity " + commodity_; 
 };
 

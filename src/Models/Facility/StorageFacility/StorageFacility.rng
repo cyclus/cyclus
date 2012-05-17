@@ -2,39 +2,39 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="StorageFacility">
-     <element name="StorageFacility"> 
+      <element name="StorageFacility"> 
         <oneOrMore>
           <ref name="incommodity"/>
-          </oneOrMore>
+        </oneOrMore>
         <element name="capacity">
-          <text/>
-          </element>
+          <data type="double"/>
+        </element>
         <element name="inventorysize">
-          <text/>
-          </element>
+          <data type="double"/>
+        </element>
         <element name="residencetime">
-          <text/>
-          </element>
+          <data type="nonNegativeInteger"/>
+        </element>
         <element name="initialstocks">
         <zeroOrMore>
-        <element name="entry">
-                  <element name="facility">
-                        <text/>
-                      </element>
+          <element name="entry">
+            <element name="facility">
+              <data type="string"/>
+            </element>
             <ref name="incommodity"/>
-                  <element name="recipe">
-                        <text/>
-                      </element>
+            <element name="recipe">
+              <data type="string"/>
+            </element>
             <element name="amount">
-                <text/>
-                </element>
+              <data type="double"/>
+            </element>
             <element name="age">
-                <text/>
-                </element>
+              <data type="double"/>
+            </element>
+          </element>
+        </zeroOrMore>
         </element>
-            </zeroOrMore>
-    </element>
-     </element>
+      </element>
   </define>
 
 </grammar>

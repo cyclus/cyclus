@@ -1,8 +1,18 @@
 # Build the cyclus executable from the CYCLUS_SRC source files
-ADD_SUBDIRECTORY( StubInst )
-ADD_SUBDIRECTORY( FixedInst )
-ADD_SUBDIRECTORY( DeployInst )
-ADD_SUBDIRECTORY( BuildInst )
+file(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
+
+foreach(dir ${all_valid_subdirs})
+    if(${dir} MATCHES "^([^/]*)//CMakeLists.txt")
+        string(REGEX REPLACE "^([^/]*)//CMakeLists.txt" "\\1" dir_trimmed ${dir})
+        add_subdirectory(${dir_trimmed})
+    endif()
+endforeach(dir)
 
 SET(ModelTestSource ${ModelTestSource} ${InstTestSource} PARENT_SCOPE)
-
+#SET(INST_REFS "")
+#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
+#  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
+STRING(REPLACE ";" "\n\ \ \ \ \ \ \ \ " INST_REFS "${INST_REFS}")
+STRING(REPLACE ";" "\n\ \ " RNG_INCLUDES "${RNG_INCLUDES}")
+SET(INST_REFS ${INST_REFS} PARENT_SCOPE)
+SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE)

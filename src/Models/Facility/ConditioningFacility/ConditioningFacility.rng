@@ -5,10 +5,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
      <element name="ConditioningFacility"> 
         <ref name="capacity"/>
         <element name="fileformat">
-          <text/>
+          <data type="string"/>
         </element>
         <element name="datafile">
-          <text/>
+          <data type="string"/>
         </element>
         <oneOrMore>
           <element name="commodset">

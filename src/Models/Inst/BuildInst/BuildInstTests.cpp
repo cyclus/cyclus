@@ -10,16 +10,47 @@
 #include <string>
 #include <queue>
 
+
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeBuildInst : public BuildInst {
-  public:
-    FakeBuildInst() : BuildInst() {
-    }
+public:
+  FakeBuildInst() : BuildInst() {}
+  
+  virtual ~FakeBuildInst() {}
 
-    virtual ~FakeBuildInst() {
-    }
+  void wrapAddPrototype(Model* prototype){
+    addPrototype(prototype);
+  }
+
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class BuildInstTest : public ::testing::Test {
+protected:
+  FakeBuildInst* src_inst;
+  FakeBuildInst* new_inst; 
+  TestRegion* tst_region;
+  BuildInst* prototype;
+  
+  virtual void SetUp(){
+    src_inst = new FakeBuildInst();
+    tst_region = new TestRegion();
+    src_inst->setParent(tst_region);
+    new_inst = new FakeBuildInst();
+    prototype = new BuildInst();
+    prototype->setModelType("Inst");
+    prototype->setModelImpl("BuildInst");
+    prototype->setName("test_prototype");
+  };
+  
+  virtual void TearDown() {
+    delete src_inst;
+    delete new_inst;
+    delete tst_region;
+    delete prototype;
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,26 +62,6 @@ Model* BuildInstModelConstructor(){
 InstModel* BuildInstConstructor(){
   return dynamic_cast<InstModel*>(new FakeBuildInst());
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class BuildInstTest : public ::testing::Test {
-  protected:
-    FakeBuildInst* src_inst;
-    FakeBuildInst* new_inst; 
-
-    virtual void SetUp(){
-      src_inst = new FakeBuildInst();
-      src_inst->setParent(new TestRegion());
-      new_inst = new FakeBuildInst();
-      // for facilities that trade commodities, create appropriate markets here
-    };
-
-    virtual void TearDown() {
-      delete src_inst;
-      // for facilities that trade commodities, delete appropriate markets here
-    }
-};
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, InitialState) {
@@ -67,10 +78,9 @@ TEST_F(BuildInstTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, Print) {
-  EXPECT_NO_THROW(src_inst->print());
+  EXPECT_NO_THROW(std::string s = src_inst->str());
   // Test BuildInst specific aspects of the print method here
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BuildInstTest, ReceiveMessage) {
@@ -90,6 +100,13 @@ TEST_F(BuildInstTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_inst->handleTick(time));
   // Test BuildInst specific behaviors of the handleTock function here
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(BuildInstTest, BuildPrototype) {
+  EXPECT_NO_THROW( src_inst->wrapAddPrototype(prototype) );
+  EXPECT_EQ( src_inst->isAvailablePrototype(prototype), true );
+  EXPECT_NO_THROW( src_inst->build(prototype,tst_region) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

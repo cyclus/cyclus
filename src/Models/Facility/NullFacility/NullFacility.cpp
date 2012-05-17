@@ -2,6 +2,7 @@
 // Implements the NullFacility class
 
 #include <iostream>
+#include <sstream>
 
 #include "NullFacility.h"
 
@@ -64,16 +65,18 @@ void NullFacility::copyFreshModel(Model* src) {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::print() { 
-  FacilityModel::print(); 
-  LOG(LEV_DEBUG2, "NullFac") << "    converts commodity {"
-      << in_commod_
-      << "} into commodity {"
-      << out_commod_
-      << "}, and has an inventory that holds " 
-      << inventory_.capacity() << " materials"
-      << ", and has a stock that holds " 
-      << stocks_.capacity() << " materials";
+std::string NullFacility::str() { 
+  std::stringstream ss;
+  ss << FacilityModel::str()
+     << " converts commodity '"
+     << in_commod_
+     << "' into commodity '"
+     << out_commod_
+     << "', with inventory holding " 
+     << inventory_.capacity() << " materials"
+     << ", and stock holding " 
+     << stocks_.capacity() << " materials";
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -109,7 +112,7 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void NullFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   try {
     stocks_.pushAll(ResourceBuff::toMat(manifest));
   } catch(CycOverCapException err) {
@@ -166,6 +169,10 @@ void NullFacility::makeOffers() {
   }
   if (offer_amt >= inventory_.capacity()) {
     offer_amt = inventory_.capacity(); 
+  }
+
+  if (offer_amt < EPS_KG) {
+    return;
   }
 
   // there is no minimum amount a null facility may send

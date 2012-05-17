@@ -10,3 +10,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Market/GreedyMarket/GreedyMarket.rng
 ${CMAKE_CURRENT_BINARY_DIR}/GreedyMarket.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Market/GreedyMarket/GreedyMarket.rng'/>"
+  PARENT_SCOPE)
+SET(MKT_REFS ${MKT_REFS}
+  "<ref name='GreedyMarket'/>"
+  PARENT_SCOPE)

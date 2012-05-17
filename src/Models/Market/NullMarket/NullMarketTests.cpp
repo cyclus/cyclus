@@ -22,7 +22,6 @@ class FakeNullMarket : public NullMarket {
       string kg = "kg";
       string qual = "qual";
       gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
-      res->setOriginatorID(1);
       msg_ = msg_ptr(new Message(this));
       msg_->setResource(res);
     }
@@ -78,7 +77,7 @@ TEST_F(NullMarketTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullMarketTest, Print) {
-  EXPECT_NO_THROW(src_market->print());
+  EXPECT_NO_THROW(std::string s = src_market->str());
 }
 
 

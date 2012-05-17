@@ -14,80 +14,77 @@
 
 using namespace std;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-  /// Default constructor for RegionModel Class
-  RegionModel::RegionModel() {
-    setModelType("Region");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+RegionModel::RegionModel() { 
+  init();
+  setModelType("Region");
+}
 
-    // register to receive time-step notifications
-    TI->registerTickListener(this);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::init(xmlNodePtr cur) { 
+  Model::init(cur); // name_ and model_impl_
+  RegionModel::initAllowedFacilities(cur); // allowedFacilities_
+  RegionModel::initSimInteraction(this); // parent_ and tick listener, model 'born'
+  RegionModel::initChildren(cur); // children->setParent, requires init()
+}
 
-    // register the model
-    setIsTemplate(false);
-  };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::init(xmlNodePtr cur) {
- 
-  Model::init(cur);
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
-  /// all regions require allowed facilities - possibly many
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur,"allowedfacility");
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initAllowedFacilities(xmlNodePtr cur) {   
+  xmlNodeSetPtr fac_nodes = 
+    XMLinput->get_xpath_elements(cur,"allowedfacility");
   string fac_name;
   Model* new_fac;
-  
-  for (int i=0;i<nodes->nodeNr;i++){
-    fac_name = (const char*)nodes->nodeTab[i]->children->content;
+  for (int i=0;i<fac_nodes->nodeNr;i++){
+    fac_name = (const char*)fac_nodes->nodeTab[i]->children->content;
     new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
-
-  // region models do not currently follow the template/not template
-  // paradigm of insts and facs, so log this as its own parent
-  this->setParent(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initSimInteraction(RegionModel* reg) {
+  reg->setParent(reg);
+  TI->registerTickListener(reg);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::initChildren(xmlNodePtr cur) {   
+  string inst_name;
+  Model* inst;
+  xmlNodeSetPtr inst_nodes = XMLinput->get_xpath_elements(cur,"institution");
+  for (int i=0;i<inst_nodes->nodeNr;i++){
+    inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
+    inst = Model::getTemplateByName(inst_name);
+    inst->setParent(this);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::copy(RegionModel* src) {
   Model::copy(src);
   Communicator::copy(src);
-
-  /** 
-   *  Specific initialization for RegionModels
-   */
-
   allowedFacilities_ = src->allowedFacilities_;
-  
-  // don't copy institutions!
-
+  RegionModel::initSimInteraction(src);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::print() {
+std::string RegionModel::str() {
+  std::string s = Model::str();
 
-  Model::print();
-
-  LOG(LEV_DEBUG2, "none!") << "allows facilities " ;
-
+  s += "allows facs: ";
   for(set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
-    LOG(LEV_DEBUG2, "none!") << (fac == allowedFacilities_.begin() ? "{" : ", " )
-        << (*fac)->name();
+    s += (*fac)->name() + ", ";
   }
-  
-  LOG(LEV_DEBUG2, "none!") << "} and has the following institutions:";
-  
+
+  s += ". And has insts: ";
   for(vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
-    (*inst)->print();
+    s += (*inst)->name() + ", ";
   }
+  return s;
 }
 
 /* --------------------
@@ -111,23 +108,34 @@ void RegionModel::handlePreHistory(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTick(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->handleTick(time);
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<InstModel*>(m)->handleTick(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTock(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->handleTock(time);
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<InstModel*>(m)->handleTock(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
-  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

@@ -6,6 +6,7 @@
 
 #include "FacilityModel.h"
 
+#include "Timer.h"
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -24,24 +25,15 @@ void FixedInst::init(xmlNodePtr cur) {
     string fac_name = XMLinput->get_xpath_content(fac_node,"type");
   
     Model* facility = Model::getTemplateByName(fac_name);
-    
-    if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
-      throw CycException("Facility '" 
-                         + fac_name 
-                         + "' is not an allowed facility for region '" 
-                         + parent()->name() +"'.");
-    }
-
-    Model* new_facility = Model::create(facility);
-
-    new_facility->setName(XMLinput->get_xpath_content(fac_node,"name"));
-    new_facility->setParent(this);
+    facility->setName(XMLinput->get_xpath_content(fac_node,"name"));
+    facilities_.push(facility);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void FixedInst::copy(FixedInst* src) {
   InstModel::copy(src);
+  facilities_ = src->facilities();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -50,17 +42,44 @@ void FixedInst::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void FixedInst::print() {
-  InstModel::print();
-
-  LOG(LEV_DEBUG2, "none!") << " and the following permanent facilities: ";
-  for (vector<Model*>::iterator fac=children_.begin(); 
-       fac != children_.end(); 
-       fac++){
-    LOG(LEV_DEBUG2, "none!") << "        * " << (dynamic_cast<FacilityModel*>(*fac))->facName()
-     << " (" << (*fac)->name() << ")";
+std::string FixedInst::str() {
+  std::string s = InstModel::str();
+  if (children_.size() > 0) {
+    s += "has the permanent facilities: ";
+    for (vector<Model*>::iterator fac=children_.begin(); 
+         fac != children_.end(); 
+         fac++){
+      s += (dynamic_cast<FacilityModel*>(*fac))->facName()
+           + " (" + (*fac)->name() + "), ";
+    }
+  } else {
+    s += " has no built facilities (currently).";
   }
+  return s + ".";
 };
+
+void FixedInst::handleTick(int time){
+  // if time is t0, create those facilities
+  if ( time == TI->startTime() ) {
+    while (facilities_.size() > 0) {
+      Model* facility = facilities_.front();
+      // check that the facility is in the allowed facilities
+      if (!(dynamic_cast<RegionModel*>( parent() ))->isAllowedFacility(facility)){
+        throw CycException("Facility '" 
+                           + facility->name() 
+                           + "' is not an allowed facility for region '" 
+                           + parent()->name() +"'.");
+      }
+      // if its allowed, build it
+      Model* new_facility = Model::create(facility);
+      new_facility->setName(facility->name());
+      new_facility->setParent(this);
+      facilities_.pop();
+    }
+  }
+  // in any case, send children the handle ticks
+  InstModel::handleTick(time);
+}
 
 /* --------------------
  * all MODEL classes have these members

@@ -10,6 +10,7 @@ class TestMarket : public MarketModel {
     }
     TestMarket(std::string commod) {
       commodity_ = commod;
+      MarketModel::initSimInteraction(this);
     }
     virtual void receiveMessage(msg_ptr msg) {
     }
@@ -17,6 +18,7 @@ class TestMarket : public MarketModel {
     }
     virtual void copy(TestMarket* src){
       commodity_ = src->commodity_;
+      MarketModel::init();
     }
     void copyFreshModel(Model* src){
       copy(dynamic_cast<TestMarket*>(src));

@@ -82,7 +82,7 @@ TEST_F(NullFacilityTest, CopyFreshModel) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Print) {
-  EXPECT_NO_THROW(src_facility->print());
+  EXPECT_NO_THROW(std::string s = src_facility->str());
   // Test NullFacility specific aspects of the print method here
 }
 
@@ -103,7 +103,7 @@ TEST_F(NullFacilityTest, Tick) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(NullFacilityTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility->handleTick(time));
+  EXPECT_NO_THROW(src_facility->handleTock(time));
   // Test NullFacility specific behaviors of the handleTock function here
 }
 

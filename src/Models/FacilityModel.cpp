@@ -12,6 +12,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
+  init();
   setModelType("Facility");
 };
 
@@ -39,6 +40,11 @@ void FacilityModel::copy(FacilityModel* src) {
 
   // don't copy fac_name to new instance
   this->setFacName("");
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string FacilityModel::str() {
+  return Model::str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

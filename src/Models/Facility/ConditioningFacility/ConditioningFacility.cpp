@@ -12,13 +12,14 @@
 #include "Material.h"
 #include "GenericResource.h"
 #include "MarketModel.h"
+#include "Timer.h"
 
 using namespace std;
 
 /**
   ConditioningFacility matches waste streams with 
   waste form loading densities and waste form 
-  material definitions. 
+  material definitions provided in an sql, xml, or csv input file.
   
   It attaches these properties to the material objects 
   as Material Properties.
@@ -39,6 +40,11 @@ using namespace std;
  
   SEND MATERIAL
   Sends material from inventory to fulfill transactions
+
+  OUTPUT TABLE
+  The ConditioningFacility creates a ConditionedResources output database table.
+  It contains information about the conditioned resources, the times they were 
+  conditioned, at what loading densities, etc.
  
  */
 
@@ -46,6 +52,9 @@ using namespace std;
  * all MODEL classes have these members
  * --------------------
  */
+
+// Database table for conditioned materials
+table_ptr ConditioningFacility::cond_fac_table = new Table("ConditionedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConditioningFacility::ConditioningFacility() {
@@ -55,6 +64,7 @@ ConditioningFacility::ConditioningFacility() {
     allowed_formats_.insert(make_pair("csv", &ConditioningFacility::loadCSVFile)); 
     stocks_ = deque<pair<string, mat_rsrc_ptr> >();
     inventory_ = deque<pair<string, mat_rsrc_ptr> >();
+    file_is_open_ = false;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,7 +102,6 @@ void ConditioningFacility::init(xmlNodePtr cur)
     };
 
     loadTable(datafile, fileformat);
-    file_is_open_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -116,22 +125,19 @@ void ConditioningFacility::copyFreshModel(Model* src)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void ConditioningFacility::print() 
-{ 
-    FacilityModel::print();
-    string incommods, outcommods;
-    map<string, pair<int, string> >::const_iterator it;
-    for(it = commod_map_.begin(); it != commod_map_.end(); it++){
-      incommods += (*it).first;
-      incommods += ", ";
-      outcommods += (*it).second.second;
-      outcommods += ", ";
-    }
-    LOG(LEV_DEBUG2, "none!") << " conditions {" 
-      << incommods
-      <<"} into forms { "
-      << outcommods
-      << " }.";
+std::string ConditioningFacility::str() { 
+  string incommods, outcommods;
+  map<string, pair<int, string> >::const_iterator it;
+  for(it = commod_map_.begin(); it != commod_map_.end(); it++){
+    incommods += (*it).first;
+    incommods += ", ";
+    outcommods += (*it).second.second;
+    outcommods += ", ";
+  }
+  std::string s = FacilityModel::str();
+  s +=  " conditions {"  + incommods;
+  s += "} into forms { " + outcommods + " }.";
+  return s;
 };
 
 /* ------------------- */ 
@@ -144,7 +150,7 @@ void ConditioningFacility::print()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::receiveMessage(msg_ptr msg) {
-  LOG(LEV_DEBUG2, "none!") << "Warning, the ConditioningFacility ignores messages.";
+  LOG(LEV_DEBUG2, "CondFac") << "Warning, the ConditioningFacility ignores messages.";
 };
 
 /* ------------------- */ 
@@ -168,7 +174,7 @@ vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
     msg += "The order requested by ";
     msg += order->requester()->name();
     msg += " will not be sent.";
-    LOG(LEV_DEBUG2, "none!") << msg;
+    LOG(LEV_DEBUG2, "CondFac") << msg;
     gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
     toRet.push_back(empty);
   }
@@ -209,21 +215,21 @@ vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
     }
 
     toSend.push_back(newMat);
-    LOG(LEV_DEBUG2, "none!") <<"ConditioningFacility "<< ID()
+    LOG(LEV_DEBUG2, "CondFac") <<"ConditioningFacility "<< ID()
       <<"  is sending a mat with mass: "<< newMat->quantity();
   }    
   return toSend;
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void ConditioningFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
        thisMat != manifest.end();
        thisMat++) {
-    LOG(LEV_DEBUG2, "none!") <<"ConditiondingFacility " << ID() << " is receiving material with mass "
+    LOG(LEV_DEBUG2, "CondFac") <<"ConditiondingFacility " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
 
     mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
@@ -258,7 +264,7 @@ void ConditioningFacility::handleTock(int time){
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadTable(string datafile, string fileformat){
+void ConditioningFacility::loadTable(std::string datafile, std::string fileformat){
   // check that the format is supported
   // if not, throw an exception
   bool table_okay = verifyTable(datafile, fileformat);
@@ -277,7 +283,7 @@ void ConditioningFacility::loadTable(string datafile, string fileformat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool ConditioningFacility::verifyTable(string datafile, string fileformat){
+bool ConditioningFacility::verifyTable(std::string datafile, std::string fileformat){
   // start by assuming the table is bad
   bool okay = false;
   // if the fileformat is supported
@@ -293,7 +299,7 @@ bool ConditioningFacility::verifyTable(string datafile, string fileformat){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadXMLFile(string datafile){
+void ConditioningFacility::loadXMLFile(std::string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
@@ -302,7 +308,7 @@ void ConditioningFacility::loadXMLFile(string datafile){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadSQLFile(string datafile){
+void ConditioningFacility::loadSQLFile(std::string datafile){
   // get dimensions
   // // how many rows
   // // how many columns
@@ -311,7 +317,7 @@ void ConditioningFacility::loadSQLFile(string datafile){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::loadCSVFile(string datafile){
+void ConditioningFacility::loadCSVFile(std::string datafile){
   string file_path = Env::getCyclusPath() + "/" + datafile; 
 
   // create an ifstream for the file
@@ -327,26 +333,26 @@ void ConditioningFacility::loadCSVFile(string datafile){
       getline(file, buffer, ',');
       // copy the data to the typed member of the stream struct
       stream.streamID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2, "none!") <<  "streamID  = " <<  stream.streamID ;;
+      LOG(LEV_DEBUG2, "CondFac") <<  "streamID  = " <<  stream.streamID ;;
       getline(file, buffer, ',');
       stream.formID = strtol(buffer.c_str() , NULL, 10);
-      LOG(LEV_DEBUG2, "none!") <<  "formID  = " <<  stream.formID ;;
+      LOG(LEV_DEBUG2, "CondFac") <<  "formID  = " <<  stream.formID ;;
       getline(file, buffer, ',');
       stream.density = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2, "none!") <<  "density  = " <<  stream.density ;;
+      LOG(LEV_DEBUG2, "CondFac") <<  "density  = " <<  stream.density ;;
       getline(file, buffer, ',');
       stream.wfvol = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2, "none!") <<  "wfvol  = " <<  stream.wfvol ;;
+      LOG(LEV_DEBUG2, "CondFac") <<  "wfvol  = " <<  stream.wfvol ;;
       getline(file, buffer, '\n');
       stream.wfmass = strtod(buffer.c_str() , NULL);
-      LOG(LEV_DEBUG2, "none!") <<  "wfmass  = " <<  stream.wfmass ;;
+      LOG(LEV_DEBUG2, "CondFac") <<  "wfmass  = " <<  stream.wfmass ;;
       // put the full struct into the vector of structs
       stream_vec_.push_back(stream);
     }
     file.close();
   }
   else {
-    string err = "XML file, ";
+    string err = "CSV file, ";
     err += file_path;
     err += ", not found.";
     throw CycException(err);
@@ -394,7 +400,7 @@ void ConditioningFacility::makeRequests(){
       trans.resource = request_res;
 
       sendMessage(recipient, trans);
-      LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has requested "
+      LOG(LEV_DEBUG2, "CondFac") << " The ConditioningFacility has requested "
         << requestAmt 
         << " kg of "
         << in_commod 
@@ -447,7 +453,7 @@ void ConditioningFacility::makeOffers(){
       offers += " , ";
     }
   }
-  LOG(LEV_DEBUG2, "none!") << " The ConditioningFacility has offered "
+  LOG(LEV_DEBUG2, "CondFac") << " The ConditioningFacility has offered "
     << offers 
     << ".";
 }
@@ -494,6 +500,8 @@ double ConditioningFacility::checkStocks(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::conditionMaterials(){
+
+  LOG(LEV_INFO3, "CondFac ") << facName() << " is conditioning {";
   // Partition the in-stream according to loading density
   // for each stream object in stocks
   map<string, mat_rsrc_ptr> remainders;
@@ -512,10 +520,11 @@ void ConditioningFacility::conditionMaterials(){
   for(rem=remainders.begin(); rem!=remainders.end(); rem++){
       stocks_.push_back(*rem);
   }
+  LOG(LEV_INFO3, "CondFac ") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
+mat_rsrc_ptr ConditioningFacility::condition(std::string commod, mat_rsrc_ptr mat){
   stream_t stream = getStream(commod);
   double mass_to_condition = stream.wfmass;
   double mass_remaining = mat->quantity();
@@ -523,15 +532,18 @@ mat_rsrc_ptr ConditioningFacility::condition(string commod, mat_rsrc_ptr mat){
   while( mass_remaining > mass_to_condition && remaining_capacity_ > mass_to_condition) {
     out_commod = commod_map_.find(commod)->second.second;
     inventory_.push_back(make_pair(out_commod, mat->extract(mass_to_condition)));
-    // mat_to_condition->absorb(wf_iso_vec_[commod]); ^^
     remaining_capacity_ = remaining_capacity_ - mass_to_condition;
     mass_remaining = mat->quantity();
+    // log the fact that we just conditioned stuff
+    LOG(LEV_INFO3, "CondFac ") << "         " << commod << " has been conditioned into " << 
+      out_commod << " with mass : " << mass_to_condition;
+    addToTable(boost::dynamic_pointer_cast<Resource>(mat), commod, out_commod);
   }
   return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
+ConditioningFacility::stream_t ConditioningFacility::getStream(std::string commod){
   int stream_id =(commod_map_.find(commod))->second.first;
   vector<stream_t>::const_iterator it = stream_vec_.begin();
   bool found = false;
@@ -556,7 +568,7 @@ ConditioningFacility::stream_t ConditioningFacility::getStream(string commod){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ConditioningFacility::printStatus(int time){
   // For now, lets just print out what we have at each timestep.
-  LOG(LEV_DEBUG2, "none!") << "ConditioningFacility " << this->ID()
+  LOG(LEV_DEBUG2, "CondFac") << "ConditioningFacility " << this->ID()
                   << " is holding " << this->checkInventory()
                   << " units of material in inventory, and  "
                   << this->checkStocks() 
@@ -564,6 +576,59 @@ void ConditioningFacility::printStatus(int time){
                   << time
                   << ".";
 };
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::defineTable() {
+  // declare the table columns
+  vector<column> columns;
+  columns.push_back(make_pair("facID","INTEGER"));
+  columns.push_back(make_pair("ConditionedRsrcID","INTEGER"));
+  columns.push_back(make_pair("Time","INTEGER"));
+  columns.push_back(make_pair("streamID","INTEGER"));
+  columns.push_back(make_pair("formID","INTEGER"));
+  columns.push_back(make_pair("wfvol","FLOAT"));
+  columns.push_back(make_pair("wfmass","FLOAT"));
+  columns.push_back(make_pair("density","FLOAT"));
+  columns.push_back(make_pair("rawCommod","STRING"));
+  columns.push_back(make_pair("condCommod","STRING"));
+  columns.push_back(make_pair("totmass","FLOAT"));
+  // declare the table's primary key
+  primary_key pk;
+  pk.push_back("facID"), pk.push_back("ConditionedRsrcID");
+  cond_fac_table->defineTable(columns,pk);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ConditioningFacility::addToTable(rsrc_ptr rsrc, std::string incommod, std::string outcommod){
+  // if we haven't logged some conditioned material yet, define the table
+  if ( !cond_fac_table->defined() ) {
+    ConditioningFacility::defineTable();
+  }
+  // get stream 
+  stream_t stream = getStream(incommod);
+
+  // declare row
+  row aRow;
+  aRow.push_back(make_pair("facID", this->ID()));
+  aRow.push_back( make_pair("ConditionedRsrcID", rsrc->ID()));
+  aRow.push_back(make_pair("Time", TI->time()));
+  aRow.push_back( make_pair("streamID", stream.streamID));
+  aRow.push_back( make_pair("formID", stream.formID ));
+  aRow.push_back( make_pair("wfvol",stream.wfvol ));
+  aRow.push_back( make_pair("wfmass", stream.wfmass ));
+  aRow.push_back( make_pair("density", stream.density ));
+  aRow.push_back( make_pair("rawCommod", incommod));
+  aRow.push_back( make_pair("condCommod", outcommod));
+  if(rsrc->units()=="kg"){
+    aRow.push_back( make_pair("totmass", rsrc->quantity() + stream.wfmass));
+  } else {
+    aRow.push_back( make_pair("totmass", 0.0) );
+    LOG(LEV_ERROR,"CondFac")<< "Resource mass must be in units of kg for conditioning.";
+  }
+  // add the row
+  cond_fac_table->addRow(aRow);
+}
 
 /* --------------------
  * all MODEL classes have these members

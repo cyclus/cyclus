@@ -11,3 +11,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Inst/StubInst/StubInst.rng
 ${CMAKE_CURRENT_BINARY_DIR}/StubInst.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Inst/StubInst/StubInst.rng'/>"
+  PARENT_SCOPE)
+SET(INST_REFS ${INST_REFS}
+  "<ref name='StubInst'/>"
+  PARENT_SCOPE)

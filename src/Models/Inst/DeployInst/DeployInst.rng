@@ -13,13 +13,13 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="deploy">
     <element name="deploy">
       <element name="type">
-        <text/>
+        <data type="string"/>
       </element>   
       <element name="name">
-        <text/>
+        <data type="string"/>
       </element>   
       <element name="start">
-        <text/>
+        <data type="nonNegativeInteger"/>
       </element>
     </element>
   </define>

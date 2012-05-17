@@ -1,6 +1,7 @@
 // SinkFacility.cpp
 // Implements the SinkFacility class
 #include <iostream>
+#include <sstream>
 
 #include "SinkFacility.h"
 
@@ -22,6 +23,8 @@ SinkFacility::~SinkFacility(){ }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void SinkFacility::init(xmlNodePtr cur) {
   FacilityModel::init(cur);
+
+  LOG(LEV_DEBUG2, "SnkFac") << "A Sink Facility is being initialized";
 
   /// Sink facilities can have many input/output commodities
   /// move XML pointer to current model
@@ -61,13 +64,12 @@ void SinkFacility::copyFreshModel(Model* src) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::print() {
-  FacilityModel::print();
+std::string SinkFacility::str() {
+  std::stringstream ss;
+  ss << FacilityModel::str();
 
   string msg = "";
-
   msg += "accepts commodities ";
-
   for (vector<string>::iterator commod=in_commods_.begin();
        commod != in_commods_.end();
        commod++) {
@@ -75,7 +77,8 @@ void SinkFacility::print() {
     msg += (*commod);
   }
   msg += "} until its inventory is full at ";
-  LOG(LEV_DEBUG2, "SnkFac") << msg << inventory_.capacity() << " kg.";
+  ss << msg << inventory_.capacity() << " kg.";
+  return "" + ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -130,7 +133,7 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+void SinkFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
   inventory_.pushAll(ResourceBuff::toMat(manifest));
 }
 

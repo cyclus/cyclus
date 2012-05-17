@@ -18,27 +18,27 @@ using ::testing::Values;
 typedef FacilityModel* FacilityModelConstructor();
 
 class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
-  public:
-    virtual void SetUp() { 
-      facility_model_ = (*GetParam())();
-      test_inst_ = new TestInst();
-      facility_model_->setParent(test_inst_);
-      test_out_market_ = new TestMarket("out-commod");
-      test_in_market_ = new TestMarket("in-commod");
-    }
-    virtual void TearDown(){ 
-      delete facility_model_;
-      delete test_inst_;
-      delete test_out_market_;
-      delete test_in_market_;
-    }
-
-  protected:
-    FacilityModel* facility_model_;
-    TestMarket* test_out_market_;
-    TestMarket* test_in_market_;
-    TestInst* test_inst_;
-
+ public:
+  virtual void SetUp() { 
+    facility_model_ = (*GetParam())();
+    facility_model_->init();
+    test_inst_ = new TestInst();
+    facility_model_->setParent(test_inst_);
+    test_out_market_ = new TestMarket("out-commod");
+    test_in_market_ = new TestMarket("in-commod");
+  }
+  virtual void TearDown(){ 
+    delete facility_model_;
+    delete test_inst_;
+    delete test_out_market_;
+    delete test_in_market_;
+  }
+    
+ protected:
+  FacilityModel* facility_model_;
+  TestMarket* test_out_market_;
+  TestMarket* test_in_market_;
+  TestInst* test_inst_;
 };
 
 #else
