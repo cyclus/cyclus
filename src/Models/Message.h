@@ -196,8 +196,10 @@ class Message: IntrusiveBase<Message> {
   virtual ~Message();
 
   /**
-     Creates a new message by copying the current one and 
-     returns a reference to it. 
+     The copy returned will contain a clone of this message's transaction (this
+     is a deep copy).
+
+     @return a newly allocated copy of this message object
    */
   msg_ptr clone();
 
@@ -218,25 +220,19 @@ class Message: IntrusiveBase<Message> {
   virtual void sendOn();
 
  private:
-  /**
-     Checks required conditions prior to sending a message. 
-   */
+
   void validateForSend();
 
-  /**
-     mark a Model* as a participating sim agent (not a template) 
-   */
   void makeRealParticipant(Communicator* who);
   
  public:
+
   /**
-     designate the next object to receive this message 
-      
      Calls to this method are ignored (do nothing) when the message 
-     direction is down. 
+     direction is DOWN_MSG. 
       
-     @param next_stop the next communicator to receive this message 
-      
+     @param next_stop the communicator that will receive this message when
+     sendOn is next invoked
    */
   void setNextDest(Communicator* next_stop);
   
@@ -251,19 +247,25 @@ class Message: IntrusiveBase<Message> {
   void approveTransfer();
   
   /**
-     Renders the sendOn method disfunctional. 
+     Renders the sendOn method disfunctional, preventing it from being sent
+     anywhere.
       
-     Used to prevend messages from returning through/to deallocated 
+     Used to prevent messages from returning through/to deallocated Communicators
    */
   void kill();
 
   /**
-     returns true if this message has been killed - see Message::kill() 
+     Indicates whether this message is active and sendable.
+
+     @return true if this message has been killed, false otherwise - see
+     Message::kill() 
    */
   bool isDead();
   
   /**
-     Returns the direction this Message is traveling (UP_MSG or DOWN_MSG). 
+     setNextDest must be called before sendOn is invoked only if dir is UP_MSG.
+
+     @return the direction this Message is traveling (UP_MSG or DOWN_MSG). 
    */
   MessageDir dir() const;
   
@@ -275,7 +277,7 @@ class Message: IntrusiveBase<Message> {
   void setDir(MessageDir new_dir);
   
   /**
-     returns the corresponding offer/request message assuming this message has
+     @return the corresponding offer/request message assuming this message has
      been matched in a market. Returns the 'this' pointer otherwise. 
    */
   msg_ptr partner();
@@ -287,17 +289,23 @@ class Message: IntrusiveBase<Message> {
      Allows requesters to know which request message that they sent corresponds
      to the resources they receive.
 
+     @param partner the matched offer/request counterpart to this message.
+
      @TODO figure out how to make this work with markets
    */
   void setPartner(msg_ptr partner);
 
   /**
-     Returns the sender of this Message. 
+     Set via the Message constructor and cannot be changed.
+
+     @return the sender (original creator) of this Message. 
    */
   Communicator* sender() const;
   
   /**
-     Returns the receiver of this Message. 
+     Set via the Message constructor and cannot be changed.
+
+     @return the receiver of this Message, a destination set by the sender. 
 
      @exception CycNullMsgParamException receiver is uninitialized (NULL)
    */
@@ -316,7 +324,7 @@ class Message: IntrusiveBase<Message> {
   MarketModel* market();
   
   /**
-     Returns a pointer to the supplier in this Message. 
+     @return a pointer to the supplier in this Message. 
 
      @exception CycNullMsgParamException supplier is uninitialized (NULL)
    */
@@ -331,7 +339,7 @@ class Message: IntrusiveBase<Message> {
   void setSupplier(Model* supplier);
 
   /**
-     Returns a pointer to the requester in this Message. 
+     @return a pointer to the requester in this Message. 
 
      @exception CycNullMsgParamException requester is uninitialized (NULL)
    */
@@ -346,7 +354,10 @@ class Message: IntrusiveBase<Message> {
   void setRequester(Model* requester);
 
   /**
-     Returns the transaction associated with this message. 
+    Although passed by value, the trans.resource is a pointer, and modifying it
+    will change this message's transaction's resource also.
+
+     @returns the transaction associated with this message. 
    */
   Transaction trans() const;
 
