@@ -411,7 +411,7 @@ class Message: IntrusiveBase<Message> {
   MessageDir dir_;
   
   /**
-     The Transaction this message is concerned with 
+     The Transaction with which this message is concerned. 
    */
   Transaction trans_;
   
@@ -438,7 +438,7 @@ class Message: IntrusiveBase<Message> {
   Communicator* curr_owner_;
 
   /**
-     offer/request partner for this message (meaning only for matched 
+     offer/request partner for this message (only for matched pairs)
    */
   msg_ptr partner_;
   
