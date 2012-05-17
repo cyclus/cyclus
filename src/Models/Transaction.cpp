@@ -36,11 +36,13 @@ Transaction* Transaction::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* Transaction::market() const {
-  //try {
-    MarketModel* market = MarketModel::marketForCommod(commod_);
-  //} catch(CycMarketlessCommodException e) {
-    //throw e;
-  //}
+  // put here to make explicit that this method throws
+  MarketModel* market;
+  try {
+    market = MarketModel::marketForCommod(commod_);
+  } catch(CycMarketlessCommodException e) {
+    throw e;
+  }
   return market;
 } 
 
