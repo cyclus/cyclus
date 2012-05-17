@@ -12,10 +12,12 @@
 #include "Resource.h"
 #include "IntrusiveBase.h"
 #include "Table.h"
+#include "CycException.h"
 
 class Communicator;
 class Model;
 class Message;
+class MarketModel;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
@@ -24,6 +26,20 @@ typedef boost::intrusive_ptr<Message> msg_ptr;
    (up or down the class hierarchy) this message is moving. 
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
+
+class CycCircularMsgException: public CycException {
+  public: CycCircularMsgException() :
+      CycException("Message receiver and sender are the same.") { };
+};
+
+class CycNoMsgReceiverException: public CycException {
+  public: CycNoMsgReceiverException() : 
+      CycException("Can't send the message - must call setNextDest first") { };
+};
+
+class CycNullMsgParamException: public CycException {
+  public: CycNullMsgParamException(std::string msg) : CycException(msg) {};
+};
 
 /**
    A transaction structure to include in any message. 
@@ -129,13 +145,9 @@ struct Transaction {
     
    In order for a message to arrive at the destination as intended by 
    its originator, each communicator may check to see if it is the 
-   recipient. If not, it should continue forwarding the message in some 
-   defined way (usually up a hierarchy). Attempts to invoke sendOn() 
-   without first specifying a next stop will throw an exception (this 
-   helps prevent circular/recursive messaging). An exception is also 
-   thrown if a communicator attempts to send a message after the message 
-   has completed an entire 2-leg round trip 
-    
+   receiver. If not, it should continue forwarding the message in some 
+   defined way (usually up to its parent).
+   
    @section transaction Transaction 
    The transaction contains information about the material order to be 
    offered, requested, or filled. Sufficient information for specifying 
@@ -145,18 +157,252 @@ struct Transaction {
    - the price of the Commodity 
    - the specific resource to be traded 
     
-   Communicator classes which should utilize the MessageClass interface 
-   include RegionModel, InstModel, FacilityModel and MarketModel 
-   classes. These model classes pass messages during the simulation. 
-    
-   @section seeAlso See Also 
-    
-   The CommunicatorClass describes the class of models that pass 
-   messages during the simulation. The StubCommModel provides an example 
-   of a Message model implementation. 
+   Communicator classes that utilize the Message class to communicate with
+   each other during the simulation include RegionModel, InstModel,
+   FacilityModel and MarketModel classes.
  */
-
 class Message: IntrusiveBase<Message> {
+
+ private:
+  void constructBase(Communicator* sender);
+
+ public:
+  /**
+     Creates an empty upward message from some communicator. 
+      
+     @param sender the sender of this Message 
+   */
+  Message(Communicator* sender);
+
+  /**
+     Creates an upward message using the given 
+     sender, and receiver. 
+      
+     @param sender sender of this Message 
+     @param receiver receiver of this Message 
+   */
+  Message(Communicator* sender, Communicator* receiver);
+  
+  /**
+     Creates an upward message using the given sender, 
+     receiver, and transaction. 
+      
+     @param sender sender of this Message 
+     @param receiver receiver of this Message 
+     @param trans the message's transaction specifics 
+   */
+  Message(Communicator* sender, Communicator* receiver, Transaction trans);
+
+  virtual ~Message();
+
+  /**
+     The copy returned will contain a clone of this message's transaction (this
+     is a deep copy).
+
+     @return a newly allocated copy of this message object
+   */
+  msg_ptr clone();
+
+  /**
+     Send this message to the next communicator in it's path 
+      
+     Messages heading up (UP_MSG) are forwareded to the communicator 
+     designated by the setNextDest(Communicator*) function. Messages 
+     heading down (DOWN_MSG) are sent successively to each communicator 
+     in reverse order of their 'upward' sequence. 
+      
+     @exception CycNoMsgReceiverException no receiver is designated (must call
+     setNextDest first) 
+      
+     @exception CycCircularMsgException attempted to send a message to the 
+     message sender (circular messaging) 
+   */
+  virtual void sendOn();
+
+ private:
+
+  void validateForSend();
+
+  void makeRealParticipant(Communicator* who);
+  
+ public:
+
+  /**
+     Calls to this method are ignored (do nothing) when the message 
+     direction is DOWN_MSG. 
+      
+     @param next_stop the communicator that will receive this message when
+     sendOn is next invoked
+   */
+  void setNextDest(Communicator* next_stop);
+  
+  /**
+     Initiate the market-matched transaction - resource(s) are taken from the
+     supplier and sent to the requester.
+      
+     This should be the sole way of transferring resources between simulation
+     agents/models. Book keeping of transactions (and corresponding resource
+     states) are taken care of automatically.
+   */
+  void approveTransfer();
+  
+  /**
+     Renders the sendOn method disfunctional, preventing it from being sent
+     anywhere.
+      
+     Used to prevent messages from returning through/to deallocated Communicators
+   */
+  void kill();
+
+  /**
+     Indicates whether this message is active and sendable.
+
+     @return true if this message has been killed, false otherwise - see
+     Message::kill() 
+   */
+  bool isDead();
+  
+  /**
+     setNextDest must be called before sendOn is invoked only if dir is UP_MSG.
+
+     @return the direction this Message is traveling (UP_MSG or DOWN_MSG). 
+   */
+  MessageDir dir() const;
+  
+  /**
+     Sets the direction of the message 
+      
+     @param new_dir is the new direction 
+   */
+  void setDir(MessageDir new_dir);
+  
+  /**
+     @return the corresponding offer/request message assuming this message has
+     been matched in a market. Returns the 'this' pointer otherwise. 
+   */
+  msg_ptr partner();
+
+  /**
+     Used to match this message with a corresponding offer/request message
+     after matching takes place in a market. 
+
+     Allows requesters to know which request message that they sent corresponds
+     to the resources they receive.
+
+     @param partner the matched offer/request counterpart to this message.
+
+     @TODO figure out how to make this work with markets
+   */
+  void setPartner(msg_ptr partner);
+
+  /**
+     Set via the Message constructor and cannot be changed.
+
+     @return the sender (original creator) of this Message. 
+   */
+  Communicator* sender() const;
+  
+  /**
+     Set via the Message constructor and cannot be changed.
+
+     @return the receiver of this Message, a destination set by the sender. 
+
+     @exception CycNullMsgParamException receiver is uninitialized (NULL)
+   */
+  Communicator* receiver() const;
+
+///////////////////////////////////////////////////////////////////////////////
+////////////// transaction getters/setters ////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+  /**
+     Get the market corresponding to the transaction commodity 
+      
+     @return market corresponding to this msg's transaction's commodity 
+      
+   */
+  MarketModel* market();
+  
+  /**
+     @return a pointer to the supplier in this Message. 
+
+     @exception CycNullMsgParamException supplier is uninitialized (NULL)
+   */
+  Model* supplier() const;
+
+  /**
+     Sets the assigned supplier of the material for the 
+     transaction in this message. 
+      
+     @param supplier pointer to the new supplier 
+   */
+  void setSupplier(Model* supplier);
+
+  /**
+     @return a pointer to the requester in this Message. 
+
+     @exception CycNullMsgParamException requester is uninitialized (NULL)
+   */
+  Model* requester() const;
+
+  /**
+     Sets the assigned requester to receive the material 
+     for the transaction in this message. 
+      
+     @param requester pointer to the new requester 
+   */
+  void setRequester(Model* requester);
+
+  /**
+    Although passed by value, the trans.resource is a pointer, and modifying it
+    will change this message's transaction's resource also.
+
+     @returns the transaction associated with this message. 
+   */
+  Transaction trans() const;
+
+  /**
+     Returns the commodity requested or offered in this Message. 
+   */
+  std::string commod() const;
+
+  /**
+     Sets the commodity requested or offered in this Message. 
+      
+     @param new_commod the commodity associated with this 
+   */
+  void setCommod(std::string new_commod);
+
+  /**
+     True if the transaction is an offer, false if it is a request.
+   */
+  bool isOffer() const;
+
+  /**
+     Set the transaction type (true=offer, false=request)
+   */
+  void setIsOffer(bool offer);
+
+  /**
+     Returns the price (in dollars) being requested or offered in this message. 
+   */
+  double price() const;
+
+  /**
+     Set the price (in dollars) being requested or offered in this message. 
+   */
+  void setPrice(double new_price);
+
+  /**
+     Returns a pointer to the Resource being requested or offered in this message. 
+   */
+  rsrc_ptr resource() const;
+
+  /**
+     Sets the message transaction's resource to a copy of the passed resource.
+   */
+  void setResource(rsrc_ptr new_resource);
+
  private:
   /**
      The direction this message is traveling 
@@ -177,7 +423,7 @@ class Message: IntrusiveBase<Message> {
   /**
      The Communicator who will receive this Message. 
    */
-  Communicator* recipient_;
+  Communicator* receiver_;
 
   /**
      Pointers to each model this message passes through. 
@@ -189,7 +435,7 @@ class Message: IntrusiveBase<Message> {
       
      Used to prevent circular messaging. 
    */
-  Communicator* current_owner_;
+  Communicator* curr_owner_;
 
   /**
      offer/request partner for this message (meaning only for matched 
@@ -197,263 +443,19 @@ class Message: IntrusiveBase<Message> {
   msg_ptr partner_;
   
   /**
-     Checks required conditions prior to sending a message. 
-   */
-  void validateForSend();
-
-  /**
-     mark a Model* as a participating sim agent (not a template) 
-   */
-  void setRealParticipant(Communicator* who);
-  
-  /**
      stores the next available transaction ID 
    */
-  static int nextTransID_;
+  static int next_trans_id_;
 
   /**
      a boolean to determine if the message has completed its route 
    */
   bool dead_;
 
- public:
-  /**
-     Creates an empty upward message from some communicator. 
-      
-     @param sender the sender of this Message 
-   */
-  Message(Communicator* sender);
+///////////////////////////////////////////////////////////////////////////////
+////////////// Output db recording code ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-  /**
-     Creates an upward message using the given 
-     sender, and recipient. 
-      
-     @param sender sender of this Message 
-     @param receiver recipient of this Message 
-   */
-  Message(Communicator* sender, Communicator* receiver);
-  
-  /**
-     Creates an upward message using the given sender, 
-     recipient, and transaction. 
-      
-     @param sender sender of this Message 
-     @param receiver recipient of this Message 
-     @param trans the message's transaction specifics 
-   */
-  Message(Communicator* sender, Communicator* receiver, Transaction trans);
-
-  virtual ~Message();
-
-  /**
-     Creates a new message by copying the current one and 
-     returns a reference to it. 
-   */
-  msg_ptr clone();
-
-  /**
-     Send this message to the next communicator in it's path 
-      
-     Messages heading up (UP_MSG) are forwareded to the communicator 
-     designated by the setNextDest(Communicator*) function. Messages 
-     heading down (DOWN_MSG) are sent successively to each communicator 
-     in reverse order of their 'upward' sequence. 
-      
-     @exception CycMessageException attempted to send message with 
-     with no designated receiver (next dest is undefined) 
-      
-     @exception CycMessageException attempted to send a message to the 
-     message sender (circular messaging) 
-   */
-  virtual void sendOn();
-
-  /**
-     Renders the sendOn method disfunctional. 
-      
-     Used to prevend messages from returning through/to deallocated 
-   */
-  void kill();
-
-  /**
-     returns true if this message has been killed - see Message::kill() 
-   */
-  bool isDead();
-  
-  /**
-     designate the next object to receive this message 
-      
-     Calls to this method are ignored (do nothing) when the message 
-     direction is down. 
-      
-     @param next_stop the next communicator to receive this message 
-      
-   */
-  void setNextDest(Communicator* next_stop);
-  
-  /**
-     Reverses the direction this Message is being sent (so, for 
-     instance, the Manager can forward a message back down the hierarchy 
-     to an appropriate handler. 
-   */
-  void reverseDirection();
-  
-  /**
-     Returns the direction this Message is traveling. 
-   */
-  MessageDir dir() const;
-  
-  /**
-     Sets the direction of the message 
-      
-     @param newDir is the new direction 
-   */
-  void setDir(MessageDir newDir);
-  
-  /**
-     Get the market corresponding to the transaction commodity 
-      
-     @return market corresponding to this msg's transaction's commodity 
-      
-   */
-  Communicator* market();
-  
-  /**
-     Prints the transaction data. 
-   */
-  void printTrans();
-  
-  /**
-     Returns the sender of this Message. 
-      
-     @return the sender 
-   */
-  Communicator* sender() const {return sender_;};
-  
-  /**
-     Returns the recipient of this Message. 
-      
-     @return the recipient 
-   */
-  Communicator* recipient() const;
-
-  /**
-     Returns the supplier in this Message. 
-      
-     @return pointer to the supplier 
-   */
-  Model* supplier() const;
-
-  /**
-     Sets the assigned supplier of the material for the 
-     transaction in this message. 
-      
-     @param supplier pointer to the new supplier 
-   */
-  void setSupplier(Model* supplier) {trans_.supplier = supplier;};
-
-  /**
-     Returns the requester in this Message. 
-      
-     @return pointer to the requester 
-   */
-  Model* requester() const;
-
-  /**
-     Sets the assigned requester to receive the material 
-     for the transaction in this message. 
-      
-     @param requester pointer to the new requester 
-   */
-  void setRequester(Model* requester){trans_.requester = requester;};
-
-  /**
-     Returns the transaction associated with this message. 
-      
-     @return the Transaction 
-   */
-  Transaction trans() const {return trans_;};
-
-  /**
-     Returns the commodity requested or offered in this Message. 
-      
-     @return commodity for this transaction 
-   */
-  std::string commod() const {return trans_.commod;};
-
-  /**
-     Sets the commodity requested or offered in this Message. 
-      
-     @param new_commod the commodity associated with this 
-   */
-  void setCommod(std::string new_commod) {trans_.commod = new_commod;};
-
-  /**
-     True if the transaction is an offer, false if it's a request 
-      
-     @return true if the transaction is an offer, false if it's a 
-   */
-  double isOffer() const {return trans_.is_offer;};
-
-  /**
-     True if the transaction is an offer, false if it's a request 
-      
-     @return true if the transaction is an offer, false if it's a 
-   */
-  void setIsOffer(bool is_offer) {trans_.is_offer = is_offer;};
-
-  /**
-     Returns the price being requested or offered in this message. 
-      
-     @return the price (in dollars) 
-   */
-  double price() const {return trans_.price;};
-
-  /**
-     Returns the price being requested or offered in this message. 
-      
-     @param new_price the new price (in dollars) 
-   */
-  void setPrice(double new_price) {trans_.price = new_price;};
-
-  /**
-     Returns the Resource being requested or offered in this message. 
-      
-     @return the Resource  (i.e. Material object) 
-   */
-  rsrc_ptr resource() const {return trans_.resource;};
-
-  /**
-     Sets the assigned resource to a new resource 
-      
-     @param new_resource is the new Resource in the transaction 
-   */
-  void setResource(rsrc_ptr new_resource) {if (new_resource.get()) {trans_.resource = new_resource->clone();}};
-
-  /**
-     Used to match this message with a corresponding offer/request 
-     message after matching takes place in a market. 
-   */
-  void setPartner(msg_ptr partner) {partner_ = partner;};
-
-  /**
-     returns the corresponding offer/request message 
-     assuming this message has been matched 
-     in a market. Returns the 'this' pointer otherwise. 
-   */
-  msg_ptr partner() {return partner_;};
-
-  /**
-     Initiate the transaction - sending/receiving of resource(s) between 
-     the supplier/requester 
-      
-     This should be the sole way of transferring resources between 
-     simulation agents/models. Book keeping of transactions (and 
-     corresponding resource states) are taken care of automatically 
-   */
-  void approveTransfer();
-  
-
-// -------- output database related members  -------- 
  public:
   /**
      the transaction output database Table 
@@ -499,7 +501,6 @@ class Message: IntrusiveBase<Message> {
      the resource primary key 
    */
   primary_key_ref pkref_rsrc_;
-// -------- output database related members  --------   
 };
 
 #endif
