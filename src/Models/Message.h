@@ -67,17 +67,17 @@ struct Transaction {
   double price;
 
   /**
-     A specific resource this transaction is concerned with 
+     A specific resource with which this transaction is concerned.
    */
   rsrc_ptr resource;
 
   /**
-     supplier in this transaction. 
+     The supplier in this transaction. 
    */
   Model* supplier;
 
   /**
-     requester in this transaction. 
+     The requester in this transaction. 
    */
   Model* requester;
 };
@@ -369,7 +369,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Sets the commodity requested or offered in this Message. 
       
-     @param new_commod the commodity associated with this 
+     @param new_commod the commodity associated with this Message
    */
   void setCommod(std::string new_commod);
 
@@ -411,7 +411,7 @@ class Message: IntrusiveBase<Message> {
   MessageDir dir_;
   
   /**
-     The Transaction this message is concerned with 
+     The Transaction with which this message is concerned. 
    */
   Transaction trans_;
   
@@ -438,7 +438,7 @@ class Message: IntrusiveBase<Message> {
   Communicator* curr_owner_;
 
   /**
-     offer/request partner for this message (meaning only for matched 
+     offer/request partner for this message (only for matched pairs)
    */
   msg_ptr partner_;
   
