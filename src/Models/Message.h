@@ -114,17 +114,17 @@ struct Transaction {
    message. An example of the message passing is outlined below:  
    - Up/outgoing message: 
    -# Inside originator 
-   -# msg->setNextDest(nextStop) 
+   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for nextStop 
+   -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop A 
-   -# msg->setNextDest(nextStop) 
+   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for nextStop 
+   -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop B 
-   -# msg->setNextDest(nextStop) 
+   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for nextStop 
+   -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop C 
    -# flip message direction 
    - Down/incoming message: 
@@ -235,10 +235,10 @@ class Message: IntrusiveBase<Message> {
      Calls to this method are ignored (do nothing) when the message 
      direction is down. 
       
-     @param nextStop the next communicator to receive this message 
+     @param next_stop the next communicator to receive this message 
       
    */
-  void setNextDest(Communicator* nextStop);
+  void setNextDest(Communicator* next_stop);
   
   /**
      Initiate the market-matched transaction - resource(s) are taken from the
@@ -270,9 +270,9 @@ class Message: IntrusiveBase<Message> {
   /**
      Sets the direction of the message 
       
-     @param newDir is the new direction 
+     @param new_dir is the new direction 
    */
-  void setDir(MessageDir newDir);
+  void setDir(MessageDir new_dir);
   
   /**
      returns the corresponding offer/request message assuming this message has
@@ -360,7 +360,7 @@ class Message: IntrusiveBase<Message> {
       
      @param new_commod the commodity associated with this 
    */
-  void setCommod(std::string newCommod);
+  void setCommod(std::string new_commod);
 
   /**
      True if the transaction is an offer, false if it is a request.
@@ -380,7 +380,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Set the price (in dollars) being requested or offered in this message. 
    */
-  void setPrice(double newPrice);
+  void setPrice(double new_price);
 
   /**
      Returns a pointer to the Resource being requested or offered in this message. 
@@ -390,7 +390,7 @@ class Message: IntrusiveBase<Message> {
   /**
      Sets the message transaction's resource to a copy of the passed resource.
    */
-  void setResource(rsrc_ptr newResource);
+  void setResource(rsrc_ptr new_resource);
 
  private:
   /**
@@ -417,14 +417,14 @@ class Message: IntrusiveBase<Message> {
   /**
      Pointers to each model this message passes through. 
    */
-  std::vector<Communicator*> pathStack_;
+  std::vector<Communicator*> path_stack_;
   
   /**
      the most recent communicator to receive this message. 
       
      Used to prevent circular messaging. 
    */
-  Communicator* currentOwner_;
+  Communicator* curr_owner_;
 
   /**
      offer/request partner for this message (meaning only for matched 
@@ -434,7 +434,7 @@ class Message: IntrusiveBase<Message> {
   /**
      stores the next available transaction ID 
    */
-  static int nextTransID_;
+  static int next_trans_id_;
 
   /**
      a boolean to determine if the message has completed its route 

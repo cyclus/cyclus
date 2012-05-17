@@ -16,7 +16,7 @@
 using namespace std;
 
 // initialize static variables
-int Message::nextTransID_ = 1;
+int Message::next_trans_id_ = 1;
 // Database table for transactions
 table_ptr Message::trans_table = new Table("Transactions"); 
 table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
@@ -24,7 +24,7 @@ table_ptr Message::trans_resource_table = new Table("TransactedResources");
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::constructBase(Communicator* sender) {
   sender_ = sender;
-  currentOwner_ = sender;
+  curr_owner_ = sender;
   receiver_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
@@ -90,45 +90,45 @@ void Message::sendOn() {
   msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
-    pathStack_.back()->untrackMessage(me);
-    pathStack_.pop_back();
+    path_stack_.back()->untrackMessage(me);
+    path_stack_.pop_back();
   } else {
-    pathStack_.back()->trackMessage(me);
+    path_stack_.back()->trackMessage(me);
   }
 
-  Communicator* nextStop = pathStack_.back();
-  makeRealParticipant(nextStop);
-  currentOwner_ = nextStop;
+  Communicator* next_stop = path_stack_.back();
+  makeRealParticipant(next_stop);
+  curr_owner_ = next_stop;
 
   CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
-                   << nextStop << " {";
+                   << next_stop << " {";
 
-  nextStop->receiveMessage(me);
+  next_stop->receiveMessage(me);
 
   CLOG(LEV_DEBUG1) << "} Message " << this << " send to comm "
-                   << nextStop << " completed";
+                   << next_stop << " completed";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::validateForSend() {
-  int nextStop_index = -1;
-  bool receiver_specified = false;
-  Communicator* nextStop;
+  int next_stop_i = -1;
+  bool has_receiver = false;
+  Communicator* next_stop;
 
   if (dir_ == UP_MSG) {
-    receiver_specified = (pathStack_.size() > 0);
-    nextStop_index = pathStack_.size() - 1;
+    has_receiver = (path_stack_.size() > 0);
+    next_stop_i = path_stack_.size() - 1;
   } else if (dir_ == DOWN_MSG) {
-    receiver_specified = (pathStack_.size() > 1);
-    nextStop_index = pathStack_.size() - 2;
+    has_receiver = (path_stack_.size() > 1);
+    next_stop_i = path_stack_.size() - 2;
   }
 
-  if (!receiver_specified) {
+  if (!has_receiver) {
     throw CycNoMsgReceiverException();
   }
 
-  nextStop = pathStack_[nextStop_index];
-  if (nextStop == currentOwner_) {
+  next_stop = path_stack_[next_stop_i];
+  if (next_stop == curr_owner_) {
     throw CycCircularMsgException();
   }
 }
@@ -141,14 +141,14 @@ void Message::makeRealParticipant(Communicator* who) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setNextDest(Communicator* nextStop) {
+void Message::setNextDest(Communicator* next_stop) {
   if (dir_ == UP_MSG) {
     CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
-                     << nextStop;
-    if (pathStack_.size() == 0) {
-      pathStack_.push_back(sender_);
+                     << next_stop;
+    if (path_stack_.size() == 0) {
+      path_stack_.push_back(sender_);
     }
-    pathStack_.push_back(nextStop);
+    path_stack_.push_back(next_stop);
     return;
   }
   CLOG(LEV_DEBUG4) << "Message " << this
@@ -176,7 +176,7 @@ void Message::approveTransfer() {
     return;
   }
 
-  int id = nextTransID_++;
+  int id = next_trans_id_++;
   
   // register that this transaction occured
   this->Message::addTransToTable(id);
@@ -212,11 +212,11 @@ MessageDir Message::dir() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setDir(MessageDir newDir) {
+void Message::setDir(MessageDir new_dir) {
   CLOG(LEV_DEBUG4) << "Message " << this << " direction manually set to "
-                   << newDir << ".";
+                   << new_dir << ".";
 
-  dir_ = newDir;
+  dir_ = new_dir;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -290,8 +290,8 @@ std::string Message::commod() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setCommod(std::string newCommod) {
-  trans_.commod = newCommod;
+void Message::setCommod(std::string new_commod) {
+  trans_.commod = new_commod;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -310,8 +310,8 @@ double Message::price() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPrice(double newPrice) {
-  trans_.price = newPrice;
+void Message::setPrice(double new_price) {
+  trans_.price = new_price;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -320,9 +320,9 @@ rsrc_ptr Message::resource() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setResource(rsrc_ptr newResource) {
-  if (newResource.get()) {
-    trans_.resource = newResource->clone();
+void Message::setResource(rsrc_ptr new_resource) {
+  if (new_resource.get()) {
+    trans_.resource = new_resource->clone();
   }
 }
 
