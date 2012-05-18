@@ -100,7 +100,7 @@ std::string StorageFacility::str() {
 void StorageFacility::receiveMessage(msg_ptr msg)
 {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -203,11 +203,11 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
 
     // make new material
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(recipe->getMassComp(), 
-                                    recipe->getUnits(), 
-                                    recipe->getName(),
-                                    amount, 
-                                    MASSBASED);
-    
+                                                    recipe->getUnits(), 
+                                                    recipe->getName(),
+                                                    amount, 
+                                                    MASSBASED));
+
     // decay the material for the alloted time
     newMat->decay(age);
 

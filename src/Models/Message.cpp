@@ -1,118 +1,74 @@
 // Message.cpp
 // Implements the Message class.
 
-#include <iostream>
-
 #include "Message.h"
 
-#include "CycException.h"
 #include "Communicator.h"
-#include "FacilityModel.h"
+#include "Model.h"
 #include "MarketModel.h"
-#include "InstModel.h"
-#include "GenericResource.h"
+
+#include "Resource.h"
 #include "Logger.h"
 #include "Timer.h"
 
 using namespace std;
 
 // initialize static variables
-int Message::nextTransID_ = 1;
+int Message::next_trans_id_ = 1;
 // Database table for transactions
 table_ptr Message::trans_table = new Table("Transactions"); 
 table_ptr Message::trans_resource_table = new Table("TransactedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Message(Communicator* sender) {
-  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+void Message::constructBase(Communicator* sender) {
+  sender_ = sender;
+  curr_owner_ = sender;
+  receiver_ = NULL;
+  trans_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
-  sender_ = sender;
-  recipient_ = NULL;
-  current_owner_ = NULL;
-  path_stack_ = vector<Communicator*>();
-  current_owner_ = sender;
+
   sender->trackMessage(msg_ptr(this));
+  makeRealParticipant(sender);
 
-  trans_.supplier = NULL;
-  trans_.requester = NULL;
-  trans_.is_offer = NULL;
-  trans_.resource = NULL;
-  trans_.minfrac = 0;
-  trans_.price = 0;
+  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
+}
 
-  setRealParticipant(sender);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Message::Message(Communicator* sender) {
+  constructBase(sender);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
-  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
-  dead_ = false;
-  dir_ = UP_MSG;
-  sender_ = sender;
-  recipient_ = receiver;
-  current_owner_ = NULL;
-  sender->trackMessage(msg_ptr(this));
-
-  trans_.supplier = NULL;
-  trans_.requester = NULL;
-  trans_.is_offer = NULL;
-  trans_.resource = NULL;
-  trans_.minfrac = 0;
-  trans_.price = 0;
-
-  setRealParticipant(sender);
+  constructBase(sender);
+  receiver_ = receiver;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
-                 Transaction thisTrans) {
-  MLOG(LEV_DEBUG4) << "Message " << this << " created.";
-  dead_ = false;
-  dir_ = UP_MSG;
-  trans_ = thisTrans;
-  sender_ = sender;
-  recipient_ = receiver;
-  current_owner_ = NULL;
-  setResource(thisTrans.resource);
-  sender->trackMessage(msg_ptr(this));
-
-  if (trans_.is_offer) {
-    // if this message is an offer, the sender is the supplier
-    setSupplier(dynamic_cast<Model*>(sender_));
-  } else if (!trans_.is_offer) {
-    // if this message is a request, the sender is the requester
-    setRequester(dynamic_cast<Model*>(sender_));
-  }
-
-  setRealParticipant(sender);
+                 Transaction& trans) {
+  constructBase(sender);
+  receiver_ = receiver;
+  trans_ = new Transaction(trans);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::~Message() {
+  if (trans_ != NULL) {
+    delete trans_;
+  }
   MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRealParticipant(Communicator* who) {
-  Model* model = NULL;
-  model = dynamic_cast<Model*>(who);
-  if (model != NULL) {model->setIsTemplate(false);}
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::printTrans() {
-  CLOG(LEV_INFO4) << "Transaction info {"
-                  << ", Requester ID=" << trans_.requester->ID()
-                  << ", Supplier ID=" << trans_.supplier->ID()
-                  << ", Price="  << trans_.price << " }";
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 msg_ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   msg_ptr new_msg(new Message(*this));
-  new_msg->setResource(resource());
+  try {
+    new_msg->trans_ = trans_->clone();
+  } catch(CycNullMsgParamException) { }
   return new_msg;
 }
 
@@ -131,8 +87,8 @@ void Message::sendOn() {
   }
 
   Communicator* next_stop = path_stack_.back();
-  setRealParticipant(next_stop);
-  current_owner_ = next_stop;
+  makeRealParticipant(next_stop);
+  curr_owner_ = next_stop;
 
   CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
                    << next_stop << " {";
@@ -144,40 +100,34 @@ void Message::sendOn() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::kill() {
-  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
-  dead_ = true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Message::isDead() {
-  return dead_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::validateForSend() {
-  int next_stop_index = -1;
-  bool receiver_specified = false;
+  int next_stop_i = -1;
+  bool has_receiver = false;
   Communicator* next_stop;
 
   if (dir_ == UP_MSG) {
-    receiver_specified = (path_stack_.size() > 0);
-    next_stop_index = path_stack_.size() - 1;
+    has_receiver = (path_stack_.size() > 0);
+    next_stop_i = path_stack_.size() - 1;
   } else if (dir_ == DOWN_MSG) {
-    receiver_specified = (path_stack_.size() > 1);
-    next_stop_index = path_stack_.size() - 2;
+    has_receiver = (path_stack_.size() > 1);
+    next_stop_i = path_stack_.size() - 2;
   }
 
-  if (!receiver_specified) {
-    string err_msg = "Can't send the message: next dest is unspecified.";
-    throw CycMessageException(err_msg);
+  if (!has_receiver) {
+    throw CycNoMsgReceiverException();
   }
 
-  next_stop = path_stack_[next_stop_index];
-  if (next_stop == current_owner_) {
-    string err_msg = "Message receiver and sender are the same.";
-    throw CycMessageException(err_msg);
+  next_stop = path_stack_[next_stop_i];
+  if (next_stop == curr_owner_) {
+    throw CycCircularMsgException();
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::makeRealParticipant(Communicator* who) {
+  Model* model = NULL;
+  model = dynamic_cast<Model*>(who);
+  if (model != NULL) {model->setIsTemplate(false);}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -196,65 +146,6 @@ void Message::setNextDest(Communicator* next_stop) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::reverseDirection() {
-  if (DOWN_MSG == dir_) {
-    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'down' to 'up'.";
-    dir_ = UP_MSG; 
-  } else {
-    CLOG(LEV_DEBUG4) << "Message " << this << "direction flipped from 'up' to 'down'.";
-  	dir_ = DOWN_MSG;
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MessageDir Message::dir() const {
-  return dir_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setDir(MessageDir newDir) {
-  CLOG(LEV_DEBUG4) << "Message " << this << " direction manually set to "
-                   << newDir << ".";
-
-  dir_ = newDir;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::market() {
-  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
-  return market;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Communicator* Message::recipient() const {
-  if (recipient_ == NULL) {
-    string err_msg = "Uninitilized message recipient.";
-    throw CycMessageException(err_msg);
-  }
-
-  return recipient_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::supplier() const {
-  if (trans_.supplier == NULL) {
-    string err_msg = "Uninitilized message supplier.";
-    throw CycMessageException(err_msg);
-  }
-
-  return trans_.supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::requester() const {
-  if (trans_.requester == NULL) {
-    string err_msg = "Uninitilized message requester.";
-    throw CycMessageException(err_msg);
-  }
-
-  return trans_.requester;
-}
-
 void Message::approveTransfer() {
   if (dead_) {
     return;
@@ -263,8 +154,8 @@ void Message::approveTransfer() {
   msg_ptr me = msg_ptr(this);
 
   vector<rsrc_ptr> manifest;
-  Model* req = requester();
-  Model* sup = supplier();
+  Model* req = trans_->requester();
+  Model* sup = trans_->supplier();
 
   try {
     manifest = sup->removeResource(me);
@@ -275,7 +166,7 @@ void Message::approveTransfer() {
     return;
   }
 
-  int id = nextTransID_++;
+  int id = next_trans_id_++;
   
   // register that this transaction occured
   this->Message::addTransToTable(id);
@@ -293,6 +184,67 @@ void Message::approveTransfer() {
   CLOG(LEV_INFO3) << "Material sent from " << sup->ID() << " to " 
                   << req->ID() << ".";
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::kill() {
+  MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
+  dead_ = true;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Message::isDead() {
+  return dead_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+MessageDir Message::dir() const {
+  return dir_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setDir(MessageDir new_dir) {
+  CLOG(LEV_DEBUG4) << "Message " << this << " direction manually set to "
+                   << new_dir << ".";
+
+  dir_ = new_dir;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+msg_ptr Message::partner() {
+  return partner_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setPartner(msg_ptr partner) {
+  partner_ = partner;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::sender() const {
+  return sender_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Communicator* Message::receiver() const {
+  if (receiver_ == NULL) {
+    string err_msg = "Uninitilized message receiver.";
+    throw CycNullMsgParamException(err_msg);
+  }
+  return receiver_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Transaction& Message::trans() const {
+  if (trans_ == NULL) {
+    throw CycNullMsgParamException("Uninitialized transaction parameter.");
+  }
+  return *trans_;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+////////////// Output db recording code ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 
 void Message::define_trans_table(){
   // declare the table columns
@@ -338,9 +290,9 @@ void Message::addTransToTable(int transID) {
   
   // make a row
   // declare data
-  data an_id(transID), a_sender( trans_.supplier->ID() ), 
-    a_receiver( trans_.requester->ID() ), a_time( TI->time() ), 
-    a_price( trans_.price );
+  data an_id(transID), a_sender( trans_->supplier()->ID() ), 
+    a_receiver( trans_->requester()->ID() ), a_time( TI->time() ), 
+    a_price( trans_->price() );
   // declare entries
   entry id("ID",an_id), sender("SenderID",a_sender), 
     receiver("ReceiverID",a_receiver), time("Time",a_time), 

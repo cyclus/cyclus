@@ -5,12 +5,12 @@
 #include "FacilityModel.h"
 //#include "StorageFacility.h"
 
+#include "Transaction.h"
 #include "Material.h"
 #include "MatBuff.h"
 
 #include "Logger.h"
 
-#include <iostream>
 #include <queue>
 
 // Useful typedefs
@@ -416,17 +416,17 @@ class BatchReactor : public FacilityModel  {
   /**
      sends a request of offer to the commodity's market
    */
-  void interactWithMarket(std::string commod, double amt, bool offer);
+  void interactWithMarket(std::string commod, double amt, TransType type);
 
   /**
      make reqest for a specific amount of fuel
    */
-  void makeRequest(double amt) {interactWithMarket(inCommod(),amt,false);}
+  void makeRequest(double amt) {interactWithMarket(inCommod(),amt,REQUEST);}
 
   /**
      offer all off-loaded fuel
    */
-  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),true);}
+  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),OFFER);}
 
   /**
      Processes all orders in ordersWaiting_

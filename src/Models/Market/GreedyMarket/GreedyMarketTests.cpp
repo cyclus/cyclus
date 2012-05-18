@@ -26,8 +26,9 @@ class FakeGreedyMarket : public GreedyMarket {
       string kg = "kg";
       string qual = "qual";
       gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(kg, qual, 1));
-      msg_ = msg_ptr(new Message(this));
-      msg_->setResource(res);
+      Transaction trans(this, OFFER);
+      msg_ = msg_ptr(new Message(this, this, trans));
+      msg_->trans().setResource(res);
     }
 
     virtual ~FakeGreedyMarket() {
@@ -67,9 +68,9 @@ public:
   }
 
   std::vector<rsrc_ptr> removeResource(msg_ptr msg) {
-    sent.push_back(msg->resource());
+    sent.push_back(msg->trans().resource());
     std::vector<rsrc_ptr> manifest;
-    manifest.push_back(msg->resource());
+    manifest.push_back(msg->trans().resource());
     return manifest;
   }
 };
@@ -81,7 +82,6 @@ class GreedyMarketTest : public ::testing::Test {
     FakeGreedyMarket* new_market; 
 
     IsoVector recipe;
-    Transaction trans;
     msg_ptr offer, request;
     FakeFacility* supplier;
     FakeFacility* requester;
@@ -92,10 +92,6 @@ class GreedyMarketTest : public ::testing::Test {
       (*comp)[92238] = 90;
       recipe = IsoVector(comp);
 
-      trans.commod = "none";
-      trans.minfrac = 0.1;
-      trans.price = 3;
-
       src_market = new FakeGreedyMarket();
       new_market = new FakeGreedyMarket();
 
@@ -104,12 +100,20 @@ class GreedyMarketTest : public ::testing::Test {
       supplier = new FakeFacility();
       requester = new FakeFacility();
 
-      trans.is_offer = false;
-      request = msg_ptr(new Message(requester, recipient, trans)); 
+      Transaction req(requester, REQUEST);
+      req.setCommod("none");
+      req.minfrac = 0.1;
+      req.setPrice(3);
+
+      Transaction off(supplier, OFFER);
+      off.setCommod("none");
+      off.minfrac = 0.1;
+      off.setPrice(3);
+
+      request = msg_ptr(new Message(requester, recipient, req)); 
       request->setNextDest(recipient);
 
-      trans.is_offer = true;
-      offer = msg_ptr(new Message(supplier, recipient, trans)); 
+      offer = msg_ptr(new Message(supplier, recipient, off)); 
       offer->setNextDest(recipient);
 
     };
@@ -124,8 +128,8 @@ class GreedyMarketTest : public ::testing::Test {
 TEST_F(GreedyMarketTest, RequestEqOffer) {
   rsrc_ptr resource(new Material(recipe));
   resource->setQuantity(10);
-  request->setResource(resource);
-  offer->setResource(resource);
+  request->trans().setResource(resource);
+  offer->trans().setResource(resource);
 
   request->sendOn();
   offer->sendOn();
@@ -142,9 +146,9 @@ TEST_F(GreedyMarketTest, RequestEqOffer) {
 TEST_F(GreedyMarketTest, RequestIsLarger) {
   rsrc_ptr resource(new Material(recipe));
   resource->setQuantity(20);
-  request->setResource(resource);
+  request->trans().setResource(resource);
   resource->setQuantity(10);
-  offer->setResource(resource);
+  offer->trans().setResource(resource);
 
   request->sendOn();
   offer->sendOn();
@@ -161,9 +165,9 @@ TEST_F(GreedyMarketTest, RequestIsLarger) {
 TEST_F(GreedyMarketTest, OfferIsLarger) {
   rsrc_ptr resource(new Material(recipe));
   resource->setQuantity(10);
-  request->setResource(resource);
+  request->trans().setResource(resource);
   resource->setQuantity(20);
-  offer->setResource(resource);
+  offer->trans().setResource(resource);
 
   request->sendOn();
   offer->sendOn();

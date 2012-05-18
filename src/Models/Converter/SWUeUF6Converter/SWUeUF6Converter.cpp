@@ -53,8 +53,8 @@ std::string SWUeUF6Converter::str() {
 msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
 {
   // Figure out what you're converting to and from
-  in_commod_ = convMsg->commod();
-  out_commod_ = refMsg->commod();
+  in_commod_ = convMsg->trans().commod();
+  out_commod_ = refMsg->trans().commod();
   Model* enr;
   Model* castEnr;
   msg_ptr toRet;
@@ -72,13 +72,13 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
   // determine which direction we're converting
   if (in_commod_ == "SWUs" && out_commod_ == "eUF6"){
     // the enricher is the supplier in the convMsg
-    enr = convMsg->supplier();
+    enr = convMsg->trans().supplier();
     if (0 == enr){
       throw CycException("SWUs offered by non-Model");
     }
-    SWUs = convMsg->resource()->quantity();
+    SWUs = convMsg->trans().resource()->quantity();
     try {
-      mat = boost::dynamic_pointer_cast<Material>(refMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(refMsg->trans().resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -87,12 +87,12 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     }
   } else if (in_commod_ == "eUF6" && out_commod_ == "SWUs") {
     // the enricher is the supplier in the refMsg
-    enr = refMsg->supplier();
+    enr = refMsg->trans().supplier();
     if (0 == enr) {
       throw CycException("SWUs offered by non-Model");
     }
     try{
-      mat = boost::dynamic_pointer_cast<Material>(convMsg->resource());
+      mat = boost::dynamic_pointer_cast<Material>(convMsg->trans().resource());
       iso_vector = mat->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SWUeUF6Converter must be a \
@@ -124,14 +124,14 @@ msg_ptr SWUeUF6Converter::convert(msg_ptr convMsg, msg_ptr refMsg)
     mat = mat_rsrc_ptr(new Material(iso_vector));
     mat->setQuantity(massProdU);
     toRet = convMsg->clone();
-    toRet->setResource(mat);
+    toRet->trans().setResource(mat);
   } else if (out_commod_ == "SWUs") {
     toRet = convMsg->clone();
     gen_rsrc_ptr conv_res = gen_rsrc_ptr(new GenericResource(out_commod_, out_commod_, SWUs));
-    toRet->setResource(conv_res);
+    toRet->trans().setResource(conv_res);
   }
   
-  toRet->setCommod(out_commod_);
+  toRet->trans().setCommod(out_commod_);
 
   return toRet;
 }    

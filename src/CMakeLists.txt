@@ -66,6 +66,7 @@ SET(CYCLUS_INCLUDE_DIR
 SET( CYCLUS_CORE
   Models/Model.cpp 
   Models/Message.cpp
+  Models/Transaction.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
