@@ -61,16 +61,16 @@ public:
     msg->trans().approveTransfer();
   }
 
-  void addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {
+  void addResource(Transaction trans, vector<rsrc_ptr> manifest) {
     for (int i = 0; i < manifest.size(); i++) {
       received.push_back(manifest.at(i));
     }
   }
 
-  std::vector<rsrc_ptr> removeResource(msg_ptr msg) {
-    sent.push_back(msg->trans().resource());
+  std::vector<rsrc_ptr> removeResource(Transaction trans) {
+    sent.push_back(trans.resource());
     std::vector<rsrc_ptr> manifest;
-    manifest.push_back(msg->trans().resource());
+    manifest.push_back(trans.resource());
     return manifest;
   }
 };
