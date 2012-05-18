@@ -21,6 +21,10 @@ namespace po = boost::program_options;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  // verbosity help msg
+  std::string vmessage = "output log verbosity. Can be text:\n\n";
+  vmessage += "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
+  vmessage += "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
 
   // parse command line options
   po::options_description desc("Allowed options");
@@ -28,7 +32,7 @@ int main(int argc, char* argv[]) {
     ("help,h", "produce help message")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
-    ("verbosity,v", po::value<string>(), "set output log verbosity level")
+    ("verb,v", po::value<string>(), vmessage.c_str())
     ("input-file", po::value<string>(), "input file")
     ;
 
