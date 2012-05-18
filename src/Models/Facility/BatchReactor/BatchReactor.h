@@ -3,25 +3,15 @@
 #define _BATCHREACTOR_H
 
 #include "FacilityModel.h"
-//#include "StorageFacility.h"
 
 #include "Transaction.h"
 #include "Material.h"
 #include "MatBuff.h"
 
 #include "Logger.h"
+#include "Table.h"
 
 #include <queue>
-
-// Useful typedefs
-typedef std::pair<std::string, mat_rsrc_ptr> Fuel; 
-typedef std::pair<std::string, IsoVector> Recipe; 
-typedef std::pair<Recipe, Recipe> FuelPair;
-
-/**
-   Defines all possible phases this facility can be in
- */
-enum Phase {INIT, BEGIN, OPERATION, REFUEL, END};
 
 /**
    @class BatchReactor 
@@ -34,6 +24,33 @@ class BatchReactor : public FacilityModel  {
  * --------------------
  */
  public:  
+  // Useful typedefs
+  typedef std::pair<std::string, mat_rsrc_ptr> Fuel; 
+  typedef std::pair<std::string, IsoVector> Recipe; 
+  typedef std::pair<Recipe, Recipe> FuelPair;
+  
+  /**
+     Defines all possible phases this facility can be in
+  */
+  enum Phase {INIT, BEGIN, OPERATION, REFUEL, END};
+  
+  /**
+     Defines where fuel can be transfered to
+  */
+  enum Location {IN,WET,DRY,OUT};
+
+  /**
+     a structure to define a transfer of fuel
+   */
+  struct FuelTransfer {
+    int time;
+    double quantity;
+    Location end_location;
+    
+  FuelTransfer(int t, double q, Location l) :
+    time(t), quantity(q), end_location(l) {};
+  };
+
   /**
      Constructor for the BatchReactor class. 
    */
@@ -87,7 +104,6 @@ class BatchReactor : public FacilityModel  {
      When the facility receives a message, execute any transaction
    */
   virtual void receiveMessage(msg_ptr msg);
-
 /* ------------------- */ 
 
 
@@ -102,7 +118,6 @@ class BatchReactor : public FacilityModel  {
      @param trans the transaction to send 
    */
   void sendMessage(Communicator* recipient, Transaction trans);
-
 /* ------------------- */ 
 
 
@@ -246,12 +261,12 @@ class BatchReactor : public FacilityModel  {
   /**
      return the input commodity 
    */
-  std::string inCommod() {return fuelPairs_.front().first.first;}
+  std::string inCommod() {return fuel_pairs_.front().first.first;}
 
   /**
      return the output commodity 
    */
-  std::string outCommod() {return fuelPairs_.front().second.first;}
+  std::string outCommod() {return fuel_pairs_.front().second.first;}
 
   /**
      get the current phase
@@ -313,27 +328,78 @@ class BatchReactor : public FacilityModel  {
   /**
      a matbuff for material before they enter the core
    */
-  MatBuff preCore_;
+  MatBuff pre_core_;
 
   /**
      a matbuff for material while they are inside the core
    */
-  MatBuff inCore_;
+  MatBuff in_core_;
 
   /**
-     a matbuff for material after they exit the core
+     wet storage matbuff
    */
-  MatBuff postCore_;
+  MatBuff wet_storage_;
+
+  /**
+     time in wet storage
+   */
+  int wet_residency_;
+
+  /**
+     set wet residency
+     @param time the residency time
+   */
+  void setWetResidency(int time) {wet_residency_ = time;}
+
+  /**
+     wet storage matbuff
+   */
+  MatBuff dry_storage_;
+
+  /**
+     time in dry storage
+   */
+  int dry_residency_;
+
+  /**
+     set dry residency
+     @param time the residency time
+   */
+  void setDryResidency(int time) {dry_residency_ = time;}
+
+  /**
+     a matbuff for material ready to be traded
+   */
+  MatBuff post_core_;
+
+  /**
+     transfer times
+   */
+  std::queue<FuelTransfer> transfers_;
+
+  /**
+     adds a transfer time to the queue
+     @param time time of transfer
+     @param t type of transfer
+   */
+  void addTransfer(FuelTransfer& t);
+
+  /**
+     transfer fuel from wet to dry or dry to out,
+     depending on the transfer type
+     @param t type of transfer
+   */
+  void transferFuel(Location l1, Location l2);
 
   /**
      The BatchReactor has pairs of input and output fuel 
    */
-  std::deque<FuelPair> fuelPairs_;
+  std::deque<FuelPair> fuel_pairs_;
 
   /**
      The list of orders to process on the Tock 
    */
-  std::deque<msg_ptr> ordersWaiting_;
+  std::deque<msg_ptr> orders_waiting_;
 
   /**
      The current phase this facility is in
@@ -344,6 +410,11 @@ class BatchReactor : public FacilityModel  {
      set the next phase
    */
   void setPhase(Phase p);
+
+  /**
+     deletes this fac
+   */
+  void decomission();
 
   /**
      set the requested amount of fresh fuel
@@ -363,7 +434,7 @@ class BatchReactor : public FacilityModel  {
   /**
      return the current received amount
   */
-  double receivedAmt() {return preCore_.quantity();}
+  double receivedAmt() {return pre_core_.quantity();}
 
   /**
      return the amount of material requested less 
@@ -390,28 +461,22 @@ class BatchReactor : public FacilityModel  {
   /**
      move a certain amount of fuel from one buffer to another
   */
-  void moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt);
+  void moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt, Location end_location);
 
   /**
-     move all fuel from one buffer to another
-  */
-  void moveFuel(MatBuff& fromBuff, MatBuff& toBuff) 
-  {moveFuel(fromBuff,toBuff,fromBuff.quantity());}
-
-  /**
-     load fuel from preCore_ into inCore_
+     load fuel from pre_core_ into in_core_
    */
-  void loadCore() {moveFuel(preCore_,inCore_);}
+  void loadCore();
 
   /**
-     move a batch from inCore_ to postCore_
+     move a batch from in_core_ to wet_storage__
    */
-  void offloadBatch() {moveFuel(inCore_,postCore_,batchLoading());}
+  void offloadBatch();
 
   /**
-     move all material from inCore_ to postCore_
+     move all material from in_core_ to wet_storage_
    */
-  void offloadCore() {moveFuel(inCore_,postCore_);}
+  void offloadCore();
 
   /**
      sends a request of offer to the commodity's market
@@ -426,12 +491,27 @@ class BatchReactor : public FacilityModel  {
   /**
      offer all off-loaded fuel
    */
-  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),OFFER);}
+  void makeOffers() {interactWithMarket(outCommod(),post_core_.quantity(),OFFER);}
 
   /**
      Processes all orders in ordersWaiting_
    */
   void handleOrders();
+
+  /**
+     table holding wet/dry storage info
+   */
+  static table_ptr rxtr_table;
+
+  /**
+     define the output table
+   */
+  static void defineTable();
+
+  /**
+     add a transfer to the table
+   */
+  static void addToTable(mat_rsrc_ptr mat, int time, Location l);
   
 /* ------------------- */ 
 
