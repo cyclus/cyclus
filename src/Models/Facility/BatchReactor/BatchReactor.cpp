@@ -8,6 +8,7 @@
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
+#include "Table.h"
 
 #include <queue>
 #include <sstream>
@@ -20,6 +21,7 @@ using namespace std;
   RECIEVE MATERIAL
   SEND MATERIAL
  */
+table_ptr BatchReactor::rxtr_table = new Table("Storage"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 BatchReactor::BatchReactor() {
@@ -402,12 +404,44 @@ void BatchReactor::addFuelPair(std::string incommod, IsoVector inFuel,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::defineTable() {
+  // declare the table columns
+  column id("ID","INTEGER");
+  column time("Time","INTEGER");
+  column location("Location","INTEGER");
+  column amt("Quantity","REAL");
+  // declare the table's primary key  
+  primary_key pk;
+  pk.push_back("ID"), pk.push_back("Time"), pk.push_back("Location");
+  rxtr_table->setPrimaryKey(pk);
+  // add columns to the table
+  rxtr_table->addColumn(id);
+  rxtr_table->addColumn(time);
+  rxtr_table->addColumn(location);
+  rxtr_table->addColumn(amt);
+  // we've now defined the table
+  rxtr_table->tableDefined();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::addToTable(mat_rsrc_ptr mat, int time, Location l) {
+  // if we haven't logged an agent yet, define the table
+  if ( !rxtr_table->defined() ) {
+    BatchReactor::defineTable();
+  }
+  int id = mat->isoVector().comp()->ID();
+  double amt = mat->quantity();
+  // make a row
+  // declare data
+  data an_id(id), an_amt(amt), a_loc((int)l), a_time(time);
+  // declare entries
+  entry e_id("ID",an_id), e_amt("Quantity",an_amt), e_loc("Location",a_loc), e_time("Time",a_time);
+  // declare row
+  row aRow;
+  aRow.push_back(e_id), aRow.push_back(e_amt), aRow.push_back(e_loc),
+    aRow.push_back(e_time);
+  // add the row
+  rxtr_table->addRow(aRow);
 }
-
 /* ------------------- */ 
 
 
