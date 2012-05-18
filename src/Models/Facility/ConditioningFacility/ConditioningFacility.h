@@ -308,7 +308,7 @@ class ConditioningFacility : public FacilityModel {
       
      @param order the order to be processed 
    */
-  std::vector<rsrc_ptr> processOrder(msg_ptr order);
+  std::vector<rsrc_ptr> processOrder(Transaction order);
 
   /** 
      Checks the amount (in kg) of material in the inventory 

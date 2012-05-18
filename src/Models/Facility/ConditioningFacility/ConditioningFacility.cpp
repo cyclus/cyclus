@@ -182,10 +182,8 @@ vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
+vector<rsrc_ptr> ConditioningFacility::processOrder(Transaction order) {
  // Send material from inventory to fulfill transactions
-
-  Transaction trans = order;
 
   double newAmt = 0;
 
@@ -194,21 +192,21 @@ vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
+  while(order.resource()->quantity() > newAmt && !inventory_.empty() ) {
     mat_rsrc_ptr m = inventory_.front().second;
 
     // start with an empty material
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->quantity() <= (trans.resource()->quantity() - newAmt)) {
+    if(m->quantity() <= (order.resource()->quantity() - newAmt)) {
       newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
       remaining_capacity_ = remaining_capacity_ - newAmt;
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      mat_rsrc_ptr toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(order.resource()->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
       remaining_capacity_ = remaining_capacity_ - newAmt;
@@ -233,7 +231,7 @@ void ConditioningFacility::addResource(Transaction trans, std::vector<rsrc_ptr> 
         << (*thisMat)->quantity();
 
     mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
-    stocks_.push_front(make_pair(msg->trans().commod(), mat));
+    stocks_.push_front(make_pair(trans.commod(), mat));
   } 
 };
 

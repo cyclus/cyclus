@@ -212,8 +212,6 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> RecipeReactor::removeResource(Transaction order) {
-  Transaction trans = msg->trans();
-
   double newAmt = 0;
 
   mat_rsrc_ptr m;
@@ -224,25 +222,25 @@ vector<rsrc_ptr> RecipeReactor::removeResource(Transaction order) {
   vector<rsrc_ptr> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while (trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
+  while (order.resource()->quantity() > newAmt && !inventory_.empty() ) {
     for (deque<Fuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
       // be sure to get the right commodity
-      if (iter->first == trans.commod()) {
+      if (iter->first == order.commod()) {
         m = iter->second;
 
         // start with an empty material
         newMat = mat_rsrc_ptr(new Material());
 
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if (m->quantity() <= (trans.resource()->quantity() - newAmt)) {
+        if (m->quantity() <= (order.resource()->quantity() - newAmt)) {
           newAmt += m->quantity();
           newMat->absorb(m);
           inventory_.pop_front();
         } else { 
           // if the inventory obj is larger than the remaining need, split it.
-          toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
+          toAbsorb = m->extract(order.resource()->quantity() - newAmt);
           newAmt += toAbsorb->quantity();
           newMat->absorb(toAbsorb);
         }
@@ -264,7 +262,7 @@ void RecipeReactor::addResource(Transaction trans, std::vector<rsrc_ptr> manifes
        thisMat++) {
     LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
+    stocks_.push_front(make_pair(trans.commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -416,7 +414,7 @@ void RecipeReactor::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order.approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

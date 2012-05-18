@@ -161,8 +161,6 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(Transaction order) {
-  Transaction trans = msg->trans();
-
   double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
@@ -170,7 +168,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(Transaction orde
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource()->quantity() > newAmt && !inventory_.empty() ){
+  while(order.resource()->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -180,14 +178,14 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(Transaction orde
       mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
-      if(m->quantity() <= (trans.resource()->quantity() - newAmt)){
+      if(m->quantity() <= (order.resource()->quantity() - newAmt)){
         newAmt += m->quantity();
         newMat->absorb(m);
         inventory_.pop_front();
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        mat_rsrc_ptr toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
+        mat_rsrc_ptr toAbsorb = m->extract(order.resource()->quantity() - newAmt);
         newAmt += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
@@ -212,7 +210,7 @@ void SeparationsMatrixFacility::addResource(Transaction trans,
       thisMat++) {
     LOG(LEV_DEBUG2, "none!") <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
-    stocks_.push_back(make_pair(msg->trans().commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
+    stocks_.push_back(make_pair(trans.commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -272,7 +270,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    order.approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
 }

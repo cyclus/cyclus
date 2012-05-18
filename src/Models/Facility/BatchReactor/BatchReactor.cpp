@@ -142,7 +142,7 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 void BatchReactor::handleOrders() {
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order.approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
 }
