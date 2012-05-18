@@ -5,6 +5,7 @@
 #define _TRANSACTION_H
 
 #include "Resource.h"
+#include "Table.h"
 
 class MarketModel;
 class Model;
@@ -35,6 +36,16 @@ class Transaction {
     */
     Transaction* clone();
 
+    /**
+       Initiate the market-matched transaction - resource(s) are taken from the
+       supplier and sent to the requester.
+        
+       This should be the sole way of transferring resources between simulation
+       agents/models. Book keeping of transactions (and corresponding resource
+       states) are taken care of automatically.
+     */
+    void approveTransfer();
+  
     /**
        @return the market that deals in this this transaction's commodity
 
@@ -135,6 +146,59 @@ class Transaction {
     Model* supplier_;
 
     Model* requester_;
+
+    /// stores the next available transaction ID 
+    static int next_trans_id_;
+
+///////////////////////////////////////////////////////////////////////////////
+////////////// Output db recording code ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+ public:
+  /**
+     the transaction output database Table 
+   */
+  static table_ptr trans_table;
+
+  /**
+     the transacted resource output database Table 
+   */
+  static table_ptr trans_resource_table;
+
+ private:
+  /**
+     Define the transaction database table 
+   */
+  static void define_trans_table();
+
+  /**
+     Define the transacted resource database table 
+   */
+  static void define_trans_resource_table();
+
+  /**
+     add a transaction to the transaction table 
+     @param id the message id 
+   */
+  void addTransToTable(int id);
+
+  /**
+     add a transaction to the transaction table 
+     @param id the message id 
+     @param position the position in the manifest 
+     @param resource the resource being transacted 
+   */
+  void addResourceToTable(int id, int position, rsrc_ptr resource);
+
+  /**
+     the transaction primary key 
+   */
+  primary_key_ref pkref_trans_;
+
+  /**
+     the resource primary key 
+   */
+  primary_key_ref pkref_rsrc_;
 };
 
 #endif
