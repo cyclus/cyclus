@@ -227,7 +227,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.amount = newMat->quantity();
 
     msg_ptr storage_history(new Message(sending_facility, this, trans); 
-    storage_history->approveTransfer();
+    storage_history->trans().approveTransfer();
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
@@ -354,7 +354,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
   

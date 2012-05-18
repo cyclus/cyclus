@@ -58,7 +58,7 @@ public:
   void copyFreshModel(Model* model) { };
   
   void receiveMessage(msg_ptr msg) {
-    msg->approveTransfer();
+    msg->trans().approveTransfer();
   }
 
   void addResource(msg_ptr msg, vector<rsrc_ptr> manifest) {

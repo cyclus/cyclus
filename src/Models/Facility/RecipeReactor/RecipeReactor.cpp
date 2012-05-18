@@ -416,7 +416,7 @@ void RecipeReactor::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

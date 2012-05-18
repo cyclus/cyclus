@@ -206,7 +206,7 @@ void EnrichmentFacility::handleTock(int time) {
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
 }
@@ -433,7 +433,7 @@ void EnrichmentFacility::enrich() {
     rsrc->setQuantity(theProd->quantity());
     mess->trans().setResource(boost::dynamic_pointer_cast<Resource>(theProd));
 
-    mess->approveTransfer();
+    mess->trans().approveTransfer();
     wastes_.push_back(theTails);
 
     curr ++;

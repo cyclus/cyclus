@@ -266,7 +266,7 @@ TEST_F(MessagePassingTest, KillSendOn) {
 TEST_F(MessagePassingTest, KillApproveTransfer) {
   // if this doesn't segfault, the test passes
   comm1->msg_->kill();
-  comm1->msg_->approveTransfer();
+  comm1->msg_->trans().approveTransfer();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -174,7 +174,7 @@ void SourceFacility::handleTock(int time){
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {
-      order->approveTransfer();
+      order->trans().approveTransfer();
       ordersWaiting_.pop_front();
     }
   }
