@@ -92,7 +92,7 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> NullFacility::removeResource(Transaction order) {
-  Transaction trans = order->trans();
+  Transaction trans = order;
   if (trans.commod() != out_commod_) {
     string err_msg = "NullFacility can only send '" + out_commod_ ;
     err_msg += + "' materials.";
@@ -217,7 +217,7 @@ void NullFacility::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    order->trans().approveTransfer();
+    order.approveTransfer();
     ordersWaiting_.pop_front();
   }
 }

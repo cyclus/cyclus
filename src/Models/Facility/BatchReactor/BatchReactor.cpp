@@ -142,7 +142,7 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 void BatchReactor::handleOrders() {
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->trans().approveTransfer();
+    order.approveTransfer();
     ordersWaiting_.pop_front();
   };
 }
@@ -159,7 +159,7 @@ void BatchReactor::addResource(Transaction trans,
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> BatchReactor::removeResource(Transaction order) {
-  Transaction trans = order->trans();
+  Transaction trans = order;
   double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "

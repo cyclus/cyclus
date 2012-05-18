@@ -111,7 +111,7 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> StorageFacility::removeResource(Transaction order) {
-  Transaction trans = order->trans();
+  Transaction trans = order;
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
     throw CycException("StorageFacility can only send incommodity type materials.");
@@ -354,7 +354,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->trans().approveTransfer();
+    order.approveTransfer();
     ordersWaiting_.pop_front();
   }
   

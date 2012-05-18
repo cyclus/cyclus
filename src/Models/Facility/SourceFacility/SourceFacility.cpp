@@ -170,11 +170,11 @@ void SourceFacility::handleTock(int time){
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    if (order->trans().resource()->quantity() - inventory_.quantity() > EPS_KG) {
+    if (order.resource()->quantity() - inventory_.quantity() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {
-      order->trans().approveTransfer();
+      order.approveTransfer();
       ordersWaiting_.pop_front();
     }
   }

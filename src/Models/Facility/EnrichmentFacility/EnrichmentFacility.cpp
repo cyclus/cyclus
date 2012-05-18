@@ -206,7 +206,7 @@ void EnrichmentFacility::handleTock(int time) {
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->trans().approveTransfer();
+    order.approveTransfer();
     ordersWaiting_.pop_front();
   }
 }

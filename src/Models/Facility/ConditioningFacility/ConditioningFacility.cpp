@@ -164,7 +164,7 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
   vector<rsrc_ptr> toRet = vector<rsrc_ptr>() ;
-  Transaction trans = order->trans();
+  Transaction trans = order;
   double order_amount = trans.resource()->quantity()*trans.minfrac;
   if (remaining_capacity_ >= order_amount){
     toRet = processOrder(order);
@@ -172,7 +172,7 @@ vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
     string msg;
     msg += "The ConditioningFacility has run out of processing capacity. ";
     msg += "The order requested by ";
-    msg += order->trans().requester()->name();
+    msg += order.requester()->name();
     msg += " will not be sent.";
     LOG(LEV_DEBUG2, "CondFac") << msg;
     gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
@@ -185,7 +185,7 @@ vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
 vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
  // Send material from inventory to fulfill transactions
 
-  Transaction trans = order->trans();
+  Transaction trans = order;
 
   double newAmt = 0;
 
