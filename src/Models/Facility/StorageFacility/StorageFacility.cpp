@@ -110,7 +110,7 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
+vector<rsrc_ptr> StorageFacility::removeResource(Transaction order) {
   Transaction trans = order->trans();
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
@@ -151,7 +151,7 @@ vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void StorageFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque

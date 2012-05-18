@@ -162,7 +162,7 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
+vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
   vector<rsrc_ptr> toRet = vector<rsrc_ptr>() ;
   Transaction trans = order->trans();
   double order_amount = trans.resource()->quantity()*trans.minfrac;
@@ -222,7 +222,7 @@ vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
 };
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConditioningFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void ConditioningFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // Put the material received in the stocks
   // grab each material object off of the manifest
   // and move it into the stocks.

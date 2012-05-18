@@ -211,7 +211,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> RecipeReactor::removeResource(Transaction order) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -256,7 +256,7 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void RecipeReactor::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();

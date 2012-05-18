@@ -109,7 +109,7 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> EnrichmentFacility::removeResource(Transaction order) {
   Transaction trans = msg->trans();
   // it should be of out_commod_ Commodity type
   if(trans.commod() != out_commod_){
@@ -150,7 +150,7 @@ vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void EnrichmentFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();

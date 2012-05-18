@@ -91,7 +91,7 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
+vector<rsrc_ptr> NullFacility::removeResource(Transaction order) {
   Transaction trans = order->trans();
   if (trans.commod() != out_commod_) {
     string err_msg = "NullFacility can only send '" + out_commod_ ;
@@ -112,7 +112,7 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void NullFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   try {
     stocks_.pushAll(ResourceBuff::toMat(manifest));
   } catch(CycOverCapException err) {

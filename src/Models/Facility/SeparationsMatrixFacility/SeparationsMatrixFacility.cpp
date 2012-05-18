@@ -160,7 +160,7 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
+std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(Transaction order) {
   Transaction trans = msg->trans();
 
   double newAmt = 0;
@@ -201,7 +201,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::addResource(msg_ptr msg,
+void SeparationsMatrixFacility::addResource(Transaction trans,
                                             std::vector<rsrc_ptr> manifest) {  
   LOG(LEV_DEBUG2, "none!") << "Entered the addResource file ";
 

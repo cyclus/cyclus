@@ -148,7 +148,7 @@ void BatchReactor::handleOrders() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::addResource(msg_ptr msg,
+void BatchReactor::addResource(Transaction trans,
                                std::vector<rsrc_ptr> manifest) {
   double preQuantity = preCore_.quantity();
   preCore_.pushAll(ResourceBuff::toMat(manifest));
@@ -158,7 +158,7 @@ void BatchReactor::addResource(msg_ptr msg,
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
+vector<rsrc_ptr> BatchReactor::removeResource(Transaction order) {
   Transaction trans = order->trans();
   double amt = trans.resource()->quantity();
 

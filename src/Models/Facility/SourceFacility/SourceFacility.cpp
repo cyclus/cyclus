@@ -94,7 +94,7 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
+vector<rsrc_ptr> SourceFacility::removeResource(Transaction order) {
   Transaction trans = msg->trans();
   return ResourceBuff::toRes(inventory_.popQty(trans.resource()->quantity()));
 }
