@@ -262,13 +262,6 @@ TEST_F(MessagePassingTest, KillSendOn) {
   EXPECT_EQ(stops[2], "comm3");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessagePassingTest, KillApproveTransfer) {
-  // if this doesn't segfault, the test passes
-  comm1->msg_->kill();
-  comm1->msg_->trans().approveTransfer();
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - -Message Public Interface Testing - - - - - - - - - - - -
