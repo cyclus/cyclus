@@ -12,7 +12,6 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
-  init();
   setModelType("Facility");
 };
 

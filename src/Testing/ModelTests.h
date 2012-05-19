@@ -19,7 +19,6 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
     virtual void SetUp() { 
       model_ = (*GetParam())();
-      model_->init();
     }
     virtual void TearDown(){ 
       delete model_;

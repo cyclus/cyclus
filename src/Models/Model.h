@@ -115,12 +115,6 @@ class Model {
   Model();
 
   /**
-     Initalize members of Model and any other non-input
-     related parameters
-   */
-  void init() {};
-
-  /**
      A method to initialize the model 
       
      @param cur the pointer to the xml input for the model to initialize 
