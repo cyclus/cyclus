@@ -39,7 +39,7 @@ void BatchReactor::init() {
   lifetime_ = 0;
   operation_timer_ = -1;
   phase_ = INIT;
-  transfers_ = queue<FuelTransfer>();
+  transfers_ = TransferSchedule();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -189,27 +189,22 @@ void BatchReactor::handleTick(int time) {
   LOG(LEV_INFO3, "BReact") << name() << " is ticking at time " << time << " {";
 
   // transfer fuel if we need to
-  while (transfers_.front().time == TI->time()) {
-    FuelTransfer t = transfers_.front();
-    switch(t.end_location) {
-    case(DRY):
-      moveFuel(wet_storage_,dry_storage_,t.quantity,t.end_location);
-      break;
-    case(OUT):
-      moveFuel(dry_storage_,post_core_,t.quantity,t.end_location);
-      break;
-    transfers_.pop();
-    }
+  TransferSchedule::iterator it_s = transfers_.find(time);
+  if (it_s != transfers_.end()) {
+    doFuelTransfers(it_s->second);
+    transfers_.erase(it_s); // all transfers treated
   }
 
   // end the facility's life if its time
   if (lifetimeReached()) {
     setPhase(END);
   }
+
   // request fuel if needed
   if (requestAmt() > EPS_KG) {
     makeRequest(requestAmt());
   }
+
   // offer used fuel if needed
   if (!post_core_.empty()) {
     makeOffers();
@@ -252,6 +247,29 @@ void BatchReactor::handleTock(int time) {
   increaseOperationTimer();
 
   LOG(LEV_INFO3, "BReact") << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::scheduleTransfer(FuelTransfer& t) {
+  if (transfers_.find(t.time) == transfers_.end()) {
+    transfers_[t.time] = FuelTransfers();
+  }
+  transfers_[t.time].push_back(t);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BatchReactor::doFuelTransfers(FuelTransfers& ft) {   
+  FuelTransfers::iterator it;
+  for (it = ft.begin(); it != ft.end(); it++) {
+    switch(it->end_location) {
+    case(DRY):
+      moveFuel(wet_storage_,dry_storage_,it->quantity,it->end_location);
+      break;
+    case(OUT):
+      moveFuel(dry_storage_,post_core_,it->quantity,it->end_location);
+      break;
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -324,15 +342,15 @@ void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff,
       addToTable(new_mat,TI->time(),WET);
       toBuff.pushOne(new_mat);
       FuelTransfer trans(TI->time()+dry_residency_,amt,DRY);
-      transfers_.push(trans);
+      scheduleTransfer(trans);
       break;
     }
- case DRY: // log, push
+ case DRY: // log, push !fallthrough!
     for (vector<mat_rsrc_ptr>::iterator mat = popped.begin();
          mat != popped.end(); mat++) {
       addToTable(*mat,TI->time(),DRY);
     }
- case IN:  // push
+ case IN:  // push !fallthrough!
  case OUT: // push
     toBuff.pushAll(popped);
     break;  
@@ -352,16 +370,16 @@ void BatchReactor::loadCore() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::offloadBatch() {
-  FuelTransfer t(TI->time()+wet_residency_,batchLoading(),DRY);
-  moveFuel(in_core_,wet_storage_,batchLoading(),WET);
-  transfers_.push(t);
+  FuelTransfer t(TI->time()+wet_residency_,batch_loading_,DRY);
+  moveFuel(in_core_,wet_storage_,batch_loading_,WET);
+  scheduleTransfer(t);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::offloadCore() {
   FuelTransfer t(TI->time()+wet_residency_,in_core_.quantity(),DRY);
   moveFuel(in_core_,wet_storage_,in_core_.quantity(),WET);
-  transfers_.push(t);
+  scheduleTransfer(t);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

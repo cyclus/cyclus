@@ -11,7 +11,8 @@
 #include "Logger.h"
 #include "Table.h"
 
-#include <queue>
+#include <map>
+#include <vector>
 
 /**
    @class BatchReactor 
@@ -24,11 +25,6 @@ class BatchReactor : public FacilityModel  {
  * --------------------
  */
  public:  
-  // Useful typedefs
-  typedef std::pair<std::string, mat_rsrc_ptr> Fuel; 
-  typedef std::pair<std::string, IsoVector> Recipe; 
-  typedef std::pair<Recipe, Recipe> FuelPair;
-  
   /**
      Defines all possible phases this facility can be in
   */
@@ -50,6 +46,13 @@ class BatchReactor : public FacilityModel  {
   FuelTransfer(int t, double q, Location l) :
     time(t), quantity(q), end_location(l) {};
   };
+
+  // Useful typedefs
+  typedef std::pair<std::string, mat_rsrc_ptr> Fuel; 
+  typedef std::pair<std::string, IsoVector> Recipe; 
+  typedef std::pair<Recipe, Recipe> FuelPair;
+  typedef std::vector<FuelTransfer> FuelTransfers;
+  typedef std::map<int,FuelTransfers> TransferSchedule;
 
   /**
      Constructor for the BatchReactor class. 
@@ -375,21 +378,21 @@ class BatchReactor : public FacilityModel  {
   /**
      transfer times
    */
-  std::queue<FuelTransfer> transfers_;
+  TransferSchedule transfers_;
 
   /**
-     adds a transfer time to the queue
-     @param time time of transfer
-     @param t type of transfer
+     adds a transfer time to the transfers_ schedule
+     @param t transfer object to be added
    */
-  void addTransfer(FuelTransfer& t);
+  void scheduleTransfer(FuelTransfer& t);
 
   /**
-     transfer fuel from wet to dry or dry to out,
-     depending on the transfer type
-     @param t type of transfer
+     perform all transfers in a set of transfers
+     @warning only transfers from wet -> dry or dry->out are 
+     treated. 
+     @param ft the set of transfers to treat
    */
-  void transferFuel(Location l1, Location l2);
+  void doFuelTransfers(FuelTransfers& ft);
 
   /**
      The BatchReactor has pairs of input and output fuel 
