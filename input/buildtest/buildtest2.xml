@@ -67,6 +67,8 @@
         <lifetime>12</lifetime>
 	<coreloading>10.0</coreloading>
 	<batchespercore>5</batchespercore>
+	<wetresidency>4</wetresidency>
+	<dryresidency>5</dryresidency>
       </BatchReactor>
     </model>
   </facility>

@@ -191,7 +191,7 @@ void BatchReactor::handleTick(int time) {
   // transfer fuel if we need to
   TransferSchedule::iterator it_s = transfers_.find(time);
   if (it_s != transfers_.end()) {
-    doFuelTransfers(it_s->second);
+    doFuelTransfers(it_s->second); // post_core_ is populated here
     transfers_.erase(it_s); // all transfers treated
   }
 
@@ -252,9 +252,9 @@ void BatchReactor::handleTock(int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::scheduleTransfer(FuelTransfer& t) {
   if (transfers_.find(t.time) == transfers_.end()) {
-    transfers_[t.time] = FuelTransfers();
+    transfers_[t.time] = FuelTransfers(); // create an entry if none exists
   }
-  transfers_[t.time].push_back(t);
+  transfers_[t.time].push_back(t); // add transfer to entry
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -264,9 +264,11 @@ void BatchReactor::doFuelTransfers(FuelTransfers& ft) {
     switch(it->end_location) {
     case(DRY):
       moveFuel(wet_storage_,dry_storage_,it->quantity,it->end_location);
+      LOG(LEV_INFO5, "BReact") << name() << " moved " << it->quantity << "of fuel into dry storage.";
       break;
     case(OUT):
       moveFuel(dry_storage_,post_core_,it->quantity,it->end_location);
+      LOG(LEV_INFO5, "BReact") << name() << " moved " << it->quantity << "of fuel out of dry storage.";
       break;
     }
   }
@@ -366,6 +368,7 @@ void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::loadCore() {
   moveFuel(pre_core_,in_core_,pre_core_.quantity(),IN);
+  LOG(LEV_INFO5, "BReact") << name() << " loaded its core.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -373,6 +376,7 @@ void BatchReactor::offloadBatch() {
   FuelTransfer t(TI->time()+wet_residency_,batch_loading_,DRY);
   moveFuel(in_core_,wet_storage_,batch_loading_,WET);
   scheduleTransfer(t);
+  LOG(LEV_INFO5, "BReact") << name() << " moved a batch load into wet storage.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -380,6 +384,7 @@ void BatchReactor::offloadCore() {
   FuelTransfer t(TI->time()+wet_residency_,in_core_.quantity(),DRY);
   moveFuel(in_core_,wet_storage_,in_core_.quantity(),WET);
   scheduleTransfer(t);
+  LOG(LEV_INFO5, "BReact") << name() << " moved its core into wet storage.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
