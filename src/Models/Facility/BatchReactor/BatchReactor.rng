@@ -25,6 +25,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="batchespercore">
           <data type="nonNegativeInteger"/>
 	</element>
+        <element name="wetresidency">
+          <data type="nonNegativeInteger"/>
+	</element>
+        <element name="dryresidency">
+          <data type="nonNegativeInteger"/>
+	</element>
 
      </element>
   </define>

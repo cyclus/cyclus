@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
   }
 
   Model::printModelList();
-  IsoVector::printRecipes();
+  //IsoVector::printRecipes();
   
   // Run the simulation 
   try {

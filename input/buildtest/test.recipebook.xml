@@ -7,8 +7,6 @@
   <recipe>
     <name>fresh_PWR_uo2</name>
     <basis>mass</basis>
-    <unit>batch</unit>
-    <total>10.0</total>
     <isotope>
       <id>92234</id><comp>2.691</comp>
     </isotope>    
@@ -36,8 +34,6 @@
   <recipe>
     <name>spent_PWR_uo2</name>
     <basis>mass</basis>
-    <unit>batch</unit>
-    <total>10.0</total>
     <isotope>
       <id>01001</id><comp>2.169</comp>
     </isotope>

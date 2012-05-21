@@ -17,7 +17,7 @@ class TestInst: public InstModel {
 
     Model* what_model = NULL;
 
-    msg->setRequester(what_model);
+    msg->trans().setRequester(what_model);
 
   }
 
