@@ -9,7 +9,6 @@
 
 #include "Logger.h"
 #include "FacilityModel.h"
-#include "Material.h"
 #include "MatBuff.h"
 
 /**
@@ -197,7 +196,7 @@ class SinkFacility : public FacilityModel  {
   /**
      this facility holds material in storage. 
    */
-  MatBuff inventory_;
+  ResourceBuff inventory_;
 
 /* ------------------- */ 
 

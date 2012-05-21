@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- 1 BuildRegion and 1 BuildInst -->
-<!-- 1 SourceFacility FrontEnd, 1 SinkFacility BackEnd, and 1 GreedyMarket -->
+<!-- 1 SourceFacility FrontEnd, 1 SinkFacility BackEnd, and 1 NullMarket -->
 <simulation>
   <duration>10</duration>
   <startmonth>1</startmonth>
@@ -16,7 +16,7 @@
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
     <model>
-      <GreedyMarket/>
+      <NullMarket/>
     </model>
   </market>
 
@@ -85,8 +85,6 @@
   <recipe>
     <name>fresh_50gwd</name>
     <basis>mass</basis>
-    <unit>assembly</unit>
-    <total>1000</total>
     <isotope>
       <id>92235</id>
       <comp>0.05</comp>

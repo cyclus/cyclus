@@ -4,11 +4,12 @@
 
 #include "Logger.h"
 #include "GenericResource.h"
+#include "RecipeLogger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
+#include "Table.h"
 
-#include <iostream>
 #include <queue>
 #include <sstream>
 
@@ -20,6 +21,7 @@ using namespace std;
   RECIEVE MATERIAL
   SEND MATERIAL
  */
+table_ptr BatchReactor::rxtr_table = new Table("Storage"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 BatchReactor::BatchReactor() {
@@ -28,13 +30,16 @@ BatchReactor::BatchReactor() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::init() { 
-  preCore_.makeUnlimited();
-  inCore_.makeUnlimited();
-  postCore_.makeUnlimited();
+  pre_core_.makeUnlimited();
+  in_core_.makeUnlimited();
+  wet_storage_.makeUnlimited();
+  dry_storage_.makeUnlimited();
+  post_core_.makeUnlimited();
   request_amount_ = 0.0;
   lifetime_ = 0;
   operation_timer_ = -1;
   phase_ = INIT;
+  transfers_ = TransferSchedule();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -48,8 +53,10 @@ void BatchReactor::init(xmlNodePtr cur) {
   setCycleLength( strtod( XMLinput->get_xpath_content(cur,"cyclelength"), NULL ) );
   setLifetime( strtol( XMLinput->get_xpath_content(cur,"lifetime"), NULL, 10 ) ); 
   setCoreLoading( strtod( XMLinput->get_xpath_content(cur,"coreloading"), NULL ) );
-  setNBatches( strtol( XMLinput->get_xpath_content(cur,"batchespercore"), NULL, 10 ) ); 
+  setNBatches(strtol( XMLinput->get_xpath_content(cur,"batchespercore"), NULL, 10 ) ); 
   setBatchLoading( core_loading_ / batches_per_core_ );
+  setWetResidency( strtol( XMLinput->get_xpath_content(cur,"wetresidency"), NULL, 10 ) );
+  setDryResidency( strtol( XMLinput->get_xpath_content(cur,"dryresidency"), NULL, 10 ) );
   setOperationTimer(0);
 
   // all facilities require commodities - possibly many
@@ -68,13 +75,13 @@ void BatchReactor::init(xmlNodePtr cur) {
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    setInRecipe(IsoVector::recipe(recipe_name));
+    setInRecipe(RecipeLogger::Recipe(recipe_name));
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    setOutRecipe(IsoVector::recipe(recipe_name));
+    setOutRecipe(RecipeLogger::Recipe(recipe_name));
 
-    fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
+    fuel_pairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
   }
 
@@ -93,8 +100,10 @@ void BatchReactor::copy(BatchReactor* src) {
   setBatchLoading( coreLoading() / nBatches() ); 
   setInRecipe( src->inRecipe() );
   setOutRecipe( src->outRecipe() );
+  wet_residency_ = src->wet_residency_;
+  dry_residency_ = src->dry_residency_;
   setOperationTimer(0);
-  fuelPairs_ = src->fuelPairs_;
+  fuel_pairs_ = src->fuel_pairs_;
 
   setPhase(BEGIN);
 }
@@ -115,10 +124,10 @@ std::string BatchReactor::str() {
      << ", Batches Per Core = " << nBatches()
      << ", Batch Loading = " << batchLoading()
      << ", converts commodity '";
-  if (fuelPairs_.size() > 0) {
-    ss << fuelPairs_.front().first.first
+  if (fuel_pairs_.size() > 0) {
+    ss << fuel_pairs_.front().first.first
        << "' into commodity '"
-       << this->fuelPairs_.front().second.first;
+       << this->fuel_pairs_.front().second.first;
   }
   ss << "'}";
   return ss.str();
@@ -127,9 +136,9 @@ std::string BatchReactor::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
-    ordersWaiting_.push_front(msg);
+    orders_waiting_.push_front(msg);
     LOG(LEV_INFO5, "BReact") << name() << " just received an order.";
   }
   else {
@@ -146,19 +155,19 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::handleOrders() {
-  while(!ordersWaiting_.empty()){
-    msg_ptr order = ordersWaiting_.front();
+  while(!orders_waiting_.empty()){
+    msg_ptr order = orders_waiting_.front();
     order->approveTransfer();
-    ordersWaiting_.pop_front();
+    orders_waiting_.pop_front();
   };
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::addResource(msg_ptr msg,
                                std::vector<rsrc_ptr> manifest) {
-  double preQuantity = preCore_.quantity();
-  preCore_.pushAll(ResourceBuff::toMat(manifest));
-  double added = preCore_.quantity() - preQuantity;
+  double preQuantity = pre_core_.quantity();
+  pre_core_.pushAll(MatBuff::toMat(manifest));
+  double added = pre_core_.quantity() - preQuantity;
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
                             << added << " to its precore buffer.";
 }
@@ -166,32 +175,41 @@ void BatchReactor::addResource(msg_ptr msg,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  double amt = trans.resource->quantity();
+  double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
-                            << amt << " of " << postCore_.quantity() 
+                            << amt << " of " << post_core_.quantity() 
                             << " to its postcore buffer.";
   
-  return ResourceBuff::toRes(postCore_.popQty(amt));
+  return MatBuff::toRes(post_core_.popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::handleTick(int time) {
   LOG(LEV_INFO3, "BReact") << name() << " is ticking at time " << time << " {";
 
+  // transfer fuel if we need to
+  TransferSchedule::iterator it_s = transfers_.find(time);
+  if (it_s != transfers_.end()) {
+    doFuelTransfers(it_s->second); // post_core_ is populated here
+    transfers_.erase(it_s); // all transfers treated
+  }
+
   // end the facility's life if its time
   if (lifetimeReached()) {
     setPhase(END);
   }
+
   // request fuel if needed
   if (requestAmt() > EPS_KG) {
     makeRequest(requestAmt());
   }
+
   // offer used fuel if needed
-  if (!postCore_.empty()) {
+  if (!post_core_.empty()) {
     makeOffers();
   }
-
+  
   LOG(LEV_INFO3, "BReact") << "}";
 }
 
@@ -220,8 +238,8 @@ void BatchReactor::handleTock(int time) {
       }
       break; // end OPERATION
     case END:
-      if (postCore_.empty()) {
-        delete this;
+      if (post_core_.empty()) {
+        decomission();
         return;
       }
       break; // end END
@@ -229,6 +247,31 @@ void BatchReactor::handleTock(int time) {
   increaseOperationTimer();
 
   LOG(LEV_INFO3, "BReact") << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::scheduleTransfer(FuelTransfer& t) {
+  if (transfers_.find(t.time) == transfers_.end()) {
+    transfers_[t.time] = FuelTransfers(); // create an entry if none exists
+  }
+  transfers_[t.time].push_back(t); // add transfer to entry
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BatchReactor::doFuelTransfers(FuelTransfers& ft) {   
+  FuelTransfers::iterator it;
+  for (it = ft.begin(); it != ft.end(); it++) {
+    switch(it->end_location) {
+    case(DRY):
+      moveFuel(wet_storage_,dry_storage_,it->quantity,it->end_location);
+      LOG(LEV_INFO5, "BReact") << name() << " moved " << it->quantity << "of fuel into dry storage.";
+      break;
+    case(OUT):
+      moveFuel(dry_storage_,post_core_,it->quantity,it->end_location);
+      LOG(LEV_INFO5, "BReact") << name() << " moved " << it->quantity << "of fuel out of dry storage.";
+      break;
+    }
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -261,6 +304,11 @@ void BatchReactor::setPhase(Phase p) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::decomission() {
+  delete this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool BatchReactor::requestMet() {
   double remaining = requestAmt() - receivedAmt();
 
@@ -285,18 +333,62 @@ bool BatchReactor::requestMet() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
-  //  toBuff->pushAll(fromBuff->popQty(amt));
-  vector<mat_rsrc_ptr> to_delete = fromBuff.popQty(amt);
-  IsoVector* temp = &out_recipe_;
-  temp->setMass(amt);
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
-  //newMat->setMass(amt);
-  toBuff.pushOne(newMat);
+void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, 
+                            double amt, Location end_location) {
+  vector<mat_rsrc_ptr> popped = fromBuff.popQty(amt);
+  switch (end_location) {
+  case WET: // transmute, log, push
+    {
+      mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(out_recipe_));
+      new_mat->setQuantity(amt);
+      addToTable(new_mat,TI->time(),WET);
+      toBuff.pushOne(new_mat);
+      FuelTransfer trans(TI->time()+dry_residency_,amt,DRY);
+      scheduleTransfer(trans);
+      break;
+    }
+ case DRY: // log, push !fallthrough!
+    for (vector<mat_rsrc_ptr>::iterator mat = popped.begin();
+         mat != popped.end(); mat++) {
+      addToTable(*mat,TI->time(),DRY);
+    }
+ case IN:  // push !fallthrough!
+ case OUT: // push
+    toBuff.pushAll(popped);
+    break;  
+ default:
+    stringstream err("");
+    err << "BatchReactor " << this->name() << " does not have a location "
+        << "enumerated by " << end_location << ".";
+    throw CycOverrideException(err.str()); 
+    break;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer) {
+void BatchReactor::loadCore() {
+  moveFuel(pre_core_,in_core_,pre_core_.quantity(),IN);
+  LOG(LEV_INFO5, "BReact") << name() << " loaded its core.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::offloadBatch() {
+  FuelTransfer t(TI->time()+wet_residency_,batch_loading_,DRY);
+  moveFuel(in_core_,wet_storage_,batch_loading_,WET);
+  scheduleTransfer(t);
+  LOG(LEV_INFO5, "BReact") << name() << " moved a batch load into wet storage.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::offloadCore() {
+  FuelTransfer t(TI->time()+wet_residency_,in_core_.quantity(),DRY);
+  moveFuel(in_core_,wet_storage_,in_core_.quantity(),WET);
+  scheduleTransfer(t);
+  LOG(LEV_INFO5, "BReact") << name() << " moved its core into wet storage.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::interactWithMarket(std::string commod, double amt, TransType type) {
   LOG(LEV_INFO4, "BReact") << " making requests {";  
   // get the market
   MarketModel* market = MarketModel::marketForCommod(commod);
@@ -306,15 +398,14 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
   // request a generic resource
   gen_rsrc_ptr trade_res = gen_rsrc_ptr(new GenericResource(commod, "kg", amt));
   // build the transaction and message
-  Transaction trans;
-  trans.commod = commod;
+  Transaction trans(this, type);
+  trans.setCommod(commod);
   trans.minfrac = 1.0;
-  trans.is_offer = offer;
-  trans.price = commod_price;
-  trans.resource = trade_res;
+  trans.setPrice(commod_price);
+  trans.setResource(trade_res);
   // log the event
   string text;
-  if (offer) {
+  if (type == OFFER) {
     text = " has offered ";
   }
   else {
@@ -330,10 +421,50 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::addFuelPair(std::string incommod, IsoVector inFuel,
                                 std::string outcommod, IsoVector outFuel) {
-  fuelPairs_.push_back(make_pair(make_pair(incommod, inFuel),
+  fuel_pairs_.push_back(make_pair(make_pair(incommod, inFuel),
                                  make_pair(outcommod, outFuel)));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::defineTable() {
+  // declare the table columns
+  column id("ID","INTEGER");
+  column time("Time","INTEGER");
+  column location("Location","INTEGER");
+  column amt("Quantity","REAL");
+  // declare the table's primary key  
+  primary_key pk;
+  pk.push_back("ID"), pk.push_back("Time"), pk.push_back("Location");
+  rxtr_table->setPrimaryKey(pk);
+  // add columns to the table
+  rxtr_table->addColumn(id);
+  rxtr_table->addColumn(time);
+  rxtr_table->addColumn(location);
+  rxtr_table->addColumn(amt);
+  // we've now defined the table
+  rxtr_table->tableDefined();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void BatchReactor::addToTable(mat_rsrc_ptr mat, int time, Location l) {
+  // if we haven't logged an agent yet, define the table
+  if ( !rxtr_table->defined() ) {
+    BatchReactor::defineTable();
+  }
+  int id = mat->isoVector().comp()->ID();
+  double amt = mat->quantity();
+  // make a row
+  // declare data
+  data an_id(id), an_amt(amt), a_loc((int)l), a_time(time);
+  // declare entries
+  entry e_id("ID",an_id), e_amt("Quantity",an_amt), e_loc("Location",a_loc), e_time("Time",a_time);
+  // declare row
+  row aRow;
+  aRow.push_back(e_id), aRow.push_back(e_amt), aRow.push_back(e_loc),
+    aRow.push_back(e_time);
+  // add the row
+  rxtr_table->addRow(aRow);
+}
 /* ------------------- */ 
 
 

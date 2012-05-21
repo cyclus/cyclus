@@ -98,14 +98,14 @@ void DecayHandler::addIsoToList(int iso) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::setComp(CompMap comp) {
+void DecayHandler::setComp(CompMapPtr comp) {
   atom_comp_ = comp;
   buildDecayMatrix();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::setComp(Vector comp) {
-  atom_comp_.clear();
+  atom_comp_.reset(new CompMap(ATOM));
 
   // loops through the ParentMap and populates the new composition map with
   // the number density from the comp parameter for each isotope
@@ -119,11 +119,10 @@ void DecayHandler::setComp(Vector comp) {
       double atom_count = comp(col,1);
       // adds isotope to the map if its number density is non-zero
       if ( atom_count != 0 )
-        atom_comp_[iso] = atom_count;
+        (*atom_comp_)[iso] = atom_count;
     } else {
       LOG(LEV_ERROR, "none!") << "Decay Error - invalid Vector position";
     }
-
     ++parent_iter; // get next parent
   }
 }
@@ -135,8 +134,8 @@ Vector DecayHandler::compAsVector() {
         
   Vector comp_vector = Vector(parent_.size(),1);
 
-  map<int, double>::const_iterator comp_iter = atom_comp_.begin();
-  while( comp_iter != atom_comp_.end() ) {
+  map<int, double>::const_iterator comp_iter = atom_comp_->begin();
+  while( comp_iter != atom_comp_->end() ) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
 
@@ -165,7 +164,7 @@ Vector DecayHandler::compAsVector() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CompMap DecayHandler::compAsCompMap() {
+CompMapPtr DecayHandler::comp() {
   return atom_comp_;
 }
 

@@ -165,14 +165,14 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
 vector<rsrc_ptr> ConditioningFacility::removeResource(msg_ptr order) {
   vector<rsrc_ptr> toRet = vector<rsrc_ptr>() ;
   Transaction trans = order->trans();
-  double order_amount = trans.resource->quantity()*trans.minfrac;
+  double order_amount = trans.resource()->quantity()*trans.minfrac;
   if (remaining_capacity_ >= order_amount){
     toRet = processOrder(order);
   } else { 
     string msg;
     msg += "The ConditioningFacility has run out of processing capacity. ";
     msg += "The order requested by ";
-    msg += order->requester()->name();
+    msg += order->trans().requester()->name();
     msg += " will not be sent.";
     LOG(LEV_DEBUG2, "CondFac") << msg;
     gen_rsrc_ptr empty = gen_rsrc_ptr(new GenericResource("kg","kg",0));
@@ -194,21 +194,21 @@ vector<rsrc_ptr> ConditioningFacility::processOrder(msg_ptr order) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource->quantity() > newAmt && !inventory_.empty() ) {
+  while(trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
     mat_rsrc_ptr m = inventory_.front().second;
 
     // start with an empty material
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->quantity() <= (trans.resource->quantity() - newAmt)) {
+    if(m->quantity() <= (trans.resource()->quantity() - newAmt)) {
       newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
       remaining_capacity_ = remaining_capacity_ - newAmt;
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
       remaining_capacity_ = remaining_capacity_ - newAmt;
@@ -233,7 +233,7 @@ void ConditioningFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manife
         << (*thisMat)->quantity();
 
     mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(*thisMat);
-    stocks_.push_front(make_pair(msg->trans().commod, mat));
+    stocks_.push_front(make_pair(msg->trans().commod(), mat));
   } 
 };
 
@@ -392,12 +392,11 @@ void ConditioningFacility::makeRequests(){
       gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
 
       // build the transaction and message
-      Transaction trans;
-      trans.commod = in_commod;
+      Transaction trans(this, REQUEST);
+      trans.setCommod(in_commod);
       trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price;
-      trans.resource = request_res;
+      trans.setPrice(commod_price);
+      trans.setResource(request_res);
 
       sendMessage(recipient, trans);
       LOG(LEV_DEBUG2, "CondFac") << " The ConditioningFacility has requested "
@@ -437,12 +436,11 @@ void ConditioningFacility::makeOffers(){
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
-    Transaction trans;
-    trans.commod = outcommod;
+    Transaction trans(this, OFFER);
+    trans.setCommod(outcommod);
     trans.minfrac = 1;
-    trans.is_offer = true;
-    trans.price = commod_price;
-    trans.resource = offer_mat;
+    trans.setPrice(commod_price);
+    trans.setResource(offer_mat);
 
     sendMessage(recipient, trans);
 
