@@ -38,9 +38,13 @@ class StubModel : public Model {
 
   /**
      Initalize members of StubModel and any other non-input
-     related parameters
+     related parameters - guarnatees all members that can be accessed are
+     initialized (containers, etc.)
+
+     This is called in the constructor, and is separate function in the case
+     that there are multiple constructors. 
    */
-  void init() { Model::init(); }
+  void init() {};
 
   /**
      every model needs a method to initialize from XML 

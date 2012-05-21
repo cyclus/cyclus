@@ -12,6 +12,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::StubModel() { 
+  init();
   setModelType("Stub");
 };
 
