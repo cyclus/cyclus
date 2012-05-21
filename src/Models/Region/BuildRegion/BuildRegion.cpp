@@ -19,6 +19,7 @@ using namespace std;
  * Comparison Functors
  * --------------------
  */
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
   return (o1->first < o2->first); // sort by time
@@ -32,7 +33,7 @@ bool compare_order_times(PrototypeBuildOrder* o1, PrototypeBuildOrder* o2) {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BuildRegion::init() {
+BuildRegion::BuildRegion() {
   prototypeOrders_ = new PrototypeOrders();
   builders_ = new map<Model*, std::list<Model*>*>();
 }

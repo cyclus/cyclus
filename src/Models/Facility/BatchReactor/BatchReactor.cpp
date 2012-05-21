@@ -23,11 +23,6 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 BatchReactor::BatchReactor() {
-  init();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::init() { 
   preCore_.makeUnlimited();
   inCore_.makeUnlimited();
   postCore_.makeUnlimited();

@@ -15,7 +15,6 @@ list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
-  init();
   setModelType("Market"); 
 }
 
