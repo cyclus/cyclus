@@ -1,15 +1,13 @@
 // Message.cpp
 // Implements the Message class.
 
-#include <iostream>
-
 #include "Message.h"
 
 #include "Communicator.h"
-#include "FacilityModel.h"
+#include "Model.h"
 #include "MarketModel.h"
-#include "InstModel.h"
-#include "GenericResource.h"
+
+#include "Resource.h"
 #include "Logger.h"
 #include "Timer.h"
 
@@ -26,15 +24,9 @@ void Message::constructBase(Communicator* sender) {
   sender_ = sender;
   curr_owner_ = sender;
   receiver_ = NULL;
+  trans_ = NULL;
   dead_ = false;
   dir_ = UP_MSG;
-
-  trans_.supplier = NULL;
-  trans_.requester = NULL;
-  trans_.is_offer = NULL;
-  trans_.resource = NULL;
-  trans_.minfrac = 0;
-  trans_.price = 0;
 
   sender->trackMessage(msg_ptr(this));
   makeRealParticipant(sender);
@@ -55,21 +47,17 @@ Message::Message(Communicator* sender, Communicator* receiver) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
-                 Transaction trans) {
+                 Transaction& trans) {
   constructBase(sender);
-  trans_ = trans;
   receiver_ = receiver;
-  setResource(trans.resource);
-
-  if (trans_.is_offer) {
-    setSupplier(dynamic_cast<Model*>(sender_));
-  } else {
-    setRequester(dynamic_cast<Model*>(sender_));
-  }
+  trans_ = new Transaction(trans);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::~Message() {
+  if (trans_ != NULL) {
+    delete trans_;
+  }
   MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
 }
 
@@ -78,7 +66,9 @@ msg_ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   msg_ptr new_msg(new Message(*this));
-  new_msg->setResource(resource());
+  try {
+    new_msg->trans_ = trans_->clone();
+  } catch(CycNullMsgParamException) { }
   return new_msg;
 }
 
@@ -164,8 +154,8 @@ void Message::approveTransfer() {
   msg_ptr me = msg_ptr(this);
 
   vector<rsrc_ptr> manifest;
-  Model* req = requester();
-  Model* sup = supplier();
+  Model* req = trans_->requester();
+  Model* sup = trans_->supplier();
 
   try {
     manifest = sup->removeResource(me);
@@ -243,87 +233,12 @@ Communicator* Message::receiver() const {
   return receiver_;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-////////////// transaction getters/setters ////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-MarketModel* Message::market() {
-  MarketModel* market = MarketModel::marketForCommod(trans_.commod);
-  return market;
-} 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::supplier() const {
-  if (trans_.supplier == NULL) {
-    string err_msg = "Uninitilized message supplier.";
-    throw CycNullMsgParamException(err_msg);
+Transaction& Message::trans() const {
+  if (trans_ == NULL) {
+    throw CycNullMsgParamException("Uninitialized transaction parameter.");
   }
-  return trans_.supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setSupplier(Model* supplier) {
-  trans_.supplier = supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Message::requester() const {
-  if (trans_.requester == NULL) {
-    string err_msg = "Uninitilized message requester.";
-    throw CycNullMsgParamException(err_msg);
-  }
-  return trans_.requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setRequester(Model* requester) {
-  trans_.requester = requester;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction Message::trans() const {
-  return trans_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Message::commod() const {
-  return trans_.commod;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setCommod(std::string new_commod) {
-  trans_.commod = new_commod;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Message::isOffer() const {
-  return trans_.is_offer;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setIsOffer(bool offer) {
-  trans_.is_offer = offer;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::price() const {
-  return trans_.price;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPrice(double new_price) {
-  trans_.price = new_price;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr Message::resource() const {
-  return trans_.resource;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setResource(rsrc_ptr new_resource) {
-  if (new_resource.get()) {
-    trans_.resource = new_resource->clone();
-  }
+  return *trans_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -375,9 +290,9 @@ void Message::addTransToTable(int transID) {
   
   // make a row
   // declare data
-  data an_id(transID), a_sender( trans_.supplier->ID() ), 
-    a_receiver( trans_.requester->ID() ), a_time( TI->time() ), 
-    a_price( trans_.price );
+  data an_id(transID), a_sender( trans_->supplier()->ID() ), 
+    a_receiver( trans_->requester()->ID() ), a_time( TI->time() ), 
+    a_price( trans_->price() );
   // declare entries
   entry id("ID",an_id), sender("SenderID",a_sender), 
     receiver("ReceiverID",a_receiver), time("Time",a_time), 

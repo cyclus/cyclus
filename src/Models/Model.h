@@ -15,7 +15,7 @@
 
 class Model;
 class Message;
-struct Transaction;
+class Transaction;
 
 typedef Model* mdl_ctor();
 typedef boost::intrusive_ptr<Message> msg_ptr;

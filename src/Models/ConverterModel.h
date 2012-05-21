@@ -6,6 +6,7 @@
 #include <list>
 
 #include "Message.h"
+#include "Model.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
