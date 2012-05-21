@@ -276,7 +276,7 @@ class BatchReactor : public FacilityModel  {
   */
   Phase phase() {return phase_;}
 
- private:
+ protected:
   /**
      The time between batch reloadings. 
    */
