@@ -132,7 +132,7 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void SinkFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   inventory_.pushAll(ResourceBuff::toMat(manifest));
 }
 

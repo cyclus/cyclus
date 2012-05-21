@@ -109,10 +109,9 @@ void EnrichmentFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
+vector<rsrc_ptr> EnrichmentFacility::removeResource(Transaction order) {
   // it should be of out_commod_ Commodity type
-  if(trans.commod() != out_commod_){
+  if(order.commod() != out_commod_){
     throw CycException("EnrichmentFacility can only send '" +  out_commod_ + 
                        "' materials.");
   }
@@ -124,20 +123,20 @@ vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource()->quantity() > newAmt && !inventory_.empty() ) {
+  while(order.resource()->quantity() > newAmt && !inventory_.empty() ) {
     mat_rsrc_ptr m = inventory_.front();
 
     // start with an empty material
     mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
     // if the inventory obj isn't larger than the remaining need, send it as is.
-    if(m->quantity() <= (trans.resource()->quantity() - newAmt)) {
+    if(m->quantity() <= (order.resource()->quantity() - newAmt)) {
       newAmt += m->quantity();
       newMat->absorb(m);
       inventory_.pop_front();
     } else { 
       // if the inventory obj is larger than the remaining need, split it.
-      mat_rsrc_ptr toAbsorb = m->extract(trans.resource()->quantity() - newAmt);
+      mat_rsrc_ptr toAbsorb = m->extract(order.resource()->quantity() - newAmt);
       newMat->absorb(toAbsorb);
       newAmt += toAbsorb->quantity();
     }
@@ -150,7 +149,7 @@ vector<rsrc_ptr> EnrichmentFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void EnrichmentFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void EnrichmentFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
@@ -206,7 +205,7 @@ void EnrichmentFacility::handleTock(int time) {
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
 }
@@ -433,7 +432,7 @@ void EnrichmentFacility::enrich() {
     rsrc->setQuantity(theProd->quantity());
     mess->trans().setResource(boost::dynamic_pointer_cast<Resource>(theProd));
 
-    mess->approveTransfer();
+    mess->trans().approveTransfer();
     wastes_.push_back(theTails);
 
     curr ++;

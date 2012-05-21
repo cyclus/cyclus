@@ -94,9 +94,8 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
-  return ResourceBuff::toRes(inventory_.popQty(trans.resource()->quantity()));
+vector<rsrc_ptr> SourceFacility::removeResource(Transaction order) {
+  return ResourceBuff::toRes(inventory_.popQty(order.resource()->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -169,12 +168,12 @@ void SourceFacility::handleTock(int time){
   // check what orders are waiting,
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
-    msg_ptr order = ordersWaiting_.front();
-    if (order->trans().resource()->quantity() - inventory_.quantity() > EPS_KG) {
+    Transaction order = ordersWaiting_.front()->trans();
+    if (order.resource()->quantity() - inventory_.quantity() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {
-      order->approveTransfer();
+      order.approveTransfer();
       ordersWaiting_.pop_front();
     }
   }

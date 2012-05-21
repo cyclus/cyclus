@@ -13,7 +13,6 @@
 #include "Env.h"
 #include "InputXML.h"
 #include "Timer.h"
-#include "Message.h"
 #include "Resource.h"
 #include "Table.h"
 
@@ -348,20 +347,19 @@ const string Model::modelImpl() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<rsrc_ptr> Model::removeResource(msg_ptr order) {
+vector<rsrc_ptr> Model::removeResource(Transaction order) {
   string msg = "The model " + name();
   msg += " doesn't support resource removal.";
   throw CycOverrideException(msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::addResource(msg_ptr msg,
+void Model::addResource(Transaction trans,
 			std::vector<rsrc_ptr> manifest) {
   string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
   throw CycOverrideException(err_msg);
 }
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::define_table() {

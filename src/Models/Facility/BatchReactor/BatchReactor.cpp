@@ -142,13 +142,13 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 void BatchReactor::handleOrders() {
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::addResource(msg_ptr msg,
+void BatchReactor::addResource(Transaction trans,
                                std::vector<rsrc_ptr> manifest) {
   double preQuantity = preCore_.quantity();
   preCore_.pushAll(ResourceBuff::toMat(manifest));
@@ -158,8 +158,8 @@ void BatchReactor::addResource(msg_ptr msg,
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
-  Transaction trans = order->trans();
+vector<rsrc_ptr> BatchReactor::removeResource(Transaction order) {
+  Transaction trans = order;
   double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "

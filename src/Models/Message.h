@@ -10,7 +10,6 @@
 #include "Resource.h"
 #include "Transaction.h"
 #include "IntrusiveBase.h"
-#include "Table.h"
 #include "CycException.h"
 
 class Communicator;
@@ -193,16 +192,6 @@ class Message: IntrusiveBase<Message> {
   void setNextDest(Communicator* next_stop);
   
   /**
-     Initiate the market-matched transaction - resource(s) are taken from the
-     supplier and sent to the requester.
-      
-     This should be the sole way of transferring resources between simulation
-     agents/models. Book keeping of transactions (and corresponding resource
-     states) are taken care of automatically.
-   */
-  void approveTransfer();
-  
-  /**
      Renders the sendOn method disfunctional, preventing it from being sent
      anywhere.
       
@@ -312,64 +301,10 @@ class Message: IntrusiveBase<Message> {
   msg_ptr partner_;
   
   /**
-     stores the next available transaction ID 
-   */
-  static int next_trans_id_;
-
-  /**
      a boolean to determine if the message has completed its route 
    */
   bool dead_;
 
-///////////////////////////////////////////////////////////////////////////////
-////////////// Output db recording code ///////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
- public:
-  /**
-     the transaction output database Table 
-   */
-  static table_ptr trans_table;
-
-  /**
-     the transacted resource output database Table 
-   */
-  static table_ptr trans_resource_table;
-
- private:
-  /**
-     Define the transaction database table 
-   */
-  static void define_trans_table();
-
-  /**
-     Define the transacted resource database table 
-   */
-  static void define_trans_resource_table();
-
-  /**
-     add a transaction to the transaction table 
-     @param id the message id 
-   */
-  void addTransToTable(int id);
-
-  /**
-     add a transaction to the transaction table 
-     @param id the message id 
-     @param position the position in the manifest 
-     @param resource the resource being transacted 
-   */
-  void addResourceToTable(int id, int position, rsrc_ptr resource);
-
-  /**
-     the transaction primary key 
-   */
-  primary_key_ref pkref_trans_;
-
-  /**
-     the resource primary key 
-   */
-  primary_key_ref pkref_rsrc_;
 };
 
 #endif

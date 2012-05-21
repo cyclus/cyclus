@@ -63,10 +63,10 @@ void StubFacility::receiveMessage(msg_ptr msg) {}
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<rsrc_ptr> StubFacility::removeResource(msg_ptr order) {}
+vector<rsrc_ptr> StubFacility::removeResource(Transaction order) {}
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest){}
+void StubFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::handleTick(int time){}
