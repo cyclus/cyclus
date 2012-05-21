@@ -8,7 +8,6 @@
 #include "InputXML.h"
 #include "Timer.h"
 
-#include <iostream>
 #include <queue>
 #include <sstream>
 
@@ -122,7 +121,7 @@ std::string BatchReactor::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "BReact") << name() << " just received an order.";
@@ -161,7 +160,7 @@ void BatchReactor::addResource(msg_ptr msg,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
   Transaction trans = order->trans();
-  double amt = trans.resource->quantity();
+  double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
                             << amt << " of " << postCore_.quantity() 
@@ -291,7 +290,7 @@ void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer) {
+void BatchReactor::interactWithMarket(std::string commod, double amt, TransType type) {
   LOG(LEV_INFO4, "BReact") << " making requests {";  
   // get the market
   MarketModel* market = MarketModel::marketForCommod(commod);
@@ -301,15 +300,14 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
   // request a generic resource
   gen_rsrc_ptr trade_res = gen_rsrc_ptr(new GenericResource(commod, "kg", amt));
   // build the transaction and message
-  Transaction trans;
-  trans.commod = commod;
+  Transaction trans(this, type);
+  trans.setCommod(commod);
   trans.minfrac = 1.0;
-  trans.is_offer = offer;
-  trans.price = commod_price;
-  trans.resource = trade_res;
+  trans.setPrice(commod_price);
+  trans.setResource(trade_res);
   // log the event
   string text;
-  if (offer) {
+  if (type == OFFER) {
     text = " has offered ";
   }
   else {

@@ -92,7 +92,7 @@ std::string RegionModel::str() {
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::receiveMessage(msg_ptr msg){
-  msg->setNextDest(msg->market());
+  msg->setNextDest(msg->receiver());
   msg->sendOn();
 }
 

@@ -1,23 +1,21 @@
 // Message.h
 // A Message class for inter-entity requests, instructions, etc.
 
-#if !defined(_MESSAGE)
-#define _MESSAGE
+#if !defined(_MESSAGE_H)
+#define _MESSAGE_H
 
 #include <vector>
 #include <string>
-#include "boost/intrusive_ptr.hpp"
 
-#include "Model.h"
 #include "Resource.h"
+#include "Transaction.h"
 #include "IntrusiveBase.h"
 #include "Table.h"
 #include "CycException.h"
 
 class Communicator;
-class Model;
 class Message;
-class MarketModel;
+class Transaction;
 
 typedef boost::intrusive_ptr<Message> msg_ptr;
 
@@ -40,48 +38,6 @@ class CycNoMsgReceiverException: public CycException {
 class CycNullMsgParamException: public CycException {
   public: CycNullMsgParamException(std::string msg) : CycException(msg) {};
 };
-
-/**
-   A transaction structure to include in any message. 
- */
-struct Transaction {
-  /**
-     The commodity that is being requested or offered in this Message. 
-   */
-  std::string commod;
-
-  /**
-     True if this is an offer, false if it's a request 
-   */
-  bool is_offer;
-
-  /**
-     The minimum fraction of the specified commodity that the 
-     requester is willing to accept or the offerer is willing to send. 
-   */
-  double minfrac;
-
-  /**
-     The price per unit of the commodity being requested or offered. 
-   */
-  double price;
-
-  /**
-     A specific resource with which this transaction is concerned.
-   */
-  rsrc_ptr resource;
-
-  /**
-     The supplier in this transaction. 
-   */
-  Model* supplier;
-
-  /**
-     The requester in this transaction. 
-   */
-  Model* requester;
-};
-
 
 /**
    A Message class for inter-entity communication. 
@@ -191,7 +147,7 @@ class Message: IntrusiveBase<Message> {
      @param receiver receiver of this Message 
      @param trans the message's transaction specifics 
    */
-  Message(Communicator* sender, Communicator* receiver, Transaction trans);
+  Message(Communicator* sender, Communicator* receiver, Transaction& trans);
 
   virtual ~Message();
 
@@ -311,97 +267,10 @@ class Message: IntrusiveBase<Message> {
    */
   Communicator* receiver() const;
 
-///////////////////////////////////////////////////////////////////////////////
-////////////// transaction getters/setters ////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
   /**
-     Get the market corresponding to the transaction commodity 
-      
-     @return market corresponding to this msg's transaction's commodity 
-      
+     Returns by reference the transaction associated with this message. 
    */
-  MarketModel* market();
-  
-  /**
-     @return a pointer to the supplier in this Message. 
-
-     @exception CycNullMsgParamException supplier is uninitialized (NULL)
-   */
-  Model* supplier() const;
-
-  /**
-     Sets the assigned supplier of the material for the 
-     transaction in this message. 
-      
-     @param supplier pointer to the new supplier 
-   */
-  void setSupplier(Model* supplier);
-
-  /**
-     @return a pointer to the requester in this Message. 
-
-     @exception CycNullMsgParamException requester is uninitialized (NULL)
-   */
-  Model* requester() const;
-
-  /**
-     Sets the assigned requester to receive the material 
-     for the transaction in this message. 
-      
-     @param requester pointer to the new requester 
-   */
-  void setRequester(Model* requester);
-
-  /**
-    Although passed by value, the trans.resource is a pointer, and modifying it
-    will change this message's transaction's resource also.
-
-     @returns the transaction associated with this message. 
-   */
-  Transaction trans() const;
-
-  /**
-     Returns the commodity requested or offered in this Message. 
-   */
-  std::string commod() const;
-
-  /**
-     Sets the commodity requested or offered in this Message. 
-      
-     @param new_commod the commodity associated with this Message
-   */
-  void setCommod(std::string new_commod);
-
-  /**
-     True if the transaction is an offer, false if it is a request.
-   */
-  bool isOffer() const;
-
-  /**
-     Set the transaction type (true=offer, false=request)
-   */
-  void setIsOffer(bool offer);
-
-  /**
-     Returns the price (in dollars) being requested or offered in this message. 
-   */
-  double price() const;
-
-  /**
-     Set the price (in dollars) being requested or offered in this message. 
-   */
-  void setPrice(double new_price);
-
-  /**
-     Returns a pointer to the Resource being requested or offered in this message. 
-   */
-  rsrc_ptr resource() const;
-
-  /**
-     Sets the message transaction's resource to a copy of the passed resource.
-   */
-  void setResource(rsrc_ptr new_resource);
+  Transaction& trans() const;
 
  private:
   /**
@@ -413,7 +282,7 @@ class Message: IntrusiveBase<Message> {
   /**
      The Transaction with which this message is concerned. 
    */
-  Transaction trans_;
+  Transaction* trans_;
   
   /**
      The Communicator who sent this Message. 
