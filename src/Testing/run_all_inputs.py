@@ -51,8 +51,10 @@ class TestFile():
         """Returns the output from running the FileTest"""
         flags = " -v9"
         try :
-            input_output = subprocess.Popen("./cyclus "+self.name+flags,
+            p = subprocess.Popen("./cyclus "+self.name+flags,
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            io_tuple = p.communicate()
+            output = io_tuple[1]
         except subprocess.CalledProcessError, e:
             print(e)
         return output
