@@ -69,15 +69,12 @@ class CycNullMsgParamException: public CycException {
    message. An example of the message passing is outlined below:  
    - Up/outgoing message: 
    -# Inside originator 
-   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
    -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop A 
-   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
    -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop B 
-   -# msg->setNextDest(next_stop) 
    -# msg->sendOn() 
    -# message object invokes receiveMessage(this) for next_stop 
    -# Inside stop C 

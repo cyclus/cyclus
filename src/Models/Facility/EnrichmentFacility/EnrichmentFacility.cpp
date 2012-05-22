@@ -295,7 +295,6 @@ void EnrichmentFacility::makeRequests(){
     trans.setResource(req_res);
 
     msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
     request->sendOn();
   }
 }
@@ -332,7 +331,6 @@ void EnrichmentFacility::makeOffers() {
   trans.setResource(offer_res);
 
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
   msg->sendOn();
 }
 
