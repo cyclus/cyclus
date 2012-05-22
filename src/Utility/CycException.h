@@ -59,11 +59,6 @@ class CycIOException: public CycException {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycMessageException: public CycException {
-  public: CycMessageException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CycTypeException: public CycException {
   public: CycTypeException(std::string msg) : CycException(msg) {};
 };

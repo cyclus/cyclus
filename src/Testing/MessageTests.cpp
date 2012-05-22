@@ -262,13 +262,6 @@ TEST_F(MessagePassingTest, KillSendOn) {
   EXPECT_EQ(stops[2], "comm3");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessagePassingTest, KillApproveTransfer) {
-  // if this doesn't segfault, the test passes
-  comm1->msg_->kill();
-  comm1->msg_->approveTransfer();
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - -Message Public Interface Testing - - - - - - - - - - - -
@@ -281,6 +274,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
+    TestCommunicator* comm2;
     msg_ptr msg1;
 
     virtual void SetUp(){
@@ -288,12 +282,16 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       quantity2 = 2.0;
       resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
+      Model* foo;
+      Transaction* trans = new Transaction(foo, OFFER);
       comm1 = new TestCommunicator("comm1");
-      msg1 = msg_ptr(new Message(comm1));
+      comm2 = new TestCommunicator("comm2");
+      msg1 = msg_ptr(new Message(comm1, comm2, *trans));
     };
 
     virtual void TearDown() {
       delete comm1;
+      delete comm2;
     }
 };
 
@@ -316,19 +314,19 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
-  msg1->setResource(resource);
+  msg1->trans().setResource(resource);
   msg_ptr msg2 = msg1->clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  rsrc_ptr resource2 = msg2->resource();
+  rsrc_ptr resource2 = msg2->trans().resource();
   resource2->setQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
-  ASSERT_NE(resource, msg1->resource());
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_NE(resource, msg1->trans().resource());
   ASSERT_NE(resource, resource2);
 
   EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
@@ -342,13 +340,13 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 TEST_F(MessagePublicInterfaceTest, GetSetResource) {
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
 
-  msg1->setResource(resource);
+  msg1->trans().setResource(resource);
 
-  ASSERT_NE(resource, msg1->resource());
+  ASSERT_NE(resource, msg1->trans().resource());
 
-  msg1->resource()->setQuantity(quantity2);
+  msg1->trans().resource()->setQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg1->trans().resource()->quantity(), quantity2);
 }
 

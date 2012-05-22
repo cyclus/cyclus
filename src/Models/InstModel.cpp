@@ -17,20 +17,12 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 InstModel::InstModel() {
-  init();
   setModelType("Inst");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init() {
   prototypes_ = new PrototypeSet();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
-  // non xml inits
-  InstModel::init();
-  // xml inits
   Model::init(cur);
 }
 

@@ -6,6 +6,7 @@
 #include <list>
 
 #include "Message.h"
+#include "Model.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
@@ -56,12 +57,6 @@ class ConverterModel : public Model {
      every model should be destructable 
    */
   virtual ~ConverterModel() {};
-
-  /**
-     Initalize members of ConverterModel and any other non-input
-     related parameters
-   */
-  void init() {};
 
   /**
      A method to initialize the model 

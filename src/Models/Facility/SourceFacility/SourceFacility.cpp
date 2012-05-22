@@ -85,7 +85,7 @@ std::string SourceFacility::str() {
 void SourceFacility::receiveMessage(msg_ptr msg){
 
   // is this a message from on high? 
-  if(msg->supplier() == this){
+  if(msg->trans().supplier() == this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "SrcFac") << name() << " just received an order.";
@@ -95,9 +95,8 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
-  return MatBuff::toRes(inventory_.popQty(trans.resource->quantity()));
+vector<rsrc_ptr> SourceFacility::removeResource(Transaction order) {
+  return MatBuff::toRes(inventory_.popQty(order.resource()->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -107,7 +106,7 @@ void SourceFacility::handleTick(int time){
   generateMaterial(time);
   Transaction trans = buildTransaction();
 
-  LOG(LEV_INFO4, "SrcFac") << "offers "<< trans.resource->quantity() << " kg of "
+  LOG(LEV_INFO4, "SrcFac") << "offers "<< trans.resource()->quantity() << " kg of "
                            << out_commod_ << ".";
 
   sendOffer(trans);
@@ -143,12 +142,11 @@ Transaction SourceFacility::buildTransaction() {
 
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
 
-  Transaction trans;
-  trans.commod = out_commod_;
+  Transaction trans(this, OFFER);
+  trans.setCommod(out_commod_);
   trans.minfrac = min_amt/offer_amt;
-  trans.is_offer = true;
-  trans.price = commod_price_;
-  trans.resource = offer_res;
+  trans.setPrice(commod_price_);
+  trans.setResource(offer_res);
 
   return trans;
 }
@@ -170,12 +168,12 @@ void SourceFacility::handleTock(int time){
   // check what orders are waiting,
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
-    msg_ptr order = ordersWaiting_.front();
-    if (order->resource()->quantity() - inventory_.quantity() > EPS_KG) {
+    Transaction order = ordersWaiting_.front()->trans();
+    if (order.resource()->quantity() - inventory_.quantity() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {
-      order->approveTransfer();
+      order.approveTransfer();
       ordersWaiting_.pop_front();
     }
   }
