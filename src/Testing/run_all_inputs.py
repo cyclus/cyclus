@@ -28,7 +28,7 @@ def get_files(path):
         if '.git' in dirs:
             dirs.remove('.git')
         for name in files: 
-            if re.search("test.*\.xml",name):
+            if re.search("\.xml",name):
                 full_paths.append(os.path.join(root, name))
             else :
                 files.remove(name)
@@ -55,6 +55,9 @@ class TestFile():
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             io_tuple = p.communicate()
             output = io_tuple[0]
+            print "----------------------------"
+            print output
+            print "----------------------------"
         except subprocess.CalledProcessError, e:
             print(e)
         return output
