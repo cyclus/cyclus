@@ -7,19 +7,27 @@ import re
  
 def main():
     check_inputs()
-    path = get_path()
-    files = get_files(path)
+    input_path = get_input_path()
+    cyclus_path = get_cyclus_path()
+    files = get_files(input_path)
+    sum = Summary()
     for file in files :
-        file_to_test = TestFile(file) 
+        file_to_test = TestFile(cyclus_path, file) 
         file_to_test.run_tests()
+        sum.add_to_summary(file_to_test)
+    sum.print_summary()
 
 def check_inputs():
-    if len(sys.argv) != 2: 
-        print 'Usage: run_all_inputs.py <path_to_Input_folder>' 
+    if len(sys.argv) != 3: 
+        print 'Usage: run_all_inputs.py [path_to_cyclus_executable] [path_to_Input_folder]' 
         sys.exit(1) 
  
-def get_path():
+def get_cyclus_path():
     path = sys.argv[1]
+    return path
+
+def get_input_path():
+    path = sys.argv[2]
     return path
 
 def get_files(path):
@@ -36,28 +44,48 @@ def get_files(path):
     print full_paths
     return full_paths
 
+class Summary():
+    """An object to hold the results of all the tests"""
+    def __init__(self):
+        self.passed = []
+        self.failed = []
+
+    def add_to_summary(self, test_file) :
+        if test_file.passed : 
+            self.passed.append( test_file.infile )
+        else :
+            self.failed.append( test_file.infile )
+
+    def print_summary(self) :
+        print "Tests passed = " + str(len(self.passed))
+        print "Tests failed = " + str(len(self.failed))
+        print "Failed tests : " 
+        for test in self.failed : 
+            print test
+
 class TestFile():
     """An object representing the inputxml file to test"""
-    def __init__(self, file_path):
-        self.name = file_path # strip off front bit
+    def __init__(self, cyclus_path, file_path):
+        self.infile = file_path 
+        self.cyclus_path = cyclus_path 
+        self.passed=True
   
     def run_tests(self):
         """Runs all of the input file tests"""
         output = self.get_output()
-        self.test_no_errors(output)
-        self.test_expected(output)
+        if self.test_no_errors(output) and self.test_expected(output) : 
+            self.passed = True
+        else :
+            self.passed = False
 
     def get_output(self):
         """Returns the output from running the FileTest"""
         flags = " -v9"
         try :
-            p = subprocess.Popen("./cyclus "+self.name+flags,
+            p = subprocess.Popen(self.cyclus_path+" "+ self.infile + flags,
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             io_tuple = p.communicate()
             output = io_tuple[0]
-            print "----------------------------"
-            print output
-            print "----------------------------"
         except subprocess.CalledProcessError, e:
             print(e)
         return output
@@ -65,7 +93,7 @@ class TestFile():
     def test_no_errors(self, output):
         """returns true if there were no errors or segfaults running this TestFile"""
         to_ret = True
-        print "Test " + self.name 
+        print "Test " + self.infile 
         if re.search("ERROR",output) or re.search("Segmentation fault",output):
             to_ret = False
             print " resulted in errors: "
