@@ -23,15 +23,18 @@ def get_path():
     return path
 
 def get_files(path):
+    full_paths=[]
     for root, dirs, files in os.walk(path, followlinks=True):
         if '.git' in dirs:
             dirs.remove('.git')
         for name in files: 
-            if re.search("null\.xml",name):
-                files.append(os.path.join(root, name))
+            if re.search("test.*\.xml",name):
+                full_paths.append(os.path.join(root, name))
             else :
                 files.remove(name)
-    return files
+    print "The files to be tested are:"
+    print full_paths
+    return full_paths
 
 class TestFile():
     """An object representing the inputxml file to test"""
@@ -40,25 +43,24 @@ class TestFile():
   
     def run_tests(self):
         """Runs all of the input file tests"""
-        if self.test_no_crash() : 
-            output = self.get_output()
-            self.test_no_errors(output)
-            self.test_expected(output)
+        output = self.get_output()
+        self.test_no_errors(output)
+        self.test_expected(output)
 
     def get_output(self):
         """Returns the output from running the FileTest"""
-        flags = " -v9 " + self.name
+        flags = " -v9"
         try :
-            subprocess.check_call(["./cyclus", flags])
+            input_output = subprocess.Popen("./cyclus "+self.name+flags,
+                    shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError, e:
-            print "native CalledProcessError.output = " + e.output
-        output = subprocess.check_output("./cyclus"+flags, stderr=subprocess.STDOUT, shell=True)
+            print(e)
         return output
         
     def test_no_errors(self, output):
         """returns true if there were no errors or segfaults running this TestFile"""
         to_ret = True
-            print "Test " + self.name 
+        print "Test " + self.name 
         if re.search("ERROR",output) or re.search("Segmentation fault",output):
             to_ret = False
             print " resulted in errors: "
