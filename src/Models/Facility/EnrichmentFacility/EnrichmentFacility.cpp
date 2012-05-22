@@ -12,6 +12,7 @@
 #include "InputXML.h"
 #include "MarketModel.h"
 #include "GenericResource.h"
+#include "CompMap.h"
 
 using namespace std;
 
@@ -372,10 +373,10 @@ void EnrichmentFacility::enrich() {
     }
 
     // Do the enrichment math.
-    double P = vecToMake.eltMass(92);
-    double xp = vecToMake.mass(922350) / P;
-    double F = mat_iso.eltMass(92);
-    double xf = mat_iso.mass(922350) / F;
+    double xp = vecToMake.massFraction(922350);
+    double P = vecToMake.quantity() * xp;
+    double xf = mat_iso.massFraction(922350);
+    double F = mat.quantity() * xf;
     double W = F - P;
     double xw = (F * xf - P * xp) / W;
 
@@ -393,13 +394,13 @@ void EnrichmentFacility::enrich() {
     // The stoich for this one's easy:
     atoms19 = (atoms235 + atoms238) * 6;
 
-    IsoVector pComp;
-    pComp.setAtomCount(922350, atoms235);
-    pComp.setAtomCount(922380, atoms238);
-    pComp.setAtomCount(90190, atoms19);
-    pComp.setMass(mat->quantity());
+    CompMapPtr pComp = CompMapPtr(new CompMap(ATOM));
+    (*pComp)[922350] = atoms235;
+    (*pComp)[922380] = atoms238;
+    (*pComp)[90190] = atoms19;
 
     mat_rsrc_ptr theProd = mat_rsrc_ptr(new Material(pComp));
+    theProd->setQuantity(mat->quantity());
 
     // in this moment, we assume that P is in tons... KDHFLAG
     grams92 = W * 1E6;
@@ -409,22 +410,18 @@ void EnrichmentFacility::enrich() {
     // The stoich for this one's easy:
     atoms19 = (atoms235 + atoms238) * 6;
 
-    IsoVector wComp;
-    wComp.setAtomCount(922350, atoms235);
-    wComp.setAtomCount(922380, atoms238);
-    wComp.setAtomCount(90190, atoms19);
-    wComp.setMass(mat->quantity());
+    CompMapPtr wComp = CompMapPtr(new CompMap(ATOM));
+    (*wComp)[922350] = atoms235;
+    (*wComp)[922380] = atoms238;
+    (*wComp)[90190] = atoms19;
 
     //KDHFlag - Make sure you're not losing mass with this... you likely are. Think about it.
     mat_rsrc_ptr theTails = mat_rsrc_ptr(new Material(wComp));
+    theTails->setQuantity(mat->quantity());
 
     // CONSERVATION OF MASS CHECKS:
-    if (fabs(pComp.eltMass(92) + wComp.eltMass(92) 
-          - mat_iso.eltMass(92)) > EPS_KG)
-      throw CycException("Conservation of mass violation at Enrichment!!");
-
-    if (fabs(pComp.mass(922350) +
-          wComp.mass(922350) 
+    if (fabs(theProduct.mass(922350) +
+          theTails.mass(922350) 
           - mat_iso.mass(922350)) > EPS_KG)
       throw CycException("Conservation of mass violation at Enrichment!!");
 

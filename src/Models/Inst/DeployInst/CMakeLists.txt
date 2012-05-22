@@ -11,3 +11,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Inst/DeployInst/DeployInst.rng
 ${CMAKE_CURRENT_BINARY_DIR}/DeployInst.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Inst/DeployInst/DeployInst.rng'/>"
+  PARENT_SCOPE)
+SET(INST_REFS ${INST_REFS}
+  "<ref name='DeployInst'/>"
+  PARENT_SCOPE)

@@ -11,7 +11,13 @@
 class Resource;
 typedef boost::intrusive_ptr<Resource> rsrc_ptr;
 
-/// A list of concrete types of resource
+/* -- Defines -- */
+#define EPS_RSRC 1e-6
+/* -- */
+
+/**
+   A list of concrete types of resource
+*/
 enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES }; 
 
 /**
@@ -148,6 +154,11 @@ public:
      Constructor 
    */
   Resource();
+
+  /**
+     amount of a resource
+   */
+  double quantity_;
 
   /**
      Resource ID 

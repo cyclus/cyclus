@@ -10,3 +10,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Market/StubMarket/StubMarket.rng
 ${CMAKE_CURRENT_BINARY_DIR}/StubMarket.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Market/StubMarket/StubMarket.rng'/>"
+  PARENT_SCOPE)
+SET(MKT_REFS ${MKT_REFS}
+  "<ref name='StubMarket'/>"
+  PARENT_SCOPE)

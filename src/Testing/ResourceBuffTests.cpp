@@ -1,85 +1,7 @@
 
 #include <gtest/gtest.h>
-#include "IsoVector.h"
-#include "ResourceBuff.h"
-#include "CycException.h"
-#include "Logger.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-class ResourceBuffTest : public ::testing::Test {
-  protected:
-    IsoVector vect1_, vect2_;
-
-    int oxygen, u235, u238, pu240;
-
-    double v1_m_oxygen, v1_m_u235, v1_m_u238;
-    double v2_m_oxygen, v2_m_u235, v2_m_pu240;
-
-    rsrc_ptr mat1_;
-    rsrc_ptr mat2_;
-    Manifest mats;
-
-    ResourceBuff store_; // default constructed mat store
-    ResourceBuff filled_store_;
-
-    double neg_cap, zero_cap, cap, low_cap;
-    double exact_qty; // mass in filled_store_
-    double exact_qty_under; // mass in filled_store - 0.9*STORE_EPS
-    double exact_qty_over; // mass in filled_store + 0.9*STORE_EPS
-    double over_qty;  // mass in filled_store - 1.1*STORE_EPS
-    double under_qty; // mass in filled_store + 1.1*STORE_EPS
-    double overeps, undereps;
-
-    virtual void SetUp() {
-      try {
-        oxygen = 8001;
-        u235 = 92235;
-        u238 = 92238;
-        pu240 = 94240;
-
-        v1_m_oxygen = 1;
-        v1_m_u235 = 10;
-        v1_m_u238 = 100;
-
-        v2_m_oxygen = 2;
-        v2_m_u235 = 20;
-        v2_m_pu240 = 200;
-
-        vect1_.setMass(oxygen, v1_m_oxygen);
-        vect1_.setMass(u235, v1_m_u235);
-        vect1_.setMass(u238, v1_m_u238);
-
-        vect2_.setMass(oxygen, v2_m_oxygen);
-        vect2_.setMass(u235, v2_m_u235);
-        vect2_.setMass(pu240, v2_m_pu240);
-
-        mat1_ = rsrc_ptr(new Material(vect1_));
-        mat2_ = rsrc_ptr(new Material(vect2_));
-        mats.push_back(mat1_);
-        mats.push_back(mat2_);
-
-        neg_cap = -1;
-        zero_cap = 0;
-        cap = 334; // should be higher than mat1+mat2 masses
-        low_cap = 332; // should be lower than mat1_mat2 masses
-
-        undereps = 0.9 * STORE_EPS;
-        overeps = 1.1 * STORE_EPS;
-        exact_qty = mat1_->quantity();
-        exact_qty_under = exact_qty - undereps;
-        exact_qty_over = exact_qty + undereps;
-        under_qty = exact_qty - overeps;
-        over_qty = exact_qty + overeps;
-
-        filled_store_.setCapacity(cap);
-        filled_store_.pushOne(mat1_);
-        filled_store_.pushOne(mat2_);
-      } catch (std::exception err) {
-        LOG(LEV_ERROR, "MSTest") << err.what();
-        FAIL() << "An exception was thrown in the fixture SetUp.";
-      }
-    }
-};
+#include "ResourceBuffTests.h"
 
 /*
 To check:
@@ -95,6 +17,8 @@ To check:
 // ResourceBuff. The "Filled" suffix indicates the test uses the
 // filled_store_ instance of ResourceBuff.
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, SetCapacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
@@ -244,6 +168,8 @@ TEST_F(ResourceBuffTest, MakeLimited_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
   Manifest manifest;
   double qty = cap + overeps;
@@ -390,6 +316,8 @@ TEST_F(ResourceBuffTest, RemoveOne_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
@@ -400,6 +328,21 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.pushOne(mat2_));
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(ResourceBuffTest, PushToUnlimited) {
+  store_.setCapacity(cap);
+  store_.makeUnlimited();
+
+  int nMats = 5;
+  double tot = cap * nMats;
+  for (int i = 0; i < nMats; i++) {
+    rsrc_ptr mat = rsrc_ptr(new Material(vect1_));
+    mat->setQuantity(cap);
+    ASSERT_NO_THROW(store_.pushOne(mat));
+  }
+  EXPECT_DOUBLE_EQ(store_.quantity(), tot);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

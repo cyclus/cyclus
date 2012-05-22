@@ -277,7 +277,7 @@ class Message: IntrusiveBase<Message> {
   /**
      returns true if this message has been killed - see Message::kill() 
    */
-  bool isDead() {return dead_;}
+  bool isDead();
   
   /**
      designate the next object to receive this message 

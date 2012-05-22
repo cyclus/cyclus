@@ -10,3 +10,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Market/ConverterMarket/ConverterMarket.rng
 ${CMAKE_CURRENT_BINARY_DIR}/ConverterMarket.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Market/ConverterMarket/ConverterMarket.rng'/>"
+  PARENT_SCOPE)
+SET(MKT_REFS ${MKT_REFS}
+  "<ref name='ConverterMarket'/>"
+  PARENT_SCOPE)

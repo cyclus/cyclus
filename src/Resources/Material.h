@@ -13,10 +13,15 @@
 #include "Resource.h"
 #include "IsoVector.h"
 
+/* -- Defines -- */
+#define EPS_KG 1e-6
 #define WF_U235 0.007200 // feed, natural uranium 
+/* -- */
 
+/* -- Typedefs -- */
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
+/* -- */
 
 /*!
    @class Material
@@ -65,11 +70,19 @@ public:
 
   /**
      a constructor for making a material object 
-     from a known recipe and size. 
+     from a known recipe. 
       
      @param comp isotopic makeup of this material object 
    */
-  Material(IsoVector comp);
+  Material(CompMapPtr comp);
+
+  /**
+     a constructor for making a material object 
+     from a known isovector. 
+      
+     @param comp isotopic makeup of this material object 
+   */
+  Material(IsoVector vec);
 
   /**
      a constructor for making a material object 
@@ -101,7 +114,7 @@ public:
   /**
      Resource class method 
    */
-  double quantity() {return iso_vector_.mass();};
+  double quantity();
 
   /**
      Resource class method 
@@ -143,15 +156,16 @@ public:
   virtual void absorb(mat_rsrc_ptr matToAdd);
 
   /**
-     Extracts from this material a composition 
-     specified by the given IsoVector 
+     Extracts from this material a composition
+     specified by the given IsoVector. This operation will change
+     the quantity_ and iso_vector_ members.
       
-     @param rem_comp the composition/amount of material that will be 
-     removed against this Material 
+     @param other the composition/amount of material that will be
+     removed against this Material
       
-     @return the extracted material as a newly allocated material object 
+     @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(IsoVector rem_comp);
+  virtual mat_rsrc_ptr extract(const IsoVector& other);
 
   /**
      Extracts a specified mass from this material creating a new 
@@ -177,6 +191,11 @@ public:
      last entry in the material history. 
    */
   void decay();
+
+  /**
+     returns the mass of a given isotope
+   */
+  double mass(Iso tope);
 
   /**
      Returns a copy of this material's isotopic composition 
@@ -269,7 +288,7 @@ private:
   /**
      return the state id for the iso vector 
    */
-  virtual int stateID() {return iso_vector_.stateID();}
+  virtual int stateID() {return iso_vector_.comp()->ID();}
 
  private:
   /**

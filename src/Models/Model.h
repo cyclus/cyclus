@@ -211,7 +211,9 @@ class Model {
   int diedOn() {return diedOn_;};
 
   /**
-     add a child to the list of children 
+     add a child to the list of children.
+
+     This does NOT set the specified child's parent to be this model.
    */
   void addChild(Model* child);
 
@@ -227,6 +229,9 @@ class Model {
 
   /**
      set the parent of this model 
+
+     This DOES add the this model to the specified parent's list of children
+     (i.e. this automatically calls "parent->addChild(this);")
    */
   void setParent(Model* parent);
 

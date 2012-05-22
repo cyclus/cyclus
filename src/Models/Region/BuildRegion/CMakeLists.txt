@@ -13,3 +13,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Region/BuildRegion/BuildRegion.rng
 ${CMAKE_CURRENT_BINARY_DIR}/BuildRegion.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Region/BuildRegion/BuildRegion.rng'/>"
+  PARENT_SCOPE)
+SET(REG_REFS ${REG_REFS}
+  "<ref name='BuildRegion'/>"
+  PARENT_SCOPE)

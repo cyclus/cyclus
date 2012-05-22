@@ -10,3 +10,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/StorageFacility/StorageFacility.rng
 ${CMAKE_CURRENT_BINARY_DIR}/StorageFacility.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Facility/StorageFacility/StorageFacility.rng'/>"
+  PARENT_SCOPE)
+SET(FAC_REFS ${FAC_REFS}
+  "<ref name='StorageFacility'/>"
+  PARENT_SCOPE)

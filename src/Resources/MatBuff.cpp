@@ -3,12 +3,12 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MatBuff::popQty(double qty) {
-  return ResourceBuff::toMat(ResourceBuff::popQty(qty));
+  return toMat(ResourceBuff::popQty(qty));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MatBuff::popNum(int num) {
-  return ResourceBuff::toMat(ResourceBuff::popNum(num));
+  return toMat(ResourceBuff::popNum(num));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -23,6 +23,6 @@ void MatBuff::pushOne(mat_rsrc_ptr mat) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MatBuff::pushAll(MatManifest mats) {
-  ResourceBuff::pushAll(ResourceBuff::toRes(mats));
+  ResourceBuff::pushAll(toRes(mats));
 }
 
