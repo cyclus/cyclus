@@ -16,7 +16,6 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RegionModel::RegionModel() { 
-  init();
   setModelType("Region");
 }
 
@@ -93,7 +92,7 @@ std::string RegionModel::str() {
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::receiveMessage(msg_ptr msg){
-  msg->setNextDest(msg->market());
+  msg->setNextDest(msg->receiver());
   msg->sendOn();
 }
 
@@ -108,23 +107,34 @@ void RegionModel::handlePreHistory(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTick(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->handleTick(time);
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<InstModel*>(m)->handleTick(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTock(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->handleTock(time);
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<InstModel*>(m)->handleTock(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
-  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

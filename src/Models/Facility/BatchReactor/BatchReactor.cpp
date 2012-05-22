@@ -4,11 +4,11 @@
 
 #include "Logger.h"
 #include "GenericResource.h"
+#include "RecipeLogger.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 
-#include <iostream>
 #include <queue>
 #include <sstream>
 
@@ -23,11 +23,6 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 BatchReactor::BatchReactor() {
-  init();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::init() { 
   preCore_.makeUnlimited();
   inCore_.makeUnlimited();
   postCore_.makeUnlimited();
@@ -68,11 +63,11 @@ void BatchReactor::init(xmlNodePtr cur) {
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    setInRecipe(IsoVector::recipe(recipe_name));
+    setInRecipe(RecipeLogger::Recipe(recipe_name));
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    setOutRecipe(IsoVector::recipe(recipe_name));
+    setOutRecipe(RecipeLogger::Recipe(recipe_name));
 
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
@@ -127,7 +122,7 @@ std::string BatchReactor::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "BReact") << name() << " just received an order.";
@@ -148,33 +143,31 @@ void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
 void BatchReactor::handleOrders() {
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::addResource(msg_ptr msg,
+void BatchReactor::addResource(Transaction trans,
                                std::vector<rsrc_ptr> manifest) {
   double preQuantity = preCore_.quantity();
-  preCore_.pushAll(ResourceBuff::toMat(manifest));
+  preCore_.pushAll(MatBuff::toMat(manifest));
   double added = preCore_.quantity() - preQuantity;
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " added "
-                            << added << " to its " << preCore_.name()
-                            << " buffer.";
+                            << added << " to its precore buffer.";
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> BatchReactor::removeResource(msg_ptr order) {
-  Transaction trans = order->trans();
-  double amt = trans.resource->quantity();
+vector<rsrc_ptr> BatchReactor::removeResource(Transaction order) {
+  Transaction trans = order;
+  double amt = trans.resource()->quantity();
 
   LOG(LEV_DEBUG4, "BReact") << "BatchReactor " << name() << " removed "
                             << amt << " of " << postCore_.quantity() 
-                            <<" to its " << postCore_.name()
-                            << " buffer.";
+                            << " to its postcore buffer.";
   
-  return ResourceBuff::toRes(postCore_.popQty(amt));
+  return MatBuff::toRes(postCore_.popQty(amt));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -290,15 +283,13 @@ bool BatchReactor::requestMet() {
 void BatchReactor::moveFuel(MatBuff& fromBuff, MatBuff& toBuff, double amt) {
   //  toBuff->pushAll(fromBuff->popQty(amt));
   vector<mat_rsrc_ptr> to_delete = fromBuff.popQty(amt);
-  IsoVector* temp = &out_recipe_;
-  temp->setMass(amt);
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
-  //newMat->setMass(amt);
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(out_recipe_));
+  newMat->setQuantity(amt);
   toBuff.pushOne(newMat);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer) {
+void BatchReactor::interactWithMarket(std::string commod, double amt, TransType type) {
   LOG(LEV_INFO4, "BReact") << " making requests {";  
   // get the market
   MarketModel* market = MarketModel::marketForCommod(commod);
@@ -308,15 +299,14 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, bool offer
   // request a generic resource
   gen_rsrc_ptr trade_res = gen_rsrc_ptr(new GenericResource(commod, "kg", amt));
   // build the transaction and message
-  Transaction trans;
-  trans.commod = commod;
+  Transaction trans(this, type);
+  trans.setCommod(commod);
   trans.minfrac = 1.0;
-  trans.is_offer = offer;
-  trans.price = commod_price;
-  trans.resource = trade_res;
+  trans.setPrice(commod_price);
+  trans.setResource(trade_res);
   // log the event
   string text;
-  if (offer) {
+  if (type == OFFER) {
     text = " has offered ";
   }
   else {

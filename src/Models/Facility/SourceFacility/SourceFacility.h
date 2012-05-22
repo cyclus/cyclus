@@ -8,7 +8,6 @@
 
 #include "Logger.h"
 #include "FacilityModel.h"
-#include "Material.h"
 #include "MatBuff.h"
 
 /**
@@ -135,7 +134,7 @@ class SourceFacility : public FacilityModel  {
      @return list of resources to be sent for this order 
       
    */ 
-  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(Transaction order);
 
 /* ------------------- */ 
 
@@ -244,7 +243,7 @@ private:
      A collection  that holds the "product" Material this Facility has 
      on hand to send to others. 
    */ 
-  MatBuff inventory_;
+  MatBuff inventory_; // @MJG couldnt this be a RsrcBuff?
   
 };
 

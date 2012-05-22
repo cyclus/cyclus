@@ -10,3 +10,11 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/BatchReactor/BatchReactor.rng
 ${CMAKE_CURRENT_BINARY_DIR}/BatchReactor.rng
 COPYONLY
 )
+
+
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Facility/BatchReactor/BatchReactor.rng'/>"
+  PARENT_SCOPE)
+SET(FAC_REFS ${FAC_REFS}
+  "<ref name='BatchReactor'/>"
+  PARENT_SCOPE)

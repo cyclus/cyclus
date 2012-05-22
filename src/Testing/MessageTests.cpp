@@ -30,11 +30,12 @@ class TestCommunicator : public Communicator {
       flip_at_receive_ = false;
       flip_down_to_up_ = false;
       forget_set_dest_ = false;
+      keep_ = false;
       kill_ = false;
       down_up_count_ = 0;
     }
 
-    ~TestCommunicator() { }
+    virtual ~TestCommunicator() { }
 
     Communicator* parent_;
     msg_ptr msg_;
@@ -42,6 +43,7 @@ class TestCommunicator : public Communicator {
     string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
     bool flip_down_to_up_;
+    bool keep_;
     int down_up_count_;
     bool kill_;
 
@@ -51,12 +53,23 @@ class TestCommunicator : public Communicator {
       msg_->sendOn();
     }
 
+    void returnMessage() {
+      if (!keep_) {
+        return;
+      }
+      msg_->sendOn();
+    }
+
   private:
 
     void receiveMessage(msg_ptr msg) {
       boost::intrusive_ptr<TrackerMessage> ptr;
       ptr = boost::intrusive_ptr<TrackerMessage>(dynamic_cast<TrackerMessage*>(msg.get()));
       ptr->dest_list_.push_back(name_);
+      if (keep_) {
+        msg_ = msg;
+        return;
+      }
       if (kill_) {
         msg->kill();
       }
@@ -105,10 +118,7 @@ class MessagePassingTest : public ::testing::Test {
     };
 
     virtual void TearDown() {
-      delete comm1;
-      delete comm2;
-      delete comm3;
-      delete comm4;
+
     }
 };
 
@@ -215,12 +225,17 @@ TEST_F(MessagePassingTest, YoYo) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessagePassingTest, KillSendOn) {
-  comm3->kill_ = true;
+TEST_F(MessagePassingTest, KillByDeletingSender) {
+  msg_ptr msg = comm1->msg_;
+  comm3->keep_ = true;
 
   ASSERT_NO_THROW(comm1->startMessage());
+  ASSERT_FALSE(msg->isDead());
+  delete comm1;
+  ASSERT_TRUE(msg->isDead());
+  ASSERT_NO_THROW(comm3->returnMessage());
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  vector<string> stops = dynamic_cast<TrackerMessage*>(msg.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -232,10 +247,19 @@ TEST_F(MessagePassingTest, KillSendOn) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(MessagePassingTest, KillApproveTransfer) {
-  // if this doesn't segfault, the test passes
-  comm1->msg_->kill();
-  comm1->msg_->approveTransfer();
+TEST_F(MessagePassingTest, KillSendOn) {
+  comm3->kill_ = true;
+  ASSERT_NO_THROW(comm1->startMessage());
+
+  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  int num_stops = stops.size();
+  int expected_num_stops = 3;
+
+  ASSERT_EQ(num_stops, expected_num_stops);
+
+  EXPECT_EQ(stops[0], "comm1");
+  EXPECT_EQ(stops[1], "comm2");
+  EXPECT_EQ(stops[2], "comm3");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -250,6 +274,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
+    TestCommunicator* comm2;
     msg_ptr msg1;
 
     virtual void SetUp(){
@@ -257,12 +282,16 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       quantity2 = 2.0;
       resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
+      Model* foo;
+      Transaction* trans = new Transaction(foo, OFFER);
       comm1 = new TestCommunicator("comm1");
-      msg1 = msg_ptr(new Message(comm1));
+      comm2 = new TestCommunicator("comm2");
+      msg1 = msg_ptr(new Message(comm1, comm2, *trans));
     };
 
     virtual void TearDown() {
       delete comm1;
+      delete comm2;
     }
 };
 
@@ -285,19 +314,19 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
-  msg1->setResource(resource);
+  msg1->trans().setResource(resource);
   msg_ptr msg2 = msg1->clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  rsrc_ptr resource2 = msg2->resource();
+  rsrc_ptr resource2 = msg2->trans().resource();
   resource2->setQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->resource()->quantity(), quantity2);
-  ASSERT_NE(resource, msg1->resource());
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_NE(resource, msg1->trans().resource());
   ASSERT_NE(resource, resource2);
 
   EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
@@ -311,13 +340,13 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 TEST_F(MessagePublicInterfaceTest, GetSetResource) {
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
 
-  msg1->setResource(resource);
+  msg1->trans().setResource(resource);
 
-  ASSERT_NE(resource, msg1->resource());
+  ASSERT_NE(resource, msg1->trans().resource());
 
-  msg1->resource()->setQuantity(quantity2);
+  msg1->trans().resource()->setQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg1->trans().resource()->quantity(), quantity2);
 }
 

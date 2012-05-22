@@ -62,12 +62,6 @@ class InstModel : public TimeAgent, public Communicator {
   virtual ~InstModel() {};
       
   /**
-     Initalize members of InstModel and any other non-input
-     related parameters
-   */
-  void init();
-
-  /**
      Initalize the InstModel from xml. Calls the init function. 
      
      @param cur the current xml node pointer 

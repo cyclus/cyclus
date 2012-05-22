@@ -28,9 +28,17 @@ Material::Material() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-Material::Material(IsoVector comp) {
+Material::Material(CompMapPtr comp) {
+  IsoVector vec = IsoVector(comp);
   last_update_time_ = TI->time();
-  iso_vector_ = comp;
+  iso_vector_ = vec;
+  CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::Material(IsoVector vec) {
+  last_update_time_ = TI->time();
+  iso_vector_ = vec;
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
@@ -38,6 +46,7 @@ Material::Material(IsoVector comp) {
 Material::Material(const Material& other) {
   iso_vector_ = other.iso_vector_;
   last_update_time_ = other.last_update_time_;
+  quantity_ = other.quantity_;
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
 };
 
@@ -45,40 +54,47 @@ Material::Material(const Material& other) {
 void Material::absorb(mat_rsrc_ptr matToAdd) { 
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
-  IsoVector vec_to_add = matToAdd->isoVector();
-  iso_vector_ = iso_vector_ + vec_to_add;
+  double amt = matToAdd->quantity();
+  iso_vector_.mix(matToAdd->isoVector(),quantity_/amt); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
+  quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
                    << matToAdd->ID() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
-
-  IsoVector new_comp = iso_vector_;
-  new_comp.setMass(mass);
-  iso_vector_.setMass(iso_vector_.mass() - mass);
+  // remove our mass
+  quantity_ -= mass;
+  // make a new material, set its mass
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(iso_vector_));
+  new_mat->setQuantity(mass);
+  // we just split a resource, so keep track of the original for book keeping
+  new_mat->setOriginalID( this->originalID() );
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
                    << " kg extracted from it. New mass=" << quantity() << " kg.";
   
-  mat_rsrc_ptr new_mat = new Material(new_comp);
-  // we just split a resource, so keep track of the original for book keeping
-  new_mat->setOriginalID( this->originalID() );
-
-  return mat_rsrc_ptr(new_mat);
+  return new_mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(IsoVector rem_comp) {
-  iso_vector_ = iso_vector_ - rem_comp;
+mat_rsrc_ptr Material::extract(const IsoVector& other) {
+  // get the extraction paramters
+  double fraction = iso_vector_.intersectionFraction(other);
+  double amt = quantity_ * fraction;
+  IsoVector vec = iso_vector_ - other; // @MJG_FLAG previous bevaior was isovector -= other..
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+  // make new material
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(vec));
+  new_mat->setQuantity(amt);
+  new_mat->setOriginalID( this->originalID() ); // book keeping
+  
+  // adjust old material
+  iso_vector_ -= other; // matching previous behavior
+  quantity_ -= amt;
 
-  mat_rsrc_ptr new_mat = new Material(rem_comp);
-  // we just split a resource, so keep track of the original for book keeping
-  new_mat->setOriginalID( this->originalID() );
-
-  return mat_rsrc_ptr(new_mat);
+  return new_mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -94,7 +110,7 @@ void Material::print() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 string Material::detail() {
   vector<string>::iterator entry;
-  vector<string> entries = iso_vector_.compStrings();
+  vector<string> entries = iso_vector_.comp()->compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
@@ -103,15 +119,21 @@ string Material::detail() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::setQuantity(double quantity) {
-  iso_vector_.setMass(quantity);
+  quantity_ = quantity;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
                    << quantity << " kg";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::quantity() {
+  return quantity_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 rsrc_ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
   rsrc_ptr mat(new Material(*this));
+  mat->setQuantity(this->quantity());
   return mat;
 }
 
@@ -163,11 +185,16 @@ bool Material::checkQuantityGT(rsrc_ptr other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Material::mass(Iso tope) {
+  return iso_vector_.massFraction(tope) * quantity_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
   
-  iso_vector_.executeDecay(delta_time);
+  iso_vector_.decay((double)delta_time);
 
   last_update_time_ = curr_time;
 }
@@ -202,6 +229,5 @@ void Material::setDecay(int dec) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::addToTable() {
   Resource::addToTable();
-  iso_vector_.recordState();
+  iso_vector_.log();
 }
-

@@ -325,7 +325,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
       prepared @return list of resources to be sent for this order 
        
     */ 
-   virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
+   virtual std::vector<rsrc_ptr> removeResource(Transaction order);
 
    /**
       Transacted resources are received through this method 
@@ -334,7 +334,7 @@ class SeparationsMatrixFacility : public FacilityModel  {
       belong 
       @param manifest is the set of resources being received
     */ 
-   virtual void addResource(msg_ptr msg,
+   virtual void addResource(Transaction trans,
 			    std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 

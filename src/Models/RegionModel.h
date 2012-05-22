@@ -77,12 +77,6 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual ~RegionModel() {};
     
   /**
-     Initalize members of RegionModel and any other non-input
-     related parameters
-   */
-  void init() {};
-
-  /**
      Initalize the InstModel from xml. Calls the init function. 
      
      @param cur the current xml node pointer 

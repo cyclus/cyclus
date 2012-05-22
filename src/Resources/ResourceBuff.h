@@ -3,7 +3,7 @@
 #define _RESOURCEBUFF_H
 
 #include "Resource.h"
-#include "Material.h"
+
 #include "CycException.h"
 #include <list>
 #include <vector>
@@ -36,26 +36,6 @@ class ResourceBuff {
 
 public:
 
-  /// toRes is a helper function for casting std::vector<Material> to
-  /// std::vector<Resource>
-  static std::vector<rsrc_ptr> toRes(std::vector<mat_rsrc_ptr> mats) {
-    std::vector<rsrc_ptr> resources;
-    for (int i = 0; i < mats.size(); i++) {
-      resources.push_back(boost::dynamic_pointer_cast<Resource>(mats.at(i)));
-    }
-    return resources;
-  }
-
-  /// toMat is a helper function for casting std::vector<Resource> to
-  /// std::vector<Material>
-  static std::vector<mat_rsrc_ptr> toMat(std::vector<rsrc_ptr> resources) {
-    std::vector<mat_rsrc_ptr> mats;
-    for (int i = 0; i < resources.size(); i++) {
-      mats.push_back(boost::dynamic_pointer_cast<Material>(resources.at(i)));
-    }
-    return mats;
-  }
-
   ResourceBuff();
 
   virtual ~ResourceBuff();
@@ -63,7 +43,7 @@ public:
   /*!
   capacity returns the maximum resource quantity this store can hold (units
   based on constituent resource objects' units). 
-Never throws.  Returns -1 if the store is unlimited.
+  Never throws.  Returns -1 if the store is unlimited.
   */
   double capacity();
 
@@ -181,16 +161,6 @@ Never throws.  Returns -1 if the store is unlimited.
   */
   bool empty() {return mats_.empty();}
 
-  /**
-     sets the buffer's name
-  */
-  void setName(std::string name) {name_ = name;}
-  
-  /**
-     returns the buffer's name
-  */
-  std::string name() {return name_;}
-
 private:
 
   /// true if this store has an infinite capacity
@@ -201,11 +171,6 @@ private:
 
   /// list of constituent resource objects forming the store's inventory
   std::list<rsrc_ptr> mats_;
-
-  /**
-     buffer's name
-  */
-  std::string name_;
 };
 
 #endif

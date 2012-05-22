@@ -9,7 +9,6 @@
 
 #include "Logger.h"
 #include "FacilityModel.h"
-#include "Material.h"
 #include "MatBuff.h"
 
 /**
@@ -127,7 +126,7 @@ class SinkFacility : public FacilityModel  {
      @param msg the transaction to which these resource objects belong 
      @param manifest is the set of resources being received 
    */ 
-  virtual void addResource(msg_ptr msg,
+  virtual void addResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
 
 /* ------------------- */ 
