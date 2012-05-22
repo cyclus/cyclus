@@ -5,7 +5,7 @@ import os
 import re
  
 def main():
-    check_inputs(sys.argv)
+    check_inputs()
     path = get_path()
     files = get_files(path)
     for file in files :
@@ -26,18 +26,19 @@ def get_files(path):
         if '.git' in dirs:
             dirs.remove('.git')
         for name in files: 
-            if not re.search("\.xml",name):
+            if re.search("\.xml",name):
+                files.append(os.path.join(root, name))
+            else :
                 files.remove(name)
     return files
 
-class TestFile(self, file_path):
+class TestFile():
     '''An object representing the inputxml file to test'''
-  def __init__(self, file_path):
-    self.name = file_path # strip off front bit
-    self. = 
-
-  def test(self):
-    os.system("./cyclus " + os.path.join(root, name))
-    print("The Classy classmember speaks with clarity.")
+    def __init__(self, file_path):
+        self.name = file_path # strip off front bit
+  
+    def test_no_errors(self):
+        os.system("./cyclus -v9 " + self.name)
+        
 
 if __name__ == '__main__' : main()
