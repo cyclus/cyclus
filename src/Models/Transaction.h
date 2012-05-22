@@ -6,11 +6,17 @@
 
 #include "Resource.h"
 #include "Table.h"
+#include "CycException.h"
 
 class MarketModel;
 class Model;
 
 enum TransType {OFFER, REQUEST};
+
+class CycTransMismatchException: public CycException {
+  public: CycTransMismatchException() :
+      CycException("Matching requires 1 OFFER and 1 REQUEST typed transaction") { };
+};
 
 class Transaction {
 
@@ -68,23 +74,11 @@ class Transaction {
     Model* supplier() const;
 
     /**
-       @param supplier the assigned supplier of the material for this
-       transaction
-     */
-    void setSupplier(Model* supplier);
-
-    /**
        @return a pointer to the requester in this transaction. 
 
        @exception CycNullMsgParamException requester is uninitialized (NULL)
      */
     Model* requester() const;
-
-    /**
-       @param requester model that will receive the material for this
-       transaction
-     */
-    void setRequester(Model* requester);
 
     /**
        @return the commodity requested or offered in this transaction. 
@@ -152,6 +146,9 @@ class Transaction {
     Model* supplier_;
 
     Model* requester_;
+
+    /// unique to a matched offer/request pair, set by matchWith
+    int trans_id_;
 
     /// stores the next available transaction ID 
     static int next_trans_id_;
