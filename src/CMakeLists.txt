@@ -49,6 +49,13 @@ ${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
 COPYONLY
 )
 
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Testing/run_all_inputs.py
+${CMAKE_CURRENT_BINARY_DIR}/Testing/run_all_inputs.py
+COPYONLY
+)
+
+
 # ----- Cyclus Unit Test Driver ------
 
 # Includes the directories in which there are source files. 
