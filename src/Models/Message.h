@@ -222,25 +222,6 @@ class Message: IntrusiveBase<Message> {
   void setDir(MessageDir new_dir);
   
   /**
-     @return the corresponding offer/request message assuming this message has
-     been matched in a market. Returns the 'this' pointer otherwise. 
-   */
-  msg_ptr partner();
-
-  /**
-     Used to match this message with a corresponding offer/request message
-     after matching takes place in a market. 
-
-     Allows requesters to know which request message that they sent corresponds
-     to the resources they receive.
-
-     @param partner the matched offer/request counterpart to this message.
-
-     @TODO figure out how to make this work with markets
-   */
-  void setPartner(msg_ptr partner);
-
-  /**
      Set via the Message constructor and cannot be changed.
 
      @return the sender (original creator) of this Message. 

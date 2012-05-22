@@ -75,6 +75,11 @@ void Transaction::approveTransfer() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Transaction::matchWith(Transaction& other) {
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* Transaction::market() const {
   // put here to make explicit that this method throws
   MarketModel* market;

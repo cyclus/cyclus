@@ -164,16 +164,6 @@ void Message::setDir(MessageDir new_dir) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr Message::partner() {
-  return partner_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPartner(msg_ptr partner) {
-  partner_ = partner;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::sender() const {
   return sender_;
 }

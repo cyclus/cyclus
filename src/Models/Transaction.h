@@ -45,6 +45,12 @@ class Transaction {
        states) are taken care of automatically.
      */
     void approveTransfer();
+
+    /**
+
+    @exception CycTransMismatchException this transaction and "other" are of the same type.
+    */
+    void matchWith(Transaction& other);
   
     /**
        @return the market that deals in this this transaction's commodity
