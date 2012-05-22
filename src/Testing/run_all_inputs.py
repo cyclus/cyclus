@@ -54,7 +54,7 @@ class TestFile():
             p = subprocess.Popen("./cyclus "+self.name+flags,
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             io_tuple = p.communicate()
-            output = io_tuple[1]
+            output = io_tuple[0]
         except subprocess.CalledProcessError, e:
             print(e)
         return output
