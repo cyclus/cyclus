@@ -58,16 +58,19 @@ class TestFile():
     def test_no_errors(self, output):
         """returns true if there were no errors or segfaults running this TestFile"""
         to_ret = True
+            print "Test " + self.name 
         if re.search("ERROR",output) or re.search("Segmentation fault",output):
             to_ret = False
-            print "Test " + self.name + " resulted in errors: "
+            print " resulted in errors: "
             print output
-       return to_ret 
+        else :
+            print " passed. "
+        return to_ret 
 
-   def test_expected(self, output):
-       """This function is currently a placeholder. It is intended to print the 
-       difference between the current output and the output gathered the last 
-       time the test was run"""
-       return True
+    def test_expected(self, output):
+        """This function is currently a placeholder. It is intended to print the 
+        difference between the current output and the output gathered the last 
+        time the test was run"""
+        return True
 
 if __name__ == '__main__' : main()
