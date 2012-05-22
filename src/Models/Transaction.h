@@ -181,17 +181,15 @@ class Transaction {
 
   /**
      add a transaction to the transaction table 
-     @param id the message id 
    */
-  void addTransToTable(int id);
+  void addTransToTable();
 
   /**
      add a transaction to the transaction table 
-     @param id the message id 
      @param position the position in the manifest 
      @param resource the resource being transacted 
    */
-  void addResourceToTable(int id, int position, rsrc_ptr resource);
+  void addResourceToTable(int position, rsrc_ptr resource);
 
   /**
      the transaction primary key 
