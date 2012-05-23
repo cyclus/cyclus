@@ -51,7 +51,7 @@ COPYONLY
 
 set(input_path ${CYCLUS_SOURCE_DIR}/../input)
 set(cyclus_path ${CMAKE_CURRENT_BINARY_DIR})
-CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_all_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_all_inputs.py @ONLY)
+CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_inputs.py @ONLY)
 
 
 # ----- Cyclus Unit Test Driver ------
