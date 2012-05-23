@@ -148,15 +148,15 @@ void Message::setNextDest(Communicator* next_stop) {
     return;
   }
 
-  needs_next_dest_ = false;
-  
-  CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
-                   << next_stop;
-
   if (path_stack_.size() == 0) {
     path_stack_.push_back(sender_);
   }
   path_stack_.push_back(next_stop);
+
+  needs_next_dest_ = false;
+
+  CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
+                   << next_stop;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
