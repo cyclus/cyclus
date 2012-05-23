@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
 import re
@@ -37,21 +38,21 @@ def check_inputs():
 
 def print_usage() :
     """This prints the proper way to treat the command line interface"""
-        print 'Usage: python run_all_inputs.py\n' + \
-                'Allowed Options : \n' + \
-                '-v [ --verb ] arg   \
-                output log verbosity. \n' + \
-                '                    \
-                Can be text: \n' + \
-                '                    \
-                LEV_ERROR (least verbose, default), LEV_WARN,\n' + \
-                '                    \
-                LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n' + \
-                '                    \
-                Or an integer:\n'+ \
-                '                    \
-                0 (LEV_ERROR equiv) through 11 \
-                (LEV_DEBUG5 equiv)\n'
+    print 'Usage: python run_all_inputs.py\n' + \
+            'Allowed Options : \n' + \
+            '-v [ --verb ] arg  \
+            output log verbosity. \n' + \
+            '                    \
+            Can be text: \n' + \
+            '                    \
+            LEV_ERROR (least verbose, default), LEV_WARN,\n' + \
+            '                    \
+            LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n' + \
+            '                    \
+            Or an integer:\n'+ \
+            '                    \
+            0 (LEV_ERROR equiv) through 11 \
+            (LEV_DEBUG5 equiv)\n'
  
 def get_files(path):
     """This function walks the 'path' tree and finds input files"""
@@ -129,8 +130,8 @@ class TestFile():
     def get_output(self):
         """Returns the output from running the FileTest"""
         try :
-            p = subprocess.Popen(self.cyclus_path+" "+ self.infile + self.flag,
-                    shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = Popen(self.cyclus_path+" "+ self.infile + self.flag,
+                    shell=True, stdout=PIPE, stderr=STDOUT)
             io_tuple = p.communicate()
             output = io_tuple[0]
         except subprocess.CalledProcessError, e:
