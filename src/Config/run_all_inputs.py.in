@@ -16,7 +16,7 @@ def main():
     summ = Summary()
     for name in files :
         file_to_test = TestFile(cyclus_path, name, flag) 
-        file_to_test.run_tests()
+        file_to_test.run()
         summ.add_to_summary(file_to_test)
     clean_catalogs(catalognames)
     summ.print_summary()
@@ -117,7 +117,7 @@ class TestFile():
         self.passed=True
         self.flag = " "+flag+" "
   
-    def run_tests(self):
+    def run(self):
         """Runs all of the input file tests"""
         output = self.get_output()
         if self.test_no_errors(output) and self.test_expected(output) : 
