@@ -9,7 +9,8 @@ def main():
     check_inputs()
     input_path = "@input_path@"
     cyclus_path =  "@cyclus_path@/cyclus"
-    files = get_files(input_path)
+    files, catalogs = get_files(input_path)
+    move_catalogs(catalogs,cyclus_path)
     sum = Summary()
     for file in files :
         file_to_test = TestFile(cyclus_path, file) 
@@ -23,18 +24,34 @@ def check_inputs():
         sys.exit(1) 
  
 def get_files(path):
-    full_paths=[]
+    catalogs=[]
+    inputs=[]
     for root, dirs, files in os.walk(path, followlinks=True):
         if '.git' in dirs:
             dirs.remove('.git')
         for name in files: 
-            if re.search("\.xml",name):
-                full_paths.append(os.path.join(root, name))
+            if re.search("\.xml",name) :
+                if re.search("recipebook",name) or re.search("facilitycatalog",name):
+                    catalogs.append(os.path.join(root,name))
+                else : 
+                    inputs.append(os.path.join(root, name))
             else :
                 files.remove(name)
+    print "The catalogs to be moved are:"
+    print catalogs
     print "The files to be tested are:"
-    print full_paths
-    return full_paths
+    print inputs
+    return inputs, catalogs
+
+def move_catalogs(catalogs,cyclus_path) :
+    for cat in catalogs : 
+        p = subprocess.Popen("cp "+cat+" "+cyclus_path.strip("cyclus"),
+                shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+def clean_catalogs(catalogs) : 
+    for cat in catalogs :
+        p = subprocess.Popen("rm "+os.getcwd()+"/"+cat,
+                shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 class Summary():
     """An object to hold the results of all the tests"""
@@ -49,9 +66,9 @@ class Summary():
             self.failed.append( test_file.infile )
 
     def print_summary(self) :
-        print "Tests passed = " + str(len(self.passed))
-        print "Tests failed = " + str(len(self.failed))
-        print "Failed tests : " 
+        print "Input files passed = " + str(len(self.passed))
+        print "Input files failed = " + str(len(self.failed))
+        print "Failed input files : " 
         for test in self.failed : 
             print test
 
@@ -85,7 +102,7 @@ class TestFile():
     def test_no_errors(self, output):
         """returns true if there were no errors or segfaults running this TestFile"""
         to_ret = True
-        print "Test " + self.infile 
+        print "Input file " + self.infile 
         if re.search("No such file or directory",output) :
             print "Cyclus executable not found in path."
         elif re.search("ERROR",output) or re.search("Segmentation fault",output):
