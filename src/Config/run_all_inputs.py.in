@@ -40,19 +40,17 @@ def print_usage() :
     """This prints the proper way to treat the command line interface"""
     print 'Usage: python run_all_inputs.py\n' + \
             'Allowed Options : \n' + \
-            '-v [ --verb ] arg  \
-            output log verbosity. \n' + \
+            '-v arg                    output log verbosity. \n' + \
             '                    \
             Can be text: \n' + \
             '                    \
-            LEV_ERROR (least verbose, default), LEV_WARN,\n' + \
+              LEV_ERROR (least verbose, default), LEV_WARN,\n' + \
             '                    \
-            LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n' + \
+              LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n' + \
             '                    \
             Or an integer:\n'+ \
             '                    \
-            0 (LEV_ERROR equiv) through 11 \
-            (LEV_DEBUG5 equiv)\n'
+              0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n'
  
 def get_files(path):
     """This function walks the 'path' tree and finds input files"""
