@@ -24,8 +24,8 @@ def check_inputs():
         print_usage()
         sys.exit(1) 
     elif len(sys.argv) == 2:
-        if re.search("-v*",argv[1]):
-            flag = argv[1]
+        if re.search("-v*",sys.argv[1]):
+            flag = sys.argv[1]
         else : 
             print_usage()
             sys.exit(1)
@@ -100,7 +100,7 @@ class TestFile():
         self.infile = file_path 
         self.cyclus_path = cyclus_path 
         self.passed=True
-        self.flag = flag
+        self.flag = " "+flag+" "
   
     def run_tests(self):
         """Runs all of the input file tests"""
