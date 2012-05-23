@@ -457,7 +457,6 @@ void ConditioningFacility::makeOffers(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void ConditioningFacility::sendMessage(Communicator* recipient, Transaction trans){
       msg_ptr msg(new Message(this, recipient, trans)); 
-      msg->setNextDest(facInst());
       msg->sendOn();
 }
 

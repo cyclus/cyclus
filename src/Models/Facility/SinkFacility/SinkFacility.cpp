@@ -109,7 +109,6 @@ void SinkFacility::handleTick(int time){
       trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
 
     }

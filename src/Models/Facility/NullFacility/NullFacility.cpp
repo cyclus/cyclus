@@ -144,7 +144,6 @@ void NullFacility::makeRequests() {
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   Transaction trans = buildRequestTrans(cantake);
   msg_ptr request(new Message(this, recipient, trans)); 
-  request->setNextDest(facInst());
   request->sendOn();
 }
 
@@ -183,7 +182,6 @@ void NullFacility::makeOffers() {
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
   msg->sendOn();
 }
 

@@ -135,7 +135,6 @@ void BatchReactor::receiveMessage(msg_ptr msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void BatchReactor::sendMessage(Communicator* recipient, Transaction trans){
       msg_ptr msg(new Message(this, recipient, trans)); 
-      msg->setNextDest(facInst());
       msg->sendOn();
 }
 
