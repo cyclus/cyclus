@@ -53,8 +53,19 @@ class Transaction {
     void approveTransfer();
 
     /**
+    Used by markets to pair matched offers and requests.
 
-    @exception CycTransMismatchException this transaction and "other" are of the same type.
+    This method automatically sets the supplier/requester of both this and the
+    "other" transaction. Note that "offerTrans.matchWith(requestTrans)" is
+    equivelent to "requestTrans.matchWith(offerTrans)".
+
+    @param other the offer or request transaction to pair with
+
+    @warning using a transaction more than once with this method will result in
+             previous paring info being erased
+
+    @exception CycTransMismatchException this transaction and "other" are of
+               the same TransType.
     */
     void matchWith(Transaction& other);
   
