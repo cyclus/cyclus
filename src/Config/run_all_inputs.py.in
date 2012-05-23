@@ -6,23 +6,42 @@ import os
 import re
  
 def main():
-    check_inputs()
+    flag = check_inputs()
     input_path = "@input_path@"
     cyclus_path =  "@cyclus_path@/cyclus"
     files, catalogs, catalognames = get_files(input_path)
     move_catalogs(catalogs,cyclus_path)
-    sum = Summary()
-    for file in files :
-        file_to_test = TestFile(cyclus_path, file) 
+    summ = Summary()
+    for name in files :
+        file_to_test = TestFile(cyclus_path, name, flag) 
         file_to_test.run_tests()
-        sum.add_to_summary(file_to_test)
+        summ.add_to_summary(file_to_test)
     clean_catalogs(catalognames)
-    sum.print_summary()
+    summ.print_summary()
 
 def check_inputs():
-    if len(sys.argv) != 1: 
-        print 'Usage: python run_all_inputs.py'
+    if len(sys.argv) > 2: 
+        print_usage()
         sys.exit(1) 
+    elif len(sys.argv) == 2:
+        if re.search("-v*",argv[1]):
+            flag = argv[1]
+        else : 
+            print_usage()
+            sys.exit(1)
+    elif len(sys.argv) == 1 :
+        flag = "-v0"
+    return flag
+
+def print_usage() :
+        print 'Usage: python run_all_inputs.py'
+        print 'Allowed Options : '
+        print '-v [ --verb ] arg     output log verbosity. '
+        print ' Can be text: '
+        print '              LEV_ERROR (least verbose, default), LEV_WARN,' 
+        print '              LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).'
+        print 'Or an integer:'
+        print '              0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)'
  
 def get_files(path):
     catalogs=[]
@@ -77,10 +96,11 @@ class Summary():
 
 class TestFile():
     """An object representing the inputxml file to test"""
-    def __init__(self, cyclus_path, file_path):
+    def __init__(self, cyclus_path, file_path, flag):
         self.infile = file_path 
         self.cyclus_path = cyclus_path 
         self.passed=True
+        self.flag = flag
   
     def run_tests(self):
         """Runs all of the input file tests"""
@@ -92,9 +112,8 @@ class TestFile():
 
     def get_output(self):
         """Returns the output from running the FileTest"""
-        flags = " -v9"
         try :
-            p = subprocess.Popen(self.cyclus_path+" "+ self.infile + flags,
+            p = subprocess.Popen(self.cyclus_path+" "+ self.infile + self.flag,
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             io_tuple = p.communicate()
             output = io_tuple[0]
