@@ -49,7 +49,7 @@ ${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
 COPYONLY
 )
 
-set(input_path ${CYCLUS_SOURCE_DIR}/input)
+set(input_path ${CYCLUS_SOURCE_DIR}/../input)
 set(cyclus_path ${CMAKE_CURRENT_BINARY_DIR})
 CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_all_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_all_inputs.py @ONLY)
 

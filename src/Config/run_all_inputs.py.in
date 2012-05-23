@@ -8,7 +8,7 @@ import re
 def main():
     check_inputs()
     input_path = "@input_path@"
-    cyclus_path =  ".@cyclus_path@/cyclus"
+    cyclus_path =  "@cyclus_path@/cyclus"
     files = get_files(input_path)
     sum = Summary()
     for file in files :
