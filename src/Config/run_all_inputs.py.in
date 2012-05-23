@@ -120,7 +120,7 @@ class TestFile():
     def run(self):
         """Runs all of the input file tests"""
         output = self.get_output()
-        if self.test_no_errors(output) and self.test_expected(output) : 
+        if self.no_errors(output) and self.test_expected(output) : 
             self.passed = True
         else :
             self.passed = False
@@ -136,7 +136,7 @@ class TestFile():
             print(e)
         return output
         
-    def test_no_errors(self, output):
+    def no_errors(self, output):
         """returns true if there were no errors or segfaults running this TestFile"""
         to_ret = True
         print "Input file " + self.infile 
