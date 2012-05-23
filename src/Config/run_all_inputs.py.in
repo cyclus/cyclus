@@ -34,14 +34,14 @@ def check_inputs():
     return flag
 
 def print_usage() :
-        print 'Usage: python run_all_inputs.py'
-        print 'Allowed Options : '
-        print '-v [ --verb ] arg     output log verbosity. '
-        print ' Can be text: '
-        print '              LEV_ERROR (least verbose, default), LEV_WARN,' 
-        print '              LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).'
-        print 'Or an integer:'
-        print '              0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)'
+        print 'Usage: python run_all_inputs.py\n' + \
+                'Allowed Options : \n' + \
+                '-v [ --verb ] arg   output log verbosity. \n' + \
+                '                    Can be text: \n' + \
+                '                      LEV_ERROR (least verbose, default), LEV_WARN,\n' + \
+                '                      LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n' + \
+                '                    Or an integer:\n'+ \
+                '                      0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n'
  
 def get_files(path):
     catalogs=[]
