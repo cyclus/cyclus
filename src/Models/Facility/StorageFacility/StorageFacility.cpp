@@ -279,7 +279,6 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
     request->sendOn();
 
   // otherwise, the upper bound is the monthly acceptance capacity 
@@ -296,7 +295,6 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
     request->sendOn();
   }
   
@@ -327,7 +325,6 @@ void StorageFacility::handleTick(int time)
   trans.amount = offer_amt; // offers have a positive amount
 
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
   msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

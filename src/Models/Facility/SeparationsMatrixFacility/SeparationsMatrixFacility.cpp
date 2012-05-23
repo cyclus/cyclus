@@ -351,7 +351,6 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
     }
     // otherwise, the upper bound is the monthly acceptance capacity 
@@ -372,7 +371,6 @@ void SeparationsMatrixFacility::makeRequests(){
       trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
     }
 
@@ -414,7 +412,6 @@ void SeparationsMatrixFacility::makeOffers() {
     trans.setResource(offer_mat);
 
     msg_ptr msg(new Message(this, recipient, trans)); 
-    msg->setNextDest(facInst());
     msg->sendOn();
   }
 

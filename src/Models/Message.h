@@ -55,18 +55,20 @@ class CycNullMsgParamException: public CycException {
     
    @section path Path 
     
-   A message contains a reference (pointer) to its originator and the 
-   intended receiver. The message class is designed to facilitate a two 
-   leg path. The first leg, the message is in an "outgoing" state. The 
-   originator will specify the next stop (next communicator) to receive 
-   the message and invoke the sendOn() method of the message. The next 
-   stop communicator receives the message, does necessary processing, 
-   sets the message's "next stop", and invokes the message's sendOn() 
-   method. This process is repeated until the message direction is 
-   flipped to the incoming (return leg) state. When in the incomming 
-   state, a communicator invokes the sendOn() method and the message is 
-   sent to the communicator from which this communicator received the 
-   message. An example of the message passing is outlined below:  
+   A message contains a reference (pointer) to its originator and the
+   intended receiver. The message class is designed to facilitate a two leg
+   path. The first leg, the message is in an "outgoing" state. The originator
+   will specify the next stop (next communicator) to receive the message and
+   invoke the sendOn() method of the message. The next stop communicator
+   receives the message, does necessary processing, sets the message's "next
+   stop", and invokes the message's sendOn() method. This process is repeated
+   until the message direction is flipped to the incoming (return leg) state.
+   The message will attempt to auto set the next destination to the current
+   owner's parent (see sendOn API documentation).  When in the incomming
+   state, a communicator invokes the sendOn() method and the message is sent
+   to the communicator from which this communicator received the message. An
+   example of the message passing is outlined below:  
+
    - Up/outgoing message: 
    -# Inside originator 
    -# msg->setNextDest(next_stop) 
@@ -161,10 +163,13 @@ class Message: IntrusiveBase<Message> {
   /**
      Send this message to the next communicator in it's path 
       
-     Messages heading up (UP_MSG) are forwareded to the communicator 
-     designated by the setNextDest(Communicator*) function. Messages 
-     heading down (DOWN_MSG) are sent successively to each communicator 
-     in reverse order of their 'upward' sequence. 
+     Messages heading up (UP_MSG) are forwareded to the communicator
+     designated by the setNextDest(Communicator*) function. If setNextDest
+     hasn't been called, the current owner's parent model will be used as the
+     next destination.  If the current owner is a root (region) node, the
+     next destination will be auto set to the message's specified receiver.
+     Messages heading down (DOWN_MSG) are sent successively to each
+     communicator in reverse order of their 'upward' sequence. 
       
      @exception CycNoMsgReceiverException no receiver is designated (must call
      setNextDest first) 
@@ -175,6 +180,8 @@ class Message: IntrusiveBase<Message> {
   virtual void sendOn();
 
  private:
+
+  void autoSetNextDest();
 
   void validateForSend();
 
@@ -222,25 +229,6 @@ class Message: IntrusiveBase<Message> {
   void setDir(MessageDir new_dir);
   
   /**
-     @return the corresponding offer/request message assuming this message has
-     been matched in a market. Returns the 'this' pointer otherwise. 
-   */
-  msg_ptr partner();
-
-  /**
-     Used to match this message with a corresponding offer/request message
-     after matching takes place in a market. 
-
-     Allows requesters to know which request message that they sent corresponds
-     to the resources they receive.
-
-     @param partner the matched offer/request counterpart to this message.
-
-     @TODO figure out how to make this work with markets
-   */
-  void setPartner(msg_ptr partner);
-
-  /**
      Set via the Message constructor and cannot be changed.
 
      @return the sender (original creator) of this Message. 
@@ -283,10 +271,11 @@ class Message: IntrusiveBase<Message> {
    */
   Communicator* receiver_;
 
-  /**
-     Pointers to each model this message passes through. 
-   */
+  /// Pointers to each model this message passes through. 
   std::vector<Communicator*> path_stack_;
+
+  /// true if sendOn needs to call setNextDest with curr_owner_'s parent
+  bool needs_next_dest_;
   
   /**
      the most recent communicator to receive this message. 

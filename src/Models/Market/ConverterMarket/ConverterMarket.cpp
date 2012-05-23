@@ -139,7 +139,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
       if (requestAmt > offerAmt) { 
         // put a new message in the order stack
         // it goes down to supplier
-        offerMsg->trans().setRequester(requestMsg->trans().requester());
+        offerMsg->trans().matchWith(requestMsg->trans());
 
         // tenatively queue a new order (don't execute yet)
         matchedOffers_.insert(offerMsg);
@@ -162,7 +162,7 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         msg_ptr maybe_offer = offerMsg->clone();
 
         maybe_offer->trans().resource()->setQuantity(requestAmt);
-        maybe_offer->trans().setRequester(requestMsg->trans().requester());
+        maybe_offer->trans().matchWith(requestMsg->trans());
 
         matchedOffers_.insert(offerMsg);
 

@@ -20,6 +20,7 @@ void Message::constructBase(Communicator* sender) {
   receiver_ = NULL;
   trans_ = NULL;
   dead_ = false;
+  needs_next_dest_ = true;
   dir_ = UP_MSG;
 
   sender->trackMessage(msg_ptr(this));
@@ -70,6 +71,11 @@ msg_ptr Message::clone() {
 void Message::sendOn() {
   if (dead_) {return;}
 
+  if (needs_next_dest_) {
+    autoSetNextDest();
+    needs_next_dest_ = true;
+  }
+
   validateForSend();
   msg_ptr me = msg_ptr(this);
 
@@ -91,6 +97,16 @@ void Message::sendOn() {
 
   CLOG(LEV_DEBUG1) << "} Message " << this << " send to comm "
                    << next_stop << " completed";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::autoSetNextDest() {
+  Model* next_model = dynamic_cast<Model*>(curr_owner_)->parent();
+  Communicator* next_dest = dynamic_cast<Communicator*>(next_model);
+  if (next_dest == curr_owner_) {
+    next_dest = receiver_;
+  }
+  setNextDest(next_dest);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -126,17 +142,21 @@ void Message::makeRealParticipant(Communicator* who) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::setNextDest(Communicator* next_stop) {
-  if (dir_ == UP_MSG) {
-    CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
-                     << next_stop;
-    if (path_stack_.size() == 0) {
-      path_stack_.push_back(sender_);
-    }
-    path_stack_.push_back(next_stop);
+  if (dir_ == DOWN_MSG) {
+    CLOG(LEV_DEBUG4) << "Message " << this
+                     << " next stop set attempt ignored";
     return;
   }
-  CLOG(LEV_DEBUG4) << "Message " << this
-                   << " next stop set attempt ignored";
+
+  if (path_stack_.size() == 0) {
+    path_stack_.push_back(sender_);
+  }
+  path_stack_.push_back(next_stop);
+
+  needs_next_dest_ = false;
+
+  CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
+                   << next_stop;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -161,16 +181,6 @@ void Message::setDir(MessageDir new_dir) {
                    << new_dir << ".";
 
   dir_ = new_dir;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr Message::partner() {
-  return partner_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setPartner(msg_ptr partner) {
-  partner_ = partner;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
