@@ -101,9 +101,12 @@ void Message::sendOn() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::autoSetNextDest() {
-  Model* next_model = dynamic_cast<Model*>(curr_owner_)->parent();
-  Communicator* next_dest = dynamic_cast<Communicator*>(next_model);
-  if (next_dest == curr_owner_) {
+  Model* next_model;
+  Communicator* next_dest;
+  try {
+    next_model = dynamic_cast<Model*>(curr_owner_)->parent();
+    next_dest = dynamic_cast<Communicator*>(next_model);
+  } catch (CycIndexException err) {
     next_dest = receiver_;
   }
   setNextDest(next_dest);
