@@ -12,13 +12,13 @@ def main():
     input_path = "@input_path@"
     cyclus_path =  "@cyclus_path@/cyclus"
     files, catalogs, catalognames = get_files(input_path)
-    copy_catalogs(catalogs,cyclus_path)
+    copy_catalogs(catalogs,cyclus_path.strip("cyclus"))
     summ = Summary()
     for name in files :
         file_to_test = TestFile(cyclus_path, name, flag) 
         file_to_test.run()
         summ.add_to_summary(file_to_test)
-    clean_catalogs(catalognames)
+    clean_catalogs(cyclus_path.strip("cyclus"),catalognames)
     summ.print_summary()
 
 def check_inputs():
@@ -79,13 +79,13 @@ def get_files(path):
 def copy_catalogs(catalogs,cyclus_path) :
     """Copies files in the catalogs list to the cyclus executable directory""" 
     for cat in catalogs : 
-        p = Popen("cp "+cat+" "+cyclus_path.strip("cyclus"),
+        p = Popen("cp "+cat+" "+cyclus_path,
                 shell=True, stdout=PIPE, stderr=STDOUT)
 
-def clean_catalogs(catalogs) : 
+def clean_catalogs(cyclus_path, catalogs) : 
     """Removes previously copied catalogs from executable directory."""
     for cat in catalogs :
-        p = Popen("rm "+os.getcwd()+"/"+cat,
+        p = Popen("rm "+ os.path.join(cyclus_path,cat),
                 shell=True, stdout=PIPE, stderr=STDOUT)
 
 class Summary():
