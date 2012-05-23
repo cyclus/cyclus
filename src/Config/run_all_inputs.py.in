@@ -22,7 +22,7 @@ def main():
     summ.print_summary()
 
 def check_inputs():
-    """This funciton checks the input arguments"""
+    """This function checks the input arguments"""
     if len(sys.argv) > 2: 
         print_usage()
         sys.exit(1) 
