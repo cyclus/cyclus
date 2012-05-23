@@ -55,10 +55,8 @@ void Transaction::approveTransfer() {
     return;
   }
 
-  int id = next_trans_id_++;
-  
   // register that this transaction occured
-  this->Transaction::addTransToTable(id);
+  this->Transaction::addTransToTable();
   int nResources = manifest.size();
   
   for (int pos = 0; pos < nResources; pos++) {
@@ -67,11 +65,29 @@ void Transaction::approveTransfer() {
     manifest.at(pos)->addToTable();
   
     // record that what resources belong to this transaction
-    this->Transaction::addResourceToTable(id, pos + 1, manifest.at(pos));
+    this->Transaction::addResourceToTable(pos + 1, manifest.at(pos));
   }
   
   CLOG(LEV_INFO3) << "Material sent from " << supplier_->ID() << " to " 
                   << requester_->ID() << ".";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Transaction::matchWith(Transaction& other) {
+  if (other.type_ == type_) {
+    throw CycTransMismatchException();
+  }
+
+  if (type_ == OFFER) {
+    requester_ = other.requester();
+    other.supplier_ = supplier();
+  } else {
+    supplier_ = other.supplier();
+    other.requester_ = requester();
+  }
+
+  trans_id_ = next_trans_id_++;
+  other.trans_id_ = trans_id_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,22 +112,12 @@ Model* Transaction::supplier() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setSupplier(Model* supplier) {
-  supplier_ = supplier;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Transaction::requester() const {
   if (requester_ == NULL) {
     std::string err_msg = "Uninitilized message requester.";
     throw CycNullMsgParamException(err_msg);
   }
   return requester_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setRequester(Model* requester) {
-  requester_ = requester;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -193,14 +199,14 @@ void Transaction::define_trans_table(){
   trans_table->tableDefined();
 }
 
-void Transaction::addTransToTable(int transID) {  
+void Transaction::addTransToTable() {  
   // if we haven't logged a message yet, define the table
   if ( !trans_table->defined() )
     Transaction::define_trans_table();
   
   // make a row
   // declare data
-  data an_id(transID), a_sender( supplier_->ID() ), 
+  data an_id(trans_id_), a_sender( supplier_->ID() ), 
     a_receiver( requester_->ID() ), a_time( TI->time() ), 
     a_price( price_ );
   // declare entries
@@ -255,14 +261,14 @@ void Transaction::define_trans_resource_table(){
   trans_resource_table->tableDefined();
 }
 
-void Transaction::addResourceToTable(int transID, int transPos, rsrc_ptr r){  
+void Transaction::addResourceToTable(int transPos, rsrc_ptr r){  
   // if we haven't logged a message yet, define the table
   if ( !trans_resource_table->defined() )
     Transaction::define_trans_resource_table();
   
   // make a row
   // declare data
-  data an_id(transID), a_pos(transPos), 
+  data an_id(trans_id_), a_pos(transPos), 
     a_resource(r->originalID()), a_state(r->stateID()), an_amt(r->quantity());
   // declare entries
   entry id("TransactionID",an_id), pos("Position",a_pos), 

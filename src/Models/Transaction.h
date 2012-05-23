@@ -6,11 +6,17 @@
 
 #include "Resource.h"
 #include "Table.h"
+#include "CycException.h"
 
 class MarketModel;
 class Model;
 
 enum TransType {OFFER, REQUEST};
+
+class CycTransMismatchException: public CycException {
+  public: CycTransMismatchException() :
+      CycException("Matching requires 1 OFFER and 1 REQUEST typed transaction") { };
+};
 
 class Transaction {
 
@@ -45,6 +51,23 @@ class Transaction {
        states) are taken care of automatically.
      */
     void approveTransfer();
+
+    /**
+    Used by markets to pair matched offers and requests.
+
+    This method automatically sets the supplier/requester of both this and the
+    "other" transaction. Note that "offerTrans.matchWith(requestTrans)" is
+    equivelent to "requestTrans.matchWith(offerTrans)".
+
+    @param other the offer or request transaction to pair with
+
+    @warning using a transaction more than once with this method will result in
+             previous paring info being erased
+
+    @exception CycTransMismatchException this transaction and "other" are of
+               the same TransType.
+    */
+    void matchWith(Transaction& other);
   
     /**
        @return the market that deals in this this transaction's commodity
@@ -62,23 +85,11 @@ class Transaction {
     Model* supplier() const;
 
     /**
-       @param supplier the assigned supplier of the material for this
-       transaction
-     */
-    void setSupplier(Model* supplier);
-
-    /**
        @return a pointer to the requester in this transaction. 
 
        @exception CycNullMsgParamException requester is uninitialized (NULL)
      */
     Model* requester() const;
-
-    /**
-       @param requester model that will receive the material for this
-       transaction
-     */
-    void setRequester(Model* requester);
 
     /**
        @return the commodity requested or offered in this transaction. 
@@ -147,6 +158,9 @@ class Transaction {
 
     Model* requester_;
 
+    /// unique to a matched offer/request pair, set by matchWith
+    int trans_id_;
+
     /// stores the next available transaction ID 
     static int next_trans_id_;
 
@@ -178,17 +192,15 @@ class Transaction {
 
   /**
      add a transaction to the transaction table 
-     @param id the message id 
    */
-  void addTransToTable(int id);
+  void addTransToTable();
 
   /**
      add a transaction to the transaction table 
-     @param id the message id 
      @param position the position in the manifest 
      @param resource the resource being transacted 
    */
-  void addResourceToTable(int id, int position, rsrc_ptr resource);
+  void addResourceToTable(int position, rsrc_ptr resource);
 
   /**
      the transaction primary key 
