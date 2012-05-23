@@ -52,7 +52,6 @@ void InstModel::receiveMessage(msg_ptr msg){
   // Just pass them along. 
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
-  msg->setNextDest( (dynamic_cast<Communicator*>( parent() )) );
   msg->sendOn();
 }
 

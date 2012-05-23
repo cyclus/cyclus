@@ -157,7 +157,6 @@ void SourceFacility::sendOffer(Transaction trans) {
 
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(dynamic_cast<Communicator*>(parent()));
   msg->sendOn();
 }
 
