@@ -120,7 +120,7 @@ class TestFile():
     def run(self):
         """Runs all of the input file tests"""
         output = self.get_output()
-        if self.no_errors(output) and self.test_expected(output) : 
+        if self.no_errors(output) :
             self.passed = True
         else :
             self.passed = False
@@ -149,11 +149,5 @@ class TestFile():
         else :
             print " passed. "
         return to_ret 
-
-    def test_expected(self, output):
-        """This function is currently a placeholder. It is intended to print the 
-        difference between the current output and the output gathered the last 
-        time the test was run"""
-        return True
 
 if __name__ == '__main__' : main()
