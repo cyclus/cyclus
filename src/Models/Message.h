@@ -227,7 +227,21 @@ class Message: IntrusiveBase<Message> {
      @param new_dir is the new direction 
    */
   void setDir(MessageDir new_dir);
-  
+
+  /**
+  Retrieve notes associated with this message.
+
+  @return (potentially serialized) notes pertinent to the message's purpose
+  */
+  std::string notes();
+
+  /**
+  Add extra info that may or may not be related to a transaction.
+
+  @param text (potentially serialized) notes pertinent to the message's purpose
+  */
+  void setNotes(std::string text);
+
   /**
      Set via the Message constructor and cannot be changed.
 
@@ -265,6 +279,9 @@ class Message: IntrusiveBase<Message> {
   
   /// The intended receiver of this message
   Communicator* receiver_;
+
+  /// optional extra info that may or may not be transaction related.
+  std::string notes_;
 
   /// Pointers to each model this message passes through. 
   std::vector<Communicator*> path_stack_;
