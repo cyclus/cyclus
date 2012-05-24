@@ -187,6 +187,16 @@ void Message::setDir(MessageDir new_dir) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Message::notes() {
+  return notes_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::setNotes(std::string text) {
+  notes_ = text;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::sender() const {
   return sender_;
 }
