@@ -2,8 +2,6 @@ _______________________________________________________________________
 Cyclus Core
 _______________________________________________________________________
 
-**Last Updated: 2.28.2012**
-
 The core of the Cyclus nuclear fuel cycle simulator from the University of 
 Wisconsin - Madison is intended to be a simulation framework upon which to 
 develop innovative fuel cycle simulations. 
