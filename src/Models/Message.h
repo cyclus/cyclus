@@ -153,8 +153,8 @@ class Message: IntrusiveBase<Message> {
   virtual ~Message();
 
   /**
-     The copy returned will contain a clone of this message's transaction (this
-     is a deep copy).
+     The copy returned will contain a clone of this message's transaction.
+     Sender, receiver, and any previously traversed path are preserved.
 
      @return a newly allocated copy of this message object
    */
@@ -250,25 +250,20 @@ class Message: IntrusiveBase<Message> {
   Transaction& trans() const;
 
  private:
+
   /**
-     The direction this message is traveling 
-     (up or down the class hierarchy). 
+     The direction this message is traveling (up/down the parent/child
+     hierarchy). 
    */
   MessageDir dir_;
   
-  /**
-     The Transaction with which this message is concerned. 
-   */
+  /// The Transaction with which this message is concerned. 
   Transaction* trans_;
   
-  /**
-     The Communicator who sent this Message. 
-   */
+  /// sender/creator of this Message. 
   Communicator* sender_;
   
-  /**
-     The Communicator who will receive this Message. 
-   */
+  /// The intended receiver of this message
   Communicator* receiver_;
 
   /// Pointers to each model this message passes through. 
@@ -277,21 +272,10 @@ class Message: IntrusiveBase<Message> {
   /// true if sendOn needs to call setNextDest with curr_owner_'s parent
   bool needs_next_dest_;
   
-  /**
-     the most recent communicator to receive this message. 
-      
-     Used to prevent circular messaging. 
-   */
+  /// the most recent communicator to receive this message. 
   Communicator* curr_owner_;
 
-  /**
-     offer/request partner for this message (only for matched pairs)
-   */
-  msg_ptr partner_;
-  
-  /**
-     a boolean to determine if the message has completed its route 
-   */
+  /// a boolean to determine if the message has completed its route 
   bool dead_;
 
 };
