@@ -41,7 +41,7 @@ void Resource::define_table(){
   resource_table->addField("Type","INTEGER");
   resource_table->addField("OriginalQuantity","REAL");
   // declare the table's primary key
-  resource_table->setPrimaryKey(id);
+  resource_table->setPrimaryKey("ID");
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -97,7 +97,7 @@ void Resource::define_type_table(){
   resource_type_table->addField("Name","VARCHAR(128)");
   resource_type_table->addField("Units","VARCHAR(32)");
   // declare the table's primary key
-  resource_type_table->setPrimaryKey(type);
+  resource_type_table->setPrimaryKey("Type");
   // we've now defined the table
   resource_type_table->tableDefined();
 }

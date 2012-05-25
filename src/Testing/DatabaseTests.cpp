@@ -23,7 +23,7 @@ class DatabaseTest : public ::testing::Test {
     tbl->addField("int","INTEGER");
     tbl->addField("dbl","REAL");
     tbl->addField("str","VARCHAR(128)");
-    tbl->setPrimaryKey(int_col);
+    tbl->setPrimaryKey("int");
     tbl->tableDefined();
   }
   

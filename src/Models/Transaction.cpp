@@ -221,19 +221,15 @@ void Transaction::addTransToTable() {
 
 void Transaction::define_trans_resource_table(){
   // declare the table columns
-  column transID("TransactionID","INTEGER");
-  column transPos("Position","INTEGER");
-  column resource("ResourceID","INTEGER");
-  column state("StateID","INTEGER");
-  column amt("Quantity","REAL");
+  trans_resource_table->addField("TransactionID","INTEGER");
+  trans_resource_table->addField("Position","INTEGER");
+  trans_resource_table->addField("ResourceID","INTEGER");
+  trans_resource_table->addField("StateID","INTEGER");
+  trans_resource_table->addField("Quantity","REAL");
   // declare the table's primary key
   primary_key pk;
   pk.push_back("TransactionID"), pk.push_back("Position");
   trans_resource_table->setPrimaryKey(pk);
-  // add columns to the table
-  trans_resource_table->addField(transID), trans_resource_table->addField(transPos), 
-    trans_resource_table->addField(resource), trans_resource_table->addField(state),
-    trans_resource_table->addField(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;

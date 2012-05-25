@@ -370,7 +370,7 @@ void Model::define_table() {
   agent_table->addField("EnterDate","INTEGER");
   agent_table->addField("LeaveDate","INTEGER");
   // declare the table's primary key
-  agent_table->setPrimaryKey(agent_id);
+  agent_table->setPrimaryKey("ID");
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;

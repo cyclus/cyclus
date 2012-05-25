@@ -38,11 +38,6 @@ void Table::tableDefined() {
 }
 
 // -----------------------------------------------------------------------
-void Table::setPrimaryKey(column const col) {
-  setPrimaryKey(col.first);
-}
-
-// -----------------------------------------------------------------------
 void Table::setPrimaryKey(std::string const pk_string) {
   primary_key pk;
   pk.push_back(pk_string);

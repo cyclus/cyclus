@@ -58,7 +58,7 @@ protected:
     tbl->addField(iLabel,"INTEGER");
     tbl->addField(dLabel,"REAL");
     tbl->addField(sLabel,"VARCHAR(128)");
-    tbl->setPrimaryKey(int_val);
+    tbl->setPrimaryKey(iLabel);
     foreign_key_ref *fkref;
     foreign_key *fk;
     key myk, theirk;
