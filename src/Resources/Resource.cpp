@@ -37,15 +37,11 @@ void Resource::setOriginalID(int id){
 // Specific resources
 void Resource::define_table(){
   // declare the table columns
-  column id("ID","INTEGER");
-  column type("Type","INTEGER");
-  column amt("OriginalQuantity","REAL");
+  resource_table->addField("ID","INTEGER");
+  resource_table->addField("Type","INTEGER");
+  resource_table->addField("OriginalQuantity","REAL");
   // declare the table's primary key
   resource_table->setPrimaryKey(id);
-  // add columns to the table
-  resource_table->addField(id);
-  resource_table->addField(type);
-  resource_table->addField(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -97,15 +93,11 @@ void Resource::addToTable(){
 // Generic Resource Types
 void Resource::define_type_table(){
   // declare the table columns
-  column type("Type","INTEGER");
-  column type_name("Name","VARCHAR(128)");
-  column units("Units","VARCHAR(32)");
+  resource_type_table->addField("Type","INTEGER");
+  resource_type_table->addField("Name","VARCHAR(128)");
+  resource_type_table->addField("Units","VARCHAR(32)");
   // declare the table's primary key
   resource_type_table->setPrimaryKey(type);
-  // add columns to the table
-  resource_type_table->addField(type);
-  resource_type_table->addField(type_name);
-  resource_type_table->addField(units);
   // we've now defined the table
   resource_type_table->tableDefined();
 }

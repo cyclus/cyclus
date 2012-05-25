@@ -20,13 +20,10 @@ class DatabaseTest : public ::testing::Test {
  
   // define the test table
   void define_table() {
-    column int_col("int","INTEGER");
-    column dbl_col("dbl","REAL");
-    column str_col("str","VARCHAR(128)");
+    tbl->addField("int","INTEGER");
+    tbl->addField("dbl","REAL");
+    tbl->addField("str","VARCHAR(128)");
     tbl->setPrimaryKey(int_col);
-    tbl->addField(int_col);
-    tbl->addField(dbl_col);
-    tbl->addField(str_col);
     tbl->tableDefined();
   }
   

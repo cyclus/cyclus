@@ -164,19 +164,15 @@ void Transaction::setResource(rsrc_ptr new_resource) {
 
 void Transaction::define_trans_table(){
   // declare the table columns
-  column id("ID","INTEGER");
-  column sender("SenderID","INTEGER");
-  column receiver("ReceiverID","INTEGER");
-  column time("Time","INTEGER");
-  column price("Price","REAL");
+  trans_table->addField("ID","INTEGER");
+  trans_table->addField("SenderID","INTEGER");
+  trans_table->addField("ReceiverID","INTEGER");
+  trans_table->addField("Time","INTEGER");
+  trans_table->addField("Price","REAL");
   // declare the table's primary key
   primary_key pk;
   pk.push_back("ID");
   trans_table->setPrimaryKey(pk);
-  // add columns to the table
-  trans_table->addField(id), trans_table->addField(sender), 
-    trans_table->addField(receiver), trans_table->addField(time),
-    trans_table->addField(price);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
