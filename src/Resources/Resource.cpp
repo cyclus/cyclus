@@ -43,9 +43,9 @@ void Resource::define_table(){
   // declare the table's primary key
   resource_table->setPrimaryKey(id);
   // add columns to the table
-  resource_table->addColumn(id);
-  resource_table->addColumn(type);
-  resource_table->addColumn(amt);
+  resource_table->addField(id);
+  resource_table->addField(type);
+  resource_table->addField(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -103,9 +103,9 @@ void Resource::define_type_table(){
   // declare the table's primary key
   resource_type_table->setPrimaryKey(type);
   // add columns to the table
-  resource_type_table->addColumn(type);
-  resource_type_table->addColumn(type_name);
-  resource_type_table->addColumn(units);
+  resource_type_table->addField(type);
+  resource_type_table->addField(type_name);
+  resource_type_table->addField(units);
   // we've now defined the table
   resource_type_table->tableDefined();
 }

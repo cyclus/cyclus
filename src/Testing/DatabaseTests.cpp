@@ -24,9 +24,9 @@ class DatabaseTest : public ::testing::Test {
     column dbl_col("dbl","REAL");
     column str_col("str","VARCHAR(128)");
     tbl->setPrimaryKey(int_col);
-    tbl->addColumn(int_col);
-    tbl->addColumn(dbl_col);
-    tbl->addColumn(str_col);
+    tbl->addField(int_col);
+    tbl->addField(dbl_col);
+    tbl->addField(str_col);
     tbl->tableDefined();
   }
   

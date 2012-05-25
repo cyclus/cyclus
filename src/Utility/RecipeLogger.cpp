@@ -242,9 +242,9 @@ void RecipeLogger::define_table() {
   column state_id("ID","INTEGER");
   column iso_id("IsoID","INTEGER");
   column iso_value("Value","REAL");
-  iso_table->addColumn(state_id);
-  iso_table->addColumn(iso_id);
-  iso_table->addColumn(iso_value);
+  iso_table->addField(state_id);
+  iso_table->addField(iso_id);
+  iso_table->addField(iso_value);
   // declare the table's primary key
   primary_key pk;
   pk.push_back("ID"), pk.push_back("IsoID");

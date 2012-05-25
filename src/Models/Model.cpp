@@ -372,11 +372,11 @@ void Model::define_table() {
   // declare the table's primary key
   agent_table->setPrimaryKey(agent_id);
   // add columns to the table
-  agent_table->addColumn(agent_id);
-  agent_table->addColumn(agent_type);
-  agent_table->addColumn(parent_id);
-  agent_table->addColumn(bornOn);
-  agent_table->addColumn(diedOn);
+  agent_table->addField(agent_id);
+  agent_table->addField(agent_type);
+  agent_table->addField(parent_id);
+  agent_table->addField(bornOn);
+  agent_table->addField(diedOn);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;

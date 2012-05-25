@@ -59,9 +59,9 @@ protected:
     column dbl_val(dLabel,"REAL");
     column str_val(sLabel,"VARCHAR(128)");
     tbl->setPrimaryKey(int_val);
-    tbl->addColumn(int_val);
-    tbl->addColumn(dbl_val);
-    tbl->addColumn(str_val);
+    tbl->addField(int_val);
+    tbl->addField(dbl_val);
+    tbl->addField(str_val);
     foreign_key_ref *fkref;
     foreign_key *fk;
     key myk, theirk;

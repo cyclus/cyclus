@@ -174,9 +174,9 @@ void Transaction::define_trans_table(){
   pk.push_back("ID");
   trans_table->setPrimaryKey(pk);
   // add columns to the table
-  trans_table->addColumn(id), trans_table->addColumn(sender), 
-    trans_table->addColumn(receiver), trans_table->addColumn(time),
-    trans_table->addColumn(price);
+  trans_table->addField(id), trans_table->addField(sender), 
+    trans_table->addField(receiver), trans_table->addField(time),
+    trans_table->addField(price);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -235,9 +235,9 @@ void Transaction::define_trans_resource_table(){
   pk.push_back("TransactionID"), pk.push_back("Position");
   trans_resource_table->setPrimaryKey(pk);
   // add columns to the table
-  trans_resource_table->addColumn(transID), trans_resource_table->addColumn(transPos), 
-    trans_resource_table->addColumn(resource), trans_resource_table->addColumn(state),
-    trans_resource_table->addColumn(amt);
+  trans_resource_table->addField(transID), trans_resource_table->addField(transPos), 
+    trans_resource_table->addField(resource), trans_resource_table->addField(state),
+    trans_resource_table->addField(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;

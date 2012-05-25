@@ -86,7 +86,7 @@ class Table : IntrusiveBase<Table> {
      A storage container for each column's title and data type 
      (\@gidden can we combine these two? )
    */
-  std::vector<column> columns_;
+  std::vector<column> col_types_;
 
   /**
      Every table must have a defined primary key 
@@ -194,9 +194,11 @@ class Table : IntrusiveBase<Table> {
 
   /**
      Add a column to the list of this table's columns. 
-     @param col the column to add 
+
+     @param name the new column's name
+     @param data_type the new column's data type (e.g. int)
    */
-  void addColumn(column col);
+  void addField(std::string name, std::string data_type);
 
   /**
      Set the primary key given a column. This name string 
