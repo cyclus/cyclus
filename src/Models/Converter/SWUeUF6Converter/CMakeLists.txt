@@ -11,3 +11,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Converter/SWUeUF6Converter/SWUeUF6Converter.rng
 ${CMAKE_CURRENT_BINARY_DIR}/SWUeUF6Converter.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES}
+  "<include href='../Models/Converter/SWUeUF6Converter/SWUeUF6Converter.rng'/>"
+  PARENT_SCOPE)
+SET(CONV_REFS ${CONV_REFS}
+  "<ref name='SWUeUF6Converter'/>"
+  PARENT_SCOPE)

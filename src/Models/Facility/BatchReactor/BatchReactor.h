@@ -4,12 +4,12 @@
 
 #include "FacilityModel.h"
 
+#include "Transaction.h"
 #include "Material.h"
 #include "MatBuff.h"
 
 #include "Logger.h"
 
-#include <iostream>
 #include <queue>
 
 // Useful typedefs
@@ -43,11 +43,6 @@ class BatchReactor : public FacilityModel  {
    */
   virtual ~BatchReactor() {};
 
-  /**
-     Initialize all members during construction
-   */
-  void init();
-    
   /**
      initialize an object from XML input 
    */
@@ -115,7 +110,7 @@ class BatchReactor : public FacilityModel  {
      @param order the msg/order for which resource(s) are to be prepared
      @return list of resources to be sent for this order
    */
-  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(Transaction order);
 
   /**
      Transacted resources are received through this method
@@ -123,7 +118,7 @@ class BatchReactor : public FacilityModel  {
      @param msg the transaction to which these resource objects belong
      @param manifest is the set of resources being received
    */
-  virtual void addResource(msg_ptr msg,
+  virtual void addResource(Transaction trans,
         		   std::vector<rsrc_ptr> manifest);
   /**
      The handleTick function specific to the BatchReactor.
@@ -415,17 +410,17 @@ class BatchReactor : public FacilityModel  {
   /**
      sends a request of offer to the commodity's market
    */
-  void interactWithMarket(std::string commod, double amt, bool offer);
+  void interactWithMarket(std::string commod, double amt, TransType type);
 
   /**
      make reqest for a specific amount of fuel
    */
-  void makeRequest(double amt) {interactWithMarket(inCommod(),amt,false);}
+  void makeRequest(double amt) {interactWithMarket(inCommod(),amt,REQUEST);}
 
   /**
      offer all off-loaded fuel
    */
-  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),true);}
+  void makeOffers() {interactWithMarket(outCommod(),postCore_.quantity(),OFFER);}
 
   /**
      Processes all orders in ordersWaiting_

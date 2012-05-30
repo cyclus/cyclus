@@ -12,4 +12,15 @@ foreach(dir ${all_valid_subdirs})
     endif()
 endforeach(dir)
 
+# # Add subdirs and build for the models
+# ADD_SUBDIRECTORY( Stub )
+# ADD_SUBDIRECTORY( StubComm )
+# ADD_SUBDIRECTORY( Market )
+# ADD_SUBDIRECTORY( Facility )
+# ADD_SUBDIRECTORY( Region )
+# ADD_SUBDIRECTORY( Inst )
+# ADD_SUBDIRECTORY( Converter )
+
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
+CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
+  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)

@@ -100,7 +100,7 @@ std::string StorageFacility::str() {
 void StorageFacility::receiveMessage(msg_ptr msg)
 {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -110,8 +110,8 @@ void StorageFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
-  Transaction trans = order->trans();
+vector<rsrc_ptr> StorageFacility::removeResource(Transaction order) {
+  Transaction trans = order;
   // it should be of incommod Commodity type
   if(trans.commod != incommod_){
     throw CycException("StorageFacility can only send incommodity type materials.");
@@ -151,7 +151,7 @@ vector<rsrc_ptr> StorageFacility::removeResource(msg_ptr order) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StorageFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void StorageFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   // also record its entry time map in entryTimes deque
@@ -227,7 +227,7 @@ void StorageFacility::getInitialState(xmlNodePtr cur)
     trans.amount = newMat->quantity();
 
     msg_ptr storage_history(new Message(sending_facility, this, trans); 
-    storage_history->approveTransfer();
+    storage_history->trans().approveTransfer();
     sending_facility->sendMaterial(storage_history,manifest);
   }
   
@@ -279,7 +279,6 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
     request->sendOn();
 
   // otherwise, the upper bound is the monthly acceptance capacity 
@@ -296,7 +295,6 @@ void StorageFacility::handleTick(int time)
     trans.amount = -requestAmt; // requests have a negative amount
 
     msg_ptr request(new Message(this, recipient, trans)); 
-    request->setNextDest(facInst());
     request->sendOn();
   }
   
@@ -327,7 +325,6 @@ void StorageFacility::handleTick(int time)
   trans.amount = offer_amt; // offers have a positive amount
 
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
   msg->sendOn();
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -354,7 +351,7 @@ void StorageFacility::handleTock(int time)
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order.approveTransfer();
     ordersWaiting_.pop_front();
   }
   

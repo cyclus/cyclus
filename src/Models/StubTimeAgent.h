@@ -36,12 +36,6 @@ class StubTimeAgent : public TimeAgent {
   virtual ~StubTimeAgent();
 
   /**
-     Initalize members of StubTimeAgent and any other non-input
-     related parameters
-   */
-  void init() { Model::init(); }
-    
-  /**
      every model needs a method to initialize from XML 
       
      @param cur is the pointer to the model's xml node 

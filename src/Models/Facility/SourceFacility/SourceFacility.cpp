@@ -6,6 +6,7 @@
 #include "SourceFacility.h"
 
 #include "Logger.h"
+#include "RecipeLogger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -39,7 +40,7 @@ void SourceFacility::init(xmlNodePtr cur) {
 
   // get recipe
   recipe_name_ = XMLinput->get_xpath_content(cur,"recipe");
-  recipe_ = IsoVector::recipe(recipe_name_);
+  recipe_ = RecipeLogger::Recipe(recipe_name_);
 
   // get capacity
   capacity_ = strtod(XMLinput->get_xpath_content(cur,"capacity"), NULL);
@@ -84,7 +85,7 @@ std::string SourceFacility::str() {
 void SourceFacility::receiveMessage(msg_ptr msg){
 
   // is this a message from on high? 
-  if(msg->supplier() == this){
+  if(msg->trans().supplier() == this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "SrcFac") << name() << " just received an order.";
@@ -94,9 +95,8 @@ void SourceFacility::receiveMessage(msg_ptr msg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> SourceFacility::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
-  return ResourceBuff::toRes(inventory_.popQty(trans.resource->quantity()));
+vector<rsrc_ptr> SourceFacility::removeResource(Transaction order) {
+  return MatBuff::toRes(inventory_.popQty(order.resource()->quantity()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -106,7 +106,7 @@ void SourceFacility::handleTick(int time){
   generateMaterial(time);
   Transaction trans = buildTransaction();
 
-  LOG(LEV_INFO4, "SrcFac") << "offers "<< trans.resource->quantity() << " kg of "
+  LOG(LEV_INFO4, "SrcFac") << "offers "<< trans.resource()->quantity() << " kg of "
                            << out_commod_ << ".";
 
   sendOffer(trans);
@@ -119,19 +119,18 @@ void SourceFacility::generateMaterial(int curr_time) {
   int time_change = curr_time - prev_time_;
   prev_time_ = curr_time;
 
-  // if there's room in the inventory, process material at capacity
   double empty_space = inventory_.space();
-  if (empty_space < EPS_KG) {return;}
-
-  IsoVector* temp = new IsoVector(recipe_.comp());
-  if (capacity_ * recipe_.mass() * time_change <= empty_space) {
-    // add a material the size of the capacity to the inventory
-    temp->multBy(capacity_ * time_change);
-  } else {
-    // add a material that fills the inventory
-    temp->setMass(empty_space);
+  if (empty_space < EPS_KG) {
+    return; // no room
   }
-  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material((*temp)));
+
+  mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material(recipe_));
+  double amt = capacity_ * time_change;
+  if (amt <= empty_space) {
+    newMat->setQuantity(amt); // plenty of room
+  } else {
+    newMat->setQuantity(empty_space); // not enough room
+  }
   inventory_.pushOne(newMat);
 }
 
@@ -143,12 +142,11 @@ Transaction SourceFacility::buildTransaction() {
 
   gen_rsrc_ptr offer_res = gen_rsrc_ptr(new GenericResource(out_commod_,"kg",offer_amt));
 
-  Transaction trans;
-  trans.commod = out_commod_;
+  Transaction trans(this, OFFER);
+  trans.setCommod(out_commod_);
   trans.minfrac = min_amt/offer_amt;
-  trans.is_offer = true;
-  trans.price = commod_price_;
-  trans.resource = offer_res;
+  trans.setPrice(commod_price_);
+  trans.setResource(offer_res);
 
   return trans;
 }
@@ -159,7 +157,6 @@ void SourceFacility::sendOffer(Transaction trans) {
 
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(dynamic_cast<Communicator*>(parent()));
   msg->sendOn();
 }
 
@@ -170,12 +167,12 @@ void SourceFacility::handleTock(int time){
   // check what orders are waiting,
   // send material if you have it now
   while (!ordersWaiting_.empty()) {
-    msg_ptr order = ordersWaiting_.front();
-    if (order->resource()->quantity() - inventory_.quantity() > EPS_KG) {
+    Transaction order = ordersWaiting_.front()->trans();
+    if (order.resource()->quantity() - inventory_.quantity() > EPS_KG) {
       LOG(LEV_INFO3, "SrcFac") << "Not enough inventory. Waitlisting remaining orders.";
       break;
     } else {
-      order->approveTransfer();
+      order.approveTransfer();
       ordersWaiting_.pop_front();
     }
   }

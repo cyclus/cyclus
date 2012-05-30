@@ -13,6 +13,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandlerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketModelTests.cpp 
@@ -22,6 +23,8 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/ModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   PARENT_SCOPE)
 
 SET(INTERFACE_LIBRARIES ${CYCLUS_TEST_CORE} PARENT_SCOPE )

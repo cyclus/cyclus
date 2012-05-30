@@ -7,18 +7,15 @@
 #include <libxml/tree.h>
 #include <vector>
 
-#include "boost/intrusive_ptr.hpp"
-
-#include "Message.h"
+#include "Transaction.h"
 #include "Resource.h"
 #include "Table.h"
 
 class Model;
 class Message;
-struct Transaction;
+class Transaction;
 
 typedef Model* mdl_ctor();
-typedef boost::intrusive_ptr<Message> msg_ptr;
 
 /** 
    defines the possible model types 
@@ -115,12 +112,6 @@ class Model {
   Model();
 
   /**
-     Initalize members of Model and any other non-input
-     related parameters
-   */
-  void init() {};
-
-  /**
      A method to initialize the model 
       
      @param cur the pointer to the xml input for the model to initialize 
@@ -211,7 +202,9 @@ class Model {
   int diedOn() {return diedOn_;};
 
   /**
-     add a child to the list of children 
+     add a child to the list of children.
+
+     This does NOT set the specified child's parent to be this model.
    */
   void addChild(Model* child);
 
@@ -227,6 +220,9 @@ class Model {
 
   /**
      set the parent of this model 
+
+     This DOES add the this model to the specified parent's list of children
+     (i.e. this automatically calls "parent->addChild(this);")
    */
   void setParent(Model* parent);
 
@@ -246,10 +242,12 @@ class Model {
      @warning This method should never be directly invoked.  All 
      resource transfers should take place using the 
      Message.approveTransfer() method.  
-     @param order the msg/order for which resource(s) are to be prepared 
+
+     @param order the transaction for which resource(s) are to be prepared 
+
      @return list of resources to be sent for this order 
    */ 
-  virtual std::vector<rsrc_ptr> removeResource(msg_ptr order);
+  virtual std::vector<rsrc_ptr> removeResource(Transaction order);
 
   /**
      Transacted resources are received through this method. 
@@ -257,10 +255,13 @@ class Model {
      @warning This method should never be directly invoked.  All 
      resource transfers should take place using the 
      Message.approveTransfer() method.  
-     @param msg the sent message that corresponds with the materials 
-     being received @param manifest is the set of resources being 
+
+     @param trans the transaction that corresponds with the materials 
+     being received
+
+     @param manifest is the set of resources being 
    */ 
-  virtual void addResource(msg_ptr msg,
+  virtual void addResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
 
   /**

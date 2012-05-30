@@ -102,15 +102,13 @@ void SinkFacility::handleTick(int time){
       gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*commod), "kg", requestAmt));
 
       // build the transaction and message
-      Transaction trans;
-      trans.commod = *commod;
+      Transaction trans(this, REQUEST);
+      trans.setCommod(*commod);
       trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price_;
-      trans.resource = request_res;
+      trans.setPrice(commod_price_);
+      trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
 
     }
@@ -133,8 +131,8 @@ void SinkFacility::handleTock(int time){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void SinkFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
-  inventory_.pushAll(ResourceBuff::toMat(manifest));
+void SinkFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
+  inventory_.pushAll(MatBuff::toMat(manifest));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

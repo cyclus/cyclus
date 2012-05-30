@@ -18,7 +18,6 @@ class TestMarket : public MarketModel {
     }
     virtual void copy(TestMarket* src){
       commodity_ = src->commodity_;
-      MarketModel::init();
     }
     void copyFreshModel(Model* src){
       copy(dynamic_cast<TestMarket*>(src));

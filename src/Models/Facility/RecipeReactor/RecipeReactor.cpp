@@ -5,6 +5,7 @@
 #include "RecipeReactor.h"
 
 #include "Logger.h"
+#include "RecipeLogger.h"
 #include "GenericResource.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -78,11 +79,11 @@ void RecipeReactor::init(xmlNodePtr cur) {
 
     // get in_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"inrecipe");
-    in_recipe_ = IsoVector::recipe(recipe_name);
+    in_recipe_ = RecipeLogger::Recipe(recipe_name);
 
     // get out_recipe
     recipe_name = XMLinput->get_xpath_content(pair_node,"outrecipe");
-    out_recipe_ = IsoVector::recipe(recipe_name);
+    out_recipe_ = RecipeLogger::Recipe(recipe_name);
 
     fuelPairs_.push_back(make_pair(make_pair(in_commod,in_recipe_),
           make_pair(out_commod, out_recipe_)));
@@ -200,7 +201,7 @@ void RecipeReactor::endCycle() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
     LOG(LEV_INFO5, "RReact") << name() << " just received an order.";
@@ -211,9 +212,7 @@ void RecipeReactor::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
-
+vector<rsrc_ptr> RecipeReactor::removeResource(Transaction order) {
   double newAmt = 0;
 
   mat_rsrc_ptr m;
@@ -224,25 +223,25 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
   vector<rsrc_ptr> toSend;
 
   // pull materials off of the inventory stack until you get the trans amount
-  while (trans.resource->quantity() > newAmt && !inventory_.empty() ) {
+  while (order.resource()->quantity() > newAmt && !inventory_.empty() ) {
     for (deque<Fuel>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
       // be sure to get the right commodity
-      if (iter->first == trans.commod) {
+      if (iter->first == order.commod()) {
         m = iter->second;
 
         // start with an empty material
         newMat = mat_rsrc_ptr(new Material());
 
         // if the inventory obj isn't larger than the remaining need, send it as is.
-        if (m->quantity() <= (trans.resource->quantity() - newAmt)) {
+        if (m->quantity() <= (order.resource()->quantity() - newAmt)) {
           newAmt += m->quantity();
           newMat->absorb(m);
           inventory_.pop_front();
         } else { 
           // if the inventory obj is larger than the remaining need, split it.
-          toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+          toAbsorb = m->extract(order.resource()->quantity() - newAmt);
           newAmt += toAbsorb->quantity();
           newMat->absorb(toAbsorb);
         }
@@ -256,7 +255,7 @@ vector<rsrc_ptr> RecipeReactor::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void RecipeReactor::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void RecipeReactor::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   // grab each material object off of the manifest
   // and move it into the stocks.
   for (vector<rsrc_ptr>::iterator thisMat=manifest.begin();
@@ -264,7 +263,7 @@ void RecipeReactor::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
        thisMat++) {
     LOG(LEV_DEBUG2, "RReact") <<"RecipeReactor " << ID() << " is receiving material with mass "
         << (*thisMat)->quantity();
-    stocks_.push_front(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
+    stocks_.push_front(make_pair(trans.commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -289,85 +288,70 @@ void RecipeReactor::handleTick(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::makeRequests(){
-  LOG(LEV_INFO4, "RReact") << " making requests {";
   // MAKE A REQUEST
-  if(this->stocksMass() == 0){
-    // It chooses the next in/out commodity pair in the preference lineup
-    Recipe request_commod_pair;
-    Recipe offer_commod_pair;
-    request_commod_pair = fuelPairs_.front().first;
-    offer_commod_pair = fuelPairs_.front().second;
-    string in_commod = request_commod_pair.first;
-    IsoVector in_recipe = request_commod_pair.second;
-
-    // It then moves that pair from the front to the back of the preference lineup
-    fuelPairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
-    fuelPairs_.pop_front();
-
-    // It can accept only a whole batch
-    double requestAmt;
-    double minAmt = in_recipe.mass();
-    // The Recipe Reactor should ask for a batch if there isn't one in stock.
-    double sto = this->stocksMass(); 
-    // subtract sto from batch size to get total empty space. 
-    // Hopefully the result is either 0 or the batch size 
-    double space = minAmt - sto; // KDHFLAG get minAmt from the input ?
-    // this will be a request for free stuff
-    double commod_price = 0;
-
-    if (space == 0) {
-      // don't request anything
-    } else if (space <= minAmt) {
-      MarketModel* market = MarketModel::marketForCommod(in_commod);
-      Communicator* recipient = dynamic_cast<Communicator*>(market);
-      // if empty space is less than monthly acceptance capacity
-      requestAmt = space;
-
-      // request a generic resource
-      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
-
-      // build the transaction and message
-      Transaction trans;
-      trans.commod = in_commod;
-      trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price;
-      trans.resource = request_res;
-
-      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
-                               << " kg of " << in_commod << ".";
-      sendMessage(recipient, trans);
-      // otherwise, the upper bound is the batch size
-      // minus the amount in stocks.
-    } else if (space >= minAmt) {
-      MarketModel* market = MarketModel::marketForCommod(in_commod);
-      Communicator* recipient = dynamic_cast<Communicator*>(market);
-      // if empty space is more than monthly acceptance capacity
-      requestAmt = capacity_ - sto;
-
-      // request a generic resource
-      gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
-
-      // build the transaction and message
-      Transaction trans;
-      trans.commod = in_commod;
-      trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price;
-      trans.resource = request_res;
-
-      LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
-                               << " kg of " << in_commod << ".";
-      sendMessage(recipient, trans);
-    }
+  if(this->stocksMass() != 0) {
+    return;
   }
+
+  // It chooses the next in/out commodity pair in the preference lineup
+  Recipe request_commod_pair;
+  Recipe offer_commod_pair;
+  request_commod_pair = fuelPairs_.front().first;
+  offer_commod_pair = fuelPairs_.front().second;
+  string in_commod = request_commod_pair.first;
+  IsoVector in_recipe = request_commod_pair.second;
+
+  // It then moves that pair from the front to the back of the preference lineup
+  fuelPairs_.push_back(make_pair(request_commod_pair, offer_commod_pair));
+  fuelPairs_.pop_front();
+
+  // It can accept only a whole batch
+  double requestAmt;
+  double minAmt = in_recipe.mass();
+  // The Recipe Reactor should ask for a batch if there isn't one in stock.
+  double sto = this->stocksMass(); 
+  // subtract sto from batch size to get total empty space. 
+  // Hopefully the result is either 0 or the batch size 
+  double space = minAmt - sto; // KDHFLAG get minAmt from the input ?
+  // this will be a request for free stuff
+  double commod_price = 0;
+
+  if (space <= 0) {
+    // don't request anything
+    return;
+  } else if (space <= minAmt) {
+    // if empty space is less than monthly acceptance capacity
+    requestAmt = space;
+  } else if (space >= minAmt) {
+    // empty space is more than monthly acceptance capacity
+    // upper bound is the batch size minus the amount in stocks.
+    requestAmt = capacity_ - sto;
+  }
+
+  LOG(LEV_INFO4, "RReact") << " making requests {";
+
+  MarketModel* market = MarketModel::marketForCommod(in_commod);
+  Communicator* recipient = dynamic_cast<Communicator*>(market);
+
+  // request a generic resource
+  gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource(in_commod, "kg", requestAmt));
+
+  // build the transaction and message
+  Transaction trans(this, REQUEST);
+  trans.setCommod(in_commod);
+  trans.minfrac = minAmt/requestAmt;
+  trans.setPrice(commod_price);
+  trans.setResource(request_res);
+
+  LOG(LEV_INFO5, "RReact") << name() << " has requested " << request_res->quantity()
+                           << " kg of " << in_commod << ".";
+  sendMessage(recipient, trans);
   LOG(LEV_INFO4, "RReact") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void RecipeReactor::sendMessage(Communicator* recipient, Transaction trans){
       msg_ptr msg(new Message(this, recipient, trans)); 
-      msg->setNextDest(facInst());
       msg->sendOn();
 }
 
@@ -405,12 +389,11 @@ void RecipeReactor::makeOffers(){
     offer_mat->setQuantity(offer_amt);
 
     // build the transaction and message
-    Transaction trans;
-    trans.commod = commod;
+    Transaction trans(this, OFFER);
+    trans.setCommod(commod);
     trans.minfrac = min_amt/offer_amt;
-    trans.is_offer = true;
-    trans.price = commod_price;
-    trans.resource = offer_mat;
+    trans.setPrice(commod_price);
+    trans.setResource(offer_mat);
 
     LOG(LEV_INFO5, "RReact") << name() << " has offered " << offer_mat->quantity()
                              << " kg of " << commod << ".";
@@ -431,7 +414,7 @@ void RecipeReactor::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()){
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   };
   month_in_cycle_++;

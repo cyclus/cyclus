@@ -2,8 +2,6 @@ _______________________________________________________________________
 Cyclus Core
 _______________________________________________________________________
 
-**Last Updated: 2.28.2012**
-
 The core of the Cyclus nuclear fuel cycle simulator from the University of 
 Wisconsin - Madison is intended to be a simulation framework upon which to 
 develop innovative fuel cycle simulations. 
@@ -301,3 +299,10 @@ This time we want to update our local develop branch based on the changes we mad
 checkout and update develop in case the upstream develop branch introduced any changes. We then
 apply our changes via merging work into develop, and push that back up to origin. In case the upstream
 pull did introduce changes, we go ahead and update the work branch on origin.
+
+See also
+--------
+
+A good description of a git workflow with good graphics is available at
+http://nvie.com/posts/a-successful-git-branching-model/
+

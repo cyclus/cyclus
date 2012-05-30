@@ -11,11 +11,6 @@ class TestFacility: public FacilityModel {
   
   void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
-
-    Model* what_model = NULL;
-
-    msg->setRequester(what_model);
-
   }
 
   void copyFreshModel(Model* src) { copy(dynamic_cast<TestFacility*>(src)); }

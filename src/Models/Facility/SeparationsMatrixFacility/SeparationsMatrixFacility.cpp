@@ -150,7 +150,7 @@ std::string SeparationsMatrixFacility::str() {
 void SeparationsMatrixFacility::receiveMessage(msg_ptr msg) 
 {
   // is this a message from on high? 
-  if(msg->supplier()==this){
+  if(msg->trans().supplier()==this){
     // file the order
     ordersWaiting_.push_front(msg);
   }
@@ -160,9 +160,7 @@ void SeparationsMatrixFacility::receiveMessage(msg_ptr msg)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
-  Transaction trans = msg->trans();
-
+std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(Transaction order) {
   double newAmt = 0;
 
   // pull materials off of the inventory stack until you get the trans amount
@@ -170,7 +168,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
   // start with an empty manifest
   vector<rsrc_ptr> toSend;
 
-  while(trans.resource->quantity() > newAmt && !inventory_.empty() ){
+  while(order.resource()->quantity() > newAmt && !inventory_.empty() ){
     for (deque<InSep>::iterator iter = inventory_.begin(); 
         iter != inventory_.end(); 
         iter ++){
@@ -180,14 +178,14 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
       mat_rsrc_ptr newMat = mat_rsrc_ptr(new Material());
 
       // if the inventory obj isn't larger than the remaining need, send it as is.
-      if(m->quantity() <= (trans.resource->quantity() - newAmt)){
+      if(m->quantity() <= (order.resource()->quantity() - newAmt)){
         newAmt += m->quantity();
         newMat->absorb(m);
         inventory_.pop_front();
       }
       else{ 
         // if the inventory obj is larger than the remaining need, split it.
-        mat_rsrc_ptr toAbsorb = m->extract(trans.resource->quantity() - newAmt);
+        mat_rsrc_ptr toAbsorb = m->extract(order.resource()->quantity() - newAmt);
         newAmt += toAbsorb->quantity();
         newMat->absorb(toAbsorb);
       }
@@ -201,7 +199,7 @@ std::vector<rsrc_ptr> SeparationsMatrixFacility::removeResource(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SeparationsMatrixFacility::addResource(msg_ptr msg,
+void SeparationsMatrixFacility::addResource(Transaction trans,
                                             std::vector<rsrc_ptr> manifest) {  
   LOG(LEV_DEBUG2, "none!") << "Entered the addResource file ";
 
@@ -212,7 +210,7 @@ void SeparationsMatrixFacility::addResource(msg_ptr msg,
       thisMat++) {
     LOG(LEV_DEBUG2, "none!") <<"SeparationsFacility " << ID() << " is receiving material with mass "
       << (*thisMat)->quantity();
-    stocks_.push_back(make_pair(msg->trans().commod, boost::dynamic_pointer_cast<Material>(*thisMat)));
+    stocks_.push_back(make_pair(trans.commod(), boost::dynamic_pointer_cast<Material>(*thisMat)));
   }
 }
 
@@ -272,7 +270,7 @@ void SeparationsMatrixFacility::handleTock(int time)
   // fill the orders that are waiting, 
   while(!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
 }
@@ -346,15 +344,13 @@ void SeparationsMatrixFacility::makeRequests(){
       gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
-      Transaction trans;
-      trans.commod = (*iter);
+      Transaction trans(this, REQUEST);
+      trans.setCommod(*iter);
       trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price;
-      trans.resource = request_res; 
+      trans.setPrice(commod_price);
+      trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
     }
     // otherwise, the upper bound is the monthly acceptance capacity 
@@ -368,15 +364,13 @@ void SeparationsMatrixFacility::makeRequests(){
       gen_rsrc_ptr request_res = gen_rsrc_ptr(new GenericResource((*iter), "kg", requestAmt));
 
       // build the transaction and message
-      Transaction trans;
-      trans.commod = (*iter);
+      Transaction trans(this, REQUEST);
+      trans.setCommod(*iter);
       trans.minfrac = minAmt/requestAmt;
-      trans.is_offer = false;
-      trans.price = commod_price;
-      trans.resource = request_res;
+      trans.setPrice(commod_price);
+      trans.setResource(request_res);
 
       msg_ptr request(new Message(this, recipient, trans)); 
-      request->setNextDest(facInst());
       request->sendOn();
     }
 
@@ -411,15 +405,13 @@ void SeparationsMatrixFacility::makeOffers() {
     mat_rsrc_ptr offer_mat = mat_rsrc_ptr(new Material(comp));
 
     // build the transaction and message
-    Transaction trans;
-    trans.commod = (*iter);
+    Transaction trans(this, OFFER);
+    trans.setCommod(*iter);
     trans.minfrac = min_amt/offer_amt;
-    trans.is_offer = true;
-    trans.price = commod_price;
-    trans.resource = offer_mat;
+    trans.setPrice(commod_price);
+    trans.setResource(offer_mat);
 
     msg_ptr msg(new Message(this, recipient, trans)); 
-    msg->setNextDest(facInst());
     msg->sendOn();
   }
 
@@ -448,7 +440,7 @@ void SeparationsMatrixFacility::separate()
 
     // Find out what we're trying to make.
     try {
-      IsoVector vecToMake =  boost::dynamic_pointer_cast<Material>(mess->resource())->isoVector();
+      IsoVector vecToMake =  boost::dynamic_pointer_cast<Material>(mess->trans().resource())->isoVector();
     } catch (exception& e) {
       string err = "The Resource sent to the SeparationsMatrixFacility \
                     must be a Material type Resource" ;

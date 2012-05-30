@@ -39,7 +39,6 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
  public:
   virtual void SetUp() { 
     inst_model_ = new FakeInstModel();
-    inst_model_->init();
     test_facility_ = new TestFacility();
     test_region_ = new TestRegion();
     inst_model_->setParent(test_region_);

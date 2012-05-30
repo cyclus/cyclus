@@ -19,7 +19,6 @@ class ConverterModelTests : public TestWithParam<ConverterModelConstructor*> {
   public:
     virtual void SetUp() { 
       converter_model_ = (*GetParam())();
-      converter_model_->init();
     }
     virtual void TearDown(){ 
       delete converter_model_;

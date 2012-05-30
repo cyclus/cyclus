@@ -10,3 +10,10 @@ ${CYCLUS_SOURCE_DIR}/Models/Market/NullMarket/NullMarket.rng
 ${CMAKE_CURRENT_BINARY_DIR}/NullMarket.rng
 COPYONLY
 )
+
+SET(RNG_INCLUDES ${RNG_INCLUDES} 
+  "<include href='../Models/Market/NullMarket/NullMarket.rng'/>"
+  PARENT_SCOPE)
+SET(MKT_REFS ${MKT_REFS}
+  "<ref name='NullMarket'/>"
+  PARENT_SCOPE)

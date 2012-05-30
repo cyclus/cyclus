@@ -82,7 +82,7 @@ std::string NullFacility::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void NullFacility::receiveMessage(msg_ptr msg) {
   // is this a message from on high? 
-  if (msg->supplier()==this) {
+  if (msg->trans().supplier()==this) {
     // file the order
     ordersWaiting_.push_front(msg);
   } else {
@@ -91,9 +91,9 @@ void NullFacility::receiveMessage(msg_ptr msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
-  Transaction trans = order->trans();
-  if (trans.commod != out_commod_) {
+vector<rsrc_ptr> NullFacility::removeResource(Transaction order) {
+  Transaction trans = order;
+  if (trans.commod() != out_commod_) {
     string err_msg = "NullFacility can only send '" + out_commod_ ;
     err_msg += + "' materials.";
     throw CycException(err_msg);
@@ -101,20 +101,20 @@ vector<rsrc_ptr> NullFacility::removeResource(msg_ptr order) {
 
   MatManifest mats;
   try {
-    mats = inventory_.popQty(trans.resource->quantity());
+    mats = inventory_.popQty(trans.resource()->quantity());
   } catch(CycNegQtyException err) {
-    LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource->quantity()
+    LOG(LEV_ERROR, "NulFac") << "extraction of " << trans.resource()->quantity()
                    << " kg failed. Inventory is only "
                    << inventory_.quantity() << " kg.";
   }
 
-  return ResourceBuff::toRes(mats);
+  return MatBuff::toRes(mats);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void NullFacility::addResource(msg_ptr msg, std::vector<rsrc_ptr> manifest) {
+void NullFacility::addResource(Transaction trans, std::vector<rsrc_ptr> manifest) {
   try {
-    stocks_.pushAll(ResourceBuff::toMat(manifest));
+    stocks_.pushAll(MatBuff::toMat(manifest));
   } catch(CycOverCapException err) {
     LOG(LEV_ERROR, "NulFac") << "addition of resources"
                    << " to stocks failed. Stocks only has"
@@ -144,19 +144,16 @@ void NullFacility::makeRequests() {
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   Transaction trans = buildRequestTrans(cantake);
   msg_ptr request(new Message(this, recipient, trans)); 
-  request->setNextDest(facInst());
   request->sendOn();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Transaction NullFacility::buildRequestTrans(double amt) {
-  Transaction trans;
   gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(in_commod_,"kg",amt));
-  trans.commod = in_commod_;
-  trans.minfrac = 0;
-  trans.is_offer = false;
-  trans.price = 0;
-  trans.resource = res;
+
+  Transaction trans(this, REQUEST);
+  trans.setCommod(in_commod_);
+  trans.setResource(res);
   return trans;
 }
 
@@ -171,25 +168,20 @@ void NullFacility::makeOffers() {
     offer_amt = inventory_.capacity(); 
   }
 
-  // there is no minimum amount a null facility may send
-  double min_amt = 0;
-  // and it's free
-  double commod_price = 0;
+  if (offer_amt < EPS_KG) {
+    return;
+  }
 
   // create a Resource and build transaction
   gen_rsrc_ptr res = gen_rsrc_ptr(new GenericResource(out_commod_, "kg", offer_amt));
-  Transaction trans;
-  trans.commod = out_commod_;
-  trans.minfrac = min_amt/offer_amt;
-  trans.is_offer = true;
-  trans.price = commod_price;
-  trans.resource = res;
+  Transaction trans(this, OFFER);
+  trans.setCommod(out_commod_);
+  trans.setResource(res);
 
   // build and send the message
   MarketModel* market = MarketModel::marketForCommod(out_commod_);
   Communicator* recipient = dynamic_cast<Communicator*>(market);
   msg_ptr msg(new Message(this, recipient, trans)); 
-  msg->setNextDest(facInst());
   msg->sendOn();
 }
 
@@ -223,7 +215,7 @@ void NullFacility::handleTock(int time) {
   // check what orders are waiting, 
   while(!ordersWaiting_.empty()) {
     msg_ptr order = ordersWaiting_.front();
-    order->approveTransfer();
+    order->trans().approveTransfer();
     ordersWaiting_.pop_front();
   }
 }

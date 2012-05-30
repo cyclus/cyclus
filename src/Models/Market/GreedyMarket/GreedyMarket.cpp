@@ -7,7 +7,7 @@
 #include "GreedyMarket.h"
 
 #include "Logger.h"
-#include "IsoVector.h"
+#include "Resource.h"
 #include "CycException.h"
 #include "InputXML.h"
 
@@ -22,10 +22,10 @@ std::string GreedyMarket::str() {
 void GreedyMarket::receiveMessage(msg_ptr msg) {
   messages_.insert(msg);
 
-  if (msg->isOffer()) {
-    offers_.insert(indexedMsg(msg->resource()->quantity(), msg));
+  if (msg->trans().isOffer()) {
+    offers_.insert(indexedMsg(msg->trans().resource()->quantity(), msg));
   } else {
-    requests_.insert(indexedMsg(msg->resource()->quantity(), msg));
+    requests_.insert(indexedMsg(msg->trans().resource()->quantity(), msg));
   }
 }
 
@@ -69,7 +69,7 @@ void GreedyMarket::reject_request(sortedMsgList::iterator request) {
   // put all matched offers_ back in the sorted list
   while (matchedOffers_.size() > 0) {
     msg_ptr msg = *(matchedOffers_.begin());
-    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
+    offers_.insert(indexedMsg(msg->trans().resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
 }
@@ -98,7 +98,7 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
   
   // if this request is not yet satisfied &&
   // there are more offers_ left
-  while ( fabs(requestAmt) > EPS_KG && offers_.size() > 0) {
+  while ( fabs(requestAmt) > EPS_RSRC && offers_.size() > 0) {
     // get a new offer
     offer = offers_.end();
     offer--;
@@ -110,10 +110,10 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
     // pop off this offer
     offers_.erase(offer);
-    if (requestAmt - offerAmt > EPS_KG) { 
+    if (requestAmt - offerAmt > EPS_RSRC) { 
       // put a new message in the order stack
       // it goes down to supplier
-      offerMsg->setRequester(requestMsg->requester());
+      offerMsg->trans().matchWith(requestMsg->trans());
 
       // tenatively queue a new order (don't execute yet)
       matchedOffers_.insert(offerMsg);
@@ -123,11 +123,11 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
       LOG(LEV_DEBUG1, "GreedM") 
         << "GreedyMarket has resolved a transaction "
         << " which is a match from "
-        << offerMsg->supplier()->ID()
+        << offerMsg->trans().supplier()->ID()
         << " to "
-        << offerMsg->requester()->ID()
+        << offerMsg->trans().requester()->ID()
         << " for the amount:  " 
-        << offerMsg->resource()->quantity();
+        << offerMsg->trans().resource()->quantity();
 
       requestAmt -= offerAmt;
     } 
@@ -136,8 +136,8 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
 
       // queue a new order
       msg_ptr maybe_offer = offerMsg->clone();
-      maybe_offer->resource()->setQuantity(requestAmt);
-      maybe_offer->setRequester(requestMsg->requester());
+      maybe_offer->trans().resource()->setQuantity(requestAmt);
+      maybe_offer->trans().matchWith(requestMsg->trans());
 
       matchedOffers_.insert(offerMsg);
 
@@ -146,11 +146,11 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
       LOG(LEV_DEBUG1, "GreedM")  
         << "GreedyMarket has resolved a transaction "
         << " which is a match from "
-        << maybe_offer->supplier()->ID()
+        << maybe_offer->trans().supplier()->ID()
         << " (offer split) to "
-        << maybe_offer->requester()->ID()
+        << maybe_offer->trans().requester()->ID()
         << " for the amount:  " 
-        << maybe_offer->resource()->quantity();
+        << maybe_offer->trans().resource()->quantity();
 
       // reduce the offer amount
       offerAmt -= requestAmt;
@@ -158,9 +158,9 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
       // if the residual is above threshold,
       // make a new offer with reduced amount
 
-      if(offerAmt > EPS_KG) {
+      if(offerAmt > EPS_RSRC) {
         msg_ptr new_offer = offerMsg->clone();
-        new_offer->resource()->setQuantity(offerAmt);
+        new_offer->trans().resource()->setQuantity(offerAmt);
         receiveMessage(new_offer);
       }
 
@@ -169,14 +169,14 @@ bool GreedyMarket::match_request(sortedMsgList::iterator request) {
     }
   }
 
-  if (fabs(requestAmt) > EPS_KG) {
+  if (fabs(requestAmt) > EPS_RSRC) {
     LOG(LEV_DEBUG2, "GreedM") << "The request from Requester "
-      << requestMsg->requester()->ID()
+      << requestMsg->trans().requester()->ID()
       << " for the amount " << requestAmt << " rejected. ";
       reject_request(request);
   }
 
-  return (fabs(requestAmt) < EPS_KG);
+  return (fabs(requestAmt) < EPS_RSRC);
 }
 
 /* --------------------

@@ -14,11 +14,6 @@ class TestInst: public InstModel {
   
   void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
-
-    Model* what_model = NULL;
-
-    msg->setRequester(what_model);
-
   }
 
   bool canBuild(Model* mdl) {return true;}

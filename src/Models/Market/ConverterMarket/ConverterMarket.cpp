@@ -7,7 +7,7 @@
 #include "ConverterMarket.h"
 
 #include "ConverterModel.h"
-#include "IsoVector.h"
+#include "Resource.h"
 #include "Logger.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -71,11 +71,11 @@ void ConverterMarket::receiveMessage(msg_ptr msg)
 {
   messages_.insert(msg);
 
-  if (msg->isOffer()){
-    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
+  if (msg->trans().isOffer()){
+    offers_.insert(indexedMsg(msg->trans().resource()->quantity(),msg));
   }
-  else if (!msg->isOffer()) {
-    requests_.insert(indexedMsg(msg->resource()->quantity(),msg));
+  else if (!msg->trans().isOffer()) {
+    requests_.insert(indexedMsg(msg->trans().resource()->quantity(),msg));
   }
 }
 
@@ -91,7 +91,7 @@ void ConverterMarket::reject_request(sortedMsgList::iterator request)
   // put all matched offers back in the sorted list
   while (matchedOffers_.size() > 0) {
     msg_ptr msg = *(matchedOffers_.begin());
-    offers_.insert(indexedMsg(msg->resource()->quantity(),msg));
+    offers_.insert(indexedMsg(msg->trans().resource()->quantity(),msg));
     matchedOffers_.erase(msg);
   }
 
@@ -131,15 +131,15 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
     offer--;
     // convert it
     offerMsg = (this->getConverter())->convert((*offer).second, requestMsg);
-    offerAmt = offerMsg->resource()->quantity();
+    offerAmt = offerMsg->trans().resource()->quantity();
 
     // pop off this offer
     offers_.erase(offer);
-    if (requestMsg->resource()->checkQuality(offerMsg->resource())){
+    if (requestMsg->trans().resource()->checkQuality(offerMsg->trans().resource())){
       if (requestAmt > offerAmt) { 
         // put a new message in the order stack
         // it goes down to supplier
-        offerMsg->setRequester(requestMsg->requester());
+        offerMsg->trans().matchWith(requestMsg->trans());
 
         // tenatively queue a new order (don't execute yet)
         matchedOffers_.insert(offerMsg);
@@ -147,11 +147,11 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         orders_.push_back(offerMsg);
 
         LOG(LEV_DEBUG2, "none!") << "ConverterMarket has resolved a match from "
-          << offerMsg->supplier()->ID()
+          << offerMsg->trans().supplier()->ID()
           << " to "
-          << offerMsg->requester()->ID()
+          << offerMsg->trans().requester()->ID()
           << " for the amount:  " 
-          << offerMsg->resource()->quantity();
+          << offerMsg->trans().resource()->quantity();
 
         requestAmt -= offerAmt;
       } 
@@ -161,19 +161,19 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // queue a new order
         msg_ptr maybe_offer = offerMsg->clone();
 
-        maybe_offer->resource()->setQuantity(requestAmt);
-        maybe_offer->setRequester(requestMsg->requester());
+        maybe_offer->trans().resource()->setQuantity(requestAmt);
+        maybe_offer->trans().matchWith(requestMsg->trans());
 
         matchedOffers_.insert(offerMsg);
 
         orders_.push_back(maybe_offer);
 
         LOG(LEV_DEBUG2, "none!") << "ConverterMarket has resolved a partial match from "
-          << maybe_offer->supplier()->ID()
+          << maybe_offer->trans().supplier()->ID()
           << " to "
-          << maybe_offer->requester()->ID()
+          << maybe_offer->trans().requester()->ID()
           << " for the amount:  " 
-          << maybe_offer->resource()->quantity();
+          << maybe_offer->trans().resource()->quantity();
 
         // reduce the offer amount
         offerAmt -= requestAmt;
@@ -181,9 +181,9 @@ bool ConverterMarket::match_request(sortedMsgList::iterator request)
         // if the residual is above threshold,
         // make a new offer with reduced amount
 
-        if(offerAmt > EPS_KG) {
+        if(offerAmt > EPS_RSRC) {
           msg_ptr new_offer = offerMsg->clone();
-          new_offer->resource()->setQuantity(offerAmt);
+          new_offer->trans().resource()->setQuantity(offerAmt);
           // call this method for consistency
           receiveMessage(new_offer);
         }
@@ -215,7 +215,7 @@ void ConverterMarket::resolve()
     } 
     else {
       LOG(LEV_DEBUG2, "none!") << "The request from Requester "<< 
-          (*request).second->requester()->ID()
+          (*request).second->trans().requester()->ID()
           << " for the amount " << (*request).first 
           << " rejected by the ConverterMarket. ";
       reject_request(request);

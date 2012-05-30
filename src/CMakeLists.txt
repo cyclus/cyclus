@@ -30,6 +30,32 @@ ELSE()
   CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
 ENDIF()
 
+# Copy Data
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
+${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite
+COPYONLY
+)
+
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Config/cyclus.rng.in
+${PROJECT_BINARY_DIR}/Data/cyclus.rng
+COPYONLY
+)
+
+CONFIGURE_FILE(
+${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
+${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
+COPYONLY
+)
+
+set(input_path ${CYCLUS_SOURCE_DIR}/../input)
+set(cyclus_path ${CMAKE_CURRENT_BINARY_DIR})
+CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_inputs.py @ONLY)
+
+
+# ----- Cyclus Unit Test Driver ------
+
 # Includes the directories in which there are source files. 
 SET(CYCLUS_INCLUDE_DIR
   ${CYCLUS_SRC_DIR}
@@ -45,6 +71,7 @@ SET(CYCLUS_INCLUDE_DIR
 SET( CYCLUS_CORE
   Models/Model.cpp 
   Models/Message.cpp
+  Models/Transaction.cpp
   Models/StubTimeAgent.cpp 
   Models/StubModel.cpp 
   Models/StubCommModel.cpp 
@@ -66,24 +93,6 @@ SET( CYCLUS_SRC
 
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
-
-# Copy Data
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
-${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite
-COPYONLY
-)
-
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Input/cyclus.rng
-${CMAKE_CURRENT_BINARY_DIR}/Data/cyclus.rng
-COPYONLY
-)
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
-${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
-COPYONLY
-)
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -127,7 +136,6 @@ ENDIF (DOXYGEN_FOUND)
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} )
 
-# ----- Cyclus Unit Test Driver ------
 
 # Be sure to clear these each time
 set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )

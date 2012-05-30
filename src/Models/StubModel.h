@@ -37,12 +37,6 @@ class StubModel : public Model {
   virtual ~StubModel();
 
   /**
-     Initalize members of StubModel and any other non-input
-     related parameters
-   */
-  void init() { Model::init(); }
-
-  /**
      every model needs a method to initialize from XML 
       
      @param cur is the pointer to the model's xml node 

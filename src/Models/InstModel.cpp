@@ -17,20 +17,12 @@ using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 InstModel::InstModel() {
-  init();
   setModelType("Inst");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init() {
   prototypes_ = new PrototypeSet();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
-  // non xml inits
-  InstModel::init();
-  // xml inits
   Model::init(cur);
 }
 
@@ -60,7 +52,6 @@ void InstModel::receiveMessage(msg_ptr msg){
   // Just pass them along. 
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
-  msg->setNextDest( (dynamic_cast<Communicator*>( parent() )) );
   msg->sendOn();
 }
 
@@ -73,17 +64,24 @@ void InstModel::handlePreHistory(){
   }
 }
 
-void InstModel::handleTick(int time){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handleTick(time);
+void InstModel::handleTick(int time) {
+  // tell all of the institution's child models to handle the tick
+  int currsize = children_.size();
+  int i = 0;
+  while (i < children_.size()) {
+    Model* m = children_.at(i);
+    dynamic_cast<FacilityModel*>(m)->handleTick(time);
+
+    // increment not needed if a facility deleted itself
+    if (children_.size() == currsize) {
+      i++;
+    }
+    currsize = children_.size();
   }
 }
 
-void InstModel::handleTock(int time){
-  // tell all of the institution's child models to handle the tick
+void InstModel::handleTock(int time) {
+  // tell all of the institution's child models to handle the tock
   int currsize = children_.size();
   int i = 0;
   while (i < children_.size()) {
@@ -93,8 +91,8 @@ void InstModel::handleTock(int time){
     // increment not needed if a facility deleted itself
     if (children_.size() == currsize) {
       i++;
-      currsize = children_.size();
     }
+    currsize = children_.size();
   }
 }
 
