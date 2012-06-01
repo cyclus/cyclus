@@ -31,15 +31,14 @@ string Env::pathBase(std::string path) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Env::getCyclusPath() {
   // return the join of cwd_ and rel path to cyclus
-  CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
-                  << cwd_ / path_from_cwd_to_cyclus_;
-
   boost::filesystem::path path;
   if(path_from_cwd_to_cyclus_.has_root_path()) {
     path = path_from_cwd_to_cyclus_.normalize();
   } else {
     path = (cwd_ / path_from_cwd_to_cyclus_).normalize();
   }
+  CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
+                  <<  path.string();
   return path.string();
 }
 
