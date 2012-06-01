@@ -1,3 +1,6 @@
+
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Models/Facility/BatchReactor)
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_LIBRARY( BatchReactor       BatchReactor.cpp )
 SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} BatchReactor )
@@ -10,6 +13,7 @@ ${CYCLUS_SOURCE_DIR}/Models/Facility/BatchReactor/BatchReactor.rng
 ${CMAKE_CURRENT_BINARY_DIR}/BatchReactor.rng
 COPYONLY
 )
+
 
 
 SET(RNG_INCLUDES ${RNG_INCLUDES}

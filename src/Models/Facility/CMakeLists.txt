@@ -10,9 +10,6 @@ foreach(dir ${all_valid_subdirs})
 endforeach(dir)
 
 SET(ModelTestSource ${ModelTestSource} ${FacilityTestSource} PARENT_SCOPE)
-#SET(FAC_REFS "")
-#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
-#  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
 STRING(REPLACE ";" "\n\ \ \ \ \ \ \ \ " FAC_REFS "${FAC_REFS}")
 STRING(REPLACE ";" "\n\ \ " RNG_INCLUDES "${RNG_INCLUDES}")
 SET(FAC_REFS ${FAC_REFS} PARENT_SCOPE)
