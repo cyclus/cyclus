@@ -200,22 +200,22 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${Test
  install(TARGETS 
      ${INTERFACE_LIBRARIES} 
    ARCHIVE
-   DESTINATION lib
+   DESTINATION cyclus/lib
    COMPONENT libraries
    )
  install(TARGETS 
      cyclus
      Testing/CyclusUnitTestDriver
    RUNTIME
-   DESTINATION bin
+   DESTINATION cyclus/bin
    COMPONENT application
    )
  install(FILES 
      Input/cyclus.rng
-     Data/mass.sqlite
-     Data/decayInfo.dat
+     Utility/mass.sqlite
+     Utility/decayInfo.dat
    DESTINATION 
-     share
+     cyclus/share
    COMPONENT data
    )
 
