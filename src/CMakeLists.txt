@@ -224,7 +224,7 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource}
    COMPONENT application
    )
  install(FILES 
-     Input/cyclus.rng
+     ${PROJECT_BINARY_DIR}/Data/cyclus.rng
      Utility/mass.sqlite
      Utility/decayInfo.dat
    DESTINATION  

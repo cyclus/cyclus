@@ -21,6 +21,11 @@ macro(cyclus_init_model _path _name)
   SET(RNG_INCLUDES ${RNG_INCLUDES}
     "<include href='..${_path}/${_name}.rng'/>"
     PARENT_SCOPE)
+
+  install(FILES "${_name}.rng"
+    DESTINATION cyclus/${_path}
+    COMPONENT "${_path}.rng"
+    )
 endmacro()
   
 
