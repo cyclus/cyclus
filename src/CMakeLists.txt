@@ -53,6 +53,17 @@ set(input_path ${CYCLUS_SOURCE_DIR}/../input)
 set(cyclus_path ${CMAKE_CURRENT_BINARY_DIR})
 CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_inputs.py @ONLY)
 
+# Setup build locations.
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/bin)
+endif()
+if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+endif()
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+endif()
+
 
 # ----- Cyclus Unit Test Driver ------
 
@@ -184,16 +195,16 @@ if (CMAKE_USE_PTHREADS_INIT)
 endif()
 
 INCLUDE_DIRECTORIES(Testing/Googletest) # necessary?
-add_executable(Testing/CyclusUnitTestDriver
+add_executable( CyclusUnitTestDriver
   Testing/CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
 
-target_link_libraries ( Testing/CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
+target_link_libraries ( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
   ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
 
 # Here we add all the tests
-add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${TestSource} 
+add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource} 
   ${INTERFACE_LIBRARIES})
 
 # Here we set some components for installation with cpack
@@ -205,7 +216,12 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${Test
    )
  install(TARGETS 
      cyclus
-     Testing/CyclusUnitTestDriver
+   RUNTIME
+   DESTINATION cyclus/bin
+   COMPONENT application
+   )
+ install(TARGETS 
+     CyclusUnitTestDriver
    RUNTIME
    DESTINATION cyclus/bin
    COMPONENT application
