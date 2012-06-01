@@ -44,6 +44,14 @@ string Env::getCyclusPath() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+string Env::getBuildPath() {
+  // return the join of cwd_ and rel path to cyclus MINUS the bin directory
+  boost::filesystem::path cyc_path = getCyclusPath();
+  boost::filesystem::path to_ret = (cyc_path / "..").normalize();
+  return to_ret.string();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Env::setCyclusRelPath(std::string path) {
   path_from_cwd_to_cyclus_ = boost::filesystem::path(path);
   CLOG(LEV_DEBUG3) << "Cyclus rel path: " << path;

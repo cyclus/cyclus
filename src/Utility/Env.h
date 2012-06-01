@@ -44,7 +44,14 @@ public:
      @return the relative path from the cwd to the cyclus executable 
    */
   static std::string getCyclusPath();
-  
+
+  /**
+     the relative path to the root build directory (containing bin, lib, etc.)
+      
+     @return the relative path from the cwd to the build directory
+    */
+  static std::string getBuildPath();
+
   /**
      Allows configuration and other files to be located independent 
      of the working directory from which cyclus is executed. 
