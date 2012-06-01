@@ -5,12 +5,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 
-# # Determine the output directory
-# IF (NOT EXISTS ENV{CYCLUS_OUT_DIR})
-#   SET( ENV{CYCLUS_OUT_DIR} ${CMAKE_CURRENT_BINARY_DIR} )
-#   MESSAGE(STATUS "CYCLUS_OUT_DIR not found, setting to ${CMAKE_CURRENT_BINARY_DIR}")
-# ENDIF(NOT EXISTS ENV{CYCLUS_OUT_DIR})
-
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
@@ -104,6 +98,10 @@ SET( CYCLUS_SRC
 
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
+
+# Include macros
+include(CyclusModuleMacros)
+
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )

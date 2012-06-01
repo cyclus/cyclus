@@ -1,28 +1,31 @@
-SET(MODEL_PATH "/Models/Facility/BatchReactor")
+SET(MODEL_NAME "BatchReactor")
+SET(MODEL_PATH "/Models/Facility/${MODEL_NAME}")
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
   ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${MODEL_PATH})
+
 # Build the cyclus executable from the CYCLUS_SRC source files
-ADD_LIBRARY( BatchReactor       BatchReactor.cpp )
-SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} BatchReactor )
+ADD_LIBRARY( ${MODEL_NAME}       ${MODEL_NAME}.cpp )
+SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${MODEL_NAME} )
 SET(FacilityTestSource ${FacilityTestSource} 
-  ${CMAKE_CURRENT_SOURCE_DIR}/BatchReactor.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/BatchReactorTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_NAME}.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/${MODEL_NAME}Tests.cpp 
   PARENT_SCOPE)
+
 CONFIGURE_FILE(
-  ${CYCLUS_SOURCE_DIR}${MODEL_PATH}/BatchReactor.rng
-  ${CMAKE_CURRENT_BINARY_DIR}/BatchReactor.rng
+  ${CYCLUS_SOURCE_DIR}${MODEL_PATH}/${MODEL_NAME}.rng
+  ${CMAKE_CURRENT_BINARY_DIR}/${MODEL_NAME}.rng
   COPYONLY
   )
 
-install(TARGETS BatchReactor
+install(TARGETS ${MODEL_NAME}
   LIBRARY DESTINATION cyclus/lib${MODEL_PATH}
   COMPONENT ${MODEL_PATH}
   )
 
 SET(RNG_INCLUDES ${RNG_INCLUDES}
-  "<include href='..${MODEL_PATH}/BatchReactor.rng'/>"
+  "<include href='..${MODEL_PATH}/${MODEL_NAME}.rng'/>"
   PARENT_SCOPE)
 SET(FAC_REFS ${FAC_REFS}
-  "<ref name='BatchReactor'/>"
+  "<ref name='${MODEL_NAME}'/>"
   PARENT_SCOPE)
