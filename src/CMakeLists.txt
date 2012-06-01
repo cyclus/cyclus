@@ -197,18 +197,27 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${Test
   ${INTERFACE_LIBRARIES})
 
 # Here we set some components for installation with cpack
- install(TARGETS ${INTERFACE_LIBRARIES} 
+ install(TARGETS 
+     ${INTERFACE_LIBRARIES} 
    ARCHIVE
    DESTINATION lib
-   COMPONENT libraries)
- install(TARGETS cyclus
+   COMPONENT libraries
+   )
+ install(TARGETS 
+     cyclus
+     Testing/CyclusUnitTestDriver
    RUNTIME
    DESTINATION bin
-   COMPONENT application)
+   COMPONENT application
+   )
  install(FILES 
-   Input/cyclus.rng
-   DESTINATION include
-   COMPONENT data)
+     Input/cyclus.rng
+     Data/mass.sqlite
+     Data/decayInfo.dat
+   DESTINATION 
+     share
+   COMPONENT data
+   )
 
 set(CPACK_COMPONENTS_ALL cyclus libraries data)
 
