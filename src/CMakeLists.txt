@@ -214,8 +214,8 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/Testing/CyclusUnitTestDriver ${Test
      Input/cyclus.rng
      Utility/mass.sqlite
      Utility/decayInfo.dat
-   DESTINATION 
-     cyclus/share
+   DESTINATION  
+     cyclus/Data
    COMPONENT data
    )
 

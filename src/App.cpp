@@ -12,7 +12,6 @@
 #include "CycException.h"
 #include "Env.h"
 #include "Logger.h"
-#include "IsoVector.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -113,7 +112,6 @@ int main(int argc, char* argv[]) {
   }
 
   Model::printModelList();
-  //IsoVector::printRecipes();
   
   // Run the simulation 
   try {
