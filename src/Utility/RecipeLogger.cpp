@@ -239,12 +239,9 @@ bool RecipeLogger::compositionDecayable(CompMapPtr comp) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLogger::define_table() {
   // declare the state id columns and add it to the table
-  column state_id("ID","INTEGER");
-  column iso_id("IsoID","INTEGER");
-  column iso_value("Value","REAL");
-  iso_table->addColumn(state_id);
-  iso_table->addColumn(iso_id);
-  iso_table->addColumn(iso_value);
+  iso_table->addField("ID","INTEGER");
+  iso_table->addField("IsoID","INTEGER");
+  iso_table->addField("Value","REAL");
   // declare the table's primary key
   primary_key pk;
   pk.push_back("ID"), pk.push_back("IsoID");

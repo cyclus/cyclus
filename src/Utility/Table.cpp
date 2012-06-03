@@ -23,7 +23,7 @@ Table::Table(table_name name) {
 void Table::defineTable(std::vector<column> cols, primary_key keys){
   vector<column>::iterator each_col;
   for(each_col=cols.begin(); each_col!=cols.end(); each_col++){
-    this->addColumn((*each_col));
+    this->addField(each_col->first, each_col->second);
   }
   this->setPrimaryKey(keys);
   this->tableDefined();
@@ -38,11 +38,6 @@ void Table::tableDefined() {
 }
 
 // -----------------------------------------------------------------------
-void Table::setPrimaryKey(column const col) {
-  setPrimaryKey(col.first);
-}
-
-// -----------------------------------------------------------------------
 void Table::setPrimaryKey(std::string const pk_string) {
   primary_key pk;
   pk.push_back(pk_string);
@@ -50,9 +45,9 @@ void Table::setPrimaryKey(std::string const pk_string) {
 }
 
 // -----------------------------------------------------------------------
-void Table::addColumn(column col) {
-  col_names_.push_back(col.first);
-  columns_.push_back(col);
+void Table::addField(std::string name, std::string data_type) {
+  col_names_.push_back(name);
+  col_types_.push_back(data_type);
 }
 
 // -----------------------------------------------------------------------
@@ -73,14 +68,13 @@ string Table::create(){
   cmd << "CREATE TABLE " << this->name() <<" (";
   // for each entry, add the column name and data type
   // and comma separate entries
-  for(vector<column>::iterator col = columns_.begin(); 
-      col != columns_.end(); 
-      ++col) {
+  for(int i = 0; i < col_names_.size(); i++) {
     // add the column and data type to the command
-    cmd << col->first << " " << col->second;
+    cmd << col_names_.at(i) << " " << col_types_.at(i);
     // if this is the last entry, do not comma separate
-    if (col != columns_.end() - 1)
+    if (i < col_names_.size() - 1) {
       cmd << ", ";
+    }
   }
   // add primary keys
   if (primary_key_.size() > 0)
@@ -232,13 +226,12 @@ string Table::p_key(){
     cmd << "PRIMARY KEY (";
     // for each column, add the column name to the key
     // and comma separate entries
-    for(vector<col_name>::iterator name = primary_key_.begin(); 
-	name != primary_key_.end(); 
-	++name) {
-      cmd << *name;
+    for (int i = 0; i < primary_key_.size(); i++) {
+      cmd << primary_key_.at(i);
       // if this is the last entry, do not comma separate
-      if (name != primary_key_.end() - 1)
-	cmd << ", ";
+      if (i < primary_key_.size() - 1) {
+        cmd << ", ";
+      }
     }
     // close the primary key command
     cmd << ")";

@@ -364,19 +364,13 @@ void Model::addResource(Transaction trans,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::define_table() {
   // declare the table columns
-  column agent_id("ID","INTEGER");
-  column agent_type("Type","VARCHAR(128)");
-  column parent_id("ParentID","INTEGER");
-  column bornOn("EnterDate","INTEGER");
-  column diedOn("LeaveDate","INTEGER");
+  agent_table->addField("ID","INTEGER");
+  agent_table->addField("Type","VARCHAR(128)");
+  agent_table->addField("ParentID","INTEGER");
+  agent_table->addField("EnterDate","INTEGER");
+  agent_table->addField("LeaveDate","INTEGER");
   // declare the table's primary key
-  agent_table->setPrimaryKey(agent_id);
-  // add columns to the table
-  agent_table->addColumn(agent_id);
-  agent_table->addColumn(agent_type);
-  agent_table->addColumn(parent_id);
-  agent_table->addColumn(bornOn);
-  agent_table->addColumn(diedOn);
+  agent_table->setPrimaryKey("ID");
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;

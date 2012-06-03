@@ -55,13 +55,10 @@ protected:
   
   // define the table for testing
   void define_test_table(table_ptr tbl) {
-    column int_val(iLabel,"INTEGER");
-    column dbl_val(dLabel,"REAL");
-    column str_val(sLabel,"VARCHAR(128)");
-    tbl->setPrimaryKey(int_val);
-    tbl->addColumn(int_val);
-    tbl->addColumn(dbl_val);
-    tbl->addColumn(str_val);
+    tbl->addField(iLabel,"INTEGER");
+    tbl->addField(dLabel,"REAL");
+    tbl->addField(sLabel,"VARCHAR(128)");
+    tbl->setPrimaryKey(iLabel);
     foreign_key_ref *fkref;
     foreign_key *fk;
     key myk, theirk;
