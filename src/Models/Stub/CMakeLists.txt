@@ -10,9 +10,6 @@ endforeach(dir)
 
 
 SET(ModelTestSource ${ModelTestSource} ${StubTestSource} PARENT_SCOPE)
-#SET(STUB_REFS "")
-#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
-#  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
 STRING(REPLACE ";" "\n\ \ \ \ \ \ \ \ " STUB_REFS "${STUB_REFS}")
 STRING(REPLACE ";" "\n\ \ " RNG_INCLUDES "${RNG_INCLUDES}")
 SET(STUB_REFS ${STUB_REFS} PARENT_SCOPE)
