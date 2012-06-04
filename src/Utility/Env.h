@@ -63,14 +63,7 @@ public:
       
      @return the relative path from the cwd to the build directory
     */
-  static std::string getBuildPath();
-
-  /**
-     the current working directory (from which cyclus is being executed)
-
-     @return cwd_ the full path to the directory where cyclus is being executed
-    */
-  static std::string getCWD();
+  static const std::string getBuildPath();
 
   /**
      Allows configuration and other files to be located independent 

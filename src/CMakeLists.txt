@@ -31,9 +31,9 @@ endif()
 if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
 endif()
-#if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-#  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
-#endif()
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+endif()
 
 # Copy Data
 CONFIGURE_FILE(
@@ -190,6 +190,10 @@ add_library(gtest ${GTest})
 if (CMAKE_USE_PTHREADS_INIT)
   target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
 endif()
+install(TARGETS gtest
+  LIBRARY DESTINATION cyclus/lib
+  COMPONENT testing
+  )
 
 INCLUDE_DIRECTORIES(Testing/Googletest) # necessary?
 add_executable( CyclusUnitTestDriver
@@ -221,7 +225,7 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource}
      CyclusUnitTestDriver
    RUNTIME
    DESTINATION cyclus/bin
-   COMPONENT application
+   COMPONENT testing
    )
  install(FILES 
      ${PROJECT_BINARY_DIR}/share/cyclus.rng

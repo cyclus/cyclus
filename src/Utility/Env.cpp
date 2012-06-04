@@ -43,17 +43,12 @@ string Env::getCyclusPath() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::getBuildPath() {
+const string Env::getBuildPath() {
   // return the join of cwd_ and rel path to cyclus MINUS the bin directory
   string cyc_path = getCyclusPath();
-  size_t index=cyc_path.find_last_of("/");
+  size_t index=cyc_path.rfind("/");
   string to_ret = cyc_path.substr(0,index);
   return to_ret;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Env::getCWD() {
-  return cwd_.string();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
