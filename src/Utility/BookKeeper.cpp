@@ -37,7 +37,7 @@ BookKeeper::BookKeeper() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(){
-  createDB("cyclus.sqlite", Env::getBuildPath());
+  createDB("cyclus.sqlite", Env::checkEnv("PWD"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
