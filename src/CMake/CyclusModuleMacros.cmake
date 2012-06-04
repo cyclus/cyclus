@@ -1,7 +1,4 @@
 macro(cyclus_init_model _path _name)
-  #SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
-  #  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${_path})
-  
   # Build the cyclus executable from the CYCLUS_SRC source files
   ADD_LIBRARY( ${_name}       ${_name}.cpp )
   SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_name} )
@@ -117,6 +114,11 @@ endmacro()
 macro(cyclus_init_stubcomm  _name)
   SET(MODEL_PATH "/Models/StubComm/${_name}")
   cyclus_init_model(${MODEL_PATH} ${_name})
+
+  SET(StubCommTestSource ${StubCommTestSource} 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}Tests.cpp 
+    PARENT_SCOPE)
 
   SET(STUBCOMM_REFS ${STUBCOMM_REFS}
     "<ref name='${_name}'/>"

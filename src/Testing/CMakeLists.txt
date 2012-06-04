@@ -23,6 +23,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/ModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubCommModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   PARENT_SCOPE)
