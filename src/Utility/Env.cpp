@@ -45,9 +45,10 @@ string Env::getCyclusPath() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 string Env::getBuildPath() {
   // return the join of cwd_ and rel path to cyclus MINUS the bin directory
-  boost::filesystem::path cyc_path = getCyclusPath();
-  boost::filesystem::path to_ret = (cyc_path / "..").normalize();
-  return to_ret.string();
+  string cyc_path = getCyclusPath();
+  size_t index=cyc_path.find_last_of("/bin");
+  string to_ret = cyc_path.substr(0,index);
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

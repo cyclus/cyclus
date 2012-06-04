@@ -41,6 +41,11 @@ void BookKeeper::createDB(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BookKeeper::createDB(file_path fpath){
+  createDB("cyclus.sqlite", fpath);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(std::string name, file_path fpath) {
   dbName_ = name;
 

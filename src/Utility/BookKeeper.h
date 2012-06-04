@@ -119,14 +119,13 @@ class BookKeeper {
      Creates a database file with the default name and path 
    */
   void createDB();
- 
+
   /**
-     Creates a database file with the name indicated. 
-     This function queries the environment variable CYCLUS_OUTPUT_DIR. 
-      
-     @param name is the name of the sqlite database file. Should end in 
+     Creates a database file with the default name and given path 
+
+     @param fpath the path to the file 
    */
-  void createDB(std::string name);
+  void createDB(file_path fpath);
 
   /**
      Creates a database given a file_path. This is the master create 
