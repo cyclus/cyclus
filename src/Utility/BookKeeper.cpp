@@ -36,10 +36,8 @@ BookKeeper::BookKeeper() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(std::string name) {
-  // construct output file path
-  file_path fpath = Env::getCyclusPath();
-  createDB(name,fpath);
+void BookKeeper::createDB(){
+  createDB("cyclus.sqlite", Env::getBuildPath());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

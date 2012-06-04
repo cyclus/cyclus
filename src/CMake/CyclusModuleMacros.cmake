@@ -98,3 +98,28 @@ macro(cyclus_init_conv  _name)
     "<ref name='${_name}'/>"
     PARENT_SCOPE)
 endmacro()
+
+
+macro(cyclus_init_stub  _name)
+  SET(MODEL_PATH "/Models/Stub/${_name}")
+  cyclus_init_model(${MODEL_PATH} ${_name})
+
+  SET(StubTestSource ${StubTestSource} 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}Tests.cpp 
+    PARENT_SCOPE)
+
+  SET(STUB_REFS ${STUB_REFS}
+    "<ref name='${_name}'/>"
+    PARENT_SCOPE)
+endmacro()
+
+macro(cyclus_init_stubcomm  _name)
+  SET(MODEL_PATH "/Models/StubComm/${_name}")
+  cyclus_init_model(${MODEL_PATH} ${_name})
+
+  SET(STUBCOMM_REFS ${STUBCOMM_REFS}
+    "<ref name='${_name}'/>"
+    PARENT_SCOPE)
+endmacro()
+

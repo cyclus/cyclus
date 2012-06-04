@@ -29,6 +29,12 @@ private:
    */
   static boost::filesystem::path cwd_;
 
+  /**
+     the cwd path 
+   */
+  static boost::filesystem::path path_to_output_dir_;
+
+
 public:
 
   /**
@@ -46,6 +52,13 @@ public:
   static std::string getCyclusPath();
 
   /**
+     the cyclus output path 
+      
+     @return the full path to the directory of the cyclus output
+   */
+  static std::string getCyclusOutputPath();
+
+  /**
      the relative path to the root build directory (containing bin, lib, etc.)
       
      @return the relative path from the cwd to the build directory
@@ -61,6 +74,15 @@ public:
      the name of the cyclus executable) 
    */
   static void setCyclusRelPath(std::string path);
+  
+  /**
+     Allows the user to set the cyclus output path
+      
+     @param path this should be an argument flagged -o as passed to the 
+     main function (i.e. the relative path from the cwd to the desired 
+     output directory)
+   */
+  static void setCyclusOutputPath(std::string path);
   
   /**
      Method to check the existence of and return an environment variable 

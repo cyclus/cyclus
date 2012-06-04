@@ -42,7 +42,7 @@ double MassTable::gramsPerMol(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
   // get the file location
-  string file_path = Env::getBuildPath() + "/Data";
+  string file_path = Env::getBuildPath() + "/share";
   string file_name = "mass.sqlite";
   Database *db = new Database( file_name, file_path );
 

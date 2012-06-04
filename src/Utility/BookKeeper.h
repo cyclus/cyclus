@@ -116,9 +116,9 @@ class BookKeeper {
   void turnLoggingOff();
   
   /**
-     Creates a database file with the default name, cyclus.sqlite. 
+     Creates a database file with the default name and path 
    */
-  void createDB(){createDB("cyclus.sqlite");}
+  void createDB();
  
   /**
      Creates a database file with the name indicated. 
@@ -134,7 +134,9 @@ class BookKeeper {
      will delete it and create a new file. 
       
      @param name is the name of the sqlite database file. Should end in 
-     .sqlite @param fpath the path to the file 
+     .sqlite
+     
+     @param fpath the path to the file 
    */
   void createDB(std::string name, file_path fpath);
 

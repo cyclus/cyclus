@@ -38,19 +38,19 @@ endif()
 # Copy Data
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
-${CMAKE_CURRENT_BINARY_DIR}/Data/mass.sqlite
+${CMAKE_CURRENT_BINARY_DIR}/share/mass.sqlite
 COPYONLY
 )
 
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Config/cyclus.rng.in
-${PROJECT_BINARY_DIR}/Data/cyclus.rng
+${PROJECT_BINARY_DIR}/share/cyclus.rng
 COPYONLY
 )
 
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
-${CMAKE_CURRENT_BINARY_DIR}/Data/decayInfo.dat
+${CMAKE_CURRENT_BINARY_DIR}/share/decayInfo.dat
 COPYONLY
 )
 
@@ -224,11 +224,11 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource}
    COMPONENT application
    )
  install(FILES 
-     ${PROJECT_BINARY_DIR}/Data/cyclus.rng
+     ${PROJECT_BINARY_DIR}/share/cyclus.rng
      Utility/mass.sqlite
      Utility/decayInfo.dat
    DESTINATION  
-     cyclus/Data
+     cyclus/share
    COMPONENT data
    )
 
