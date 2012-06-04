@@ -1,1 +1,1 @@
-cyclus_init_mkt("StubMarket")
+cyclus_init_model("Market" "StubMarket")

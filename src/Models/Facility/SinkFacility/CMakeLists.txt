@@ -1,1 +1,1 @@
-cyclus_init_fac("SinkFacility")
+cyclus_init_model("Facility" "SinkFacility")

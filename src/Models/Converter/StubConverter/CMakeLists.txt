@@ -1,1 +1,1 @@
-cyclus_init_conv("StubConverter")
+cyclus_init_model("Converter" "StubConverter")

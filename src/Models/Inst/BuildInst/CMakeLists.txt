@@ -1,1 +1,1 @@
-cyclus_init_inst("BuildInst")
+cyclus_init_model("Inst" "BuildInst")

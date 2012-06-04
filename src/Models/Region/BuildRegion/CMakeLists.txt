@@ -1,1 +1,1 @@
-cyclus_init_reg("BuildRegion")
+cyclus_init_model("Region" "BuildRegion")

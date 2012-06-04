@@ -1,1 +1,1 @@
-cyclus_init_inst("FixedInst")
+cyclus_init_model("Inst" "FixedInst")

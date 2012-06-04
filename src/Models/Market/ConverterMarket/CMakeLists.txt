@@ -1,1 +1,1 @@
-cyclus_init_mkt("ConverterMarket")
+cyclus_init_model("Market" "ConverterMarket")

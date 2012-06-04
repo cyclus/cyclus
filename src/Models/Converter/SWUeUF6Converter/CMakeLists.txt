@@ -1,1 +1,1 @@
-cyclus_init_conv("SWUeUF6Converter")
+cyclus_init_model("Converter" "SWUeUF6Converter")

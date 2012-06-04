@@ -1,1 +1,1 @@
-cyclus_init_reg("StubRegion")
+cyclus_init_model("Region" "StubRegion")

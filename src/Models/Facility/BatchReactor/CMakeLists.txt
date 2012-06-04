@@ -1,1 +1,1 @@
-cyclus_init_fac("BatchReactor")
+cyclus_init_model("Facility" "BatchReactor")

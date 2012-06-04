@@ -1,1 +1,1 @@
-cyclus_init_mkt("GreedyMarket")
+cyclus_init_model("Market" "GreedyMarket")

@@ -1,1 +1,1 @@
-cyclus_init_stubcomm("StubStubComm")
+cyclus_init_model("StubComm" "StubStubComm")

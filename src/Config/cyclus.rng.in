@@ -149,7 +149,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        @MKT_REFS@
+        @Market_REFS@
       </choice>
       </element>
 
@@ -168,7 +168,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        @FAC_REFS@
+        @Facility_REFS@
       </choice>
       </element>
 
@@ -302,7 +302,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        @REG_REFS@
+        @Region_REFS@
       </choice>
       </element>
 
@@ -323,7 +323,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice>
-        @INST_REFS@
+        @Inst_REFS@
       </choice>
       </element>
     </element>
@@ -339,7 +339,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice>
-        @CONV_REFS@
+        @Converter_REFS@
       </choice>
       </element>
     </element>

@@ -1,1 +1,1 @@
-cyclus_init_inst("DeployInst")
+cyclus_init_model("Inst" "DeployInst")

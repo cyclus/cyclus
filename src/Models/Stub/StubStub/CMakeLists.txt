@@ -1,1 +1,1 @@
-cyclus_init_stub("StubStub")
+cyclus_init_model("Stub" "StubStub")

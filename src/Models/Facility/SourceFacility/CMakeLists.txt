@@ -1,1 +1,1 @@
-cyclus_init_fac("SourceFacility")
+cyclus_init_model("Facility" "SourceFacility")

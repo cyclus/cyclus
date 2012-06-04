@@ -1,1 +1,1 @@
-cyclus_init_fac("NullFacility")
+cyclus_init_model("Facility" "NullFacility")
