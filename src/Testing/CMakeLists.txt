@@ -23,6 +23,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/ModelTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubCommModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   PARENT_SCOPE)
@@ -39,7 +40,7 @@ macro(ADD_GOOGLE_TESTS executable)
     file(READ "${source}" contents)
 
     # Find all test lists
-    string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,_]+)\\)" AllTests ${contents})
+    string(REGEX MATCHALL "TEST_?[FP]?\\(([A-Za-z_0-9 ,_]+)\\)" AllTests ${contents})
 
     # Convert the C++ code into a short test name
     foreach(hit ${AllTests})

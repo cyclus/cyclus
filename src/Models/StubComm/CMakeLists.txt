@@ -9,10 +9,7 @@ foreach(dir ${all_valid_subdirs})
 endforeach(dir)
 
 SET(ModelTestSource ${ModelTestSource} ${StubCommTestSource} PARENT_SCOPE)
-#SET(STUBCOMM_REFS "")
-#CONFIGURE_FILE(${PROJECT_BINARY_DIR}/Data/cyclus.rng 
-#  ${PROJECT_BINARY_DIR}/Data/cyclus.rng @ONLY)
-STRING(REPLACE ";" "\n\ \ \ \ \ \ \ \ " STUBCOMM_REFS "${STUBCOMM_REFS}")
+STRING(REPLACE ";" "\n\ \ \ \ \ \ \ \ " StubComm_REFS "${StubComm_REFS}")
 STRING(REPLACE ";" "\n\ \ " RNG_INCLUDES "${RNG_INCLUDES}")
-SET(STUBCOMM_REFS ${STUBCOMM_REFS} PARENT_SCOPE)
+SET(StubComm_REFS ${StubComm_REFS} PARENT_SCOPE)
 SET(RNG_INCLUDES ${RNG_INCLUDES} PARENT_SCOPE)

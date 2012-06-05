@@ -18,7 +18,7 @@ class BookKeeperTest : public ::testing::Test {
   // this sets up the fixtures
   virtual void SetUp() {
     BI->turnLoggingOn();
-    fpath = Env::getCyclusPath() + "/Testing/Temporary";
+    fpath = Env::checkEnv("PWD");
     test_filename = "testBK.sqlite";
     table_ptr test_table = new Table("test_tbl"); 
   };
@@ -29,6 +29,10 @@ class BookKeeperTest : public ::testing::Test {
       BI->closeDB();
     }
     BI->turnLoggingOff();
+    const char* test_file = (fpath + "/" + test_filename).c_str();
+    if( BI->getDB()->fexists(test_file) && std::remove( test_file ) != 0 ){
+      throw ("Error deleting file " + test_filename ); 
+    }
   };
 };
 
