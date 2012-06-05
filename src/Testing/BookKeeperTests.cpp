@@ -29,9 +29,10 @@ class BookKeeperTest : public ::testing::Test {
       BI->closeDB();
     }
     BI->turnLoggingOff();
-    std::string test_file = fpath + "/" + test_filename;
-    if( std::remove( test_file.c_str() ) != 0 )
-      throw( "Error deleting file " + test_filename );
+    const char* test_file = (fpath + "/" + test_filename).c_str();
+    if( BI->getDB()->fexists(test_file) && std::remove( test_file ) != 0 ){
+      throw ("Error deleting file " + test_filename ); 
+    }
   };
 };
 
