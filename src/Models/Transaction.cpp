@@ -164,19 +164,15 @@ void Transaction::setResource(rsrc_ptr new_resource) {
 
 void Transaction::define_trans_table(){
   // declare the table columns
-  column id("ID","INTEGER");
-  column sender("SenderID","INTEGER");
-  column receiver("ReceiverID","INTEGER");
-  column time("Time","INTEGER");
-  column price("Price","REAL");
+  trans_table->addField("ID","INTEGER");
+  trans_table->addField("SenderID","INTEGER");
+  trans_table->addField("ReceiverID","INTEGER");
+  trans_table->addField("Time","INTEGER");
+  trans_table->addField("Price","REAL");
   // declare the table's primary key
   primary_key pk;
   pk.push_back("ID");
   trans_table->setPrimaryKey(pk);
-  // add columns to the table
-  trans_table->addColumn(id), trans_table->addColumn(sender), 
-    trans_table->addColumn(receiver), trans_table->addColumn(time),
-    trans_table->addColumn(price);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
@@ -225,19 +221,15 @@ void Transaction::addTransToTable() {
 
 void Transaction::define_trans_resource_table(){
   // declare the table columns
-  column transID("TransactionID","INTEGER");
-  column transPos("Position","INTEGER");
-  column resource("ResourceID","INTEGER");
-  column state("StateID","INTEGER");
-  column amt("Quantity","REAL");
+  trans_resource_table->addField("TransactionID","INTEGER");
+  trans_resource_table->addField("Position","INTEGER");
+  trans_resource_table->addField("ResourceID","INTEGER");
+  trans_resource_table->addField("StateID","INTEGER");
+  trans_resource_table->addField("Quantity","REAL");
   // declare the table's primary key
   primary_key pk;
   pk.push_back("TransactionID"), pk.push_back("Position");
   trans_resource_table->setPrimaryKey(pk);
-  // add columns to the table
-  trans_resource_table->addColumn(transID), trans_resource_table->addColumn(transPos), 
-    trans_resource_table->addColumn(resource), trans_resource_table->addColumn(state),
-    trans_resource_table->addColumn(amt);
   // add foreign keys
   foreign_key_ref *fkref;
   foreign_key *fk;
