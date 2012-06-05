@@ -190,10 +190,6 @@ add_library(gtest ${GTest})
 if (CMAKE_USE_PTHREADS_INIT)
   target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
 endif()
-install(TARGETS gtest
-  LIBRARY DESTINATION cyclus/lib
-  COMPONENT testing
-  )
 
 INCLUDE_DIRECTORIES(Testing/Googletest) # necessary?
 add_executable( CyclusUnitTestDriver
@@ -219,7 +215,7 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource}
      cyclus
    RUNTIME
    DESTINATION cyclus/bin
-   COMPONENT application
+   COMPONENT cyclus
    )
  install(TARGETS 
      CyclusUnitTestDriver
@@ -235,8 +231,12 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource}
      cyclus/share
    COMPONENT data
    )
+ install(TARGETS gtest
+   LIBRARY DESTINATION cyclus/lib
+   COMPONENT testing
+   )
 
-set(CPACK_COMPONENTS_ALL cyclus libraries data)
+set(CPACK_COMPONENTS_ALL cyclus testing libraries data)
 
 # Here's where we package it with CPack
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
