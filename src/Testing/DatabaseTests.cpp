@@ -60,9 +60,10 @@ class DatabaseTest : public ::testing::Test {
   
   // this tears down the fixtures
   virtual void TearDown() {
-    std::string test_file = dbPath + "/" + dbName;
-    if( std::remove( test_file.c_str() ) != 0 )
-      std::cout << "Error deleting file " << dbName ;
+    const char* test_file = (dbPath + "/" + dbName).c_str();
+    if( db->fexists(test_file) && std::remove( test_file ) != 0 ){
+      throw ("Error deleting file " + dbName );
+    }
   };
 };
 
@@ -70,6 +71,7 @@ class DatabaseTest : public ::testing::Test {
 TEST_F(DatabaseTest, initTest) {
   EXPECT_EQ( db->dbExists(), true );
   EXPECT_EQ( db->name(), dbName );
+  EXPECT_EQ( Env::pathBase(db->path()), dbPath );
   EXPECT_EQ( db->isOpen(), false );
 }
 

@@ -31,7 +31,7 @@ class BookKeeperTest : public ::testing::Test {
     BI->turnLoggingOff();
     std::string test_file = fpath + "/" + test_filename;
     if( std::remove( test_file.c_str() ) != 0 )
-      std::cout << "Error deleting file " << test_filename ;
+      throw( "Error deleting file " + test_filename );
   };
 };
 
