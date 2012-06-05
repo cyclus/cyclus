@@ -8,22 +8,6 @@ SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
-# This allows apple to build the libraries dynamically
-IF (WIN32)
-  set(suffix ".dll")
-  set(dynamicloadlib "WinLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
-ELSEIF(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
-  set(suffix ".dylib")
-  set(dynamicloadlib "UnixLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
-ELSE()
-  set(suffix ".so")
-  set(dynamicloadlib "UnixLoadConstr.h")
-  CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/suffix.h.in ${CYCLUS_SRC_DIR}/Config/suffix.h @ONLY)
-ENDIF()
-
 # Setup build locations.
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/bin)
@@ -35,6 +19,9 @@ if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
 endif()
 
+# Configure files
+ADD_SUBDIRECTORY(Config)
+
 # Copy Data
 CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
@@ -43,20 +30,10 @@ COPYONLY
 )
 
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Config/cyclus.rng.in
-${PROJECT_BINARY_DIR}/share/cyclus.rng
-COPYONLY
-)
-
-CONFIGURE_FILE(
 ${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
 ${CMAKE_CURRENT_BINARY_DIR}/share/decayInfo.dat
 COPYONLY
 )
-
-set(input_path ${CYCLUS_SOURCE_DIR}/../input)
-set(cyclus_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-CONFIGURE_FILE(${CYCLUS_SRC_DIR}/Config/run_inputs.py.in ${PROJECT_BINARY_DIR}/Testing/run_inputs.py @ONLY)
 
 # ----- Cyclus Unit Test Driver ------
 
