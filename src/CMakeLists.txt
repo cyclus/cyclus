@@ -180,7 +180,7 @@ target_link_libraries ( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES}
   ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
 
 # Here we add all the tests
-add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/CyclusUnitTestDriver ${TestSource} 
+add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSource} 
   ${INTERFACE_LIBRARIES})
 
 # Here we set some components for installation with cpack

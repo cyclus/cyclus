@@ -40,7 +40,7 @@ macro(ADD_GOOGLE_TESTS executable)
     file(READ "${source}" contents)
 
     # Find all test lists
-    string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,_]+)\\)" AllTests ${contents})
+    string(REGEX MATCHALL "TEST_?[FP]?\\(([A-Za-z_0-9 ,_]+)\\)" AllTests ${contents})
 
     # Convert the C++ code into a short test name
     foreach(hit ${AllTests})
