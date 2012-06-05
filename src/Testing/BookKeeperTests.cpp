@@ -18,7 +18,7 @@ class BookKeeperTest : public ::testing::Test {
   // this sets up the fixtures
   virtual void SetUp() {
     BI->turnLoggingOn();
-    fpath = Env::getCyclusPath() + "/Testing/Temporary";
+    fpath = Env::getBuildPath() + "/Testing/Temporary";
     test_filename = "testBK.sqlite";
     table_ptr test_table = new Table("test_tbl"); 
   };
