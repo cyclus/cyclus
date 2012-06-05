@@ -5,7 +5,6 @@
 #define _TRANSACTION_H
 
 #include "Resource.h"
-#include "Table.h"
 #include "CycException.h"
 
 class MarketModel;
