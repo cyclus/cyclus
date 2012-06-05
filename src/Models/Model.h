@@ -8,8 +8,6 @@
 #include <vector>
 
 #include "Transaction.h"
-#include "Resource.h"
-#include "Table.h"
 
 class Model;
 class Message;
