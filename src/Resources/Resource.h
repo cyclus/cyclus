@@ -3,9 +3,7 @@
 #define _RESOURCE_H
 
 #include <string>
-#include <boost/intrusive_ptr.hpp>
 
-#include "IntrusiveBase.h"
 #include "Table.h"
 
 class Resource;
