@@ -46,7 +46,7 @@ class DatabaseTest : public ::testing::Test {
 
   // this sets up the fixtures
   virtual void SetUp() {
-    dbPath = Env::getCyclusPath() + "/Testing/Temporary";
+    dbPath = Env::getBuildPath() + "/Testing/Temporary";
     dbName = "testDB.sqlite";
     db = new Database(dbName,dbPath);
     tbl_name = "test_table";
