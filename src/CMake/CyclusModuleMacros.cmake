@@ -10,7 +10,7 @@ macro(cyclus_init  _path _name)
   
   CONFIGURE_FILE(
     ${CYCLUS_SOURCE_DIR}${_path}/${_name}.rng
-    ${CMAKE_CURRENT_BINARY_DIR}/${_name}.rng
+    ${PROJECT_BINARY_DIR}/lib${_path}/${_name}.rng
     COPYONLY
     )
   
