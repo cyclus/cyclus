@@ -46,7 +46,7 @@ class DatabaseTest : public ::testing::Test {
 
   // this sets up the fixtures
   virtual void SetUp() {
-    dbPath = Env::getBuildPath() + "/Testing/Temporary";
+    dbPath = Env::checkEnv("PWD");
     dbName = "testDB.sqlite";
     db = new Database(dbName,dbPath);
     tbl_name = "test_table";
@@ -59,7 +59,11 @@ class DatabaseTest : public ::testing::Test {
   };
   
   // this tears down the fixtures
-  virtual void TearDown() {};
+  virtual void TearDown() {
+    std::string test_file = dbPath + "/" + dbName;
+    if( std::remove( test_file.c_str() ) != 0 )
+      std::cout << "Error deleting file " << dbName ;
+  };
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
