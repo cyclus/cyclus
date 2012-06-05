@@ -13,3 +13,18 @@ SET(CYCLUS_CORE ${CYCLUS_CORE}
   ${CMAKE_CURRENT_SOURCE_DIR}/Timer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/UniformTaylor.cpp 
   PARENT_SCOPE)
+
+install(FILES 
+  BookKeeper.h
+  CycException.h
+  Database.h
+  DecayHandler.h
+  Env.h
+  LMatrix.h
+  MassTable.h
+  RecipeLogger.h
+  Table.h
+  Timer.h
+  UniformTaylor.h
+  DESTINATION cyclus/include
+  )
