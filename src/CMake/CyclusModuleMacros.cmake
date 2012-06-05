@@ -20,11 +20,11 @@ macro(cyclus_init  _path _name)
     )
   
   SET(RNG_INCLUDES ${RNG_INCLUDES}
-    "<include href='..${_path}/${_name}.rng'/>"
+    "<include href='../lib${_path}/${_name}.rng'/>"
     PARENT_SCOPE)
 
   install(FILES "${_name}.rng"
-    DESTINATION cyclus/${_path}
+    DESTINATION cyclus/lib${_path}
     COMPONENT "${_path}.rng"
     )
 endmacro()
