@@ -45,9 +45,7 @@ string Env::getCyclusPath() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const string Env::getBuildPath() {
   // return the join of cwd_ and rel path to cyclus MINUS the bin directory
-  string cyc_path = getCyclusPath();
-  size_t index=cyc_path.rfind("/");
-  string to_ret = cyc_path.substr(0,index);
+  string to_ret = pathBase(getCyclusPath());
   return to_ret;
 }
 
