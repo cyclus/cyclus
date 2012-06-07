@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!-- 1 BuildRegion oneRegion -->
+<!-- 1 BuildInst oneInst -->
+<!-- 1 SourceFacility FrontEnd @ t = 0, 
+     1 SinkFacility BackEnd    @ t = 0, 
+     1 BatchReactor Reactor    @ t = 1 -->
+<!-- NullMarket freshfuel -->
+<!-- NullMarket usedfuel -->
+
+<simulation>
+  <!-- master sim info -->
+  <duration>10</duration>
+  <startmonth>1</startmonth>
+  <startyear>2000</startyear>
+  <simstart>0</simstart>
+  <decay>-1</decay>
+  <!-- end master sim info -->
+
+  <!-- commodities -->
+  <commodity>
+    <name>fresh_fuel</name>
+  </commodity>
+
+  <commodity>
+    <name>used_fuel</name>
+  </commodity>
+  <!-- end commodities -->
+
+  <!-- markets -->
+  <market>
+    <name>freshfuel</name>
+    <mktcommodity>fresh_fuel</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+
+  <market>
+    <name>usedfuel</name>
+    <mktcommodity>used_fuel</mktcommodity>
+    <model>
+      <NullMarket/>
+    </model>
+  </market>
+  <!-- end markets -->
+
+  <!-- facility prototypes -->
+  <facility>
+    <name>FrontEnd</name>
+    <model>
+      <SourceFacility>
+        <outcommodity>fresh_fuel</outcommodity>
+        <capacity>1</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+        <recipe>fresh_50gwd</recipe>
+      </SourceFacility>
+    </model>
+  </facility>
+
+  <facility>
+    <name>BackEnd</name>
+    <model>
+      <SinkFacility>
+        <incommodity>used_fuel</incommodity>
+        <capacity>1e3</capacity>
+        <inventorysize>1e4</inventorysize>
+        <commodprice>0</commodprice>
+      </SinkFacility>
+    </model>
+  </facility>
+  <!-- end facility prototypes -->
+
+  <region>
+    <name>oneRegion</name>
+    <allowedfacility>FrontEnd</allowedfacility>
+    <allowedfacility>BackEnd</allowedfacility>
+    <model>
+      <BuildRegion>
+	<prototyperequirement>
+	  <prototypename>FrontEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+	<prototyperequirement>
+	  <prototypename>BackEnd</prototypename>
+	  <demandschedule>
+	    <entry>
+	      <time>0</time>
+	      <number>1</number>
+	    </entry>
+	  </demandschedule>
+	</prototyperequirement>
+      </BuildRegion>
+    </model>
+    <institution>
+      <name>oneInst</name>
+      <model>
+        <BuildInst>
+	  <availableprototype>FrontEnd</availableprototype>
+	  <availableprototype>BackEnd</availableprototype>
+        </BuildInst>
+      </model>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>fresh_50gwd</name>
+    <basis>mass</basis>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+</simulation>
