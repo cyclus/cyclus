@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 #include "Env.h"
@@ -46,7 +46,7 @@ class DatabaseTest : public ::testing::Test {
 
   // this sets up the fixtures
   virtual void SetUp() {
-    dbPath = Env::getCyclusPath() + "/Testing/Temporary";
+    dbPath = Env::checkEnv("PWD");
     dbName = "testDB.sqlite";
     db = new Database(dbName,dbPath);
     tbl_name = "test_table";
@@ -59,13 +59,19 @@ class DatabaseTest : public ::testing::Test {
   };
   
   // this tears down the fixtures
-  virtual void TearDown() {};
+  virtual void TearDown() {
+    const char* test_file = (dbPath + "/" + dbName).c_str();
+    if( db->fexists(test_file) && std::remove( test_file ) != 0 ){
+      throw ("Error deleting file " + dbName );
+    }
+  };
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(DatabaseTest, initTest) {
   EXPECT_EQ( db->dbExists(), true );
   EXPECT_EQ( db->name(), dbName );
+  EXPECT_EQ( Env::pathBase(db->path()), dbPath );
   EXPECT_EQ( db->isOpen(), false );
 }
 

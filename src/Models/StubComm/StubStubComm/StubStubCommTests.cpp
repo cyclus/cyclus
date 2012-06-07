@@ -36,10 +36,11 @@ class StubStubCommTest : public ::testing::Test {
       delete src_stub_;
       delete new_stub_;
     }
+    
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubCommModel* StubStubCommModelConstructor(){
+Model* StubStubCommModelConstructor(){
   return dynamic_cast<Model*>(new FakeStubStubComm());
 }
 
