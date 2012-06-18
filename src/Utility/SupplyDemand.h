@@ -4,29 +4,29 @@
 #include <string>
 
 /**
-   a simple class defining a product; it is currently super simple
+   a simple class defining a commodity; it is currently super simple
  */
-class Product {
+class Commodity {
  public:
   /**
      constructor
-     @param name the name of the product
+     @param name the name of the commodity
   */
- Product(std::string name) : name_(name) {};
+ Commodity(std::string name) : name_(name) {};
   
-  /// the product's name
+  /// the commodity's name
   std::string name() const {return name_;}
   
  private:
-  /// the name of the product
+  /// the name of the commodity
   std::string name_;
 };
 
 /**
-   a comparitor so that products may be used in maps
+   a comparitor so that commoditys may be used in maps
  */
-struct ProductCompare {
-  inline bool operator() (const Product& lhs, const Product& rhs) { 
+struct CommodityCompare {
+  inline bool operator() (const Commodity& lhs, const Commodity& rhs) { 
     return lhs.name() < rhs.name(); 
   }
 };
@@ -34,71 +34,71 @@ struct ProductCompare {
 /**
    a small class defining a producer
    a producer is associated with:
-     * a product
-     * a production capactiy
-     * a production cost
+     * a commodity
+     * a commodityion capactiy
+     * a commodityion cost
  */
 class Producer {
  public:
   /**
-     constructor, sets name, product, capacity, and cost
+     constructor, sets name, commodity, capacity, and cost
    */
- Producer(std::string name, Product p, double capacity, double cost) :
-  name_(name), product_(p), capacity_(capacity), production_cost_(cost) {};
+ Producer(std::string name, Commodity p, double capacity, double cost) :
+  name_(name), commodity_(p), capacity_(capacity), commodityion_cost_(cost) {};
 
   /// name getter
   std::string name() {return name_;}
   
-  /// product getter
-  Product product() {return product_;}
+  /// commodity getter
+  Commodity commodity() {return commodity_;}
 
   /// capacity getter
   double capacity() {return capacity_;}
 
   /// cost getter
-  double cost() {return production_cost_;}
+  double cost() {return commodityion_cost_;}
 
  private:
   /// name
   std::string name_;
 
-  /// product
-  Product product_;
+  /// commodity
+  Commodity commodity_;
 
-  /// production capcity
+  /// commodityion capcity
   double capacity_;
 
-  /// production cost
-  double production_cost_;
+  /// commodityion cost
+  double commodityion_cost_;
 };
 
 #include "SymbolicFunctions.h"
 #include <vector>
 
 /**
-   a simple container class to hold product information
-     * the supply of a product
+   a simple container class to hold commodity information
+     * the supply of a commodity
      * the demand function
-     * the producers of a product
+     * the producers of a commodity
 */
-class ProductInformation {
+class CommodityInformation {
  public:
   /**
-     constructor given a product, a demand function, and a set of produers
-     @param product the product
+     constructor given a commodity, a demand function, and a set of produers
+     @param commodity the commodity
      @param fp a shared pointer to the demand function
-     @param producers a vector of producers of the product
+     @param producers a vector of producers of the commodity
   */
-    ProductInformation(Product product, FunctionPtr fp, std::vector<Producer> producers) : 
-  product_(product), demand_(fp), supply_(0), producers_(producers) {};
+    CommodityInformation(Commodity commodity, FunctionPtr fp, std::vector<Producer> producers) : 
+  commodity_(commodity), demand_(fp), supply_(0), producers_(producers) {};
 
   /**
-     constructor given a product and a demand function
-     @param product the product
+     constructor given a commodity and a demand function
+     @param commodity the commodity
      @param fp a shared pointer to the demand function
    */
- ProductInformation(Product p, FunctionPtr fp) : 
-  product_(p), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
+ CommodityInformation(Commodity p, FunctionPtr fp) : 
+  commodity_(p), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
 
   /// supply
   double supply() {return supply_;}
@@ -125,22 +125,22 @@ class ProductInformation {
   Producer* producer(int i) {return &producers_.at(i);}
 
   /**
-     register producer of a product
-     @param p the product
+     register producer of a commodity
+     @param p the commodity
   */
   void registerProducer(const Producer& p) {producers_.push_back(Producer(p));}
   
  private:
-  /// the product
-  Product product_;
+  /// the commodity
+  Commodity commodity_;
   
-  /// the supply of the product
+  /// the supply of the commodity
   double supply_;
   
   /// the demand function
   FunctionPtr demand_;
 
-  /// a set of producers of the product
+  /// a set of producers of the commodity
   std::vector<Producer> producers_;
 };
 

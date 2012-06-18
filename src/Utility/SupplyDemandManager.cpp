@@ -4,43 +4,43 @@ using namespace std;
 
 // --------------------------------------------------------------------------------------
 SupplyDemandManager::SupplyDemandManager() {
-  products_ = map<Product,ProductInformation,ProductCompare>();
+  commodities_ = map<Commodity,CommodityInformation,CommodityCompare>();
 }
 
 // --------------------------------------------------------------------------------------
-void SupplyDemandManager::registerProduct(const Product& product, const FunctionPtr fp, 
+void SupplyDemandManager::registerCommodity(const Commodity& commodity, const FunctionPtr fp, 
                                           const std::vector<Producer>& producers) {
-  products_.insert(pair<Product,ProductInformation>
-                   (product,ProductInformation(product,fp,producers)));  
+  commodities_.insert(pair<Commodity,CommodityInformation>
+                   (commodity,CommodityInformation(commodity,fp,producers)));  
 }
 
 // --------------------------------------------------------------------------------------
-void SupplyDemandManager::registerProducer(const Product& product, 
+void SupplyDemandManager::registerProducer(const Commodity& commodity, 
                                            const Producer& producer) {
-  products_.find(product)->second.registerProducer(producer);
+  commodities_.find(commodity)->second.registerProducer(producer);
 }
 
 // --------------------------------------------------------------------------------------
-double SupplyDemandManager::demand(const Product& p, int time) {
-  return products_.find(p)->second.demand(time);
+double SupplyDemandManager::demand(const Commodity& commodity, int time) {
+  return commodities_.find(commodity)->second.demand(time);
 }
 
 // --------------------------------------------------------------------------------------
-double SupplyDemandManager::supply(const Product& p) {
-  return products_.find(p)->second.supply();
+double SupplyDemandManager::supply(const Commodity& commodity) {
+  return commodities_.find(commodity)->second.supply();
 }
 
 // --------------------------------------------------------------------------------------
-void SupplyDemandManager::increaseSupply(const Product& p, double amt) { 
-  products_.find(p)->second.increaseSupply(amt); 
+void SupplyDemandManager::increaseSupply(const Commodity& commodity, double amt) { 
+  commodities_.find(commodity)->second.increaseSupply(amt); 
 }
 
 // --------------------------------------------------------------------------------------
-int SupplyDemandManager::nProducers(const Product& p) {
-  return products_.find(p)->second.nProducers(); 
+int SupplyDemandManager::nProducers(const Commodity& commodity) {
+  return commodities_.find(commodity)->second.nProducers(); 
 }
 
 // --------------------------------------------------------------------------------------
-Producer* SupplyDemandManager::producer(const Product& p, int index) {
-  return products_.find(p)->second.producer(index); 
+Producer* SupplyDemandManager::producer(const Commodity& commodity, int index) {
+  return commodities_.find(commodity)->second.producer(index); 
 }
