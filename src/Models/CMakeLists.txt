@@ -5,16 +5,16 @@ INCLUDE_DIRECTORIES ("${LIBXML2_INCLUDE_DIR}")
 
 # Add the core model files to the core source
 SET( CYCLUS_CORE_SRC 
-  ConverterModel.cpp
-  FacilityModel.cpp
-  InstModel.cpp
-  MarketModel.cpp
-  Message.cpp
-  Model.cpp
-  StubCommModel.cpp
-  StubModel.cpp
-  StubTimeAgent.cpp
-  Transaction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/InstModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MarketModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Message.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Model.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubCommModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubTimeAgent.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Transaction.cpp
   PARENT_SCOPE 
   )
 
