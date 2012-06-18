@@ -104,9 +104,6 @@ set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
-# Add subdirs and build for the models
-ADD_SUBDIRECTORY(Models)
-
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
 
