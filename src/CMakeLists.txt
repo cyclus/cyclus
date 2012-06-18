@@ -44,9 +44,19 @@ INSTALL(TARGETS cycluscore
   LIBRARY DESTINATION cyclus/lib
   COMPONENT cycluscore
   )
+SET(LIBS ${LIBS} cycluscore)
 
 SET( CYCLUS_SRC
   App.cpp
+  )
+
+SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
+  ${CYCLUS_SRC_DIR}
+  ${CYCLUS_SRC_DIR}/Config
+  ${CYCLUS_SRC_DIR}/Input
+  ${CYCLUS_SRC_DIR}/Resources
+  ${CYCLUS_SRC_DIR}/Models
+  ${CYCLUS_SRC_DIR}/Utility
   )
 
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
@@ -56,9 +66,9 @@ SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 INCLUDE(CyclusModuleMacros)
 
 # Find the Cyclus core library and include directories
-FIND_PACKAGE( cycluscore REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
-SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+#FIND_PACKAGE( cycluscore REQUIRED )
+#SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
+#SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -106,7 +116,7 @@ set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
 set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # The gtest include file directories.
-SET(GTEST_INCLUDE_DIRS ${CYCLUS_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
+SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
 
 # The gtest library directories.
 SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/Testing")

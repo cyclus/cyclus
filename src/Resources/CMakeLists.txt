@@ -13,7 +13,6 @@ install(FILES
   CompMap.h
   IsoVector.h
   GenericResource.h
-  Logger.h
   Material.h
   MatBuff.h
   Resource.h
