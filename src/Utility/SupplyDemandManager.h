@@ -43,39 +43,39 @@ class SupplyDemandManager {
 
   /**
      the demand for a commodity at a given time
-     @param c the commodity
+     @param commodity the commodity
      @param time the time
    */
-  double demand(const Commodity& c, int time);
+  double demand(const Commodity& commodity, int time);
 
   /**
      returns the current supply of commodity p
-     @param c the commodity
+     @param commodity the commodity
      @return the current supply of the commodity
    */
-  double supply(const Commodity& c);
+  double supply(const Commodity& commodity);
 
   /**
      increase the supply of a given commodity by an amount
-     @param c the commodity
+     @param commodity the commodity
      @param amt the amount to increase
    */
-  void increaseSupply(const Commodity& c, double amt);
+  void increaseSupply(const Commodity& commodity, double amt);
   
   /**
      return the number of producers of a given commodity
-     @param c the commodity
+     @param commodity the commodity
      @return the number of producers of commodity p
    */
-  int nProducers(const Commodity& c);
+  int nProducers(const Commodity& commodity);
 
   /**
      return a specific producer of a commodity
-     @param c the commodity
+     @param commodity the commodity
      @param index the producer's index
      @return a pointer to the producer of commodity p at index
    */
-  Producer* producer(const Commodity& c, int index);
+  Producer* producer(const Commodity& commodity, int index);
   
  private:
   /// a container of all commoditys known to the manager
