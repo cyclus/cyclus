@@ -8,3 +8,15 @@ SET(CYCLUS_CORE ${CYCLUS_CORE}
   ${CMAKE_CURRENT_SOURCE_DIR}/Resource.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuff.cpp
   PARENT_SCOPE)
+
+install(FILES
+  CompMap.h
+  IsoVector.h
+  GenericResource.h
+  Material.h
+  MatBuff.h
+  Resource.h
+  ResourceBuff.h
+  DESTINATION cyclus/include
+  )
+

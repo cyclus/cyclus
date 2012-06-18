@@ -16,6 +16,12 @@ SET( TestSource ${ModelTestSource} PARENT_SCOPE )
 CONFIGURE_FILE(${PROJECT_BINARY_DIR}/share/cyclus.rng 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng @ONLY)
 
-install(FILES Model.h
+install(FILES 
+  ConverterModel.h
+  FacilityModel.h
+  InstModel.h
+  MarketModel.h
+  Model.h
+  RegionModel.h
   DESTINATION cyclus/include
   )
