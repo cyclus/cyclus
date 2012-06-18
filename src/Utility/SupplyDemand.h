@@ -10,12 +10,11 @@ class Product {
  public:
   /**
      constructor
+     @param name the name of the product
   */
  Product(std::string name) : name_(name) {};
   
-  /**
-     the product's name
-   */
+  /// the product's name
   std::string name() const {return name_;}
   
  private:
@@ -42,7 +41,7 @@ struct ProductCompare {
 class Producer {
  public:
   /**
-     constructor, sets product, capacity, and cost
+     constructor, sets name, product, capacity, and cost
    */
  Producer(std::string name, Product p, double capacity, double cost) :
   name_(name), product_(p), capacity_(capacity), production_cost_(cost) {};
@@ -84,26 +83,65 @@ class Producer {
 */
 class ProductInformation {
  public:
-  ///constructors
- ProductInformation(Product product, FunctionPtr fp, std::vector<Producer> producers) : 
-    product_(product), demand_(fp), supply_(0), producers_(producers) {};
-  ProductInformation(Product p, FunctionPtr fp) : 
-    product_(p), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
-    /// supply
-    double supply() {return supply_;}
-    void increaseSupply(double amt) {supply_ += amt;}
-    /// demand
-    double demand(int time) {return demand_->value(time);}
-    /// producers
-    int nProducers() {return producers_.size();}
-    Producer* producer(int i) {return &producers_.at(i);}
-    void registerProducer(const Producer& p) {producers_.push_back(Producer(p));}
-    
+  /**
+     constructor given a product, a demand function, and a set of produers
+     @param product the product
+     @param fp a shared pointer to the demand function
+     @param producers a vector of producers of the product
+  */
+    ProductInformation(Product product, FunctionPtr fp, std::vector<Producer> producers) : 
+  product_(product), demand_(fp), supply_(0), producers_(producers) {};
+
+  /**
+     constructor given a product and a demand function
+     @param product the product
+     @param fp a shared pointer to the demand function
+   */
+ ProductInformation(Product p, FunctionPtr fp) : 
+  product_(p), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
+
+  /// supply
+  double supply() {return supply_;}
+
+  /**
+     increase the supply by an amount
+     @param amt the amount
+   */ 
+  void increaseSupply(double amt) {supply_ += amt;}
+
+  /**
+     the demand at a given time
+     @param time the time
+   */
+  double demand(int time) {return demand_->value(time);}
+
+  /// producers
+  int nProducers() {return producers_.size();}
+
+  /**
+     a pointer to a producer
+     @param i the index in producers_ 
+   */
+  Producer* producer(int i) {return &producers_.at(i);}
+
+  /**
+     register producer of a product
+     @param p the product
+  */
+  void registerProducer(const Producer& p) {producers_.push_back(Producer(p));}
+  
  private:
-    Product product_;
-    double supply_;
-    FunctionPtr demand_;
-    std::vector<Producer> producers_;
+  /// the product
+  Product product_;
+  
+  /// the supply of the product
+  double supply_;
+  
+  /// the demand function
+  FunctionPtr demand_;
+
+  /// a set of producers of the product
+  std::vector<Producer> producers_;
 };
 
 
