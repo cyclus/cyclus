@@ -1,5 +1,5 @@
 # Add any new cyclus core source files to this list
-SET(CYCLUS_CORE ${CYCLUS_CORE} 
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp 
@@ -20,11 +20,14 @@ install(FILES
   Database.h
   DecayHandler.h
   Env.h
+  IntrusiveBase.h
   LMatrix.h
+  Logger.h
   MassTable.h
   RecipeLogger.h
   Table.h
   Timer.h
   UniformTaylor.h
+  UseMatrixLib.h
   DESTINATION cyclus/include
   )

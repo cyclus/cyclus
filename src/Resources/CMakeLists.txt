@@ -1,5 +1,5 @@
 # Add any new cyclus core source files to this list
-SET(CYCLUS_CORE ${CYCLUS_CORE} 
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMap.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GenericResource.cpp 
@@ -13,6 +13,7 @@ install(FILES
   CompMap.h
   IsoVector.h
   GenericResource.h
+  Logger.h
   Material.h
   MatBuff.h
   Resource.h

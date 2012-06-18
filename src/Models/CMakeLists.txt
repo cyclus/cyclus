@@ -4,7 +4,7 @@ FIND_PACKAGE( LibXml2 REQUIRED )
 INCLUDE_DIRECTORIES ("${LIBXML2_INCLUDE_DIR}")
 
 # Add the core model files to the core source
-SET( CYCLUS_CORE_SRC 
+SET( CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModel.cpp
