@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "Utility/Env.h"
 #include "Utility/BookKeeper.h"

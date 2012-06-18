@@ -1,54 +1,59 @@
 <?xml version="1.0"?>
-<!-- 1 BuildRegion and 1 BuildInst -->
-<!-- 1 SourceFacility FrontEnd, 1 SinkFacility BackEnd, 10 BatchReactor Reactor and 1 NullMarket -->
+<!-- 1  BuildRegion    oneRegion           -->
+<!-- 1  BuildInst      oneInst             -->
+<!-- 1  SourceFacility FrontEnd   @ t = 0 
+     1  SinkFacility   BackEnd    @ t = 0 
+     10 BatchReactor   Reactor    @ t = 1  -->
+<!-- NullMarket freshfuel -->
+<!-- NullMarket usedfuel -->
+
 <simulation>
+  <!-- master sim info -->
   <duration>15</duration>
   <startmonth>1</startmonth>
   <startyear>2000</startyear>
   <simstart>0</simstart>
-  <decay>2</decay>
+  <decay>-1</decay>
+  <!-- end master sim info -->
 
-  <!-- Commodities -->
+  <!-- commodities -->
   <commodity>
-    <name>fresh_PWR_uo2</name>
+    <name>fresh_fuel</name>
   </commodity>
 
   <commodity>
-    <name>spent_PWR_uo2</name>
+    <name>used_fuel</name>
   </commodity>
+  <!-- end commodities -->
 
-  <!-- Markets -->
+  <!-- markets -->
   <market>
-    <name>fresh_PWR_uo2market</name>
-    <mktcommodity>fresh_PWR_uo2</mktcommodity>
+    <name>freshfuel</name>
+    <mktcommodity>fresh_fuel</mktcommodity>
     <model>
       <NullMarket/>
     </model>
   </market>
 
   <market>
-    <name>spent_PWR_uo2market</name>
-    <mktcommodity>spent_PWR_uo2</mktcommodity>
+    <name>usedfuel</name>
+    <mktcommodity>used_fuel</mktcommodity>
     <model>
       <NullMarket/>
     </model>
   </market>
+  <!-- end markets -->
 
-  <recipebook>
-    <filename>test.recipebook.xml</filename>
-    <namespace>test</namespace>
-    <format>xml</format>
-  </recipebook>
-
+  <!-- facility prototypes -->
   <facility>
     <name>FrontEnd</name>
     <model>
       <SourceFacility>
-        <outcommodity>fresh_PWR_uo2</outcommodity>
-        <capacity>1e5</capacity>
-        <inventorysize>1e6</inventorysize>
+        <outcommodity>fresh_fuel</outcommodity>
+        <capacity>40</capacity>
+        <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
-        <recipe>test:fresh_PWR_uo2</recipe>
+        <recipe>fresh_uo2</recipe>
       </SourceFacility>
     </model>
   </facility>
@@ -58,15 +63,15 @@
     <model>
       <BatchReactor>
         <fuelpair>
-          <incommodity>fresh_PWR_uo2</incommodity>
-          <inrecipe>test:fresh_PWR_uo2</inrecipe>
-          <outcommodity>spent_PWR_uo2</outcommodity>
-          <outrecipe>test:spent_PWR_uo2</outrecipe>
+          <incommodity>fresh_fuel</incommodity>
+          <inrecipe>fresh_uo2</inrecipe>
+          <outcommodity>used_fuel</outcommodity>
+          <outrecipe>used_uo2_50gwd</outrecipe>
         </fuelpair>
 	<cyclelength>3</cyclelength>
         <lifetime>12</lifetime>
-	<coreloading>10.0</coreloading>
-	<batchespercore>5</batchespercore>
+	<coreloading>4</coreloading>
+	<batchespercore>4</batchespercore>
       </BatchReactor>
     </model>
   </facility>
@@ -75,14 +80,16 @@
     <name>BackEnd</name>
     <model>
       <SinkFacility>
-        <incommodity>spent_PWR_uo2</incommodity>
-        <capacity>1e5</capacity>
-        <inventorysize>1e6</inventorysize>
+        <incommodity>used_fuel</incommodity>
+        <capacity>1e3</capacity>
+        <inventorysize>1e4</inventorysize>
         <commodprice>0</commodprice>
       </SinkFacility>
     </model>
   </facility>
+  <!-- end facility prototypes -->
 
+  <!-- region definitions -->
   <region>
     <name>oneRegion</name>
     <allowedfacility>FrontEnd</allowedfacility>
@@ -90,6 +97,7 @@
     <allowedfacility>BackEnd</allowedfacility>
     <model>
       <BuildRegion>
+
 	<prototyperequirement>
 	  <prototypename>FrontEnd</prototypename>
 	  <demandschedule>
@@ -99,6 +107,7 @@
 	    </entry>
 	  </demandschedule>
 	</prototyperequirement>
+
 	<prototyperequirement>
 	  <prototypename>Reactor</prototypename>
 	  <demandschedule>
@@ -108,6 +117,7 @@
 	    </entry>
 	  </demandschedule>
 	</prototyperequirement>
+
 	<prototyperequirement>
 	  <prototypename>BackEnd</prototypename>
 	  <demandschedule>
@@ -117,8 +127,10 @@
 	    </entry>
 	  </demandschedule>
 	</prototyperequirement>
+
       </BuildRegion>
     </model>
+    <!-- institution definitions -->
     <institution>
       <name>oneInst</name>
       <model>
@@ -129,6 +141,52 @@
         </BuildInst>
       </model>
     </institution>
+    <!-- end institution definitions -->
   </region>
+  <!-- end region definitions -->
+
+  <!-- recipe definitions -->
+  <recipe>
+    <name>fresh_uo2</name>
+    <basis>mass</basis>    
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92235</id>
+      <comp>0.05</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.95</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+
+  <recipe>
+    <name>used_uo2_50gwd</name>
+    <basis>mass</basis>
+    <unit>assembly</unit>
+    <total>1000</total>
+    <isotope>
+      <id>92234</id>
+      <comp>0.01</comp>
+    </isotope>
+    <isotope>
+      <id>92235</id>
+      <comp>0.02</comp>
+    </isotope>
+    <isotope>
+      <id>92238</id>
+      <comp>0.97</comp>
+    </isotope>
+    <isotope>
+      <id>08016</id>
+      <comp>0.13</comp>
+    </isotope>
+  </recipe>
+  <!-- end recipe definitions -->
 
 </simulation>
