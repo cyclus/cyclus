@@ -1,5 +1,5 @@
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef SYMBOLICFUNCTIONS_H
+#define SYMBOLICFUNCTIONS_H
 
 #include <fstream>
 #include <string>
@@ -21,6 +21,10 @@ class Function {
   virtual double value(int x) = 0; 
   /// base class must define how to calculate demand
   virtual double value(double x) = 0; 
+  /// overload function operator
+  double operator()(int x) {return value(x);}
+  /// overload function operator
+  double operator()(double x) {return value(x);}
 };
 
 /**
