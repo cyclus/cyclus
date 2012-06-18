@@ -37,40 +37,17 @@ ${CMAKE_CURRENT_BINARY_DIR}/share/decayInfo.dat
 COPYONLY
 )
 
-# ----- Cyclus Unit Test Driver ------
-
-# Includes the directories in which there are source files. 
-SET(CYCLUS_INCLUDE_DIR
-  ${CYCLUS_SRC_DIR}
-  ${CYCLUS_SRC_DIR}/Config
-  ${CYCLUS_SRC_DIR}/Input
-  ${CYCLUS_SRC_DIR}/Models
-  ${CYCLUS_SRC_DIR}/Resources
-  ${CYCLUS_SRC_DIR}/Utility
-  )
-
-
-# Add any new core source files to this list.
-SET( CYCLUS_CORE
-  Models/Model.cpp 
-  Models/Message.cpp
-  Models/Transaction.cpp
-  Models/StubTimeAgent.cpp 
-  Models/StubModel.cpp 
-  Models/StubCommModel.cpp 
-  Models/ConverterModel.cpp 
-  Models/MarketModel.cpp 
-  Models/FacilityModel.cpp 
-  Models/RegionModel.cpp
-  Models/InstModel.cpp
-  )
-
 ADD_SUBDIRECTORY(Input)
 ADD_SUBDIRECTORY(Resources)
 ADD_SUBDIRECTORY(Utility)
+ADD_SUBDIRECTORY(Models)
+ADD_LIBRARY(CyclusCore ${CYCLUS_CORE_SRC})
+INSTALL(TARGETS CyclusCore
+  LIBRARY DESTINATION cyclus/lib
+  COMPONENT cycluscore
+  )
 
 SET( CYCLUS_SRC
-  ${CYCLUS_CORE}
   App.cpp
   )
 
@@ -80,6 +57,10 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 # Include macros
 include(CyclusModuleMacros)
 
+# Find the Cyclus core library and include directories
+FIND_PACKAGE( CyclusCore REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
+set(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -103,9 +84,6 @@ set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
-
-# Descend into the Models Directory 
-ADD_SUBDIRECTORY(Models)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
