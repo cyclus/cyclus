@@ -34,3 +34,10 @@ install(FILES run_inputs.py
   DESTINATION cyclus/bin
   COMPONENT testing
   )
+
+install(FILES
+  UnixLoadConstr.h
+  WinLoadConstr.h
+  suffix.h
+  DESTINATION cyclus/include
+  )
