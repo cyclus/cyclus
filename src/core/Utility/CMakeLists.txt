@@ -1,3 +1,27 @@
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
+  ${CYCLUS_BINARY_DIR}/share/mass.sqlite
+  COPYONLY
+  )
+install(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
+  DESTINATION
+    cyclus/share
+  COMPONENT core
+  )
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
+  ${CYCLUS_BINARY_DIR}/share/decayInfo.dat
+  COPYONLY
+  )
+install(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
+  DESTINATION 
+    cyclus/share
+  COMPONENT core
+  )
+
 # Add any new cyclus core source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
@@ -31,3 +55,4 @@ install(FILES
   UseMatrixLib.h
   DESTINATION cyclus/include
   )
+

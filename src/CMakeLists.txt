@@ -21,30 +21,16 @@ endif()
 
 SET(CYCLUS_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-# Copy Data
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/cycluscore/Utility/mass.sqlite
-${CMAKE_CURRENT_BINARY_DIR}/share/mass.sqlite
-COPYONLY
-)
-
-CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/cycluscore/Utility/decayInfo.dat
-${CMAKE_CURRENT_BINARY_DIR}/share/decayInfo.dat
-COPYONLY
-)
-
-
 SET( CYCLUS_SRC
   App.cpp
   )
 
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}/cycluscore/Utility
-  ${CYCLUS_SRC_DIR}/cycluscore/Config
-  ${CYCLUS_SRC_DIR}/cycluscore/Input
-  ${CYCLUS_SRC_DIR}/cycluscore/Resources
-  ${CYCLUS_SRC_DIR}/cycluscore/Models
+  ${CYCLUS_SRC_DIR}/core/Utility
+  ${CYCLUS_SRC_DIR}/core/Config
+  ${CYCLUS_SRC_DIR}/core/Input
+  ${CYCLUS_SRC_DIR}/core/Resources
+  ${CYCLUS_SRC_DIR}/core/Models
   )
 
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
@@ -83,7 +69,7 @@ set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # add the core library 
-ADD_SUBDIRECTORY(cycluscore)
+ADD_SUBDIRECTORY(core)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -182,8 +168,6 @@ add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSour
    )
  install(FILES 
      ${PROJECT_BINARY_DIR}/share/cyclus.rng
-     Utility/mass.sqlite
-     Utility/decayInfo.dat
    DESTINATION  
      cyclus/share
    COMPONENT data
@@ -199,17 +183,17 @@ set(CPACK_COMPONENTS_ALL cyclus testing libraries data)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
 SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cycluscore/Config/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cycluscore/Config/LICENSE.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/core/Config/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/core/Config/LICENSE.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
  
-CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/cycluscore/Config/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/cycluscore/Config/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cycluscore/Config/CyclusCPackOptions.cmake")
+CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/core/Config/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/core/Config/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/core/Config/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 

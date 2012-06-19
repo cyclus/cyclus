@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <cstdio>
 
-#include "Utility/Env.h"
-#include "Utility/BookKeeper.h"
-#include "Utility/Table.h"
+#include "Env.h"
+#include "BookKeeper.h"
+#include "Table.h"
 
 
 class BookKeeperTest : public ::testing::Test {

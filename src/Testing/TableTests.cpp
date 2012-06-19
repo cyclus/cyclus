@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "Utility/Table.h"
+#include "Table.h"
 
 class TableTest : public ::testing::Test {
 protected:
