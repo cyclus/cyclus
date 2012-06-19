@@ -3,12 +3,14 @@
 #  CYCLUS_CORE_LIBRARIES - The libraries needed to use the Cyclus Core Library
 
 # Look for the header files
-FIND_PATH(CYCLUS_CORE_INCLUDE_DIR cyclus/include/suffix.h)
+FIND_PATH(CYCLUS_CORE_INCLUDE_DIR suffix.h
+  HINTS /usr/local/cyclus /opt/local/cyclus 
+  PATH_SUFFIXES cyclus/include)
 
 # Look for the library
-FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cycluscore PATH /usr/lib /usr/lib/cyclus
-	/usr/local/lib /usr/local/cyclus/lib /usr/local/lib/cyclus 
-        /opt/local/lib /opt/local/cyclus/lib)
+FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cycluscore 
+  HINTS /usr/local/cyclus/lib /usr/local/cyclus 
+  /opt/local/lib /opt/local/cyclus/lib)
 
 # Copy the results to the output variables.
 IF (CYCLUS_CORE_INCLUDE_DIR AND CYCLUS_CORE_LIBRARY)

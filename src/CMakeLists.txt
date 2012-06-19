@@ -23,40 +23,28 @@ SET(CYCLUS_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # Copy Data
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/mass.sqlite
+${CYCLUS_SOURCE_DIR}/cycluscore/Utility/mass.sqlite
 ${CMAKE_CURRENT_BINARY_DIR}/share/mass.sqlite
 COPYONLY
 )
 
 CONFIGURE_FILE(
-${CYCLUS_SOURCE_DIR}/Utility/decayInfo.dat
+${CYCLUS_SOURCE_DIR}/cycluscore/Utility/decayInfo.dat
 ${CMAKE_CURRENT_BINARY_DIR}/share/decayInfo.dat
 COPYONLY
 )
 
-ADD_SUBDIRECTORY(Utility)
-ADD_SUBDIRECTORY(Config)
-ADD_SUBDIRECTORY(Input)
-ADD_SUBDIRECTORY(Resources)
-ADD_SUBDIRECTORY(Models)
-ADD_LIBRARY(cycluscore ${CYCLUS_CORE_SRC})
-INSTALL(TARGETS cycluscore
-  LIBRARY DESTINATION cyclus/lib
-  COMPONENT cycluscore
-  )
-SET(LIBS ${LIBS} cycluscore)
 
 SET( CYCLUS_SRC
   App.cpp
   )
 
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}
-  ${CYCLUS_SRC_DIR}/Config
-  ${CYCLUS_SRC_DIR}/Input
-  ${CYCLUS_SRC_DIR}/Resources
-  ${CYCLUS_SRC_DIR}/Models
-  ${CYCLUS_SRC_DIR}/Utility
+  ${CYCLUS_SRC_DIR}/cycluscore/Utility
+  ${CYCLUS_SRC_DIR}/cycluscore/Config
+  ${CYCLUS_SRC_DIR}/cycluscore/Input
+  ${CYCLUS_SRC_DIR}/cycluscore/Resources
+  ${CYCLUS_SRC_DIR}/cycluscore/Models
   )
 
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
@@ -66,9 +54,9 @@ SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 INCLUDE(CyclusModuleMacros)
 
 # Find the Cyclus core library and include directories
-#FIND_PACKAGE( cycluscore REQUIRED )
-#SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
-#SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+FIND_PACKAGE( cycluscore REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIRS})
+SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -90,8 +78,12 @@ set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
+
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
+
+# add the core library 
+ADD_SUBDIRECTORY(cycluscore)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -207,17 +199,17 @@ set(CPACK_COMPONENTS_ALL cyclus testing libraries data)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
 SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Config/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Config/LICENSE.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cycluscore/Config/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/cycluscore/Config/LICENSE.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
  
-CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Config/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/Config/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Config/CyclusCPackOptions.cmake")
+CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/cycluscore/Config/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/cycluscore/Config/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cycluscore/Config/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 
