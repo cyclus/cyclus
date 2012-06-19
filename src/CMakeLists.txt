@@ -42,7 +42,7 @@ INCLUDE(CyclusModuleMacros)
 # Find the Cyclus core library and include directories
 FIND_PACKAGE( cycluscore REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIRS})
-SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+#SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -85,7 +85,7 @@ ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
 
 
 # Be sure to clear these each time

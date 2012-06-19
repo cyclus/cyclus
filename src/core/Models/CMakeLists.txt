@@ -20,8 +20,6 @@ SET( CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   )
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
-CONFIGURE_FILE(${PROJECT_BINARY_DIR}/share/cyclus.rng 
-  ${PROJECT_BINARY_DIR}/share/cyclus.rng @ONLY)
 
 install(FILES 
   Communicator.h
@@ -35,6 +33,7 @@ install(FILES
   StubCommModel.h
   StubModel.h
   StubTimeAgent.h
+  TimeAgent.h
   Transaction.h
   DESTINATION cyclus/include
   )
@@ -47,4 +46,7 @@ foreach(dir ${all_valid_subdirs})
         add_subdirectory(${dir_trimmed})
     endif()
 endforeach(dir)
+
+CONFIGURE_FILE(${PROJECT_BINARY_DIR}/share/cyclus.rng 
+  ${PROJECT_BINARY_DIR}/share/cyclus.rng @ONLY)
 
