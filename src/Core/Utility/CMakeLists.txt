@@ -3,7 +3,7 @@ CONFIGURE_FILE(
   ${CYCLUS_BINARY_DIR}/share/mass.sqlite
   COPYONLY
   )
-install(FILES
+INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
   DESTINATION
     cyclus/share
@@ -15,7 +15,7 @@ CONFIGURE_FILE(
   ${CYCLUS_BINARY_DIR}/share/decayInfo.dat
   COPYONLY
   )
-install(FILES
+INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
   DESTINATION 
     cyclus/share
@@ -38,7 +38,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/UniformTaylor.cpp 
   PARENT_SCOPE)
 
-install(FILES 
+INSTALL(FILES 
   BookKeeper.h
   CycException.h
   Database.h
@@ -54,5 +54,6 @@ install(FILES
   UniformTaylor.h
   UseMatrixLib.h
   DESTINATION cyclus/include
+  COMPONENT core
   )
 

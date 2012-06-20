@@ -31,11 +31,11 @@ INCLUDE(CyclusModuleMacros)
 # Include the core header files in the app build manually.
 # Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}/core/Utility
-  ${CYCLUS_SRC_DIR}/core/Config
-  ${CYCLUS_SRC_DIR}/core/Input
-  ${CYCLUS_SRC_DIR}/core/Resources
-  ${CYCLUS_SRC_DIR}/core/Models
+  ${CYCLUS_SRC_DIR}/Core/Utility
+  ${CYCLUS_SRC_DIR}/Core/Config
+  ${CYCLUS_SRC_DIR}/Core/Input
+  ${CYCLUS_SRC_DIR}/Core/Resources
+  ${CYCLUS_SRC_DIR}/Core/Models
   )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
@@ -62,7 +62,7 @@ SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # add the core library 
-ADD_SUBDIRECTORY(core)
+ADD_SUBDIRECTORY(Core)
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
 SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
@@ -164,23 +164,23 @@ INSTALL(FILES
   COMPONENT data
   )
 
-SET(CPACK_COMPONENTS_ALL cyclus testing libraries data)
+SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
 
 # Here's where we package it with CPack
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
 SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/core/Config/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/core/Config/LICENSE.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Core/Config/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Core/Config/LICENSE.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
  
-CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/core/Config/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/core/Config/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/core/Config/CyclusCPackOptions.cmake")
+CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Core/Config/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 

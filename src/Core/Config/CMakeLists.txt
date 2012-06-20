@@ -20,24 +20,25 @@ CONFIGURE_FILE(
   COPYONLY
   )
 
-set(input_path ${CYCLUS_SOURCE_DIR}/../input)
-set(cyclus_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+SET(input_path ${CYCLUS_SOURCE_DIR}/../input)
+SET(cyclus_path ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/run_inputs.py.in 
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/run_inputs.py @ONLY)
 
-set(input_path ${CYCLUS_SOURCE_DIR}/../input)
-set(cyclus_path ${CMAKE_INSTALL_PREFIX}/cyclus/bin)
+SET(input_path ${CYCLUS_SOURCE_DIR}/../input)
+SET(cyclus_path ${CMAKE_INSTALL_PREFIX}/cyclus/bin)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/run_inputs.py.in 
   ${CMAKE_CURRENT_SOURCE_DIR}/run_inputs.py @ONLY)
 
-install(FILES run_inputs.py 
+INSTALL(FILES run_inputs.py 
   DESTINATION cyclus/bin
   COMPONENT testing
   )
 
-install(FILES
-  UnixLoadConstr.h
-  WinLoadConstr.h
-  suffix.h
+INSTALL(FILES
+    UnixLoadConstr.h
+    WinLoadConstr.h
+    suffix.h
   DESTINATION cyclus/include
+  COMPONENT core
   )

@@ -9,7 +9,7 @@ macro(cyclus_init  _path _name)
 
   
   CONFIGURE_FILE(
-    ${CYCLUS_SOURCE_DIR}/core${_path}/${_name}.rng
+    ${CYCLUS_SOURCE_DIR}/Core${_path}/${_name}.rng
     ${PROJECT_BINARY_DIR}/lib${_path}/${_name}.rng
     COPYONLY
     )

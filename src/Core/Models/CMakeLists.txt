@@ -21,7 +21,7 @@ SET( CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
 
-install(FILES 
+INSTALL(FILES 
   Communicator.h
   ConverterModel.h
   FacilityModel.h
@@ -36,16 +36,17 @@ install(FILES
   TimeAgent.h
   Transaction.h
   DESTINATION cyclus/include
+  COMPONENT core
   )
 
-file(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
+FILE(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
 
-foreach(dir ${all_valid_subdirs})
-    if(${dir} MATCHES "^([^/]*)//CMakeLists.txt")
-        string(REGEX REPLACE "^([^/]*)//CMakeLists.txt" "\\1" dir_trimmed ${dir})
-        add_subdirectory(${dir_trimmed})
-    endif()
-endforeach(dir)
+FOREACH(dir ${all_valid_subdirs})
+  IF(${dir} MATCHES "^([^/]*)//CMakeLists.txt")
+    STRING(REGEX REPLACE "^([^/]*)//CMakeLists.txt" "\\1" dir_trimmed ${dir})
+    ADD_SUBDIRECTORY(${dir_trimmed})
+  ENDIF()
+ENDFOREACH(dir)
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
 
