@@ -101,6 +101,24 @@ set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
+
+# find cyclopts and link to it
+FIND_PACKAGE( CYCLOPTS REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLOPTS_INCLUDE_DIR})
+MESSAGE("\tFound CYCLOPTS Include Dir: ${CYCLOPTS_INCLUDE_DIR}")
+set(LIBS ${LIBS} ${CYCLOPTS_LIBRARY})
+MESSAGE("\tFound CYCLOPTS Libraries: ${CYCLOPTS_LIBRARY}")
+
+# find coin and link to it
+# note: this is NOT how I want this to work. why do I have to find
+# the coin includes? shouldn't that be 
+FIND_PACKAGE( COIN REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${COIN_INCLUDE_DIRS})
+MESSAGE("\tFound COIN Include Dir: ${COIN_INCLUDE_DIRS}")
+# set(LIBS ${LIBS} ${COIN_LIBRARIES})
+# MESSAGE("\tFound COIN Libraries: ${COIN_LIBRARIES}")
+
+
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
