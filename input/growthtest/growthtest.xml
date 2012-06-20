@@ -9,7 +9,7 @@
 
 <simulation>
   <!-- master sim info -->
-  <duration>100</duration>
+  <duration>1200</duration>
   <startmonth>1</startmonth>
   <startyear>2000</startyear>
   <simstart>0</simstart>
@@ -140,6 +140,7 @@
 	</gcommodity>
       </GrowthRegion>
     </model>
+
     <!-- institution definitions -->
     <institution>
       <name>oneInst</name>
