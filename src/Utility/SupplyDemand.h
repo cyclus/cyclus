@@ -4,7 +4,10 @@
 #include <string>
 
 /**
-   a simple class defining a commodity; it is currently super simple
+   a simple class defining a commodity; it is currently super simple.
+   the reason this class exists is so that code may be cleaner and more straightforward
+   while one could have chosen to typedef a string, there may be some reason to extend
+   the class in the future.
  */
 class Commodity {
  public:
@@ -23,7 +26,8 @@ class Commodity {
 };
 
 /**
-   a comparitor so that commoditys may be used in maps
+   a comparitor so that commodities may be used in maps
+   we do not care how they are compared, only that they can be
  */
 struct CommodityCompare {
   inline bool operator() (const Commodity& lhs, const Commodity& rhs) { 
@@ -35,8 +39,8 @@ struct CommodityCompare {
    a small class defining a producer
    a producer is associated with:
      * a commodity
-     * a commodityion capactiy
-     * a commodityion cost
+     * a capactiy for production of commodity
+     * a cost of production of commodity
  */
 class Producer {
  public:
@@ -44,7 +48,7 @@ class Producer {
      constructor, sets name, commodity, capacity, and cost
    */
  Producer(std::string name, Commodity p, double capacity, double cost) :
-  name_(name), commodity_(p), capacity_(capacity), commodityion_cost_(cost) {};
+  name_(name), commodity_(p), capacity_(capacity), production_cost_(cost) {};
 
   /// name getter
   std::string name() {return name_;}
@@ -56,7 +60,7 @@ class Producer {
   double capacity() {return capacity_;}
 
   /// cost getter
-  double cost() {return commodityion_cost_;}
+  double cost() {return production_cost_;}
 
  private:
   /// name
@@ -68,8 +72,8 @@ class Producer {
   /// commodityion capcity
   double capacity_;
 
-  /// commodityion cost
-  double commodityion_cost_;
+  /// production cost
+  double production_cost_;
 };
 
 #include "SymbolicFunctions.h"

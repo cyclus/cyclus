@@ -8,9 +8,9 @@
 #include <map>
 
 /**
-   This is a manager class that manages a set of commoditys. Those commoditys have a certain
+   This is a manager class that manages a set of commodities. Those commodities have a certain
    demand function associated with them and a list of producers who can produce the
-   commoditys.
+   commodities.
 
    The SupplyDemandManager simply keeps track of this information and provides the
    demand and supply of a commodity at a given time. What to do with this information is 
@@ -49,7 +49,7 @@ class SupplyDemandManager {
   double demand(const Commodity& commodity, int time);
 
   /**
-     returns the current supply of commodity p
+     returns the current supply of a commodity
      @param commodity the commodity
      @return the current supply of the commodity
    */
@@ -65,7 +65,7 @@ class SupplyDemandManager {
   /**
      return the number of producers of a given commodity
      @param commodity the commodity
-     @return the number of producers of commodity p
+     @return the number of producers of a commodity
    */
   int nProducers(const Commodity& commodity);
 
@@ -73,12 +73,12 @@ class SupplyDemandManager {
      return a specific producer of a commodity
      @param commodity the commodity
      @param index the producer's index
-     @return a pointer to the producer of commodity p at index
+     @return a pointer to the producer of a commodity at an index
    */
   Producer* producer(const Commodity& commodity, int index);
   
  private:
-  /// a container of all commoditys known to the manager
+  /// a container of all commodities known to the manager
   std::map<Commodity,CommodityInformation,CommodityCompare> commodities_;
 };
 
