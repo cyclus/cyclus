@@ -9,22 +9,27 @@ SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
 SET(BUILD_SHARED_LIBS true)
 
 # Setup build locations.
-if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/bin)
 endif()
-if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
   SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
 endif()
-if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
   SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
-endif()
+ENDIF()
 
 SET(CYCLUS_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-SET( CYCLUS_SRC
-  App.cpp
-  )
+# Tell CMake where the modules are
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 
+# Include macros
+INCLUDE(CyclusModuleMacros)
+
+# Include the core header files in the app build manually.
+# Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   ${CYCLUS_SRC_DIR}/core/Utility
   ${CYCLUS_SRC_DIR}/core/Config
@@ -32,15 +37,6 @@ SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   ${CYCLUS_SRC_DIR}/core/Resources
   ${CYCLUS_SRC_DIR}/core/Models
   )
-
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
-
-# Include macros
-INCLUDE(CyclusModuleMacros)
-
-# Find the Cyclus core library
-FIND_PACKAGE( cycluscore )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
@@ -54,14 +50,13 @@ SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 # Include the boost header files and the program_options library
-set(Boost_USE_STATIC_LIBS        ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
+SET(Boost_USE_STATIC_LIBS        ON)
+SET(Boost_USE_STATIC_RUNTIME    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
-set(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
-set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
-set(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
-
+SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
@@ -75,22 +70,29 @@ SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
 FIND_PACKAGE(Doxygen)
 IF (DOXYGEN_FOUND)
-	ADD_SUBDIRECTORY(doc)
-	SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
+  ADD_SUBDIRECTORY(doc)
+  SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
 ELSE (DOXYGEN_FOUND)
-	MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
+  MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
 # Build the cyclus executable from the CYCLUS_SRC source files
+SET( CYCLUS_SRC
+  App.cpp
+  )
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
+INSTALL(TARGETS cyclus
+  RUNTIME DESTINATION cyclus/bin
+  COMPONENT cyclus
+  )
 
 # ------------------------- Google Test -----------------------------------
 
 # Be sure to clear these each time
-set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
+SET( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
+SET( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
+SET( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # The gtest include file directories.
 SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
@@ -103,11 +105,11 @@ INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
 
 # Create an executable for all the gtests
 # Options for testing
-option ( USE_TESTING "Build testing" ON )
-if ( USE_TESTING )
+OPTION( USE_TESTING "Build testing" ON )
+IF( USE_TESTING )
   enable_testing()
-  include(CTest)
-endif()
+  INCLUDE(CTest)
+ENDIF()
 
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
@@ -116,67 +118,53 @@ SET(TestSource
   ${CYCLUS_TEST_CORE}
   )
 
-# Build Google Test
-find_package(Threads)
-if (CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
-  set(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
-endif()
+FIND_PACKAGE(Threads)
+IF(CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
+  SET(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
+ENDIF()
 
-# Build Google Testing
-set ( GTest
+# Build libgtest
+SET( GTest
   Testing/GoogleTest/gtest/gtest-all.cc
 )
-include_directories ( Testing ) # necessary?
+INCLUDE_DIRECTORIES( Testing )
 
-add_library(gtest ${GTest})
-if (CMAKE_USE_PTHREADS_INIT)
-  target_link_libraries(gtest ${CMAKE_THREAD_LIBS_INIT})
-endif()
+ADD_LIBRARY(gtest ${GTest})
 
-INCLUDE_DIRECTORIES(Testing/Googletest) # necessary?
-add_executable( CyclusUnitTestDriver
+IF (CMAKE_USE_PTHREADS_INIT)
+  TARGET_LINK_LIBRARIES(gtest ${CMAKE_THREAD_LIBS_INIT})
+ENDIF()
+
+INSTALL(TARGETS gtest
+  LIBRARY DESTINATION cyclus/lib
+  COMPONENT testing
+  )
+
+# Build CyclusUnitTestDriver
+ADD_EXECUTABLE( CyclusUnitTestDriver
   Testing/CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-
-target_link_libraries ( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
+TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
   ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
 
 # Here we add all the tests
-add_google_tests ( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSource} 
+add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSource} 
   ${INTERFACE_LIBRARIES})
 
-# Here we set some components for installation with cpack
- install(TARGETS 
-     ${INTERFACE_LIBRARIES} 
-   ARCHIVE
-   DESTINATION cyclus/lib
-   COMPONENT libraries
-   )
- install(TARGETS 
-     cyclus
-   RUNTIME
-   DESTINATION cyclus/bin
-   COMPONENT cyclus
-   )
- install(TARGETS 
-     CyclusUnitTestDriver
-   RUNTIME
-   DESTINATION cyclus/bin
-   COMPONENT testing
-   )
- install(FILES 
-     ${PROJECT_BINARY_DIR}/share/cyclus.rng
-   DESTINATION  
-     cyclus/share
-   COMPONENT data
-   )
- install(TARGETS gtest
-   LIBRARY DESTINATION cyclus/lib
-   COMPONENT testing
-   )
+INSTALL(TARGETS CyclusUnitTestDriver
+  RUNTIME DESTINATION cyclus/bin
+  COMPONENT testing
+  )
 
-set(CPACK_COMPONENTS_ALL cyclus testing libraries data)
+# Here we set some components for installation with cpack
+INSTALL(FILES 
+  ${PROJECT_BINARY_DIR}/share/cyclus.rng
+  DESTINATION cyclus/share
+  COMPONENT data
+  )
+
+SET(CPACK_COMPONENTS_ALL cyclus testing libraries data)
 
 # Here's where we package it with CPack
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
