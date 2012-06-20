@@ -85,6 +85,7 @@ ENDIF (DOXYGEN_FOUND)
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
 
+# ------------------------- Google Test -----------------------------------
 
 # Be sure to clear these each time
 set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
@@ -95,7 +96,7 @@ set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
 
 # The gtest library directories.
-SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/Testing")
+SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
 # Alerts CMake to any tests we need to worry about
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
