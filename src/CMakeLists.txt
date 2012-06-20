@@ -39,10 +39,8 @@ SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 # Include macros
 INCLUDE(CyclusModuleMacros)
 
-# Find the Cyclus core library and include directories
-FIND_PACKAGE( cycluscore REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIRS})
-#SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+# Find the Cyclus core library
+FIND_PACKAGE( cycluscore )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 FIND_PACKAGE( LibXml2 REQUIRED )
