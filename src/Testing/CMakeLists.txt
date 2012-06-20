@@ -29,11 +29,6 @@ set ( CYCLUS_TEST_CORE
   PARENT_SCOPE)
 
 SET(INTERFACE_LIBRARIES ${CYCLUS_TEST_CORE} PARENT_SCOPE )
-INSTALL(TARGETS 
-  ${INTERFACE_LIBRARIES}
-  ARCHIVE DESTINATION cyclus/lib
-  COMPONENT libraries
-  )
 
 # Add all the tests by parsing the source code
 # This macro searches for GoogleTest macros and adds them as tests automatically
