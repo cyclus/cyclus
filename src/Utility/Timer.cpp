@@ -29,7 +29,7 @@ void Timer::runSim() {
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ << " {";
       CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
 
-      //Material::decayMaterials(time_);
+      Material::decayMaterials(time_);
       sendTick();
       sendResolve();
     }
@@ -199,7 +199,7 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
 
   if (decay > dur)
     throw CycRangeException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
-  //Material::setDecay(decay);
+  Material::setDecay(decay);
 
   month0_ = m0;
   year0_ = y0;
