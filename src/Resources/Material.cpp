@@ -154,41 +154,6 @@ bool Material::checkQuality(rsrc_ptr other){
   return toRet;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuantityEqual(rsrc_ptr other) {
-  // This will be false until proven true
-  bool toRet = false;
-
-  // Make sure the other is a material
-  try{
-    // check mass values
-    double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
-    toRet=( abs(quantity() - second_qty) < EPS_KG);
-  } catch (exception e) { }
-  return toRet;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuantityGT(rsrc_ptr other){
-  // true if the total atoms in the other is greater than in the base.
-  // This will be true until proven false
-  bool toRet = false;
-
-  // Make sure the other is a material
-  try{
-    // check mass values
-    double second_qty = boost::dynamic_pointer_cast<Material>(other)->quantity();
-    toRet = second_qty - quantity() > EPS_KG;
-  } catch (exception& e){ }
-
-  return toRet;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Material::mass(Iso tope) {
-  return iso_vector_.massFraction(tope) * quantity_;
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decay() {
   int curr_time = TI->time();
