@@ -33,6 +33,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MassTable.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLogger.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Table.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Timer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/UniformTaylor.cpp 
@@ -49,6 +50,9 @@ install(FILES
   Logger.h
   MassTable.h
   RecipeLogger.h
+  SupplyDemand.h
+  SupplyDemandManager.h
+  SymbolicFunctions.h
   Table.h
   Timer.h
   UniformTaylor.h
