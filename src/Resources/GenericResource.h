@@ -95,28 +95,6 @@ public:
   void setQuality(std::string new_quality) {quality_ = new_quality;};
     
   /**
-     A boolean comparing the quantity of the other resource is 
-     to the quantity of the base 
-      
-     @param other The resource to evaluate against the base 
-      
-     @return True if other is sufficiently equal in quantity to 
-     the base, False otherwise. 
-   */
-  virtual bool checkQuantityEqual(rsrc_ptr other);
-
-  /**
-     Returns true if the quantity of the other resource is 
-     greater than the quantity of the base 
-      
-     @param second The resource to evaluate against the base 
-      
-     @return True if second is sufficiently equal in quantity to 
-     first, False otherwise. 
-   */
-  virtual bool checkQuantityGT(rsrc_ptr second);
-
-  /**
      Returns the concrete type of this resource 
    */ 
   virtual ResourceType type(){return GENERIC_RES;};

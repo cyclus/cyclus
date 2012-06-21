@@ -129,16 +129,6 @@ public:
   /**
      Resource class method 
    */
-  bool checkQuantityEqual(rsrc_ptr other);
-
-  /**
-     Resource class method 
-   */
-  bool checkQuantityGT(rsrc_ptr other);
-
-  /**
-     Resource class method 
-   */
   ResourceType type() {return MATERIAL_RES;};
 
   /**
@@ -191,11 +181,6 @@ public:
      last entry in the material history. 
    */
   void decay();
-
-  /**
-     returns the mass of a given isotope
-   */
-  double mass(Iso tope);
 
   /**
      Returns a copy of this material's isotopic composition 

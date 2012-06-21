@@ -21,9 +21,8 @@ TEST_F(MaterialTest, Clone) {
   EXPECT_EQ(test_mat_->quantity(), clone_mat->quantity());
   EXPECT_EQ(test_mat_->type(), clone_mat->type());
   EXPECT_TRUE(test_mat_->checkQuality(clone_mat));
-  EXPECT_TRUE(test_mat_->checkQuantityEqual(clone_mat));
+  EXPECT_DOUBLE_EQ(test_mat_->quantity(), clone_mat->quantity());
   EXPECT_TRUE(clone_mat->checkQuality(test_mat_));
-  EXPECT_TRUE(clone_mat->checkQuantityEqual(test_mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -85,7 +84,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // see that materials with different compositions do the right thing
   ASSERT_NO_THROW(test_mat_->absorb(diff_test_mat));
   EXPECT_FLOAT_EQ(orig + origdiff, test_mat_->quantity() );
-  EXPECT_FALSE(same_as_orig_test_mat->checkQuantityEqual(test_mat_));
+  EXPECT_DOUBLE_EQ(same_as_orig_test_mat->quantity(), test_mat_->quantity());
   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 

@@ -72,39 +72,6 @@ public:
   virtual void setQuantity(double val) = 0;
     
   /**
-     A boolean comparing the quantity of the other resource is 
-     to the quantity of the base 
-      
-     @param other The resource to evaluate against the base 
-      
-     @return True if other is sufficiently equal in quantity to 
-     the base, False otherwise. 
-   */
-  virtual bool checkQuantityEqual(rsrc_ptr other) = 0;
-
-  /**
-     Returns true if the quantity of the other resource is 
-     greater than the quantity of the base 
-      
-     @param other The resource to evaluate against the base 
-      
-     @return True if second is sufficiently equal in quantity to 
-     first, False otherwise. 
-   */
-  virtual bool checkQuantityGT(rsrc_ptr other) = 0;
-
-  /**
-     Compares the quantity and quality of the other resource 
-     to the base 
-      
-     @param other The resource to evaluate 
-      
-     @return True if other is sufficiently equal to the base, 
-     False otherwise. 
-   */
-  virtual bool checkEquality(rsrc_ptr other);
-
-  /**
   The current state of the resource object.
 
   This can be used to prevent writing of redundant information into the output
