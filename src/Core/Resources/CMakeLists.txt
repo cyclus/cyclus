@@ -9,7 +9,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuff.cpp
   PARENT_SCOPE)
 
-install(FILES
+INSTALL(FILES
   CompMap.h
   IsoVector.h
   GenericResource.h
@@ -18,5 +18,6 @@ install(FILES
   Resource.h
   ResourceBuff.h
   DESTINATION cyclus/include
+  COMPONENT core
   )
 
