@@ -183,6 +183,9 @@ class Message: IntrusiveBase<Message> {
 
   void autoSetNextDest();
 
+  // keeps history of total order vs request qtys for every commodity
+  void tallyOrder(Model* next_model);
+
   void validateForSend();
 
   void makeRealParticipant(Communicator* who);
@@ -263,6 +266,26 @@ class Message: IntrusiveBase<Message> {
    */
   Transaction& trans() const;
 
+  /**
+  Allows peeking in at a commodity's supply/demand balance at specific
+  simulation times.
+
+  Note that the demand/supply balance for each timestep is maintained
+  throughout the duration of the simulation.
+
+  @warning unmetDemand is ill-defined for the current timestep - as not all
+           offers/requests for the timestep in progress may have been
+           generated/recorded yet.
+
+  @param commod the commodity (i.e. market) of interest
+  @param time simulation time/instant of interest
+
+  @return the difference between the total request quantity and total offer
+          quantity (negative values indicate a supply heavy state)
+
+  */
+  static double unmetDemand(std::string commod, int time);
+
  private:
 
   /**
@@ -295,6 +318,8 @@ class Message: IntrusiveBase<Message> {
   /// a boolean to determine if the message has completed its route 
   bool dead_;
 
+  static std::map<std::string, std::map<int, double> > offer_qtys_;
+  static std::map<std::string, std::map<int, double> > request_qtys_;
 };
 
 #endif
