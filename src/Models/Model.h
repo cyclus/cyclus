@@ -181,6 +181,9 @@ class Model {
    */
   virtual std::string str();
 
+  /// Makes model not a template and records it in output db
+  void itLives();
+
   /**
      return parent of this model 
    */

@@ -140,7 +140,7 @@ void Message::validateForSend() {
 void Message::makeRealParticipant(Communicator* who) {
   Model* model = NULL;
   model = dynamic_cast<Model*>(who);
-  if (model != NULL) {model->setIsTemplate(false);}
+  if (model != NULL) {model->itLives();}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

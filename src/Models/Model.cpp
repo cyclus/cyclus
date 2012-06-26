@@ -277,21 +277,15 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::setParent(Model* parent){ 
-  // A model is "born" in the world it's parent is set
+void Model::itLives() {
   this->setBornOn( TI->time() );
 
-  // log who the parent is
-  if (parent == this) {
-    // root nodes are their own parent
-    parent_ = NULL; // parent pointer set to NULL for memory management
+  if (parent_ == NULL) {
     parentID_ = this->ID();
+  } else {
+    parentID_ = parent_->ID();
   }
-  else{
-    parent_ = parent;
-    parentID_ = parent->ID();
-  }
-
+  
   // register the model with the simulation
   this->addToTable();
 
@@ -307,6 +301,17 @@ void Model::setParent(Model* parent){
   CLOG(LEV_DEBUG2) << "Created Model: {";
   CLOG(LEV_DEBUG2) << str();
   CLOG(LEV_DEBUG2) << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::setParent(Model* parent){ 
+  if (parent == this) {
+    // root nodes are their own parent
+    parent_ = NULL; // parent pointer set to NULL for memory management
+  } else {
+    parent_ = parent;
+  }
+  itLives();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
