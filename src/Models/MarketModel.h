@@ -117,19 +117,19 @@ class MarketModel : public Model, public Communicator {
   virtual std::string str();
 
   /**
-     default MarketModel receiver simply logs the offer/request 
-   */
-  virtual void receiveMessage(msg_ptr msg) 
-  { messages_.insert(msg); };
-
- protected:
-  /**
      registers a market instance with the static list
 
      @param mkt the market to register, usually a this pointer
      during init
    */
   static void registerMarket(MarketModel* mkt);
+
+ private:
+  /**
+     default MarketModel receiver simply logs the offer/request 
+   */
+  virtual void receiveMessage(msg_ptr msg) 
+  { messages_.insert(msg); };
 
 /* ------------------- */ 
 
