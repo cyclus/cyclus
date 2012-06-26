@@ -29,9 +29,10 @@ class BookKeeperTest : public ::testing::Test {
       BI->closeDB();
     }
     BI->turnLoggingOff();
-    const char* test_file = (fpath + "/" + test_filename).c_str();
-    if( BI->getDB()->fexists(test_file) && std::remove( test_file ) != 0 ){
-      throw ("Error deleting file " + test_filename ); 
+
+    std::string path = fpath + "/" + test_filename;
+    if( BI->getDB()->fexists(path.c_str()) && std::remove( path.c_str() ) != 0 ){
+      FAIL() << "could not remove file '" << path.c_str() << "'";
     }
   };
 };
