@@ -90,11 +90,6 @@ public:
   std::string quality() {return quality_;};
 
   /**
-     Sets the quality of this resource 
-   */ 
-  void setQuality(std::string new_quality) {quality_ = new_quality;};
-    
-  /**
      A boolean comparing the quantity of the other resource is 
      to the quantity of the base 
       
@@ -151,6 +146,8 @@ public:
    */
   virtual gen_rsrc_ptr extract(double mass);
 
+  virtual void addToTable();
+
 private:  
   /**
      The units of the resource 
@@ -167,11 +164,20 @@ private:
    */ 
   double quantity_;
 
+  bool recorded_;
+
  private:
   /**
      A boolean to tell if the resource has been logged 
    */ 
   static bool type_is_logged_;
+
+  /**
+     defines the resource table 
+   */
+  static void define_table();
+
+  static table_ptr genres_table;
 };
 
 #endif
