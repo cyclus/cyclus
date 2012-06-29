@@ -183,7 +183,13 @@ class Message: IntrusiveBase<Message> {
 
   void autoSetNextDest();
 
-  // keeps history of total order vs request qtys for every commodity
+  /**
+   Keeps history of total order vs request qtys for every commodity.
+   If you need more, read the implementation - it is only 10 lines.
+
+   @param next_model the model queued to receive this message on the next
+   send
+  */
   void tallyOrder(Model* next_model);
 
   void validateForSend();
