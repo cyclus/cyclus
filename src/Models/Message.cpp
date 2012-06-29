@@ -11,6 +11,10 @@
 #include "Logger.h"
 #include "Timer.h"
 
+
+std::map<std::string, std::map<int, double> > Message::offer_qtys_;
+std::map<std::string, std::map<int, double> > Message::request_qtys_;
+
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,11 +109,26 @@ void Message::autoSetNextDest() {
   Communicator* next_dest;
   try {
     next_model = dynamic_cast<Model*>(curr_owner_)->parent();
+    tallyOrder(next_model);
     next_dest = dynamic_cast<Communicator*>(next_model);
   } catch (CycIndexException err) {
     next_dest = receiver_;
   }
   setNextDest(next_dest);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::tallyOrder(Model* next_model) {
+  if (next_model->modelType() != "Market") {
+    return;
+  }
+
+  Transaction tran = trans();
+  if (tran.isOffer()) {
+    Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+  } else {
+    Message::request_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,5 +235,12 @@ Transaction& Message::trans() const {
     throw CycNullMsgParamException("Uninitialized transaction parameter.");
   }
   return *trans_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Message::unmetDemand(std::string commod, int time) {
+  double supply = Message::offer_qtys_[commod][time];
+  double demand = Message::request_qtys_[commod][time];
+  return demand - supply;
 }
 
