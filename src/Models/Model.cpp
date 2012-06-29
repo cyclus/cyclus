@@ -243,17 +243,6 @@ Model::~Model() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::setIsTemplate(bool is_template) {
-  is_template_ = is_template;
-
-  if (!is_template) {
-    // this prevents duplicates from being stored in the list
-    removeFromList(this, model_list_);
-    model_list_.push_back(this);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
   for (int i = 0; i < mlist.size(); i++) {
     if (mlist[i] == model) {
@@ -277,27 +266,27 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::setParent(Model* parent){ 
-  // A model is "born" in the world it's parent is set
+void Model::itLives() {
+  if (!isTemplate()) {
+    return;
+  }
+
   this->setBornOn( TI->time() );
 
-  // log who the parent is
-  if (parent == this) {
-    // root nodes are their own parent
-    parent_ = NULL; // parent pointer set to NULL for memory management
+  if (parent_ == NULL) {
     parentID_ = this->ID();
+  } else {
+    parentID_ = parent_->ID();
   }
-  else{
-    parent_ = parent;
-    parentID_ = parent->ID();
-  }
-
+  
   // register the model with the simulation
   this->addToTable();
 
-  // the model has been registered with the simulation, 
-  // so it is no longer a template
-  setIsTemplate(false);
+  is_template_ = false;
+
+  // this prevents duplicates from being stored in the list
+  removeFromList(this, model_list_);
+  model_list_.push_back(this);
   
   // if this node is not its own parent, add it to its parent's list of children
   if (parent_ != NULL){
@@ -307,6 +296,17 @@ void Model::setParent(Model* parent){
   CLOG(LEV_DEBUG2) << "Created Model: {";
   CLOG(LEV_DEBUG2) << str();
   CLOG(LEV_DEBUG2) << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::setParent(Model* parent){ 
+  if (parent == this) {
+    // root nodes are their own parent
+    parent_ = NULL; // parent pointer set to NULL for memory management
+  } else {
+    parent_ = parent;
+  }
+  itLives();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
