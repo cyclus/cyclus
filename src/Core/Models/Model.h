@@ -179,6 +179,9 @@ class Model {
    */
   virtual std::string str();
 
+  /// Makes model not a template and records it in output db
+  void itLives();
+
   /**
      return parent of this model 
    */
@@ -266,11 +269,6 @@ class Model {
      returns whether or not the model is a template 
    */
   bool isTemplate() {return is_template_;};
-
-  /**
-     declares if the model is a template 
-   */
-  void setIsTemplate(bool is_template);
 
   /**
      Asks if a model can build a certain prototype. Returns false by
