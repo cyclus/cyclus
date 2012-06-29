@@ -21,12 +21,6 @@ Resource::~Resource() {
   MLOG(LEV_DEBUG4) << "Resource ID=" << ID_ << ", ptr=" << this << " deleted.";
 }
 
-bool Resource::checkEquality(rsrc_ptr other) {
-  bool toRet;
-  (this->checkQuality(other) && this->checkQuantityEqual(other)) ? toRet = true : toRet = false;
-  return toRet; 
-}
-
 void Resource::setOriginalID(int id){
   originalID_ = id;
 }
