@@ -1,6 +1,7 @@
 // MaterialTests.cpp
 #include <gtest/gtest.h>
 #include "MaterialTests.h"
+#include <cmath>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Constructors){
@@ -84,7 +85,8 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // see that materials with different compositions do the right thing
   ASSERT_NO_THROW(test_mat_->absorb(diff_test_mat));
   EXPECT_FLOAT_EQ(orig + origdiff, test_mat_->quantity() );
-  EXPECT_DOUBLE_EQ(same_as_orig_test_mat->quantity(), test_mat_->quantity());
+  EXPECT_TRUE(std::abs(same_as_orig_test_mat->quantity() - 
+              test_mat_->quantity()) > EPS_KG);
   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
 }
 
