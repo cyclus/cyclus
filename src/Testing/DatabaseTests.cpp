@@ -4,8 +4,8 @@
 #include <string>
 
 #include "Env.h"
-#include "Utility/Database.h"
-#include "Utility/Table.h"
+#include "Database.h"
+#include "Table.h"
 
 class DatabaseTest : public ::testing::Test {
   protected:
@@ -60,9 +60,9 @@ class DatabaseTest : public ::testing::Test {
   
   // this tears down the fixtures
   virtual void TearDown() {
-    const char* test_file = (dbPath + "/" + dbName).c_str();
-    if( db->fexists(test_file) && std::remove( test_file ) != 0 ){
-      throw ("Error deleting file " + dbName );
+    std::string path = dbPath + "/" + dbName;
+    if( db->fexists(path.c_str()) && std::remove( path.c_str() ) != 0 ){
+      FAIL() << "could not remove file '" << path.c_str() << "'";
     }
   };
 };

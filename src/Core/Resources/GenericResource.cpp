@@ -54,22 +54,6 @@ bool GenericResource::checkQuality(rsrc_ptr other){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityEqual(rsrc_ptr other) {
-  // KDHFLAG : Should allow epsilon as a parameter to this function?
-  bool toRet;
-  toRet =( checkQuality(other) && quantity_ == other->quantity());
-  return toRet;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool GenericResource::checkQuantityGT(rsrc_ptr other) {
-  // KDHFLAG : Should allow epsilon as a parameter to this function?
-  bool toRet;
-  toRet = ( checkQuality(other) && quantity_ < other->quantity());
-  return toRet;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void GenericResource::absorb(gen_rsrc_ptr other) {
   if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {
     throw CycGenResourceIncompatible("incompatible resource types.");
