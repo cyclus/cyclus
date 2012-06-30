@@ -4,8 +4,8 @@
 #include <string>
 
 #include "Env.h"
-#include "Utility/Database.h"
-#include "Utility/Table.h"
+#include "Database.h"
+#include "Table.h"
 
 class DatabaseTest : public ::testing::Test {
   protected:
