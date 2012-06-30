@@ -7,6 +7,7 @@
 #include "Logger.h"
 
 bool GenericResource::type_is_logged_ = false;
+table_ptr GenericResource::genres_table = new Table("GenericResources"); 
 
 using namespace std;
 
@@ -16,6 +17,7 @@ GenericResource::GenericResource(std::string units,
   units_ = units;
   quality_ = quality;
   quantity_ = quantity;
+  recorded_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -71,3 +73,42 @@ gen_rsrc_ptr GenericResource::extract(double quantity) {
 
   return gen_rsrc_ptr(new GenericResource(units_, quality_, quantity));
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GenericResource::addToTable() {
+  Resource::addToTable();
+
+  if ( !genres_table->defined() ) {
+    GenericResource::define_table();
+  }
+
+  if (recorded_) {
+    return;
+  }
+
+  recorded_ = true;
+
+  data an_id( ID() );
+  entry id("ResourceID", an_id);
+
+  data a_qual( quality() );
+  entry qual("Quality", a_qual);
+
+  row aRow;
+  aRow.push_back(id), aRow.push_back(qual);
+
+  genres_table->addRow(aRow);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GenericResource::define_table() {
+  genres_table->addField("ResourceID","INTEGER");
+  genres_table->addField("Quality","VARCHAR(128)");
+
+  primary_key pk;
+  pk.push_back("ResourceID");
+  genres_table->setPrimaryKey(pk);
+
+  genres_table->tableDefined();
+}
+
