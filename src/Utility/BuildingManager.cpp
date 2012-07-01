@@ -12,13 +12,15 @@ using namespace std;
 using boost::any_cast;
 using namespace CyclusOptimization;
 
-// --------------------------------------------------------------------------------------
+// -------------------------------------------------------------------
 BuildingManager::BuildingManager(SupplyDemandManager& m) : 
   manager_(SupplyDemandManager(m)) {}; // copy made of manager
 
 
-// --------------------------------------------------------------------------------------
-vector<BuildOrder> BuildingManager::makeBuildDecision(const Product& p, double unmet_demand) {
+// -------------------------------------------------------------------
+vector<BuildOrder> 
+BuildingManager::makeBuildDecision(const Product& p, 
+                                   double unmet_demand) {
   orders_ = vector<BuildOrder>();
   if (unmet_demand > 0) {
     doMakeBuildDecision(p,unmet_demand);
@@ -26,8 +28,9 @@ vector<BuildOrder> BuildingManager::makeBuildDecision(const Product& p, double u
   return orders_;
 }
 
-// --------------------------------------------------------------------------------------
-void BuildingManager::doMakeBuildDecision(const Product& product, double unmet_demand) {
+// -------------------------------------------------------------------
+void BuildingManager::doMakeBuildDecision(const Product& product, 
+                                          double unmet_demand) {
 
   // set up solver and interface
   SolverPtr solver(new CBCSolver());
