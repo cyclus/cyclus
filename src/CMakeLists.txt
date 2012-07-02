@@ -194,6 +194,7 @@ INSTALL(TARGETS CyclusUnitTestDriver
 # Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
+  ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
   DESTINATION cyclus/share
   COMPONENT data
   )
