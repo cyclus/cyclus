@@ -119,35 +119,13 @@ IF(CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
   SET(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
 ENDIF()
 
-# Build libgtest
-SET( GTest
-  Testing/GoogleTest/gtest/gtest-all.cc
-)
-INCLUDE_DIRECTORIES( Testing )
-
-ADD_LIBRARY(gtest ${GTest})
-
-IF (CMAKE_USE_PTHREADS_INIT)
-  TARGET_LINK_LIBRARIES(gtest ${CMAKE_THREAD_LIBS_INIT})
-ENDIF()
-
-SET_TARGET_PROPERTIES(gtest
-  PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/cycamore/lib"
-  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cycamore/lib"
-)
-
-INSTALL(TARGETS gtest
-  LIBRARY DESTINATION cycamore/lib
-  COMPONENT testing
-  )
-
 # Build CycamoreUnitTestDriver
 ADD_EXECUTABLE( CycamoreUnitTestDriver
   Testing/CycamoreUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CycamoreUnitTestDriver dl ${CYCAMORE_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
+  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest cycluscore)
 
 # Here we add all the tests
 add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver ${TestSource} 
