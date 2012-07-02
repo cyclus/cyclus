@@ -88,6 +88,9 @@ ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
+# ------------------------- Add the Models -----------------------------------
+ADD_SUBDIRECTORY(Models)
+
 # ------------------------- Google Test -----------------------------------
 
 # Be sure to clear these each time
