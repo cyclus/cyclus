@@ -3,7 +3,7 @@ PROJECT(cycamore)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Direct any out-of-source builds to this directory
-SET( CYCAMORE_SRC_DIR ${CMAKE_SOURCE_DIR} )
+SET( CYCAMORE_SOURCE_DIR ${CMAKE_SOURCE_DIR} )
 
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
@@ -74,7 +74,7 @@ SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 INCLUDE_DIRECTORIES( ${CYCAMORE_INCLUDE_DIR} )
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET( DOC_INPUT_DIR ${CYCAMORE_SRC_DIR}/doc)
+SET( DOC_INPUT_DIR ${CYCAMORE_SOURCE_DIR}/doc)
 
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
 FIND_PACKAGE(Doxygen)
@@ -130,8 +130,6 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
-  ${CYCAMORE_CORE_SRC}
-  ${CYCAMORE_TEST_CORE}
   )
 
 FIND_PACKAGE(Threads)
