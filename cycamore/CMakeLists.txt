@@ -63,6 +63,12 @@ FIND_PACKAGE( Sqlite3 REQUIRED )
 SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
+# Find Sqlite3
+# KDHFLAG Necessary?
+FIND_PACKAGE( cycluscore REQUIRED )
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
+SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+
 # Include the boost header files and the program_options library
 # KDHFLAG Necessary?
 SET(Boost_USE_STATIC_LIBS       OFF)
@@ -145,7 +151,7 @@ INSTALL(TARGETS CycamoreUnitTestDriver
 # Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
-  DESTINATION cyclus/share
+  DESTINATION ${CYCLUS_CORE_SHARE_DIR}
   COMPONENT data
   )
 

@@ -11,6 +11,6 @@ ENDFOREACH(dir)
 SET( TestSource ${ModelTestSource} PARENT_SCOPE)
 
 # --------------------- Configure the cyclus.rng file -------------------
-CONFIGURE_FILE(${PROJECT_BINARY_DIR}/share/cyclus.rng 
+CONFIGURE_FILE(${CYCLUS_CORE_SHARE_DIR}/cyclus.rng.in 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng @ONLY)
 
