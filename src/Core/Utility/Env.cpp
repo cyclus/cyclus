@@ -32,14 +32,22 @@ string Env::pathBase(std::string path) {
 string Env::getCyclusPath() {
   // return the join of cwd_ and rel path to cyclus
   boost::filesystem::path path;
+  string bin_key = "/bin";
+  size_t bin_found;
+  string to_ret;
   if(path_from_cwd_to_cyclus_.has_root_path()) {
     path = path_from_cwd_to_cyclus_.normalize();
   } else {
     path = (cwd_ / path_from_cwd_to_cyclus_).normalize();
   }
+  to_ret=path.string();
+  bin_found=to_ret.rfind(bin_key);
+  if (bin_found!=string::npos){
+    to_ret.replace (bin_found,bin_key.length(),"/");
+  }
   CLOG(LEV_DEBUG4) << "Cyclus absolute path retrieved: " 
-                  <<  path.string();
-  return path.string();
+                  << to_ret;
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
