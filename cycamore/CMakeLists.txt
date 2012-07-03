@@ -150,13 +150,19 @@ INSTALL(TARGETS CycamoreUnitTestDriver
   COMPONENT testing
   )
 
-# Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   DESTINATION ${CYCLUS_CORE_SHARE_DIR}
   COMPONENT data
   )
 
+FILE(GLOB cyclus_shared "${CYCLUS_CORE_SHARE_DIR}/*")
+INSTALL(FILES ${cyclus_shared} 
+  DESTINATION cycamore/share
+  COMPONENT data
+  )
+
+# Here we set some components for installation with cpack
 SET(CPACK_COMPONENTS_ALL cycamore testing libraries data core)
 
 # Here's where we package it with CPack
