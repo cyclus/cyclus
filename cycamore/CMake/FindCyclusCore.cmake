@@ -4,23 +4,28 @@
 
 # Look for the header files
 FIND_PATH(CYCLUS_CORE_INCLUDE_DIR suffix.h
-  HINTS /usr/local/cyclus /opt/local/cyclus 
+  HINTS /usr/local/cyclus /opt/local/cyclus "$ENV{CYCLUS_ROOT_DIR}/cyclus"
+  "$ENV{CYCLUS_ROOT_DIR}"
   PATH_SUFFIXES cyclus/include)
 
 # Look for the header files
 FIND_PATH(CYCLUS_CORE_SHARE_DIR cyclus.rng.in
-  HINTS /usr/local/cyclus /opt/local/cyclus 
+  HINTS /usr/local/cyclus /opt/local/cyclus "$ENV{CYCLUS_ROOT_DIR}/cyclus" 
+  "$ENV{CYCLUS_ROOT_DIR}"
   PATH_SUFFIXES cyclus/share)
 
 # Look for the library
 FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cycluscore 
   HINTS /usr/local/cyclus/lib /usr/local/cyclus 
-  /opt/local/lib /opt/local/cyclus/lib)
+  "$ENV{CYCLUS_ROOT_DIR}/lib"
+  /opt/local/lib /opt/local/cyclus/lib "$ENV{CYCLUS_ROOT_DIR}/cyclus/lib")
 
 # Look for the library
 FIND_LIBRARY(CYCLUS_GTEST_LIBRARY NAMES gtest
   HINTS /usr/local/cyclus/lib /usr/local/cyclus 
-  /opt/local/lib /opt/local/cyclus/lib)
+  /opt/local/lib /opt/local/cyclus/lib "$ENV{CYCLUS_ROOT_DIR}/cyclus/lib"
+  "$ENV{CYCLUS_ROOT_DIR}/lib"
+  )
 
 # Copy the results to the output variables.
 IF (CYCLUS_CORE_INCLUDE_DIR AND CYCLUS_CORE_LIBRARY AND CYCLUS_GTEST_LIBRARY AND CYCLUS_CORE_SHARE_DIR)
