@@ -49,4 +49,7 @@ macro(ADD_GOOGLE_TESTS executable)
 endmacro()
 
 
-
+INSTALL(FILES GoogleTest/gtest/gtest.h
+  DESTINATION cyclus/include/gtest
+  COMPONENT testing
+  )
