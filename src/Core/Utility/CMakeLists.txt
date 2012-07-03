@@ -22,6 +22,14 @@ INSTALL(FILES
   COMPONENT core
   )
 
+SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp
+  @ONLY
+  )
+  
 # Add any new cyclus core source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
