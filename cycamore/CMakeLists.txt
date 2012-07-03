@@ -78,6 +78,9 @@ SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
+# include the model directories
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} Testing )
+
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCAMORE_INCLUDE_DIR} )
 

@@ -48,8 +48,16 @@ macro(ADD_GOOGLE_TESTS executable)
   endforeach()
 endmacro()
 
-
 INSTALL(FILES GoogleTest/gtest/gtest.h
   DESTINATION cyclus/include/gtest
+  COMPONENT testing
+  )
+
+INSTALL(FILES 
+  TestInst.h
+  TestRegion.h
+  TestFacility.h
+  TestMarket.h
+  DESTINATION cyclus/include
   COMPONENT testing
   )
