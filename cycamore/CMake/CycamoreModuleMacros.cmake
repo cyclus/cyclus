@@ -6,7 +6,7 @@ macro(cyclus_init  _path _name)
   # Build the libraries from the CYCAMORE_SRC source files
   ADD_LIBRARY( ${_name}       ${_name}.cpp )
   # Link the libraries to libcycluscore 
-  TARGET_LINK_LIBRARIES(${_name} dl cycluscore)
+  TARGET_LINK_LIBRARIES(${_name} dl ${LIBS})
   SET(CYCAMORE_LIBRARIES ${CYCAMORE_LIBRARIES} ${_name} )
 
   
