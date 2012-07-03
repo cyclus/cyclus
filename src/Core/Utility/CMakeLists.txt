@@ -22,6 +22,7 @@ INSTALL(FILES
   COMPONENT core
   )
 
+SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX}/cyclus)
 SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
 
 CONFIGURE_FILE(
