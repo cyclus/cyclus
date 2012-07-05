@@ -59,9 +59,16 @@ public:
   static std::string getCyclusOutputPath();
 
   /**
+     the relative path to the root install directory (containing bin, lib, etc.)
+      
+     @return the absolute path to the build directory
+    */
+  static const std::string getInstallPath();
+
+  /**
      the relative path to the root build directory (containing bin, lib, etc.)
       
-     @return the relative path from the cwd to the build directory
+     @return the absolute path to the build directory
     */
   static const std::string getBuildPath();
 

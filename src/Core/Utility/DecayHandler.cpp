@@ -28,7 +28,7 @@ DecayHandler::DecayHandler() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::loadDecayInfo() {
-  string path = Env::getCyclusPath() + "/Data/decayInfo.dat";
+  string path = Env::getBuildPath() + "/share/decayInfo.dat";
   ifstream decayInfo (path.c_str());
 
   if ( decayInfo.is_open() ) {

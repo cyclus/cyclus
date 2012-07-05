@@ -1,13 +1,21 @@
 
-set(CYCLOPTS_ROOT_DIR $ENV{CYCLOPTS_ROOT_DIR})
-
-FIND_PATH(CYCLOPTS_INCLUDE_DIR Variable.h
-  HINTS ${CYCLOPTS_ROOT_DIR}/include
+# if installed in a non-standard location,
+# the include directory must be added to the PATH variable
+FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/Variable.h
+  HINTS /usr/
+  HINTS /usr/include/
+  HINTS /usr/local/
+  HINTS /usr/local/include/
+  HINTS /usr/cyclopts/
+  HINTS /usr/local/cyclopts/
 )
+
+set(CYCLOPTS_INCLUDE_DIR ${CYCLOPTS_INCLUDE_DIR}/cyclopts)
+#MESSAGE("\tCYCLOPTS Include Dir: ${CYCLOPTS_INCLUDE_DIR}")
 
 FIND_LIBRARY(CYCLOPTS_LIBRARY
   NAMES cyclopts libcyclopts
-  HINTS ${CYCLOPTS_ROOT_DIR}/lib
+  HINTS ${CYCLOPTS_INCLUDE_DIR}/../../lib
 )
 
 # let us know if we found it
