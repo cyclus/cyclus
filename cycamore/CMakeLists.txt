@@ -108,7 +108,6 @@ SET( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # The gtest include file directories.
 SET(GTEST_INCLUDE_DIRS "${CYCAMORE_INCLUDE_DIR}")
-MESSAGE("gtest include: ${GTEST_INCLUDE_DIRS}")
 
 # Alerts CMake to any tests we need to worry about
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
@@ -138,11 +137,11 @@ ADD_EXECUTABLE( CycamoreUnitTestDriver
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CycamoreUnitTestDriver dl ${CYCAMORE_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
+  dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
 
 # Here we add all the tests
-add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver ${TestSource} 
-  ${INTERFACE_LIBRARIES})
+add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver 
+  ${TestSource}) 
 
 INSTALL(TARGETS CycamoreUnitTestDriver
   RUNTIME DESTINATION cycamore/bin
