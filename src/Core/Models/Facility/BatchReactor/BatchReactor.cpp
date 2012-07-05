@@ -300,7 +300,7 @@ void BatchReactor::interactWithMarket(std::string commod, double amt, TransType 
   // build the transaction and message
   Transaction trans(this, type);
   trans.setCommod(commod);
-  trans.minfrac = 1.0;
+  trans.setMinFrac(1.0);
   trans.setPrice(commod_price);
   trans.setResource(trade_res);
   // log the event

@@ -26,10 +26,13 @@ class Transaction {
     requester depending on the transaction type.
 
     @param creator supplier if type=OFFER, requester if type=REQUEST
-
     @param type indicates the directionality of the transaction w.r.t. the creator
+    @param price The price per unit of the commodity being requested or offered. 
+    @param res a resource to be set as the (cloned) resource in this transaction
+    @param minfrac minimum commodity fraction acceptible for sending/receiving
     */
-    Transaction(Model* creator, TransType type);
+    Transaction(Model* creator, TransType type, double price=0, rsrc_ptr res=NULL, 
+        double minfrac=0);
 
     virtual ~Transaction();
 
@@ -135,12 +138,25 @@ class Transaction {
     void setResource(rsrc_ptr new_resource);
 
     /**
+       @return the minimum fraction (0-1) acceptible by the supplier or 
+       receiver of this transaction
+     */
+    double minfrac() const;
+
+    /**
+       Sets the transaction's minimum fraction to new_minfrac (0-1).
+
+       @param new_minfrac the minimum commodity fraction acceptible
+     */
+    void setMinFrac(double new_minfrac);
+
+  private:
+    /**
       The minimum fraction of the specified commodity that the 
       requester is willing to accept or the offerer is willing to send. 
      */
-    double minfrac;
+    double minfrac_;
 
-  private:
 
     /// The commodity that is being requested or offered in this Message. 
     std::string commod_;

@@ -290,7 +290,7 @@ void EnrichmentFacility::makeRequests(){
     // build the transaction and message
     Transaction trans(this, REQUEST);
     trans.setCommod(in_commod_);
-    trans.minfrac = minAmt/requestAmt;
+    trans.setMinFrac(minAmt/requestAmt);
     trans.setPrice(commod_price);
     trans.setResource(req_res);
 
@@ -326,7 +326,7 @@ void EnrichmentFacility::makeOffers() {
   // build the transaction and message
   Transaction trans(this, OFFER);
   trans.setCommod(out_commod_);
-  trans.minfrac = min_amt/offer_amt;
+  trans.setMinFrac(min_amt/offer_amt);
   trans.setPrice(commod_price);
   trans.setResource(offer_res);
 

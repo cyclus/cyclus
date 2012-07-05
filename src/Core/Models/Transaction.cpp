@@ -15,15 +15,17 @@ table_ptr Transaction::trans_table = new Table("Transactions");
 table_ptr Transaction::trans_resource_table = new Table("TransactedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction::Transaction(Model* creator, TransType type) {
-  minfrac = 0;
-  price_ = 0;
+Transaction::Transaction(Model* creator, TransType type, price=0, res = NULL,
+    minfrac = 0) {
+  minfrac_ = minfrac;
+  type_ = type;
+
+  this->setPrice(price);
+  this->setResource(res);
 
   supplier_ = NULL;
   requester_ = NULL;
-  resource_ = NULL;
 
-  type_ = type;
   if (type == OFFER) {
     supplier_ = creator;
   } else {
