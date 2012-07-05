@@ -30,6 +30,7 @@ GenericResource::GenericResource(const GenericResource& other) {
   units_ = other.units_;
   quality_ = other.quality_;
   quantity_ = other.quantity_;
+  recorded_ = false;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
