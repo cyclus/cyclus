@@ -12,7 +12,7 @@
 mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name) {
   mdl_ctor* new_model;
 
-  string start_path = Env::getBuildPath() + "/lib";
+  string start_path = Env::getInstallPath() + "/lib";
 
   std::string construct_fname = std::string("construct") + model_name;
   std::string destruct_fname = std::string("destruct") + model_name;
