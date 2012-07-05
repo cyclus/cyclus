@@ -16,6 +16,12 @@ ENDIF()
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
+  ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
+  COPYONLY
+  )
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   COPYONLY
   )
