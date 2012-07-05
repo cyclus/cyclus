@@ -19,8 +19,8 @@ FIND_PATH(CYCLUS_CORE_SHARE_DIR cyclus.rng.in
 # Look for the library
 FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cycluscore 
   HINTS /usr/local/cyclus/lib /usr/local/cyclus 
-  "$ENV{CYCLUS_ROOT_DIR}/lib"
-  /opt/local/lib /opt/local/cyclus/lib "$ENV{CYCLUS_ROOT_DIR}/cyclus/lib"
+  "$ENV{CYCLUS_ROOT_DIR}"
+  /opt/local /opt/local/cyclus "$ENV{CYCLUS_ROOT_DIR}/cyclus"
   PATH_SUFFIXES cyclus/lib)
 #MESSAGE("core lib: ${CYCLUS_CORE_LIBRARY}")
 
