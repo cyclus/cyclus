@@ -180,11 +180,11 @@ ADD_EXECUTABLE( CyclusUnitTestDriver
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
+ dl ${LIBS} gtest)
 
 # Here we add all the tests
-add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSource} 
-  ${INTERFACE_LIBRARIES})
+add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 
+  ${TestSource}) 
 
 INSTALL(TARGETS CyclusUnitTestDriver
   RUNTIME DESTINATION cyclus/bin
@@ -194,6 +194,7 @@ INSTALL(TARGETS CyclusUnitTestDriver
 # Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
+  ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
   DESTINATION cyclus/share
   COMPONENT data
   )
