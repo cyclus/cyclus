@@ -20,8 +20,6 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   PARENT_SCOPE)
 
-SET(INTERFACE_LIBRARIES ${CYCLUS_TEST_CORE} PARENT_SCOPE )
-
 # Add all the tests by parsing the source code
 # This macro searches for GoogleTest macros and adds them as tests automatically
 macro(ADD_GOOGLE_TESTS executable)
@@ -48,5 +46,16 @@ macro(ADD_GOOGLE_TESTS executable)
   endforeach()
 endmacro()
 
+INSTALL(FILES GoogleTest/gtest/gtest.h
+  DESTINATION cyclus/include/gtest
+  COMPONENT testing
+  )
 
-
+INSTALL(FILES 
+  TestInst.h
+  TestRegion.h
+  TestFacility.h
+  TestMarket.h
+  DESTINATION cyclus/include
+  COMPONENT testing
+  )

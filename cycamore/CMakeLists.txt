@@ -63,8 +63,7 @@ FIND_PACKAGE( Sqlite3 REQUIRED )
 SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
-# Find Sqlite3
-# KDHFLAG Necessary?
+# Find cycluscore
 FIND_PACKAGE( cycluscore REQUIRED )
 SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
@@ -78,6 +77,9 @@ SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
+
+# include the model directories
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} Testing )
 
 # include all the directories we just found
 INCLUDE_DIRECTORIES( ${CYCAMORE_INCLUDE_DIR} )
@@ -105,10 +107,7 @@ SET( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
 SET( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # The gtest include file directories.
-SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
-
-# The gtest library directories.
-SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/lib")
+SET(GTEST_INCLUDE_DIRS "${CYCAMORE_INCLUDE_DIR}")
 
 # Alerts CMake to any tests we need to worry about
 INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
@@ -124,6 +123,7 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
+  ${CYCAMORE_TEST_CORE}
   )
 
 FIND_PACKAGE(Threads)
@@ -137,24 +137,30 @@ ADD_EXECUTABLE( CycamoreUnitTestDriver
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CycamoreUnitTestDriver dl ${CYCAMORE_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest cycluscore)
+  dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
 
 # Here we add all the tests
-add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver ${TestSource} 
-  ${INTERFACE_LIBRARIES})
+add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver 
+  ${TestSource}) 
 
 INSTALL(TARGETS CycamoreUnitTestDriver
   RUNTIME DESTINATION cycamore/bin
   COMPONENT testing
   )
 
-# Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   DESTINATION ${CYCLUS_CORE_SHARE_DIR}
   COMPONENT data
   )
 
+FILE(GLOB cyclus_shared "${CYCLUS_CORE_SHARE_DIR}/*")
+INSTALL(FILES ${cyclus_shared} 
+  DESTINATION cycamore/share
+  COMPONENT data
+  )
+
+# Here we set some components for installation with cpack
 SET(CPACK_COMPONENTS_ALL cycamore testing libraries data core)
 
 # Here's where we package it with CPack
