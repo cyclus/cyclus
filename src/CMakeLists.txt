@@ -81,6 +81,8 @@ SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 FIND_PACKAGE( CYCLOPTS REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLOPTS_INCLUDE_DIR})
 set(LIBS ${LIBS} ${CYCLOPTS_LIBRARY})
+#MESSAGE("cyclopts include: ${CYCLOPTS_INCLUDE_DIR}")
+#MESSAGE("cyclopts lib: ${CYCLOPTS_LIBRARY}")
 
 # find coin and link to it
 FIND_PACKAGE( COIN REQUIRED )
@@ -104,6 +106,8 @@ IF (DOXYGEN_FOUND)
 ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
+
+#MESSAGE("libs: ${LIBS}")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 SET( CYCLUS_SRC
