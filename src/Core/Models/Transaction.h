@@ -27,11 +27,11 @@ class Transaction {
 
     @param creator supplier if type=OFFER, requester if type=REQUEST
     @param type indicates the directionality of the transaction w.r.t. the creator
-    @param price The price per unit of the commodity being requested or offered. 
     @param res a resource to be set as the (cloned) resource in this transaction
+    @param price The price per unit of the commodity being requested or offered. 
     @param minfrac minimum commodity fraction acceptible for sending/receiving
     */
-    Transaction(Model* creator, TransType type, double price=0, rsrc_ptr res=NULL, 
+    Transaction(Model* creator, TransType type, rsrc_ptr res=NULL,  double price=0, 
         double minfrac=0);
 
     virtual ~Transaction();
