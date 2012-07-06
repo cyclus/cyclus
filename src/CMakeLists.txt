@@ -107,7 +107,7 @@ ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
-MESSAGE("libs: ${LIBS}")
+#MESSAGE("libs: ${LIBS}")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 SET( CYCLUS_SRC
