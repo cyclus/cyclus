@@ -276,13 +276,13 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     TestCommunicator* comm1;
     TestCommunicator* comm2;
     msg_ptr msg1;
+    Model* foo;
 
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
       resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
-      Model* foo;
       Transaction* trans = new Transaction(foo, OFFER);
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
@@ -298,8 +298,22 @@ class MessagePublicInterfaceTest : public ::testing::Test {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - -Constructors and Cloning - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorOne) {
-  
+TEST_F(MessagePublicInterfaceTest, FullConstructor) {
+  double price = 1.2;
+  double minfrac = 0.2;
+  Transaction* trans;
+  Transaction* trans_no_min;
+  Transaction* trans_no_price;
+  Transaction* trans_no_res;
+  EXPECT_NO_THROW(trans = new Transaction(foo, OFFER, resource, price, minfrac)); 
+  ASSERT_EQ(trans->price(), price);
+  ASSERT_EQ(trans->minfrac(), minfrac);
+  ASSERT_EQ(trans->isOffer(), true);
+  EXPECT_NO_THROW(Transaction* trans_no_min = new Transaction(foo, REQUEST, resource, price)); 
+  ASSERT_EQ(trans_no_min->minfrac(), 0);
+  ASSERT_EQ(trans->isOffer(), false);
+  EXPECT_NO_THROW(Transaction* trans_no_price = new Transaction(foo, REQUEST, resource)); 
+  ASSERT_EQ(trans_no_price->price(), 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -332,6 +346,7 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
   EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
   EXPECT_DOUBLE_EQ(resource2->quantity(), quantity2);
 }
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - - Getters and Setters - - - - - - - - - - - - - - - - - -

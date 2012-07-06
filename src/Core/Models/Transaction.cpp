@@ -159,6 +159,16 @@ void Transaction::setResource(rsrc_ptr new_resource) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Transaction::minfrac() const {
+  return minfrac_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Transaction::setMinFrac(double minfrac) {
+  minfrac_=minfrac;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////// Output db recording code ///////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
