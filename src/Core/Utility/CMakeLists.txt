@@ -34,6 +34,7 @@ CONFIGURE_FILE(
 # Add any new cyclus core source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManager.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
@@ -50,6 +51,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 INSTALL(FILES 
   BookKeeper.h
+  BuildingManager.h
   CycException.h
   Database.h
   DecayHandler.h
