@@ -4,23 +4,20 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
-set ( CYCLUS_TEST_CORE 
-  # -- do not change this order
-  ${CMAKE_CURRENT_SOURCE_DIR}/TableTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
-  # --
-  ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandlerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
+set ( CYCAMORE_TEST_CORE 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModelTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/InstModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/MarketModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ModelTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubModelTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/StubCommModelTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   PARENT_SCOPE)
 
-SET(INTERFACE_LIBRARIES ${CYCLUS_TEST_CORE} PARENT_SCOPE )
+SET(INTERFACE_LIBRARIES ${CYCAMORE_TEST_CORE} PARENT_SCOPE )
 
 # Add all the tests by parsing the source code
 # This macro searches for GoogleTest macros and adds them as tests automatically

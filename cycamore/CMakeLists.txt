@@ -1,25 +1,28 @@
-# This project name is cyclus.
-PROJECT( CYCLUS )
+# This project name is cycamore
+PROJECT(cycamore)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Direct any out-of-source builds to this directory
-SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
+SET( CYCAMORE_SOURCE_DIR ${CMAKE_SOURCE_DIR} )
+
+# Direct any binary installation paths to this directory
+SET( CYCAMORE_BINARY_DIR ${CMAKE_BINARY_DIR} )
 
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
 # Setup build locations.
 IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/bin)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCAMORE_BINARY_DIR}/bin)
 endif()
 IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCAMORE_BINARY_DIR}/lib)
 endif()
 IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+  SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCAMORE_BINARY_DIR}/lib)
 ENDIF()
 
-SET(CYCLUS_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+SET(CYCAMORE_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -28,73 +31,59 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cycamore/lib")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/cyclus/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/cycamore/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cycamore/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Tell CMake where the modules are
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCAMORE_SOURCE_DIR}/CMake )
 
 # Include macros
-INCLUDE(CyclusModuleMacros)
-
-# Include the core header files in the app build manually.
-# Since we build the core library in the same project, this is safer.
-SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}/Core/Utility
-  ${CYCLUS_SRC_DIR}/Core/Config
-  ${CYCLUS_SRC_DIR}/Core/Input
-  ${CYCLUS_SRC_DIR}/Core/Resources
-  ${CYCLUS_SRC_DIR}/Core/Models
-  )
+INCLUDE(CycamoreModuleMacros)
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
+# KDHFLAG Necessary?
 FIND_PACKAGE( LibXml2 REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
 SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
 # Find Sqlite3
+# KDHFLAG Necessary?
 FIND_PACKAGE( Sqlite3 REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
+# Find Sqlite3
+# KDHFLAG Necessary?
+FIND_PACKAGE( cycluscore REQUIRED )
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${CYCLUS_CORE_INCLUDE_DIR})
+SET(LIBS ${LIBS} ${CYCLUS_CORE_LIBRARIES})
+
 # Include the boost header files and the program_options library
+# KDHFLAG Necessary?
 SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
+SET(CYCAMORE_INCLUDE_DIR ${CYCAMORE_INCLUDE_DIR} ${BOOST_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 
-# find cyclopts and link to it
-FIND_PACKAGE( CYCLOPTS REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLOPTS_INCLUDE_DIR})
-set(LIBS ${LIBS} ${CYCLOPTS_LIBRARY})
-
-# find coin and link to it
-FIND_PACKAGE( COIN REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${COIN_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${COIN_LIBRARIES})
-
 # include all the directories we just found
-INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
-
-# add the core library 
-ADD_SUBDIRECTORY(Core)
+INCLUDE_DIRECTORIES( ${CYCAMORE_INCLUDE_DIR} )
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
+SET( DOC_INPUT_DIR ${CYCAMORE_SOURCE_DIR}/doc)
 
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
 FIND_PACKAGE(Doxygen)
@@ -105,16 +94,8 @@ ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
-# Build the cyclus executable from the CYCLUS_SRC source files
-SET( CYCLUS_SRC
-  App.cpp
-  )
-ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
-INSTALL(TARGETS cyclus
-  RUNTIME DESTINATION cyclus/bin
-  COMPONENT cyclus
-  )
+# ------------------------- Add the Models -----------------------------------
+ADD_SUBDIRECTORY(Models)
 
 # ------------------------- Google Test -----------------------------------
 
@@ -143,8 +124,6 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
-  ${CYCLUS_CORE_SRC}
-  ${CYCLUS_TEST_CORE}
   )
 
 FIND_PACKAGE(Threads)
@@ -152,72 +131,50 @@ IF(CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
   SET(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
 ENDIF()
 
-# Build libgtest
-SET( GTest
-  Testing/GoogleTest/gtest/gtest-all.cc
-)
-INCLUDE_DIRECTORIES( Testing )
-
-ADD_LIBRARY(gtest ${GTest})
-
-IF (CMAKE_USE_PTHREADS_INIT)
-  TARGET_LINK_LIBRARIES(gtest ${CMAKE_THREAD_LIBS_INIT})
-ENDIF()
-
-SET_TARGET_PROPERTIES(gtest
-  PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/cyclus/lib"
-  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib"
-)
-
-INSTALL(TARGETS gtest
-  LIBRARY DESTINATION cyclus/lib
-  COMPONENT testing
-  )
-
-# Build CyclusUnitTestDriver
-ADD_EXECUTABLE( CyclusUnitTestDriver
-  Testing/CyclusUnitTestDriver.cpp ${TestSource}
+# Build CycamoreUnitTestDriver
+ADD_EXECUTABLE( CycamoreUnitTestDriver
+  Testing/CycamoreUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
-  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest)
+TARGET_LINK_LIBRARIES( CycamoreUnitTestDriver dl ${CYCAMORE_LIBRARIES} 
+  ${INTERFACE_LIBRARIES} dl ${LIBS} gtest cycluscore)
 
 # Here we add all the tests
-add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver ${TestSource} 
+add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CycamoreUnitTestDriver ${TestSource} 
   ${INTERFACE_LIBRARIES})
 
-INSTALL(TARGETS CyclusUnitTestDriver
-  RUNTIME DESTINATION cyclus/bin
+INSTALL(TARGETS CycamoreUnitTestDriver
+  RUNTIME DESTINATION cycamore/bin
   COMPONENT testing
   )
 
 # Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
-  ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
-  DESTINATION cyclus/share
+  DESTINATION ${CYCLUS_CORE_SHARE_DIR}
   COMPONENT data
   )
 
-SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
+SET(CPACK_COMPONENTS_ALL cycamore testing libraries data core)
 
 # Here's where we package it with CPack
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cycamore : The Cyclus Additional Module Repository.")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
 SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Core/Config/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Core/Config/LICENSE.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/README.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/LICENSE.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cycamore${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
  
-CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Core/Config/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake")
-SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
+CONFIGURE_FILE("${CYCAMORE_SOURCE_DIR}/CMake/CycamoreCPackOptions.cmake.in"
+  "${CYCAMORE_BINARY_DIR}/CMake/CycamoreCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCAMORE_BINARY_DIR}/CMake/CycamoreCPackOptions.cmake")
+SET(CPACK_PACKAGE_EXECUTABLES "cycamore" "CycamoreUnitTestDriver")
 
 
 INCLUDE(CPack)
- 
+
+
