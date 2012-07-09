@@ -17,9 +17,9 @@ class Function {
  public:
   /// virtual destructor for an abstract base class
   virtual ~Function() {}; 
-  /// base class must define how to calculate demand
+  /// base class must define how to calculate demand (int argument)
   virtual double value(int x) = 0; 
-  /// base class must define how to calculate demand
+  /// base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0; 
   /// overload function operator
   double operator()(int x) {return value(x);}
@@ -33,16 +33,25 @@ class Function {
  */
 class LinearFunction : public Function {
  public:
-  /// constructor
+  /**
+     constructor for a linear function
+     @param s the slope
+     @param i the intercept
+   */
  LinearFunction(double s, double i) : 
   slope_(s), intercept_(i) {};
   
-  /// evaluations
-  virtual double value(int x) { return slope_ * x + intercept_; }
-  virtual double value(double x) { return slope_ * x + intercept_; }
+  /// evaluation for an integer argument
+  virtual double value(int x);
+  
+  /// evaluation for an double argument
+  virtual double value(double x);
 
  private:
+  /// the slope
   double slope_;
+
+  /// the intercept
   double intercept_;
 };
 
@@ -52,17 +61,29 @@ class LinearFunction : public Function {
  */
 class ExponentialFunction : public Function {
  public:
-  /// constructor
+  /**
+     constructor for an exponential function
+     @param c the leading constant
+     @param e the exponent multiplier
+     @param i the intercept
+   */
  ExponentialFunction(double c, double e, double i) : 
   constant_(c), exponent_(e), intercept_(i) {};
 
-  /// evaluations
-  virtual double value(int x) { return constant_ * exp(exponent_ * x) + intercept_; }
-  virtual double value(double x) { return constant_ * exp(exponent_ * x) + intercept_; }
+  /// evaluation for an integer argument
+  virtual double value(int x);
+
+  /// evaluation for a double argument
+  virtual double value(double x);
 
  private:
+  /// the constant factor
   double constant_;
+
+  /// the exponent multiplier
   double exponent_;
+
+  /// the intercept
   double intercept_;
 };
 
