@@ -2,14 +2,14 @@
 #define SYMBOLICFUNCTIONS_H
 
 #include <string>
-
+#include <map>
 #include <boost/shared_ptr.hpp>
 
 /// a smart pointer to the abstract class so we can pass it around
 class Function;
 typedef boost::shared_ptr<Function> FunctionPtr;
 
-/// abstract base class
+/// abstract base class for symbolic functions
 class Function {
  public:
   /// virtual destructor for an abstract base class
@@ -111,7 +111,7 @@ class LinFunctionFactory : public SymbFunctionFactory {
      slope, intercept
      @return the linear function
    */
-  FunctionPtr getFunctionPtr(std::string params);
+  virtual FunctionPtr getFunctionPtr(std::string params);
 };
 
 /**
@@ -125,7 +125,36 @@ class ExpFunctionFactory : public SymbFunctionFactory {
      order: constant, exponent, intercept
      @return the exponential function
    */
-  FunctionPtr getFunctionPtr(std::string params);
+  virtual FunctionPtr getFunctionPtr(std::string params);
 };
+
+/**
+   a concrete factory that can provide access to  basic symbolic 
+   functions
+ */
+class BasicFunctionFactory {
+ public:
+  /// the type of functions this factory can provide
+  enum FunctionType {LIN,EXP};
+  
+  /**
+     constructor sets up the enum names map
+   */
+  BasicFunctionFactory();
+
+  /**
+     return a function pointer to a registered function type
+     @param type the function type
+     @param params the function parameters
+     @return the function
+   */
+  FunctionPtr getFunctionPtr(std::string type, std::string params);
+    
+ private:
+  /// a map between enums and names
+  static std::map<std::string,BasicFunctionFactory::FunctionType> 
+    enum_names_;
+};
+
 
 #endif

@@ -1,5 +1,8 @@
 #include "SymbolicFunctions.h"
 
+#include "CycException.h"
+
+#include <map>
 #include <string>
 #include <sstream>
 #include <math.h>
@@ -41,4 +44,42 @@ FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params) {
   ss >> constant >> exponent >> intercept;
   return FunctionPtr(new ExponentialFunction(constant,exponent,
                                              intercept));
+}
+
+// -------------------------------------------------------------------
+std::map<std::string,BasicFunctionFactory::FunctionType> 
+BasicFunctionFactory::enum_names_ = 
+  map<string,BasicFunctionFactory::FunctionType>();
+
+// -------------------------------------------------------------------
+BasicFunctionFactory::BasicFunctionFactory() {
+  if (enum_names_.empty()) {
+    enum_names_["lin"]=LIN;
+    enum_names_["exp"]=EXP;
+  }
+} 
+
+// -------------------------------------------------------------------
+FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type, 
+                                                 std::string params) {
+  switch(enum_names_[type]) {
+  case LIN:
+    {
+    LinFunctionFactory lff;
+    return lff.getFunctionPtr(params);
+    }
+    break;
+  case EXP:
+    {
+    ExpFunctionFactory eff;
+    return eff.getFunctionPtr(params);
+    }
+    break;
+  default:
+    stringstream err("");
+    err << type << " is not a registered function type" 
+        << " of the basic function factory.";
+    throw CycException(err.str());
+    break;
+  }
 }
