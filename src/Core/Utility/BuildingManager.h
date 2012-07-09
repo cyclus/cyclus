@@ -1,6 +1,7 @@
 #ifndef BUILDINGMANAGER_H
 #define BUILDINGMANAGER_H
 
+#include "SupplyDemand.h"
 #include "SupplyDemandManager.h"
 
 #include <vector>
@@ -18,8 +19,8 @@ struct BuildOrder {
    about which objects to build given certain conditions.
 
    Specifically, the BuildingManager queries the SupplyDemandManager 
-   to determine if there exists unmet demand for a Product, and then
-   decides which object(s) amongst that Product's producers should be 
+   to determine if there exists unmet demand for a Commodity, and then
+   decides which object(s) amongst that Commodity's producers should be 
    built to meet that demand. This decision takes the form of an
    integer program:
 
@@ -30,7 +31,7 @@ struct BuildOrder {
    Where n_i is the number of objects of type i to build, c_i is the 
    cost to build the object of type i, \phi_i is the nameplate 
    capacity of the object, and \Phi is the capacity demand. Here the 
-   set I corresponds to all producers of a given product.
+   set I corresponds to all producers of a given commodity.
  */
 class BuildingManager {
  public:
@@ -42,14 +43,14 @@ class BuildingManager {
   BuildingManager(SupplyDemandManager& m);
 
   /**
-     given a certain product and demand, this calls the private 
+     given a certain commodity and demand, this calls the private 
      makeBuildDecision() and returns the number of each producer to 
      build
-     @param product the product being demanded
+     @param commodity the commodity being demanded
      @param demand the additional capacity required
      @return the vector of build orders as decided
    */
-  std::vector<BuildOrder> makeBuildDecision(const Product& product, 
+  std::vector<BuildOrder> makeBuildDecision(const Commodity& commodity, 
                                             double unmet_demand);
   
  private:
@@ -62,11 +63,11 @@ class BuildingManager {
   /**
      a decision is made as to how many producers of each available 
      type to build this function constructs an integer program through
-     the CyclusSolverInterface and populates orders_ with the solution
-     @param p the product being demanded
+     the SolverInterface and populates orders_ with the solution
+     @param c the commodity being demanded
      @param unmet_demand the capacity required to be built
    */
-  void doMakeBuildDecision(const Product& p, double unmet_demand);
+  void doMakeBuildDecision(const Commodity& c, double unmet_demand);
 };
 
 #endif

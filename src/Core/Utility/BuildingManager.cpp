@@ -4,13 +4,15 @@
 #include <vector>
 #include <boost/any.hpp>
 
-#include "CyclusSolverTools.h"
-#include "CyclusSolver.h"
-#include "CyclusSolverInterface.h"
+#include "SupplyDemandManager.h"
+#include "SolverTools.h"
+#include "Solver.h"
+#include "SolverInterface.h"
+#include "CBCSolver.h"
 
 using namespace std;
 using boost::any_cast;
-using namespace CyclusOptimization;
+using namespace Cyclopts;
 
 // -------------------------------------------------------------------
 BuildingManager::BuildingManager(SupplyDemandManager& m) : 
@@ -19,7 +21,7 @@ BuildingManager::BuildingManager(SupplyDemandManager& m) :
 
 // -------------------------------------------------------------------
 vector<BuildOrder> 
-BuildingManager::makeBuildDecision(const Product& p, 
+BuildingManager::makeBuildDecision(const Commodity& p, 
                                    double unmet_demand) {
   orders_ = vector<BuildOrder>();
   if (unmet_demand > 0) {
@@ -29,12 +31,12 @@ BuildingManager::makeBuildDecision(const Product& p,
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::doMakeBuildDecision(const Product& product, 
+void BuildingManager::doMakeBuildDecision(const Commodity& commodity, 
                                           double unmet_demand) {
 
   // set up solver and interface
   SolverPtr solver(new CBCSolver());
-  CyclusSolverInterface csi(solver);
+  SolverInterface csi(solver);
 
   // set up objective function
   ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
@@ -45,10 +47,10 @@ void BuildingManager::doMakeBuildDecision(const Product& product,
   csi.registerConstraint(c);
 
   // set up variables, constraints, and objective function
-  int n = manager_.nProducers(product);
+  int n = manager_.nProducers(commodity);
   vector<VariablePtr> soln;
   for (int i = 0; i < n; i++) {
-    Producer* p = manager_.producer(product,i);
+    Producer* p = manager_.producer(commodity,i);
     // set up var`iables
     VariablePtr x(new IntegerVariable(0,Variable::INF));
     x->setName(p->name());
@@ -67,7 +69,8 @@ void BuildingManager::doMakeBuildDecision(const Product& product,
   for (int i = 0; i < n; i++) {
     int number = any_cast<int>(soln.at(i)->value());
     if (number > 0) {
-      orders_.push_back(BuildOrder(number,manager_.producer(product,i)));
+      orders_.push_back(BuildOrder(number,
+                                   manager_.producer(commodity,i)));
     }
   }
 }
