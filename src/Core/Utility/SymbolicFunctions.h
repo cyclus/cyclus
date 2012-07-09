@@ -18,10 +18,10 @@ class Function {
   virtual double value(int x) = 0; 
   /// base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0; 
-  /// overload function operator
-  double operator()(int x) {return value(x);}
-  /// overload function operator
-  double operator()(double x) {return value(x);}
+  /* /// overload function operator */
+  /* double operator()(int x) {return value(x);} */
+  /* /// overload function operator */
+  /* double operator()(double x) {return value(x);} */
 };
 
 /**
