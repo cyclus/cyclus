@@ -308,11 +308,11 @@ TEST_F(MessagePublicInterfaceTest, FullConstructor) {
   ASSERT_FLOAT_EQ(price, trans->price());
   ASSERT_FLOAT_EQ(minfrac, trans->minfrac());
   ASSERT_EQ(true, trans->isOffer());
-  EXPECT_NO_THROW(Transaction* trans_no_min = new Transaction(foo, REQUEST, resource, price)); 
+  EXPECT_NO_THROW(trans_no_min = new Transaction(foo, REQUEST, resource, price)); 
   ASSERT_FLOAT_EQ(price, trans_no_min->price());
   ASSERT_FLOAT_EQ(0.0, trans_no_min->minfrac());
-  ASSERT_EQ(false, trans->isOffer());
-  EXPECT_NO_THROW(Transaction* trans_no_price = new Transaction(foo, REQUEST, resource)); 
+  ASSERT_EQ(false, trans_no_min->isOffer());
+  EXPECT_NO_THROW(trans_no_price = new Transaction(foo, REQUEST, resource)); 
   ASSERT_FLOAT_EQ(0,trans_no_price->price());
 }
 
