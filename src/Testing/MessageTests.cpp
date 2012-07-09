@@ -283,7 +283,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
       quantity2 = 2.0;
       resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
 
-      Transaction* trans = new Transaction(foo, OFFER);
+      Transaction* trans = new Transaction(foo, OFFER, NULL);
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
       msg1 = msg_ptr(new Message(comm1, comm2, *trans));
@@ -304,16 +304,16 @@ TEST_F(MessagePublicInterfaceTest, FullConstructor) {
   Transaction* trans;
   Transaction* trans_no_min;
   Transaction* trans_no_price;
-  Transaction* trans_no_res;
   EXPECT_NO_THROW(trans = new Transaction(foo, OFFER, resource, price, minfrac)); 
-  ASSERT_EQ(trans->price(), price);
-  ASSERT_EQ(trans->minfrac(), minfrac);
-  ASSERT_EQ(trans->isOffer(), true);
+  ASSERT_FLOAT_EQ(price, trans->price());
+  ASSERT_FLOAT_EQ(minfrac, trans->minfrac());
+  ASSERT_EQ(true, trans->isOffer());
   EXPECT_NO_THROW(Transaction* trans_no_min = new Transaction(foo, REQUEST, resource, price)); 
-  ASSERT_EQ(trans_no_min->minfrac(), 0);
-  ASSERT_EQ(trans->isOffer(), false);
+  ASSERT_FLOAT_EQ(price, trans_no_min->price());
+  ASSERT_FLOAT_EQ(0.0, trans_no_min->minfrac());
+  ASSERT_EQ(false, trans->isOffer());
   EXPECT_NO_THROW(Transaction* trans_no_price = new Transaction(foo, REQUEST, resource)); 
-  ASSERT_EQ(trans_no_price->price(), 0);
+  ASSERT_FLOAT_EQ(0,trans_no_price->price());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

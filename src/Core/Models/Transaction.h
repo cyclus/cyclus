@@ -31,8 +31,8 @@ class Transaction {
     @param price The price per unit of the commodity being requested or offered. 
     @param minfrac minimum commodity fraction acceptible for sending/receiving
     */
-    Transaction(Model* creator, TransType type, rsrc_ptr res=NULL,  double price=0, 
-        double minfrac=0);
+    Transaction(Model* creator, TransType type, rsrc_ptr res,  double price=0.0, 
+        double minfrac=0.0);
 
     virtual ~Transaction();
 
@@ -156,7 +156,6 @@ class Transaction {
       requester is willing to accept or the offerer is willing to send. 
      */
     double minfrac_;
-
 
     /// The commodity that is being requested or offered in this Message. 
     std::string commod_;
