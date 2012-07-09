@@ -1,10 +1,7 @@
 #ifndef SYMBOLICFUNCTIONS_H
 #define SYMBOLICFUNCTIONS_H
 
-#include <fstream>
 #include <string>
-#include <sstream>
-#include <math.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -107,22 +104,26 @@ class SymbFunctionFactory {
    a concrete factory for linear functions
  */
 class LinFunctionFactory : public SymbFunctionFactory {
+ public:
   /**
      return a function pointer to a linear function
-     @param params the parameters for the linear function
+     @param params the parameters for the linear function in order:
+     slope, intercept
      @return the linear function
    */
   FunctionPtr getFunctionPtr(std::string params);
 };
 
 /**
-   a concrete factory for linear functions
+   a concrete factory for exponential functions
  */
 class ExpFunctionFactory : public SymbFunctionFactory {
+ public:
   /**
-     return a function pointer to a linear function
-     @param params the parameters for the linear function
-     @return the linear function
+     return a function pointer to a exponential function
+     @param params the parameters for the exponential function in
+     order: constant, exponent, intercept
+     @return the exponential function
    */
   FunctionPtr getFunctionPtr(std::string params);
 };
