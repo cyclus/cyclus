@@ -15,15 +15,14 @@ table_ptr Transaction::trans_table = new Table("Transactions");
 table_ptr Transaction::trans_resource_table = new Table("TransactedResources"); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction::Transaction(Model* creator, TransType type) {
-  minfrac = 0;
-  price_ = 0;
+Transaction::Transaction(Model* creator, TransType type, rsrc_ptr res, 
+    const double price, const double minfrac) : price_(price), minfrac_(minfrac) { 
+  type_ = type;
 
+  this->setResource(res);
   supplier_ = NULL;
   requester_ = NULL;
-  resource_ = NULL;
 
-  type_ = type;
   if (type == OFFER) {
     supplier_ = creator;
   } else {
@@ -155,6 +154,16 @@ void Transaction::setResource(rsrc_ptr new_resource) {
   if (new_resource.get()) {
     resource_ = new_resource->clone();
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Transaction::minfrac() const {
+  return minfrac_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Transaction::setMinFrac(double new_minfrac) {
+  minfrac_ = new_minfrac;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

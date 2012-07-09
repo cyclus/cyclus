@@ -165,7 +165,7 @@ void ConditioningFacility::receiveMessage(msg_ptr msg) {
 vector<rsrc_ptr> ConditioningFacility::removeResource(Transaction order) {
   vector<rsrc_ptr> toRet = vector<rsrc_ptr>() ;
   Transaction trans = order;
-  double order_amount = trans.resource()->quantity()*trans.minfrac;
+  double order_amount = trans.resource()->quantity()*trans.minfrac();
   if (remaining_capacity_ >= order_amount){
     toRet = processOrder(order);
   } else { 
@@ -392,7 +392,7 @@ void ConditioningFacility::makeRequests(){
       // build the transaction and message
       Transaction trans(this, REQUEST);
       trans.setCommod(in_commod);
-      trans.minfrac = minAmt/requestAmt;
+      trans.setMinFrac(minAmt/requestAmt);
       trans.setPrice(commod_price);
       trans.setResource(request_res);
 
@@ -436,7 +436,7 @@ void ConditioningFacility::makeOffers(){
     // build the transaction and message
     Transaction trans(this, OFFER);
     trans.setCommod(outcommod);
-    trans.minfrac = 1;
+    trans.setMinFrac(1);
     trans.setPrice(commod_price);
     trans.setResource(offer_mat);
 

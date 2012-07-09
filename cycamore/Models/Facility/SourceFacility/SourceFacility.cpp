@@ -144,7 +144,7 @@ Transaction SourceFacility::buildTransaction() {
 
   Transaction trans(this, OFFER);
   trans.setCommod(out_commod_);
-  trans.minfrac = min_amt/offer_amt;
+  trans.setMinFrac(min_amt/offer_amt);
   trans.setPrice(commod_price_);
   trans.setResource(offer_res);
 

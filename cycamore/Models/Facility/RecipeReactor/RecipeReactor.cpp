@@ -339,7 +339,7 @@ void RecipeReactor::makeRequests(){
   // build the transaction and message
   Transaction trans(this, REQUEST);
   trans.setCommod(in_commod);
-  trans.minfrac = minAmt/requestAmt;
+  trans.setMinFrac( minAmt/requestAmt );
   trans.setPrice(commod_price);
   trans.setResource(request_res);
 
@@ -391,7 +391,7 @@ void RecipeReactor::makeOffers(){
     // build the transaction and message
     Transaction trans(this, OFFER);
     trans.setCommod(commod);
-    trans.minfrac = min_amt/offer_amt;
+    trans.setMinFrac(min_amt/offer_amt);
     trans.setPrice(commod_price);
     trans.setResource(offer_mat);
 
