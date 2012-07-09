@@ -104,7 +104,7 @@ void SinkFacility::handleTick(int time){
       // build the transaction and message
       Transaction trans(this, REQUEST);
       trans.setCommod(*commod);
-      trans.minfrac = minAmt/requestAmt;
+      trans.setMinFrac(minAmt/requestAmt);
       trans.setPrice(commod_price_);
       trans.setResource(request_res);
 

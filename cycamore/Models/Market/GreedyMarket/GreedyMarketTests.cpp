@@ -102,12 +102,12 @@ class GreedyMarketTest : public ::testing::Test {
 
       Transaction req(requester, REQUEST);
       req.setCommod("none");
-      req.minfrac = 0.1;
+      req.setMinFrac(0.1);
       req.setPrice(3);
 
       Transaction off(supplier, OFFER);
       off.setCommod("none");
-      off.minfrac = 0.1;
+      off.setMinFrac(0.1);
       off.setPrice(3);
 
       request = msg_ptr(new Message(requester, recipient, req)); 
