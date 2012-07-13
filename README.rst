@@ -197,7 +197,8 @@ Workflow Notes
 
      - Look over the code. 
 
-        - Check that it meets :doc:`our style guidelines <devdoc/style>`.
+        - Check that it meets our style guidelines (
+          http://cyclus.github.com/devdoc/style_guide.html).
 
         - Make inline review comments concerning improvements. 
       
@@ -328,7 +329,7 @@ review and accept it.
 Sometimes, your pull request will be closed by the reviewer until further 
 changes are made to appease the reviewer's concerns. This may be frustrating, 
 but please act rationally, discuss the issues on the github space made for your 
-pull request, consult the :doc:`style guide <devdoc/style_guide>`, email the 
+pull request, consult the http://cyclus.github.com/devdoc/style_guide.html, email the 
 developer listhost for further advice, and make changes to your topic branch 
 accordingly. The pull request will be updated with those changes when you push them 
 to your fork.  When you think your request is ready for another review, you can 
