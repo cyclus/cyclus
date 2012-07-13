@@ -52,6 +52,18 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   )
 
 INSTALL(FILES 
+  ModelTests.cpp
+  ModelTests.h
+  FacilityModelTests.cpp
+  FacilityModelTests.h
+  InstModelTests.cpp
+  InstModelTests.h
+  RegionModelTests.cpp
+  RegionModelTests.h
+  ConverterModelTests.cpp
+  ConverterModelTests.h
+  MarketModelTests.cpp
+  MarketModelTests.h
   TestInst.h
   TestRegion.h
   TestFacility.h
