@@ -64,6 +64,10 @@ INSTALL(FILES
   ConverterModelTests.h
   MarketModelTests.cpp
   MarketModelTests.h
+  StubModelTests.cpp
+  StubModelTests.h
+  StubCommModelTests.cpp
+  StubCommTests.h
   TestInst.h
   TestRegion.h
   TestFacility.h
