@@ -213,8 +213,8 @@ Workflow Notes
           local changes to the pulled branch, or you just want to do it from the 
           command line, make sure your merge is a non-fast-forward merge. For example::
           
-        git checkout develop
-        git merge --no-ff remote_name/branch_name -m "A message""
+            git checkout develop
+            git merge --no-ff remote_name/branch_name -m "A message""
 
 
 ~~~~~~~~~~~~~~~~~~~
