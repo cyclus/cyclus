@@ -166,15 +166,15 @@ Workflow Notes
 
       - To check that your branch passes the tests, you must build and install your topic 
         branch and then run the CyclusUnitTestDriver (at the moment, ```make 
-        test``` is insufficient) ::
+        test``` is insufficient). For example ::
       
-        mkdir build
-        mkdir install
-        cd build
-        cmake ../src -DCMAKE_INSTALL_PREFIX=../install
-        make
-        make install
-        ../install/cyclus/bin/CyclusUnitTestDriver
+          mkdir build
+          mkdir install
+          cd build
+          cmake ../src -DCMAKE_INSTALL_PREFIX=../install
+          make
+          make install
+          ../install/cyclus/bin/CyclusUnitTestDriver
 
   * **Making a Pull Request** 
     
