@@ -182,8 +182,7 @@ Workflow Notes
         "develop" branch, it must be reviewed and accepted by another 
         developer. 
 
-      - You may want to review this tutorial 
-        https://help.github.com/articles/using-pull-requests/ 
+      - You may want to review this `tutorial <https://help.github.com/articles/using-pull-requests/>`_ 
         before you make a pull request to the develop branch.
         
   * **Reviewing a Pull Request** 
@@ -197,8 +196,7 @@ Workflow Notes
 
      - Look over the code. 
 
-        - Check that it meets our style guidelines (
-          http://cyclus.github.com/devdoc/style_guide.html).
+        - Check that it meets `our style guidelines <http://cyclus.github.com/devdoc/style_guide.html>`_.
 
         - Make inline review comments concerning improvements. 
       
@@ -329,8 +327,8 @@ review and accept it.
 Sometimes, your pull request will be closed by the reviewer until further 
 changes are made to appease the reviewer's concerns. This may be frustrating, 
 but please act rationally, discuss the issues on the github space made for your 
-pull request, consult the http://cyclus.github.com/devdoc/style_guide.html, email the 
-developer listhost for further advice, and make changes to your topic branch 
+pull request, consult the `style guide <http://cyclus.github.com/devdoc/style_guide.html>`_, 
+email the developer listhost for further advice, and make changes to your topic branch 
 accordingly. The pull request will be updated with those changes when you push them 
 to your fork.  When you think your request is ready for another review, you can 
 reopen the review yourself with the button made available to you. 
