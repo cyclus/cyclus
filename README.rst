@@ -113,8 +113,8 @@ The Developer Workflow
 
 *Note that "blessed" repository refers to the primary `cyclus/core` repository.*
 
-As you do your development, push primarily only to your own fork. Push to
-the blessed repository (usually the "develop" branch) only after:
+As you do your development, push primarily only to your own fork. Make a pull 
+request to the blessed repository (usually the "develop" branch) only after:
 
   * You have pulled the latest changes from the blessed repository.
   * You have completed a logical set of changes.
