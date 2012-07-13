@@ -62,6 +62,8 @@ Package                Minimum Version
 `boost`                1.34.1
 `libxml2`              2                 
 `sqlite3`              3.7.10            
+`Cyclopts`             0.1            
+`coin-Cbc`             2.7            
 ====================   ==================
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,22 +162,59 @@ Workflow Notes
       git checkout [your topic branch]
       git rebase develop
 
-  * In general, **every commit** (notice this is not 'every push') to the
-    "develop" and "master" branches should compile and pass tests. This
-    means that when you are ready to move changes from one of your topic
-    branches into the "develop" branch, you should use a NON-fast-forward
-    merge.  For example::
-    
-      git checkout develop
-      git merge --no-ff [your topic branch]
-    
-    Possible exceptions to this 'no fast-forward' merge
-    include:
+  * **Passing Tests**
 
-     - your topic branch consists of only one (compileable and passes
-       tests) commit.
+      - To check that your branch passes the tests, you must build and install your topic 
+        branch and then run the CyclusUnitTestDriver (at the moment, ```make 
+        test``` is insufficient) ::
+      
+        mkdir build
+        mkdir install
+        cd build
+        cmake ../src -DCMAKE_INSTALL_PREFIX=../install
+        make
+        make install
+        ../install/cyclus/bin/CyclusUnitTestDriver
 
-     - every commit in your topic branch is compileable and passes tests.
+  * **Making a Pull Request** 
+    
+      - When you are ready to move changes from one of your topic branches into the 
+        "develop" branch, it must be reviewed and accepted by another 
+        developer. 
+
+      - You may want to review this tutorial 
+        https://help.github.com/articles/using-pull-requests/ 
+        before you make a pull request to the develop branch.
+        
+  * **Reviewing a Pull Request** 
+
+     - Build, install, and test it. If you have added the remmote repository as 
+       a remote you can check it out and merge it with the current develop 
+       branch thusly, ::
+       
+         git checkout -b remote_name/branch_name
+         git merge develop
+
+     - Look over the code. 
+
+        - Check that it meets :doc:`our style guidelines <devdoc/style>`.
+
+        - Make inline review comments concerning improvements. 
+      
+     - Accept the Pull Request    
+
+        - In general, **every commit** (notice this is not 'every push') to the
+          "develop" and "master" branches should compile and pass tests. This
+          is guaranteed by using a NON-fast-forward merge during the pull request 
+          acceptance process. 
+    
+        - The green "Merge Pull Request" button does a non-fast-forward merge by 
+          default. However, if that button is unavailable, you've made minor 
+          local changes to the pulled branch, or you just want to do it from the 
+          command line, make sure your merge is a non-fast-forward merge. For example::
+          
+        git checkout develop
+        git merge --no-ff remote_name/branch_name -m "A message""
 
 
 ~~~~~~~~~~~~~~~~~~~
@@ -283,22 +322,17 @@ As time passes, you make some changes to files, and you commit those changes (to
 branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
 on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
 Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
-so it's time to merge those changes with the local develop branch and push them to origin's develop
-branch: ::
+so it's time to make a pull request online and wait for our developer friends to 
+review and accept it.
 
-    .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull upstream develop
-    .../cyclus_dir/$ git merge work 
-    .../cyclus_dir/$ git push origin develop
-
-    .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git merge develop
-    .../cyclus_dir/$ git push origin work
-
-This time we want to update our local develop branch based on the changes we made in work. First we
-checkout and update develop in case the upstream develop branch introduced any changes. We then
-apply our changes via merging work into develop, and push that back up to origin. In case the upstream
-pull did introduce changes, we go ahead and update the work branch on origin.
+Sometimes, your pull request will be closed by the reviewer until further 
+changes are made to appease the reviewer's concerns. This may be frustrating, 
+but please act rationally, discuss the issues on the github space made for your 
+pull request, consult the :doc:`style guide <devdoc/style_guide>`, email the 
+developer listhost for further advice, and make changes to your topic branch 
+accordingly. The pull request will be updated with those changes when you push them 
+to your fork.  When you think your request is ready for another review, you can 
+reopen the review yourself with the button made available to you. 
 
 See also
 --------
