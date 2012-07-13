@@ -67,7 +67,7 @@ INSTALL(FILES
   StubModelTests.cpp
   StubModelTests.h
   StubCommModelTests.cpp
-  StubCommTests.h
+  StubCommModelTests.h
   TestInst.h
   TestRegion.h
   TestFacility.h
