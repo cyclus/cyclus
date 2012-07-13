@@ -4,7 +4,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Direct any out-of-source builds to this directory
 SET( CYCLUS_SRC_DIR ${CMAKE_SOURCE_DIR} )
-
+  
+IF(NOT CYCLUS_DOC_ONLY)
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
@@ -94,18 +95,6 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 # add the core library 
 ADD_SUBDIRECTORY(Core)
-
-# This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
-
-# If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
-FIND_PACKAGE(Doxygen)
-IF (DOXYGEN_FOUND)
-  ADD_SUBDIRECTORY(doc)
-  SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
-ELSE (DOXYGEN_FOUND)
-  MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
-ENDIF (DOXYGEN_FOUND)
 
 #MESSAGE("libs: ${LIBS}")
 
@@ -216,7 +205,7 @@ SET(CPACK_PACKAGE_VERSION_MINOR "1")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
- 
+
 CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Core/Config/CyclusCPackOptions.cmake.in"
   "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake" @ONLY)
 SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake")
@@ -224,4 +213,17 @@ SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 
 INCLUDE(CPack)
- 
+
+ENDIF(NOT CYCLUS_DOC_ONLY)  
+
+# This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
+SET( DOC_INPUT_DIR ${CYCLUS_SRC_DIR}/doc)
+  
+# If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
+FIND_PACKAGE(Doxygen)
+IF (DOXYGEN_FOUND)
+  ADD_SUBDIRECTORY(doc)
+  SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
+ELSE (DOXYGEN_FOUND)
+  MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
+ENDIF (DOXYGEN_FOUND)
