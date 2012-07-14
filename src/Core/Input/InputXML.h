@@ -269,6 +269,11 @@ public:
     return get_xpath_name(curFilePtr->xpathCtxt,cur,expression);
   }
 
+  /**
+     returns the current xpath context
+   */
+  xmlXPathContextPtr context() {return curFilePtr->xpathCtxt;}
+
 private:
   /**
      pointer to thie single instance of this class 
