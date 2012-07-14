@@ -90,30 +90,48 @@ public:
   /**
      Opens and loads a facilitycatalog: included catalog of facility 
      definitions 
-      
+     
      This method will push the current xmlFileInfo strcutre onto the 
      stack and create a new one for the facilitycatalog library to be 
      opened.  It will be opened and validated against a Relax-NG schema 
      and then the facilities will be loaded using the same method as 
      used by load_file()  
      @param filename name of facilitycatalog file to open 
-   */
+  */
   void load_facilitycatalog(std::string filename);
   
   /**
      Get the contents of the single element with this XPath 
      expression 
-      
+     
      This method will return the contents of the first element in the 
      XML document tree that matches this XPath expression.  Ideally, 
      this should only be called when a single element exists, because no 
      error will be issued when only the first match is returned. 
+     
+     @param context the context to query
+     @param cur XML node pointer from which to start the search 
+     @param expression XPath expression that will be interpreted 
+     relative to the XML node pointer cur 
+  */
+  const char* get_xpath_content(xmlXPathContextPtr& context,
+                                xmlNodePtr& cur,
+                                const char* expression);
+  
+  /**
+     Get the contents of the single element with this XPath 
+     expression 
+      
+     calls get_xpath_content() using the stored context
       
      @param cur XML node pointer from which to start the search 
      @param expression XPath expression that will be interpreted 
      relative to the XML node pointer cur 
    */
-  const char* get_xpath_content(xmlNodePtr cur,const char* expression);
+  const char* get_xpath_content(xmlNodePtr& cur,
+                                const char* expression) {
+    return get_xpath_content(curFilePtr->xpathCtxt,cur,expression);
+  }
 
   /**
      Get content of single node from current XML doc that match 
@@ -136,12 +154,29 @@ public:
       
      This method will return an xmlNodeSetPtr that provides a list of 
      nodes that match the given XPath expression. 
+    
+     @param context the xml context to query
+     @param cur XML node pointer from which to start the search 
+     @param expression XPath expression that will be interpreted 
+     relative to the XML node pointer cur 
+   */
+  xmlNodeSetPtr get_xpath_elements(xmlXPathContextPtr& context,
+                                   xmlNodePtr& cur,
+                                   const char* expression);
+  
+  /**
+     Get list of nodes that match relative XPath expression 
+     
+     calls get_xpath_elements() on the stored context
       
      @param cur XML node pointer from which to start the search 
      @param expression XPath expression that will be interpreted 
      relative to the XML node pointer cur 
    */
-  xmlNodeSetPtr get_xpath_elements(xmlNodePtr cur,const char* expression);
+  xmlNodeSetPtr get_xpath_elements(xmlNodePtr& cur,
+                                   const char* expression) {
+    return get_xpath_elements(curFilePtr->xpathCtxt,cur,expression);
+  }
 
   /**
      Get list of nodes from current XML doc that match XPath 
@@ -163,11 +198,28 @@ public:
      This method will return an xmlNodePtr to the single node that 
      matches the given XPath expression. 
       
+     @param context the context to query
      @param cur XML node pointer from which to start the search 
      @param expression XPath expression that will be interpreted 
      relative to the XML node pointer cur 
    */
-  xmlNodePtr get_xpath_element(xmlNodePtr cur, const char* expression);
+  xmlNodePtr get_xpath_element(xmlXPathContextPtr& context,
+                               xmlNodePtr& cur,const char* expression);
+
+  /**
+     Get a single node that matches relative XPath expression 
+      
+     This method will return an xmlNodePtr to the single node that 
+     matches the given XPath expression. 
+      
+     @param cur XML node pointer from which to start the search 
+     @param expression XPath expression that will be interpreted 
+     relative to the XML node pointer cur 
+  */
+  xmlNodePtr get_xpath_element(xmlNodePtr& cur,
+                               const char* expression) {
+    return get_xpath_element(curFilePtr->xpathCtxt,cur,expression);
+  }
 
   /**
      Get a single node from current XML doc that matches XPath 
@@ -195,11 +247,27 @@ public:
      would not already be known.  If a fixed expression is used, then 
      the name is probably already known and this method doesn't need to 
      be called.  
+
+     @param context the context to query
      @param cur XML node pointer from which to start the search 
      @param expression XPath expression that will be interpreted 
      relative to the XML node pointer cur 
    */
-  const char* get_xpath_name(xmlNodePtr cur,const char* expression);
+  const char* get_xpath_name(xmlXPathContextPtr& context, 
+                             xmlNodePtr& cur,const char* expression);
+
+  /**
+     Get the name of the single element with this XPath expression 
+     
+     calls get_xpath_name() on the current context
+      
+     @param cur XML node pointer from which to start the search 
+     @param expression XPath expression that will be interpreted 
+     relative to the XML node pointer cur 
+   */
+  const char* get_xpath_name(xmlNodePtr& cur,const char* expression) {
+    return get_xpath_name(curFilePtr->xpathCtxt,cur,expression);
+  }
 
 private:
   /**
