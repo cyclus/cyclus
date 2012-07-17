@@ -77,9 +77,7 @@ void Message::sendOn() {
 
   if (needs_next_dest_) {
     autoSetNextDest();
-    needs_next_dest_ = true;
   }
-
   validateForSend();
   msg_ptr me = msg_ptr(this);
 
@@ -87,6 +85,7 @@ void Message::sendOn() {
     path_stack_.back()->untrackMessage(me);
     path_stack_.pop_back();
   } else {
+    needs_next_dest_ = true;
     path_stack_.back()->trackMessage(me);
   }
 
@@ -150,6 +149,12 @@ void Message::validateForSend() {
   }
 
   next_stop = path_stack_[next_stop_i];
+
+  LOG(LEV_ERROR, "debug") << "back of stack = " << dynamic_cast<Model*>(path_stack_.back())->name();
+  LOG(LEV_ERROR, "debug") << "next stop = " << dynamic_cast<Model*>(next_stop)->name();
+  LOG(LEV_ERROR, "debug") << "curr owner = " << dynamic_cast<Model*>(curr_owner_)->name();
+  //LOG(LEV_ERROR, "debug") << "curr owner parent = " << dynamic_cast<Model*>(curr_owner_)->parent()->name();
+
   if (next_stop == curr_owner_) {
     throw CycCircularMsgException();
   }
