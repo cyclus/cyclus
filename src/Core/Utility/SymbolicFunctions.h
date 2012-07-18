@@ -17,6 +17,8 @@ class Function {
   virtual double value(int x) = 0; 
   /// base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0; 
+  /// every function must print itself
+  virtual std::string print() = 0;
   /* /// overload function operator */
   /* double operator()(int x) {return value(x);} */
   /* /// overload function operator */
@@ -42,6 +44,9 @@ class LinearFunction : public Function {
   
   /// evaluation for an double argument
   virtual double value(double x);
+  
+  /// print a string of the function
+  virtual std::string print();
 
  private:
   /// the slope
@@ -71,6 +76,9 @@ class ExponentialFunction : public Function {
 
   /// evaluation for a double argument
   virtual double value(double x);
+
+  /// print a string of the function
+  virtual std::string print();
 
  private:
   /// the constant factor
