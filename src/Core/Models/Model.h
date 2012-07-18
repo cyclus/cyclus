@@ -220,12 +220,30 @@ class Model {
   int nChildren() {return children_.size();}
 
   /**
-     set the parent of this model 
+     recursively prints the parent-child tree
+   */
+  std::string printChildren();
+
+  /**
+     returns a vector of strings representing the parent-child tree
+     at the node for Model m
+     @param m the model node to base as the root of this print tree
+   */
+  std::vector<std::string> getTreePrintOuts(Model* m);
+
+  /**
+     calls doSetParent() and itLives()
 
      This DOES add the this model to the specified parent's list of children
      (i.e. this automatically calls "parent->addChild(this);")
    */
   void setParent(Model* parent);
+
+  /**
+     sets the parent_ member
+     @param parent the model to set parent_ to
+   */
+  void doSetParent(Model* parent);
 
   /**
      set the bornOn date of this model 

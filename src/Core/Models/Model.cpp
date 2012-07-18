@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #include "Model.h"
 
@@ -205,6 +206,8 @@ void Model::copy(Model* model_orig) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
+  children_ = vector<Model*>();
+  name_ = "";
   ID_ = next_id_++;
   is_template_ = true;
   born_ = false;
@@ -244,11 +247,9 @@ Model::~Model() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
-  for (int i = 0; i < mlist.size(); i++) {
-    if (mlist[i] == model) {
-      mlist.erase(mlist.begin() + i);
-      break;
-    }
+  vector<Model*>::iterator it = find(mlist.begin(),mlist.end(),model);
+  if (it != mlist.end()) {
+    mlist.erase(it);
   }
 }
 
@@ -300,14 +301,19 @@ void Model::itLives() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
+  doSetParent(parent);
+  itLives();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::doSetParent(Model* parent){ 
   if (parent == this) {
     // root nodes are their own parent
     parent_ = NULL; // parent pointer set to NULL for memory management
   } else {
     parent_ = parent;
   }
-  itLives();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::parent(){
@@ -340,6 +346,36 @@ void Model::removeChild(Model* child){
 		  << child->ID() << " from its list of children.";
   removeFromList(child, children_);
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Model::printChildren() {
+  stringstream ss("");
+  ss << "Children of " << name() << ":" << endl;
+  for (int i = 0; i < children_.size(); i++) {
+    vector<string> print_outs = getTreePrintOuts(children_.at(i));
+    for (int j = 0; j < print_outs.size(); j++) {
+      ss << "\t" << print_outs.at(j);
+    }
+  }
+  return ss.str();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> Model::getTreePrintOuts(Model* m) {
+  vector<string> ret;
+  stringstream ss("");
+  ss << m->name() << endl;
+  ret.push_back(ss.str());
+  for (int i = 0; i < m->nChildren(); i++) {
+    vector<string> outs = getTreePrintOuts(m->children(i));
+    for (int j = 0; j < outs.size(); j++) {
+      ss.str("");
+      ss << "\t" << outs.at(j) << endl;
+      ret.push_back(ss.str());
+    }
+  }
+  return ret;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const string Model::modelImpl() {
