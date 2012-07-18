@@ -19,6 +19,11 @@ class Commodity {
   
   /// the commodity's name
   std::string name() const {return name_;}
+
+  /// equality operator
+  bool operator==(const Commodity& other) const {
+    return (name_ == other.name());
+  } 
   
  private:
   /// the name of the commodity
@@ -51,17 +56,27 @@ class Producer {
   name_(name), commodity_(p), capacity_(capacity), production_cost_(cost) {};
 
   /// name getter
-  std::string name() {return name_;}
+  std::string name() const {return name_;}
   
   /// commodity getter
-  Commodity commodity() {return commodity_;}
+  Commodity commodity() const {return commodity_;}
 
   /// capacity getter
-  double capacity() {return capacity_;}
+  double capacity() const {return capacity_;}
 
   /// cost getter
-  double cost() {return production_cost_;}
+  double cost() const {return production_cost_;}
 
+  /// equality operator
+  bool operator==(const Producer& other) const {
+    bool test = true;
+    test = test && (name_ == other.name());
+    test = test && (commodity_ == other.commodity());
+    test = test && (capacity_ == other.capacity());
+    test = test && (production_cost_ == other.cost());
+    return test;
+  }
+  
  private:
   /// name
   std::string name_;
@@ -114,14 +129,21 @@ class CommodityInformation {
   void increaseSupply(double amt) {supply_ += amt;}
 
   /**
+     the demand function
+   */
+  FunctionPtr demandFunction() {return demand_;}
+
+  /**
      the demand at a given time
      @param time the time
    */
   double demand(int time) {return demand_->value(time);}
-
-  /// producers
+  
+  /**
+     @return the number of producers
+  */
   int nProducers() {return producers_.size();}
-
+  
   /**
      a pointer to a producer
      @param i the index in producers_ 
