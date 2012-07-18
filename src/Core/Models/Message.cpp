@@ -24,9 +24,9 @@ void Message::constructBase(Communicator* sender) {
   receiver_ = NULL;
   trans_ = NULL;
   dead_ = false;
-  needs_next_dest_ = true;
   dir_ = UP_MSG;
 
+  path_stack_.push_back(sender_);
   sender->trackMessage(msg_ptr(this));
   makeRealParticipant(sender);
 
@@ -74,21 +74,19 @@ msg_ptr Message::clone() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::sendOn() {
   if (dead_) {return;}
-
-  if (needs_next_dest_) {
-    autoSetNextDest();
-    needs_next_dest_ = true;
-  }
-
-  validateForSend();
   msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
     path_stack_.back()->untrackMessage(me);
     path_stack_.pop_back();
-  } else {
+  } else if (dir_ == UP_MSG) {
+    autoSetNextDest();
     path_stack_.back()->trackMessage(me);
+  } else {
+    return;
   }
+
+  validateForSend();
 
   Communicator* next_stop = path_stack_.back();
   makeRealParticipant(next_stop);
@@ -105,10 +103,19 @@ void Message::sendOn() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::autoSetNextDest() {
-  Model* next_model;
+  if (path_stack_.back() != curr_owner_) {
+    return;
+  }
+
+  Model* curr = dynamic_cast<Model*>(curr_owner_);
+  if (curr == NULL) {
+    // cannot set auto-set (e.g. curr_owner_ is not a Model*
+    return;
+  }
+
   Communicator* next_dest;
   try {
-    next_model = dynamic_cast<Model*>(curr_owner_)->parent();
+    Model* next_model = curr->parent();
     tallyOrder(next_model);
     next_dest = dynamic_cast<Communicator*>(next_model);
   } catch (CycIndexException err) {
@@ -133,23 +140,15 @@ void Message::tallyOrder(Model* next_model) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::validateForSend() {
-  int next_stop_i = -1;
-  bool has_receiver = false;
-  Communicator* next_stop;
-
-  if (dir_ == UP_MSG) {
-    has_receiver = (path_stack_.size() > 0);
-    next_stop_i = path_stack_.size() - 1;
-  } else if (dir_ == DOWN_MSG) {
-    has_receiver = (path_stack_.size() > 1);
-    next_stop_i = path_stack_.size() - 2;
-  }
+  int next_stop_i = path_stack_.size() - 1;
+  bool has_receiver = (path_stack_.size() > 0);
 
   if (!has_receiver) {
     throw CycNoMsgReceiverException();
   }
 
-  next_stop = path_stack_[next_stop_i];
+  Communicator* next_stop = path_stack_[next_stop_i];
+
   if (next_stop == curr_owner_) {
     throw CycCircularMsgException();
   }
@@ -170,12 +169,7 @@ void Message::setNextDest(Communicator* next_stop) {
     return;
   }
 
-  if (path_stack_.size() == 0) {
-    path_stack_.push_back(sender_);
-  }
   path_stack_.push_back(next_stop);
-
-  needs_next_dest_ = false;
 
   CLOG(LEV_DEBUG4) << "Message " << this << " set next stop to comm "
                    << next_stop;
