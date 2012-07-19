@@ -1,4 +1,4 @@
-// RecipeLogger.h
+// RecipeLibrary.h
 #if !defined(_RECIPELOGGER_H)
 #define _RECIPELOGGER_H
 
@@ -9,7 +9,7 @@
 #include <set>
 #include <map>
 
-#define RL RecipeLogger::Instance()
+#define RL RecipeLibrary::Instance()
 
 /**
    map of recipe name to composition
@@ -37,34 +37,34 @@ typedef std::map<double,CompMapPtr> DaughterMap;
 typedef std::map<CompMapPtr,DaughterMap> DecayChainMap; 
 
 /**
-   The RecipeLogger manages the list of recipes held in memory
+   The RecipeLibrary manages the list of recipes held in memory
    during a simulation. It works in conjunction with the CompMap
    class to efficiently manage isotopic-related memory.
  */
-class RecipeLogger {
+class RecipeLibrary {
   /* --- Singleton Members and Methods --- */
  public: 
   /**
-     Gives all simulation objects global access to the RecipeLogger by 
+     Gives all simulation objects global access to the RecipeLibrary by 
      returning a pointer to it. 
      Like the Highlander, there can be only one. 
       
-     @return a pointer to the RecipeLogger 
+     @return a pointer to the RecipeLibrary 
    */
-  static RecipeLogger* Instance();
+  static RecipeLibrary* Instance();
 
  protected:
   /**
      The (protected) constructor for this class, which can only be 
      called indirectly by the client. 
    */
-  RecipeLogger();
+  RecipeLibrary();
 
  private:
   /**
-     A pointer to this RecipeLogger once it has been initialized. 
+     A pointer to this RecipeLibrary once it has been initialized. 
    */
-  static RecipeLogger* instance_;
+  static RecipeLibrary* instance_;
   /* --- */
 
   /* --- Recipe Logging --- */
