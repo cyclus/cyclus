@@ -4,7 +4,7 @@
 #include "CycException.h"
 #include "Logger.h"
 #include "DecayHandler.h"
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 
 #include <vector>
 #include <string>

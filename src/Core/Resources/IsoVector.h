@@ -19,7 +19,7 @@ typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
 /* -- */
 
 /* -- Sensitive Includes -- */
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 /* -- */
 
 /** 
@@ -152,7 +152,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void print();
 
   /**
-     logs composition_ with the RecipeLogger
+     logs composition_ with the RecipeLibrary
    */
   void log();
 
@@ -207,7 +207,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      decays a composition for a given time, assumed to be in months
      
-     this public function checks with the RecipeLogger to see if comp is
+     this public function checks with the RecipeLibrary to see if comp is
      logged as a decayable parent. if so, it will intelligently decay comp
      if a daughter has not already been decayed. if one has, a copy will be
      returned.

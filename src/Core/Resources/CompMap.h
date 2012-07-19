@@ -43,7 +43,7 @@ enum Basis {MASS, ATOM};
 
 /* -- Sensitive Includes -- */
 #include "IsoVector.h"
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 /* -- */
 
 /** 
@@ -426,7 +426,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
 
   /* -- Friends -- */
   friend class IsoVector;
-  friend class RecipeLogger;
+  friend class RecipeLibrary;
   /* -- */
 };
 
