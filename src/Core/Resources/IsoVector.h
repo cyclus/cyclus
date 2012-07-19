@@ -208,7 +208,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      decays a composition for a given time, assumed to be in months
      
      this public function checks with the RecipeLibrary to see if comp is
-     logged as a decayable parent. if so, it will intelligently decay comp
+     recorded as a decayable parent. if so, it will intelligently decay comp
      if a daughter has not already been decayed. if one has, a copy will be
      returned.
      @param comp the composition to be decayed

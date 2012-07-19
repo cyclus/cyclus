@@ -217,13 +217,13 @@ void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
 void IsoVector::decay(double time) {
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
-  bool root_logged = root->logged();
+  bool root_recorded = root->recorded();
   Basis orig_basis = parent->basis();
   CompMapPtr child;
-  if (root_logged) { 
+  if (root_recorded) { 
     int t_f = parent->root_decay_time() + time;
-    bool child_logged = RL->daughterLogged(parent,t_f);
-    if (child_logged) {
+    bool child_recorded = RL->daughterRecorded(parent,t_f);
+    if (child_recorded) {
       child = RL->Daughter(parent,t_f);
     }
     else {

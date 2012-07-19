@@ -29,12 +29,12 @@ typedef std::map<CompMapPtr,decay_times> DecayTimesMap;
 /**
    map of decay time to composition
  */
-typedef std::map<double,CompMapPtr> DaughterMap; 
+typedef std::map<double,CompMapPtr> ChildMap; 
 
 /**
-   map of recipe composition to its decayed daughters
+   map of recipe composition to its decayed children
  */
-typedef std::map<CompMapPtr,DaughterMap> DecayChainMap; 
+typedef std::map<CompMapPtr,ChildMap> DecayChainMap; 
 
 /**
    The RecipeLibrary manages the list of recipes held in memory
@@ -67,7 +67,7 @@ class RecipeLibrary {
   static RecipeLibrary* instance_;
   /* --- */
 
-  /* --- Recipe Logging --- */
+  /* --- Recipe Record --- */
  public:
   /**
      loads the recipes from the input file 
@@ -80,38 +80,49 @@ class RecipeLibrary {
   static void load_recipe(xmlNodePtr cur);
   
   /**
-     logs a new recipe with the simulation
-     - logs recipe with BookKeeper
+     records a new recipe in the simulation
+     - records the recipe in the BookKeeper
+
+     @param recipe the recipe to be recorded, a CompMapPtr
    */
-  static void logRecipe(CompMapPtr recipe);
+  static void recordRecipe(CompMapPtr recipe);
 
   /**
-     logs a new named recipe with the simulation
+     records a new named recipe in the simulation
      - adds recipe to CompMap's static containers
-     - calls the logRecipe() method
+     - calls the recordRecipe(recipe) method
+
+     @param name the recipe name to be used as a key in the recipes_ map, a string
+     @param recipe the recipe to be recorded, a CompMapPtr
    */
-  static void logRecipe(std::string name, CompMapPtr recipe);
+  static void recordRecipe(std::string name, CompMapPtr recipe);
 
   /**
-     logs a new named recipe with the simulation
+     records a new named recipe with the simulation
      - sets the parent of and decay time child
-     - calls the logRecipe() method
+     - calls the recordRecipe() method
+
+     @param parent the initial recipe in a recipe map 
      @param t_f -> total time decayed from parent to child
    */
-  static void logRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f);
+  static void recordRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f);
   
   /**
-     checks if the recipe has been logged (i.e. it exists in the simulation)
+     checks if the named recipe has been recorded (i.e. it exists in the simulation)
+
+     @param name the name of the parent recipe, a key in the recipes_ map
    */
-  static bool recipeLogged(std::string name);
+  static bool recipeRecorded(std::string name);
 
   /**
-     the total number of recipes 
+     the total number of recipes in the recipes_ map  
    */
   static int recipeCount();   
 
   /**
-     accessing a recipe 
+     This returns a CompMapPtr to the named recipe in the recipes_ map 
+
+     @param name the name of the parent recipe, a key in the recipes_ map
    */
   static CompMapPtr Recipe(std::string name);
 
@@ -121,60 +132,89 @@ class RecipeLibrary {
   static void printRecipes();
 
   /**
-     checks if the composition is logged
+     checks if the composition is recorded. Returns true if the composition 
+     appears in the decay_chains_ map. 
+
+     @param comp a pointer to the composition to check
    */
   static bool compositionDecayable(CompMapPtr comp);
 
   /**
      checks if the parent has already been decayed by this time
+
+     @param parent a pointer to the composition that might have a child
+     @param time the time at which a child might exist for a parent
    */
-  static bool daughterLogged(CompMapPtr parent, double time);
+  static bool childRecorded(CompMapPtr parent, double time);
 
  private:
   /**
      adds recipe to containers tracking decayed recipes
+
+     @param recipe the recipe to store in the decay_chains_ and decay_times_ maps
    */
   static void storeDecayableRecipe(CompMapPtr recipe);
 
   /**
      add a new decay time for a parent composition
+
+     @param parent the recipe with which a new decay_time should be associated
+     @param time the time to be added to the keys of the decay_times_ map 
    */
   static void addDecayTime(CompMapPtr parent, double time);
 
   /**
-     accessing a set of decay times 
+     accesses a set of decay times that have been recorded (associated with this parent)
+
+     @param parent the recipe whose decay times are to be retrieved
    */
   static decay_times& decayTimes(CompMapPtr parent);
 
   /**
-     accessing the daughters of a parent
+     accesses the child recipes of a parent recipe
+
+     @param parent the recipe whose composition evolution is to be retrieved
    */
-  static DaughterMap& Daughters(CompMapPtr parent);
+  static ChildMap& Children(CompMapPtr parent);
 
   /**
-     accessing a specific daughter 
+     accesses a specific child recipe 
+
+     @param parent the recipe whose composition evolution is to be retrieved
+     @param time the time at which the child recipe of interest is indexed 
    */
-  static CompMapPtr& Daughter(CompMapPtr parent, double time);
+  static CompMapPtr& Child(CompMapPtr parent, double time);
 
   /**
-     add a daughter to a map of daughters
+     add a child to a map of children
+
+     @param parent the recipe with which a new child should be associated
+     @param child the child recipe to be added to the evolution of the parent recipe 
+     @param time the time at which the child recipe of interest is indexed 
    */
-  static void addDaughter(CompMapPtr parent, CompMapPtr child, double time);
+  static void addChild(CompMapPtr parent, CompMapPtr child, double time);
 
   /**
-     calls recipeLogged() and throws an error if false
+     calls recipeRecorded() and throws an error if false
+
+     @param name the name of the recipe to be found
    */
   static void checkRecipe(std::string name);
 
   /**
      calls compositionDecayable() and throws an error if false
+
+     @param parent the recipe whose composition record is to be queried
    */
   static void checkDecayable(CompMapPtr parent);
 
   /**
-     calls daughterLogged() and throws an error if false
+     calls childRecorded() and throws an error if false
+
+     @param parent the recipe whose composition record is to be queried
+     @param time the time at which the child recipe of interest is indexed 
    */
-  static void checkDaughter(CompMapPtr parent, double time);
+  static void checkChild(CompMapPtr parent, double time);
 
   /**
      Stores the next available state ID 

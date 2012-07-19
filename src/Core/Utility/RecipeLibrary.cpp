@@ -15,7 +15,7 @@ using namespace std;
 
 // initialize singleton member
 RecipeLibrary* RecipeLibrary::instance_ = 0;
-// initialize logging members
+// initialize recordging members
 int RecipeLibrary::nextStateID_ = 0;
 RecipeMap RecipeLibrary::recipes_;
 DecayChainMap RecipeLibrary::decay_chains_;
@@ -107,28 +107,28 @@ void RecipeLibrary::load_recipe(xmlNodePtr cur) {
     (*recipe)[key] = value;
   }
   recipe->massify();
-  // log this composition (static members and database)
-  logRecipe(name,recipe);
+  // record this composition (static members and database)
+  recordRecipe(name,recipe);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::logRecipe(std::string name, CompMapPtr recipe) {
-  if ( !recipeLogged(name) ) {
-    logRecipe(recipe); // log this with the database, assigns id
+void RecipeLibrary::recordRecipe(std::string name, CompMapPtr recipe) {
+  if ( !recipeRecorded(name) ) {
+    recordRecipe(recipe); // record this with the database, assigns id
     recipes_[name] = recipe; // store this as a named recipe, copies recipe
     storeDecayableRecipe(Recipe(name)); // store this as a decayable recipe
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::recipeLogged(std::string name) {
+bool RecipeLibrary::recipeRecorded(std::string name) {
   int count = recipes_.count(name);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::logRecipe(CompMapPtr recipe) {
-  if (!recipe->logged()) {
+void RecipeLibrary::recordRecipe(CompMapPtr recipe) {
+  if (!recipe->recorded()) {
     recipe->ID_ = nextStateID_++;
     addToTable(recipe);
   }
@@ -144,17 +144,17 @@ CompMapPtr RecipeLibrary::Recipe(std::string name) {
 void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
   // initialize containers
   decay_times times;
-  DaughterMap daughters;
+  ChildMap childs;
   // assign containers
   decay_times_.insert( pair<CompMapPtr,decay_times>(recipe,times) );
-  decay_chains_.insert( pair<CompMapPtr,DaughterMap>(recipe,daughters) );
+  decay_chains_.insert( pair<CompMapPtr,ChildMap>(recipe,childs) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::logRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f) {
+void RecipeLibrary::recordRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f) {
   addDecayTime(parent,t_f);
-  addDaughter(parent,child,t_f);
-  logRecipe(child);
+  addChild(parent,child,t_f);
+  recordRecipe(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -164,9 +164,9 @@ int RecipeLibrary::recipeCount() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::checkRecipe(std::string name) {
-  if (!recipeLogged(name)) {
+  if (!recipeRecorded(name)) {
     stringstream err;
-    err << "RecipeLibrary has not logged recipe with name: " << name << ".";
+    err << "RecipeLibrary has not recorded recipe with name: " << name << ".";
     throw CycIndexException(err.str());
   }
 }
@@ -175,17 +175,17 @@ void RecipeLibrary::checkRecipe(std::string name) {
 void RecipeLibrary::checkDecayable(CompMapPtr parent) {
   if (!compositionDecayable(parent)) {
     stringstream err;
-    err << "RecipeLibrary has not logged recipe with id:" << parent->ID_
+    err << "RecipeLibrary has not recorded recipe with id:" << parent->ID_
         << " as decayable.";
     throw CycIndexException(err.str());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::checkDaughter(CompMapPtr parent, double time) {
-  if (!daughterLogged(parent,time)) {
+void RecipeLibrary::checkChild(CompMapPtr parent, double time) {
+  if (!childRecorded(parent,time)) {
     stringstream err;
-    err << "RecipeLibrary has not logged a decayed recipe for the parent " 
+    err << "RecipeLibrary has not recorded a decayed recipe for the parent " 
         << "recipe with id:" << parent->ID_ << " and decay time:" << time 
         << ".";
     throw CycIndexException(err.str());
@@ -205,28 +205,28 @@ decay_times& RecipeLibrary::decayTimes(CompMapPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DaughterMap& RecipeLibrary::Daughters(CompMapPtr parent) {
+ChildMap& RecipeLibrary::Children(CompMapPtr parent) {
   checkDecayable(parent);
   return decay_chains_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMapPtr& RecipeLibrary::Daughter(CompMapPtr parent, double time) {
-  checkDaughter(parent,time);
-  return Daughters(parent)[time];
+CompMapPtr& RecipeLibrary::Child(CompMapPtr parent, double time) {
+  checkChild(parent,time);
+  return Children(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::daughterLogged(CompMapPtr parent, double time) {
-  int count = Daughters(parent).count(time);
+bool RecipeLibrary::childRecorded(CompMapPtr parent, double time) {
+  int count = Children(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::addDaughter(CompMapPtr parent, CompMapPtr child, double time) {
+void RecipeLibrary::addChild(CompMapPtr parent, CompMapPtr child, double time) {
   child->parent_ = parent;
   child->decay_time_ = time;
-  Daughter(parent,time) = child; // child is copied
+  Child(parent,time) = child; // child is copied
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -252,7 +252,7 @@ void RecipeLibrary::define_table() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::addToTable(CompMapPtr recipe){
-  // if we haven't logged a composition yet, define the table
+  // if we haven't recorded a composition yet, define the table
   if ( !iso_table->defined() ) {
     RecipeLibrary::define_table();
   }
