@@ -152,9 +152,9 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void print();
 
   /**
-     logs composition_ with the RecipeLibrary
+     records composition_ with the RecipeLibrary
    */
-  void log();
+  void record();
 
   /**
      computes the total mass fraction that this isovector has in
@@ -209,7 +209,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      
      this public function checks with the RecipeLibrary to see if comp is
      recorded as a decayable parent. if so, it will intelligently decay comp
-     if a daughter has not already been decayed. if one has, a copy will be
+     if a child has not already been decayed. if one has, a copy will be
      returned.
      @param comp the composition to be decayed
      @param time the decay time, in months
@@ -221,9 +221,9 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
  private:
   /* --- Instance Management --- */
   /**
-     the log level for all IsoVector instances
+     the record level for all IsoVector instances
    */
-  static LogLevel log_level_;
+  static LogLevel record_level_;
 
   /**
      a shared pointer to the CompMap managed by this IsoVector

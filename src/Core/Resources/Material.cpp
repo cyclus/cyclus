@@ -18,7 +18,7 @@ int Material::decay_interval_ = 1;
 
 table_ptr Material::material_table = new Table("MaterialHistory"); 
 
-bool Material::type_is_logged_ = false;
+bool Material::type_is_recorded_ = false;
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -194,5 +194,5 @@ void Material::setDecay(int dec) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::addToTable() {
   Resource::addToTable();
-  iso_vector_.log();
+  iso_vector_.record();
 }

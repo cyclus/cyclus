@@ -6,7 +6,7 @@
 #include "CycException.h"
 #include "Logger.h"
 
-bool GenericResource::type_is_logged_ = false;
+bool GenericResource::type_is_recorded_ = false;
 table_ptr GenericResource::genres_table = new Table("GenericResources"); 
 
 using namespace std;

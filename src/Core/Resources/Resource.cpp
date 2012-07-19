@@ -58,10 +58,10 @@ void Resource::addToTable(){
   }
   book_kept_ = true;
 
-  // if we haven't logged the resource type yet, do so
-  if ( !this->is_resource_type_logged() ){
-    Resource::logNewType();
-    this->type_logged();
+  // if we haven't recorded the resource type yet, do so
+  if ( !this->is_resource_type_recorded() ){
+    Resource::recordNewType();
+    this->type_recorded();
   }
   // if we haven't yet, define the table
   if ( !resource_table->defined() )
@@ -96,7 +96,7 @@ void Resource::define_type_table(){
   resource_type_table->tableDefined();
 }
 
-void Resource::logNewType(){
+void Resource::recordNewType(){
   // if we haven't yet, define the table
   if ( !resource_type_table->defined() )
     Resource::define_type_table();

@@ -12,7 +12,7 @@
 
 using namespace std;
 
-LogLevel IsoVector::log_level_ = LEV_INFO3;
+LogLevel IsoVector::record_level_ = LEV_INFO3;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector() {
@@ -111,13 +111,13 @@ void IsoVector::reset() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
-  CLOG(log_level_) << "This IsoVector manages: ";
+  CLOG(record_level_) << "This IsoVector manages: ";
   composition_->print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::log() {
-  RL->logRecipe(composition_);
+void IsoVector::record() {
+  RL->recordRecipe(composition_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -222,13 +222,13 @@ void IsoVector::decay(double time) {
   CompMapPtr child;
   if (root_recorded) { 
     int t_f = parent->root_decay_time() + time;
-    bool child_recorded = RL->daughterRecorded(parent,t_f);
+    bool child_recorded = RL->childRecorded(parent,t_f);
     if (child_recorded) {
-      child = RL->Daughter(parent,t_f);
+      child = RL->Child(parent,t_f);
     }
     else {
-      child = executeDecay(parent,time); // do decay and log it
-      RL->logRecipeDecay(parent,child,t_f);
+      child = executeDecay(parent,time); // do decay and record it
+      RL->recordRecipeDecay(parent,child,t_f);
     }
   }
   else {
