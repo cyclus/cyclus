@@ -34,7 +34,7 @@ typedef std::map<double,CompMapPtr> ChildMap;
 /**
    map of recipe composition to its decayed children
  */
-typedef std::map<CompMapPtr,ChildMap> DecayChainMap; 
+typedef std::map<CompMapPtr,ChildMap> DecayHistMap; 
 
 /**
    The RecipeLibrary manages the list of recipes held in memory
@@ -133,7 +133,7 @@ class RecipeLibrary {
 
   /**
      checks if the composition is recorded. Returns true if the composition 
-     appears in the decay_chains_ map. 
+     appears in the decay_hist_ map. 
 
      @param comp a pointer to the composition to check
    */
@@ -151,7 +151,7 @@ class RecipeLibrary {
   /**
      adds recipe to containers tracking decayed recipes
 
-     @param recipe the recipe to store in the decay_chains_ and decay_times_ maps
+     @param recipe the recipe to store in the decay_hist_ and decay_times_ maps
    */
   static void storeDecayableRecipe(CompMapPtr recipe);
 
@@ -227,12 +227,12 @@ class RecipeLibrary {
   static RecipeMap recipes_;
 
   /**
-     a container of recipes in each decay chain
+     a container of recipes for each parent recipe, representing its decay history
    */
-  static DecayChainMap decay_chains_;
+  static DecayHistMap decay_hist_;
 
   /**
-     a container of decay times that recipes have gone through
+     a container of decay times that recipes have gone through, the time keys in the ChildMap
    */
   static DecayTimesMap decay_times_;
 

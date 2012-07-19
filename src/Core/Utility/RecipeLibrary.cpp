@@ -18,7 +18,7 @@ RecipeLibrary* RecipeLibrary::instance_ = 0;
 // initialize recordging members
 int RecipeLibrary::nextStateID_ = 0;
 RecipeMap RecipeLibrary::recipes_;
-DecayChainMap RecipeLibrary::decay_chains_;
+DecayHistMap RecipeLibrary::decay_hist_;
 DecayTimesMap RecipeLibrary::decay_times_;
 // initialize table member
 table_ptr RecipeLibrary::iso_table = new Table("IsotopicStates"); 
@@ -147,7 +147,7 @@ void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
   ChildMap childs;
   // assign containers
   decay_times_.insert( pair<CompMapPtr,decay_times>(recipe,times) );
-  decay_chains_.insert( pair<CompMapPtr,ChildMap>(recipe,childs) );
+  decay_hist_.insert( pair<CompMapPtr,ChildMap>(recipe,childs) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -207,7 +207,7 @@ decay_times& RecipeLibrary::decayTimes(CompMapPtr parent) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ChildMap& RecipeLibrary::Children(CompMapPtr parent) {
   checkDecayable(parent);
-  return decay_chains_[parent];
+  return decay_hist_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -232,7 +232,7 @@ void RecipeLibrary::addChild(CompMapPtr parent, CompMapPtr child, double time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool RecipeLibrary::compositionDecayable(CompMapPtr comp) {
   int count1 = decay_times_.count(comp);
-  int count2 = decay_chains_.count(comp);
+  int count2 = decay_hist_.count(comp);
   return (count1 != 0 && count2 != 0); // true iff comp in both 
 }
 
