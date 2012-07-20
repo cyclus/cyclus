@@ -315,9 +315,6 @@ class Message: IntrusiveBase<Message> {
   /// Pointers to each model this message passes through. 
   std::vector<Communicator*> path_stack_;
 
-  /// true if sendOn needs to call setNextDest with curr_owner_'s parent
-  bool needs_next_dest_;
-  
   /// the most recent communicator to receive this message. 
   Communicator* curr_owner_;
 

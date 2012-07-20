@@ -52,6 +52,12 @@ class SupplyDemandManager {
   double demand(const Commodity& commodity, int time);
 
   /**
+     returns the demand function for a commodity
+     @param commodity the commodity being queried
+   */
+  FunctionPtr demandFunction(const Commodity& commodity);
+
+  /**
      returns the current supply of a commodity
      @param commodity the commodity
      @return the current supply of the commodity
