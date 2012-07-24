@@ -203,7 +203,7 @@ public:
 
 private:
   /**
-     used by print() to 'hide' print code when logging is not desired 
+     used by print() to 'hide' print code when recording is not desired 
    */
   std::string detail(); 
 
@@ -241,27 +241,27 @@ private:
   std::string type_name() {return "material";}
 
   /**
-     resouce type logging state 
+     resouce type recording state 
    */
-  bool is_resource_type_logged() {return type_is_logged_;}
+  bool is_resource_type_recorded() {return type_is_recorded_;}
 
   /**
-     tells the simulation this resource type is logged 
+     tells the simulation this resource type is recorded 
    */
-  void type_logged() {type_is_logged_ = true;}
+  void type_recorded() {type_is_recorded_ = true;}
 
  private:
   /**
-     the state of logging for this resource type 
+     the state of recording for this resource type 
    */
-  static bool type_is_logged_;
+  static bool type_is_recorded_;
 // -------- resource class related members  -------- 
 
 
 // -------- output database related members  -------- 
  public:
   /**
-     the table for logging material resources 
+     the table for recording material resources 
    */
   static table_ptr material_table;
 
