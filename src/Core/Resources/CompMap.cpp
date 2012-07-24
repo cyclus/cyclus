@@ -92,7 +92,7 @@ bool CompMap::operator<(const CompMap& rhs) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::logged() const {
+bool CompMap::recorded() const {
   return (ID_ > 0);
 }
 

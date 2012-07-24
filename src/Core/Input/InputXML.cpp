@@ -8,7 +8,7 @@
 
 #include "Timer.h"
 #include "Env.h"
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 #include "CycException.h"
 #include "Model.h"
 //#include "Material.h"
@@ -111,7 +111,7 @@ void InputXML::load_file(std::string filename) {
 
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  RecipeLogger::load_recipes();
+  RecipeLibrary::load_recipes();
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
   
   //Models
@@ -135,7 +135,7 @@ void InputXML::load_recipebook(std::string filename) {
   recipebook.doc = validate_file(&recipebook);
   recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
-  RecipeLogger::load_recipes();
+  RecipeLibrary::load_recipes();
 
   // get rid of recipebook, freeing memory
   delete curFilePtr;
