@@ -1,6 +1,6 @@
 // RecipeLibrary.h
-#if !defined(_RECIPELOGGER_H)
-#define _RECIPELOGGER_H
+#if !defined(_RECIPELIBRARY_H)
+#define _RECIPELIBRARY_H
 
 #include "CompMap.h"
 #include "Table.h"
