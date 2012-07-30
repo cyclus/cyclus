@@ -106,7 +106,7 @@ enum Basis {MASS, ATOM};
    an atom-based state and a massFraction() call occurs, it will 
    return the correct mass fraction).
 
-   @section Lineage/Decay
+   @section Lineage & Decay
    The CompMap class provides functionality to track the lineage of
    parents and their children due to decay. This lineage takes the
    form of a tree, rooted at some initial composition, with branches
@@ -418,7 +418,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   
   /**
      Used to determine validity of isotope's value
-     @param tope isotope identifier 
+     @param value isotope identifier 
      @exception throws an error if fraction < 0.0
   */
   static void validateValue(const double& value);  

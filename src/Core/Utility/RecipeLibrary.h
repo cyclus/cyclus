@@ -103,6 +103,7 @@ class RecipeLibrary {
      - calls the recordRecipe() method
 
      @param parent the initial recipe in a recipe map 
+     @param child the child recipe
      @param t_f -> total time decayed from parent to child
    */
   static void recordRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f);

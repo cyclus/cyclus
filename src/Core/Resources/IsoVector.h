@@ -177,9 +177,8 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 
   /* --- Transformations --- */
   /**
-     mixes two IsoVectors with a given ratio of c1:c2
-     @param c1 the first IsoVector
-     @param c2 the second IsoVector
+     mixes this IsoVectors with another given ratio of this:other
+     @param other the second IsoVector
      @param ratio the amount of c1 compared to c2
      @return a shared pointer to the resulting composition
    */
@@ -191,9 +190,8 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void mix(const IsoVectorPtr& p_other, double ratio);
 
   /**
-     separates one IsoVector from another at a given efficiency
-     @param c1 the base IsoVector
-     @param c2 the IsoVector to extract from c1
+     separates an IsoVector from this one 
+     @param other the IsoVector to extract from this
      @param efficiency the effiency of the separation
      @return a shared pointer to the resulting composition
    */
@@ -211,7 +209,6 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      recorded as a decayable parent. if so, it will intelligently decay comp
      if a child has not already been decayed. if one has, a copy will be
      returned.
-     @param comp the composition to be decayed
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
@@ -238,7 +235,8 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      this private function uses the DecayHandler to decay a composition
      by a given time
-     @param comp the composition to be decayed
+
+     @param parent the composition to be decayed, a ptr recorded in the RecipeLibrary
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
