@@ -24,13 +24,15 @@ struct BuildOrder {
    built to meet that demand. This decision takes the form of an
    integer program:
 
-   \min \sum_{i=1}^{N}n_i*c_i
-   s.t. \sum_{i=1}^{N}n_i*\phi_i \ge \Phi
+   \f[
+   \min \sum_{i=1}^{N}n_i*c_i \\
+   s.t. \sum_{i=1}^{N}n_i*\phi_i \ge \Phi \\
         n_i \in [0,\infty) \forall i \in I, n_i integer
+   \f]
 
    Where n_i is the number of objects of type i to build, c_i is the 
-   cost to build the object of type i, \phi_i is the nameplate 
-   capacity of the object, and \Phi is the capacity demand. Here the 
+   cost to build the object of type i, \f$\phi_i\f$ is the nameplate 
+   capacity of the object, and \f$\Phi\f$ is the capacity demand. Here the 
    set I corresponds to all producers of a given commodity.
  */
 class BuildingManager {
@@ -47,7 +49,7 @@ class BuildingManager {
      makeBuildDecision() and returns the number of each producer to 
      build
      @param commodity the commodity being demanded
-     @param demand the additional capacity required
+     @param unmet_demand the additional capacity required
      @return the vector of build orders as decided
    */
   std::vector<BuildOrder> makeBuildDecision(const Commodity& commodity, 
