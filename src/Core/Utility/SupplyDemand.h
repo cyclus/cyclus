@@ -117,7 +117,7 @@ class CommodityInformation {
      @param fp a shared pointer to the demand function
    */
  CommodityInformation(Commodity commodity, FunctionPtr fp) : 
-  commodity_(p), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
+  commodity_(commodity), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
 
   /// supply
   double supply() {return supply_;}

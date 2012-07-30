@@ -235,6 +235,8 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      this private function uses the DecayHandler to decay a composition
      by a given time
+
+     @param parent the composition to be decayed, a ptr recorded in the RecipeLibrary
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
