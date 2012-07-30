@@ -38,8 +38,8 @@ class SupplyDemandManager {
   /**
      calls the registerProducer() function of the CommodityInformation
      instance associated with the commodity
-     @param the commodity gaining a new producer
-     @param the producer to be registered
+     @param commodity the commodity gaining a new producer
+     @param producer the producer to be registered
    */
   void registerProducer(const Commodity& commodity, 
                         const Producer& producer);

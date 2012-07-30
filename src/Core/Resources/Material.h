@@ -80,7 +80,7 @@ public:
      a constructor for making a material object 
      from a known isovector. 
       
-     @param comp isotopic makeup of this material object 
+     @param vec isotopic makeup of this material object 
    */
   Material(IsoVector vec);
 

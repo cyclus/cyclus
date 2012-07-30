@@ -65,5 +65,5 @@ TEST_F(IsoVectorTests,separation) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,decay) {
-  /// @MJG_FLAG this needs to be written... think about the best way to do it
+  /// \@MJG_FLAG this needs to be written... think about the best way to do it
 }
