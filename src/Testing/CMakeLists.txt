@@ -18,6 +18,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
   PARENT_SCOPE)
 
 # Add all the tests by parsing the source code
