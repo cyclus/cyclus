@@ -136,6 +136,25 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   int fac_lifetime_;
 
+  /**
+     each facility must keep track when it should be decommissioned
+   */
+  int decommission_date_;
+
+  /**
+     set the decommission date
+     @param current_time the current sim time
+   */
+  void setDecommissionDate(int current_time) {
+    decommission_date_ = fac_lifetime_ + current_time;
+  }
+
+  /**
+     decommissions the facility, default behavior is for the facility
+     to delete itself
+   */
+  virtual void decommission();
+
  public:
   /**
      Sets the facility's name 
@@ -205,6 +224,9 @@ class FacilityModel : public TimeAgent, public Communicator {
   /**
      Each facility is prompted to its end-of-time-step 
      stuff on the tock of the timer. 
+
+     By default, facilities are decommissioned if time is greater
+     than or equal to its end date.
       
      @param time is the time to perform the tock 
    */

@@ -366,5 +366,15 @@ private:
 };
 
 
+#include "CycException.h"
+#include <string>
+/**
+   An exception class for an xpath that can not be evaluated
+*/
+class CycNullXPathException : public CycException {
+ public: 
+ CycNullXPathException(std::string msg) : CycException(msg) {};
+};
+
 
 #endif
