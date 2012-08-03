@@ -129,6 +129,12 @@ class CommodityInformation {
   void increaseSupply(double amt) {supply_ += amt;}
 
   /**
+     decrease the supply by an amount
+     @param amt the amount
+   */ 
+  void decreaseSupply(double amt) {supply_ -= amt;}
+
+  /**
      the demand function
    */
   FunctionPtr demandFunction() {return demand_;}
