@@ -1,5 +1,7 @@
 #include "SupplyDemandManager.h"
 
+#include <sstream>
+
 using namespace std;
 
 // -------------------------------------------------------------------
@@ -43,6 +45,21 @@ double SupplyDemandManager::supply(const Commodity& commodity) {
 void SupplyDemandManager::increaseSupply(const Commodity& commodity, 
                                          double amt) { 
   commodities_.find(commodity)->second.increaseSupply(amt); 
+}
+
+// -------------------------------------------------------------------
+void SupplyDemandManager::decreaseSupply(const Commodity& commodity, 
+                                         double amt) { 
+  if (supply(commodity) - amt < 0) {
+    stringstream ss("");
+    ss << "Cannot decrease supply of " << commodity.name()
+       << " from " << supply(commodity) << " by " << amt
+       << " because a negative value would result.";
+    throw CycNegativeValueException(ss.str());
+  }
+  else {
+    commodities_.find(commodity)->second.decreaseSupply(amt); 
+  }
 }
 
 // -------------------------------------------------------------------

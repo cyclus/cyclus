@@ -70,6 +70,13 @@ class SupplyDemandManager {
      @param amt the amount to increase
    */
   void increaseSupply(const Commodity& commodity, double amt);
+
+  /**
+     decrease the supply of a given commodity by an amount
+     @param commodity the commodity
+     @param amt the amount to increase
+   */
+  void decreaseSupply(const Commodity& commodity, double amt);
   
   /**
      return the number of producers of a given commodity
@@ -91,5 +98,16 @@ class SupplyDemandManager {
   std::map<Commodity,CommodityInformation,
     CommodityCompare> commodities_;
 };
+
+#include "CycException.h"
+#include <string>
+/**
+   An exception class for supplies attempting to be decreased below 0.
+ */
+class CycNegativeValueException : public CycException {
+ public: 
+ CycNegativeValueException(std::string msg) : CycException(msg) {};
+};
+
 
 #endif
