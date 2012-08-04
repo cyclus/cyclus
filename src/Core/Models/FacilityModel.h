@@ -142,12 +142,21 @@ class FacilityModel : public TimeAgent, public Communicator {
   int decommission_date_;
 
   /**
-     set the decommission date
+     the date the facility is built
+   */
+  int build_date_;
+
+  /**
+     set the build date
      @param current_time the current sim time
    */
-  void setDecommissionDate(int current_time) {
-    decommission_date_ = fac_lifetime_ + current_time;
-  }
+  void setBuildDate(int current_time);
+
+  /**
+     set the decommission date
+     @param time the time to be decommissioned
+   */
+  void setDecommissionDate(int current_time);
 
   /**
      decommissions the facility, default behavior is for the facility

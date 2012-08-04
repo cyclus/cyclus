@@ -93,8 +93,18 @@ void FacilityModel::handleDailyTasks(int time, int day){
   // facilities who have more intricate details should utilize this function
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
   delete this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::setBuildDate(int current_time) {
+  build_date_ = current_time;
+  setDecommissionDate(build_date_ + fac_lifetime_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::setDecommissionDate(int time) {
+    decommission_date_ = time;
 }
