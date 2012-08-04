@@ -99,15 +99,4 @@ class SupplyDemandManager {
     CommodityCompare> commodities_;
 };
 
-#include "CycException.h"
-#include <string>
-/**
-   An exception class for supplies attempting to be decreased below 0.
- */
-class CycNegativeValueException : public CycException {
- public: 
- CycNegativeValueException(std::string msg) : CycException(msg) {};
-};
-
-
 #endif

@@ -124,13 +124,13 @@ class CommodityInformation {
 
   /**
      increase the supply by an amount
-     @param amt the amount
+     @param amt the amount in the unit characteristic to the commodity
    */ 
   void increaseSupply(double amt) {supply_ += amt;}
 
   /**
      decrease the supply by an amount
-     @param amt the amount
+     @param amt the amount in the unit characteristic to the commodity
    */ 
   void decreaseSupply(double amt) {supply_ -= amt;}
 

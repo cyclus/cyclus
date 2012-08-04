@@ -1,4 +1,5 @@
 #include "SupplyDemandManager.h"
+#include "CycException.h"
 
 #include <sstream>
 
