@@ -2,6 +2,7 @@
 
 #include "SDManagerTests.h"
 
+#include "CycException.h"
 #include "SupplyDemandManager.h"
 #include "SupplyDemand.h"
 #include "SymbolicFunctions.h"
