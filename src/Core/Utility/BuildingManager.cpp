@@ -15,9 +15,9 @@ using boost::any_cast;
 using namespace Cyclopts;
 
 // -------------------------------------------------------------------
-BuildingManager::BuildingManager(SupplyDemandManager& m) : 
-  manager_(SupplyDemandManager(m)) {}; // copy made of manager
-
+BuildingManager::BuildingManager(SupplyDemandManager* m) {
+  manager_ = m;
+}
 
 // -------------------------------------------------------------------
 vector<BuildOrder> 
@@ -47,10 +47,10 @@ void BuildingManager::doMakeBuildDecision(const Commodity& commodity,
   csi.registerConstraint(c);
 
   // set up variables, constraints, and objective function
-  int n = manager_.nProducers(commodity);
+  int n = manager_->nProducers(commodity);
   vector<VariablePtr> soln;
   for (int i = 0; i < n; i++) {
-    Producer* p = manager_.producer(commodity,i);
+    Producer* p = manager_->producer(commodity,i);
     // set up var`iables
     VariablePtr x(new IntegerVariable(0,Variable::INF));
     x->setName(p->name());
@@ -70,7 +70,7 @@ void BuildingManager::doMakeBuildDecision(const Commodity& commodity,
     int number = any_cast<int>(soln.at(i)->value());
     if (number > 0) {
       orders_.push_back(BuildOrder(number,
-                                   manager_.producer(commodity,i)));
+                                   manager_->producer(commodity,i)));
     }
   }
 }
