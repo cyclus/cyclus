@@ -28,7 +28,9 @@ void SDManagerTests::SetUp() {
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SDManagerTests::TearDown() {
-  delete commod, p1, p2;
+  delete commod;
+  delete p1;
+  delete p2;
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
