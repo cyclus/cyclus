@@ -10,6 +10,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
+  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandlerTests.cpp
@@ -18,6 +19,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
   PARENT_SCOPE)
 
 # Add all the tests by parsing the source code

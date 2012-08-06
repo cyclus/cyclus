@@ -70,6 +70,13 @@ class SupplyDemandManager {
      @param amt the amount to increase
    */
   void increaseSupply(const Commodity& commodity, double amt);
+
+  /**
+     decrease the supply of a given commodity by an amount
+     @param commodity the commodity
+     @param amt the amount to increase
+   */
+  void decreaseSupply(const Commodity& commodity, double amt);
   
   /**
      return the number of producers of a given commodity
