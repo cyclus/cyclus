@@ -16,7 +16,11 @@ void BuildingManagerTests::SetUp() {
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManagerTests::TearDown() {
-  delete sdmanager_, commod_, manager_, p1_, p2_;
+  delete sdmanager_;
+  delete commod_;
+  delete manager_;
+  delete p1_;
+  delete p2_;
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
