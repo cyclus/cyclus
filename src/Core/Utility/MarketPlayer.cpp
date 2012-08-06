@@ -1,7 +1,5 @@
 #include "MarketPlayer.h"
 
-#include "CycException.h"
-
 #include <sstream>
 
 using namespace std;
@@ -37,6 +35,12 @@ double MarketPlayer::productionCapacity(Commodity& commod) {
 void MarketPlayer::registerManager(MarketPlayerManager* m, 
                                    Commodity& commod) {
   ManagerIterator mi = checkCommodityManagement(commod);
+  if (m->commodity() != commod) {
+    stringstream ss("");
+    ss << "Cannot register a manager of " << m->commodity().name() 
+       << " with the commodity: " << commod.name();
+    throw CycCommodityMismatchError(ss.str());
+  }
   mi->second.push_back(m);
 }
 

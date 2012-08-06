@@ -104,4 +104,13 @@ class MarketPlayer {
   ManagerIterator checkCommodityManagement(Commodity& commod);
 };
 
+#include "CycException.h"
+/**
+   an exception class for mismatched commodities and managers
+ */
+class CycCommodityMismatchError: public CycException {
+  public: CycCommodityMismatchError(std::string msg) : 
+  CycException(msg) {};
+};
+
 #endif

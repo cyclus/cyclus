@@ -16,18 +16,12 @@ class MarketPlayerManager {
      @param commod the commodity to associate with this manager
    */
   MarketPlayerManager(Commodity& commod);
-
+  
   /**
-     add a player from the list of players
-     @param m the player to add
+     return the commodity associated with this manager
+     @return the commodity associated with this manager
    */
-  void playerEnteringMarket(MarketPlayer* m);
-
-  /**
-     remove a player from the list of players
-     @param m the player to remove
-   */
-  void playerLeavingMarket(MarketPlayer* m);
+  Commodity commodity();
 
   /**
      returns the total production capacity of all players in the
@@ -42,6 +36,21 @@ class MarketPlayerManager {
 
   /// the players associated with this manager
   std::set<MarketPlayer*> players_;
+
+  /**
+     add a player from the list of players
+     @param m the player to add
+   */
+  void playerEnteringMarket(MarketPlayer* m);
+
+  /**
+     remove a player from the list of players
+     @param m the player to remove
+   */
+  void playerLeavingMarket(MarketPlayer* m);
+
+  /// MarketPlayer is a friend class for access to enter/leaving
+  friend class MarketPlayer;
 };
 
 #endif

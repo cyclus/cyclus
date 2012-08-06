@@ -9,6 +9,11 @@ MarketPlayerManager::MarketPlayerManager(Commodity& commod) :
 }
 
 // -------------------------------------------------------------------
+Commodity MarketPlayerManager::commodity() {
+  return commod_;
+}
+
+// -------------------------------------------------------------------
 void MarketPlayerManager::playerEnteringMarket(MarketPlayer* m) {
   players_.insert(m);
 }
