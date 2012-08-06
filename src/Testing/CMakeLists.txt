@@ -10,6 +10,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
+  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandlerTests.cpp

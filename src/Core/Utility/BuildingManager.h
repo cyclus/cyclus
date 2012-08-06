@@ -32,8 +32,8 @@ struct BuildOrder {
 
    Where n_i is the number of objects of type i to build, c_i is the 
    cost to build the object of type i, \f$\phi_i\f$ is the nameplate 
-   capacity of the object, and \f$\Phi\f$ is the capacity demand. Here the 
-   set I corresponds to all producers of a given commodity.
+   capacity of the object, and \f$\Phi\f$ is the capacity demand. Here
+   the set I corresponds to all producers of a given commodity.
  */
 class BuildingManager {
  public:
@@ -42,7 +42,7 @@ class BuildingManager {
      into its manager_ member
      @param m the SupplyDemandManager to act as manager_
   */
-  BuildingManager(SupplyDemandManager& m);
+  BuildingManager(SupplyDemandManager* m);
 
   /**
      given a certain commodity and demand, this calls the private 
@@ -57,7 +57,7 @@ class BuildingManager {
   
  private:
   /// manager of supply and demand
-  SupplyDemandManager manager_;
+  SupplyDemandManager* manager_;
   
   /// build orders that are populated and returned after each decision
   std::vector<BuildOrder> orders_;
