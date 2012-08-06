@@ -11,8 +11,10 @@ void MarketPlayerTests::SetUp() {
   commodA_ = new Commodity("A");
   commodB_ = new Commodity("B");
   commodC_ = new Commodity("C");
-  managerA_ = new MarketPlayerManager(*commodA_);
-  managerB_ = new MarketPlayerManager(*commodB_);
+  managerA_ = new MarketPlayerManager();
+  managerA_->setCommodity(*commodA_);
+  managerB_ = new MarketPlayerManager();
+  managerB_->setCommodity(*commodB_);
   player1_ = new MarketPlayer();
   player2_ = new MarketPlayer();
   nPlayers_ = 2;

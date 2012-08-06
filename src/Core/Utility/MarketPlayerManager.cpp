@@ -3,14 +3,18 @@
 using namespace std;
 
 // -------------------------------------------------------------------
-MarketPlayerManager::MarketPlayerManager(Commodity& commod) : 
-  commod_(commod) {
+MarketPlayerManager::MarketPlayerManager() {
   players_ = set<MarketPlayer*>();
 }
 
 // -------------------------------------------------------------------
+void MarketPlayerManager::setCommodity(Commodity& commod) {
+  commod_ = &commod;
+}
+
+// -------------------------------------------------------------------
 Commodity MarketPlayerManager::commodity() {
-  return commod_;
+  return *commod_;
 }
 
 // -------------------------------------------------------------------
@@ -28,7 +32,7 @@ double MarketPlayerManager::playerProductionCapacity() {
   double value = 0;
   set<MarketPlayer*>::iterator it;
   for (it = players_.begin(); it != players_.end(); it++) {
-    value += (*it)->productionCapacity(commod_);
+    value += (*it)->productionCapacity(*commod_);
   }
   return value;
 }

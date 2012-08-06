@@ -13,10 +13,14 @@ class MarketPlayerManager {
  public:
   /**
      constructor
-     @param commod the commodity to associate with this manager
    */
-  MarketPlayerManager(Commodity& commod);
+  MarketPlayerManager();
   
+  /**
+     set's the commodity associated with this manager
+   */
+  void setCommodity(Commodity& commod);
+
   /**
      return the commodity associated with this manager
      @return the commodity associated with this manager
@@ -32,7 +36,7 @@ class MarketPlayerManager {
   
  private:
   /// the commodity associated with this manager
-  Commodity commod_;
+  Commodity* commod_;
 
   /// the players associated with this manager
   std::set<MarketPlayer*> players_;
