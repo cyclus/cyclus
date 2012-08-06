@@ -63,10 +63,13 @@ INSTALL(FILES
   InstModelTests.h
   RegionModelTests.cpp
   RegionModelTests.h
+  BuildingManagerTests.h
   ConverterModelTests.cpp
   ConverterModelTests.h
   MarketModelTests.cpp
   MarketModelTests.h
+  MarketPlayerTests.h
+  SDManagerTests.h
   StubModelTests.cpp
   StubModelTests.h
   StubCommModelTests.cpp
