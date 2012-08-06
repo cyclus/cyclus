@@ -3,16 +3,18 @@
 #define MARKETPLAYER_H
 
 #include "SupplyDemand.h"
-#include "MarketPlayerManager.h"
 
 #include <map>
 #include <vector>
 
+class MarketPlayer;
+#include "MarketPlayerManager.h"
+
 /// an iterator for the manager map
-typedef map<Commodity,
-            vector<MarketPlayerManager*> >::iterator ManagerIterator;
+typedef std::map<Commodity,
+  std::vector<MarketPlayerManager*> >::iterator ManagerIterator;
 /// an iterator for the production map
-typedef map<Commodity,double>::iterator ProductionIterator;
+typedef std::map<Commodity,double>::iterator ProductionIterator;
 
 /**
    A MarketPlayer is an agent mixin that allows for querying
@@ -73,10 +75,11 @@ class MarketPlayer {
 
  private:
   /// the production capacity of each commodity
-  std::map<Commodity, double> production_capacity_;
+  std::map<Commodity,double,CommodityCompare> production_capacity_;
 
   /// the managers of each commodity
-  std::map<Commodity, std::vector<MarketPlayerManager*> > managers_;
+  std::map<Commodity,std::vector<MarketPlayerManager*>,
+    CommodityCompare> managers_;
   
   /**
      throws an error saying the commodity is not registered

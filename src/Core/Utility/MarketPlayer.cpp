@@ -8,8 +8,9 @@ using namespace std;
 
 // -------------------------------------------------------------------
 MarketPlayer::MarketPlayer() {
-  managers_ = map<Commodity, vector<MarketPlayerManager*> > ();
-  production_capacity_ = map<Commodity, double>();
+  managers_ = map<Commodity,vector<MarketPlayerManager*>,
+                  CommodityCompare> ();
+  production_capacity_ = map<Commodity,double,CommodityCompare>();
 }
 
 // -------------------------------------------------------------------
@@ -22,12 +23,12 @@ void MarketPlayer::registerCommodity(Commodity& commod) {
 // -------------------------------------------------------------------
 void MarketPlayer::setProductionCapacity(double& value,
                                          Commodity& commod) {
-  ProductionIterator pi = checkProductionCommodity(commod);
+  ProductionIterator pi = checkCommodityProduction(commod);
   pi->second = value;
 }
 
 // -------------------------------------------------------------------
-void MarketPlayer::productionCapacity(Commodity& commod) {
+double MarketPlayer::productionCapacity(Commodity& commod) {
   ProductionIterator pi = checkCommodityProduction(commod);
   return pi->second;
 }
