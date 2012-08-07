@@ -54,6 +54,11 @@ class CycIndexException: public CycException {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class CycKeyException: public CycException {
+  public: CycKeyException(std::string msg) : CycException(msg) {};
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CycIOException: public CycException {
   public: CycIOException(std::string msg) : CycException(msg) {};
 };

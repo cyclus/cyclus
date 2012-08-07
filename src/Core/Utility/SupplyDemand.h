@@ -2,6 +2,7 @@
 #define SUPPLYDEMAND_H
 
 #include <string>
+#include <ostream>
 
 /**
    a simple class defining a commodity; it is currently super simple.
@@ -23,6 +24,11 @@ class Commodity {
   /// equality operator
   bool operator==(const Commodity& other) const {
     return (name_ == other.name());
+  } 
+
+  /// inequality operator
+  bool operator!=(const Commodity& other) const {
+    return !(name_ == other.name());
   } 
   
  private:
