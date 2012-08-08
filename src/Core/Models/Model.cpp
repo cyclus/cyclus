@@ -124,32 +124,36 @@ void Model::load_markets() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_converters() {
-
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    create("Converter",nodes->nodeTab[i]);
-  }
+  try {
+    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
+    
+    for (int i=0;i<nodes->nodeNr;i++) {
+      create("Converter",nodes->nodeTab[i]);
+    }
+  } catch (CycNullXPathException) {} // no converters
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_facilities() {
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
+  xmlNodeSetPtr nodes;
+  try {
+     nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
+    
+    for (int i=0;i<nodes->nodeNr;i++){
+      load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], 
+                                                       "filename"),
+                           XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
+                           XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
+    }
+  } catch (CycNullXPathException) {}; // no converters
   
-  for (int i=0;i<nodes->nodeNr;i++){
-    load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], 
-                         "filename"),
-        XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
-        XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
-  }
-
   nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++) {
     create("Facility",nodes->nodeTab[i]);
   }
 }
-
+  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
   XMLinput->extendCurNS(ns);

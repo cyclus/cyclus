@@ -184,7 +184,7 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlXPathContextPtr& context,
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
 
-  if(xpathObj == NULL) {
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
     stringstream ss("");
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
@@ -207,7 +207,7 @@ xmlNodePtr InputXML::get_xpath_element(xmlXPathContextPtr& context,
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression,context);
 
-  if(xpathObj == NULL) {
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
     stringstream ss("");
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
@@ -230,7 +230,7 @@ const char* InputXML::get_xpath_content(xmlXPathContextPtr& context,
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
   
-  if(xpathObj == NULL) {
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
     stringstream ss("");
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
@@ -254,7 +254,7 @@ const char* InputXML::get_xpath_name(xmlXPathContextPtr& context,
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
 
-  if(xpathObj == NULL) {
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
     stringstream ss("");
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
