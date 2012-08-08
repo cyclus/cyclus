@@ -192,7 +192,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       
       <optional>
-	<element name="name">
+	<element name="lifetime">
 	  <text/>
 	</element>
       </optional>
