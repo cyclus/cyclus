@@ -41,7 +41,7 @@ InputXML* InputXML::Instance() {
 xmlDocPtr InputXML::validate_file(xmlFileInfo *fileInfo) {
   xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(fileInfo->schema->c_str());
   if (NULL == ctxt)
-  throw CycParseException("Failed to generate parser from schema: " + *(fileInfo->schema));
+    throw CycParseException("Failed to generate parser from schema: " + *(fileInfo->schema));
 
   xmlRelaxNGPtr schema = xmlRelaxNGParse(ctxt);
 
@@ -189,9 +189,11 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlXPathContextPtr& context,
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
     throw CycNullXPathException(ss.str());
+    return xmlNodeSetPtr();
   }
-
-  return xpathObj->nodesetval;
+  else {
+    return xpathObj->nodesetval;
+  }
 
   // when and how to cleanup memory allocation?
 
@@ -212,10 +214,12 @@ xmlNodePtr InputXML::get_xpath_element(xmlXPathContextPtr& context,
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
     throw CycNullXPathException(ss.str());
+    return xmlNodePtr();
+  }
+  else {
+    return xpathObj->nodesetval->nodeTab[0];
   }
   
-  return xpathObj->nodesetval->nodeTab[0];
-
   // when and how to cleanup memory allocation?
 
 }
@@ -235,10 +239,12 @@ const char* InputXML::get_xpath_content(xmlXPathContextPtr& context,
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
     throw CycNullXPathException(ss.str());
+    return "";
   }
-
-  return (const char*)(xpathObj->nodesetval->
-                       nodeTab[0]->children->content);
+  else {
+    return (const char*)(xpathObj->nodesetval->
+                         nodeTab[0]->children->content);
+  }
 
   // when and how to cleanup memory allocation?
 
@@ -259,9 +265,11 @@ const char* InputXML::get_xpath_name(xmlXPathContextPtr& context,
     ss << "Error: unable to evaluate xpath expression " 
        << expression;
     throw CycNullXPathException(ss.str());
+    return "";
   }
-
-  return (const char*)(xpathObj->nodesetval->nodeTab[0]->name);
+  else {
+    return (const char*)(xpathObj->nodesetval->nodeTab[0]->name);
+  }
 
   // when and how to cleanup memory allocation?
 
