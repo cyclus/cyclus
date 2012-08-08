@@ -19,7 +19,7 @@ void MarketPlayer::registerCommodity(Commodity& commod) {
 }
 
 // -------------------------------------------------------------------
-void MarketPlayer::setProductionCapacity(double& value,
+void MarketPlayer::setProductionCapacity(double value,
                                          Commodity& commod) {
   ProductionIterator pi = checkCommodityProduction(commod);
   pi->second = value;

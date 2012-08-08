@@ -24,13 +24,19 @@ void SDManagerTests::SetUp() {
   p2 = new Producer("p2",*commod,capacity,cost);
 
   initCommodity();
+  initMarketPlayers();
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SDManagerTests::TearDown() {
-  delete commod;
   delete p1;
   delete p2;
+  player1_->leaveMarket(*commod);
+  player2_->leaveMarket(*commod);
+  delete mpmanager_;
+  delete player1_;
+  delete player2_;
+  delete commod;
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -39,6 +45,29 @@ void SDManagerTests::initCommodity() {
   v.push_back(*p1);
   v.push_back(*p2);
   manager.registerCommodity(*commod,demand,v);
+}  
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void SDManagerTests::initMarketPlayers() {
+  cap1_ = 15;
+  cap2_ = 20;
+
+  mpmanager_ = new MarketPlayerManager();
+  mpmanager_->setCommodity(*commod);
+
+  player1_ = new MarketPlayer();
+  player1_->registerCommodity(*commod);
+  player1_->setProductionCapacity(cap1_,*commod);
+  player1_->registerManager(mpmanager_,*commod);
+  player1_->enterMarket(*commod);
+
+  player2_ = new MarketPlayer();
+  player2_->registerCommodity(*commod);
+  player2_->setProductionCapacity(cap2_,*commod);
+  player2_->registerManager(mpmanager_,*commod);
+  player2_->enterMarket(*commod);
+
+  manager.registerPlayerManager(*commod,mpmanager_);
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,30 +87,7 @@ TEST_F(SDManagerTests,TestDemand) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SDManagerTests,TestSupply) {
-  double base = 0;
-  double val = 5;
-  EXPECT_EQ(manager.supply(*commod),base);
-
-  // increase
-  double total = 0;
-  for (int i = 0; i < 10; i++) {
-    double incr = (i+1) * val;
-    manager.increaseSupply(*commod,incr);
-    total += incr;
-    EXPECT_EQ(manager.supply(*commod),total);
-  }
-
-  // decrease
-  for (int i = 0; i < 10; i++){
-    double decr = (i+1) * val;
-    manager.decreaseSupply(*commod,decr);
-    total -= decr;
-    EXPECT_EQ(manager.supply(*commod),total);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SDManagerTests,TestSupplyThrow) {
-  EXPECT_THROW(manager.decreaseSupply(*commod,1),
-               CycNegativeValueException);
+  EXPECT_EQ(manager.supply(*commod),cap1_+cap2_);
+  player1_->setProductionCapacity(0.0,*commod);
+  EXPECT_EQ(manager.supply(*commod),cap2_);
 }
