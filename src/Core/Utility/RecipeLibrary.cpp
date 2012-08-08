@@ -49,24 +49,26 @@ void RecipeLibrary::load_recipes() {
   }
 
   // load recipes from databases
-  nodes = XMLinput->get_xpath_elements("/*/recipebook");
-  string filename, ns, format;
-  for (int i = 0; i < nodes->nodeNr; i++) {
-    filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
-    ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
-    format = XMLinput->get_xpath_content(nodes->nodeTab[i], "format");
-    XMLinput->extendCurNS(ns);
-
-    if ("xml" == format) {
-      CLOG(LEV_DEBUG2) << "going into a recipe book...";
-      XMLinput->load_recipebook(filename);  // load recipe book
-    } 
-    else {
-      throw 
-        CycRangeException(format + "is not a supported recipebook format.");
+  try {
+    nodes = XMLinput->get_xpath_elements("/*/recipebook");
+    string filename, ns, format;
+    for (int i = 0; i < nodes->nodeNr; i++) {
+      filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
+      ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
+      format = XMLinput->get_xpath_content(nodes->nodeTab[i], "format");
+      XMLinput->extendCurNS(ns);
+      
+      if ("xml" == format) {
+        CLOG(LEV_DEBUG2) << "going into a recipe book...";
+        XMLinput->load_recipebook(filename);  // load recipe book
+      } 
+      else {
+        throw 
+          CycRangeException(format + "is not a supported recipebook format.");
+      }
+      XMLinput->stripCurNS();
     }
-    XMLinput->stripCurNS();
-  }
+  } catch (CycNullXPathException) {} // no recipebook entered
   CLOG(LEV_DEBUG2) << "}";
 }
 
