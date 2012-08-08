@@ -184,11 +184,10 @@ INSTALL(TARGETS CyclusUnitTestDriver
   COMPONENT testing
   )
 
-# Here we set some components for installation with cpack
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
-  DESTINATION cyclus/share
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/cyclus/share
   COMPONENT data
   )
 
