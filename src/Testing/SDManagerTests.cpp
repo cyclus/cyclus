@@ -88,4 +88,6 @@ TEST_F(SDManagerTests,TestDemand) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SDManagerTests,TestSupply) {
   EXPECT_EQ(manager.supply(*commod),cap1_+cap2_);
+  player1_->setProductionCapacity(0.0,*commod);
+  EXPECT_EQ(manager.supply(*commod),cap2_);
 }
