@@ -190,6 +190,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="name">
         <text/>
       </element>
+      
+      <optional>
+	<element name="name">
+	  <text/>
+	</element>
+      </optional>
 
       <element name="model">
       <choice>
