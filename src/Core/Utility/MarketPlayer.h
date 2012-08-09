@@ -35,7 +35,7 @@ class MarketPlayer {
 
   /**
      register a commodity that is produced
-     @param the produced commodity
+     @param commod the produced commodity
    */
   void registerCommodity(Commodity& commod);
 
