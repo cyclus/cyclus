@@ -238,6 +238,10 @@ class Model {
      (i.e. this automatically calls "parent->addChild(this);")
    */
   virtual void setParent(Model* parent);
+  /* DEVELOPER NOTE: setParent was made virtual to address issue #292,
+     but this led to a discussion in issue #307.  Resolution of #307
+     may lead to this being reverted to a non-virtual function. 
+  */
 
   /**
      sets the parent_ member
