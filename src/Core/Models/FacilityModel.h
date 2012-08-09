@@ -154,7 +154,7 @@ class FacilityModel : public TimeAgent, public Communicator {
 
   /**
      set the decommission date
-     @param time the time to be decommissioned
+     @param current_time the time to be decommissioned
    */
   void setDecommissionDate(int current_time);
 
