@@ -237,7 +237,7 @@ class Model {
      This DOES add the this model to the specified parent's list of children
      (i.e. this automatically calls "parent->addChild(this);")
    */
-  void setParent(Model* parent);
+  virtual void setParent(Model* parent);
 
   /**
      sets the parent_ member
