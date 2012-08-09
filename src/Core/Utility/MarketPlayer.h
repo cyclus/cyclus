@@ -44,7 +44,7 @@ class MarketPlayer {
      @param value the value of the production capacity
      @param commod the produced commodity
    */
-  void setProductionCapacity(double& value,Commodity& commod);
+  void setProductionCapacity(double value,Commodity& commod);
 
   /**
      return the production capacity for a commodity

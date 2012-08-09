@@ -1,6 +1,6 @@
 #include "SupplyDemandManager.h"
-#include "CycException.h"
 
+#include <utility>
 #include <sstream>
 
 using namespace std;
@@ -26,6 +26,20 @@ void SupplyDemandManager::registerProducer(const Commodity& commodity,
 }
 
 // -------------------------------------------------------------------
+void 
+SupplyDemandManager::
+registerPlayerManager(const Commodity& commodity, 
+                      MarketPlayerManager* m) {
+  map<Commodity,set<MarketPlayerManager*>,CommodityCompare>::iterator 
+    it = player_managers_.find(commodity);
+  if (it == player_managers_.end()) {
+    set<MarketPlayerManager*> s;
+    player_managers_.insert(make_pair(commodity,s));
+  }
+  player_managers_[commodity].insert(m);
+}
+
+// -------------------------------------------------------------------
 double SupplyDemandManager::demand(const Commodity& commodity, 
                                    int time) {
   return commodities_.find(commodity)->second.demand(time);
@@ -39,28 +53,13 @@ SupplyDemandManager::demandFunction(const Commodity& commodity) {
 
 // -------------------------------------------------------------------
 double SupplyDemandManager::supply(const Commodity& commodity) {
-  return commodities_.find(commodity)->second.supply();
-}
-
-// -------------------------------------------------------------------
-void SupplyDemandManager::increaseSupply(const Commodity& commodity, 
-                                         double amt) { 
-  commodities_.find(commodity)->second.increaseSupply(amt); 
-}
-
-// -------------------------------------------------------------------
-void SupplyDemandManager::decreaseSupply(const Commodity& commodity, 
-                                         double amt) { 
-  if (supply(commodity) - amt < 0) {
-    stringstream ss("");
-    ss << "Cannot decrease supply of " << commodity.name()
-       << " from " << supply(commodity) << " by " << amt
-       << " because a negative value would result.";
-    throw CycNegativeValueException(ss.str());
+  double value = 0;
+  set<MarketPlayerManager*>::iterator it;
+  set<MarketPlayerManager*> managers = player_managers_[commodity];
+  for (it = managers.begin(); it != managers.end(); it++) {
+    value += (*it)->playerProductionCapacity();
   }
-  else {
-    commodities_.find(commodity)->second.decreaseSupply(amt); 
-  }
+  return value;
 }
 
 // -------------------------------------------------------------------

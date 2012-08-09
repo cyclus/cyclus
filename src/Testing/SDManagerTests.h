@@ -5,6 +5,8 @@
 
 #include "SupplyDemand.h"
 #include "SymbolicFunctions.h"
+#include "MarketPlayer.h"
+#include "MarketPlayerManager.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SDManagerTests : public ::testing::Test {
@@ -20,9 +22,15 @@ class SDManagerTests : public ::testing::Test {
 
   void initCommodity();
 
+  
+  MarketPlayerManager* mpmanager_;
+  MarketPlayer* player1_;
+  MarketPlayer* player2_;
+  double cap1_, cap2_;
+  void initMarketPlayers();
+
  public:
 
   virtual void SetUp();  
   virtual void TearDown();
-  
 };
