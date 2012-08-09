@@ -15,6 +15,11 @@ class MarketPlayerManager {
      constructor
    */
   MarketPlayerManager();
+
+  /**
+     destructor
+   */
+  virtual ~MarketPlayerManager() {};
   
   /**
      set's the commodity associated with this manager
