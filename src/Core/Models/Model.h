@@ -237,17 +237,17 @@ class Model {
      This DOES add the this model to the specified parent's list of children
      (i.e. this automatically calls "parent->addChild(this);")
    */
-  virtual void setParent(Model* parent);
-  /* DEVELOPER NOTE: setParent was made virtual to address issue #292,
-     but this led to a discussion in issue #307.  Resolution of #307
-     may lead to this being reverted to a non-virtual function. 
-  */
+  void setParent(Model* parent);
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
-  void doSetParent(Model* parent);
+  virtual void doSetParent(Model* parent);
+  /* DEVELOPER NOTE: doSetParent was made virtual to address issue #292,
+     but this led to a discussion in issue #307.  Resolution of #307
+     may lead to this being reverted to a non-virtual function. 
+  */
 
   /**
      set the bornOn date of this model 
@@ -304,6 +304,11 @@ class Model {
    */
   std::vector<Model*> children_;
 
+  /**
+     parent of this model 
+   */
+  Model* parent_;
+
  private:
   /**
      loads the facilities specified in a file 
@@ -353,11 +358,6 @@ class Model {
      used to remove model instance refs from static model lists 
    */
   void removeFromList(Model* model, std::vector<Model*> &mlist);
-
-  /**
-     parent of this model 
-   */
-  Model* parent_;
 
   /**
      parent's ID of this model 
