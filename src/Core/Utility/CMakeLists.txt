@@ -63,6 +63,8 @@ INSTALL(FILES
   IntrusiveBase.h
   LMatrix.h
   Logger.h
+  MarketPlayer.h
+  MarketPlayerManager.h
   MassTable.h
   RecipeLibrary.h
   SupplyDemand.h
