@@ -170,20 +170,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </choice>
       </element>
 
-      <element name="name">
-        <text/>
-      </element>
-
       <zeroOrMore>
-      <element name="incommodity">
-        <text/>
-      </element>
+        <ref name="incommodity"/>
       </zeroOrMore>
 
       <zeroOrMore>
-      <element name="outcommodity">
-        <text/>
-      </element>
+        <ref name="outcommodity"/>
       </zeroOrMore>
 
     </element>
