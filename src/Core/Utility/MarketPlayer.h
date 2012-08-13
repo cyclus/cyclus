@@ -34,6 +34,11 @@ class MarketPlayer {
   MarketPlayer();
 
   /**
+     destructor
+   */
+  virtual ~MarketPlayer() {};
+
+  /**
      register a commodity that is produced
      @param commod the produced commodity
    */
