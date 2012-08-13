@@ -132,6 +132,16 @@ class FacilityModel : public TimeAgent, public Communicator {
   std::string inst_name_;
 
   /**
+     most facilities will have a vector of incomming, request commodities
+   */
+  std::vector<std::string> in_commods_;
+
+  /**
+     most facilities will have a vector of outgoing, offer commodities
+   */
+  std::vector<std::string> out_commods_;
+
+  /**
      each facility needs a lifetime 
    */
   int fac_lifetime_;
