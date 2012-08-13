@@ -176,6 +176,10 @@ Workflow Notes
           make install
           ../install/cyclus/bin/CyclusUnitTestDriver
 
+      - If your changes to the core repository have an effect on any module 
+        repositories (such as `cyamore <https://github.com/cyclus/cycamore/>`_ 
+        ), please install those modules and test them appropriately as well.  
+
   * **Making a Pull Request** 
     
       - When you are ready to move changes from one of your topic branches into the 
