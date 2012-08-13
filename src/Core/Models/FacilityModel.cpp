@@ -14,6 +14,8 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
   setModelType("Facility");
+  in_commods_ = std::vector<std::string>();
+  out_commods_ = std::vector<std::string>();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,7 +54,6 @@ void FacilityModel::init(xmlNodePtr cur) {
     }
   }
   catch (CycNullXPathException e) {
-    in_commods_.push_back(NULL);
   }
 
   // get the outcommodities
@@ -65,7 +66,6 @@ void FacilityModel::init(xmlNodePtr cur) {
     }
   }
   catch (CycNullXPathException e) {
-    out_commods_.push_back(NULL);
   }
 
 
