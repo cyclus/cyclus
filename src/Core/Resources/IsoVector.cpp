@@ -4,7 +4,7 @@
 #include "CycException.h"
 #include "Logger.h"
 #include "DecayHandler.h"
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 
 #include <vector>
 #include <string>
@@ -12,7 +12,7 @@
 
 using namespace std;
 
-LogLevel IsoVector::log_level_ = LEV_INFO3;
+LogLevel IsoVector::record_level_ = LEV_INFO3;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector() {
@@ -111,13 +111,13 @@ void IsoVector::reset() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IsoVector::print() {
-  CLOG(log_level_) << "This IsoVector manages: ";
+  CLOG(record_level_) << "This IsoVector manages: ";
   composition_->print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::log() {
-  RL->logRecipe(composition_);
+void IsoVector::record() {
+  RL->recordRecipe(composition_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -217,18 +217,18 @@ void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
 void IsoVector::decay(double time) {
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
-  bool root_logged = root->logged();
+  bool root_recorded = root->recorded();
   Basis orig_basis = parent->basis();
   CompMapPtr child;
-  if (root_logged) { 
+  if (root_recorded) { 
     int t_f = parent->root_decay_time() + time;
-    bool child_logged = RL->daughterLogged(parent,t_f);
-    if (child_logged) {
-      child = RL->Daughter(parent,t_f);
+    bool child_recorded = RL->childRecorded(parent,t_f);
+    if (child_recorded) {
+      child = RL->Child(parent,t_f);
     }
     else {
-      child = executeDecay(parent,time); // do decay and log it
-      RL->logRecipeDecay(parent,child,t_f);
+      child = executeDecay(parent,time); // do decay and record it
+      RL->recordRecipeDecay(parent,child,t_f);
     }
   }
   else {

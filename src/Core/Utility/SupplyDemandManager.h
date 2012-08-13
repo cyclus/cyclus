@@ -3,9 +3,11 @@
 
 #include "SupplyDemand.h"
 #include "SymbolicFunctions.h"
+#include "MarketPlayerManager.h"
 
 #include <vector>
 #include <map>
+#include <set>
 
 /**
    This is a manager class that manages a set of commodities. Those 
@@ -38,11 +40,20 @@ class SupplyDemandManager {
   /**
      calls the registerProducer() function of the CommodityInformation
      instance associated with the commodity
-     @param the commodity gaining a new producer
-     @param the producer to be registered
+     @param commodity the commodity gaining a new producer
+     @param producer the producer to be registered
    */
   void registerProducer(const Commodity& commodity, 
                         const Producer& producer);
+
+  /**
+     adds a player manager to the set of managers for a given 
+     commodity
+     @param commodity the commodity gaining a new player manager
+     @param m the new player manager
+   */
+  void registerPlayerManager(const Commodity& commodity, 
+                             MarketPlayerManager* m);
 
   /**
      the demand for a commodity at a given time
@@ -52,18 +63,17 @@ class SupplyDemandManager {
   double demand(const Commodity& commodity, int time);
 
   /**
+     returns the demand function for a commodity
+     @param commodity the commodity being queried
+   */
+  FunctionPtr demandFunction(const Commodity& commodity);
+
+  /**
      returns the current supply of a commodity
      @param commodity the commodity
      @return the current supply of the commodity
    */
   double supply(const Commodity& commodity);
-
-  /**
-     increase the supply of a given commodity by an amount
-     @param commodity the commodity
-     @param amt the amount to increase
-   */
-  void increaseSupply(const Commodity& commodity, double amt);
   
   /**
      return the number of producers of a given commodity
@@ -84,6 +94,10 @@ class SupplyDemandManager {
   /// a container of all commodities known to the manager
   std::map<Commodity,CommodityInformation,
     CommodityCompare> commodities_;
+
+  /// a container of all player managers known to the manager
+  std::map<Commodity,std::set<MarketPlayerManager*>,
+    CommodityCompare> player_managers_;
 };
 
 #endif

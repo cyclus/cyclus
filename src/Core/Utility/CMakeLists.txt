@@ -41,8 +41,10 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/LMatrix.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayer.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MassTable.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLogger.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLibrary.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionFactories.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctions.cpp 
@@ -61,8 +63,10 @@ INSTALL(FILES
   IntrusiveBase.h
   LMatrix.h
   Logger.h
+  MarketPlayer.h
+  MarketPlayerManager.h
   MassTable.h
-  RecipeLogger.h
+  RecipeLibrary.h
   SupplyDemand.h
   SupplyDemandManager.h
   SymbolicFunctionFactories.h

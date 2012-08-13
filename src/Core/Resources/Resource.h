@@ -147,12 +147,12 @@ public:
  public:
 
   /**
-     the output database table which logs resources 
+     the output database table which records resources 
    */
   static table_ptr resource_table;
 
   /**
-     the output database table which logs resource types 
+     the output database table which records resource types 
    */
   static table_ptr resource_type_table;
 
@@ -167,14 +167,14 @@ public:
   virtual std::string type_name() = 0;
 
   /**
-     returns if this type of resource is logged 
+     returns if this type of resource is recorded 
    */
-  virtual bool is_resource_type_logged() = 0;
+  virtual bool is_resource_type_recorded() = 0;
 
   /**
-     declares that this resource type is now logged 
+     declares that this resource type is now recorded 
    */
-  virtual void type_logged() = 0;
+  virtual void type_recorded() = 0;
   
  private:
   /**
@@ -190,7 +190,7 @@ public:
   /**
      adds a resource type to the resource type table 
    */
-  void logNewType();
+  void recordNewType();
 
   /**
      the primary key reference to this resource 

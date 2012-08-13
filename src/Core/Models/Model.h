@@ -220,12 +220,34 @@ class Model {
   int nChildren() {return children_.size();}
 
   /**
-     set the parent of this model 
+     recursively prints the parent-child tree
+   */
+  std::string printChildren();
+
+  /**
+     returns a vector of strings representing the parent-child tree
+     at the node for Model m
+     @param m the model node to base as the root of this print tree
+   */
+  std::vector<std::string> getTreePrintOuts(Model* m);
+
+  /**
+     calls doSetParent() and itLives()
 
      This DOES add the this model to the specified parent's list of children
      (i.e. this automatically calls "parent->addChild(this);")
    */
   void setParent(Model* parent);
+
+  /**
+     sets the parent_ member
+     @param parent the model to set parent_ to
+   */
+  virtual void doSetParent(Model* parent);
+  /* DEVELOPER NOTE: doSetParent was made virtual to address issue #292,
+     but this led to a discussion in issue #307.  Resolution of #307
+     may lead to this being reverted to a non-virtual function. 
+  */
 
   /**
      set the bornOn date of this model 
@@ -282,6 +304,11 @@ class Model {
    */
   std::vector<Model*> children_;
 
+  /**
+     parent of this model 
+   */
+  Model* parent_;
+
  private:
   /**
      loads the facilities specified in a file 
@@ -331,11 +358,6 @@ class Model {
      used to remove model instance refs from static model lists 
    */
   void removeFromList(Model* model, std::vector<Model*> &mlist);
-
-  /**
-     parent of this model 
-   */
-  Model* parent_;
 
   /**
      parent's ID of this model 

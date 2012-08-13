@@ -8,7 +8,7 @@
 
 #include "Timer.h"
 #include "Env.h"
-#include "RecipeLogger.h"
+#include "RecipeLibrary.h"
 #include "CycException.h"
 #include "Model.h"
 //#include "Material.h"
@@ -111,7 +111,7 @@ void InputXML::load_file(std::string filename) {
 
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  RecipeLogger::load_recipes();
+  RecipeLibrary::load_recipes();
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
   
   //Models
@@ -135,7 +135,7 @@ void InputXML::load_recipebook(std::string filename) {
   recipebook.doc = validate_file(&recipebook);
   recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
 
-  RecipeLogger::load_recipes();
+  RecipeLibrary::load_recipes();
 
   // get rid of recipebook, freeing memory
   delete curFilePtr;
@@ -175,16 +175,20 @@ void InputXML::load_facilitycatalog(std::string filename) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression) {
-
-  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
-  xpathCtxt->node = cur;
+xmlNodeSetPtr InputXML::get_xpath_elements(xmlXPathContextPtr& context,
+                                           xmlNodePtr& cur,
+                                           const char* expression) {
+  context->node = cur;
   
   /* Evaluate xpath expression */
-  xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
-  if(xpathObj == NULL) {
-    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
-    xmlXPathFreeContext(xpathCtxt); 
+  xmlXPathObjectPtr xpathObj = 
+    xmlXPathEvalExpression((const xmlChar*)expression, context);
+
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
   return xpathObj->nodesetval;
@@ -194,18 +198,22 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlNodePtr cur,const char* expression
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression) {
-
-  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
-  xpathCtxt->node = cur;
+xmlNodePtr InputXML::get_xpath_element(xmlXPathContextPtr& context,
+                                       xmlNodePtr& cur,
+                                       const char* expression) {
+  context->node = cur;
   
   /* Evaluate xpath expression */
-  xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
-  if(xpathObj == NULL) {
-    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
-    xmlXPathFreeContext(xpathCtxt); 
-  }
+  xmlXPathObjectPtr xpathObj = 
+    xmlXPathEvalExpression((const xmlChar*)expression,context);
 
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
+  }
+  
   return xpathObj->nodesetval->nodeTab[0];
 
   // when and how to cleanup memory allocation?
@@ -213,35 +221,44 @@ xmlNodePtr InputXML::get_xpath_element(xmlNodePtr cur,const char* expression) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* InputXML::get_xpath_content(xmlNodePtr cur,const char* expression) {
-
-  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
-  xpathCtxt->node = cur;
+const char* InputXML::get_xpath_content(xmlXPathContextPtr& context,
+                                        xmlNodePtr& cur,
+                                        const char* expression) {
+  context->node = cur;
   
   /* Evaluate xpath expression */
-  xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
-  if(xpathObj == NULL) {
-    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
-    xmlXPathFreeContext(xpathCtxt); 
+  xmlXPathObjectPtr xpathObj = 
+    xmlXPathEvalExpression((const xmlChar*)expression, context);
+  
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
-  return (const char*)(xpathObj->nodesetval->nodeTab[0]->children->content);
+  return (const char*)(xpathObj->nodesetval->
+                       nodeTab[0]->children->content);
 
   // when and how to cleanup memory allocation?
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* InputXML::get_xpath_name(xmlNodePtr cur,const char* expression) {
-
-  xmlXPathContextPtr xpathCtxt = curFilePtr->xpathCtxt;
-  xpathCtxt->node = cur;
+const char* InputXML::get_xpath_name(xmlXPathContextPtr& context,
+                                     xmlNodePtr& cur,
+                                     const char* expression) {
+  context->node = cur;
   
   /* Evaluate xpath expression */
-  xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
-  if(xpathObj == NULL) {
-    fprintf(stderr,"Error: unable to evaluate xpath expression \"%s\"\n", expression);
-    xmlXPathFreeContext(xpathCtxt); 
+  xmlXPathObjectPtr xpathObj = 
+    xmlXPathEvalExpression((const xmlChar*)expression, context);
+
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
   return (const char*)(xpathObj->nodesetval->nodeTab[0]->name);

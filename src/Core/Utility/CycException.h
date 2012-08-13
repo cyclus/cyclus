@@ -54,6 +54,11 @@ class CycIndexException: public CycException {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class CycKeyException: public CycException {
+  public: CycKeyException(std::string msg) : CycException(msg) {};
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CycIOException: public CycException {
   public: CycIOException(std::string msg) : CycException(msg) {};
 };
@@ -76,6 +81,13 @@ class CycParseException: public CycException {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CycOverrideException: public CycException {
   public: CycOverrideException(std::string msg) : CycException(msg) {};
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class CycNegativeValueException : public CycException {
+///An exception class for something nonzero attempting to be decreased below 0.
+   public: 
+      CycNegativeValueException(std::string msg) : CycException(msg) {};
 };
 
 #endif

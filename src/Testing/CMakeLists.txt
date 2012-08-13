@@ -10,14 +10,17 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
+  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandlerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
   PARENT_SCOPE)
 
 # Add all the tests by parsing the source code
@@ -52,6 +55,25 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   )
 
 INSTALL(FILES 
+  ModelTests.cpp
+  ModelTests.h
+  FacilityModelTests.cpp
+  FacilityModelTests.h
+  InstModelTests.cpp
+  InstModelTests.h
+  RegionModelTests.cpp
+  RegionModelTests.h
+  BuildingManagerTests.h
+  ConverterModelTests.cpp
+  ConverterModelTests.h
+  MarketModelTests.cpp
+  MarketModelTests.h
+  MarketPlayerTests.h
+  SDManagerTests.h
+  StubModelTests.cpp
+  StubModelTests.h
+  StubCommModelTests.cpp
+  StubCommModelTests.h
   TestInst.h
   TestRegion.h
   TestFacility.h

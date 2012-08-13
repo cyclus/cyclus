@@ -100,14 +100,14 @@ public:
   virtual std::string type_name(){return "Generic Resource";}
 
   /**
-     Return if this resource type has been logged for the database 
+     Return if this resource type has been recorded for the database 
    */ 
-  bool is_resource_type_logged(){return type_is_logged_;}
+  bool is_resource_type_recorded(){return type_is_recorded_;}
 
   /**
-     Tells this resource that it has, indeed, been logged 
+     Tells this resource that it has, indeed, been recorded 
    */   
-  void type_logged(){type_is_logged_ = true;}
+  void type_recorded(){type_is_recorded_ = true;}
   
   /**
      Absorbs the contents of the given 'other' resource into this 
@@ -146,9 +146,9 @@ private:
 
  private:
   /**
-     A boolean to tell if the resource has been logged 
+     A boolean to tell if the resource has been recorded 
    */ 
-  static bool type_is_logged_;
+  static bool type_is_recorded_;
 
   /**
      defines the resource table 
