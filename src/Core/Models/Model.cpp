@@ -88,10 +88,14 @@ void Model::initializePrototype(std::string model_type,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_models() {
+void Model::loadGlobalElements() {
   load_converters();
   load_markets();
   load_facilities();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::loadEntities() {
   load_institutions();
   load_regions();
 }
@@ -133,7 +137,7 @@ void Model::load_facilities() {
   nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    initializePrototypes("Facility",nodes->nodeTab[i]);
+    initializePrototype("Facility",nodes->nodeTab[i]);
   }
 }
   

@@ -102,9 +102,14 @@ class Model {
   static void initializePrototype(std::string model_type, xmlNodePtr cur);
 
   /**
-     loads all models appropriately ordered by type 
+     loads all globally accessible elements
    */
-  static void load_models();
+  static void loadElements();
+
+  /**
+     loads all simulation entities
+   */
+  static void loadEntities();
 
   /**
      load all facilities 
