@@ -364,6 +364,28 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="name">
          <text/>
       </element>
+      
+      <optional>
+	<oneOrMore>
+	  <element name="availableprototype">
+	    <text/>
+	  </element>
+	</oneOrMore>
+      </optional>
+
+      <optional>
+	<element name="initialfacilitylist">
+	  <oneOrMore>
+	    <element name="prototype">
+	      <text/>
+	    </element>
+	    <element name="number">
+	      <data type="nonNegativeInteger"/>
+	    </element>
+	  </oneOrMore>
+	</element>
+      </optional>
+
       <element name="model">
       <choice>
         <ref name="StubInst"/>

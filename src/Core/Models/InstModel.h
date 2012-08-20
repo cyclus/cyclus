@@ -6,13 +6,15 @@
 #include "Communicator.h"
 #include "RegionModel.h"
 #include "Model.h"
+#include "Prototype.h"
 
+#include <map>
 #include <set>
 #include <list>
 
 // Usefull Typedefs
-typedef std::set<Model*> PrototypeSet;
-typedef std::set<Model*>::iterator PrototypeIterator;
+typedef std::set<Prototype*> PrototypeSet;
+typedef std::set<Prototype*>::iterator PrototypeIterator;
 
 /**
    The InstModel class is the abstract class/interface 
@@ -130,6 +132,10 @@ class InstModel : public TimeAgent, public Communicator {
    */
   virtual void handleDailyTasks(int time, int day);
 
+  /**
+     perform all tasks required when an inst enters the simulation
+   */
+  virtual void enterSimulation(Model* parent);
 /* ------------------- */ 
 
 
@@ -143,10 +149,16 @@ class InstModel : public TimeAgent, public Communicator {
    */
   PrototypeSet* prototypes_;
 
-   /**
-     Add a prototype to the Insts list of prototypes 
+  /**
+     the initial prototypes to build
    */
-  void addPrototype(Model* prototype);  
+  std::map<Prototype*,int> initial_build_order_;
+
+  /**
+     Adds a prototype build order to initial_build_order_
+     @param cur the xml node comprising the order
+   */
+  void addPrototypeToInitialBuild(xmlNodePtr cur)
 
  public:
   /**
@@ -167,10 +179,23 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Checks if prototype is in the prototype list 
    */
-  bool isAvailablePrototype(Model* prototype) {
+  bool isAvailablePrototype(Prototype* prototype) {
     return ( prototypes_->find(prototype) 
 	     != prototypes_->end() ); 
   }
+
+  /**
+     another moniker for isAvailablePrototype
+     @param prototype the prototype to be built
+   */
+  virtual bool canBuild(Prototype* prototype) {return isAvailablePrototype(prototype);}
+  
+  /**
+     checks if a prototype is in its list of available prototypes
+     if not, it throws an error
+     @param p the prototype to check for
+   */
+  virtual checkAvailablePrototype(Prototype* p);
 
   /**
      returns this institution's region 
@@ -181,16 +206,6 @@ class InstModel : public TimeAgent, public Communicator {
      reports number of facilities in this inst 
    */
   int getNumFacilities(){ return this->nChildren();};
-
-  /**
-     determines if a prototype can be built by this inst at the present
-     time
-
-     by default, returns false
-
-     @param prototype the prototype to be built
-   */
-  virtual bool canBuild(Model* prototype) {return false;}
 
   /**
      builds a prototype 
