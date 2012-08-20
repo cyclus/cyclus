@@ -8,6 +8,7 @@
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"
+#include "Prototype.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
@@ -65,7 +66,8 @@ class Material;
    pages that describe how to get the models and the detailed behavior 
  */
 
-class FacilityModel : public TimeAgent, public Communicator {
+class FacilityModel : public TimeAgent, public Communicator, 
+  public Prototype {
 /* --------------------
  * all MODEL classes have these members
  * --------------------

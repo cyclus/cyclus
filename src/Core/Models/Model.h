@@ -69,27 +69,37 @@ class Model {
   static std::vector<Model*> getModelList();
 
   /**
-     Creates a model instance for use in the simulation 
-      
-     @param model_type model type (region, inst, facility, ...) to 
-     create @param cur pointer to the xml input representing the model 
-   */
-  static void create(std::string model_type, xmlNodePtr cur);
-
-  /** 
-     Create a new model object based on an existing one 
-      
-     @param model_orig a pointer to the original Model to be mimicked 
-   */
-  static Model* create(Model* model_orig);
-
-  /**
      dynamically loads a model constructor from a shared object file 
+     
+     as this is system dependent, a function is provided in the 
+     LoadConstructor files in the src/Core/Config folder.
       
      @param model_type model type (region, inst, facility, ...) to add 
      @param model_name name of model (NullFacility, StubMarket, ...) to 
    */
   static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
+
+  /**
+     provides a constructed simulation entity
+     @param model_type the type of entity
+     @param model_name the name of the entity
+     @return a pointer to the construced entity
+   */
+  static Model* getEntityViaConstructor(std::string model_type, std::string model_name);
+
+  /**
+     constructs and initializes an entity
+     @param model_type the type of entity
+     @param cur the initialization snippet position in input
+   */
+  static void initializeSimulationEntity(std::string model_type, xmlNodePtr cur);
+
+  /**
+     constructs and initializes a prototype
+     @param model_type the type of entity
+     @param cur the initialization snippet position in input
+   */
+  static void initializePrototype(std::string model_type, xmlNodePtr cur);
 
   /**
      loads all models appropriately ordered by type 
@@ -288,11 +298,6 @@ class Model {
                               std::vector<rsrc_ptr> manifest);
 
   /**
-     returns whether or not the model is a template 
-   */
-  bool isTemplate() {return is_template_;};
-
-  /**
      Asks if a model can build a certain prototype. Returns false by
      default.
    */
@@ -345,11 +350,6 @@ class Model {
   static int next_id_;
 
   /**
-     comprehensive list of all templated models. 
-   */
-  static std::vector<Model*> template_list_;
-
-  /**
      comprehensive list of all initialized models. 
    */
   static std::vector<Model*> model_list_;
@@ -377,11 +377,6 @@ class Model {
   int diedOn_;
   
   /**
-     map of constructor methods for each loaded model 
-   */
-  static std::map<std::string, mdl_ctor*> create_map_;
-
-  /**
      every instance of a model should have a name 
    */
   std::string name_;
@@ -400,11 +395,6 @@ class Model {
      every instance of a model will have a serialized ID 
    */
   int ID_;
-
-  /**
-     whether or not the model is a template 
-   */
-  bool is_template_;
 
   /**
      wheter or not the model has been born 

@@ -91,15 +91,13 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      set the parameters necessary for RegionModel to interact
      with the simulation
-     
-     @param reg the RegionModel to initialize
    */
-  virtual void initSimInteraction(RegionModel* reg);
+  virtual void addRegionAsRootNode();
 
   /**
      populate the region's list of child institutions
    */
-  virtual void initChildren(xmlNodePtr cur);
+  virtual void addChildrenToTree(xmlNodePtr cur);
 
   /**
      every model needs a method to copy one object to another 
