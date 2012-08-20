@@ -116,6 +116,7 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << e.what();
   }
 
+  // print the model list
   Model::printModelList();
   
   // Run the simulation 

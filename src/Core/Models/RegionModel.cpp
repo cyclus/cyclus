@@ -6,6 +6,7 @@
 
 #include "RegionModel.h"
 
+#include "Model.h"
 #include "InstModel.h"
 #include "CycException.h"
 #include "InputXML.h"
@@ -43,8 +44,8 @@ void RegionModel::initAllowedFacilities(xmlNodePtr cur) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::addRegionAsRootNode() {
-  setParent(this);
-  TI->registerTickListener(reg);
+  Model::enterSimulation(this);
+  TI->registerTickListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -55,7 +56,7 @@ void RegionModel::addChildrenToTree(xmlNodePtr cur) {
   for (int i=0;i<inst_nodes->nodeNr;i++){
     inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
     inst = Model::getModelByName(inst_name);
-    inst->setParent(this);
+    inst->enterSimulation(this);
   }
 }
 

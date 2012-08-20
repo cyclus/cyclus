@@ -255,37 +255,23 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::itLives() {
+void Model::enterSimulation(Model* parent){ 
+  // set model-specific members
+  parent_ID_ = parent->ID();
+  setParent(parent);
+  bornOn_ = TI->time();
 
-  this->setBornOn( TI->time() );
-
-  if (parent_ == NULL) {
-    parentID_ = this->ID();
-  } else {
-    parentID_ = parent_->ID();
-  }
-  
-  // register the model with the simulation
+  // add model to the database
   this->addToTable();
-  
-  // if this node is not its own parent, add it to its parent's list of children
-  if (parent_ != NULL){
-    parent_->addChild(this);
-  }
 
-  CLOG(LEV_DEBUG2) << "Created Model: {";
+  // inform user
+  CLOG(LEV_DEBUG2) << "Model Entered Simulation: {";
   CLOG(LEV_DEBUG2) << str();
   CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
-  doSetParent(parent);
-  itLives();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::doSetParent(Model* parent){ 
   if (parent == this) {
     // root nodes are their own parent
     parent_ = NULL; // parent pointer set to NULL for memory management
