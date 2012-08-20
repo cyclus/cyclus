@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
+#include "Model.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -32,6 +33,14 @@ void FacilityModel::init(xmlNodePtr cur) {
   }
   setDecommissionDate(TI->time());
 } 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::enterSimulation(Model* parent) {
+  Model::enterSimulation(parent);
+  initializeConcreteMembers();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::initializeConcreteMembers() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::copy(FacilityModel* src) { 

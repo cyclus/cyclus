@@ -51,7 +51,7 @@ class Prototype {
      initialized members
      @param p the prototype to copy members from
    */
-  virtual void copyInitializedMembers(Prototype* p) = 0;
+  virtual void getInitializedClone(Prototype* p) = 0;
 
   /**
      a function to be overridden if a prototype needs a constructing

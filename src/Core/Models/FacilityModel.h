@@ -90,6 +90,21 @@ class FacilityModel : public TimeAgent, public Communicator,
   virtual void copy(FacilityModel* src);
 
   /**
+     overrides Model's enterSimulation() in order to additionally
+     initialize members for prototypes that enter simulations
+   */
+  virtual void enterSimulation(Model* parent);
+
+  /**
+     allows facilities to define what members need to be initialized
+     after their prototypes have been cloned and entered into the 
+     simulation
+
+     this operation is empty by default
+   */
+  virtual void initializeConcreteMembers();
+
+  /**
      This drills down the dependency tree to initialize all relevant 
      parameters/containers. 
       

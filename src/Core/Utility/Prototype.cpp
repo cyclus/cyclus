@@ -24,9 +24,8 @@ Prototype* Prototype::getRegisteredPrototype(std::string name) {
 }
 
 // -------------------------------------------------------------------
-Prototype* Prototype::clone(std::string name) {
-  Prototype* prototype = getRegisteredPrototype(name);
-  Prototype* clone = copyInitializedMembers(prototype);
+Prototype* Prototype::clone() {
+  Prototype* clone = getInitializedClone(this);
   return clone;
 }
 

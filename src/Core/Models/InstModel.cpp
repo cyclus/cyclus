@@ -109,31 +109,16 @@ void InstModel::handleDailyTasks(int time, int day){
  * all INSTMODEL classes have these members
  * --------------------
  */
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void InstModel::addPrototype(Model* prototype) {
+void InstModel::addPrototype(Prototype* prototype) {
   if ( !isAvailablePrototype(prototype) ) {
     prototypes_->insert(prototype);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::build(Model* prototype, Model* requester) {
-  // by default
-  stringstream err("");
-  err << "Institution " << this->name() << " does not have a definied " 
-      << "facility-building fuction.";
-  throw CycOverrideException(err.str());
-}
-
-double InstModel::powerCapacity(){
-  // queries each facility for their power capacity
-  double capacity = 0.0;
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    capacity += (dynamic_cast<FacilityModel*>(*fac))->powerCapacity();
-  }
-  return capacity;
+void InstModel::build(Prototype* prototype) {
+  Prototype* clone = prototype->clone();
+  dynamice_cast<Model*>(clone)->enterSimulation(this);
 }
 

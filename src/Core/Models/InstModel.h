@@ -183,11 +183,6 @@ class InstModel : public TimeAgent, public Communicator {
   int getNumFacilities(){ return this->nChildren();};
 
   /**
-     queries the power capacity of each facility in the institution 
-   */
-  double powerCapacity();
-
-  /**
      determines if a prototype can be built by this inst at the present
      time
 
@@ -198,24 +193,10 @@ class InstModel : public TimeAgent, public Communicator {
   virtual bool canBuild(Model* prototype) {return false;}
 
   /**
-     builds a prototype requested by requester
-
-     by default, an error is thrown.
-
-     @param prototype the prototype to be built 
-     @param requester the Model requesting that the prototype be built 
+     builds a prototype 
+     @param prototype the prototype to build
    */
-  virtual void build(Model* prototype, Model* requester);
-
-  /**
-     builds a prototype with a specific name as requested by requester
-     
-     by default, it calls the simpler build function
-   */
-  virtual void build(Model* prototype, Model* requester, 
-                     std::string name) { 
-    build(prototype,requester); 
-  }
+  void build(Prototype* prototype);
 
 /* ------------------- */ 
   
