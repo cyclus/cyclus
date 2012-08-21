@@ -124,7 +124,12 @@ class XMLQueryEngine {
    */
   std::string get_child(const char* expression);
   
+  /**
+     Get the name of a specific child element of matches.  This is
+     typically the result of a wildcard search.
 
+     @param elementNum the ordinal number of the element to be queried
+  */
   std::string get_name(int elementNum);
 
  private:
