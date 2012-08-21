@@ -21,6 +21,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/XMLFileLoaderTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/XMLQueryEngineTests.cpp
   PARENT_SCOPE)
 
