@@ -176,6 +176,7 @@ void Transaction::define_trans_table(){
   trans_table->addField("ID","INTEGER");
   trans_table->addField("SenderID","INTEGER");
   trans_table->addField("ReceiverID","INTEGER");
+  trans_table->addField("MarketID","INTEGER");
   trans_table->addField("Time","INTEGER");
   trans_table->addField("Price","REAL");
   // declare the table's primary key
@@ -183,12 +184,15 @@ void Transaction::define_trans_table(){
   pk.push_back("ID");
   trans_table->setPrimaryKey(pk);
   // add foreign keys
-  foreign_key_ref *fkref;
+  foreign_key_ref *fkref, *fkref_m;
   foreign_key *fk;
-  key myk, theirk;
+  key myk, theirk, theirk_m;
   //   Agents table foreign keys
   theirk.push_back("ID");
   fkref = new foreign_key_ref("Agents",theirk);
+  //   Markets table foreigh keys
+  theirk_m.push_back("ID");
+  fkref_m = new foreign_key_ref("Markets",theirk_m);
   //     the sender id
   myk.push_back("SenderID");
   fk = new foreign_key(myk, (*fkref) );
@@ -200,6 +204,12 @@ void Transaction::define_trans_table(){
   trans_table->addForeignKey( (*fk) ); // receiver id references agents' id
   myk.clear();
   theirk.clear();
+  //     the market id
+  myk.push_back("MarketID");
+  fk = new foreign_key(myk, (*fkref_m) );
+  trans_table->addForeignKey( (*fk) ); // this market id references markets' id
+  myk.clear();
+  theirk_m.clear();
   // we've now defined the table
   trans_table->tableDefined();
 }
@@ -211,17 +221,27 @@ void Transaction::addTransToTable() {
   
   // make a row
   // declare data
-  data an_id(trans_id_), a_sender( supplier_->ID() ), 
-    a_receiver( requester_->ID() ), a_time( TI->time() ), 
-    a_price( price_ );
+  data an_id(trans_id_), 
+       a_sender( supplier_->ID() ), 
+       a_receiver( requester_->ID() ), 
+       a_market( market()->ID() ), 
+       a_time( TI->time() ), 
+       a_price( price_ );
   // declare entries
-  entry id("ID",an_id), sender("SenderID",a_sender), 
-    receiver("ReceiverID",a_receiver), time("Time",a_time), 
-    price("Price",a_price);
+  entry id("ID",an_id), 
+        sender("SenderID",a_sender), 
+        receiver("ReceiverID",a_receiver), 
+        market("ReceiverID",a_market), 
+        time("Time",a_time), 
+        price("Price",a_price);
   // declare row
   row aRow;
-  aRow.push_back(id), aRow.push_back(sender), aRow.push_back(receiver), 
-    aRow.push_back(time),aRow.push_back(price);
+  aRow.push_back(id), 
+    aRow.push_back(sender), 
+    aRow.push_back(receiver), 
+    aRow.push_back(market), 
+    aRow.push_back(time),
+    aRow.push_back(price);
   // add the row
   trans_table->addRow(aRow);
   // record this primary key
