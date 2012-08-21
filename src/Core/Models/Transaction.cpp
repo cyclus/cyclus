@@ -177,6 +177,7 @@ void Transaction::define_trans_table(){
   trans_table->addField("SenderID","INTEGER");
   trans_table->addField("ReceiverID","INTEGER");
   trans_table->addField("MarketID","INTEGER");
+  trans_table->addField("Commodity","VARCHAR(128)");
   trans_table->addField("Time","INTEGER");
   trans_table->addField("Price","REAL");
   // declare the table's primary key
@@ -221,13 +222,15 @@ void Transaction::addTransToTable() {
        a_sender( supplier_->ID() ), 
        a_receiver( requester_->ID() ), 
        a_market( market()->ID() ), 
+       a_commodity( commod() ), 
        a_time( TI->time() ), 
        a_price( price_ );
   // declare entries
   entry id("ID",an_id), 
         sender("SenderID",a_sender), 
         receiver("ReceiverID",a_receiver), 
-        market("ReceiverID",a_market), 
+        market("MarketID",a_market), 
+        commodity("Commodity",a_commodity), 
         time("Time",a_time), 
         price("Price",a_price);
   // declare row
@@ -236,6 +239,7 @@ void Transaction::addTransToTable() {
     aRow.push_back(sender), 
     aRow.push_back(receiver), 
     aRow.push_back(market), 
+    aRow.push_back(commodity), 
     aRow.push_back(time),
     aRow.push_back(price);
   // add the row
