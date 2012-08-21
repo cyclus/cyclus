@@ -59,14 +59,6 @@ void RegionModel::addChildrenToTree(xmlNodePtr cur) {
     inst->enterSimulation(this);
   }
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::copy(RegionModel* src) {
-  Model::copy(src);
-  Communicator::copy(src);
-  allowedFacilities_ = src->allowedFacilities_;
-  RegionModel::initSimInteraction(src);
-}
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 std::string RegionModel::str() {

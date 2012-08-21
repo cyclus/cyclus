@@ -43,15 +43,6 @@ void FacilityModel::enterSimulation(Model* parent) {
 void FacilityModel::initializeConcreteMembers() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::copy(FacilityModel* src) { 
-  Model::copy(src); 
-  Communicator::copy(src); 
-
-  // don't copy fac_name to new instance
-  this->setFacName("");
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
   return Model::str();
 };

@@ -132,24 +132,6 @@ class Model {
   virtual void init(xmlNodePtr cur);
 
   /**
-     A method to copy a model 
-      
-     @param model_orig pointer to the original (usu initialized) model 
-   */
-  virtual void copy(Model* model_orig);
-
-  /**
-     Drills down the dependency tree to initialize all relevant 
-     parameters/containers. 
-      
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param model_orig pointer to (usu initialized) model to be copied 
-   */
-  virtual void copyFreshModel(Model* model_orig)=0;
-
-  /**
      Destructor for the Model Class 
    */
   virtual ~Model();

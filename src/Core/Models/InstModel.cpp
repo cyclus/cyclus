@@ -77,12 +77,6 @@ void InstModel::checkAvailablePrototype(Prototype* p) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::copy(InstModel* src) {
-  Model::copy(src);
-  Communicator::copy(src);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::string InstModel::str() {
   try {
     return Model::str() + " in region" + parent()->name();

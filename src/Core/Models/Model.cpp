@@ -182,20 +182,6 @@ void Model::init(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::copy(Model* model_orig) {
-  if (model_orig->modelType() != model_type_ && 
-       model_orig->modelImpl() != model_impl_) {
-    throw CycTypeException("Cannot copy a model of type " 
-        + model_orig->modelType() + "/" + model_orig->modelImpl()
-        + " to an object of type "
-        + model_type_ + "/" + model_impl_);
-  }
-
-  name_ = model_orig->name();
-  model_impl_ = model_orig->modelImpl();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
   children_ = vector<Model*>();
   name_ = "";

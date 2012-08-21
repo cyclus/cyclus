@@ -24,11 +24,6 @@ void StubTimeAgent::init(xmlNodePtr cur) {
 };
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::copy(StubTimeAgent* src) { 
-  TimeAgent::copy(src); 
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubTimeAgent::str() { 
   return TimeAgent::str() + ""; 
 };
