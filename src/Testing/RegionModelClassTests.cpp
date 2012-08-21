@@ -13,7 +13,6 @@ class ConcreteRegionModel : public RegionModel {
   
   virtual ~ConcreteRegionModel() { };
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<ConcreteRegionModel*>(src));}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,8 +27,6 @@ class DieInst : public InstModel {
   
   virtual ~DieInst() {};
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<DieInst*>(src));}
-
   virtual void handleTick(int time) {
     tickCount_++;
     totalTicks++;

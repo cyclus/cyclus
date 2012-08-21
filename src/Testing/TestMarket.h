@@ -16,11 +16,5 @@ class TestMarket : public MarketModel {
     }
     virtual void resolve() {
     }
-    virtual void copy(TestMarket* src){
-      commodity_ = src->commodity_;
-    }
-    void copyFreshModel(Model* src){
-      copy(dynamic_cast<TestMarket*>(src));
-    }
 };
 #endif

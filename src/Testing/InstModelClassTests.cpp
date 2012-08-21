@@ -13,7 +13,6 @@ class ConcreteInstModel : public InstModel {
   
   virtual ~ConcreteInstModel() {};
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<ConcreteInstModel*>(src));}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,8 +27,6 @@ class DieModel : public FacilityModel {
   
   virtual ~DieModel() {};
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<DieModel*>(src));}
-
   virtual void receiveMessage(msg_ptr msg) { };
 
   virtual void handleTick(int time) {
