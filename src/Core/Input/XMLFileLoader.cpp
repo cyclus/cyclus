@@ -7,6 +7,7 @@
 #include "XMLFileLoader.h"
 #include "XMLQueryEngine.h"
 
+#include "Env.h"
 #include "Timer.h"
 #include "RecipeLibrary.h"
 #include "Model.h"
@@ -17,7 +18,7 @@
 
 using namespace std;
 
-std::string XMLFileLoader::main_schema_ = "cyclus.rng";
+std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
 std::string XMLFileLoader::recipe_book_schema_ = "cyclus.rng";
 std::string XMLFileLoader::facility_catalog_schema_ = "cyclus.rng";
 

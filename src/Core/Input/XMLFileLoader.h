@@ -17,10 +17,6 @@ class XMLFileLoader {
     facilityCatalog
   };
 
-  static std::string main_schema_;
-  static std::string recipe_book_schema_;
-  static std::string facility_catalog_schema_;
-
   std::string filename;
   xmlDocPtr doc;
 
@@ -33,6 +29,10 @@ class XMLFileLoader {
   void load_models(std::string modelPath, std::string factoryType);
 
  public:
+  static std::string main_schema_;
+  static std::string recipe_book_schema_;
+  static std::string facility_catalog_schema_;
+
 
   XMLFileLoader() {};
 
