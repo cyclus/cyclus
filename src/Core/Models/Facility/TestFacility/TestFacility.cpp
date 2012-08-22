@@ -1,5 +1,7 @@
+
 #include "FacilityModel.h"
 #include "Material.h"
+#include "TestFacility.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void TestFacility::receiveMessage(msg_ptr msg) {

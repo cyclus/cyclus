@@ -1,4 +1,8 @@
 #include "MarketModel.h"
+#include "TestMarket.h"
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TestMarket::TestMarket() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TestMarket::TestMarket(std::string commod) {

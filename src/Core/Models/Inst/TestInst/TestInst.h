@@ -12,16 +12,16 @@ class TestInst: public InstModel {
  public:
   virtual ~TestInst() {};
   
-  void receiveMessage(msg_ptr msg) 
+  void receiveMessage(msg_ptr msg); 
 
   bool canBuild(Model* mdl);
 
   void build(Model* mdl, Model* parent) ;
 
-  void copyFreshModel(Model* model) { }
+  void copyFreshModel(Model* model) ;
 
  public:
-  void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
+  void wrapAddPrototype(Model* prototype);
 };
 
 #endif
