@@ -6,6 +6,7 @@
 /// This is the simplest possible Market, for testing.
 class TestMarket : public MarketModel {
   public :
+    TestMarket() ;
     TestMarket(std::string commod) ;
     virtual void receiveMessage(msg_ptr msg) ;
     virtual void resolve() ;

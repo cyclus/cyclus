@@ -1,4 +1,5 @@
 #include "RegionModel.h"
+#include "TestRegion.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void TestRegion::receiveMessage(msg_ptr msg) {
