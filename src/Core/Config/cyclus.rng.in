@@ -165,6 +165,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <text/>
       </element>
 
+      <optional>
+        <ref name="lifetime"/>
+      </optional>
+
       <element name="model">
       <choice> @Facility_REFS@
       </choice>
@@ -323,9 +327,34 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for institutions -->
   <define name="institution">
     <element name="institution">
+  <!-- begin section for institutions -->
+  <define name="institution">
+    <element name="institution">
       <element name="name">
          <text/>
       </element>
+      
+      <optional>
+	<oneOrMore>
+	  <element name="availableprototype">
+	    <text/>
+	  </element>
+	</oneOrMore>
+      </optional>
+
+      <optional>
+	<element name="initialfacilitylist">
+	  <oneOrMore>
+	    <element name="prototype">
+	      <text/>
+	    </element>
+	    <element name="number">
+	      <data type="nonNegativeInteger"/>
+	    </element>
+	  </oneOrMore>
+	</element>
+      </optional>
+
       <element name="model">
       <choice> @Inst_REFS@
       </choice>

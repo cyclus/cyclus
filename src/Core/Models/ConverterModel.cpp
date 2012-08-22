@@ -16,14 +16,6 @@ void ConverterModel::init(xmlNodePtr cur) {
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConverterModel::copy(ConverterModel* src) { 
-  Model::copy(src); 
-
-  // don't copy conv_name to new instance
-  conv_name_ = "";
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 msg_ptr ConverterModel::convert(msg_ptr convMsg, msg_ptr refMsg) {
   // converters should override this method, unless they're very naiive.
   // generally, a converter's convert behavior should be to 

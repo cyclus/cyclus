@@ -69,22 +69,10 @@ class Model {
   static std::vector<Model*> getModelList();
 
   /**
-     Creates a model instance for use in the simulation 
-      
-     @param model_type model type (region, inst, facility, ...) to 
-     create @param cur pointer to the xml input representing the model 
-   */
-  static void create(std::string model_type, xmlNodePtr cur);
-
-  /** 
-     Create a new model object based on an existing one 
-      
-     @param model_orig a pointer to the original Model to be mimicked 
-   */
-  static Model* create(Model* model_orig);
-
-  /**
      dynamically loads a model constructor from a shared object file 
+     
+     as this is system dependent, a function is provided in the 
+     LoadConstructor files in the src/Core/Config folder.
       
      @param model_type model type (region, inst, facility, ...) to add 
      @param model_name name of model (NullFacility, StubMarket, ...) to 
@@ -92,9 +80,36 @@ class Model {
   static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
 
   /**
-     loads all models appropriately ordered by type 
+     provides a constructed simulation entity
+     @param model_type the type of entity
+     @param cur the model snippet position in input
+     @return a pointer to the construced entity
    */
-  static void load_models();
+  static Model* getEntityViaConstructor(std::string model_type,xmlNodePtr cur);
+
+  /**
+     constructs and initializes an entity
+     @param model_type the type of entity
+     @param cur the initialization snippet position in input
+   */
+  static void initializeSimulationEntity(std::string model_type, xmlNodePtr cur);
+
+  /**
+     constructs and initializes a prototype
+     @param model_type the type of entity
+     @param cur the initialization snippet position in input
+   */
+  static void initializePrototype(std::string model_type, xmlNodePtr cur);
+
+  /**
+     loads all globally accessible elements
+   */
+  static void loadGlobalElements();
+
+  /**
+     loads all simulation entities
+   */
+  static void loadEntities();
 
   /**
      load all facilities 
@@ -115,24 +130,6 @@ class Model {
      @param cur the pointer to the xml input for the model to initialize 
    */
   virtual void init(xmlNodePtr cur);
-
-  /**
-     A method to copy a model 
-      
-     @param model_orig pointer to the original (usu initialized) model 
-   */
-  virtual void copy(Model* model_orig);
-
-  /**
-     Drills down the dependency tree to initialize all relevant 
-     parameters/containers. 
-      
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param model_orig pointer to (usu initialized) model to be copied 
-   */
-  virtual void copyFreshModel(Model* model_orig)=0;
 
   /**
      Destructor for the Model Class 
@@ -178,9 +175,6 @@ class Model {
      every model should be able to print a verbose description 
    */
   virtual std::string str();
-
-  /// Makes model not a template and records it in output db
-  void itLives();
 
   /**
      return parent of this model 
@@ -232,22 +226,15 @@ class Model {
   std::vector<std::string> getTreePrintOuts(Model* m);
 
   /**
-     calls doSetParent() and itLives()
-
-     This DOES add the this model to the specified parent's list of children
-     (i.e. this automatically calls "parent->addChild(this);")
+     calls setParent() and sets other model-specific members
    */
-  void setParent(Model* parent);
+  virtual void enterSimulation(Model* parent);
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
-  virtual void doSetParent(Model* parent);
-  /* DEVELOPER NOTE: doSetParent was made virtual to address issue #292,
-     but this led to a discussion in issue #307.  Resolution of #307
-     may lead to this being reverted to a non-virtual function. 
-  */
+  virtual void setParent(Model* parent);
 
   /**
      set the bornOn date of this model 
@@ -286,11 +273,6 @@ class Model {
    */ 
   virtual void addResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
-
-  /**
-     returns whether or not the model is a template 
-   */
-  bool isTemplate() {return is_template_;};
 
   /**
      Asks if a model can build a certain prototype. Returns false by
@@ -345,11 +327,6 @@ class Model {
   static int next_id_;
 
   /**
-     comprehensive list of all templated models. 
-   */
-  static std::vector<Model*> template_list_;
-
-  /**
      comprehensive list of all initialized models. 
    */
   static std::vector<Model*> model_list_;
@@ -377,11 +354,6 @@ class Model {
   int diedOn_;
   
   /**
-     map of constructor methods for each loaded model 
-   */
-  static std::map<std::string, mdl_ctor*> create_map_;
-
-  /**
      every instance of a model should have a name 
    */
   std::string name_;
@@ -400,11 +372,6 @@ class Model {
      every instance of a model will have a serialized ID 
    */
   int ID_;
-
-  /**
-     whether or not the model is a template 
-   */
-  bool is_template_;
 
   /**
      wheter or not the model has been born 

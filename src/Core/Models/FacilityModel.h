@@ -8,6 +8,7 @@
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"
+#include "Prototype.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
@@ -65,7 +66,8 @@ class Material;
    pages that describe how to get the models and the detailed behavior 
  */
 
-class FacilityModel : public TimeAgent, public Communicator {
+class FacilityModel : public TimeAgent, public Communicator, 
+  public Prototype {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -81,22 +83,21 @@ class FacilityModel : public TimeAgent, public Communicator {
      @param cur the current xml node pointer 
    */
   virtual void init(xmlNodePtr cur);
-  
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(FacilityModel* src);
 
   /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers. 
-      
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
+     overrides Model's enterSimulation() in order to additionally
+     initialize members for prototypes that enter simulations
    */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual void enterSimulation(Model* parent);
+
+  /**
+     allows facilities to define what members need to be initialized
+     after their prototypes have been cloned and entered into the 
+     simulation
+
+     this operation is empty by default
+   */
+  virtual void initializeConcreteMembers();
 
   /**
      every model should be able to print a verbose description 

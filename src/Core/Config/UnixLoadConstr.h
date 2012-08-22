@@ -18,29 +18,24 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
   std::string start_path = Env::getInstallPath() + "/lib"  ;
 
   std::string construct_fname = std::string("construct") + model_name;
-  std::string destruct_fname = std::string("destruct") + model_name;
+  //  std::string destruct_fname = std::string("destruct") + model_name;
 
-  if (create_map_.find(model_name) == create_map_.end()) {
-    model_name = start_path + "/Models/" + model_type + "/" + 
-      model_name + "/lib" + model_name+SUFFIX;
-    void* model = dlopen(model_name.c_str(),RTLD_LAZY);
-    if (!model) {
-      std::string err_msg = "Unable to load model shared object file: ";
-      err_msg += dlerror();
-      throw CycIOException(err_msg);
-    }
-
-    new_model = (mdl_ctor*) dlsym(model, construct_fname.c_str() );
-    if (!new_model) {
-      std::string err_msg = "Unable to load model constructor: ";
-      err_msg += dlerror();
-      throw CycIOException(err_msg);
-    }
-
-    create_map_[model_name] = new_model;
-  } else {
-    new_model = create_map_[model_name];
+  model_name = start_path + "/Models/" + model_type + "/" + 
+    model_name + "/lib" + model_name+SUFFIX;
+  void* model = dlopen(model_name.c_str(),RTLD_LAZY);
+  if (!model) {
+    std::string err_msg = "Unable to load model shared object file: ";
+    err_msg += dlerror();
+    throw CycIOException(err_msg);
   }
+  
+  new_model = (mdl_ctor*) dlsym(model, construct_fname.c_str() );
+  if (!new_model) {
+    std::string err_msg = "Unable to load model constructor: ";
+    err_msg += dlerror();
+    throw CycIOException(err_msg);
+  }
+ 
   return new_model;
 }
 #endif
