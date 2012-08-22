@@ -170,14 +170,6 @@ public:
   virtual mat_rsrc_ptr extract(double mass);
 
   /**
-     Decays this Material object for the given number of months and 
-     updates its composition map with the new number densities. 
-      
-     @param months the number of months to decay a material 
-   */
-  void decay(double months);
-  
-  /**
      Decays this Material object for however 
      many months have passed since the 
      last entry in the material history. 
@@ -204,6 +196,16 @@ public:
      sets the decay boolean and the interval 
    */
   static void setDecay(int dec);
+
+protected:
+  /**
+     Decays this Material object for the given number of months and 
+     updates its composition map with the new number densities. 
+      
+     @param months the number of months to decay a material 
+   */
+  void decay(double months);
+  
 
 private:
   /**
