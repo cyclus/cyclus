@@ -38,21 +38,50 @@ TEST_F(MaterialTest, CheckQuality) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, CheckMass){
+TEST_F(MaterialTest, CheckIsoMass) {
+  // check total mass, you'll use it later.
   double amt = test_size_ ;
-  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+
+  // you should be able to get the mass per isotope
+  EXPECT_NO_THROW(test_mat_->kg(u235_));
+
+  // if the material has only one isotope, it should be the same as the total
+  // the u235 mass should be (mol/mat)(1kg/1000g)(235g/mol)  
+  ASSERT_FLOAT_EQ(test_mat_->kg(u235) , test_mat_->moles(u235)*0.235); 
+
+  // if the mat has many isotopes, their individual masses should scale with 
+  // their atomic numbers.
+  double test_total = 0;
+  CompMap::iterator comp; 
+  int i;
+  for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
+    i = comp.first;
+    test_total += test_mat->kg(i);
+  }
+  ASSERT_FLOAT_EQ(test_mat_->quantity(), test_total);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, CheckIsoMass) {
-  double amt = test_size_ / 3;
-  double diff = test_size_ - amt;  
-  mat_rsrc_ptr extracted;
-  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
-  EXPECT_NO_THROW(extracted = test_mat_->extract(amt)); // extract an amt
-  EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
-  EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
-  EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+TEST_F(MaterialTest, CheckIsoAtoms){
+
+  // you should be able to get to the atoms of a certain iso in your material
+  EXPECT_NO_THROW(test_mat_->moles(u235_));
+  EXPECT_FLOAT_EQ(one_mol_,test_mat_->moles(u235_));
+
+  // a mat's total atoms should be the total of all the contained isotopes. 
+  double test_total = 0;
+  CompMap::iterator comp; 
+  int i;
+  for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
+    iso = comp.first;
+    total_atoms += test_mat_->moles(iso);
+  }
+  ASSERT_FLOAT_EQ(test_mat_->moles(), test_total);
+
+  // you should be able to get to the total atoms in your material
+  total_atoms = test_mat_->moles();
+
 }
 
 
