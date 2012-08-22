@@ -16,3 +16,6 @@ void TestFacility::receiveMaterial(Transaction trans,
     std::vector<mat_rsrc_ptr> manifest) { 
 }
 
+extern "C" Model* constructTestFacility() {
+  return new TestFacility();
+}
