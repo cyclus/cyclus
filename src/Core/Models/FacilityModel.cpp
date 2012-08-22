@@ -7,6 +7,7 @@
 #include "BookKeeper.h"
 #include "InputXML.h"
 
+#include <stdlib.h>
 #include <iostream>
 #include "Logger.h"
 
@@ -30,6 +31,15 @@ void FacilityModel::init(xmlNodePtr cur) {
     this->setInstName(inst_name_);
     LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just set its inst to " << inst_name_;
   }
+
+  // get lifetime and set decommission date
+  try {
+    fac_lifetime_ = atoi(XMLinput->get_xpath_content(cur, "lifetime"));
+  }
+  catch (CycNullXPathException e) {
+    fac_lifetime_ = TI->simDur();
+  }
+  setDecommissionDate(TI->time());
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,9 +83,28 @@ void FacilityModel::handleTock(int time){
   // send the appropriate materials, 
   // receive any materials the market has found a source for, 
   // and record all material transfers.
+  if (time >= decommission_date_) {
+    decommission();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleDailyTasks(int time, int day){
   // facilities who have more intricate details should utilize this function
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::decommission() {
+  delete this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::setBuildDate(int current_time) {
+  build_date_ = current_time;
+  setDecommissionDate(build_date_ + fac_lifetime_);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::setDecommissionDate(int time) {
+    decommission_date_ = time;
 }

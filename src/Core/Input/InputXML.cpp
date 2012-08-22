@@ -183,10 +183,12 @@ xmlNodeSetPtr InputXML::get_xpath_elements(xmlXPathContextPtr& context,
   /* Evaluate xpath expression */
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
-  if(xpathObj == NULL) {
-    fprintf(stderr,
-            "Error: unable to evaluate xpath expression \"%s\"\n", 
-            expression); 
+
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
   return xpathObj->nodesetval;
@@ -204,12 +206,14 @@ xmlNodePtr InputXML::get_xpath_element(xmlXPathContextPtr& context,
   /* Evaluate xpath expression */
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression,context);
-  if(xpathObj == NULL) {
-    fprintf(stderr,
-            "Error: unable to evaluate xpath expression \"%s\"\n", 
-            expression);
-  }
 
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
+  }
+  
   return xpathObj->nodesetval->nodeTab[0];
 
   // when and how to cleanup memory allocation?
@@ -225,10 +229,12 @@ const char* InputXML::get_xpath_content(xmlXPathContextPtr& context,
   /* Evaluate xpath expression */
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
-  if(xpathObj == NULL) {
-    fprintf(stderr,
-            "Error: unable to evaluate xpath expression \"%s\"\n", 
-            expression);
+  
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
   return (const char*)(xpathObj->nodesetval->
@@ -247,10 +253,12 @@ const char* InputXML::get_xpath_name(xmlXPathContextPtr& context,
   /* Evaluate xpath expression */
   xmlXPathObjectPtr xpathObj = 
     xmlXPathEvalExpression((const xmlChar*)expression, context);
-  if(xpathObj == NULL) {
-    fprintf(stderr,
-            "Error: unable to evaluate xpath expression \"%s\"\n", 
-            expression);
+
+  if(xmlXPathNodeSetIsEmpty(xpathObj->nodesetval)) {
+    stringstream ss("");
+    ss << "Error: unable to evaluate xpath expression " 
+       << expression;
+    throw CycNullXPathException(ss.str());
   }
 
   return (const char*)(xpathObj->nodesetval->nodeTab[0]->name);

@@ -3,9 +3,11 @@
 
 #include "SupplyDemand.h"
 #include "SymbolicFunctions.h"
+#include "MarketPlayerManager.h"
 
 #include <vector>
 #include <map>
+#include <set>
 
 /**
    This is a manager class that manages a set of commodities. Those 
@@ -45,6 +47,15 @@ class SupplyDemandManager {
                         const Producer& producer);
 
   /**
+     adds a player manager to the set of managers for a given 
+     commodity
+     @param commodity the commodity gaining a new player manager
+     @param m the new player manager
+   */
+  void registerPlayerManager(const Commodity& commodity, 
+                             MarketPlayerManager* m);
+
+  /**
      the demand for a commodity at a given time
      @param commodity the commodity
      @param time the time
@@ -63,13 +74,6 @@ class SupplyDemandManager {
      @return the current supply of the commodity
    */
   double supply(const Commodity& commodity);
-
-  /**
-     increase the supply of a given commodity by an amount
-     @param commodity the commodity
-     @param amt the amount to increase
-   */
-  void increaseSupply(const Commodity& commodity, double amt);
   
   /**
      return the number of producers of a given commodity
@@ -90,6 +94,10 @@ class SupplyDemandManager {
   /// a container of all commodities known to the manager
   std::map<Commodity,CommodityInformation,
     CommodityCompare> commodities_;
+
+  /// a container of all player managers known to the manager
+  std::map<Commodity,std::set<MarketPlayerManager*>,
+    CommodityCompare> player_managers_;
 };
 
 #endif
