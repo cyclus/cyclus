@@ -9,13 +9,11 @@
 class TestFacility: public FacilityModel {
  public:
   
-  void receiveMessage(msg_ptr msg) {
-    msg->setDir(DOWN_MSG);
-  }
+  void receiveMessage(msg_ptr msg) ;
 
-  void copyFreshModel(Model* src) { copy(dynamic_cast<TestFacility*>(src)); }
+  void copyFreshModel(Model* src) ;
 
-  void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) { }
+  void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) ;
 
 };
 
