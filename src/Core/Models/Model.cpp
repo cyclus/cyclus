@@ -354,7 +354,9 @@ void Model::addResource(Transaction trans,
 void Model::define_table() {
   // declare the table columns
   agent_table->addField("ID","INTEGER");
-  agent_table->addField("Type","VARCHAR(128)");
+  agent_table->addField("AgentType","VARCHAR(128)"); // e.g. Inst, Facility
+  agent_table->addField("ModelType","VARCHAR(128)"); // e.g. BuildInst
+  agent_table->addField("Prototype","VARCHAR(128)"); // e.g. Areva, AP1000
   agent_table->addField("ParentID","INTEGER");
   agent_table->addField("EnterDate","INTEGER");
   agent_table->addField("LeaveDate","INTEGER");
@@ -383,14 +385,26 @@ void Model::addToTable(){
 
   // make a row
   // declare data
-  data an_id( this->ID() ), a_type( this->modelImpl() ), 
-    a_pid( this->parentID() ), a_bod( this->bornOn() );
+  data an_id( this->ID() ), 
+       an_agent_type( this->modelType() ), 
+       a_model_type( this->modelImpl() ), 
+       a_prototype( this->name() ), 
+       a_pid( this->parentID() ), 
+       a_bod( this->bornOn() );
   // declare entries
-  entry id("ID",an_id), type("Type",a_type), pid("ParentID",a_pid), 
-    bod("EnterDate",a_bod);
+  entry id("ID",an_id), 
+        agent_type("AgentType",an_agent_type), 
+        model_type("ModelType",a_model_type), 
+        prototype("Prototype",a_prototype), 
+        pid("ParentID",a_pid), 
+        bod("EnterDate",a_bod);
   // declare row
   row aRow;
-  aRow.push_back(id), aRow.push_back(type), aRow.push_back(pid),
+  aRow.push_back(id), 
+    aRow.push_back(agent_type), 
+    aRow.push_back(model_type), 
+    aRow.push_back(prototype), 
+    aRow.push_back(pid),
     aRow.push_back(bod);
   // add the row
   agent_table->addRow(aRow);
