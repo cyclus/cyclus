@@ -38,6 +38,25 @@ TEST_F(MaterialTest, CheckQuality) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckMass){
+  double amt = test_size_ ;
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckIsoMass) {
+  double amt = test_size_ / 3;
+  double diff = test_size_ - amt;  
+  mat_rsrc_ptr extracted;
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
+  EXPECT_NO_THROW(extracted = test_mat_->extract(amt)); // extract an amt
+  EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
+  EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   mat_rsrc_ptr one_test_mat;
   mat_rsrc_ptr two_test_mat;

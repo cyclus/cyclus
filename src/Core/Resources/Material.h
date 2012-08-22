@@ -113,6 +113,8 @@ public:
 
   /**
      Resource class method 
+
+     @return the mass in kg
    */
   double quantity();
 
@@ -171,7 +173,7 @@ public:
      Decays this Material object for the given number of months and 
      updates its composition map with the new number densities. 
       
-     @param months the number of months to decay 
+     @param months the number of months to decay a material 
    */
   void decay(double months);
   
@@ -184,6 +186,8 @@ public:
 
   /**
      Returns a copy of this material's isotopic composition 
+
+     @return a copy of the isovector
    */
   IsoVector isoVector() {return iso_vector_;}
 
