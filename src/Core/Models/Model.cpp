@@ -16,6 +16,7 @@
 #include "Timer.h"
 #include "Resource.h"
 #include "Table.h"
+#include "Prototype.h"
 
 #include DYNAMICLOADLIB
 
@@ -83,8 +84,8 @@ void Model::initializePrototype(std::string model_type,
                                 xmlNodePtr cur) {
   Model* model = getEntityViaConstructor(model_type,cur);
   model->init(cur);
-  Prototype::registerPrototype(dynamic_cast<Prototype*>(model),
-                               model->name());
+  Prototype::registerPrototype(model->name(),
+                               dynamic_cast<Prototype*>(model));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -243,8 +244,9 @@ std::string Model::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::enterSimulation(Model* parent){ 
   // set model-specific members
-  parent_ID_ = parent->ID();
+  parentID_ = parent->ID();
   setParent(parent);
+  parent->addChild(this);
   bornOn_ = TI->time();
 
   // add model to the database

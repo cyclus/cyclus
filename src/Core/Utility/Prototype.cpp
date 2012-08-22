@@ -10,7 +10,7 @@ using namespace std;
 map<string,Prototype*> Prototype::prototype_registry_;
 
 // -------------------------------------------------------------------
-Prototype::registerPrototype(std::string name, Prototype* p) {
+void Prototype::registerPrototype(std::string name, Prototype* p) {
   prototype_registry_.insert(make_pair(name,p));
 }
 
@@ -20,12 +20,5 @@ Prototype* Prototype::getRegisteredPrototype(std::string name) {
   if (it == prototype_registry_.end()) {
     throw CycKeyException(name + "is not a registered prototype.");
   }
-  return *it;
+  return it->second;
 }
-
-// -------------------------------------------------------------------
-Prototype* Prototype::clone() {
-  Prototype* clone = getInitializedClone(this);
-  return clone;
-}
-

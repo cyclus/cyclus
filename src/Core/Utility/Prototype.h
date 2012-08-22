@@ -2,16 +2,22 @@
 #define PROTOTYPE_H
 
 #include <map>
+#include <string>
 
 /**
    Prototypes are Models in the simulation that are created through
    the process of cloning. All prototypes have a subset of their
-   members initialized before being registered. These members are 
-   copied when a prototype is cloned. The cloning process returns a 
-   "fresh" prototype ready to be entered into the simulation. 
-   Additionally, some prototypes may require an additional 
-   intialization or construction step after being connected into the
-   simulation. Such functionality is provided through the virtual
+   members initialized before being registered. These majority of 
+   these members are likely to be static members in the derived 
+   prototype class, and are therefore accessible by all cloned 
+   prototype instances. Some, however, may be mutable by each instance
+   of a cloned prototype. Such members must be copied during the clone
+   operation. The cloning process returns a "fresh" prototype ready to 
+   be entered into the simulation. 
+
+   Some prototypes may require an additional intialization or 
+   construction step after being connected into the simulation. Such 
+   functionality is provided through the virtual 
    prototypeConstructor() function.
 
    Note!!! To date, *all* classes that inherite from Prototype must
@@ -41,17 +47,10 @@ class Prototype {
   virtual ~Prototype() {};
 
   /**
-     get a clone of a prototype
-     @param name the name of the prototype to clone
-   */
-  static Prototype* clone(std::string name);
-
-  /**
      prototypes are required to provide the capacity to copy their
      initialized members
-     @param p the prototype to copy members from
    */
-  virtual void getInitializedClone(Prototype* p) = 0;
+  virtual Prototype* clone() = 0;
 
   /**
      a function to be overridden if a prototype needs a constructing
@@ -62,6 +61,6 @@ class Prototype {
  private:
   /// the set of registered prototyeps
   static std::map<std::string,Prototype*> prototype_registry_;
-}
+};
 
 #endif

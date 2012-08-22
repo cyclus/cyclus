@@ -9,7 +9,6 @@
 
 #include "Logger.h"
 #include "Timer.h"
-#include "InputXML.h"
 #include "CycException.h"
 #include "FacilityModel.h"
 
@@ -26,7 +25,7 @@ InstModel::InstModel() {
 void InstModel::init(xmlNodePtr cur) {
   Model::init(cur);
 
-  xmlNodetSetPtr nodes;
+  xmlNodeSetPtr nodes;
   string name;
   Prototype* prototype;  
   
@@ -58,7 +57,7 @@ void InstModel::init(xmlNodePtr cur) {
 void InstModel::addPrototypeToInitialBuild(xmlNodePtr cur) {
   string name = 
     (const char*)XMLinput->
-    get_xpath_content(inst_nodes->nodeTab[i],"prototype");
+    get_xpath_content(cur,"prototype");
   int number = atoi(XMLinput->get_xpath_content(cur, "number"));
 
   Prototype* p = Prototype::getRegisteredPrototype(name);
@@ -70,7 +69,8 @@ void InstModel::addPrototypeToInitialBuild(xmlNodePtr cur) {
 void InstModel::checkAvailablePrototype(Prototype* p) {
   if (!isAvailablePrototype(p)) {    
     stringstream err("");
-    err << "Inst " << this->name() << " does not have " << p->name() 
+    err << "Inst " << this->name() << " does not have " 
+        << dynamic_cast<Model*>(p)->name() 
         << " as one of its available prototypes.";
     throw CycOverrideException(err.str());
   }

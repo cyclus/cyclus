@@ -7,6 +7,7 @@
 #include "RegionModel.h"
 #include "Model.h"
 #include "Prototype.h"
+#include "InputXML.h"
 
 #include <map>
 #include <set>
@@ -132,7 +133,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      The Inst's set of available prototypes to build 
    */
-  PrototypeSet* prototypes_;
+  PrototypeSet prototypes_;
 
   /**
      the initial prototypes to build
@@ -143,30 +144,30 @@ class InstModel : public TimeAgent, public Communicator {
      Adds a prototype build order to initial_build_order_
      @param cur the xml node comprising the order
    */
-  void addPrototypeToInitialBuild(xmlNodePtr cur)
+  void addPrototypeToInitialBuild(xmlNodePtr cur);
 
  public:
   /**
      return the number of prototypes this inst can build
    */
-  int nPrototypes() { return prototypes_->size(); }
+  int nPrototypes() { return prototypes_.size(); }
   
   /**
      return the first prototype
    */
-  PrototypeIterator beginPrototype() { return prototypes_->begin(); }
+  PrototypeIterator beginPrototype() { return prototypes_.begin(); }
 
   /**
      return the last prototype
    */
-  PrototypeIterator endPrototype() { return prototypes_->end(); }
+  PrototypeIterator endPrototype() { return prototypes_.end(); }
 
   /**
      Checks if prototype is in the prototype list 
    */
   bool isAvailablePrototype(Prototype* prototype) {
-    return ( prototypes_->find(prototype) 
-	     != prototypes_->end() ); 
+    return ( prototypes_.find(prototype) 
+	     != prototypes_.end() ); 
   }
 
   /**
@@ -180,7 +181,7 @@ class InstModel : public TimeAgent, public Communicator {
      if not, it throws an error
      @param p the prototype to check for
    */
-  virtual checkAvailablePrototype(Prototype* p);
+  void checkAvailablePrototype(Prototype* p);
 
   /**
      returns this institution's region 

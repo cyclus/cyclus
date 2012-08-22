@@ -82,10 +82,10 @@ class Model {
   /**
      provides a constructed simulation entity
      @param model_type the type of entity
-     @param model_name the name of the entity
+     @param cur the model snippet position in input
      @return a pointer to the construced entity
    */
-  static Model* getEntityViaConstructor(std::string model_type, std::string model_name);
+  static Model* getEntityViaConstructor(std::string model_type,xmlNodePtr cur);
 
   /**
      constructs and initializes an entity
@@ -104,7 +104,7 @@ class Model {
   /**
      loads all globally accessible elements
    */
-  static void loadElements();
+  static void loadGlobalElements();
 
   /**
      loads all simulation entities
