@@ -76,10 +76,6 @@ INSTALL(FILES
   StubModelTests.h
   StubCommModelTests.cpp
   StubCommModelTests.h
-  TestInst.h
-  TestRegion.h
-  TestFacility.h
-  TestMarket.h
   DESTINATION cyclus/include
   COMPONENT testing
   )
