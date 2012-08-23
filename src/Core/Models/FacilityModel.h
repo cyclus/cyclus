@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "Model.h"
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"

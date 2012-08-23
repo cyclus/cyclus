@@ -22,12 +22,11 @@
 
 using namespace std;
 
-// Default starting ID for all Models is zero.
+// static members
 int Model::next_id_ = 0;
-// Database table for agents
 table_ptr Model::agent_table = new Table("Agents"); 
-// Model containers
 vector<Model*> Model::model_list_;
+map<string,mdl_ctor*> Model::loaded_modules_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getModelByName(std::string name) {
@@ -65,10 +64,18 @@ vector<Model*> Model::getModelList() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getEntityViaConstructor(std::string model_type,
                                       xmlNodePtr cur) {
-  string model_impl = XMLinput->get_xpath_name(cur,"model/*");
-  mdl_ctor* model_constructor = 
-    loadConstructor(model_type,model_impl);
-  return model_constructor();
+  string module = XMLinput->get_xpath_name(cur,"model/*");
+  mdl_ctor* module_constructor; 
+  // if it hasn't been loaded, load the module and register it
+  if (loaded_modules_.find(module) == loaded_modules_.end()) { 
+    module_constructor = loadConstructor(model_type,module);
+    loaded_modules_.insert(make_pair(module,module_constructor));
+  }
+  // else return the registered module
+  else {
+    module_constructor = loaded_modules_[module];
+  }
+  return module_constructor();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -6,7 +6,6 @@
 #include "Timer.h"
 #include "BookKeeper.h"
 #include "InputXML.h"
-#include "Model.h"
 
 #include <stdlib.h>
 #include <iostream>

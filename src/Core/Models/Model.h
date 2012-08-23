@@ -282,6 +282,12 @@ class Model {
     
  protected:
   /**
+     a map of loaded modules. all dynamically loaded modules are 
+     registered with this map when loaded.
+   */
+  static std::map<std::string,mdl_ctor*> loaded_modules_;
+
+  /**
      children of this model 
    */
   std::vector<Model*> children_;

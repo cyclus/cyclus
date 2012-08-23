@@ -165,23 +165,24 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Checks if prototype is in the prototype list 
    */
-  bool isAvailablePrototype(Prototype* prototype) {
-    return ( prototypes_.find(prototype) 
-	     != prototypes_.end() ); 
+  bool isAvailablePrototype(Prototype* p) {
+    return ( prototypes_.find(p) != prototypes_.end() ); 
   }
 
   /**
      another moniker for isAvailablePrototype
      @param prototype the prototype to be built
    */
-  virtual bool canBuild(Prototype* prototype) {return isAvailablePrototype(prototype);}
+  virtual bool canBuild(Prototype* prototype) {
+    return isAvailablePrototype(prototype);
+  }
   
   /**
      checks if a prototype is in its list of available prototypes
      if not, it throws an error
      @param p the prototype to check for
    */
-  void checkAvailablePrototype(Prototype* p);
+  void throwErrorIfPrototypeIsntAvailable(Prototype* p);
 
   /**
      returns this institution's region 

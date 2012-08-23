@@ -61,12 +61,12 @@ void InstModel::addPrototypeToInitialBuild(xmlNodePtr cur) {
   int number = atoi(XMLinput->get_xpath_content(cur, "number"));
 
   Prototype* p = Prototype::getRegisteredPrototype(name);
-  checkAvailablePrototype(p);
+  throwErrorIfPrototypeIsntAvailable(p);
   initial_build_order_.insert(make_pair(p,number));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::checkAvailablePrototype(Prototype* p) {
+void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
   if (!isAvailablePrototype(p)) {    
     stringstream err("");
     err << "Inst " << this->name() << " does not have " 
