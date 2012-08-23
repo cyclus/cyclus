@@ -1,5 +1,0 @@
-INSTALL(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/postinstall.cmake)
-INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/cyclus/share/cyclus.rng
-  DESTINATION share
-  COMPONENT data
-  )

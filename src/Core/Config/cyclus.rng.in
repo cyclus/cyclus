@@ -2,6 +2,10 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   @RNG_INCLUDES@
+  <include href='../lib/Models/Market/TestMarket/TestMarket.rng'/>
+  <include href='../lib/Models/Region/TestRegion/TestRegion.rng'/>
+  <include href='../lib/Models/Inst/TestInst/TestInst.rng'/>
+  <include href='../lib/Models/Facility/TestFacility/TestFacility.rng'/>
 
   <start>
   <choice>
@@ -149,6 +153,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice> @Market_REFS@
+        <ref name='TestMarket'/>
       </choice>
       </element>
 
@@ -167,6 +172,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice> @Facility_REFS@
+        <ref name='TestFacility'/>
       </choice>
       </element>
 
@@ -308,6 +314,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice> @Region_REFS@
+        <ref name='TestRegion'/>
       </choice>
       </element>
 
@@ -328,6 +335,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice> @Inst_REFS@
+        <ref name='TestInst'/>
       </choice>
       </element>
     </element>
