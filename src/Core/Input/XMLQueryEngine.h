@@ -91,7 +91,7 @@ class XMLQueryEngine {
      Get the number of children of a specific match to the expression
      search.
 
-     @oaram elementNum the ordinal index of the element to be returned
+     @param elementNum the ordinal index of the element to be returned
   */
   int get_num_children(int elementNum=0);
 
