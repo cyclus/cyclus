@@ -21,7 +21,7 @@ TEST_F(XMLFileLoaderTests, ValidateFile) {
   ASSERT_ANY_THROW(xmlFile.validate_file("thisSchemaDoseNotExist"));
   ASSERT_ANY_THROW(xmlFile.validate_file(XMLFileLoader::main_schema_));
 
-  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile3));
+  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile2));
   ASSERT_ANY_THROW(xmlFile.validate_file(XMLFileLoader::main_schema_));
 
   ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile3));
