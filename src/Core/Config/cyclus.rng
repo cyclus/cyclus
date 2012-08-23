@@ -2,6 +2,7 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <include href='../lib/Models/Market/TestMarket/TestMarket.rng'/>
+  <include href='../lib/Models/Converter/TestConverter/TestConverter.rng'/>
   <include href='../lib/Models/Region/TestRegion/TestRegion.rng'/>
   <include href='../lib/Models/Inst/TestInst/TestInst.rng'/>
   <include href='../lib/Models/Facility/TestFacility/TestFacility.rng'/>
@@ -152,7 +153,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        <ref name='TestMarket'/>
+        <ref name="TestMarket"/>
       </choice>
       </element>
 
@@ -171,7 +172,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        <ref name='TestFacility'/>
+        <ref name="TestFacility"/>
       </choice>
       </element>
 
@@ -313,7 +314,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <element name="model">
       <choice>
-        <ref name='TestRegion'/>
+        <ref name="TestRegion"/>
       </choice>
       </element>
 
@@ -334,7 +335,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice> 
-        <ref name='TestInst'/>
+        <ref name="TestInst"/>
       </choice>
       </element>
     </element>
@@ -350,6 +351,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       <element name="model">
       <choice>
+        <ref name="TestConverter"/>
       </choice>
       </element>
     </element>
