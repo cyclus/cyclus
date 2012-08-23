@@ -22,6 +22,12 @@ StubCommModel::~StubCommModel() {};
 void StubCommModel::init(xmlNodePtr cur) { 
   Model::init(cur); 
 };
+  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubCommModel::copy(StubCommModel* src) { 
+  Model::copy(src);
+  Communicator::copy(src); 
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubCommModel::str() { 

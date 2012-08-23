@@ -5,11 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "Model.h"
 #include "TimeAgent.h"
 #include "Communicator.h"
 #include "InstModel.h"
-#include "Prototype.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
@@ -67,8 +65,7 @@ class Material;
    pages that describe how to get the models and the detailed behavior 
  */
 
-class FacilityModel : public TimeAgent, public Communicator, 
-  public Prototype {
+class FacilityModel : public TimeAgent, public Communicator {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -84,21 +81,22 @@ class FacilityModel : public TimeAgent, public Communicator,
      @param cur the current xml node pointer 
    */
   virtual void init(xmlNodePtr cur);
+  
+  /**
+     every model needs a method to copy one object to another 
+   */
+  virtual void copy(FacilityModel* src);
 
   /**
-     overrides Model's enterSimulation() in order to additionally
-     initialize members for prototypes that enter simulations
+     This drills down the dependency tree to initialize all relevant 
+     parameters/containers. 
+      
+     Note that this function must be defined only in the specific model 
+     in question and not in any inherited models preceding it. 
+      
+     @param src the pointer to the original (initialized ?) model to be 
    */
-  virtual void enterSimulation(Model* parent);
-
-  /**
-     allows facilities to define what members need to be initialized
-     after their prototypes have been cloned and entered into the 
-     simulation
-
-     this operation is empty by default
-   */
-  virtual void initializeConcreteMembers();
+  virtual void copyFreshModel(Model* src)=0;
 
   /**
      every model should be able to print a verbose description 
@@ -132,22 +130,6 @@ class FacilityModel : public TimeAgent, public Communicator,
      each facility should have an institution that manages it 
    */
   std::string inst_name_;
-
-  /**
-     Most facilities will have a vector of incoming, request commodities.
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.  
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> in_commods_;
-
-  /**
-     most facilities will have a vector of outgoing, offer commodities
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.  
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> out_commods_;
 
   /**
      each facility needs a lifetime 

@@ -14,8 +14,6 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
   setModelType("Facility");
-  in_commods_ = std::vector<std::string>();
-  out_commods_ = std::vector<std::string>();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,6 +23,15 @@ FacilityModel::~FacilityModel() {};
 void FacilityModel::init(xmlNodePtr cur) {
   Model::init(cur);
 
+  // Specific initialization for FacilityModels
+  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
+   
+  for (int i=0;i<nodes->nodeNr;i++){
+    inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+    this->setInstName(inst_name_);
+    LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just set its inst to " << inst_name_;
+  }
+
   // get lifetime and set decommission date
   try {
     fac_lifetime_ = atoi(XMLinput->get_xpath_content(cur, "lifetime"));
@@ -33,42 +40,16 @@ void FacilityModel::init(xmlNodePtr cur) {
     fac_lifetime_ = TI->simDur();
   }
   setDecommissionDate(TI->time());
-
-  // get the incommodities
-  std::string commod;
-  try {
-    nodes = XMLinput->get_xpath_elements(cur, "incommodity");
-    for (int i=0;i<nodes->nodeNr;i++){
-      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
-      in_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity" << commod;
-    }
-  }
-  catch (CycNullXPathException e) {
-  }
-
-  // get the outcommodities
-  try {
-    nodes = XMLinput->get_xpath_elements(cur, "outcommodity");
-    for (int i=0;i<nodes->nodeNr;i++){
-      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
-      out_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added outcommodity" << commod;
-    }
-  }
-  catch (CycNullXPathException e) {
-  }
-
-
 } 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::enterSimulation(Model* parent) {
-  Model::enterSimulation(parent);
-  initializeConcreteMembers();
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::initializeConcreteMembers() {};
+void FacilityModel::copy(FacilityModel* src) { 
+  Model::copy(src); 
+  Communicator::copy(src); 
+
+  // don't copy fac_name to new instance
+  this->setFacName("");
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {

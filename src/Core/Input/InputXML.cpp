@@ -109,39 +109,16 @@ void InputXML::load_file(std::string filename) {
     fprintf(stderr,"Error: unable to create new xpath context \n");
   }
 
-  // timer sets data
-  initializeSimulationTimeData();
-
-  // recipes, markets, converters, prototypes
-  loadGlobalSimulationElements();
-
-  // regions, institutions
-  loadSimulationEntities();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::loadGlobalSimulationElements() {
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
   RecipeLibrary::load_recipes();
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
   
   //Models
-  LOG(LEV_DEBUG3, "none!") << "Begin loading elements";
-  Model::loadGlobalElements();
-  LOG(LEV_DEBUG3, "none!") << "End loading elements";
+  LOG(LEV_DEBUG3, "none!") << "Begin loading models";
+  Model::load_models();
+  LOG(LEV_DEBUG3, "none!") << "End loading models";
 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::loadSimulationEntities() {
-  LOG(LEV_DEBUG3, "none!") << "Begin loading entities";
-  Model::loadEntities();
-  LOG(LEV_DEBUG3, "none!") << "End loading entities";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::initializeSimulationTimeData() {
   TI->load_simulation();
 }
 

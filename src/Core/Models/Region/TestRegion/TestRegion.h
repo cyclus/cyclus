@@ -11,6 +11,8 @@ class TestRegion: public RegionModel {
   void receiveMessage(msg_ptr msg) {
     msg->setDir(DOWN_MSG);
   }
+
+  void copyFreshModel(Model* model) { }
 };
 
 #endif
