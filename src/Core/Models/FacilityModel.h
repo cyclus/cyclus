@@ -132,6 +132,22 @@ class FacilityModel : public TimeAgent, public Communicator {
   std::string inst_name_;
 
   /**
+     Most facilities will have a vector of incoming, request commodities.
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.  
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> in_commods_;
+
+  /**
+     most facilities will have a vector of outgoing, offer commodities
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.  
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> out_commods_;
+
+  /**
      each facility needs a lifetime 
    */
   int fac_lifetime_;

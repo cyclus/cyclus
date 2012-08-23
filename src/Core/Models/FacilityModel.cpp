@@ -14,6 +14,8 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
   setModelType("Facility");
+  in_commods_ = std::vector<std::string>();
+  out_commods_ = std::vector<std::string>();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +42,33 @@ void FacilityModel::init(xmlNodePtr cur) {
     fac_lifetime_ = TI->simDur();
   }
   setDecommissionDate(TI->time());
+
+  // get the incommodities
+  std::string commod;
+  try {
+    nodes = XMLinput->get_xpath_elements(cur, "incommodity");
+    for (int i=0;i<nodes->nodeNr;i++){
+      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
+      in_commods_.push_back(commod);
+      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity" << commod;
+    }
+  }
+  catch (CycNullXPathException e) {
+  }
+
+  // get the outcommodities
+  try {
+    nodes = XMLinput->get_xpath_elements(cur, "outcommodity");
+    for (int i=0;i<nodes->nodeNr;i++){
+      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
+      out_commods_.push_back(commod);
+      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added outcommodity" << commod;
+    }
+  }
+  catch (CycNullXPathException e) {
+  }
+
+
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
