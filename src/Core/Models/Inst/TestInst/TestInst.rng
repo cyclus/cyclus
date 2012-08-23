@@ -3,10 +3,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="TestInst">
     <element name="TestInst"> 
-      <ref name="incommodity"/>
-      <oneOrMore>
-        <ref name="outcommodity"/>
-      </oneOrMore>
+      <text/>
     </element>
   </define>
 

@@ -2,7 +2,8 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="TestFacility">
-    <element name="TestFacility"> 
+    <element name="TestFacility">
+      <text/>
     </element>
   </define>
 

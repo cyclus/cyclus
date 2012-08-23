@@ -2,12 +2,9 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="TestRegion">
-    <element name="TestRegion"> 
-      <ref name="incommodity"/>
-      <oneOrMore>
-        <ref name="outcommodity"/>
-      </oneOrMore>
-    </element>
+    <element name="TestRegion"/> 
+      <text/>
+    <element>
   </define>
 
 </grammar>
