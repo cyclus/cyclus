@@ -6,11 +6,22 @@
 /// This is the simplest possible Market, for testing.
 class TestMarket : public MarketModel {
   public :
-    TestMarket() ;
-    TestMarket(std::string commod) ;
-    virtual void receiveMessage(msg_ptr msg) ;
-    virtual void resolve() ;
-    virtual void copy(TestMarket* src);
-    void copyFreshModel(Model* src);
+    TestMarket() {}
+    virtual ~TestMarket() {
+    }
+    TestMarket(std::string commod) {
+      commodity_ = commod;
+      MarketModel::initSimInteraction(this);
+    }
+    virtual void receiveMessage(msg_ptr msg) {
+    }
+    virtual void resolve() {
+    }
+    virtual void copy(TestMarket* src){
+      commodity_ = src->commodity_;
+    }
+    void copyFreshModel(Model* src){
+      copy(dynamic_cast<TestMarket*>(src));
+    }
 };
 #endif
