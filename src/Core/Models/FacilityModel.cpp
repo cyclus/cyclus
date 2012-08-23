@@ -34,6 +34,8 @@ void FacilityModel::init(xmlNodePtr cur) {
   }
   setDecommissionDate(TI->time());
 
+  xmlNodeSetPtr nodes;
+
   // get the incommodities
   std::string commod;
   try {
