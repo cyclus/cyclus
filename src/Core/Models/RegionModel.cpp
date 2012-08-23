@@ -6,13 +6,11 @@
 
 #include "RegionModel.h"
 
-#include "Model.h"
 #include "InstModel.h"
 #include "CycException.h"
 #include "InputXML.h"
 #include "Timer.h"
 #include "Logger.h"
-#include "Prototype.h"
 
 using namespace std;
 
@@ -25,8 +23,8 @@ RegionModel::RegionModel() {
 void RegionModel::init(xmlNodePtr cur) { 
   Model::init(cur); // name_ and model_impl_
   RegionModel::initAllowedFacilities(cur); // allowedFacilities_
-  RegionModel::addRegionAsRootNode(); // parent_ and tick listener, model 'born'
-  RegionModel::addChildrenToTree(cur); // children->setParent, requires init()
+  RegionModel::initSimInteraction(this); // parent_ and tick listener, model 'born'
+  RegionModel::initChildren(cur); // children->setParent, requires init()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,27 +35,35 @@ void RegionModel::initAllowedFacilities(xmlNodePtr cur) {
   Model* new_fac;
   for (int i=0;i<fac_nodes->nodeNr;i++){
     fac_name = (const char*)fac_nodes->nodeTab[i]->children->content;
-    new_fac = dynamic_cast<Model*>(Prototype::getRegisteredPrototype(fac_name));
+    new_fac = Model::getTemplateByName(fac_name);
     allowedFacilities_.insert(new_fac);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::addRegionAsRootNode() {
-  Model::enterSimulation(this);
-  TI->registerTickListener(this);
+void RegionModel::initSimInteraction(RegionModel* reg) {
+  reg->setParent(reg);
+  TI->registerTickListener(reg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::addChildrenToTree(xmlNodePtr cur) {   
+void RegionModel::initChildren(xmlNodePtr cur) {   
   string inst_name;
   Model* inst;
   xmlNodeSetPtr inst_nodes = XMLinput->get_xpath_elements(cur,"institution");
   for (int i=0;i<inst_nodes->nodeNr;i++){
     inst_name = (const char*)XMLinput->get_xpath_content(inst_nodes->nodeTab[i],"name");
-    inst = Model::getModelByName(inst_name);
-    inst->enterSimulation(this);
+    inst = Model::getTemplateByName(inst_name);
+    inst->setParent(this);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void RegionModel::copy(RegionModel* src) {
+  Model::copy(src);
+  Communicator::copy(src);
+  allowedFacilities_ = src->allowedFacilities_;
+  RegionModel::initSimInteraction(src);
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  

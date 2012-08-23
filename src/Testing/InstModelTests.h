@@ -23,7 +23,9 @@ class FakeInstModel : public InstModel {
   FakeInstModel() : InstModel() {};
   
   virtual ~FakeInstModel() {};
-
+  
+  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<FakeInstModel*>(src));}
+  
   void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
 };
 

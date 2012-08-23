@@ -6,6 +6,10 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - Param per-Inst Tests  - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_P(InstModelTests, CopyInst) {
+  InstModel* new_inst = inst_model_;
+  EXPECT_NO_THROW(new_inst->copy(inst_model_)); 
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(InstModelTests, Tick) {

@@ -363,22 +363,6 @@ private:
    */ 
   static std::string main_schema_; 
 
-  /**
-     initializes data information via timer
-   */
-  void initializeSimulationTimeData();
-
-  /**
-     loads globally available simulation elements
-     currently includes: recipes, markets, converters, and prototypes
-   */
-  void loadGlobalSimulationElements();
-
-  /**
-     loads simulation entities: regions and institutions
-   */
-  void loadSimulationEntities();
-
 };
 
 

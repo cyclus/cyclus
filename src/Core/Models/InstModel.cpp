@@ -9,6 +9,7 @@
 
 #include "Logger.h"
 #include "Timer.h"
+#include "InputXML.h"
 #include "CycException.h"
 #include "FacilityModel.h"
 
@@ -17,63 +18,18 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 InstModel::InstModel() {
   setModelType("Inst");
-  prototypes_ = PrototypeSet();
-  initial_build_order_ = map<Prototype*,int>();
+  prototypes_ = new PrototypeSet();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::init(xmlNodePtr cur) {
   Model::init(cur);
-
-  xmlNodeSetPtr nodes;
-  string name;
-  Prototype* prototype;  
-  
-  // populate prototypes_
-  try {
-    nodes = 
-      XMLinput->get_xpath_elements(cur,"availableprototype");
-    
-    // populate prototypes_
-    for (int i=0;i<nodes->nodeNr;i++){
-      name = (const char*)nodes->nodeTab[i]->children->content;
-      prototype = Prototype::getRegisteredPrototype(name);
-      prototypes_.insert(prototype);
-    }
-  } catch (CycNullXPathException) {}; // no prototypes available
-
-  // populate initial_build_order_
-  try {
-    nodes = 
-      XMLinput->get_xpath_elements(cur,"initialfacilitylist");
-    for (int i=0;i<nodes->nodeNr;i++){
-      addPrototypeToInitialBuild(nodes->nodeTab[i]);
-    }
-  } catch (CycNullXPathException) {}; // no initial builds
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::addPrototypeToInitialBuild(xmlNodePtr cur) {
-  string name = 
-    (const char*)XMLinput->
-    get_xpath_content(cur,"prototype");
-  int number = atoi(XMLinput->get_xpath_content(cur, "number"));
-
-  Prototype* p = Prototype::getRegisteredPrototype(name);
-  throwErrorIfPrototypeIsntAvailable(p);
-  initial_build_order_.insert(make_pair(p,number));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
-  if (!isAvailablePrototype(p)) {    
-    stringstream err("");
-    err << "Inst " << this->name() << " does not have " 
-        << dynamic_cast<Model*>(p)->name() 
-        << " as one of its available prototypes.";
-    throw CycOverrideException(err.str());
-  }
+void InstModel::copy(InstModel* src) {
+  Model::copy(src);
+  Communicator::copy(src);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -85,26 +41,6 @@ std::string InstModel::str() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::enterSimulation(Model* parent) {
-  Model::enterSimulation(parent);
-
-  // build initial prototypes
-  map<Prototype*,int>::iterator it;
-  for (it = initial_build_order_.begin(); 
-       it != initial_build_order_.end(); it ++) {
-    
-    // for each prototype
-    Prototype* p = it->first;
-    int number = it->second;
-
-    for (int i = 0; i < number; i++) {
-      // build as many as required
-      build(p);
-    }
-
-  }
-}
 
 /* --------------------
  * all COMMUNICATOR classes have these members
@@ -173,9 +109,31 @@ void InstModel::handleDailyTasks(int time, int day){
  * all INSTMODEL classes have these members
  * --------------------
  */
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void InstModel::addPrototype(Model* prototype) {
+  if ( !isAvailablePrototype(prototype) ) {
+    prototypes_->insert(prototype);
+  }
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::build(Prototype* prototype) {
-  Prototype* clone = prototype->clone();
-  dynamic_cast<Model*>(clone)->enterSimulation(this);
+void InstModel::build(Model* prototype, Model* requester) {
+  // by default
+  stringstream err("");
+  err << "Institution " << this->name() << " does not have a definied " 
+      << "facility-building fuction.";
+  throw CycOverrideException(err.str());
+}
+
+double InstModel::powerCapacity(){
+  // queries each facility for their power capacity
+  double capacity = 0.0;
+  for(vector<Model*>::iterator fac=children_.begin();
+      fac != children_.end();
+      fac++){
+    capacity += (dynamic_cast<FacilityModel*>(*fac))->powerCapacity();
+  }
+  return capacity;
 }
 

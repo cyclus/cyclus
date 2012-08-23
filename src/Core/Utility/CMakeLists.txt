@@ -43,8 +43,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerManager.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/MassTable.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/Prototype.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/MassTable.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLibrary.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionFactories.cpp  
@@ -67,7 +66,6 @@ INSTALL(FILES
   MarketPlayer.h
   MarketPlayerManager.h
   MassTable.h
-  Prototype.h
   RecipeLibrary.h
   SupplyDemand.h
   SupplyDemandManager.h

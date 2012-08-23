@@ -194,6 +194,8 @@ class Message: IntrusiveBase<Message> {
 
   void validateForSend();
 
+  void makeRealParticipant(Communicator* who);
+  
  public:
 
   /**
