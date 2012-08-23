@@ -23,8 +23,6 @@ class FakeInstModel : public InstModel {
   FakeInstModel() : InstModel() {};
   
   virtual ~FakeInstModel() {};
-
-  void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

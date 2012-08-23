@@ -19,9 +19,6 @@ class TestInst: public InstModel {
   }
 
   bool canBuild(Model* mdl) {return true;}
-
- public:
-  void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
 };
 
 #endif
