@@ -91,30 +91,13 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      set the parameters necessary for RegionModel to interact
      with the simulation
-     
-     @param reg the RegionModel to initialize
    */
-  virtual void initSimInteraction(RegionModel* reg);
+  virtual void addRegionAsRootNode();
 
   /**
      populate the region's list of child institutions
    */
-  virtual void initChildren(xmlNodePtr cur);
-
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(RegionModel* src);
-
-  /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers.  
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
-   */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual void addChildrenToTree(xmlNodePtr cur);
 
   /**
      every model should be able to print a verbose description 

@@ -13,7 +13,6 @@ class ConcreteRegionModel : public RegionModel {
   
   virtual ~ConcreteRegionModel() { };
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<ConcreteRegionModel*>(src));}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,8 +27,6 @@ class DieInst : public InstModel {
   
   virtual ~DieInst() {};
   
-  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<DieInst*>(src));}
-
   virtual void handleTick(int time) {
     tickCount_++;
     totalTicks++;
@@ -81,11 +78,11 @@ class RegionModelClassTests : public ::testing::Test {
       child5_ = new DieInst();
 
       reg_ = new ConcreteRegionModel();
-      child1_->setParent(reg_);
-      child2_->setParent(reg_);
-      child3_->setParent(reg_);
-      child4_->setParent(reg_);
-      child5_->setParent(reg_);
+      child1_->enterSimulation(reg_);
+      child2_->enterSimulation(reg_);
+      child3_->enterSimulation(reg_);
+      child4_->enterSimulation(reg_);
+      child5_->enterSimulation(reg_);
     }
 };
 

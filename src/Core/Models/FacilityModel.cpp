@@ -23,15 +23,6 @@ FacilityModel::~FacilityModel() {};
 void FacilityModel::init(xmlNodePtr cur) {
   Model::init(cur);
 
-  // Specific initialization for FacilityModels
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements(cur, "/simulation/region/institution");
-   
-  for (int i=0;i<nodes->nodeNr;i++){
-    inst_name_ = XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
-    this->setInstName(inst_name_);
-    LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just set its inst to " << inst_name_;
-  }
-
   // get lifetime and set decommission date
   try {
     fac_lifetime_ = atoi(XMLinput->get_xpath_content(cur, "lifetime"));
@@ -41,15 +32,14 @@ void FacilityModel::init(xmlNodePtr cur) {
   }
   setDecommissionDate(TI->time());
 } 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::enterSimulation(Model* parent) {
+  Model::enterSimulation(parent);
+  initializeConcreteMembers();
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::copy(FacilityModel* src) { 
-  Model::copy(src); 
-  Communicator::copy(src); 
-
-  // don't copy fac_name to new instance
-  this->setFacName("");
-};
+void FacilityModel::initializeConcreteMembers() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
