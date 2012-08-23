@@ -3,7 +3,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="TestInst">
     <element name="TestInst"> 
-      <text/>
+      <text />
     </element>
   </define>
 

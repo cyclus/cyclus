@@ -2,9 +2,9 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <define name="TestRegion">
-    <element name="TestRegion"/> 
-      <text/>
-    <element>
+    <element name="TestRegion"> 
+      <text />
+    </element>
   </define>
 
 </grammar>
