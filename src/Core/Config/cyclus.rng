@@ -1,7 +1,10 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
-  @RNG_INCLUDES@
+  <include href='../lib/Models/Market/TestMarket/TestMarket.rng'/>
+  <include href='../lib/Models/Region/TestRegion/TestRegion.rng'/>
+  <include href='../lib/Models/Inst/TestInst/TestInst.rng'/>
+  <include href='../lib/Models/Facility/TestFacility/TestFacility.rng'/>
 
   <start>
   <choice>
@@ -148,7 +151,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
 
       <element name="model">
-      <choice> @Market_REFS@
+      <choice>
+        <ref name='TestMarket'/>
       </choice>
       </element>
 
@@ -166,7 +170,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
 
       <element name="model">
-      <choice> @Facility_REFS@
+      <choice>
+        <ref name='TestFacility'/>
       </choice>
       </element>
 
@@ -307,7 +312,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </oneOrMore>
 
       <element name="model">
-      <choice> @Region_REFS@
+      <choice>
+        <ref name='TestRegion'/>
       </choice>
       </element>
 
@@ -327,7 +333,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
       <element name="model">
-      <choice> @Inst_REFS@
+      <choice> 
+        <ref name='TestInst'/>
       </choice>
       </element>
     </element>
@@ -342,7 +349,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
       <element name="model">
-      <choice> @Converter_REFS@
+      <choice>
       </choice>
       </element>
     </element>
