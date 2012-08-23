@@ -5,8 +5,9 @@ macro(cyclus_init  _path _name)
 
   # Build the cyclus executable from the CYCLUS_SRC source files
   ADD_LIBRARY( ${_name}       ${_name}.cpp )
+  # Link the libraries to libcycluscore
+  TARGET_LINK_LIBRARIES(${_name} dl cycluscore)
   SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_name} )
-
   
   CONFIGURE_FILE(
     ${CYCLUS_SOURCE_DIR}/Core${_path}/${_name}.rng
@@ -18,10 +19,6 @@ macro(cyclus_init  _path _name)
     LIBRARY DESTINATION cyclus/lib${_path}
     COMPONENT ${_path}
     )
-  
-  SET(RNG_INCLUDES ${RNG_INCLUDES}
-    "<include href='../lib${_path}/${_name}.rng'/>"
-    PARENT_SCOPE)
 
   install(FILES "${_name}.rng"
     DESTINATION cyclus/lib${_path}
@@ -29,7 +26,6 @@ macro(cyclus_init  _path _name)
     )
 endmacro()
   
-
 macro(cyclus_init_model _type _name)
   SET(MODEL_PATH "/Models/${_type}/${_name}")
   cyclus_init(${MODEL_PATH} ${_name})
@@ -38,9 +34,15 @@ macro(cyclus_init_model _type _name)
     ${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/${_name}Tests.cpp 
     PARENT_SCOPE)
-
-  SET(${_type}_REFS ${${_type}_REFS}
-    "<ref name='${_name}'/>"
-    PARENT_SCOPE)
 endmacro()
 
+macro(add_all_subdirs)
+  file(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
+  
+  foreach(dir ${all_valid_subdirs})
+      if(${dir} MATCHES "^([^/]*)//CMakeLists.txt")
+          string(REGEX REPLACE "^([^/]*)//CMakeLists.txt" "\\1" dir_trimmed ${dir})
+          add_subdirectory(${dir_trimmed})
+      endif()
+  endforeach(dir)
+endmacro()
