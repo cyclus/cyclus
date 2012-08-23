@@ -176,6 +176,8 @@ void Transaction::define_trans_table(){
   trans_table->addField("ID","INTEGER");
   trans_table->addField("SenderID","INTEGER");
   trans_table->addField("ReceiverID","INTEGER");
+  trans_table->addField("MarketID","INTEGER");
+  trans_table->addField("Commodity","VARCHAR(128)");
   trans_table->addField("Time","INTEGER");
   trans_table->addField("Price","REAL");
   // declare the table's primary key
@@ -199,6 +201,11 @@ void Transaction::define_trans_table(){
   fk = new foreign_key(myk, (*fkref) );
   trans_table->addForeignKey( (*fk) ); // receiver id references agents' id
   myk.clear();
+  //     the market id
+  myk.push_back("MarketID");
+  fk = new foreign_key(myk, (*fkref) );
+  trans_table->addForeignKey( (*fk) ); // this market id references markets' id
+  myk.clear();
   theirk.clear();
   // we've now defined the table
   trans_table->tableDefined();
@@ -211,17 +218,30 @@ void Transaction::addTransToTable() {
   
   // make a row
   // declare data
-  data an_id(trans_id_), a_sender( supplier_->ID() ), 
-    a_receiver( requester_->ID() ), a_time( TI->time() ), 
-    a_price( price_ );
+  data an_id(trans_id_), 
+       a_sender( supplier_->ID() ), 
+       a_receiver( requester_->ID() ), 
+       a_market( market()->ID() ), 
+       a_commodity( commod() ), 
+       a_time( TI->time() ), 
+       a_price( price_ );
   // declare entries
-  entry id("ID",an_id), sender("SenderID",a_sender), 
-    receiver("ReceiverID",a_receiver), time("Time",a_time), 
-    price("Price",a_price);
+  entry id("ID",an_id), 
+        sender("SenderID",a_sender), 
+        receiver("ReceiverID",a_receiver), 
+        market("MarketID",a_market), 
+        commodity("Commodity",a_commodity), 
+        time("Time",a_time), 
+        price("Price",a_price);
   // declare row
   row aRow;
-  aRow.push_back(id), aRow.push_back(sender), aRow.push_back(receiver), 
-    aRow.push_back(time),aRow.push_back(price);
+  aRow.push_back(id), 
+    aRow.push_back(sender), 
+    aRow.push_back(receiver), 
+    aRow.push_back(market), 
+    aRow.push_back(commodity), 
+    aRow.push_back(time),
+    aRow.push_back(price);
   // add the row
   trans_table->addRow(aRow);
   // record this primary key

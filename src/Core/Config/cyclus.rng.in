@@ -170,6 +170,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </choice>
       </element>
 
+      <zeroOrMore>
+        <ref name="incommodity"/>
+      </zeroOrMore>
+
+      <zeroOrMore>
+        <ref name="outcommodity"/>
+      </zeroOrMore>
+
     </element>
   </define>
 

@@ -227,3 +227,4 @@ IF (DOXYGEN_FOUND)
 ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
+

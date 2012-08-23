@@ -14,6 +14,11 @@
 class TimeAgent : public Model {  
  public:
   /**
+     destructor
+   */
+  virtual ~TimeAgent() {};
+
+  /**
      Each simulation agent is prompted to do its beginning-of-life 
      stuff. 
    */
