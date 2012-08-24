@@ -122,11 +122,74 @@ void Material::setQuantity(double quantity) {
   quantity_ = quantity;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
                    << quantity << " kg";
-};
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void Material::setQuantity(double quantity, MassUnit unit) {
+  setQuantity( convertToKg(quantity,unit) );
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::quantity() {
   return quantity_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::mass(MassUnit unit) {
+  return convertFromKg(quantity(),unit);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::mass(Iso tope, MassUnit unit) {
+  return convertFromKg(mass(tope),unit);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::mass(Iso tope){
+  return(isoVector().comp()->massFraction(tope)*mass(KG));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::convertFromKg(double mass, MassUnit to_unit) {
+  double converted;
+  switch( to_unit ) {
+    case G :
+      converted = mass*1000.0;
+    case KG : 
+      converted = mass;
+      break;
+    default:
+      throw CycException("The unit provided is not a supported mass unit.");
+  }
+  return converted;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::convertToKg(double mass, MassUnit from_unit) {
+  double in_kg;
+  switch( from_unit ) {
+    case G :
+      in_kg = mass/1000.0;
+    case KG : 
+      in_kg = mass;
+      break;
+    default:
+      throw CycException("The unit provided is not a supported mass unit.");
+  }
+  return in_kg;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::moles(){
+  double m_a_ratio = isoVector().comp()->mass_to_atom_ratio();
+  return mass(G)/m_a_ratio;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+double Material::moles(Iso tope){
+  double atom_frac = isoVector().comp()->atomFraction(tope);
+  double m_a_ratio = isoVector().comp()->mass_to_atom_ratio();
+  return mass(G)*atom_frac/m_a_ratio;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

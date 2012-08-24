@@ -23,6 +23,9 @@ class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
 /* -- */
 
+// A type definition for mass units
+enum MassUnit { KG, G };
+
 /*!
    @class Material
   
@@ -112,11 +115,23 @@ public:
   void setQuantity(double quantity);
 
   /**
+     Change/set the mass of the resource object. 
+     Note that this does make matter (dis)appear and 
+     should only be used on objects that are not part of 
+     any actual tracked inventory. 
+
+     @param quantity the new mass, in units of the unit provided
+     @param unit the unit of the mass provided, choose kg, g..
+    */
+  void setQuantity(double quantity, MassUnit unit);
+
+  /**
      Resource class method 
 
      @return the mass in kg
    */
   double quantity();
+
 
   /**
      Resource class method 
@@ -137,6 +152,61 @@ public:
      Resource class method 
    */
   rsrc_ptr clone();
+
+  /**
+     Calls the resource class method, but checks 
+     the units.
+
+     @param unit is the mass unit. Choose kg, g...
+   */
+  double mass(MassUnit unit);
+
+  /**
+     returns the mass (in kg) of a certain isotope contained 
+     in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+   */
+  double mass(Iso tope);
+
+  /**
+     returns the mass of a certain isotope contained 
+     in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+     @param unit is the mass unit. Choose kg, g...
+   */
+  double mass(Iso tope, MassUnit unit);
+
+  /** 
+     conversion from kg to some other unit
+
+     @param kg the mass in kg to convert
+     @param to_unit the unit to convert it to
+     */
+  double convertFromKg(double kg, MassUnit to_unit);
+
+  /** 
+     conversion from kg to some other unit
+
+     @param kg the mass in kg to convert
+     @param from_unit the unit to convert it from
+     */
+  double convertToKg(double mass, MassUnit from_unit);
+
+  /**
+     returns the number of atoms, in moles in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+    */
+  double moles();
+
+  /**
+     returns the number of atomes (in moles) of a certain isotope in a material
+
+     @param tope is the isotope identifier. (e.g. 92235)
+    */
+  double moles(Iso tope);
 
   /**
      Absorbs the contents of the given 

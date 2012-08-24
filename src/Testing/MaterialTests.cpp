@@ -40,15 +40,14 @@ TEST_F(MaterialTest, CheckQuality) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckIsoMass) {
   // check total mass, you'll use it later.
-  double amt = test_size_ ;
   EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
 
   // you should be able to get the mass per isotope
-  EXPECT_NO_THROW(test_mat_->kg(u235_));
+  EXPECT_NO_THROW(test_mat_->mass(u235_));
 
   // if the material has only one isotope, it should be the same as the total
   // the u235 mass should be (mol/mat)(1kg/1000g)(235g/mol)  
-  ASSERT_FLOAT_EQ(test_mat_->kg(u235) , test_mat_->moles(u235)*0.235); 
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_) , test_mat_->moles(u235_)*0.235); 
 
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
@@ -57,7 +56,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = comp.first;
-    test_total += test_mat->kg(i);
+    test_total += test_mat->mass(i);
   }
   ASSERT_FLOAT_EQ(test_mat_->quantity(), test_total);
 }
@@ -84,6 +83,26 @@ TEST_F(MaterialTest, CheckIsoAtoms){
 
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckConvertFromKg){
+  // check total mass, you'll use it later.
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+  // you should be able to get the mass per isotope
+  EXPECT_NO_THROW(test_mat_->mass(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
+  ASSERT_FLOAT_EQ(1000.0*test_mat_->mass(u235_), test_mat_->mass(u235_,G));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckConvertToKg){
+  // check total mass, you'll use it later.
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_*1000.0,G));
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_,G));
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG)/1000.0);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
