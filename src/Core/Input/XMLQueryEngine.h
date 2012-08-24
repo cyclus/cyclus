@@ -10,6 +10,8 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/relaxng.h>
 
+#include "QueryEngine.h"
+
 /**
    @class XMLQueryEngine
 

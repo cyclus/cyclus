@@ -50,8 +50,9 @@ int XMLQueryEngine::find_elements(const char* expression) {
   /* Evaluate xpath expression */
   currentXpathObj_ = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt_);
   
-  if (NULL != currentXpathObj_)
+  if (!xmlXPathNodeSetIsEmpty(currentXpathObj_->nodesetval)) {
     numElements_ = currentXpathObj_->nodesetval->nodeNr;
+  }
 
   return numElements_;
 }
