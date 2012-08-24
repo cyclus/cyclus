@@ -70,7 +70,6 @@ class XMLQueryEngine : public QueryEngine {
      of the document
    */
   virtual int numElementsMatchingQuery(std::string query);
-  //int find_elements(const char* expression);
 
   /**
      Get the full contents of a specific match to the expression

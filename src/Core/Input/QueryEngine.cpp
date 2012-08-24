@@ -12,8 +12,8 @@ QueryEngine::QueryEngine() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine::~QueryEngine() {
   while (!spawned_children_.empty()) {
-    QueryEngine* qe = *spawned_children_.end();
-    spawned_children_.erase(spawned_children_.end());
+    QueryEngine* qe = *spawned_children_.begin();
+    spawned_children_.erase(spawned_children_.begin());
     if (qe) {
       delete qe;
     }
