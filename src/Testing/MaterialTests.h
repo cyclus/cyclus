@@ -10,7 +10,7 @@
 class MaterialTest : public ::testing::Test {
   protected:
     Iso u235_, am241_, th228_, pb208_;
-    int one_mol_; // atoms
+    int one_g_; // grams
     CompMapPtr test_comp_, diff_comp;
     double test_size_, fraction;
     mat_rsrc_ptr test_mat_;
@@ -24,15 +24,15 @@ class MaterialTest : public ::testing::Test {
       am241_ = 95241;
       th228_ = 90228;
       pb208_ = 82208;
-      one_mol_ = 1.0;
+      one_g_ = 1.0;
 
       // composition creation
       test_comp_ = CompMapPtr(new CompMap(MASS));
       diff_comp = CompMapPtr(new CompMap(MASS));
-      (*test_comp_)[u235_]=one_mol_;
-      (*diff_comp)[u235_]=one_mol_;
-      (*diff_comp)[pb208_]=one_mol_;
-      (*diff_comp)[am241_]=one_mol_;
+      (*test_comp_)[u235_]=one_g_;
+      (*diff_comp)[u235_]=one_g_;
+      (*diff_comp)[pb208_]=one_g_;
+      (*diff_comp)[am241_]=one_g_;
       test_size_ = 10.0;
       fraction = 2.0 / 3.0;
       
