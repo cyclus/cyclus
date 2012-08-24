@@ -33,13 +33,16 @@
    children.  This class provides methods to get the full contents of
    each match, or each child of each match.
 */
-class XMLQueryEngine {
+class XMLQueryEngine : public QueryEngine {
  public:
   /** 
       This default constructor should rarely be used explicitly, but
       is useful to allow simple declarations.
   */
   XMLQueryEngine();
+
+  /// virtual destructor
+  virtual ~XMLQueryEngine() {};
 
   /** 
       This most common constructor creates a set of XML objects from a
@@ -66,7 +69,8 @@ class XMLQueryEngine {
      @param expression an XPath search expression relative to the root
      of the document
    */
-  int find_elements(const char* expression);
+  virtual int numElementsMatchingQuery(std::string query);
+  //int find_elements(const char* expression);
 
   /**
      Get the full contents of a specific match to the expression
@@ -85,6 +89,11 @@ class XMLQueryEngine {
      of the document
   */
   std::string get_content(const char* expression);
+
+  /**
+   */
+  virtual std::string getElementContent(std::string query,
+                                        int index = 0);
 
   /**
      Get the number of children of a specific match to the expression
@@ -130,6 +139,9 @@ class XMLQueryEngine {
      @param elementNum the ordinal number of the element to be queried
   */
   std::string get_name(int elementNum);
+
+ protected:
+  virtual QueryEngine* getEngineFromSnippet(std::string snippet);
 
  private:
   int numElements_;

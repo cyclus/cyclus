@@ -101,12 +101,12 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
 
   XMLQueryEngine xqe(doc);
 
-  int numRecipeBooks = xqe.find_elements("/*/recipebook");
+  int numRecipeBooks = xqe.numElementsMatchingQuery("/*/recipebook");
   for (int rb_num=0;rb_num<numRecipeBooks;rb_num++) {
     load_catalog(xqe.get_content(rb_num),recipeBook,cur_ns);
   }
 
-  int numRecipes = xqe.find_elements("/*/recipe");
+  int numRecipes = xqe.numElementsMatchingQuery("/*/recipe");
   for (int recipe_num=0;recipe_num<numRecipes;recipe_num++) {
     //RecipeLibrary::load_recipe(xqe.get_content(recipe_num),cur_ns);
   }
@@ -117,7 +117,7 @@ void XMLFileLoader::load_facilities(std::string cur_ns) {
 
   XMLQueryEngine xqe(doc);
 
-  int numFacCats = xqe.find_elements("/*/facilitycatalog");
+  int numFacCats = xqe.numElementsMatchingQuery("/*/facilitycatalog");
   for (int fac_cat_num=0;fac_cat_num<numFacCats;fac_cat_num++) {
     load_catalog(xqe.get_content(fac_cat_num),facilityCatalog,cur_ns);
   }
@@ -140,7 +140,7 @@ void XMLFileLoader::load_models(std::string modelPath, std::string factoryType) 
 
   XMLQueryEngine xqe(doc);
 
-  int numModels = xqe.find_elements(modelPath.c_str());
+  int numModels = xqe.numElementsMatchingQuery(modelPath.c_str());
   for (int model_num=0;model_num<numModels;model_num++) {
     //Model::create(factoryType,xqe.get_content(model_num));
   }

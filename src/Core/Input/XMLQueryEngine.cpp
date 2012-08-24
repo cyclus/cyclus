@@ -1,6 +1,5 @@
 // XMLQueryEngine.cpp
 // Implements class for querying XML snippets
-
 #include <iostream>
 
 #include "XMLQueryEngine.h"
@@ -44,11 +43,11 @@ void XMLQueryEngine::init(std::string snippet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int XMLQueryEngine::find_elements(const char* expression) {
+int XMLQueryEngine::numElementsMatchingQuery(std::string query) {//const char* expression) {
   numElements_ = 0;
 
   /* Evaluate xpath expression */
-  currentXpathObj_ = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt_);
+  currentXpathObj_ = xmlXPathEvalExpression((const xmlChar*)query.c_str(), xpathCtxt_);
   
   if (!xmlXPathNodeSetIsEmpty(currentXpathObj_->nodesetval)) {
     numElements_ = currentXpathObj_->nodesetval->nodeNr;
@@ -58,8 +57,15 @@ int XMLQueryEngine::find_elements(const char* expression) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string XMLQueryEngine::getElementContent(std::string query,
+                                              int index) {
+  numElementsMatchingQuery(query);
+  return get_content(index);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_content(const char* expression) {
-  if (0 == find_elements(expression)) {
+  if (0 == numElementsMatchingQuery(expression)) {
     throw CycParseException("Can't find an element with that name.");
   }
 
@@ -108,7 +114,7 @@ std::string XMLQueryEngine::get_content(int elementNum) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_child(const char* expression) {
-  if (0 == find_elements(expression)) {
+  if (0 == numElementsMatchingQuery(expression)) {
     throw CycParseException("Can't find an element with that name.");
   }
   
@@ -156,3 +162,7 @@ std::string XMLQueryEngine::get_name(int elementNum) {
   return XMLname;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+QueryEngine* XMLQueryEngine::getEngineFromSnippet(std::string snippet) {
+  return new XMLQueryEngine(snippet);
+}
