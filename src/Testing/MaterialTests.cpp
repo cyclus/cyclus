@@ -56,7 +56,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;
-    test_total += test_mat->mass(i);
+    test_total += test_mat_->mass(i);
   }
   ASSERT_FLOAT_EQ(test_mat_->quantity(), test_total);
 }
@@ -73,8 +73,8 @@ TEST_F(MaterialTest, CheckIsoAtoms){
   CompMap::iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
-    iso = comp.first;
-    total_atoms += test_mat_->moles(iso);
+    i = (*comp).first;
+    total_atoms += test_mat_->moles(i);
   }
   ASSERT_FLOAT_EQ(test_mat_->moles(), test_total);
 
