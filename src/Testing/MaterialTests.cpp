@@ -69,17 +69,16 @@ TEST_F(MaterialTest, CheckIsoAtoms){
   EXPECT_FLOAT_EQ(one_mol_,test_mat_->moles(u235_));
 
   // a mat's total atoms should be the total of all the contained isotopes. 
-  double test_total = 0;
+  double total_atoms = 0;
   CompMap::iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;
     total_atoms += test_mat_->moles(i);
   }
-  ASSERT_FLOAT_EQ(test_mat_->moles(), test_total);
-
   // you should be able to get to the total atoms in your material
-  total_atoms = test_mat_->moles();
+  ASSERT_FLOAT_EQ(test_mat_->moles(), total_atoms);
+
 
 }
 
