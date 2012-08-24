@@ -10,7 +10,7 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/relaxng.h>
 
-/*!
+/**
    @class XMLQueryEngine
 
    A class for extracting information from XML snippets
@@ -30,11 +30,8 @@
    there may be multiple matches and each match may have multiple
    children.  This class provides methods to get the full contents of
    each match, or each child of each match.
-
 */
-
 class XMLQueryEngine {
-
  public:
   /** 
       This default constructor should rarely be used explicitly, but
@@ -133,12 +130,10 @@ class XMLQueryEngine {
   std::string get_name(int elementNum);
 
  private:
-
-  // 
-  int numElements;
-  xmlDocPtr doc;
-  xmlXPathContextPtr xpathCtxt;
-  xmlXPathObjectPtr currentXpathObj;
+  int numElements_;
+  xmlDocPtr doc_;
+  xmlXPathContextPtr xpathCtxt_;
+  xmlXPathObjectPtr currentXpathObj_;
 
   void init(std::string expression);
 

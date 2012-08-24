@@ -7,67 +7,57 @@
 
 #include "CycException.h"
 
-//- - - - - - 
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine() {
-  
-  doc = NULL;
-  xpathCtxt = NULL;
-  numElements = 0;
-
+  doc_ = NULL;
+  xpathCtxt_ = NULL;
+  numElements_ = 0;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine(std::string snippet) {
-
   init(snippet);
-
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine(xmlDocPtr current_doc) {
-
   if (NULL == current_doc) {
     throw CycParseException("Invalide xmlDocPtr passed into XMLQueryEngine");
   }
   
-  doc = current_doc;
-  xpathCtxt = xmlXPathNewContext(doc);
-  numElements = 0;
-
+  doc_ = current_doc;
+  xpathCtxt_ = xmlXPathNewContext(doc_);
+  numElements_ = 0;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLQueryEngine::init(std::string snippet) {
-
   char *myEncoding = NULL;
   int myParserOptions = 0;
-  doc = xmlReadDoc((const xmlChar*)snippet.c_str(),"",myEncoding,myParserOptions);
-  if (NULL == doc) {
+  doc_ = xmlReadDoc((const xmlChar*)snippet.c_str(),"",myEncoding,myParserOptions);
+  if (NULL == doc_) {
     // throw CycParseException("Failed to parse snippet");
   }
   
-  xpathCtxt = xmlXPathNewContext(doc);
-  numElements = 0;
-
+  xpathCtxt_ = xmlXPathNewContext(doc_);
+  numElements_ = 0;
 }
 
-
-//- - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int XMLQueryEngine::find_elements(const char* expression) {
-
-  numElements = 0;
+  numElements_ = 0;
 
   /* Evaluate xpath expression */
-  currentXpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
+  currentXpathObj_ = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt_);
   
-  if (NULL != currentXpathObj)
-    numElements = currentXpathObj->nodesetval->nodeNr;
+  if (NULL != currentXpathObj_)
+    numElements_ = currentXpathObj_->nodesetval->nodeNr;
 
-  return numElements;
-
+  return numElements_;
 }
 
-//- - - - - -
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_content(const char* expression) {
-
   if (0 == find_elements(expression)) {
     throw CycParseException("Can't find an element with that name.");
   }
@@ -75,10 +65,9 @@ std::string XMLQueryEngine::get_content(const char* expression) {
   return get_content(0);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_content(int elementNum) {
-
-  
-  xmlNodePtr node = currentXpathObj->nodesetval->nodeTab[elementNum];
+  xmlNodePtr node = currentXpathObj_->nodesetval->nodeTab[elementNum];
   // xmlNodePtr child = node->children;
   std::string XMLcontent = "";
   xmlBufferPtr nodeBuffer = xmlBufferCreate();
@@ -114,26 +103,24 @@ std::string XMLQueryEngine::get_content(int elementNum) {
   xmlBufferFree(nodeBuffer);
 
   return XMLcontent;
-
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_child(const char* expression) {
-
   if (0 == find_elements(expression)) {
     throw CycParseException("Can't find an element with that name.");
   }
   
   return get_child(0);
-
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
-
-  if (elementNum >= numElements) {
+  if (elementNum >= numElements_) {
     throw CycParseException("Too many elements requested.");
   }
 
-  xmlNodePtr node = currentXpathObj->nodesetval->nodeTab[elementNum];
+  xmlNodePtr node = currentXpathObj_->nodesetval->nodeTab[elementNum];
   xmlNodePtr child = node->children;
   std::string XMLcontent;
 
@@ -146,7 +133,7 @@ std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
   xmlBufferPtr nodeBuffer = xmlBufferCreate();
   if (nodeBuffer)
     {
-      int success = xmlNodeDump(nodeBuffer,doc,child,0,1);
+      int success = xmlNodeDump(nodeBuffer,doc_,child,0,1);
       if (-1 < success)
 	XMLcontent = (const char*)xmlBufferContent(nodeBuffer);
       else
@@ -158,15 +145,13 @@ std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
   xmlBufferFree(nodeBuffer);
 
   return XMLcontent;
-
 }
 
-//- - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_name(int elementNum) {
-
-  std::string XMLname = (const char*)(currentXpathObj->nodesetval->nodeTab[elementNum]->name);
-
+  std::string XMLname = 
+    (const char*)(currentXpathObj_->nodesetval->
+                  nodeTab[elementNum]->name);
   return XMLname;
-
 }
 

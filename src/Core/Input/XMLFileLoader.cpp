@@ -78,19 +78,22 @@ void XMLFileLoader::load_catalog(std::string catalogElement, CatalogType catalog
   if ("xml" == format) {
     CLOG(LEV_DEBUG2) << "going into a catalog...";
     XMLFileLoader catalog(cat_filename);
-    if (recipeBook == catalogType) {
+    // choose load function based on catalog type
+    switch (catalogType) {
+    case recipeBook:
       catalog.validate_file(recipe_book_schema_);
       catalog.load_recipes(cur_ns + ns + ":");
-    } else if (facilityCatalog == catalogType) {
-        catalog.validate_file(facility_catalog_schema_);
-	catalog.load_facilities(cur_ns + ns + ":");
+      break;
+    case facilityCatalog:
+      catalog.validate_file(facility_catalog_schema_);
+      catalog.load_facilities(cur_ns + ns + ":");
+      break;
     }
-  } 
-  else {
+  } else {
     throw 
-      CycRangeException(format + "is not a supported catalog format.");
+      CycRangeException(format + 
+                        "is not a supported catalog format.");
   }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
