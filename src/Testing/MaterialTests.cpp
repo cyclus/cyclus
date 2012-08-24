@@ -55,7 +55,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   CompMap::iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
-    i = comp.first;
+    i = (*comp).first;
     test_total += test_mat->mass(i);
   }
   ASSERT_FLOAT_EQ(test_mat_->quantity(), test_total);
