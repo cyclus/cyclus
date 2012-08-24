@@ -16,37 +16,17 @@
 #include "Timer.h"
 #include "Resource.h"
 #include "Table.h"
+#include "Prototype.h"
 
 #include DYNAMICLOADLIB
 
 using namespace std;
 
-// Default starting ID for all Models is zero.
+// static members
 int Model::next_id_ = 0;
-// Database table for agents
 table_ptr Model::agent_table = new Table("Agents"); 
-// Model containers
-vector<Model*> Model::template_list_;
 vector<Model*> Model::model_list_;
-map<string, mdl_ctor*> Model::create_map_;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getTemplateByName(std::string name) {
-  Model* found_model = NULL;
-
-  for (int i = 0; i < template_list_.size(); i++) {
-    if (name == template_list_.at(i)->name()) {
-      found_model = template_list_.at(i);
-      break;
-    }
-  }
-
-  if (found_model == NULL) {
-    string err_msg = "Model '" + name + "' doesn't exist.";
-    throw CycIndexException(err_msg);
-  }
-  return found_model;
-}
+map<string,mdl_ctor*> Model::loaded_modules_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getModelByName(std::string name) {
@@ -82,33 +62,48 @@ vector<Model*> Model::getModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::create(std::string model_type, xmlNodePtr cur) {
-  string model_impl = XMLinput->get_xpath_name(cur, "model/*");
+Model* Model::getEntityViaConstructor(std::string model_type,
+                                      xmlNodePtr cur) {
+  string module = XMLinput->get_xpath_name(cur,"model/*");
+  mdl_ctor* module_constructor; 
+  // if it hasn't been loaded, load the module and register it
+  if (loaded_modules_.find(module) == loaded_modules_.end()) { 
+    module_constructor = loadConstructor(model_type,module);
+    loaded_modules_.insert(make_pair(module,module_constructor));
+  }
+  // else return the registered module
+  else {
+    module_constructor = loaded_modules_[module];
+  }
+  return module_constructor();
+}
 
-  // get instance
-  mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
-
-  Model* model = model_constructor();
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::initializeSimulationEntity(std::string model_type, 
+                                       xmlNodePtr cur) {
+  Model* model = getEntityViaConstructor(model_type,cur);
   model->init(cur);
+  model_list_.push_back(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(Model* model_orig) {
-  mdl_ctor* model_constructor = loadConstructor(model_orig->modelType(),model_orig->modelImpl());
-  
-  Model* model_copy = model_constructor();
-  
-  model_copy->copyFreshModel(model_orig);
-
-  return model_copy;
+void Model::initializePrototype(std::string model_type, 
+                                xmlNodePtr cur) {
+  Model* model = getEntityViaConstructor(model_type,cur);
+  model->init(cur);
+  Prototype::registerPrototype(model->name(),
+                               dynamic_cast<Prototype*>(model));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_models() {
+void Model::loadGlobalElements() {
   load_converters();
   load_markets();
   load_facilities();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::loadEntities() {
   load_institutions();
   load_regions();
 }
@@ -118,7 +113,7 @@ void Model::load_markets() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    create("Market",nodes->nodeTab[i]);
+    initializeSimulationEntity("Market",nodes->nodeTab[i]);
   }
 }
 
@@ -128,7 +123,7 @@ void Model::load_converters() {
     xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
     
     for (int i=0;i<nodes->nodeNr;i++) {
-      create("Converter",nodes->nodeTab[i]);
+      initializeSimulationEntity("Converter",nodes->nodeTab[i]);
     }
   } catch (CycNullXPathException) {} // no converters
 }
@@ -150,7 +145,7 @@ void Model::load_facilities() {
   nodes = XMLinput->get_xpath_elements("/*/facility");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    create("Facility",nodes->nodeTab[i]);
+    initializePrototype("Facility",nodes->nodeTab[i]);
   }
 }
   
@@ -173,7 +168,7 @@ void Model::load_regions() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    create("Region",nodes->nodeTab[i]);
+    initializeSimulationEntity("Region",nodes->nodeTab[i]);
   }
 }
 
@@ -183,7 +178,7 @@ void Model::load_institutions() {
   xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
   
   for (int i=0;i<nodes->nodeNr;i++) {
-    create("Inst",nodes->nodeTab[i]);   
+    initializeSimulationEntity("Inst",nodes->nodeTab[i]);   
   }
 }
 
@@ -195,27 +190,11 @@ void Model::init(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::copy(Model* model_orig) {
-  if (model_orig->modelType() != model_type_ && 
-       model_orig->modelImpl() != model_impl_) {
-    throw CycTypeException("Cannot copy a model of type " 
-        + model_orig->modelType() + "/" + model_orig->modelImpl()
-        + " to an object of type "
-        + model_type_ + "/" + model_impl_);
-  }
-
-  name_ = model_orig->name();
-  model_impl_ = model_orig->modelImpl();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
   children_ = vector<Model*>();
   name_ = "";
   ID_ = next_id_++;
-  is_template_ = true;
   born_ = false;
-  template_list_.push_back(this);
   parent_ = NULL;
   parentID_ = -1;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
@@ -232,7 +211,6 @@ Model::~Model() {
   agent_table->updateRow( this->pkref(), don );
   
   // remove references to self
-  removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
   if (parent_ != NULL) {
@@ -271,46 +249,24 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::itLives() {
-  if (!isTemplate()) {
-    return;
-  }
+void Model::enterSimulation(Model* parent){ 
+  // set model-specific members
+  parentID_ = parent->ID();
+  setParent(parent);
+  parent->addChild(this);
+  bornOn_ = TI->time();
 
-  this->setBornOn( TI->time() );
-
-  if (parent_ == NULL) {
-    parentID_ = this->ID();
-  } else {
-    parentID_ = parent_->ID();
-  }
-  
-  // register the model with the simulation
+  // add model to the database
   this->addToTable();
 
-  is_template_ = false;
-
-  // this prevents duplicates from being stored in the list
-  removeFromList(this, model_list_);
-  model_list_.push_back(this);
-  
-  // if this node is not its own parent, add it to its parent's list of children
-  if (parent_ != NULL){
-    parent_->addChild(this);
-  }
-
-  CLOG(LEV_DEBUG2) << "Created Model: {";
+  // inform user
+  CLOG(LEV_DEBUG2) << "Model Entered Simulation: {";
   CLOG(LEV_DEBUG2) << str();
   CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
-  doSetParent(parent);
-  itLives();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::doSetParent(Model* parent){ 
   if (parent == this) {
     // root nodes are their own parent
     parent_ = NULL; // parent pointer set to NULL for memory management

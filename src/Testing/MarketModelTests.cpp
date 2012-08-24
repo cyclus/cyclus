@@ -11,18 +11,6 @@ TEST_P(MarketModelTests, Print) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(MarketModelTests, CopyMarket) {
-  MarketModel* new_market = market_model_;
-  EXPECT_NO_THROW(new_market->copy(market_model_)); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(MarketModelTests, CopyFreshMarket) {
-  MarketModel* new_market = market_model_;
-  EXPECT_NO_THROW(new_market->copyFreshModel(dynamic_cast<Model*>(market_model_))); 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(MarketModelTests, ReceiveMessage) {
   EXPECT_NO_THROW(market_model_->resolve());
 }

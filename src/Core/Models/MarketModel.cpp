@@ -77,18 +77,6 @@ void MarketModel::init(xmlNodePtr cur) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::copy(MarketModel* src) {
-  Model::copy(src);
-  Communicator::copy(src);
-
-   /** 
-   *  Specific initialization for MarketModels
-   */
-
-  commodity_ = src->commodity();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::string MarketModel::str() { 
   return Model::str() + " trades commodity " + commodity_; 
 };

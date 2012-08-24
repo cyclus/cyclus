@@ -20,19 +20,6 @@ class TestInst: public InstModel {
 
   bool canBuild(Model* mdl) {return true;}
 
-  void build(Model* mdl, Model* parent) {
-    if ( parent != this->parent() ) {
-      // if the requester is not this inst's parent, throw an error
-      std::stringstream err("");
-      err << "Model " << parent->name() << " is requesting that "
-          << "BuildInst " << this->name() << " build a prototype, but "
-          << "is not the BuildInst's parent.";
-      throw CycOverrideException(err.str());
-    }
-  }
-
-  void copyFreshModel(Model* model) { }
-
  public:
   void wrapAddPrototype(Model* prototype){addPrototype(prototype);}
 };
