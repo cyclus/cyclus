@@ -42,6 +42,13 @@ class XMLQueryEngineTest : public ::testing::Test {
     std::string snippet;
     int numA, numB;
     
+    TestSnippet() {};
+    
+  TestSnippet(std::string element, int nA, int nB) : 
+    numA(nA), numB(nB) {
+      snippet = "<start>" + element + "</start>";
+    };
+    
   } testSnippetA, testSnippetB, testSnippetC, testSnippetD, 
     testSnippetE, testSnippetF, testSnippetG, testSnippetH,
     testSnippetI, testSnippetJ,
@@ -54,57 +61,45 @@ class XMLQueryEngineTest : public ::testing::Test {
     testElementB =  TestElement("elementB","contentB");
     testElementAC = TestElement("elementA","contentC");
 
-    testSnippetA.snippet = "<start>" + testElementA.element + "</start>";
-    testSnippetA.numA = 1;
-    testSnippetA.numB = 0;
+    int numA, numB;
 
-    testSnippetB.snippet = "<start>" + testElementA.element + testElementB.element + "</start>";
-    testSnippetB.numA = 1;
-    testSnippetB.numB = 1;
+    numA = 1, numB = 0;
+    testSnippetA = TestSnippet(testElementA.element,numA,numB);
 
-    testSnippetC.snippet = "<start>" + testElementB.element + testElementA.element + "</start>";
-    testSnippetC.numA = 1;
-    testSnippetC.numB = 1;
+    numA = 1, numB = 1;
+    testSnippetB = TestSnippet(testElementA.element+testElementB.element,numA,numB);
 
-    testSnippetD.snippet = "<start>" + testElementA.element + testElementA.element + "</start>";
-    testSnippetD.numA = 2;
-    testSnippetD.numB = 0;
+    numA = 1, numB = 1;
+    testSnippetC = TestSnippet(testElementB.element+testElementA.element,numA,numB);
 
-    testSnippetE.snippet = "<start>" + testElementA.element + testElementA.element  
-                                     + testElementB.element + "</start>";
-    testSnippetE.numA = 2;
-    testSnippetE.numB = 1;
+    numA = 2, numB = 0;
+    testSnippetD = TestSnippet(testElementA.element+testElementA.element,numA,numB);
 
-    testSnippetF.snippet = "<start>" + testElementA.element + testElementA.element  
-                                     + testElementB.element + testElementB.element + "</start>";
-    testSnippetF.numA = 2;
-    testSnippetF.numB = 2;
+    numA = 2, numB = 1;
+    testSnippetE = TestSnippet(testElementA.element+testElementA.element+testElementB.element,numA,numB);
 
-    testSnippetG.snippet = "<start>" + testElementA.element + testElementB.element  
-                                     + testElementA.element + testElementB.element + "</start>";
-    testSnippetG.numA = 2;
-    testSnippetG.numB = 2;
+    numA = 2, numB = 2;
+    testSnippetF = TestSnippet(testElementA.element+testElementA.element+testElementB.element+testElementB.element,numA,numB);
 
-    testSnippetH.snippet = "<start>" + testElementA.element + testElementB.element  
-                                     + testElementAC.element + testElementB.element + "</start>";
-    testSnippetH.numA = 2;
-    testSnippetH.numB = 2;
+    numA = 2, numB = 2;
+    testSnippetG = TestSnippet(testElementA.element+testElementB.element+testElementA.element+testElementB.element,numA,numB);
+
+    numA = 2, numB = 2;
+    testSnippetH = TestSnippet(testElementA.element+testElementB.element+testElementAC.element+testElementB.element,numA,numB);
 
     testElementAAin  = testElementA;
     testElementAAout = TestElement("elementA",testElementAAin.element);
     testElementAAin.path = testElementAAout.path + "/" + testElementAAin.name;
-    testSnippetI.snippet = "<start>" + testElementAAout.element + "</start>";
+    testSnippetI = TestSnippet(testElementAAout.element,numA,numB);
 
     testElementABin  = testElementB;
     testElementABout = TestElement("elementA",testElementABin.element);
     testElementABin.path = testElementABout.path + "/" + testElementABin.name;
-    testSnippetJ.snippet = "<start>" + testElementABout.element + "</start>";
+    testSnippetJ = TestSnippet(testElementABout.element,numA,numB);
 
+    numA = 1, numB = 0;
     startContent = "startContent";
-    testSnippetZ.snippet = "<start>" + testElementA.element + startContent + "</start>";
-    testSnippetZ.numA = 1;
-    testSnippetZ.numB = 0;
-
+    testSnippetZ = TestSnippet(testElementA.element+startContent,numA,numB);
   }
 
   virtual void TearDown() {
