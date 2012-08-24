@@ -21,7 +21,7 @@ CONFIGURE_FILE(
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   COPYONLY
   )

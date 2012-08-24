@@ -21,6 +21,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/XMLQueryEngineTests.cpp
   PARENT_SCOPE)
 
 # Add all the tests by parsing the source code
@@ -74,10 +75,6 @@ INSTALL(FILES
   StubModelTests.h
   StubCommModelTests.cpp
   StubCommModelTests.h
-  TestInst.h
-  TestRegion.h
-  TestFacility.h
-  TestMarket.h
   DESTINATION cyclus/include
   COMPONENT testing
   )
