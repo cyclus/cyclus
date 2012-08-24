@@ -60,3 +60,9 @@ TEST_P(ModelTests, SetAndGetModelType) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_P(ModelTests, Copy) {
+  Model* new_model = model_;
+  EXPECT_NO_THROW(new_model->copy(model_)); 
+}
+

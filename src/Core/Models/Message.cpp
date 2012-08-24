@@ -28,6 +28,7 @@ void Message::constructBase(Communicator* sender) {
 
   path_stack_.push_back(sender_);
   sender->trackMessage(msg_ptr(this));
+  makeRealParticipant(sender);
 
   MLOG(LEV_DEBUG4) << "Message " << this << " created.";
 }
@@ -88,6 +89,7 @@ void Message::sendOn() {
   validateForSend();
 
   Communicator* next_stop = path_stack_.back();
+  makeRealParticipant(next_stop);
   curr_owner_ = next_stop;
 
   CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
@@ -150,6 +152,13 @@ void Message::validateForSend() {
   if (next_stop == curr_owner_) {
     throw CycCircularMsgException();
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Message::makeRealParticipant(Communicator* who) {
+  Model* model = NULL;
+  model = dynamic_cast<Model*>(who);
+  if (model != NULL) {model->itLives();}
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

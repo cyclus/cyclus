@@ -3,7 +3,6 @@
 
 #include "InstModel.h"
 #include "FacilityModel.h"
-#include "Prototype.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
@@ -14,6 +13,7 @@ class ConcreteInstModel : public InstModel {
   
   virtual ~ConcreteInstModel() {};
   
+  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<ConcreteInstModel*>(src));}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,10 +28,7 @@ class DieModel : public FacilityModel {
   
   virtual ~DieModel() {};
   
-  virtual Prototype* clone() {
-    DieModel* clone = new DieModel();
-    return dynamic_cast<Prototype*>(clone);
-  };
+  virtual void copyFreshModel(Model* src) {copy(dynamic_cast<DieModel*>(src));}
 
   virtual void receiveMessage(msg_ptr msg) { };
 
@@ -86,11 +83,11 @@ class InstModelClassTests : public ::testing::Test {
       child5_ = new DieModel();
 
       inst_ = new ConcreteInstModel();
-      child1_->enterSimulation(inst_);
-      child2_->enterSimulation(inst_);
-      child3_->enterSimulation(inst_);
-      child4_->enterSimulation(inst_);
-      child5_->enterSimulation(inst_);
+      child1_->setParent(inst_);
+      child2_->setParent(inst_);
+      child3_->setParent(inst_);
+      child4_->setParent(inst_);
+      child5_->setParent(inst_);
     }
 };
 
