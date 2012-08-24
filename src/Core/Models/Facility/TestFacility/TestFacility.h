@@ -14,6 +14,8 @@ class TestFacility: public FacilityModel {
   }
 
   void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) { }
+  
+  Prototype* clone() { return new TestFacility(); }
 
 };
 

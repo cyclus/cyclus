@@ -9,9 +9,6 @@ class TestConverter: public ConverterModel {
  public:
   TestConverter(){};
   virtual ~TestConverter(){};
-  
-  void copyFreshModel(Model* src) { copy(dynamic_cast<TestConverter*>(src)); }
-
 };
 
 #endif
