@@ -16,15 +16,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
     <interleave>
 
-    <ref name="duration"/>
-
-    <ref name="startmonth"/>
-
-    <ref name="startyear"/>
-
-    <ref name="simstart"/>
-
-    <ref name="decay"/>
+    <ref name="control"/>
 
     <oneOrMore>
     <ref name="commodity"/>
@@ -92,6 +84,16 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </start>
 
   <!-- begin section for simulation parameters -->
+  <define name="control"/>
+    <interleave>
+	<ref name="duration"/>
+	<ref name="startmonth"/>
+	<ref name="startyear"/>
+    	<ref name="simstart"/>
+    	<ref name="decay"/>
+    </interleave>
+  </define>
+
   <define name="duration">
     <element name="duration">
       <data type="nonNegativeInteger"/>

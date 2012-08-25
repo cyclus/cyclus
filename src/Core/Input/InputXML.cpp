@@ -144,7 +144,7 @@ void InputXML::loadSimulationEntities() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::initializeSimulationTimeData() {
-  TI->load_simulation();
+  //TI->load_simulation();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

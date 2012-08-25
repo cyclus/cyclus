@@ -9,6 +9,8 @@
 #include "TimeAgent.h"
 #include "MarketModel.h"
 
+class QueryEngine;
+
 #define TI Timer::Instance()
 
 /**
@@ -244,8 +246,10 @@ public:
 
   /**
      Loads the information about the simulation timing 
+     
+     @param qe is a pointer to a general QueryEngine that can 
    */
-  static void load_simulation();
+  static void load_simulation(QueryEngine *qe);
 
 };
 #endif

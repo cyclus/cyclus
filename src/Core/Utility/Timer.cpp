@@ -245,27 +245,27 @@ pair<int, int> Timer::convertDate(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation() { 
+void Timer::load_simulation(QueryEngine *qe) { 
   
   int dur, m0, y0, sim0, dec;
   string dur_str, m0_str, y0_str, sim0_str, decay_str;
+  
 
   xmlNodePtr cur = XMLinput->get_xpath_element("/simulation");
   // get duration
-  dur_str = (XMLinput->get_xpath_content(cur,"duration"));
-  // get start month
-  m0_str = (XMLinput->get_xpath_content(cur,"startmonth"));
-  // get start year
-  y0_str = (XMLinput->get_xpath_content(cur,"startyear"));
-  // get simulation start
-  sim0_str = (XMLinput->get_xpath_content(cur,"simstart"));
-  // get decay interval
-  decay_str = (XMLinput->get_xpath_content(cur,"decay"));
-
+  dur_str = qe->getElementContent("duration");
   dur = strtol(dur_str.c_str(), NULL, 10);
+  // get start month
+  m0_str = qe->getElementContent("startMonth");
   m0 = strtol(m0_str.c_str(), NULL, 10);
+  // get start year
+  y0_str = qe->getElementContent("startyear");
   y0 = strtol(y0_str.c_str(), NULL, 10);
+  // get simulation start
+  sim0_str = qe->getElementContent("simstart");
   sim0 = strtol(sim0_str.c_str(), NULL, 10);
+  // get decay interval
+  decay_str = qe->getElementContent("decay");
   dec = strtol(decay_str.c_str(), NULL, 10);
 
   TI->initialize(dur, m0, y0, sim0, dec);

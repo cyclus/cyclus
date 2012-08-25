@@ -153,8 +153,11 @@ void XMLFileLoader::load_models(std::string modelPath, std::string factoryType) 
 void XMLFileLoader::load_params() {
 
   XMLQueryEngine xqe(doc);
+
+  string query = "/*/control";
+  QueryEngine* qe = xqe.queryElement(query);
   
-  // TI->initialize(xqe.get_content("/control"));
+  TI->load_simulation(qe);
   
 }
   
