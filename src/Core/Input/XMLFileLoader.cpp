@@ -4,6 +4,7 @@
 #include <string>
 #include <sys/stat.h>
 
+#include "QueryEngine.h"
 #include "XMLFileLoader.h"
 #include "XMLQueryEngine.h"
 
@@ -106,9 +107,11 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
     load_catalog(xqe.get_content(rb_num),recipeBook,cur_ns);
   }
 
-  int numRecipes = xqe.numElementsMatchingQuery("/*/recipe");
-  for (int recipe_num=0;recipe_num<numRecipes;recipe_num++) {
-    //RecipeLibrary::load_recipe(xqe.get_content(recipe_num),cur_ns);
+  string query = "/*/recipe";
+  int numRecipes = xqe.numElementsMatchingQuery(query);
+  for (int i=0; i<numRecipes; i++) {
+    QueryEngine* qe = xqe.queryElement(query,i);
+    RecipeLibrary::load_recipe(qe);
   }
 
 }

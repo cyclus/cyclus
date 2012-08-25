@@ -36,52 +36,26 @@ RecipeLibrary* RecipeLibrary::Instance() {
 RecipeLibrary::RecipeLibrary() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::load_recipes() {
+void RecipeLibrary::load_recipes(QueryEngine* qe) {
   // load recipes from file
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/recipe");
-  string name;
+  int nRecipes = qe->numElementsMatchingQuery("recipe");
   CLOG(LEV_DEBUG2) << "loading recipes {";
-  for (int i = 0; i < nodes->nodeNr; i++) {
-    name = XMLinput->getCurNS() + 
-                  XMLinput->get_xpath_content(nodes->nodeTab[i], "name");
+  for (int i = 0; i < nRecipes; i++) {
+    QueryEngine* recipe = qe->queryElement("recipe",i);
+    string name = recipe->getElementContent("name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    load_recipe(nodes->nodeTab[i]); // load recipe
+    load_recipe(recipe); // load recipe
   }
-
-  // load recipes from databases
-  try {
-    nodes = XMLinput->get_xpath_elements("/*/recipebook");
-    string filename, ns, format;
-    for (int i = 0; i < nodes->nodeNr; i++) {
-      filename = XMLinput->get_xpath_content(nodes->nodeTab[i], "filename");
-      ns = XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace");
-      format = XMLinput->get_xpath_content(nodes->nodeTab[i], "format");
-      XMLinput->extendCurNS(ns);
-      
-      if ("xml" == format) {
-        CLOG(LEV_DEBUG2) << "going into a recipe book...";
-        XMLinput->load_recipebook(filename);  // load recipe book
-      } 
-      else {
-        throw 
-          CycRangeException(format + "is not a supported recipebook format.");
-      }
-      XMLinput->stripCurNS();
-    }
-  } catch (CycNullXPathException) {} // no recipebook entered
+  delete qe;
   CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::load_recipe(xmlNodePtr cur) {
-  // get general values from xml
-  string name = XMLinput->get_xpath_content(cur,"name");
-  string basis_str = XMLinput->get_xpath_content(cur,"basis");
-  xmlNodeSetPtr isotopes = XMLinput->get_xpath_elements(cur,"isotope");
-
+void RecipeLibrary::load_recipe(QueryEngine* qe) {
   // set basis
   bool atom;
   Basis basis;
+  string basis_str = qe->getElementContent("basis");
   if (basis_str == "atom") {
     atom = true;
     basis = ATOM;
@@ -100,16 +74,17 @@ void RecipeLibrary::load_recipe(xmlNodePtr cur) {
   // get values needed for composition
   double value;
   int key;
-  xmlNodePtr iso_node;
-  for (int i = 0; i < isotopes->nodeNr; i++) {
-    iso_node = isotopes->nodeTab[i];
-    key = strtol(XMLinput->get_xpath_content(iso_node,"id"), NULL, 10);
-    value = strtod(XMLinput->get_xpath_content(iso_node,"comp"), NULL);
+  QueryEngine* isotopes = qe->queryElement("isotope");
+  int nIsos = isotopes->numElementsMatchingQuery("id");
+  for (int i = 0; i < nIsos; i++) {
+    key = strtol(isotopes->getElementContent("id",i).c_str(), NULL, 10);
+    value = strtod(isotopes->getElementContent("comp",i).c_str(), NULL);
     // update our mass-related values
     (*recipe)[key] = value;
   }
   recipe->massify();
   // record this composition (static members and database)
+  string name = qe->getElementContent("name");
   recordRecipe(name,recipe);
 }
 

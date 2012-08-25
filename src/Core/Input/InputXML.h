@@ -76,18 +76,6 @@ public:
   void load_file(std::string filename);
 
   /**
-     Opens and loads a recipebook: included library of recipes 
-      
-     This method will push the current xmlFileInfo strcutre onto the 
-     stack and create a new one for the recipebook library to be opened. 
-      It will be opened and validated against a Relax-NG schema and then 
-     the recipes will be loaded using the same method as used by 
-     load_file()  
-     @param filename name of recipebook file to open 
-   */
-  void load_recipebook(std::string filename);
-
-  /**
      Opens and loads a facilitycatalog: included catalog of facility 
      definitions 
      

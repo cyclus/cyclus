@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 
 #include "InputXML.h"
+#include "XMLQueryEngine.h"
 
 #include "Timer.h"
 #include "Env.h"
@@ -123,7 +124,8 @@ void InputXML::load_file(std::string filename) {
 void InputXML::loadGlobalSimulationElements() {
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  RecipeLibrary::load_recipes();
+  XMLQueryEngine* qe = new XMLQueryEngine("/simulation/");
+  RecipeLibrary::load_recipes(qe);
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
   
   //Models
@@ -143,31 +145,6 @@ void InputXML::loadSimulationEntities() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::initializeSimulationTimeData() {
   TI->load_simulation();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InputXML::load_recipebook(std::string filename) {
-  /// store parent file info
-  fileStack_.push(curFilePtr);
-
-  curFilePtr = new xmlFileInfo;
-  xmlFileInfo &recipebook = *curFilePtr;
-
-  recipebook.filename = filename;
-  recipebook.schema = &main_schema_;
-  recipebook.doc = validate_file(&recipebook);
-  recipebook.xpathCtxt = xmlXPathNewContext(recipebook.doc);
-
-  RecipeLibrary::load_recipes();
-
-  // get rid of recipebook, freeing memory
-  delete curFilePtr;
-
-  /// restore parent file info
-  curFilePtr = fileStack_.top();
-  fileStack_.pop();
-
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
