@@ -19,10 +19,12 @@
 
 using namespace std;
 
+// static members
 std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
 std::string XMLFileLoader::recipe_book_schema_ = "cyclus.rng";
 std::string XMLFileLoader::facility_catalog_schema_ = "cyclus.rng";
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(std::string load_filename) {
   // double check that the file exists
   if("" == load_filename) {
@@ -39,7 +41,7 @@ XMLFileLoader::XMLFileLoader(std::string load_filename) {
   filename = load_filename;
 }
 
-
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::validate_file(std::string schema_file) {
 
   xmlRelaxNGParserCtxtPtr ctxt = xmlRelaxNGNewParserCtxt(schema_file.c_str());
@@ -99,7 +101,6 @@ void XMLFileLoader::load_catalog(std::string catalogElement, CatalogType catalog
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLFileLoader::load_recipes(std::string cur_ns) {
-
   XMLQueryEngine xqe(doc);
 
   int numRecipeBooks = xqe.numElementsMatchingQuery("/*/recipebook");
@@ -112,27 +113,23 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
   for (int i=0; i<numRecipes; i++) {
     QueryEngine* qe = xqe.queryElement(query,i);
     RecipeLibrary::load_recipe(qe);
-    delete qe;
   }
-
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_facilities(std::string cur_ns) {
-
   XMLQueryEngine xqe(doc);
 
   int numFacCats = xqe.numElementsMatchingQuery("/*/facilitycatalog");
   for (int fac_cat_num=0;fac_cat_num<numFacCats;fac_cat_num++) {
     load_catalog(xqe.get_content(fac_cat_num),facilityCatalog,cur_ns);
   }
-
   load_models("/*/facility","Facility");
-
 }
 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_all_models() {
-
   load_models("/*/converter","Converter");
   load_models("/*/market","Market");
   load_facilities("");
@@ -140,25 +137,22 @@ void XMLFileLoader::load_all_models() {
   load_models("/simulation/region/institution","Inst");
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_models(std::string modelPath, std::string factoryType) {
-
   XMLQueryEngine xqe(doc);
 
   int numModels = xqe.numElementsMatchingQuery(modelPath.c_str());
   for (int model_num=0;model_num<numModels;model_num++) {
     //Model::create(factoryType,xqe.get_content(model_num));
   }
-  
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_params() {
-
   XMLQueryEngine xqe(doc);
 
   string query = "/*/control";
   QueryEngine* qe = xqe.queryElement(query);
-  
   TI->load_simulation(qe);
-  
 }
   
