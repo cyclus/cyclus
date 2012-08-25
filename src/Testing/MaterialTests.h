@@ -17,6 +17,7 @@ class MaterialTest : public ::testing::Test {
     mat_rsrc_ptr diff_mat_;
     long int u235_halflife_;
     int th228_halflife_;
+    double u235_g_per_mol_;
 
     virtual void SetUp(){
       // composition set up
@@ -48,6 +49,7 @@ class MaterialTest : public ::testing::Test {
       diff_mat_->setQuantity(test_size_);
 
       // test info
+      u235_g_per_mol_ = 235.044;
       u235_halflife_ = 8445600000; // approximate, in months
       th228_halflife_ = 2*11; // approximate, in months
       int time_ = TI->time();

@@ -37,19 +37,37 @@ TEST_F(MaterialTest, CheckQuality) {
   EXPECT_FALSE(test->checkQuality(gen));
 }
 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckMass) {
+  // check total mass, you'll use it later.
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+  ASSERT_FLOAT_EQ(1000.0*(test_mat_->quantity()), test_mat_->mass(G));
+
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_*1000.0,G));
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  // reset the size to be 1000 times less, by changing units to 
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_,G));
+  ASSERT_FLOAT_EQ(test_size_/1000.0, test_mat_->mass(KG));
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckIsoMass) {
   // check total mass, you'll use it later.
   EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
 
   // what's the mass per atom ratio?
-  ASSERT_EQ(0.235, 1/(*test_mat_->isoVector().comp()).mass_to_atom_ratio());
+  ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
   // you should be able to get the mass per isotope
   EXPECT_NO_THROW(test_mat_->mass(u235_));
 
   // if the material has only one isotope, it should be the same as the total
   // the u235 mass should be (mol/mat)(1kg/1000g)(235g/mol)  
-  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->moles(u235_)*0.235); 
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->moles(u235_)*u235_g_per_mol_/1000.0); 
+  // you should be able to get the mass per isotope
+  EXPECT_NO_THROW(test_mat_->mass(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
 
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
@@ -69,7 +87,8 @@ TEST_F(MaterialTest, CheckIsoAtoms){
   // you should be able to get to the atoms of a certain iso in your material
   EXPECT_NO_THROW(test_mat_->moles(u235_));
   EXPECT_EQ(true, test_comp_->normalized());
-  EXPECT_FLOAT_EQ(one_g_*test_size_, test_mat_->moles(u235_));
+  ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
+  EXPECT_FLOAT_EQ(1000*test_size_/u235_g_per_mol_, test_mat_->moles(u235_));
 
   // a mat's total atoms should be the total of all the contained isotopes. 
   double total_atoms = 0;
@@ -85,23 +104,16 @@ TEST_F(MaterialTest, CheckIsoAtoms){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckConvertFromKg){
-  // check total mass, you'll use it later.
-  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
-  // you should be able to get the mass per isotope
-  EXPECT_NO_THROW(test_mat_->mass(u235_));
-  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
-  ASSERT_FLOAT_EQ(1000.0*(test_mat_->mass(u235_)), test_mat_->mass(u235_, G));
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertFromKg(1,G)); // 1000g = 1 kg
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertFromKg(1000,KG)); // 1000 kg = 1000 kg
+  EXPECT_FLOAT_EQ(1, test_mat_->convertFromKg(1,KG)); // 1 kg = 1 kg
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckConvertToKg){
-  // check total mass, you'll use it later.
-  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
-  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
-  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_*1000.0,G));
-  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
-  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_,G));
-  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG)/1000.0);
+  EXPECT_FLOAT_EQ(1, test_mat_->convertToKg(1000,G)); // 1kg = 1000 g
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertToKg(1000,KG)); // 1000kg = 1000kg
+  EXPECT_FLOAT_EQ(1, test_mat_->convertToKg(1,KG)); // 1kg = 1kg
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

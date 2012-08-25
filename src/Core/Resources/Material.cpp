@@ -155,6 +155,7 @@ double Material::convertFromKg(double mass, MassUnit to_unit) {
   switch( to_unit ) {
     case G :
       converted = mass*1000.0;
+      break;
     case KG : 
       converted = mass;
       break;
@@ -170,6 +171,7 @@ double Material::convertToKg(double mass, MassUnit from_unit) {
   switch( from_unit ) {
     case G :
       in_kg = mass/1000.0;
+      break;
     case KG : 
       in_kg = mass;
       break;
@@ -188,8 +190,7 @@ double Material::moles(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::moles(Iso tope){
   double atom_frac = isoVector().comp()->atomFraction(tope);
-  double m_a_ratio = isoVector().comp()->mass_to_atom_ratio();
-  return mass(G)*atom_frac/m_a_ratio;
+  return moles()*atom_frac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
