@@ -42,6 +42,8 @@ TEST_F(MaterialTest, CheckIsoMass) {
   // check total mass, you'll use it later.
   EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
 
+  // what's the mass per atom ratio?
+  ASSERT_EQ(0.235, 1/(*test_mat_->isoVector().comp()).mass_to_atom_ratio());
   // you should be able to get the mass per isotope
   EXPECT_NO_THROW(test_mat_->mass(u235_));
 
