@@ -8,10 +8,10 @@ TEST_F(MassTableTest, Constructors){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MassTableTest, gramsPerMol){
-  EXPECT_FLOAT_EQ(235, MT->gramsPerMol(u235_));
-  EXPECT_FLOAT_EQ(241, MT->gramsPerMol(am241_));
-  EXPECT_FLOAT_EQ(228, MT->gramsPerMol(th228_));
-  EXPECT_FLOAT_EQ(208, MT->gramsPerMol(pb208_));
+  EXPECT_NEAR(235, MT->gramsPerMol(u235_),0.5);
+  EXPECT_NEAR(241, MT->gramsPerMol(am241_),0.5);
+  EXPECT_NEAR(228, MT->gramsPerMol(th228_),0.5);
+  EXPECT_NEAR(208, MT->gramsPerMol(pb208_), 0.5);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -19,5 +19,3 @@ TEST_F(MassTableTest, gramsPerMol){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-
-
