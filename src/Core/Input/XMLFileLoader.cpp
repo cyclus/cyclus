@@ -112,6 +112,7 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
   for (int i=0; i<numRecipes; i++) {
     QueryEngine* qe = xqe.queryElement(query,i);
     RecipeLibrary::load_recipe(qe);
+    delete qe;
   }
 
 }

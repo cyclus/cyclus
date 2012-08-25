@@ -127,7 +127,8 @@ void InputXML::loadGlobalSimulationElements() {
   XMLQueryEngine* qe = new XMLQueryEngine("/simulation/");
   RecipeLibrary::load_recipes(qe);
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
-  
+  delete qe;
+
   //Models
   LOG(LEV_DEBUG3, "none!") << "Begin loading elements";
   Model::loadGlobalElements();
