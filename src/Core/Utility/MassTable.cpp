@@ -26,18 +26,18 @@ MassTable* MassTable::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
   initializeSQL();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::~MassTable() {
   //Should close the 'mass.h5' file
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MassTable::gramsPerMol(int tope) {
   double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
@@ -63,9 +63,11 @@ void MassTable::initializeSQL() {
     nuclide_t n = {Znum,Anum,mass};
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
-    int tope = Znum*1000 + Anum;
+    int tope = Anum*1000 + Znum ;
     isoIndex_.insert(make_pair(tope,i));
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();
-};
+}
+
+
