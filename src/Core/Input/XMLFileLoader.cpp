@@ -22,10 +22,11 @@ using namespace std;
 // static members
 std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
 std::string XMLFileLoader::recipe_book_schema_ = "cyclus.rng";
-std::string XMLFileLoader::facility_catalog_schema_ = "cyclus.rng";
+std::string XMLFileLoader::prototype_catalog_schema_ = "cyclus.rng";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(std::string load_filename) {
+
   // double check that the file exists
   if("" == load_filename) {
     throw CycIOException("No input filename was given");
@@ -68,15 +69,13 @@ void XMLFileLoader::validate_file(std::string schema_file) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLFileLoader::load_catalog(std::string catalogElement, CatalogType catalogType, 
+void XMLFileLoader::load_catalog(QueryEngine* qe, CatalogType catalogType, 
 				 std::string cur_ns) {
 
-  XMLQueryEngine xqe(catalogElement);
-
   string cat_filename, ns, format;
-  cat_filename = xqe.get_content("filename");
-  ns = xqe.get_content("namespace");
-  format = xqe.get_content("format");
+  cat_filename = qe->getElementContent("filename");
+  ns = qe->getElementContent("namespace");
+  format = qe->getElementContent("format");
   
   if ("xml" == format) {
     CLOG(LEV_DEBUG2) << "going into a catalog...";
@@ -87,9 +86,9 @@ void XMLFileLoader::load_catalog(std::string catalogElement, CatalogType catalog
       catalog.validate_file(recipe_book_schema_);
       catalog.load_recipes(cur_ns + ns + ":");
       break;
-    case facilityCatalog:
-      catalog.validate_file(facility_catalog_schema_);
-      catalog.load_facilities(cur_ns + ns + ":");
+    case prototypeCatalog:
+      catalog.validate_file(prototype_catalog_schema_);
+      catalog.load_prototypes(cur_ns + ns + ":");
       break;
     }
   } else {
@@ -105,7 +104,8 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
 
   int numRecipeBooks = xqe.numElementsMatchingQuery("/*/recipebook");
   for (int rb_num=0;rb_num<numRecipeBooks;rb_num++) {
-    load_catalog(xqe.get_content(rb_num),recipeBook,cur_ns);
+    QueryEngine* catalog_qe = xqe.queryElement("/*/recipebook",rb_num);
+    load_catalog(catalog_qe,recipeBook,cur_ns);
   }
 
   string query = "/*/recipe";
@@ -117,35 +117,42 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_facilities(std::string cur_ns) {
+void XMLFileLoader::load_prototypes(std::string cur_ns) {
   XMLQueryEngine xqe(doc);
 
-  int numFacCats = xqe.numElementsMatchingQuery("/*/facilitycatalog");
+  int numFacCats = xqe.numElementsMatchingQuery("/*/prototypecatalog");
   for (int fac_cat_num=0;fac_cat_num<numFacCats;fac_cat_num++) {
-    load_catalog(xqe.get_content(fac_cat_num),facilityCatalog,cur_ns);
+    QueryEngine* catalog_qe = xqe.queryElement("/*/prototypecatalog",fac_cat_num);
+    load_catalog(catalog_qe,prototypeCatalog,cur_ns);
   }
-  load_models("/*/facility","Facility");
+  load_dynmodules("/*/prototype","Facility",cur_ns);
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_all_models() {
-  load_models("/*/converter","Converter");
-  load_models("/*/market","Market");
-  load_facilities("");
-  load_models("/simulation/region","Region");
-  load_models("/simulation/region/institution","Inst");
+
+  
+
+  load_dynmodules("/*/converter","Converter");
+  load_dynmodules("/*/market","Market");
+  load_prototypes();
+  load_dynmodules("/simulation/region","Region");
+  load_dynmodules("/simulation/region/institution","Inst");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_models(std::string modelPath, std::string factoryType) {
+void XMLFileLoader::load_dynmodules(std::string query, std::string factoryType, std::string cur_ns) {
+  
   XMLQueryEngine xqe(doc);
-
-  int numModels = xqe.numElementsMatchingQuery(modelPath.c_str());
+  
+  int numModels = xqe.numElementsMatchingQuery(query);
   for (int model_num=0;model_num<numModels;model_num++) {
-    //Model::create(factoryType,xqe.get_content(model_num));
+    QueryEngine* qe = xqe.queryElement(query,model_num);
+    Model::initializeSimulationEntity(factoryType,qe);
   }
 }
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_params() {
