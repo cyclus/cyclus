@@ -5,9 +5,9 @@
 
 #include "MarketModel.h"
 
-#include "InputXML.h"
 #include "Timer.h"
 #include "Logger.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
@@ -67,13 +67,13 @@ void MarketModel::initSimInteraction(MarketModel* mkt) {
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::init(xmlNodePtr cur) {
+void MarketModel::init(QueryEngine* qe) {
   // general initializations
-  Model::init(cur);  
+  Model::init(qe);  
   MarketModel::initSimInteraction(this);
 
   // specific initalizations
-  commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
+  commodity_ = qe->getElementContent("mktcommodity");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

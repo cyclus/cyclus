@@ -10,6 +10,8 @@
 #include "Communicator.h"
 #include "CycException.h"
 
+class QueryEngine;
+
 class CycMarketlessCommodException: public CycException {
   public: CycMarketlessCommodException(std::string msg) :
       CycException(msg) { };
@@ -90,11 +92,12 @@ class MarketModel : public Model, public Communicator {
   virtual void initSimInteraction(MarketModel* mkt);
 
   /**
-     every model needs a method to initialize from XML 
+     every model needs a method to initialize from a QueryEngine
      this method calls the MarketModel's initSimInteraction() 
      method
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
