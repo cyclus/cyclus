@@ -65,4 +65,12 @@ class QueryEngine {
   std::set<QueryEngine*> spawned_children_;
 };
 
+
+#include "CycException.h"
+#include <string>
+class CycNullQueryException : public CycException {
+ public:
+ CycNullQueryException(std::string msg) : CycException(msg) {};
+};
+
 #endif
