@@ -9,8 +9,8 @@ ConverterModel::ConverterModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConverterModel::init(xmlNodePtr cur) {
-  Model::init(cur);
+void ConverterModel::init(QueryEngine* qe) {
+  Model::init(qe);
 
   // register the model
 } 
