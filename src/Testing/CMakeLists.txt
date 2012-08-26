@@ -18,6 +18,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/QueryEngineTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
