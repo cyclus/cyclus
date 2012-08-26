@@ -84,31 +84,10 @@ void InputXML::stripCurNS() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_file(std::string filename) {
-  // double check that the file exists
-  if(filename=="") {
-    throw CycIOException("No input filename was given");
-  } else { 
-    FILE* file = fopen(filename.c_str(),"r");
-    if (file == NULL) { 
-      throw CycIOException("The file '" + filename
-           + "' cannot be loaded because it has not been found.");
-    }
-    fclose(file);
-  }
 
-  curFilePtr = new xmlFileInfo;
+  xmlInputFile = XMLFileLoader(filename);
 
-  xmlFileInfo &inputFile = *curFilePtr;
-
-  inputFile.filename = filename;
-  inputFile.schema = &main_schema_;
-  inputFile.doc = validate_file(&inputFile);
-
-  /* Create xpath evaluation context */
-  inputFile.xpathCtxt = xmlXPathNewContext(inputFile.doc);
-  if (inputFile.xpathCtxt == NULL) {
-    fprintf(stderr,"Error: unable to create new xpath context \n");
-  }
+  xmlInputFile.validate_file(XMLFileLoader::main_schema_);
 
   // timer sets data
   initializeSimulationTimeData();
@@ -142,7 +121,7 @@ void InputXML::loadSimulationEntities() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::initializeSimulationTimeData() {
-  //TI->load_simulation();
+  xmlInputFile.load_params();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
