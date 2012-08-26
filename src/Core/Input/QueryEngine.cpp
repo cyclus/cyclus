@@ -12,10 +12,10 @@ QueryEngine::QueryEngine() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine::~QueryEngine() {
   while (!spawned_children_.empty()) {
-    QueryEngine* qe = *spawned_children_.begin();
+    QueryEngine* qe_child = *spawned_children_.begin();
     spawned_children_.erase(spawned_children_.begin());
-    if (qe) {
-      delete qe;
+    if (qe_child) {
+      delete qe_child;
     }
   }
 }
@@ -23,8 +23,8 @@ QueryEngine::~QueryEngine() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine* QueryEngine::queryElement(std::string query, 
                                        int index) {
-  QueryEngine* qe = 
+  QueryEngine* qe_child = 
     getEngineFromSnippet(getElementContent(query,index));
-  spawned_children_.insert(qe);
-  return qe;
+  spawned_children_.insert(qe_child);
+  return qe_child;
 }
