@@ -137,7 +137,7 @@ class XMLQueryEngine : public QueryEngine {
 
      @param elementNum the ordinal number of the element to be queried
   */
-  std::string get_name(int elementNum);
+  std::string getElementName(std::string query,int index=0);
 
  protected:
   virtual QueryEngine* getEngineFromSnippet(std::string snippet);

@@ -85,24 +85,6 @@ std::string XMLQueryEngine::get_content(int elementNum) {
       XMLcontent = (const char*) xmlBufferContent(nodeBuffer);
     else
       throw CycParseException("Couldn't dump node");
-
-  // while (NULL != child) {
-  //   xmlNodeDump(nodeBuffer,doc,child,0,1);
-  //   XMLcontent += xmlBufferContent(nodeBuffer);
-  //   // switch (child->type) {
-  //   // case XML_ELEMENT_NODE:
-  //   //   xmlNodeDump(nodeBuffer,doc,child,0,1);
-  //   //   XMLcontent += (const char*)(nodeBuffer->content);
-  //   //   break;
-  //   // case XML_TEXT_NODE:
-  //   //   XMLcontent += (const char*)(child->content);
-  //   //   break;
-  //   // default:
-  //   //   XMLcontent = "XMLQueryEngine does not currently handle nodes of this type";
-  //   // }
-
-  //   child = child->next;
-  // }
   }
   else
     throw CycParseException("Couldn't allocate buffer.");
@@ -155,7 +137,10 @@ std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngine::get_name(int elementNum) {
+std::string XMLQueryEngine::getElementName(std::string query, int elementNum) {
+
+  numElementsMatchingQuery(query);
+
   std::string XMLname = 
     (const char*)(currentXpathObj_->nodesetval->
                   nodeTab[elementNum]->name);
