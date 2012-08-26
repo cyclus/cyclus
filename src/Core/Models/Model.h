@@ -12,6 +12,7 @@
 class Model;
 class Message;
 class Transaction;
+class QueryEngine;
 
 typedef Model* mdl_ctor();
 
@@ -82,24 +83,17 @@ class Model {
   /**
      provides a constructed simulation entity
      @param model_type the type of entity
-     @param cur the model snippet position in input
+     @param qe a pointer to a QueryEngine object containing module identity data
      @return a pointer to the construced entity
    */
-  static Model* getEntityViaConstructor(std::string model_type,xmlNodePtr cur);
+  static Model* getEntityViaConstructor(std::string model_type,QueryEngine* qe);
 
   /**
      constructs and initializes an entity
      @param model_type the type of entity
-     @param cur the initialization snippet position in input
+     @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void initializeSimulationEntity(std::string model_type, xmlNodePtr cur);
-
-  /**
-     constructs and initializes a prototype
-     @param model_type the type of entity
-     @param cur the initialization snippet position in input
-   */
-  static void initializePrototype(std::string model_type, xmlNodePtr cur);
+  static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
      loads all globally accessible elements
@@ -127,9 +121,9 @@ class Model {
   /**
      A method to initialize the model 
       
-     @param cur the pointer to the xml input for the model to initialize 
+     @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe,std::string cur_ns = "");
 
   /**
      Destructor for the Model Class 
