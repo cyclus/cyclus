@@ -11,6 +11,7 @@
 #include "Timer.h"
 #include "CycException.h"
 #include "FacilityModel.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
@@ -22,43 +23,40 @@ InstModel::InstModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init(xmlNodePtr cur) {
-  Model::init(cur);
+void InstModel::init(QueryEngine* qe) {
+  Model::init(qe);
 
-  xmlNodeSetPtr nodes;
   string name;
   Prototype* prototype;  
   
   // populate prototypes_
   try {
-    nodes = 
-      XMLinput->get_xpath_elements(cur,"availableprototype");
+    int numAvailProtos = qe->numElementsMatchingQuery("availableprototype");
     
     // populate prototypes_
-    for (int i=0;i<nodes->nodeNr;i++){
-      name = (const char*)nodes->nodeTab[i]->children->content;
+    for (int i=0;i<numAvailProtos;i++){
+      name = qe->getElementContent("availableprototype",i);
       prototype = Prototype::getRegisteredPrototype(name);
       prototypes_.insert(prototype);
     }
-  } catch (CycNullXPathException) {}; // no prototypes available
+  } catch (CycNullQueryException) {}; // no prototypes available
 
   // populate initial_build_order_
   try {
-    nodes = 
-      XMLinput->get_xpath_elements(cur,"initialfacilitylist");
-    for (int i=0;i<nodes->nodeNr;i++){
-      addPrototypeToInitialBuild(nodes->nodeTab[i]);
+    int numInitFacs = qe->numElementsMatchingQuery("initialfacilitylist");
+    for (int i=0;i<numInitFacs;i++){
+      QueryEngine* qe_child = qe->queryElement("initialfacilitylist",1);
+      addPrototypeToInitialBuild(qe_child);
     }
-  } catch (CycNullXPathException) {}; // no initial builds
+  } catch (CycNullQueryException) {}; // no initial builds
 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::addPrototypeToInitialBuild(xmlNodePtr cur) {
-  string name = 
-    (const char*)XMLinput->
-    get_xpath_content(cur,"prototype");
-  int number = atoi(XMLinput->get_xpath_content(cur, "number"));
+void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
+  
+  string name = qe->getElementContent("prototype");
+  int number = atoi(qe->getElementContent("number").c_str());
 
   Prototype* p = Prototype::getRegisteredPrototype(name);
   throwErrorIfPrototypeIsntAvailable(p);

@@ -4,14 +4,15 @@
 
 #include "TimeAgent.h"
 #include "Communicator.h"
-#include "RegionModel.h"
 #include "Model.h"
-#include "Prototype.h"
-#include "InputXML.h"
+#include "RegionModel.h"
 
 #include <map>
 #include <set>
 #include <list>
+
+class QueryEngine;
+class Prototype;
 
 // Usefull Typedefs
 typedef std::set<Prototype*> PrototypeSet;
@@ -65,11 +66,11 @@ class InstModel : public TimeAgent, public Communicator {
   virtual ~InstModel() {};
       
   /**
-     Initalize the InstModel from xml. Calls the init function. 
+     Initalize the InstModel from a QueryEngine. Calls the init function. 
      
-     @param cur the current xml node pointer 
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
@@ -142,9 +143,9 @@ class InstModel : public TimeAgent, public Communicator {
 
   /**
      Adds a prototype build order to initial_build_order_
-     @param cur the xml node comprising the order
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  void addPrototypeToInitialBuild(xmlNodePtr cur);
+  void addPrototypeToInitialBuild(QueryEngine* qe);
 
  public:
   /**
