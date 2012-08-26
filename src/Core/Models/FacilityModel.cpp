@@ -5,7 +5,8 @@
 
 #include "Timer.h"
 #include "BookKeeper.h"
-#include "InputXML.h"
+#include "QueryEngine.h"
+#include "InstModel.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -22,43 +23,41 @@ FacilityModel::FacilityModel() {
 FacilityModel::~FacilityModel() {};
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::init(xmlNodePtr cur) {
-  Model::init(cur);
+void FacilityModel::init(QueryEngine* qe) {
+  Model::init(qe);
 
   // get lifetime and set decommission date
   try {
-    fac_lifetime_ = atoi(XMLinput->get_xpath_content(cur, "lifetime"));
+    fac_lifetime_ = atoi(qe->getElementContent("lifetime").c_str());
   }
-  catch (CycNullXPathException e) {
+  catch (CycNullQueryException e) {
     fac_lifetime_ = TI->simDur();
   }
   setDecommissionDate(TI->time());
 
-  xmlNodeSetPtr nodes;
-
   // get the incommodities
   std::string commod;
   try {
-    nodes = XMLinput->get_xpath_elements(cur, "incommodity");
-    for (int i=0;i<nodes->nodeNr;i++){
-      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
+    int numInCommod = qe->numElementsMatchingQuery("incommodity");
+    for (int i=0;i<numInCommod;i++){
+      commod = qe->getElementContent("incommodity",i);
       in_commods_.push_back(commod);
       LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity" << commod;
     }
   }
-  catch (CycNullXPathException e) {
+  catch (CycNullQueryException e) {
   }
 
   // get the outcommodities
   try {
-    nodes = XMLinput->get_xpath_elements(cur, "outcommodity");
-    for (int i=0;i<nodes->nodeNr;i++){
-      commod = XMLinput->get_xpath_content(nodes->nodeTab[i],"name");
+    int numOutCommod = qe->numElementsMatchingQuery("outcommodity");
+    for (int i=0;i<numOutCommod;i++){
+      commod = qe->getElementContent("outcommodity",i);
       out_commods_.push_back(commod);
       LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added outcommodity" << commod;
     }
   }
-  catch (CycNullXPathException e) {
+  catch (CycNullQueryException e) {
   }
 
 
