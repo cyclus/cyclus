@@ -156,9 +156,9 @@ class XMLQueryEngine : public QueryEngine {
 /**
    An exception class for an xpath that can not be evaluated
 */
-class CycXPathException : public CycException {
+class CycXPathException : public CycNullQueryException {
  public: 
- CycXPathException(std::string msg) : CycException(msg) {};
+ CycXPathException(std::string msg) : CycNullQueryException(msg) {};
 };
 
 #endif
