@@ -35,30 +35,24 @@
 */
 class XMLQueryEngine : public QueryEngine {
  public:
-  /** 
-      This default constructor should rarely be used explicitly, but
-      is useful to allow simple declarations.
+  /**
+     This most common constructor creates a set of XML objects from a
+     snippet of XML text.
+     
+     @param snippet a string containing well-formed XML
   */
-  XMLQueryEngine();
-
+  XMLQueryEngine(std::string snippet);
+  
   /// virtual destructor
   virtual ~XMLQueryEngine() {};
 
-  /** 
-      This most common constructor creates a set of XML objects from a
-      snippet of XML text.
-
-      @param snippet a string containing well-formed XML
-   */
-  XMLQueryEngine(std::string snippet);
-
-  /** 
-      This constructor allows a new object to be created from an
-      already existing xmlDocPtr.
-
-      @param current_doc a XML document object that has been generated
-          elsewhere
-   */
+  /**
+     This constructor allows a new object to be created from an
+     already existing xmlDocPtr.
+     
+     @param current_doc a XML document object that has been generated
+     elsewhere
+  */
   XMLQueryEngine(xmlDocPtr current_doc);
   
   /**
@@ -90,6 +84,9 @@ class XMLQueryEngine : public QueryEngine {
   std::string get_content(const char* expression);
 
   /**
+     get the content of a query
+     @query the query
+     @index the index, if there is more than one matched result
    */
   virtual std::string getElementContent(std::string query,
                                         int index = 0);

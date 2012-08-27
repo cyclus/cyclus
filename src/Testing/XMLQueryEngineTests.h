@@ -11,7 +11,6 @@ class XMLQueryEngineTest : public ::testing::Test {
  protected:
 
   XMLQueryEngine *xqe;
-  XMLQueryEngine xqeA;
 
   std::string startContent;
 

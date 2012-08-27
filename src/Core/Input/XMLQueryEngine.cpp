@@ -10,13 +10,6 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-XMLQueryEngine::XMLQueryEngine() {
-  doc_ = NULL;
-  xpathCtxt_ = NULL;
-  numElements_ = 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine(std::string snippet) {
   init(snippet);
 }
