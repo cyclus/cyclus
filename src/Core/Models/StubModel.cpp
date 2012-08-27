@@ -19,8 +19,8 @@ StubModel::StubModel() {
 StubModel::~StubModel() {};
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubModel::init(xmlNodePtr cur) { 
-  Model::init(cur); 
+void StubModel::init(QueryEngine* qe,std::string cur_ns) { 
+  Model::init(qe,cur_ns); 
 };
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

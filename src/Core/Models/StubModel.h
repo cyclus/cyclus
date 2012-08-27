@@ -41,7 +41,7 @@ class StubModel : public Model {
       
      @param cur is the pointer to the model's xml node 
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe,std::string cur_ns = "");
   
   /**
      every model should be able to print a verbose description 

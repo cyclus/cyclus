@@ -103,19 +103,19 @@ void InputXML::load_file(std::string filename) {
 void InputXML::loadGlobalSimulationElements() {
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  //RecipeLibrary::load_recipes();
+  xmlInputFile.load_recipes();
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
 
   //Models
   LOG(LEV_DEBUG3, "none!") << "Begin loading elements";
-  Model::loadGlobalElements();
+  //Model::loadGlobalElements();
   LOG(LEV_DEBUG3, "none!") << "End loading elements";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::loadSimulationEntities() {
   LOG(LEV_DEBUG3, "none!") << "Begin loading entities";
-  Model::loadEntities();
+  //Model::loadEntities();
   LOG(LEV_DEBUG3, "none!") << "End loading entities";
 }
 
