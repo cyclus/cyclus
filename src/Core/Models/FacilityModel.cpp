@@ -23,8 +23,8 @@ FacilityModel::FacilityModel() {
 FacilityModel::~FacilityModel() {};
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::init(QueryEngine* qe) {
-  Model::init(qe);
+void FacilityModel::initCoreMembers(QueryEngine* qe) {
+  Model::initCoreMembers(qe);
 
   // get lifetime and set decommission date
   try {

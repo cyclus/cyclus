@@ -83,7 +83,7 @@ class FacilityModel : public TimeAgent, public Communicator,
      
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(QueryEngine* qe);
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
      overrides Model's enterSimulation() in order to additionally

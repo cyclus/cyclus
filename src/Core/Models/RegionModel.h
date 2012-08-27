@@ -81,23 +81,7 @@ class RegionModel : public TimeAgent, public Communicator {
      
      @param qe A pointer to a QueryEngine object containing initialization data
    */
-  virtual void init(QueryEngine* qe);
-
-  /**
-     populate the region's list of allowed facilities
-   */
-  virtual void initAllowedFacilities(QueryEngine* qe);
-
-  /**
-     set the parameters necessary for RegionModel to interact
-     with the simulation
-   */
-  virtual void addRegionAsRootNode();
-
-  /**
-     populate the region's list of child institutions
-   */
-  virtual void addChildrenToTree(QueryEngine* qe);
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
@@ -155,10 +139,35 @@ class RegionModel : public TimeAgent, public Communicator {
     
  protected:
   /**
+     populate the region's list of allowed facilities
+   */
+  virtual void initAllowedFacilities(QueryEngine* qe);
+
+  /**
+     populate the region's list of institution names
+   */
+  virtual void initInstitutionNames(QueryEngine* qe);
+
+  /**
+     set the parameters necessary for RegionModel to interact
+     with the simulation
+   */
+  virtual void addRegionAsRootNode();
+
+  /**
+     populate the region's list of child institutions
+   */
+  virtual void addChildrenToTree(QueryEngine* qe);
+
+  /**
      every region has a list of allowed facilities 
    */
   std::set<Model*> allowedFacilities_;
-      
+
+  /**
+     the names of the institutions in this region
+   */
+  std::set<std::string> inst_names_;
 };
 
 #endif

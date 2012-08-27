@@ -17,11 +17,6 @@ StubTimeAgent::StubTimeAgent() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::~StubTimeAgent() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::init(QueryEngine* qe,std::string cur_ns) { 
-  Model::init(qe,cur_ns); 
-};
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubTimeAgent::str() { 

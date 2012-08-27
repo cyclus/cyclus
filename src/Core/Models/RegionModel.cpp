@@ -22,11 +22,12 @@ RegionModel::RegionModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::init(QueryEngine* qe) { 
-  Model::init(qe); // name_ and model_impl_
+void RegionModel::initCoreMembers(QueryEngine* qe) { 
+  Model::initCoreMembers(qe); // name_
   RegionModel::initAllowedFacilities(qe); // allowedFacilities_
-  RegionModel::addRegionAsRootNode(); // parent_ and tick listener, model 'born'
-  RegionModel::addChildrenToTree(qe); // children->setParent, requires init()
+  RegionModel::initInstitutionNames(qe); // inst_names_
+  //RegionModel::addRegionAsRootNode(); // parent_ and tick listener, model 'born'
+  //RegionModel::addChildrenToTree(qe); // children->setParent, requires initCoreMembers()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,6 +39,17 @@ void RegionModel::initAllowedFacilities(QueryEngine* qe) {
     fac_name = qe->getElementContent("allowedfacility",i);
     new_fac = dynamic_cast<Model*>(Prototype::getRegisteredPrototype(fac_name));
     allowedFacilities_.insert(new_fac);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::initInstitutionNames(QueryEngine* qe) {
+  int nInsts = qe->numElementsMatchingQuery("institution");
+  string name;
+  for (int i=0; i<nInsts; i++) {
+    QueryEngine* inst_data = qe->queryElement("institution",i);
+    name = inst_data->getElementContent("name");
+    inst_names_.insert(name);
   }
 }
 

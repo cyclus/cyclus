@@ -36,13 +36,6 @@ class StubCommModel : public Model, public Communicator {
   virtual ~StubCommModel();
 
   /**
-     every model needs a method to initialize from a QueryEngine
-      
-     @param qe a pointer to a QueryEngine 
-   */
-  virtual void init(QueryEngine* qe);
-
-  /**
      every model should be able to print a verbose description 
    */
    virtual std::string str();

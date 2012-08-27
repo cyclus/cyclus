@@ -63,10 +63,7 @@ vector<Model*> Model::getModelList() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getEntityViaConstructor(std::string model_type,
-                                      QueryEngine* qe) {
-  std::string query = "model/*";
-  std::string module = qe->getElementName(query);
-
+                                      std::string module) {
   mdl_ctor* module_constructor; 
   // if it hasn't been loaded, load the module and register it
   if (loaded_modules_.find(module) == loaded_modules_.end()) { 
@@ -83,23 +80,29 @@ Model* Model::getEntityViaConstructor(std::string model_type,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::initializeSimulationEntity(std::string model_type, 
                                        QueryEngine* qe) {
-  Model* model = getEntityViaConstructor(model_type,qe);
-  QueryEngine* model_data = qe->queryElement("model/*");
-  model->init(model_data);
-  if ("Facility" == model_type)
+  // query data
+  QueryEngine* module_data = qe->queryElement("model");
+  string module = module_data->getElementName();
+
+  // instantiate & init module
+  Model* model = getEntityViaConstructor(model_type,module);
+  model->initCoreMembers(qe);
+  model->setModelImpl(module);
+  model->initModuleMembers(module_data->queryElement(module));
+
+  // register module
+  if ("Facility" == model_type) {
     Prototype::registerPrototype(model->name(),
 				 dynamic_cast<Prototype*>(model));
-  else
+  } else {
     model_list_.push_back(model);
-    
+  }
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::init(QueryEngine* qe,std::string cur_ns) {
-  name_ = cur_ns + qe->getElementContent("name");
+void Model::initCoreMembers(QueryEngine* qe) {
+  name_ = qe->getElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
-  model_impl_ = qe->getElementName("model/*");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

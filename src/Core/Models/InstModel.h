@@ -70,7 +70,7 @@ class InstModel : public TimeAgent, public Communicator {
      
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(QueryEngine* qe);
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 

@@ -59,13 +59,6 @@ class ConverterModel : public Model {
   virtual ~ConverterModel() {};
 
   /**
-     A method to initialize the model 
-      
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  virtual void init(QueryEngine* qe);
-
-  /**
      every model should be able to print a verbose description 
    */
   virtual std::string str();

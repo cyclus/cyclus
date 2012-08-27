@@ -17,11 +17,6 @@ StubCommModel::StubCommModel() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::~StubCommModel() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubCommModel::init(QueryEngine* qe) { 
-  Model::init(qe); 
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubCommModel::str() { 

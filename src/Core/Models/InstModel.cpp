@@ -23,8 +23,8 @@ InstModel::InstModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init(QueryEngine* qe) {
-  Model::init(qe);
+void InstModel::initCoreMembers(QueryEngine* qe) {
+  Model::initCoreMembers(qe);
 
   string name;
   Prototype* prototype;  

@@ -35,13 +35,6 @@ class StubModel : public Model {
      every model should be destructable 
    */
   virtual ~StubModel();
-
-  /**
-     every model needs a method to initialize from XML 
-      
-     @param cur is the pointer to the model's xml node 
-   */
-  virtual void init(QueryEngine* qe,std::string cur_ns = "");
   
   /**
      every model should be able to print a verbose description 

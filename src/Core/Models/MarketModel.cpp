@@ -67,10 +67,9 @@ void MarketModel::initSimInteraction(MarketModel* mkt) {
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::init(QueryEngine* qe) {
+void MarketModel::initCoreMembers(QueryEngine* qe) {
   // general initializations
-  Model::init(qe);  
-  MarketModel::initSimInteraction(this);
+  Model::initCoreMembers(qe);
 
   // specific initalizations
   commodity_ = qe->getElementContent("mktcommodity");

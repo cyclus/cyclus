@@ -9,13 +9,6 @@ ConverterModel::ConverterModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ConverterModel::init(QueryEngine* qe) {
-  Model::init(qe);
-
-  // register the model
-} 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 msg_ptr ConverterModel::convert(msg_ptr convMsg, msg_ptr refMsg) {
   // converters should override this method, unless they're very naiive.
   // generally, a converter's convert behavior should be to 

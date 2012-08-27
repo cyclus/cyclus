@@ -83,10 +83,11 @@ class Model {
   /**
      provides a constructed simulation entity
      @param model_type the type of entity
-     @param qe a pointer to a QueryEngine object containing module identity data
+     @param module the name of the module
      @return a pointer to the construced entity
    */
-  static Model* getEntityViaConstructor(std::string model_type,QueryEngine* qe);
+  static Model* getEntityViaConstructor(std::string model_type,
+                                        std::string module);
 
   /**
      constructs and initializes an entity
@@ -104,11 +105,16 @@ class Model {
   Model();
 
   /**
-     A method to initialize the model 
-      
+     Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void init(QueryEngine* qe,std::string cur_ns = "");
+  virtual void initCoreMembers(QueryEngine* qe);
+
+  /**
+     Initialize members related to derived module class
+     @param qe a pointer to a QueryEngine object containing initialization data
+   */
+  virtual void initModuleMembers(QueryEngine* qe) {};
 
   /**
      Destructor for the Model Class 

@@ -17,11 +17,6 @@ StubModel::StubModel() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::~StubModel() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubModel::init(QueryEngine* qe,std::string cur_ns) { 
-  Model::init(qe,cur_ns); 
-};
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubModel::str() { 
