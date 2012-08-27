@@ -77,16 +77,16 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual ~RegionModel() {};
     
   /**
-     Initalize the InstModel from xml. Calls the init function. 
+     Initalize the InstModel from a QueryEngine. Calls the init function. 
      
-     @param cur the current xml node pointer 
+     @param qe A pointer to a QueryEngine object containing initialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      populate the region's list of allowed facilities
    */
-  virtual void initAllowedFacilities(xmlNodePtr cur);
+  virtual void initAllowedFacilities(QueryEngine* qe);
 
   /**
      set the parameters necessary for RegionModel to interact
@@ -97,7 +97,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      populate the region's list of child institutions
    */
-  virtual void addChildrenToTree(xmlNodePtr cur);
+  virtual void addChildrenToTree(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 

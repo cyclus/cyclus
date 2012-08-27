@@ -42,6 +42,15 @@ class QueryEngine {
    */
   virtual std::string getElementContent(std::string query, 
                                         int index = 0) = 0;
+
+  /**
+     investigates the current status and returns a string representing
+     the name of a query at a given index
+     @param query the query
+     @param index the index of the queried element
+   */
+  virtual std::string getElementName(std::string query,
+				     int index = 0) = 0;
   
  protected:
   /**
@@ -54,6 +63,14 @@ class QueryEngine {
 
  private:
   std::set<QueryEngine*> spawned_children_;
+};
+
+
+#include "CycException.h"
+#include <string>
+class CycNullQueryException : public CycException {
+ public:
+ CycNullQueryException(std::string msg) : CycException(msg) {};
 };
 
 #endif

@@ -8,11 +8,11 @@
 #include "Model.h"
 #include "TimeAgent.h"
 #include "Communicator.h"
-#include "InstModel.h"
 #include "Prototype.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
+class InstModel;
 
 /**
    @class FacilityModel 
@@ -81,9 +81,9 @@ class FacilityModel : public TimeAgent, public Communicator,
   /**
      Initalize the FacilityModel from xml. Calls the init function. 
      
-     @param cur the current xml node pointer 
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      overrides Model's enterSimulation() in order to additionally

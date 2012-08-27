@@ -61,9 +61,9 @@ class ConverterModel : public Model {
   /**
      A method to initialize the model 
       
-     @param cur the pointer to the xml input for the model to initialize 
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 

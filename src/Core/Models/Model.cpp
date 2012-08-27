@@ -12,11 +12,11 @@
 #include "suffix.h"
 #include "CycException.h"
 #include "Env.h"
-#include "InputXML.h"
 #include "Timer.h"
 #include "Resource.h"
 #include "Table.h"
 #include "Prototype.h"
+#include "QueryEngine.h"
 
 #include DYNAMICLOADLIB
 
@@ -63,8 +63,10 @@ vector<Model*> Model::getModelList() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getEntityViaConstructor(std::string model_type,
-                                      xmlNodePtr cur) {
-  string module = XMLinput->get_xpath_name(cur,"model/*");
+                                      QueryEngine* qe) {
+  std::string query = "model/*";
+  std::string module = qe->getElementName(query);
+
   mdl_ctor* module_constructor; 
   // if it hasn't been loaded, load the module and register it
   if (loaded_modules_.find(module) == loaded_modules_.end()) { 
@@ -80,113 +82,24 @@ Model* Model::getEntityViaConstructor(std::string model_type,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::initializeSimulationEntity(std::string model_type, 
-                                       xmlNodePtr cur) {
-  Model* model = getEntityViaConstructor(model_type,cur);
-  model->init(cur);
-  model_list_.push_back(model);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::initializePrototype(std::string model_type, 
-                                xmlNodePtr cur) {
-  Model* model = getEntityViaConstructor(model_type,cur);
-  model->init(cur);
-  Prototype::registerPrototype(model->name(),
-                               dynamic_cast<Prototype*>(model));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::loadGlobalElements() {
-  load_converters();
-  load_markets();
-  load_facilities();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::loadEntities() {
-  load_institutions();
-  load_regions();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_markets() {
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    initializeSimulationEntity("Market",nodes->nodeTab[i]);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_converters() {
-  try {
-    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
+                                       QueryEngine* qe) {
+  Model* model = getEntityViaConstructor(model_type,qe);
+  QueryEngine* model_data = qe->queryElement("model/*");
+  model->init(model_data);
+  if ("Facility" == model_type)
+    Prototype::registerPrototype(model->name(),
+				 dynamic_cast<Prototype*>(model));
+  else
+    model_list_.push_back(model);
     
-    for (int i=0;i<nodes->nodeNr;i++) {
-      initializeSimulationEntity("Converter",nodes->nodeTab[i]);
-    }
-  } catch (CycNullXPathException) {} // no converters
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilities() {
-  xmlNodeSetPtr nodes;
-  try {
-     nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
-    
-    for (int i=0;i<nodes->nodeNr;i++){
-      load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], 
-                                                       "filename"),
-                           XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
-                           XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
-    }
-  } catch (CycNullXPathException) {}; // no converters
-  
-  nodes = XMLinput->get_xpath_elements("/*/facility");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    initializePrototype("Facility",nodes->nodeTab[i]);
-  }
-}
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
-  XMLinput->extendCurNS(ns);
-
-  if ("xml" == format){
-    XMLinput->load_facilitycatalog(filename);
-  } else {
-    throw CycRangeException(format + "is not a supported facilitycatalog format.");
-  }
-
-  XMLinput->stripCurNS();
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_regions() {
-
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    initializeSimulationEntity("Region",nodes->nodeTab[i]);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_institutions() {
-
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    initializeSimulationEntity("Inst",nodes->nodeTab[i]);   
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::init(xmlNodePtr cur) {
-  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+void Model::init(QueryEngine* qe,std::string cur_ns) {
+  name_ = cur_ns + qe->getElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
-  model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
+  model_impl_ = qe->getElementName("model/*");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -84,31 +84,10 @@ void InputXML::stripCurNS() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::load_file(std::string filename) {
-  // double check that the file exists
-  if(filename=="") {
-    throw CycIOException("No input filename was given");
-  } else { 
-    FILE* file = fopen(filename.c_str(),"r");
-    if (file == NULL) { 
-      throw CycIOException("The file '" + filename
-           + "' cannot be loaded because it has not been found.");
-    }
-    fclose(file);
-  }
 
-  curFilePtr = new xmlFileInfo;
+  xmlInputFile = XMLFileLoader(filename);
 
-  xmlFileInfo &inputFile = *curFilePtr;
-
-  inputFile.filename = filename;
-  inputFile.schema = &main_schema_;
-  inputFile.doc = validate_file(&inputFile);
-
-  /* Create xpath evaluation context */
-  inputFile.xpathCtxt = xmlXPathNewContext(inputFile.doc);
-  if (inputFile.xpathCtxt == NULL) {
-    fprintf(stderr,"Error: unable to create new xpath context \n");
-  }
+  xmlInputFile.validate_file(XMLFileLoader::main_schema_);
 
   // timer sets data
   initializeSimulationTimeData();
@@ -124,25 +103,25 @@ void InputXML::load_file(std::string filename) {
 void InputXML::loadGlobalSimulationElements() {
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  //RecipeLibrary::load_recipes();
+  xmlInputFile.load_recipes("");
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
 
   //Models
   LOG(LEV_DEBUG3, "none!") << "Begin loading elements";
-  Model::loadGlobalElements();
+  xmlInputFile.load_all_models();
   LOG(LEV_DEBUG3, "none!") << "End loading elements";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::loadSimulationEntities() {
   LOG(LEV_DEBUG3, "none!") << "Begin loading entities";
-  Model::loadEntities();
+  //Model::loadEntities();
   LOG(LEV_DEBUG3, "none!") << "End loading entities";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InputXML::initializeSimulationTimeData() {
-  //TI->load_simulation();
+  xmlInputFile.load_params();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -160,7 +139,7 @@ void InputXML::load_facilitycatalog(std::string filename) {
 
   /// load here???
   LOG(LEV_DEBUG3, "none!") << "Begin loading models - facilities";
-  Model::load_facilities();
+  //Model::load_facilities();
   LOG(LEV_DEBUG3, "none!") << "End loading models - facilities";
 
   // get rid of facilitycatalog, freeing memory

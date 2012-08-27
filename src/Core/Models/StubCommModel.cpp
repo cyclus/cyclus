@@ -19,8 +19,8 @@ StubCommModel::StubCommModel() {
 StubCommModel::~StubCommModel() {};
     
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubCommModel::init(xmlNodePtr cur) { 
-  Model::init(cur); 
+void StubCommModel::init(QueryEngine* qe) { 
+  Model::init(qe); 
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

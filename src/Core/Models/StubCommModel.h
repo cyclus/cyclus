@@ -36,11 +36,11 @@ class StubCommModel : public Model, public Communicator {
   virtual ~StubCommModel();
 
   /**
-     every model needs a method to initialize from XML 
+     every model needs a method to initialize from a QueryEngine
       
-     @param cur is the pointer to the model's xml node 
+     @param qe a pointer to a QueryEngine 
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void init(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 

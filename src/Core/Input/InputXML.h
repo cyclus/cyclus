@@ -11,7 +11,11 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/relaxng.h>
 
+#include <XMLFileLoader.h>
+
 #define XMLinput InputXML::Instance()
+
+
 
 /**
    provide interface to libxml for all input parsing needs 
@@ -261,6 +265,8 @@ public:
      returns the current xpath context
    */
   xmlXPathContextPtr context() {return curFilePtr->xpathCtxt;}
+
+  XMLFileLoader xmlInputFile;
 
 private:
   /**

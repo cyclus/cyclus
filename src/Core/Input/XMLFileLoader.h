@@ -8,14 +8,17 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/relaxng.h>
 
+class QueryEngine;
+
 class XMLFileLoader {
 
  private:
 
   enum CatalogType {
     recipeBook,
-    facilityCatalog
+    prototypeCatalog
   };
+
 
   std::string filename;
   xmlDocPtr doc;
@@ -26,12 +29,12 @@ class XMLFileLoader {
      @params modelPath XMLQueryEngine path to the search for model definitions
      @params factoryType type indication to pass to ModelFactory
   */
-  void load_models(std::string modelPath, std::string factoryType);
+  void load_dynmodules(std::string modelPath, std::string factoryType, std::string cur_ns = "");
 
  public:
   static std::string main_schema_;
   static std::string recipe_book_schema_;
-  static std::string facility_catalog_schema_;
+  static std::string prototype_catalog_schema_;
 
 
   XMLFileLoader() {};
@@ -62,7 +65,7 @@ class XMLFileLoader {
      
      @param cur_ns The current namespace for entries from this catalog
   */
-  void load_catalog(std::string catalogElement, CatalogType catalogType, std::string cur_ns);
+  void load_catalog(QueryEngine* qe, CatalogType catalogType, std::string cur_ns);
 
   /** 
       Method to load recipes from either the primary input file or a recipeBook catalog.
@@ -72,11 +75,11 @@ class XMLFileLoader {
   void load_recipes(std::string cur_ns);
 
   /** 
-      Method to load facilities from either the primary input file or a facilityCatalog catalog.
+      Method to load facilities from either the primary input file or a prototypeCatalog catalog.
 
       @param cur_ns the current namespace for entries being registered here
   */
-  void load_facilities(std::string cur_ns);
+  void load_prototypes(std::string cur_ns = "");
 
   /**
      Method to load all the agent models in a given order.
