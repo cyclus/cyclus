@@ -6,7 +6,6 @@
 #include <string>
 #include <iostream>
 
-#include "InputXML.h"
 #include "CycException.h"
 #include "Logger.h"
 #include "Material.h"
@@ -250,9 +249,7 @@ void Timer::load_simulation(QueryEngine *qe) {
   int dur, m0, y0, sim0, dec;
   string dur_str, m0_str, y0_str, sim0_str, decay_str;
   
-
-  xmlNodePtr cur = XMLinput->get_xpath_element("/simulation");
-  // get duration
+// get duration
   dur_str = qe->getElementContent("duration");
   dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month

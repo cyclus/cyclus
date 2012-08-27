@@ -4,7 +4,6 @@
 
 #include "CompMap.h"
 #include "Table.h"
-#include "InputXML.h"
 #include "QueryEngine.h"
 
 #include <set>

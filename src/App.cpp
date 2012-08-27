@@ -109,17 +109,18 @@ int main(int argc, char* argv[]) {
   // read input file and setup simulation
   try {
     string inputFile = vm["input-file"].as<string>();
+    set<string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(inputFile);
     loader.validate_file(XMLFileLoader::main_schema_);
-    loader.load_params();
+    loader.load_control_parameters();
     loader.load_recipes();
-    loader.load_all_models();
+    loader.load_dynamic_modules(module_types);
   } catch (CycException e) {
     CLOG(LEV_ERROR) << e.what();
   }
 
-  // sim initialization - should be handled by some entity
-  Model::initializeSimulation();
+  // sim construction - should be handled by some entity
+  Model::constructSimulation();
 
   // print the model list
   Model::printModelList();

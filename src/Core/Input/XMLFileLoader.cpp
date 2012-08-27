@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
+#include <set>
+#include <string>
 
 #include "QueryEngine.h"
 #include "XMLFileLoader.h"
@@ -21,8 +23,6 @@ using namespace std;
 
 // static members
 std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
-std::string XMLFileLoader::recipe_book_schema_ = "cyclus.rng";
-std::string XMLFileLoader::prototype_catalog_schema_ = "cyclus.rng";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(std::string load_filename) {
@@ -33,13 +33,23 @@ XMLFileLoader::XMLFileLoader(std::string load_filename) {
   } else { 
     FILE* file = fopen(load_filename.c_str(),"r");
     if (NULL == file) { 
-      throw CycIOException("The file '" + filename
+      throw CycIOException("The file '" + load_filename
            + "' cannot be loaded because it has not been found.");
     }
     fclose(file);
   }
 
-  filename = load_filename;
+  filename_ = load_filename;
+  initialize_module_paths();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::initialize_module_paths() {
+  module_paths_["Market"] = "/*/market";
+  module_paths_["Converter"] = "/*/converter";
+  module_paths_["Region"] = "/simulation/region";
+  module_paths_["Inst"] = "/simulation/region/institution";
+  module_paths_["Facility"] = "/*/facility";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,14 +63,14 @@ void XMLFileLoader::validate_file(std::string schema_file) {
 
   xmlRelaxNGValidCtxtPtr vctxt = xmlRelaxNGNewValidCtxt(schema);
 
-  doc = xmlReadFile(filename.c_str(), NULL,0);
-  if (NULL == doc) {
-    throw CycParseException("Failed to parse: " + filename);
+  doc_ = xmlReadFile(filename_.c_str(), NULL,0);
+  if (NULL == doc_) {
+    throw CycParseException("Failed to parse: " + filename_);
   }
 
-  if (xmlRelaxNGValidateDoc(vctxt,doc))
+  if (xmlRelaxNGValidateDoc(vctxt,doc_))
     throw CycParseException("Invalid XML file; file: "    
-      + filename 
+      + filename_ 
       + " does not validate against schema " 
       + schema_file);
 
@@ -69,44 +79,8 @@ void XMLFileLoader::validate_file(std::string schema_file) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLFileLoader::load_catalog(QueryEngine* qe, CatalogType catalogType, 
-				 std::string cur_ns) {
-
-  string cat_filename, ns, format;
-  cat_filename = qe->getElementContent("filename");
-  ns = qe->getElementContent("namespace");
-  format = qe->getElementContent("format");
-  
-  if ("xml" == format) {
-    CLOG(LEV_DEBUG2) << "going into a catalog...";
-    XMLFileLoader catalog(cat_filename);
-    // choose load function based on catalog type
-    switch (catalogType) {
-    case recipeBook:
-      catalog.validate_file(recipe_book_schema_);
-      catalog.load_recipes(cur_ns + ns + ":");
-      break;
-    case prototypeCatalog:
-      catalog.validate_file(prototype_catalog_schema_);
-      catalog.load_prototypes(cur_ns + ns + ":");
-      break;
-    }
-  } else {
-    throw 
-      CycRangeException(format + 
-                        "is not a supported catalog format.");
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLFileLoader::load_recipes(std::string cur_ns) {
-  XMLQueryEngine xqe(doc);
-
-  int numRecipeBooks = xqe.numElementsMatchingQuery("/*/recipebook");
-  for (int rb_num=0;rb_num<numRecipeBooks;rb_num++) {
-    QueryEngine* catalog_qe = xqe.queryElement("/*/recipebook",rb_num);
-    load_catalog(catalog_qe,recipeBook,cur_ns);
-  }
+void XMLFileLoader::load_recipes() {
+  XMLQueryEngine xqe(doc_);
 
   string query = "/*/recipe";
   int numRecipes = xqe.numElementsMatchingQuery(query);
@@ -117,46 +91,29 @@ void XMLFileLoader::load_recipes(std::string cur_ns) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_prototypes(std::string cur_ns) {
-  XMLQueryEngine xqe(doc);
-
-  int numFacCats = xqe.numElementsMatchingQuery("/*/prototypecatalog");
-  for (int fac_cat_num=0;fac_cat_num<numFacCats;fac_cat_num++) {
-    QueryEngine* catalog_qe = xqe.queryElement("/*/prototypecatalog",fac_cat_num);
-    load_catalog(catalog_qe,prototypeCatalog,cur_ns);
+void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
+  set<string>::iterator it;
+  for (it = module_types.begin(); it != module_types.end(); it++) {
+    load_modules_of_type(*it,module_paths_[*it]);
   }
-  load_dynmodules("/*/prototype","Facility",cur_ns);
-}
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_all_models() {
-
-  
-
-  load_dynmodules("/*/converter","Converter");
-  load_dynmodules("/*/market","Market");
-  load_prototypes();
-  load_dynmodules("/simulation/region","Region");
-  load_dynmodules("/simulation/region/institution","Inst");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_dynmodules(std::string query, std::string factoryType, std::string cur_ns) {
+void XMLFileLoader::load_modules_of_type(std::string type, 
+                                         std::string query_path) {  
+  XMLQueryEngine xqe(doc_);
   
-  XMLQueryEngine xqe(doc);
-  
-  int numModels = xqe.numElementsMatchingQuery(query);
-  for (int model_num=0;model_num<numModels;model_num++) {
-    QueryEngine* qe = xqe.queryElement(query,model_num);
-    Model::initializeSimulationEntity(factoryType,qe);
+  int numModels = xqe.numElementsMatchingQuery(query_path);
+  for (int i=0; i<numModels; i++) {
+    QueryEngine* qe = xqe.queryElement(query_path,i);
+    Model::initializeSimulationEntity(type,qe);
   }
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_params() {
-  XMLQueryEngine xqe(doc);
+void XMLFileLoader::load_control_parameters() {
+  XMLQueryEngine xqe(doc_);
 
   string query = "/*/control";
   QueryEngine* qe = xqe.queryElement(query);

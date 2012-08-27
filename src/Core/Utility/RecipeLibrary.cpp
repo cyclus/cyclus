@@ -6,7 +6,6 @@
 #include "CompMap.h"
 #include "MassTable.h"
 #include "CycException.h"
-#include "InputXML.h"
 
 #include <map>
 #include <sstream>
