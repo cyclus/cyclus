@@ -112,10 +112,8 @@ int main(int argc, char* argv[]) {
     XMLFileLoader loader(inputFile);
     loader.validate_file(XMLFileLoader::main_schema_);
     loader.load_params();
+    loader.load_recipes();
     loader.load_all_models();
-  } catch (CycIOException ge) {
-    CLOG(LEV_ERROR) << ge.what();
-    return 0;
   } catch (CycException e) {
     CLOG(LEV_ERROR) << e.what();
   }
