@@ -41,13 +41,6 @@ class StubTimeAgent : public TimeAgent {
    virtual std::string str();
 
   /**
-     Each simulation agent is prompted to do its beginning-of-life 
-     stuff. 
-      
-   */
-  virtual void handlePreHistory();
-
-  /**
      Each simulation agent is prompted to do its beginning-of-time-step 
      stuff at the tick of the timer. 
       

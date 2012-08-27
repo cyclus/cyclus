@@ -82,12 +82,6 @@ InstModel* FacilityModel::facInst() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::handlePreHistory() {
-  // facilities should override this method, unless they're very naiive.
-  // this function allows the facility to set up the simulation before it begins.
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::handleTick(int time){
   // facilities should override this method, unless they're very naiive.
   // generally, a facility's handleTick() behavior should be to 

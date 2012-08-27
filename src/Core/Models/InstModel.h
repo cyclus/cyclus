@@ -84,14 +84,6 @@ class InstModel : public TimeAgent, public Communicator {
   virtual void receiveMessage(msg_ptr msg);
   
   /**
-     Each inst is prompted to do its beginning-of-life-step 
-     stuff before the simulation begins. 
-      
-     Normally, inst.s simply hand the command down to facilities. 
-   */
-  virtual void handlePreHistory();
-
-  /**
      Each institution is prompted to do its beginning-of-time-step 
      stuff at the tick of the timer. 
      Default behavior is to ignore the tick. 

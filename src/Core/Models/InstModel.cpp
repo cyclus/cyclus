@@ -117,15 +117,6 @@ void InstModel::receiveMessage(msg_ptr msg){
   msg->sendOn();
 }
 
-void InstModel::handlePreHistory(){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
-  }
-}
-
 void InstModel::handleTick(int time) {
   // tell all of the institution's child models to handle the tick
   int currsize = children_.size();

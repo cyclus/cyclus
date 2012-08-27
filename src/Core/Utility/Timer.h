@@ -101,12 +101,6 @@ class Timer {
   void sendTock();
     
   /**
-     handles all pre-history interactions between regions, 
-     institutions, and facilities. 
-   */
-  void handlePreHistory();
-
-  /**
      sends a notification to Tick listeners that a day has passed 
    */
   void sendDailyTasks();

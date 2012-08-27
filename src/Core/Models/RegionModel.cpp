@@ -108,15 +108,6 @@ void RegionModel::receiveMessage(msg_ptr msg){
   msg->sendOn();
 }
 
-void RegionModel::handlePreHistory(){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->handlePreHistory();
-  }
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleTick(int time){
   int currsize = children_.size();

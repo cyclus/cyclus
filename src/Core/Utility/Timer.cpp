@@ -18,9 +18,6 @@ Timer* Timer::instance_ = 0;
 void Timer::runSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << startDate_ << " to end=" << endDate_;
-
-  time_ = -1;
-  handlePreHistory();
   time_ = time0_;
   CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()){
@@ -80,18 +77,6 @@ string Timer::reportListeners() {
   return report;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::handlePreHistory() {
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
-       agent != tick_listeners_.end(); 
-       agent++) {
-    try {
-      (*agent)->handlePreHistory();
-    } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in handlePreHistory(): " << err.what();
-    }
-  }
-}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendResolve() {
   for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();

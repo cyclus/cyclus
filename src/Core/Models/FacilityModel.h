@@ -234,13 +234,6 @@ class FacilityModel : public TimeAgent, public Communicator,
   virtual double powerCapacity() { return 0.0; };
 
   /**
-     Each facility is prompted to do its beginning-of-life 
-     stuff. 
-      
-   */
-  virtual void handlePreHistory();
-
-  /**
      Each facility is prompted to do its beginning-of-time-step 
      stuff at the tick of the timer. 
       

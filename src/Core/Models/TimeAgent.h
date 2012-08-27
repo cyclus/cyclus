@@ -17,12 +17,6 @@ class TimeAgent : public Model {
      destructor
    */
   virtual ~TimeAgent() {};
-
-  /**
-     Each simulation agent is prompted to do its beginning-of-life 
-     stuff. 
-   */
-  virtual void handlePreHistory() = 0;
   
   /**
      Each simulation agent is prompted to do its beginning-of-time-step 
