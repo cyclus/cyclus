@@ -18,6 +18,8 @@
 #include "Prototype.h"
 #include "QueryEngine.h"
 
+#include "RegionModel.h"
+
 #include DYNAMICLOADLIB
 
 using namespace std;
@@ -27,6 +29,7 @@ int Model::next_id_ = 0;
 table_ptr Model::agent_table = new Table("Agents"); 
 vector<Model*> Model::model_list_;
 map<string,mdl_ctor*> Model::loaded_modules_;
+set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getModelByName(std::string name) {
@@ -96,6 +99,30 @@ void Model::initializeSimulationEntity(std::string model_type,
 				 dynamic_cast<Prototype*>(model));
   } else {
     model_list_.push_back(model);
+  }
+  if ("Region" == model_type) {
+    registerRegionWithSimulation(model);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::registerRegionWithSimulation(Model* region) {
+  RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
+  if (!regionCast) {
+    string err_msg = "Model '" + region->name() + "' can't be registered as a region.";
+    throw CycOverrideException(err_msg);
+  }
+  else {
+    regions_.insert(region);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::initializeSimulation() {
+  set<Model*>::iterator it;
+  for (it = regions_.begin(); it != regions_.end(); it++) {
+    Model* region = *it;
+    region->enterSimulation(region);
   }
 }
 

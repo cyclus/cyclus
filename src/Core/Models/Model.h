@@ -6,6 +6,7 @@
 #include <string>
 #include <libxml/tree.h>
 #include <vector>
+#include <set>
 
 #include "Transaction.h"
 
@@ -97,12 +98,15 @@ class Model {
   static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
-     Constructor for the Model Class 
-      
-     @warning all constructors must set ID_ and increment next_id_ 
-      
+     register a model as a region
+     @param region the model to register
    */
-  Model();
+  static void registerRegionWithSimulation(Model* region);
+
+  /**
+     initialize the simulation to its initial state
+   */
+  static void initializeSimulation();
 
   /**
      Initialize members related to core classes
@@ -115,6 +119,14 @@ class Model {
      @param qe a pointer to a QueryEngine object containing initialization data
    */
   virtual void initModuleMembers(QueryEngine* qe) {};
+
+  /**
+     Constructor for the Model Class 
+      
+     @warning all constructors must set ID_ and increment next_id_ 
+      
+   */
+  Model();
 
   /**
      Destructor for the Model Class 
@@ -272,6 +284,11 @@ class Model {
    */
   static std::map<std::string,mdl_ctor*> loaded_modules_;
 
+  /**
+     a set of registered regions
+   */
+  static std::set<Model*> regions_;
+  
   /**
      children of this model 
    */
