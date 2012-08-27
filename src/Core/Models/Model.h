@@ -96,21 +96,6 @@ class Model {
   static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
-     loads all globally accessible elements
-   */
-  static void loadGlobalElements();
-
-  /**
-     loads all simulation entities
-   */
-  static void loadEntities();
-
-  /**
-     load all facilities 
-   */
-  static void load_facilities();
-
-  /**
      Constructor for the Model Class 
       
      @warning all constructors must set ID_ and increment next_id_ 

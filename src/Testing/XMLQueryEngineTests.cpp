@@ -187,7 +187,7 @@ TEST_F(XMLQueryEngineTest, GetName) {
   int elenum;
 
   ASSERT_NO_THROW(xqeA = XMLQueryEngine(testSnippetG.snippet));
-  std::string query = "/start*";
+  std::string query = "/start/*";
   EXPECT_EQ(xqeA.numElementsMatchingQuery(query),testSnippetG.numA+testSnippetG.numB);
   elenum = 0;
   EXPECT_EQ(xqeA.getElementName(query,elenum++),testElementA.name);

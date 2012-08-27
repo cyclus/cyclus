@@ -103,12 +103,12 @@ void InputXML::load_file(std::string filename) {
 void InputXML::loadGlobalSimulationElements() {
   // Recipes
   LOG(LEV_DEBUG3, "none!") << "Begin loading recipes";
-  xmlInputFile.load_recipes();
+  xmlInputFile.load_recipes("");
   LOG(LEV_DEBUG3, "none!") << "End loading recipes";
 
   //Models
   LOG(LEV_DEBUG3, "none!") << "Begin loading elements";
-  //Model::loadGlobalElements();
+  xmlInputFile.load_all_models();
   LOG(LEV_DEBUG3, "none!") << "End loading elements";
 }
 
@@ -139,7 +139,7 @@ void InputXML::load_facilitycatalog(std::string filename) {
 
   /// load here???
   LOG(LEV_DEBUG3, "none!") << "Begin loading models - facilities";
-  Model::load_facilities();
+  //Model::load_facilities();
   LOG(LEV_DEBUG3, "none!") << "End loading models - facilities";
 
   // get rid of facilitycatalog, freeing memory
