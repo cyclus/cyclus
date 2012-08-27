@@ -31,7 +31,7 @@ class XMLQueryEngineTest : public ::testing::Test {
       name=nm; 
       content=cntnt; 
       element="<" + name + ">" + content + "</" + name + ">";
-      path="/start/"+name;
+      path=name;
     }
   } testElementA, testElementB, testElementAC, 
     testElementAAin, testElementAAout,
@@ -41,12 +41,8 @@ class XMLQueryEngineTest : public ::testing::Test {
     std::string snippet;
     int numA, numB;
     
-    TestSnippet() {};
-    
-  TestSnippet(std::string element, int nA, int nB) : 
-    numA(nA), numB(nB) {
-      snippet = "<start>" + element + "</start>";
-    };
+  TestSnippet(std::string s="", int nA=0, int nB=0) : 
+    snippet(s), numA(nA), numB(nB) {};
     
   } testSnippetA, testSnippetB, testSnippetC, testSnippetD, 
     testSnippetE, testSnippetF, testSnippetG, testSnippetH,

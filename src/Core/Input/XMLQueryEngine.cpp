@@ -29,26 +29,28 @@ XMLQueryEngine::XMLQueryEngine(xmlDocPtr current_doc) {
 void XMLQueryEngine::init(std::string snippet) {
   char *myEncoding = NULL;
   int myParserOptions = 0;
-  doc_ = xmlReadDoc((const xmlChar*)snippet.c_str(),"",myEncoding,myParserOptions);
+
+  string full_form = "<start>" + snippet + "</start>";
+
+
+  doc_ = xmlReadDoc((const xmlChar*)full_form.c_str(),"",myEncoding,myParserOptions);
   if (NULL == doc_) {
-    // throw CycParseException("Failed to parse snippet");
+    throw CycParseException("Failed to parse snippet");
   }
   
   xpathCtxt_ = xmlXPathNewContext(doc_);
   numElements_ = 0;
+  numElementsMatchingQuery("/start/*");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int XMLQueryEngine::numElementsMatchingQuery(std::string query) {//const char* expression) {
   numElements_ = 0;
 
-  /* Evaluate xpath expression */
   currentXpathObj_ = xmlXPathEvalExpression((const xmlChar*)query.c_str(), xpathCtxt_);
   
-  if (!xmlXPathNodeSetIsEmpty(currentXpathObj_->nodesetval)) {
-    numElements_ = currentXpathObj_->nodesetval->nodeNr;
-  }
-
+  numElements_ = currentXpathObj_->nodesetval->nodeNr;
+  
   return numElements_;
 }
 
@@ -142,23 +144,24 @@ std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngine::getElementName(int elementNum) {
+std::string XMLQueryEngine::getElementName(int index) {
 
-  stringstream ss("");
-  ss << elementNum;
+  int numElements = currentXpathObj_->nodesetval->nodeNr;
 
-  if (currentXpathObj_->nodesetval->nodeNr < elementNum) {
-    throw CycParseException("Snippet does not have " 
-                            + ss.str() + " elements.");
+  if (numElements < index+1) {
+    stringstream ss("");
+    ss << "Snippet has " << numElements << " element(s), not "
+       << index+1 << ".";
+    throw CycParseException(ss.str());
   }
 
   std::string XMLname = 
     (const char*)(currentXpathObj_->nodesetval->
-                  nodeTab[elementNum]->name);
+                  nodeTab[index]->name);
   return XMLname;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 QueryEngine* XMLQueryEngine::getEngineFromSnippet(std::string snippet) {
-  return new XMLQueryEngine(snippet);
+  return new XMLQueryEngine(snippet);;
 }

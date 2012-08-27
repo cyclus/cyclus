@@ -43,9 +43,6 @@ class XMLQueryEngine : public QueryEngine {
   */
   XMLQueryEngine(std::string snippet);
   
-  /// virtual destructor
-  virtual ~XMLQueryEngine() {};
-
   /**
      This constructor allows a new object to be created from an
      already existing xmlDocPtr.
@@ -54,7 +51,10 @@ class XMLQueryEngine : public QueryEngine {
      elsewhere
   */
   XMLQueryEngine(xmlDocPtr current_doc);
-  
+
+  /// virtual destructor
+  virtual ~XMLQueryEngine() {};
+
   /**
      This is the primary search interface.  The object retains some
      state information as a result of this query for an XML element:
@@ -145,8 +145,6 @@ class XMLQueryEngine : public QueryEngine {
   xmlXPathObjectPtr currentXpathObj_;
 
   void init(std::string expression);
-
-
 };
 
 #include "CycException.h"
