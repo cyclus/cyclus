@@ -1,10 +1,13 @@
 // XMLQueryEngine.cpp
 // Implements class for querying XML snippets
 #include <iostream>
+#include <sstream>
 
 #include "XMLQueryEngine.h"
 
 #include "CycException.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine() {
@@ -74,7 +77,16 @@ std::string XMLQueryEngine::get_content(const char* expression) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::get_content(int elementNum) {
-  xmlNodePtr node = currentXpathObj_->nodesetval->nodeTab[elementNum];
+  xmlNodeSetPtr nodeSet = currentXpathObj_->nodesetval;
+  
+  if(nodeSet->nodeNr < elementNum + 1) {
+    stringstream ss("");
+    ss << "Error: " << "query only has " << nodeSet->nodeNr 
+       << " elements.";
+    throw CycXPathException(ss.str());
+  }
+
+  xmlNodePtr node = nodeSet->nodeTab[elementNum];
   // xmlNodePtr child = node->children;
   std::string XMLcontent = "";
   xmlBufferPtr nodeBuffer = xmlBufferCreate();
@@ -137,9 +149,15 @@ std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngine::getElementName(std::string query, int elementNum) {
+std::string XMLQueryEngine::getElementName(int elementNum) {
 
-  numElementsMatchingQuery(query);
+  stringstream ss("");
+  ss << elementNum;
+
+  if (currentXpathObj_->nodesetval->nodeNr < elementNum) {
+    throw CycParseException("Snippet does not have " 
+                            + ss.str() + " elements.");
+  }
 
   std::string XMLname = 
     (const char*)(currentXpathObj_->nodesetval->

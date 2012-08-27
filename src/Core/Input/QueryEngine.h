@@ -45,12 +45,10 @@ class QueryEngine {
 
   /**
      investigates the current status and returns a string representing
-     the name of a query at a given index
-     @param query the query
+     the name of a given index
      @param index the index of the queried element
    */
-  virtual std::string getElementName(std::string query,
-				     int index = 0) = 0;
+  virtual std::string getElementName(int index = 0) = 0;
   
  protected:
   /**

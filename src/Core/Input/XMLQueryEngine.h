@@ -132,12 +132,11 @@ class XMLQueryEngine : public QueryEngine {
   std::string get_child(const char* expression);
   
   /**
-     Get the name of a specific child element of matches.  This is
-     typically the result of a wildcard search.
+     Get the name of a child element.
 
      @param elementNum the ordinal number of the element to be queried
   */
-  std::string getElementName(std::string query,int index=0);
+  std::string getElementName(int index=0);
 
  protected:
   virtual QueryEngine* getEngineFromSnippet(std::string snippet);
@@ -151,6 +150,15 @@ class XMLQueryEngine : public QueryEngine {
   void init(std::string expression);
 
 
+};
+
+#include "CycException.h"
+/**
+   An exception class for an xpath that can not be evaluated
+*/
+class CycXPathException : public CycException {
+ public: 
+ CycXPathException(std::string msg) : CycException(msg) {};
 };
 
 #endif
