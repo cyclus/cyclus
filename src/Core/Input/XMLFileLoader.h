@@ -8,12 +8,17 @@
 #include <libxml/xpathInternals.h>
 #include <libxml/relaxng.h>
 
+// forward declarations
 class QueryEngine;
 
+/**
+   a class that encapsulates the methods needed to load input to
+   a cyclus simulation from xml
+ */
 class XMLFileLoader {
-
  private:
 
+  /// types of catalogs
   enum CatalogType {
     recipeBook,
     prototypeCatalog
