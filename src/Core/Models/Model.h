@@ -47,6 +47,11 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 class Model {
  public:
   /**
+     return a set of the types of dynamic modules
+   */
+  static std::set<std::string> dynamic_module_types();
+
+  /**
      returns a model template given the template's name 
       
      @param name name of the template as defined in the input file 
@@ -104,9 +109,9 @@ class Model {
   static void registerRegionWithSimulation(Model* region);
 
   /**
-     initialize the simulation to its initial state
+     constructs the simulation in its initial state
    */
-  static void initializeSimulation();
+  static void constructSimulation();
 
   /**
      Initialize members related to core classes

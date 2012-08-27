@@ -6,6 +6,7 @@
 
 #include "TimeAgent.h"
 #include "Communicator.h"
+#include "QueryEngine.h"
 
 /**
    @class RegionModel 
@@ -84,6 +85,12 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual void initCoreMembers(QueryEngine* qe);
 
   /**
+     perform actions required when entering the simulation
+     @param parent this models parent
+   */
+   virtual void enterSimulation(Model* parent);
+
+  /**
      every model should be able to print a verbose description 
    */
   virtual std::string str();
@@ -157,7 +164,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      populate the region's list of child institutions
    */
-  virtual void addChildrenToTree(QueryEngine* qe);
+  virtual void addChildrenToTree();
 
   /**
      every region has a list of allowed facilities 

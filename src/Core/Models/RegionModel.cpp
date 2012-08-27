@@ -54,24 +54,31 @@ void RegionModel::initInstitutionNames(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::enterSimulation(Model* parent) {
+  if (parent != this) {
+    string err = "Regions must be their own parent.";
+    throw CycOverrideException(err);
+  }
+  addRegionAsRootNode();
+  addChildrenToTree();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::addRegionAsRootNode() {
   Model::enterSimulation(this);
   TI->registerTickListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::addChildrenToTree(QueryEngine* qe) {   
-  string inst_name;
+void RegionModel::addChildrenToTree() {
   Model* inst;
-  int num_inst = qe->numElementsMatchingQuery("institution");
-  for (int i=0;i<num_inst;i++){
-    QueryEngine* iqe = qe->queryElement("institution",i);
-    inst_name = iqe->getElementContent("name");
-    inst = Model::getModelByName(inst_name);
+  set<string>::iterator it;
+  for (it = inst_names_.begin(); it != inst_names_.end(); it++){
+    inst = Model::getModelByName((*it));
     inst->enterSimulation(this);
   }
 }
-  
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 std::string RegionModel::str() {
   std::string s = Model::str();

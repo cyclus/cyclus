@@ -32,6 +32,17 @@ map<string,mdl_ctor*> Model::loaded_modules_;
 set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<std::string> Model::dynamic_module_types() {
+  set<string> types;
+  types.insert("Market");
+  types.insert("Converter");
+  types.insert("Region");
+  types.insert("Institution");
+  types.insert("Facility");
+  return types;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::getModelByName(std::string name) {
   Model* found_model = NULL;
 
@@ -118,7 +129,7 @@ void Model::registerRegionWithSimulation(Model* region) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::initializeSimulation() {
+void Model::constructSimulation() {
   set<Model*>::iterator it;
   for (it = regions_.begin(); it != regions_.end(); it++) {
     Model* region = *it;
