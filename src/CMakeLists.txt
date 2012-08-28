@@ -58,9 +58,9 @@ SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   ${CYCLUS_SRC_DIR}/Core/Models
   )
 
-# Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
+# Find LibXML++ and dependencies
 FIND_PACKAGE( LibXML++ REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${APP_INCLUDE_DIR} ${LibXML++_INCLUDE_DIR} ${Glibmm_INCLUDE_DIRS} ${LibXML++Config_INCLUDE_DIR})
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LibXML++_INCLUDE_DIR} ${Glibmm_INCLUDE_DIRS} ${LibXML++Config_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
 # Find Sqlite3
