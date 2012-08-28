@@ -32,7 +32,7 @@ void RegionModel::initCoreMembers(QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::initAllowedFacilities(QueryEngine* qe) {   
-  int num_allowed_fac = qe->numElementsMatchingQuery("allowedfacility");
+  int num_allowed_fac = qe->nElementsMatchingQuery("allowedfacility");
   string fac_name;
   Model* new_fac;
   for (int i=0;i<num_allowed_fac;i++) {
@@ -44,7 +44,7 @@ void RegionModel::initAllowedFacilities(QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::initInstitutionNames(QueryEngine* qe) {
-  int nInsts = qe->numElementsMatchingQuery("institution");
+  int nInsts = qe->nElementsMatchingQuery("institution");
   string name;
   for (int i=0; i<nInsts; i++) {
     QueryEngine* inst_data = qe->queryElement("institution",i);

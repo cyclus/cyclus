@@ -38,7 +38,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
   // get the incommodities
   std::string commod;
   try {
-    int numInCommod = qe->numElementsMatchingQuery("incommodity");
+    int numInCommod = qe->nElementsMatchingQuery("incommodity");
     for (int i=0;i<numInCommod;i++){
       commod = qe->getElementContent("incommodity",i);
       in_commods_.push_back(commod);
@@ -50,7 +50,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
 
   // get the outcommodities
   try {
-    int numOutCommod = qe->numElementsMatchingQuery("outcommodity");
+    int numOutCommod = qe->nElementsMatchingQuery("outcommodity");
     for (int i=0;i<numOutCommod;i++){
       commod = qe->getElementContent("outcommodity",i);
       out_commods_.push_back(commod);

@@ -8,8 +8,8 @@ TestQueryEngine::separator = ':';
 //- - - - - -
 // test simple search
 TEST_F(QueryEngine, NumElementsMatchingQuery) {
-  EXPECT_EQ(0,pqe->numElementsMatchingQuery("noMatch"));
-  EXPECT_EQ(1,pqe->numElementsMatchingQuery("path"));
+  EXPECT_EQ(0,pqe->nElementsMatchingQuery("noMatch"));
+  EXPECT_EQ(1,pqe->nElementsMatchingQuery("path"));
 }
 
 //- - - - - - 

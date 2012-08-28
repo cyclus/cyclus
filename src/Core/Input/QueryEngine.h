@@ -16,6 +16,18 @@ class QueryEngine {
 
   /// virtual destructor
   virtual ~QueryEngine();
+    
+  /**
+     @return the number of elements in the current query state
+   */
+  virtual int nElements() = 0;
+
+  /**
+     investigates the current status and returns a string representing
+     the name of a given index
+     @param index the index of the queried element
+   */
+  virtual std::string getElementName(int index = 0) = 0;
 
   /**
      investigates the current status and returns the number of elements
@@ -23,17 +35,8 @@ class QueryEngine {
      @param query the query
      @return the number of elements matching the query
    */
-  virtual int numElementsMatchingQuery(std::string query) = 0;
-
-
-  /**
-     populates a child query engine based on a query and index
-     @param query the query
-     @param index the index of the queried element
-     @return a initialized query engine based on the query and index
-   */
-  QueryEngine* queryElement(std::string query, int index = 0);
-    
+  virtual int nElementsMatchingQuery(std::string query) = 0;
+  
   /**
      investigates the current status and returns a string representing
      the content of a query at a given index
@@ -44,25 +47,27 @@ class QueryEngine {
                                         int index = 0) = 0;
 
   /**
-     investigates the current status and returns a string representing
-     the name of a given index
+     populates a child query engine based on a query and index
+     @param query the query
      @param index the index of the queried element
+     @return a initialized query engine based on the query and index
    */
-  virtual std::string getElementName(int index = 0) = 0;
-  
+  QueryEngine* queryElement(std::string query, int index = 0);
+
  protected:
   /**
      every derived query engine must return a new instance initialized
-     with a snippet.
-     @param snippet the snippet to use for initialization
+     by a query.
+     @param query the query
+     @param index the index of the queried element
      @return a query engine initialized via the snippet
    */
-  virtual QueryEngine* getEngineFromSnippet(std::string snippet) = 0;
+  virtual QueryEngine* getEngineFromQuery(std::string query,
+                                          int index) = 0;
 
  private:
   std::set<QueryEngine*> spawned_children_;
 };
-
 
 #include "CycException.h"
 #include <string>

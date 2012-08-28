@@ -30,7 +30,7 @@ class TestQueryEngine : public QueryEngine {
 
   ~TestQueryEngine();
   
-  virtual int numElementsMatchingQuery(std::string query) {
+  virtual int nElementsMatchingQuery(std::string query) {
     if (query == name_)
       return 1;
     else

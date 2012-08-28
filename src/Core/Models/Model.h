@@ -4,7 +4,6 @@
 
 #include <map>
 #include <string>
-#include <libxml/tree.h>
 #include <vector>
 #include <set>
 

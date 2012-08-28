@@ -37,7 +37,7 @@ RecipeLibrary::RecipeLibrary() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::load_recipes(QueryEngine* qe) {
   // load recipes from file
-  int nRecipes = qe->numElementsMatchingQuery("recipe");
+  int nRecipes = qe->nElementsMatchingQuery("recipe");
   CLOG(LEV_DEBUG2) << "loading recipes {";
   for (int i = 0; i < nRecipes; i++) {
     QueryEngine* recipe = qe->queryElement("recipe",i);
@@ -74,7 +74,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
   double value;
   int key;
   QueryEngine* isotopes = qe->queryElement("isotope");
-  int nIsos = isotopes->numElementsMatchingQuery("id");
+  int nIsos = isotopes->nElementsMatchingQuery("id");
   for (int i = 0; i < nIsos; i++) {
     key = strtol(isotopes->getElementContent("id",i).c_str(), NULL, 10);
     value = strtod(isotopes->getElementContent("comp",i).c_str(), NULL);

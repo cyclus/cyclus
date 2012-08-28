@@ -24,7 +24,7 @@ QueryEngine::~QueryEngine() {
 QueryEngine* QueryEngine::queryElement(std::string query, 
                                        int index) {
   QueryEngine* qe_child = 
-    getEngineFromSnippet(getElementContent(query,index));
+    getEngineFromQuery(query,index) ;
   spawned_children_.insert(qe_child);
   return qe_child;
 }

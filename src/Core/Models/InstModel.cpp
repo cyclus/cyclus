@@ -31,7 +31,7 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
   
   // populate prototypes_
   try {
-    int numAvailProtos = qe->numElementsMatchingQuery("availableprototype");
+    int numAvailProtos = qe->nElementsMatchingQuery("availableprototype");
     
     // populate prototypes_
     for (int i=0;i<numAvailProtos;i++){
@@ -43,7 +43,7 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
 
   // populate initial_build_order_
   try {
-    int numInitFacs = qe->numElementsMatchingQuery("initialfacilitylist");
+    int numInitFacs = qe->nElementsMatchingQuery("initialfacilitylist");
     for (int i=0;i<numInitFacs;i++){
       QueryEngine* qe_child = qe->queryElement("initialfacilitylist",1);
       addPrototypeToInitialBuild(qe_child);

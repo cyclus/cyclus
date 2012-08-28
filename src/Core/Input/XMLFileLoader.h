@@ -2,11 +2,6 @@
 #if !defined(_XMLFILELOADER_H)
 #define _XMLFILELOADER_H
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
-#include <libxml/relaxng.h>
 #include <map>
 
 // forward declarations
@@ -75,7 +70,7 @@ class XMLFileLoader {
   std::string filename_;
 
   /// the main document entry point
-  xmlDocPtr doc_;
+  //  xmlDocPtr doc_;
 };
 
 

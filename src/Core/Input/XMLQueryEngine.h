@@ -4,12 +4,6 @@
 
 #include <string>
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
-#include <libxml/relaxng.h>
-
 #include "QueryEngine.h"
 
 /**
@@ -42,109 +36,49 @@ class XMLQueryEngine : public QueryEngine {
      @param snippet a string containing well-formed XML
   */
   XMLQueryEngine(std::string snippet);
-  
-  /**
-     This constructor allows a new object to be created from an
-     already existing xmlDocPtr.
-     
-     @param current_doc a XML document object that has been generated
-     elsewhere
-  */
-  XMLQueryEngine(xmlDocPtr current_doc);
 
   /// virtual destructor
   virtual ~XMLQueryEngine() {};
-
+    
   /**
-     This is the primary search interface.  The object retains some
-     state information as a result of this query for an XML element:
-     the number of matches and the list of matches.
-
-     @param expression an XPath search expression relative to the root
-     of the document
+     @return the number of elements in the current query state
    */
-  virtual int numElementsMatchingQuery(std::string query);
+  virtual int nElements();
 
   /**
-     Get the full contents of a specific match to the expression
-     search, including all the children.
-
-     @param elementNum the ordinal index of the element to be returned
-  */
-  std::string get_content(int elementNum=0);
-
-  /**
-     This is a short cut to get the contents of the first match to a
-     search expression.  It is intended for use when only a single
-     match is expected.
-
-     @param expression an XPath search expression relative to the root
-     of the document
-  */
-  std::string get_content(const char* expression);
-
-  /**
-     get the content of a query
-     @query the query
-     @index the index, if there is more than one matched result
+     investigates the current status and returns a string representing
+     the name of a given index
+     @param index the index of the queried element
    */
-  virtual std::string getElementContent(std::string query,
+  virtual std::string getElementName(int index = 0);
+
+  /**
+     investigates the current status and returns the number of elements
+     matching a query
+     @param query the query
+     @return the number of elements matching the query
+   */
+  virtual int nElementsMatchingQuery(std::string query);
+  
+  /**
+     investigates the current status and returns a string representing
+     the content of a query at a given index
+     @param query the query
+     @param index the index of the queried element
+   */
+  virtual std::string getElementContent(std::string query, 
                                         int index = 0);
 
-  /**
-     Get the number of children of a specific match to the expression
-     search.
-
-     @param elementNum the ordinal index of the element to be returned
-  */
-  int get_num_children(int elementNum=0);
-
-  /**
-     This is a short cut to get the number of children of the first
-     match to a search expression.  It is intended for use when only a
-     single match is expected.
-
-     @param expression an XPath search expression relative to the root
-     of the document
-  */
-  int get_num_children(const char* expression);
-
-  /**
-     Get the contents of a specific child element of all the matches
-     to a search expression.
-
-     @param elementNum the ordinal index of the element to be returned
-     @param childNum the ordinal index of the child to be returned
-  */
-  std::string get_child(int elementNum=0, int childNum=0);
-  
-  /**
-     This is a short cut to get the first child element of the first
-     match to a search expression.  It is intended for use when only a
-     single match is expected.
-
-     @param expression an XPath search expression relative to the root
-     of the document
-   */
-  std::string get_child(const char* expression);
-  
-  /**
-     Get the name of a child element.
-
-     @param elementNum the ordinal number of the element to be queried
-  */
-  std::string getElementName(int index=0);
-
  protected:
-  virtual QueryEngine* getEngineFromSnippet(std::string snippet);
-
- private:
-  int numElements_;
-  xmlDocPtr doc_;
-  xmlXPathContextPtr xpathCtxt_;
-  xmlXPathObjectPtr currentXpathObj_;
-
-  void init(std::string expression);
+  /**
+     every derived query engine must return a new instance initialized
+     by a query.
+     @param query the query
+     @param index the index of the queried element
+     @return a query engine initialized via the snippet
+   */
+  virtual QueryEngine* getEngineFromQuery(std::string query,
+                                          int index);
 };
 
 #include "CycException.h"
@@ -155,5 +89,4 @@ class CycXPathException : public CycNullQueryException {
  public: 
  CycXPathException(std::string msg) : CycNullQueryException(msg) {};
 };
-
 #endif
