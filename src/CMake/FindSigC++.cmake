@@ -13,8 +13,8 @@ libfind_pkg_check_modules(SigC++_PKGCONF sigc++-2.0)
 # Main include dir
 find_path(SigC++_INCLUDE_DIR
   NAMES sigc++/sigc++.h
-  PATHS ${SigC++_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES sigc++-2.0
+  PATHS ${SigC++_PKGCONF_INCLUDE_DIRS} ${SigC++_PKGCONF_INCLUDE_DIRS}/include
+  PATH_SUFFIXES include/sigc++-2.0 sigc++-2.0
 )
 
 # Glib-related libraries also use a separate config header, which is in lib dir
