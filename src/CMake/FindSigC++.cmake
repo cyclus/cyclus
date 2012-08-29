@@ -24,6 +24,11 @@ find_path(SigC++Config_INCLUDE_DIR
   PATH_SUFFIXES lib/sigc++-2.0/include
 )
 
+# find lib
+find_path(SigC++_PKGCONF_LIBRARY_DIRS
+  NAMES libsigc-2.0.so
+  PATH_SUFFIXES lib
+)
 libfind_library(SigC++ sigc 2.0)
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
