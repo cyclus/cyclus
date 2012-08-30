@@ -1,5 +1,5 @@
 //XMLParser.h
-#if !defined(_XMLPARSER_H)
+#ifndef _XMLPARSER_H
 #define _XMLPARSER_H
 
 #include <sstream>

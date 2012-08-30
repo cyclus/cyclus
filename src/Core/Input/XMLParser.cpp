@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string>
+#include "RelaxNGValidator.h"
 
 using namespace std;
 using namespace xmlpp;
@@ -31,8 +32,8 @@ XMLParser::~XMLParser() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLParser::validateFileAgaisntSchema(std::stringstream&
                                           xml_schema_snippet) {
-  XMLParser schema_parser(xml_schema_snippet);
-  SchemaValidator validator(*schema_parser.document());
+  RelaxNGValidator validator;
+  validator.parse_memory(xml_schema_snippet.str());
   validator.validate(this->document());
 }
 
