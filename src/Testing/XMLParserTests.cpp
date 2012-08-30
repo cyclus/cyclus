@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "XMLParserTests.h"
-
 #include <iostream>
 
 using namespace std;
@@ -11,6 +10,12 @@ void XMLParserTests::fillSnippet(std::stringstream &ss) {
   ss << "<" << outer_node_ << ">"
      << "<" << inner_node_ << ">" << inner_content_
      << "</" << inner_node_ << ">"
+     << "</" << outer_node_ << ">";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void XMLParserTests::fillBadSnippet(std::stringstream &ss) {
+  ss << "<" << outer_node_ << ">"
      << "</" << outer_node_ << ">";
 }
 
@@ -39,17 +44,26 @@ void XMLParserTests::SetUp() {
 void XMLParserTests::TearDown() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLParserTests,WithoutSchema) {  
+  stringstream snippet("");
+  fillSnippet(snippet);
+  EXPECT_NO_THROW(XMLParser parser(snippet));
+} 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithSchema) {
   stringstream snippet("");
   fillSnippet(snippet);  
   stringstream schema("");
   fillSchema(schema);
-  XMLParser parser(snippet,schema);
+  EXPECT_NO_THROW(XMLParser parser(snippet,schema));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLParserTests,WithoutSchema) {  
+TEST_F(XMLParserTests,WithError) {
   stringstream snippet("");
-  fillSnippet(snippet);
-  EXPECT_NO_THROW(XMLParser parser(snippet));
+  fillBadSnippet(snippet);  
+  stringstream schema("");
+  fillSchema(schema);
+  EXPECT_THROW(XMLParser parser(snippet,schema), CycLoadXMLException);
 } 

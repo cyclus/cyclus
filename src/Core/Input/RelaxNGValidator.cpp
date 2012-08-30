@@ -9,7 +9,7 @@
  */
 
 #include "RelaxNGValidator.h"
-
+#include <libxml/xmlerror.h>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RelaxNGValidator::RelaxNGValidator() : schema_(0), valid_context_(0) {}
 
@@ -60,9 +60,14 @@ bool RelaxNGValidator::validate(const xmlpp::Document* doc) {
 
   if(!valid_context_)
     throw CycValidityException("Couldn't create validating context");
-
-  int res = xmlRelaxNGValidateDoc( valid_context_, (xmlDocPtr)doc->cobj() );
-
+  
+  int res;
+  try {
+    res = xmlRelaxNGValidateDoc( valid_context_, (xmlDocPtr)doc->cobj() );
+  } catch (xmlError e) {
+    throw CycValidityException(e.message);
+  }
+  
   if(res != 0)
     throw CycValidityException("Document failed schema validation");
 

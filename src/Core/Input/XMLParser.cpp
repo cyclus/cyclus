@@ -34,7 +34,11 @@ void XMLParser::validateFileAgaisntSchema(std::stringstream&
                                           xml_schema_snippet) {
   RelaxNGValidator validator;
   validator.parse_memory(xml_schema_snippet.str());
-  validator.validate(this->document());
+  try {
+    validator.validate(this->document());
+  } catch(CycValidityException& e) {
+    throw CycLoadXMLException(e.what());
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
