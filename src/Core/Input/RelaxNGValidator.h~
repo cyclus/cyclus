@@ -1,0 +1,38 @@
+/* schemavalidator.h
+ * libxml++ and this file are copyright (C) 2000 by Ari Johnson,
+ * (C) 2002-2004 by the libxml dev team and
+ * are covered by the GNU Lesser General Public License, which should be
+ * included with libxml++ as the file COPYING.
+ */
+
+#ifndef RELAXNGVALIDATOR_H
+#define RELAXNGVALIDATOR_H
+
+#include <libxml++/validators/validator.h>
+#include <libxml++/schema.h>
+#include <libxml++/document.h>
+
+/** 
+    Schema Validator
+ */
+class SchemaValidator : public Validator
+{
+public:
+  SchemaValidator();
+  virtual ~SchemaValidator();
+
+  virtual void parse_memory(const Glib::ustring& contents);
+
+  bool validate(const Document* doc);
+
+protected:
+  virtual void initialize_valid();
+  void parse_context(_xmlSchemaParserCtxt* context);
+  virtual void release_underlying();
+
+  Schema* schema_;
+  bool embbeded_shema_;
+  _xmlSchemaValidCtxt* ctxt_;
+};
+
+#endif
