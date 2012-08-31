@@ -5,37 +5,27 @@
 #include <string>
 
 #include "QueryEngine.h"
+#include "XMLParser.h"
+#include <libxml++/libxml++.h>
 
 /**
    @class XMLQueryEngine
 
-   A class for extracting information from XML snippets
-
-   This class provides a simple mechanism for retreiving information
-   from an XML snippet using the XPath query infrastructure.
-
-   A new object is formed from a std::string snippet of XML,
-   immediately creating an XML document object based on that snippet
-   and an XPath search context based on that document object.
-
-   These objects retain some state information from each query.  When
-   a query matches, the object itself stores the number of matches
-   that were found and the lsit of matches as an xmlXPathObject.
-
-   When performing an XPath search for a given string expression,
-   there may be multiple matches and each match may have multiple
-   children.  This class provides methods to get the full contents of
-   each match, or each child of each match.
+   A class for extracting information from a given XML parser
 */
 class XMLQueryEngine : public QueryEngine {
  public:
   /**
-     This most common constructor creates a set of XML objects from a
-     snippet of XML text.
-     
-     @param snippet a string containing well-formed XML
+     constructor given a parser
+     @param parser the xml parser
   */
-  XMLQueryEngine(std::string snippet);
+  XMLQueryEngine(XMLParser& parser);
+
+  /**
+     constructor given a node
+     @param node the node to set as the current node
+  */
+  XMLQueryEngine(xmlpp::Node* node);
 
   /// virtual destructor
   virtual ~XMLQueryEngine() {};
@@ -79,14 +69,22 @@ class XMLQueryEngine : public QueryEngine {
    */
   virtual QueryEngine* getEngineFromQuery(std::string query,
                                           int index);
+  /**
+     sets the current node to a given node
+     @param node the new current node
+   */
+  void setCurrentNode(xmlpp::Node* node);
+
+ private:
+  xmlpp::Node* current_node_;
 };
 
 #include "CycException.h"
 /**
    An exception class for an xpath that can not be evaluated
 */
-class CycXPathException : public CycNullQueryException {
+class CycNodeTypeException : public CycNullQueryException {
  public: 
- CycXPathException(std::string msg) : CycNullQueryException(msg) {};
+ CycNodeTypeException(std::string msg) : CycNullQueryException(msg) {};
 };
 #endif
