@@ -88,8 +88,7 @@ TEST_F(XMLQueryEngineTest,top_level_throws) {
   EXPECT_THROW(engine.getElementContent(content_node_,ninner_nodes_+1),CycIndexException);
   EXPECT_THROW(engine.getElementContent(inner_node_),CycRangeException);
   EXPECT_THROW(engine.getElementName(ninner_nodes_+1),CycIndexException);
-  EXPECT_THROW(engine.queryElement(content_node_,ninner_nodes_+1),CycIndexException);
-  
+  EXPECT_THROW(engine.queryElement(content_node_,ninner_nodes_+1),CycIndexException);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -9,19 +9,20 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class XMLQueryEngineTest : public ::testing::Test {
-
  protected:
-
-  XMLQueryEngine *xqe;
+  // equality checks
   std::string root_node_, content_node_, inner_node_, unknown_node_;
   std::string content_;
+  int ncontent_;
+  int ninner_nodes_;
+
+  // loading helpers
+  XMLParser* parser_;
+  void loadParser();
   void getContent(std::stringstream &ss);
   std::string subcontent();
   std::string unknowncontent();
-  int ncontent_;
-  int ninner_nodes_;
-  XMLParser* parser_;
-  void loadParser();
+
  public:
   virtual void SetUp();
   virtual void TearDown();
