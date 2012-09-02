@@ -1,246 +1,110 @@
 // XMLQueryEngineTests.cpp
-#include <string>
 #include "XMLQueryEngineTests.h"
+
 #include <iostream>
-#include <sstream>
+#include "XMLParser.h"
 
 using namespace std;
 
-// // search for single entries in a snippet with only 1 entry
-// TEST_F(XMLQueryEngineTest, SearchOneOfOne) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string XMLQueryEngineTest::unknowncontent() {
+  stringstream ss("");
+  ss << "    <" << unknown_node_ << ">" << endl
+     << "      <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << endl
+     << "    </" << unknown_node_ << ">" << endl;
+  return ss.str();
+}
 
-//   cout << testSnippetA.snippet << endl;
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetA.snippet));
-//   // find entry that is there
-//   string query = "/"+testElementA.name;
-//   cout << xqe->getElementName() << endl;
-//   cout << query << endl;
-//   cout << xqe->nElementsMatchingQuery(query) << endl;
-//   //EXPECT_EQ(testSnippetA.numA,xqe->nElementsMatchingQuery(query.c_str()));
-//   // confirm tht we don't find entry that isn't there
-//   //EXPECT_EQ(testSnippetA.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string XMLQueryEngineTest::subcontent() {
+  stringstream ss("");
+  ss  << "  <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << endl;
+  return ss.str();
+}
 
-//   delete xqe;
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void XMLQueryEngineTest::getContent(std::stringstream &ss) {  
+  ss << "<" << root_node_ << ">" << endl;
+  for (int i = 0; i < ncontent_; i++) {
+    ss << subcontent();
+  }
+  ss << "  <" << inner_node_ << ">"  << endl
+     << unknowncontent()
+     << "  </" << inner_node_ << ">" << endl
+     << "</" << root_node_ << ">";
+}
+ 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void XMLQueryEngineTest::SetUp() {
+  root_node_ = "facility";
+  content_node_ = "name";
+  content_ = "the_name";
+  inner_node_ = "module";
+  unknown_node_ = "unknown_module_name";
+  ncontent_ = 2;
+  ninner_nodes_ = ncontent_+1;
+}
 
-// // search for single entries in a snippet with multiple entries
-// TEST_F(XMLQueryEngineTest, SearchOneOfMany) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void XMLQueryEngineTest::TearDown() {
+  if (parser_)
+    delete parser_;
+}
 
-//   // find each of the different entries
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetB.snippet));
-//   EXPECT_EQ(testSnippetB.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetB.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void XMLQueryEngineTest::loadParser() {
+  stringstream ss("");
+  getContent(ss);
+  //cout << ss.str() << endl;
+  parser_ = new XMLParser(ss);
+}
 
-//   delete xqe;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest,constructor) {  
+  loadParser();
+  EXPECT_NO_THROW(XMLQueryEngine engine(*parser_));
+} 
 
-//   // find each of the different entries in different order
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetC.snippet));
-//   EXPECT_EQ(testSnippetC.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetC.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest,top_level_queries) {  
+  loadParser();
+  XMLQueryEngine engine(*parser_);
+  EXPECT_EQ(engine.nElements(),ninner_nodes_);
+  EXPECT_EQ(engine.nElementsMatchingQuery(content_node_),ncontent_);
+  EXPECT_EQ(engine.nElementsMatchingQuery(inner_node_),1);
+  EXPECT_EQ(engine.getElementName(),content_node_);
+  EXPECT_EQ(engine.getElementContent(content_node_),content_);
+  for (int i = 0; i < ncontent_; i++) {
+    EXPECT_EQ(engine.getElementName(i),content_node_);
+    EXPECT_EQ(engine.getElementContent(content_node_,i),content_);
+  }
+  EXPECT_EQ(engine.getElementName(ncontent_),inner_node_);
+} 
 
-//   delete xqe;
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest,top_level_throws) {  
+  loadParser();
+  XMLQueryEngine engine(*parser_);
+  EXPECT_THROW(engine.getElementContent(content_node_,ninner_nodes_+1),CycIndexException);
+  EXPECT_THROW(engine.getElementContent(inner_node_),CycRangeException);
+  EXPECT_THROW(engine.getElementName(ninner_nodes_+1),CycIndexException);
+  EXPECT_THROW(engine.queryElement(content_node_,ninner_nodes_+1),CycIndexException);
+  
+}
 
-// // search for 1 or more entries in a snippet with multiple entries
-// TEST_F(XMLQueryEngineTest, SearchManyOfMany) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest,mid_level_queries) {  
+  loadParser();
+  XMLQueryEngine engine(*parser_);
+  EXPECT_NO_THROW(QueryEngine* qe = engine.queryElement(inner_node_));
+}
 
-//   // find the correct number of entries of each type (A,A)
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetD.snippet));
-//   EXPECT_EQ(testSnippetD.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetD.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
-
-//   delete xqe;
-
-//   // find the correct number of entries of each type (A,A,B)
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetE.snippet));
-//   EXPECT_EQ(testSnippetE.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetE.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
-
-//   delete xqe;
-
-//   // find the correct number of entries of each type (A,A,B,B)
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetF.snippet));
-//   EXPECT_EQ(testSnippetF.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetF.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
-
-//   delete xqe;
-
-//   // find the correct number of entries of each type (A,B,A,B)
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetG.snippet));
-//   EXPECT_EQ(testSnippetG.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetG.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
-
-//   delete xqe;
-
-//   // find the correct number of entries of each type (A,B,AC,B)
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetH.snippet));
-//   EXPECT_EQ(testSnippetH.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testSnippetH.numB,xqe->nElementsMatchingQuery(testElementB.path.c_str()));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, SearchDeepSame) {
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetI.snippet));
-//   EXPECT_EQ(1,xqe->nElementsMatchingQuery(testElementAAin.path.c_str()));
-//   EXPECT_EQ(1,xqe->nElementsMatchingQuery(testElementAAout.path.c_str()));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, SearchDeepDiff) {
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetJ.snippet));
-//   EXPECT_EQ(1,xqe->nElementsMatchingQuery(testElementABin.path.c_str()));
-//   EXPECT_EQ(1,xqe->nElementsMatchingQuery(testElementABout.path.c_str()));
-
-//   delete xqe;
-// }
-
-// // extract contents of a single entry in a snippet with only 1 entry
-// TEST_F(XMLQueryEngineTest, ExtractOneOfOne) {
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetA.snippet));
-//   EXPECT_EQ(testSnippetA.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   EXPECT_EQ(testElementA.content,xqe->get_content());
-
-//   delete xqe;
-// }
-
-// // extract contents of a single entry in a snippet with only 1 entry
-// // USING the expression directly
-// TEST_F(XMLQueryEngineTest, ExtractOneOfOneByName) {
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetA.snippet));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(testElementA.path.c_str()));
-
-//   delete xqe;
-// }
-
-
-// // extract contents of a single entry in a snippet with multiple entries
-// TEST_F(XMLQueryEngineTest, ExtractOneOfMany) {
-
-//   int elenum; 
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetB.snippet));
-//   elenum=0;
-//   xqe->nElementsMatchingQuery(testElementA.path.c_str());
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum));
-//   xqe->nElementsMatchingQuery(testElementB.path.c_str());
-//   EXPECT_EQ(testElementB.content,xqe->get_content(elenum));
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetC.snippet));
-//   elenum=0;
-//   xqe->nElementsMatchingQuery(testElementA.path.c_str());
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum));
-//   xqe->nElementsMatchingQuery(testElementB.path.c_str());
-//   EXPECT_EQ(testElementB.content,xqe->get_content(elenum));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, ExtractOneOfManyByName) {
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetB.snippet));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(testElementA.path.c_str()));
-//   EXPECT_EQ(testElementB.content,xqe->get_content(testElementB.path.c_str()));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, ExtractManyOfMany) {
-
-//   int elenum;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetD.snippet));
-//   EXPECT_EQ(testSnippetD.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   elenum=0;
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-
-//   delete xqe;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetE.snippet));
-//   EXPECT_EQ(testSnippetE.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   elenum=0;
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-
-//   delete xqe;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetF.snippet));
-//   EXPECT_EQ(testSnippetF.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   elenum=0;
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-
-//   delete xqe;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetG.snippet));
-//   EXPECT_EQ(testSnippetG.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   elenum=0;
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-
-//   delete xqe;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetH.snippet));
-//   EXPECT_EQ(testSnippetH.numA,xqe->nElementsMatchingQuery(testElementA.path.c_str()));
-//   elenum=0;
-//   EXPECT_EQ(testElementA.content,xqe->get_content(elenum++));
-//   EXPECT_EQ(testElementAC.content,xqe->get_content(elenum++));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, ExtractChild) {
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetZ.snippet));
-//   EXPECT_EQ(1,xqe->nElementsMatchingQuery("/start"));
-//   EXPECT_EQ(testElementA.element,xqe->get_child(0,0));
-//   EXPECT_EQ(startContent,xqe->get_child(0,1));
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest, GetName) {
-
-//   int elenum;
-
-//   ASSERT_NO_THROW(xqe = new XMLQueryEngine(testSnippetG.snippet));
-//   string query = "/start/*";
-//   EXPECT_EQ(xqe->nElementsMatchingQuery(query),testSnippetG.numA+testSnippetG.numB);
-//   elenum = 0;
-//   EXPECT_EQ(xqe->getElementName(elenum++),testElementA.name);
-//   EXPECT_EQ(xqe->getElementName(elenum++),testElementB.name);
-//   EXPECT_EQ(xqe->getElementName(elenum++),testElementA.name);
-//   EXPECT_EQ(xqe->getElementName(elenum++),testElementB.name);
-
-//   delete xqe;
-// }
-
-// TEST_F(XMLQueryEngineTest,TestNesting) {
-//   stringstream ss("");
-//   string query = "name";
-//   string content = "region";
-//   string subcontent = "module";
-
-//   ss << "<" << content << ">\n"
-//      << "  <" << query << ">" << content << "</" << query << ">\n"
-//      << "  <" << subcontent << ">\n"
-//      << "    <" << query << ">" << subcontent << "</" << query << ">\n"
-//      << "  </" << subcontent << ">\n"
-//      << "</" << content << ">";
-
-//   cout << ss.str() << endl;
-
-//   xqe = new XMLQueryEngine(ss.str());
-//   string element_name = xqe->getElementName();
-//   cout << element_name << endl;
-//   //QueryEngine* qe = xqe->queryElement(element_name);
-
-//   //EXPECT_EQ(content,qe->getElementContent("/name"));
-//   //QueryEngine* subqe = xqe->queryElement(subcontent);
-//   //EXPECT_EQ(subcontent,subqe->getElementContent("name"));
-// }
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest,low_level_queries) {  
+  loadParser();
+  XMLQueryEngine engine(*parser_);
+  QueryEngine* qe = engine.queryElement(inner_node_);
+  EXPECT_EQ(qe->getElementName(),unknown_node_);
+  QueryEngine* qe2 = qe->queryElement(unknown_node_);
+  EXPECT_EQ(qe2->getElementContent(content_node_),content_);
+}
