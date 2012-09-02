@@ -5,47 +5,13 @@
 
 TEST_F(XMLFileLoaderTests, OpenFile) {
 
-  std::string emptyString = "";
-  ASSERT_ANY_THROW(xmlFile = XMLFileLoader(emptyString));
+  // std::string emptyString = "";
+  // ASSERT_ANY_THROW(xmlFile = XMLFileLoader(emptyString));
 
-  std::string missingFile = "thisFileShouldNotExist.xml";
-  ASSERT_ANY_THROW(xmlFile = XMLFileLoader(missingFile));
+  // std::string missingFile = "thisFileShouldNotExist.xml";
+  // ASSERT_ANY_THROW(xmlFile = XMLFileLoader(missingFile));
 
-  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile1));
-
-}
-
-TEST_F(XMLFileLoaderTests, ValidateFile) {
-
-  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile1));
-  ASSERT_ANY_THROW(xmlFile.validate_file("thisSchemaDoseNotExist"));
-  ASSERT_ANY_THROW(xmlFile.validate_file(XMLFileLoader::main_schema_));
-
-  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile2));
-  ASSERT_ANY_THROW(xmlFile.validate_file(XMLFileLoader::main_schema_));
-
-  ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile3));
-  ASSERT_NO_THROW(xmlFile.validate_file(XMLFileLoader::main_schema_));
-
-}
-
-TEST_F(XMLFileLoaderTests, LoadCatalog) {
-
-}
-
-TEST_F(XMLFileLoaderTests, LoadFacilities ) {
-
-}
-
-TEST_F(XMLFileLoaderTests, LoadRecipes ) {
-
-}
-
-TEST_F(XMLFileLoaderTests, LoadAllModels ) {
-
-}
-
-TEST_F(XMLFileLoaderTests, LoadParams ) {
+  // ASSERT_NO_THROW(xmlFile = XMLFileLoader(testFile1));
 
 }
 

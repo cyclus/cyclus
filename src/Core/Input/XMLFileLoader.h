@@ -3,9 +3,11 @@
 #define _XMLFILELOADER_H
 
 #include <map>
-
-// forward declarations
-class QueryEngine;
+#include <set>
+#include <string>
+#include <sstream>
+#include <boost/shared_ptr.hpp>
+#include "XMLParser.h"
 
 /**
    a class that encapsulates the methods needed to load input to
@@ -25,12 +27,6 @@ class XMLFileLoader {
   */
   XMLFileLoader(std::string load_filename);
   
-  /**
-     method to allow for RNG validation of an open file using
-     @param schema_file The filename of the schema to use for validation
-  */
-  void validate_file(std::string schema_file);
-
   /**
      Method to load the simulation control parameters.
   */
@@ -59,6 +55,14 @@ class XMLFileLoader {
   void initialize_module_paths();
 
   /**
+     loads a file into a stringstream
+     @param stream the stream to load the file into
+     @param file the file name
+   */
+  void loadStringstreamFromFile(std::stringstream &stream,
+                                std::string file);
+
+  /**
      dynamically load a set of modules
      @param type the type of module to load
      @param query_path the path to the set of module nodes
@@ -66,11 +70,8 @@ class XMLFileLoader {
   void load_modules_of_type(std::string type, std::string query_path);
 
  private:
-  /// the name of the input file
-  std::string filename_;
-
-  /// the main document entry point
-  //  xmlDocPtr doc_;
+  /// the parser
+  boost::shared_ptr<XMLParser> parser_;
 };
 
 

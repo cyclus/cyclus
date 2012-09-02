@@ -1,46 +1,46 @@
 // XMLFileLoader.cpp
 // Implements file reader for an XML format
-#include <iostream>
-#include <string>
-#include <sys/stat.h>
-#include <set>
-#include <string>
-
-#include "QueryEngine.h"
 #include "XMLFileLoader.h"
+
+#include <fstream>
+
 #include "XMLQueryEngine.h"
 
 #include "Env.h"
 #include "Timer.h"
 #include "RecipeLibrary.h"
 #include "Model.h"
-
-#include "Env.h"
 #include "CycException.h"
-#include "Logger.h"
 
 using namespace std;
+using namespace boost;
 
 // static members
 std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(std::string load_filename) {
+  initialize_module_paths();
 
-  // // double check that the file exists
-  // if("" == load_filename) {
-  //   throw CycIOException("No input filename was given");
-  // } else { 
-  //   FILE* file = fopen(load_filename.c_str(),"r");
-  //   if (NULL == file) { 
-  //     throw CycIOException("The file '" + load_filename
-  //          + "' cannot be loaded because it has not been found.");
-  //   }
-  //   fclose(file);
-  // }
+  stringstream input("");
+  stringstream schema("");
+  loadStringstreamFromFile(input,load_filename);
+  loadStringstreamFromFile(schema,main_schema_);
+  parser_ = shared_ptr<XMLParser>(new XMLParser(input,schema));
+}
 
-  // filename_ = load_filename;
-  // initialize_module_paths();
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
+                                             std::string file) {
+  ifstream file_stream(file.c_str());
+
+  if (file_stream) {
+    stream << file_stream.rdbuf();
+    file_stream.close();
+  } else {
+    throw CycIOException("The file '" + file
+                         + "' could not be loaded.");
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,59 +52,45 @@ void XMLFileLoader::initialize_module_paths() {
   module_paths_["Facility"] = "/*/facility";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::validate_file(std::string schema_file) {
-  // if (NULL == doc_) {
-  //   throw CycParseException("Failed to parse: " + filename_);
-  // }
-
-  // if (xmlRelaxNGValidateDoc(vctxt,doc_))
-  //   throw CycParseException("Invalid XML file; file: "    
-  //     + filename_ 
-  //     + " does not validate against schema " 
-  //     + schema_file);
-
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLFileLoader::load_recipes() {
-  // XMLQueryEngine xqe(doc_);
+  XMLQueryEngine xqe(*parser_);
 
-  // string query = "/*/recipe";
-  // int numRecipes = xqe.nElementsMatchingQuery(query);
-  // for (int i=0; i<numRecipes; i++) {
-  //   QueryEngine* qe = xqe.queryElement(query,i);
-  //   RecipeLibrary::load_recipe(qe);
-  // }
+  string query = "/*/recipe";
+  int numRecipes = xqe.nElementsMatchingQuery(query);
+  for (int i=0; i<numRecipes; i++) {
+    QueryEngine* qe = xqe.queryElement(query,i);
+    RecipeLibrary::load_recipe(qe);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
-  // set<string>::iterator it;
-  // for (it = module_types.begin(); it != module_types.end(); it++) {
-  //   load_modules_of_type(*it,module_paths_[*it]);
-  // }
+  set<string>::iterator it;
+  for (it = module_types.begin(); it != module_types.end(); it++) {
+    load_modules_of_type(*it,module_paths_[*it]);
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_modules_of_type(std::string type, 
                                          std::string query_path) {  
-  // XMLQueryEngine xqe(doc_);
+  XMLQueryEngine xqe(*parser_);
   
-  // int numModels = xqe.nElementsMatchingQuery(query_path);
-  // for (int i=0; i<numModels; i++) {
-  //   QueryEngine* qe = xqe.queryElement(query_path,i);
-  //   Model::initializeSimulationEntity(type,qe);
-  // }
+  int numModels = xqe.nElementsMatchingQuery(query_path);
+  for (int i=0; i<numModels; i++) {
+    QueryEngine* qe = xqe.queryElement(query_path,i);
+    Model::initializeSimulationEntity(type,qe);
+  }
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_control_parameters() {
-  // XMLQueryEngine xqe(doc_);
+  XMLQueryEngine xqe(*parser_);
 
-  // string query = "/*/control";
-  // QueryEngine* qe = xqe.queryElement(query);
-  // TI->load_simulation(qe);
+  string query = "/*/control";
+  QueryEngine* qe = xqe.queryElement(query);
+  TI->load_simulation(qe);
 }
   
