@@ -33,6 +33,12 @@ class XMLParser {
      @return the parser's document
    */
   xmlpp::Document* document();
+
+  /**
+     validates the file agaisnt a schema, if requested
+     @param xml_schema_snippet snippet of xml schema
+   */
+  void validateFileAgaisntSchema(std::stringstream& xml_schema_snippet);
   
  private:
   /// file parser
@@ -43,12 +49,6 @@ class XMLParser {
      @param xml_input_snippet the xml snippet
    */
   void initParser(std::stringstream& xml_input_snippet);
-
-  /**
-     validates the file agaisnt a schema, if requested
-     @param xml_schema_snippet snippet of xml schema
-   */
-  void validateFileAgaisntSchema(std::stringstream& xml_schema_snippet);
 };
 
 #include "CycException.h"

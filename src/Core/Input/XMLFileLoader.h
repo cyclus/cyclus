@@ -17,16 +17,21 @@ class XMLFileLoader {
  public:
   /// the schema to validate the file against
   static std::string main_schema_;
-  
-  /// empty constructor 
-  XMLFileLoader() {};
-  
+    
   /**
      Constructor to create a new XML for loading
      @param load_filename The filename for the file to be loaded
+     @param use_main_schema whether or not to use the main schema to 
+     validate the file
   */
-  XMLFileLoader(std::string load_filename);
+  XMLFileLoader(std::string load_filename, bool use_main_schema=true);
   
+  /**
+     applies a schema agaisnt the parser used by the file loader
+     @param schema the schema representation
+   */
+  void applySchema(std::stringstream &schema);
+
   /**
      Method to load the simulation control parameters.
   */
@@ -43,6 +48,13 @@ class XMLFileLoader {
      @params module_types the set of all types of modules
   */
   void load_dynamic_modules(std::set<std::string>& module_types);
+
+  /**
+     dynamically load a set of modules
+     @param type the type of module to load
+     @param query_path the path to the set of module nodes
+   */
+  void load_modules_of_type(std::string type, std::string query_path);
   
  protected:
   /// a map of module types to their paths in xml
@@ -61,13 +73,6 @@ class XMLFileLoader {
    */
   void loadStringstreamFromFile(std::stringstream &stream,
                                 std::string file);
-
-  /**
-     dynamically load a set of modules
-     @param type the type of module to load
-     @param query_path the path to the set of module nodes
-   */
-  void load_modules_of_type(std::string type, std::string query_path);
 
  private:
   /// the parser

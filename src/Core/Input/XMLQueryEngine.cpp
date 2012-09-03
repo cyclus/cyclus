@@ -45,6 +45,10 @@ std::string XMLQueryEngine::getElementContent(std::string query,
                                               int index) {
   const NodeSet nodeset = current_node_->find(query);
 
+  if (nodeset.empty())
+    throw CycNullQueryException("Could not find a node by the name: " 
+                                + query);
+
   if (nodeset.size() < index+1)
     throw CycIndexException("Index exceeds number of nodes in query: " 
                             + query);

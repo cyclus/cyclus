@@ -14,7 +14,6 @@
 class XMLFileLoaderTests : public ::testing::Test {
 
  private:
-  static std::string testFile1Contents, testFile2Contents, testFile3Contents;
 
   void createTestInputFile(std::string fname, std::string contents) {
     std::ofstream outFile(fname.c_str());
@@ -23,24 +22,29 @@ class XMLFileLoaderTests : public ::testing::Test {
   }
 
  public:
-  std::string testFile1, testFile2, testFile3;
-  XMLFileLoader xmlFile;
+  static std::string controlSequence, falseSequence, moduleSequence, recipeSequence;
+  std::string controlFile, falseFile, moduleFile, recipeFile;
+  XMLFileLoader* xmlFile;
 
   virtual void SetUp() {
-    testFile1 = "simpleXMLFile.xml";
-    createTestInputFile(testFile1,testFile1Contents);
+    falseFile = "false.xml";
+    createTestInputFile(falseFile,falseSequence);
 
-    testFile2 = "notAnXMLFile.txt";
-    createTestInputFile(testFile2,testFile2Contents);
+    controlFile = "control.xml";
+    createTestInputFile(controlFile,controlSequence);
 
-    testFile3 = "validCyclusTestInput.xml";
-    createTestInputFile(testFile3,testFile3Contents);
+    recipeFile = "recipes.xml";
+    createTestInputFile(recipeFile,recipeSequence);
+
+    moduleFile = "modules.xml";
+    createTestInputFile(moduleFile,moduleSequence);
   };
 
   virtual void TearDown() {
-    unlink(testFile1.c_str());
-    unlink(testFile2.c_str());
-    unlink(testFile3.c_str());
+    unlink(falseFile.c_str());
+    unlink(controlFile.c_str());
+    unlink(recipeFile.c_str());
+    unlink(moduleFile.c_str());
   };
 
 

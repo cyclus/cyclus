@@ -19,14 +19,19 @@ using namespace boost;
 std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(std::string load_filename) {
+XMLFileLoader::XMLFileLoader(std::string load_filename, 
+                             bool use_main_schema) {
   initialize_module_paths();
 
   stringstream input("");
-  stringstream schema("");
   loadStringstreamFromFile(input,load_filename);
-  loadStringstreamFromFile(schema,main_schema_);
-  parser_ = shared_ptr<XMLParser>(new XMLParser(input,schema));
+  if (use_main_schema) {
+    stringstream schema("");
+    loadStringstreamFromFile(schema,main_schema_);
+    parser_ = shared_ptr<XMLParser>(new XMLParser(input,schema));
+  } else {
+    parser_ = shared_ptr<XMLParser>(new XMLParser(input));
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,11 +49,16 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::applySchema(std::stringstream &schema) {
+  parser_->validateFileAgaisntSchema(schema);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::initialize_module_paths() {
   module_paths_["Market"] = "/*/market";
   module_paths_["Converter"] = "/*/converter";
-  module_paths_["Region"] = "/simulation/region";
-  module_paths_["Inst"] = "/simulation/region/institution";
+  module_paths_["Region"] = "/*/region";
+  module_paths_["Inst"] = "/*/region/institution";
   module_paths_["Facility"] = "/*/facility";
 }
 
@@ -83,7 +93,6 @@ void XMLFileLoader::load_modules_of_type(std::string type,
     Model::initializeSimulationEntity(type,qe);
   }
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_control_parameters() {
