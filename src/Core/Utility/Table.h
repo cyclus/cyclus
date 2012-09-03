@@ -6,7 +6,7 @@
 #include <vector>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/spirit/home/support/detail/hold_any.hpp>
-
+#include <boost/shared_ptr.hpp>
 #include "IntrusiveBase.h"
 
 // Useful Typedefs

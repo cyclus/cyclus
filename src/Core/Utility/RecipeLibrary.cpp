@@ -20,7 +20,7 @@ RecipeMap RecipeLibrary::recipes_;
 DecayHistMap RecipeLibrary::decay_hist_;
 DecayTimesMap RecipeLibrary::decay_times_;
 // initialize table member
-table_ptr RecipeLibrary::iso_table = new Table("IsotopicStates"); 
+table_ptr RecipeLibrary::iso_table = table_ptr(new Table("IsotopicStates")); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 RecipeLibrary* RecipeLibrary::Instance() {

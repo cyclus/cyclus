@@ -238,7 +238,7 @@ void Timer::load_simulation(QueryEngine *qe) {
   dur_str = qe->getElementContent("duration");
   dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month
-  m0_str = qe->getElementContent("startMonth");
+  m0_str = qe->getElementContent("startmonth");
   m0 = strtol(m0_str.c_str(), NULL, 10);
   // get start year
   y0_str = qe->getElementContent("startyear");

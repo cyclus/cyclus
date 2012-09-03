@@ -26,7 +26,7 @@ using namespace std;
 
 // static members
 int Model::next_id_ = 0;
-table_ptr Model::agent_table = new Table("Agents"); 
+table_ptr Model::agent_table = table_ptr(new Table("Agents")); 
 vector<Model*> Model::model_list_;
 map<string,mdl_ctor*> Model::loaded_modules_;
 set<Model*> Model::regions_;
@@ -37,7 +37,7 @@ std::set<std::string> Model::dynamic_module_types() {
   types.insert("Market");
   types.insert("Converter");
   types.insert("Region");
-  types.insert("Institution");
+  types.insert("Inst");
   types.insert("Facility");
   return types;
 }
@@ -80,8 +80,10 @@ Model* Model::getEntityViaConstructor(std::string model_type,
                                       std::string module) {
   mdl_ctor* module_constructor; 
   // if it hasn't been loaded, load the module and register it
-  if (loaded_modules_.find(module) == loaded_modules_.end()) { 
-    module_constructor = loadConstructor(model_type,module);
+  if (loaded_modules_.find(module) == loaded_modules_.end()) {
+    /* --- */
+    module_constructor = loadConstructor(model_type,module); // this line
+    /* --- */
     loaded_modules_.insert(make_pair(module,module_constructor));
   }
   // else return the registered module
@@ -99,7 +101,9 @@ void Model::initializeSimulationEntity(std::string model_type,
   string module = module_data->getElementName();
 
   // instantiate & init module
-  Model* model = getEntityViaConstructor(model_type,module);
+  /* --- */
+  Model* model = getEntityViaConstructor(model_type,module); // this line
+  /* --- */
   model->initCoreMembers(qe);
   model->setModelImpl(module);
   model->initModuleMembers(module_data->queryElement(module));
@@ -107,7 +111,7 @@ void Model::initializeSimulationEntity(std::string model_type,
   // register module
   if ("Facility" == model_type) {
     Prototype::registerPrototype(model->name(),
-				 dynamic_cast<Prototype*>(model));
+        			 dynamic_cast<Prototype*>(model));
   } else {
     model_list_.push_back(model);
   }

@@ -7,7 +7,7 @@
 #include "Logger.h"
 
 bool GenericResource::type_is_recorded_ = false;
-table_ptr GenericResource::genres_table = new Table("GenericResources"); 
+table_ptr GenericResource::genres_table = table_ptr(new Table("GenericResources")); 
 
 using namespace std;
 
