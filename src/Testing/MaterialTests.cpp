@@ -179,6 +179,7 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
   EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -193,5 +194,6 @@ TEST_F(MaterialTest, Extract) {
   EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
   EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
 
-  // ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
+  EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
 }
+
