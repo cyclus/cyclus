@@ -86,7 +86,7 @@ mat_rsrc_ptr Material::extract(double mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const IsoVector& other) {
-  // get the extraction paramters
+  // get the extraction parameters
   double fraction = iso_vector_.intersectionFraction(other);
   double amt = quantity_ * fraction;
 
