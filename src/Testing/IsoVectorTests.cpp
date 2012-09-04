@@ -9,7 +9,6 @@
 TEST_F(IsoVectorTests,default_constructor) {
   CompMapPtr zero_comp = CompMapPtr(new CompMap(MASS));
   EXPECT_TRUE(zero_vec.compEquals(zero_comp));
-  EXPECT_THROW(zero_vec.normalize(), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
