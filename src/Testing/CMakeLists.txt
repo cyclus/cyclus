@@ -16,6 +16,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MassTableTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
