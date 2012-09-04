@@ -55,7 +55,8 @@ void MassTable::initializeSQL() {
   for (int i = 0; i < nResults; i++){
     // // obtain the database row and declare the appropriate members
     query_row row = result.at(i);
-    string Zstr = row.at(0), Astr = row.at(1), Mstr = row.at(2);
+    // note transposition, mislabeled columns
+    string Zstr = row.at(1), Astr = row.at(0), Mstr = row.at(2); 
     int Znum = atoi( Zstr.c_str() );
     int Anum = atoi( Astr.c_str() );
     double mass = atof( Mstr.c_str() );
@@ -63,7 +64,7 @@ void MassTable::initializeSQL() {
     nuclide_t n = {Znum,Anum,mass};
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
-    int tope = Znum*1000 + Anum;
+    int tope = Anum*1000 + Znum;
     isoIndex_.insert(make_pair(tope,i));
   }
   // set the total number of nuclides
