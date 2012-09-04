@@ -109,7 +109,7 @@ void FacilityModel::handleDailyTasks(int time, int day){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
-  delete this;
+  delete this; // @MJG-NOT THIS
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

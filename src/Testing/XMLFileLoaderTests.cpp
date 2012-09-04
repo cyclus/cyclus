@@ -8,7 +8,7 @@
 using namespace std;
 
 TEST_F(XMLFileLoaderTests, OpenFile) {
-  ASSERT_ANY_THROW(xmlFile = new XMLFileLoader(falseFile, false); delete xmlFile;);
+  ASSERT_ANY_THROW(xmlFile = new XMLFileLoader(falseFile,false); delete xmlFile;);
   ASSERT_NO_THROW(xmlFile = new XMLFileLoader(controlFile,false); delete xmlFile;);
 }
 
@@ -29,6 +29,7 @@ TEST_F(XMLFileLoaderTests,modules) {
   set<string> module_types = Model::dynamic_module_types();
   //EXPECT_NO_THROW();
   //xmlFile->load_modules_of_type("Market","/*/market");
+  Model::closeDynamicLibraries();
   //  xmlFile->load_dynamic_modules(module_types);
   delete xmlFile;
 }

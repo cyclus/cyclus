@@ -28,14 +28,25 @@ mdl_ctor* Model::loadConstructor(std::string model_type, std::string model_name)
     err_msg += dlerror();
     throw CycIOException(err_msg);
   }
-  
+
+  dynamic_libraries_.push_back(model);
+
   new_model = (mdl_ctor*) dlsym(model, construct_fname.c_str() );
   if (!new_model) {
     std::string err_msg = "Unable to load model constructor: ";
     err_msg += dlerror();
     throw CycIOException(err_msg);
   }
- 
+  
   return new_model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::closeDynamicLibraries() {
+  while (!dynamic_libraries_.empty()) {
+    void* lib = dynamic_libraries_.back();
+    dlclose(lib);
+    dynamic_libraries_.pop_back();
+  }
 }
 #endif

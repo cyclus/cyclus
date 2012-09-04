@@ -29,6 +29,7 @@ int Model::next_id_ = 0;
 table_ptr Model::agent_table = table_ptr(new Table("Agents")); 
 vector<Model*> Model::model_list_;
 map<string,mdl_ctor*> Model::loaded_modules_;
+vector<void*> Model::dynamic_libraries_;
 set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -179,7 +180,7 @@ Model::~Model() {
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->ID() << " {";
-    delete child;
+    delete child; // @MJG-NOT THIS
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";

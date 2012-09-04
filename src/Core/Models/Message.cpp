@@ -54,7 +54,7 @@ Message::Message(Communicator* sender, Communicator* receiver,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::~Message() {
   if (trans_ != NULL) {
-    delete trans_;
+    delete trans_; // @MJG-NOT THIS
   }
   MLOG(LEV_DEBUG4) << "Message " << this << " deleted.";
 }

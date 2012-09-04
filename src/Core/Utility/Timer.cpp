@@ -51,7 +51,7 @@ void Timer::runSim() {
     try {
       model->parent();
     } catch (CycIndexException err) {
-      delete model;
+      delete model; // @MJG-NOT THIS
       count = 0;
       continue;
     }

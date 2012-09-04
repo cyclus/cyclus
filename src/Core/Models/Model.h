@@ -86,6 +86,11 @@ class Model {
   static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
 
   /**
+     close all dynamic libraries
+   */
+  static void closeDynamicLibraries();
+
+  /**
      provides a constructed simulation entity
      @param model_type the type of entity
      @param module the name of the module
@@ -287,6 +292,11 @@ class Model {
      registered with this map when loaded.
    */
   static std::map<std::string,mdl_ctor*> loaded_modules_;
+
+  /**
+     the set of loaded dynamic libraries
+   */
+  static std::vector<void*> dynamic_libraries_;
 
   /**
      a set of registered regions
