@@ -188,11 +188,13 @@ TEST_F(MaterialTest, Extract) {
   ASSERT_NO_THROW(m1 = test_mat_->extract(test_comp_));
   EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
   EXPECT_FLOAT_EQ(m1->quantity(), test_size_ );
+  EXPECT_TRUE(m1->isoVector().compEquals(test_comp_));
 
   mat_rsrc_ptr m2;
   ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
   EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
   EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
+  EXPECT_TRUE(m2->isoVector().compEquals(test_comp_));
 
   EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
 }
