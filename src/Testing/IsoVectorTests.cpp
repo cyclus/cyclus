@@ -44,7 +44,7 @@ TEST_F(IsoVectorTests,mixing) {
 TEST_F(IsoVectorTests,mixing_zero_vector) { 
   LoadMaps();
   EXPECT_NO_THROW(zero_vec.mix(to_add_vec, .1)); // should just ignore ratio
-  EXPECT_EQ(zero_vec, to_add_vec); // the resulting vector is the added vector
+  EXPECT_TRUE(zero_vec.compEquals(to_add_vec)); // the resulting vector is the added vector
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
