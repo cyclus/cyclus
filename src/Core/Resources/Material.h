@@ -99,6 +99,37 @@ public:
      default destructor 
    */
   ~Material() {};
+
+  /**
+     assignment operator
+    */
+  Material& operator=(Material rhs);
+
+  /** 
+     assignment operator
+    */
+  mat_rsrc_ptr operator=(mat_rsrc_ptr rhs);
+
+  /**
+     adds two materials
+    */
+  mat_rsrc_ptr operator+=(mat_rsrc_ptr rhs);
+
+  /**
+     adds two materials
+     */
+  Material& operator+=(Material& rhs);
+
+  /**
+     subtracts two materials
+     */
+  mat_rsrc_ptr operator-=(const mat_rsrc_ptr rhs);
+
+  /**
+     subtracts two materials
+    */
+  Material& operator-=(const Material& rhs);
+
   
   /**
      standard verbose printer includes both an 
