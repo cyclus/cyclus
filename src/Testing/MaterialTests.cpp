@@ -201,9 +201,10 @@ TEST_F(MaterialTest, ExtractMass) {
 TEST_F(MaterialTest, Extract) {
   mat_rsrc_ptr m1;
   ASSERT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
+  // the comp is automatically normalized
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
-  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
 
   mat_rsrc_ptr m2;
   ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));

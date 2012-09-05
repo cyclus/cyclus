@@ -27,6 +27,8 @@ class MaterialTest : public ::testing::Test {
       th228_ = 90228;
       pb208_ = 82208;
       one_g_ = 1.0;
+      test_size_ = 10.0;
+      fraction = 2.0 / 3.0;
 
       // composition creation
       test_comp_ = CompMapPtr(new CompMap(MASS));
@@ -37,7 +39,7 @@ class MaterialTest : public ::testing::Test {
       (*two_test_comp_)[u235_]=2*one_g_;
 
       non_norm_test_comp_ = CompMapPtr(new CompMap(MASS));
-      (*two_test_comp_)[u235_]=test_size_*one_g_;
+      (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
 
       diff_comp_ = CompMapPtr(new CompMap(MASS));
       (*diff_comp_)[u235_]=one_g_;
@@ -45,9 +47,6 @@ class MaterialTest : public ::testing::Test {
       (*diff_comp_)[am241_]=one_g_;
       (*diff_comp_).normalize();
 
-      test_size_ = 10.0;
-      fraction = 2.0 / 3.0;
-      
 
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
