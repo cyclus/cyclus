@@ -24,9 +24,9 @@ TEST_F(IsoVectorTests,constructors) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,addition) {
   LoadMaps();
-  EXPECT_NO_THROW(orig_vec += vec_to_add);
-  EXPECT_TRUE(orig_vec.compEquals(*add_result));
-  for (CompMap::iterator it = orig_vec.comp()->begin(); it != orig_vec.comp()->end(); it++) {
+  EXPECT_NO_THROW(add_to_vec += to_add_vec);
+  EXPECT_TRUE(add_to_vec.compEquals(*add_result));
+  for (CompMap::iterator it = add_to_vec.comp()->begin(); it != add_to_vec.comp()->end(); it++) {
     EXPECT_DOUBLE_EQ((*add_result)[it->first],it->second);
   }
 }
@@ -34,25 +34,25 @@ TEST_F(IsoVectorTests,addition) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,mixing) {
   LoadMaps();
-  EXPECT_NO_THROW(orig_vec.mix(vec_to_add,ratio));
-  EXPECT_TRUE(orig_vec.compEquals(*mix_result));
-  EXPECT_THROW(orig_vec.mix(vec_to_add,-1),CycRangeException);
-  EXPECT_NO_THROW(orig_vec.mix(vec_to_add,0)); // corner
+  EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,ratio));
+  EXPECT_TRUE(add_to_vec.compEquals(*mix_result));
+  EXPECT_THROW(add_to_vec.mix(to_add_vec,-1),CycRangeException);
+  EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,0)); // corner
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,mixing_zero_vector) { 
   LoadMaps();
-  EXPECT_NO_THROW(zero_vec.mix(vec_to_add, .1)); // should just ignore ratio
-  EXPECT_TRUE(zero_vec.compEquals(vec_to_add)); // the resulting vector is the added vector
+  EXPECT_NO_THROW(zero_vec.mix(to_add_vec, .1)); // should just ignore ratio
+  EXPECT_TRUE(zero_vec.compEquals(to_add_vec)); // the resulting vector is the added vector
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,intersection_fraction) {
   LoadMaps();
-  orig_vec += vec_to_add;
+  add_to_vec += to_add_vec;
   double amt;
-  EXPECT_NO_THROW(amt = orig_vec.intersectionFraction(vec_to_add));
+  EXPECT_NO_THROW(amt = add_to_vec.intersectionFraction(to_add_vec));
   EXPECT_DOUBLE_EQ(amt,0.5);
 }
 

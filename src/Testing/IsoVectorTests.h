@@ -11,7 +11,7 @@ protected:
   std::vector<int> isotopes;
   double ratio;
   CompMapPtr add_result, mix_result;
-  IsoVector orig_vec, vec_to_add;
+  IsoVector add_to_vec, to_add_vec;
   double efficiency;
   CompMapPtr subtract_result, separate_result;
   IsoVector subtract_from_vec, to_subtract_vec;
@@ -32,12 +32,12 @@ protected:
     
     // add, mix terms
     ratio = 2;
-    CompMapPtr comp_to_add = CompMapPtr(new CompMap(MASS));
-    (*comp_to_add)[isotopes.at(isotopes.size()-1)] = 1;
-    vec_to_add = IsoVector(comp_to_add);
-    CompMapPtr orig_comp = CompMapPtr(new CompMap(MASS));
-    (*orig_comp)[isotopes.at(0)] = 1;
-    orig_vec = IsoVector(orig_comp);
+    CompMapPtr to_add = CompMapPtr(new CompMap(MASS));
+    (*to_add)[isotopes.at(isotopes.size()-1)] = 1;
+    to_add_vec = IsoVector(to_add);
+    CompMapPtr add_to = CompMapPtr(new CompMap(MASS));
+    (*add_to)[isotopes.at(0)] = 1;
+    add_to_vec = IsoVector(add_to);
     // add, mix results
     add_result = CompMapPtr(new CompMap(MASS));
     (*add_result)[isotopes.at(0)] = 1;
@@ -51,9 +51,9 @@ protected:
     // subtract, separate terms
     efficiency = 0.9;
     subtract_from_vec = IsoVector(add_result);
-    to_subtract_vec = IsoVector(comp_to_add);
+    to_subtract_vec = IsoVector(to_add);
     // subtract, separate results
-    subtract_result = orig_comp;
+    subtract_result = add_to;
     separate_result = CompMapPtr(new CompMap(MASS));
     (*separate_result)[isotopes.at(0)] = 1;
     (*separate_result)[isotopes.at(isotopes.size()-1)] = 1-efficiency;
