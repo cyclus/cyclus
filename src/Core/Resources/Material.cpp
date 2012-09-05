@@ -89,15 +89,15 @@ mat_rsrc_ptr Material::extract(const CompMapPtr other) {
   
   CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
   CompMapPtr remove_comp = other;
-  double remainder_kg, new_kg, diff_kg;
+  double remainder_kg, new_kg;
+  remainder_kg = this->quantity();
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     if ( this->mass(it->first) >= it->second ) {
-      diff_kg = this->mass(it->first) - it->second;
-      (*new_comp)[it->first] = diff_kg;
-      remainder_kg += diff_kg;
+      (*new_comp)[it->first] = this->mass(it->first) - it->second;
       new_kg += it->second;
+      remainder_kg -= it->second;
     } else {
     stringstream ss("");
     ss << "The Material " << this->ID() 

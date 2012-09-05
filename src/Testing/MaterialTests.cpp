@@ -200,20 +200,30 @@ TEST_F(MaterialTest, ExtractMass) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract) {
   mat_rsrc_ptr m1;
-  ASSERT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
-  // the comp is automatically normalized
+  EXPECT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
   EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 
   mat_rsrc_ptr m2;
-  ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
-  EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
-  EXPECT_TRUE(m2->isoVector().compEquals(non_norm_test_comp_));
-
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  (*two_test_comp_)[u235_]=2*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  ASSERT_FALSE( two_test_comp_->normalized());
+  EXPECT_THROW( m2 = diff_mat_->extract(non_norm_test_comp_), CycNegativeValueException);
   EXPECT_THROW(test_mat_->extract(two_test_comp_), CycException);
 
+  mat_rsrc_ptr m3;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m3 = two_test_mat_->extract(non_norm_test_comp_));
+  EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
+
+  mat_rsrc_ptr m4;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m4 = diff_mat_->extract( test_comp_));
+  EXPECT_FLOAT_EQ( test_size_ - m4->quantity(), diff_mat_->quantity() );
 
 }
 

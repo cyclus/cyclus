@@ -36,7 +36,7 @@ class MaterialTest : public ::testing::Test {
       (*test_comp_).normalize();
 
       two_test_comp_ = CompMapPtr(new CompMap(MASS));
-      (*two_test_comp_)[u235_]=2*one_g_;
+      (*two_test_comp_)[u235_]=one_g_;
 
       non_norm_test_comp_ = CompMapPtr(new CompMap(MASS));
       (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
