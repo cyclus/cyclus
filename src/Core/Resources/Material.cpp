@@ -170,7 +170,14 @@ double Material::mass(Iso tope, MassUnit unit) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::mass(Iso tope){
-  return(isoVector().comp()->massFraction(tope)*mass(KG));
+  double to_ret;
+  CompMapPtr the_comp = isoVector().comp();
+  if(the_comp->count(tope) != 0) {
+    to_ret = the_comp->massFraction(tope)*mass(KG);
+  } else {
+    to_ret = 0;
+  }
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

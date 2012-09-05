@@ -68,6 +68,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   // you should be able to get the mass per isotope
   EXPECT_NO_THROW(test_mat_->mass(u235_));
   ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
+  ASSERT_FLOAT_EQ(test_mat_->mass(am241_), 0);
 
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
@@ -196,7 +197,7 @@ TEST_F(MaterialTest, Extract) {
   EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
   EXPECT_TRUE(m2->isoVector().compEquals(test_comp_));
 
-  EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
+  //EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
 
 
 }
