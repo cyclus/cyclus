@@ -14,6 +14,7 @@ class MaterialTest : public ::testing::Test {
     CompMapPtr test_comp_, diff_comp_;
     double test_size_, fraction;
     mat_rsrc_ptr test_mat_;
+    mat_rsrc_ptr two_test_mat_;
     mat_rsrc_ptr diff_mat_;
     long int u235_halflife_;
     int th228_halflife_;
@@ -45,6 +46,8 @@ class MaterialTest : public ::testing::Test {
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
       test_mat_->setQuantity(test_size_);
+      two_test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
+      two_test_mat_->setQuantity(2*test_size_);
       diff_mat_ = mat_rsrc_ptr(new Material(diff_comp_));
       diff_mat_->setQuantity(test_size_);
 

@@ -63,6 +63,13 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
+  if(quantity_ < mass){
+    string err = "The mass ";
+    err += mass;
+    err += " cannot be extracted from Material with ID ";
+    err += ID_; 
+    throw CycNegativeValueException(err);
+  }
   // remove our mass
   quantity_ -= mass;
   // make a new material, set its mass
@@ -79,20 +86,20 @@ mat_rsrc_ptr Material::extract(double mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const IsoVector& other) {
-  // get the extraction paramters
+  // get the extraction parameters
   double fraction = iso_vector_.intersectionFraction(other);
   double amt = quantity_ * fraction;
-  IsoVector vec = iso_vector_ - other; // @MJG_FLAG previous bevaior was isovector -= other..
 
-  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
   // make new material
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(vec));
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(other));
   new_mat->setQuantity(amt);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
   iso_vector_ -= other; // matching previous behavior
   quantity_ -= amt;
+
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
 
   return new_mat;
 }
