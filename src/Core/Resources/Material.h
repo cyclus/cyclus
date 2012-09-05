@@ -101,37 +101,6 @@ public:
   ~Material() {};
 
   /**
-     assignment operator
-    */
-  Material& operator=(Material rhs);
-
-  /** 
-     assignment operator
-    */
-  mat_rsrc_ptr operator=(mat_rsrc_ptr rhs);
-
-  /**
-     adds two materials
-    */
-  mat_rsrc_ptr operator+=(mat_rsrc_ptr rhs);
-
-  /**
-     adds two materials
-     */
-  Material& operator+=(Material& rhs);
-
-  /**
-     subtracts two materials
-     */
-  mat_rsrc_ptr operator-=(const mat_rsrc_ptr rhs);
-
-  /**
-     subtracts two materials
-    */
-  Material& operator-=(const Material& rhs);
-
-  
-  /**
      standard verbose printer includes both an 
      atom and mass composition output 
    */
@@ -258,7 +227,7 @@ public:
       
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const IsoVector& other);
+  virtual mat_rsrc_ptr extract(const CompMapPtr other);
 
   /**
      Extracts a specified mass from this material creating a new 

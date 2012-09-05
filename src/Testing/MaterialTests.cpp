@@ -197,5 +197,7 @@ TEST_F(MaterialTest, Extract) {
   EXPECT_TRUE(m2->isoVector().compEquals(test_comp_));
 
   EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
+
+
 }
 
