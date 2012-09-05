@@ -6,6 +6,7 @@ INCLUDE_DIRECTORIES ("${LIBXML2_INCLUDE_DIR}")
 # Add the core model files to the core source
 SET( CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/ConverterModel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/DynamicModule.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/FacilityModel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketModel.cpp
@@ -24,6 +25,7 @@ SET( TestSource ${ModelTestSource} PARENT_SCOPE )
 INSTALL(FILES 
   Communicator.h
   ConverterModel.h
+  DynamicModule.h
   FacilityModel.h
   InstModel.h
   MarketModel.h
