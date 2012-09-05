@@ -90,6 +90,7 @@ TEST_F(MaterialTest, CheckIsoAtoms){
   EXPECT_EQ(true, test_comp_->normalized());
   ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
   EXPECT_FLOAT_EQ(1000*test_size_/u235_g_per_mol_, test_mat_->moles(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->moles(am241_), 0);
 
   // a mat's total atoms should be the total of all the contained isotopes. 
   double total_atoms = 0;

@@ -172,6 +172,7 @@ double Material::mass(Iso tope, MassUnit unit) {
 double Material::mass(Iso tope){
   double to_ret;
   CompMapPtr the_comp = isoVector().comp();
+  the_comp->massify();
   if(the_comp->count(tope) != 0) {
     to_ret = the_comp->massFraction(tope)*mass(KG);
   } else {
@@ -220,8 +221,15 @@ double Material::moles(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::moles(Iso tope){
-  double atom_frac = isoVector().comp()->atomFraction(tope);
-  return moles()*atom_frac;
+  double to_ret;
+  CompMapPtr the_comp = isoVector().comp();
+  the_comp->atomify();
+  if(the_comp->count(tope) != 0) {
+    to_ret = moles()*isoVector().comp()->atomFraction(tope);
+  } else {
+    to_ret = 0;
+  }
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
