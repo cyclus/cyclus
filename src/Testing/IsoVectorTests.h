@@ -33,7 +33,7 @@ protected:
     // add, mix terms
     ratio = 2;
     CompMapPtr comp_to_add = CompMapPtr(new CompMap(MASS));
-    (*comp_to_add)[isotopes.at(isotopes.size()-1)] = 1;
+    (*comp_to_add)[isotopes.at(1)] = 1;
     vec_to_add = IsoVector(comp_to_add);
     CompMapPtr orig_comp = CompMapPtr(new CompMap(MASS));
     (*orig_comp)[isotopes.at(0)] = 1;
@@ -41,11 +41,11 @@ protected:
     // add, mix results
     add_result = CompMapPtr(new CompMap(MASS));
     (*add_result)[isotopes.at(0)] = 1;
-    (*add_result)[isotopes.at(isotopes.size()-1)] = 1;
+    (*add_result)[isotopes.at(1)] = 1;
     add_result->normalize();
     mix_result = CompMapPtr(new CompMap(MASS));
     (*mix_result)[isotopes.at(0)] = 1;
-    (*mix_result)[isotopes.at(isotopes.size()-1)] = 1*ratio;
+    (*mix_result)[isotopes.at(1)] = 1*ratio;
     mix_result->normalize();    
 
     // subtract, separate terms
@@ -56,7 +56,7 @@ protected:
     subtract_result = orig_comp;
     separate_result = CompMapPtr(new CompMap(MASS));
     (*separate_result)[isotopes.at(0)] = 1;
-    (*separate_result)[isotopes.at(isotopes.size()-1)] = 1-efficiency;
+    (*separate_result)[isotopes.at(1)] = 1-efficiency;
     separate_result->normalize();
   }
 };
