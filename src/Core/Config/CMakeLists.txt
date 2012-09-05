@@ -27,8 +27,8 @@ CONFIGURE_FILE(
   )
 
 INSTALL(FILES
-    UnixLoadConstr.h
-    WinLoadConstr.h
+    UnixHelperFunctions.h
+    WindowsHelperFunctions.h
     suffix.h
   DESTINATION cyclus/include
   COMPONENT core

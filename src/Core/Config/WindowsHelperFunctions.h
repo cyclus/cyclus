@@ -4,6 +4,8 @@
 #define WINDOWSHELPERFUNCTIONS_H
 
 #include <windows.h>
+
+#include "suffix.h"
 #include "CycException.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

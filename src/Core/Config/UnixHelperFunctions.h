@@ -4,6 +4,8 @@
 #define UNIXHELPERFUNCTIONS_H
 
 #include <dlfcn.h>
+
+#include "suffix.h"
 #include "CycException.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

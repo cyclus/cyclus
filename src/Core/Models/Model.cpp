@@ -20,8 +20,6 @@
 
 #include "RegionModel.h"
 
-#include DYNAMICLOADLIB
-
 using namespace std;
 
 // static members
@@ -83,9 +81,9 @@ Model* Model::getEntityViaConstructor(std::string model_type,
   // if it hasn't been loaded, load the module and register it
   if (loaded_modules_.find(module) == loaded_modules_.end()) {
     /* --- */
-    module_constructor = loadConstructor(model_type,module); // this line
+    //module_constructor = loadConstructor(model_type,module); // this line
     /* --- */
-    loaded_modules_.insert(make_pair(module,module_constructor));
+    //loaded_modules_.insert(make_pair(module,module_constructor));
   }
   // else return the registered module
   else {

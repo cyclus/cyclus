@@ -6,6 +6,8 @@
 #include "suffix.h"
 #include "Model.h"
 
+#include DYNAMICLOADLIB
+
 using namespace std;
 
 // static variables
