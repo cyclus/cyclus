@@ -8,8 +8,8 @@
 
 #include "Model.h"
 
+#include "DynamicModule.h"
 #include "Logger.h"
-#include "suffix.h"
 #include "CycException.h"
 #include "Env.h"
 #include "Timer.h"
@@ -21,12 +21,13 @@
 #include "RegionModel.h"
 
 using namespace std;
+using namespace boost;
 
 // static members
 int Model::next_id_ = 0;
 table_ptr Model::agent_table = table_ptr(new Table("Agents")); 
 vector<Model*> Model::model_list_;
-map<string,mdl_ctor*> Model::loaded_modules_;
+map< string, shared_ptr<DynamicModule> > Model::loaded_modules_;
 vector<void*> Model::dynamic_libraries_;
 set<Model*> Model::regions_;
 
@@ -75,37 +76,23 @@ vector<Model*> Model::getModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getEntityViaConstructor(std::string model_type,
-                                      std::string module) {
-  mdl_ctor* module_constructor; 
-  // if it hasn't been loaded, load the module and register it
-  if (loaded_modules_.find(module) == loaded_modules_.end()) {
-    /* --- */
-    //module_constructor = loadConstructor(model_type,module); // this line
-    /* --- */
-    //loaded_modules_.insert(make_pair(module,module_constructor));
-  }
-  // else return the registered module
-  else {
-    module_constructor = loaded_modules_[module];
-  }
-  return module_constructor();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::initializeSimulationEntity(std::string model_type, 
                                        QueryEngine* qe) {
   // query data
   QueryEngine* module_data = qe->queryElement("model");
-  string module = module_data->getElementName();
+  string module_name = module_data->getElementName();
 
   // instantiate & init module
   /* --- */
-  Model* model = getEntityViaConstructor(model_type,module); // this line
+  shared_ptr<DynamicModule> 
+    module(new DynamicModule(model_type,module_name)); 
+  loaded_modules_.insert(make_pair(module_name,module));
+
+  Model* model = module->constructInstance();
   /* --- */
   model->initCoreMembers(qe);
-  model->setModelImpl(module);
-  model->initModuleMembers(module_data->queryElement(module));
+  model->setModelImpl(module->name());
+  model->initModuleMembers(module_data->queryElement(module->name()));
 
   // register module
   if ("Facility" == model_type) {
@@ -178,10 +165,15 @@ Model::~Model() {
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->ID() << " {";
-    delete child; // @MJG-NOT THIS
+    deleteModel(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::deleteModel(Model* model){
+    loaded_modules_[model->modelImpl()]->destructInstance(model); // @MJG-NOT THIS
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

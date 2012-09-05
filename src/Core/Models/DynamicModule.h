@@ -12,18 +12,25 @@ typedef void destroy_t(Model*);
 class DynamicModule {
  public:
   /**
-     constructor; sets module_name_ and abs_path_
-     NOTE: all derived constructors must:
-     * call openLibrary()
-     * call setConstructor()
-     * call setDestructor()
+     constructor
+     sets:
+     * module_name_
+     * abs_path_
+     * constructor_name_
+     * destructor_name_
+     calls:
+     * openLibrary()
+     * setConstructor()
+     * setDestructor()
+     @param type the module type
+     @param name the name of the module
    */
   DynamicModule(std::string type, std::string name);
   
   /**
      destructor
-     NOTE: all inherited destructors must:
-     * call closeLibrary()
+     calls:
+     * closeLibrary()
    */
   virtual ~DynamicModule();
 
@@ -42,12 +49,18 @@ class DynamicModule {
   */
   void destructInstance(Model* model);
   
- protected:
+ private:
+  /// the path to the library
+  std::string abs_path_;
+  
+  /// the name of the module
+  std::string module_name_;
+
   /// the name of all module constructor functions
-  static std::string constructor_name;
+  std::string constructor_name_;
 
   /// the name of all module destructor functions
-  static std::string destructor_name;
+  std::string destructor_name_;
 
   /// the library to open and close
   void * module_library_;
@@ -62,37 +75,24 @@ class DynamicModule {
   std::string path();
 
   /**
-     all derived classes must define how to open the library and do
-     so during their constructor
-     openLibrary() must:
-     * set module_library_
+     opens the library
    */
-  virtual void openLibrary() = 0;
+  void openLibrary();
 
   /**
-     all derived classes must define how to set the constructor_ 
-     member and must do so during their constructor
+     sets the constructor member
    */
-  virtual void setConstructor() = 0;
+  void setConstructor();
 
   /**
-     all derived classes must define how to set the destructor_ 
-     member and must do so during their constructor
+     sets the destructor member
    */
-  virtual void setDestructor() = 0;
+  void setDestructor();
 
   /**
-     all derived classes must define how to close the library and
-     do so during their destructor
+     closes the library
    */
-  virtual void closeLibrary() = 0;
-
- private:
-  /// the path to the library
-  std::string abs_path_;
-  
-  /// the name of the module
-  std::string module_name_;
+  void closeLibrary();
 };
 
 #endif

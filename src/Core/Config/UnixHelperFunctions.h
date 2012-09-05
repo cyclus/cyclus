@@ -10,7 +10,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::openLibrary() {
-  module_library_ = dlopen(path().c_str(),RTLD_LAZY);
+  module_library_ = dlopen(abs_path_.c_str(),RTLD_LAZY);
 
   if (!module_library_) {
     std::string err_msg = "Unable to load model shared object file: ";
@@ -25,7 +25,7 @@ void DynamicModule::openLibrary() {
 void DynamicModule::setConstructor() {
 
   constructor_ = (create_t*) 
-    dlsym(module_library_,DynamicModule::constructor_name.c_str());
+    dlsym(module_library_,constructor_name_.c_str());
 
   if (!constructor_) {
     std::string err_msg = "Unable to load module constructor: ";
@@ -39,7 +39,7 @@ void DynamicModule::setConstructor() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setDestructor() {
   destructor_ = (destroy_t*) 
-    dlsym(module_library_,DynamicModule::destructor_name.c_str());
+    dlsym(module_library_,destructor_name_.c_str());
 
   if (!destructor_) {
     std::string err_msg = "Unable to load module destructor: ";

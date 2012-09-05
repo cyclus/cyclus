@@ -49,7 +49,7 @@ TEST_F(XMLFileLoaderTests,modules) {
   xmlFile = new XMLFileLoader(moduleFile,false);  
   set<string> module_types = Model::dynamic_module_types();
   //EXPECT_NO_THROW();
-  xmlFile->load_modules_of_type("Market","/*/market");
+  //xmlFile->load_modules_of_type("Market","/*/market");
   //xmlFile->load_dynamic_modules(module_types);
   //Model::closeDynamicLibraries();
   

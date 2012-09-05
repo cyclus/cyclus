@@ -25,8 +25,7 @@ void DynamicModule::openLibrary() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setConstructor() {
   constructor_ = (create_t*) 
-    GetProcAddress(module_library_,
-                   DynamicModule::constructor_name.c_str());
+    GetProcAddress(module_library_,constructor_name_.c_str());
 
   if (!constructor_) {
     string err_msg = "Unable to load model constructor: ";
@@ -39,8 +38,7 @@ void DynamicModule::setConstructor() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setDestructor() {
   destructor_ = (destroy_t*) 
-    GetProcAddress(module_library_,
-                   DynamicModule::destructor_name.c_str());
+    GetProcAddress(module_library_,destructor_name_.c_str());
 
   if (!destructor_) {
     string err_msg = "Unable to load model constructor: ";

@@ -6,9 +6,11 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 #include "Transaction.h"
 
+class DynamicModule;
 class Model;
 class Message;
 class Transaction;
@@ -91,15 +93,6 @@ class Model {
   static void closeDynamicLibraries();
 
   /**
-     provides a constructed simulation entity
-     @param model_type the type of entity
-     @param module the name of the module
-     @return a pointer to the construced entity
-   */
-  static Model* getEntityViaConstructor(std::string model_type,
-                                        std::string module);
-
-  /**
      constructs and initializes an entity
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
@@ -142,6 +135,12 @@ class Model {
    */
   virtual ~Model();
 
+  /**
+     uses the loaded modules to properly destruct a model
+     @param model the model to delete
+   */
+  void deleteModel(Model* model);
+  
   /**
      get model instance name 
    */
@@ -291,7 +290,7 @@ class Model {
      a map of loaded modules. all dynamically loaded modules are 
      registered with this map when loaded.
    */
-  static std::map<std::string,mdl_ctor*> loaded_modules_;
+  static std::map< std::string, boost::shared_ptr<DynamicModule> > loaded_modules_;
 
   /**
      the set of loaded dynamic libraries

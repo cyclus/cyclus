@@ -11,18 +11,24 @@
 using namespace std;
 
 // static variables
-string DynamicModule::constructor_name="constructor";
-string DynamicModule::destructor_name="destructor";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string type, std::string name) {
   module_name_ = name;
   abs_path_ = Env::getInstallPath() + "/lib/Models/" + type + "/" +
     name + "/lib" + name + SUFFIX;
+  constructor_name_="constructor";
+  destructor_name_="destructor";
+
+  openLibrary();
+  setConstructor();
+  setDestructor();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DynamicModule::~DynamicModule() {}
+DynamicModule::~DynamicModule() {
+  closeLibrary();
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* DynamicModule::constructInstance() {
