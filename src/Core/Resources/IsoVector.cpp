@@ -51,7 +51,21 @@ IsoVector& IsoVector::operator+= (const IsoVector& rhs) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector& IsoVector::operator-= (const IsoVector& rhs) {
-  this->separate(rhs,1.0);
+  CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_));
+  CompMapPtr remove_comp = rhs.comp();
+  for (CompMap::iterator it = remove_comp->begin(); 
+       it != remove_comp->end(); it++) {
+    if ( new_comp->count(it->first) != 0 &&  
+        (*new_comp)[it->first] >= it->second ) {
+      (*new_comp)[it->first] -= it->second ;
+    } else { 
+      stringstream ss("");
+      ss << "An insufficient amount of isotope "<< it->first 
+        <<" exists in the original IsoVector."; 
+      throw CycNegativeValueException(ss.str());
+    }
+  }
+  setComp(new_comp);
   return *this;
 }
 
@@ -202,12 +216,7 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
       else {
         new_comp->erase(it->first);
       }
-    } else { // iso does not exist in the original comp
-      stringstream ss("");
-      ss << "The isotope "<< it->first 
-        <<" cannot be separated from an IsoVector in which it does not exist.";
-      throw CycNegativeValueException(ss.str());
-    }
+    } 
   }
   setComp(new_comp);
 }
