@@ -27,6 +27,19 @@ TEST_F(MaterialTest, Clone) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, setQuantity) {
+  EXPECT_FLOAT_EQ( test_size_, test_mat_->quantity());
+  double new_size = test_size_/2;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+  new_size = new_size*10;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size, KG));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckQuality) {
   rsrc_ptr test(test_mat_);
   rsrc_ptr diff(diff_mat_);
@@ -187,18 +200,18 @@ TEST_F(MaterialTest, ExtractMass) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract) {
   mat_rsrc_ptr m1;
-  ASSERT_NO_THROW(m1 = test_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
-  EXPECT_FLOAT_EQ(m1->quantity(), test_size_ );
-  EXPECT_TRUE(m1->isoVector().compEquals(test_comp_));
+  ASSERT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
+  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
 
   mat_rsrc_ptr m2;
   ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
   EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
   EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
-  EXPECT_TRUE(m2->isoVector().compEquals(test_comp_));
+  EXPECT_TRUE(m2->isoVector().compEquals(non_norm_test_comp_));
 
-  //EXPECT_THROW(test_mat_->extract(two_test_mat_->isoVector()), CycException);
+  EXPECT_THROW(test_mat_->extract(two_test_comp_), CycException);
 
 
 }

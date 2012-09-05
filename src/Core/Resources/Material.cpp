@@ -90,14 +90,15 @@ mat_rsrc_ptr Material::extract(const CompMapPtr other) {
   CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
   CompMapPtr remove_comp = other;
   remove_comp->massify();
-  double total, new_iso_mass;
+  double remainder_kg, new_kg, diff_kg;
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     if ( this->mass(it->first) >= it->second ) {
-      new_iso_mass = this->mass(it->first) - it->second;
-      (*new_comp)[it->first] = new_iso_mass;
-      total += new_iso_mass;
+      diff_kg = this->mass(it->first) - it->second;
+      (*new_comp)[it->first] = diff_kg;
+      remainder_kg += diff_kg;
+      new_kg += it->second;
     } else {
     stringstream ss("");
     ss << "The Material " << this->ID() 
@@ -109,12 +110,12 @@ mat_rsrc_ptr Material::extract(const CompMapPtr other) {
 
   // make new material
   mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(other));
-  new_mat->setQuantity(total);
+  new_mat->setQuantity(new_kg, KG);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
   iso_vector_ = IsoVector(new_comp); 
-  this->setQuantity(total, KG);
+  this->setQuantity(remainder_kg, KG);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
 
