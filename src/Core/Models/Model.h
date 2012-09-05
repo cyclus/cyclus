@@ -77,22 +77,6 @@ class Model {
   static std::vector<Model*> getModelList();
 
   /**
-     dynamically loads a model constructor from a shared object file 
-     
-     as this is system dependent, a function is provided in the 
-     LoadConstructor files in the src/Core/Config folder.
-      
-     @param model_type model type (region, inst, facility, ...) to add 
-     @param model_name name of model (NullFacility, StubMarket, ...) to 
-   */
-  static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
-
-  /**
-     close all dynamic libraries
-   */
-  static void closeDynamicLibraries();
-
-  /**
      constructs and initializes an entity
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data

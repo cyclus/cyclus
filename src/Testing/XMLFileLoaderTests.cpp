@@ -51,7 +51,6 @@ TEST_F(XMLFileLoaderTests,modules) {
   //EXPECT_NO_THROW();
   //xmlFile->load_modules_of_type("Market","/*/market");
   //xmlFile->load_dynamic_modules(module_types);
-  //Model::closeDynamicLibraries();
   
   delete xmlFile;
 }
