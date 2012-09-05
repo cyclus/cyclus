@@ -12,12 +12,11 @@ typedef void destroy_t(Model*);
 class DynamicModule {
  public:
   /**
-     constructor; sets module_name_
+     constructor; sets module_name_ and abs_path_
      NOTE: all derived constructors must:
-     * set module_library_
      * call openLibrary()
-     * set constructor_
-     * set destructor_
+     * call setConstructor()
+     * call setDestructor()
    */
   DynamicModule(std::string type, std::string name);
   
@@ -44,6 +43,12 @@ class DynamicModule {
   void destructInstance(Model* model);
   
  protected:
+  /// the name of all module constructor functions
+  static std::string constructor_name;
+
+  /// the name of all module destructor functions
+  static std::string destructor_name;
+
   /// the library to open and close
   void * module_library_;
 
@@ -59,8 +64,22 @@ class DynamicModule {
   /**
      all derived classes must define how to open the library and do
      so during their constructor
+     openLibrary() must:
+     * set module_library_
    */
-  virtual void * openLibrary() = 0;
+  virtual void openLibrary() = 0;
+
+  /**
+     all derived classes must define how to set the constructor_ 
+     member and must do so during their constructor
+   */
+  virtual void setConstructor() = 0;
+
+  /**
+     all derived classes must define how to set the destructor_ 
+     member and must do so during their constructor
+   */
+  virtual void setDestructor() = 0;
 
   /**
      all derived classes must define how to close the library and

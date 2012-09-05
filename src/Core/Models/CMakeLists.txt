@@ -17,6 +17,8 @@ SET( CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/StubModel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/StubTimeAgent.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Transaction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/UnixSharedObject.cpp
+#  ${CMAKE_CURRENT_SOURCE_DIR}/WindowsDLL.cpp
   PARENT_SCOPE 
   )
 
@@ -37,6 +39,8 @@ INSTALL(FILES
   StubTimeAgent.h
   TimeAgent.h
   Transaction.h
+  UnixSharedObject.h
+#  WindowsDLL.h
   DESTINATION cyclus/include
   COMPONENT core
   )
