@@ -189,7 +189,7 @@ public:
   /** 
      conversion from kg to some other unit
 
-     @param kg the mass in kg to convert
+     @param mass the mass in kg to convert
      @param from_unit the unit to convert it from
      */
   double convertToKg(double mass, MassUnit from_unit);
@@ -197,7 +197,6 @@ public:
   /**
      returns the number of atoms, in moles in the material.
 
-     @param tope is the isotope identifier. (e.g. 92235)
     */
   double moles();
 
