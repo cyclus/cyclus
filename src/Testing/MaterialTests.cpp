@@ -199,12 +199,15 @@ TEST_F(MaterialTest, ExtractMass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract) {
+
+  // Complete extraction
   mat_rsrc_ptr m1;
   EXPECT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
   EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 
+  // Over-extraction should throw an exception
   mat_rsrc_ptr m2;
   (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
   (*two_test_comp_)[u235_]=2*one_g_;
@@ -213,12 +216,14 @@ TEST_F(MaterialTest, Extract) {
   EXPECT_THROW( m2 = diff_mat_->extract(non_norm_test_comp_), CycNegativeValueException);
   EXPECT_THROW(test_mat_->extract(two_test_comp_), CycException);
 
+  // two minus one equals one.
   mat_rsrc_ptr m3;
   (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
   ASSERT_FALSE( non_norm_test_comp_->normalized());
   EXPECT_NO_THROW( m3 = two_test_mat_->extract(non_norm_test_comp_));
   EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
 
+  // ten minus one equals nine.
   mat_rsrc_ptr m4;
   (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
   ASSERT_FALSE( non_norm_test_comp_->normalized());
