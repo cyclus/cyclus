@@ -268,9 +268,13 @@ TEST_F(MaterialTest, ExtractDiffMat) {
   mat_rsrc_ptr m5;
   test_mat_->setQuantity(1);
   double orig = diff_mat_->quantity();
+  double orig_am241 = diff_mat_->moles(am241_);
+  double orig_pb208 = diff_mat_->moles(pb208_);
   EXPECT_NO_THROW(m5 = diff_mat_->extract( test_mat_ )); 
   EXPECT_FLOAT_EQ( orig - m5->quantity(), diff_mat_->quantity() );
   EXPECT_TRUE( m5->isoVector().compEquals(test_comp_));
   EXPECT_FALSE( diff_mat_->isoVector().compEquals(test_comp_));
+  EXPECT_FLOAT_EQ( orig_am241, diff_mat_->moles(am241_) );
+  EXPECT_FLOAT_EQ( orig_pb208, diff_mat_->moles(pb208_) );
 }
 
