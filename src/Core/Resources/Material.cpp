@@ -86,7 +86,7 @@ mat_rsrc_ptr Material::extract(double mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr other) {
-  
+
   CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
   CompMapPtr remove_comp = other;
   double remainder_kg, new_kg;
