@@ -86,8 +86,8 @@ mat_rsrc_ptr Material::extract(double mass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr other) {
-
-  CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
+ 
+  CompMapPtr new_comp = CompMapPtr(new CompMap( *(iso_vector_.comp())));
   CompMapPtr remove_comp = other;
   double remainder_kg, new_kg;
   remainder_kg = this->quantity();
@@ -113,12 +113,49 @@ mat_rsrc_ptr Material::extract(const CompMapPtr other) {
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
-  iso_vector_ = IsoVector(new_comp); 
+  this->iso_vector_ = IsoVector(new_comp); 
   this->setQuantity(remainder_kg, KG);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
 
   return new_mat;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mat_rsrc_ptr Material::extract(const mat_rsrc_ptr other) {
+ 
+  CompMapPtr new_comp = CompMapPtr(new CompMap( *(iso_vector_.comp())));
+  CompMapPtr remove_comp = other->isoVector().comp();
+
+  int iso;
+  double remainder_kg;
+  remainder_kg = this->quantity();
+
+  for (CompMap::iterator it = remove_comp->begin(); 
+       it != remove_comp->end(); it++) {
+    // reduce isotope, if it exists in new_comp
+    iso = it->first;
+    if ( this->mass(iso) >= other->mass(iso) ) {
+      (*new_comp)[iso] = this->mass(iso) - other->mass(iso);
+      remainder_kg -= other->mass(iso);
+    } else {
+    stringstream ss("");
+    ss << "The Material " << this->ID() 
+      << " has insufficient material to extract the isotope : "
+      << iso ;
+    throw CycNegativeValueException(ss.str());
+    }
+  }
+
+  other->setOriginalID( this->originalID() ); // book keeping
+  
+  // adjust old material
+  this->iso_vector_ = IsoVector(new_comp); 
+  this->setQuantity(remainder_kg, KG);
+
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
+
+  return other;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

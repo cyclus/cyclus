@@ -198,7 +198,7 @@ TEST_F(MaterialTest, ExtractMass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, Extract) {
+TEST_F(MaterialTest, ExtractComp) {
 
   // Complete extraction
   mat_rsrc_ptr m1;
@@ -220,7 +220,7 @@ TEST_F(MaterialTest, Extract) {
   mat_rsrc_ptr m3;
   (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
   ASSERT_FALSE( non_norm_test_comp_->normalized());
-  EXPECT_NO_THROW( m3 = two_test_mat_->extract(non_norm_test_comp_));
+  m3 = two_test_mat_->extract(non_norm_test_comp_);
   EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
 
   // ten minus one equals nine.
@@ -230,5 +230,47 @@ TEST_F(MaterialTest, Extract) {
   EXPECT_NO_THROW( m4 = diff_mat_->extract( test_comp_));
   EXPECT_FLOAT_EQ( test_size_ - m4->quantity(), diff_mat_->quantity() );
 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, ExtractMat) {
+
+  // Complete extraction
+  mat_rsrc_ptr m1;
+  mat_rsrc_ptr clone_mat = mat_rsrc_ptr( new Material( *test_mat_ ));
+  EXPECT_NO_THROW( m1 = test_mat_->extract(clone_mat));
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
+  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
+
+  // Over-extraction should throw an exception
+  mat_rsrc_ptr m2;
+  EXPECT_THROW( m2 = diff_mat_->extract(two_test_mat_), CycNegativeValueException);
+  EXPECT_THROW(test_mat_->extract(two_test_mat_), CycException);
+
+  // two minus one equals one.
+  mat_rsrc_ptr m3;
+  EXPECT_NO_THROW( m3 = two_test_mat_->extract( m1 ) );
+  EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
+  EXPECT_TRUE( m3->isoVector().compEquals(test_comp_));
+
+  // ten minus one equals nine.
+  mat_rsrc_ptr m4;
+  double orig = ten_test_mat_->quantity();
+  EXPECT_NO_THROW( m4 = ten_test_mat_->extract( m1 ) );
+  EXPECT_FLOAT_EQ( orig - m4->quantity(), ten_test_mat_->quantity() );
+  EXPECT_TRUE( m4->isoVector().compEquals(test_comp_));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, ExtractDiffMat) {
+  // differing comp minus one element equals old comp minus new
+  mat_rsrc_ptr m5;
+  test_mat_->setQuantity(1);
+  double orig = diff_mat_->quantity();
+  EXPECT_NO_THROW(m5 = diff_mat_->extract( test_mat_ )); 
+  EXPECT_FLOAT_EQ( orig - m5->quantity(), diff_mat_->quantity() );
+  EXPECT_TRUE( m5->isoVector().compEquals(test_comp_));
+  EXPECT_FALSE( diff_mat_->isoVector().compEquals(test_comp_));
 }
 

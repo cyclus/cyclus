@@ -219,7 +219,7 @@ public:
 
   /**
      Extracts from this material a composition
-     specified by the given IsoVector. This operation will change
+     specified by the given CompMapPtr. This operation will change
      the quantity_ and iso_vector_ members.
       
      @param other the composition of material that will be
@@ -228,6 +228,17 @@ public:
      @return the extracted material as a newly allocated material object
    */
   virtual mat_rsrc_ptr extract(const CompMapPtr other);
+
+  /**
+     Extracts from this material a material
+     specified by the given IsoVector. This operation will change
+     the quantity_ and iso_vector_ members.
+      
+     @param other the material that will be removed against this Material. 
+     @throws CycNegativeValueException for overextraction events
+     @return the extracted material object with this set as its OriginalID
+   */
+  virtual mat_rsrc_ptr extract(const mat_rsrc_ptr other);
 
   /**
      Extracts a specified mass from this material creating a new 
