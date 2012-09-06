@@ -6,6 +6,12 @@
 #include "CycException.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,default_constructor) {
+  CompMapPtr zero_comp = CompMapPtr(new CompMap(MASS));
+  EXPECT_TRUE(zero_vec.compEquals(zero_comp));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,constructors) {
   IsoVector equality = IsoVector(comp);
   EXPECT_EQ(equality,vec); // equality
@@ -32,6 +38,13 @@ TEST_F(IsoVectorTests,mixing) {
   EXPECT_TRUE(add_to_vec.compEquals(*mix_result));
   EXPECT_THROW(add_to_vec.mix(to_add_vec,-1),CycRangeException);
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,0)); // corner
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,mixing_zero_vector) { 
+  LoadMaps();
+  EXPECT_NO_THROW(zero_vec.mix(to_add_vec, .1)); // should just ignore ratio
+  EXPECT_TRUE(zero_vec.compEquals(to_add_vec)); // the resulting vector is the added vector
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

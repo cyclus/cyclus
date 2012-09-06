@@ -5,72 +5,72 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,default_constructor) {
-  EXPECT_EQ(comp.basis(),basis);
-  EXPECT_EQ(map,comp.map());
+  EXPECT_EQ(comp_.basis(),basis_);
+  EXPECT_EQ(map_,comp_.map());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,copy_constructor) {
-  CompMap copy = CompMap(comp);
-  EXPECT_EQ(copy.basis(),comp.basis());
-  EXPECT_EQ(copy.map(),comp.map());
+  CompMap copy = CompMap(comp_);
+  EXPECT_EQ(copy.basis(),comp_.basis());
+  EXPECT_EQ(copy.map(),comp_.map());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,map_interface) {
   LoadMap();
-  for (Map::iterator it = map.begin(); it != map.end(); it++) {
-    EXPECT_NO_THROW(comp[it->first] = it->second);
+  for (Map::iterator it = map_.begin(); it != map_.end(); it++) {
+    EXPECT_NO_THROW(comp_[it->first] = it->second);
   }
-  EXPECT_EQ(*map.begin(),*comp.begin());
-  EXPECT_NO_THROW(comp.end());
-  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
-    EXPECT_EQ(map.count(it->first),comp.count(it->first));
-    EXPECT_EQ(map[it->first],comp[it->first]);
-    comp.erase(it->first);
+  EXPECT_EQ(*map_.begin(),*comp_.begin());
+  EXPECT_NO_THROW(comp_.end());
+  for (CompMap::iterator it = comp_.begin(); it != comp_.end(); it++) {
+    EXPECT_EQ(map_.count(it->first),comp_.count(it->first));
+    EXPECT_EQ(map_[it->first],comp_[it->first]);
+    comp_.erase(it->first);
   }
-  EXPECT_TRUE(comp.empty());
+  EXPECT_TRUE(comp_.empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,normalize) { 
   LoadMap();
-  comp.setMap(map);
-  EXPECT_EQ(map,comp.map());
-  EXPECT_NO_THROW(comp.normalize());
-  EXPECT_EQ(massified,comp.map());
-  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
-  EXPECT_TRUE(comp.normalized());
-  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
-    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
-    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  comp_.setMap(map_);
+  EXPECT_EQ(map_,comp_.map());
+  EXPECT_NO_THROW(comp_.normalize());
+  EXPECT_EQ(massified_,comp_.map());
+  EXPECT_DOUBLE_EQ(ratio_,comp_.mass_to_atom_ratio());
+  EXPECT_TRUE(comp_.normalized());
+  for (CompMap::iterator it = comp_.begin(); it != comp_.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified_[it->first],comp_.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified_[it->first],comp_.atomFraction(it->first));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,atomify) { 
   LoadMap();
-  comp.setMap(map);
-  EXPECT_NO_THROW(comp.atomify());
-  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
-  EXPECT_TRUE(comp.normalized());
-  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
-    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
-    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  comp_.setMap(map_);
+  EXPECT_NO_THROW(comp_.atomify());
+  EXPECT_DOUBLE_EQ(ratio_,comp_.mass_to_atom_ratio());
+  EXPECT_TRUE(comp_.normalized());
+  for (CompMap::iterator it = comp_.begin(); it != comp_.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified_[it->first],comp_.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified_[it->first],comp_.atomFraction(it->first));
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,massify) { 
   LoadMap();
-  comp.setMap(map);
-  EXPECT_NO_THROW(comp.atomify());  
-  EXPECT_NO_THROW(comp.massify());  
-  EXPECT_DOUBLE_EQ(ratio,comp.mass_to_atom_ratio());
-  EXPECT_TRUE(comp.normalized());
-  for (CompMap::iterator it = comp.begin(); it != comp.end(); it++) {
-    EXPECT_DOUBLE_EQ(massified[it->first],comp.massFraction(it->first));
-    EXPECT_DOUBLE_EQ(atomified[it->first],comp.atomFraction(it->first));
+  comp_.setMap(map_);
+  EXPECT_NO_THROW(comp_.atomify());  
+  EXPECT_NO_THROW(comp_.massify());  
+  EXPECT_DOUBLE_EQ(ratio_,comp_.mass_to_atom_ratio());
+  EXPECT_TRUE(comp_.normalized());
+  for (CompMap::iterator it = comp_.begin(); it != comp_.end(); it++) {
+    EXPECT_DOUBLE_EQ(massified_[it->first],comp_.massFraction(it->first));
+    EXPECT_DOUBLE_EQ(atomified_[it->first],comp_.atomFraction(it->first));
   }
 }
 
@@ -85,8 +85,8 @@ TEST_F(CompMapTests,lineage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,equality) {
   LoadMap();
-  comp.setMap(map);
-  comp.normalize();
-  CompMap copy = CompMap(comp);
-  EXPECT_TRUE(copy == comp);
+  comp_.setMap(map_);
+  comp_.normalize();
+  CompMap copy = CompMap(comp_);
+  EXPECT_TRUE(copy == comp_);
 }

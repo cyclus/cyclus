@@ -27,6 +27,19 @@ TEST_F(MaterialTest, Clone) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, setQuantity) {
+  EXPECT_FLOAT_EQ( test_size_, test_mat_->quantity());
+  double new_size = test_size_/2;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+  new_size = new_size*10;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size, KG));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckQuality) {
   rsrc_ptr test(test_mat_);
   rsrc_ptr diff(diff_mat_);
@@ -35,6 +48,87 @@ TEST_F(MaterialTest, CheckQuality) {
   EXPECT_TRUE(test->checkQuality(diff));
   EXPECT_TRUE(diff->checkQuality(test));
   EXPECT_FALSE(test->checkQuality(gen));
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckMass) {
+  // check total mass, you'll use it later.
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+  ASSERT_FLOAT_EQ(1000.0*(test_mat_->quantity()), test_mat_->mass(G));
+
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_*1000.0,G));
+  ASSERT_FLOAT_EQ(test_size_, test_mat_->mass(KG));
+  // reset the size to be 1000 times less, by changing units to 
+  EXPECT_NO_THROW(test_mat_->setQuantity(test_size_,G));
+  ASSERT_FLOAT_EQ(test_size_/1000.0, test_mat_->mass(KG));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckIsoMass) {
+  // check total mass, you'll use it later.
+  EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); 
+
+  // what's the mass per atom ratio?
+  ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
+  // you should be able to get the mass per isotope
+  EXPECT_NO_THROW(test_mat_->mass(u235_));
+
+  // if the material has only one isotope, it should be the same as the total
+  // the u235 mass should be (mol/mat)(1kg/1000g)(235g/mol)  
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->moles(u235_)*u235_g_per_mol_/1000.0); 
+  // you should be able to get the mass per isotope
+  EXPECT_NO_THROW(test_mat_->mass(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
+  ASSERT_FLOAT_EQ(test_mat_->mass(am241_), 0);
+
+  // if the mat has many isotopes, their individual masses should scale with 
+  // their atomic numbers.
+  double test_total = 0;
+  CompMap::iterator comp; 
+  int i;
+  for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
+    i = (*comp).first;
+    test_total += test_mat_->mass(i);
+  }
+  ASSERT_FLOAT_EQ(test_mat_->quantity(), test_total);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckIsoAtoms){
+
+  // you should be able to get to the atoms of a certain iso in your material
+  EXPECT_NO_THROW(test_mat_->moles(u235_));
+  EXPECT_EQ(true, test_comp_->normalized());
+  ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
+  EXPECT_FLOAT_EQ(1000*test_size_/u235_g_per_mol_, test_mat_->moles(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->moles(am241_), 0);
+
+  // a mat's total atoms should be the total of all the contained isotopes. 
+  double total_atoms = 0;
+  CompMap::iterator comp; 
+  int i;
+  for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
+    i = (*comp).first;
+    total_atoms += test_mat_->moles(i);
+  }
+  // you should be able to get to the total atoms in your material
+  ASSERT_FLOAT_EQ(test_mat_->moles(), total_atoms);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckConvertFromKg){
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertFromKg(1,G)); // 1000g = 1 kg
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertFromKg(1000,KG)); // 1000 kg = 1000 kg
+  EXPECT_FLOAT_EQ(1, test_mat_->convertFromKg(1,KG)); // 1 kg = 1 kg
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, CheckConvertToKg){
+  EXPECT_FLOAT_EQ(1, test_mat_->convertToKg(1000,G)); // 1kg = 1000 g
+  EXPECT_FLOAT_EQ(1000, test_mat_->convertToKg(1000,KG)); // 1000kg = 1000kg
+  EXPECT_FLOAT_EQ(1, test_mat_->convertToKg(1,KG)); // 1kg = 1kg
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -100,19 +194,41 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
   EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract) {
+
+  // Complete extraction
   mat_rsrc_ptr m1;
-  ASSERT_NO_THROW(m1 = test_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
-  EXPECT_FLOAT_EQ(m1->quantity(), test_size_ );
+  EXPECT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
+  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 
+  // Over-extraction should throw an exception
   mat_rsrc_ptr m2;
-  ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
-  EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  (*two_test_comp_)[u235_]=2*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  ASSERT_FALSE( two_test_comp_->normalized());
+  EXPECT_THROW( m2 = diff_mat_->extract(non_norm_test_comp_), CycNegativeValueException);
+  EXPECT_THROW(test_mat_->extract(two_test_comp_), CycException);
 
-  // ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
+  // two minus one equals one.
+  mat_rsrc_ptr m3;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m3 = two_test_mat_->extract(non_norm_test_comp_));
+  EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
+
+  // ten minus one equals nine.
+  mat_rsrc_ptr m4;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m4 = diff_mat_->extract( test_comp_));
+  EXPECT_FLOAT_EQ( test_size_ - m4->quantity(), diff_mat_->quantity() );
+
 }
+

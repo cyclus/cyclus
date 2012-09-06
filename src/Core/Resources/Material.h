@@ -23,6 +23,9 @@ class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
 /* -- */
 
+// A type definition for mass units
+enum MassUnit { KG, G };
+
 /*!
    @class Material
   
@@ -96,7 +99,7 @@ public:
      default destructor 
    */
   ~Material() {};
-  
+
   /**
      standard verbose printer includes both an 
      atom and mass composition output 
@@ -112,9 +115,23 @@ public:
   void setQuantity(double quantity);
 
   /**
+     Change/set the mass of the resource object. 
+     Note that this does make matter (dis)appear and 
+     should only be used on objects that are not part of 
+     any actual tracked inventory. 
+
+     @param quantity the new mass, in units of the unit provided
+     @param unit the unit of the mass provided, choose kg, g..
+    */
+  void setQuantity(double quantity, MassUnit unit);
+
+  /**
      Resource class method 
+
+     @return the mass in kg
    */
   double quantity();
+
 
   /**
      Resource class method 
@@ -137,6 +154,61 @@ public:
   rsrc_ptr clone();
 
   /**
+     Calls the resource class method, but checks 
+     the units.
+
+     @param unit is the mass unit. Choose kg, g...
+   */
+  double mass(MassUnit unit);
+
+  /**
+     returns the mass (in kg) of a certain isotope contained 
+     in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+   */
+  double mass(Iso tope);
+
+  /**
+     returns the mass of a certain isotope contained 
+     in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+     @param unit is the mass unit. Choose kg, g...
+   */
+  double mass(Iso tope, MassUnit unit);
+
+  /** 
+     conversion from kg to some other unit
+
+     @param kg the mass in kg to convert
+     @param to_unit the unit to convert it to
+     */
+  double convertFromKg(double kg, MassUnit to_unit);
+
+  /** 
+     conversion from kg to some other unit
+
+     @param kg the mass in kg to convert
+     @param from_unit the unit to convert it from
+     */
+  double convertToKg(double mass, MassUnit from_unit);
+
+  /**
+     returns the number of atoms, in moles in the material.
+
+     @param tope is the isotope identifier. (e.g. 92235)
+    */
+  double moles();
+
+  /**
+     returns the number of atomes (in moles) of a certain isotope in a material
+
+     @param tope is the isotope identifier. (e.g. 92235)
+    */
+  double moles(Iso tope);
+
+  /**
      Absorbs the contents of the given 
      Material into this Material and deletes 
      the given Material. 
@@ -150,31 +222,23 @@ public:
      specified by the given IsoVector. This operation will change
      the quantity_ and iso_vector_ members.
       
-     @param other the composition/amount of material that will be
-     removed against this Material
-      
+     @param other the composition of material that will be
+     removed against this Material. It should not be normalized.
+     @throws CycNegativeValueException for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const IsoVector& other);
+  virtual mat_rsrc_ptr extract(const CompMapPtr other);
 
   /**
      Extracts a specified mass from this material creating a new 
      material object with the same isotopic ratios. 
       
      @param mass the amount (mass) of material that will be removed 
-      
+     @throws CycNegativeValueException for overextraction events
      @return the extracted material as a newly allocated material object 
    */
   virtual mat_rsrc_ptr extract(double mass);
 
-  /**
-     Decays this Material object for the given number of months and 
-     updates its composition map with the new number densities. 
-      
-     @param months the number of months to decay 
-   */
-  void decay(double months);
-  
   /**
      Decays this Material object for however 
      many months have passed since the 
@@ -184,6 +248,8 @@ public:
 
   /**
      Returns a copy of this material's isotopic composition 
+
+     @return a copy of the isovector
    */
   IsoVector isoVector() {return iso_vector_;}
 
@@ -200,6 +266,16 @@ public:
      sets the decay boolean and the interval 
    */
   static void setDecay(int dec);
+
+protected:
+  /**
+     Decays this Material object for the given number of months and 
+     updates its composition map with the new number densities. 
+      
+     @param months the number of months to decay a material 
+   */
+  void decay(double months);
+  
 
 private:
   /**

@@ -26,18 +26,18 @@ MassTable* MassTable::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
   initializeSQL();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::~MassTable() {
   //Should close the 'mass.h5' file
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double MassTable::gramsPerMol(int tope) {
   double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
@@ -55,7 +55,8 @@ void MassTable::initializeSQL() {
   for (int i = 0; i < nResults; i++){
     // // obtain the database row and declare the appropriate members
     query_row row = result.at(i);
-    string Zstr = row.at(0), Astr = row.at(1), Mstr = row.at(2);
+    // note transposition, mislabeled columns
+    string Zstr = row.at(1), Astr = row.at(0), Mstr = row.at(2); 
     int Znum = atoi( Zstr.c_str() );
     int Anum = atoi( Astr.c_str() );
     double mass = atof( Mstr.c_str() );
@@ -68,4 +69,6 @@ void MassTable::initializeSQL() {
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();
-};
+}
+
+
