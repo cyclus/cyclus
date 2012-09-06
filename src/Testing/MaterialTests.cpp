@@ -27,6 +27,19 @@ TEST_F(MaterialTest, Clone) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, setQuantity) {
+  EXPECT_FLOAT_EQ( test_size_, test_mat_->quantity());
+  double new_size = test_size_/2;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+  new_size = new_size*10;
+  ASSERT_NO_THROW( test_mat_->setQuantity(new_size, KG));
+  EXPECT_FLOAT_EQ( new_size , test_mat_->quantity());
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckQuality) {
   rsrc_ptr test(test_mat_);
   rsrc_ptr diff(diff_mat_);
@@ -68,6 +81,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   // you should be able to get the mass per isotope
   EXPECT_NO_THROW(test_mat_->mass(u235_));
   ASSERT_FLOAT_EQ(test_mat_->mass(u235_), test_mat_->mass(u235_,KG));
+  ASSERT_FLOAT_EQ(test_mat_->mass(am241_), 0);
 
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
@@ -89,6 +103,7 @@ TEST_F(MaterialTest, CheckIsoAtoms){
   EXPECT_EQ(true, test_comp_->normalized());
   ASSERT_NEAR(u235_g_per_mol_, (*test_mat_->isoVector().comp()).mass_to_atom_ratio(), 0.1);
   EXPECT_FLOAT_EQ(1000*test_size_/u235_g_per_mol_, test_mat_->moles(u235_));
+  ASSERT_FLOAT_EQ(test_mat_->moles(am241_), 0);
 
   // a mat's total atoms should be the total of all the contained isotopes. 
   double total_atoms = 0;
@@ -179,19 +194,41 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
   EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
+  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract) {
+
+  // Complete extraction
   mat_rsrc_ptr m1;
-  ASSERT_NO_THROW(m1 = test_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(test_mat_->quantity(), 0 );
-  EXPECT_FLOAT_EQ(m1->quantity(), test_size_ );
+  EXPECT_NO_THROW( m1 = test_mat_->extract(non_norm_test_comp_));
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
+  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 
+  // Over-extraction should throw an exception
   mat_rsrc_ptr m2;
-  ASSERT_NO_THROW(m2 = diff_mat_->extract(test_comp_));
-  EXPECT_FLOAT_EQ(diff_mat_->quantity(), test_size_*fraction );
-  EXPECT_FLOAT_EQ(m2->quantity(), test_size_*(1-fraction) );
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  (*two_test_comp_)[u235_]=2*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  ASSERT_FALSE( two_test_comp_->normalized());
+  EXPECT_THROW( m2 = diff_mat_->extract(non_norm_test_comp_), CycNegativeValueException);
+  EXPECT_THROW(test_mat_->extract(two_test_comp_), CycException);
 
-  // ASSERT_THROW(two_test_mat->extract(ten_test_comp), CycException);
+  // two minus one equals one.
+  mat_rsrc_ptr m3;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m3 = two_test_mat_->extract(non_norm_test_comp_));
+  EXPECT_FLOAT_EQ( test_size_, m3->quantity() );
+
+  // ten minus one equals nine.
+  mat_rsrc_ptr m4;
+  (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
+  ASSERT_FALSE( non_norm_test_comp_->normalized());
+  EXPECT_NO_THROW( m4 = diff_mat_->extract( test_comp_));
+  EXPECT_FLOAT_EQ( test_size_ - m4->quantity(), diff_mat_->quantity() );
+
 }
+

@@ -11,9 +11,10 @@ class MaterialTest : public ::testing::Test {
   protected:
     Iso u235_, am241_, th228_, pb208_;
     int one_g_; // grams
-    CompMapPtr test_comp_, diff_comp_;
+    CompMapPtr test_comp_, two_test_comp_, non_norm_test_comp_, diff_comp_;
     double test_size_, fraction;
     mat_rsrc_ptr test_mat_;
+    mat_rsrc_ptr two_test_mat_;
     mat_rsrc_ptr diff_mat_;
     long int u235_halflife_;
     int th228_halflife_;
@@ -26,11 +27,19 @@ class MaterialTest : public ::testing::Test {
       th228_ = 90228;
       pb208_ = 82208;
       one_g_ = 1.0;
+      test_size_ = 10.0;
+      fraction = 2.0 / 3.0;
 
       // composition creation
       test_comp_ = CompMapPtr(new CompMap(MASS));
       (*test_comp_)[u235_]=one_g_;
       (*test_comp_).normalize();
+
+      two_test_comp_ = CompMapPtr(new CompMap(MASS));
+      (*two_test_comp_)[u235_]=one_g_;
+
+      non_norm_test_comp_ = CompMapPtr(new CompMap(MASS));
+      (*non_norm_test_comp_)[u235_]=test_size_*one_g_;
 
       diff_comp_ = CompMapPtr(new CompMap(MASS));
       (*diff_comp_)[u235_]=one_g_;
@@ -38,13 +47,12 @@ class MaterialTest : public ::testing::Test {
       (*diff_comp_)[am241_]=one_g_;
       (*diff_comp_).normalize();
 
-      test_size_ = 10.0;
-      fraction = 2.0 / 3.0;
-      
 
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
       test_mat_->setQuantity(test_size_);
+      two_test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
+      two_test_mat_->setQuantity(2*test_size_);
       diff_mat_ = mat_rsrc_ptr(new Material(diff_comp_));
       diff_mat_->setQuantity(test_size_);
 

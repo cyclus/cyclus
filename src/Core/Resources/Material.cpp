@@ -63,6 +63,13 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
+  if(quantity_ < mass){
+    string err = "The mass ";
+    err += mass;
+    err += " cannot be extracted from Material with ID ";
+    err += ID_; 
+    throw CycNegativeValueException(err);
+  }
   // remove our mass
   quantity_ -= mass;
   // make a new material, set its mass
@@ -78,21 +85,38 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const IsoVector& other) {
-  // get the extraction paramters
-  double fraction = iso_vector_.intersectionFraction(other);
-  double amt = quantity_ * fraction;
-  IsoVector vec = iso_vector_ - other; // @MJG_FLAG previous bevaior was isovector -= other..
+mat_rsrc_ptr Material::extract(const CompMapPtr other) {
 
-  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had vector extracted.";
+  CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
+  CompMapPtr remove_comp = other;
+  double remainder_kg, new_kg;
+  remainder_kg = this->quantity();
+  for (CompMap::iterator it = remove_comp->begin(); 
+       it != remove_comp->end(); it++) {
+    // reduce isotope, if it exists in new_comp
+    if ( this->mass(it->first) >= it->second ) {
+      (*new_comp)[it->first] = this->mass(it->first) - it->second;
+      new_kg += it->second;
+      remainder_kg -= it->second;
+    } else {
+    stringstream ss("");
+    ss << "The Material " << this->ID() 
+      << " has insufficient material to extract the isotope : "
+      << it->first ;
+    throw CycNegativeValueException(ss.str());
+    }
+  }
+
   // make new material
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(vec));
-  new_mat->setQuantity(amt);
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(other));
+  new_mat->setQuantity(new_kg, KG);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
-  iso_vector_ -= other; // matching previous behavior
-  quantity_ -= amt;
+  iso_vector_ = IsoVector(new_comp); 
+  this->setQuantity(remainder_kg, KG);
+
+  CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
 
   return new_mat;
 }
@@ -146,7 +170,15 @@ double Material::mass(Iso tope, MassUnit unit) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::mass(Iso tope){
-  return(isoVector().comp()->massFraction(tope)*mass(KG));
+  double to_ret;
+  CompMapPtr the_comp = isoVector().comp();
+  the_comp->massify();
+  if(the_comp->count(tope) != 0) {
+    to_ret = the_comp->massFraction(tope)*mass(KG);
+  } else {
+    to_ret = 0;
+  }
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -189,8 +221,15 @@ double Material::moles(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::moles(Iso tope){
-  double atom_frac = isoVector().comp()->atomFraction(tope);
-  return moles()*atom_frac;
+  double to_ret;
+  CompMapPtr the_comp = isoVector().comp();
+  the_comp->atomify();
+  if(the_comp->count(tope) != 0) {
+    to_ret = moles()*isoVector().comp()->atomFraction(tope);
+  } else {
+    to_ret = 0;
+  }
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

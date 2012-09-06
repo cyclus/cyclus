@@ -6,6 +6,7 @@ class IsoVectorTests : public ::testing::Test {
 protected:
   CompMapPtr comp;
   IsoVector vec;
+  IsoVector zero_vec;
 
   std::vector<int> isotopes;
   double ratio;
