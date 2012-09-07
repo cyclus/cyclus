@@ -31,6 +31,8 @@ class XMLFileLoaderTests : public ::testing::Test {
 
   virtual void TearDown();
 
+  void testModuleOpening();
+
 };
 
 

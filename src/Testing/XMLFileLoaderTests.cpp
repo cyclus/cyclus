@@ -5,6 +5,8 @@
 #include <set>
 #include <iostream>
 #include "Model.h"
+#include "DynamicModule.h"
+
 using namespace std;
 
 void XMLFileLoaderTests::SetUp() {
@@ -19,6 +21,13 @@ void XMLFileLoaderTests::SetUp() {
 
     moduleFile = "modules.xml";
     createTestInputFile(moduleFile,moduleSequence);
+    
+    // here
+    //testModuleOpening();
+}
+
+void XMLFileLoaderTests::testModuleOpening() {
+    DynamicModule module("Market","TestMarket");
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -28,31 +37,33 @@ void XMLFileLoaderTests::TearDown() {
     unlink(moduleFile.c_str());
 }
 
-// TEST_F(XMLFileLoaderTests, OpenFile) {
-//   ASSERT_ANY_THROW(xmlFile = new XMLFileLoader(falseFile,false); delete xmlFile;);
-//   ASSERT_NO_THROW(xmlFile = new XMLFileLoader(controlFile,false); delete xmlFile;);
-// }
+TEST_F(XMLFileLoaderTests, OpenFile) {
+  ASSERT_ANY_THROW(xmlFile = new XMLFileLoader(falseFile,false); delete xmlFile;);
+  ASSERT_NO_THROW(xmlFile = new XMLFileLoader(controlFile,false); delete xmlFile;);
+}
 
-// TEST_F(XMLFileLoaderTests,control) {
-//   xmlFile = new XMLFileLoader(controlFile,false);
-//   EXPECT_NO_THROW(xmlFile->load_control_parameters());
-//   delete xmlFile;
-// }
+TEST_F(XMLFileLoaderTests,control) {
+  xmlFile = new XMLFileLoader(controlFile,false);
+  EXPECT_NO_THROW(xmlFile->load_control_parameters());
+  delete xmlFile;
+}
 
-// TEST_F(XMLFileLoaderTests,recipes) {
-//   xmlFile = new XMLFileLoader(recipeFile,false);
-//   EXPECT_NO_THROW(xmlFile->load_recipes());
-//   delete xmlFile;
-// }
+TEST_F(XMLFileLoaderTests,recipes) {
+  xmlFile = new XMLFileLoader(recipeFile,false);
+  EXPECT_NO_THROW(xmlFile->load_recipes());
+  delete xmlFile;
+}
 
 TEST_F(XMLFileLoaderTests,modules) {
-  xmlFile = new XMLFileLoader(moduleFile,false);  
-  set<string> module_types = Model::dynamic_module_types();
-  //EXPECT_NO_THROW();
+  // here
+  //testModuleOpening();
+
+
+  //  xmlFile = new XMLFileLoader(moduleFile,false);  
+  //set<string> module_types = Model::dynamic_module_types();
   //xmlFile->load_modules_of_type("Market","/*/market");
   //xmlFile->load_dynamic_modules(module_types);
-  
-  delete xmlFile;
+  //delete xmlFile;
 }
 
 std::string XMLFileLoaderTests::falseSequence =
