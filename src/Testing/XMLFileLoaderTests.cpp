@@ -56,7 +56,7 @@ TEST_F(XMLFileLoaderTests,recipes) {
 
 TEST_F(XMLFileLoaderTests,modules) {
   // here
-  //testModuleOpening();
+  testModuleOpening();
 
 
   //  xmlFile = new XMLFileLoader(moduleFile,false);  

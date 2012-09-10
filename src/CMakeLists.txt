@@ -142,7 +142,7 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
-  ${CYCLUS_CORE_SRC}
+#  ${CYCLUS_CORE_SRC}
   ${CYCLUS_TEST_CORE}
   )
 
@@ -178,8 +178,7 @@ ADD_EXECUTABLE( CyclusUnitTestDriver
   Testing/CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
- dl ${LIBS} gtest)
+TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)
 
 # Here we add all the tests
 add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 
