@@ -64,53 +64,80 @@ setting its quantity. For example: ::
 Material Data 
 ~~~~~~~~~~~~~~
 
-mass(isos, time, units) 
-should return data about an appropriately decayed material
-allow kg, g (amu?)
-allow summing
-just a single isotope 
-a set of isotopes
-a single element
-a set of elements,
-return data for any time, in any allowed unit.
-atoms(isos, time, units) 
-should return data about an appropriately decayed material
-always moles (?)
-allow summing
-just a single isotope 
-a set of isotopes
-a single element
-a set of elements,
-return data for any time, in any allowed unit.
+The data held by a material object is straightforward. The interface allows 
+access to the mass or atomic composition of the material ::
+
+    m_p->mass();   // returns the total mass of the material in kg
+    m_p->atoms();  // returns the total atoms in the material in moles
+
+While the default is to sum over all contained isotopes, the data can be 
+retrieved for a single isotope, ::
+
+    m_p->mass(92235, KG);   // returns the mass of 235U in kg
+    m_p->atoms(92235);      // returns the mass of 235U in moles
+
+It is capable of returning masses in kg or g, and capable of returning atoms in moles. ::
+
+    m_p->mass(KG);  // returns the total mass of the material in kg
+    m_p->mass(G);   // returns the total mass of the material in g
+    m_p->atoms();   // returns the total atoms in the material in moles
+
+
+Any time the data is queried, the Material object should be decayed, so that the 
+most up-to-date material is returned. 
 
 
 Material Methods  
 ~~~~~~~~~~~~~~~~~~~
 
-absorb(other_mat)
-To use this, the material to absorb has to already exist. This helps with mass conservation
-extract(new_mat)
-To use this, the material to extract has to already exist. This helps with mass conservation
-returns the new_mat
-throws an error if the old material does not contain sufficient masses of each isotope in the new_mat
-extract(mass, units)  
-This function should create a new material made of this material's composition, but the mass specified, then call extract(new_mat)
-returns the new_mat
-To use this, the material to extract is created within the material class and returned as part of this function call. This helps with mass conservation
-throws an error if the old material does not contain sufficient mass 
-extract(atoms, units) 
-This function should create a new material made of this material's composition, but the atoms specified, then call extract(new_mat)
-returns the new_mat
-To use this, the material to extract is created within the material class and returned as part of this function call. This helps with mass conservation
-throws an error if the old material does not contain sufficient atoms 
+The methods that can be performed on a Material object in order to mainupulated 
+are a small subset of mass conserving functions. These functions allow the user 
+to combine two materials, extract a material from another, and decay materials 
+on demand. 
+
+**Material absorption** can be used when two materials should be combined physically
+and when their histories should be shared in the future. To use this, the material 
+to absorb must already exist. This helps with mass conservation ::
+
+   mat_rsrc_ptr other_mat = mat_rsrc_ptr(new Material(c_p));
+   m_p->absorb(other_mat);
+
+**Material extraction** can be used when a subpart of a material is being separated 
+physically from the original and when that subpart will have its own history (rather 
+than a shared history) in the rest of the simulation. 
 
 
+There are three ways to extract a material. The first method should be used when the 
+material to extract already exists. This helps with mass conservation as the function
+throws an error if the old material does not contain sufficient masses of each isotope 
+in the new_mat ::
+
+   mat_rsrc_ptr other_mat = mat_rsrc_ptr(new Material(c_p));
+   m_p->extract(other_mat); 
+
+The second way extracts a specified mass of material from the original. It internally
+creates a new material that has the same normalized composition as the original but has 
+the specified mass. Then, this function internally calls extract(new_mat) and returns 
+the new material. ::
+
+   double mass = 1000;
+   MassUnit units = KG;
+   mat_rsrc_ptr new_mat = extract(mass, units); 
+
+An analgous function exists for extracting based on number of atoms. ::
+
+   extract(atoms, units) 
+
+
+ 
 Material Expectations 
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Always decays material sufficiently so that the retrieved data is current.
-Always conserves mass, never creating material out of nothing.
+The material class makes two primary promises. 
 
+First, it will always decay material sufficiently that any retrieved data is 
+current.  Second, it will always conserves mass, never creating material out 
+of nothing.
 
 
 
