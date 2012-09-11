@@ -2,6 +2,7 @@
 #include "XMLFileLoaderTests.h"
 
 #include <string>
+#include <sstream>
 #include <set>
 #include <iostream>
 #include "Model.h"
@@ -11,23 +12,16 @@ using namespace std;
 
 void XMLFileLoaderTests::SetUp() {
     falseFile = "false.xml";
-    createTestInputFile(falseFile,falseSequence);
+    createTestInputFile(falseFile,falseSequence());
 
     controlFile = "control.xml";
-    createTestInputFile(controlFile,controlSequence);
+    createTestInputFile(controlFile,controlSequence());
 
     recipeFile = "recipes.xml";
-    createTestInputFile(recipeFile,recipeSequence);
+    createTestInputFile(recipeFile,recipeSequence());
 
     moduleFile = "modules.xml";
-    createTestInputFile(moduleFile,moduleSequence);
-    
-    // here
-    //testModuleOpening();
-}
-
-void XMLFileLoaderTests::testModuleOpening() {
-    DynamicModule module("Market","TestMarket");
+    createTestInputFile(moduleFile,moduleSequence());
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -37,40 +31,12 @@ void XMLFileLoaderTests::TearDown() {
     unlink(moduleFile.c_str());
 }
 
-TEST_F(XMLFileLoaderTests, OpenFile) {
-  ASSERT_ANY_THROW(xmlFile = new XMLFileLoader(falseFile,false); delete xmlFile;);
-  ASSERT_NO_THROW(xmlFile = new XMLFileLoader(controlFile,false); delete xmlFile;);
+std::string XMLFileLoaderTests::falseSequence() {
+  return "XML is nice, but boooooooooooooooo";
 }
 
-TEST_F(XMLFileLoaderTests,control) {
-  xmlFile = new XMLFileLoader(controlFile,false);
-  EXPECT_NO_THROW(xmlFile->load_control_parameters());
-  delete xmlFile;
-}
-
-TEST_F(XMLFileLoaderTests,recipes) {
-  xmlFile = new XMLFileLoader(recipeFile,false);
-  EXPECT_NO_THROW(xmlFile->load_recipes());
-  delete xmlFile;
-}
-
-TEST_F(XMLFileLoaderTests,modules) {
-  // here
-  testModuleOpening();
-
-
-  //  xmlFile = new XMLFileLoader(moduleFile,false);  
-  //set<string> module_types = Model::dynamic_module_types();
-  //xmlFile->load_modules_of_type("Market","/*/market");
-  //xmlFile->load_dynamic_modules(module_types);
-  //delete xmlFile;
-}
-
-std::string XMLFileLoaderTests::falseSequence =
-  "I am not an XML file.";
-
-std::string XMLFileLoaderTests::controlSequence =
-          "<start>"
+std::string XMLFileLoaderTests::controlSequence() {
+  return  "<start>"
           " <control>"
           "  <duration>1200</duration>"
           "  <startmonth>1</startmonth>"
@@ -79,9 +45,10 @@ std::string XMLFileLoaderTests::controlSequence =
           "  <decay>-1</decay>"
           " </control>"
           "</start>";
+}
 
-std::string XMLFileLoaderTests::recipeSequence =
-          "<start>"
+std::string XMLFileLoaderTests::recipeSequence() {
+  return  "<start>"
           " <control>"
           "  <recipe>"
           "    <name>used_uo2_50gwd</name>"
@@ -107,9 +74,10 @@ std::string XMLFileLoaderTests::recipeSequence =
           "  </recipe>"          
           " </control>"
           "</start>";
+}
 
-std::string XMLFileLoaderTests::moduleSequence = 
-          "<start>"
+std::string XMLFileLoaderTests::moduleSequence() {
+  return  "<start>"
           "  <!-- markets -->"
           "  <market>"
           "    <name>freshfuel</name>"
@@ -143,3 +111,61 @@ std::string XMLFileLoaderTests::moduleSequence =
           "    <!-- end institution definitions -->"
           "  </region>"
           "</start>";
+}
+
+std::string XMLFileLoaderTests::moduleSchema() {
+  return 
+    "<start>"    
+    "<element name=\"control\">"    
+    "<element name=\"duration\">"
+    "  <data type=\"nonNegativeInteger\"/>"
+    "</element>"
+    "<element name=\"startmonth\">"
+    "  <data type=\"nonNegativeInteger\"/>"
+    "</element>"
+    "<element name=\"startyear\">"
+    "  <data type=\"nonNegativeInteger\"/>"
+    "</element>"
+    "<element name=\"simstart\">"
+    "  <data type=\"nonNegativeInteger\"/>"
+    "</element>"
+    "<element name=\"decay\">"
+    "  <data type=\"integer\"/>"
+    "</element>"
+    "</element>"
+    "</start>";
+}
+
+TEST_F(XMLFileLoaderTests,openfile) {
+  EXPECT_NO_THROW(xmlFile = new XMLFileLoader(controlFile,false); delete xmlFile;);
+}
+
+TEST_F(XMLFileLoaderTests,throws) {
+  EXPECT_THROW(XMLFileLoader file("blah",false), CycIOException);
+}
+
+TEST_F(XMLFileLoaderTests,control) {
+  xmlFile = new XMLFileLoader(controlFile,false);
+  EXPECT_NO_THROW(xmlFile->load_control_parameters());
+  delete xmlFile;
+}
+
+TEST_F(XMLFileLoaderTests,recipes) {
+  xmlFile = new XMLFileLoader(recipeFile,false);
+  EXPECT_NO_THROW(xmlFile->load_recipes());
+  delete xmlFile;
+}
+
+TEST_F(XMLFileLoaderTests,modules) {
+  xmlFile = new XMLFileLoader(moduleFile,false);  
+  set<string> module_types = Model::dynamic_module_types();
+  xmlFile->load_dynamic_modules(module_types);
+  delete xmlFile;
+}
+
+TEST_F(XMLFileLoaderTests,schema) {
+  xmlFile = new XMLFileLoader(moduleFile,false);  
+  stringstream schema(moduleSchema());
+  EXPECT_NO_THROW(xmlFile->applySchema(schema));
+  delete xmlFile;
+}

@@ -22,7 +22,6 @@ class XMLFileLoaderTests : public ::testing::Test {
   }
 
  public:
-  static std::string controlSequence, falseSequence, moduleSequence, recipeSequence;
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
   XMLFileLoader* xmlFile;
@@ -31,7 +30,11 @@ class XMLFileLoaderTests : public ::testing::Test {
 
   virtual void TearDown();
 
-  void testModuleOpening();
+  std::string falseSequence();
+  std::string controlSequence();
+  std::string recipeSequence();
+  std::string moduleSequence();
+  std::string moduleSchema();
 
 };
 
