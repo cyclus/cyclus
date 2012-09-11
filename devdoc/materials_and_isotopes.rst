@@ -50,15 +50,69 @@ functions.
 Materials
 ---------
 
-Materials are the main constituents in *Cyclus* simulations. A Material has a quantity
+Materials are the main objects of information in *Cyclus* simulations. A Material has a quantity
 and an IsoVector, comprising its composition. Materials are also passed around *Cyclus* functions
-in boost smart points called "mat_rsrc_ptr"s. 
+in boost smart pointers called "mat_rsrc_ptr"s. 
 
 A Material is effectively fully initialized through construction via CompMapPtr or IsoVector and
 setting its quantity. For example: ::
 
     mat_rsrc_ptr m_p = mat_rsrc_ptr(new Material(c_p));
     m_p->setQuantity(10); // 10kg of c_p
+
+
+Material Data 
+~~~~~~~~~~~~~~
+
+mass(isos, time, units) 
+should return data about an appropriately decayed material
+allow kg, g (amu?)
+allow summing
+just a single isotope 
+a set of isotopes
+a single element
+a set of elements,
+return data for any time, in any allowed unit.
+atoms(isos, time, units) 
+should return data about an appropriately decayed material
+always moles (?)
+allow summing
+just a single isotope 
+a set of isotopes
+a single element
+a set of elements,
+return data for any time, in any allowed unit.
+
+
+Material Methods  
+~~~~~~~~~~~~~~~~~~~
+
+absorb(other_mat)
+To use this, the material to absorb has to already exist. This helps with mass conservation
+extract(new_mat)
+To use this, the material to extract has to already exist. This helps with mass conservation
+returns the new_mat
+throws an error if the old material does not contain sufficient masses of each isotope in the new_mat
+extract(mass, units)  
+This function should create a new material made of this material's composition, but the mass specified, then call extract(new_mat)
+returns the new_mat
+To use this, the material to extract is created within the material class and returned as part of this function call. This helps with mass conservation
+throws an error if the old material does not contain sufficient mass 
+extract(atoms, units) 
+This function should create a new material made of this material's composition, but the atoms specified, then call extract(new_mat)
+returns the new_mat
+To use this, the material to extract is created within the material class and returned as part of this function call. This helps with mass conservation
+throws an error if the old material does not contain sufficient atoms 
+
+
+Material Expectations 
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Always decays material sufficiently so that the retrieved data is current.
+Always conserves mass, never creating material out of nothing.
+
+
+
 
 RecipeLogger
 ------------
