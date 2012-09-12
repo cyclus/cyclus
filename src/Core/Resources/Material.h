@@ -228,23 +228,12 @@ public:
      specified by the given CompMapPtr. This operation will change
      the quantity_ and iso_vector_ members.
       
-     @param other the composition of material that will be
-     removed against this Material. It should not be normalized.
+     @param comp_to_rem the composition of material that will be removed against this Material. 
+     @param kg_to_rem the amount in kg of material that will be removed against this Material. 
      @throws CycNegativeValueException for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const CompMapPtr other);
-
-  /**
-     Extracts from this material a material
-     specified by the given IsoVector. This operation will change
-     the quantity_ and iso_vector_ members.
-      
-     @param other the material that will be removed against this Material. 
-     @throws CycNegativeValueException for overextraction events
-     @return the extracted material object with this set as its OriginalID
-   */
-  virtual mat_rsrc_ptr extract(const mat_rsrc_ptr other);
+  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double kg_to_rem);
 
   /**
      Extracts a specified mass from this material creating a new 
