@@ -90,6 +90,8 @@ mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
   CompMapPtr new_comp = CompMapPtr(this->unnormalizeComp(MASS));
   assert(!new_comp->normalized());
   CompMapPtr remove_comp = comp_to_rem;
+  remove_comp->massify();
+  assert(remove_comp->normalized());
   double remainder_kg, new_kg, kg_to_rem_i;
   remainder_kg = this->quantity();
   int iso;
