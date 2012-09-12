@@ -15,19 +15,17 @@
 using namespace std;
 using namespace boost;
 
-// static members
-std::string XMLFileLoader::main_schema_ = Env::getInstallPath() + "/share/cyclus.rng";
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(std::string load_filename, 
-                             bool use_main_schema) {
+                             bool use_main_schema)  {
+  
   initialize_module_paths();
 
   stringstream input("");
   loadStringstreamFromFile(input,load_filename);
   if (use_main_schema) {
     stringstream schema("");
-    loadStringstreamFromFile(schema,main_schema_);
+    loadStringstreamFromFile(schema,pathToMainSchema());
     parser_ = shared_ptr<XMLParser>(new XMLParser(input,schema));
   } else {
     parser_ = shared_ptr<XMLParser>(new XMLParser(input));
@@ -37,6 +35,7 @@ XMLFileLoader::XMLFileLoader(std::string load_filename,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
                                              std::string file) {
+
   ifstream file_stream(file.c_str());
 
   if (file_stream) {
@@ -46,6 +45,11 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
     throw CycIOException("The file '" + file
                          + "' could not be loaded.");
   }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string XMLFileLoader::pathToMainSchema() {
+  return Env::getInstallPath() + "/share/cyclus.rng";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

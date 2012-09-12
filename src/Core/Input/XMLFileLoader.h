@@ -14,10 +14,7 @@
    a cyclus simulation from xml
  */
 class XMLFileLoader {
- public:
-  /// the schema to validate the file against
-  static std::string main_schema_;
-    
+ public:    
   /**
      Constructor to create a new XML for loading
      @param load_filename The filename for the file to be loaded
@@ -26,6 +23,11 @@ class XMLFileLoader {
   */
   XMLFileLoader(std::string load_filename, bool use_main_schema=true);
   
+  /**
+     @return the path to the main file schema (cyclus.rng)
+   */
+  std::string pathToMainSchema();
+
   /**
      applies a schema agaisnt the parser used by the file loader
      @param schema the schema representation

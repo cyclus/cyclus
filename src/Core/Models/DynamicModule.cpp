@@ -16,7 +16,7 @@ using namespace std;
 DynamicModule::DynamicModule(std::string type, std::string name) :
   abs_path_(""), module_name_(""), 
   constructor_name_(""), destructor_name_(""),
-  module_library_(NULL), constructor_(NULL), destructor_(NULL) {
+  module_library_(0), constructor_(0), destructor_(0) {
   
   module_name_ = name;
   abs_path_ = Env::getInstallPath() + "/lib/Models/" + type + "/" +

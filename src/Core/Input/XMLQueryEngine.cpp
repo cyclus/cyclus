@@ -12,12 +12,12 @@ using namespace boost;
 using namespace xmlpp;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-XMLQueryEngine::XMLQueryEngine(XMLParser& parser) {
+XMLQueryEngine::XMLQueryEngine(XMLParser& parser) : current_node_(0) {
   current_node_ = parser.document()->get_root_node();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) {
+XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) : current_node_(0) {
   current_node_ = node;
 }
 

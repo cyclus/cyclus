@@ -21,12 +21,6 @@ class XMLQueryEngine : public QueryEngine {
   */
   XMLQueryEngine(XMLParser& parser);
 
-  /**
-     constructor given a node
-     @param node the node to set as the current node
-  */
-  XMLQueryEngine(xmlpp::Node* node);
-
   /// virtual destructor
   virtual ~XMLQueryEngine() {};
     
@@ -60,6 +54,12 @@ class XMLQueryEngine : public QueryEngine {
                                         int index = 0);
 
  protected:
+  /**
+     constructor given a node
+     @param node the node to set as the current node
+  */
+  XMLQueryEngine(xmlpp::Node* node);
+
   /**
      every derived query engine must return a new instance initialized
      by a query.
