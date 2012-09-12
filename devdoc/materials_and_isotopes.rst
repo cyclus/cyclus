@@ -62,7 +62,7 @@ setting its quantity. For example: ::
 
 
 Material Data 
-~~~~~~~~~~~~~~
+*************
 
 The data held by a material object is straightforward. The interface allows 
 access to the mass or atomic composition of the material ::
@@ -88,7 +88,7 @@ most up-to-date material is returned.
 
 
 Material Methods  
-~~~~~~~~~~~~~~~~~~~
+****************
 
 The methods that can be performed on a Material object in order to mainupulated 
 are a small subset of mass conserving functions. These functions allow the user 
@@ -131,7 +131,7 @@ An analgous function exists for extracting based on number of atoms. ::
 
  
 Material Expectations 
-~~~~~~~~~~~~~~~~~~~~~~~~
+*********************
 
 The material class makes two primary promises. 
 
