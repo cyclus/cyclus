@@ -34,7 +34,7 @@ class XMLFileLoaderTests : public ::testing::Test {
   std::string controlSequence();
   std::string recipeSequence();
   std::string moduleSequence();
-  std::string moduleSchema();
+  std::string controlSchema();
 
 };
 

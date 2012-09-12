@@ -36,7 +36,7 @@ std::string XMLFileLoaderTests::falseSequence() {
 }
 
 std::string XMLFileLoaderTests::controlSequence() {
-  return  "<start>"
+  return  "<simulation>"
           " <control>"
           "  <duration>1200</duration>"
           "  <startmonth>1</startmonth>"
@@ -44,11 +44,11 @@ std::string XMLFileLoaderTests::controlSequence() {
           "  <simstart>0</simstart>"
           "  <decay>-1</decay>"
           " </control>"
-          "</start>";
+          "</simulation>";
 }
 
 std::string XMLFileLoaderTests::recipeSequence() {
-  return  "<start>"
+  return  "<simulation>"
           " <control>"
           "  <recipe>"
           "    <name>used_uo2_50gwd</name>"
@@ -73,11 +73,11 @@ std::string XMLFileLoaderTests::recipeSequence() {
           "    </isotope>"
           "  </recipe>"          
           " </control>"
-          "</start>";
+          "</simulation>";
 }
 
 std::string XMLFileLoaderTests::moduleSequence() {
-  return  "<start>"
+  return  "<simulation>"
           "  <!-- markets -->"
           "  <market>"
           "    <name>freshfuel</name>"
@@ -110,12 +110,15 @@ std::string XMLFileLoaderTests::moduleSequence() {
           "    </institution>"
           "    <!-- end institution definitions -->"
           "  </region>"
-          "</start>";
+          "</simulation>";
 }
 
-std::string XMLFileLoaderTests::moduleSchema() {
+std::string XMLFileLoaderTests::controlSchema() {
   return 
-    "<start>"    
+    "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\""
+    "datatypeLibrary=\"http://www.w3.org/2001/XMLSchema-datatypes\">"
+    "<start>"
+    "<element name=\"simulation\">"    
     "<element name=\"control\">"    
     "<element name=\"duration\">"
     "  <data type=\"nonNegativeInteger\"/>"
@@ -133,7 +136,9 @@ std::string XMLFileLoaderTests::moduleSchema() {
     "  <data type=\"integer\"/>"
     "</element>"
     "</element>"
-    "</start>";
+    "</element>"
+    "</start>"
+    "</grammar>";
 }
 
 TEST_F(XMLFileLoaderTests,openfile) {
@@ -164,8 +169,8 @@ TEST_F(XMLFileLoaderTests,modules) {
 }
 
 TEST_F(XMLFileLoaderTests,schema) {
-  xmlFile = new XMLFileLoader(moduleFile,false);  
-  stringstream schema(moduleSchema());
-  EXPECT_NO_THROW(xmlFile->applySchema(schema));
+  xmlFile = new XMLFileLoader(controlFile,false);  
+  stringstream schema(controlSchema());
+  EXPECT_NO_THROW(xmlFile->applySchema(schema););
   delete xmlFile;
 }
