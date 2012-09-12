@@ -85,35 +85,42 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const CompMapPtr other) {
-
-  CompMapPtr new_comp = CompMapPtr(new CompMap(MASS));
-  CompMapPtr remove_comp = other;
-  double remainder_kg, new_kg;
+mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
+ 
+  CompMapPtr new_comp = CompMapPtr(this->unnormalizeComp(MASS));
+  assert(!new_comp->normalized());
+  CompMapPtr remove_comp = comp_to_rem;
+  remove_comp->massify();
+  assert(remove_comp->normalized());
+  double remainder_kg, new_kg, kg_to_rem_i;
   remainder_kg = this->quantity();
+  int iso;
+
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
-    if ( this->mass(it->first) >= it->second ) {
-      (*new_comp)[it->first] = this->mass(it->first) - it->second;
-      new_kg += it->second;
-      remainder_kg -= it->second;
+    kg_to_rem_i = it->second * kg_to_rem;
+    iso = it->first;
+    if ( this->mass(iso) >= kg_to_rem_i ) {
+      (*new_comp)[iso] = this->mass(iso) - kg_to_rem_i;
+      new_kg += kg_to_rem_i;
+      remainder_kg -= kg_to_rem_i;
     } else {
     stringstream ss("");
     ss << "The Material " << this->ID() 
       << " has insufficient material to extract the isotope : "
-      << it->first ;
+      << iso ;
     throw CycNegativeValueException(ss.str());
     }
   }
 
   // make new material
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(other));
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(comp_to_rem));
   new_mat->setQuantity(new_kg, KG);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
-  iso_vector_ = IsoVector(new_comp); 
+  this->iso_vector_ = IsoVector(new_comp); 
   this->setQuantity(remainder_kg, KG);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
@@ -232,6 +239,31 @@ double Material::moles(Iso tope){
   return to_ret;
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+CompMapPtr Material::unnormalizeComp(Basis basis){
+  CompMapPtr norm_comp = isoVector().comp();
+  double scaling;
+
+  switch(basis) {
+    case MASS :
+      norm_comp->massify();
+      scaling = this->mass(KG);
+      break;
+    case ATOM :
+      norm_comp->atomify();
+      scaling = this->moles();
+      break;
+    default : 
+      throw CycException("The basis provided is not a supported CompMap basis");
+  }
+  CompMapPtr full_comp = CompMapPtr(new CompMap(*norm_comp));
+  CompMap::iterator it;
+  for( it=norm_comp->begin(); it!= norm_comp->end(); ++it ){
+    (*full_comp)[it->first] = scaling*(it->second);
+  }
+
+  return full_comp;
+}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 rsrc_ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
