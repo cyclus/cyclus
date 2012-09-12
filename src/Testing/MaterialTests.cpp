@@ -198,26 +198,26 @@ TEST_F(MaterialTest, ExtractMass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, ExtractIsoVector_complete) {
+TEST_F(MaterialTest, Extract_complete) {
 
   // Complete extraction
   mat_rsrc_ptr m1;
-  EXPECT_NO_THROW( m1 = test_mat_->extract(IsoVector(test_comp_, test_size_)));
+  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, test_size_));
   EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, ExtractIsoVector_over_extract) {
+TEST_F(MaterialTest, Extract_over_extract) {
 
   // Over-extraction should throw an exception
-  EXPECT_THROW( diff_mat_->extract(IsoVector(test_comp_, 2*test_size_)), CycNegativeValueException);
+  EXPECT_THROW( diff_mat_->extract(test_comp_, 2*test_size_), CycNegativeValueException);
   EXPECT_THROW( test_mat_->extract(test_comp_, 2*test_size_), CycException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, ExtractIsoVector_half) {
+TEST_F(MaterialTest, Extract_half) {
   // two minus one equals one.
   mat_rsrc_ptr m1;
   m1 = two_test_mat_->extract(test_comp_, test_size_);
@@ -225,7 +225,7 @@ TEST_F(MaterialTest, ExtractIsoVector_half) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, ExtractIsoVector_diff_comp) {
+TEST_F(MaterialTest, Extract_diff_comp) {
 
   // differing comp minus one element equals old comp minus new
   mat_rsrc_ptr m1;
