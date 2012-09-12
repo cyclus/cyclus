@@ -209,12 +209,6 @@ public:
   double moles(Iso tope);
 
   /**
-     This scales the composition by the amount of moles or kg, depending on the 
-     basis provided. It returns an unnormalized CompMapPtr
-     */
-  CompMapPtr unnormalizeComp(Basis basis);
-
-  /**
      Absorbs the contents of the given 
      Material into this Material and deletes 
      the given Material. 
@@ -284,6 +278,12 @@ protected:
   
 
 private:
+  /**
+     This scales the composition by the amount of moles or kg, depending on the 
+     basis provided. It returns an unnormalized CompMapPtr
+     */
+  CompMapPtr unnormalizeComp(Basis basis);
+
   /**
      used by print() to 'hide' print code when recording is not desired 
    */
