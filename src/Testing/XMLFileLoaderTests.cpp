@@ -161,11 +161,14 @@ TEST_F(XMLFileLoaderTests,recipes) {
   delete xmlFile;
 }
 
-TEST_F(XMLFileLoaderTests,modules) {
+// This needs to be moved somewhere else! maybe to a new simulation
+// constructor class..
+TEST_F(XMLFileLoaderTests,modulesandsim) {
   xmlFile = new XMLFileLoader(moduleFile,false);  
   set<string> module_types = Model::dynamic_module_types();
   xmlFile->load_dynamic_modules(module_types);
   delete xmlFile;
+  EXPECT_NO_THROW(Model::constructSimulation());
 }
 
 TEST_F(XMLFileLoaderTests,schema) {
