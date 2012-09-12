@@ -62,7 +62,7 @@ template <class Derived> class IntrusiveBase {
   friend void intrusive_ptr_release(const Derived* p) {
     BOOST_ASSERT(p);
     if (--((const IntrusiveBase*) p)->counter_ == 0) {
-      delete p; // @MJG-NOT THIS
+      delete p;
     }
   }
 

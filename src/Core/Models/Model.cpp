@@ -173,7 +173,7 @@ Model::~Model() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::deleteModel(Model* model){
-    loaded_modules_[model->modelImpl()]->destructInstance(model); // @MJG-NOT THIS
+    loaded_modules_[model->modelImpl()]->destructInstance(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

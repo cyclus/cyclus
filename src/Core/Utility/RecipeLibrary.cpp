@@ -45,7 +45,6 @@ void RecipeLibrary::load_recipes(QueryEngine* qe) {
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
     load_recipe(recipe); // load recipe
   }
-  // delete qe // @MJG-NOT THIS (BUT STILL BAD)
   CLOG(LEV_DEBUG2) << "}";
 }
 
