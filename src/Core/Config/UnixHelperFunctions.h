@@ -52,8 +52,15 @@ void DynamicModule::setDestructor() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::closeLibrary() {
-  if (module_library_)
-    dlclose(module_library_);
+  if (module_library_) {
+    int exit_code = dlclose(module_library_);
+    if (exit_code != 0)  {
+      std::string err_msg = "Error closing shared object file: ";
+      err_msg  += dlerror();
+      throw CycIOException(err_msg);
+    }  
+    dlerror(); // reset errors
+  }
 }
 
 #endif
