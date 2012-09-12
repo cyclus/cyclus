@@ -18,7 +18,6 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/QueryEngineTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
@@ -58,28 +57,8 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   COMPONENT testing
   )
 
-INSTALL(FILES 
-  ModelTests.cpp
-  ModelTests.h
-  FacilityModelTests.cpp
-  FacilityModelTests.h
-  InstModelTests.cpp
-  InstModelTests.h
-  RegionModelTests.cpp
-  RegionModelTests.h
-  BuildingManagerTests.h
-  ConverterModelTests.cpp
-  ConverterModelTests.h
-  MarketModelTests.cpp
-  MarketModelTests.h
-  MarketPlayerTests.h
-  SDManagerTests.h
-  StubModelTests.cpp
-  StubModelTests.h
-  StubCommModelTests.cpp
-  StubCommModelTests.h
-  XMLParserTests.cpp
-  XMLParserTests.h
+FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+INSTALL(FILES ${files} 
   DESTINATION cyclus/include
   COMPONENT testing
   )
