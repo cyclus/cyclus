@@ -49,23 +49,24 @@ void MassTable::initializeSQL() {
   // get mass info
   db->open();
 
-  query_result result = db->query("SELECT * FROM IsotopeMasses");
+  query_result znums = db->query("SELECT Z FROM isotopemasses");
+  query_result anums = db->query("SELECT A FROM isotopemasses");
+  query_result mnums = db->query("SELECT Mass FROM isotopemasses");
   
-  int nResults = result.size();
-  for (int i = 0; i < nResults; i++){
+  for (int i = 0; i < znums.size(); i++){
     // // obtain the database row and declare the appropriate members
-    query_row row = result.at(i);
-    // note transposition, mislabeled columns
-    string Zstr = row.at(1), Astr = row.at(0), Mstr = row.at(2); 
-    int Znum = atoi( Zstr.c_str() );
-    int Anum = atoi( Astr.c_str() );
-    double mass = atof( Mstr.c_str() );
+    string aStr = anums.at(i).at(0);
+    string zStr = znums.at(i).at(0);
+    string mStr = mnums.at(i).at(0);
+    int z = atoi( zStr.c_str() );
+    int a = atoi( aStr.c_str() );
+    double mass = atof( mStr.c_str() );
     // create a nuclide member and add it to the nuclide vector
-    nuclide_t n = {Znum,Anum,mass};
+    nuclide_t n = {z, a, mass};
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
-    int tope = Znum*1000 + Anum;
-    isoIndex_.insert(make_pair(tope,i));
+    int tope = z * 1000 + a;
+    isoIndex_.insert(make_pair(tope, i));
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();
