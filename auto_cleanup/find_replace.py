@@ -25,7 +25,7 @@ start_path = getcwd()
 
 for (path, dirs, files) in walk(start_path):
     for file in files:   
-        mode = str(stat(file).st_mode)
-        if mode[-1] != "7":
-            replace(file,"constructor","construct"+file.split(".")[0])
-            replace(file,"destructor","destruct"+file.split(".")[0])
+        parts = file.split(".")
+        if parts[-1] == "cpp":
+            replace(path+"/"+file,"constructor","construct"+parts[0])
+            replace(path+"/"+file,"destructor","destruct"+parts[0])

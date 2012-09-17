@@ -10,8 +10,6 @@
 
 using namespace std;
 
-// static variables
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string type, std::string name) :
   abs_path_(""), module_name_(""), 

@@ -2,10 +2,10 @@
 
 #include "Model.h"
 
-extern "C" Model* constructor() {
+extern "C" Model* constructTestFacility() {
   return new TestFacility();
 }
 
-extern "C" Model* destructor(Model* model) {
+extern "C" Model* destructTestFacility(Model* model) {
   delete model;
 }
