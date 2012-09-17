@@ -19,8 +19,8 @@ DynamicModule::DynamicModule(std::string type, std::string name) :
   module_name_ = name;
   abs_path_ = Env::getInstallPath() + "/lib/Models/" + type + "/" +
     name + "/lib" + name + SUFFIX;
-  constructor_name_="constructor";
-  destructor_name_="destructor";
+  constructor_name_= "construct" + name;
+  destructor_name_= "destruct" + name;
 
   openLibrary();
   setConstructor();

@@ -134,6 +134,12 @@ class InstModel : public TimeAgent, public Communicator {
   std::map<Prototype*,int> initial_build_order_;
 
   /**
+     add a prtotoype to the set of available prototypes
+     @param prototype the prototype to add
+   */
+  void addAvailablePrototype(Prototype* prototype);
+
+  /**
      Adds a prototype build order to initial_build_order_
      @param qe a pointer to a QueryEngine object containing intialization data
    */

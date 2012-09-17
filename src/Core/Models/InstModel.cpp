@@ -37,7 +37,7 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
     for (int i=0;i<numAvailProtos;i++){
       name = qe->getElementContent("availableprototype",i);
       prototype = Prototype::getRegisteredPrototype(name);
-      prototypes_.insert(prototype);
+      addAvailablePrototype(prototype);
     }
   } catch (CycNullQueryException) {}; // no prototypes available
 
@@ -50,6 +50,11 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
     }
   } catch (CycNullQueryException) {}; // no initial builds
 
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::addAvailablePrototype(Prototype* prototype) {
+  prototypes_.insert(prototype);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
