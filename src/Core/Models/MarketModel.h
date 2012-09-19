@@ -72,6 +72,12 @@ class MarketModel : public Model, public Communicator {
      MarketModels should not be indestructible. 
    */
   virtual ~MarketModel();
+
+  /**
+     sets the commodity for this market
+     @param name the commodity name
+   */
+  void setCommodity(std::string name);
   
   /**
      Queries the list of known markets for one associated with the 

@@ -65,6 +65,11 @@ void MarketModel::initSimInteraction(MarketModel* mkt) {
   TI->registerResolveListener(mkt);
   MarketModel::registerMarket(mkt);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::setCommodity(std::string name) {
+  commodity_ = name;
+}
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void MarketModel::initCoreMembers(QueryEngine* qe) {
@@ -72,7 +77,7 @@ void MarketModel::initCoreMembers(QueryEngine* qe) {
   Model::initCoreMembers(qe);
 
   // specific initalizations
-  commodity_ = qe->getElementContent("mktcommodity");
+  setCommodity(qe->getElementContent("mktcommodity"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
