@@ -97,7 +97,7 @@ void FacilityModel::handleTock(int time){
   // send the appropriate materials, 
   // receive any materials the market has found a source for, 
   // and record all material transfers.
-  if (time >= decommission_date_) {
+  if ( lifetimeReached() ) {
     decommission();
   }
 }
@@ -110,6 +110,11 @@ void FacilityModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
   deleteModel(this);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool FacilityModel::lifetimeReached() {
+  return (TI->time() >= decommission_date_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

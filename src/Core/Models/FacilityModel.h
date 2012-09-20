@@ -226,6 +226,12 @@ class FacilityModel : public TimeAgent, public Communicator,
   virtual int facLifetime() { return fac_lifetime_; };
 
   /**
+     @return true if the current time is greater than the 
+     decommission date
+   */
+  bool lifetimeReached();
+
+  /**
      Returns the facility's power capacity 
       
      @return 0 by default. If the facility produces power, it will use 
