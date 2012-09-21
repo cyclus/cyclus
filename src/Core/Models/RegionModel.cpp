@@ -26,8 +26,6 @@ void RegionModel::initCoreMembers(QueryEngine* qe) {
   Model::initCoreMembers(qe); // name_
   RegionModel::initAllowedFacilities(qe); // allowedFacilities_
   RegionModel::initInstitutionNames(qe); // inst_names_
-  //RegionModel::addRegionAsRootNode(); // parent_ and tick listener, model 'born'
-  //RegionModel::addChildrenToTree(qe); // children->setParent, requires initCoreMembers()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

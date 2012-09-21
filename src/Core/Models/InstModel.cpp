@@ -45,7 +45,7 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
   try {
     int numInitFacs = qe->nElementsMatchingQuery("initialfacilitylist");
     for (int i=0;i<numInitFacs;i++){
-      QueryEngine* qe_child = qe->queryElement("initialfacilitylist",1);
+      QueryEngine* qe_child = qe->queryElement("initialfacilitylist",i);
       addPrototypeToInitialBuild(qe_child);
     }
   } catch (CycNullQueryException) {}; // no initial builds

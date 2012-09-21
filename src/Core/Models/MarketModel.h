@@ -90,12 +90,9 @@ class MarketModel : public Model, public Communicator {
   static MarketModel* marketForCommod(std::string commod);
 
   /**
-     set the parameters necessary for MarketModel to interact
-     with the simulation
-     
-     @param mkt the MarketModel to initialize
+     enters the market into the simulation
    */
-  virtual void initSimInteraction(MarketModel* mkt);
+  virtual void enterSimulation(Model* parent);
 
   /**
      every model needs a method to initialize from a QueryEngine

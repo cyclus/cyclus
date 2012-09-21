@@ -80,14 +80,16 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </start>
 
   <!-- begin section for simulation parameters -->
-  <define name="control"/>
-    <interleave>
+  <define name="control">
+    <element name ="control">
+      <interleave>
 	<ref name="duration"/>
 	<ref name="startmonth"/>
 	<ref name="startyear"/>
-    	<ref name="simstart"/>
-    	<ref name="decay"/>
-    </interleave>
+	<ref name="simstart"/>
+	<ref name="decay"/>
+      </interleave>
+    </element>
   </define>
 
   <define name="duration">
@@ -229,6 +231,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
   </define>
 
+  <define name="input_capacity">
+      <element name="input_capacity">
+         <data type="double"/>
+      </element>
+  </define>
+
   <define name="innerradius">
       <element name="innerradius">
         <data type="double"/>
@@ -262,6 +270,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="outcommodity">
       <element name="outcommodity">
          <text/>
+      </element>
+  </define>
+
+  <define name="output_capacity">
+      <element name="output_capacity">
+         <data type="double"/>
       </element>
   </define>
 
@@ -329,6 +343,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for institutions -->
   <define name="institution">
     <element name="institution">
+
+      <element name="name">
+         <text/>
+      </element>
       
       <optional>
         <oneOrMore>
@@ -386,7 +404,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="basis">
         <text/>
       </element>
-
+<!--
       <element name="unit">
         <text/>
       </element>
@@ -394,7 +412,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="total">
         <text/>
       </element>
-
+-->
       <oneOrMore>
       <element name="isotope">
         <element name="id">
@@ -429,6 +447,3 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- end section for recipes -->
 
 </grammar>
-
-
-    

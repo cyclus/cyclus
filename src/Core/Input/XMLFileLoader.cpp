@@ -36,6 +36,8 @@ XMLFileLoader::XMLFileLoader(std::string load_filename,
 void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
                                              std::string file) {
 
+  CLOG(LEV_DEBUG4) << "loading the file: " << file;
+
   ifstream file_stream(file.c_str());
 
   if (file_stream) {
@@ -45,6 +47,8 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
     throw CycIOException("The file '" + file
                          + "' could not be loaded.");
   }
+
+  CLOG(LEV_DEBUG5) << "file loaded as a string: " << stream.str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

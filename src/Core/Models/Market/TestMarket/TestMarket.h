@@ -11,7 +11,6 @@ class TestMarket : public MarketModel {
     }
     TestMarket(std::string commod) {
       commodity_ = commod;
-      MarketModel::initSimInteraction(this);
     }
     virtual void receiveMessage(msg_ptr msg) {
     }

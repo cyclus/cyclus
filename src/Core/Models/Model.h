@@ -84,6 +84,12 @@ class Model {
   static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
+     register a model as a market
+     @param market the model to register
+   */
+  static void registerMarketWithSimulation(Model* market);
+
+  /**
      register a model as a region
      @param region the model to register
    */
@@ -280,6 +286,11 @@ class Model {
      the set of loaded dynamic libraries
    */
   static std::vector<void*> dynamic_libraries_;
+
+  /**
+     a set of registered markets
+   */
+  static std::set<Model*> markets_;
 
   /**
      a set of registered regions

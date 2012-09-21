@@ -57,13 +57,12 @@ void MarketModel::registerMarket(MarketModel* mkt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::initSimInteraction(MarketModel* mkt) {  
-  // this brings the market into the simulation (all agents must have a parent)
-  mkt->setParent(mkt);
+void MarketModel::enterSimulation(Model* parent) {
+  Model::enterSimulation(parent);
 
   // register the model
-  TI->registerResolveListener(mkt);
-  MarketModel::registerMarket(mkt);
+  TI->registerResolveListener(this);
+  MarketModel::registerMarket(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

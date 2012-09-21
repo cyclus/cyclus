@@ -29,6 +29,7 @@ table_ptr Model::agent_table = table_ptr(new Table("Agents"));
 vector<Model*> Model::model_list_;
 map< string, shared_ptr<DynamicModule> > Model::loaded_modules_;
 vector<void*> Model::dynamic_libraries_;
+set<Model*> Model::markets_;
 set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,11 +99,25 @@ void Model::initializeSimulationEntity(std::string model_type,
   if ("Facility" == model_type) {
     Prototype::registerPrototype(model->name(),
         			 dynamic_cast<Prototype*>(model));
-  } else {
+  } else if ("Market" == model_type) {
+    registerMarketWithSimulation(model);
+  }  else {
     model_list_.push_back(model);
   }
   if ("Region" == model_type) {
     registerRegionWithSimulation(model);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::registerMarketWithSimulation(Model* market) {
+  MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
+  if (!marketCast) {
+    string err_msg = "Model '" + market->name() + "' can't be registered as a market.";
+    throw CycOverrideException(err_msg);
+  }
+  else {
+    markets_.insert(market);
   }
 }
 
@@ -121,6 +136,10 @@ void Model::registerRegionWithSimulation(Model* region) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::constructSimulation() {
   set<Model*>::iterator it;
+  for (it = markets_.begin(); it != markets_.end(); it++) {
+    Model* market = *it;
+    market->enterSimulation(market);
+  }
   for (it = regions_.begin(); it != regions_.end(); it++) {
     Model* region = *it;
     region->enterSimulation(region);
@@ -202,7 +221,8 @@ void Model::enterSimulation(Model* parent){
   // set model-specific members
   parentID_ = parent->ID();
   setParent(parent);
-  parent->addChild(this);
+  if (parent != this)
+    parent->addChild(this);
   bornOn_ = TI->time();
 
   // add model to the database
