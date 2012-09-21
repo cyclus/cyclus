@@ -80,10 +80,27 @@ class FacilityModel : public TimeAgent, public Communicator,
 
   /**
      Initalize the FacilityModel from xml. Calls the init function. 
-     
      @param qe a pointer to a QueryEngine object containing intialization data
    */
   virtual void initCoreMembers(QueryEngine* qe);
+
+  /**
+     prototypes are required to provide the capacity to copy their
+     initialized members
+   */
+  virtual Prototype* clone();
+
+  /**
+     Copy core members from a source model
+     @param source the model to copy from
+   */
+  void cloneCoreMembersFrom(FacilityModel* source);
+
+  /**
+     Copy module members from a source model
+     @param source the model to copy from
+   */
+  virtual void cloneModuleMembersFrom(FacilityModel* source);
 
   /**
      overrides Model's enterSimulation() in order to additionally
@@ -185,59 +202,55 @@ class FacilityModel : public TimeAgent, public Communicator,
  public:
   /**
      Sets the facility's name 
-      
      @param facName is the new name of the facility 
    */
   virtual void setFacName(std::string facName) { this->setName(facName); };
 
   /**
      Returns the facility's name 
-      
      @return fac_name_ the name of this facility, a string 
    */
   virtual std::string facName() { return this->name(); };
 
   /**
      Sets this facility's instutution name 
-      
      @param name the name of the institution associated with this 
    */
   virtual void setInstName(std::string name){ inst_name_ = name;};
 
   /**
      Returns this facility's institution 
-      
      @return the institution assosicated with this facility 
    */
   virtual InstModel* facInst();
 
   /**
      Sets the facility's lifetime 
-      
      @param lifetime is the new lifetime of the facility in months 
    */
   virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
-     Returns the facility's lifetime 
-      
+     Returns the facility's lifetime     
      @return fac_lifetime_ the lifetime of this facility, an int, in 
    */
   virtual int facLifetime() { return fac_lifetime_; };
+  
+  /**
+     @return the input commodities
+  */
+  std::vector<std::string> inputCommodities();
 
+  /**
+     @return the output commodities
+  */
+  std::vector<std::string> outputCommodities();
+  
   /**
      @return true if the current time is greater than the 
      decommission date
    */
   bool lifetimeReached();
-
-  /**
-     Returns the facility's power capacity 
-      
-     @return 0 by default. If the facility produces power, it will use 
-     its own function. 
-   */
-  virtual double powerCapacity() { return 0.0; };
 
   /**
      Each facility is prompted to do its beginning-of-time-step 

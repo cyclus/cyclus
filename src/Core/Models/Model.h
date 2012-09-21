@@ -126,6 +126,13 @@ class Model {
   virtual ~Model();
 
   /**
+     uses the loaded modules to properly construct a model
+     @param model_impl the implementation to construct
+     @return the constructed model
+   */
+  Model* constructModel(std::string model_impl);
+
+  /**
      uses the loaded modules to properly destruct a model
      @param model the model to delete
    */

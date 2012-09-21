@@ -28,10 +28,10 @@ class DieModel : public FacilityModel {
   
   virtual ~DieModel() {};
   
-  virtual Prototype* clone() {
-    DieModel* clone = new DieModel();
-    return dynamic_cast<Prototype*>(clone);
-  };
+  // virtual Prototype* clone() {
+  //   DieModel* clone = new DieModel();
+  //   return dynamic_cast<Prototype*>(clone);
+  // };
 
   virtual void receiveMessage(msg_ptr msg) { };
 

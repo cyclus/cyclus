@@ -89,11 +89,21 @@ void Model::initializeSimulationEntity(std::string model_type,
     module(new DynamicModule(model_type,module_name)); 
   loaded_modules_.insert(make_pair(module_name,module));
 
+  CLOG(LEV_DEBUG1) << "Module '" << module_name
+                   << "' of type: " << model_type 
+                   << " has been loaded.";
+
   Model* model = module->constructInstance();
   /* --- */
   model->initCoreMembers(qe);
   model->setModelImpl(module->name());
   model->initModuleMembers(module_data->queryElement(module->name()));
+
+  CLOG(LEV_DEBUG3) << "Module '" << model->name()
+                   << "' has had its module members initialized:";
+  CLOG(LEV_DEBUG3) << " * Type: " << model->modelType(); 
+  CLOG(LEV_DEBUG3) << " * Implementation: " << model->modelImpl() ;
+  CLOG(LEV_DEBUG3) << " * ID: " << model->ID();
 
   // register module
   if ("Facility" == model_type) {
@@ -191,6 +201,11 @@ Model::~Model() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::constructModel(std::string model_impl){
+    return loaded_modules_[model_impl]->constructInstance();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::deleteModel(Model* model){
     loaded_modules_[model->modelImpl()]->destructInstance(model);
 }
@@ -218,6 +233,13 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::enterSimulation(Model* parent){ 
+
+  CLOG(LEV_DEBUG1) << "Model '" << name()
+                   << "' is entering the simulation.";
+  CLOG(LEV_DEBUG3) << "It has:";
+  CLOG(LEV_DEBUG3) << " * Implementation: " << modelImpl() ;
+  CLOG(LEV_DEBUG3) << " * ID: " << ID();
+
   // set model-specific members
   parentID_ = parent->ID();
   setParent(parent);
@@ -227,11 +249,6 @@ void Model::enterSimulation(Model* parent){
 
   // add model to the database
   this->addToTable();
-
-  // inform user
-  CLOG(LEV_DEBUG2) << "Model Entered Simulation: {";
-  CLOG(LEV_DEBUG2) << str();
-  CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -258,13 +275,19 @@ Model* Model::parent(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
-  if (child == this || child == NULL) {
-    return;
-  }
-  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+  if (child == this)
+    throw CycOverrideException("Model " + name() + 
+                               "is trying to add itself as its own child.");
+      
+  if (!child)
+    throw CycOverrideException("Model " + name() + 
+                               "is trying to add an invalid model as its child.");
+    
+
+  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << ID() 
 		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
-  removeChild(child);
+
   children_.push_back(child); 
 };
 

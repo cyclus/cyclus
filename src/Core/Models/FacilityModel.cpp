@@ -26,14 +26,16 @@ FacilityModel::~FacilityModel() {};
 void FacilityModel::initCoreMembers(QueryEngine* qe) {
   Model::initCoreMembers(qe);
 
-  // get lifetime and set decommission date
+  // get lifetime
   try {
-    fac_lifetime_ = atoi(qe->getElementContent("lifetime").c_str());
+    setFacLifetime(atoi(qe->getElementContent("lifetime").c_str()));
   }
   catch (CycNullQueryException e) {
-    fac_lifetime_ = TI->simDur();
+    setFacLifetime(TI->simDur());
   }
-  setDecommissionDate(TI->time());
+
+  // set build date
+  setBuildDate(TI->time());
 
   // get the incommodities
   std::string commod;
@@ -59,9 +61,30 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
   }
   catch (CycNullQueryException e) {
   }
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Prototype* FacilityModel::clone() {
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(Model::constructModel(modelImpl()));
+  clone->cloneCoreMembersFrom(this);
+  clone->cloneModuleMembersFrom(this);
+  setBuildDate(TI->time());
+  return clone;
+}
 
-} 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::cloneCoreMembersFrom(FacilityModel* source) {
+  setName(source->name());
+  setModelImpl(source->modelImpl());
+  setModelType(source->modelType());
+  setFacLifetime(source->facLifetime());
+  in_commods_ = source->inputCommodities();
+  out_commods_ = source->outputCommodities();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::cloneModuleMembersFrom(FacilityModel* source) {}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::enterSimulation(Model* parent) {
   Model::enterSimulation(parent);
@@ -110,6 +133,16 @@ void FacilityModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
   deleteModel(this);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> FacilityModel::inputCommodities() {
+  return in_commods_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> FacilityModel::outputCommodities() {
+  return out_commods_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
