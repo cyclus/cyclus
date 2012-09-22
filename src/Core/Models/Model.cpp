@@ -237,7 +237,7 @@ void Model::enterSimulation(Model* parent){
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
-  CLOG(LEV_DEBUG3) << " * Implementation: " << modelImpl() ;
+  CLOG(LEV_DEBUG3) << " * Implementation: " << modelImpl();
   CLOG(LEV_DEBUG3) << " * ID: " << ID();
 
   // set model-specific members

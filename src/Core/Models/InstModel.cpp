@@ -43,10 +43,11 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
 
   // populate initial_build_order_
   try {
-    int numInitFacs = qe->nElementsMatchingQuery("initialfacilitylist");
+    QueryEngine* list = qe->queryElement("initialfacilitylist");
+    int numInitFacs = list->nElementsMatchingQuery("entry");
     for (int i=0;i<numInitFacs;i++){
-      QueryEngine* qe_child = qe->queryElement("initialfacilitylist",i);
-      addPrototypeToInitialBuild(qe_child);
+      QueryEngine* entry = list->queryElement("entry",i);
+      addPrototypeToInitialBuild(entry);
     }
   } catch (CycNullQueryException) {}; // no initial builds
 
@@ -65,6 +66,11 @@ void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
 
   Prototype* p = Prototype::getRegisteredPrototype(name);
   throwErrorIfPrototypeIsntAvailable(p);
+
+  CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
+                   << number << " prototypes of type " << name 
+                   << " to its list of initial facilities to build.";
+
   initial_build_order_.insert(make_pair(p,number));
 }
 

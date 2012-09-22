@@ -359,12 +359,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="initialfacilitylist">
           <oneOrMore>
-            <element name="prototype">
-              <text/>
-            </element>
-            <element name="number">
-              <data type="nonNegativeInteger"/>
-            </element>
+	    <element name="entry">
+	      <element name="prototype">
+		<text/>
+	      </element>
+	      <element name="number">
+		<data type="nonNegativeInteger"/>
+	      </element>
+	    </element>
           </oneOrMore>
         </element>
       </optional>
