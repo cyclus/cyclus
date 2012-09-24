@@ -180,6 +180,7 @@ void InstModel::handleDailyTasks(int time, int day){
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::build(Prototype* prototype) {
+  throwErrorIfPrototypeIsntAvailable(prototype);
   Prototype* clone = prototype->clone();
   dynamic_cast<Model*>(clone)->enterSimulation(this);
 }
