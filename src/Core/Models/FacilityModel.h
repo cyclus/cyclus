@@ -264,6 +264,7 @@ class FacilityModel : public TimeAgent, public Communicator,
    */
   virtual void handleDailyTasks(int time, int day);
 
+  friend class InstModel;
 /* ------------------- */ 
   
 };

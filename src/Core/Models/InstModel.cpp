@@ -149,8 +149,13 @@ void InstModel::handleTock(int time) {
   int currsize = children_.size();
   int i = 0;
   while (i < children_.size()) {
-    Model* m = children_.at(i);
-    dynamic_cast<FacilityModel*>(m)->handleTock(time);
+    FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
+    child->handleTock(time);
+
+    if ( child->lifetimeReached() ) {
+      CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
+      child->decommission();
+    }
 
     // increment not needed if a facility deleted itself
     if (children_.size() == currsize) {
