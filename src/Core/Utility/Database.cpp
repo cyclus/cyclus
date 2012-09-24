@@ -228,23 +228,23 @@ query_result Database::query(std::string query){
       int cols = sqlite3_column_count(statement);
       int result = 0;
       while(true){
-	result = sqlite3_step(statement);
-	// access the rows
-	if(result == SQLITE_ROW){
-	  query_row values;
-	  for(int col = 0; col < cols; col++){
-	    string  val;
-	    char * ptr = (char*)sqlite3_column_text(statement, col);
-	    if(ptr)
-	      val = ptr;
-	    else 
-	      val = "";
-	    values.push_back(val);  // now we will never push NULL
-	  }
-	  results.push_back(values);
-	}
-	else
-	  break;  
+        result = sqlite3_step(statement);
+        // access the rows
+        if(result == SQLITE_ROW){
+          query_row values;
+          for(int col = 0; col < cols; col++){
+            string  val;
+            char * ptr = (char*)sqlite3_column_text(statement, col);
+            if(ptr)
+              val = ptr;
+            else 
+              val = "";
+            values.push_back(val);  // now we will never push NULL
+          }
+          results.push_back(values);
+        }
+        else
+          break;  
       } 
       sqlite3_finalize(statement);
     }
