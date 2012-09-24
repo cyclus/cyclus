@@ -26,30 +26,33 @@ InstModel::InstModel() {
 void InstModel::initCoreMembers(QueryEngine* qe) {
   Model::initCoreMembers(qe);
 
-  string name;
+  string name, query;
+  int nEntries;
   Prototype* prototype;  
   
   // populate prototypes_
-  try {
-    int numAvailProtos = qe->nElementsMatchingQuery("availableprototype");
-    
+  query = "availableprototype";
+  nEntries = qe->nElementsMatchingQuery(query);
+  if (nEntries > 0) {
     // populate prototypes_
-    for (int i=0;i<numAvailProtos;i++){
-      name = qe->getElementContent("availableprototype",i);
+    for (int i=0;i<nEntries;i++){
+      name = qe->getElementContent(query,i);
       prototype = Prototype::getRegisteredPrototype(name);
       addAvailablePrototype(prototype);
     }
-  } catch (CycNullQueryException) {}; // no prototypes available
+  } 
 
+  query = "initialfacilitylist";
+  nEntries = qe->nElementsMatchingQuery(query);
   // populate initial_build_order_
-  try {
-    QueryEngine* list = qe->queryElement("initialfacilitylist");
+  if (nEntries > 0) {
+    QueryEngine* list = qe->queryElement(query);
     int numInitFacs = list->nElementsMatchingQuery("entry");
     for (int i=0;i<numInitFacs;i++){
       QueryEngine* entry = list->queryElement("entry",i);
       addPrototypeToInitialBuild(entry);
     }
-  } catch (CycNullQueryException) {}; // no initial builds
+  }
 
 }
 
@@ -95,9 +98,7 @@ std::string InstModel::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::enterSimulation(Model* parent) {
-  Model::enterSimulation(parent);
-
+void InstModel::enterSimulationAsCoreEntity() {
   // build initial prototypes
   map<Prototype*,int>::iterator it;
   for (it = initial_build_order_.begin(); 
@@ -111,7 +112,6 @@ void InstModel::enterSimulation(Model* parent) {
       // build as many as required
       build(p);
     }
-
   }
 }
 

@@ -87,15 +87,6 @@ void FacilityModel::cloneCoreMembersFrom(FacilityModel* source) {
 void FacilityModel::cloneModuleMembersFrom(FacilityModel* source) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::enterSimulation(Model* parent) {
-  Model::enterSimulation(parent);
-  initializeConcreteMembers();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::initializeConcreteMembers() {};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
   stringstream ss("");
   ss << Model::str() << " with: "

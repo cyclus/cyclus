@@ -88,7 +88,7 @@ void Model::initializeSimulationEntity(std::string model_type,
   shared_ptr<DynamicModule> 
     module(new DynamicModule(model_type,module_name)); 
   loaded_modules_.insert(make_pair(module_name,module));
-
+  
   CLOG(LEV_DEBUG1) << "Module '" << module_name
                    << "' of type: " << model_type 
                    << " has been loaded.";
@@ -249,7 +249,16 @@ void Model::enterSimulation(Model* parent){
 
   // add model to the database
   this->addToTable();
+
+  enterSimulationAsCoreEntity();
+  enterSimulationAsModule();
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsCoreEntity() {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsModule() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
