@@ -9,8 +9,10 @@
 #include "InstModel.h"
 
 #include <stdlib.h>
-#include <iostream>
+#include <sstream>
 #include "Logger.h"
+
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() {
@@ -33,10 +35,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
   catch (CycNullQueryException e) {
     setFacLifetime(TI->simDur());
   }
-
-  // set build date
-  setBuildDate(TI->time());
-
+  
   // get the incommodities
   std::string commod;
   try {
@@ -68,7 +67,9 @@ Prototype* FacilityModel::clone() {
   FacilityModel* clone = dynamic_cast<FacilityModel*>(Model::constructModel(modelImpl()));
   clone->cloneCoreMembersFrom(this);
   clone->cloneModuleMembersFrom(this);
-  setBuildDate(TI->time());
+  clone->setBuildDate(TI->time());
+  CLOG(LEV_DEBUG3) << clone->modelImpl() << " cloned: " << clone->str();
+  CLOG(LEV_DEBUG3) << "               From: " << this->str();
   return clone;
 }
 
@@ -79,7 +80,7 @@ void FacilityModel::cloneCoreMembersFrom(FacilityModel* source) {
   setModelType(source->modelType());
   setFacLifetime(source->facLifetime());
   in_commods_ = source->inputCommodities();
-  out_commods_ = source->outputCommodities();
+  out_commods_ = source->outputCommodities();  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,7 +97,12 @@ void FacilityModel::initializeConcreteMembers() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
-  return Model::str();
+  stringstream ss("");
+  ss << Model::str() << " with: "
+     << " lifetime: " << facLifetime()
+     << " build date: " << build_date_
+     << " decommission date: " << decommission_date_;
+  return ss.str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -121,6 +127,7 @@ void FacilityModel::handleTock(int time){
   // receive any materials the market has found a source for, 
   // and record all material transfers.
   if ( lifetimeReached() ) {
+    CLOG(LEV_INFO3) << name() << " has reached the end of its lifetime";
     decommission();
   }
 }
@@ -132,6 +139,7 @@ void FacilityModel::handleDailyTasks(int time, int day){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
+  CLOG(LEV_INFO3) << name() << " is being decommissioned";
   deleteModel(this);
 }
 
@@ -154,6 +162,10 @@ bool FacilityModel::lifetimeReached() {
 void FacilityModel::setBuildDate(int current_time) {
   build_date_ = current_time;
   setDecommissionDate(build_date_ + fac_lifetime_);
+  CLOG(LEV_DEBUG3) << name() << " has set its time-related members: ";
+  CLOG(LEV_DEBUG3) << " * lifetime: " << facLifetime(); 
+  CLOG(LEV_DEBUG3) << " * build date: " << build_date_; 
+  CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

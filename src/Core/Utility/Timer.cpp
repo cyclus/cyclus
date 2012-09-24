@@ -163,7 +163,6 @@ Timer* Timer::Instance() {
   // either way.
   if (0 == instance_) {
     instance_ = new Timer();
-    instance_->initialize();
   }
 
   return instance_;
@@ -234,7 +233,7 @@ void Timer::load_simulation(QueryEngine *qe) {
   int dur, m0, y0, sim0, dec;
   string dur_str, m0_str, y0_str, sim0_str, decay_str;
   
-// get duration
+  // get duration
   dur_str = qe->getElementContent("duration");
   dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month
