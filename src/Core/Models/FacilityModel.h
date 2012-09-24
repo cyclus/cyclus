@@ -184,6 +184,12 @@ class FacilityModel : public TimeAgent, public Communicator,
    */
   virtual void decommission();
 
+  /**
+     facilities over write this method if a condition must be met 
+     before their destructors can be called
+   */
+  virtual bool checkDecommissionCondition();
+
  public:
   /**
      Sets the facility's name 
