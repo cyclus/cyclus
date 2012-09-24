@@ -83,11 +83,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="control">
     <element name ="control">
       <interleave>
-	<ref name="duration"/>
-	<ref name="startmonth"/>
-	<ref name="startyear"/>
-	<ref name="simstart"/>
-	<ref name="decay"/>
+        <ref name="duration"/>
+        <ref name="startmonth"/>
+        <ref name="startyear"/>
+        <ref name="simstart"/>
+        <ref name="decay"/>
       </interleave>
     </element>
   </define>
@@ -359,14 +359,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="initialfacilitylist">
           <oneOrMore>
-	    <element name="entry">
-	      <element name="prototype">
-		<text/>
-	      </element>
-	      <element name="number">
-		<data type="nonNegativeInteger"/>
-	      </element>
-	    </element>
+            <element name="entry">
+              <element name="prototype">
+                <text/>
+              </element>
+              <element name="number">
+                <data type="nonNegativeInteger"/>
+              </element>
+            </element>
           </oneOrMore>
         </element>
       </optional>
