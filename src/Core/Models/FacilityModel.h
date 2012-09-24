@@ -103,21 +103,6 @@ class FacilityModel : public TimeAgent, public Communicator,
   virtual void cloneModuleMembersFrom(FacilityModel* source);
 
   /**
-     overrides Model's enterSimulation() in order to additionally
-     initialize members for prototypes that enter simulations
-   */
-  virtual void enterSimulation(Model* parent);
-
-  /**
-     allows facilities to define what members need to be initialized
-     after their prototypes have been cloned and entered into the 
-     simulation
-
-     this operation is empty by default
-   */
-  virtual void initializeConcreteMembers();
-
-  /**
      every model should be able to print a verbose description 
    */
   virtual std::string str();
@@ -279,6 +264,7 @@ class FacilityModel : public TimeAgent, public Communicator,
    */
   virtual void handleDailyTasks(int time, int day);
 
+  friend class InstModel;
 /* ------------------- */ 
   
 };

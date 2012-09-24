@@ -52,18 +52,13 @@ void RegionModel::initInstitutionNames(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::enterSimulation(Model* parent) {
-  if (parent != this) {
-    string err = "Regions must be their own parent.";
-    throw CycOverrideException(err);
-  }
+void RegionModel::enterSimulationAsCoreEntity() {
   addRegionAsRootNode();
   addChildrenToTree();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::addRegionAsRootNode() {
-  Model::enterSimulation(this);
   TI->registerTickListener(this);
 }
 

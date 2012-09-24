@@ -228,9 +228,21 @@ class Model {
   std::vector<std::string> getTreePrintOuts(Model* m);
 
   /**
-     calls setParent() and sets other model-specific members
+     creates the parent-child link and invokes the core-level and
+     module-level enter simulation methods
+     @param parent this model's parent
    */
-  virtual void enterSimulation(Model* parent);
+  void enterSimulation(Model* parent);
+
+  /**
+     perform core-related tasks when entering the simulation
+   */
+  virtual void enterSimulationAsCoreEntity();
+
+  /**
+     perform module-specific tasks when entering the simulation
+   */
+  virtual void enterSimulationAsModule();
 
   /**
      sets the parent_ member

@@ -11,11 +11,14 @@
 #include <stdlib.h>
 #include <sstream>
 #include "Logger.h"
+#include <limits>
 
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-FacilityModel::FacilityModel() {
+FacilityModel::FacilityModel() : 
+  fac_lifetime_(numeric_limits<int>::max()),
+  decommission_date_(numeric_limits<int>::max()) {
   setModelType("Facility");
   in_commods_ = std::vector<std::string>();
   out_commods_ = std::vector<std::string>();
@@ -87,15 +90,6 @@ void FacilityModel::cloneCoreMembersFrom(FacilityModel* source) {
 void FacilityModel::cloneModuleMembersFrom(FacilityModel* source) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::enterSimulation(Model* parent) {
-  Model::enterSimulation(parent);
-  initializeConcreteMembers();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::initializeConcreteMembers() {};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
   stringstream ss("");
   ss << Model::str() << " with: "
@@ -126,10 +120,6 @@ void FacilityModel::handleTock(int time){
   // send the appropriate materials, 
   // receive any materials the market has found a source for, 
   // and record all material transfers.
-  if ( lifetimeReached() ) {
-    CLOG(LEV_INFO3) << name() << " has reached the end of its lifetime";
-    decommission();
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -140,6 +130,9 @@ void FacilityModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
+  cout << "decommoissioning facility with lifetime: " << fac_lifetime_
+       << " at time: " << TI->time() << " which matches decommission date: "
+       << decommission_date_ <<endl;
   deleteModel(this);
 }
 
@@ -163,7 +156,7 @@ void FacilityModel::setBuildDate(int current_time) {
   build_date_ = current_time;
   setDecommissionDate(build_date_ + fac_lifetime_);
   CLOG(LEV_DEBUG3) << name() << " has set its time-related members: ";
-  CLOG(LEV_DEBUG3) << " * lifetime: " << facLifetime(); 
+  CLOG(LEV_DEBUG3) << " * lifetime: " << fac_lifetime_; 
   CLOG(LEV_DEBUG3) << " * build date: " << build_date_; 
   CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }

@@ -114,7 +114,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void enterSimulation(Model* parent);
+  virtual void enterSimulationAsCoreEntity();
 /* ------------------- */ 
 
 

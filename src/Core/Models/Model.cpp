@@ -88,7 +88,7 @@ void Model::initializeSimulationEntity(std::string model_type,
   shared_ptr<DynamicModule> 
     module(new DynamicModule(model_type,module_name)); 
   loaded_modules_.insert(make_pair(module_name,module));
-
+  
   CLOG(LEV_DEBUG1) << "Module '" << module_name
                    << "' of type: " << model_type 
                    << " has been loaded.";
@@ -202,12 +202,18 @@ Model::~Model() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::constructModel(std::string model_impl){
-    return loaded_modules_[model_impl]->constructInstance();
+  if (loaded_modules_.find(model_impl) == loaded_modules_.end())
+    throw CycOverrideException("No module is registered for " + model_impl);
+
+  return loaded_modules_[model_impl]->constructInstance();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::deleteModel(Model* model){
-    loaded_modules_[model->modelImpl()]->destructInstance(model);
+  map<string, shared_ptr<DynamicModule> >::iterator it;
+  it = loaded_modules_.find(model->modelImpl());
+  if (it != loaded_modules_.end()) 
+    it->second->destructInstance(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -249,7 +255,16 @@ void Model::enterSimulation(Model* parent){
 
   // add model to the database
   this->addToTable();
+
+  enterSimulationAsCoreEntity();
+  enterSimulationAsModule();
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsCoreEntity() {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsModule() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
