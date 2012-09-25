@@ -288,12 +288,6 @@ class Model {
   virtual void addResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
 
-  /**
-     Asks if a model can build a certain prototype. Returns false by
-     default.
-   */
-  virtual bool canBuild(Model* prototype) {return false;}
-    
  protected:
   /**
      a map of loaded modules. all dynamically loaded modules are 
