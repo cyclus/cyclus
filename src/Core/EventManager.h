@@ -8,13 +8,14 @@
 #include <list>
 #include <string>
 
-typedef std::list<event_ptr> event_list;
+typedef std::list<event_ptr> EventList;
 class CycGroupDataMismatch: public CycException {
     public: CycGroupDataMismatch(std::string msg) : CycException(msg) {};
 };
 
 class EventBackend {
-  public notify(event_list events) = 0;
+  public void notify(EventList events) = 0;
+  public void close() = 0;
 }
 
 class EventManager {

@@ -42,7 +42,7 @@ void EventManager::notifyBacks() {
     return;
   }
 
-  for(event_list::iterator it = events_.begin(); it != events_.end(); it++) {
+  for(EventList::iterator it = events_.begin(); it != events_.end(); it++) {
     *it->notify(events_);
   }
   events_.clear();
