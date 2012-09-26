@@ -35,6 +35,8 @@ CONFIGURE_FILE(
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManager.cpp  
+  ${CMAKE_CURRENT_SOURCE_DIR}/Commodity.cpp 
+  #${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
@@ -57,6 +59,8 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 INSTALL(FILES 
   BookKeeper.h
   BuildingManager.h
+  Commodity.h
+  #CommodityProducer.h
   CycException.h
   Database.h
   DecayHandler.h
