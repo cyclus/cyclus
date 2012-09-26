@@ -67,7 +67,7 @@ namespace SupplyDemand
 
   private:
     /// a collection of commodities and their production capacities
-    std::map<Commodity,double> production_capacities_;
+    std::map<Commodity,double,CommodityCompare> production_capacities_;
 
     //#include "CommodityProducerTests.h"
     //friend class CommodityProducerTests; 

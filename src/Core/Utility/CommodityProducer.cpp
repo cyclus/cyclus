@@ -3,6 +3,7 @@
 #include "CycException.h"
 
 using namespace std;
+using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::CommodityProducer() : default_capacity_(0.0) {}
