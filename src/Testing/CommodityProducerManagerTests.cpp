@@ -8,92 +8,63 @@ using namespace SupplyDemand;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::SetUp() 
 {
-  commodity_name_ = "commodity";
-  commodity_ = Commodity(commodity_name_);
-  manager_ = CommodityProducerManager();
-  producer1_ = new CommodityProducer();
-  producer2_ = new CommodityProducer();
-  nproducers_ = 2;
-  capacity_ = 5.0;
+  helper = new CommodityTestHelper();
+  helper->setUpProducers();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::TearDown() 
 {
-  delete producer1_;
-  delete producer2_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManagerTests::addCommodity(SupplyDemand::CommodityProducer* producer) 
-{
-  producer->addCommodity(commodity_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManagerTests::setCapacity(SupplyDemand::CommodityProducer* producer) 
-{
-  producer->setCapacity(commodity_,capacity_);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManagerTests::setUpProducers()
-{
-  addCommodity(producer1_);
-  setCapacity(producer1_);
-  addCommodity(producer2_);
-  setCapacity(producer2_);
+  delete helper;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::registerProducer(SupplyDemand::CommodityProducer* producer) 
 {
-  manager_.registerProducer(producer);
+  manager.registerProducer(producer);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::unRegisterProducer(SupplyDemand::CommodityProducer* producer) 
 {
-  manager_.unRegisterProducer(producer);
+  manager.unRegisterProducer(producer);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests,initialization) 
 {
-  EXPECT_EQ(manager_.totalProductionCapacity(commodity_),0.0);
+  EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),0.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests,registerunregister)
 {
-  setUpProducers();
   // 1 producer
-  EXPECT_NO_THROW(registerProducer(producer1_));
-  EXPECT_EQ(manager_.totalProductionCapacity(commodity_),capacity_);
-  EXPECT_THROW(registerProducer(producer1_),CycDoubleRegistrationException);
+  EXPECT_NO_THROW(registerProducer(helper->producer1));
+  EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->capacity);
+  EXPECT_THROW(registerProducer(helper->producer1),CycDoubleRegistrationException);
 
   // 2 producers
-  EXPECT_NO_THROW(registerProducer(producer2_));
-  EXPECT_EQ(manager_.totalProductionCapacity(commodity_),nproducers_*capacity_);
-  EXPECT_THROW(registerProducer(producer2_),CycDoubleRegistrationException);
+  EXPECT_NO_THROW(registerProducer(helper->producer2));
+  EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->nproducers*helper->capacity);
+  EXPECT_THROW(registerProducer(helper->producer2),CycDoubleRegistrationException);
   
   // 1 producer
-  EXPECT_NO_THROW(unRegisterProducer(producer1_));
-  EXPECT_EQ(manager_.totalProductionCapacity(commodity_),capacity_);
-  EXPECT_THROW(unRegisterProducer(producer1_),CycNotRegisteredException);
+  EXPECT_NO_THROW(unRegisterProducer(helper->producer1));
+  EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->capacity);
+  EXPECT_THROW(unRegisterProducer(helper->producer1),CycNotRegisteredException);
 
   // 0 producers
-  EXPECT_NO_THROW(unRegisterProducer(producer2_));
-  EXPECT_EQ(manager_.totalProductionCapacity(commodity_),0.0);
-  EXPECT_THROW(unRegisterProducer(producer2_),CycNotRegisteredException);
+  EXPECT_NO_THROW(unRegisterProducer(helper->producer2));
+  EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),0.0);
+  EXPECT_THROW(unRegisterProducer(helper->producer2),CycNotRegisteredException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests,differentcommodity)
 {
-  setUpProducers();
-  EXPECT_NO_THROW(registerProducer(producer1_));
+  EXPECT_NO_THROW(registerProducer(helper->producer1));
   
-  Commodity different_commodity("different_commodity");
-  EXPECT_EQ(manager_.totalProductionCapacity(different_commodity),0.0);
+  Commodity differentcommodity("differentcommodity");
+  EXPECT_EQ(manager.totalProductionCapacity(differentcommodity),0.0);
 }
