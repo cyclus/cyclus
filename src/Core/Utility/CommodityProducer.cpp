@@ -6,34 +6,52 @@ using namespace std;
 using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CommodityProducer::CommodityProducer() : default_capacity_(0.0) {}
+CommodityInformation::CommodityInformation() :
+  capacity(0),
+  cost(0) 
+{}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CommodityInformation::CommodityInformation(double a_capacity, 
+                                           double a_cost) :
+  capacity(a_capacity),
+  cost(a_cost)
+{}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CommodityProducer::CommodityProducer() : 
+  default_capacity_(0.0),
+  default_cost_(0.0)
+{}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::~CommodityProducer() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducer::productionCapacity(Commodity& commodity)
+bool CommodityProducer::producesCommodity(Commodity& commodity)
 {
-  throwErrorIfCommodityNotProduced(commodity);
-  return production_capacities_[commodity];
+  return (produced_commodities_.find(commodity) != 
+          produced_commodities_.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CommodityProducer::producesCommodity(Commodity& commodity)
+double CommodityProducer::productionCapacity(Commodity& commodity)
 {
-  return (production_capacities_.find(commodity) != 
-          production_capacities_.end());
+  throwErrorIfCommodityNotProduced(commodity);
+  return produced_commodities_[commodity].capacity;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+double CommodityProducer::productionCost(Commodity& commodity)
+{
+  throwErrorIfCommodityNotProduced(commodity);
+  return produced_commodities_[commodity].cost;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducer::addCommodity(Commodity& commodity) {
-  if (producesCommodity(commodity))
-    {
-      throw CycDoubleRegistrationException("This producer already has registered "
-                                           + commodity.name());
-    }
-
-  production_capacities_.insert(make_pair(commodity,default_capacity_));
+  CommodityInformation info(default_capacity_,default_cost_);
+  addCommodityWithInformation(commodity,info);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -41,15 +59,27 @@ void CommodityProducer::setCapacity(Commodity& commodity,
                                     double capacity)
 {
   throwErrorIfCommodityNotProduced(commodity);
-  production_capacities_[commodity] = capacity;
+  produced_commodities_[commodity].capacity = capacity;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodityAndSetCapacity(Commodity& commodity, 
-                                                   double capacity) 
+void CommodityProducer::setCost(Commodity& commodity, 
+                                double cost)
 {
-  addCommodity(commodity);
-  setCapacity(commodity,capacity);
+  throwErrorIfCommodityNotProduced(commodity);
+  produced_commodities_[commodity].cost = cost;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CommodityProducer::addCommodityWithInformation(Commodity& commodity, 
+                                                    CommodityInformation& info) 
+{
+  if (producesCommodity(commodity))
+    {
+      throw CycDoubleRegistrationException("This producer already has registered "
+                                           + commodity.name());
+    }
+  produced_commodities_.insert(make_pair(commodity,info));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

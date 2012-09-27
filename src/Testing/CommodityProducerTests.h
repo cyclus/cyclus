@@ -10,12 +10,14 @@ class CommodityProducerTests : public ::testing::Test {
   std::string commodity_name_;
   Commodity commodity_;
   SupplyDemand::CommodityProducer producer_;
-  double capacity_;
+  double capacity_, cost_;
 
  public:
   virtual void SetUp();
   virtual void TearDown();
   double defaultCapacity();
+  double defaultCost();
   void addCommodity();
   void setCapacity();
+  void setCost();
 };
