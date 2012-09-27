@@ -42,16 +42,16 @@ namespace ActionBuilding
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<CommodityProducer*>::iterator begin();
+    std::set<SupplyDemand::CommodityProducer*>::iterator begin();
 
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<CommodityProducer*>::iterator end();
+    std::set<SupplyDemand::CommodityProducer*>::iterator end();
 
   private:
     /// the set of managed producers
-    std::set<CommodityProducer*> producers_;
+    std::set<SupplyDemand::CommodityProducer*> producers_;
 
     //#include "CommodityProducerManagerTests.h"
     //friend class CommodityProducerManagerTests; 

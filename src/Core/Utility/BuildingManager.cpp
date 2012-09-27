@@ -1,76 +1,154 @@
 #include "BuildingManager.h"
 
-#include <iostream>
-#include <vector>
 #include <boost/any.hpp>
 
-#include "SupplyDemandManager.h"
-#include "SolverTools.h"
 #include "Solver.h"
 #include "SolverInterface.h"
 #include "CBCSolver.h"
+#include "CycException.h"
 
 using namespace std;
 using boost::any_cast;
 using namespace Cyclopts;
+using namespace SupplyDemand;
+using namespace ActionBuilding;
 
 // -------------------------------------------------------------------
-BuildingManager::BuildingManager(SupplyDemandManager* m) {
-  manager_ = m;
+BuildOrder::BuildOrder(int n, ActionBuilding::Builder* b,
+                       SupplyDemand::CommodityProducer* cp) :
+  number(n),
+  builder(b),
+  producer(cp)
+{}
+
+// -------------------------------------------------------------------
+ProblemInstance::ProblemInstance(Commodity& commod, double demand, 
+                                 Cyclopts::SolverInterface& sinterface, 
+                                 Cyclopts::ConstraintPtr constr, 
+                                 std::vector<Cyclopts::VariablePtr>& soln) :
+  commodity(commod),
+  unmet_demand(demand),
+  interface(sinterface),
+  constraint(constr),
+  solution(soln)
+{}
+
+// -------------------------------------------------------------------
+BuildingManager::BuildingManager() {}
+
+// -------------------------------------------------------------------
+BuildingManager::~BuildingManager() {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
+  if (builders_.find(builder) != builders_.end())
+    {
+      throw CycDoubleRegistrationException("A manager is trying to register a builder twice.");
+    }
+  else
+    {
+      builders_.insert(builder);
+    }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
+  if (builders_.find(builder) == builders_.end())
+    {
+      throw CycNotRegisteredException("A manager is trying to unregister a builder not originally registered with it.");
+    }
+  else
+    {
+      builders_.erase(builder);
+    }
 }
 
 // -------------------------------------------------------------------
-vector<BuildOrder> 
-BuildingManager::makeBuildDecision(const Commodity& p, 
-                                   double unmet_demand) {
-  orders_ = vector<BuildOrder>();
-  if (unmet_demand > 0) {
-    doMakeBuildDecision(p,unmet_demand);
-  }
-  return orders_;
-}
+std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(Commodity& commodity, 
+                                                                           double unmet_demand) 
+{
+  vector<BuildOrder> orders;
 
-// -------------------------------------------------------------------
-void BuildingManager::doMakeBuildDecision(const Commodity& commodity, 
-                                          double unmet_demand) {
+  if (unmet_demand > 0) 
+    {
+      // set up solver and interface
+      SolverPtr solver(new CBCSolver());
+      SolverInterface csi(solver);
 
-  // // set up solver and interface
-  // SolverPtr solver(new CBCSolver());
-  // SolverInterface csi(solver);
+      // set up objective function
+      ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+      csi.registerObjFunction(obj);
 
-  // // set up objective function
-  // ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
-  // csi.registerObjFunction(obj);
+      // set up constraint
+      ConstraintPtr constraint(new Constraint(Constraint::GTEQ,unmet_demand));
+      csi.registerConstraint(constraint);
 
-  // // set up constraint
-  // ConstraintPtr c(new Constraint(Constraint::GTEQ,unmet_demand));
-  // csi.registerConstraint(c);
-
-  // // set up variables, constraints, and objective function
-  // int n = manager_->nProducers(commodity);
-  // vector<VariablePtr> soln;
-  // for (int i = 0; i < n; i++) {
-  //   Producer* p = manager_->producer(commodity,i);
-  //   // set up var`iables
-  //   VariablePtr x(new IntegerVariable(0,Variable::INF));
-  //   x->setName(p->name());
-  //   soln.push_back(x);
-  //   csi.registerVariable(x);
-  //   double constraint_modifier = p->capacity();
-  //   csi.addVarToConstraint(x,constraint_modifier,c);
-  //   double obj_modifier = p->cost();
-  //   csi.addVarToObjFunction(x,obj_modifier);
-  // }
+      // set up variables, constraints, and objective function
+      vector<VariablePtr> solution;
+      ProblemInstance problem(commodity,unmet_demand,csi,constraint,solution);
+      setUpProblem(problem);
   
-  // // solve and get solution
-  // csi.solve();
+      // solve and get solution
+      csi.solve();
+      constructBuildOrdersFromSolution(orders,solution);
+    }
 
-  // // construct the build orders
-  // for (int i = 0; i < n; i++) {
-  //   int number = any_cast<int>(soln.at(i)->value());
-  //   if (number > 0) {
-  //     orders_.push_back(BuildOrder(number,
-  //                                  manager_->producer(commodity,i)));
-  //   }
-  // }
+  return orders;
+}
+
+// -------------------------------------------------------------------
+void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
+{
+  solution_map_ = map< VariablePtr, pair<Builder*,CommodityProducer*> >();
+
+  set<Builder*>::iterator builder_it;
+  for (builder_it = builders_.begin(); builder_it != builders_.end(); builder_it++)
+    {
+      Builder* builder = (*builder_it);
+      
+      std::set<CommodityProducer*>::iterator producer_it;
+      for (producer_it = builder->begin(); producer_it != builder->end(); producer_it++)
+        {
+          CommodityProducer* producer = (*producer_it);
+          if (producer->producesCommodity(problem.commodity))
+            {
+              addProducerVariableToProblem(producer,builder,problem);
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------
+void BuildingManager::addProducerVariableToProblem(SupplyDemand::CommodityProducer* producer,
+                                                   ActionBuilding::Builder* builder,
+                                                   ActionBuilding::ProblemInstance& problem)
+{
+  VariablePtr x(new IntegerVariable(0,Variable::INF));
+  problem.solution.push_back(x);
+  problem.interface.registerVariable(x);
+  solution_map_.insert(make_pair(x,make_pair(builder,producer)));
+
+  double constraint_modifier = producer->productionCapacity(problem.commodity);
+  problem.interface.addVarToConstraint(x,constraint_modifier,problem.constraint);
+
+  double obj_modifier = producer->productionCost(problem.commodity);
+  problem.interface.addVarToObjFunction(x,obj_modifier);
+}
+
+// -------------------------------------------------------------------
+void BuildingManager::constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
+                                                       std::vector<Cyclopts::VariablePtr>& solution)
+{
+  // construct the build orders
+  for (int i = 0; i < solution.size(); i++) 
+    {
+      int number = any_cast<int>(solution.at(i)->value());
+      if (number > 0) 
+        {
+          Builder* builder = solution_map_[solution.at(i)].first;
+          CommodityProducer* producer = solution_map_[solution.at(i)].second;
+          BuildOrder order(number,builder,producer);
+          orders.push_back(order);
+        }
+    }
 }

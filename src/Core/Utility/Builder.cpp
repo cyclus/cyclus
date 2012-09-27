@@ -49,7 +49,7 @@ std::set<CommodityProducer*>::iterator Builder::begin()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<CommodityProducer*>::iterator Builder::end();
+std::set<CommodityProducer*>::iterator Builder::end()
 {
   return producers_.end();
 }
