@@ -61,9 +61,12 @@ Data contained by all resources includes :
 Resource Methods
 -----------------
 
-The key method implemented by all resources is:
+The key method implemented by all resources returns a boolean to be used by the 
+market for comparison of two commodities. The quality of two resources can be 
+compared in order to determine whether the offer resource sufficiently satisfies the 
+request resource. ::
 
- * checkQuality(rsrc_ptr other)
+    request_rsrc->checkQuality(offer_rsrc)
 
-
+The boolean that it returns is used by the market to match requests with offers.
 
