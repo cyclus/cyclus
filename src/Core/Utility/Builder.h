@@ -42,12 +42,12 @@ namespace ActionBuilding
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<SupplyDemand::CommodityProducer*>::iterator begin();
+    std::set<SupplyDemand::CommodityProducer*>::iterator beginningProducer();
 
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<SupplyDemand::CommodityProducer*>::iterator end();
+    std::set<SupplyDemand::CommodityProducer*>::iterator endingProducer();
 
   private:
     /// the set of managed producers

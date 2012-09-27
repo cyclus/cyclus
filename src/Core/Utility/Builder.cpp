@@ -43,13 +43,13 @@ double Builder::nBuildingPrototypes()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<CommodityProducer*>::iterator Builder::begin()
+std::set<CommodityProducer*>::iterator Builder::beginningProducer()
 {
   return producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<CommodityProducer*>::iterator Builder::end()
+std::set<CommodityProducer*>::iterator Builder::endingProducer()
 {
   return producers_.end();
 }

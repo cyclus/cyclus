@@ -106,8 +106,8 @@ void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
     {
       Builder* builder = (*builder_it);
       
-      std::set<CommodityProducer*>::iterator producer_it;
-      for (producer_it = builder->begin(); producer_it != builder->end(); producer_it++)
+      set<CommodityProducer*>::iterator producer_it;
+      for (producer_it = builder->beginningProducer(); producer_it != builder->endingProducer(); producer_it++)
         {
           CommodityProducer* producer = (*producer_it);
           if (producer->producesCommodity(problem.commodity))
