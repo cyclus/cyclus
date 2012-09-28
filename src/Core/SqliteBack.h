@@ -3,20 +3,15 @@
 #define _SQLITEBACK_H
 
 #include "EventManager.h"
+
 #include <list>
-#include <string>
-
-class SqliteBack: public EventBackend {
-}
-
 #include <string>
 #include <sqlite3.h>
 
-// Useful Typedefs
-//   query results
+
 typedef std::list<std::string> StrList;
 
-class SqliteBack {
+class SqliteBack: public EventBackend {
   public:
     SqliteBack(std::string filename);
     
@@ -25,6 +20,9 @@ class SqliteBack {
     void notify(event_list events);
 
     void close();
+
+    std::string name();
+
   private:
     /// Open a connection to Sqlite database file.
     void open();
@@ -41,29 +39,21 @@ class SqliteBack {
 
     std::string tableName(event_ptr e); 
 
+    /// Queue up a table-create command for e.
     void createTable(event_ptr e);
 
-    void writeRow(event_ptr e);
+    void writeEvent(event_ptr e);
     
-    /**
-       Issue a command to the database to flush Table rows 
-       @param t the Table to which rows will be flushed 
-     */
+    /// Execute all pending commands
     void flush();
 
-    /**
-       A pointer to the database managed by the SqliteBack class 
-     */
+    /// A pointer to the database managed by the SqliteBack class 
     sqlite3* db_;
 
-    /**
-       A boolean stating whether database is currently open on disk 
-     */
+    /// A boolean stating whether database is currently open on disk 
     bool isOpen_;
 
-    /**
-       Stores the database's name, declared during construction. 
-     */
+    /// Stores the database's name, declared during construction. 
     std::string name_;
 
     StrList cmds_;

@@ -2,7 +2,17 @@
 
 #include "EventManager.h"
 
-#define DUMP_SIZE 100
+#define DUMP_SIZE 300
+
+EventManager* EventManager::instance_ = 0;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+EventManager* EventManager::Instance() {
+  if (0 == instance_){
+    instance_ = new EventManager();  
+  }
+  return instance_;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 event_ptr EventManager::newEvent(Model* creator, std::string group) {
@@ -42,8 +52,14 @@ void EventManager::notifyBacks() {
     return;
   }
 
-  for(EventList::iterator it = events_.begin(); it != events_.end(); it++) {
-    *it->notify(events_);
+  std::list<EventBackend*>::iterator it;
+  for(it = backs_.begin(); it != backs_.end(); it++) {
+    try {
+      *it->notify(events_);
+    } catch (CycException err) {
+      CLOG(LEV_ERROR) << "Backend '" << *it->name() << "failed write with err: "
+                      << err.what();
+    }
   }
   events_.clear();
 }
@@ -51,4 +67,17 @@ void EventManager::notifyBacks() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::registerBackend(EventBackend b) {
   backs_.push_back(b);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void EventManager::close() {
+  std::list<EventBackend*>::iterator it;
+  for(it = backs_.begin(); it != backs_.end(); it++) {
+    try {
+      *it->close();
+    } catch (CycException err) {
+      CLOG(LEV_ERROR) << "Backend '" << *it->name() << "failed to close with err: "
+                      << err.what();
+    }
+  }
 }

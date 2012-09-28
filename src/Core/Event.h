@@ -20,13 +20,25 @@ class Event: IntrusiveBase<Event> {
   public:
     friend class EventManager;
 
+    // Add an arbitrary labeled value to the event.
+    //
+    // @param field a label or key for a value. Loosely analogous to a column label.
+    //
+    // @warning for the val argument - only types int, long, float, double, and
+    // string are currently supported.
     event_ptr addVal(std::string field, boost::any val);
+
+    // Add a timestamp value to this event of the current simulation time.
+    // @return a pointer to this event (for method chaining).
     event_ptr timestamp();
+
+    // Record this event to output.
     void record();
 
     std::string group();
     Model* creator();
     ValMap vals();
+    std::string name();
 
     virtual ~Event();
 

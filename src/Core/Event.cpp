@@ -62,3 +62,12 @@ ValMap Event::vals() {
   return vals_;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string Event::name() {
+  Model* m = creator_;
+  if (m != NULL) {
+    return m->modelImpl() + "_" + m->ID() + "_" + e->group();
+  }
+  return e->group();
+}
+

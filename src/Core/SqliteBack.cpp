@@ -1,16 +1,11 @@
 
 #include "SqliteBack.h"
 
-#include "Table.h"
 #include "CycException.h"
 #include "Logger.h"
 
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <sqlite3.h>
-
-using namespace std;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SqliteBack::SqliteBack(std::string filename){
@@ -23,21 +18,27 @@ SqliteBack::SqliteBack(std::string filename){
 SqliteBack::~SqliteBack() { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SqliteBack::name() {
+  return "Sqlite-backend";
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
     if (! tableExists(*it) ) {
       createTable(*it);
     }
-    writeRow(*it);
+    writeEvent(*it);
   }
+  flush();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::close() {
   if ( isOpen_ ) {
+    flush();
     if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
-      return;
     } else {
       throw CycIOException("Error closing existing database: " + name_);
     }
@@ -73,37 +74,26 @@ void SqliteBack::open() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::createTable(event_ptr e){
   Model* m = e->creator();
-  std::string name = tableName(e);
+  std::string name = e->name();
   tbl_names_.push_back(name);
 
   std::stringstream cmd;
   cmd << "CREATE TABLE " << name <<" (";
 
-  // for each entry, add the column name and data type
-  // and comma separate entries
   for(int i = 0; i < col_names_.size(); i++) {
-    // add the column and data type to the command
     cmd << col_names_.at(i) << " " << col_types_.at(i);
-    // if this is the last entry, do not comma separate
     if (i < col_names_.size() - 1) {
       cmd << ", ";
     }
   }
-  // close the create table command
   cmd << ");";
 
   cmds_.push_back(cmd.str());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string tableName(event_ptr e) {
-  Model* m = e->creator();
-  return m->modelImpl() + "_" + m->ID() + "_" + e->group();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool SqliteBack::tableExists(event_ptr e) {
-  std::string nm = tableName(e);
+  std::string nm = e->name();
   if (find(tbl_names_.begin(), tbl_names_.end(), nm) != tbl_names_.end()) {
     return true;
   }
@@ -112,9 +102,7 @@ bool SqliteBack::tableExists(event_ptr e) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::executeSQL(std::string cmd){  
-  if ( !isOpen_ ) {
-    throw CycIOException("Tried to issue command to closed table: " + name_);
-  }
+  open();
 
   sqlite3_stmt *statement;
   int check_query = 
@@ -123,7 +111,7 @@ void SqliteBack::executeSQL(std::string cmd){
     int result = sqlite3_step(statement);
     sqlite3_finalize(statement);
   }
-  // collect errors
+  // collect sqlite errors
   string error = sqlite3_errmsg(db_);
   if(error != "not an error") {
     throw CycIOException("SQL error: " + cmd + " " + error);
@@ -131,16 +119,21 @@ void SqliteBack::executeSQL(std::string cmd){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SqliteBack::writeRow(event_ptr e){
-  // write each row in the Table's row commands
-  int nRows = t->nRows();
-  for (int i = 0; i < nRows; i++){
-    string cmd_str = t->row_command(i)->str();
-    this->cmds_.push_back(cmd_str);
-    LOG(LEV_DEBUG4,"db") << "Issued writeRows command to table: " 
-             << t->name() << " with the command being " 
-             << cmd_str;
+void SqliteBack::writeEvent(event_ptr e){
+  std::stringstream cols, vals, cmd;
+  ValMap vals = e.vals();
+  for (ValMap::iterator it = vals.begin(); it != vals.end(); it++) {
+    cols << it->first;
+    vals << it->second;
+    if (it != vals.end()-1){
+      cols << ", ";
+      vals << ", ";
+    }
   }
+
+  cmd << "INSERT INTO " << name() << " (" << cols.str() << ") "
+         << "VALUES (" << values.str() << ");";
+  cmds_.push_back(cmd.str());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
