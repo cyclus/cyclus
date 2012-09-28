@@ -59,7 +59,11 @@ void InstModel::initCoreMembers(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::addAvailablePrototype(Prototype* prototype) {
   prototypes_.insert(prototype);
+  registerAvailablePrototype(prototype);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::registerAvailablePrototype(Prototype* prototype) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
@@ -154,6 +158,7 @@ void InstModel::handleTock(int time) {
 
     if ( child->lifetimeReached() ) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
+      registerCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
       child->decommission();
     }
 
@@ -183,5 +188,11 @@ void InstModel::build(Prototype* prototype) {
   throwErrorIfPrototypeIsntAvailable(prototype);
   Prototype* clone = prototype->clone();
   dynamic_cast<Model*>(clone)->enterSimulation(this);
+  registerCloneAsBuilt(clone);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::registerCloneAsBuilt(Prototype* clone) {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::registerCloneAsDecommissioned(Prototype* clone) {}
