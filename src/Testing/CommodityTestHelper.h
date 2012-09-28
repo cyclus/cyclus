@@ -1,3 +1,6 @@
+#ifndef COMMODITYTESTHELPER_H
+#define COMMODITYTESTHELPER_H
+
 #include <string>
 #include "Commodity.h"
 #include "CommodityProducer.h"
@@ -39,3 +42,5 @@ class CommodityTestHelper {
   /// initialize the producer manager
   void setUpProducerManager();
 };
+
+#endif
