@@ -97,6 +97,8 @@ namespace ActionBuilding {
     std::vector<ActionBuilding::BuildOrder> makeBuildDecision(Commodity& commodity, 
                                                               double unmet_demand);
 
+    // protected: @MJGFlag - should be protected. revise when tests can
+    // be found by classes in the Utility folder
     /**
        set up the constraint problem
        @param problem the problem instance
@@ -129,6 +131,10 @@ namespace ActionBuilding {
     std::map<Cyclopts::VariablePtr, 
       std::pair<ActionBuilding::Builder*,SupplyDemand::CommodityProducer*> > solution_map_;
   };
+
+  //#include "BuildingManagerTests.h"
+  //friend class BuildingManagerTests; 
+  // @MJGFlag - removed for the same reason as above
 }
 
 #endif
