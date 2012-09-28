@@ -40,7 +40,6 @@ namespace SupplyDemand
      */
     void unRegisterProducer(SupplyDemand::CommodityProducer* producer);
 
-  private:
     /// the set of managed producers
     std::set<CommodityProducer*> producers_;
 
