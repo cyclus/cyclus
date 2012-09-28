@@ -11,7 +11,7 @@
 SqliteBack::SqliteBack(std::string filename){
   db_ = NULL;
   isOpen_ = false;
-  name_ = filename;
+  path_ = filename;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -19,7 +19,7 @@ SqliteBack::~SqliteBack() { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string SqliteBack::name() {
-  return "Sqlite-backend";
+  return path_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -40,10 +40,10 @@ void SqliteBack::close() {
     if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
     } else {
-      throw CycIOException("Error closing existing database: " + name_);
+      throw CycIOException("Failed to close database: " + path_);
     }
   } else {
-    throw CycIOException("Trying to close an already-closed database: " + name_);
+    throw CycIOException("Cannot close a closed database: " + path_);
   }
 }
 
@@ -59,15 +59,16 @@ void SqliteBack::open() {
     return;
   }
 
-  if ( dbExists() ) {
-    if(sqlite3_open(name_.c_str(), &db_) == SQLITE_OK) {
-      isOpen_ = true;
-      return;
-    } else {
-      throw CycIOException("Unable to open database " + name_); 
-    }
+  // if the file already exists, delete it
+  ifstream ifile(path_);
+  if( ifile ) {
+    remove( path_.c_str() );
+  }
+
+  if(sqlite3_open(path_.c_str(), &db_) == SQLITE_OK) {
+    isOpen_ = true;
   } else {
-    throw CycIOException("Trying to open a non-existant SqliteBack file"); 
+    throw CycIOException("Unable to create/open database " + path_); 
   }
 }
 
@@ -131,7 +132,7 @@ void SqliteBack::writeEvent(event_ptr e){
     }
   }
 
-  cmd << "INSERT INTO " << name() << " (" << cols.str() << ") "
+  cmd << "INSERT INTO " << e->name() << " (" << cols.str() << ") "
          << "VALUES (" << values.str() << ");";
   cmds_.push_back(cmd.str());
 }

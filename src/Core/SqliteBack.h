@@ -54,7 +54,7 @@ class SqliteBack: public EventBackend {
     bool isOpen_;
 
     /// Stores the database's name, declared during construction. 
-    std::string name_;
+    std::string path_;
 
     StrList cmds_;
 
