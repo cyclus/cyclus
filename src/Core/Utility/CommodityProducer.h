@@ -84,6 +84,11 @@ namespace SupplyDemand
      */
     void addCommodityWithInformation(const Commodity& commodity, 
                                      const CommodityInformation& info);
+    /**
+       add all commodities produced by a source
+       @param source the original commodity producer
+     */
+    void copyProducedCommoditiesFrom(CommodityProducer* source);
     
     /**
        checks if producesCommodity() is true. if it is false, an 

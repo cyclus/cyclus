@@ -99,6 +99,19 @@ void CommodityProducer::addCommodityWithInformation(const Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CommodityProducer::copyProducedCommoditiesFrom(CommodityProducer* source) 
+{
+  set<Commodity,CommodityCompare> commodities = source->producedCommodities();
+  set<Commodity,CommodityCompare>::iterator it;
+  for (it = commodities.begin(); it != commodities.end(); it++)
+    {
+      addCommodity(*it);
+      setCapacity(*it,source->productionCapacity(*it));
+      setCost(*it,source->productionCost(*it));
+    }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commodity)
 {
   if(!producesCommodity(commodity))
