@@ -36,7 +36,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
     setFacLifetime(atoi(qe->getElementContent("lifetime").c_str()));
   }
   catch (CycNullQueryException e) {
-    setFacLifetime(TI->simDur());
+    setFacLifetime(TI->simDur()-1);
   }
   
   // get the incommodities
