@@ -11,17 +11,10 @@ class TestMarket : public MarketModel {
     }
     TestMarket(std::string commod) {
       commodity_ = commod;
-      MarketModel::initSimInteraction(this);
     }
     virtual void receiveMessage(msg_ptr msg) {
     }
     virtual void resolve() {
-    }
-    virtual void copy(TestMarket* src){
-      commodity_ = src->commodity_;
-    }
-    void copyFreshModel(Model* src){
-      copy(dynamic_cast<TestMarket*>(src));
     }
 };
 #endif

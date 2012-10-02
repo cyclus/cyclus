@@ -1,172 +1,112 @@
 // XMLQueryEngine.cpp
 // Implements class for querying XML snippets
-
 #include <iostream>
+#include <sstream>
 
 #include "XMLQueryEngine.h"
 
 #include "CycException.h"
 
-//- - - - - - 
+using namespace std;
+using namespace boost;
+using namespace xmlpp;
 
-XMLQueryEngine::XMLQueryEngine() {
-  
-  doc = NULL;
-  xpathCtxt = NULL;
-  numElements = 0;
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+XMLQueryEngine::XMLQueryEngine(XMLParser& parser) : current_node_(0) {
+  current_node_ = parser.document()->get_root_node();
 }
 
-XMLQueryEngine::XMLQueryEngine(std::string snippet) {
-
-  init(snippet);
-
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) : current_node_(0) {
+  current_node_ = node;
 }
 
-XMLQueryEngine::XMLQueryEngine(xmlDocPtr current_doc) {
-
-  if (NULL == current_doc) {
-    throw CycParseException("Invalide xmlDocPtr passed into XMLQueryEngine");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+int XMLQueryEngine::nElements() {
+  int n = 0;
+  const Node::NodeList nodelist = current_node_->get_children();  
+  Node::NodeList::const_iterator it;
+  for (it = nodelist.begin(); it != nodelist.end(); it++) {
+    const Element* element = dynamic_cast<const Element*>(*it);
+    if (element) 
+      n++;
   }
-  
-  doc = current_doc;
-  xpathCtxt = xmlXPathNewContext(doc);
-  numElements = 0;
-
+  return n;
 }
 
-void XMLQueryEngine::init(std::string snippet) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+int XMLQueryEngine::nElementsMatchingQuery(std::string query) {
+  const NodeSet nodeset = current_node_->find(query);
+  return nodeset.size();
+}
 
-  char *myEncoding = NULL;
-  int myParserOptions = 0;
-  doc = xmlReadDoc((const xmlChar*)snippet.c_str(),"",myEncoding,myParserOptions);
-  if (NULL == doc) {
-    // throw CycParseException("Failed to parse snippet");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string XMLQueryEngine::getElementContent(std::string query,
+                                              int index) {
+  const NodeSet nodeset = current_node_->find(query);
+
+  if (nodeset.empty())
+    throw CycNullQueryException("Could not find a node by the name: " 
+                                + query);
+
+  if (nodeset.size() < index+1)
+    throw CycIndexException("Index exceeds number of nodes in query: " 
+                            + query);
+
+  const Element* element = 
+    dynamic_cast<const Element*>(nodeset.at(index));
+
+  if (!element) 
+    throw CycNodeTypeException("Node: " + element->get_name() +
+                               " is not an Element node.");
+
+  const Node::NodeList nodelist = element->get_children();
+  if (nodelist.size() != 1) 
+    throw CycRangeException("Element node " + element->get_name() +
+                            " has more content than expected.");
+  
+  const TextNode* text = 
+    dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
+  
+  if (!text)
+    throw CycNodeTypeException("Node: " + text->get_name() +
+                               " is not a Text node.");
+  
+  return text->get_content();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string XMLQueryEngine::getElementName(int index) {
+  vector<Element*> elements;
+  const Node::NodeList nodelist = current_node_->get_children();
+  Node::NodeList::const_iterator it;
+  for (it = nodelist.begin(); it != nodelist.end(); it++) {
+    Element* element = dynamic_cast<Element*>(*it);
+    if (element) 
+      elements.push_back(element);
   }
-  
-  xpathCtxt = xmlXPathNewContext(doc);
-  numElements = 0;
-
+  if (elements.size() < index+1)
+    throw CycIndexException("Index exceeds number of elements in node: " 
+                            + current_node_->get_name());
+  return elements.at(index)->get_name();
 }
 
-
-//- - - - - - - 
-int XMLQueryEngine::find_elements(const char* expression) {
-
-  numElements = 0;
-
-  /* Evaluate xpath expression */
-  currentXpathObj = xmlXPathEvalExpression((const xmlChar*)expression, xpathCtxt);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+QueryEngine* XMLQueryEngine::getEngineFromQuery(std::string query,
+                                                int index) {
   
-  if (NULL != currentXpathObj)
-    numElements = currentXpathObj->nodesetval->nodeNr;
+  const NodeSet nodeset = current_node_->find(query);
 
-  return numElements;
+  if (nodeset.size() < index+1)
+    throw CycIndexException("Index exceeds number of nodes in query: " 
+                            + query);
 
+  Element* element = 
+    dynamic_cast<Element*>(nodeset.at(index));
+
+  if (!element) 
+    throw CycNodeTypeException("Node: " + element->get_name() +
+                               " is not an Element node.");
+
+  return new XMLQueryEngine(element);
 }
-
-//- - - - - -
-std::string XMLQueryEngine::get_content(const char* expression) {
-
-  if (0 == find_elements(expression)) {
-    throw CycParseException("Can't find an element with that name.");
-  }
-
-  return get_content(0);
-}
-
-std::string XMLQueryEngine::get_content(int elementNum) {
-
-  
-  xmlNodePtr node = currentXpathObj->nodesetval->nodeTab[elementNum];
-  // xmlNodePtr child = node->children;
-  std::string XMLcontent = "";
-  xmlBufferPtr nodeBuffer = xmlBufferCreate();
-  
-  if (nodeBuffer) {
-    int success = xmlNodeBufGetContent(nodeBuffer, node);
-    if (0 == success) 
-      XMLcontent = (const char*) xmlBufferContent(nodeBuffer);
-    else
-      throw CycParseException("Couldn't dump node");
-
-  // while (NULL != child) {
-  //   xmlNodeDump(nodeBuffer,doc,child,0,1);
-  //   XMLcontent += xmlBufferContent(nodeBuffer);
-  //   // switch (child->type) {
-  //   // case XML_ELEMENT_NODE:
-  //   //   xmlNodeDump(nodeBuffer,doc,child,0,1);
-  //   //   XMLcontent += (const char*)(nodeBuffer->content);
-  //   //   break;
-  //   // case XML_TEXT_NODE:
-  //   //   XMLcontent += (const char*)(child->content);
-  //   //   break;
-  //   // default:
-  //   //   XMLcontent = "XMLQueryEngine does not currently handle nodes of this type";
-  //   // }
-
-  //   child = child->next;
-  // }
-  }
-  else
-    throw CycParseException("Couldn't allocate buffer.");
-  
-  xmlBufferFree(nodeBuffer);
-
-  return XMLcontent;
-
-}
-
-std::string XMLQueryEngine::get_child(const char* expression) {
-
-  if (0 == find_elements(expression)) {
-    throw CycParseException("Can't find an element with that name.");
-  }
-  
-  return get_child(0);
-
-}
-
-std::string XMLQueryEngine::get_child(int elementNum, int childNum) {
-
-  if (elementNum >= numElements) {
-    throw CycParseException("Too many elements requested.");
-  }
-
-  xmlNodePtr node = currentXpathObj->nodesetval->nodeTab[elementNum];
-  xmlNodePtr child = node->children;
-  std::string XMLcontent;
-
-  while (childNum-- > 0 && NULL != child)
-    child = child->next;
-  
-  if (NULL == child)
-    throw CycParseException("Too many children requested.");
-
-  xmlBufferPtr nodeBuffer = xmlBufferCreate();
-  if (nodeBuffer)
-    {
-      int success = xmlNodeDump(nodeBuffer,doc,child,0,1);
-      if (-1 < success)
-	XMLcontent = (const char*)xmlBufferContent(nodeBuffer);
-      else
-	throw CycParseException("Couldn't dump node");
-    }
-  else
-    throw CycParseException("Couldn't allocate buffer.");
-
-  xmlBufferFree(nodeBuffer);
-
-  return XMLcontent;
-
-}
-
-//- - - - - - 
-std::string XMLQueryEngine::get_name(int elementNum) {
-
-  std::string XMLname = (const char*)(currentXpathObj->nodesetval->nodeTab[elementNum]->name);
-
-  return XMLname;
-
-}
-

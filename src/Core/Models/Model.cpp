@@ -8,44 +8,39 @@
 
 #include "Model.h"
 
+#include "DynamicModule.h"
 #include "Logger.h"
-#include "suffix.h"
 #include "CycException.h"
 #include "Env.h"
-#include "InputXML.h"
 #include "Timer.h"
 #include "Resource.h"
 #include "Table.h"
+#include "Prototype.h"
+#include "QueryEngine.h"
 
-#include DYNAMICLOADLIB
+#include "RegionModel.h"
 
 using namespace std;
+using namespace boost;
 
-// Default starting ID for all Models is zero.
+// static members
 int Model::next_id_ = 0;
-// Database table for agents
-table_ptr Model::agent_table = new Table("Agents"); 
-// Model containers
-vector<Model*> Model::template_list_;
+table_ptr Model::agent_table = table_ptr(new Table("Agents")); 
 vector<Model*> Model::model_list_;
-map<string, mdl_ctor*> Model::create_map_;
+map< string, shared_ptr<DynamicModule> > Model::loaded_modules_;
+vector<void*> Model::dynamic_libraries_;
+set<Model*> Model::markets_;
+set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::getTemplateByName(std::string name) {
-  Model* found_model = NULL;
-
-  for (int i = 0; i < template_list_.size(); i++) {
-    if (name == template_list_.at(i)->name()) {
-      found_model = template_list_.at(i);
-      break;
-    }
-  }
-
-  if (found_model == NULL) {
-    string err_msg = "Model '" + name + "' doesn't exist.";
-    throw CycIndexException(err_msg);
-  }
-  return found_model;
+std::set<std::string> Model::dynamic_module_types() {
+  set<string> types;
+  types.insert("Market");
+  types.insert("Converter");
+  types.insert("Region");
+  types.insert("Inst");
+  types.insert("Facility");
+  return types;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,130 +77,89 @@ vector<Model*> Model::getModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::create(std::string model_type, xmlNodePtr cur) {
-  string model_impl = XMLinput->get_xpath_name(cur, "model/*");
+void Model::initializeSimulationEntity(std::string model_type, 
+                                       QueryEngine* qe) {
+  // query data
+  QueryEngine* module_data = qe->queryElement("model");
+  string module_name = module_data->getElementName();
 
-  // get instance
-  mdl_ctor* model_constructor = loadConstructor(model_type, model_impl);
-
-  Model* model = model_constructor();
-
-  model->init(cur);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::create(Model* model_orig) {
-  mdl_ctor* model_constructor = loadConstructor(model_orig->modelType(),model_orig->modelImpl());
+  // instantiate & init module
+  /* --- */
+  shared_ptr<DynamicModule> 
+    module(new DynamicModule(model_type,module_name)); 
+  loaded_modules_.insert(make_pair(module_name,module));
   
-  Model* model_copy = model_constructor();
-  
-  model_copy->copyFreshModel(model_orig);
+  CLOG(LEV_DEBUG1) << "Module '" << module_name
+                   << "' of type: " << model_type 
+                   << " has been loaded.";
 
-  return model_copy;
-}
+  Model* model = module->constructInstance();
+  /* --- */
+  model->initCoreMembers(qe);
+  model->setModelImpl(module->name());
+  model->initModuleMembers(module_data->queryElement(module->name()));
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_models() {
-  load_converters();
-  load_markets();
-  load_facilities();
-  load_institutions();
-  load_regions();
-}
+  CLOG(LEV_DEBUG3) << "Module '" << model->name()
+                   << "' has had its module members initialized:";
+  CLOG(LEV_DEBUG3) << " * Type: " << model->modelType(); 
+  CLOG(LEV_DEBUG3) << " * Implementation: " << model->modelImpl() ;
+  CLOG(LEV_DEBUG3) << " * ID: " << model->ID();
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_markets() {
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/market");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    create("Market",nodes->nodeTab[i]);
+  // register module
+  if ("Facility" == model_type) {
+    Prototype::registerPrototype(model->name(),
+        			 dynamic_cast<Prototype*>(model));
+  } else if ("Market" == model_type) {
+    registerMarketWithSimulation(model);
+  }  else {
+    model_list_.push_back(model);
+  }
+  if ("Region" == model_type) {
+    registerRegionWithSimulation(model);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_converters() {
-  try {
-    xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/*/converter");
-    
-    for (int i=0;i<nodes->nodeNr;i++) {
-      create("Converter",nodes->nodeTab[i]);
-    }
-  } catch (CycNullXPathException) {} // no converters
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilities() {
-  xmlNodeSetPtr nodes;
-  try {
-     nodes = XMLinput->get_xpath_elements("/*/facilitycatalog");
-    
-    for (int i=0;i<nodes->nodeNr;i++){
-      load_facilitycatalog(XMLinput->get_xpath_content(nodes->nodeTab[i], 
-                                                       "filename"),
-                           XMLinput->get_xpath_content(nodes->nodeTab[i], "namespace"),
-                           XMLinput->get_xpath_content(nodes->nodeTab[i], "format"));
-    }
-  } catch (CycNullXPathException) {}; // no converters
-  
-  nodes = XMLinput->get_xpath_elements("/*/facility");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    create("Facility",nodes->nodeTab[i]);
+void Model::registerMarketWithSimulation(Model* market) {
+  MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
+  if (!marketCast) {
+    string err_msg = "Model '" + market->name() + "' can't be registered as a market.";
+    throw CycOverrideException(err_msg);
   }
-}
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_facilitycatalog(std::string filename, std::string ns, std::string format){
-  XMLinput->extendCurNS(ns);
-
-  if ("xml" == format){
-    XMLinput->load_facilitycatalog(filename);
-  } else {
-    throw CycRangeException(format + "is not a supported facilitycatalog format.");
-  }
-
-  XMLinput->stripCurNS();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_regions() {
-
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    create("Region",nodes->nodeTab[i]);
+  else {
+    markets_.insert(market);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::load_institutions() {
-
-  xmlNodeSetPtr nodes = XMLinput->get_xpath_elements("/simulation/region/institution");
-  
-  for (int i=0;i<nodes->nodeNr;i++) {
-    create("Inst",nodes->nodeTab[i]);   
+void Model::registerRegionWithSimulation(Model* region) {
+  RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
+  if (!regionCast) {
+    string err_msg = "Model '" + region->name() + "' can't be registered as a region.";
+    throw CycOverrideException(err_msg);
+  }
+  else {
+    regions_.insert(region);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::init(xmlNodePtr cur) {
-  name_ = XMLinput->getCurNS() + XMLinput->get_xpath_content(cur,"name");
+void Model::constructSimulation() {
+  set<Model*>::iterator it;
+  for (it = markets_.begin(); it != markets_.end(); it++) {
+    Model* market = *it;
+    market->enterSimulation(market);
+  }
+  for (it = regions_.begin(); it != regions_.end(); it++) {
+    Model* region = *it;
+    region->enterSimulation(region);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::initCoreMembers(QueryEngine* qe) {
+  name_ = qe->getElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
-  model_impl_ = XMLinput->get_xpath_name(cur, "model/*");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::copy(Model* model_orig) {
-  if (model_orig->modelType() != model_type_ && 
-       model_orig->modelImpl() != model_impl_) {
-    throw CycTypeException("Cannot copy a model of type " 
-        + model_orig->modelType() + "/" + model_orig->modelImpl()
-        + " to an object of type "
-        + model_type_ + "/" + model_impl_);
-  }
-
-  name_ = model_orig->name();
-  model_impl_ = model_orig->modelImpl();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -213,9 +167,7 @@ Model::Model() {
   children_ = vector<Model*>();
   name_ = "";
   ID_ = next_id_++;
-  is_template_ = true;
   born_ = false;
-  template_list_.push_back(this);
   parent_ = NULL;
   parentID_ = -1;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
@@ -232,7 +184,6 @@ Model::~Model() {
   agent_table->updateRow( this->pkref(), don );
   
   // remove references to self
-  removeFromList(this, template_list_);
   removeFromList(this, model_list_);
 
   if (parent_ != NULL) {
@@ -243,10 +194,26 @@ Model::~Model() {
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->ID() << " {";
-    delete child;
+    deleteModel(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Model::constructModel(std::string model_impl){
+  if (loaded_modules_.find(model_impl) == loaded_modules_.end())
+    throw CycOverrideException("No module is registered for " + model_impl);
+
+  return loaded_modules_[model_impl]->constructInstance();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::deleteModel(Model* model){
+  map<string, shared_ptr<DynamicModule> >::iterator it;
+  it = loaded_modules_.find(model->modelImpl());
+  if (it != loaded_modules_.end()) 
+    it->second->destructInstance(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -271,46 +238,36 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::itLives() {
-  if (!isTemplate()) {
-    return;
-  }
+void Model::enterSimulation(Model* parent){ 
 
-  this->setBornOn( TI->time() );
+  CLOG(LEV_DEBUG1) << "Model '" << name()
+                   << "' is entering the simulation.";
+  CLOG(LEV_DEBUG3) << "It has:";
+  CLOG(LEV_DEBUG3) << " * Implementation: " << modelImpl();
+  CLOG(LEV_DEBUG3) << " * ID: " << ID();
 
-  if (parent_ == NULL) {
-    parentID_ = this->ID();
-  } else {
-    parentID_ = parent_->ID();
-  }
-  
-  // register the model with the simulation
+  // set model-specific members
+  parentID_ = parent->ID();
+  setParent(parent);
+  if (parent != this)
+    parent->addChild(this);
+  bornOn_ = TI->time();
+
+  // add model to the database
   this->addToTable();
 
-  is_template_ = false;
-
-  // this prevents duplicates from being stored in the list
-  removeFromList(this, model_list_);
-  model_list_.push_back(this);
-  
-  // if this node is not its own parent, add it to its parent's list of children
-  if (parent_ != NULL){
-    parent_->addChild(this);
-  }
-
-  CLOG(LEV_DEBUG2) << "Created Model: {";
-  CLOG(LEV_DEBUG2) << str();
-  CLOG(LEV_DEBUG2) << "}";
+  enterSimulationAsCoreEntity();
+  enterSimulationAsModule();
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsCoreEntity() {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::enterSimulationAsModule() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::setParent(Model* parent){ 
-  doSetParent(parent);
-  itLives();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::doSetParent(Model* parent){ 
   if (parent == this) {
     // root nodes are their own parent
     parent_ = NULL; // parent pointer set to NULL for memory management
@@ -333,13 +290,19 @@ Model* Model::parent(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
-  if (child == this || child == NULL) {
-    return;
-  }
-  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID() 
+  if (child == this)
+    throw CycOverrideException("Model " + name() + 
+                               "is trying to add itself as its own child.");
+      
+  if (!child)
+    throw CycOverrideException("Model " + name() + 
+                               "is trying to add an invalid model as its child.");
+    
+
+  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << ID() 
 		  << " has added child '" << child->name() << "' ID=" 
 		  << child->ID() << " to its list of children.";
-  removeChild(child);
+
   children_.push_back(child); 
 };
 

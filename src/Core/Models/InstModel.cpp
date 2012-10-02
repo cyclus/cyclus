@@ -9,27 +9,83 @@
 
 #include "Logger.h"
 #include "Timer.h"
-#include "InputXML.h"
 #include "CycException.h"
 #include "FacilityModel.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 InstModel::InstModel() {
   setModelType("Inst");
-  prototypes_ = new PrototypeSet();
+  prototypes_ = PrototypeSet();
+  initial_build_order_ = map<Prototype*,int>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::init(xmlNodePtr cur) {
-  Model::init(cur);
+void InstModel::initCoreMembers(QueryEngine* qe) {
+  Model::initCoreMembers(qe);
+
+  string name, query;
+  int nEntries;
+  Prototype* prototype;  
+  
+  // populate prototypes_
+  query = "availableprototype";
+  nEntries = qe->nElementsMatchingQuery(query);
+  if (nEntries > 0) {
+    // populate prototypes_
+    for (int i=0;i<nEntries;i++){
+      name = qe->getElementContent(query,i);
+      prototype = Prototype::getRegisteredPrototype(name);
+      addAvailablePrototype(prototype);
+    }
+  } 
+
+  query = "initialfacilitylist";
+  nEntries = qe->nElementsMatchingQuery(query);
+  // populate initial_build_order_
+  if (nEntries > 0) {
+    QueryEngine* list = qe->queryElement(query);
+    int numInitFacs = list->nElementsMatchingQuery("entry");
+    for (int i=0;i<numInitFacs;i++){
+      QueryEngine* entry = list->queryElement("entry",i);
+      addPrototypeToInitialBuild(entry);
+    }
+  }
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::copy(InstModel* src) {
-  Model::copy(src);
-  Communicator::copy(src);
+void InstModel::addAvailablePrototype(Prototype* prototype) {
+  prototypes_.insert(prototype);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
+  
+  string name = qe->getElementContent("prototype");
+  int number = atoi(qe->getElementContent("number").c_str());
+
+  Prototype* p = Prototype::getRegisteredPrototype(name);
+  throwErrorIfPrototypeIsntAvailable(p);
+
+  CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
+                   << number << " prototypes of type " << name 
+                   << " to its list of initial facilities to build.";
+
+  initial_build_order_.insert(make_pair(p,number));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
+  if (!isAvailablePrototype(p)) {    
+    stringstream err("");
+    err << "Inst " << this->name() << " does not have " 
+        << dynamic_cast<Model*>(p)->name() 
+        << " as one of its available prototypes.";
+    throw CycOverrideException(err.str());
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -41,6 +97,23 @@ std::string InstModel::str() {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void InstModel::enterSimulationAsCoreEntity() {
+  // build initial prototypes
+  map<Prototype*,int>::iterator it;
+  for (it = initial_build_order_.begin(); 
+       it != initial_build_order_.end(); it ++) {
+    
+    // for each prototype
+    Prototype* p = it->first;
+    int number = it->second;
+
+    for (int i = 0; i < number; i++) {
+      // build as many as required
+      build(p);
+    }
+  }
+}
 
 /* --------------------
  * all COMMUNICATOR classes have these members
@@ -53,15 +126,6 @@ void InstModel::receiveMessage(msg_ptr msg){
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
   msg->sendOn();
-}
-
-void InstModel::handlePreHistory(){
-  // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    (dynamic_cast<FacilityModel*>(*fac))->handlePreHistory();
-  }
 }
 
 void InstModel::handleTick(int time) {
@@ -85,8 +149,13 @@ void InstModel::handleTock(int time) {
   int currsize = children_.size();
   int i = 0;
   while (i < children_.size()) {
-    Model* m = children_.at(i);
-    dynamic_cast<FacilityModel*>(m)->handleTock(time);
+    FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
+    child->handleTock(time);
+
+    if ( child->lifetimeReached() ) {
+      CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
+      child->decommission();
+    }
 
     // increment not needed if a facility deleted itself
     if (children_.size() == currsize) {
@@ -109,31 +178,10 @@ void InstModel::handleDailyTasks(int time, int day){
  * all INSTMODEL classes have these members
  * --------------------
  */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void InstModel::addPrototype(Model* prototype) {
-  if ( !isAvailablePrototype(prototype) ) {
-    prototypes_->insert(prototype);
-  }
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::build(Model* prototype, Model* requester) {
-  // by default
-  stringstream err("");
-  err << "Institution " << this->name() << " does not have a definied " 
-      << "facility-building fuction.";
-  throw CycOverrideException(err.str());
-}
-
-double InstModel::powerCapacity(){
-  // queries each facility for their power capacity
-  double capacity = 0.0;
-  for(vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    capacity += (dynamic_cast<FacilityModel*>(*fac))->powerCapacity();
-  }
-  return capacity;
+void InstModel::build(Prototype* prototype) {
+  throwErrorIfPrototypeIsntAvailable(prototype);
+  Prototype* clone = prototype->clone();
+  dynamic_cast<Model*>(clone)->enterSimulation(this);
 }
 

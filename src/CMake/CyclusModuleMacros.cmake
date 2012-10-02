@@ -31,7 +31,6 @@ macro(cyclus_init_model _type _name)
   cyclus_init(${MODEL_PATH} ${_name})
 
   SET(${_type}TestSource ${${_type}TestSource} 
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/${_name}Tests.cpp 
     PARENT_SCOPE)
 endmacro()

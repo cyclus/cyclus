@@ -9,6 +9,8 @@
 #include "TimeAgent.h"
 #include "MarketModel.h"
 
+class QueryEngine;
+
 #define TI Timer::Instance()
 
 /**
@@ -98,12 +100,6 @@ class Timer {
    */
   void sendTock();
     
-  /**
-     handles all pre-history interactions between regions, 
-     institutions, and facilities. 
-   */
-  void handlePreHistory();
-
   /**
      sends a notification to Tick listeners that a day has passed 
    */
@@ -244,8 +240,10 @@ public:
 
   /**
      Loads the information about the simulation timing 
+     
+     @param qe is a pointer to a general QueryEngine that can 
    */
-  static void load_simulation();
+  static void load_simulation(QueryEngine *qe);
 
 };
 #endif

@@ -6,8 +6,8 @@
 int Resource::nextID_ = 0;
 
 // Database table for resources
-table_ptr Resource::resource_table = new Table("Resources"); 
-table_ptr Resource::resource_type_table = new Table("ResourceTypes"); 
+table_ptr Resource::resource_table = table_ptr(new Table("Resources")); 
+table_ptr Resource::resource_type_table = table_ptr(new Table("ResourceTypes"));
 
 // -------------------------------------------------------------
 Resource::Resource() {

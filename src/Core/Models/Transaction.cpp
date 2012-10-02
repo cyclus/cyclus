@@ -11,8 +11,8 @@
 // initialize static variables
 int Transaction::next_trans_id_ = 1;
 // Database table for transactions
-table_ptr Transaction::trans_table = new Table("Transactions"); 
-table_ptr Transaction::trans_resource_table = new Table("TransactedResources"); 
+table_ptr Transaction::trans_table = table_ptr(new Table("Transactions")); 
+table_ptr Transaction::trans_resource_table = table_ptr(new Table("TransactedResources")); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction::Transaction(Model* creator, TransType type, rsrc_ptr res, 

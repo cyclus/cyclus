@@ -4,7 +4,7 @@
 
 #include "CompMap.h"
 #include "Table.h"
-#include "InputXML.h"
+#include "QueryEngine.h"
 
 #include <set>
 #include <map>
@@ -72,12 +72,12 @@ class RecipeLibrary {
   /**
      loads the recipes from the input file 
    */
-  static void load_recipes();
+  static void load_recipes(QueryEngine* qe);
 
   /**
      loads a specific recipe 
    */
-  static void load_recipe(xmlNodePtr cur);
+  static void load_recipe(QueryEngine* qe);
   
   /**
      records a new recipe in the simulation
