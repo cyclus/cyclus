@@ -10,6 +10,8 @@
 #include "Communicator.h"
 #include "CycException.h"
 
+class QueryEngine;
+
 class CycMarketlessCommodException: public CycException {
   public: CycMarketlessCommodException(std::string msg) :
       CycException(msg) { };
@@ -70,6 +72,12 @@ class MarketModel : public Model, public Communicator {
      MarketModels should not be indestructible. 
    */
   virtual ~MarketModel();
+
+  /**
+     sets the commodity for this market
+     @param name the commodity name
+   */
+  void setCommodity(std::string name);
   
   /**
      Queries the list of known markets for one associated with the 
@@ -82,34 +90,17 @@ class MarketModel : public Model, public Communicator {
   static MarketModel* marketForCommod(std::string commod);
 
   /**
-     set the parameters necessary for MarketModel to interact
-     with the simulation
-     
-     @param mkt the MarketModel to initialize
+     enters the market into the simulation
    */
-  virtual void initSimInteraction(MarketModel* mkt);
+  virtual void enterSimulationAsCoreEntity();
 
   /**
-     every model needs a method to initialize from XML 
+     every model needs a method to initialize from a QueryEngine
      this method calls the MarketModel's initSimInteraction() 
      method
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
-
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(MarketModel* src);
-
-  /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers.  
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
-   */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 

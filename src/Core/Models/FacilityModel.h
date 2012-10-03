@@ -5,12 +5,14 @@
 #include <string>
 #include <vector>
 
+#include "Model.h"
 #include "TimeAgent.h"
 #include "Communicator.h"
-#include "InstModel.h"
+#include "Prototype.h"
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
+class InstModel;
 
 /**
    @class FacilityModel 
@@ -65,7 +67,8 @@ class Material;
    pages that describe how to get the models and the detailed behavior 
  */
 
-class FacilityModel : public TimeAgent, public Communicator {
+class FacilityModel : public TimeAgent, public Communicator, 
+  public Prototype {
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -77,26 +80,27 @@ class FacilityModel : public TimeAgent, public Communicator {
 
   /**
      Initalize the FacilityModel from xml. Calls the init function. 
-     
-     @param cur the current xml node pointer 
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
-  
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(FacilityModel* src);
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers. 
-      
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
+     prototypes are required to provide the capacity to copy their
+     initialized members
    */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual Prototype* clone();
+
+  /**
+     Copy core members from a source model
+     @param source the model to copy from
+   */
+  void cloneCoreMembersFrom(FacilityModel* source);
+
+  /**
+     Copy module members from a source model
+     @param source the model to copy from
+   */
+  virtual void cloneModuleMembersFrom(FacilityModel* source);
 
   /**
      every model should be able to print a verbose description 
@@ -132,6 +136,22 @@ class FacilityModel : public TimeAgent, public Communicator {
   std::string inst_name_;
 
   /**
+     Most facilities will have a vector of incoming, request commodities.
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.  
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> in_commods_;
+
+  /**
+     most facilities will have a vector of outgoing, offer commodities
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.  
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> out_commods_;
+
+  /**
      each facility needs a lifetime 
    */
   int fac_lifetime_;
@@ -164,63 +184,64 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   virtual void decommission();
 
+  /**
+     facilities over write this method if a condition must be met 
+     before their destructors can be called
+   */
+  virtual bool checkDecommissionCondition();
+
  public:
   /**
      Sets the facility's name 
-      
      @param facName is the new name of the facility 
    */
   virtual void setFacName(std::string facName) { this->setName(facName); };
 
   /**
      Returns the facility's name 
-      
      @return fac_name_ the name of this facility, a string 
    */
   virtual std::string facName() { return this->name(); };
 
   /**
      Sets this facility's instutution name 
-      
      @param name the name of the institution associated with this 
    */
   virtual void setInstName(std::string name){ inst_name_ = name;};
 
   /**
      Returns this facility's institution 
-      
      @return the institution assosicated with this facility 
    */
   virtual InstModel* facInst();
 
   /**
      Sets the facility's lifetime 
-      
      @param lifetime is the new lifetime of the facility in months 
    */
   virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
-     Returns the facility's lifetime 
-      
+     Returns the facility's lifetime     
      @return fac_lifetime_ the lifetime of this facility, an int, in 
    */
   virtual int facLifetime() { return fac_lifetime_; };
+  
+  /**
+     @return the input commodities
+  */
+  std::vector<std::string> inputCommodities();
 
   /**
-     Returns the facility's power capacity 
-      
-     @return 0 by default. If the facility produces power, it will use 
-     its own function. 
-   */
-  virtual double powerCapacity() { return 0.0; };
-
+     @return the output commodities
+  */
+  std::vector<std::string> outputCommodities();
+  
   /**
-     Each facility is prompted to do its beginning-of-life 
-     stuff. 
-      
+     @return true if the current time is greater than the 
+     decommission date
    */
-  virtual void handlePreHistory();
+  bool lifetimeReached();
 
   /**
      Each facility is prompted to do its beginning-of-time-step 
@@ -249,6 +270,7 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   virtual void handleDailyTasks(int time, int day);
 
+  friend class InstModel;
 /* ------------------- */ 
   
 };

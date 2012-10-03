@@ -64,6 +64,12 @@ SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
 SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
+# Find LibXML++ and dependencies
+FIND_PACKAGE( LibXML++ REQUIRED )
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LibXML++_INCLUDE_DIR} ${Glibmm_INCLUDE_DIRS} ${LibXML++Config_INCLUDE_DIR})
+SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
+MESSAGE(${LIBS})
+
 # Find Sqlite3
 FIND_PACKAGE( Sqlite3 REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
@@ -96,7 +102,7 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 # add the core library 
 ADD_SUBDIRECTORY(Core)
 
-#MESSAGE("libs: ${LIBS}")
+MESSAGE("libs: ${LIBS}")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 SET( CYCLUS_SRC
@@ -136,7 +142,7 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
-  ${CYCLUS_CORE_SRC}
+#  ${CYCLUS_CORE_SRC}
   ${CYCLUS_TEST_CORE}
   )
 
@@ -172,8 +178,7 @@ ADD_EXECUTABLE( CyclusUnitTestDriver
   Testing/CyclusUnitTestDriver.cpp ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
-TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${CYCLUS_LIBRARIES} 
- dl ${LIBS} gtest)
+TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)
 
 # Here we add all the tests
 add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 

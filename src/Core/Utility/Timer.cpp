@@ -6,7 +6,6 @@
 #include <string>
 #include <iostream>
 
-#include "InputXML.h"
 #include "CycException.h"
 #include "Logger.h"
 #include "Material.h"
@@ -19,9 +18,6 @@ Timer* Timer::instance_ = 0;
 void Timer::runSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << startDate_ << " to end=" << endDate_;
-
-  time_ = -1;
-  handlePreHistory();
   time_ = time0_;
   CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()){
@@ -81,18 +77,6 @@ string Timer::reportListeners() {
   return report;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::handlePreHistory() {
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
-       agent != tick_listeners_.end(); 
-       agent++) {
-    try {
-      (*agent)->handlePreHistory();
-    } catch(CycException err) {
-      LOG(LEV_ERROR, "none!") << "ERROR occured in handlePreHistory(): " << err.what();
-    }
-  }
-}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendResolve() {
   for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
@@ -179,7 +163,6 @@ Timer* Timer::Instance() {
   // either way.
   if (0 == instance_) {
     instance_ = new Timer();
-    instance_->initialize();
   }
 
   return instance_;
@@ -245,27 +228,25 @@ pair<int, int> Timer::convertDate(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation() { 
+void Timer::load_simulation(QueryEngine *qe) { 
   
   int dur, m0, y0, sim0, dec;
   string dur_str, m0_str, y0_str, sim0_str, decay_str;
-
-  xmlNodePtr cur = XMLinput->get_xpath_element("/simulation");
+  
   // get duration
-  dur_str = (XMLinput->get_xpath_content(cur,"duration"));
-  // get start month
-  m0_str = (XMLinput->get_xpath_content(cur,"startmonth"));
-  // get start year
-  y0_str = (XMLinput->get_xpath_content(cur,"startyear"));
-  // get simulation start
-  sim0_str = (XMLinput->get_xpath_content(cur,"simstart"));
-  // get decay interval
-  decay_str = (XMLinput->get_xpath_content(cur,"decay"));
-
+  dur_str = qe->getElementContent("duration");
   dur = strtol(dur_str.c_str(), NULL, 10);
+  // get start month
+  m0_str = qe->getElementContent("startmonth");
   m0 = strtol(m0_str.c_str(), NULL, 10);
+  // get start year
+  y0_str = qe->getElementContent("startyear");
   y0 = strtol(y0_str.c_str(), NULL, 10);
+  // get simulation start
+  sim0_str = qe->getElementContent("simstart");
   sim0 = strtol(sim0_str.c_str(), NULL, 10);
+  // get decay interval
+  decay_str = qe->getElementContent("decay");
   dec = strtol(decay_str.c_str(), NULL, 10);
 
   TI->initialize(dur, m0, y0, sim0, dec);

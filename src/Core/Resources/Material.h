@@ -7,7 +7,6 @@
 #include <math.h>
 #include <vector>
 #include <string>
-#include <libxml/tree.h>
 
 #include "UseMatrixLib.h"
 #include "Resource.h"

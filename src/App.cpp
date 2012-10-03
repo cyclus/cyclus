@@ -8,10 +8,10 @@
 #include "Model.h"
 #include "BookKeeper.h"
 #include "Timer.h"
-#include "InputXML.h"
 #include "CycException.h"
 #include "Env.h"
 #include "Logger.h"
+#include "XMLFileLoader.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -108,14 +108,20 @@ int main(int argc, char* argv[]) {
 
   // read input file and setup simulation
   try {
-    XMLinput->load_file(vm["input-file"].as<string>()); 
-  } catch (CycIOException ge) {
-    CLOG(LEV_ERROR) << ge.what();
-    return 0;
+    string inputFile = vm["input-file"].as<string>();
+    set<string> module_types = Model::dynamic_module_types();
+    XMLFileLoader loader(inputFile);
+    loader.load_control_parameters();
+    loader.load_recipes();
+    loader.load_dynamic_modules(module_types);
   } catch (CycException e) {
     CLOG(LEV_ERROR) << e.what();
   }
 
+  // sim construction - should be handled by some entity
+  Model::constructSimulation();
+
+  // print the model list
   Model::printModelList();
   
   // Run the simulation 

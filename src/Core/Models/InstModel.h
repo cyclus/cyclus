@@ -4,15 +4,19 @@
 
 #include "TimeAgent.h"
 #include "Communicator.h"
-#include "RegionModel.h"
 #include "Model.h"
+#include "RegionModel.h"
 
+#include <map>
 #include <set>
 #include <list>
 
+class QueryEngine;
+class Prototype;
+
 // Usefull Typedefs
-typedef std::set<Model*> PrototypeSet;
-typedef std::set<Model*>::iterator PrototypeIterator;
+typedef std::set<Prototype*> PrototypeSet;
+typedef std::set<Prototype*>::iterator PrototypeIterator;
 
 /**
    The InstModel class is the abstract class/interface 
@@ -62,26 +66,11 @@ class InstModel : public TimeAgent, public Communicator {
   virtual ~InstModel() {};
       
   /**
-     Initalize the InstModel from xml. Calls the init function. 
+     Initalize the InstModel from a QueryEngine. Calls the init function. 
      
-     @param cur the current xml node pointer 
+     @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void init(xmlNodePtr cur);
-
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(InstModel* src);
-
-  /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers.  
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
-   */
-  virtual void copyFreshModel(Model* src)=0;
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
@@ -94,14 +83,6 @@ class InstModel : public TimeAgent, public Communicator {
    */
   virtual void receiveMessage(msg_ptr msg);
   
-  /**
-     Each inst is prompted to do its beginning-of-life-step 
-     stuff before the simulation begins. 
-      
-     Normally, inst.s simply hand the command down to facilities. 
-   */
-  virtual void handlePreHistory();
-
   /**
      Each institution is prompted to do its beginning-of-time-step 
      stuff at the tick of the timer. 
@@ -130,6 +111,10 @@ class InstModel : public TimeAgent, public Communicator {
    */
   virtual void handleDailyTasks(int time, int day);
 
+  /**
+     perform all tasks required when an inst enters the simulation
+   */
+  virtual void enterSimulationAsCoreEntity();
 /* ------------------- */ 
 
 
@@ -141,36 +126,62 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      The Inst's set of available prototypes to build 
    */
-  PrototypeSet* prototypes_;
+  PrototypeSet prototypes_;
 
-   /**
-     Add a prototype to the Insts list of prototypes 
+  /**
+     the initial prototypes to build
    */
-  void addPrototype(Model* prototype);  
+  std::map<Prototype*,int> initial_build_order_;
+
+  /**
+     add a prtotoype to the set of available prototypes
+     @param prototype the prototype to add
+   */
+  void addAvailablePrototype(Prototype* prototype);
+
+  /**
+     Adds a prototype build order to initial_build_order_
+     @param qe a pointer to a QueryEngine object containing intialization data
+   */
+  void addPrototypeToInitialBuild(QueryEngine* qe);
 
  public:
   /**
      return the number of prototypes this inst can build
    */
-  int nPrototypes() { return prototypes_->size(); }
+  int nPrototypes() { return prototypes_.size(); }
   
   /**
      return the first prototype
    */
-  PrototypeIterator beginPrototype() { return prototypes_->begin(); }
+  PrototypeIterator beginPrototype() { return prototypes_.begin(); }
 
   /**
      return the last prototype
    */
-  PrototypeIterator endPrototype() { return prototypes_->end(); }
+  PrototypeIterator endPrototype() { return prototypes_.end(); }
 
   /**
      Checks if prototype is in the prototype list 
    */
-  bool isAvailablePrototype(Model* prototype) {
-    return ( prototypes_->find(prototype) 
-	     != prototypes_->end() ); 
+  bool isAvailablePrototype(Prototype* p) {
+    return ( prototypes_.find(p) != prototypes_.end() ); 
   }
+
+  /**
+     another moniker for isAvailablePrototype
+     @param prototype the prototype to be built
+   */
+  virtual bool canBuild(Prototype* prototype) {
+    return isAvailablePrototype(prototype);
+  }
+  
+  /**
+     checks if a prototype is in its list of available prototypes
+     if not, it throws an error
+     @param p the prototype to check for
+   */
+  void throwErrorIfPrototypeIsntAvailable(Prototype* p);
 
   /**
      returns this institution's region 
@@ -183,39 +194,10 @@ class InstModel : public TimeAgent, public Communicator {
   int getNumFacilities(){ return this->nChildren();};
 
   /**
-     queries the power capacity of each facility in the institution 
+     builds a prototype 
+     @param prototype the prototype to build
    */
-  double powerCapacity();
-
-  /**
-     determines if a prototype can be built by this inst at the present
-     time
-
-     by default, returns false
-
-     @param prototype the prototype to be built
-   */
-  virtual bool canBuild(Model* prototype) {return false;}
-
-  /**
-     builds a prototype requested by requester
-
-     by default, an error is thrown.
-
-     @param prototype the prototype to be built 
-     @param requester the Model requesting that the prototype be built 
-   */
-  virtual void build(Model* prototype, Model* requester);
-
-  /**
-     builds a prototype with a specific name as requested by requester
-     
-     by default, it calls the simpler build function
-   */
-  virtual void build(Model* prototype, Model* requester, 
-                     std::string name) { 
-    build(prototype,requester); 
-  }
+  void build(Prototype* prototype);
 
 /* ------------------- */ 
   

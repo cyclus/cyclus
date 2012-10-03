@@ -17,17 +17,7 @@ StubModel::StubModel() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::~StubModel() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubModel::init(xmlNodePtr cur) { 
-  Model::init(cur); 
-};
   
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubModel::copy(StubModel* src) { 
-  Model::copy(src); 
-};
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubModel::str() { 
   return Model::str() + ""; 

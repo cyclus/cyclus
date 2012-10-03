@@ -1,16 +1,16 @@
 # This allows apple to build the libraries dynamically
 IF (WIN32)
   set(suffix ".dll")
-  set(dynamicloadlib "WinLoadConstr.h")
+  set(dynamicloadlib "WindowHelperFunctions.h")
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ELSEIF(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup" PARENT_SCOPE)
   set(suffix ".dylib")
-  set(dynamicloadlib "UnixLoadConstr.h")
+  set(dynamicloadlib "UnixHelperFunctions.h")
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ELSE()
   set(suffix ".so")
-  set(dynamicloadlib "UnixLoadConstr.h")
+  set(dynamicloadlib "UnixHelperFunctions.h")
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ENDIF()
 
@@ -27,8 +27,8 @@ CONFIGURE_FILE(
   )
 
 INSTALL(FILES
-    UnixLoadConstr.h
-    WinLoadConstr.h
+    UnixHelperFunctions.h
+    WindowsHelperFunctions.h
     suffix.h
   DESTINATION cyclus/include
   COMPONENT core

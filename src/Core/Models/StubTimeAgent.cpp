@@ -17,24 +17,11 @@ StubTimeAgent::StubTimeAgent() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::~StubTimeAgent() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::init(xmlNodePtr cur) { 
-  Model::init(cur); 
-};
   
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::copy(StubTimeAgent* src) { 
-  TimeAgent::copy(src); 
-};
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubTimeAgent::str() { 
   return TimeAgent::str() + ""; 
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::handlePreHistory() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::handleTick(int time) {}

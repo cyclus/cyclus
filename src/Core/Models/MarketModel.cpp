@@ -5,9 +5,9 @@
 
 #include "MarketModel.h"
 
-#include "InputXML.h"
 #include "Timer.h"
 #include "Logger.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
@@ -57,35 +57,24 @@ void MarketModel::registerMarket(MarketModel* mkt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::initSimInteraction(MarketModel* mkt) {  
-  // this brings the market into the simulation (all agents must have a parent)
-  mkt->setParent(mkt);
-
+void MarketModel::enterSimulationAsCoreEntity() {
   // register the model
-  TI->registerResolveListener(mkt);
-  MarketModel::registerMarket(mkt);
+  TI->registerResolveListener(this);
+  MarketModel::registerMarket(this);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void MarketModel::setCommodity(std::string name) {
+  commodity_ = name;
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::init(xmlNodePtr cur) {
+void MarketModel::initCoreMembers(QueryEngine* qe) {
   // general initializations
-  Model::init(cur);  
-  MarketModel::initSimInteraction(this);
+  Model::initCoreMembers(qe);
 
   // specific initalizations
-  commodity_ = XMLinput->get_xpath_content(cur,"mktcommodity");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::copy(MarketModel* src) {
-  Model::copy(src);
-  Communicator::copy(src);
-
-   /** 
-   *  Specific initialization for MarketModels
-   */
-
-  commodity_ = src->commodity();
+  setCommodity(qe->getElementContent("mktcommodity"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

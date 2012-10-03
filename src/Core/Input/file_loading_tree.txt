@@ -1,0 +1,20 @@
+* initalize file pointer
+* validate file
+* initializeSimulationTimeData
+   * [Timer::initialize(snippet)]
+* load non-modules (elements)
+   * load recipe information [XMLFileLoader::load_recipes]
+      * find & parse recipe_catalogs
+          * initialize recipes with catalog-derived data [RecipeLibrary::load_recipe(snippet, namespace)]
+      * initialize recipes with top-level data [RecipeLibrary::load_recipe(snippet, namespace)]
+* load dyn-modules
+   * get list of dyn-module types from Model static member
+   * loop over that list of modeltypes
+      * XMLFileLoader::load_dynmodules(modeltype,Xpath)  
+          N.B. this requires the fileloader to have a map of modeltype->Xpath
+          N.B. we need to think about how to manage prototpye catalogs
+          at this time since that's different from other dynmodules.
+          * Model::factory(modeltype,snippet)
+          N.B. the model factory will determine how to handle loading of different model types
+               as it does now (elements vs. entities, for example)
+

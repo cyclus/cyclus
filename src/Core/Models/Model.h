@@ -4,14 +4,17 @@
 
 #include <map>
 #include <string>
-#include <libxml/tree.h>
 #include <vector>
+#include <set>
+#include <boost/shared_ptr.hpp>
 
 #include "Transaction.h"
 
+class DynamicModule;
 class Model;
 class Message;
 class Transaction;
+class QueryEngine;
 
 typedef Model* mdl_ctor();
 
@@ -45,6 +48,11 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 class Model {
  public:
   /**
+     return a set of the types of dynamic modules
+   */
+  static std::set<std::string> dynamic_module_types();
+
+  /**
      returns a model template given the template's name 
       
      @param name name of the template as defined in the input file 
@@ -69,37 +77,40 @@ class Model {
   static std::vector<Model*> getModelList();
 
   /**
-     Creates a model instance for use in the simulation 
-      
-     @param model_type model type (region, inst, facility, ...) to 
-     create @param cur pointer to the xml input representing the model 
+     constructs and initializes an entity
+     @param model_type the type of entity
+     @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void create(std::string model_type, xmlNodePtr cur);
-
-  /** 
-     Create a new model object based on an existing one 
-      
-     @param model_orig a pointer to the original Model to be mimicked 
-   */
-  static Model* create(Model* model_orig);
+  static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
-     dynamically loads a model constructor from a shared object file 
-      
-     @param model_type model type (region, inst, facility, ...) to add 
-     @param model_name name of model (NullFacility, StubMarket, ...) to 
+     register a model as a market
+     @param market the model to register
    */
-  static mdl_ctor* loadConstructor(std::string model_type, std::string model_name);
+  static void registerMarketWithSimulation(Model* market);
 
   /**
-     loads all models appropriately ordered by type 
+     register a model as a region
+     @param region the model to register
    */
-  static void load_models();
+  static void registerRegionWithSimulation(Model* region);
 
   /**
-     load all facilities 
+     constructs the simulation in its initial state
    */
-  static void load_facilities();
+  static void constructSimulation();
+
+  /**
+     Initialize members related to core classes
+     @param qe a pointer to a QueryEngine object containing initialization data
+   */
+  virtual void initCoreMembers(QueryEngine* qe);
+
+  /**
+     Initialize members related to derived module class
+     @param qe a pointer to a QueryEngine object containing initialization data
+   */
+  virtual void initModuleMembers(QueryEngine* qe) {};
 
   /**
      Constructor for the Model Class 
@@ -110,35 +121,23 @@ class Model {
   Model();
 
   /**
-     A method to initialize the model 
-      
-     @param cur the pointer to the xml input for the model to initialize 
-   */
-  virtual void init(xmlNodePtr cur);
-
-  /**
-     A method to copy a model 
-      
-     @param model_orig pointer to the original (usu initialized) model 
-   */
-  virtual void copy(Model* model_orig);
-
-  /**
-     Drills down the dependency tree to initialize all relevant 
-     parameters/containers. 
-      
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param model_orig pointer to (usu initialized) model to be copied 
-   */
-  virtual void copyFreshModel(Model* model_orig)=0;
-
-  /**
      Destructor for the Model Class 
    */
   virtual ~Model();
 
+  /**
+     uses the loaded modules to properly construct a model
+     @param model_impl the implementation to construct
+     @return the constructed model
+   */
+  Model* constructModel(std::string model_impl);
+
+  /**
+     uses the loaded modules to properly destruct a model
+     @param model the model to delete
+   */
+  void deleteModel(Model* model);
+  
   /**
      get model instance name 
    */
@@ -178,9 +177,6 @@ class Model {
      every model should be able to print a verbose description 
    */
   virtual std::string str();
-
-  /// Makes model not a template and records it in output db
-  void itLives();
 
   /**
      return parent of this model 
@@ -232,22 +228,27 @@ class Model {
   std::vector<std::string> getTreePrintOuts(Model* m);
 
   /**
-     calls doSetParent() and itLives()
-
-     This DOES add the this model to the specified parent's list of children
-     (i.e. this automatically calls "parent->addChild(this);")
+     creates the parent-child link and invokes the core-level and
+     module-level enter simulation methods
+     @param parent this model's parent
    */
-  void setParent(Model* parent);
+  void enterSimulation(Model* parent);
+
+  /**
+     perform core-related tasks when entering the simulation
+   */
+  virtual void enterSimulationAsCoreEntity();
+
+  /**
+     perform module-specific tasks when entering the simulation
+   */
+  virtual void enterSimulationAsModule();
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
-  virtual void doSetParent(Model* parent);
-  /* DEVELOPER NOTE: doSetParent was made virtual to address issue #292,
-     but this led to a discussion in issue #307.  Resolution of #307
-     may lead to this being reverted to a non-virtual function. 
-  */
+  virtual void setParent(Model* parent);
 
   /**
      set the bornOn date of this model 
@@ -287,18 +288,28 @@ class Model {
   virtual void addResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
 
+ protected:
   /**
-     returns whether or not the model is a template 
+     a map of loaded modules. all dynamically loaded modules are 
+     registered with this map when loaded.
    */
-  bool isTemplate() {return is_template_;};
+  static std::map< std::string, boost::shared_ptr<DynamicModule> > loaded_modules_;
 
   /**
-     Asks if a model can build a certain prototype. Returns false by
-     default.
+     the set of loaded dynamic libraries
    */
-  virtual bool canBuild(Model* prototype) {return false;}
-    
- protected:
+  static std::vector<void*> dynamic_libraries_;
+
+  /**
+     a set of registered markets
+   */
+  static std::set<Model*> markets_;
+
+  /**
+     a set of registered regions
+   */
+  static std::set<Model*> regions_;
+  
   /**
      children of this model 
    */
@@ -345,11 +356,6 @@ class Model {
   static int next_id_;
 
   /**
-     comprehensive list of all templated models. 
-   */
-  static std::vector<Model*> template_list_;
-
-  /**
      comprehensive list of all initialized models. 
    */
   static std::vector<Model*> model_list_;
@@ -377,11 +383,6 @@ class Model {
   int diedOn_;
   
   /**
-     map of constructor methods for each loaded model 
-   */
-  static std::map<std::string, mdl_ctor*> create_map_;
-
-  /**
      every instance of a model should have a name 
    */
   std::string name_;
@@ -400,11 +401,6 @@ class Model {
      every instance of a model will have a serialized ID 
    */
   int ID_;
-
-  /**
-     whether or not the model is a template 
-   */
-  bool is_template_;
 
   /**
      wheter or not the model has been born 

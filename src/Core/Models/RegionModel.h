@@ -6,6 +6,7 @@
 
 #include "TimeAgent.h"
 #include "Communicator.h"
+#include "QueryEngine.h"
 
 /**
    @class RegionModel 
@@ -77,44 +78,17 @@ class RegionModel : public TimeAgent, public Communicator {
   virtual ~RegionModel() {};
     
   /**
-     Initalize the InstModel from xml. Calls the init function. 
+     Initalize the InstModel from a QueryEngine. Calls the init function. 
      
-     @param cur the current xml node pointer 
+     @param qe A pointer to a QueryEngine object containing initialization data
    */
-  virtual void init(xmlNodePtr cur);
+  virtual void initCoreMembers(QueryEngine* qe);
 
   /**
-     populate the region's list of allowed facilities
+     perform actions required when entering the simulation
+     @param parent this models parent
    */
-  virtual void initAllowedFacilities(xmlNodePtr cur);
-
-  /**
-     set the parameters necessary for RegionModel to interact
-     with the simulation
-     
-     @param reg the RegionModel to initialize
-   */
-  virtual void initSimInteraction(RegionModel* reg);
-
-  /**
-     populate the region's list of child institutions
-   */
-  virtual void initChildren(xmlNodePtr cur);
-
-  /**
-     every model needs a method to copy one object to another 
-   */
-  virtual void copy(RegionModel* src);
-
-  /**
-     This drills down the dependency tree to initialize all relevant 
-     parameters/containers.  
-     Note that this function must be defined only in the specific model 
-     in question and not in any inherited models preceding it. 
-      
-     @param src the pointer to the original (initialized ?) model to be 
-   */
-  virtual void copyFreshModel(Model* src)=0;
+   virtual void enterSimulationAsCoreEntity();
 
   /**
      every model should be able to print a verbose description 
@@ -126,15 +100,6 @@ class RegionModel : public TimeAgent, public Communicator {
      default RegionModel receiver is to ignore messages 
    */
   virtual void receiveMessage(msg_ptr msg);
-
-  /**
-     Each region is prompted to do its beginning-of-life-step 
-     stuff before the simulation begins. 
-      
-     Normally, Regions simply hand the command down to institutions. 
-      
-   */
-  virtual void handlePreHistory();
 
   /**
      Each region is prompted to do its beginning-of-time-step 
@@ -172,10 +137,35 @@ class RegionModel : public TimeAgent, public Communicator {
     
  protected:
   /**
+     populate the region's list of allowed facilities
+   */
+  virtual void initAllowedFacilities(QueryEngine* qe);
+
+  /**
+     populate the region's list of institution names
+   */
+  virtual void initInstitutionNames(QueryEngine* qe);
+
+  /**
+     set the parameters necessary for RegionModel to interact
+     with the simulation
+   */
+  virtual void addRegionAsRootNode();
+
+  /**
+     populate the region's list of child institutions
+   */
+  virtual void addChildrenToTree();
+
+  /**
      every region has a list of allowed facilities 
    */
   std::set<Model*> allowedFacilities_;
-      
+
+  /**
+     the names of the institutions in this region
+   */
+  std::set<std::string> inst_names_;
 };
 
 #endif
