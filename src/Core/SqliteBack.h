@@ -37,6 +37,8 @@ class SqliteBack: public EventBackend {
 
     bool tableExists(event_ptr e); 
 
+    std::string valType(boost::any v); 
+
     std::string tableName(event_ptr e); 
 
     /// Queue up a table-create command for e.

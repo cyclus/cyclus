@@ -74,22 +74,36 @@ void SqliteBack::open() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::createTable(event_ptr e){
-  Model* m = e->creator();
   std::string name = e->name();
   tbl_names_.push_back(name);
 
-  std::stringstream cmd;
-  cmd << "CREATE TABLE " << name <<" (";
+  std::string cmd = "CREATE TABLE " + name + " (";
 
-  for(int i = 0; i < col_names_.size(); i++) {
-    cmd << col_names_.at(i) << " " << col_types_.at(i);
-    if (i < col_names_.size() - 1) {
-      cmd << ", ";
+  ValMap vals = e.vals();
+  for (ValMap::iterator it = vals.begin(); it != vals.end(); it++) {
+    if (it + 1 != vals.end()) {
+      cmd += it->first + " " + valType(it->second) + ", ";
+    } else {
+      cmd += it->first + " " + valType(it->second);
     }
   }
-  cmd << ");";
+  cmd += ");";
+  cmds_.push_back(cmd);
+}
 
-  cmds_.push_back(cmd.str());
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SqliteBack::valType(boost::any v) {
+  std::type_info t = v.type();
+  if (t == typeid(int)) {
+    return "INTEGER"
+  } else if (t == typeid(float)) {
+    return "REAL"
+  } else if (t == typeid(double)) {
+    return "REAL"
+  } else if (t == typeid(std::string)) {
+    return "VARCHAR(128)"
+  }
+  return "VARCHAR(128)"
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

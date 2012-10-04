@@ -5,12 +5,14 @@
 
 #include "Event.h"
 #include "CycException.h"
+#include "Event.h"
 #include <list>
 #include <string>
 
 #define EM EventManager::Instance()
 
 typedef std::list<event_ptr> EventList;
+
 class CycGroupDataMismatch: public CycException {
     public: CycGroupDataMismatch(std::string msg) : CycException(msg) {};
 };
