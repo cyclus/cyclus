@@ -3,6 +3,7 @@
 
 #include "CycException.h"
 #include "Logger.h"
+#include "Event.h"
 
 #include <iostream>
 #include <fstream>
@@ -47,12 +48,6 @@ void SqliteBack::close() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SqliteBack::fexists(const char *filename) {
-  ifstream ifile(filename);
-  return ifile;
-}
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::open() {
   if (isOpen_) {
@@ -60,7 +55,7 @@ void SqliteBack::open() {
   }
 
   // if the file already exists, delete it
-  ifstream ifile(path_);
+  std::ifstream ifile(path_.c_str());
   if( ifile ) {
     remove( path_.c_str() );
   }
@@ -79,31 +74,33 @@ void SqliteBack::createTable(event_ptr e){
 
   std::string cmd = "CREATE TABLE " + name + " (";
 
-  ValMap vals = e.vals();
-  for (ValMap::iterator it = vals.begin(); it != vals.end(); it++) {
-    if (it + 1 != vals.end()) {
-      cmd += it->first + " " + valType(it->second) + ", ";
-    } else {
-      cmd += it->first + " " + valType(it->second);
+  ValMap vals = e->vals();
+  ValMap::iterator it = vals.begin();
+  while (true) {
+    cmd += it->first + " " + valType(it->second);
+    ++it;
+    if (it == vals.end()) {
+      break;
     }
+    cmd += ", ";
   }
+
   cmd += ");";
   cmds_.push_back(cmd);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string SqliteBack::valType(boost::any v) {
-  std::type_info t = v.type();
-  if (t == typeid(int)) {
-    return "INTEGER"
-  } else if (t == typeid(float)) {
-    return "REAL"
-  } else if (t == typeid(double)) {
-    return "REAL"
-  } else if (t == typeid(std::string)) {
-    return "VARCHAR(128)"
+  if (v.type() == typeid(int)) {
+    return "INTEGER";
+  } else if (v.type() == typeid(float)) {
+    return "REAL";
+  } else if (v.type() == typeid(double)) {
+    return "REAL";
+  } else if (v.type() == typeid(std::string)) {
+    return "VARCHAR(128)";
   }
-  return "VARCHAR(128)"
+  return "VARCHAR(128)";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -112,7 +109,7 @@ bool SqliteBack::tableExists(event_ptr e) {
   if (find(tbl_names_.begin(), tbl_names_.end(), nm) != tbl_names_.end()) {
     return true;
   }
-  return false
+  return false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -127,7 +124,7 @@ void SqliteBack::executeSQL(std::string cmd){
     sqlite3_finalize(statement);
   }
   // collect sqlite errors
-  string error = sqlite3_errmsg(db_);
+  std::string error = sqlite3_errmsg(db_);
   if(error != "not an error") {
     throw CycIOException("SQL error: " + cmd + " " + error);
   }
@@ -135,20 +132,41 @@ void SqliteBack::executeSQL(std::string cmd){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::writeEvent(event_ptr e){
-  std::stringstream cols, vals, cmd;
-  ValMap vals = e.vals();
-  for (ValMap::iterator it = vals.begin(); it != vals.end(); it++) {
-    cols << it->first;
-    vals << it->second;
-    if (it != vals.end()-1){
-      cols << ", ";
-      vals << ", ";
+  std::stringstream cs, vs, cmd;
+  ValMap vals = e->vals();
+  ValMap::iterator it = vals.begin();
+  while (true) {
+    cs << it->first;
+    vs << valData(it->second);
+    ++it;
+    if (it == vals.end()) {
+      break;
     }
+    cs << ", ";
+    vs << ", ";
   }
 
-  cmd << "INSERT INTO " << e->name() << " (" << cols.str() << ") "
-         << "VALUES (" << values.str() << ");";
+  cmd << "INSERT INTO " << e->name() << " (" << cs.str() << ") "
+         << "VALUES (" << vs.str() << ");";
   cmds_.push_back(cmd.str());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+std::string SqliteBack::valData(boost::any v) {
+  std::stringstream ss;
+  if (v.type() == typeid(int)) {
+    ss << boost::any_cast<int>(v);
+  } else if (v.type() == typeid(float)) {
+    ss << boost::any_cast<float>(v);
+  } else if (v.type() == typeid(double)) {
+    ss << boost::any_cast<double>(v);
+  } else if (v.type() == typeid(std::string)) {
+    ss << boost::any_cast<std::string>(v);
+  } else {
+    CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
+      << name();
+  }
+  return ss.str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

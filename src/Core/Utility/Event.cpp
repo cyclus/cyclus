@@ -6,7 +6,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 event_ptr Event::addVal(std::string field, boost::any val) {
   if (vals_.find(field) != vals_.end()) {
-    throw CycDupEventField("Field '" + field + "' already exists in the event.");
+    throw CycDupEventFieldErr("Field '" + field + "' already exists in the event.");
   }
   vals_[field] = val;
 
@@ -28,10 +28,14 @@ void Event::record() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::Event(Model* creator, std::string group) {
+Event::Event(EventManager* m, Model* creator, std::string group) {
+  manager_ = m;
   creator_ = creator;
   group_ = group;
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Event::~Event() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Event::schemaWithin(event_ptr primary) {
@@ -40,7 +44,7 @@ bool Event::schemaWithin(event_ptr primary) {
   for(ValMap::iterator it = vals_.begin(); it != vals_.end(); it++) {
     if (pvals.find(it->first) == pvals.end()) {
       return false;
-    } else if (pvals[it->first]->type() != it->second->type()){
+    } else if (pvals[it->first].type() != it->second.type()){
       return false;
     }
   }
@@ -66,8 +70,10 @@ ValMap Event::vals() {
 std::string Event::name() {
   Model* m = creator_;
   if (m != NULL) {
-    return m->modelImpl() + "_" + m->ID() + "_" + e->group();
+    std::stringstream ss;
+    ss << m->modelImpl() + "-" << m->ID() << "_" + group();
+    return ss.str();
   }
-  return e->group();
+  return group();
 }
 

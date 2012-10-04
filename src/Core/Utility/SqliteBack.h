@@ -8,7 +8,6 @@
 #include <string>
 #include <sqlite3.h>
 
-
 typedef std::list<std::string> StrList;
 
 class SqliteBack: public EventBackend {
@@ -17,7 +16,7 @@ class SqliteBack: public EventBackend {
     
     virtual ~SqliteBack();
   
-    void notify(event_list events);
+    void notify(EventList events);
 
     void close();
 
@@ -29,15 +28,11 @@ class SqliteBack: public EventBackend {
 
     void executeSQL(std::string cmd);
 
-    /**
-       Utility function to determine if a file exists 
-       @param filename the name of the file to search for 
-     */
-    bool fexists(const char *filename); 
-
     bool tableExists(event_ptr e); 
 
     std::string valType(boost::any v); 
+
+    std::string valData(boost::any v);
 
     std::string tableName(event_ptr e); 
 

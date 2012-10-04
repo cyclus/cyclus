@@ -8,13 +8,10 @@
 #include <list>
 #include <string>
 #include <boost/any.hpp>
-#include <boost/intrusive_ptr.hpp>
 
-class Event;
-class EventManager;
-
-typedef boost::intrusive_ptr<Event> event_ptr;
-typedef std::map<std::string, boost::any> ValMap;
+class CycDupEventFieldErr: public CycException {
+    public: CycDupEventFieldErr(std::string msg) : CycException(msg) {};
+};
 
 class Event: IntrusiveBase<Event> {
   public:
