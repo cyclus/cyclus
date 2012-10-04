@@ -23,10 +23,10 @@ event_ptr EventManager::newEvent(Model* creator, std::string group) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool EventManager::isValidSchema(event_ptr ev) {
-  if (schemas_.find(creator_) != schemas_.end()) {
-    std::map<std::string, event_ptr> subs = schemas_[creator_];
-    if (subs.find(group_) != subs.end()) {
-      event_ptr primary = schemas_[creator_][group_];
+  if (schemas_.find(ev->creator()) != schemas_.end()) {
+    std::map<std::string, event_ptr> subs = schemas_[ev->creator()];
+    if (subs.find(ev->group()) != subs.end()) {
+      event_ptr primary = subs[ev->group()];
       if (! ev->schemaWithin(primary)) {
         return false;
       } 
@@ -39,11 +39,11 @@ bool EventManager::isValidSchema(event_ptr ev) {
 void EventManager::addEvent(event_ptr ev) {
   if (! isValidSchema(ev)) {
     std::string msg;
-    msg = "Group '" + group_ + "' with different schema already exists.";
+    msg = "Group '" + ev->group() + "' with different schema already exists.";
     throw CycGroupDataMismatchErr(msg);
   }
 
-  schemas_[creator_][group_] = ev;
+  schemas_[ev->creator()][ev->group()] = ev;
   events_.push_back(ev);
   notifyBacks();
 }

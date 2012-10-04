@@ -19,10 +19,11 @@ class Event: IntrusiveBase<Event> {
 
     // Add an arbitrary labeled value to the event.
     //
-    // @param field a label or key for a value. Loosely analogous to a column label.
+    // @param field a label or key for a value. Loosely analogous to a column
+    // label.
     //
-    // @warning for the val argument - only types int, long, float, double, and
-    // string are currently supported.
+    // @warning for the val argument - what val types are supported depends on
+    // what the selected backend(s) handles.
     event_ptr addVal(std::string field, boost::any val);
 
     // Add a timestamp value to this event of the current simulation time.

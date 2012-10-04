@@ -6,6 +6,9 @@
 #include "CompMap.h"
 #include "MassTable.h"
 #include "CycException.h"
+#include "CycException.h"
+#include "EventManager.h"
+#include "Event.h"
 
 #include <map>
 #include <sstream>
@@ -19,8 +22,6 @@ int RecipeLibrary::nextStateID_ = 0;
 RecipeMap RecipeLibrary::recipes_;
 DecayHistMap RecipeLibrary::decay_hist_;
 DecayTimesMap RecipeLibrary::decay_times_;
-// initialize table member
-table_ptr RecipeLibrary::iso_table = table_ptr(new Table("IsotopicStates")); 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 RecipeLibrary* RecipeLibrary::Instance() {
@@ -220,52 +221,15 @@ bool RecipeLibrary::compositionDecayable(CompMapPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::define_table() {
-  // declare the state id columns and add it to the table
-  iso_table->addField("ID","INTEGER");
-  iso_table->addField("IsoID","INTEGER");
-  iso_table->addField("Value","REAL");
-  // declare the table's primary key
-  primary_key pk;
-  pk.push_back("ID"), pk.push_back("IsoID");
-  iso_table->setPrimaryKey(pk);
-  // we've now defined the table
-  iso_table->tableDefined();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::addToTable(CompMapPtr recipe){
-  // if we haven't recorded a composition yet, define the table
-  if ( !iso_table->defined() ) {
-    RecipeLibrary::define_table();
-  }
-
-  // make a row - stateid first then isotopics
-  // declare data
-  data an_id( recipe->ID() );
-  // declare entries
-  entry id("ID",an_id);
+  event_ptr e = EM->newEvent(NULL, "IsotopicStates")
+    ->addVal("ID", recipe->ID());
 
   // now for the composition isotopics
   for (CompMap::iterator item = recipe->begin();
        item != recipe->end(); item++) {
-    // declare row
-    // decalre data
-    data an_iso_id(item->first), an_iso_value(item->second);
-    // declare entries
-    entry iso_id("IsoID",an_iso_id), iso_value("Value",an_iso_value);
-    // construct row
-    row aRow;
-    aRow.push_back(id), aRow.push_back(iso_id), aRow.push_back(iso_value);
-    // add the row
-    iso_table->addRow(aRow);
-    // // record this primary key
-    // pkref_.push_back(id);
-    // pkref_.push_back(iso_id);
+    e->addVal("IsoID", item->first)
+     ->addVal("Value", item->second);
   }
+  e->record();
 }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// primary_key_ref RecipeLibrary::pkref() {
-//   return pkref_;
-// }

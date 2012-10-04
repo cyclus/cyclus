@@ -8,7 +8,6 @@ set ( CYCLUS_TEST_CORE
   # -- do not change this order
   ${CMAKE_CURRENT_SOURCE_DIR}/TableTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp

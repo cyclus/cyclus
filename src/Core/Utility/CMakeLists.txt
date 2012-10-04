@@ -33,14 +33,12 @@ CONFIGURE_FILE(
   
 # Add any new cyclus core source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
-  ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Builder.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManager.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/Commodity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
@@ -54,7 +52,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionFactories.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctions.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Table.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Timer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/UniformTaylor.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
@@ -63,7 +60,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   PARENT_SCOPE)
 
 INSTALL(FILES 
-  BookKeeper.h
   Builder.h
   BuildingManager.h
   Commodity.h
@@ -71,7 +67,6 @@ INSTALL(FILES
   CommodityProducerManager.h
   CycException.h
   CycLimits.h
-  Database.h
   DecayHandler.h
   Enrichment.h
   Env.h
@@ -87,10 +82,11 @@ INSTALL(FILES
   SupplyDemandManager.h
   SymbolicFunctionFactories.h
   SymbolicFunctions.h
-  Table.h
   Timer.h
   UniformTaylor.h
   UseMatrixLib.h
+  EventManager.h
+  Event.h
   DESTINATION cyclus/include
   COMPONENT core
   )

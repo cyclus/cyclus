@@ -3,7 +3,6 @@
 #define _RECIPELIBRARY_H
 
 #include "CompMap.h"
-#include "Table.h"
 #include "QueryEngine.h"
 
 #include <set>
@@ -239,10 +238,6 @@ class RecipeLibrary {
 
  /* -- Output Database Interaction  -- */ 
  public:
-  /**
-     the isotopics output database Table 
-   */
-  static table_ptr iso_table;
   
   /* /\** */
   /*    return the agent table's primary key  */
@@ -255,22 +250,12 @@ class RecipeLibrary {
   void recordState();
   
  private:
-  /**
-     Define the database table on the first Message's init 
-   */
-  static void define_table();
 
   /**
      Add an isotopic state to the table 
    */
   static void addToTable(CompMapPtr recipe);
 
-  /* /\** */
-  /*    Store information about the transactions's primary key  */
-  /*  *\/ */
-  /* primary_key_ref pkref_; */
- /* -- */ 
-  
   //  friend class CompMap;
   friend class IsoVector;
 };

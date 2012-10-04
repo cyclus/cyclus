@@ -4,7 +4,6 @@
 #include "FacilityModel.h"
 
 #include "Timer.h"
-#include "BookKeeper.h"
 #include "QueryEngine.h"
 #include "InstModel.h"
 
