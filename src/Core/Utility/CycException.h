@@ -90,6 +90,27 @@ class CycNegativeValueException : public CycException {
       CycNegativeValueException(std::string msg) : CycException(msg) {};
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class CycNotRegisteredException : public CycException {
+  /** 
+      An exception class for a not-registration event, i.e., when 
+      an object should be registered with another object but is not
+  */
+ public: 
+ CycNotRegisteredException(std::string msg) : CycException(msg) {};
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class CycDoubleRegistrationException : public CycException {
+  /** 
+      An exception class for a multiple registration event, i.e., when 
+      an object should only be registered with another object once but a 
+      second attempt has been made
+  */
+ public: 
+ CycDoubleRegistrationException(std::string msg) : CycException(msg) {};
+};
+
 #endif
 
 
