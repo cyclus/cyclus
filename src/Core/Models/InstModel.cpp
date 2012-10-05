@@ -158,8 +158,11 @@ void InstModel::handleTock(int time) {
 
     if ( child->lifetimeReached() ) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
-      registerCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
-      child->decommission();
+      if (child->checkDecommissionCondition())
+        {
+          registerCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
+          child->decommission();
+        }
     }
 
     // increment not needed if a facility deleted itself
