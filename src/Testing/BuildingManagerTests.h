@@ -2,26 +2,21 @@
 #include <gtest/gtest.h>
 
 #include "BuildingManager.h"
-
-#include "SupplyDemandManager.h"
-#include "SupplyDemand.h"
-#include "SymbolicFunctions.h"
+#include "CommodityTestHelper.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildingManagerTests : public ::testing::Test {
  protected:
-  SupplyDemandManager* sdmanager_;
-  BuildingManager* manager_;
-
-  Commodity* commod_;
-  Producer* p1_;
-  Producer* p2_;
-  double demand_, capacity1_, cost1_, capacity2_, cost2_;
+  CommodityTestHelper* helper;
+  ActionBuilding::BuildingManager manager;
+  ActionBuilding::Builder* builder1;
+  ActionBuilding::Builder* builder2;
+  double demand, capacity1, capacity2, cost1, cost2;
+  int build1, build2;
 
  public:
-  void initSDManager();
 
   virtual void SetUp();  
   virtual void TearDown();
-  
+  void setUpProblem();
 };

@@ -118,7 +118,7 @@ TEST_F(ResourceBuffTest, MakeUnlimited_Empty) {
 TEST_F(ResourceBuffTest, GetCapacity_UnlimitedEmpty) {
   store_.makeUnlimited();
   EXPECT_NO_THROW(store_.setCapacity(cap));
-  EXPECT_DOUBLE_EQ(store_.capacity(), -1.0);
+  EXPECT_DOUBLE_EQ(store_.capacity(),cap);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
