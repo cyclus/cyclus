@@ -42,7 +42,7 @@ void BuildingManagerTests::initSDManager() {
 
   FunctionPtr demand = FunctionPtr(new LinearFunction(5,5));
 
-  sdmanager_->registerCommodity(*commod_,demand,v);
+  sdmanager_->registerCommodity(*commod_,demand);
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,74 +1,75 @@
 #include "SupplyDemandManager.h"
 
-#include <utility>
-#include <sstream>
+#include "CycException.h"
 
 using namespace std;
+using namespace SupplyDemand;
 
 // -------------------------------------------------------------------
-SupplyDemandManager::SupplyDemandManager() {
-  commodities_ = map<Commodity,CommodityInformation,CommodityCompare>();
+SupplyDemandManager::SupplyDemandManager() {}
+
+// -------------------------------------------------------------------
+SupplyDemandManager::~SupplyDemandManager() {}
+
+// -------------------------------------------------------------------
+void SupplyDemandManager::registerCommodity(Commodity& commodity, 
+                                            FunctionPtr fp) 
+{
+  demand_functions_.insert(make_pair(commodity,fp));  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool SupplyDemandManager::managesCommodity(Commodity& commodity)
+{
+  return (demand_functions_.find(commodity) != 
+          demand_functions_.end());
 }
 
 // -------------------------------------------------------------------
-void 
-SupplyDemandManager::registerCommodity(const Commodity& commodity, 
-                                       const FunctionPtr fp, 
-                                       const std::vector<Producer>& producers) {
-  commodities_.insert(pair<Commodity,CommodityInformation>
-                   (commodity,CommodityInformation(commodity,fp,producers)));  
+void SupplyDemandManager::registerProducerManager(SupplyDemand::CommodityProducerManager* cpm) 
+{
+  managers_.insert(cpm);
 }
 
 // -------------------------------------------------------------------
-void SupplyDemandManager::registerProducer(const Commodity& commodity,
-                                           const Producer& producer) {
-  commodities_.find(commodity)->second.registerProducer(producer);
+void SupplyDemandManager::unRegisterProducerManager(SupplyDemand::CommodityProducerManager* cpm) 
+{
+  managers_.erase(cpm);
 }
 
 // -------------------------------------------------------------------
-void 
-SupplyDemandManager::
-registerPlayerManager(const Commodity& commodity, 
-                      MarketPlayerManager* m) {
-  map<Commodity,set<MarketPlayerManager*>,CommodityCompare>::iterator 
-    it = player_managers_.find(commodity);
-  if (it == player_managers_.end()) {
-    set<MarketPlayerManager*> s;
-    player_managers_.insert(make_pair(commodity,s));
-  }
-  player_managers_[commodity].insert(m);
-}
-
-// -------------------------------------------------------------------
-double SupplyDemandManager::demand(const Commodity& commodity, 
-                                   int time) {
-  return commodities_.find(commodity)->second.demand(time);
-}
-
-// -------------------------------------------------------------------
-FunctionPtr 
-SupplyDemandManager::demandFunction(const Commodity& commodity) {
-  return commodities_.find(commodity)->second.demandFunction();
-}
-
-// -------------------------------------------------------------------
-double SupplyDemandManager::supply(const Commodity& commodity) {
-  double value = 0;
-  set<MarketPlayerManager*>::iterator it;
-  set<MarketPlayerManager*> managers = player_managers_[commodity];
-  for (it = managers.begin(); it != managers.end(); it++) {
-    value += (*it)->playerProductionCapacity();
-  }
+double SupplyDemandManager::supply(Commodity& commodity) 
+{
+  throwErrorIfCommodityNotManaged(commodity);
+  double value = 0.0;
+  set<CommodityProducerManager*>::iterator it;
+  for (it = managers_.begin(); it != managers_.end(); it++) 
+    {
+      value += (*it)->totalProductionCapacity(commodity);
+    }
   return value;
 }
 
 // -------------------------------------------------------------------
-int SupplyDemandManager::nProducers(const Commodity& commodity) {
-  return commodities_.find(commodity)->second.nProducers(); 
+double SupplyDemandManager::demand(Commodity& commodity,int time) 
+{
+  throwErrorIfCommodityNotManaged(commodity);
+  return demand_functions_[commodity]->value(time);
 }
 
 // -------------------------------------------------------------------
-Producer* SupplyDemandManager::producer(const Commodity& commodity, 
-                                        int index) {
-  return commodities_.find(commodity)->second.producer(index); 
+FunctionPtr SupplyDemandManager::demandFunction(Commodity& commodity) 
+{
+  throwErrorIfCommodityNotManaged(commodity);
+  return demand_functions_[commodity];
+}
+
+// -------------------------------------------------------------------
+void SupplyDemandManager::throwErrorIfCommodityNotManaged(Commodity& commodity)
+{
+  if(!managesCommodity(commodity))
+    {
+      throw CycNotRegisteredException("SDManager does not manage demand for " 
+                                      + commodity.name());
+    }
 }
