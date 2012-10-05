@@ -1,50 +1,8 @@
 #ifndef SUPPLYDEMAND_H
 #define SUPPLYDEMAND_H
 
-#include <string>
 #include <ostream>
-
-/**
-   a simple class defining a commodity; it is currently super simple.
-   the reason this class exists is so that code may be cleaner and more straightforward
-   while one could have chosen to typedef a string, there may be some reason to extend
-   the class in the future.
- */
-class Commodity {
- public:
-  /**
-     constructor
-     @param name the name of the commodity
-  */
- Commodity(std::string name) : name_(name) {};
-  
-  /// the commodity's name
-  std::string name() const {return name_;}
-
-  /// equality operator
-  bool operator==(const Commodity& other) const {
-    return (name_ == other.name());
-  } 
-
-  /// inequality operator
-  bool operator!=(const Commodity& other) const {
-    return !(name_ == other.name());
-  } 
-  
- private:
-  /// the name of the commodity
-  std::string name_;
-};
-
-/**
-   a comparitor so that commodities may be used in maps
-   we do not care how they are compared, only that they can be
- */
-struct CommodityCompare {
-  inline bool operator() (const Commodity& lhs, const Commodity& rhs) { 
-    return lhs.name() < rhs.name(); 
-  }
-};
+#include "Commodity.h"
 
 /**
    a small class defining a producer
