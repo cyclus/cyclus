@@ -1,11 +1,10 @@
 #ifndef SUPPLYDEMANDMANAGER_H
 #define SUPPLYDEMANDMANAGER_H
 
-#include "SupplyDemand.h"
+#include "Commodity.h"
+#include "CommodityProducerManager.h"
 #include "SymbolicFunctions.h"
-#include "MarketPlayerManager.h"
 
-#include <vector>
 #include <map>
 #include <set>
 
@@ -27,77 +26,70 @@ class SupplyDemandManager {
   SupplyDemandManager();
 
   /**
+     virtual destructor
+   */
+  virtual ~SupplyDemandManager();
+
+  /**
      register a new commodity with the manager, along with all the 
      necessary information
      @param commodity the commodity
-     @param fp a smart pointer to the demand function
-     @param producers the list of producers of commodity
+     @param demand a smart pointer to the demand function
    */
-  void registerCommodity(const Commodity& commodity, 
-                         const FunctionPtr fp, 
-                         const std::vector<Producer>& producers);
+  void registerCommodity(Commodity& commodity,FunctionPtr demand);
 
   /**
-     calls the registerProducer() function of the CommodityInformation
-     instance associated with the commodity
-     @param commodity the commodity gaining a new producer
-     @param producer the producer to be registered
+     @return true if the demand for a commodity is managed by this entity
+     @param commodity the commodity in question
+  */
+  bool managesCommodity(Commodity& commodity);
+  
+  /**
+     adds a commodity producer manager to the set of producer managers
    */
-  void registerProducer(const Commodity& commodity, 
-                        const Producer& producer);
+  void registerProducerManager(SupplyDemand::CommodityProducerManager* cpm);
 
   /**
-     adds a player manager to the set of managers for a given 
-     commodity
-     @param commodity the commodity gaining a new player manager
-     @param m the new player manager
+     removes a commodity producer manager from the set of producer 
+     managers
    */
-  void registerPlayerManager(const Commodity& commodity, 
-                             MarketPlayerManager* m);
-
-  /**
-     the demand for a commodity at a given time
-     @param commodity the commodity
-     @param time the time
-   */
-  double demand(const Commodity& commodity, int time);
-
-  /**
-     returns the demand function for a commodity
-     @param commodity the commodity being queried
-   */
-  FunctionPtr demandFunction(const Commodity& commodity);
+  void unRegisterProducerManager(SupplyDemand::CommodityProducerManager* cpm);
 
   /**
      returns the current supply of a commodity
      @param commodity the commodity
      @return the current supply of the commodity
    */
-  double supply(const Commodity& commodity);
-  
-  /**
-     return the number of producers of a given commodity
-     @param commodity the commodity
-     @return the number of producers of a commodity
-   */
-  int nProducers(const Commodity& commodity);
+  double supply(Commodity& commodity);
 
   /**
-     return a specific producer of a commodity
+     the demand for a commodity at a given time
      @param commodity the commodity
-     @param index the producer's index
-     @return a pointer to the producer of a commodity at an index
+     @param time the time
    */
-  Producer* producer(const Commodity& commodity, int index);
-  
+  double demand(Commodity& commodity, int time);
+
+  /**
+     returns the demand function for a commodity
+     @param commodity the commodity being queried
+   */
+  FunctionPtr demandFunction(Commodity& commodity);
+
+  // protected: @MJGFlag - should be protected. revise when tests can
+  // be found by classes in the Utility folder
+  /**
+     checks if managesCommodity() is true. if it is false, an 
+     error is thrown.
+     @param commodity the commodity in question
+  */
+  void throwErrorIfCommodityNotManaged(Commodity& commodity);
+
  private:
-  /// a container of all commodities known to the manager
-  std::map<Commodity,CommodityInformation,
-    CommodityCompare> commodities_;
+  /// a container of all demand functions known to the manager
+  std::map<Commodity,FunctionPtr,CommodityCompare> demand_functions_;
 
-  /// a container of all player managers known to the manager
-  std::map<Commodity,std::set<MarketPlayerManager*>,
-    CommodityCompare> player_managers_;
+  /// a container of all production managers known to the manager
+  std::set<SupplyDemand::CommodityProducerManager*> managers_;
 };
 
 #endif
