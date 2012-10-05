@@ -77,12 +77,32 @@ class Model {
   static std::vector<Model*> getModelList();
 
   /**
+     load a dynamic module
+     @param model_type the type of model
+     @param module_name the name of the module
+   */
+  static void loadModule(std::string model_type, std::string module_name);
+
+  /**
      constructs and initializes an entity
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
   static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
+  /**
+     uses the loaded modules to properly construct a model
+     @param model_impl the implementation to construct
+     @return the constructed model
+   */
+  static Model* constructModel(std::string model_impl);
+
+  /**
+     uses the loaded modules to properly destruct a model
+     @param model the model to delete
+   */
+  static void deleteModel(Model* model);
+  
   /**
      register a model as a market
      @param market the model to register
@@ -125,19 +145,6 @@ class Model {
    */
   virtual ~Model();
 
-  /**
-     uses the loaded modules to properly construct a model
-     @param model_impl the implementation to construct
-     @return the constructed model
-   */
-  Model* constructModel(std::string model_impl);
-
-  /**
-     uses the loaded modules to properly destruct a model
-     @param model the model to delete
-   */
-  void deleteModel(Model* model);
-  
   /**
      get model instance name 
    */

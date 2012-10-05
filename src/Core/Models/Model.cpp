@@ -77,6 +77,19 @@ vector<Model*> Model::getModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::loadModule(std::string model_type, std::string module_name)
+{
+  shared_ptr<DynamicModule> 
+    module(new DynamicModule(model_type,module_name)); 
+
+  loaded_modules_.insert(make_pair(module_name,module));
+  
+  CLOG(LEV_DEBUG1) << "Module '" << module_name
+                   << "' of type: " << model_type 
+                   << " has been loaded.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::initializeSimulationEntity(std::string model_type, 
                                        QueryEngine* qe) {
   // query data
@@ -85,19 +98,12 @@ void Model::initializeSimulationEntity(std::string model_type,
 
   // instantiate & init module
   /* --- */
-  shared_ptr<DynamicModule> 
-    module(new DynamicModule(model_type,module_name)); 
-  loaded_modules_.insert(make_pair(module_name,module));
-  
-  CLOG(LEV_DEBUG1) << "Module '" << module_name
-                   << "' of type: " << model_type 
-                   << " has been loaded.";
-
-  Model* model = module->constructInstance();
+  loadModule(model_type,module_name);
+  Model* model = constructModel(module_name);
   /* --- */
   model->initCoreMembers(qe);
-  model->setModelImpl(module->name());
-  model->initModuleMembers(module_data->queryElement(module->name()));
+  model->setModelImpl(module_name);
+  model->initModuleMembers(module_data->queryElement(module_name));
 
   CLOG(LEV_DEBUG3) << "Module '" << model->name()
                    << "' has had its module members initialized:";
