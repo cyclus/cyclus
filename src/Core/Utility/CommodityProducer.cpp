@@ -2,13 +2,15 @@
 
 #include "CycException.h"
 
+#include <limits>
+
 using namespace std;
 using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation() :
   capacity(0),
-  cost(0) 
+  cost(numeric_limits<double>::max()) 
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -21,41 +23,55 @@ CommodityInformation::CommodityInformation(double a_capacity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::CommodityProducer() : 
   default_capacity_(0.0),
-  default_cost_(0.0)
+  default_cost_(numeric_limits<double>::max())
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::~CommodityProducer() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CommodityProducer::producesCommodity(Commodity& commodity)
+std::set<Commodity,CommodityCompare> CommodityProducer::producedCommodities()
+{
+  set<Commodity,CommodityCompare> commodities;
+  map<Commodity,CommodityInformation,CommodityCompare>::iterator it;
+  for (it = produced_commodities_.begin(); 
+       it != produced_commodities_.end(); 
+       it++)
+    {
+      commodities.insert(it->first);
+    }
+  return commodities;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CommodityProducer::producesCommodity(const Commodity& commodity)
 {
   return (produced_commodities_.find(commodity) != 
           produced_commodities_.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducer::productionCapacity(Commodity& commodity)
+double CommodityProducer::productionCapacity(const Commodity& commodity)
 {
   throwErrorIfCommodityNotProduced(commodity);
   return produced_commodities_[commodity].capacity;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducer::productionCost(Commodity& commodity)
+double CommodityProducer::productionCost(const Commodity& commodity)
 {
   throwErrorIfCommodityNotProduced(commodity);
   return produced_commodities_[commodity].cost;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodity(Commodity& commodity) {
+void CommodityProducer::addCommodity(const Commodity& commodity) {
   CommodityInformation info(default_capacity_,default_cost_);
   addCommodityWithInformation(commodity,info);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::setCapacity(Commodity& commodity, 
+void CommodityProducer::setCapacity(const Commodity& commodity, 
                                     double capacity)
 {
   throwErrorIfCommodityNotProduced(commodity);
@@ -63,7 +79,7 @@ void CommodityProducer::setCapacity(Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::setCost(Commodity& commodity, 
+void CommodityProducer::setCost(const Commodity& commodity, 
                                 double cost)
 {
   throwErrorIfCommodityNotProduced(commodity);
@@ -71,8 +87,8 @@ void CommodityProducer::setCost(Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodityWithInformation(Commodity& commodity, 
-                                                    CommodityInformation& info) 
+void CommodityProducer::addCommodityWithInformation(const Commodity& commodity, 
+                                                    const CommodityInformation& info) 
 {
   if (producesCommodity(commodity))
     {
@@ -83,7 +99,20 @@ void CommodityProducer::addCommodityWithInformation(Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::throwErrorIfCommodityNotProduced(Commodity& commodity)
+void CommodityProducer::copyProducedCommoditiesFrom(CommodityProducer* source) 
+{
+  set<Commodity,CommodityCompare> commodities = source->producedCommodities();
+  set<Commodity,CommodityCompare>::iterator it;
+  for (it = commodities.begin(); it != commodities.end(); it++)
+    {
+      addCommodity(*it);
+      setCapacity(*it,source->productionCapacity(*it));
+      setCost(*it,source->productionCost(*it));
+    }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commodity)
 {
   if(!producesCommodity(commodity))
     {

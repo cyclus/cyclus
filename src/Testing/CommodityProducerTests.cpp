@@ -74,3 +74,16 @@ TEST_F(CommodityProducerTests,info)
   EXPECT_EQ(producer_.productionCapacity(commodity_),capacity_);
   EXPECT_EQ(producer_.productionCost(commodity_),cost_);
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(CommodityProducerTests,copy) 
+{
+  EXPECT_NO_THROW(addCommodity());
+  EXPECT_NO_THROW(setCapacity());
+  EXPECT_NO_THROW(setCost());
+  CommodityProducer copy;
+  copy.copyProducedCommoditiesFrom(&producer_);
+  EXPECT_TRUE(copy.producesCommodity(commodity_));
+  EXPECT_EQ(copy.productionCapacity(commodity_),capacity_);
+  EXPECT_EQ(copy.productionCost(commodity_),cost_);
+}

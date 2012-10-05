@@ -34,6 +34,7 @@ CONFIGURE_FILE(
 # Add any new cyclus core source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeper.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Builder.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManager.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/Commodity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducer.cpp 
@@ -59,6 +60,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 INSTALL(FILES 
   BookKeeper.h
+  Builder.h
   BuildingManager.h
   Commodity.h
   CommodityProducer.h

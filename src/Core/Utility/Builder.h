@@ -1,30 +1,24 @@
-#ifndef COMMODITYPRODUCERMANAGER_H
-#define COMMODITYPRODUCERMANAGER_H
+#ifndef BUILDER_H
+#define BUILDER_H
 
 #include <set>
 
-#include "Commodity.h"
 #include "CommodityProducer.h"
 
-namespace SupplyDemand
+namespace ActionBuilding
 {
   /**
-     a mixin to provide information about commodity producers
+     a mixin to provide information about commodity producers that can
+     be built
    */
-  class CommodityProducerManager
+  class Builder
   {
   public:
     /// constructor
-    CommodityProducerManager();
+    Builder();
 
     /// virtual destructor for inheritence
-    virtual ~CommodityProducerManager();
-
-    /**
-       @return the total production capacity for a commodity amongst producers
-       @param commodity the commodity in question
-     */
-    double totalProductionCapacity(Commodity& commodity);
+    virtual ~Builder();
 
     // protected: @MJGFlag - should be protected. revise when tests can
     // be found by classes in the Utility folder
@@ -40,8 +34,24 @@ namespace SupplyDemand
      */
     void unRegisterProducer(SupplyDemand::CommodityProducer* producer);
 
+    /**
+       @return the number of buildings managed by this builder
+     */
+    double nBuildingPrototypes();
+    
+    /**
+       @return the beginning iterator of the set of producers
+     */
+    std::set<SupplyDemand::CommodityProducer*>::iterator beginningProducer();
+
+    /**
+       @return the beginning iterator of the set of producers
+     */
+    std::set<SupplyDemand::CommodityProducer*>::iterator endingProducer();
+
+  private:
     /// the set of managed producers
-    std::set<CommodityProducer*> producers_;
+    std::set<SupplyDemand::CommodityProducer*> producers_;
 
     //#include "CommodityProducerManagerTests.h"
     //friend class CommodityProducerManagerTests; 
