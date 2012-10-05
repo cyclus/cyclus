@@ -5,9 +5,6 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
-  # -- do not change this order
-  ${CMAKE_CURRENT_SOURCE_DIR}/TableTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
   # --
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp

@@ -11,6 +11,8 @@
 #include "Env.h"
 #include "Logger.h"
 #include "XMLFileLoader.h"
+#include "EventManager.h"
+#include "SqliteBack.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -96,6 +98,7 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
+  // Create the output file
   string output_path = "cyclus.sqlite";
   try {
     if (vm.count("output-path")){
@@ -105,7 +108,7 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBackend* sqlBack = new SqliteBackend(output_path);
+  SqliteBack* sqlBack = new SqliteBack(output_path);
   EM->registerBackend(sqlBack);
 
   // read input file and setup simulation

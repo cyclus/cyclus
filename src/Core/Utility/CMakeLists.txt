@@ -57,6 +57,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBack.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDb.cpp 
   PARENT_SCOPE)
 
 INSTALL(FILES 
@@ -85,8 +86,9 @@ INSTALL(FILES
   Timer.h
   UniformTaylor.h
   UseMatrixLib.h
-  EventManager.h
+  SqliteDb.h
   Event.h
+  EventManager.h
   DESTINATION cyclus/include
   COMPONENT core
   )
