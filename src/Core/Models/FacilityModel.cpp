@@ -133,9 +133,6 @@ void FacilityModel::decommission() {
     throw CycOverrideException("Cannot decommission " + name());
 
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  cout << "decommoissioning facility with lifetime: " << fac_lifetime_
-       << " at time: " << TI->time() << " which matches decommission date: "
-       << decommission_date_ <<endl;
   deleteModel(this);
 }
 
@@ -171,5 +168,14 @@ void FacilityModel::setBuildDate(int current_time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::setDecommissionDate(int time) {
-    decommission_date_ = time;
+  double current_time = TI->time();
+  double final_time = TI->finalTime();
+  if (time + current_time < final_time)
+    {
+      decommission_date_ = time;
+    }
+  else
+    {
+      decommission_date_ = final_time;
+    }
 }

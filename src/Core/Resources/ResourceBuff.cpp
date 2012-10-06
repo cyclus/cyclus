@@ -25,6 +25,7 @@ void ResourceBuff::setCapacity(double cap) {
   if (quantity() - cap > STORE_EPS) {
     throw CycOverCapException("New capacity lower than existing quantity");
   }
+  unlimited_ = false;
   capacity_ = cap;
 }
 
@@ -64,7 +65,6 @@ void ResourceBuff::makeUnlimited() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::makeLimited(double cap) {
   setCapacity(cap);
-  unlimited_ = false;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

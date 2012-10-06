@@ -140,6 +140,13 @@ class InstModel : public TimeAgent, public Communicator {
   void addAvailablePrototype(Prototype* prototype);
 
   /**
+     perform any actions required after prototype has been added to
+     the list of available prototypes
+     @param prototype the prototype to register
+   */
+  virtual void registerAvailablePrototype(Prototype* prototype);
+
+  /**
      Adds a prototype build order to initial_build_order_
      @param qe a pointer to a QueryEngine object containing intialization data
    */
@@ -198,6 +205,20 @@ class InstModel : public TimeAgent, public Communicator {
      @param prototype the prototype to build
    */
   void build(Prototype* prototype);
+
+  /**
+     perform any registration functionality after a clone has been 
+     built
+     @param clone the built (cloned) prototype
+   */
+  virtual void registerCloneAsBuilt(Prototype* clone);
+
+  /**
+     perform any registration functionality before a clone is 
+     decommissioned(deleted)
+     @param clone the to-be-decommissioned prototype
+   */
+  virtual void registerCloneAsDecommissioned(Prototype* clone);
 
 /* ------------------- */ 
   

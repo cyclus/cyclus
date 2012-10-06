@@ -166,6 +166,11 @@ public:
   int startTime() {return time0_;}
 
   /**
+     Returns the the start time of the simulation
+   */
+  int finalTime() {return time0_+simDur_;}
+
+  /**
      Returns the duration of the simulation this Timer's timing. 
       
      @return the duration, in months 
