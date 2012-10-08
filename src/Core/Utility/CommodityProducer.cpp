@@ -2,7 +2,7 @@
 
 #include "CycException.h"
 
-#include <limits>
+#include "Limits.h"
 
 using namespace std;
 using namespace SupplyDemand;
@@ -10,7 +10,7 @@ using namespace SupplyDemand;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation() :
   capacity(0),
-  cost(numeric_limits<double>::max()) 
+  cost(Cyclopts::Limits::modifier_limit) 
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -23,7 +23,7 @@ CommodityInformation::CommodityInformation(double a_capacity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::CommodityProducer() : 
   default_capacity_(0.0),
-  default_cost_(numeric_limits<double>::max())
+  default_cost_(Cyclopts::Limits::modifier_limit)
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

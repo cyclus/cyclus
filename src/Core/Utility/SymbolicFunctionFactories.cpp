@@ -2,6 +2,7 @@
 
 #include "SymbolicFunctions.h"
 #include "CycException.h"
+#include "Logger.h"
 
 #include <map>
 #include <string>
@@ -14,6 +15,11 @@ FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params) {
   stringstream ss(params);
   double slope, intercept;
   ss >> slope >> intercept;
+
+  LOG(LEV_DEBUG2,"Funct") << "Linear function created in the form y = m*x + b, with";
+  LOG(LEV_DEBUG2,"Funct") << "  * m: " << slope;
+  LOG(LEV_DEBUG2,"Funct") << "  * b: " << intercept;
+  
   return FunctionPtr(new LinearFunction(slope,intercept));
 }
 
@@ -22,6 +28,12 @@ FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params) {
   stringstream ss(params);
   double constant, exponent, intercept;
   ss >> constant >> exponent >> intercept;
+
+  LOG(LEV_DEBUG2,"Funct") << "Exponential function created in the form y = a*exp(b*x) + c, with";
+  LOG(LEV_DEBUG2,"Funct") << "  * a: " << constant;
+  LOG(LEV_DEBUG2,"Funct") << "  * b: " << exponent;
+  LOG(LEV_DEBUG2,"Funct") << "  * c: " << intercept;
+  
   return FunctionPtr(new ExponentialFunction(constant,exponent,
                                              intercept));
 }
