@@ -222,14 +222,12 @@ bool RecipeLibrary::compositionDecayable(CompMapPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::addToTable(CompMapPtr recipe){
-  event_ptr e = EM->newEvent(NULL, "IsotopicStates")
-    ->addVal("ID", recipe->ID());
-
-  // now for the composition isotopics
   for (CompMap::iterator item = recipe->begin();
        item != recipe->end(); item++) {
-    e->addVal("IsoID", item->first)
-     ->addVal("Value", item->second);
+    EM->newEvent(NULL, "IsotopicStates")
+      ->addVal("ID", recipe->ID())
+      ->addVal("IsoID", item->first)
+      ->addVal("Value", item->second)
+      ->record();
   }
-  e->record();
 }

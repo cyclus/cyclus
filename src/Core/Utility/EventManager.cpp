@@ -3,7 +3,7 @@
 #include "EventManager.h"
 #include "Event.h"
 
-#define DUMP_SIZE 300
+#define DUMP_SIZE 10
 
 EventManager* EventManager::instance_ = 0;
 
@@ -45,21 +45,19 @@ void EventManager::addEvent(event_ptr ev) {
 
   schemas_[ev->creator()][ev->group()] = ev;
   events_.push_back(ev);
-  notifyBacks();
+  if (events_.size() >= DUMP_SIZE) {
+    notifyBacks();
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::notifyBacks() {
-  if (events_.size() < DUMP_SIZE) {
-    return;
-  }
-
   std::list<EventBackend*>::iterator it;
   for(it = backs_.begin(); it != backs_.end(); it++) {
     try {
       (*it)->notify(events_);
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "failed write with err: "
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "' failed write with err: "
                       << err.what();
     }
   }
@@ -73,12 +71,13 @@ void EventManager::registerBackend(EventBackend* b) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::close() {
+  notifyBacks();
   std::list<EventBackend*>::iterator it;
   for(it = backs_.begin(); it != backs_.end(); it++) {
     try {
       (*it)->close();
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "failed to close with err: "
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "' failed to close with err: "
                       << err.what();
     }
   }
