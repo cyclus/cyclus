@@ -250,6 +250,11 @@ public:
    */
   static void load_simulation(QueryEngine *qe);
 
+  /**
+     logs relevant time-related data with the output system, including:
+     the simulation start time and the simulation duration
+   */
+  void logTimeData();
 };
 #endif
 
