@@ -194,7 +194,8 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   startDate_ = boost::gregorian::date(year0_,month0_,1);
   endDate_ = getEndDate(startDate_,simDur_);
   date_ = boost::gregorian::date(startDate_);
-
+  
+  logTimeData();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -250,6 +251,34 @@ void Timer::load_simulation(QueryEngine *qe) {
   dec = strtol(decay_str.c_str(), NULL, 10);
 
   TI->initialize(dur, m0, y0, sim0, dec);
-
+  
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void Timer::logTimeData() 
+{
+  table_ptr table = table_ptr(new Table("SimulationTimeInfo")); 
+  table->addField("InitialYear","INTEGER");
+  table->addField("InitialMonth","INTEGER");
+  table->addField("SimulationStart","INTEGER");
+  table->addField("Duration","INTEGER");
+  table->setPrimaryKey("InitialYear"); // no clear primary key for this table
+  table->tableDefined();
+
+  data a_start_year(year0_),
+    a_start_month(month0_),
+    a_start_time(time0_),
+    a_duration(simDur_);
+
+  entry start_year("InitialYear",a_start_year),
+    start_month("InitialMonth",a_start_month),
+    start_time("SimulationStart",a_start_time),
+    duration("Duration",a_duration);
+    
+  row aRow;
+  aRow.push_back(start_year),
+    aRow.push_back(start_month),
+    aRow.push_back(start_time), 
+    aRow.push_back(duration);
+  table->addRow(aRow);
+}
