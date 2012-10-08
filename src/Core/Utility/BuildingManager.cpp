@@ -2,6 +2,7 @@
 
 #include <boost/any.hpp>
 
+#include "Logger.h"
 #include "Solver.h"
 #include "SolverInterface.h"
 #include "CBCSolver.h"
@@ -87,9 +88,26 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(Commo
       vector<VariablePtr> solution;
       ProblemInstance problem(commodity,unmet_demand,csi,constraint,solution);
       setUpProblem(problem);
+
+      // report problem
+      LOG(LEV_DEBUG2,"buildman") << "Building Manager is solving a decision problem with:";
+      LOG(LEV_DEBUG2,"buildman") << "  * Objective Function: " << obj->print();
+      LOG(LEV_DEBUG2,"buildman") << "  * Constraint: " << constraint->print();
   
-      // solve and get solution
+      // solve
       csi.solve();
+
+      // report solution
+      LOG(LEV_DEBUG2,"buildman") << "Building Manager has solved a decision problem with:";
+      LOG(LEV_DEBUG2,"buildman") << "  * Types of Prototypes to build: " << solution.size();
+      for (int i = 0; i < solution.size(); i++)
+        {
+          VariablePtr x = solution.at(i);
+          LOG(LEV_DEBUG2,"buildman") << "  * Type: " << x->name()
+                                     << "  * Value: " << any_cast<int>(x->value());
+        }
+  
+      // construct order
       constructBuildOrdersFromSolution(orders,solution);
     }
 
