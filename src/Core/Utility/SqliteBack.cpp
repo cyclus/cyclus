@@ -20,10 +20,14 @@ SqliteBack::~SqliteBack() {
   delete db_;
 }
 
+#include <iostream>
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
+    std::cout << (*it)->name() << std::endl;
     if (! tableExists(*it) ) {
+      std::cout << "    doesn't exist" << std::endl;
       createTable(*it);
     }
     writeEvent(*it);
@@ -134,5 +138,6 @@ void SqliteBack::flush(){
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); it++) {
     db_->execute(*it);
   }
+  cmds_.clear();
 }
 
