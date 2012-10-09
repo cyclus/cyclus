@@ -20,14 +20,10 @@ SqliteBack::~SqliteBack() {
   delete db_;
 }
 
-#include <iostream>
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
-    std::cout << (*it)->name() << std::endl;
     if (! tableExists(*it) ) {
-      std::cout << "    doesn't exist" << std::endl;
       createTable(*it);
     }
     writeEvent(*it);
@@ -124,7 +120,7 @@ std::string SqliteBack::valData(boost::any v) {
   } else if (v.type() == typeid(double)) {
     ss << boost::any_cast<double>(v);
   } else if (v.type() == typeid(std::string)) {
-    ss << boost::any_cast<std::string>(v);
+    ss << "\"" << boost::any_cast<std::string>(v) << "\"";
   } else {
     CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
       << path_;
@@ -136,7 +132,12 @@ std::string SqliteBack::valData(boost::any v) {
 void SqliteBack::flush(){
   db_->open();
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); it++) {
+    try {
     db_->execute(*it);
+    } catch (CycIOException err) {
+      CLOG(LEV_ERROR) << "backend '" << path_ << "' failed write: "
+                      << err.what();
+    }
   }
   cmds_.clear();
 }

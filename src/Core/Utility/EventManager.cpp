@@ -3,7 +3,7 @@
 #include "EventManager.h"
 #include "Event.h"
 
-#define DUMP_SIZE 10
+#define DUMP_SIZE 500
 
 EventManager* EventManager::instance_ = 0;
 
