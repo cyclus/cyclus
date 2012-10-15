@@ -81,3 +81,44 @@ double PiecewiseFunction::rhs()
 {
   return rhs_;
 }
+
+// -------------------------------------------------------------------
+PiecewiseFunctionSeries::PiecewiseFunctionSeries()
+{
+  Point neg_inf(-1*numeric_limits<double>::max(),0.0);
+  FunctionPtr flat_line = FunctionPtr(new LinearFunction(0.0,0.0));
+  FunctionPtr seed = FunctionPtr(new PiecewiseFunction(flat_line,neg_inf));
+  appendFunction(seed);
+}
+
+// -------------------------------------------------------------------
+void PiecewiseFunctionSeries::appendFunction(boost::shared_ptr<PiecewiseFunction> function)
+{
+  if (functions_.empty()) functions_.push_back(function);
+  else
+    {
+       list< shared_ptr<PiecewiseFunction> >::iterator 
+         last = functions_.end() - 1;
+       // @MJGFlag breaking here... resume later
+    }
+}
+
+// -------------------------------------------------------------------
+double PiecewiseFunctionSeries::value(double x) 
+{
+  list< shared_ptr<PiecewiseFunction> >::iterator f = functions_.begin();
+  while ( x >= (*f)->lhs() && f != functions_end() ) ++f; // exceeds search by 1
+  --f; // go back to the correct one
+  return (*f)->value(x);
+}
+
+// -------------------------------------------------------------------
+std::string PiecewiseFunctionSeries::print() 
+{ 
+  stringstream ss("");
+  ss << function_->print() 
+     << " valid on [" << init_point_.x << "," << rhs_ << "]"
+     << " starting at coordinate (" 
+     << init_point_.x << "," << init_point_.y << ")";
+  return ss.str();
+}

@@ -26,7 +26,8 @@ class Function
    linear functions
    f(x) = slope_ * x + intercept_
  */
-class LinearFunction : public Function {
+class LinearFunction : public Function 
+{
  public:
   /**
      constructor for a linear function
@@ -54,7 +55,8 @@ class LinearFunction : public Function {
    exponential functions
    f(x) = constant_ * exp ( exponent_ * x ) + intercept_
  */
-class ExponentialFunction : public Function {
+class ExponentialFunction : public Function 
+{
  public:
   /**
      constructor for an exponential function
@@ -103,7 +105,8 @@ class Point
    f(x) for all x in [lhs,rhs]
    0 otherwise
  */
-class PiecewiseFunction : public Function {
+class PiecewiseFunction : public Function 
+{
  public:
   /**
      constructor for a piecewise function
@@ -152,6 +155,35 @@ class PiecewiseFunction : public Function {
   
   /// the rhs cutoff
   double rhs_;
+};
+
+/**
+   a class that contains a series of piecewise functions
+ */
+class PiecewiseFunctionSeries : public Function 
+{
+ public:
+  /**
+     constructor
+   */
+  PiecewiseFunctionSeries();
+
+  /**
+     append a function to the list of functions comprising this series
+     @param function the function to append. default behavior is to 
+     throw an error if the location is before the lhs of the last 
+     appended function.
+   */
+  void appendFunction(boost::shared_ptr<PiecewiseFunction> function);
+
+  /// evaluation for an double argument
+  virtual double value(double x);
+  
+  /// print a string of the function
+  virtual std::string print();
+  
+ private:
+  std::list< boost::shared_ptr<PiecewiseFunction> > functions_;
 };
 
 #endif
