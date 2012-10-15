@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string>
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
@@ -35,20 +36,40 @@ std::string ExponentialFunction::print()
   return ss.str();
 }
 
-// // -------------------------------------------------------------------
-// double PiecewiseFunction::value(int x) 
-// { 
-// }
+// -------------------------------------------------------------------
+PiecewiseFunction::PiecewiseFunction(FunctionPtr function, double lhs) :
+function_(function), lhs_(lhs), rhs_(numeric_limits<double>::max()) {}
 
-// // -------------------------------------------------------------------
-// double PiecewiseFunction::value(double x) 
-// { 
-// }
+// -------------------------------------------------------------------
+PiecewiseFunction::PiecewiseFunction(FunctionPtr function) :
+function_(function), lhs_(0.0), rhs_(numeric_limits<double>::max()) {}
 
-// // -------------------------------------------------------------------
-// std::string PiecewiseFunction::print() { 
-//   stringstream ss("");
-//   ss << function_->print() 
-//      << " valid on [" << lhs_ << "," << rhs_ << "]";
-//   return ss.str();
-// }
+// -------------------------------------------------------------------
+double PiecewiseFunction::value(double x) 
+{ 
+  double value;
+  if (x < lhs_ || x > rhs_) value = 0.0;
+  else value = function_->value(x);
+  return value;
+}
+
+// -------------------------------------------------------------------
+std::string PiecewiseFunction::print() 
+{ 
+  stringstream ss("");
+  ss << function_->print() 
+     << " valid on [" << lhs_ << "," << rhs_ << "]";
+  return ss.str();
+}
+
+// -------------------------------------------------------------------
+double PiecewiseFunction::lhs() 
+{
+  return lhs_;
+}
+
+// -------------------------------------------------------------------
+double PiecewiseFunction::rhs() 
+{
+  return rhs_;
+}

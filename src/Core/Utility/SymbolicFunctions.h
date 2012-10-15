@@ -82,60 +82,60 @@ class ExponentialFunction : public Function {
   double intercept_;
 };
 
-/* /\** */
-/*    piecewise function */
-/*    f(x) for all x in [lhs,rhs] */
-/*    0 otherwise */
-/*  *\/ */
-/* class PiecewiseFunction : public Function { */
-/*  public: */
-/*   /\** */
-/*      constructor for a piecewise function */
-/*      @param function the function */
-/*      @param lhs the lhs bound */
-/*      @param rhs the rhs bound */
-/*    *\/ */
-/*  PiecewiseFunction(FunctionPtr function, double lhs, double rhs) :  */
-/*   function_(function), lhs_(lhs), rhs_(rhs) {}; */
+/**
+   piecewise function
+   f(x) for all x in [lhs,rhs]
+   0 otherwise
+ */
+class PiecewiseFunction : public Function {
+ public:
+  /**
+     constructor for a piecewise function
+     @param function the function
+     @param lhs the lhs bound
+     @param rhs the rhs bound
+   */
+ PiecewiseFunction(FunctionPtr function, double lhs, double rhs) :
+  function_(function), lhs_(lhs), rhs_(rhs) {};
 
-/*   /\** */
-/*      constructor for a piecewise function, rhs defaults to inf */
-/*      @param function the function */
-/*      @param lhs the lhs bound */
-/*    *\/ */
-/*   PiecewiseFunction(FunctionPtr function, double lhs); */
+  /**
+     constructor for a piecewise function, rhs defaults to inf
+     @param function the function
+     @param lhs the lhs bound
+   */
+  PiecewiseFunction(FunctionPtr function, double lhs);
 
-/*   /\** */
-/*      constructor for a piecewise function, rhs defaults to inf, */
-/*      lhs defaults to 0 */
-/*      @param function the function */
-/*    *\/ */
-/*   PiecewiseFunction(FunctionPtr function); */
+  /**
+     constructor for a piecewise function, rhs defaults to inf,
+     lhs defaults to 0
+     @param function the function
+   */
+  PiecewiseFunction(FunctionPtr function);
   
-/*   /// evaluation for an integer argument */
-/*   //  virtual double value(int x); */
+  /// evaluation for an integer argument
+  //  virtual double value(int x);
   
-/*   /// evaluation for an double argument */
-/*   virtual double value(double x); */
+  /// evaluation for an double argument
+  virtual double value(double x);
   
-/*   /// print a string of the function */
-/*   virtual std::string print(); */
+  /// print a string of the function
+  virtual std::string print();
 
-/*   /// the lhs boundary */
-/*   double lhs(); */
+  /// the lhs boundary
+  double lhs();
   
-/*   /// the rhs boundary */
-/*   double rhs(); */
+  /// the rhs boundary
+  double rhs();
 
-/*  private: */
-/*   /// the constituent function */
-/*   FunctionPtr function_; */
+ private:
+  /// the constituent function
+  FunctionPtr function_;
 
-/*   /// the lhs cutoff */
-/*   double lhs_; */
+  /// the lhs cutoff
+  double lhs_;
 
-/*   /// the rhs cutoff */
-/*   double rhs_; */
-/* }; */
+  /// the rhs cutoff
+  double rhs_;
+};
 
 #endif
