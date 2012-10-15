@@ -37,19 +37,25 @@ std::string ExponentialFunction::print()
 }
 
 // -------------------------------------------------------------------
-PiecewiseFunction::PiecewiseFunction(FunctionPtr function, double lhs) :
-function_(function), lhs_(lhs), rhs_(numeric_limits<double>::max()) {}
+PiecewiseFunction::PiecewiseFunction(FunctionPtr function, Point point) :
+  function_(function), 
+  init_point_(point), 
+  rhs_(numeric_limits<double>::max()) 
+{}
 
 // -------------------------------------------------------------------
 PiecewiseFunction::PiecewiseFunction(FunctionPtr function) :
-function_(function), lhs_(0.0), rhs_(numeric_limits<double>::max()) {}
+  function_(function), 
+  init_point_(Point(0.0,0.0)), 
+  rhs_(numeric_limits<double>::max()) 
+{}
 
 // -------------------------------------------------------------------
 double PiecewiseFunction::value(double x) 
 { 
   double value;
-  if (x < lhs_ || x > rhs_) value = 0.0;
-  else value = function_->value(x);
+  if (x < lhs() || x > rhs()) value = 0.0;
+  else value = function_->value(x - init_point_.x) + init_point_.y;
   return value;
 }
 
@@ -58,14 +64,16 @@ std::string PiecewiseFunction::print()
 { 
   stringstream ss("");
   ss << function_->print() 
-     << " valid on [" << lhs_ << "," << rhs_ << "]";
+     << " valid on [" << init_point_.x << "," << rhs_ << "]"
+     << " starting at coordinate (" 
+     << init_point_.x << "," << init_point_.y << ")";
   return ss.str();
 }
 
 // -------------------------------------------------------------------
 double PiecewiseFunction::lhs() 
 {
-  return lhs_;
+  return init_point_.x;
 }
 
 // -------------------------------------------------------------------

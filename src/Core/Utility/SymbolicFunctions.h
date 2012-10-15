@@ -83,6 +83,22 @@ class ExponentialFunction : public Function {
 };
 
 /**
+   a container for an x,y coordinate
+ */
+class Point
+{
+ public:
+  /**
+     constructor for a point
+  */
+ Point(double x_, double y_) :x(x_), y(y_) {};
+  /// x coordinate
+  double x;
+  /// y coordinate
+  double y;
+};
+
+/**
    piecewise function
    f(x) for all x in [lhs,rhs]
    0 otherwise
@@ -92,28 +108,25 @@ class PiecewiseFunction : public Function {
   /**
      constructor for a piecewise function
      @param function the function
-     @param lhs the lhs bound
+     @param point the initial point for the function
      @param rhs the rhs bound
    */
- PiecewiseFunction(FunctionPtr function, double lhs, double rhs) :
-  function_(function), lhs_(lhs), rhs_(rhs) {};
+ PiecewiseFunction(FunctionPtr function, Point point, double rhs) :
+  function_(function), init_point_(point), rhs_(rhs) {};
 
   /**
      constructor for a piecewise function, rhs defaults to inf
      @param function the function
-     @param lhs the lhs bound
+     @param point the initial point for the function
    */
-  PiecewiseFunction(FunctionPtr function, double lhs);
+  PiecewiseFunction(FunctionPtr function, Point point);
 
   /**
      constructor for a piecewise function, rhs defaults to inf,
-     lhs defaults to 0
+     initial point defaults to (0,0)
      @param function the function
    */
   PiecewiseFunction(FunctionPtr function);
-  
-  /// evaluation for an integer argument
-  //  virtual double value(int x);
   
   /// evaluation for an double argument
   virtual double value(double x);
@@ -127,13 +140,16 @@ class PiecewiseFunction : public Function {
   /// the rhs boundary
   double rhs();
 
+  /// the initial point
+  Point startingPoint();
+  
  private:
   /// the constituent function
   FunctionPtr function_;
 
-  /// the lhs cutoff
-  double lhs_;
-
+  /// the initial point
+  Point init_point_;
+  
   /// the rhs cutoff
   double rhs_;
 };
