@@ -6,6 +6,7 @@
 #include <limits>
 
 using namespace std;
+using namespace boost;
 
 // -------------------------------------------------------------------
 double LinearFunction::value(double x) 
@@ -37,14 +38,14 @@ std::string ExponentialFunction::print()
 }
 
 // -------------------------------------------------------------------
-PiecewiseFunction::PiecewiseFunction(FunctionPtr function, Point point) :
+PiecewiseFunction::PiecewiseFunction(const FunctionPtr& function, const Point& point) :
   function_(function), 
   init_point_(point), 
   rhs_(numeric_limits<double>::max()) 
 {}
 
 // -------------------------------------------------------------------
-PiecewiseFunction::PiecewiseFunction(FunctionPtr function) :
+PiecewiseFunction::PiecewiseFunction(const FunctionPtr& function) :
   function_(function), 
   init_point_(Point(0.0,0.0)), 
   rhs_(numeric_limits<double>::max()) 
@@ -87,27 +88,31 @@ PiecewiseFunctionSeries::PiecewiseFunctionSeries()
 {
   Point neg_inf(-1*numeric_limits<double>::max(),0.0);
   FunctionPtr flat_line = FunctionPtr(new LinearFunction(0.0,0.0));
-  FunctionPtr seed = FunctionPtr(new PiecewiseFunction(flat_line,neg_inf));
+  shared_ptr<PiecewiseFunction> seed = shared_ptr<PiecewiseFunction>(new PiecewiseFunction(flat_line,neg_inf));
   appendFunction(seed);
 }
 
 // -------------------------------------------------------------------
-void PiecewiseFunctionSeries::appendFunction(boost::shared_ptr<PiecewiseFunction> function)
+void PiecewiseFunctionSeries::appendFunction(const boost::shared_ptr<PiecewiseFunction>& function)
 {
-  if (functions_.empty()) functions_.push_back(function);
-  else
+  if (!functions_.empty())
     {
-       list< shared_ptr<PiecewiseFunction> >::iterator 
-         last = functions_.end() - 1;
-       // @MJGFlag breaking here... resume later
+      list< shared_ptr<PiecewiseFunction> >::iterator 
+        last = --functions_.end();
+      
+      if (function->lhs() <= (*last)->lhs())
+        {
+          //throw PiecewiseFunctionOrderException(*last,function);
+        }
     }
+  functions_.push_back(function);
 }
 
 // -------------------------------------------------------------------
 double PiecewiseFunctionSeries::value(double x) 
 {
   list< shared_ptr<PiecewiseFunction> >::iterator f = functions_.begin();
-  while ( x >= (*f)->lhs() && f != functions_end() ) ++f; // exceeds search by 1
+  while ( f != functions_.end() && x >= (*f)->lhs() ) ++f; // exceeds search by 1
   --f; // go back to the correct one
   return (*f)->value(x);
 }
@@ -116,9 +121,11 @@ double PiecewiseFunctionSeries::value(double x)
 std::string PiecewiseFunctionSeries::print() 
 { 
   stringstream ss("");
-  ss << function_->print() 
-     << " valid on [" << init_point_.x << "," << rhs_ << "]"
-     << " starting at coordinate (" 
-     << init_point_.x << "," << init_point_.y << ")";
+  ss << "Series comprised of: ";
+  list< shared_ptr<PiecewiseFunction> >::iterator f;
+  for (f = functions_.begin(); f != functions_.end(); f++)
+    {
+      ss << " * " << (*f)->print();
+    }
   return ss.str();
 }

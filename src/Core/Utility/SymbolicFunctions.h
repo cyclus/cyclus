@@ -2,6 +2,7 @@
 #define SYMBOLICFUNCTIONS_H
 
 #include <string>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 /// a smart pointer to the abstract class so we can pass it around
@@ -114,7 +115,7 @@ class PiecewiseFunction : public Function
      @param point the initial point for the function
      @param rhs the rhs bound
    */
- PiecewiseFunction(FunctionPtr function, Point point, double rhs) :
+ PiecewiseFunction(const FunctionPtr& function, const Point& point, double rhs) :
   function_(function), init_point_(point), rhs_(rhs) {};
 
   /**
@@ -122,14 +123,14 @@ class PiecewiseFunction : public Function
      @param function the function
      @param point the initial point for the function
    */
-  PiecewiseFunction(FunctionPtr function, Point point);
+  PiecewiseFunction(const FunctionPtr& function, const Point& point);
 
   /**
      constructor for a piecewise function, rhs defaults to inf,
      initial point defaults to (0,0)
      @param function the function
    */
-  PiecewiseFunction(FunctionPtr function);
+  PiecewiseFunction(const FunctionPtr& function);
   
   /// evaluation for an double argument
   virtual double value(double x);
@@ -174,7 +175,7 @@ class PiecewiseFunctionSeries : public Function
      throw an error if the location is before the lhs of the last 
      appended function.
    */
-  void appendFunction(boost::shared_ptr<PiecewiseFunction> function);
+  void appendFunction(const boost::shared_ptr<PiecewiseFunction>& function);
 
   /// evaluation for an double argument
   virtual double value(double x);
