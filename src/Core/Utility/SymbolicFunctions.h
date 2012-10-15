@@ -9,20 +9,17 @@ class Function;
 typedef boost::shared_ptr<Function> FunctionPtr;
 
 /// abstract base class for symbolic functions
-class Function {
+class Function 
+{
  public:
   /// virtual destructor for an abstract base class
   virtual ~Function() {}; 
-  /// base class must define how to calculate demand (int argument)
-  virtual double value(int x) = 0; 
+
   /// base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0; 
+
   /// every function must print itself
   virtual std::string print() = 0;
-  /* /// overload function operator */
-  /* double operator()(int x) {return value(x);} */
-  /* /// overload function operator */
-  /* double operator()(double x) {return value(x);} */
 };
 
 /**
@@ -38,9 +35,6 @@ class LinearFunction : public Function {
    */
  LinearFunction(double s, double i) : 
   slope_(s), intercept_(i) {};
-  
-  /// evaluation for an integer argument
-  virtual double value(int x);
   
   /// evaluation for an double argument
   virtual double value(double x);
@@ -71,9 +65,6 @@ class ExponentialFunction : public Function {
  ExponentialFunction(double c, double e, double i) : 
   constant_(c), exponent_(e), intercept_(i) {};
 
-  /// evaluation for an integer argument
-  virtual double value(int x);
-
   /// evaluation for a double argument
   virtual double value(double x);
 
@@ -90,5 +81,61 @@ class ExponentialFunction : public Function {
   /// the intercept
   double intercept_;
 };
+
+/* /\** */
+/*    piecewise function */
+/*    f(x) for all x in [lhs,rhs] */
+/*    0 otherwise */
+/*  *\/ */
+/* class PiecewiseFunction : public Function { */
+/*  public: */
+/*   /\** */
+/*      constructor for a piecewise function */
+/*      @param function the function */
+/*      @param lhs the lhs bound */
+/*      @param rhs the rhs bound */
+/*    *\/ */
+/*  PiecewiseFunction(FunctionPtr function, double lhs, double rhs) :  */
+/*   function_(function), lhs_(lhs), rhs_(rhs) {}; */
+
+/*   /\** */
+/*      constructor for a piecewise function, rhs defaults to inf */
+/*      @param function the function */
+/*      @param lhs the lhs bound */
+/*    *\/ */
+/*   PiecewiseFunction(FunctionPtr function, double lhs); */
+
+/*   /\** */
+/*      constructor for a piecewise function, rhs defaults to inf, */
+/*      lhs defaults to 0 */
+/*      @param function the function */
+/*    *\/ */
+/*   PiecewiseFunction(FunctionPtr function); */
+  
+/*   /// evaluation for an integer argument */
+/*   //  virtual double value(int x); */
+  
+/*   /// evaluation for an double argument */
+/*   virtual double value(double x); */
+  
+/*   /// print a string of the function */
+/*   virtual std::string print(); */
+
+/*   /// the lhs boundary */
+/*   double lhs(); */
+  
+/*   /// the rhs boundary */
+/*   double rhs(); */
+
+/*  private: */
+/*   /// the constituent function */
+/*   FunctionPtr function_; */
+
+/*   /// the lhs cutoff */
+/*   double lhs_; */
+
+/*   /// the rhs cutoff */
+/*   double rhs_; */
+/* }; */
 
 #endif
