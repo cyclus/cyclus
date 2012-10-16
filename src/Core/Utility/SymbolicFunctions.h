@@ -41,9 +41,9 @@ class LinearFunction : public Function
   /**
      constructor for a linear function
      @param s the slope
-     @param i the intercept
+     @param i the intercept, with the default being 0
    */
- LinearFunction(double s, double i) : 
+ LinearFunction(double s, double i = 0.0) : 
   slope_(s), intercept_(i) {};
   
   /// evaluation for an double argument
@@ -71,9 +71,9 @@ class ExponentialFunction : public Function
      constructor for an exponential function
      @param c the leading constant
      @param e the exponent multiplier
-     @param i the intercept
+     @param i the intercept, with the default being 0
    */
- ExponentialFunction(double c, double e, double i) : 
+ ExponentialFunction(double c, double e, double i = 0.0) : 
   constant_(c), exponent_(e), intercept_(i) {};
 
   /// evaluation for a double argument
