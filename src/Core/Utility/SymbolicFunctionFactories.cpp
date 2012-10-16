@@ -1,7 +1,6 @@
 #include "SymbolicFunctionFactories.h"
 
 #include "SymbolicFunctions.h"
-#include "CycException.h"
 #include "Logger.h"
 
 #include <map>
@@ -9,6 +8,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost;
 
 // -------------------------------------------------------------------
 FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params) 
@@ -38,6 +38,44 @@ FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params)
   
   return FunctionPtr(new ExponentialFunction(constant,exponent,
                                              intercept));
+}
+
+// -------------------------------------------------------------------
+PiecewiseFunctionFactory::PiecewiseFunctionFactory()
+{
+  function_ = shared_ptr<PiecewiseFunction>(new PiecewiseFunction());
+}
+
+// -------------------------------------------------------------------
+FunctionPtr PiecewiseFunctionFactory::getFunctionPtr(std::string params) 
+{ 
+  if (!params.empty()) 
+    {
+      throw InvalidFunctionParamterException("Piecewise Functions cannot be created with a list of parameters");
+    }
+  
+  LOG(LEV_DEBUG2,"Funct") << "A piecewise function has been created: "
+                          << function_->print();
+  
+  return function_;
+}
+
+// -------------------------------------------------------------------
+void PiecewiseFunctionFactory::addFunction(FunctionPtr function, double starting_coord, bool continuous) 
+{
+  if (!function_->functions_.empty())
+    {
+      const PiecewiseFunction::PiecewiseFunctionInfo& last = function_->functions_.back();  
+      if (starting_coord <= last.xoffset)
+        {
+          throw PiecewiseFunctionOrderException("Cannot append a function before the last registered function");
+        }
+    }
+  
+  double yoffset = 0;
+  if (continuous) yoffset = function_->value(starting_coord);
+
+  function_->functions_.push_back(PiecewiseFunction::PiecewiseFunctionInfo(function,starting_coord,yoffset));
 }
 
 // -------------------------------------------------------------------

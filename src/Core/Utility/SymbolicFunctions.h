@@ -5,9 +5,17 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-/// a smart pointer to the abstract class so we can pass it around
+// forward declarations
 class Function;
+class LinearFunction;
+class ExponentialFunction;
+class PiecewiseFunction;
+
+// typedefs
 typedef boost::shared_ptr<Function> FunctionPtr;
+
+// forward includes
+#include "SymbolicFunctionFactories.h"
 
 /// abstract base class for symbolic functions
 class Function 
@@ -86,97 +94,21 @@ class ExponentialFunction : public Function
 };
 
 /**
-   a container for an x,y coordinate
- */
-class Point
-{
- public:
-  /**
-     constructor for a point
-  */
- Point(double x_, double y_) :x(x_), y(y_) {};
-  /// x coordinate
-  double x;
-  /// y coordinate
-  double y;
-};
-
-/**
    piecewise function
    f(x) for all x in [lhs,rhs]
    0 otherwise
  */
 class PiecewiseFunction : public Function 
 {
+  struct PiecewiseFunctionInfo
+  {
+  PiecewiseFunctionInfo(FunctionPtr function_, double xoff_ = 0, double yoff_ = 0) :
+    function(function_), xoffset(xoff_), yoffset(yoff_) {};
+    FunctionPtr function;
+    double xoffset, yoffset;
+  };
+  
  public:
-  /**
-     constructor for a piecewise function
-     @param function the function
-     @param point the initial point for the function
-     @param rhs the rhs bound
-   */
- PiecewiseFunction(const FunctionPtr& function, const Point& point, double rhs) :
-  function_(function), init_point_(point), rhs_(rhs) {};
-
-  /**
-     constructor for a piecewise function, rhs defaults to inf
-     @param function the function
-     @param point the initial point for the function
-   */
-  PiecewiseFunction(const FunctionPtr& function, const Point& point);
-
-  /**
-     constructor for a piecewise function, rhs defaults to inf,
-     initial point defaults to (0,0)
-     @param function the function
-   */
-  PiecewiseFunction(const FunctionPtr& function);
-  
-  /// evaluation for an double argument
-  virtual double value(double x);
-  
-  /// print a string of the function
-  virtual std::string print();
-
-  /// the lhs boundary
-  double lhs();
-  
-  /// the rhs boundary
-  double rhs();
-
-  /// the initial point
-  Point startingPoint();
-  
- private:
-  /// the constituent function
-  FunctionPtr function_;
-
-  /// the initial point
-  Point init_point_;
-  
-  /// the rhs cutoff
-  double rhs_;
-};
-
-/**
-   a class that contains a series of piecewise functions
- */
-class PiecewiseFunctionSeries : public Function 
-{
- public:
-  /**
-     constructor
-   */
-  PiecewiseFunctionSeries();
-
-  /**
-     append a function to the list of functions comprising this series
-     @param function the function to append. default behavior is to 
-     throw an error if the location is before the lhs of the last 
-     appended function.
-   */
-  void appendFunction(const boost::shared_ptr<PiecewiseFunction>& function);
-
   /// evaluation for an double argument
   virtual double value(double x);
   
@@ -184,7 +116,9 @@ class PiecewiseFunctionSeries : public Function
   virtual std::string print();
   
  private:
-  std::list< boost::shared_ptr<PiecewiseFunction> > functions_;
+  std::list<PiecewiseFunctionInfo> functions_;
+
+  friend class PiecewiseFunctionFactory;
 };
 
 #endif
