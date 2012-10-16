@@ -9,7 +9,8 @@
 /**
    An abstract factory for pointers to symbolic functions
  */
-class SymbFunctionFactory {
+class SymbFunctionFactory 
+{
  public:
   /// virtual destructor for an abstract base class
   virtual ~SymbFunctionFactory() {};
@@ -25,7 +26,8 @@ class SymbFunctionFactory {
 /**
    a concrete factory for linear functions
  */
-class LinFunctionFactory : public SymbFunctionFactory {
+class LinFunctionFactory : public SymbFunctionFactory 
+{
  public:
   /**
      return a function pointer to a linear function
@@ -39,7 +41,8 @@ class LinFunctionFactory : public SymbFunctionFactory {
 /**
    a concrete factory for exponential functions
  */
-class ExpFunctionFactory : public SymbFunctionFactory {
+class ExpFunctionFactory : public SymbFunctionFactory 
+{
  public:
   /**
      return a function pointer to a exponential function
@@ -54,7 +57,8 @@ class ExpFunctionFactory : public SymbFunctionFactory {
    a concrete factory that can provide access to  basic symbolic 
    functions
  */
-class BasicFunctionFactory {
+class BasicFunctionFactory 
+{
  public:
   /// the type of functions this factory can provide
   enum FunctionType {LIN,EXP};
