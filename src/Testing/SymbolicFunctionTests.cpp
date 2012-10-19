@@ -11,7 +11,7 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SymbolicFunctionTests::SetUp()
 {
-  slope = 5.0;
+  slope = 2.0;
   intercept = 1.0;
   lin_xoffset = 0.0;
   lin_yoffset = 0.0;
@@ -47,7 +47,7 @@ void SymbolicFunctionTests::setUpPiecewiseEnvironment()
   // point 3, interface with linear function and exp function
   check_points.push_back(offset*2);
   exp_xoffset = offset*2;
-  exp_yoffset = linear_value(offset*2) + lin_yoffset;  
+  exp_yoffset = linear_value(offset) + lin_yoffset - exp_value(0);  
 
   // point 3, exp function
   check_points.push_back(offset*3);
@@ -89,13 +89,13 @@ FunctionPtr SymbolicFunctionTests::getPiecewiseFunction()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double SymbolicFunctionTests::linear_value(double value)
 {
-  return slope*(value-lin_xoffset) + intercept + lin_yoffset;
+  return slope * value + intercept;
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double SymbolicFunctionTests::exp_value(double value)
 {
-  return constant * exp(exponent * (value - exp_xoffset)) + exp_yoffset;
+  return constant * exp(exponent * value);
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -109,11 +109,11 @@ double SymbolicFunctionTests::piecewise_value(double value, int index)
       break;
     case(1):
     case(2):
-      ret = linear_value(value);
+      ret = linear_value(value-lin_xoffset) + lin_yoffset;
       break;
     case(3):
     case(4):
-      ret = exp_value(value);
+      ret = exp_value(value-exp_xoffset) + exp_yoffset;
       break;
     }
   return ret;
@@ -151,14 +151,19 @@ TEST_F(SymbolicFunctionTests,expfunc)
     }
 }
 
+//#include <iostream>
+//#include <fstream>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SymbolicFunctionTests,piecewisefunc) 
 {
+  //ofstream output;
+  //output.open ("out");
+
   FunctionPtr f = getPiecewiseFunction();
 
   for (int i = 0; i < check_points.size() - 1; i++)
     {
-      int n = 10;
+      int n = 50;
       double eps = 0.00000001;
       double range = check_points.at(i+1) - check_points.at(i) - eps;
       double step = range/(n-1);
@@ -167,6 +172,8 @@ TEST_F(SymbolicFunctionTests,piecewisefunc)
         {
           double x = j*step + check_points.at(i);
           EXPECT_DOUBLE_EQ(piecewise_value(x,i),f->value(x));
+          //output << x << ", " << piecewise_value(x,i) << ", " << f->value(x) << endl;
         }
     }
+  //output.close();
 }

@@ -73,7 +73,7 @@ void PiecewiseFunctionFactory::addFunction(FunctionPtr function, double starting
     }
   
   double yoffset = 0;
-  if (continuous) yoffset = function_->value(starting_coord);
+  if (continuous) yoffset = function_->value(starting_coord) - function->value(0);
 
   function_->functions_.push_back(PiecewiseFunction::PiecewiseFunctionInfo(function,starting_coord,yoffset));
 }
