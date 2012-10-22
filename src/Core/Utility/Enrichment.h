@@ -63,8 +63,8 @@ namespace Enrichment
 
   /**
      @param frac the fraction input, this will throw if the fraction
-     value is not between 0 and 1
-     @return the value function for a given fraction between 0 and 1
+     value is not in [0,1)
+     @return the value function for a given fraction in [0,1)
    */
   double value_func(double frac);
 };
