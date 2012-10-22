@@ -13,19 +13,19 @@ Enrichment::Assays::Assays(double feed, double product, double tails) :
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::feed()
+double Enrichment::Assays::feed() const
 {
   return feed_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::product()
+double Enrichment::Assays::product() const
 {
   return product_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::tails()
+double Enrichment::Assays::tails() const
 {
   return tails_;
 }
@@ -54,7 +54,7 @@ double Enrichment::uranium_qty(mat_rsrc_ptr rsrc)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::feed_qty(double product_qty, Assays& assays) 
+double Enrichment::feed_qty(double product_qty, const Assays& assays) 
 {
   double factor = 
     (assays.product() - assays.tails())
@@ -64,7 +64,7 @@ double Enrichment::feed_qty(double product_qty, Assays& assays)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::tails_qty(double product_qty, Assays& assays) 
+double Enrichment::tails_qty(double product_qty, const Assays& assays) 
 {
   double factor = 
     (assays.product() - assays.feed())
@@ -96,7 +96,7 @@ double Enrichment::value_func(double frac)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::swu_required(double product_qty, Assays& assays) 
+double Enrichment::swu_required(double product_qty, const Assays& assays) 
 {
   double feed = feed_qty(product_qty,assays);
   double tails = tails_qty(product_qty,assays);
