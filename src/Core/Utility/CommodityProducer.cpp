@@ -2,7 +2,7 @@
 
 #include "CycException.h"
 
-#include "Limits.h"
+#include "CycloptsLimits.h"
 
 using namespace std;
 using namespace SupplyDemand;
