@@ -265,6 +265,11 @@ public:
    */
   static void setDecay(int dec);
 
+  /**
+     returns true if the resource pointer points to a material resource
+  */
+  static bool isMaterial(rsrc_ptr rsrc);
+
 protected:
   /**
      Decays this Material object for the given number of months and 
