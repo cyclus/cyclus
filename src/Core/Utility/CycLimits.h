@@ -1,7 +1,7 @@
 #ifndef CYCLIMITS_H
 #define CYCLIMITS_H
 
-namespace Cyclus
+namespace cyclus
 {
   inline double eps() { return 1e-10; }
 }

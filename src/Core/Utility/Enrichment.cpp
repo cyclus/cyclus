@@ -3,35 +3,35 @@
 #include <sstream>
 
 using namespace std;
-using namespace Cyclus;
+using namespace cyclus;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-Enrichment::Assays::Assays(double feed, double product, double tails) :
+enrichment::Assays::Assays(double feed, double product, double tails) :
   feed_(feed),
   product_(product),
   tails_(tails)
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::feed() const
+double enrichment::Assays::feed() const
 {
   return feed_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::product() const
+double enrichment::Assays::product() const
 {
   return product_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::Assays::tails() const
+double enrichment::Assays::tails() const
 {
   return tails_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::uranium_assay(mat_rsrc_ptr rsrc)
+double enrichment::uranium_assay(mat_rsrc_ptr rsrc)
 {
   double value;
   double u235 = rsrc->isoVector().atomFraction(92235);
@@ -48,13 +48,13 @@ double Enrichment::uranium_assay(mat_rsrc_ptr rsrc)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::uranium_qty(mat_rsrc_ptr rsrc)
+double enrichment::uranium_qty(mat_rsrc_ptr rsrc)
 {
   return rsrc->mass(92238,KG) + rsrc->mass(92235,KG);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::feed_qty(double product_qty, const Assays& assays) 
+double enrichment::feed_qty(double product_qty, const Assays& assays) 
 {
   double factor = 
     (assays.product() - assays.tails())
@@ -64,7 +64,7 @@ double Enrichment::feed_qty(double product_qty, const Assays& assays)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::tails_qty(double product_qty, const Assays& assays) 
+double enrichment::tails_qty(double product_qty, const Assays& assays) 
 {
   double factor = 
     (assays.product() - assays.feed())
@@ -74,7 +74,7 @@ double Enrichment::tails_qty(double product_qty, const Assays& assays)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::value_func(double frac) 
+double enrichment::value_func(double frac) 
 {
   if (frac < 0)
     {
@@ -96,7 +96,7 @@ double Enrichment::value_func(double frac)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Enrichment::swu_required(double product_qty, const Assays& assays) 
+double enrichment::swu_required(double product_qty, const Assays& assays) 
 {
   double feed = feed_qty(product_qty,assays);
   double tails = tails_qty(product_qty,assays);

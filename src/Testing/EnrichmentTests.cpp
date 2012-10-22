@@ -9,8 +9,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace Cyclus;
-using namespace Enrichment;
+using namespace cyclus;
+using namespace enrichment;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void EnrichmentTests::SetUp() 

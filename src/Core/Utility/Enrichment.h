@@ -4,7 +4,7 @@
 
 #include "Material.h"
 
-namespace Enrichment
+namespace enrichment
 {
   /**
      a simple container class for enrichment assays
