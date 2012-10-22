@@ -330,8 +330,8 @@ void Material::setDecay(int dec) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Material::isMaterial(rsrc_ptr rsrc)
 {
-  mat_rsrc_ptr cast = dynamic_pointer_cast(shared_ptr<Material>(rsrc));
-  return (cast.get_count() != 0);
+  mat_rsrc_ptr cast = dynamic_pointer_cast<Material>(rsrc);
+  return !(cast.get() == 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
