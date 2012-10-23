@@ -86,7 +86,6 @@ class RegionModel : public TimeAgent, public Communicator {
 
   /**
      perform actions required when entering the simulation
-     @param parent this models parent
    */
    virtual void enterSimulationAsCoreEntity();
 
