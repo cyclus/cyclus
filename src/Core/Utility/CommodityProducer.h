@@ -64,14 +64,14 @@ namespace SupplyDemand
 
     /**
        set the production capacity for a given commodity
-       @param commdity the commodity being produced
+       @param commodity the commodity being produced
        @param capacity the production capacity
      */
     void setCapacity(const Commodity& commodity, double capacity);
 
     /**
        set the production cost for a given commodity
-       @param commdity the commodity being produced
+       @param commodity the commodity being produced
        @param cost the production cost
      */
     void setCost(const Commodity& commodity, double cost);
