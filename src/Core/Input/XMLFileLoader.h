@@ -47,7 +47,7 @@ class XMLFileLoader {
   
   /**
      Method to load all dyamic modules
-     @params module_types the set of all types of modules
+     @param module_types the set of all types of modules
   */
   void load_dynamic_modules(std::set<std::string>& module_types);
 
@@ -63,8 +63,7 @@ class XMLFileLoader {
   std::map<std::string,std::string> module_paths_;
   
   /**
-     initialize the paths to modules given a set of module types
-     @param module_types the set of module types
+     initialize the paths to modules
    */
   void initialize_module_paths();
 

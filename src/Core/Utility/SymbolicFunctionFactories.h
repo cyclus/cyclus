@@ -74,7 +74,7 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory
      add a function to the piecewise function being constructed
      @param function the function to append
      @param starting_coord the x coordinate to begin this function
-     @param continuous, if true, the added function and previous 
+     @param continuous  if true, the added function and previous 
      function will be continuous, if false, discontinuous
    */
   void addFunction(FunctionPtr function, double starting_coord = 0.0, bool continuous = true);
