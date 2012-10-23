@@ -114,7 +114,8 @@ int CompMap::ID() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::massFraction(const Iso& tope) const {
   if (count(tope) == 0) {
-    throw CycIndexException("This composition has no Iso: " + tope);
+    return 0.0;
+    //throw CycIndexException("This composition has no Iso: " + tope);
   }
   double factor = 1.0;
   if (basis_ != MASS) {
@@ -126,7 +127,8 @@ double CompMap::massFraction(const Iso& tope) const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::atomFraction(const Iso& tope) const {
   if (count(tope) == 0) {
-    throw CycIndexException("This composition has no Iso: " + tope);
+    return 0.0;
+    //throw CycIndexException("This composition has no Iso: " + tope);
   }
   double factor = 1.0;
   if (basis_ != ATOM) {
