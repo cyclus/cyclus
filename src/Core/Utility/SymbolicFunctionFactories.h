@@ -9,7 +9,8 @@
 /**
    An abstract factory for pointers to symbolic functions
  */
-class SymbFunctionFactory {
+class SymbFunctionFactory 
+{
  public:
   /// virtual destructor for an abstract base class
   virtual ~SymbFunctionFactory() {};
@@ -25,7 +26,8 @@ class SymbFunctionFactory {
 /**
    a concrete factory for linear functions
  */
-class LinFunctionFactory : public SymbFunctionFactory {
+class LinFunctionFactory : public SymbFunctionFactory 
+{
  public:
   /**
      return a function pointer to a linear function
@@ -39,7 +41,8 @@ class LinFunctionFactory : public SymbFunctionFactory {
 /**
    a concrete factory for exponential functions
  */
-class ExpFunctionFactory : public SymbFunctionFactory {
+class ExpFunctionFactory : public SymbFunctionFactory 
+{
  public:
   /**
      return a function pointer to a exponential function
@@ -51,10 +54,42 @@ class ExpFunctionFactory : public SymbFunctionFactory {
 };
 
 /**
+   a concrete factory for piecewise functions
+ */
+class PiecewiseFunctionFactory : public SymbFunctionFactory 
+{
+ public:
+  /// constructor
+  PiecewiseFunctionFactory();
+
+  /**
+     return a function pointer to a piecewise function
+     @param params an empty string by default. if this is not empty,
+     an error is thrown
+     @return the piecewise function
+   */
+  virtual FunctionPtr getFunctionPtr(std::string params = "");
+  
+  /**
+     add a function to the piecewise function being constructed
+     @param function the function to append
+     @param starting_coord the x coordinate to begin this function
+     @param continuous, if true, the added function and previous 
+     function will be continuous, if false, discontinuous
+   */
+  void addFunction(FunctionPtr function, double starting_coord = 0.0, bool continuous = true);
+
+ private:
+  /// the piecewise function to construct
+  boost::shared_ptr<PiecewiseFunction> function_;
+};
+
+/**
    a concrete factory that can provide access to  basic symbolic 
    functions
  */
-class BasicFunctionFactory {
+class BasicFunctionFactory 
+{
  public:
   /// the type of functions this factory can provide
   enum FunctionType {LIN,EXP};
@@ -77,6 +112,20 @@ class BasicFunctionFactory {
   static std::map<std::string,BasicFunctionFactory::FunctionType> 
     enum_names_;
 };
+
+#include "CycException.h"
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+class InvalidFunctionParamterException : public CycException 
+{
+  public: InvalidFunctionParamterException(std::string msg) : CycException(msg) {};
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+class PiecewiseFunctionOrderException : public CycException 
+{
+  public: PiecewiseFunctionOrderException(std::string msg) : CycException(msg) {};
+};
+
 
 
 #endif
