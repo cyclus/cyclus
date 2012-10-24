@@ -3,4 +3,5 @@ build
 debug
 doxygen.conf
 suffix.h
-
+*~
+#*
