@@ -275,6 +275,7 @@ rsrc_ptr Material::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuality(rsrc_ptr other){
+  
   // This will be false until proven true
   bool toRet = false;
   IsoVector lhs_vec = iso_vector_;
@@ -286,6 +287,9 @@ bool Material::checkQuality(rsrc_ptr other){
       toRet = true;
     }
   } catch (...) { }
+
+  CLOG(LEV_DEBUG1) << "Material is checking quality, i.e. both are "
+                   << "Materials, and the answer is " << toRet << " with true = " << true << ".";
 
   return toRet;
 }
