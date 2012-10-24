@@ -36,6 +36,11 @@ double enrichment::uranium_assay(mat_rsrc_ptr rsrc)
   double value;
   double u235 = rsrc->isoVector().atomFraction(92235);
   double u238 = rsrc->isoVector().atomFraction(92238);
+  
+  LOG(LEV_DEBUG1, "CEnr") << "Comparing u235 atom fraction : " 
+                          << u235 << " with u238 atom fraction: "
+                          << u238;
+  
   if (u235 + u238 > 0)
     {
       value = u235 / (u235 + u238);
@@ -102,7 +107,7 @@ double enrichment::swu_required(double product_qty, const Assays& assays)
   double tails = tails_qty(product_qty,assays);
   double swu = 
     product_qty * value_func(assays.product()) +
-    feed * value_func(assays.feed()) +
-    tails * value_func(assays.tails());
+    tails * value_func(assays.tails()) -
+    feed * value_func(assays.feed());
   return swu;
 }

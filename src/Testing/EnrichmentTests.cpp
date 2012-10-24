@@ -46,7 +46,7 @@ void EnrichmentTests::setEnrichmentParameters()
 
   feed_qty_ = mass_u_ * (product_-tails_)/(feed_-tails_);
   tails_qty_ = mass_u_ * (product_-feed_)/(feed_-tails_);
-  swu_ = mass_u_*product_val + feed_qty_*feed_val + tails_qty_*tails_val;
+  swu_ = mass_u_*product_val + tails_qty_*tails_val - feed_qty_*feed_val;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
