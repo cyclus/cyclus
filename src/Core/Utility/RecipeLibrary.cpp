@@ -66,23 +66,31 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
     throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
   }
 
+  string name = qe->getElementContent("name");
+  CLOG(LEV_DEBUG3) << "loading recipe: " << name 
+                   << " with basis: " << basis_str;
+
   // make a new composition
   CompMapPtr recipe(new CompMap(basis));
 
   // get values needed for composition
   double value;
   int key;
-  QueryEngine* isotopes = qe->queryElement("isotope");
-  int nIsos = isotopes->nElementsMatchingQuery("id");
-  for (int i = 0; i < nIsos; i++) {
-    key = strtol(isotopes->getElementContent("id",i).c_str(), NULL, 10);
-    value = strtod(isotopes->getElementContent("comp",i).c_str(), NULL);
-    // update our mass-related values
-    (*recipe)[key] = value;
-  }
+  string query = "isotope";
+  int nIsos = qe->nElementsMatchingQuery(query);
+  
+  for (int i = 0; i < nIsos; i++) 
+    {
+      QueryEngine* isotope = qe->queryElement(query,i);
+      key = strtol(isotope->getElementContent("id").c_str(), NULL, 10);
+      value = strtod(isotope->getElementContent("comp").c_str(), NULL);
+      // update our mass-related values
+      (*recipe)[key] = value;
+      CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << value;
+    }
+  
   recipe->massify();
   // record this composition (static members and database)
-  string name = qe->getElementContent("name");
   recordRecipe(name,recipe);
 }
 

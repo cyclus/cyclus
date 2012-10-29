@@ -47,11 +47,12 @@ void GenericResource::print() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GenericResource::checkQuality(rsrc_ptr other){
-  bool toRet = false;
-
-  toRet = (units_ == other->units());
-  return toRet;
+bool GenericResource::checkQuality(rsrc_ptr other)
+{
+  CLOG(LEV_DEBUG1) << "GenericResource is checking quality, this = " 
+                   << units_ << " other = " << other->units();
+  
+  return units_ == other->units();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

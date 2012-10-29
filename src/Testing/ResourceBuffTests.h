@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "ResourceBuff.h"
 #include "CycException.h"
+#include "CycLimits.h"
 #include "Logger.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -23,10 +24,10 @@ protected:
   
   double neg_cap, zero_cap, cap, low_cap;
   double exact_qty; // mass in filled_store_
-  double exact_qty_under; // mass in filled_store - 0.9*STORE_EPS
-  double exact_qty_over; // mass in filled_store + 0.9*STORE_EPS
-  double over_qty;  // mass in filled_store - 1.1*STORE_EPS
-  double under_qty; // mass in filled_store + 1.1*STORE_EPS
+  double exact_qty_under; // mass in filled_store - 0.9*cyclus::eps_rsrc()
+  double exact_qty_over; // mass in filled_store + 0.9*cyclus::eps_rsrc()
+  double over_qty;  // mass in filled_store - 1.1*cyclus::eps_rsrc()
+  double under_qty; // mass in filled_store + 1.1*cyclus::eps_rsrc()
   double overeps, undereps;
 
   virtual void SetUp() {
@@ -69,8 +70,8 @@ protected:
       cap = mat1_->quantity()+mat2_->quantity()+1; // should be higher than mat1+mat2 masses
       low_cap = mat1_->quantity()+mat2_->quantity()-1; // should be lower than mat1_mat2 masses
 
-      undereps = 0.9 * STORE_EPS;
-      overeps = 1.1 * STORE_EPS;
+      undereps = 0.9 * cyclus::eps_rsrc();
+      overeps = 1.1 * cyclus::eps_rsrc();
       exact_qty = mat1_->quantity();
       exact_qty_under = exact_qty - undereps;
       exact_qty_over = exact_qty + undereps;

@@ -9,6 +9,7 @@
 #include <vector>
 
 using namespace std;
+using namespace boost;
 
 vector<mat_rsrc_ptr> Material::materials_;
 
@@ -274,17 +275,21 @@ rsrc_ptr Material::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::checkQuality(rsrc_ptr other){
+  
   // This will be false until proven true
   bool toRet = false;
   IsoVector lhs_vec = iso_vector_;
 
   try {
     // Make sure the other is a material
-    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(other);
+    mat_rsrc_ptr mat = dynamic_pointer_cast<Material>(other);
     if (mat) {
       toRet = true;
     }
   } catch (...) { }
+
+  CLOG(LEV_DEBUG1) << "Material is checking quality, i.e. both are "
+                   << "Materials, and the answer is " << toRet << " with true = " << true << ".";
 
   return toRet;
 }
@@ -324,6 +329,13 @@ void Material::setDecay(int dec) {
     decay_wanted_ = true;
     decay_interval_ = dec;
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool Material::isMaterial(rsrc_ptr rsrc)
+{
+  mat_rsrc_ptr cast = dynamic_pointer_cast<Material>(rsrc);
+  return !(cast.get() == 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
