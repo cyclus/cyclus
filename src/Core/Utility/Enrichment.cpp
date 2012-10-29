@@ -9,8 +9,7 @@ using namespace cyclus;
 enrichment::Assays::Assays(double feed, double product, double tails) :
   feed_(feed),
   product_(product),
-  tails_(tails)
-{}
+  tails_(tails) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double enrichment::Assays::feed() const {
