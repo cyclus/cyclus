@@ -4,24 +4,31 @@
 
 #include "Material.h"
 
-namespace enrichment
-{
+namespace enrichment {
   /**
      a simple container class for enrichment assays
    */
-  class Assays
-  {
+  class Assays {
   public:
     /// constructor
     Assays(double feed, double product, double tails);
     
-    /// returns the feed assay
+    /**
+       @return the feed assay as an atomic fraction, i.e. for
+       0.711% U-235 in natural uranium, this will return 0.00711.
+    */
     double feed() const;
 
-    /// returns the product assay
+    /**
+       @return the product assay as an atomic fraction, i.e. for
+       3% U-235 in enriched uranium, this will return 0.03.
+    */
     double product() const;
 
-    /// returns the tails assay
+    /**
+       @return the tails assay as an atomic fraction, i.e. for
+       0.2% U-235 in depleted uranium, this will return 0.002.
+    */
     double tails() const;
 
   private:
@@ -36,14 +43,16 @@ namespace enrichment
 
   /**
      @param mat the material inquired about
-     @return the quantity of uranium in a material
+     @return the quantity of uranium in a material whose units match
+     those of the given material
    */
   double uranium_qty(mat_rsrc_ptr mat);
 
   /**
      @param product_qty the amount of product Uranium
      @param assays the assay of product, feed, and tails
-     @return the quantity of feedstock required to make the product
+     @return the quantity of feedstock required to make the product 
+     whose units match those of the given product
    */
   double feed_qty(double product_qty, const Assays& assays);
 
@@ -51,6 +60,7 @@ namespace enrichment
      @param product_qty the amount of product Uranium
      @param assays the assay of product, feed, and tails
      @return the quantity of tails resulting from enriching the product
+     whose units match those of the given product
    */
   double tails_qty(double product_qty, const Assays& assays);
 
