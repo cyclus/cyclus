@@ -3,6 +3,7 @@
 
 #include "MassTable.h"
 #include "CycException.h"
+#include "CycLimits.h"
 
 #include <sstream>
 #include <cmath> // std::abs
@@ -79,7 +80,7 @@ bool CompMap::operator==(const CompMap& rhs) const {
       return false;
     }
     double val = rhs.massFraction(it->first) - massFraction(it->first); 
-    if (abs(val) > EPS_FRACTION) {
+    if (abs(val) > cyclus::eps()) {
       return false;
     }
   }
@@ -115,7 +116,6 @@ int CompMap::ID() const {
 double CompMap::massFraction(const Iso& tope) const {
   if (count(tope) == 0) {
     return 0.0;
-    //throw CycIndexException("This composition has no Iso: " + tope);
   }
   double factor = 1.0;
   if (basis_ != MASS) {
@@ -128,7 +128,6 @@ double CompMap::massFraction(const Iso& tope) const {
 double CompMap::atomFraction(const Iso& tope) const {
   if (count(tope) == 0) {
     return 0.0;
-    //throw CycIndexException("This composition has no Iso: " + tope);
   }
   double factor = 1.0;
   if (basis_ != ATOM) {

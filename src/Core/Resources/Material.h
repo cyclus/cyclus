@@ -12,11 +12,6 @@
 #include "Resource.h"
 #include "IsoVector.h"
 
-/* -- Defines -- */
-#define EPS_KG 1e-6
-#define WF_U235 0.007200 // feed, natural uranium 
-/* -- */
-
 /* -- Typedefs -- */
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;

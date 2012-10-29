@@ -12,10 +12,6 @@
 #include <boost/enable_shared_from_this.hpp>
 /* -- */
 
-/* -- Defines -- */
-#define EPS_FRACTION 1e-8
-/* -- */
-
 /* -- Typedefs -- */
 /**
    Isotope integer, ZZZAAA
@@ -179,7 +175,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
 
   /**
      returns true if both comp maps have the same isotopic entries
-     and the difference in each value is less than EPS_PERCENT
+     and the difference in each value is less than cyclus::eps()
    */
   bool operator==(const CompMap& other) const;
 
