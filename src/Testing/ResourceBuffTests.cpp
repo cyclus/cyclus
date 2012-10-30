@@ -231,7 +231,7 @@ TEST_F(ResourceBuffTest, RemoveQty_SplitOverFilled) {
   ASSERT_NO_THROW(manifest = filled_store_.popQty(over_qty));
   ASSERT_EQ(manifest.size(), 2);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_NEAR(manifest.at(1)->quantity(), overeps, STORE_EPS); // not sure why DOUBLE_EQ doesn't work
+  EXPECT_NEAR(manifest.at(1)->quantity(), overeps, cyclus::eps_rsrc()); // not sure why DOUBLE_EQ doesn't work
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(manifest.at(1), mat2_);
   EXPECT_EQ(filled_store_.count(), 1);

@@ -1,5 +1,5 @@
 // ResourceBuff.cpp
-
+#include "CycLimits.h"
 #include "ResourceBuff.h"
 
 
@@ -22,7 +22,7 @@ double ResourceBuff::capacity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::setCapacity(double cap) {
-  if (quantity() - cap > STORE_EPS) {
+  if (quantity() - cap > cyclus::eps_rsrc()) {
     throw CycOverCapException("New capacity lower than existing quantity");
   }
   unlimited_ = false;
@@ -69,10 +69,10 @@ void ResourceBuff::makeLimited(double cap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::popQty(double qty) {
-  if (qty - quantity() > STORE_EPS) {
+  if (qty - quantity() > cyclus::eps_rsrc()) {
     throw CycNegQtyException("Removal quantity larger than store tot quantity.");
   }
-  if (qty < STORE_EPS) {
+  if (qty < cyclus::eps_rsrc()) {
     throw CycNegQtyException("Removal quantity cannot be negative.");
   }
 
@@ -80,11 +80,11 @@ Manifest ResourceBuff::popQty(double qty) {
   rsrc_ptr mat, leftover;
   double left = qty;
   double quan;
-  while (left > STORE_EPS) {
+  while (left > cyclus::eps_rsrc()) {
     mat = mats_.front();
     mats_.pop_front();
     quan = mat->quantity();
-    if ((quan - left) > STORE_EPS) {
+    if ((quan - left) > cyclus::eps_rsrc()) {
       // too big - split the mat before pushing
       leftover = mat->clone();
       leftover->setQuantity(quan - left);
@@ -123,7 +123,7 @@ rsrc_ptr ResourceBuff::popOne() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::pushOne(rsrc_ptr mat) {
-  if (mat->quantity() - space() > STORE_EPS && unlimited_ != true) {
+  if (mat->quantity() - space() > cyclus::eps_rsrc() && unlimited_ != true) {
     throw CycOverCapException("Material pushing of breaks capacity limit.");
   }
   std::list<rsrc_ptr>::iterator iter;
@@ -141,7 +141,7 @@ void ResourceBuff::pushAll(Manifest mats) {
   for (int i = 0; i < mats.size(); i++) {
     tot_qty += mats.at(i)->quantity();
   }
-  if (tot_qty - space() > STORE_EPS && unlimited_ != true) {
+  if (tot_qty - space() > cyclus::eps_rsrc() && unlimited_ != true) {
     throw CycOverCapException("Material pushing breaks capacity limit.");
   }
   std::list<rsrc_ptr>::iterator iter;

@@ -9,8 +9,6 @@
 #include <vector>
 #include <string>
 
-#define STORE_EPS 1e-6
-
 class CycOverCapException: public CycException {
     public: CycOverCapException(std::string msg) : CycException(msg) {};
 };
@@ -51,7 +49,7 @@ public:
   setCapacity sets the maximum quantity this store can hold (units based
   on constituent resource objects' units).
 
-  @throws CycOverCapException the new capacity is lower (by STORE_EPS) than the
+  @throws CycOverCapException the new capacity is lower (by cyclus::eps_rsrc()) than the
   quantity of resources that already exist in the store.
   */
   void setCapacity(double cap);
@@ -85,7 +83,7 @@ public:
   /*!
   makeLimited sets the store's capacity finite and sets it to the specified value.
 
-  @throws CycOverCapException the new capacity is lower (by STORE_EPS) than the
+  @throws CycOverCapException the new capacity is lower (by cyclus::eps_rsrc()) than the
   quantity of resources that already exist in the store.
   */
   void makeLimited(double cap);
@@ -95,11 +93,11 @@ public:
   store.
 
   Resources are split if necessary in order to pop the exact quantity
-  specified (within STORE_EPS).  Resources are retrieved in the order they were
+  specified (within cyclus::eps_rsrc()).  Resources are retrieved in the order they were
   pushed (i.e. oldest first).
 
   @throws CycNegQtyException the specified pop quantity is larger (by
-  STORE_EPS) than the store's current quantity.
+  cyclus::eps_rsrc()) than the store's current quantity.
   */
   std::vector<rsrc_ptr> popQty(double qty);
 

@@ -42,6 +42,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/LMatrix.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
@@ -66,8 +67,10 @@ INSTALL(FILES
   CommodityProducer.h
   CommodityProducerManager.h
   CycException.h
+  CycLimits.h
   Database.h
   DecayHandler.h
+  Enrichment.h
   Env.h
   IntrusiveBase.h
   LMatrix.h

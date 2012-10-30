@@ -9,10 +9,6 @@
 class Resource;
 typedef boost::intrusive_ptr<Resource> rsrc_ptr;
 
-/* -- Defines -- */
-#define EPS_RSRC 1e-6
-/* -- */
-
 /**
    A list of concrete types of resource
 */
