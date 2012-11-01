@@ -318,15 +318,11 @@ void Material::decay() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decayMaterials(int time) {
-  // if decay is on
   if (decay_wanted_) {
-    // and if (time(mod interval)==0)
     if (time % decay_interval_ == 0) {
-      // acquire a list of all materials
       for (vector<mat_rsrc_ptr>::iterator mat = materials_.begin();
           mat != materials_.end();
           mat++){
-         // and decay each of them
          (*mat)->decay();
       }
     }

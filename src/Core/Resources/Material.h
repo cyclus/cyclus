@@ -233,9 +233,11 @@ public:
   virtual mat_rsrc_ptr extract(double mass);
 
   /**
-     Decays this Material object for however 
-     many months have passed since the 
-     last entry in the material history. 
+     Decays this Material object for the amount of time that has passed since
+     decay was last called.
+
+     Calling decay effectively updates the material decay to the current
+     simulation time-step.
    */
   void decay();
 
@@ -256,9 +258,12 @@ public:
   static void decayMaterials(int time);
   
   /**
-     sets the decay boolean and the interval 
+     Sets the global material-decay interval
+
+     @param interval the number of months between decays.  interval <= 0
+     implies no simulation-wide decay.
    */
-  static void setDecay(int dec);
+  static void setDecay(int interval);
 
   /**
      returns true if the resource pointer points to a material resource
