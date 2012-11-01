@@ -26,7 +26,19 @@ bool Material::type_is_recorded_ = false;
 Material::Material() {
   last_update_time_ = TI->time();
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
+  materials_.push_back(this);
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::~Material() {
+  vector<mat_rsrc_ptr>::iterator it;
+  for (it = materials_.begin(); it != materials_.end(); it++) {
+    if (*it = this) {
+      materials_.erase(it);
+      break;
+    }
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMapPtr comp) {

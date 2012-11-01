@@ -92,7 +92,7 @@ public:
   /**
      default destructor 
    */
-  ~Material() {};
+  ~Material();
 
   /**
      standard verbose printer includes both an 
