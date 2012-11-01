@@ -134,7 +134,7 @@ void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::recordRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f) {
+void RecipeLibrary::recordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f) {
   addDecayTime(parent,t_f);
   addChild(parent,child,t_f);
   recordRecipe(child);
@@ -165,7 +165,7 @@ void RecipeLibrary::checkDecayable(CompMapPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::checkChild(CompMapPtr parent, double time) {
+void RecipeLibrary::checkChild(CompMapPtr parent, int time) {
   if (!childRecorded(parent,time)) {
     stringstream err;
     err << "RecipeLibrary has not recorded a decayed recipe for the parent " 
@@ -176,7 +176,7 @@ void RecipeLibrary::checkChild(CompMapPtr parent, double time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::addDecayTime(CompMapPtr parent, double time) {
+void RecipeLibrary::addDecayTime(CompMapPtr parent, int time) {
   checkDecayable(parent);
   decayTimes(parent).insert(time);
 }
@@ -194,19 +194,19 @@ ChildMap& RecipeLibrary::Children(CompMapPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMapPtr& RecipeLibrary::Child(CompMapPtr parent, double time) {
+CompMapPtr& RecipeLibrary::Child(CompMapPtr parent, int time) {
   checkChild(parent,time);
   return Children(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::childRecorded(CompMapPtr parent, double time) {
+bool RecipeLibrary::childRecorded(CompMapPtr parent, int time) {
   int count = Children(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::addChild(CompMapPtr parent, CompMapPtr child, double time) {
+void RecipeLibrary::addChild(CompMapPtr parent, CompMapPtr child, int time) {
   child->parent_ = parent;
   child->decay_time_ = time;
   Child(parent,time) = child; // child is copied

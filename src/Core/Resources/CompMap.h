@@ -258,7 +258,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      returns the time decayed between this CompMap and its parent
    */
-  double decay_time() const;
+  int decay_time() const;
 
   /**
      returns a shared pointer to this composition
@@ -276,7 +276,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      the root composition
      @return the total decay time between this CompMap and its root comp
    */
-  double root_decay_time();
+  int root_decay_time();
   
   /**
      calls validateEntry() on each entry in the map
@@ -356,7 +356,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      the overall elapsed decay time between this CompMap and its parent
    */
-  double decay_time_;
+  int decay_time_;
 
   /**
      a shared pointer to the decay parent of this CompMap, if one exists

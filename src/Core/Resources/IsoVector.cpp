@@ -214,7 +214,7 @@ void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::decay(double time) {
+void IsoVector::decay(int time) {
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
   bool root_recorded = root->recorded();
@@ -247,9 +247,8 @@ void IsoVector::setComp(CompMapPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMapPtr IsoVector::executeDecay(CompMapPtr parent, double time) {
-  double months_per_year = 12;
-  double years = time / months_per_year;
+CompMapPtr IsoVector::executeDecay(CompMapPtr parent, int time) {
+  double years = double(time) / 12.0;
   DecayHandler handler;
   parent->atomify();
   handler.setComp(parent); // handler will not change parent's map
