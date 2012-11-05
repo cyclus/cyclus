@@ -150,26 +150,25 @@ void InstModel::handleTick(int time) {
 
 void InstModel::handleTock(int time) {
   // tell all of the institution's child models to handle the tock
-  int currsize = children_.size();
-  int i = 0;
-  while (i < children_.size()) {
+  vector<FacilityModel*> children_to_decomm;
+
+  for (int i = 0; i < children_.size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
     child->handleTock(time);
-
+    
     if ( child->lifetimeReached() ) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
-      if (child->checkDecommissionCondition())
-        {
-          registerCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
-          child->decommission();
-        }
+      if (child->checkDecommissionCondition()) {
+        children_to_decomm.push_back(child);
+      }
     }
-
-    // increment not needed if a facility deleted itself
-    if (children_.size() == currsize) {
-      i++;
-    }
-    currsize = children_.size();
+  }
+  
+  while(!children_to_decomm.empty()) {
+    FacilityModel* child = children_to_decomm.back();
+    children_to_decomm.pop_back();
+    registerCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
+    child->decommission();
   }
 }
 

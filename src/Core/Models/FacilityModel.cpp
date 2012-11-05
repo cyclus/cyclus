@@ -159,7 +159,7 @@ bool FacilityModel::lifetimeReached() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::setBuildDate(int current_time) {
   build_date_ = current_time;
-  setDecommissionDate(build_date_ + fac_lifetime_);
+  setDecommissionDate(build_date_ + fac_lifetime_ - 1); // -1 because you want the decommission to occur on the previous time's tock
   CLOG(LEV_DEBUG3) << name() << " has set its time-related members: ";
   CLOG(LEV_DEBUG3) << " * lifetime: " << fac_lifetime_; 
   CLOG(LEV_DEBUG3) << " * build date: " << build_date_; 
