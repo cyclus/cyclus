@@ -100,7 +100,7 @@ class FacilityModel : public TimeAgent, public Communicator,
      Copy module members from a source model
      @param source the model to copy from
    */
-  virtual void cloneModuleMembersFrom(FacilityModel* source);
+  virtual void cloneModuleMembersFrom(FacilityModel* source)=0;
 
   /**
      every model should be able to print a verbose description 
@@ -249,7 +249,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time);
+  virtual void handleTick(int time)=0;
 
   /**
      Each facility is prompted to its end-of-time-step 
@@ -260,7 +260,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time);
+  virtual void handleTock(int time)=0;
 
   /**
      Each facility is prompted to do its daily tasks 
