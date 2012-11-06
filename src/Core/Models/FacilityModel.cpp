@@ -168,9 +168,8 @@ void FacilityModel::setBuildDate(int current_time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::setDecommissionDate(int time) {
-  double current_time = TI->time();
-  double final_time = TI->finalTime();
-  if (time + current_time < final_time)
+  double final_time = TI->finalTime();  
+  if (time < final_time)
     {
       decommission_date_ = time;
     }
@@ -178,4 +177,8 @@ void FacilityModel::setDecommissionDate(int time) {
     {
       decommission_date_ = final_time;
     }
+  CLOG(LEV_DEBUG3) << name() << " is setting its decommission date: ";
+  CLOG(LEV_DEBUG3) << " * Set Time: " << time; 
+  CLOG(LEV_DEBUG3) << " * Final Time: " << final_time; 
+  CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
