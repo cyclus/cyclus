@@ -190,16 +190,20 @@ void Database::issueCommand(std::string cmd){
 void Database::writeRows(table_ptr t){
   if ( isOpen() ) {
     bool exists = tableExists(t);
+
     if (exists) {
+      this->issueCommand("BEGIN TRANSACTION;");
+
       // write each row in the Table's row commands
       int nRows = t->nRows();
       for (int i = 0; i < nRows; i++){
-	string cmd_str = t->row_command(i)->str();
-	this->issueCommand(cmd_str);
+        string cmd_str = t->row_command(i)->str();
+        this->issueCommand(cmd_str);
 	LOG(LEV_DEBUG4,"db") << "Issued writeRows command to table: " 
 			     << t->name() << " with the command being " 
 			     << cmd_str;
       }
+      this->issueCommand("END TRANSACTION;");
     }
   }
 }
