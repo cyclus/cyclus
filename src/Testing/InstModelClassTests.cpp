@@ -50,7 +50,7 @@ class DieModel : public FacilityModel {
     totalTocks++;
     
     if (tockDie_) {
-      delete this;
+      setFacLifetime(time);
     }
   }
 
@@ -129,7 +129,7 @@ TEST_F(InstModelClassTests, TockIter) {
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
 
-  ASSERT_NO_THROW(inst_->handleTock(0));
+  ASSERT_NO_THROW(inst_->handleTock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
   EXPECT_EQ(child5_->tockCount_, 2);
