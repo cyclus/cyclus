@@ -34,6 +34,7 @@ class DieModel : public FacilityModel {
   // };
 
   virtual void receiveMessage(msg_ptr msg) { };
+  virtual void cloneModuleMembersFrom(FacilityModel* source){};
 
   virtual void handleTick(int time) {
     tickCount_++;

@@ -17,6 +17,9 @@ class TestFacility: public FacilityModel {
   
   Prototype* clone() { return new TestFacility(); }
 
+  void cloneModuleMembersFrom(FacilityModel* source) { }
+  void handleTick(int time) { };
+  void handleTock(int time) { };
 };
 
 #endif
