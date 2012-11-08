@@ -156,7 +156,7 @@ void InstModel::handleTock(int time) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
     child->handleTock(time);
     
-    if ( child->lifetimeReached() ) {
+    if ( child->lifetimeReached(time) ) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->checkDecommissionCondition()) {
         children_to_decomm.push_back(child);

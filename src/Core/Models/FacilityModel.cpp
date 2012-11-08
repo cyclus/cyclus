@@ -131,8 +131,8 @@ std::vector<std::string> FacilityModel::outputCommodities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool FacilityModel::lifetimeReached() {
-  return (TI->time() >= decommission_date_);
+bool FacilityModel::lifetimeReached(int time) {
+  return (time >= decommission_date_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
