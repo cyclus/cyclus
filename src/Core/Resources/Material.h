@@ -246,7 +246,7 @@ public:
 
      @return a copy of the isovector
    */
-  IsoVector isoVector() {return iso_vector_;}
+  virtual IsoVector& isoVector() {return iso_vector_;}
 
   /**
      Decays all of the materials if decay is on 

@@ -311,7 +311,7 @@ void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
   
-  iso_vector_.decay((double)delta_time);
+  isoVector().decay(delta_time);
 
   last_update_time_ = curr_time;
 }
