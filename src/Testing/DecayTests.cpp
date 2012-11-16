@@ -2,12 +2,6 @@
 #include <gtest/gtest.h>
 #include "Material.h"
 #include "Timer.h"
-#include "CycException.h"
-
-class DecayTest : public ::testing::Test {
- protected:
-  virtual void SetUp() { }
-};
 
 class SubMaterial : public Material {
   public:
@@ -19,7 +13,7 @@ class SubMaterial : public Material {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DecayTest, GlobalFreq) {
+TEST(DecayTest, GlobalFreq) {
   SubMaterial mat;
 
   int decay_interval = 3;
@@ -39,7 +33,7 @@ TEST_F(DecayTest, GlobalFreq) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(DecayTest, MaterialDeltaTracking) {
+TEST(DecayTest, MaterialDeltaTracking) {
   int times[5] = {0, 19, 30, 37, 49};
 
   TI->initialize(times[0], 1, 2010, 0, 0);
