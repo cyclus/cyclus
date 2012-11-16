@@ -168,8 +168,14 @@ Timer* Timer::Instance() {
   return instance_;
 }
 
+void Timer::reset() {
+  resolve_listeners_.clear();
+  tick_listeners_.clear();
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
+  reset();
 
   if (m0 < 1 || m0 > 12)
     throw CycRangeException("Invalid month0; must be between 1 and 12 (inclusive).");

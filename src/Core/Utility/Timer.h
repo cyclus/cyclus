@@ -105,6 +105,9 @@ class Timer {
    */
   void sendDailyTasks();
 
+  /// reset all data (registered listeners, etc.) to empty or initial state
+  void reset();
+
 protected:
   /**
      Constructs a new Timer for this simulation. 

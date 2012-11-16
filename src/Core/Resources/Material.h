@@ -6,6 +6,7 @@
 #include <utility>
 #include <math.h>
 #include <vector>
+#include <list>
 #include <string>
 
 #include "UseMatrixLib.h"
@@ -239,14 +240,14 @@ public:
      Calling decay effectively updates the material decay to the current
      simulation time-step.
    */
-  void decay();
+  virtual void decay();
 
   /**
      Returns a copy of this material's isotopic composition 
 
      @return a copy of the isovector
    */
-  virtual IsoVector& isoVector() {return iso_vector_;}
+  IsoVector& isoVector() {return iso_vector_;}
 
   /**
      Decays all of the materials if decay is on 
@@ -306,7 +307,7 @@ private:
   /**
      list of materials 
    */
-  static std::vector<mat_rsrc_ptr> materials_;
+  static std::list<Material*> materials_;
 
   /**
      true if decay should occur, false if not. 

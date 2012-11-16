@@ -7,11 +7,12 @@
 
 #include <cmath>
 #include <vector>
+#include <list>
 
 using namespace std;
 using namespace boost;
 
-vector<mat_rsrc_ptr> Material::materials_;
+list<Material*> Material::materials_;
 
 bool Material::decay_wanted_ = false;
 
@@ -31,13 +32,7 @@ Material::Material() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::~Material() {
-  vector<mat_rsrc_ptr>::iterator it;
-  for (it = materials_.begin(); it != materials_.end(); it++) {
-    if (*it = this) {
-      materials_.erase(it);
-      break;
-    }
-  }
+  materials_.remove(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -310,17 +305,16 @@ bool Material::checkQuality(rsrc_ptr other){
 void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
-  
-  isoVector().decay(delta_time);
 
+  isoVector().decay(delta_time);
   last_update_time_ = curr_time;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decayMaterials(int time) {
   if (decay_wanted_) {
-    if (time % decay_interval_ == 0) {
-      for (vector<mat_rsrc_ptr>::iterator mat = materials_.begin();
+    if (time > 0 && time % decay_interval_ == 0) {
+      for (list<Material*>::iterator mat = materials_.begin();
           mat != materials_.end();
           mat++){
          (*mat)->decay();
