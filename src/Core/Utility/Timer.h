@@ -40,6 +40,9 @@ class Timer {
      The duration of this simulation, in months. 
    */
   int simDur_;
+
+  /// time steps between automated global material decay driving
+  int decay_interval_;
     
   /**
      The start date of the simulation 
@@ -104,6 +107,9 @@ class Timer {
      sends a notification to Tick listeners that a day has passed 
    */
   void sendDailyTasks();
+
+  /// reset all data (registered listeners, etc.) to empty or initial state
+  void reset();
 
 protected:
   /**

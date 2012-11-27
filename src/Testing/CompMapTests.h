@@ -33,7 +33,7 @@ class CompMapTests : public ::testing::Test {
 
   boost::shared_ptr<TestCompMap> child, parent;
   CompMapPtr root;
-  double t1, t2, root_decay_time;
+  int t1, t2, root_decay_time;
 
  public:
   virtual void SetUp() { 
@@ -67,8 +67,8 @@ class CompMapTests : public ::testing::Test {
   }
 
   void LoadLineage() {
-    t1 = 1.5;
-    t2 = 1000.71;
+    t1 = 3;
+    t2 = 1001;
     // root
     root_decay_time = t1+t2;
     root = CompMapPtr(new CompMap(basis_));

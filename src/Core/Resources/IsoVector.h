@@ -212,7 +212,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
-  void decay(double time);
+  virtual void decay(int time);
   /* --- */
   
  private:
@@ -240,7 +240,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
-  static CompMapPtr executeDecay(CompMapPtr parent, double time);
+  static CompMapPtr executeDecay(CompMapPtr parent, int time);
   /* --- */
 };
 
