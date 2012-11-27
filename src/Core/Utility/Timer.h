@@ -40,6 +40,9 @@ class Timer {
      The duration of this simulation, in months. 
    */
   int simDur_;
+
+  /// time steps between automated global material decay driving
+  int decay_interval_;
     
   /**
      The start date of the simulation 

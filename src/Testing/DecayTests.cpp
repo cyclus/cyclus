@@ -14,6 +14,10 @@ class SubMaterial : public Material {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST(DecayTest, GlobalFreq) {
+  // all materials are automatically added to a global static list via their
+  // constructor. The submaterial object tracks decay invocations and the
+  // submaterial object is then checked for appropriate # decay invocations and
+  // intervals between them.
   SubMaterial mat;
 
   int decay_interval = 3;
@@ -34,6 +38,10 @@ TEST(DecayTest, GlobalFreq) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST(DecayTest, MaterialDeltaTracking) {
+  // Simulation pauses are simulated by doing a runSim repeatedly with
+  // different sim durations. At each pause, we decay a material and check to
+  // see that the appropriate decay interval is propogated down to the CompMap
+  // object.
   int times[5] = {0, 19, 30, 37, 49};
 
   TI->initialize(times[0], 1, 2010, 0, 0);

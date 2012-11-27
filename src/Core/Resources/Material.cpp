@@ -311,25 +311,11 @@ void Material::decay() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::decayMaterials(int time) {
-  if (decay_wanted_) {
-    if (time > 0 && time % decay_interval_ == 0) {
-      for (list<Material*>::iterator mat = materials_.begin();
-          mat != materials_.end();
-          mat++){
-         (*mat)->decay();
-      }
-    }
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::setDecay(int dec) {
-  if ( dec <= 0 ) {
-    decay_wanted_ = false;
-  } else if ( dec > 0 ) {
-    decay_wanted_ = true;
-    decay_interval_ = dec;
+void Material::decayMaterials() {
+  for (list<Material*>::iterator mat = materials_.begin();
+      mat != materials_.end();
+      mat++){
+     (*mat)->decay();
   }
 }
 

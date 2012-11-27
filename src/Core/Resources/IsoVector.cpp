@@ -246,7 +246,8 @@ void IsoVector::setComp(CompMapPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMapPtr IsoVector::executeDecay(CompMapPtr parent, int time) {
-  double years = double(time) / 12.0;
+  double months_per_year = 12;
+  double years = double(time) / months_per_year;
   DecayHandler handler;
   parent->atomify();
   handler.setComp(parent); // handler will not change parent's map

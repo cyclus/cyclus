@@ -253,18 +253,8 @@ public:
      Decays all of the materials if decay is on 
       
      @todo should be private (khuff/rcarlsen) 
-      
-     @param time is the simulation time of the tick 
    */
-  static void decayMaterials(int time);
-  
-  /**
-     Sets the global material-decay interval
-
-     @param interval the number of months between decays.  interval <= 0
-     implies no simulation-wide decay.
-   */
-  static void setDecay(int interval);
+  static void decayMaterials();
 
   /**
      returns true if the resource pointer points to a material resource
