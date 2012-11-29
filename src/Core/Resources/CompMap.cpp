@@ -142,7 +142,7 @@ CompMapPtr CompMap::parent() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CompMap::decay_time() const {
+int CompMap::decay_time() const {
   return decay_time_;
 }
 
@@ -171,9 +171,9 @@ CompMapPtr CompMap::root_comp() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double CompMap::root_decay_time() {
+int CompMap::root_decay_time() {
   CompMapPtr child = me();
-  double time = decay_time();
+  int time = decay_time();
   while (child->parent()) {
     child = child->parent();
     time += child->decay_time();

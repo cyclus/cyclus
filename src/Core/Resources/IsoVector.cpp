@@ -214,27 +214,25 @@ void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::decay(double time) {
+void IsoVector::decay(int time) {
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
-  bool root_recorded = root->recorded();
-  Basis orig_basis = parent->basis();
   CompMapPtr child;
-  if (root_recorded) { 
+
+  if (root->recorded()) { 
     int t_f = parent->root_decay_time() + time;
-    bool child_recorded = RL->childRecorded(parent,t_f);
-    if (child_recorded) {
-      child = RL->Child(parent,t_f);
+    if (RL->childRecorded(parent, t_f)) {
+      child = RL->Child(parent, t_f);
     }
     else {
-      child = executeDecay(parent,time); // do decay and record it
-      RL->recordRecipeDecay(parent,child,t_f);
+      child = executeDecay(parent, time); // do decay and record it
+      RL->recordRecipeDecay(parent, child, t_f);
     }
   }
   else {
-    child = executeDecay(parent,time); // just do decay
+    child = executeDecay(parent, time); // just do decay
   }
-  child->change_basis(orig_basis);
+  child->change_basis(parent->basis());
   setComp(child);
 }
 
@@ -247,9 +245,9 @@ void IsoVector::setComp(CompMapPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMapPtr IsoVector::executeDecay(CompMapPtr parent, double time) {
+CompMapPtr IsoVector::executeDecay(CompMapPtr parent, int time) {
   double months_per_year = 12;
-  double years = time / months_per_year;
+  double years = double(time) / months_per_year;
   DecayHandler handler;
   parent->atomify();
   handler.setComp(parent); // handler will not change parent's map
