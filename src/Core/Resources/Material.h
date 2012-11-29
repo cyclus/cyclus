@@ -6,6 +6,7 @@
 #include <utility>
 #include <math.h>
 #include <vector>
+#include <list>
 #include <string>
 
 #include "UseMatrixLib.h"
@@ -92,7 +93,7 @@ public:
   /**
      default destructor 
    */
-  ~Material() {};
+  ~Material();
 
   /**
      standard verbose printer includes both an 
@@ -233,32 +234,27 @@ public:
   virtual mat_rsrc_ptr extract(double mass);
 
   /**
-     Decays this Material object for however 
-     many months have passed since the 
-     last entry in the material history. 
+     Decays this Material object for the amount of time that has passed since
+     decay was last called.
+
+     Calling decay effectively updates the material decay to the current
+     simulation time-step.
    */
-  void decay();
+  virtual void decay();
 
   /**
      Returns a copy of this material's isotopic composition 
 
      @return a copy of the isovector
    */
-  IsoVector isoVector() {return iso_vector_;}
+  IsoVector& isoVector() {return iso_vector_;}
 
   /**
      Decays all of the materials if decay is on 
       
      @todo should be private (khuff/rcarlsen) 
-      
-     @param time is the simulation time of the tick 
    */
-  static void decayMaterials(int time);
-  
-  /**
-     sets the decay boolean and the interval 
-   */
-  static void setDecay(int dec);
+  static void decayMaterials();
 
   /**
      returns true if the resource pointer points to a material resource
@@ -301,7 +297,7 @@ private:
   /**
      list of materials 
    */
-  static std::vector<mat_rsrc_ptr> materials_;
+  static std::list<Material*> materials_;
 
   /**
      true if decay should occur, false if not. 

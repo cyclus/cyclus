@@ -19,7 +19,7 @@ typedef std::map<std::string,CompMapPtr> RecipeMap;
 /**
    set of decay times
  */
-typedef std::set<double> decay_times;
+typedef std::set<int> decay_times;
 
 /**
    map of composition times decayed
@@ -29,7 +29,7 @@ typedef std::map<CompMapPtr,decay_times> DecayTimesMap;
 /**
    map of decay time to composition
  */
-typedef std::map<double,CompMapPtr> ChildMap; 
+typedef std::map<int,CompMapPtr> ChildMap; 
 
 /**
    map of recipe composition to its decayed children
@@ -106,7 +106,7 @@ class RecipeLibrary {
      @param child the child recipe
      @param t_f -> total time decayed from parent to child
    */
-  static void recordRecipeDecay(CompMapPtr parent, CompMapPtr child, double t_f);
+  static void recordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f);
   
   /**
      checks if the named recipe has been recorded (i.e. it exists in the simulation)
@@ -146,7 +146,7 @@ class RecipeLibrary {
      @param parent a pointer to the composition that might have a child
      @param time the time at which a child might exist for a parent
    */
-  static bool childRecorded(CompMapPtr parent, double time);
+  static bool childRecorded(CompMapPtr parent, int time);
 
  private:
   /**
@@ -162,7 +162,7 @@ class RecipeLibrary {
      @param parent the recipe with which a new decay_time should be associated
      @param time the time to be added to the keys of the decay_times_ map 
    */
-  static void addDecayTime(CompMapPtr parent, double time);
+  static void addDecayTime(CompMapPtr parent, int time);
 
   /**
      accesses a set of decay times that have been recorded (associated with this parent)
@@ -184,7 +184,7 @@ class RecipeLibrary {
      @param parent the recipe whose composition evolution is to be retrieved
      @param time the time at which the child recipe of interest is indexed 
    */
-  static CompMapPtr& Child(CompMapPtr parent, double time);
+  static CompMapPtr& Child(CompMapPtr parent, int time);
 
   /**
      add a child to a map of children
@@ -193,7 +193,7 @@ class RecipeLibrary {
      @param child the child recipe to be added to the evolution of the parent recipe 
      @param time the time at which the child recipe of interest is indexed 
    */
-  static void addChild(CompMapPtr parent, CompMapPtr child, double time);
+  static void addChild(CompMapPtr parent, CompMapPtr child, int time);
 
   /**
      calls recipeRecorded() and throws an error if false
@@ -215,7 +215,7 @@ class RecipeLibrary {
      @param parent the recipe whose composition record is to be queried
      @param time the time at which the child recipe of interest is indexed 
    */
-  static void checkChild(CompMapPtr parent, double time);
+  static void checkChild(CompMapPtr parent, int time);
 
   /**
      Stores the next available state ID 

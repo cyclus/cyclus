@@ -77,9 +77,9 @@ TEST_F(CompMapTests,massify) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,lineage) { 
   LoadLineage();
-  EXPECT_EQ(parent,child->parent());
-  EXPECT_EQ(root,child->root_comp());
-  EXPECT_EQ(root_decay_time,child->root_decay_time());
+  EXPECT_EQ(parent, child->parent());
+  EXPECT_EQ(root, child->root_comp());
+  EXPECT_EQ(root_decay_time, child->root_decay_time());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

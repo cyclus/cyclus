@@ -7,11 +7,12 @@
 
 #include <cmath>
 #include <vector>
+#include <list>
 
 using namespace std;
 using namespace boost;
 
-vector<mat_rsrc_ptr> Material::materials_;
+list<Material*> Material::materials_;
 
 bool Material::decay_wanted_ = false;
 
@@ -26,7 +27,13 @@ bool Material::type_is_recorded_ = false;
 Material::Material() {
   last_update_time_ = TI->time();
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
+  materials_.push_back(this);
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+Material::~Material() {
+  materials_.remove(this);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMapPtr comp) {
@@ -298,36 +305,17 @@ bool Material::checkQuality(rsrc_ptr other){
 void Material::decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
-  
-  iso_vector_.decay((double)delta_time);
 
+  isoVector().decay(delta_time);
   last_update_time_ = curr_time;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::decayMaterials(int time) {
-  // if decay is on
-  if (decay_wanted_) {
-    // and if (time(mod interval)==0)
-    if (time % decay_interval_ == 0) {
-      // acquire a list of all materials
-      for (vector<mat_rsrc_ptr>::iterator mat = materials_.begin();
-          mat != materials_.end();
-          mat++){
-         // and decay each of them
-         (*mat)->decay();
-      }
-    }
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::setDecay(int dec) {
-  if ( dec <= 0 ) {
-    decay_wanted_ = false;
-  } else if ( dec > 0 ) {
-    decay_wanted_ = true;
-    decay_interval_ = dec;
+void Material::decayMaterials() {
+  for (list<Material*>::iterator mat = materials_.begin();
+      mat != materials_.end();
+      mat++){
+     (*mat)->decay();
   }
 }
 
