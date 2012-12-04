@@ -35,6 +35,7 @@ class DieModel : public FacilityModel {
 
   virtual void receiveMessage(msg_ptr msg) { };
   virtual void cloneModuleMembersFrom(FacilityModel* source){};
+  virtual void decommission() { delete this; }
 
   virtual void handleTick(int time) {
     tickCount_++;
@@ -50,7 +51,8 @@ class DieModel : public FacilityModel {
     totalTocks++;
     
     if (tockDie_) {
-      delete this;
+      setFacLifetime(1);
+      setBuildDate(time);
     }
   }
 
@@ -119,6 +121,7 @@ TEST_F(InstModelClassTests, TickIter) {
 TEST_F(InstModelClassTests, TockIter) {
   child2_->tockDie_ = true;
 
+  EXPECT_EQ(inst_->nChildren(),5);
   ASSERT_NO_THROW(inst_->handleTock(0));
   EXPECT_EQ(DieModel::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
@@ -129,7 +132,8 @@ TEST_F(InstModelClassTests, TockIter) {
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
 
-  ASSERT_NO_THROW(inst_->handleTock(0));
+  EXPECT_EQ(inst_->nChildren(),4);
+  ASSERT_NO_THROW(inst_->handleTock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
   EXPECT_EQ(child5_->tockCount_, 2);

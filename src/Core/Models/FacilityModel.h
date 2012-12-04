@@ -238,10 +238,11 @@ class FacilityModel : public TimeAgent, public Communicator,
   std::vector<std::string> outputCommodities();
   
   /**
-     @return true if the current time is greater than the 
-     decommission date
+     @param time the time used to query whether it is past the 
+     facility's decommission date
+     @return true if the time is greater than the decommission date
    */
-  bool lifetimeReached();
+  bool lifetimeReached(int time);
 
   /**
      Each facility is prompted to do its beginning-of-time-step 

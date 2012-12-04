@@ -13,7 +13,7 @@
 #include "CycException.h"
 #include "Env.h"
 
-#define ROW_THRESHOLD 100000;
+#define ROW_THRESHOLD 1000;
 
 using namespace std;
 

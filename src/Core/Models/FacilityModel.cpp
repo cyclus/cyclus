@@ -131,14 +131,14 @@ std::vector<std::string> FacilityModel::outputCommodities() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool FacilityModel::lifetimeReached() {
-  return (TI->time() >= decommission_date_);
+bool FacilityModel::lifetimeReached(int time) {
+  return (time >= decommission_date_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::setBuildDate(int current_time) {
   build_date_ = current_time;
-  setDecommissionDate(build_date_ + fac_lifetime_);
+  setDecommissionDate(build_date_ + fac_lifetime_ - 1); // -1 because you want the decommission to occur on the previous time's tock
   CLOG(LEV_DEBUG3) << name() << " has set its time-related members: ";
   CLOG(LEV_DEBUG3) << " * lifetime: " << fac_lifetime_; 
   CLOG(LEV_DEBUG3) << " * build date: " << build_date_; 
@@ -147,9 +147,8 @@ void FacilityModel::setBuildDate(int current_time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::setDecommissionDate(int time) {
-  double current_time = TI->time();
-  double final_time = TI->finalTime();
-  if (time + current_time < final_time)
+  double final_time = TI->finalTime();  
+  if (time < final_time)
     {
       decommission_date_ = time;
     }
@@ -157,4 +156,8 @@ void FacilityModel::setDecommissionDate(int time) {
     {
       decommission_date_ = final_time;
     }
+  CLOG(LEV_DEBUG3) << name() << " is setting its decommission date: ";
+  CLOG(LEV_DEBUG3) << " * Set Time: " << time; 
+  CLOG(LEV_DEBUG3) << " * Final Time: " << final_time; 
+  CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
