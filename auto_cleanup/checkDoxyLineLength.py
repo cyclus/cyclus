@@ -62,7 +62,7 @@ for (path, dirs, files) in os.walk(start_path):
             if (ext == 'h'):
                 files_to_change.append(path+'/'+file)
 
-for file_name in files_to_change
+for file_name in files_to_change:
     fin = open(file_name,'r')
 
     # read all the lines
