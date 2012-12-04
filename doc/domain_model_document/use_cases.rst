@@ -241,7 +241,7 @@ Cyclus will enable the multi-regional investigation and analysis of:
    variations in available capital, technology capability, etc.
 ￼
 Disruption Studies
------------------------------
+------------------
 
 A user may want to study the ripple effect (or lack thereof) experienced by a 
 fuel cycle in the event of an unplanned facility shutdown or process disruption.
