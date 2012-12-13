@@ -63,7 +63,7 @@ Package                Minimum Version
 `libxml2`              2                 
 `sqlite3`              3.7.10            
 `Cyclopts`             0.1            
-`coin-Cbc`             2.7            
+`coin-Cbc`             2.5            
 ====================   ==================
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
