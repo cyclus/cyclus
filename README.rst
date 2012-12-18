@@ -9,9 +9,10 @@ develop innovative fuel cycle simulations.
 To see user and developer documentation for this code, please visit the `Cyclus Homepage`_.
 
 
-********
-LISCENSE
-********
+*******
+LICENSE
+*******
+
 ::
     Copyright (c) 2010-2012, University of Wisconsin Computational Nuclear Engineering Research Group
      All rights reserved.
@@ -48,7 +49,7 @@ Building Cyclus
 ***************
 
 The `Cyclus Homepage`_ has much more detailed guides and information.
-This Readme is intended to be a quick reference for building cyclus for the
+This Readme is intended to be a quick reference for building Cyclus for the
 first time.
 
 The Cyclus code requires the following software and libraries.
@@ -68,29 +69,29 @@ Building and Running Cyclus
 ===========================
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
-built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
+built using  `CMake <http://www.cmake.org>`_. This relies on CMake version
 2.8 or higher and the CMakeLists.txt file in `src/`. 
 
 We suggest separating the locations of the building and installation 
 process. In the example below, we assume the following directory 
 structure:
 
-* There is a master directory, .../cyclus, in which all cyclus-related
+* There is a master directory, .../cyclus, in which all Cyclus-related
 activities are housed.
 * There is an installation directory, .../cyclus/install, and all 
-cyclus-related libraries (i.e. cyclopts) are installed therein
-* There is a directory for the cyclus core repository, .../cyclus/cyclus
+Cyclus-related libraries (i.e. Cyclopts) are installed therein
+* There is a directory for the Cyclus core repository, .../cyclus/cyclus
 
-The cyclus core library depends on both coin and Cyclopts, which may
+The Cyclus core library depends on both coin and Cyclopts, which may
 be installed in non-standard locations. In order to aide the building
-of the cyclus core library, you can manually declare the locations of
-these two installed libraries via cmake command-line arguments:
+of the Cyclus core library, you can manually declare the locations of
+these two installed libraries via CMake command-line arguments:
 
 * COIN_ROOT_DIR for the coin library installation location
-* CYCLOPTS_ROOT_DIR for the cyclopts library installation location
+* CYCLOPTS_ROOT_DIR for the Cyclopts library installation location
 
 Assuming the above information, we now present an example of how to 
-build the cyclus core library. Note that this example will install 
+build the Cyclus core library. Note that this example will install 
 Cyclus in a non-standard location. ::
 
     .../cyclus/cyclus$ mkdir build install && cd build 
@@ -125,7 +126,7 @@ request to the blessed repository (usually the "develop" branch) only after:
   * (recommended) your code has been reviewed by another developer.
 
 Code from the "develop" branch generally must pass even more rigorous checks
-before being integrated into the "master" branch. Hotfixes would be a
+before being integrated into the "master" branch. Hot-fixes would be a
 possible exception to this.
 
 Workflow Notes
@@ -139,7 +140,7 @@ Workflow Notes
 
   * Keep your own "master" and "develop" branches in sync with the blessed repository's
     "master" and "develop" branches. The master branch should always be the 'stable'
-    or 'production' release of cyclus.
+    or 'production' release of Cyclus.
     
      - Pull the most recent history from the blessed repository "master"
        and/or "develop" branches before you merge changes into your
@@ -191,7 +192,7 @@ Workflow Notes
         
   * **Reviewing a Pull Request** 
 
-     - Build, install, and test it. If you have added the remmote repository as 
+     - Build, install, and test it. If you have added the remote repository as 
        a remote you can check it out and merge it with the current develop 
        branch thusly, ::
        
@@ -268,7 +269,7 @@ the repo, we will have two branches in our fork: "Master" and "Develop".
 Acquiring a Fork of the Cyclus Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A fork is *your* copy of Cyclus. Github offers an excelent 
+A fork is *your* copy of Cyclus. Github offers an excellent 
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
@@ -328,7 +329,7 @@ review and accept it.
 
 Sometimes, your pull request will be closed by the reviewer until further 
 changes are made to appease the reviewer's concerns. This may be frustrating, 
-but please act rationally, discuss the issues on the github space made for your 
+but please act rationally, discuss the issues on the GitHub space made for your 
 pull request, consult the `style guide <http://cyclus.github.com/devdoc/style_guide.html>`_, 
 email the developer listhost for further advice, and make changes to your topic branch 
 accordingly. The pull request will be updated with those changes when you push them 
