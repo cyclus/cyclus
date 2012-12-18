@@ -114,6 +114,7 @@ currently stands, we in fact depend on a small subset of the Boost
 libraries:
 
   #. libboost-program-options-dev
+  #. libboost-system-dev
   #. libboost-filesystem-dev
 
 However, it is possible (likely) that additional Boost libraries will
