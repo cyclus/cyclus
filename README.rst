@@ -1,6 +1,6 @@
-_______________________________________________________________________
+###########
 Cyclus Core
-_______________________________________________________________________
+###########
 
 The core of the Cyclus nuclear fuel cycle simulator from the University of 
 Wisconsin - Madison is intended to be a simulation framework upon which to 
@@ -9,12 +9,10 @@ develop innovative fuel cycle simulations.
 To see user and developer documentation for this code, please visit the `Cyclus Homepage`_.
 
 
------------------------------------------------------------------------
+********
 LISCENSE
------------------------------------------------------------------------
-
+********
 ::
-
     Copyright (c) 2010-2012, University of Wisconsin Computational Nuclear Engineering Research Group
      All rights reserved.
     
@@ -45,9 +43,9 @@ LISCENSE
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-------------------------------------------------------------------
+***************
 Building Cyclus
-------------------------------------------------------------------
+***************
 
 The `Cyclus Homepage`_ has much more detailed guides and information.
 This Readme is intended to be a quick reference for building cyclus for the
@@ -66,9 +64,8 @@ Package                Minimum Version
 `coin-Cbc`             2.7            
 ====================   ==================
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Building and Running Cyclus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===========================
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
 built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
@@ -107,9 +104,9 @@ you intend to develop for *Cyclus*, please visit it to learn more.
 .. _`Cyclus Homepage`: http://cyclus.github.com
 
 
---------------------------------------------------------------------------
+**********************
 The Developer Workflow
---------------------------------------------------------------------------
+**********************
 
 *Note that "blessed" repository refers to the primary `cyclus/core` repository.*
 
@@ -127,9 +124,8 @@ Code from the "develop" branch generally must pass even more rigorous checks
 before being integrated into the "master" branch. Hotfixes would be a
 possible exception to this.
 
-~~~~~~~~~~~~~~~~~~~
 Workflow Notes
-~~~~~~~~~~~~~~~~~~~
+==============
 
   * Use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
@@ -220,9 +216,8 @@ Workflow Notes
             git merge --no-ff remote_name/branch_name -m "A message""
 
 
-~~~~~~~~~~~~~~~~~~~
 Cautions
-~~~~~~~~~~~~~~~~~~~
+========
 
   * **NEVER** merge the "master" branch into the "develop"
     branch. Changes should only flow *to* the "master" branch *from* the
@@ -244,13 +239,12 @@ Cautions
       git pull [remote] [from-branch]
 
 
-~~~~~~~~~~~~~~~~~~~
 An Example
-~~~~~~~~~~~~~~~~~~~
+==========
 
 
 Introduction
-============
+------------
 
 As this type of workflow can be complicated to converts from SVN and very complicated
 for brand new programmers, an example is provided.
@@ -262,13 +256,13 @@ call this branch "Work". So, when all is said and done, in our fork there will b
 three branches: "Master", "Develop", and "Work".
 
 Acquiring Cyclus and Workflow
-=============================
+-----------------------------
 
 We begin with a fork of the main ("blessed") Cyclus repository. After initially forking
 the repo, we will have two branches in our fork: "Master" and "Develop".
 
 Acquiring a Fork of the Cyclus Repository
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A fork is *your* copy of Cyclus. Github offers an excelent 
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
@@ -290,7 +284,7 @@ fork's branches up to date (i.e., "push" your changes before you leave), only yo
 copies of your branches may be different when you next sit down at the other location.
 
 Workflow: The Beginning
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Now, for the workflow! This is by no means the only way to perform this type of workflow, 
 but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
@@ -319,7 +313,7 @@ We then follow the same process to update the work branch, except:
 #. we want to incorporate any changes which may have been introduced in the develop branch update.
 
 Workflow: The End
------------------
+^^^^^^^^^^^^^^^^^
 
 As time passes, you make some changes to files, and you commit those changes (to your *local work
 branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
