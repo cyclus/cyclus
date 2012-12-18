@@ -6,7 +6,7 @@ ENDIF(NOT DEFINED CYCLOPTS_ROOT_DIR)
 MESSAGE(STATUS "CYCLOPTS_ROOT_DIR hint is : ${CYCLOPTS_ROOT_DIR}")
 
 # if installed in a non-standard location,
-# a cmake variable CYCLOPTS_ROOT_DIR must be provided
+# the include directory must be added to the PATH variable
 FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/Variable.h
   HINTS "${CYCLOPTS_INCLUDE_DIR}"
   HINTS "${CYCLOPTS_ROOT_DIR}"
@@ -20,11 +20,13 @@ FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/Variable.h
   HINTS ${CYCLOPTS_HINT}/
 )
 
-# adjust for the cyclopts intermediary folder
-IF(CYCLOPTS_INCLUDE_DIR)
-  set(CYCLOPTS_INCLUDE_DIR ${CYCLOPTS_INCLUDE_DIR}/cyclopts)
-  #MESSAGE("\tCYCLOPTS Include Dir: ${CYCLOPTS_INCLUDE_DIR}")
-ENDIF(CYCLOPTS_INCLUDE_DIR)
+set(CYCLOPTS_INCLUDE_DIR ${CYCLOPTS_INCLUDE_DIR}/cyclopts)
+#MESSAGE("\tCYCLOPTS Include Dir: ${CYCLOPTS_INCLUDE_DIR}")
+
+FIND_LIBRARY(CYCLOPTS_LIBRARY
+  NAMES cyclopts libcyclopts
+  HINTS ${CYCLOPTS_INCLUDE_DIR}/../../lib
+)
 
 # let us know if we found it
 IF(CYCLOPTS_INCLUDE_DIR)
@@ -32,9 +34,3 @@ IF(CYCLOPTS_INCLUDE_DIR)
 ELSE(CYCLOPTS_INCLUDE_DIR)
   MESSAGE("\tCYCLOPTS Include Dir NOT FOUND")
 ENDIF(CYCLOPTS_INCLUDE_DIR)
-
-# find the library
-FIND_LIBRARY(CYCLOPTS_LIBRARY
-  NAMES cyclopts libcyclopts
-  HINTS ${CYCLOPTS_INCLUDE_DIR}/../../lib
-)

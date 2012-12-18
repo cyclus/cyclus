@@ -2,12 +2,12 @@
 Cyclus Core
 ###########
 
-The core of the Cyclus nuclear fuel cycle simulator from the University of 
-Wisconsin - Madison is intended to be a simulation framework upon which to 
-develop innovative fuel cycle simulations. 
+The core of the Cyclus nuclear fuel cycle simulator from the 
+University of Wisconsin - Madison is intended to be a simulation 
+framework upon which to develop innovative fuel cycle simulations. 
 
-To see user and developer documentation for this code, please visit the `Cyclus Homepage`_.
-
+To see user and developer documentation for this code, please visit 
+the `Cyclus Homepage`_.
 
 *******
 LICENSE
@@ -44,70 +44,136 @@ LICENSE
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-***************
-Building Cyclus
-***************
+******************************
+Building and Installing Cyclus
+******************************
 
-The `Cyclus Homepage`_ has much more detailed guides and information.
-This Readme is intended to be a quick reference for building Cyclus for the
-first time.
-
-The Cyclus code requires the following software and libraries.
+The Cyclus code requires the following software and libraries. In 
+order to facilitate future compatibility with multiple platforms, 
+Cyclus is built using `CMake <http://www.cmake.org>`_.
 
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
 `CMake`                2.8            
 `boost`                1.34.1
-`libxml2`              2                 
+`libxml2`              2
 `sqlite3`              3.7.10            
 `Cyclopts`             0.1            
-`coin-Cbc`             2.7            
 ====================   ==================
 
-Building and Running Cyclus
-===========================
+As with all software, the build/install can be broken into two steps:
 
-In order to facilitate future compatibility with multiple platforms, Cyclus is
-built using  `CMake <http://www.cmake.org>`_. This relies on CMake version
-2.8 or higher and the CMakeLists.txt file in `src/`. 
+  #. building and installing the dependencies
+  #. building and installing Cyclus
 
-We suggest separating the locations of the building and installation 
-process. In the example below, we assume the following directory 
-structure:
+Installing Dependencies
+=======================
 
-* There is a master directory, .../cyclus, in which all Cyclus-related
-activities are housed.
-* There is an installation directory, .../cyclus/install, and all 
-Cyclus-related libraries (i.e. Cyclopts) are installed therein
-* There is a directory for the Cyclus core repository, .../cyclus/cyclus
+This guide assumes that the user has access to a package manager, or
+have some other suitable method of automatically installing known
+libraries. This process was tested using a fresh install of Ubuntu
+12.10. 
 
-The Cyclus core library depends on both coin and Cyclopts, which may
-be installed in non-standard locations. In order to aide the building
-of the Cyclus core library, you can manually declare the locations of
-these two installed libraries via CMake command-line arguments:
+Cyclopts
+--------
 
-* COIN_ROOT_DIR for the coin library installation location
-* CYCLOPTS_ROOT_DIR for the Cyclopts library installation location
+Cyclopts is an optimization wrapper library used by Cyclus and is
+part of the general Cyclus software suite. Detailed build/install
+instructions are provided in the Cyclopts 
+`readme <https://github.com/cyclus/cyclopts>`_. We assume that the 
+user has successfully built and installed Cyclopts (and CMake) for 
+the following discussion. 
 
-Assuming the above information, we now present an example of how to 
-build the Cyclus core library. Note that this example will install 
-Cyclus in a non-standard location. ::
+All Others
+----------
 
-    .../cyclus/cyclus$ mkdir build install && cd build 
-    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCOIN_ROOT_DIR=/the/path/to/coin/install -DCYCLOPTS_ROOT_DIR=../../install
+All other dependencies are common libraries available through package
+managers. We provide an example using 
+`apt-get <http://linux.die.net/man/8/apt-get>`_. All required commands
+will take the form of:
+
+.. code-block:: bash
+
+  sudo apt-get install package
+
+Where you will replace "package" with the correct package name. The
+list of required package names are:
+
+  #. libboost-all-dev
+  #. libxml++2.6-dev
+  #. libsqlite3-dev
+
+So, for example, in order to install libxml++ on your system, you will
+type:
+
+.. code-block:: bash
+
+  sudo apt-get install libxml++2.6-dev
+
+Let us take a moment to note the Boost library depdency. As it 
+currently stands, we in fact depend on a subset of the Boost libraries:
+
+  #. libboost-program-options-dev
+  #. libboost-filesystem-dev
+
+However, it is possible (likely) that additional Boost libraries will
+be used as they are an industry standard. Accordingly, we suggest
+simply installing libboost-all-dev to limit any headaches due to 
+possible dependency additions in the future.
+
+Installing Cyclus
+=================
+
+
+Assuming you have the dependencies installed correctly, it's pretty
+straightforward to install Cyclus. We make the following assumptions
+in this guide:
+
+  #. you have acquired the Cyclus source code from the 
+     `repo <https://github.com/cyclus/cyclus>`_
+  #. there is some master directory in which you're placing all
+     Cyclus-related files called .../cyclus
+  #. you have placed the Cyclus repository in .../cyclus/cyclus
+  #. you have a directory named .../cyclus/install in which you plan
+     to install all Cyclus-related files
+  #. you have a directory named .../cyclus/cyclus/build in which 
+     you plan to encapsulate all build-related files (they get in the
+     way otherwise)
+  #. you have installed cyclopts using the CMAKE_INSTALL_PREFIX 
+     variable set to ../cyclus/install (see CYCLOPTS_ROOT_DIR 
+     discussion below)
+
+Under these assumptions **and** if you used a package manager to 
+install coin-Cbc (i.e. it's installed in a standard location), the
+Cycluss building and installation process will look like:
+
+.. code-block:: bash
+
+    .../cyclus/cyclus$ cd build
+    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCYCLOPTS_ROOT_DIR=../../install
     .../cyclus/cyclus/build$ make && make install
 
-Now, run it with some input file, for this example, call it `input.xml`::
+If you have installed coin-Cbc from source or otherwise have it 
+installed in a non-standard location, you should make use of the CMake
+COIN_ROOT_DIR variable. The otherwise identical process would look 
+like:
+
+.. code-block:: bash
+
+    .../cyclus/cyclus$ cd build
+    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCYCLOPTS_ROOT_DIR=../../install -DCOIN_ROOT_DIR=/the/path/to/coin/install
+    .../cyclus/cyclus/build$ make && make install
+
+Now, run it with some input file, for this example, call it 
+`input.xml`::
 
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
-The `Cyclus Homepage`_ has much more detailed guides and information.  If
-you intend to develop for *Cyclus*, please visit it to learn more.
-
+The `Cyclus Homepage`_ has much more detailed guides and information.
+If you intend to develop for *Cyclus*, please visit it to learn more.
 
 .. _`Cyclus Homepage`: http://cyclus.github.com
-
 
 **********************
 The Developer Workflow
