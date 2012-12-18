@@ -69,33 +69,37 @@ Building and Running Cyclus
 
 In order to facilitate future compatibility with multiple platforms, Cyclus is
 built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
-2.8 or higher and the CMakeLists.txt file in `src/`. It is
-recommended that you use CMake to build the Cyclus executable external to the
-source code. To do this, execute the following steps::
+2.8 or higher and the CMakeLists.txt file in `src/`. 
 
-    .../core/$ mkdir build
-    .../core/$ cd build
-    .../core/build$ cmake ../src
+We suggest separating the locations of the building and installation 
+process. In the example below, we assume the following directory 
+structure:
 
-You should see output like this::
+* There is a master directory, .../cyclus, in which all cyclus-related
+activities are housed.
+* There is an installation directory, .../cyclus/install, and all 
+cyclus-related libraries (i.e. cyclopts) are installed therein
+* There is a directory for the cyclus core repository, .../cyclus/cyclus
 
-    ...
-    ...
-    >> -- Configuring done
-    >> -- Generating done
-    >> -- Build files have been written to: .../core/build
-    /core/build$ make cyclus
-    >> Scanning dependencies of target cyclus
-    ...
-    ...
-    >> [100%] Building CXX object CMakeFiles/cyclus.dir/SourceFac.cpp.o
-    >> Linking CXX executable cyclus
-    >> [100%] Built target cyclus
+The cyclus core library depends on both coin and Cyclopts, which may
+be installed in non-standard locations. In order to aide the building
+of the cyclus core library, you can manually declare the locations of
+these two installed libraries via cmake command-line arguments:
 
-Now, you can make cyclus, and run it with some input file, for this example, call it `input.xml`::
+* COIN_ROOT_DIR for the coin library installation location
+* CYCLOPTS_ROOT_DIR for the cyclopts library installation location
 
-    .../core/build$ make
-    .../core/build$ ./cyclus input.xml
+Assuming the above information, we now present an example of how to 
+build the cyclus core library. Note that this example will install 
+Cyclus in a non-standard location. ::
+
+    .../cyclus/cyclus$ mkdir build install && cd build 
+    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCOIN_ROOT_DIR=/the/path/to/coin/install -DCYCLOPTS_ROOT_DIR=../../install
+    .../cyclus/cyclus/build$ make && make install
+
+Now, run it with some input file, for this example, call it `input.xml`::
+
+    .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
 The `Cyclus Homepage`_ has much more detailed guides and information.  If
 you intend to develop for *Cyclus*, please visit it to learn more.
