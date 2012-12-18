@@ -48,9 +48,9 @@ LICENSE
 Building and Installing Cyclus
 ******************************
 
-The Cyclus code requires the following software and libraries. In 
-order to facilitate future compatibility with multiple platforms, 
-Cyclus is built using `CMake <http://www.cmake.org>`_.
+In order to facilitate future compatibility with multiple platforms, 
+Cyclus is built using `CMake`_. A full list of the Cyclus package 
+dependencies is show below:
 
 ====================   ==================
 Package                Minimum Version   
@@ -70,18 +70,17 @@ As with all software, the build/install can be broken into two steps:
 Installing Dependencies
 =======================
 
-This guide assumes that the user has access to a package manager, or
-have some other suitable method of automatically installing known
-libraries. This process was tested using a fresh install of Ubuntu
-12.10. 
+This guide assumes that the user has root access (to issue sudo 
+commands) and access to a package manager or has some other suitable 
+method of automatically installing established libraries. This process
+was tested using a fresh install of Ubuntu 12.10. 
 
 Cyclopts
 --------
 
 Cyclopts is an optimization wrapper library used by Cyclus and is
 part of the general Cyclus software suite. Detailed build/install
-instructions are provided in the Cyclopts 
-`readme <https://github.com/cyclus/cyclopts>`_. We assume that the 
+instructions are provided in the `Cyclopts readme`_. We assume that the 
 user has successfully built and installed Cyclopts (and CMake) for 
 the following discussion. 
 
@@ -89,9 +88,8 @@ All Others
 ----------
 
 All other dependencies are common libraries available through package
-managers. We provide an example using 
-`apt-get <http://linux.die.net/man/8/apt-get>`_. All required commands
-will take the form of:
+managers. We provide an example using `apt-get`_. All required 
+commands will take the form of:
 
 .. code-block:: bash
 
@@ -111,42 +109,40 @@ type:
 
   sudo apt-get install libxml++2.6-dev
 
-Let us take a moment to note the Boost library depdency. As it 
-currently stands, we in fact depend on a subset of the Boost libraries:
+Let us take a moment to note the Boost library dependency. As it 
+currently stands, we in fact depend on a small subset of the Boost 
+libraries:
 
   #. libboost-program-options-dev
   #. libboost-filesystem-dev
 
 However, it is possible (likely) that additional Boost libraries will
-be used as they are an industry standard. Accordingly, we suggest
+be used because they are an industry standard. Accordingly, we suggest
 simply installing libboost-all-dev to limit any headaches due to 
 possible dependency additions in the future.
 
 Installing Cyclus
 =================
 
-
 Assuming you have the dependencies installed correctly, it's pretty
 straightforward to install Cyclus. We make the following assumptions
 in this guide:
 
-  #. you have acquired the Cyclus source code from the 
-     `repo <https://github.com/cyclus/cyclus>`_
   #. there is some master directory in which you're placing all
      Cyclus-related files called .../cyclus
-  #. you have placed the Cyclus repository in .../cyclus/cyclus
   #. you have a directory named .../cyclus/install in which you plan
      to install all Cyclus-related files
+  #. you have acquired the Cyclus source code from the `Cyclus repo`_
+  #. you have placed the Cyclus repository in .../cyclus/cyclus
   #. you have a directory named .../cyclus/cyclus/build in which 
      you plan to encapsulate all build-related files (they get in the
      way otherwise)
-  #. you have installed cyclopts using the CMAKE_INSTALL_PREFIX 
-     variable set to ../cyclus/install (see CYCLOPTS_ROOT_DIR 
-     discussion below)
+  #. you have installed Cyclopts using the CMAKE_INSTALL_PREFIX 
+     variable set to ../cyclus/install (see the `Cyclopts readme`_)
 
 Under these assumptions **and** if you used a package manager to 
 install coin-Cbc (i.e. it's installed in a standard location), the
-Cycluss building and installation process will look like:
+Cyclus building and installation process will look like:
 
 .. code-block:: bash
 
@@ -170,10 +166,11 @@ Now, run it with some input file, for this example, call it
 
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
-The `Cyclus Homepage`_ has much more detailed guides and information.
-If you intend to develop for *Cyclus*, please visit it to learn more.
-
 .. _`Cyclus Homepage`: http://cyclus.github.com
+.. _`CMake`: http://www.cmake.org
+.. _`apt-get`: http://linux.die.net/man/8/apt-get
+.. _`Cyclopts readme`: https://github.com/cyclus/cyclopts
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
 
 **********************
 The Developer Workflow
