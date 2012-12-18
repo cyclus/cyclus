@@ -12,8 +12,8 @@ To see user and developer documentation for this code, please visit the `Cyclus 
 *******
 LICENSE
 *******
-
 ::
+
     Copyright (c) 2010-2012, University of Wisconsin Computational Nuclear Engineering Research Group
      All rights reserved.
     
