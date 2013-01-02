@@ -3,52 +3,51 @@ Materials
 
 Materials are the primary unit of information in fuel cycle analysis. The 
 movement, transmutation, and capital exchange of materials can be used to inform 
-economic, environmental, policy, and health related fuel cycle metrics. Many 
-fuel cycle simulation tools only track materials for this reason. With 
+economic, environmental, policy, and health related fuel cycle metrics.  With 
 simplifying assumptions, mass flows can be converted into most fuel cycle 
-metrics of interest.
+metrics of interest.  Many fuel cycle simulation tools only track materials for 
+this reason. 
+
+(ugh... combine these paragraphs)
+
+Mass flows can be translated in post-processing into many metrics of
+interest to fuel cycle analysis. Facility inventories, radio toxicity, decay
+heat, waste volumes, PRPP indices, etc. can all be found from mass flow data.
+The basic unit of information in Cyclus is therefore nuclear material
+movement and transmutation.
+
+Material Resource Characteristics
+---------------------------------
+
+Materials are a well defined type of conserved Resource in the Cyclus framework. 
+
+Material Composition Tracking
+-----------------------------
 
 Cyclus should be capable of recording and tracking the composition histories
 of hundreds of thousands of material objects.
                                         
-Basis: In order to accurately model tens of thousands of fuel cycle facilities
+In order to accurately model tens of thousands of fuel cycle facilities
 and their associated material flows, the simulation must be capable of modeling
 at least a factor of fifty more material objects than facilities. That is, if a
 material object is the size of a batch of fuel, a reactor with an 18 month
-cycle will pass over fifty fuel batches in an 80 year lifetime. [F1, F2, F13,
-F14, S1, S8, S11, E1, E2, E6, E12-E14, M4-M7, M9-M16, U1-U5]
+cycle will pass over fifty fuel batches in an 80 year lifetime.
                                         
-A-7.1 Isotopic Tracking
-                                        
-A-7.1.1 The basic unit of information in Cyclus shall be nuclear material
-movement and transmutation.
-                                        
-Basis: Mass flows can be translated in post-processing into many metrics of
-interest to fuel cycle analysis. Facility inventories, radio toxicity, decay
-heat, waste volumes, PRPP indices, etc. can all be found from mass flow data.
-[F1-F10, F13-F16, S1-S11, E2, E3, E7-E14, M1-M8, M10, U1, U3-U5, Analysis
-Function 5.1.1]
-                                        
-A-7.1.2 Cyclus must be capable of tracking the mass of element groups,
-individual elements, isotope groups and individual isotopes
-                                        
-Basis: Currently, 81 mass items have been determined to be of interest in
-maintaining mass balances and calculating metrics based on experience with
-VISION. These include groups of elements, individual elements, groups of
-isotopes and individual isotopes.
+Isotopic Tracking
+*****************
 
-A-7.1 Isotopic Tracking
-                                        
-A-7.1.3 Cyclus must be capable of extending isotope tracking to include (or
+Since many fuel cycle metrics rely on the isotopic content of material in the 
+system, the Cyclus framework maintains mass balances of individual isotopes.
+As new fuel cycle technologies progress, the effects of previously
+unimportant isotopes on fuel cycle metrics of interest often become
+non-negligible [24]. 
+
+Similary, the Cyclus must be capable of extending isotope tracking to include (or
 exclude) any specific isotope of interest (or disinterest).
                                         
-Basis: As new fuel cycle technologies progress, the effects of previously
-unimportant isotopes on fuel cycle metrics of interest often become
-non-negligible [24]. [F1-F10, F13-F16, S3-S11, E2, E3, E7, E9- E14, M1-M3, M6
-M10, U1, U4, U5, Analysis Function 5.1.1]
-                                        
-A-7.2 Mass Tracking
-                                        
+Mass Tracking
+*************
+
 A-7.2.1 Mass must be conserved in Cyclus.
                                         
 Basis: Conservation of the fundamental unit of information in a simulation
