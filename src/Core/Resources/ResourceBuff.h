@@ -41,7 +41,7 @@ public:
   /*!
   capacity returns the maximum resource quantity this store can hold (units
   based on constituent resource objects' units). 
-  Never throws.  Returns -1 if the store is unlimited.
+  Never throws.
   */
   double capacity();
 
@@ -70,23 +70,9 @@ public:
   space returns the quantity of space remaining in this store.
 
   It is effectively the difference between the capacity and the quantity.
-  Never throws.  Returns -1 if the store is unlimited.
+  Never throws.
   */
   double space();
-
-  /// unlimited returns whether this store has unlimited capacity. Never throws.
-  bool unlimited();
-
-  /// makeUnlimited sets the store's capacity to be infinite. Never throws.
-  void makeUnlimited();
-
-  /*!
-  makeLimited sets the store's capacity finite and sets it to the specified value.
-
-  @throws CycOverCapException the new capacity is lower (by cyclus::eps_rsrc()) than the
-  quantity of resources that already exist in the store.
-  */
-  void makeLimited(double cap);
 
   /*!
   popQty pops the specified quantity of resources from the
@@ -160,9 +146,6 @@ public:
   bool empty() {return mats_.empty();}
 
 private:
-
-  /// true if this store has an infinite capacity
-  bool unlimited_;
 
   /// maximum quantity of resources this store can hold
   double capacity_;
