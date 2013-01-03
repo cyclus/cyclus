@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#define BUFF_INFINITY 1e300
+
 class CycOverCapException: public CycException {
     public: CycOverCapException(std::string msg) : CycException(msg) {};
 };
