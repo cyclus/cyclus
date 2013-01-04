@@ -25,18 +25,20 @@ Material Resource Characteristics
 ---------------------------------
 
 The main specific characteristic tracked by Material Resources is their isotopic 
-composition and history.
+composition and history. This is acheived with a combination of the 
+**IsoVector** and **CompMap** concepts. These concepts are the engine with which 
+Material objects keep track (simultaneously) of atomic [mol] and mass [kg] 
+-based isotopic vectors. 
 
-Composition
-***********
-
-This feature is acheived with a combination of the **IsoVector** and **CompMap** 
-concepts. These concepts are the engine with which Material objects keep track 
-(simultaneously) of atomic [mol] and mass [kg] -based isotopic vectors. 
+IsoVector
+*********
 
 The Material keeps track of its IsoVector history throughout the simulation. 
-
 the IsoVector is
+
+CompMap
+*******
+
 
 
 Simulation Handling of Materials
