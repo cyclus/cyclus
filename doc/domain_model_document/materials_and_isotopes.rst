@@ -1,8 +1,8 @@
 
 .. summary Some developers notes on how materials and isotopic vectors work
 
-Materials and Isotopics in Cyclus
-=================================
+Materials and Isotopes in Cyclus
+================================
 
 Introduction
 ------------
