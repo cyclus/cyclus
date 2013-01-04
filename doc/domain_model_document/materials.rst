@@ -12,7 +12,7 @@ simulation tools only track fuel materials for this reason.
 Cyclus tracks many objects and resources beyond matierials, but they remain the 
 primary unit of information in the simulator.
 
-Material Resource Characteristics
+Generic Resource Characteristics
 ---------------------------------
 
 Materials are a well defined type of conserved Resource in the Cyclus framework.  
@@ -21,8 +21,26 @@ amount and a default unit. For Materials, the default unit is kilograms and the
 total mass of the material is therefore the generic Resource amount of any 
 material.
 
-Material Composition Tracking
------------------------------
+Material Resource Characteristics
+---------------------------------
+
+The main specific characteristic tracked by Material Resources is their isotopic 
+composition and history.
+
+Composition
+***********
+
+This feature is acheived with a combination of the **IsoVector** and **CompMap** 
+concepts. These concepts are the engine with which Material objects keep track 
+(simultaneously) of atomic [mol] and mass [kg] -based isotopic vectors. 
+
+The Material keeps track of its IsoVector history throughout the simulation. 
+
+the IsoVector is
+
+
+Simulation Handling of Materials
+--------------------------------
 
 Material Plurality
 ******************
@@ -163,8 +181,8 @@ at runtime. [F1-F10, F12-F16, S1-S10, E1-E3, E8-E14, M1-M7, M10, M16, U1-U5,
 Analysis Function 5.1.1, Operational Function 5.2.1 and Performance Function
 5.3.3].
 
-Chemical Forms Data
-*******************
+Chemical Forms Data?
+********************
 
 A verified library of data concerning material chemical forms, waste
 forms, and material packaging must be provided.
