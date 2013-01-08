@@ -239,7 +239,8 @@ Cyclus will enable the multi-regional investigation and analysis of:
    dependencies).
 #. Deployment effects of institutional (e.g. governments, corporations) 
    variations in available capital, technology capability, etc.
-￼
+   
+
 Disruption Studies
 --------------------
 
