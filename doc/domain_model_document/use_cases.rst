@@ -10,6 +10,8 @@ supported by the Cyclus framework.
 Technology Studies
 ------------------
 
+**Primary Perturbation Parameter: The deployed fuel cycle technology suite** 
+
 Technology studies test the system effects of deploying a specific nuclear 
 technology (usually at the facility level). These studies are performed by users 
 seeking to determine the promise of a certain innovative reactor technology, 
@@ -72,6 +74,8 @@ Cyclus will support investigation and analysis of:
 Strategy Studies
 ----------------
 
+**Primary Perturbation Parameter: Routing schemes and deployment schedule** 
+
 This capability allows comparison of strategic options, using creative 
 combinations of many reactor and facility types. These combinations may be 
 strategic options such as once through, thermal recycling, fast reactor 
@@ -123,6 +127,9 @@ Cyclus will enable the strategic investigation, analysis, and demonstration of:
 
 Economic Studies
 -----------------
+
+
+**Primary Perturbation Parameter: Costs, pricing data, and market dynamics** 
 
 Cyclus will facilitate analysis of cost and economic fuel cycle dynamics. Here, 
 ‘cost analysis’ refers to financial information as an output metric only whereas 
@@ -179,6 +186,8 @@ Cyclus will enable the investigation and analysis of:
 
 Multi-Regional Studies
 -----------------------
+
+**Primary Perturbation Parameter: Intra-regional relations and technology availability**  
 
 Cyclus will facilitate analysis of the nuclear fuel cycle on the global, 
 national, and local scale, resolving real and fictional countries, institutions 
@@ -240,6 +249,8 @@ Cyclus will enable the multi-regional investigation and analysis of:
 
 Disruption Studies
 --------------------
+
+**Primary Perturbation Parameter: Fine grained facility availability**  
 
 A user may want to study the ripple effect (or lack thereof) experienced by a 
 fuel cycle in the event of an unplanned facility shutdown or process disruption.
