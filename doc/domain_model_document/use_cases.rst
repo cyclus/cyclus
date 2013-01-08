@@ -1,9 +1,6 @@
 Use Cases
 =========
 
-**Note, this is still very closely replicated from the FCS requirements 
-document.**
-
 Cyclus seeks to support the range of studies that are of interest to an 
 interdisciplinary user community. In support of these studies, it will need to 
 provide an interface that accomodates a variety of input parameters and output 
