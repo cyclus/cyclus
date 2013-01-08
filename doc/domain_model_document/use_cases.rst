@@ -47,10 +47,10 @@ Cyclus will support investigation and analysis of:
 #. Metrics resulting from deployment of various transmutation technologies
 #. The “technical and economic aspects of external neutron source-driven 
    transmutation systems to inform whether future investigation in this approach is 
-   warranted.” [ROAD2010]
+   warranted.” [ROAD2010]_
 #. Uranium/thorium resource depletion as a function of facility types, 
    deployment decisions.
-#. Uranium/thorium utilization of various new once through fuels. [ROAD2010]
+#. Uranium/thorium utilization of various new once through fuels. [ROAD2010]_
 #. Direct SNF disposal per MWh from various improved once through fuels.
 #. Metrics resulting from deployment of various separations schema (UREX, PUREX, 
    etc.)
@@ -68,7 +68,7 @@ Cyclus will support investigation and analysis of:
    fuels and cladding capable of irradiation to higher burnup.
 #. Safeguards effectiveness against covert fuel cycles.b
 #. Non-Radiological releases from fuel cycle facilities (e.g. SO2 from 
-   Mine/Milling) [IAEA2007].
+   Mine/Milling) [IAEA2007]_.
 
 
 Strategy Studies
@@ -116,10 +116,10 @@ Cyclus will enable the strategic investigation, analysis, and demonstration of:
 #. Flexibility and constraints on dry storage timing.
 #. Flexibility and constraints on repository emplacement or retrieval timing
 #. The magnitude of alleviated proliferation risk from limited separations 
-   cycles [ROAD2010].
+   cycles [ROAD2010]_.
 #. System effects of thorium fuel cycles and their synergy with existing fuel 
    cycles.
-#. System effects of non-fuel material re-use (e.g. irradiated zirconium) [ROAD2010].
+#. System effects of non-fuel material re-use (e.g. irradiated zirconium) [ROAD2010]_.
 #. Adaptation requirements for regulatory changes Waste Acceptance Criteria, 
    Classification Bases, etc.)
 #. Nuclear assisted reduction of fossil fuel use. (e.g. bio-mass processing)
@@ -171,7 +171,7 @@ Cyclus will enable the investigation and analysis of:
 #. Investigate factors (transmutation technology, facility deployment, waste 
    disposition, etc.) affecting transportation, reprocessing, disposal, storage 
    costs
-#. Economic impact of technologies to extend current fleet lifetimes [ROAD2010]. 
+#. Economic impact of technologies to extend current fleet lifetimes [ROAD2010]_. 
 #. Investigate factors (uranium availability, transmutation technology, deployment 
    schedule, etc.) affecting power production costs.
 #. Feedback effects and institutional capital limitations of facility costs on 
@@ -233,9 +233,9 @@ Cyclus will enable the multi-regional investigation and analysis of:
    Nations Index) to predict/direct interregional material and technology 
    transfers.
 #. Determine proliferation risk factors (e.g., capabilities and motivations) 
-   [ROAD2010].
+   [ROAD2010]_.
 #. Technology and materials proliferation risks as informed by social science 
-   research in international security [ROAD2010].
+   research in international security [ROAD2010]_.
 #. Feedback dynamics of international trade relationships on fuel cycle costs, 
    regional energy security, facility deployment, etc.
 #. Regional grid load restrictions.
@@ -292,10 +292,6 @@ Cyclus will enable the disruption analysis of:
 #. Sudden shutdown of centralized reprocessing facilities.
 
 
-[ROAD2010] United States Department of Energy. Nuclear Energy Research and Development 
-Roadmap. DOE-NE, http://www.ne.doe.gov/pdfFiles/NuclearEnergy_Roadmap_Final.pdf. 
-April 2010.
+.. [ROAD2010] United States Department of Energy. Nuclear Energy Research and Development Roadmap. DOE-NE, http://www.ne.doe.gov/pdfFiles/NuclearEnergy_Roadmap_Final.pdf. April 2010.
 
-[IAEA2007] International Atomic Energy Agency (IAEA) Guidance for the Application of 
-an Assessment Methodology for Innovative Nuclear Energy Systems INPRO 
-Manual-Environment, IAEA- TECDOC-1575 /Vol. 7. (2007). 1–169.
+.. [IAEA2007] International Atomic Energy Agency (IAEA) Guidance for the Application of an Assessment Methodology for Innovative Nuclear Energy Systems INPRO Manual-Environment, IAEA- TECDOC-1575 /Vol. 7. (2007). 1–169.
