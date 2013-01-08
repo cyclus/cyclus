@@ -1,8 +1,8 @@
 Use Cases
 =========
 
-**Note, this is still very closely copied and pasted from the FCS requirements 
-document. It needs to be re-imagined to avoid self-plaigarism.**
+**Note, this is still very closely replicated from the FCS requirements 
+document. **
 
 Cyclus seeks to support the range of studies that are of interest to an 
 interdisciplinary user community. In support of these studies, it will need to 
