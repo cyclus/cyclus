@@ -2,7 +2,7 @@ Use Cases
 =========
 
 **Note, this is still very closely replicated from the FCS requirements 
-document. **
+document.**
 
 Cyclus seeks to support the range of studies that are of interest to an 
 interdisciplinary user community. In support of these studies, it will need to 
