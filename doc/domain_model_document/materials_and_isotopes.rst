@@ -23,6 +23,17 @@ can be thought of as a simple map of isotopic integer values (the keys) to value
 An IsoVector manages a smart pointer to a CompMap in order to minimize unneccessary
 operations.
 
+Materials are the primary unit of information in fuel cycle analysis. The 
+movement, transmutation, and capital exchange of materials can be used to inform 
+many metrics of interest to fuel cycle analysis.  Mass flows can be translated 
+in post-processing into economic, environmental, policy, and health related fuel 
+cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes, 
+PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
+simulation tools only track fuel materials for this reason. 
+
+Cyclus tracks many objects and resources beyond matierials, but they remain the 
+primary unit of information in the simulator.
+
 CompMaps
 --------
 
@@ -146,19 +157,13 @@ RecipeLogger
 
 Predefined recipes are managed by the RecipeLogger in *Cyclus*. A CompMapPtr to a specific
 recipe can be acquired through its static Recipe() method.
-Materials
-~~~~~~~~~
 
-Materials are the primary unit of information in fuel cycle analysis. The 
-movement, transmutation, and capital exchange of materials can be used to inform 
-many metrics of interest to fuel cycle analysis.  Mass flows can be translated 
-in post-processing into economic, environmental, policy, and health related fuel 
-cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes, 
-PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
-simulation tools only track fuel materials for this reason. 
 
-Cyclus tracks many objects and resources beyond matierials, but they remain the 
-primary unit of information in the simulator.
+----
+
+**What follows is to be merged with the above.** 
+
+----
 
 Generic Resource Characteristics
 ---------------------------------
