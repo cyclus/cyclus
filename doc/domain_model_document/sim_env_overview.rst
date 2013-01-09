@@ -131,14 +131,15 @@ If a supplier is interested in satisfying the request, it creates a Bid that
 contains sufficient information about the Resource to be sent to assist the 
 requester in the process of prefering this over over others. 
 
-The bid also contains a cost. (Perhaps we need a cost class that has some 
+The bid also contains a price. (Perhaps we need a price class that has some 
 richness, fixed cost, variable cost... TBD).
 
 The bid may also send a bid constraint overall to the matchmaking entity in 
 order to avoid overpromising. That is, if a facility receives many requests, it 
 may desire to return bids which sum to an amount above its total capacity. It 
 must indicate to the matchmaking facility what its capacity constraint actually 
-is so that it is not matched to so many requests that it 
+is so that it is not matched to so many requests that it overwhelms its 
+capacity.
 
 Preferences 
 ***********
@@ -149,6 +150,11 @@ dominates in a market.
 
 Within these preference coefficients, one arc may be unallowable. This will be 
 indicated by the flagged value of that coefficient.
+
+In a package sent to the matchmacker, information about the :math:`\alpha_{ij}` 
+vector, the resource specification matching the Bid resource specification, and 
+function pointers to the consumer and supplier that may provide constraint 
+functions. 
 
 Order
 ******
