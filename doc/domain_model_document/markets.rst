@@ -1,4 +1,14 @@
 
+Simulation Environment Overview
+===============================
+
+Timer 
+
+
+Agents 
+
+
+Resources 
 
 The linear program attempts to match all the supplier offers with consumer requests.
 
@@ -85,13 +95,3 @@ that is, the solutions are trivial. Those matching problems, if solvable simply,
 should be solved simply via some heuristic. For this reason, some simple 
 simulations will never require network flow solves.
 
-Simulation Environment Overview
-===============================
-
-Timer 
-
-
-Agents 
-
-
-Resources 
