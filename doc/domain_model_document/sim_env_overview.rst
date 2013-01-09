@@ -93,15 +93,20 @@ etc.
 
 
 Since in a multi-regional, multi-facility simulation, the preferences 
-:math:`\alpha_{ij}` may be a function of a great number of parameters. This
-
-The responsibility is up to the user to determine how an agent creates its 
-preference vector, :math:`\alpha_{ij}`.
-
+:math:`\alpha_{ij}` may be a function of a great number of parameters, this 
+vector can only be determined by some combination of the facility, institutions, 
+and regions making the request.
 
 In order to do this, we need to make it possible for all agents, i, to provide 
-an :math:`\alpha_{j}` to the market. The agent must therefore have information 
-about the list of j offer/requests.
+an :math:`\alpha_{j}` to the market. This is the driving reason that the agent 
+must therefore have information about the list of j offer/requests.
+
+Phase 5 : Send Orders
+*********************
+
+The resource object that is described in the matched order is then sent from the 
+supplying facility to the receiving facility. 
+
 
 
 Messages
@@ -129,12 +134,31 @@ requester in the process of prefering this over over others.
 The bid also contains a cost. (Perhaps we need a cost class that has some 
 richness, fixed cost, variable cost... TBD).
 
+The bid may also send a bid constraint overall to the matchmaking entity in 
+order to avoid overpromising. That is, if a facility receives many requests, it 
+may desire to return bids which sum to an amount above its total capacity. It 
+must indicate to the matchmaking facility what its capacity constraint actually 
+is so that it is not matched to so many requests that it 
+
 Preferences 
 ***********
 
 A vector of Preferences, :math:`\alpha_{ij}`, is generated, based on the Bids. 
 This is a vector of doubles normalized so that no single facility unfairly 
 dominates in a market. 
+
+Within these preference coefficients, one arc may be unallowable. This will be 
+indicated by the flagged value of that coefficient.
+
+Order
+******
+
+When matched, the order will match the bid in quality (though perhaps only a 
+fraction of the quality.) The orders are then sent down to the matched 
+facilities and the sending facility meets the order according to the bid (or, 
+perhaps, throws an exception if it's overestimated its capacity or something).
+
+
 
 
 Agents 
