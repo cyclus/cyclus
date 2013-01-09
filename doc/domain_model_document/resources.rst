@@ -38,8 +38,9 @@ Resource Data
 
 Data contained by all Resources includes : 
 
+ * A **Quality** defined by specific characteristics of its Resource type.
  * A native **Unit**
- * A **Quantity** 
+ * A **Quantity** in that unit. 
  * An ID, keeping it distinct from other Resources.
  * An originalID, which allows its history to be traced back through the 
    original Resource it once was (if it was separated from the original Resource 
