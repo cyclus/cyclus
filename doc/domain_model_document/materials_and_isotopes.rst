@@ -31,7 +31,7 @@ cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes,
 PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
 simulation tools only track fuel materials for this reason. 
 
-Cyclus tracks many objects and resources beyond matierials, but they remain the 
+Cyclus tracks many objects and resources, but materials remain the 
 primary unit of information in the simulator.
 
 CompMaps
