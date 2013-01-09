@@ -2,18 +2,18 @@
 .. summary Some developers notes on how Resources work
 
 Resources In Cyclus
-=================================
+===================
 
 Introduction
 ------------
 
-The following section will discuss the Resource class, the base class for items 
-that are passed between agents in a Cyclus simulation.
+The following section will discuss the concept of Resources in Cyclus. Resources 
+are objects that are passed between agents in a Cyclus simulation.
 
-The Resource class is the parent class of the Material class in *Cyclus*. A 
-Resource must have knowlege of what is and how it was created.  Accordingly, it 
-keeps track of its units, quality, quantity, the id of its creator, and if it 
-was spawned from the splitting of a different Resource. 
+In support of  metrics calculations, a Resource must have knowlege of what is 
+and how it was created.  Accordingly, it keeps track of its units, quality, 
+quantity, the id of its creator, and if it was spawned from the splitting of a 
+different Resource. 
     
 Materials are the primary Resource that is transacted in a *Cyclus* simulation.  
 Conceptually, though, a Resource can be anything that might be an interesting 
@@ -33,45 +33,14 @@ and workers will be essential to transport, track, and conserve.
 For use cases in which environmental and health metrics are of interest, the 
 transport, tracking, and conservation of fuel Materials is paramount. 
 
-Resource Data
---------------
-
-Data contained by all Resources includes : 
+Attributes of all Resources include : 
 
  * A **Quality** defined by specific characteristics of its Resource type.
- * A native **Unit**
- * A **Quantity** in that unit. 
+ * A **Quantity** in a native **Unit**
  * An ID, keeping it distinct from other Resources.
  * An originalID, which allows its history to be traced back through the 
    original Resource it once was (if it was separated from the original Resource 
    at some point).
-
-Quantity
----------
-
-A Resource object must have a quantity associated with it, expressed in its 
-native unit. The native unit for Material quantity is kilograms, the SI unit of 
-mass. However, a developer could imagine that an electricity Resource might have 
-units of kW, MW, or GW and a money Resource might have units of dollars, euros, 
-or yuan. 
-
-Each Resource object, then, has a total quantity in its native unit. The electricity 
-offered by the DC Cook Unit 1 Reactor, for example, is 1,048 MW. 
-Since Resources may be split into two or combined with other Resources, the 
-Resource amount is mutable over time.
-
-Resource Methods
------------------
-
-The key method implemented by all Resources returns a boolean to be used by the 
-market for comparison of two commodities. The quality of two Resources can be 
-compared in order to determine whether the offer Resource sufficiently satisfies the 
-request Resource. ::
-
-    request_rsrc->checkQuality(offer_rsrc)
-
-The boolean that it returns is used by the market to match requests with offers.
-**NOW ONLY TRUE IN NULL MARKET! WHAT HAPPENED?**
 
 Quality
 ---------
@@ -100,6 +69,33 @@ may not be interchangeable (e.g., reactor operators vs. crane operators). The
 interchangeability of these subtypes will be dependent on quality and quantity 
 checks provided for the class.
 
+Quantity
+---------
+
+A Resource object must have a quantity associated with it, expressed in its 
+native unit. The native unit for Material quantity is kilograms, the SI unit of 
+mass. However, a developer could imagine that an electricity Resource might have 
+units of kW, MW, or GW and a money Resource might have units of dollars, euros, 
+or yuan. 
+
+Each Resource object, then, has a total quantity in its native unit. The electricity 
+offered by the DC Cook Unit 1 Reactor, for example, is 1,048 MW. 
+Since Resources may be split into two or combined with other Resources, the 
+Resource amount is mutable over time.
+
+Resource Methods
+-----------------
+
+The key method implemented by all Resources returns a boolean to be used by the 
+market for comparison of two commodities. Various quality aspects of two Resources can be 
+compared in order to determine whether the offer Resource sufficiently satisfies the 
+request Resource. ::
+
+    request_rsrc->checkAttribute(offer_rsrc)
+
+The information that such a member function will return is used by the Agents to 
+generate preferences about accepting or rejecting a Bid. 
+
 
 Resource Conservation
 ---------------------
@@ -125,7 +121,6 @@ database are **always** written when
 
 * some characteristic of the Resource changes or
 * its location (owning facility, institution, or region) changes.
-
 
 Entries in the database **may** be written any time a facility or Resource 
 developer creates a trigger for such an event. 
