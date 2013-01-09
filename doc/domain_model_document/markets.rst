@@ -72,4 +72,7 @@ Phase 4
 
 Then, we solve the problem based on the collected :math:`\alpha_{ij}` vectors. 
 
-
+Possibly, some of these will **not** require network flow solutions. Perhaps, 
+that is, the solutions are trivial. Those matching problems, if solvable simply, 
+should be solved simply via some heuristic. For this reason, some simple 
+simulations will never require network flow solves.
