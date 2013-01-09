@@ -48,11 +48,11 @@ Since in a multi-regional, multi-facility simulation, the preferences
 :math:`\alpha_{ij}` may be a function of a great number of parameters. This
 
 The responsibility is up to the user to determine how an agent creates its 
-preference vector, :math:`alpha_{ij}`.
+preference vector, :math:`\alpha_{ij}`.
 
 
 In order to do this, we need to make it possible for all agents, i, to provide 
-an :math:`alpha_{j}` to the market. The agent must therefore have information 
+an :math:`\alpha_{j}` to the market. The agent must therefore have information 
 about the list of j offer/requests.
 
 Phase 1 : Requests 
