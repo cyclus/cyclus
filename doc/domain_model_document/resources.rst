@@ -42,6 +42,8 @@ Attributes of all Resources include :
    original Resource it once was (if it was separated from the original Resource 
    at some point).
 
+.. _resource-quality:
+
 Quality
 ---------
 
@@ -67,6 +69,8 @@ That is, a single Resource Type (e.g., Workers) might have many sub-types which
 may not be interchangeable (e.g., reactor operators vs. crane operators). The 
 interchangeability of these subtypes will be dependent on quality and quantity 
 checks provided for the class.
+
+.. _resource-quantity:
 
 Quantity
 ---------
