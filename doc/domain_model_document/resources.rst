@@ -1,8 +1,8 @@
 
 .. summary Some developers notes on how Resources work
 
-Resources In Cyclus
-===================
+Resources 
+==========
 
 Introduction
 ------------
@@ -10,15 +10,15 @@ Introduction
 The following section will discuss the concept of Resources in Cyclus. Resources 
 are objects that are passed between agents in a Cyclus simulation.
 
+Materials are the primary Resource that is transacted in a *Cyclus* simulation.  
+Conceptually, though, a Resource can be anything that might be an interesting 
+traded item (e.g., electricity, money, or workers).
+
 In support of  metrics calculations, a Resource must have knowlege of what is 
 and how it was created.  Accordingly, it keeps track of its units, quality, 
 quantity, the id of its creator, and if it was spawned from the splitting of a 
 different Resource. 
     
-Materials are the primary Resource that is transacted in a *Cyclus* simulation.  
-Conceptually, though, a Resource can be anything that might be an interesting 
-traded item (e.g., electricity, money, or workers).
-
 Resources are simulation objects that can or should be traded and tracked 
 between facilities, institutions, and regions. Examples of Resource types of 
 interest in fuel cycle analysis use cases include people, money, electricity, 
@@ -51,18 +51,17 @@ defining characteristics. These specific characteristics are necessary for
 comparing and trading Resources during the simulation and for analyzing fuel 
 cycle metrics at the conclusion of the simulation. 
 
-The quality of a Resource is captured by this set of attributes. For 
-example, a Material's primary quality attribute is its composition whereas quality 
-attributes of a worker might be their skillset, the number of hours a day that 
-they can work, and they amount that they expect to be paid. 
+The quality of a Resource is captured by this set of attributes. For example, a 
+Material's primary quality attribute is its isotopic composition. Quality 
+attributes of a worker, on the other hand, might be their skillset, the number 
+of hours a day that they can work, and they amount that they expect to be paid. 
 
 The generic amount and unit information will be stored for all Resources, 
 whereas the specific Workforce Resource defining characteristics will be stored 
 only for the Workforce Resources in the simulation. 
 
-All of these quality attributes, both generic and specific, are intended to be 
-used to filter the acceptability of offers of some Resource to fulfill requests 
-of some other Resource.
+All of these quality attributes, both generic and specific, are intended to 
+facilitate differentiation of Resources from one another in the matching. 
 
 That is, a single Resource Type (e.g., Workers) might have many sub-types which 
 may not be interchangeable (e.g., reactor operators vs. crane operators). The 
