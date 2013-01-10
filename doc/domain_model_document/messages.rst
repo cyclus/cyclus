@@ -2,14 +2,13 @@
 Messages In Cyclus
 =================================
 
-Agents in Cyclus communicate resource requests and bids, and other
-information by creating and sending messages.
+Agents in Cyclus communicate resource requests, bids, and other information
+by creating and sending messages. Messages *will* be received by the
+specified receiver. Sent messages are routed directly to the receiver.
 
-* There is no guaruntee that messages will arrive at their destination.
+* Messages hold:
 
-* Messages contain:
-
-  - Payload (RFB, bid, preferences, ...)
+  - Payload of one or more of the following
 
     + Resource specification
     + Price (bids) or cost (preferences)
@@ -19,5 +18,6 @@ information by creating and sending messages.
 
     + creator/sender
     + destination/receiver
+
 
 
