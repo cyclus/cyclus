@@ -1,0 +1,15 @@
+*.pdf
+*.dvi
+*.toc
+*.aux
+*.out
+*.log
+*.bbl
+*.blg
+*.log
+*.spl
+*~
+*#
+*.zip
+*.html
+*.tex
