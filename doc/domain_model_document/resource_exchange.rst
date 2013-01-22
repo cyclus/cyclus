@@ -23,18 +23,21 @@ enriched uranium a product, as is normally done in these types of
 matching algorithms (where, for example, a producer knows it needs a
 certain type of widget). Rather, we must both specify the type of
 product (e.g. enriched uranium) along with a specification (e.g.  4
-w/o U-235). After an extensive literature review, the development team
-has found only two other sources that must tackle a similarly
-difficult problem. In [Holmgren]_, the additional source of difficulty
-lies in the need to specify both a product requirement and
-transportation link. They provide a framework that requires proposals
-for a product specification (including time constraints), and various
-suppliers provide bids on that proposal. A similar approach is used by
-[Julka]_ in the chemical process industry. We provide an analgous
-framework where the isotopic specification is provided in the
-proposal. The dynamic nature of the simulation in conjunction with the
-complex interactions due to isotopic considerations disallows
-relatively simple multi-period solutions as proposed by [Quelhas]_.
+w/o U-235). 
+
+After an extensive literature review, the development team has found
+only two other sources that tackle a similarly difficult problem. In
+[Holmgren]_, the additional source of difficulty lies in the need to
+specify both a product requirement and transportation link. They
+provide a framework that requires proposals for a product
+specification (including time constraints), and various suppliers
+provide bids on that proposal. A similar approach is used by [Julka]_
+in the chemical process industry in which bids for crude oil are
+ranked by a user-provided benchmark. We provide an analgous framework
+where the isotopic specification is provided in the proposal. The
+dynamic nature of the simulation in conjunction with the complex
+interactions due to isotopic considerations disallows relatively
+simple multi-period solutions as proposed by [Quelhas]_.
 
 Resource Exchange Communication
 ================================
