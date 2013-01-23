@@ -137,8 +137,8 @@ Assign Preferences Phase
 
 During this phase, consumers respond to the bids that have been placed
 on their proposals. They are allowed to assess each bid in the set of
-bids and assign a preference to them. Preference selections are given
-using a cardinal ordering. [http://www.jstor.org/stable/10.2307/1831501]
+bids and assign a preference to them. Preference selections use a
+cardinal ordering [Strotz]_.
 
 Add Policy Constraints/Costs Phase
 ----------------------------------
@@ -175,3 +175,5 @@ This phase mirrors the execution phase in the pre-resource exchange
 step. It requires the same guarantee, i.e., any actions that occur
 during the execution phase must be independent of all other such
 actions.
+
+.. [Strotz] Strotz, R. H. “Cardinal Utility.” The American Economic Review (1953): 384–397.
