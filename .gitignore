@@ -19,3 +19,4 @@ suffix.h
 *.zip
 *.html
 *.tex
+src/Core/Utility/Env.cpp
