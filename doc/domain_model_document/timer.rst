@@ -141,7 +141,7 @@ bids and assign a preference to them. Preference selections use a
 cardinal ordering [Strotz]_, i.e. their relative numerical values
 impart a notion of *degree of preference*. These numbers can be
 thought of strictly as economic costs or as such costs combined with
-externalitites.
+externalities.
 
 Add Policy Constraints/Costs Phase
 ----------------------------------
@@ -201,7 +201,7 @@ Post Resource Exchange Step
 
 After the resource exchange, modules are allowed to act. This is
 effectively the end of the time step. There are currently only
-two phases: Decommissionin and Execution.
+two phases: Decommissioning and Execution.
 
 Decommissioning Phase
 ---------------------
@@ -211,7 +211,7 @@ current time step corresponds with a facility's lifetime it will
 invoke the decommissioning process. It is possible that certain
 conditions disallow the facility from actually leaving the simulation,
 e.g. there may be left over fuel at a reactor that must leave the
-facility. As with the building phase, the decommisioning phase must
+facility. As with the building phase, the decommissioning phase must
 involve decisions that independent of any other decommissioning
 decisions, i.e. they cannot depend on one another.
 
