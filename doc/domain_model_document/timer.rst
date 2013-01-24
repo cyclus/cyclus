@@ -138,16 +138,63 @@ Assign Preferences Phase
 During this phase, consumers respond to the bids that have been placed
 on their proposals. They are allowed to assess each bid in the set of
 bids and assign a preference to them. Preference selections use a
-cardinal ordering [Strotz]_.
+cardinal ordering [Strotz]_, i.e. their relative numerical values
+impart a notion of *degree of preference*. These numbers can be
+thought of strictly as economic costs or as such costs combined with
+externalitites.
 
 Add Policy Constraints/Costs Phase
 ----------------------------------
 
+The policy addition phase of the resource exchange step allows actors
+at the institutional and regional levels affect the exchange.
+Institutions are allowed to alter costs between actors within their
+organizational boundaries, e.g. if a consumer of enriched uranium has
+no preference between two suppliers, its institution can add
+incentives to use a supplier within the same organization. This is one
+possible way contracts can be represented between institutions.
+
+Regional actors are also allowed to affect the resource exchange
+process. Regions can place constraints on material entering or leaving
+their boundaries. For example, a region may place a restriction on any
+outgoing enriched uranium that it must be low enriched (i.e. <= 20 w/o
+U-235). Similarly, regions may affect the preference of a given
+transaction by increasing its cost. This is one way in which tax
+structures can be modeled in the simulation.
+
 Match Bids with Preferences Phase
 ---------------------------------
 
+During this phase, all information is known about all possible
+transactions. A transport network linear program (LP) is solved to
+determine the appropriate resource flows. The answer is binding, i.e.,
+actors are not allowed to alter the flows once they have been
+determined. In other words, the verdict has been passed, and they
+should have spoken before and now must hold their peace.
+
+Note that future modifications may alter the internal nature of this
+process. An easy supposition is that in the future there may be a need
+for integer decision variables in the network flow, transforming the
+LP into a mixed integer-linear program (MILP). This is an ongoing area
+of research.
+
 Send/Receive Orders Phase
 -------------------------
+
+The transactions that were selected in the prior phase are now
+executed. Producers of a commodity are tapped to send the resources on
+which they bid. 
+
+It should be noted that the resources sent may not match precisely the
+resource specification offered in the bidding phase. Take, for
+example, a reprocessing facility that bid on a set of proposals. The
+agent may have provided a solution given that it might win every
+proposal. If it does not, its provided solution may differ slightly or
+largely from the specification it provided. We leave it to the
+developers of the supplier agents to deal with orders received that
+differ from their specifications. One possible solution mechanism is
+to alter preferences in future time periods in order to penalize
+suppliers that do not meet their specifications.
 
 Post Resource Exchange Step
 ===========================
