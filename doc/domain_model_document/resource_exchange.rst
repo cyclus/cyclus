@@ -11,7 +11,7 @@ nature of the nuclear engineering domain: the main resource being
 exchanged is material which is made up of various isotopes. These
 constraints lead us to a request-for-proposal/bid/bid-selection
 procedure for determining the resource transactions at any given
-timestep.
+time-step.
 
 Motivation
 ==========
@@ -23,7 +23,7 @@ enriched uranium a product, as is normally done in these types of
 matching algorithms (where, for example, a producer knows it needs a
 certain type of widget). Rather, we must both specify the type of
 product (e.g. enriched uranium) along with a specification (e.g.  4
-w/o U-235). 
+w/o U-235).
 
 After an extensive literature review, the development team has found
 only two other sources that tackle a similarly difficult problem. In
@@ -33,78 +33,90 @@ provide a framework that requires proposals for a product
 specification (including time constraints), and various suppliers
 provide bids on that proposal. A similar approach is used by [Julka]_
 in the chemical process industry in which bids for crude oil are
-ranked by a user-provided benchmark. We provide an analgous framework
+ranked by a user-provided benchmark. We provide an analogous framework
 where the isotopic specification is provided in the proposal. The
 dynamic nature of the simulation in conjunction with the complex
 interactions due to isotopic considerations disallows relatively
 simple multi-period solutions as proposed by [Quelhas]_.
 
+Resource Exchange Structure
+===========================
+
+The resource exchange is comprised of:
+
+* a set of consumer resource specifications
+* for each consumer resource specification, a set of response bids
+  provided by producers
+* for each specification/bid pair, an institution preference
+* for each specification/bid pair, regional preferences and
+  constraints
+
+The amalgamation of these specifications, bids, constraints, and
+preferences result in a transportation network that is solved via
+linear programming (LP) and mixed integer-linear programming (MILP)
+techniques. The solution of such a program results in orders,
+according to which producers send resources to consumers.
+
+This structure, including input and output, are formulated via
+information that is passed around entities in the simulation using
+Messages.
+
 Resource Exchange Communication
-================================
+===============================
 
 Messages convey request and bid information between agents.  Exchange
 negotiation occurs between two agents referred to as the consumer and
-supplier.  The types communication described in the following sections
-are sent by agents *every* timestep. All communication by an agent and
-its children (including RFB's, bids, preferences, etc.) should comply
-with restrictions imposed by its parent.  In effect, all communication
-must be "approved" by the full chain of agent ownership.
+supplier, and can be informed by both agent's institutions and
+regions.  The types communication described in the following sections
+are sent by agents at any time step in which there is demand for a
+resource by a consumer agent. 
 
 Request for Bid
------------------
+---------------
 
 In order to acquire resources, consumers must send a Request for Bid
 (RFB) to each desired potential supplier. An RFB contains a desired
 :term:`Resource Specification`. RFB's may be ignored by suppliers.
 
 Bids
--------
+----
 
-Suppliers may respond to RFB's with bids (RFB's can be ignored).
-Those RFBs not receiving bids will not be matched on an arc.  Bids
-contain a providable :term:`resource Specification` and a :term:`Price
-Description`.  The providable resource specification may differ from
-the RFB resource specification.  Bids are sent by suppliers to
-consumers. Consumers will know the originating RFB for each bid they
-receive.
+Suppliers may respond to RFB's with bids. Those RFBs not receiving
+bids will not be matched on an arc.  Bids contain a providable
+:term:`resource Specification` and a :term:`Price Description`.  The
+providable resource specification may differ from the RFB resource
+specification.  Bids are sent by suppliers to consumers. Consumers
+will know the originating RFB for each bid they receive.
 
 Preferences
------------------
+-----------
 
 After receiving a set of bids for a desired resource, consumers will
 generate a :term:`Preference Description` that will be used with other
 preference descriptions by a market's consumers to determine the final
-resource exchange obligations. The preference descriptions are sent to
-the corresponding commodity market for final matching.
+resource exchange obligations. 
 
 This preference description will contain a consumer's relative
-preference for each bid/supplier.  The consumer preference vector for
-suppliers will be normalized to enforce preference equivalence among
-agents. Within these preference coefficients, there may be bids a
-consumer wishes to reject completely (unallowable arcs). This will be
-indicated by the flagged value of that coefficient.
+preference for each bid/supplier. Within these preference
+coefficients, there may be bids a consumer wishes to reject completely
+(unallowable arcs). 
 
 In addition, the preferences will contain other constraints imposed by
-the supplier and/or consumer.  Noteably, suppliers will need to
+the supplier and/or consumer.  Notably, suppliers will need to
 communicate capacity constraints to the market.  This is a potentially
 non-trivial description of resource exchange capacity for the current
 time-step's bids.  This must be able to handle scenarios where the
 capacity is a function of bid-varying properties.  For example, an
 enrichment facility may have a capacity of SWU that is equivalent to
-varrying amounts of resource mass depending on both a tails enrichment
+varying amounts of resource mass depending on both a tails enrichment
 and a supplier's desired product enrichment.
 
 Order
-------
+-----
 
-After market resolution, orders will be generated and communicated to
-suppliers. Orders must match the bid in quality (though perhaps only a
-fraction of the quantity). Suppliers are obligated to transfer
-resources exactly as described by the order.
-
-Resources are exchanged between agents along flow paths defined by in
-and out commodities. Supply and demand of those commodities is managed
-by the matching system generally described by the linear prgram (LP).
+After specifications and bids have been resolved, orders will be
+generated and communicated to suppliers. This process is described in
+the timer's :ref:`orders_phase`.
 
 .. [Holmgren] Holmgren, J., P. Davidsson, J. A. Persson, and L. Ramstedt. “An Agent Based Simulator for Production and Transportation of Products.” In The 11th World Conference on Transport Research, Berkeley, USA, 8–12, 2007.
 .. [Julka] Julka, N., R. Srinivasan, and I. Karimi. “Agent-based Supply Chain Management-1: Framework.” Computers & Chemical Engineering 26, no. 12 (2002): 1755–1769.
