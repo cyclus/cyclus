@@ -38,6 +38,8 @@ Prior to the resource exchange, modules are allowed to act. This is
 effectively the beginning of the time step. There are currently only
 two phases: Building and Execution.
 
+.. _build_phase:
+
 Building Phase
 --------------
 
@@ -60,6 +62,8 @@ step, but the development team offers this separation in order to
 provide a temporally separate mechanism in which to perform these
 actions. That is, entities can be guaranteed that these actions occur
 before any other entities enter the resource exchange step.
+
+.. _resource_exchange_time_step:
 
 Resource Exchange Step
 ======================
@@ -86,6 +90,8 @@ following phases:
  * Match Bids with Preferences (matching algorithm)
  * Send/Receive Orders (producers/consumers)
 
+.. _proposal_phase:
+
 Request for Proposals/Bids Phase
 --------------------------------
 
@@ -99,6 +105,8 @@ includes:
 
 All procurement specifications are collected from entities during this
 phase. The phase ends when all relevant entities have been queried.
+
+.. _bid_phase:
 
 Provide Bids Phase
 ------------------
@@ -132,6 +140,8 @@ spans all bids. To clarify we provide an example.
 All production bids are collected from entities during this phase. The
 phase ends when all relevant entities have been queried.
 
+.. _preference_phase:
+
 Assign Preferences Phase
 ------------------------
 
@@ -142,6 +152,8 @@ cardinal ordering [Strotz]_, i.e. their relative numerical values
 impart a notion of *degree of preference*. These numbers can be
 thought of strictly as economic costs or as such costs combined with
 externalities.
+
+.. _policy_phase:
 
 Add Policy Constraints/Costs Phase
 ----------------------------------
@@ -161,6 +173,8 @@ outgoing enriched uranium that it must be low enriched (i.e. <= 20 w/o
 U-235). Similarly, regions may affect the preference of a given
 transaction by increasing its cost. This is one way in which tax
 structures can be modeled in the simulation.
+
+.. _exchange_match_phase:
 
 Match Bids with Preferences Phase
 ---------------------------------
@@ -202,6 +216,8 @@ Post Resource Exchange Step
 After the resource exchange, modules are allowed to act. This is
 effectively the end of the time step. There are currently only
 two phases: Decommissioning and Execution.
+
+.. _decommission_phase:
 
 Decommissioning Phase
 ---------------------

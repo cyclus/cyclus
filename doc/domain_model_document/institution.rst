@@ -12,8 +12,11 @@ among two otherwise equal producer facilities.
 
 Acting further in the role of facility manager, institutions are also
 the natural entity to govern the building of new facilities and
-decommissioning of old facilities. Accordingly, institutions have a
-set of facilities which they are able to build and can respond to
-requests for new builds given a demand. For example, a institution
-that can build power reactors can respond to a request to build new
-electrical generation capacity.
+decommissioning of old facilities. These decisions are made at the
+beginning of a time step during the :ref:`build_phase`. Accordingly,
+institutions have a set of facilities which they are able to build and
+can respond to requests for new builds given a demand. For example, a
+institution that can build power reactors can respond to a request to
+build new electrical generation capacity. Similarly, the institutions
+are in charge of handling issues related to building decommissioning
+during the :ref:`decommission_phase`.
