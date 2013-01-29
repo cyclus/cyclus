@@ -8,6 +8,9 @@ document provides a basis for the implementation of the discrete and
 quantized nature of materials by discussing the the ways in which such
 a feature may be used.
 
+Always Countable, Sometimes Divisible
+=====================================
+
 Implicit to the notion of discrete and quantized materials are the
 concepts that those materials are both indivisible and countable.
 Since there some cases where it is logical to transact materials in

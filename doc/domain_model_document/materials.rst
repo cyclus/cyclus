@@ -1,38 +1,46 @@
 
 .. summary Some developers notes on how materials and isotopic vectors work
 
+.. _materials_and_istotopes:
+
 Materials and Isotopes in Cyclus
 ================================
 
-Introduction
-------------
-The following section will discuss the three classes that comprise materials and
-isotopics in *Cyclus*:
+Cyclus tracks many objects and :doc:`Resources <resources>` , but materials 
+remain the primary unit of information in the simulator. The movement, 
+transmutation, and capital exchange of materials can be used to inform many 
+metrics of interest to fuel cycle analysis.  Mass flows can be translated in 
+post-processing into economic, environmental, policy, and health related fuel 
+cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes, 
+PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
+simulation tools only track fuel materials for this reason. 
 
-  * Material
+Generic Resource Characteristics
+---------------------------------
 
-  * IsoVector
+Materials are a well defined type of conserved :doc:`Resource <resources>` in 
+the Cyclus framework.  Thus, all materials posess a :ref:`generic  Resource 
+quantity <resource_quantity>` . That is, an amount and a default unit. For 
+Materials, the default unit is kilograms and the total mass of the material is 
+therefore the generic Resource amount of any material.
 
-  * CompMap
+Material Resource Characteristics
+---------------------------------
 
-Materials are the primary Resource that is transacted in a *Cyclus* simulation. A 
-Material has two constitutents: an amount (quantity) and an isotopic composition.
+The main :ref:`quality characteristic <resource_quality>` tracked by Material 
+Resources is their isotopic composition and history. This is acheived with a 
+combination of the **IsoVector** and **CompMap** concepts. These concepts are 
+the engine with which Material objects keep track (simultaneously) of atomic 
+[mol] and mass [kg] -based isotopic vectors. 
+
+Materials are the primary Resource that is transacted in a *Cyclus* simulation. 
+The primary Material-specific :ref:`resource quality characteristic <resource_quality>` is isotopic composition.
 Isotopic compositions can be expensive to copy and to check equality, and are therefore
 decomposed into two containers. CompMaps are the most basic isotopic container, and
 can be thought of as a simple map of isotopic integer values (the keys) to values.
 An IsoVector manages a smart pointer to a CompMap in order to minimize unneccessary
 operations.
 
-Materials are the primary unit of information in fuel cycle analysis. The 
-movement, transmutation, and capital exchange of materials can be used to inform 
-many metrics of interest to fuel cycle analysis.  Mass flows can be translated 
-in post-processing into economic, environmental, policy, and health related fuel 
-cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes, 
-PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
-simulation tools only track fuel materials for this reason. 
-
-Cyclus tracks many objects and resources, but materials remain the 
-primary unit of information in the simulator.
 
 CompMaps
 --------
@@ -51,12 +59,14 @@ is provided: ::
    (*c_p)[92238] = 90.0; // 90 g_238/ 100 g_comp
    c_p.normalize();
  
+
 IsoVectors
 ----------
 
 The IsoVector class is effectively a wrapper and manager of CompMapPtrs. Addition and 
 subtraction operators are defined here, using specific cases of the mix() and separate()
 functions.
+
 
 Materials
 ---------
@@ -164,35 +174,6 @@ recipe can be acquired through its static Recipe() method.
 **What follows is to be merged with the above.** 
 
 ----
-
-Generic Resource Characteristics
----------------------------------
-
-Materials are a well defined type of conserved Resource in the Cyclus framework.  
-Thus, all materials posess the generic characteristics of Resources such as an 
-amount and a default unit. For Materials, the default unit is kilograms and the 
-total mass of the material is therefore the generic Resource amount of any 
-material.
-
-Material Resource Characteristics
----------------------------------
-
-The main specific characteristic tracked by Material Resources is their isotopic 
-composition and history. This is acheived with a combination of the 
-**IsoVector** and **CompMap** concepts. These concepts are the engine with which 
-Material objects keep track (simultaneously) of atomic [mol] and mass [kg] 
--based isotopic vectors. 
-
-IsoVector
-*********
-
-The Material keeps track of its IsoVector history throughout the simulation. 
-the IsoVector is
-
-CompMap
-*******
-
-
 
 Simulation Handling of Materials
 --------------------------------
