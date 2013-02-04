@@ -114,7 +114,7 @@ int CompMap::ID() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::massFraction(const Iso& tope) const {
-  if (count(tope) == 0) {
+  if (count(tope) == 0 || mass_to_atom_ratio_ == 0) {
     return 0.0;
   }
   double factor = 1.0;
@@ -126,14 +126,12 @@ double CompMap::massFraction(const Iso& tope) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double CompMap::atomFraction(const Iso& tope) const {
-  if (count(tope) == 0) {
+  if (count(tope) == 0 || mass_to_atom_ratio_ == 0) {
     return 0.0;
   }
   double factor = 1.0;
-  if (basis_ != ATOM && mass_to_atom_ratio_ != 0 ) {
+  if (basis_ != ATOM) {
     factor = 1 / (MT->gramsPerMol(tope) / mass_to_atom_ratio_);
-  } else if (mass_to_atom_ratio_ == 0 ){
-    factor = 0;
   }
   return factor * map_.find(tope)->second;
 }
@@ -208,12 +206,12 @@ void CompMap::normalize() {
       other_sum += it->second / MT->gramsPerMol(it->first);
     }
   }
-  if (atom && sum != 0) {
+  if (sum == 0) {
+    mass_to_atom_ratio_ = 0;
+  } else if (atom){
     mass_to_atom_ratio_ = other_sum / sum;
-  } else if (sum != 0){
+  } else {
     mass_to_atom_ratio_ = sum / other_sum;
-  } else if (sum == 0){
-    mass_to_atom_ratio_ = 0 ;
   }
   normalize(sum);
 }
