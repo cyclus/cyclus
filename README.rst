@@ -168,7 +168,7 @@ Now, run it with some input file, for this example, call it
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
 Debugging Build
-^^^^^^^^^^^^^^^
+---------------
 
 Building the debug version of the core library requires an additional
 CMake variable flag. Simply add the following to your cmake command:
