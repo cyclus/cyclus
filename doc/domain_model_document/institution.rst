@@ -1,5 +1,6 @@
-Overview
-========
+
+Institutions
+============
 
 Institutions in Cyclus are policy implementation vehicles whose goal
 is to act as a supply chain system boundary around a set of facilities
