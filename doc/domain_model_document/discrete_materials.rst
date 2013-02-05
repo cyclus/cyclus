@@ -3,10 +3,10 @@ Discrete Materials in Cyclus
 
 One of the defining features of Cyclus among other fuel cycle
 simulators is the treatment of materials as discrete quantized objects
-that can be traded and tracked throughout the simulation.  This
-document provides a basis for the implementation of the discrete and
-quantized nature of materials by discussing the the ways in which such
-a feature may be used.
+that can be traded and tracked throughout the simulation. 
+The many :doc:`use cases<use_cases>` in which such a feature is necessary
+provide a basis for this implementation of a discrete and
+quantized nature of materials. 
 
 Always Countable, Sometimes Divisible
 =====================================
