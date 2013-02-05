@@ -81,6 +81,16 @@ setting its quantity. For example: ::
     mat_rsrc_ptr m_p = mat_rsrc_ptr(new Material(c_p));
     m_p->setQuantity(10); // 10kg of c_p
 
+Material Expectations 
+*********************
+
+The material class makes two primary promises. 
+
+First, it will always decay material sufficiently that any retrieved data is 
+current.  Second, it will always conserves mass, never creating material out 
+of nothing.
+
+
 
 Material Data 
 *************
@@ -150,17 +160,6 @@ An analgous function exists for extracting based on number of atoms. ::
    extract(atoms, units) 
 
 
- 
-Material Expectations 
-*********************
-
-The material class makes two primary promises. 
-
-First, it will always decay material sufficiently that any retrieved data is 
-current.  Second, it will always conserves mass, never creating material out 
-of nothing.
-
-
 
 RecipeLogger
 ------------
@@ -168,12 +167,6 @@ RecipeLogger
 Predefined recipes are managed by the RecipeLogger in *Cyclus*. A CompMapPtr to a specific
 recipe can be acquired through its static Recipe() method.
 
-
-----
-
-**What follows is to be merged with the above.** 
-
-----
 
 Simulation Handling of Materials
 --------------------------------
