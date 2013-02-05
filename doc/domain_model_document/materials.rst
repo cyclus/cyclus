@@ -217,9 +217,9 @@ provides transparency to the developer and the user. A fundamentally sacred
 unit also provides a useful tool in error checking during development. Mass
 flows can be translated in post-processing into many metrics of interest to
 fuel cycle analysis. Facility inventories, radiotoxicity, decay heat, waste
-volumes, PRPP indices, etc. can all be found from mass flow data. [F1-F10,
-F13-F16, S1-S11, E2, E3, E7-E14, M1-M8, M10, U1, U3-U5, Analysis Function
-5.1.1]
+volumes, PRPP indices, etc. can all be found from mass flow data. 
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-10, 13-16, :ref:`Strategy Use Cases <strategy_use_cases>` 1-11, :ref:`Economics Use Cases <econ_use_cases>` 2, 3, 7-14, :ref:`Multi-Regional Use Cases <regional_use_cases>` 1-8, 10 .) 
+
 
 Mass Conversion
 ***************
@@ -232,8 +232,8 @@ Basis
 
 Lossless mass tracking requires accounting for mass changes between mass
 groups. Furthermore, a fundamentally unit provides a good basis for error
-checking during development. [F1-F10, F13-F16, S1-S11, E2, E3, E7-E14, M1-M8,
-M10, U1, U3-U5, Analysis Function 5.1.1]
+checking during development. 
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-10, 13-16, :ref:`Strategy Use Cases <strategy_use_cases>` 1-11, :ref:`Economics Use Cases <econ_use_cases>` 2, 3, 7-14, :ref:`Multi-Regional Use Cases <regional_use_cases>` 1-8, 10 .) 
                                         
 Default Material Data 
 *********************
@@ -255,9 +255,9 @@ Operational Function 5.2.1 and Performance Function 5.3.3]
 
 Providing input and output fuel recipes supports benchmarking and verification 
 objectives as well as all mission objectives involving the use of standard 
-reactor facility types and burnups. [F1-F4, F6-F10, F12, F13, F15-F16, S1-S11, 
-E2, E3, E6-E13, M1-M6, M7, U1, U3-U5, Analysis Function 5.1.1, Operational 
-Function 5.2.1 and Performance Function 5.3.3]
+reactor facility types and burnups.
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-4, 6-10, 12, 13, 15-16, :ref:`Strategy Use Cases <strategy_use_cases>` 1-11, :ref:`Economics Use Cases <econ_use_cases>` 2, 3, 6-13, :ref:`Multi-Regional Use Cases <regional_use_cases>` 1-6, 7.) 
+
                                         
 Decay Data
 **********
@@ -269,10 +269,8 @@ Basis
 
 This supports all mission objectives involving the use of preconfigured
 storage and repository models, which will rely on decay data in order to
-perform appropriate transmutations of material objects at runtime. [F1, F3-F10,
-F12, F14-F16, S2-S10, E2, E3, E6-E13, M2, M3, M6, M7, M14, U1, U3-U5,
-Operational Functions 5.2.1 and Performance Function 5.3.3, Analysis Function
-5.1.1]
+perform appropriate transmutations of material objects at runtime. 
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` F1 F3-F10, :ref:`Strategy Use Cases <strategy_use_cases>` 2-S10, :ref:`Economics Use Cases <econ_use_cases>` 2, E3, E6-E13, :ref:`Multi-Regional Use Cases <regional_use_cases>` 2, 3, 6, 7, 14.) 
                                         
                                         
 Transmutation Data?
@@ -287,9 +285,8 @@ Basis
 This supports all mission objectives involving the use of preconfigured
 nuclear systems, which will rely on libraries of externally calculated core
 physics isotopics in order to perform appropriate transmutations of material
-objects at runtime. [F1-F4, F6-F10, F12, F13, F15-F16, S1-S11, E2, E3, E6- E13,
-M1-M7, U1, U3-U5, Analysis Function 5.1.1, Operational Function 5.2.1 and
-Performance Function 5.3.3].
+objects at runtime. 
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-4, 6-10, 12, 13, 15-16, :ref:`Strategy Use Cases <strategy_use_cases>` 1-11, :ref:`Economics Use Cases <econ_use_cases>` 2, 3, 6-13, :ref:`Multi-Regional Use Cases <regional_use_cases>` 1-7 .)
                                         
 
 Separations Data?
@@ -306,9 +303,8 @@ reprocessing facilities, which will rely on separations matrices modeling
 standard aqueous (i.e. PUREX, UREX and electrochemical), pyrolitic (e.g.
 electrolysis, voloxidation, or fluoride volatility), and other standard
 reprocessing methods to perform appropriate transmutations of material objects
-at runtime. [F1-F10, F12-F16, S1-S10, E1-E3, E8-E14, M1-M7, M10, M16, U1-U5,
-Analysis Function 5.1.1, Operational Function 5.2.1 and Performance Function
-5.3.3].
+at runtime.
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-10, 12-16, :ref:`Strategy Use Cases <strategy_use_cases>` 1-10, :ref:`Economics Use Cases <econ_use_cases>` 1-3, 8-14, :ref:`Multi-Regional Use Cases <regional_use_cases>` 1-7, 10, 16.)
 
 Chemical Forms Data?
 ********************
@@ -321,6 +317,9 @@ Basis
 
 This supports all mission objectives concerned with waste
 characterization which rely on preconfigured repository, storage, and
-transportation models. [F1-F10, F12, F13, F15, F16, S1, S3-S10, E1-E3, E6, E7,
+transportation models.
+[F1-F10, F12, F13, F15, F16, S1, S3-S10, E1-E3, E6, E7,
 E9, E11, M2, M3, M6, M7, U3-U5, Analysis Function 5.1.1, Operational Function
 5.2.1 and Performance Function 5.3.3] 
+
+(Use Cases : :ref:`Technology Use Cases <tech_use_cases>` 1-10, 12, 13, 15, 16, :ref:`Strategy Use Cases <strategy_use_cases>` 1, 3-10, :ref:`Economics Use Cases <econ_use_cases>` 1-3, 6, 7, 9 11, :ref:`Multi-Regional Use Cases <regional_use_cases>` 2, 3, 6, 7.)
