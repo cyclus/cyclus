@@ -38,11 +38,11 @@ Safety might be measured in
 Related Use Cases
 ******************
 
-:ref:`Technology Use Case<tech_use_cases>` 1. 
-:ref:`Technology Use Case<tech_use_cases>` 6. 
-:ref:`Technology Use Case<tech_use_cases>` 7. 
-:ref:`Technology Use Case<tech_use_cases>` 8. 
-:ref:`Technology Use Case<tech_use_cases>` 9. 
+*  :ref:`Technology Use Case <tech_use_cases>` 1. 
+*  :ref:`Technology Use Case <tech_use_cases>` 6. 
+*  :ref:`Technology Use Case <tech_use_cases>` 7. 
+*  :ref:`Technology Use Case <tech_use_cases>` 8. 
+*  :ref:`Technology Use Case <tech_use_cases>` 9. 
 
 
 Envrionmental Impact
@@ -64,20 +64,20 @@ Environmental Impact might be measured in
 Related Use Cases
 ******************
 
-:ref:`Technology Use Case<tech_use_cases>` 1. 
-:ref:`Technology Use Case<tech_use_cases>` 6. 
-:ref:`Technology Use Case<tech_use_cases>` 7. 
-:ref:`Technology Use Case<tech_use_cases>` 8. 
-:ref:`Technology Use Case<tech_use_cases>` 9. 
-:ref:`Technology Use Case<tech_use_cases>` 10. 
-:ref:`Technology Use Case<tech_use_cases>` 11. 
-:ref:`Technology Use Case<tech_use_cases>` 12. 
-:ref:`Technology Use Case<tech_use_cases>` 16. 
-:ref:`Strategy Use Case<strategy_use_cases>` 2. 
-:ref:`Strategy Use Case<strategy_use_cases>` 3. 
-:ref:`Strategy Use Case<strategy_use_cases>` 8. 
-:ref:`Strategy Use Case<strategy_use_cases>` 9. 
-:ref:`Strategy Use Case<strategy_use_cases>` 11. 
+*  :ref:`Technology Use Case <tech_use_cases>` 1. 
+*  :ref:`Technology Use Case <tech_use_cases>` 6. 
+*  :ref:`Technology Use Case <tech_use_cases>` 7. 
+*  :ref:`Technology Use Case <tech_use_cases>` 8. 
+*  :ref:`Technology Use Case <tech_use_cases>` 9. 
+*  :ref:`Technology Use Case <tech_use_cases>` 10. 
+*  :ref:`Technology Use Case <tech_use_cases>` 11. 
+*  :ref:`Technology Use Case <tech_use_cases>` 12. 
+*  :ref:`Technology Use Case <tech_use_cases>` 16. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 2. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 3. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 8. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 9. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 11. 
 
 
 Economics
@@ -103,7 +103,7 @@ Economics might be measured in
 Related Use Cases
 ******************
 
-:ref:`All Economic Use Cases<econ_use_cases>`. 
+*  :ref:`All Economic Use Cases<econ_use_cases>`. 
 
 Proliferation
 -----------
@@ -123,25 +123,25 @@ Example Units of Measure
 Related Use Cases
 ******************
 
-:ref:`Technology Use Case<tech_use_cases>` 1. 
-:ref:`Technology Use Case<tech_use_cases>` 3. 
-:ref:`Technology Use Case<tech_use_cases>` 6. 
-:ref:`Technology Use Case<tech_use_cases>` 10. 
-:ref:`Technology Use Case<tech_use_cases>` 15. 
-:ref:`Strategy Use Case<strategy_use_cases>` 1. 
-:ref:`Strategy Use Case<strategy_use_cases>` 2. 
-:ref:`Strategy Use Case<strategy_use_cases>` 7. 
-:ref:`Economic Use Case<econ_use_cases>` 14. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 2. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 3. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 4. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 5. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 6. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 7. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 10. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 11. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 12. 
-:ref:`Multi-Regional Use Case<regional_use_cases>` 16. 
-:ref:`Disruption Use Case<disruption_use_cases>` 3. 
-:ref:`Disruption Use Case<disruption_use_cases>` 6. 
+*  :ref:`Technology Use Case <tech_use_cases>` 1. 
+*  :ref:`Technology Use Case <tech_use_cases>` 3. 
+*  :ref:`Technology Use Case <tech_use_cases>` 6. 
+*  :ref:`Technology Use Case <tech_use_cases>` 10. 
+*  :ref:`Technology Use Case <tech_use_cases>` 15. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 1. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 2. 
+*  :ref:`Strategy Use Case <strategy_use_cases>` 7. 
+*  :ref:`Economic Use Case <econ_use_cases>` 14. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 2. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 3. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 4. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 5. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 6. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 7. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 10. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 11. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 12. 
+*  :ref:`Multi-Regional Use Case <regional_use_cases>` 16. 
+*  :ref:`Disruption Use Case <disruption_use_cases>` 3. 
+*  :ref:`Disruption Use Case <disruption_use_cases>` 6. 
 
