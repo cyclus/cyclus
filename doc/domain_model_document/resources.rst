@@ -16,7 +16,7 @@ traded item (e.g., electricity, money, or workers).
 
 In support of  metrics calculations, a Resource must have knowlege of what is 
 and how it was created.  Accordingly, it keeps track of its units, quality, 
-quantity, the id of its creator, and if it was spawned from the splitting of a 
+quantity, the id of its creator, and whether it was spawned from the splitting of a 
 different Resource. 
     
 Resources are simulation objects that can or should be traded and tracked 
@@ -42,12 +42,28 @@ Attributes of all Resources include :
    original Resource it once was (if it was separated from the original Resource 
    at some point).
 
+.. _resource-quantity:
+
+Quantity
+---------
+
+A Resource object must have a quantity associated with it, expressed in its 
+native unit. The native unit for Material quantity is kilograms, the SI unit of 
+mass. However, a developer could imagine that an electricity Resource might have 
+units of kW, MW, or GW and a money Resource might have units of dollars, euros, 
+or yuan. 
+
+Each Resource object, then, has a total quantity in its native unit. The electricity 
+offered by the DC Cook Unit 1 Reactor, for example, is 1,048 MW. 
+Since Resources may be split into two or combined with other Resources, the 
+Resource amount is mutable over time.
+
 .. _resource-quality:
 
 Quality
 ---------
 
-In addition to the generic characteristics that all Resources must have, 
+In addition to the generic resource-quantity_ characteristics that all Resources must have, 
 specific Resource types can be defined by the developer to have arbitrarily many 
 defining characteristics. These specific characteristics are necessary for 
 comparing and trading Resources during the simulation and for analyzing fuel 
@@ -70,21 +86,6 @@ may not be interchangeable (e.g., reactor operators vs. crane operators). The
 interchangeability of these subtypes will be dependent on quality and quantity 
 checks provided for the class.
 
-.. _resource-quantity:
-
-Quantity
----------
-
-A Resource object must have a quantity associated with it, expressed in its 
-native unit. The native unit for Material quantity is kilograms, the SI unit of 
-mass. However, a developer could imagine that an electricity Resource might have 
-units of kW, MW, or GW and a money Resource might have units of dollars, euros, 
-or yuan. 
-
-Each Resource object, then, has a total quantity in its native unit. The electricity 
-offered by the DC Cook Unit 1 Reactor, for example, is 1,048 MW. 
-Since Resources may be split into two or combined with other Resources, the 
-Resource amount is mutable over time.
 
 Resource Methods
 -----------------
@@ -105,20 +106,21 @@ Resource Conservation
 
 Most Resources must be conserved. Material must always be accounted for, capital 
 does not evaporate into thin air, etc. To obey laws of physics and economics, 
-the simulation framework provides a conservative interface for absorbing and 
-extracting Resources from one another (note, this should probably be in future 
-tense... it's true in Materials, but not so much for Resources at large).
+the simulation framework will provide a conservation utility, which provides an 
+interface for absorbing and extracting Resources from one another 
+conservatively. 
 
-Some Resources do not need to be conserved exactly however. A workforce, for 
+However, some Resources do not need to be conserved exactly. A workforce, for 
 example, may ebb and flow in size, since human careers are not constrained by 
 any conservation laws (two workers can become three, one worker might decide to 
-be a baker, etc.). For Resources that need not be conserved, the developer is 
-not constrained to the use of the conservative absorb and extract methods.
+retire or become a baker, etc.). For Resources that need not be conserved, the 
+developer is not constrained to the use of the conservative absorb and extract 
+interface methods.
 
 Resource Tracking
 ------------------
 
-The generic and specific characteristics of each Resource object over time is 
+The generic and specific characteristics of each Resource object over time are 
 tracked by the simulation and recorded in the output database. Entries in the 
 database are **always** written when 
 

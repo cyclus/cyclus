@@ -7,6 +7,8 @@ provide an interface that accomodates a variety of input parameters and output
 metrics for a range of users. This section describes the types of studies that 
 will be explicitly supported by the Cyclus framework.  
 
+.. _tech_use_cases:
+
 Technology Studies
 ------------------
 
@@ -66,10 +68,11 @@ Cyclus will support investigation and analysis of:
 #. Transition dynamics for new facility types.
 #. The need for an advanced fuel research facility and system effects of new 
    fuels and cladding capable of irradiation to higher burnup.
-#. Safeguards effectiveness against covert fuel cycles.b
+#. Safeguards effectiveness against covert fuel cycles.
 #. Non-Radiological releases from fuel cycle facilities (e.g. SO2 from 
    Mine/Milling) [IAEA2007]_.
 
+.. _strategy_use_cases:
 
 Strategy Studies
 ----------------
@@ -124,6 +127,8 @@ Cyclus will enable the strategic investigation, analysis, and demonstration of:
    Classification Bases, etc.)
 #. Nuclear assisted reduction of fossil fuel use. (e.g. bio-mass processing)
 
+
+.. _econ_use_cases:
 
 Economic Studies
 -----------------
@@ -183,6 +188,8 @@ Cyclus will enable the investigation and analysis of:
 #. Feedback effects of material prices on material routing.
 #. Feedback effects of trade relationships and material availability on regional 
    technology deployment.
+
+.. _regional_use_cases:
 
 Multi-Regional Studies
 -----------------------
@@ -246,6 +253,8 @@ Cyclus will enable the multi-regional investigation and analysis of:
 #. Deployment effects of institutional (e.g. governments, corporations) 
    variations in available capital, technology capability, etc.
    
+
+.. _disruption_use_cases:
 
 Disruption Studies
 --------------------

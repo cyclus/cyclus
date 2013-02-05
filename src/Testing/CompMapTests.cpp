@@ -83,6 +83,14 @@ TEST_F(CompMapTests,lineage) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests,empty_comp_behaviors) {
+  comp_[92235]=0;
+  comp_.normalize();
+  EXPECT_FLOAT_EQ(0,comp_.atomFraction(92235));
+  EXPECT_FLOAT_EQ(0,comp_.massFraction(92235));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,equality) {
   LoadMap();
   comp_.setMap(map_);
@@ -90,3 +98,4 @@ TEST_F(CompMapTests,equality) {
   CompMap copy = CompMap(comp_);
   EXPECT_TRUE(copy == comp_);
 }
+
