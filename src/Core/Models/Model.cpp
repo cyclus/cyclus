@@ -82,11 +82,24 @@ void Model::loadModule(std::string model_type, std::string module_name)
   shared_ptr<DynamicModule> 
     module(new DynamicModule(model_type,module_name)); 
 
+  module->initialize();
+  
   loaded_modules_.insert(make_pair(module_name,module));
   
   CLOG(LEV_DEBUG1) << "Module '" << module_name
                    << "' of type: " << model_type 
                    << " has been loaded.";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::unloadModules()
+{
+  std::map<std::string,boost::shared_ptr<DynamicModule> >::iterator it;
+  for (it = loaded_modules_.begin(); it != loaded_modules_.end(); it++)
+    {
+      it->second->closeLibrary();
+    }
+  loaded_modules_.erase(loaded_modules_.begin(),loaded_modules_.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

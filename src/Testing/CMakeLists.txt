@@ -11,6 +11,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingTestHelper.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
