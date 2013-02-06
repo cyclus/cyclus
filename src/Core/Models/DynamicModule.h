@@ -18,10 +18,6 @@ class DynamicModule {
      * abs_path_
      * constructor_name_
      * destructor_name_
-     calls:
-     * openLibrary()
-     * setConstructor()
-     * setDestructor()
      @param type the module type
      @param name the name of the module
    */
@@ -48,6 +44,19 @@ class DynamicModule {
      @param model the model to destruct
   */
   void destructInstance(Model* model);
+
+  /**
+     initializes the module by calling
+     * openLibrary()
+     * setConstructor()
+     * setDestructor()
+   */
+  void initialize();
+
+  /**
+     closes the library
+   */
+  void closeLibrary();
   
  private:
   /// the path to the library
@@ -88,11 +97,6 @@ class DynamicModule {
      sets the destructor member
    */
   void setDestructor();
-
-  /**
-     closes the library
-   */
-  void closeLibrary();
 };
 
 #endif
