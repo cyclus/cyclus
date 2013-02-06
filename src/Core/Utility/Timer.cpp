@@ -222,8 +222,14 @@ int Timer::simDur() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer::Timer() {
-  time_ = 0;
+Timer::Timer() :
+  time_(0),
+  time0_(0),
+  simDur_(0),
+  decay_interval_(0),
+  month0_(0),
+  year0_(0)
+{
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
