@@ -58,7 +58,7 @@ TEST_F(BuildingManagerTests,registration)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,problem) 
+TEST_F(BuildingManagerTests,DISABLED_problem) 
 {
   setUpProblem();
   vector<BuildOrder> orders = manager.makeBuildDecision(helper->commodity,demand);
