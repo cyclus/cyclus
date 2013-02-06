@@ -131,6 +131,13 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
+  // Close Dynamically loaded modules 
+  try {
+    Model::unloadModules();
+  } catch (CycException err) {
+    CLOG(LEV_ERROR) << err.what();
+  }
+
   // Close the output file
   try {
     BI->closeDB();

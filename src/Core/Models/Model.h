@@ -84,6 +84,12 @@ class Model {
   static void loadModule(std::string model_type, std::string module_name);
 
   /**
+     closes the library of each dynamically loaded module and erases
+     it from the loaded modules container
+   */
+  static void unloadModules();
+
+  /**
      constructs and initializes an entity
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data

@@ -22,6 +22,10 @@ DynamicModule::DynamicModule(std::string type, std::string name) :
   constructor_name_= "construct" + name;
   destructor_name_= "destruct" + name;
 
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void DynamicModule::initialize() {
   openLibrary();
   setConstructor();
   setDestructor();
@@ -29,7 +33,6 @@ DynamicModule::DynamicModule(std::string type, std::string name) :
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::~DynamicModule() {
-  closeLibrary();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
