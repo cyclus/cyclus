@@ -114,18 +114,6 @@ class BookKeeper {
      Turn off logging 
    */
   void turnLoggingOff();
-  
-  /**
-     Creates a database file with the default name and path 
-   */
-  void createDB();
-
-  /**
-     Creates a database file with the default name and given path 
-
-     @param fpath the path to the file 
-   */
-  void createDB(file_path fpath);
 
   /**
      Creates a database given a file_path. This is the master create 
@@ -137,7 +125,7 @@ class BookKeeper {
      
      @param fpath the path to the file 
    */
-  void createDB(std::string name, file_path fpath);
+  void createDB(std::string fpath, std::string name="cyclus.sqlite");
 
   /**
      Returns the database this Book Keeper is maintaining. 
