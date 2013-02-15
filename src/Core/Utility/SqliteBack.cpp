@@ -131,6 +131,7 @@ std::string SqliteBack::valData(boost::any v) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::flush(){
   db_->open();
+  db_->execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); it++) {
     try {
     db_->execute(*it);
@@ -139,6 +140,7 @@ void SqliteBack::flush(){
                       << err.what();
     }
   }
+  db_->execute("END TRANSACTION");
   cmds_.clear();
 }
 
