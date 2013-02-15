@@ -34,7 +34,6 @@ class Event: IntrusiveBase<Event> {
     void record();
 
     std::string group();
-    Model* creator();
     ValMap vals();
     std::string name();
 
@@ -46,7 +45,8 @@ class Event: IntrusiveBase<Event> {
 
     EventManager* manager_;
     std::string group_;
-    Model* creator_;
+    int creator_id_;
+    std::string creator_impl_;
     ValMap vals_;
 };
 

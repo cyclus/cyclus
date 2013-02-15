@@ -38,7 +38,7 @@ class EventManager {
     void notifyBacks();
 
     std::list<event_ptr> events_;
-    std::map<Model*, std::map<std::string, event_ptr> > schemas_;
+    std::map<std::string, event_ptr> schemas_;
     std::list<EventBackend*> backs_;
 
     /// A pointer to singleton EventManager.

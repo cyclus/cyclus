@@ -23,14 +23,11 @@ event_ptr EventManager::newEvent(Model* creator, std::string group) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool EventManager::isValidSchema(event_ptr ev) {
-  if (schemas_.find(ev->creator()) != schemas_.end()) {
-    std::map<std::string, event_ptr> subs = schemas_[ev->creator()];
-    if (subs.find(ev->group()) != subs.end()) {
-      event_ptr primary = subs[ev->group()];
-      if (! ev->schemaWithin(primary)) {
-        return false;
-      } 
-    }
+  if (schemas_.find(ev->name()) != schemas_.end()) {
+    event_ptr primary = schemas_[ev->name()];
+    if (! ev->schemaWithin(primary)) {
+      return false;
+    } 
   }
   return true;
 }
@@ -43,7 +40,7 @@ void EventManager::addEvent(event_ptr ev) {
     throw CycGroupDataMismatchErr(msg);
   }
 
-  schemas_[ev->creator()][ev->group()] = ev;
+  schemas_[ev->name()] = ev;
   events_.push_back(ev);
   if (events_.size() >= DUMP_SIZE) {
     notifyBacks();
