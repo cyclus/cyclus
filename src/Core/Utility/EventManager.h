@@ -54,7 +54,7 @@ class EventBackend {
 // CustomBackend* myback = new CustomBackend();
 // manager->registerBackend(myback);
 // ...
-// Event* ev = manager->newEvent(creator, "CapacityFactor");
+// event_ptr ev = manager->newEvent(creator, "CapacityFactor");
 // ...
 // ev->record();
 // ...
@@ -79,6 +79,7 @@ class EventManager {
 
   public:
 
+    // create a new event manager with default dump frequency.
     EventManager();
 
     // When called with an argument, sets the EventManager to flush its
@@ -113,6 +114,9 @@ class EventManager {
 
 };
 
+// this allows files to use events without having to explicitly include
+// both EventManager.h and Event.h, while avoiding a circular include
+// dependency.
 #include "Event.h"
 
 #endif

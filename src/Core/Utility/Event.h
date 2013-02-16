@@ -13,10 +13,13 @@ class CycDupEventFieldErr: public CycException {
     public: CycDupEventFieldErr(std::string msg) : CycException(msg) {};
 };
 
-class Event: IntrusiveBase<Event> {
-  friend class EventManager;
+// Used to specify and send a collection of key-value pairs to the
+// EventManager for recording.
+class Event: IntrusiveBase<Event> { friend class EventManager;
 
   public:
+
+    virtual ~Event();
 
     // Add an arbitrary labeled value to the event.
     //
@@ -27,18 +30,18 @@ class Event: IntrusiveBase<Event> {
     // what the selected backend(s) handles.
     event_ptr addVal(std::string field, boost::any val);
 
-    // Add a timestamp value to this event of the current simulation time.
-    // @return a pointer to this event (for method chaining).
-    event_ptr timestamp();
-
-    // Record this event to output.
+    /// Record this event to its EventManager.
     void record();
 
+    /// Returns the event's title as specified during the event's creation.
     std::string title();
-    ValMap vals();
-    std::string name();
 
-    virtual ~Event();
+    /// Returns a map of all field-value pairs that have been added to this event.
+    ValMap vals();
+
+    // Returns the full, unique name generated for this event using info about
+    // its creator along with its title.
+    std::string name();
 
   private:
     Event(EventManager* m, Model* creator, std::string title);

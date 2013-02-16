@@ -172,7 +172,7 @@ void Transaction::addTransToTable() {
     ->addVal("MarketID", market()->ID())
     ->addVal("Commodity", commod())
     ->addVal("Price", price_)
-    ->timestamp()
+    ->addVal("Time", TI->time())
     ->record();
 }
 

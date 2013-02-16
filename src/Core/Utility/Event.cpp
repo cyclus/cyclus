@@ -15,13 +15,6 @@ event_ptr Event::addVal(std::string field, boost::any val) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr Event::timestamp() {
-  std::string field = "Time";
-  boost::any val = TI->time();
-  return addVal(field, val);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Event::record() {
   event_ptr ev(this);
   manager_->addEvent(ev);
