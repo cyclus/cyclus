@@ -16,8 +16,8 @@ EventManager* EventManager::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr EventManager::newEvent(Model* creator, std::string group) {
-  event_ptr ev(new Event(this, creator, group));
+event_ptr EventManager::newEvent(Model* creator, std::string title) {
+  event_ptr ev(new Event(this, creator, title));
   return ev;
 }
 
@@ -36,11 +36,11 @@ bool EventManager::isValidSchema(event_ptr ev) {
 void EventManager::addEvent(event_ptr ev) {
   if (! isValidSchema(ev)) {
     std::string msg;
-    msg = "Group '" + ev->group() + "' with different schema already exists.";
-    throw CycGroupDataMismatchErr(msg);
+    msg = "Name '" + ev->name() + "' with different schema already exists.";
+    throw CycInvalidSchemaErr(msg);
   }
 
-  schemas_[ev->name()] = ev;
+  schemas_[ev->title()] = ev;
   events_.push_back(ev);
   if (events_.size() >= DUMP_SIZE) {
     notifyBacks();

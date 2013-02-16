@@ -28,9 +28,9 @@ void Event::record() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::Event(EventManager* m, Model* creator, std::string group) {
+Event::Event(EventManager* m, Model* creator, std::string title) {
   manager_ = m;
-  group_ = group;
+  title_ = title;
   creator_id_ = -1;
   if (creator != NULL) {
     creator_id_ = creator->ID();
@@ -56,8 +56,8 @@ bool Event::schemaWithin(event_ptr primary) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Event::group() {
-  return group_;
+std::string Event::title() {
+  return title_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +69,7 @@ ValMap Event::vals() {
 std::string Event::name() {
   if (creator_id_ > -1) {
     std::stringstream ss;
-    ss << creator_impl_ + "_" << creator_id_ << "_" + group();
+    ss << creator_impl_ + "_" << creator_id_ << "_" + title_;
     return ss.str();
   }
   return group();

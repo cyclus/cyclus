@@ -14,8 +14,9 @@ class CycDupEventFieldErr: public CycException {
 };
 
 class Event: IntrusiveBase<Event> {
+  friend class EventManager;
+
   public:
-    friend class EventManager;
 
     // Add an arbitrary labeled value to the event.
     //
@@ -33,18 +34,18 @@ class Event: IntrusiveBase<Event> {
     // Record this event to output.
     void record();
 
-    std::string group();
+    std::string title();
     ValMap vals();
     std::string name();
 
     virtual ~Event();
 
   private:
-    Event(EventManager* m, Model* creator, std::string group);
+    Event(EventManager* m, Model* creator, std::string title);
     bool schemaWithin(event_ptr primary);
 
     EventManager* manager_;
-    std::string group_;
+    std::string title_;
     int creator_id_;
     std::string creator_impl_;
     ValMap vals_;

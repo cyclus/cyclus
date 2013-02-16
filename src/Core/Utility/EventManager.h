@@ -21,8 +21,8 @@ typedef boost::intrusive_ptr<Event> event_ptr;
 typedef std::map<std::string, boost::any> ValMap;
 typedef std::list<event_ptr> EventList;
 
-class CycGroupDataMismatchErr: public CycException {
-    public: CycGroupDataMismatchErr(std::string msg) : CycException(msg) {};
+class CycInvalidSchemaErr: public CycException {
+    public: CycInvalidSchemaErr(std::string msg) : CycException(msg) {};
 };
 
 class EventBackend {
@@ -33,9 +33,12 @@ class EventBackend {
 };
 
 class EventManager {
+  friend class Event;
+
   private:
     bool isValidSchema(event_ptr ev);
     void notifyBacks();
+    void addEvent(event_ptr ev);
 
     std::list<event_ptr> events_;
     std::map<std::string, event_ptr> schemas_;
@@ -45,10 +48,10 @@ class EventManager {
     static EventManager* instance_;
 
   public:
-    event_ptr newEvent(Model* creator, std::string group);
+    event_ptr newEvent(Model* creator, std::string title);
     void registerBackend(EventBackend* b);
-    void addEvent(event_ptr ev);
     void close();
+
 
     /// Returns a pointer to the global singleton EventManager
     static EventManager* Instance();
