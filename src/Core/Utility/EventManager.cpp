@@ -3,9 +3,14 @@
 #include "EventManager.h"
 #include "Event.h"
 
-#define DUMP_SIZE 10000
+#define DEFAULT_DUMP_FREQ 10000
 
 EventManager* EventManager::instance_ = 0;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+EventManager::EventManager() {
+  dump_freq_ = DEFAULT_DUMP_FREQ;
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 EventManager* EventManager::Instance() {
@@ -13,6 +18,15 @@ EventManager* EventManager::Instance() {
     instance_ = new EventManager();  
   }
   return instance_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+unsigned int EventManager::dump_freq(unsigned int size) {
+  if (size == 0) {
+    return dump_freq_;
+  }
+  dump_freq_ = size;
+  return size;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,7 +56,7 @@ void EventManager::addEvent(event_ptr ev) {
 
   schemas_[ev->title()] = ev;
   events_.push_back(ev);
-  if (events_.size() >= DUMP_SIZE) {
+  if (events_.size() >= dump_freq_) {
     notifyBacks();
   }
 }

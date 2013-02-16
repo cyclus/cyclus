@@ -72,6 +72,6 @@ std::string Event::name() {
     ss << creator_impl_ + "_" << creator_id_ << "_" + title_;
     return ss.str();
   }
-  return group();
+  return title_;
 }
 
