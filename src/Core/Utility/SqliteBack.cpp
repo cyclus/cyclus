@@ -1,4 +1,4 @@
-
+// SqliteBack.cpp
 #include "SqliteBack.h"
 
 #include "CycException.h"
@@ -9,7 +9,7 @@
 #include <fstream>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SqliteBack::SqliteBack(std::string filename){
+SqliteBack::SqliteBack(std::string filename) {
   path_ = filename;
   db_ = new SqliteDb(path_);
   db_->overwrite();

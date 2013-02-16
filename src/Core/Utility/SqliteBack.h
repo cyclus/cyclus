@@ -8,16 +8,26 @@
 #include <list>
 #include <string>
 
+// An EventManager backend that writes data to an sqlite database.  Identically
+// named events have their data placed as rows in a single table.
 class SqliteBack: public EventBackend {
   public:
+    // Creates a new sqlite backend that will write to (or overwrite) a file.
+    //
+    // @param filename the filepath (including name) to write the sqlite file.
     SqliteBack(std::string filename);
     
     virtual ~SqliteBack();
   
+    // Write events immediately to the database as a single transaction.
+    //
+    // @param events group of events to write to the database together.
     void notify(EventList events);
 
+    /// Returns a unique name for this backend
     std::string name();
 
+    /// Finishes any incomplete tasks and closes the database/file.
     void close();
 
   private:

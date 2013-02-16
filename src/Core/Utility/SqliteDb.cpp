@@ -9,10 +9,10 @@
 #include <fstream>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SqliteDb::SqliteDb(std::string filename){
+SqliteDb::SqliteDb(std::string path) {
   db_ = NULL;
   isOpen_ = false;
-  path_ = filename;
+  path_ = path;
   overwrite_ = false;
 }
 
@@ -82,7 +82,7 @@ void SqliteDb::execute(std::string sql) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::vector<StrList> SqliteDb::query(std::string sql){  
+std::vector<StrList> SqliteDb::query(std::string sql) {
   open();
 
   sqlite3_stmt *statement;

@@ -9,25 +9,32 @@
 #include <string>
 #include <boost/any.hpp>
 
+
+/// indicates a field has previously been added to an event.
 class CycDupEventFieldErr: public CycException {
     public: CycDupEventFieldErr(std::string msg) : CycException(msg) {};
 };
 
 // Used to specify and send a collection of key-value pairs to the
 // EventManager for recording.
-class Event: IntrusiveBase<Event> { friend class EventManager;
+class Event: IntrusiveBase<Event> {
+  friend class EventManager;
 
   public:
 
     virtual ~Event();
 
-    // Add an arbitrary labeled value to the event.
+    // Add an arbitrary field-value pair to the event.
     //
     // @param field a label or key for a value. Loosely analogous to a column
     // label.
+    // @param field a label or key for a value. Loosely analogous to a column
+    // label.
     //
-    // @warning for the val argument - what val types are supported depends on
-    // what the selected backend(s) handles.
+    // @warning for the val argument - what variable types are supported depends on
+    // what the backend(s) in use are designed to handle.
+    //
+    // @throw CycDupEventFieldErr the passed field has been used already in this event
     event_ptr addVal(std::string field, boost::any val);
 
     /// Record this event to its EventManager.

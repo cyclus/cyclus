@@ -1,4 +1,3 @@
-
 // EventManager.h
 #if !defined(_EVENTMANAGER_H)
 #define _EVENTMANAGER_H
