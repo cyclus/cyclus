@@ -3,14 +3,6 @@
 
 #include "ResourceBuffTests.h"
 
-/*
-To check:
-
-  * after makeUnlimited:
-    * can push materials without restraint
-
-*/
-
 // Test order MATTERS.  Beware of reordering.
 
 // The "Empty" suffix indicates the test uses the store_ instance of
@@ -99,72 +91,6 @@ TEST_F(ResourceBuffTest, GetCount_Empty) {
 TEST_F(ResourceBuffTest, GetCount_Filled) {
   ASSERT_NO_THROW(filled_store_.count());
   EXPECT_DOUBLE_EQ(filled_store_.count(), 2);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, GetUnlimited_InitialEmpty) {
-  ASSERT_NO_THROW(store_.unlimited());
-  EXPECT_EQ(store_.unlimited(), false);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, MakeUnlimited_Empty) {
-  ASSERT_NO_THROW(store_.makeUnlimited());
-  store_.makeUnlimited();
-  EXPECT_EQ(store_.unlimited(), true);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, GetCapacity_UnlimitedEmpty) {
-  store_.makeUnlimited();
-  EXPECT_NO_THROW(store_.setCapacity(cap));
-  EXPECT_DOUBLE_EQ(store_.capacity(),cap);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, GetSpace_UnlimitedEmpty) {
-  store_.makeUnlimited();
-  EXPECT_DOUBLE_EQ(store_.space(), -1.0);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, MakeLimited_ExceptionsEmpty) {
-  store_.makeUnlimited();
-  ASSERT_THROW(store_.makeLimited(neg_cap), CycOverCapException);
-
-  // be sure that unlimited status doesn't change if exceptions are thrown
-  EXPECT_EQ(store_.unlimited(), true);
-
-  ASSERT_NO_THROW(store_.makeLimited(zero_cap));
-  ASSERT_NO_THROW(store_.makeLimited(cap));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, MakeLimited_ExceptionsFilled) {
-  filled_store_.makeUnlimited();
-  ASSERT_THROW(filled_store_.makeLimited(low_cap), CycOverCapException);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, MakeLimited_Empty) {
-  store_.makeUnlimited();
-  ASSERT_EQ(store_.unlimited(), true);
-
-  store_.makeLimited(zero_cap);
-  ASSERT_EQ(store_.unlimited(), false);
-
-  EXPECT_DOUBLE_EQ(store_.capacity(), zero_cap);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, MakeLimited_Filled) {
-  filled_store_.makeUnlimited();
-  ASSERT_EQ(filled_store_.unlimited(), true);
-
-  filled_store_.makeLimited(cap);
-  ASSERT_EQ(filled_store_.unlimited(), false);
-
-  EXPECT_DOUBLE_EQ(filled_store_.capacity(), cap);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -328,21 +254,6 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
   ASSERT_NO_THROW(store_.pushOne(mat2_));
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, PushToUnlimited) {
-  store_.setCapacity(cap);
-  store_.makeUnlimited();
-
-  int nMats = 5;
-  double tot = cap * nMats;
-  for (int i = 0; i < nMats; i++) {
-    rsrc_ptr mat = rsrc_ptr(new Material(vect1_));
-    mat->setQuantity(cap);
-    ASSERT_NO_THROW(store_.pushOne(mat));
-  }
-  EXPECT_DOUBLE_EQ(store_.quantity(), tot);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
