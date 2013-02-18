@@ -97,9 +97,9 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
+  // get output db location
   string output_path;
   string fname = "cyclus.sqlite";
-  // Create the output file
   if (vm.count("output-path")){
     output_path = vm["output-path"].as<string>();
     string ext = ".sqlite";
@@ -112,7 +112,9 @@ int main(int argc, char* argv[]) {
     }
   } else { 
     output_path = Env::checkEnv("PWD");
-    }
+  }
+
+  // create output db
   try {
     BI->createDB(output_path, fname);
   } catch (CycException ge) {
