@@ -7,9 +7,9 @@
 #include "CycException.h"
 #include <list>
 #include <vector>
-#include <string>
+#include <limits>
 
-#define BUFF_INFINITY 1e300
+static double const kBuffInfinity = std::numeric_limits<double>::max();
 
 class CycOverCapException: public CycException {
     public: CycOverCapException(std::string msg) : CycException(msg) {};
