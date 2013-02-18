@@ -42,7 +42,16 @@ void BookKeeper::createDB(){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BookKeeper::createDB(file_path fpath){
-  createDB("cyclus.sqlite", fpath);
+  string ext = ".sqlite";
+  string::size_type sql_ext_pos = fpath.rfind(ext);
+  if (sql_ext_pos != string::npos) {
+    string::size_type last_slash_pos = fpath.rfind("/");
+    int fname_len = fpath.length() - last_slash_pos - 1;
+    string fname = fpath.substr( last_slash_pos+1, fname_len);
+    createDB(fname, fpath.substr(0,fpath.length()-fname_len));
+  } else { 
+    createDB("cyclus.sqlite", fpath);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
