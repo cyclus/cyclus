@@ -172,7 +172,8 @@ int main(int argc, char* argv[]) {
     cout << "|                  Cyclus                    |" << endl;
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
-    cout << "Output location: " << output_path << fname << endl;
+    cout << "Output location: " << output_path << endl;
+    cout << "Output filename: " << fname << endl;
     cout << endl;
   } else {
     cout << endl;
