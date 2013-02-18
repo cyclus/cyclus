@@ -38,6 +38,13 @@ class SqliteBack: public EventBackend {
     /// Finishes any incomplete tasks and closes the database/file.
     void close();
 
+  protected: // for testing
+
+    /// Execute all pending commands.
+    virtual void flush();
+
+    StrList cmds_;
+
   private:
     bool tableExists(event_ptr e); 
 
@@ -51,16 +58,11 @@ class SqliteBack: public EventBackend {
 
     void writeEvent(event_ptr e);
     
-    /// Execute all pending commands
-    void flush();
-
     /// A pointer to the database managed by the SqliteBack class 
     SqliteDb* db_;
 
     /// Stores the database's path+name, declared during construction. 
     std::string path_;
-
-    StrList cmds_;
 
     StrList tbl_names_;
 };

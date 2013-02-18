@@ -24,12 +24,17 @@ class SqliteDb {
 
     virtual ~SqliteDb();
 
-    /// Finishes any incomplete operations and closes the database.
+    /*!
+    Finishes any incomplete operations and closes the database.
+    @throw CycIOException if failed to close the database properly
+    */
     void close();
 
     /*!
     Opens the sqlite database by either opening/creating a file (default) or
     creating/overwriting a file (see the overwrite method).
+
+    @throw CycIOException if failed to open existing database
     */
     void open();
 
@@ -43,14 +48,16 @@ class SqliteDb {
     Execute an SQL command.
     
     @param cmd an Sqlite compatible SQL command
+    @throw CycIOException SQL command execution failed (e.g. invalid SQL)
     */
     void execute(std::string cmd);
 
     /*!
     Execute an SQL query and return its results
     
-    @param cmd an Sqlite compatible SQL command
+    @param cmd an Sqlite compatible SQL query
     @return a list of row entries
+    @throw CycIOException SQL command execution failed (e.g. invalid SQL)
     */
     std::vector<StrList> query(std::string cmd);
 

@@ -36,8 +36,6 @@ void SqliteDb::close() {
     } else {
       throw CycIOException("Failed to close database: " + path_);
     }
-  } else {
-    throw CycIOException("Cannot close a closed database: " + path_);
   }
 }
 
@@ -91,10 +89,10 @@ std::vector<StrList> SqliteDb::query(std::string sql) {
   // query the database
   int check_query = 
     sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, 0);
-  if(check_query == SQLITE_OK){
+  if(check_query == SQLITE_OK) {
     int cols = sqlite3_column_count(statement);
     int result = 0;
-    while(true){
+    while(true) {
       result = sqlite3_step(statement);
       if(result != SQLITE_ROW){
         break;

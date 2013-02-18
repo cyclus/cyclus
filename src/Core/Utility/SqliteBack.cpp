@@ -87,8 +87,6 @@ bool SqliteBack::tableExists(event_ptr e) {
   return false;
 }
 
-
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::writeEvent(event_ptr e){
   std::stringstream colss, valss, cmd;
@@ -123,7 +121,7 @@ std::string SqliteBack::valAsString(boost::any v) {
     ss << "\"" << boost::any_cast<std::string>(v) << "\"";
   } else {
     CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
-      << path_;
+      << name();
   }
   return ss.str();
 }

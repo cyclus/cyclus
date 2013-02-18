@@ -137,19 +137,29 @@ TEST(EventManagerTest, Manager_EventSchemas) {
      ->addVal("weight", 10)
      ->record();
 
+  // subset of fields
+  ev = m->newEvent(NULL, "DumbTitle");
+  ev->addVal("weight", 17);
+  EXPECT_NO_THROW(ev->record());
+
+  // different subset of fields
+  ev = m->newEvent(NULL, "DumbTitle");
+  ev->addVal("animal", std::string("elephant"));
+  EXPECT_NO_THROW(ev->record());
+
   // inconsistent field name
   ev = m->newEvent(NULL, "DumbTitle");
-  ev ->addVal("height", 20);
+  ev->addVal("height", 20);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // inconsistent field type
   ev = m->newEvent(NULL, "DumbTitle");
-  ev ->addVal("animal", 10);
+  ev->addVal("animal", 10);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // different title/namespace
   ev = m->newEvent(NULL, "DifferentTitle");
-  ev ->addVal("height", 20);
+  ev->addVal("height", 20);
   EXPECT_NO_THROW(ev->record());
 }
 

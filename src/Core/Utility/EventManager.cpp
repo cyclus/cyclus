@@ -55,7 +55,10 @@ void EventManager::addEvent(event_ptr ev) {
     throw CycInvalidSchemaErr(msg);
   }
 
-  schemas_[ev->title()] = ev;
+  if (schemas_.find(ev->title()) == schemas_.end()) {
+    schemas_[ev->title()] = ev;
+  }
+
   events_.push_back(ev);
   if (events_.size() >= dump_count_) {
     notifyBacks();
