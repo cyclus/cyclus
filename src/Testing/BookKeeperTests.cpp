@@ -39,7 +39,7 @@ class BookKeeperTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(BookKeeperTest, createDB) {
-  EXPECT_NO_THROW( BI->createDB(test_filename,fpath) );
+  BI->createDB(fpath,test_filename);
   EXPECT_EQ( BI->dbExists(), true );
   EXPECT_EQ( BI->dbName(), test_filename );
 }

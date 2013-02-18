@@ -11,7 +11,6 @@
 #include "Database.h"
 #include "Table.h"
 #include "CycException.h"
-#include "Env.h"
 
 #define ROW_THRESHOLD 1000;
 
@@ -36,26 +35,7 @@ BookKeeper::BookKeeper() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(){
-  createDB("cyclus.sqlite", Env::checkEnv("PWD"));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(file_path fpath){
-  string ext = ".sqlite";
-  string::size_type sql_ext_pos = fpath.rfind(ext);
-  if (sql_ext_pos != string::npos) {
-    string::size_type last_slash_pos = fpath.rfind("/");
-    int fname_len = fpath.length() - last_slash_pos - 1;
-    string fname = fpath.substr( last_slash_pos+1, fname_len);
-    createDB(fname, fpath.substr(0,fpath.length()-fname_len));
-  } else { 
-    createDB("cyclus.sqlite", fpath);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void BookKeeper::createDB(std::string name, file_path fpath) {
+void BookKeeper::createDB(std::string fpath,std::string name) {
   dbName_ = name;
 
   try{

@@ -57,6 +57,8 @@ int main(int argc, char* argv[]) {
   cout << "|--------------------------------------------|" << endl;
   cout << endl;
 
+  bool success = true;
+
   // respond to command line args
   if (vm.count("help")) {
     string err_msg = "Cyclus usage requires an input file.\n";
@@ -95,14 +97,31 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
+  string output_path;
+  string fname;
   // Create the output file
   try {
     if (vm.count("output-path")){
-      BI->createDB(vm["output-path"].as<string>());
+      output_path = vm["output-path"].as<string>();
+      string ext = ".sqlite";
+      string::size_type sql_ext_pos = output_path.rfind(ext);
+      if (sql_ext_pos != string::npos) {
+        string::size_type last_slash_pos = output_path.rfind("/");
+        int fname_len = output_path.length() - last_slash_pos - 1;
+        fname = output_path.substr( last_slash_pos+1, fname_len);
+        output_path = output_path.substr(0,output_path.length()-fname_len); 
+        BI->createDB(output_path, fname);
+      } else { 
+        BI->createDB(output_path);
+        fname = "cyclus.sqlite";
+      }
     } else { 
-      BI->createDB();
+      output_path = Env::checkEnv("PWD");
+      BI->createDB(output_path);
+      fname = "cyclus.sqlite";
     }
   } catch (CycException ge) {
+    success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
 
@@ -115,6 +134,7 @@ int main(int argc, char* argv[]) {
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
   } catch (CycException e) {
+    success = false;
     CLOG(LEV_ERROR) << e.what();
   }
 
@@ -128,6 +148,7 @@ int main(int argc, char* argv[]) {
   try {
     TI->runSim();
   } catch (CycException err) {
+    success = false;
     CLOG(LEV_ERROR) << err.what();
   }
 
@@ -135,6 +156,7 @@ int main(int argc, char* argv[]) {
   try {
     Model::unloadModules();
   } catch (CycException err) {
+    success = false;
     CLOG(LEV_ERROR) << err.what();
   }
 
@@ -142,7 +164,25 @@ int main(int argc, char* argv[]) {
   try {
     BI->closeDB();
   } catch (CycException ge) {
+    success = false;
     CLOG(LEV_ERROR) << ge.what();
+  }
+
+  if (success) {
+    cout << endl;
+    cout << "|--------------------------------------------|" << endl;
+    cout << "|                  Cyclus                    |" << endl;
+    cout << "|              run successful                |" << endl;
+    cout << "|--------------------------------------------|" << endl;
+    cout << "Output location: " << output_path << fname << endl;
+    cout << endl;
+  } else {
+    cout << endl;
+    cout << "|--------------------------------------------|" << endl;
+    cout << "|                  Cyclus                    |" << endl;
+    cout << "|           run *not* successful             |" << endl;
+    cout << "|--------------------------------------------|" << endl;
+    cout << endl;
   }
 
   return 0;
