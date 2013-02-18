@@ -98,20 +98,22 @@ int main(int argc, char* argv[]) {
   Env::setCyclusRelPath(path);
 
   // get output db location
-  string output_path;
-  string fname = "cyclus.sqlite";
+  string output_path = Env::checkEnv("PWD");  // default
+  string fname = "cyclus.sqlite";             // default
   if (vm.count("output-path")){
-    output_path = vm["output-path"].as<string>();
+    string arg = vm["output-path"].as<string>();
     string ext = ".sqlite";
-    string::size_type sql_ext_pos = output_path.rfind(ext);
-    if (sql_ext_pos != string::npos) {
-      string::size_type last_slash_pos = output_path.rfind("/");
-      int fname_len = output_path.length() - last_slash_pos - 1;
-      fname = output_path.substr( last_slash_pos+1, fname_len);
-      output_path = output_path.substr(0,output_path.length()-fname_len); 
+    string::size_type sql_ext_pos = arg.rfind(ext);
+    string::size_type last_slash_pos = arg.rfind("/");
+    if (sql_ext_pos != string::npos) {        // found *.sqlite
+      if (last_slash_pos != string::npos) {   // found */*
+        int fname_len = arg.length() - last_slash_pos - 1;
+        fname = arg.substr( last_slash_pos+1, fname_len);
+        output_path = arg.substr(0,arg.length()-fname_len-1); 
+      } else {
+        fname = arg;
+      }
     }
-  } else { 
-    output_path = Env::checkEnv("PWD");
   }
 
   // create output db
@@ -171,7 +173,7 @@ int main(int argc, char* argv[]) {
     cout << "|                  Cyclus                    |" << endl;
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
-    cout << "Output location: " << output_path << fname << endl;
+    cout << "Output location: " << output_path << "/" << fname << endl;
     cout << endl;
   } else {
     cout << endl;
