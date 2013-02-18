@@ -9,8 +9,8 @@
 #include <fstream>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SqliteBack::SqliteBack(std::string filename) {
-  path_ = filename;
+SqliteBack::SqliteBack(std::string path) {
+  path_ = path;
   db_ = new SqliteDb(path_);
   db_->overwrite();
 }
@@ -91,27 +91,27 @@ bool SqliteBack::tableExists(event_ptr e) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteBack::writeEvent(event_ptr e){
-  std::stringstream cs, vs, cmd;
+  std::stringstream colss, valss, cmd;
   ValMap vals = e->vals();
   ValMap::iterator it = vals.begin();
   while (true) {
-    cs << it->first;
-    vs << valData(it->second);
+    colss << it->first;
+    valss << valAsString(it->second);
     ++it;
     if (it == vals.end()) {
       break;
     }
-    cs << ", ";
-    vs << ", ";
+    colss << ", ";
+    valss << ", ";
   }
 
-  cmd << "INSERT INTO " << e->name() << " (" << cs.str() << ") "
-         << "VALUES (" << vs.str() << ");";
+  cmd << "INSERT INTO " << e->name() << " (" << colss.str() << ") "
+         << "VALUES (" << valss.str() << ");";
   cmds_.push_back(cmd.str());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string SqliteBack::valData(boost::any v) {
+std::string SqliteBack::valAsString(boost::any v) {
   std::stringstream ss;
   if (v.type() == typeid(int)) {
     ss << boost::any_cast<int>(v);

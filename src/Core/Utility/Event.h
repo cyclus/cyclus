@@ -15,8 +15,10 @@ class CycDupEventFieldErr: public CycException {
     public: CycDupEventFieldErr(std::string msg) : CycException(msg) {};
 };
 
-// Used to specify and send a collection of key-value pairs to the
-// EventManager for recording.
+/*!
+Used to specify and send a collection of key-value pairs to the
+EventManager for recording.
+*/
 class Event: IntrusiveBase<Event> {
   friend class EventManager;
 
@@ -24,17 +26,19 @@ class Event: IntrusiveBase<Event> {
 
     virtual ~Event();
 
-    // Add an arbitrary field-value pair to the event.
-    //
-    // @param field a label or key for a value. Loosely analogous to a column
-    // label.
-    // @param field a label or key for a value. Loosely analogous to a column
-    // label.
-    //
-    // @warning for the val argument - what variable types are supported depends on
-    // what the backend(s) in use are designed to handle.
-    //
-    // @throw CycDupEventFieldErr the passed field has been used already in this event
+    /*!
+    Add an arbitrary field-value pair to the event.
+    
+    @param field a label or key for a value. Loosely analogous to a column
+    label.
+    @param field a label or key for a value. Loosely analogous to a column
+    label.
+    
+    @warning for the val argument - what variable types are supported depends on
+    what the backend(s) in use are designed to handle.
+    
+    @throw CycDupEventFieldErr the passed field has been used already in this event
+    */
     event_ptr addVal(std::string field, boost::any val);
 
     /// Record this event to its EventManager.
@@ -46,12 +50,17 @@ class Event: IntrusiveBase<Event> {
     /// Returns a map of all field-value pairs that have been added to this event.
     ValMap vals();
 
-    // Returns the full, unique name generated for this event using info about
-    // its creator along with its title.
+    /*!
+    Returns the full, unique name generated for this event using info about
+    its creator along with its title.
+    */
     std::string name();
 
   private:
+    /// events should only be created via an EventManager
     Event(EventManager* m, Model* creator, std::string title);
+
+    /// checks whether this event is valid within the preexisting shema in primary.
     bool schemaWithin(event_ptr primary);
 
     EventManager* manager_;

@@ -15,6 +15,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityTestHelper.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/EnrichmentTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/EventManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp

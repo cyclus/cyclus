@@ -8,20 +8,28 @@
 #include <list>
 #include <string>
 
-// An EventManager backend that writes data to an sqlite database.  Identically
-// named events have their data placed as rows in a single table.
+/*!
+An EventManager backend that writes data to an sqlite database.  Identically
+named events have their data placed as rows in a single table.  Handles the
+following event value types: int, float, double, std::string (up to 128
+characters long).  Unsupported value types are stored as an empty string.
+*/
 class SqliteBack: public EventBackend {
   public:
-    // Creates a new sqlite backend that will write to (or overwrite) a file.
-    //
-    // @param filename the filepath (including name) to write the sqlite file.
-    SqliteBack(std::string filename);
+    /*!
+    Creates a new sqlite backend that will write to (or overwrite) a file.
+    
+    @param filename the filepath (including name) to write the sqlite file.
+    */
+    SqliteBack(std::string path);
     
     virtual ~SqliteBack();
   
-    // Write events immediately to the database as a single transaction.
-    //
-    // @param events group of events to write to the database together.
+    /*!
+    Write events immediately to the database as a single transaction.
+
+    @param events group of events to write to the database together.
+    */
     void notify(EventList events);
 
     /// Returns a unique name for this backend
@@ -35,7 +43,8 @@ class SqliteBack: public EventBackend {
 
     std::string valType(boost::any v); 
 
-    std::string valData(boost::any v);
+    /// converts the value to a string by streaming it into
+    std::string valAsString(boost::any v);
 
     /// Queue up a table-create command for e.
     void createTable(event_ptr e);
@@ -48,7 +57,7 @@ class SqliteBack: public EventBackend {
     /// A pointer to the database managed by the SqliteBack class 
     SqliteDb* db_;
 
-    /// Stores the database's name, declared during construction. 
+    /// Stores the database's path+name, declared during construction. 
     std::string path_;
 
     StrList cmds_;

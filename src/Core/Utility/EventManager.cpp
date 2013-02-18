@@ -3,13 +3,11 @@
 #include "EventManager.h"
 #include "Event.h"
 
-#define DEFAULT_DUMP_FREQ 10000
-
 EventManager* EventManager::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 EventManager::EventManager() {
-  dump_freq_ = DEFAULT_DUMP_FREQ;
+  dump_count_ = kDefaultDumpCount;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -21,12 +19,15 @@ EventManager* EventManager::Instance() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-unsigned int EventManager::dump_freq(unsigned int size) {
-  if (size == 0) {
-    return dump_freq_;
+unsigned int EventManager::dump_count() {
+  return dump_count_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void EventManager::set_dump_count(unsigned int count) {
+  if (count > 0) {
+    dump_count_ = count;
   }
-  dump_freq_ = size;
-  return size;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,7 +57,7 @@ void EventManager::addEvent(event_ptr ev) {
 
   schemas_[ev->title()] = ev;
   events_.push_back(ev);
-  if (events_.size() >= dump_freq_) {
+  if (events_.size() >= dump_count_) {
     notifyBacks();
   }
 }
