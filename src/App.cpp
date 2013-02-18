@@ -98,14 +98,23 @@ int main(int argc, char* argv[]) {
   Env::setCyclusRelPath(path);
 
   string output_path;
+  string fname = "cyclus.sqlite";
   // Create the output file
-  try {
-    if (vm.count("output-path")){
-      output_path = vm["output-path"].as<string>();
-    } else { 
-      output_path = Env::checkEnv("PWD");
+  if (vm.count("output-path")){
+    output_path = vm["output-path"].as<string>();
+    string ext = ".sqlite";
+    string::size_type sql_ext_pos = output_path.rfind(ext);
+    if (sql_ext_pos != string::npos) {
+      string::size_type last_slash_pos = output_path.rfind("/");
+      int fname_len = output_path.length() - last_slash_pos - 1;
+      fname = output_path.substr( last_slash_pos+1, fname_len);
+      output_path = output_path.substr(0,output_path.length()-fname_len); 
     }
-    BI->createDB(output_path);
+  } else { 
+    output_path = Env::checkEnv("PWD");
+    }
+  try {
+    BI->createDB(output_path, fname);
   } catch (CycException ge) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
@@ -160,8 +169,7 @@ int main(int argc, char* argv[]) {
     cout << "|                  Cyclus                    |" << endl;
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
-    cout << "Output location: " << output_path << "/" 
-         << "cyclus.sqlite" << endl;
+    cout << "Output location: " << output_path << fname << endl;
     cout << endl;
   } else {
     cout << endl;
