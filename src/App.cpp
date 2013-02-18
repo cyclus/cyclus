@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
   Env::setCyclusRelPath(path);
 
   string output_path;
-  string fname;
+  string fname = "cyclus.sqlite";
   // Create the output file
   try {
     if (vm.count("output-path")){
@@ -110,16 +110,12 @@ int main(int argc, char* argv[]) {
         int fname_len = output_path.length() - last_slash_pos - 1;
         fname = output_path.substr( last_slash_pos+1, fname_len);
         output_path = output_path.substr(0,output_path.length()-fname_len); 
-        BI->createDB(output_path, fname);
-      } else { 
-        BI->createDB(output_path);
-        fname = "cyclus.sqlite";
       }
     } else { 
       output_path = Env::checkEnv("PWD");
-      BI->createDB(output_path);
-      fname = "cyclus.sqlite";
     }
+  try {
+    BI->createDB(output_path, fname);
   } catch (CycException ge) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
