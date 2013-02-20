@@ -25,7 +25,7 @@ static unsigned int const kDefaultDumpCount = 10000;
 
 /*!
 Indicates that a pre-recorded event of the same name (e.g. the same
-table) has one or more inconsistent field-valuetype pairs.
+table) has one or more inconsistent field-value type pairs.
 */
 class CycInvalidSchemaErr: public CycException {
     public: CycInvalidSchemaErr(std::string msg) : CycException(msg) {};
@@ -81,7 +81,7 @@ class EventManager {
 
   private:
     bool isValidSchema(event_ptr ev);
-    void notifyBacks();
+    void notifyBackends();
     void addEvent(event_ptr ev);
 
     std::list<event_ptr> events_;

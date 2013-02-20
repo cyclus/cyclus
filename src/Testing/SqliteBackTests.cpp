@@ -47,4 +47,6 @@ TEST(SqliteBackTest, CmdGenRegression) {
   EXPECT_EQ(back.cmds.at(1), "INSERT INTO DumbTitle (animal, height, weight) VALUES (\"monkey\", 5.5, 10);");
   EXPECT_EQ(back.cmds.at(2), "INSERT INTO DumbTitle (animal, weight) VALUES (\"elephant\", 1000);");
   EXPECT_EQ(back.cmds.at(3), "INSERT INTO DumbTitle (animal, height) VALUES (\"sea cucumber\", 1.2);");
+
+  remove(path.c_str());
 }

@@ -1,7 +1,6 @@
 // SqliteBack.h
 #if !defined(_SQLITEBACK_H)
-#define _SQLITEBACK_H
-
+#define _SQLITEBACK_H 
 #include "EventManager.h"
 #include "SqliteDb.h"
 
@@ -32,7 +31,7 @@ class SqliteBack: public EventBackend {
     */
     void notify(EventList events);
 
-    /// Returns a unique name for this backend
+    /// Returns a unique name for this backend.
     std::string name();
 
     /// Finishes any incomplete tasks and closes the database/file.
@@ -43,27 +42,33 @@ class SqliteBack: public EventBackend {
     /// Execute all pending commands.
     virtual void flush();
 
+    /// pending sql commands.
     StrList cmds_;
 
   private:
+
+    /// returns true if the table for e already exists.
     bool tableExists(event_ptr e); 
 
+    /// returns a valid sql data type name for v (e.g.  INT, REAL, VARCHAR(128), etc).
     std::string valType(boost::any v); 
 
-    /// converts the value to a string by streaming it into
+    /// converts the value to a string insertable into the sqlite db.
     std::string valAsString(boost::any v);
 
     /// Queue up a table-create command for e.
     void createTable(event_ptr e);
 
+    /// constructs an SQL INSERT command for e and queues it for db insertion.
     void writeEvent(event_ptr e);
     
-    /// A pointer to the database managed by the SqliteBack class 
+    /// A pointer to the database managed by the SqliteBack class.
     SqliteDb* db_;
 
     /// Stores the database's path+name, declared during construction. 
     std::string path_;
 
+    /// table names already existing (created) in the sqlite db.
     StrList tbl_names_;
 };
 

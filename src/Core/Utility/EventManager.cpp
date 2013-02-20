@@ -61,12 +61,12 @@ void EventManager::addEvent(event_ptr ev) {
 
   events_.push_back(ev);
   if (events_.size() >= dump_count_) {
-    notifyBacks();
+    notifyBackends();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::notifyBacks() {
+void EventManager::notifyBackends() {
   std::list<EventBackend*>::iterator it;
   for(it = backs_.begin(); it != backs_.end(); it++) {
     try {
@@ -86,7 +86,7 @@ void EventManager::registerBackend(EventBackend* b) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::close() {
-  notifyBacks();
+  notifyBackends();
   std::list<EventBackend*>::iterator it;
   for(it = backs_.begin(); it != backs_.end(); it++) {
     try {

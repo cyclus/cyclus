@@ -42,6 +42,8 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/LMatrix.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayer.cpp 
@@ -50,14 +52,12 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Prototype.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLibrary.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBack.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDb.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionFactories.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctions.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Timer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/UniformTaylor.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBack.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDb.cpp 
   PARENT_SCOPE)
 
 INSTALL(FILES 
@@ -71,6 +71,8 @@ INSTALL(FILES
   DecayHandler.h
   Enrichment.h
   Env.h
+  Event.h
+  EventManager.h
   IntrusiveBase.h
   LMatrix.h
   Logger.h
@@ -86,9 +88,8 @@ INSTALL(FILES
   Timer.h
   UniformTaylor.h
   UseMatrixLib.h
+  SqliteBack.h
   SqliteDb.h
-  Event.h
-  EventManager.h
   DESTINATION cyclus/include
   COMPONENT core
   )
