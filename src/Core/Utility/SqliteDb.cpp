@@ -9,19 +9,14 @@
 #include <fstream>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SqliteDb::SqliteDb(std::string path) {
-  db_ = NULL;
-  isOpen_ = false;
-  path_ = path;
-  overwrite_ = false;
-}
+SqliteDb::SqliteDb(std::string path) : 
+  db_(NULL),
+  isOpen_(false),
+  path_(path),
+  overwrite_(false) { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SqliteDb::~SqliteDb() {
-  if ( isOpen_ ) {
-    close();
-  }
-}
+SqliteDb::~SqliteDb() { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SqliteDb::overwrite() {
