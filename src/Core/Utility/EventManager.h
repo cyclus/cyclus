@@ -103,7 +103,8 @@ class EventManager {
     unsigned int dump_count();
 
     /*!
-    set the EventManager to flush its collected events to registered backends every [count] events.
+    set the EventManager to flush its collected events to registered backends
+    every [count] events.
     
     @param count # events to buffer before flushing to backends.
     */
