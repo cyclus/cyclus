@@ -12,8 +12,8 @@ EventManager::EventManager() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EventManager* EventManager::Instance() {
-  if (0 == instance_){
-    instance_ = new EventManager();  
+  if (0 == instance_) {
+    instance_ = new EventManager();
   }
   return instance_;
 }
@@ -42,7 +42,7 @@ bool EventManager::isValidSchema(event_ptr ev) {
     event_ptr primary = schemas_[ev->name()];
     if (! ev->schemaWithin(primary)) {
       return false;
-    } 
+    }
   }
   return true;
 }
@@ -68,7 +68,7 @@ void EventManager::addEvent(event_ptr ev) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::notifyBackends() {
   std::list<EventBackend*>::iterator it;
-  for(it = backs_.begin(); it != backs_.end(); it++) {
+  for (it = backs_.begin(); it != backs_.end(); it++) {
     try {
       (*it)->notify(events_);
     } catch (CycException err) {
@@ -88,7 +88,7 @@ void EventManager::registerBackend(EventBackend* b) {
 void EventManager::close() {
   notifyBackends();
   std::list<EventBackend*>::iterator it;
-  for(it = backs_.begin(); it != backs_.end(); it++) {
+  for (it = backs_.begin(); it != backs_.end(); it++) {
     try {
       (*it)->close();
     } catch (CycException err) {

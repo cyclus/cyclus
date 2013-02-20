@@ -13,7 +13,8 @@ typedef std::map<std::string, boost::any> ValMap;
 
 /// indicates a field has previously been added to an event.
 class CycDupEventFieldErr: public CycException {
-    public: CycDupEventFieldErr(std::string msg) : CycException(msg) {};
+  public:
+    CycDupEventFieldErr(std::string msg) : CycException(msg) {};
 };
 
 /*!
@@ -21,7 +22,7 @@ Used to specify and send a collection of key-value pairs to the
 EventManager for recording.
 */
 class Event: IntrusiveBase<Event> {
-  friend class EventManager;
+    friend class EventManager;
 
   public:
 
@@ -29,16 +30,16 @@ class Event: IntrusiveBase<Event> {
 
     /*!
     Add an arbitrary field-value pair to the event.
-    
+
     @param field a label or key for a value. Loosely analogous to a column
     label.
 
     @param val a value of any type (int, bool, string, vector) supported by
     the backends being used.
-    
+
     @warning for the val argument - what variable types are supported
     depends on what the backend(s) in use are designed to handle.
-    
+
     @throw CycDupEventFieldErr the passed field has been used already in
     this event
     */

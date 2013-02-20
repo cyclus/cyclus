@@ -21,10 +21,10 @@ void Event::record() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::Event(EventManager* m, Model* creator, std::string title) {
-  manager_ = m;
-  title_ = title;
-  creator_id_ = -1;
+Event::Event(EventManager* m, Model* creator, std::string title) :
+    title_(title),
+    creator_id_(-1),
+    manager_(m) {
   if (creator != NULL) {
     creator_id_ = creator->ID();
     creator_impl_ = creator->modelImpl();
@@ -60,7 +60,7 @@ ValMap Event::vals() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string Event::name() {
-  if (creator_id_ > -1) {
+  if (creator_id_ != -1) {
     std::stringstream ss;
     ss << creator_impl_ + "_" << creator_id_ << "_" + title_;
     return ss.str();

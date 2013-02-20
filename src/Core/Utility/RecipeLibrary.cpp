@@ -6,9 +6,7 @@
 #include "CompMap.h"
 #include "MassTable.h"
 #include "CycException.h"
-#include "CycException.h"
 #include "EventManager.h"
-#include "Event.h"
 
 #include <map>
 #include <sstream>
