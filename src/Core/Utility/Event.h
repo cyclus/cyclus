@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/any.hpp>
 
+typedef std::map<std::string, boost::any> ValMap;
 
 /// indicates a field has previously been added to an event.
 class CycDupEventFieldErr: public CycException {

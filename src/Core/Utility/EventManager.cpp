@@ -5,12 +5,12 @@
 
 EventManager* EventManager::instance_ = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EventManager::EventManager() {
   dump_count_ = kDefaultDumpCount;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EventManager* EventManager::Instance() {
   if (0 == instance_){
     instance_ = new EventManager();  
@@ -72,8 +72,8 @@ void EventManager::notifyBackends() {
     try {
       (*it)->notify(events_);
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "' failed write with err: "
-                      << err.what();
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->name()
+                      << "' failed write with err: " << err.what();
     }
   }
   events_.clear();
@@ -92,8 +92,8 @@ void EventManager::close() {
     try {
       (*it)->close();
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name() << "' failed to close with err: "
-                      << err.what();
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->name()
+                      << "' failed to close with err: " << err.what();
     }
   }
 }

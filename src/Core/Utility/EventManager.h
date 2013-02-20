@@ -18,7 +18,6 @@ class EventManager;
 class Model;
 
 typedef boost::intrusive_ptr<Event> event_ptr;
-typedef std::map<std::string, boost::any> ValMap;
 typedef std::list<event_ptr> EventList;
 
 /// default number of events to collect before flushing to backends.
