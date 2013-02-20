@@ -10,6 +10,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/any.hpp>
 
+// TODO: Move away from singleton pattern (that is why we kept EventManager constructor public)
 #define EM EventManager::Instance()
 
 class Event;
@@ -94,10 +95,11 @@ class EventManager {
 
   public:
 
-    /// create a new event manager with default dump countuency.
+    /// create a new event manager with default dump frequency.
     EventManager();
+    // TODO: Move away from singleton pattern (that is why we kept the constructor public)
 
-    /// Return the # events buffered between flushes to backends.
+    /// Return the dump frequency, # events buffered between flushes to backends.
     unsigned int dump_count();
 
     /*!
