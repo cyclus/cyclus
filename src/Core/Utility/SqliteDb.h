@@ -46,7 +46,7 @@ class SqliteDb {
 
     /*!
     Execute an SQL command.
-    
+
     @param cmd an Sqlite compatible SQL command
     @throw CycIOException SQL command execution failed (e.g. invalid SQL)
     */
@@ -54,7 +54,7 @@ class SqliteDb {
 
     /*!
     Execute an SQL query and return its results
-    
+
     @param cmd an Sqlite compatible SQL query
     @return a list of row entries
     @throw CycIOException SQL command execution failed (e.g. invalid SQL)

@@ -1,6 +1,6 @@
 // SqliteBack.h
 #if !defined(_SQLITEBACK_H)
-#define _SQLITEBACK_H 
+#define _SQLITEBACK_H
 #include "EventManager.h"
 #include "SqliteDb.h"
 
@@ -17,13 +17,13 @@ class SqliteBack: public EventBackend {
   public:
     /*!
     Creates a new sqlite backend that will write to (or overwrite) a file.
-    
+
     @param filename the filepath (including name) to write the sqlite file.
     */
     SqliteBack(std::string path);
-    
+
     virtual ~SqliteBack();
-  
+
     /*!
     Write events immediately to the database as a single transaction.
 
@@ -48,10 +48,10 @@ class SqliteBack: public EventBackend {
   private:
 
     /// returns true if the table for e already exists.
-    bool tableExists(event_ptr e); 
+    bool tableExists(event_ptr e);
 
     /// returns a valid sql data type name for v (e.g.  INT, REAL, VARCHAR(128), etc).
-    std::string valType(boost::any v); 
+    std::string valType(boost::any v);
 
     /// converts the value to a string insertable into the sqlite db.
     std::string valAsString(boost::any v);
@@ -61,11 +61,11 @@ class SqliteBack: public EventBackend {
 
     /// constructs an SQL INSERT command for e and queues it for db insertion.
     void writeEvent(event_ptr e);
-    
+
     /// A pointer to the database managed by the SqliteBack class.
     SqliteDb* db_;
 
-    /// Stores the database's path+name, declared during construction. 
+    /// Stores the database's path+name, declared during construction.
     std::string path_;
 
     /// table names already existing (created) in the sqlite db.

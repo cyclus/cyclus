@@ -21,8 +21,8 @@ void Event::record() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::Event(EventManager* m, Model* creator, std::string title) :
-    title_(title),
+Event::Event(EventManager* m, Model* creator, std::string title)
+  : title_(title),
     creator_id_(-1),
     manager_(m) {
   if (creator != NULL) {
@@ -38,10 +38,10 @@ Event::~Event() { }
 bool Event::schemaWithin(event_ptr primary) {
   ValMap pvals = primary->vals_;
 
-  for(ValMap::iterator it = vals_.begin(); it != vals_.end(); it++) {
+  for (ValMap::iterator it = vals_.begin(); it != vals_.end(); it++) {
     if (pvals.find(it->first) == pvals.end()) {
       return false;
-    } else if (pvals[it->first].type() != it->second.type()){
+    } else if (pvals[it->first].type() != it->second.type()) {
       return false;
     }
   }
@@ -58,7 +58,7 @@ ValMap Event::vals() {
   return vals_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Event::name() {
   if (creator_id_ != -1) {
     std::stringstream ss;

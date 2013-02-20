@@ -8,22 +8,22 @@
 #include <iostream>
 #include <fstream>
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) {
   path_ = path;
   db_ = new SqliteDb(path_);
   db_->overwrite();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::~SqliteBack() {
   delete db_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
-    if (! tableExists(*it) ) {
+    if (! tableExists(*it)) {
       createTable(*it);
     }
     writeEvent(*it);
@@ -31,19 +31,19 @@ void SqliteBack::notify(EventList evts) {
   flush();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::close() {
   flush();
   db_->close();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::name() {
   return path_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SqliteBack::createTable(event_ptr e){
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SqliteBack::createTable(event_ptr e) {
   std::string name = e->name();
   tbl_names_.push_back(name);
 
@@ -64,7 +64,7 @@ void SqliteBack::createTable(event_ptr e){
   cmds_.push_back(cmd);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::valType(boost::any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
@@ -78,7 +78,7 @@ std::string SqliteBack::valType(boost::any v) {
   return "VARCHAR(128)";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SqliteBack::tableExists(event_ptr e) {
   std::string nm = e->name();
   if (find(tbl_names_.begin(), tbl_names_.end(), nm) != tbl_names_.end()) {
@@ -87,8 +87,8 @@ bool SqliteBack::tableExists(event_ptr e) {
   return false;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SqliteBack::writeEvent(event_ptr e){
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SqliteBack::writeEvent(event_ptr e) {
   std::stringstream colss, valss, cmd;
   ValMap vals = e->vals();
   ValMap::iterator it = vals.begin();
@@ -104,11 +104,11 @@ void SqliteBack::writeEvent(event_ptr e){
   }
 
   cmd << "INSERT INTO " << e->name() << " (" << colss.str() << ") "
-         << "VALUES (" << valss.str() << ");";
+      << "VALUES (" << valss.str() << ");";
   cmds_.push_back(cmd.str());
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::valAsString(boost::any v) {
   std::stringstream ss;
   if (v.type() == typeid(int)) {
@@ -121,18 +121,18 @@ std::string SqliteBack::valAsString(boost::any v) {
     ss << "\"" << boost::any_cast<std::string>(v) << "\"";
   } else {
     CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
-      << name();
+                    << name();
   }
   return ss.str();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SqliteBack::flush(){
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SqliteBack::flush() {
   db_->open();
   db_->execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); it++) {
     try {
-    db_->execute(*it);
+      db_->execute(*it);
     } catch (CycIOException err) {
       CLOG(LEV_ERROR) << "backend '" << path_ << "' failed write: "
                       << err.what();

@@ -28,7 +28,8 @@ Indicates that a pre-recorded event of the same name (e.g. the same
 table) has one or more inconsistent field-value type pairs.
 */
 class CycInvalidSchemaErr: public CycException {
-    public: CycInvalidSchemaErr(std::string msg) : CycException(msg) {};
+  public:
+    CycInvalidSchemaErr(std::string msg) : CycException(msg) {};
 };
 
 /*!
@@ -77,7 +78,7 @@ manager->close();
 @endcode
 */
 class EventManager {
-  friend class Event;
+    friend class Event;
 
   private:
     bool isValidSchema(event_ptr ev);
@@ -104,7 +105,7 @@ class EventManager {
     /*!
     set the EventManager to flush its collected events to registered backends
     every [count] events.
-    
+
     @param count # events to buffer before flushing to backends.
     */
     void set_dump_count(unsigned int count);
@@ -113,7 +114,7 @@ class EventManager {
     Creates a new event for creator with title.  It uses uniquely
     identifiable information from creator (e.g. ID) to create a unique
     namespaces for related events.
-    
+
     @param creator the agent that created this event @param title a
     label to distinguish event sets from other sets from the same
     creator.
@@ -124,7 +125,7 @@ class EventManager {
     Registers b to receive event notifications for all events collected
     by the EventManager and to receive a close notification when there
     are no more events.
-    
+
     @param b backend to receive events
     */
     void registerBackend(EventBackend* b);

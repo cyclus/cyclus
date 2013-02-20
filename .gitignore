@@ -1,4 +1,5 @@
 *.sw*
+*.orig
 build
 debug
 doxygen.conf
