@@ -1,0 +1,13 @@
+
+--brackets=attach
+--indent=spaces=2
+--indent-classes
+--indent-switches
+--indent-preprocessor
+--min-conditional-indent=2
+--pad-oper
+--pad-header
+--unpad-paren
+--add-brackets
+--align-pointer=type
+
