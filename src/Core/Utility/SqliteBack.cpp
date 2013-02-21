@@ -44,7 +44,7 @@ std::string SqliteBack::name() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::createTable(event_ptr e) {
-  std::string name = e->name();
+  std::string name = e->title();
   tbl_names_.push_back(name);
 
   std::string cmd = "CREATE TABLE " + name + " (";
@@ -80,7 +80,7 @@ std::string SqliteBack::valType(boost::any v) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SqliteBack::tableExists(event_ptr e) {
-  std::string nm = e->name();
+  std::string nm = e->title();
   if (find(tbl_names_.begin(), tbl_names_.end(), nm) != tbl_names_.end()) {
     return true;
   }
@@ -103,7 +103,7 @@ void SqliteBack::writeEvent(event_ptr e) {
     valss << ", ";
   }
 
-  cmd << "INSERT INTO " << e->name() << " (" << colss.str() << ") "
+  cmd << "INSERT INTO " << e->title() << " (" << colss.str() << ") "
       << "VALUES (" << valss.str() << ");";
   cmds_.push_back(cmd.str());
 }

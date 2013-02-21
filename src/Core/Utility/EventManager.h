@@ -15,7 +15,6 @@
 
 class Event;
 class EventManager;
-class Model;
 
 typedef boost::intrusive_ptr<Event> event_ptr;
 typedef std::list<event_ptr> EventList;
@@ -67,7 +66,7 @@ CustomBackend* myback = new CustomBackend();
 manager->registerBackend(myback);
 ...
 ...
-manager->newEvent(creator, "CapacityFactor");
+manager->newEvent("CapacityFactor");
        ->addVal("Name", aname)
        ->addVal("Capacity", cap)
        ->record();
@@ -112,15 +111,14 @@ class EventManager {
     void set_dump_count(unsigned int count);
 
     /*!
-    Creates a new event for creator with title.  It uses uniquely
-    identifiable information from creator (e.g. ID) to create a unique
-    namespaces for related events.
+    Creates a new event namespaced under the specified title.
 
-    @param creator the agent that created this event @param title a
-    label to distinguish event sets from other sets from the same
-    creator.
+    @warning choose title carefully to not conflict with events from other
+    agents. Also note that a static title (e.g. an unchanging string) will
+    result in multiple instances of this agent storing event data together
+    (e.g. the same table).
     */
-    event_ptr newEvent(Model* creator, std::string title);
+    event_ptr newEvent(std::string title);
 
     /*!
     Registers b to receive event notifications for all events collected

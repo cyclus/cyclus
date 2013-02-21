@@ -47,8 +47,8 @@ class Event: IntrusiveBase<Event> {
 
     /*!
     Record this event to its EventManager. Recorded events of the same
-    name (e.g. same table) must not contain any fields that were not
-    present in the first event recorded of that name.  They must also not
+    title (e.g. same table) must not contain any fields that were not
+    present in the first event recorded of that title.  They must also not
     contain any fields of the same name but different value type.
 
     @throw CycInvalidSchemaErr inconsistent event field-valtype schemas
@@ -61,23 +61,15 @@ class Event: IntrusiveBase<Event> {
     /// Returns a map of all field-value pairs that have been added to this event.
     ValMap vals();
 
-    /*!
-    Returns the full, unique name generated for this event using info about
-    its creator along with its title.
-    */
-    std::string name();
-
   private:
     /// events should only be created via an EventManager
-    Event(EventManager* m, Model* creator, std::string title);
+    Event(EventManager* m, std::string title);
 
     /// checks whether this event schema is valid within the schema in primary.
     bool schemaWithin(event_ptr primary);
 
     EventManager* manager_;
     std::string title_;
-    int creator_id_;
-    std::string creator_impl_;
     ValMap vals_;
 };
 
