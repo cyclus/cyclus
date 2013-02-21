@@ -4,6 +4,12 @@
 
 class TestBack : public EventBackend {
   public:
+    TestBack() {
+      flush_count = 0;
+      notify_count = 0;
+      closed = false;
+    };
+
     virtual void notify(EventList evs) {
       flush_count = evs.size();
       events = evs;
@@ -26,152 +32,150 @@ class TestBack : public EventBackend {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_NewEvent) {
-  EventManager* m = new EventManager();
-  event_ptr ev = m->newEvent(NULL, "DumbTitle");
+  EventManager m;
+  event_ptr ev = m.newEvent(NULL, "DumbTitle");
   EXPECT_EQ(ev->title(), "DumbTitle");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_CreateDefault) {
-  EventManager* m = new EventManager();
-  EXPECT_EQ(m->dump_count(), kDefaultDumpCount);
+  EventManager m;
+  EXPECT_EQ(m.dump_count(), kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_GetSetDumpFreq) {
-  EventManager* m = new EventManager();
-  m->set_dump_count(1);
-  EXPECT_EQ(m->dump_count(), 1);
+  EventManager m;
+  m.set_dump_count(1);
+  EXPECT_EQ(m.dump_count(), 1);
 
-  m->set_dump_count(0);
-  EXPECT_EQ(m->dump_count(), 1);
+  m.set_dump_count(0);
+  EXPECT_EQ(m.dump_count(), 1);
 
-  m->set_dump_count(kDefaultDumpCount);
-  EXPECT_EQ(m->dump_count(), kDefaultDumpCount);
+  m.set_dump_count(kDefaultDumpCount);
+  EXPECT_EQ(m.dump_count(), kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_Closing) {
-  EventManager* m = new EventManager();
-  TestBack* back1 = new TestBack();
-  TestBack* back2 = new TestBack();
-  m->registerBackend(back1);
-  m->registerBackend(back2);
+  EventManager m;
+  TestBack back1;
+  TestBack back2;
+  m.registerBackend(&back1);
+  m.registerBackend(&back2);
 
-  ASSERT_FALSE(back1->closed);
-  ASSERT_FALSE(back2->closed);
+  ASSERT_FALSE(back1.closed);
+  ASSERT_FALSE(back2.closed);
 
-  m->close();
+  m.close();
 
-  EXPECT_TRUE(back1->closed);
-  EXPECT_TRUE(back2->closed);
+  EXPECT_TRUE(back1.closed);
+  EXPECT_TRUE(back2.closed);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_Buffering) {
-  TestBack* back1 = new TestBack();
-  TestBack* back2 = new TestBack();
+  TestBack back1;
 
-  EventManager* m = new EventManager();
-  m->set_dump_count(2);
-  m->registerBackend(back1);
+  EventManager m;
+  m.set_dump_count(2);
+  m.registerBackend(&back1);
 
-  m->newEvent(NULL, "DumbTitle")
+  m.newEvent(NULL, "DumbTitle")
    ->addVal("animal", std::string("monkey"))
    ->record();
 
-  EXPECT_EQ(back1->flush_count, 0);
-  EXPECT_EQ(back1->notify_count, 0);
+  EXPECT_EQ(back1.flush_count, 0);
+  EXPECT_EQ(back1.notify_count, 0);
 
-  m->newEvent(NULL, "DumbTitle")
+  m.newEvent(NULL, "DumbTitle")
    ->addVal("animal", std::string("elephant"))
    ->record();
 
-  EXPECT_EQ(back1->flush_count, 2);
-  EXPECT_EQ(back1->notify_count, 1);
+  EXPECT_EQ(back1.flush_count, 2);
+  EXPECT_EQ(back1.notify_count, 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_CloseFlushing) {
-  TestBack* back1 = new TestBack();
-  TestBack* back2 = new TestBack();
+  TestBack back1;
 
-  EventManager* m = new EventManager();
-  m->set_dump_count(2);
-  m->registerBackend(back1);
+  EventManager m;
+  m.set_dump_count(2);
+  m.registerBackend(&back1);
 
-  m->newEvent(NULL, "DumbTitle")
+  m.newEvent(NULL, "DumbTitle")
    ->addVal("animal", std::string("monkey"))
    ->record();
 
-  EXPECT_EQ(back1->flush_count, 0);
-  EXPECT_EQ(back1->notify_count, 0);
+  EXPECT_EQ(back1.flush_count, 0);
+  EXPECT_EQ(back1.notify_count, 0);
 
-  m->close();
+  m.close();
 
-  EXPECT_EQ(back1->flush_count, 1);
-  EXPECT_EQ(back1->notify_count, 1);
+  EXPECT_EQ(back1.flush_count, 1);
+  EXPECT_EQ(back1.notify_count, 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_EventSchemas) {
-  EventManager* m = new EventManager();
+  EventManager m;
 
-  event_ptr ev = m->newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent(NULL, "DumbTitle");
   ev ->addVal("animal", std::string("monkey"))
      ->addVal("weight", 10)
      ->record();
 
   // subset of fields
-  ev = m->newEvent(NULL, "DumbTitle");
+  ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("weight", 17);
   EXPECT_NO_THROW(ev->record());
 
   // different subset of fields
-  ev = m->newEvent(NULL, "DumbTitle");
+  ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("animal", std::string("elephant"));
   EXPECT_NO_THROW(ev->record());
 
   // inconsistent field name
-  ev = m->newEvent(NULL, "DumbTitle");
+  ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("height", 20);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // inconsistent field type
-  ev = m->newEvent(NULL, "DumbTitle");
+  ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("animal", 10);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // different title/namespace
-  ev = m->newEvent(NULL, "DifferentTitle");
+  ev = m.newEvent(NULL, "DifferentTitle");
   ev->addVal("height", 20);
   EXPECT_NO_THROW(ev->record());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Event_record) {
-  TestBack* back = new TestBack();
-  EventManager* m = new EventManager();
-  m->set_dump_count(1);
-  m->registerBackend(back);
+  TestBack back;
+  EventManager m;
+  m.set_dump_count(1);
+  m.registerBackend(&back);
 
-  event_ptr ev = m->newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("animal", std::string("monkey"));
 
-  EXPECT_EQ(back->flush_count, 0);
+  EXPECT_EQ(back.flush_count, 0);
 
   ev->record();
 
-  EXPECT_EQ(back->flush_count, 1);
+  EXPECT_EQ(back.flush_count, 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Event_addVal) {
-  TestBack* back = new TestBack();
-  EventManager* m = new EventManager();
-  m->registerBackend(back);
+  TestBack back;
+  EventManager m;
+  m.registerBackend(&back);
 
-  event_ptr ev = m->newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent(NULL, "DumbTitle");
 
   EXPECT_EQ(ev->vals().size(), 0);
 
@@ -190,9 +194,9 @@ TEST(EventManagerTest, Event_addVal) {
   EXPECT_EQ(boost::any_cast<int>(vals["weight"]), 10);
   EXPECT_FLOAT_EQ(boost::any_cast<double>(vals["height"]), 5.5);
 
-  m->close();
+  m.close();
 
-  vals = back->events.back()->vals();
+  vals = back.events.back()->vals();
   EXPECT_EQ(vals.size(), 3);
   EXPECT_EQ(boost::any_cast<std::string>(vals["animal"]), "monkey");
 
@@ -200,11 +204,11 @@ TEST(EventManagerTest, Event_addVal) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Event_DuplicateField) {
-  TestBack* back = new TestBack();
-  EventManager* m = new EventManager();
-  m->registerBackend(back);
+  TestBack back;
+  EventManager m;
+  m.registerBackend(&back);
 
-  event_ptr ev = m->newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent(NULL, "DumbTitle");
   ev->addVal("animal", std::string("monkey"));
   EXPECT_THROW(ev->addVal("animal", std::string("elephant")), CycDupEventFieldErr);
 }
