@@ -420,34 +420,13 @@ class Model {
    */
   bool born_;
 
-// -------- output database related members  -------- 
- public:
-  /**
-     the agent database table 
-   */
-  static table_ptr agent_table;
-  
-  /**
-     return the agent table's primary key 
-   */
-  primary_key_ref pkref(){ return pkref_;}
-
  private:
-  /**
-     Define the database table on the first Message's init 
-   */
-  static void define_table();
 
   /**
      add an agent to the transactiont table 
    */
   void addToTable();
 
-  /**
-     Store information about the transactions's primary key 
-   */
-  primary_key_ref pkref_;
-// -------- output database related members  --------   
 };
 
 #endif

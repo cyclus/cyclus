@@ -18,10 +18,7 @@ bool Material::decay_wanted_ = false;
 
 int Material::decay_interval_ = 1;
 
-table_ptr Material::material_table = table_ptr(new Table("MaterialHistory")); 
-
 bool Material::type_is_recorded_ = false;
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {

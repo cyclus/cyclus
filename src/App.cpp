@@ -6,12 +6,13 @@
 #include "boost/shared_ptr.hpp"
 
 #include "Model.h"
-#include "BookKeeper.h"
 #include "Timer.h"
 #include "CycException.h"
 #include "Env.h"
 #include "Logger.h"
 #include "XMLFileLoader.h"
+#include "EventManager.h"
+#include "SqliteBack.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -97,32 +98,18 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
-  // get output db location
-  string output_path = Env::checkEnv("PWD");  // default
-  string fname = "cyclus.sqlite";             // default
-  if (vm.count("output-path")){
-    string arg = vm["output-path"].as<string>();
-    string ext = ".sqlite";
-    string::size_type sql_ext_pos = arg.rfind(ext);
-    string::size_type last_slash_pos = arg.rfind("/");
-    if (sql_ext_pos != string::npos) {        // found *.sqlite
-      if (last_slash_pos != string::npos) {   // found */*
-        int fname_len = arg.length() - last_slash_pos - 1;
-        fname = arg.substr( last_slash_pos+1, fname_len);
-        output_path = arg.substr(0,arg.length()-fname_len-1); 
-      } else {
-        fname = arg;
-      }
-    }
-  }
-
-  // create output db
+  // Create the output file
+  string output_path = "cyclus.sqlite";
   try {
-    BI->createDB(output_path, fname);
+    if (vm.count("output-path")){
+      output_path = vm["output-path"].as<string>();
+    }
   } catch (CycException ge) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
+  SqliteBack* sqlBack = new SqliteBack(output_path);
+  EM->registerBackend(sqlBack);
 
   // read input file and setup simulation
   try {
@@ -159,13 +146,7 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
-  // Close the output file
-  try {
-    BI->closeDB();
-  } catch (CycException ge) {
-    success = false;
-    CLOG(LEV_ERROR) << ge.what();
-  }
+  EM->close();
 
   if (success) {
     cout << endl;
@@ -173,7 +154,7 @@ int main(int argc, char* argv[]) {
     cout << "|                  Cyclus                    |" << endl;
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
-    cout << "Output location: " << output_path << "/" << fname << endl;
+    cout << "Output location: " << output_path << endl;
     cout << endl;
   } else {
     cout << endl;
