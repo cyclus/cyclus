@@ -13,7 +13,7 @@ class SubMaterial : public Material {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST(DecayTest, GlobalFreq) {
+TEST(DecayTest, DISABLED_GlobalFreq) {
   // all materials are automatically added to a global static list via their
   // constructor. The submaterial object tracks decay invocations and the
   // submaterial object is then checked for appropriate # decay invocations and
@@ -37,7 +37,7 @@ TEST(DecayTest, GlobalFreq) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST(DecayTest, MaterialDeltaTracking) {
+TEST(DecayTest, DISABLED_MaterialDeltaTracking) {
   // Simulation pauses are simulated by doing a runSim repeatedly with
   // different sim durations. At each pause, we decay a material and check to
   // see that the appropriate decay interval is propogated down to the CompMap

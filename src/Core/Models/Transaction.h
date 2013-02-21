@@ -178,32 +178,7 @@ class Transaction {
     /// stores the next available transaction ID 
     static int next_trans_id_;
 
-///////////////////////////////////////////////////////////////////////////////
-////////////// Output db recording code ///////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
- public:
-  /**
-     the transaction output database Table 
-   */
-  static table_ptr trans_table;
-
-  /**
-     the transacted resource output database Table 
-   */
-  static table_ptr trans_resource_table;
-
  private:
-  /**
-     Define the transaction database table 
-   */
-  static void define_trans_table();
-
-  /**
-     Define the transacted resource database table 
-   */
-  static void define_trans_resource_table();
-
   /**
      add a transaction to the transaction table 
    */
@@ -215,16 +190,6 @@ class Transaction {
      @param resource the resource being transacted 
    */
   void addResourceToTable(int position, rsrc_ptr resource);
-
-  /**
-     the transaction primary key 
-   */
-  primary_key_ref pkref_trans_;
-
-  /**
-     the resource primary key 
-   */
-  primary_key_ref pkref_rsrc_;
 };
 
 #endif

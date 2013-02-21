@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 #include "MassTable.h"
+#include "SqliteDb.h"
 
 #include "Env.h"
-#include "Database.h"
 #include "CycException.h"
 
 using namespace std;
@@ -42,16 +42,12 @@ double MassTable::gramsPerMol(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
   // get the file location
-  string file_path = Env::getBuildPath() + "/share";
-  string file_name = "mass.sqlite";
-  Database *db = new Database( file_name, file_path );
+  string file_path = Env::getBuildPath() + "/share/mass.sqlite";
+  SqliteDb *db = new SqliteDb(file_path);
 
-  // get mass info
-  db->open();
-
-  query_result znums = db->query("SELECT Z FROM isotopemasses");
-  query_result anums = db->query("SELECT A FROM isotopemasses");
-  query_result mnums = db->query("SELECT Mass FROM isotopemasses");
+  std::vector<StrList> znums = db->query("SELECT Z FROM isotopemasses");
+  std::vector<StrList> anums = db->query("SELECT A FROM isotopemasses");
+  std::vector<StrList> mnums = db->query("SELECT Mass FROM isotopemasses");
   
   for (int i = 0; i < znums.size(); i++){
     // // obtain the database row and declare the appropriate members
@@ -70,6 +66,8 @@ void MassTable::initializeSQL() {
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();
+
+  delete db;
 }
 
 

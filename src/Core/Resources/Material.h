@@ -334,12 +334,7 @@ private:
 // -------- resource class related members  -------- 
 
 
-// -------- output database related members  -------- 
  public:
-  /**
-     the table for recording material resources 
-   */
-  static table_ptr material_table;
 
   /**
      add a material to table 
@@ -351,17 +346,6 @@ private:
    */
   virtual int stateID() {return iso_vector_.comp()->ID();}
 
- private:
-  /**
-     Define the database table 
-   */
-  static void define_table();
-
-  /**
-     Store information about the material's primary key 
-   */
-  primary_key_ref pkref_;
-// -------- output database related members  -------- 
 };
 
 #endif
