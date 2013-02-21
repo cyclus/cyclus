@@ -198,7 +198,7 @@ Model::~Model() {
   // set died on date and record it in the table
   diedOn_ = TI->time();
 
-  EM->newEvent(NULL, "AgentDeaths")
+  EM->newEvent("AgentDeaths")
     ->addVal("AgentID", ID())
     ->addVal("DeathDate", diedOn_)
     ->record();
@@ -386,7 +386,7 @@ void Model::addResource(Transaction trans,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addToTable(){
-  EM->newEvent(NULL, "Agents")
+  EM->newEvent("Agents")
     ->addVal("ID", ID())
     ->addVal("AgentType", modelType())
     ->addVal("ModelType", modelImpl())

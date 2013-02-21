@@ -37,7 +37,7 @@ void Resource::addToTable(){
     this->type_recorded();
   }
   
-  EM->newEvent(NULL, "Resources")
+  EM->newEvent("Resources")
     ->addVal("ID", ID())
     ->addVal("Type", (int)type())
     ->addVal("OriginalQuantity", quantity())
@@ -45,7 +45,7 @@ void Resource::addToTable(){
 }
 
 void Resource::recordNewType(){
-  EM->newEvent(NULL, "ResourceTypes")
+  EM->newEvent("ResourceTypes")
     ->addVal("Type", (int)type())
     ->addVal("Name", type_name())
     ->addVal("Units", units())

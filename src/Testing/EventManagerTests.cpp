@@ -33,7 +33,7 @@ class TestBack : public EventBackend {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_NewEvent) {
   EventManager m;
-  event_ptr ev = m.newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent("DumbTitle");
   EXPECT_EQ(ev->title(), "DumbTitle");
 }
 
@@ -81,14 +81,14 @@ TEST(EventManagerTest, Manager_Buffering) {
   m.set_dump_count(2);
   m.registerBackend(&back1);
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("monkey"))
    ->record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("elephant"))
    ->record();
 
@@ -104,7 +104,7 @@ TEST(EventManagerTest, Manager_CloseFlushing) {
   m.set_dump_count(2);
   m.registerBackend(&back1);
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("monkey"))
    ->record();
 
@@ -121,33 +121,33 @@ TEST(EventManagerTest, Manager_CloseFlushing) {
 TEST(EventManagerTest, Manager_EventSchemas) {
   EventManager m;
 
-  event_ptr ev = m.newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent("DumbTitle");
   ev ->addVal("animal", std::string("monkey"))
      ->addVal("weight", 10)
      ->record();
 
   // subset of fields
-  ev = m.newEvent(NULL, "DumbTitle");
+  ev = m.newEvent("DumbTitle");
   ev->addVal("weight", 17);
   EXPECT_NO_THROW(ev->record());
 
   // different subset of fields
-  ev = m.newEvent(NULL, "DumbTitle");
+  ev = m.newEvent("DumbTitle");
   ev->addVal("animal", std::string("elephant"));
   EXPECT_NO_THROW(ev->record());
 
   // inconsistent field name
-  ev = m.newEvent(NULL, "DumbTitle");
+  ev = m.newEvent("DumbTitle");
   ev->addVal("height", 20);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // inconsistent field type
-  ev = m.newEvent(NULL, "DumbTitle");
+  ev = m.newEvent("DumbTitle");
   ev->addVal("animal", 10);
   EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
 
   // different title/namespace
-  ev = m.newEvent(NULL, "DifferentTitle");
+  ev = m.newEvent("DifferentTitle");
   ev->addVal("height", 20);
   EXPECT_NO_THROW(ev->record());
 }
@@ -159,7 +159,7 @@ TEST(EventManagerTest, Event_record) {
   m.set_dump_count(1);
   m.registerBackend(&back);
 
-  event_ptr ev = m.newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent("DumbTitle");
   ev->addVal("animal", std::string("monkey"));
 
   EXPECT_EQ(back.flush_count, 0);
@@ -175,7 +175,7 @@ TEST(EventManagerTest, Event_addVal) {
   EventManager m;
   m.registerBackend(&back);
 
-  event_ptr ev = m.newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent("DumbTitle");
 
   EXPECT_EQ(ev->vals().size(), 0);
 
@@ -208,7 +208,7 @@ TEST(EventManagerTest, Event_DuplicateField) {
   EventManager m;
   m.registerBackend(&back);
 
-  event_ptr ev = m.newEvent(NULL, "DumbTitle");
+  event_ptr ev = m.newEvent("DumbTitle");
   ev->addVal("animal", std::string("monkey"));
   EXPECT_THROW(ev->addVal("animal", std::string("elephant")), CycDupEventFieldErr);
 }

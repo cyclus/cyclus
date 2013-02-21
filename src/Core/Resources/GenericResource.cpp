@@ -85,7 +85,7 @@ void GenericResource::addToTable() {
   }
   recorded_ = true;
 
-  EM->newEvent(NULL, "GenericResources")
+  EM->newEvent("GenericResources")
     ->addVal("ResourceID", ID())
     ->addVal("Quality", quality())
     ->record();

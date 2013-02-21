@@ -274,7 +274,7 @@ void Timer::load_simulation(QueryEngine *qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void Timer::logTimeData() 
 {
-  EM->newEvent(NULL, "SimulationTimeInfo")
+  EM->newEvent("SimulationTimeInfo")
     ->addVal("InitialYear", year0_)
     ->addVal("InitialMonth", month0_)
     ->addVal("SimulationStart", time0_)

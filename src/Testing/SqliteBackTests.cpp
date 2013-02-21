@@ -24,18 +24,18 @@ TEST(SqliteBackTest, CmdGenRegression) {
   EventManager m;
   m.registerBackend(&back);
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("monkey"))
    ->addVal("weight", 10)
    ->addVal("height", 5.5)
    ->record();
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("elephant"))
    ->addVal("weight", 1000)
    ->record();
 
-  m.newEvent(NULL, "DumbTitle")
+  m.newEvent("DumbTitle")
    ->addVal("animal", std::string("sea cucumber"))
    ->addVal("height", 1.2)
    ->record();

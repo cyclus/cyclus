@@ -165,7 +165,7 @@ void Transaction::setMinFrac(double new_minfrac) {
 }
 
 void Transaction::addTransToTable() {  
-  EM->newEvent(NULL, "Transactions")
+  EM->newEvent("Transactions")
     ->addVal("ID", trans_id_)
     ->addVal("SenderID", supplier_->ID())
     ->addVal("ReceiverID", requester_->ID())
@@ -177,7 +177,7 @@ void Transaction::addTransToTable() {
 }
 
 void Transaction::addResourceToTable(int transPos, rsrc_ptr r){  
-  EM->newEvent(NULL, "TransactedResources")
+  EM->newEvent("TransactedResources")
     ->addVal("TransactionID", trans_id_)
     ->addVal("Position", transPos)
     ->addVal("ResourceID", r->originalID())
