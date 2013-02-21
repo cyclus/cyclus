@@ -18,6 +18,7 @@
 #include "EventManager.h"
 #include "SqliteBack.h"
 #include "Hdf5Back.h"
+#include "CsvBack.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -133,6 +134,8 @@ int main(int argc, char* argv[]) {
   EventBackend* back;
   if (ext == ".h5") {
     back = new Hdf5Back(output_path.c_str());
+  } else if (ext == ".csv") {
+    back = new CsvBack(output_path.c_str());
   } else {
     back = new SqliteBack(output_path);
   }
