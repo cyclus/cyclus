@@ -51,21 +51,6 @@ TEST(EventManagerTest, Manager_GetSetDumpFreq) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_NoBackendsNoErrs) {
-  EventManager* m = new EventManager();
-  m->set_dump_count(1);
-
-  m->newEvent(NULL, "DumbTitle")
-   ->addVal("animal", std::string("monkey"))
-   ->record();
-  m->newEvent(NULL, "DumbTitle")
-   ->addVal("animal", std::string("elephant"))
-   ->record();
-
-  m->close();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_Closing) {
   EventManager* m = new EventManager();
   TestBack* back1 = new TestBack();
