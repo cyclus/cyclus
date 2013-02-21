@@ -25,9 +25,7 @@ unsigned int EventManager::dump_count() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::set_dump_count(unsigned int count) {
-  if (count > 0) {
-    dump_count_ = count;
-  }
+  dump_count_ = count;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

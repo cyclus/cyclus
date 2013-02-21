@@ -104,7 +104,8 @@ class EventManager {
 
     /*!
     set the EventManager to flush its collected events to registered backends
-    every [count] events.
+    every [count] events. If count <= 0 then events will be flushed immediately
+    as they come.
 
     @param count # events to buffer before flushing to backends.
     */

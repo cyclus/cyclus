@@ -49,8 +49,8 @@ TEST(EventManagerTest, Manager_GetSetDumpFreq) {
   m.set_dump_count(1);
   EXPECT_EQ(m.dump_count(), 1);
 
-  m.set_dump_count(0);
-  EXPECT_EQ(m.dump_count(), 1);
+  m.set_dump_count(-1);
+  EXPECT_EQ(m.dump_count(), -1);
 
   m.set_dump_count(kDefaultDumpCount);
   EXPECT_EQ(m.dump_count(), kDefaultDumpCount);
