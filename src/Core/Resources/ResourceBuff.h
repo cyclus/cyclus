@@ -149,6 +149,8 @@ public:
 
 private:
 
+  double qty_;
+
   /// maximum quantity of resources this store can hold
   double capacity_;
 

@@ -3,9 +3,9 @@
 #include "ResourceBuff.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ResourceBuff::ResourceBuff() {
-  capacity_ = 0.0;
-}
+ResourceBuff::ResourceBuff()
+  : capacity_(0),
+    qty_(0) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ResourceBuff::~ResourceBuff() { }
@@ -30,17 +30,12 @@ int ResourceBuff::count() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double ResourceBuff::quantity() {
-  double tot = 0;
-  std::list<rsrc_ptr>::iterator iter;
-  for (iter = mats_.begin(); iter != mats_.end(); iter++) {
-    tot += (*iter)->quantity();
-  }
-  return tot;
+  return qty_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double ResourceBuff::space() {
-  return capacity_ - quantity();
+  return capacity_ - qty_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,10 +61,15 @@ Manifest ResourceBuff::popQty(double qty) {
       leftover->setQuantity(quan - left);
       mat->setQuantity(left);
       mats_.push_front(leftover);
+      qty_ -= left;
+    } else {
+      qty_ -= quan;
     }
+
     manifest.push_back(mat);
     left -= quan;
   }
+
   return manifest;
 }
 
@@ -81,9 +81,12 @@ Manifest ResourceBuff::popNum(int num) {
 
   Manifest manifest;
   for (int i = 0; i < num; i++) {
-    manifest.push_back(mats_.front());
+    rsrc_ptr mat = mats_.front();
     mats_.pop_front();
+    manifest.push_back(mat);
+    qty_ -= mat->quantity();
   }
+
   return manifest;
 }
 
@@ -94,6 +97,7 @@ rsrc_ptr ResourceBuff::popOne() {
   }
   rsrc_ptr mat = mats_.front();
   mats_.pop_front();
+  qty_ -= mat->quantity();
   return mat;
 }
 
@@ -108,6 +112,7 @@ void ResourceBuff::pushOne(rsrc_ptr mat) {
       throw CycDupResException("Duplicate material pushing attempted.");
     }
   }
+  qty_ += mat->quantity();
   mats_.push_back(mat);
 }
 
@@ -128,8 +133,10 @@ void ResourceBuff::pushAll(Manifest mats) {
       }
     }
   }
+
   for (int i = 0; i < mats.size(); i++) {
     mats_.push_back(mats.at(i));
   }
+  qty_ += tot_qty;
 }
 
