@@ -5,6 +5,7 @@
 #include "CycException.h"
 
 #include <list>
+#include <vector>
 #include <string>
 #include <map>
 #include <boost/intrusive_ptr.hpp>
@@ -17,7 +18,7 @@ class Event;
 class EventManager;
 
 typedef boost::intrusive_ptr<Event> event_ptr;
-typedef std::list<event_ptr> EventList;
+typedef std::vector<event_ptr> EventList;
 
 /// default number of events to collect before flushing to backends.
 static unsigned int const kDefaultDumpCount = 10000;
@@ -84,7 +85,7 @@ class EventManager {
     void notifyBackends();
     void addEvent(event_ptr ev);
 
-    std::list<event_ptr> events_;
+    EventList events_;
     std::map<std::string, event_ptr> schemas_;
     std::list<EventBackend*> backs_;
     unsigned int dump_count_;
