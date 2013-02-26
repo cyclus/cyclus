@@ -110,20 +110,25 @@ void SqliteBack::writeEvent(event_ptr e) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::valAsString(boost::any v) {
-  std::stringstream ss;
+  // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
+    std::stringstream ss;
     ss << boost::any_cast<int>(v);
-  } else if (v.type() == typeid(float)) {
-    ss << boost::any_cast<float>(v);
+    return ss.str();
   } else if (v.type() == typeid(double)) {
+    std::stringstream ss;
     ss << boost::any_cast<double>(v);
+    return ss.str();
   } else if (v.type() == typeid(std::string)) {
-    ss << "\"" << boost::any_cast<std::string>(v) << "\"";
-  } else {
-    CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
-                    << name();
+    return "\"" + boost::any_cast<std::string>(v) + "\"";
+  } else if (v.type() == typeid(float)) {
+    std::stringstream ss;
+    ss << boost::any_cast<float>(v);
+    return ss.str();
   }
-  return ss.str();
+  CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
+                  << name();
+  return "";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
