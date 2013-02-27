@@ -59,6 +59,7 @@ SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
+# libxml2 is required for relaxng schema validation
 FIND_PACKAGE( LibXml2 REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
