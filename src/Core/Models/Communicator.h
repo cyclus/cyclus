@@ -4,6 +4,7 @@
 
 #include "Message.h"
 #include "Logger.h"
+#include <set>
 
 /**
    An abstract class for deriving simulation entities 
@@ -35,15 +36,15 @@
    passed between communicators. The StubCommModel provides an example 
    of a Communicator model implementation. 
  */
-
 class Communicator {
   
 public:
   virtual ~Communicator() {
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
-    for (int i = 0; i < tracked_messages_.size(); i++) {
-      tracked_messages_.at(i)->kill();
-      LOG(LEV_DEBUG3, "delete") << "killing tracked messages";
+    std::set<msg_ptr>::iterator it;
+    for (it = tracked_.begin(); it != tracked_.end(); it++) {
+      (*it)->kill();
+      LOG(LEV_DEBUG3, "delete") << "killing tracked message";
     }
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
   };
@@ -62,7 +63,7 @@ private:
    */
   virtual void receiveMessage(msg_ptr msg) = 0;
 
-  std::vector<msg_ptr> tracked_messages_;
+  std::set<msg_ptr> tracked_;
 
   /** 
      Add msg to a list of msgs to be killed when this communicator is 
@@ -72,13 +73,7 @@ private:
      @param msg the Message to be tracked. 
    */
   void trackMessage(msg_ptr msg) {
-    for (int i = 0; i < tracked_messages_.size(); i++) {
-      if (tracked_messages_.at(i) == msg) {
-        tracked_messages_.erase(tracked_messages_.begin() + i);
-        break;
-      }
-    }
-    tracked_messages_.push_back(msg);
+    tracked_.insert(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " tracks Message " << msg;
   }
 
@@ -90,12 +85,7 @@ private:
      @param msg the Message to untrack 
    */
   void untrackMessage(msg_ptr msg) {
-    for (int i = 0; i < tracked_messages_.size(); i++) {
-      if (tracked_messages_.at(i) == msg) {
-        tracked_messages_.erase(tracked_messages_.begin() + i);
-        break;
-      }
-    }
+    tracked_.erase(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " untracked Message " << msg;
   }
 

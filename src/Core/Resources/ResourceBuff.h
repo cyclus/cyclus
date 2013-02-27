@@ -7,6 +7,7 @@
 #include "CycException.h"
 #include <list>
 #include <vector>
+#include <set>
 #include <limits>
 
 static double const kBuffInfinity = std::numeric_limits<double>::max();
@@ -121,7 +122,7 @@ public:
   @throws CycOverCapException the pushing of the given resource object would
   cause the store to exceed its capacity.
 
-  @throws CycDupMatException the resource object to be pushed is already present
+  @throws CycDupResException the resource object to be pushed is already present
   in the store.
   */
   void pushOne(rsrc_ptr mat);
@@ -137,7 +138,7 @@ public:
   @throws CycOverCapException the pushing of the given resource objects would
   cause the store to exceed its capacity.
 
-  @throws CycDupMatException one or more of the resource objects to be pushed
+  @throws CycDupResException one or more of the resource objects to be pushed
   are already present in the store.
   */
   void pushAll(Manifest mats);
@@ -149,11 +150,14 @@ public:
 
 private:
 
+  double qty_;
+
   /// maximum quantity of resources this store can hold
   double capacity_;
 
   /// list of constituent resource objects forming the store's inventory
   std::list<rsrc_ptr> mats_;
+  std::set<rsrc_ptr> mats_present_;
 };
 
 #endif
