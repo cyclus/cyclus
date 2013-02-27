@@ -76,6 +76,8 @@ SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 # Include the boost header files and the program_options library
+# Please be sure to use Boost rather than BOOST. 
+# Capitalization matters on some platforms
 SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
