@@ -43,7 +43,8 @@ double MassTable::gramsPerMol(int tope) {
 void MassTable::initializeSQL() {
   // get the file location
   string file_path = Env::getBuildPath() + "/share/mass.sqlite";
-  SqliteDb *db = new SqliteDb(file_path);
+  bool readonly=true;
+  SqliteDb *db = new SqliteDb(file_path, readonly);
 
   std::vector<StrList> znums = db->query("SELECT Z FROM isotopemasses");
   std::vector<StrList> anums = db->query("SELECT A FROM isotopemasses");
