@@ -19,8 +19,9 @@ class SqliteDb {
     Creates a new Sqlite database to be stored at the specified path.
 
     @param path the path+name for the sqlite database file
+    @param readonly a boolean indicating true if db is readonly
     */
-    SqliteDb(std::string path);
+    SqliteDb(std::string path, bool readonly=false);
 
     virtual ~SqliteDb();
 
@@ -71,6 +72,9 @@ class SqliteDb {
 
     /// indicates if open() will overwrite a file at 'path'.
     bool overwrite_;
+
+    /// indicates true if the db is readonly false otherwise
+    bool readonly_;
 };
 
 #endif
