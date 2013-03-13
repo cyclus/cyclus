@@ -55,6 +55,7 @@ void SqliteDb::open() {
   } else if(sqlite3_open(path_.c_str(), &db_) == SQLITE_OK) {
     isOpen_ = true;
   } else {
+    sqlite3_close(db_);
     throw CycIOException("Unable to create/open database " + path_);
   }
 }
