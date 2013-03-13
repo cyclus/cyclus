@@ -50,7 +50,7 @@ void SqliteDb::open() {
   }
 
   if (readonly_ && sqlite3_open_v2(path_.c_str(), &db_, SQLITE_OPEN_READONLY, 
-        0) == SQLITE_OK) {
+        NULL) == SQLITE_OK) {
     isOpen_ = true;
   } else if(sqlite3_open(path_.c_str(), &db_) == SQLITE_OK) {
     isOpen_ = true;
@@ -66,7 +66,7 @@ void SqliteDb::execute(std::string sql) {
 
   sqlite3_stmt* statement;
   int check_query =
-    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, 0);
+    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
   if (check_query == SQLITE_OK) {
     int result = sqlite3_step(statement);
     sqlite3_finalize(statement);
@@ -88,7 +88,7 @@ std::vector<StrList> SqliteDb::query(std::string sql) {
 
   // query the database
   int check_query =
-    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, 0);
+    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
   if (check_query == SQLITE_OK) {
     int cols = sqlite3_column_count(statement);
     int result = 0;
