@@ -49,7 +49,8 @@ void SqliteDb::open() {
     }
   }
 
-  if (readonly_ && sqlite3_open_v2(path_.c_str(), &db_, SQLITE_OPEN_READONLY, 0) == SQLITE_OK) {
+  if (readonly_ && sqlite3_open_v2(path_.c_str(), &db_, SQLITE_OPEN_READONLY, 
+        0) == SQLITE_OK) {
     isOpen_ = true;
   } else if(sqlite3_open(path_.c_str(), &db_) == SQLITE_OK) {
     isOpen_ = true;
