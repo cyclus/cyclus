@@ -1,5 +1,56 @@
 #!/bin/bash
 
+########################################
+########### Helper Functions ###########
+########################################
+
+# \brief clones the repo if it doesn't yet exist or pulls it if it does
+# \param[in] src  the full source directory
+# \param[in] url  the global github url
+# \param[in] repo  the repository
+# \param[in] branch  the branch
+function get_repo() 
+{
+    HERE=$PWD
+    
+    local src=$1
+    local url=$2
+    local repo=$3
+    local branch=$4
+    
+    cd $src
+    if [ ! -d $repo ]; then
+	git clone $url/$repo
+    else
+	cd $repo
+	git pull origin $branch
+    fi
+
+    cd $HERE
+}
+
+# \brief removes the build folder, runs install command, makes, and installs 
+# \param[in] src  the full source directory
+# \param[in] repo  the repository
+# \param[in] cmd  the cmake installation command
+function install()
+{
+    HERE=$PWD
+
+    local src=$1
+    local repo=$2
+    local cmd=$3
+
+    cd $src/$repo
+    if [ -d build ]; then
+	rm -rf build
+    fi
+    mkdir build && cd build && $cmd && make install
+
+    cd $HERE
+}
+
+
 #####################################################################
 ################## Dependency installation ##########################
 #####################################################################
@@ -85,11 +136,11 @@ fi
 
 #check for debug cli flag
 DEBUG=""
-if [ $# > 1 ]
+if [ $# -gt 0 ]
 then
-    if [[ "$1" = "debug" ]]
+    if [ "$1" = "debug" ]
     then
-        DEBUG="-DCMAKE_BUILD_TYPE:STRING=Debug" foo = 1
+        DEBUG="-DCMAKE_BUILD_TYPE:STRING=Debug"
     fi
 fi
 
@@ -101,42 +152,47 @@ SRC=$ROOT/src
 INSTALL=$ROOT/install
 URL=http://github.com/cyclus
 
-mkdir $ROOT
-mkdir $SRC
-mkdir $INSTALL
+echo $ROOT
+
+if [ ! -d $ROOT ]; then
+    mkdir $ROOT
+fi
+if [ ! -d $SRC ]; then
+    mkdir $SRC
+fi
+if [ ! -d $INSTALL ]; then
+    mkdir $INSTALL
+fi
+
 
 INSTALL_CMD="cmake ../src -DCMAKE_INSTALL_PREFIX=$INSTALL $DEBUG"
 
 # get and build cyclopts
 REPO=cyclopts
-cd $SRC
-git clone $URL/$REPO
-cd $REPO
-mkdir build && cd build
-$INSTALL_CMD
-make && make install
+BRANCH=master
+echo "Fetching the latest version of Cyclopts"
+get_repo $SRC $URL $REPO $BRANCH 
+echo "Installing Cyclopts"
+install $SRC $REPO "$INSTALL_CMD"
 
 # get and build cyclus
 REPO=cyclus
-cd $SRC
-git clone $URL/$REPO
-cd $REPO
-mkdir build && cd build
-$INSTALL_CMD -DCYCLOPTS_ROOT_DIR=$INSTALL
-make && make install
+BRANCH=develop
+echo "Fetching the latest version of Cyclus"
+get_repo $SRC $URL $REPO $BRANCH 
+echo "Installing Cyclus"
+install $SRC $REPO "$INSTALL_CMD"
 
 # get and build cycamore
 REPO=cycamore
-cd $SRC
-git clone $URL/$REPO
-cd $REPO
-mkdir build && cd build
-$INSTALL_CMD -DCYCLOPTS_ROOT_DIR=$INSTALL -DCYCLUS_ROOT_DIR=$INSTALL
-make && make install
+BRANCH=develop
+echo "Fetching the latest version of Cycamore"
+get_repo $SRC $URL $REPO $BRANCH 
+echo "Installing Cycamore"
+install $SRC $REPO "$INSTALL_CMD"
 
 # test the installation
 echo "Running cyclus tests:"
 $INSTALL/cyclus/bin/CyclusUnitTestDriver | grep -A100 PASSED
 echo "Running cycamore tests:"
 $INSTALL/cycamore/bin/CycamoreUnitTestDriver | grep -A100 PASSED
-
