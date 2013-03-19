@@ -23,6 +23,7 @@ function get_repo()
 	git clone $url/$repo
     else
 	cd $repo
+	git checkout $branch
 	git pull origin $branch
     fi
 
