@@ -2,6 +2,7 @@
 #include "Material.h"
 
 #include "CycException.h"
+#include "CycLimits.h"
 #include "Timer.h"
 #include "Logger.h"
 
@@ -99,23 +100,27 @@ mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
   assert(remove_comp->normalized());
   double remainder_kg, new_kg, kg_to_rem_i;
   remainder_kg = this->quantity();
+  double remainder_kg_i;
   int iso;
 
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     kg_to_rem_i = it->second * kg_to_rem;
+    if ( kg_to_rem_i <= cyclus::eps_rsrc() ) { kg_to_rem_i = 0; };
     iso = it->first;
-    if ( this->mass(iso) >= kg_to_rem_i ) {
-      (*new_comp)[iso] = this->mass(iso) - kg_to_rem_i;
+    remainder_kg_i = this->mass(iso) - kg_to_rem_i;
+    if ( remainder_kg_i >= -cyclus::eps_rsrc() ) {
+      if ( remainder_kg_i <= cyclus::eps_rsrc() ) { remainder_kg_i = 0; };
+      (*new_comp)[iso] = remainder_kg_i;
       new_kg += kg_to_rem_i;
       remainder_kg -= kg_to_rem_i;
     } else {
-    stringstream ss("");
-    ss << "The Material " << this->ID() 
-      << " has insufficient material to extract the isotope : "
-      << iso ;
-    throw CycNegativeValueException(ss.str());
+      stringstream ss("");
+      ss << "The Material " << this->ID() 
+         << " has insufficient material to extract the isotope : "
+         << iso ;
+      throw CycNegativeValueException(ss.str());
     }
   }
 
