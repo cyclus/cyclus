@@ -120,7 +120,7 @@ mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
       throw CycNegativeValueException(ss.str());
     } else if (remainder_kg_i <= cyclus::eps_rsrc()) {
       remainder_kg_i = 0; 
-    };
+    }
     
     // operate on information
     (*new_comp)[iso] = remainder_kg_i;
