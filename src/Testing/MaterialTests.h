@@ -15,6 +15,7 @@ class MaterialTest : public ::testing::Test {
     double test_size_, fraction;
     mat_rsrc_ptr test_mat_, two_test_mat_, ten_test_mat_;
     mat_rsrc_ptr diff_mat_;
+    mat_rsrc_ptr default_mat_;
     long int u235_halflife_;
     int th228_halflife_;
     double u235_g_per_mol_;
@@ -46,7 +47,6 @@ class MaterialTest : public ::testing::Test {
       (*diff_comp_)[am241_]=one_g_;
       (*diff_comp_).normalize();
 
-
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
       test_mat_->setQuantity(test_size_);
@@ -58,6 +58,8 @@ class MaterialTest : public ::testing::Test {
       ten_test_mat_->setQuantity(10*test_size_);
       diff_mat_ = mat_rsrc_ptr(new Material(diff_comp_));
       diff_mat_->setQuantity(test_size_);
+
+      default_mat_ = mat_rsrc_ptr(new Material());
 
       // test info
       u235_g_per_mol_ = 235.044;
