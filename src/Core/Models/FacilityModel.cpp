@@ -4,7 +4,6 @@
 #include "FacilityModel.h"
 
 #include "Timer.h"
-#include "BookKeeper.h"
 #include "QueryEngine.h"
 #include "InstModel.h"
 
@@ -18,7 +17,8 @@ using namespace std;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() : 
   fac_lifetime_(numeric_limits<int>::max()),
-  decommission_date_(numeric_limits<int>::max()) {
+  decommission_date_(numeric_limits<int>::max()),
+  build_date_(0) {
   setModelType("Facility");
   in_commods_ = std::vector<std::string>();
   out_commods_ = std::vector<std::string>();

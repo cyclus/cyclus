@@ -5,12 +5,9 @@ message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
-  # -- do not change this order
-  ${CMAKE_CURRENT_SOURCE_DIR}/TableTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BookKeeperTests.cpp
   # --
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BuildingTestHelper.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
@@ -18,6 +15,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityTestHelper.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/EnrichmentTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/EventManagerTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
@@ -27,6 +25,8 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDbTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBackTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/XMLParserTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/XMLFileLoaderTests.cpp

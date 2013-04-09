@@ -1,13 +1,23 @@
 
+IF(NOT DEFINED CYCLOPTS_ROOT_DIR)
+    SET(CYCLOPTS_ROOT_DIR "$ENV{CYCLOPTS_ROOT_DIR}")
+ENDIF(NOT DEFINED CYCLOPTS_ROOT_DIR)
+
+MESSAGE(STATUS "CYCLOPTS_ROOT_DIR hint is : ${CYCLOPTS_ROOT_DIR}")
+
 # if installed in a non-standard location,
 # the include directory must be added to the PATH variable
 FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/Variable.h
+  HINTS "${CYCLOPTS_INCLUDE_DIR}"
+  HINTS "${CYCLOPTS_ROOT_DIR}"
+  HINTS "${CYCLOPTS_ROOT_DIR}/include"
   HINTS /usr/
   HINTS /usr/include/
   HINTS /usr/local/
   HINTS /usr/local/include/
   HINTS /usr/cyclopts/
   HINTS /usr/local/cyclopts/
+  HINTS ${CYCLOPTS_HINT}/
 )
 
 set(CYCLOPTS_INCLUDE_DIR ${CYCLOPTS_INCLUDE_DIR}/cyclopts)

@@ -144,18 +144,10 @@ private:
 
   bool recorded_;
 
- private:
   /**
      A boolean to tell if the resource has been recorded 
    */ 
   static bool type_is_recorded_;
-
-  /**
-     defines the resource table 
-   */
-  static void define_table();
-
-  static table_ptr genres_table;
 };
 
 #endif

@@ -1,115 +1,156 @@
-_______________________________________________________________________
+###########
 Cyclus Core
-_______________________________________________________________________
+###########
 
-The core of the Cyclus nuclear fuel cycle simulator from the University of 
-Wisconsin - Madison is intended to be a simulation framework upon which to 
-develop innovative fuel cycle simulations. 
+The core of the Cyclus nuclear fuel cycle simulator from the 
+University of Wisconsin - Madison is intended to be a simulation 
+framework upon which to develop innovative fuel cycle simulations. 
 
-To see user and developer documentation for this code, please visit the `Cyclus Homepage`_.
+To see user and developer documentation for this code, please visit 
+the `Cyclus Homepage`_.
 
+******************************
+Building and Installing Cyclus
+******************************
 
------------------------------------------------------------------------
-LISCENSE
------------------------------------------------------------------------
-
-::
-
-    Copyright (c) 2010-2012, University of Wisconsin Computational Nuclear Engineering Research Group
-     All rights reserved.
-    
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
-    
-      - Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
-      
-      - Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
-      
-      - Neither the name of the University of Wisconsin Computational
-        Nuclear Engineering Research Group nor the names of its
-        contributors may be used to endorse or promote products derived
-        from this software without specific prior written permission.
-    
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-
-------------------------------------------------------------------
-Building Cyclus
-------------------------------------------------------------------
-
-The `Cyclus Homepage`_ has much more detailed guides and information.
-This Readme is intended to be a quick reference for building cyclus for the
-first time.
-
-The Cyclus code requires the following software and libraries.
+In order to facilitate future compatibility with multiple platforms, 
+Cyclus is built using `CMake`_. A full list of the Cyclus package 
+dependencies is show below:
 
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
 `CMake`                2.8            
 `boost`                1.34.1
-`libxml2`              2                 
+`libxml2`              2
+`libxml++`             2.6
 `sqlite3`              3.7.10            
 `Cyclopts`             0.1            
-`coin-Cbc`             2.5            
 ====================   ==================
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Building and Running Cyclus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+As with all software, the build/install can be broken into two steps:
 
-In order to facilitate future compatibility with multiple platforms, Cyclus is
-built using  `Cmake <http://www.cmake.org>`_. This relies on CMake version
-2.8 or higher and the CMakeLists.txt file in `src/`. It is
-recommended that you use CMake to build the Cyclus executable external to the
-source code. To do this, execute the following steps::
+  #. building and installing the dependencies
+  #. building and installing Cyclus
 
-    .../core/$ mkdir build
-    .../core/$ cd build
-    .../core/build$ cmake ../src
+Installing Dependencies
+=======================
 
-You should see output like this::
+This guide assumes that the user has root access (to issue sudo 
+commands) and access to a package manager or has some other suitable 
+method of automatically installing established libraries. This process
+was tested using a fresh install of Ubuntu 12.10. 
 
-    ...
-    ...
-    >> -- Configuring done
-    >> -- Generating done
-    >> -- Build files have been written to: .../core/build
-    /core/build$ make cyclus
-    >> Scanning dependencies of target cyclus
-    ...
-    ...
-    >> [100%] Building CXX object CMakeFiles/cyclus.dir/SourceFac.cpp.o
-    >> Linking CXX executable cyclus
-    >> [100%] Built target cyclus
+Cyclopts
+--------
 
-Now, you can make cyclus, and run it with some input file, for this example, call it `input.xml`::
+Cyclopts is an optimization wrapper library used by Cyclus and is
+part of the general Cyclus software suite. Detailed build/install
+instructions are provided in the `Cyclopts readme`_. We assume that the 
+user has successfully built and installed Cyclopts (and CMake) for 
+the following discussion. 
 
-    .../core/build$ make
-    .../core/build$ ./cyclus input.xml
+All Others
+----------
 
-The `Cyclus Homepage`_ has much more detailed guides and information.  If
-you intend to develop for *Cyclus*, please visit it to learn more.
+All other dependencies are common libraries available through package
+managers. We provide an example using `apt-get`_. All required 
+commands will take the form of:
 
+.. code-block:: bash
+
+  sudo apt-get install package
+
+Where you will replace "package" with the correct package name. The
+list of required package names are:
+
+  #. libboost-all-dev
+  #. libxml++2.6-dev
+  #. libsqlite3-dev
+
+So, for example, in order to install libxml++ on your system, you will
+type:
+
+.. code-block:: bash
+
+  sudo apt-get install libxml++2.6-dev
+
+Let us take a moment to note the Boost library dependency. As it 
+currently stands, we in fact depend on a small subset of the Boost 
+libraries:
+
+  #. libboost-program-options-dev
+  #. libboost-system-dev
+  #. libboost-filesystem-dev
+
+However, it is possible (likely) that additional Boost libraries will
+be used because they are an industry standard. Accordingly, we suggest
+simply installing libboost-all-dev to limit any headaches due to 
+possible dependency additions in the future.
+
+Installing Cyclus
+=================
+
+Assuming you have the dependencies installed correctly, it's pretty
+straightforward to install Cyclus. We make the following assumptions
+in this guide:
+
+  #. there is some master directory in which you're placing all
+     Cyclus-related files called .../cyclus
+  #. you have a directory named .../cyclus/install in which you plan
+     to install all Cyclus-related files
+  #. you have acquired the Cyclus source code from the `Cyclus repo`_
+  #. you have placed the Cyclus repository in .../cyclus/cyclus
+  #. you have a directory named .../cyclus/cyclus/build in which 
+     you plan to encapsulate all build-related files (they get in the
+     way otherwise)
+  #. you have installed Cyclopts using the CMAKE_INSTALL_PREFIX 
+     variable set to ../cyclus/install (see the `Cyclopts readme`_)
+
+Under these assumptions **and** if you used a package manager to 
+install coin-Cbc (i.e. it's installed in a standard location), the
+Cyclus building and installation process will look like:
+
+.. code-block:: bash
+
+    .../cyclus/cyclus$ cd build
+    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCYCLOPTS_ROOT_DIR=../../install
+    .../cyclus/cyclus/build$ make && make install
+
+If you have installed coin-Cbc from source or otherwise have it 
+installed in a non-standard location, you should make use of the CMake
+COIN_ROOT_DIR variable. The otherwise identical process would look 
+like:
+
+.. code-block:: bash
+
+    .../cyclus/cyclus$ cd build
+    .../cyclus/cyclus/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=../../install -DCYCLOPTS_ROOT_DIR=../../install -DCOIN_ROOT_DIR=/the/path/to/coin/install
+    .../cyclus/cyclus/build$ make && make install
+
+Now, run it with some input file, for this example, call it 
+`input.xml`::
+
+    .../cyclus/install/cyclus/bin$ ./cyclus input.xml
+
+Debugging Build
+---------------
+
+Building the debug version of the core library requires an additional
+CMake variable flag. Simply add the following to your cmake command:
+::
+
+  -DCMAKE_BUILD_TYPE:STRING=Debug
 
 .. _`Cyclus Homepage`: http://cyclus.github.com
+.. _`CMake`: http://www.cmake.org
+.. _`apt-get`: http://linux.die.net/man/8/apt-get
+.. _`Cyclopts readme`: https://github.com/cyclus/cyclopts
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
 
-
---------------------------------------------------------------------------
+**********************
 The Developer Workflow
---------------------------------------------------------------------------
+**********************
 
 *Note that "blessed" repository refers to the primary `cyclus/core` repository.*
 
@@ -124,12 +165,11 @@ request to the blessed repository (usually the "develop" branch) only after:
   * (recommended) your code has been reviewed by another developer.
 
 Code from the "develop" branch generally must pass even more rigorous checks
-before being integrated into the "master" branch. Hotfixes would be a
+before being integrated into the "master" branch. Hot-fixes would be a
 possible exception to this.
 
-~~~~~~~~~~~~~~~~~~~
 Workflow Notes
-~~~~~~~~~~~~~~~~~~~
+==============
 
   * Use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
@@ -139,7 +179,7 @@ Workflow Notes
 
   * Keep your own "master" and "develop" branches in sync with the blessed repository's
     "master" and "develop" branches. The master branch should always be the 'stable'
-    or 'production' release of cyclus.
+    or 'production' release of Cyclus.
     
      - Pull the most recent history from the blessed repository "master"
        and/or "develop" branches before you merge changes into your
@@ -191,7 +231,7 @@ Workflow Notes
         
   * **Reviewing a Pull Request** 
 
-     - Build, install, and test it. If you have added the remmote repository as 
+     - Build, install, and test it. If you have added the remote repository as 
        a remote you can check it out and merge it with the current develop 
        branch thusly, ::
        
@@ -220,9 +260,8 @@ Workflow Notes
             git merge --no-ff remote_name/branch_name -m "A message""
 
 
-~~~~~~~~~~~~~~~~~~~
 Cautions
-~~~~~~~~~~~~~~~~~~~
+========
 
   * **NEVER** merge the "master" branch into the "develop"
     branch. Changes should only flow *to* the "master" branch *from* the
@@ -244,13 +283,12 @@ Cautions
       git pull [remote] [from-branch]
 
 
-~~~~~~~~~~~~~~~~~~~
 An Example
-~~~~~~~~~~~~~~~~~~~
+==========
 
 
 Introduction
-============
+------------
 
 As this type of workflow can be complicated to converts from SVN and very complicated
 for brand new programmers, an example is provided.
@@ -262,15 +300,15 @@ call this branch "Work". So, when all is said and done, in our fork there will b
 three branches: "Master", "Develop", and "Work".
 
 Acquiring Cyclus and Workflow
-=============================
+-----------------------------
 
 We begin with a fork of the main ("blessed") Cyclus repository. After initially forking
 the repo, we will have two branches in our fork: "Master" and "Develop".
 
 Acquiring a Fork of the Cyclus Repository
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A fork is *your* copy of Cyclus. Github offers an excelent 
+A fork is *your* copy of Cyclus. Github offers an excellent 
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
@@ -290,7 +328,7 @@ fork's branches up to date (i.e., "push" your changes before you leave), only yo
 copies of your branches may be different when you next sit down at the other location.
 
 Workflow: The Beginning
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Now, for the workflow! This is by no means the only way to perform this type of workflow, 
 but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
@@ -319,7 +357,7 @@ We then follow the same process to update the work branch, except:
 #. we want to incorporate any changes which may have been introduced in the develop branch update.
 
 Workflow: The End
------------------
+^^^^^^^^^^^^^^^^^
 
 As time passes, you make some changes to files, and you commit those changes (to your *local work
 branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
@@ -330,7 +368,7 @@ review and accept it.
 
 Sometimes, your pull request will be closed by the reviewer until further 
 changes are made to appease the reviewer's concerns. This may be frustrating, 
-but please act rationally, discuss the issues on the github space made for your 
+but please act rationally, discuss the issues on the GitHub space made for your 
 pull request, consult the `style guide <http://cyclus.github.com/devdoc/style_guide.html>`_, 
 email the developer listhost for further advice, and make changes to your topic branch 
 accordingly. The pull request will be updated with those changes when you push them 

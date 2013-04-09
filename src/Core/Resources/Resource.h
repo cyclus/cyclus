@@ -3,8 +3,8 @@
 #define _RESOURCE_H
 
 #include <string>
-
-#include "Table.h"
+#include "IntrusiveBase.h"
+#include <boost/intrusive_ptr.hpp>
 
 class Resource;
 typedef boost::intrusive_ptr<Resource> rsrc_ptr;
@@ -143,16 +143,6 @@ public:
  public:
 
   /**
-     the output database table which records resources 
-   */
-  static table_ptr resource_table;
-
-  /**
-     the output database table which records resource types 
-   */
-  static table_ptr resource_type_table;
-
-  /**
      adds a resource to the resouce table 
    */
   virtual void addToTable();
@@ -173,30 +163,11 @@ public:
   virtual void type_recorded() = 0;
   
  private:
-  /**
-     defines the resource table 
-   */
-  static void define_table();
-
-  /**
-     defines the resource type table 
-   */
-  static void define_type_table();
 
   /**
      adds a resource type to the resource type table 
    */
   void recordNewType();
-
-  /**
-     the primary key reference to this resource 
-   */
-  primary_key_ref pkref_;
-
-  /**
-     the primary key reference to this resource type 
-   */
-  primary_key_ref type_pkref_;
 
   /**
   True if this resource object has already been recorded to the output db
