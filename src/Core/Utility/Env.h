@@ -112,13 +112,45 @@ public:
   static std::string checkEnv(std::string var);
 
   /**
-     Environment searches for a library and, if found, sets the path
-     @param name the name of the library to search for
+     @return the environment variable used for module installations, currently
+     set to CYCLUS_MODULE_PATH
+  */
+  static const std::string moduleEnvVar();
+
+  /**
+     @return the correct environment variable delimeter based on the file system
+  */
+  static const std::string envDelimeter();
+
+  /**
+     @return the correct path delimeter based on the file system
+  */
+  static const std::string pathDelimeter();
+
+  /**
+     Environment searches for a library and, if found, sets the path. The search
+     occurs across the default install location as well as any included in the
+     CYCLUS_MODULE_PATH environment variable.
+     @param name the name of the library to search for 
      @param path the variable to set with the path to the library
      @return true if the library is found, false if not
    */
   static bool findLib(std::string name, 
                       boost::filesystem::path &path_found);
+  
+  /**
+     Taken from the answer in
+     http://stackoverflow.com/questions/236129/splitting-a-string-in-c.  This
+     function takes a string, delimeter, and vector, and splits the string by
+     the delimeter, inserting every entry into the vector.
+     @param s the string to split
+     @param delim the delimeter character
+     @param elems the vector on which to append the split characters
+     @return a reference to the added-to vector 
+   */
+  static std::vector<std::string>& split(const std::string &s, char delim,
+                                         std::vector<std::string>& elems);
+
 };
 
 #endif
