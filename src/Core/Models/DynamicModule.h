@@ -47,6 +47,7 @@ class DynamicModule {
 
   /**
      initializes the module by calling
+     * setPath()
      * openLibrary()
      * setConstructor()
      * setDestructor()
@@ -65,6 +66,9 @@ class DynamicModule {
   /// the name of the module
   std::string module_name_;
 
+  /// the type of module
+  std::string type_;
+
   /// the name of all module constructor functions
   std::string constructor_name_;
 
@@ -82,6 +86,12 @@ class DynamicModule {
 
   /// @return the path to the dynamic library
   std::string path();
+
+  /**
+     sets the absolute path to the dynamic library based on parameters set
+     during construction
+   */
+  void setPath();
 
   /**
      opens the library

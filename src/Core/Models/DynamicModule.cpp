@@ -11,21 +11,15 @@
 using namespace std;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DynamicModule::DynamicModule(std::string type, std::string name) :
-  abs_path_(""), module_name_(""), 
-  constructor_name_(""), destructor_name_(""),
-  module_library_(0), constructor_(0), destructor_(0) {
-  
-  module_name_ = name;
-  abs_path_ = Env::getInstallPath() + "/lib/Models/" + type + "/" +
-    name + "/lib" + name + SUFFIX;
-  constructor_name_= "construct" + name;
-  destructor_name_= "destruct" + name;
-
-}
+DynamicModule::DynamicModule(std::string type,std::string name) :
+  type_(type), module_name_(name), 
+  constructor_name_("construct" + name), destructor_name_("destruct" + name),
+  abs_path_(""), module_library_(0), constructor_(0), destructor_(0) 
+{}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::initialize() {
+  setPath();
   openLibrary();
   setConstructor();
   setDestructor();
@@ -33,6 +27,13 @@ void DynamicModule::initialize() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::~DynamicModule() {
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void DynamicModule::setPath() {
+  abs_path_ = Env::getInstallPath() + "/lib/Models/" + type_ + "/" +
+    module_name_ + "/lib" + module_name_ + SUFFIX;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
