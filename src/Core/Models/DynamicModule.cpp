@@ -5,10 +5,12 @@
 #include "Env.h"
 #include "suffix.h"
 #include "Model.h"
+#include "boost/filesystem.hpp"
 
 #include DYNAMICLOADLIB
 
 using namespace std;
+namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string type,std::string name) :
@@ -32,8 +34,13 @@ DynamicModule::~DynamicModule() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setPath() {
-  abs_path_ = Env::getInstallPath() + "/lib/Models/" + type_ + "/" +
-    module_name_ + "/lib" + module_name_ + SUFFIX;
+  string lib_name = "lib" + module_name_ + SUFFIX;
+  fs::path p;
+  if (!Env::findLib(lib_name,p))
+      throw CycIOException("Could not find library: " + lib_name);
+  abs_path_ = p.string();
+  // abs_path_ = Env::getInstallPath() + "/lib/Models/" + type_ + "/" +
+  //   module_name_ + "/lib" + module_name_ + SUFFIX;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
