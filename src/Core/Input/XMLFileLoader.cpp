@@ -16,13 +16,15 @@ using namespace std;
 using namespace boost;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(std::string load_filename, 
-                             bool use_main_schema)  {
-  
+XMLFileLoader::XMLFileLoader(std::string load_filename) {
+  file_ = load_filename;
   initialize_module_paths();
+}
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::init(bool use_main_schema)  {
   stringstream input("");
-  loadStringstreamFromFile(input,load_filename);
+  loadStringstreamFromFile(input,file_);
   if (use_main_schema) {
     stringstream schema("");
     loadStringstreamFromFile(schema,pathToMainSchema());

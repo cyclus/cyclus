@@ -16,13 +16,19 @@
 class XMLFileLoader {
  public:    
   /**
-     Constructor to create a new XML for loading
-     @param load_filename The filename for the file to be loaded
-     @param use_main_schema whether or not to use the main schema to 
-     validate the file
+     Constructor to create a new XML for loading 
+     @param load_filename The filename for the file to be loaded; defaults to 
+     an empty string
   */
-  XMLFileLoader(std::string load_filename, bool use_main_schema=true);
-  
+  XMLFileLoader(std::string load_filename = "");
+    
+  /**
+     Initializes the internal data structures of the file loader
+     @param use_main_schema whether or not to use the main schema to 
+     validate the file; defaults to using the main schema
+   */
+  void init(bool use_main_schema=true);
+
   /**
      @return the path to the main file schema (cyclus.rng)
    */
@@ -76,6 +82,9 @@ class XMLFileLoader {
                                 std::string file);
 
  private:
+  /// the input file name
+  std::string file_;
+
   /// the parser
   boost::shared_ptr<XMLParser> parser_;
 };

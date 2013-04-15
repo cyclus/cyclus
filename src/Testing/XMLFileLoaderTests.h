@@ -24,7 +24,7 @@ class XMLFileLoaderTests : public ::testing::Test {
  public:
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
-  XMLFileLoader* xmlFile;
+  XMLFileLoader xmlFile;
 
   virtual void SetUp();
 
