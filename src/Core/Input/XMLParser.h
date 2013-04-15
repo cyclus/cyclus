@@ -22,19 +22,19 @@ class XMLParser {
      initializes a parser with an xml snippet
      @param input an xml snippet to be used as input
    */
-  void init(std::stringstream& input);
-
-  /**
-     @return the parser's document
-   */
-  xmlpp::Document* document();
+  void init(const std::stringstream& input);
 
   /**
      validates the file agaisnt a schema
      @param schema the schema to validate agaisnt
    */
-  void validate(std::stringstream& schema);
+  void validate(const std::stringstream& schema);
   
+  /**
+     @return the parser's document
+   */
+  xmlpp::Document* document();
+
  private:
   /// file parser
   boost::shared_ptr<xmlpp::DomParser> parser_;

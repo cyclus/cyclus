@@ -16,7 +16,7 @@ using namespace std;
 using namespace boost;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(std::string load_filename) {
+XMLFileLoader::XMLFileLoader(const std::string load_filename) {
   file_ = load_filename;
   initialize_module_paths();
 }
@@ -59,7 +59,7 @@ std::string XMLFileLoader::pathToMainSchema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::applySchema(std::stringstream &schema) {
+void XMLFileLoader::applySchema(const std::stringstream &schema) {
   parser_->validate(schema);
 }
 

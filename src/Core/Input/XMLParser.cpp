@@ -21,7 +21,7 @@ XMLParser::~XMLParser() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParser::init(std::stringstream& xml_input_snippet) {
+void XMLParser::init(const std::stringstream& xml_input_snippet) {
   parser_ = shared_ptr<DomParser>(new DomParser());
   try {    
     CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet.str();
@@ -37,7 +37,7 @@ void XMLParser::init(std::stringstream& xml_input_snippet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParser::validate(std::stringstream& xml_schema_snippet) {
+void XMLParser::validate(const std::stringstream& xml_schema_snippet) {
   RelaxNGValidator validator;
   validator.parse_memory(xml_schema_snippet.str());
   try {

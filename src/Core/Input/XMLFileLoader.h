@@ -20,7 +20,7 @@ class XMLFileLoader {
      @param load_filename The filename for the file to be loaded; defaults to 
      an empty string
   */
-  XMLFileLoader(std::string load_filename = "");
+  XMLFileLoader(const std::string load_filename = "");
     
   /**
      Initializes the internal data structures of the file loader
@@ -38,7 +38,7 @@ class XMLFileLoader {
      applies a schema agaisnt the parser used by the file loader
      @param schema the schema representation
    */
-  void applySchema(std::stringstream &schema);
+  void applySchema(const std::stringstream &schema);
 
   /**
      Method to load the simulation control parameters.
