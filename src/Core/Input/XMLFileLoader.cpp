@@ -25,12 +25,12 @@ XMLFileLoader::XMLFileLoader(std::string load_filename) {
 void XMLFileLoader::init(bool use_main_schema)  {
   stringstream input("");
   loadStringstreamFromFile(input,file_);
+  parser_ = shared_ptr<XMLParser>(new XMLParser());
+  parser_->init(input);
   if (use_main_schema) {
     stringstream schema("");
     loadStringstreamFromFile(schema,pathToMainSchema());
-    parser_ = shared_ptr<XMLParser>(new XMLParser(input,schema));
-  } else {
-    parser_ = shared_ptr<XMLParser>(new XMLParser(input));
+    parser_->validate(schema);
   }
 }
 
@@ -60,7 +60,7 @@ std::string XMLFileLoader::pathToMainSchema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::applySchema(std::stringstream &schema) {
-  parser_->validateFileAgaisntSchema(schema);
+  parser_->validate(schema);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -12,22 +12,17 @@
  */
 class XMLParser {
  public:
-  /**
-     constructor given a schema
-     @param xml_input_snippet snippet of xml
-     @param xml_schema_snippet snippet of xml schema
-   */
-  XMLParser(std::stringstream& xml_input_snippet, 
-            std::stringstream& xml_schema_snippet);
-
-  /**
-     constructor without schema
-     @param xml_input_snippet snippet of xml
-   */
-  XMLParser(std::stringstream& xml_input_snippet);
+  /// constructor
+  XMLParser();
 
   /// destructor
   ~XMLParser();
+
+  /**
+     initializes a parser with an xml snippet
+     @param input an xml snippet to be used as input
+   */
+  void init(std::stringstream& input);
 
   /**
      @return the parser's document
@@ -35,20 +30,14 @@ class XMLParser {
   xmlpp::Document* document();
 
   /**
-     validates the file agaisnt a schema, if requested
-     @param xml_schema_snippet snippet of xml schema
+     validates the file agaisnt a schema
+     @param schema the schema to validate agaisnt
    */
-  void validateFileAgaisntSchema(std::stringstream& xml_schema_snippet);
+  void validate(std::stringstream& schema);
   
  private:
   /// file parser
   boost::shared_ptr<xmlpp::DomParser> parser_;
-
-  /**
-     initializes parse with an xml snippet
-     @param xml_input_snippet the xml snippet
-   */
-  void initParser(std::stringstream& xml_input_snippet);
 };
 
 #include "CycException.h"
