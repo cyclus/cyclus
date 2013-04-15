@@ -11,6 +11,9 @@ typedef void destroy_t(Model*);
 
 class DynamicModule {
  public:
+  /// @return the global library suffix
+  static const std::string suffix();
+
   /**
      constructor
      sets:
@@ -47,6 +50,7 @@ class DynamicModule {
 
   /**
      initializes the module by calling
+     * setPath()
      * openLibrary()
      * setConstructor()
      * setDestructor()
@@ -54,9 +58,18 @@ class DynamicModule {
   void initialize();
 
   /**
+     sets the absolute path to the dynamic library based on parameters set
+     during construction
+   */
+  void setPath();
+
+  /**
      closes the library
    */
   void closeLibrary();
+
+  /// @return the path to the dynamic library
+  std::string path();
   
  private:
   /// the path to the library
@@ -64,6 +77,9 @@ class DynamicModule {
   
   /// the name of the module
   std::string module_name_;
+
+  /// the type of module
+  std::string type_;
 
   /// the name of all module constructor functions
   std::string constructor_name_;
@@ -79,9 +95,6 @@ class DynamicModule {
   
   /// a functor for the destructor
   destroy_t * destructor_;
-
-  /// @return the path to the dynamic library
-  std::string path();
 
   /**
      opens the library

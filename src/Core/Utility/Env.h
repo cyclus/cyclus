@@ -34,9 +34,22 @@ private:
    */
   static boost::filesystem::path path_to_output_dir_;
 
+  /**
+     Taken directly from
+     http://www.boost.org/doc/libs/1_31_0/libs/filesystem/doc/index.htm. This
+     function recursively searches a directory and its sub-directories for the
+     file name, returning a bool, and if successful, the path to the file that
+     was found.
+     @param dir_path the directory path to search
+     @param file_name the file to search for
+     @param path_found the path, which is populated if the file is found
+     @return true if the file is found, false if it isn't
+   */
+  static bool find_file(const boost::filesystem::path &dir_path,
+                        const std::string &file_name,
+                        boost::filesystem::path &path_found );
 
 public:
-
   /**
      the path basis 
       
@@ -97,6 +110,46 @@ public:
      @param var is the variable to check and return 
    */
   static std::string checkEnv(std::string var);
+
+  /**
+     @return the environment variable used for module installations, currently
+     set to CYCLUS_MODULE_PATH
+  */
+  static const std::string moduleEnvVar();
+
+  /**
+     @return the correct environment variable delimeter based on the file system
+  */
+  static const std::string envDelimeter();
+
+  /**
+     @return the correct path delimeter based on the file system
+  */
+  static const std::string pathDelimeter();
+
+  /**
+     Environment searches for a library and, if found, sets the path. The search
+     occurs across the default install location as well as any included in the
+     CYCLUS_MODULE_PATH environment variable.
+     @param name the name of the library to search for 
+     @param path the variable to set with the path to the library
+     @return true if the library is found, false if not
+   */
+  static bool findLib(std::string name, 
+                      boost::filesystem::path &path_found);
+  
+  /**
+     Taken from the answer in
+     http://stackoverflow.com/questions/236129/splitting-a-string-in-c.  This
+     function takes a string, delimeter, and vector, and splits the string by
+     the delimeter, inserting every entry into the vector.
+     @param s the string to split
+     @param delim the delimeter character
+     @param elems the vector on which to append the split characters
+     @return a reference to the added-to vector 
+   */
+  static std::vector<std::string>& split(const std::string &s, char delim,
+                                         std::vector<std::string>& elems);
 
 };
 
