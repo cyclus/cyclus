@@ -270,6 +270,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
 
   CompMapPtr comp_to_rem = CompMapPtr(test_comp_);
   double kg_to_rem = 0.25*test_size_; 
+  double g_to_rem = 1000*kg_to_rem;
 
   // if you start with an empty material
   EXPECT_FLOAT_EQ(0, default_mat_->quantity());
@@ -277,7 +278,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract almost exactly the original composiiton 
-  EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, 1000*kg_to_rem, G));
+  EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
 
