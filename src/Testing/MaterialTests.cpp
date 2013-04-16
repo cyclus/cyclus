@@ -133,6 +133,22 @@ TEST_F(MaterialTest, CheckConvertToKg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, SimpleAbsorb) {
+  double val = 1.5;
+  mat_rsrc_ptr m1 = mat_rsrc_ptr(new Material(test_comp_));
+  mat_rsrc_ptr m2 = mat_rsrc_ptr(new Material(test_comp_));
+  m1->setQuantity(val);
+  m2->setQuantity(val);
+  ASSERT_EQ(m1->isoVector(),m2->isoVector());
+  ASSERT_EQ(m1->quantity(),m2->quantity());
+
+  m2->absorb(m1);
+
+  ASSERT_EQ(m1->isoVector(),m2->isoVector());
+  ASSERT_EQ(2*m1->quantity(),m2->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   mat_rsrc_ptr one_test_mat;
   mat_rsrc_ptr two_test_mat;
@@ -150,15 +166,18 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   // see that two materials with the same composition do the right thing
   double orig = test_mat_->quantity();
   int factor = 1+one;
-  ASSERT_NO_THROW(test_mat_->absorb(one_test_mat));
+  ASSERT_NO_THROW(test_mat_->absorb(one_test_mat));  
+  ASSERT_EQ(test_mat_->isoVector(),one_test_mat->isoVector());
   EXPECT_FLOAT_EQ(test_mat_->quantity(), factor * orig );
 
   factor += two;
   ASSERT_NO_THROW(test_mat_->absorb(two_test_mat));
+  ASSERT_EQ(test_mat_->isoVector(),two_test_mat->isoVector());
   EXPECT_FLOAT_EQ(test_mat_->quantity(), factor * orig );
 
   factor += ten;
   ASSERT_NO_THROW(test_mat_->absorb(ten_test_mat));
+  ASSERT_EQ(test_mat_->isoVector(),ten_test_mat->isoVector());
   EXPECT_FLOAT_EQ(test_mat_->quantity(), factor * orig );
 }
 
@@ -259,9 +278,31 @@ TEST_F(MaterialTest, Absorb_then_extract) {
   EXPECT_FLOAT_EQ(0, default_mat_->quantity());
   // then you absorb another material, they should be identical
   EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_TRUE(default_mat_->checkQuality(test_mat_));
+  EXPECT_EQ(default_mat_->isoVector(),test_mat_->isoVector());
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract a fraction of the original composiiton 
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, kg_to_rem));
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract_in_grams) {
+
+  CompMapPtr comp_to_rem = CompMapPtr(test_comp_);
+  double kg_to_rem = 0.25*test_size_; 
+  double g_to_rem = 1000*kg_to_rem;
+
+  // if you start with an empty material
+  EXPECT_FLOAT_EQ(0, default_mat_->quantity());
+  // then you absorb another material, they should be identical
+  EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_EQ(default_mat_->isoVector(),test_mat_->isoVector());
+  EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
+  // and it should be okay to extract part of the original composiiton IN GRAMS 
+  EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
+  EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
+}
+
+
 

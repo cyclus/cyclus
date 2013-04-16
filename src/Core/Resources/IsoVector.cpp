@@ -71,7 +71,7 @@ const IsoVector IsoVector::operator- (const IsoVector& rhs) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::operator== (const IsoVector& rhs) const {
-  return (composition_ == rhs.comp());
+  return compEquals(rhs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,12 +134,12 @@ double IsoVector::intersectionFraction(const IsoVector& other) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEquals(const IsoVector& other) {
+bool IsoVector::compEquals(const IsoVector& other) const {
   return (compEquals(*other.comp()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEquals(const CompMap& comp) {
+bool IsoVector::compEquals(const CompMap& comp) const {
   return (*composition_ == comp);
 }
 

@@ -22,6 +22,15 @@ TEST_F(IsoVectorTests,constructors) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,equivalence) {
+  LoadMaps();
+  IsoVector v1 = IsoVector(subtract_result);
+  IsoVector v2 = IsoVector(subtract_result);
+  EXPECT_EQ(v1,v2);
+  EXPECT_TRUE(v1 == v2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,addition) {
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec += to_add_vec);
@@ -29,6 +38,17 @@ TEST_F(IsoVectorTests,addition) {
   for (CompMap::iterator it = add_to_vec.comp()->begin(); it != add_to_vec.comp()->end(); it++) {
     EXPECT_DOUBLE_EQ((*add_result)[it->first],it->second);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,simple_mixing) {
+  LoadMaps();
+  IsoVector v1 = IsoVector(subtract_result);
+  IsoVector v2 = IsoVector(subtract_result);
+  EXPECT_EQ(v1,v2);
+  v1.mix(v2,1);
+  EXPECT_TRUE(v1.compEquals(*subtract_result));
+  EXPECT_EQ(v1,v2);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
