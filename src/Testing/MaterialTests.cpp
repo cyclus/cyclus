@@ -259,6 +259,7 @@ TEST_F(MaterialTest, Absorb_then_extract) {
   EXPECT_FLOAT_EQ(0, default_mat_->quantity());
   // then you absorb another material, they should be identical
   EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_TRUE(default_mat_->isoVector()==test_mat_->isoVector());
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract a fraction of the original composiiton 
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, kg_to_rem));
@@ -276,6 +277,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_FLOAT_EQ(0, default_mat_->quantity());
   // then you absorb another material, they should be identical
   EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_TRUE(default_mat_->isoVector()==test_mat_->isoVector());
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract part of the original composiiton IN GRAMS 
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
