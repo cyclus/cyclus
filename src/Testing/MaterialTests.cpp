@@ -183,6 +183,12 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   EXPECT_TRUE(std::abs(same_as_orig_test_mat->quantity() - 
               test_mat_->quantity()) > cyclus::eps_rsrc());
   EXPECT_TRUE(same_as_orig_test_mat->checkQuality(test_mat_));
+
+  // see that an empty material appropriately absorbs a not empty material.
+  ASSERT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_FLOAT_EQ(orig + origdiff, default_mat_->quantity() );
+  EXPECT_FLOAT_EQ(orig + origdiff, default_mat_->mass(KG) );
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -241,5 +247,21 @@ TEST_F(MaterialTest, Extract_diff_comp) {
   EXPECT_FLOAT_EQ( orig_am241, diff_mat_->moles(am241_) );
   EXPECT_FLOAT_EQ( orig_pb208, diff_mat_->moles(pb208_) );
   EXPECT_NE( orig_u235, diff_mat_->moles(u235_) );
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Absorb_then_extract) {
+
+  CompMapPtr comp_to_rem = CompMapPtr(test_comp_);
+  double kg_to_rem = 0.25*test_size_; 
+
+  // if you start with an empty material
+  EXPECT_FLOAT_EQ(0, default_mat_->quantity());
+  // then you absorb another material, they should be identical
+  EXPECT_NO_THROW(default_mat_->absorb(test_mat_));
+  EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
+  // and it should be okay to extract a fraction of the original composiiton 
+  EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, kg_to_rem));
+  EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
 
