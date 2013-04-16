@@ -23,6 +23,7 @@ bool Material::type_is_recorded_ = false;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
+  setQuantity(0);
   last_update_time_ = TI->time();
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
   materials_.push_back(this);
@@ -35,6 +36,7 @@ Material::~Material() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMapPtr comp) {
+  setQuantity(0);
   IsoVector vec = IsoVector(comp);
   last_update_time_ = TI->time();
   iso_vector_ = vec;
@@ -61,7 +63,8 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   double amt = matToAdd->quantity();
-  iso_vector_.mix(matToAdd->isoVector(),quantity_/amt); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
+  double ratio = ((quantity_ < cyclus::eps_rsrc()) ? 1 : quantity_/amt);
+  iso_vector_.mix(matToAdd->isoVector(),ratio); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
   quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
                    << matToAdd->ID() << ".";
