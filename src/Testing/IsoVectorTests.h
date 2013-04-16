@@ -36,7 +36,7 @@ protected:
     (*to_add)[isotopes.at(isotopes.size()-1)] = 1;
     to_add_vec = IsoVector(to_add);
     CompMapPtr add_to = CompMapPtr(new CompMap(MASS));
-    (*add_to)[isotopes.at(0)] = 1;
+    (*add_to)[isotopes.at(0)] = 2;
     add_to_vec = IsoVector(add_to);
     // add, mix results
     add_result = CompMapPtr(new CompMap(MASS));

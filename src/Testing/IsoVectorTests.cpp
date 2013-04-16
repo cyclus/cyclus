@@ -22,6 +22,15 @@ TEST_F(IsoVectorTests,constructors) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,equivalence) {
+  LoadMaps();
+  IsoVector v1 = IsoVector(subtract_result);
+  IsoVector v2 = IsoVector(subtract_result);
+  EXPECT_EQ(v1,v2);
+  EXPECT_TRUE(v1 == v2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,addition) {
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec += to_add_vec);
