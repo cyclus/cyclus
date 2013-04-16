@@ -133,6 +133,22 @@ TEST_F(MaterialTest, CheckConvertToKg){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, SimpleAbsorb) {
+  double val = 1.5;
+  mat_rsrc_ptr m1 = mat_rsrc_ptr(new Material(test_comp_));
+  mat_rsrc_ptr m2 = mat_rsrc_ptr(new Material(test_comp_));
+  m1->setQuantity(val);
+  m2->setQuantity(val);
+  ASSERT_EQ(m1->isoVector(),m2->isoVector());
+  ASSERT_EQ(m1->quantity(),m2->quantity());
+
+  m2->absorb(m1);
+
+  ASSERT_EQ(m1->isoVector(),m2->isoVector());
+  ASSERT_EQ(2*m1->quantity(),m2->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   mat_rsrc_ptr one_test_mat;
   mat_rsrc_ptr two_test_mat;
