@@ -116,12 +116,12 @@ mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
     remainder_amt_i = this->mass(iso, unit) - amt_to_rem_i;
 
     // check information
-    if ( remainder_amt_i < -cyclus::eps_rsrc() ) {
+    if ( remainder_amt_i/remainder_amt < -cyclus::eps_rsrc() ) {
       stringstream ss;
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract the isotope : " << iso ;
       throw CycNegativeValueException(ss.str());
-    } else if (remainder_amt_i <= cyclus::eps_rsrc()) {
+    } else if (remainder_amt_i/remainder_amt <= cyclus::eps_rsrc()) {
       remainder_amt_i = 0; 
     }
     
