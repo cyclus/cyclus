@@ -91,7 +91,7 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
+mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double amt_to_rem, MassUnit unit) {
  
   CompMapPtr new_comp = CompMapPtr(this->unnormalizeComp(MASS));
   CompMapPtr remove_comp = comp_to_rem;
@@ -99,43 +99,43 @@ mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double kg_to_rem) {
   assert(!new_comp->normalized());
   assert(remove_comp->normalized());
 
-  double new_kg, kg_to_rem_i, remainder_kg, remainder_kg_i;
-  remainder_kg = this->quantity();
+  double new_amt, amt_to_rem_i, remainder_amt, remainder_amt_i;
+  remainder_amt = this->mass(unit);
 
   int iso;
 
   for (CompMap::iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // get isotopic information
-    kg_to_rem_i = it->second * kg_to_rem;
-    if ( kg_to_rem_i <= cyclus::eps_rsrc() ) { kg_to_rem_i = 0; };
+    amt_to_rem_i = it->second * amt_to_rem;
+    if ( amt_to_rem_i <= cyclus::eps_rsrc() ) { amt_to_rem_i = 0; };
     iso = it->first;
-    remainder_kg_i = this->mass(iso) - kg_to_rem_i;
+    remainder_amt_i = this->mass(iso, unit) - amt_to_rem_i;
 
     // check information
-    if ( remainder_kg_i < -cyclus::eps_rsrc() ) {
+    if ( remainder_amt_i < -cyclus::eps_rsrc() ) {
       stringstream ss;
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract the isotope : " << iso ;
       throw CycNegativeValueException(ss.str());
-    } else if (remainder_kg_i <= cyclus::eps_rsrc()) {
-      remainder_kg_i = 0; 
+    } else if (remainder_amt_i <= cyclus::eps_rsrc()) {
+      remainder_amt_i = 0; 
     }
     
     // operate on information
-    (*new_comp)[iso] = remainder_kg_i;
-    new_kg += kg_to_rem_i;
-    remainder_kg -= kg_to_rem_i;
+    (*new_comp)[iso] = remainder_amt_i;
+    new_amt += amt_to_rem_i;
+    remainder_amt -= amt_to_rem_i;
   }
 
   // make new material
   mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(comp_to_rem));
-  new_mat->setQuantity(new_kg, KG);
+  new_mat->setQuantity(new_amt, unit);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   
   // adjust old material
   this->iso_vector_ = IsoVector(new_comp); 
-  this->setQuantity(remainder_kg, KG);
+  this->setQuantity(remainder_amt, unit);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
 
