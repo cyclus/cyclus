@@ -262,5 +262,6 @@ TEST_F(MaterialTest, Absorb_then_extract) {
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract a fraction of the original composiiton 
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, kg_to_rem));
+  EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
 
