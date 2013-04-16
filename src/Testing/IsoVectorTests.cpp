@@ -41,6 +41,17 @@ TEST_F(IsoVectorTests,addition) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(IsoVectorTests,simple_mixing) {
+  LoadMaps();
+  IsoVector v1 = IsoVector(subtract_result);
+  IsoVector v2 = IsoVector(subtract_result);
+  EXPECT_EQ(v1,v2);
+  v1.mix(v2,1);
+  EXPECT_TRUE(v1.compEquals(*subtract_result));
+  EXPECT_EQ(v1,v2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,mixing) {
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,ratio));
