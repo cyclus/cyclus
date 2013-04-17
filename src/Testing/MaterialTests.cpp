@@ -241,10 +241,10 @@ TEST_F(MaterialTest, Extract_complete_inexact_size) {
   // this should succeed even if inexact, within eps.
   mat_rsrc_ptr m1;
   double inexact_size = test_size_ + 0.5*cyclus::eps_rsrc();
-  m1 = test_mat_->extract(test_comp_, inexact_size);
-  //EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, inexact_size));
-  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
-  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  m1 = diff_mat_->extract(diff_comp_, inexact_size);
+  //EXPECT_NO_THROW( m1 = diff_mat_->extract(diff_comp_, inexact_size));
+  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
+  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
   EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
 }
 
@@ -257,12 +257,14 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
   // make an inexact composition
   CompMapPtr inexact_comp = CompMapPtr(new CompMap(MASS));
   CompMap::iterator it;
-  for( it = (*test_comp_).begin(); it != (*test_comp_).end(); ++it ){
-    (*inexact_comp)[(*it).first]=(*it).second + 0.5*cyclus::eps_rsrc(); 
+  double i = 1; 
+  for( it = (*diff_comp_).begin(); it != (*diff_comp_).end(); ++it ){
+    i++;
+    (*inexact_comp)[(*it).first]=(*it).second + (1/i)*cyclus::eps_rsrc(); 
   }
-  EXPECT_NO_THROW(m1 = test_mat_->extract(inexact_comp, test_size_));
-  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
-  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  m1 = diff_mat_->extract(inexact_comp, test_size_);
+  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
+  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
   EXPECT_NEAR( test_size_, m1->quantity(), cyclus::eps_rsrc() );
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -275,13 +277,15 @@ TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
   // make an inexact composition
   CompMapPtr inexact_comp = CompMapPtr(new CompMap(MASS));
   CompMap::iterator it;
-  for( it = (*test_comp_).begin(); it != (*test_comp_).end(); ++it ){
-    (*inexact_comp)[(*it).first]=(*it).second + 0.5*cyclus::eps_rsrc(); 
+  double i = 1; 
+  for( it = (*diff_comp_).begin(); it != (*diff_comp_).end(); ++it ){
+    i++;
+    (*inexact_comp)[(*it).first]=(*it).second + (1/i)*cyclus::eps_rsrc(); 
   }
-  m1 = test_mat_->extract(inexact_comp, inexact_size);
-  //EXPECT_NO_THROW(m1 = test_mat_->extract(inexact_comp, inexact_size));
-  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
-  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  m1 = diff_mat_->extract(inexact_comp, inexact_size);
+  //EXPECT_NO_THROW(m1 = diff_mat_->extract(inexact_comp, inexact_size));
+  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
+  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
   EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
 }
 
