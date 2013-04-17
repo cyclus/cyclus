@@ -235,6 +235,19 @@ TEST_F(MaterialTest, Extract_complete) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract_complete_inexact) {
+
+  // Complete extraction
+  // this should succeed even if inexact, within eps.
+  mat_rsrc_ptr m1;
+  double inexact_size = test_size_ + 0.5*cyclus::eps_rsrc();
+  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, inexact_size));
+  EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
+  EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
+  EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_over_extract) {
 
   // Over-extraction should throw an exception
