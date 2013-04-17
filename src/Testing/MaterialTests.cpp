@@ -257,6 +257,7 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
   // make an inexact composition
   CompMapPtr inexact_comp = CompMapPtr(new CompMap(MASS));
   CompMap::iterator it;
+  // make an inexact composition
   double i = 1; 
   for( it = (*diff_comp_).begin(); it != (*diff_comp_).end(); ++it ){
     i++;
