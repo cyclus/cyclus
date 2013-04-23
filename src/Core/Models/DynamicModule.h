@@ -15,22 +15,13 @@ class DynamicModule {
   static const std::string suffix();
 
   /**
-     constructor
-     sets:
-     * module_name_
-     * abs_path_
-     * constructor_name_
-     * destructor_name_
+     Creates a new dynamically loadable module.
      @param type the module type
      @param name the name of the module
    */
   DynamicModule(std::string type, std::string name);
   
-  /**
-     destructor
-     calls:
-     * closeLibrary()
-   */
+  /// Cleanup and calls closeLibrary
   virtual ~DynamicModule();
 
   /// @return the module name
@@ -48,27 +39,17 @@ class DynamicModule {
   */
   void destructInstance(Model* model);
 
-  /**
-     initializes the module by calling
-     * setPath()
-     * openLibrary()
-     * setConstructor()
-     * setDestructor()
-   */
+  /// Locates and initializes a dynamic module for use in the simulation
   void initialize();
 
-  /**
-     sets the absolute path to the dynamic library based on parameters set
-     during construction
-   */
-  void setPath();
-
-  /**
-     closes the library
-   */
+  /// closes the loaded module dynamic lib
   void closeLibrary();
 
-  /// @return the path to the dynamic library
+  /**
+    If this path for this module has not been discovered yet, path searches for it.
+    @exception CycIOException the library path was not found
+    @return the filepath of the dynamic library.
+  */
   std::string path();
   
  private:
@@ -96,20 +77,21 @@ class DynamicModule {
   /// a functor for the destructor
   destroy_t * destructor_;
 
-  /**
-     opens the library
-   */
+  /// uses dlopen to on the module shared lib
   void openLibrary();
 
-  /**
-     sets the constructor member
-   */
+  /// sets the constructor member
   void setConstructor();
 
-  /**
-     sets the destructor member
-   */
+  /// sets the destructor member
   void setDestructor();
+
+  /**
+     sets the absolute path to the dynamic library based on parameters set
+     during construction
+   */
+  void setPath();
+
 };
 
 #endif

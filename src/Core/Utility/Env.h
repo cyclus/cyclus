@@ -45,7 +45,7 @@ private:
      @param path_found the path, which is populated if the file is found
      @return true if the file is found, false if it isn't
    */
-  static bool find_file(const boost::filesystem::path &dir_path,
+  static bool findFile(const boost::filesystem::path &dir_path,
                         const std::string &file_name,
                         boost::filesystem::path &path_found );
 
@@ -120,12 +120,12 @@ public:
   /**
      @return the correct environment variable delimeter based on the file system
   */
-  static const std::string envDelimeter();
+  static const std::string envDelimiter();
 
   /**
      @return the correct path delimeter based on the file system
   */
-  static const std::string pathDelimeter();
+  static const std::string pathDelimiter();
 
   /**
      Environment searches for a library and, if found, sets the path. The search
@@ -135,22 +135,9 @@ public:
      @param path the variable to set with the path to the library
      @return true if the library is found, false if not
    */
-  static bool findLib(std::string name, 
+  static bool findModuleLib(std::string name, 
                       boost::filesystem::path &path_found);
   
-  /**
-     Taken from the answer in
-     http://stackoverflow.com/questions/236129/splitting-a-string-in-c.  This
-     function takes a string, delimeter, and vector, and splits the string by
-     the delimeter, inserting every entry into the vector.
-     @param s the string to split
-     @param delim the delimeter character
-     @param elems the vector on which to append the split characters
-     @return a reference to the added-to vector 
-   */
-  static std::vector<std::string>& split(const std::string &s, char delim,
-                                         std::vector<std::string>& elems);
-
 };
 
 #endif
