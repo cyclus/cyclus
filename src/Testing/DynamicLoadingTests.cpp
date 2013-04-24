@@ -32,7 +32,7 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
   f.close();
 
   // add path to env 
-  string cmd =  Env::moduleEnvVar() + '=' + path.parent_path().string();
+  string cmd =  Env::moduleEnvVarName() + '=' + path.parent_path().string();
   putenv((char*)cmd.c_str());
 
   // test
