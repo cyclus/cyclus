@@ -14,14 +14,13 @@
 using namespace std;
 namespace fs = boost::filesystem;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(DynamicLoadingTests,LoadTestFacility) 
-{
-  Model::loadModule("Facility","TestFacility");
-                  Model::unloadModules();
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(DynamicLoadingTests, LoadTestFacility) {
+  Model::loadModule("Facility", "TestFacility");
+  Model::unloadModules();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, FindNonStandardPath) {
   // set up
   string name = "otherfac";
@@ -34,7 +33,7 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
   f.close();
 
   // add path to env
-  string cmd = "CYCLUS_MODULE_PATH="+path.parent_path().string();
+  string cmd = "CYCLUS_MODULE_PATH=" + path.parent_path().string();
   putenv((char*)cmd.c_str());
 
   // test
@@ -44,25 +43,23 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
   fs::remove_all(path);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, LoadLibError) {
-  DynamicModule mod = DynamicModule("Facility","not_a_fac");
+  DynamicModule mod = DynamicModule("Facility", "not_a_fac");
   EXPECT_THROW(mod.initialize(), CycIOException);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(DynamicLoadingTests,ConstructTestFacility) 
-{
-  EXPECT_NO_THROW(Model::loadModule("Facility","TestFacility");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(DynamicLoadingTests, ConstructTestFacility) {
+  EXPECT_NO_THROW(Model::loadModule("Facility", "TestFacility");
                   Model* fac = Model::constructModel("TestFacility");
                   Model::deleteModel(fac);
                   Model::unloadModules(););
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(DynamicLoadingTests,cloneTestFacility) 
-{
-  EXPECT_NO_THROW(Model::loadModule("Facility","TestFacility");
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(DynamicLoadingTests, cloneTestFacility) {
+  EXPECT_NO_THROW(Model::loadModule("Facility", "TestFacility");
                   Model* fac = Model::constructModel("TestFacility");
                   Prototype* clone = dynamic_cast<Prototype*>(fac)->clone();
                   Model::deleteModel(dynamic_cast<Model*>(clone));

@@ -18,10 +18,10 @@ const std::string DynamicModule::suffix() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DynamicModule::DynamicModule(std::string type,std::string name) :
-  type_(type), module_name_(name), 
+DynamicModule::DynamicModule(std::string type, std::string name) :
+  type_(type), module_name_(name),
   constructor_name_("construct" + name), destructor_name_("destruct" + name),
-  abs_path_(""), module_library_(0), constructor_(0), destructor_(0) 
+  abs_path_(""), module_library_(0), constructor_(0), destructor_(0)
 {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,7 +40,7 @@ DynamicModule::~DynamicModule() {
 void DynamicModule::setPath() {
   string lib_name = "lib" + module_name_ + suffix();
   fs::path p;
-  if (!Env::findModuleLib(lib_name,p)) {
+  if (!Env::findModuleLib(lib_name, p)) {
     throw CycIOException("Could not find library: " + lib_name);
   }
   abs_path_ = p.string();

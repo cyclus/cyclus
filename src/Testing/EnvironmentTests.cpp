@@ -9,7 +9,7 @@
 
 using namespace std;
 namespace fs = boost::filesystem;
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(EnvironmentTests, ModuleEnvVar) {
   string path = "/my/nice/path";
   string cmd = "CYCLUS_MODULE_PATH=" + path;
@@ -17,7 +17,7 @@ TEST(EnvironmentTests, ModuleEnvVar) {
   EXPECT_EQ(Env::moduleEnvVar(), path);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(EnvironmentTests, FindNonStandardPath) {
   fs::path fname("libfoo.so");
   fs::path dir = fs::path(Env::getInstallPath()) / fs::path("test_path");
@@ -29,7 +29,7 @@ TEST(EnvironmentTests, FindNonStandardPath) {
   f.close();
 
   // add path to env
-  string cmd = "CYCLUS_MODULE_PATH="+dir.string();
+  string cmd = "CYCLUS_MODULE_PATH=" + dir.string();
   putenv((char*)cmd.c_str());
 
   fs::path actual_path;
