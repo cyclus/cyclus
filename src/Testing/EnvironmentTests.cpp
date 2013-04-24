@@ -9,10 +9,11 @@
 
 using namespace std;
 namespace fs = boost::filesystem;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(EnvironmentTests, ModuleEnvVar) {
   string path = "/my/nice/path";
-  string cmd = "CYCLUS_MODULE_PATH=" + path;
+  string cmd = Env::moduleEnvVarName() + '=' + path;
   putenv((char*)cmd.c_str());
   EXPECT_EQ(Env::moduleEnvVar(), path);
 }
@@ -29,7 +30,7 @@ TEST(EnvironmentTests, FindNonStandardPath) {
   f.close();
 
   // add path to env
-  string cmd = "CYCLUS_MODULE_PATH=" + dir.string();
+  string cmd = Env::moduleEnvVarName() + '=' + dir.string();
   putenv((char*)cmd.c_str());
 
   fs::path actual_path;
