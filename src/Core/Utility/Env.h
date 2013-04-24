@@ -113,8 +113,13 @@ class Env {
     static std::string checkEnv(std::string var);
 
     /**
-       @return the environment variable used for module installations, currently
-       set to CYCLUS_MODULE_PATH
+       @return the name of the environment variable used for module
+       installations, currently set to CYCLUS_MODULE_PATH
+    */
+    static const std::string moduleEnvVarName();
+
+    /**
+       @return the current value of the module environment variable
     */
     static const std::string moduleEnvVar();
 

@@ -5,7 +5,6 @@
 #include "Prototype.h"
 #include "DynamicModule.h"
 
-//#include <cstdlib>
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
@@ -16,8 +15,8 @@ namespace fs = boost::filesystem;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, LoadTestFacility) {
-  Model::loadModule("Facility", "TestFacility");
-  Model::unloadModules();
+  EXPECT_NO_THROW(Model::loadModule("Facility", "TestFacility"));
+  EXPECT_NO_THROW(Model::unloadModules());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,13 +31,13 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
   ofstream f(path.string().c_str());
   f.close();
 
-  // add path to env
-  string cmd = "CYCLUS_MODULE_PATH=" + path.parent_path().string();
+  // add path to env 
+  string cmd =  Env::moduleEnvVarName() + '=' + path.parent_path().string();
   putenv((char*)cmd.c_str());
 
   // test
   DynamicModule mod = DynamicModule("Facility", name);
-  EXPECT_EQ(path.string(), mod.path());
+  EXPECT_EQ(path.string(), mod.path()); // note path calls (private) setPath()
 
   fs::remove_all(path);
 }
