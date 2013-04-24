@@ -21,7 +21,7 @@ class DynamicModule {
      */
     DynamicModule(std::string type, std::string name);
 
-    /// Cleanup and calls closeLibrary
+    /// destructor
     virtual ~DynamicModule();
 
     /// @return the module name
@@ -77,7 +77,7 @@ class DynamicModule {
     /// a functor for the destructor
     destroy_t* destructor_;
 
-    /// uses dlopen to on the module shared lib
+    /// uses dlopen to open the module shared lib
     void openLibrary();
 
     /// sets the constructor member
