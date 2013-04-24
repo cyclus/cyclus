@@ -56,7 +56,8 @@ void XMLQueryEngineTest::loadParser() {
   stringstream ss("");
   getContent(ss);
   //cout << ss.str() << endl;
-  parser_ = new XMLParser(ss);
+  parser_ = new XMLParser();
+  parser_->init(ss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
