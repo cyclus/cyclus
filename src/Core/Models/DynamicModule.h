@@ -21,9 +21,6 @@ class DynamicModule {
      */
     DynamicModule(std::string type, std::string name);
 
-    /// destructor
-    virtual ~DynamicModule();
-
     /// @return the module name
     std::string name();
 

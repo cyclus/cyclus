@@ -33,10 +33,6 @@ void DynamicModule::initialize() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DynamicModule::~DynamicModule() {
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setPath() {
   string lib_name = "lib" + module_name_ + suffix();
   fs::path p;
