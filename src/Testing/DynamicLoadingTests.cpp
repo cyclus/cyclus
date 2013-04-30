@@ -24,7 +24,7 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
   // set up
   string name = "otherfac";
   string lib_name = "lib" + name + DynamicModule::suffix();
-  fs::path path = fs::path(Env::getInstallPath()) / fs::path("test_path") / fs::path(lib_name);
+  fs::path path = fs::path(getenv("HOME")) / fs::path(".tmp-cyclus-test") / fs::path(lib_name);
 
   // create file
   fs::create_directory(path.parent_path());

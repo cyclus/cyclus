@@ -21,7 +21,7 @@ TEST(EnvironmentTests, ModuleEnvVar) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(EnvironmentTests, FindNonStandardPath) {
   fs::path fname("libfoo.so");
-  fs::path dir = fs::path(Env::getInstallPath()) / fs::path("test_path");
+  fs::path dir = fs::path(getenv("HOME")) / fs::path(".tmp-cyclus-test");
   fs::path full = dir / fname;
 
   // add file
