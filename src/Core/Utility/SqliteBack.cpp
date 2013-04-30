@@ -4,13 +4,9 @@
 #include "CycException.h"
 #include "Logger.h"
 #include "Event.h"
-#include "Event.h"
 
-#include <iostream>
 #include <fstream>
 #include <boost/lexical_cast.hpp>
-
-class AutoInc {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) {
@@ -70,7 +66,6 @@ void SqliteBack::createTable(event_ptr e) {
   cmd += ");";
   cmds_.push_back(cmd);
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 unsigned int SqliteBack::getShortId(std::string sim_id) {

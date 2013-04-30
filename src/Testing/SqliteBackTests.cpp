@@ -43,10 +43,10 @@ TEST(SqliteBackTest, CmdGenRegression) {
   m.close();
 
   ASSERT_EQ(back.cmds.size(), 4);
-  EXPECT_EQ(back.cmds.at(0), "CREATE TABLE DumbTitle (animal VARCHAR(128), height REAL, weight INTEGER);");
-  EXPECT_EQ(back.cmds.at(1), "INSERT INTO DumbTitle (animal, height, weight) VALUES (\"monkey\", 5.5, 10);");
-  EXPECT_EQ(back.cmds.at(2), "INSERT INTO DumbTitle (animal, weight) VALUES (\"elephant\", 1000);");
-  EXPECT_EQ(back.cmds.at(3), "INSERT INTO DumbTitle (animal, height) VALUES (\"sea cucumber\", 1.2);");
+  EXPECT_EQ(back.cmds.at(0), "CREATE TABLE DumbTitle (" + kShortSimId + " INTEGER, animal VARCHAR(128), height REAL, weight INTEGER);");
+  EXPECT_EQ(back.cmds.at(1), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, height, weight) VALUES (1, \"monkey\", 5.5, 10);");
+  EXPECT_EQ(back.cmds.at(2), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, weight) VALUES (1, \"elephant\", 1000);");
+  EXPECT_EQ(back.cmds.at(3), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, height) VALUES (1, \"sea cucumber\", 1.2);");
 
   remove(path.c_str());
 }
