@@ -116,6 +116,7 @@ int main(int argc, char* argv[]) {
     string inputFile = vm["input-file"].as<string>();
     set<string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(inputFile);
+    loader.init();
     loader.load_control_parameters();
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
