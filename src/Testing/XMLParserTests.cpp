@@ -47,7 +47,8 @@ void XMLParserTests::TearDown() {}
 TEST_F(XMLParserTests,WithoutSchema) {  
   stringstream snippet("");
   fillSnippet(snippet);
-  EXPECT_NO_THROW(XMLParser parser(snippet));
+  XMLParser parser;
+  EXPECT_NO_THROW(parser.init(snippet));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,7 +57,9 @@ TEST_F(XMLParserTests,WithSchema) {
   fillSnippet(snippet);  
   stringstream schema("");
   fillSchema(schema);
-  EXPECT_NO_THROW(XMLParser parser(snippet,schema));
+  XMLParser parser;
+  EXPECT_NO_THROW(parser.init(snippet));
+  EXPECT_NO_THROW(parser.validate(schema));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,5 +68,7 @@ TEST_F(XMLParserTests,WithError) {
   fillBadSnippet(snippet);  
   stringstream schema("");
   fillSchema(schema);
-  EXPECT_THROW(XMLParser parser(snippet,schema), CycLoadXMLException);
+  XMLParser parser;
+  EXPECT_NO_THROW(parser.init(snippet));
+  EXPECT_THROW(parser.validate(schema),CycLoadXMLException);
 } 
