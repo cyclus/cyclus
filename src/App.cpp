@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBack* sqlBack = new SqliteBack(output_path);
+  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
   EM->registerBackend(sqlBack);
 
   // read input file and setup simulation

@@ -23,11 +23,10 @@ class SqliteBack: public EventBackend {
     Creates a new sqlite backend that will write to the database file
     specified by path. If the file doesn't exist, a new one is created.
 
+    @param sim_id the unique simulation id (i.e. from EventManager)
     @param path the filepath (including name) to write the sqlite file.
     */
-    SqliteBack(std::string path);
-
-    virtual ~SqliteBack();
+    SqliteBack(std::string sim_id, std::string path);
 
     /*!
     Write events immediately to the database as a single transaction.
@@ -70,8 +69,8 @@ class SqliteBack: public EventBackend {
     /// constructs an SQL INSERT command for e and queues it for db insertion.
     void writeEvent(event_ptr e);
 
-    /// A pointer to the database managed by the SqliteBack class.
-    SqliteDb* db_;
+    /// An interface to a sqlite db managed by the SqliteBack class.
+    SqliteDb db_;
 
     /// Stores the database's path+name, declared during construction.
     std::string path_;

@@ -9,29 +9,24 @@
 #include <boost/lexical_cast.hpp>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SqliteBack::SqliteBack(std::string path) {
+SqliteBack::SqliteBack(std::string sim_id, std::string path)
+    : db_(path) {
   path_ = path;
-  db_ = new SqliteDb(path_);
-  db_->open();
+  db_.open();
 
   // cache pre-existing table names
   std::string cmd = "SELECT name FROM sqlite_master WHERE type='table';";
-  std::vector<StrList> rows = db_->query(cmd);
-  for (int i = 0; i < rows.size(); i++) {
+  std::vector<StrList> rows = db_.query(cmd);
+  for (int i = 0; i < rows.size(); ++i) {
     tbl_names_.push_back(rows.at(i).at(0));
   }
 
-  short_sim_id_ = getShortId(EM->sim_id());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SqliteBack::~SqliteBack() {
-  delete db_;
+  short_sim_id_ = getShortId(sim_id);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::notify(EventList evts) {
-  for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
+  for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
     if (! tableExists((*it)->title())) {
       createTable(*it);
     }
@@ -43,7 +38,7 @@ void SqliteBack::notify(EventList evts) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::close() {
   flush();
-  db_->close();
+  db_.close();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +54,7 @@ void SqliteBack::createTable(event_ptr e) {
   std::string cmd = "CREATE TABLE " + name + " (" + kShortSimId + " INTEGER";
   ValMap vals = e->vals();
   ValMap::iterator it = vals.begin();
-  for (it = vals.begin(); it != vals.end(); it++) {
+  for (it = vals.begin(); it != vals.end(); ++it) {
     cmd += ", " + it->first + " " + valType(it->second);
   }
 
@@ -72,26 +67,23 @@ unsigned int SqliteBack::getShortId(std::string sim_id) {
   std::string cmd, retrieve;
   if (! tableExists(kSimIdTable)) {
     tbl_names_.push_back(kSimIdTable);
-
     cmd = "CREATE TABLE " + kSimIdTable + " ("
           + kShortSimId + " INTEGER PRIMARY KEY, "
           + kLongSimId + " INTEGER);";
-    db_->execute(cmd);
+    db_.execute(cmd);
   }
 
   retrieve = "SELECT " + kShortSimId + " FROM " + kSimIdTable + " WHERE "
              + kLongSimId + "='" + sim_id + "'";
-  std::vector<StrList> rows = db_->query(retrieve);
+  std::vector<StrList> rows = db_.query(retrieve);
 
-  if (rows.size() == 1) {
-    return boost::lexical_cast<unsigned int>(rows.at(0).at(0));
+  if (rows.size() != 1) {
+    cmd = "INSERT INTO " + kSimIdTable + " (" + kLongSimId
+          + ") VALUES ('" + sim_id + "');";
+    db_.execute(cmd);
+    rows = db_.query(retrieve);
   }
 
-  cmd = "INSERT INTO " + kSimIdTable + " (" + kLongSimId
-        + ") VALUES ('" + sim_id + "');";
-  db_->execute(cmd);
-
-  rows = db_->query(retrieve);
   return boost::lexical_cast<unsigned int>(rows.at(0).at(0));
 }
 
@@ -118,11 +110,10 @@ bool SqliteBack::tableExists(std::string name) {
 void SqliteBack::writeEvent(event_ptr e) {
   std::stringstream colss, valss, cmd;
   ValMap vals = e->vals();
-  ValMap::iterator it = vals.begin();
 
   colss << kShortSimId;
   valss << short_sim_id_;
-  for (it = vals.begin(); it != vals.end(); it++) {
+  for (ValMap::iterator it = vals.begin(); it != vals.end(); ++it) {
     colss << ", " << it->first;
     valss << ", " << valAsString(it->second);
   }
@@ -157,16 +148,16 @@ std::string SqliteBack::valAsString(boost::any v) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::flush() {
-  db_->execute("BEGIN TRANSACTION");
-  for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); it++) {
+  db_.execute("BEGIN TRANSACTION");
+  for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
     try {
-      db_->execute(*it);
+      db_.execute(*it);
     } catch (CycIOException err) {
       CLOG(LEV_ERROR) << "backend '" << path_ << "' failed write: "
                       << err.what();
     }
   }
-  db_->execute("END TRANSACTION");
+  db_.execute("END TRANSACTION");
   cmds_.clear();
 }
 
