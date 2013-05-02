@@ -1,7 +1,8 @@
 // SqliteBack.h
 #if !defined(_SQLITEBACK_H)
 #define _SQLITEBACK_H
-#include "EventManager.h"
+
+#include "EventBackend.h"
 #include "SqliteDb.h"
 
 #include <list>

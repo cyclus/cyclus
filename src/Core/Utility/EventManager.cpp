@@ -1,6 +1,7 @@
 // EventManager.cpp
 
 #include "EventManager.h"
+#include "EventBackend.h"
 #include "Event.h"
 
 #include <boost/uuid/uuid.hpp>
