@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "EventManager.h"
+#include "EventBackend.h"
 
 class TestBack : public EventBackend {
   public:
