@@ -1,13 +1,20 @@
 // EventManager.cpp
 
 #include "EventManager.h"
+#include "EventBackend.h"
 #include "Event.h"
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
 
 EventManager* EventManager::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager::EventManager() {
-  dump_count_ = kDefaultDumpCount;
+EventManager::EventManager() : dump_count_(kDefaultDumpCount) {
+  boost::uuids::uuid uuid = boost::uuids::random_generator()();
+  sim_id_ = boost::lexical_cast<std::string>(uuid);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,6 +28,11 @@ EventManager* EventManager::Instance() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 unsigned int EventManager::dump_count() {
   return dump_count_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string EventManager::sim_id() {
+  return sim_id_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
