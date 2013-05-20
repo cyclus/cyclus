@@ -102,6 +102,16 @@ public:
   void print(); 
 
   /**
+     Returns a boolean indicating whether these materials are equivalent
+
+     @param other the material to compare to this one
+     @param threshold the smallest amount considered equal when comparing comps
+
+     @return equal true if equal within the threshold. false otherwise.
+    */
+  virtual operator==(const mat_rsrc_ptr other, double threshold=cyclus::eps());
+
+  /**
      Change/set the mass of the resource object. 
      Note that this does make matter (dis)appear and 
      should only be used on objects that are not part of 
@@ -210,6 +220,25 @@ public:
      @param matToAdd the Material to be absorbed (and deleted) 
    */
   virtual void absorb(mat_rsrc_ptr matToAdd);
+  /**
+     Reports the difference between this material and another material
+
+     @param other the other material
+
+     @return diff a map of isotope ids to amounts (in the MassUnit of unit)
+     */
+  virtual map<Iso, double> diff(const mat_rsrc_prt other);
+
+  /**
+     Reports the difference between this material and a CompMap
+      
+     @param other the material to compare to the original material
+     @param other_amt the amount associated with 
+     @param unit the MassUnit with which to interperet the CompMap 
+
+     @return comp_diff a map of isotope ids to amounts (in the MassUnit of unit) 
+   */
+  virtual map<Iso, double> diff(const CompMapPtr other, double other_amt, MassUnit unit=KG);
 
   /**
      Extracts from this material a composition

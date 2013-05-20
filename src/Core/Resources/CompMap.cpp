@@ -72,6 +72,17 @@ int CompMap::size() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::operator==(const CompMap& rhs) const {
+  return almostEqual(rhs, 0);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::operator<(const CompMap& rhs) const {
+  return (ID_ < rhs.ID());
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::almostEqual(const CompMap& rhs, double threshold){
   if ( size() != rhs.size() ) {
     return false;
   }
@@ -80,16 +91,11 @@ bool CompMap::operator==(const CompMap& rhs) const {
       return false;
     }
     double val = rhs.massFraction(it->first) - massFraction(it->first); 
-    if (abs(val) > cyclus::eps()) {
+    if (abs(val) > threshold) {
       return false;
     }
   }
   return true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::operator<(const CompMap& rhs) const {
-  return (ID_ < rhs.ID());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

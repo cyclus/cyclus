@@ -186,6 +186,11 @@ string Material::detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+bool Material::operator==(const mat_rsrc_ptr other, double threshold){
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void Material::setQuantity(double quantity) {
   quantity_ = quantity;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
