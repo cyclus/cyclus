@@ -94,6 +94,18 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CompMapPtr Material::diff(const CompMapPtr orig, double orig_amt, CompMapPtr 
+    other, double other_amt, MassUnit unit){
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
+    MassUnit unit, double threshold){
+  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, MassUnit unit) {
   
   CompMapPtr final_comp = CompMapPtr(this->unnormalizeComp(MASS));
