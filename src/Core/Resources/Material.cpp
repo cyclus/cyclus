@@ -125,12 +125,11 @@ map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
+  CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
+  double final_amt = 0;
 
-  CompMapPtr final_comp = CompMapPtr(this->unnormalizeComp(MASS));
-  double final_amt = this->mass(unit);
   map<Iso, double> remainder = diff(remove_comp, remove_amt, unit);
   map<Iso, double>::iterator it;
-
   for(it=remainder.begin(); it!=remainder.end(); ++it){
     int iso = (*it).first;
     double amt = (*it).second*remove_amt;
@@ -144,8 +143,8 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
          << " of the isotope : " << iso ;
       throw CycNegativeValueException(ss.str());
     } else { 
-      (*final_comp)[iso] -= amt;
-      final_amt-=amt;
+      (*final_comp)[iso] = amt;
+      final_amt += amt;
     }
   }
 
@@ -154,7 +153,8 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
   new_mat->setQuantity(remove_amt, unit);
   new_mat->setOriginalID( this->originalID() ); // book keeping
   // adjust old material
-  this->iso_vector_ = IsoVector(final_comp); 
+  final_comp->normalize();
+  this->iso_vector_ = IsoVector(CompMapPtr(final_comp)); 
   this->setQuantity(final_amt, unit);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
