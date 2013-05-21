@@ -105,11 +105,20 @@ public:
      Returns a boolean indicating whether these materials are equivalent
 
      @param other the material to compare to this one
+
+     @return equal true if compositions and size are equal. false otherwise.
+    */
+  virtual bool operator==(const mat_rsrc_ptr other);
+
+  /**
+     Returns a boolean indicating whether these materials are equivalent
+
+     @param other the material to compare to this one
      @param threshold the smallest amount considered equal when comparing comps
 
      @return equal true if equal within the threshold. false otherwise.
     */
-  virtual operator==(const mat_rsrc_ptr other, double threshold=cyclus::eps());
+  virtual bool almostEqual(const mat_rsrc_ptr other, double threshold) const;
 
   /**
      Change/set the mass of the resource object. 
@@ -227,7 +236,7 @@ public:
 
      @return diff a map of isotope ids to amounts (in the MassUnit of unit)
      */
-  virtual map<Iso, double> diff(const mat_rsrc_prt other);
+  virtual std::map<Iso, double> diff(const mat_rsrc_ptr other);
 
   /**
      Reports the difference between this material and a CompMap
@@ -238,7 +247,7 @@ public:
 
      @return comp_diff a map of isotope ids to amounts (in the MassUnit of unit) 
    */
-  virtual map<Iso, double> diff(const CompMapPtr other, double other_amt, MassUnit unit=KG);
+  virtual std::map<Iso, double> diff(const CompMapPtr other, double other_amt, MassUnit unit=KG);
 
   /**
      Extracts from this material a composition

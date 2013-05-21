@@ -4,6 +4,7 @@
 
 /* -- Includes -- */
 #include "Logger.h"
+#include "CycLimits.h"
 
 #include <map>
 #include <vector>

@@ -82,7 +82,7 @@ bool CompMap::operator<(const CompMap& rhs) const {
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::almostEqual(const CompMap& rhs, double threshold){
+bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
   if ( size() != rhs.size() ) {
     return false;
   }

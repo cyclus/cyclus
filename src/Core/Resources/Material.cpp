@@ -186,8 +186,13 @@ string Material::detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::operator==(const mat_rsrc_ptr other, double threshold){
+bool Material::operator==(const mat_rsrc_ptr other){
+  return almostEqual(other, 0);
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+bool Material::almostEqual(const mat_rsrc_ptr other, double threshold) const {
+  return comp()->almostEqual(other->comp(), threshold);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
