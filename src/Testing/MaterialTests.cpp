@@ -211,6 +211,31 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, mat_diff_same) {
+  mat_rsrc_ptr same_as_orig = mat_rsrc_ptr(new Material(test_comp_));
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(same_as_orig));
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, mat_diff_no_thresh) {
+  mat_rsrc_ptr two_orig = mat_rsrc_ptr(new Material(test_comp_));
+  two_orig->setQuantity(2*test_size_);
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = two_test_mat_->diff(test_mat_));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    expected = (*two_orig->isoVector().comp())[(*it).first]/2.0;
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ExtractMass) {
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;  
@@ -228,7 +253,7 @@ TEST_F(MaterialTest, Extract_complete) {
 
   // Complete extraction
   mat_rsrc_ptr m1;
-  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, test_size_));
+  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, test_size_, KG, 0));
   EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
@@ -359,6 +384,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
+
 
 
 

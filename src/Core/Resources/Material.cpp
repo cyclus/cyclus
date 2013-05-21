@@ -103,14 +103,28 @@ map<Iso, double> Material::diff(mat_rsrc_ptr other){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit 
     unit){
+
   map<Iso, double> to_ret;
   map<Iso, double>::iterator entry;
-  CompMapPtr orig = iso_vector_.comp();
-  double orig_amt = mass(unit);
+  CompMapPtr orig = CompMapPtr(iso_vector_.comp());
+  orig->massify();
+  assert(orig->normalized());
+  double amt = 0;
+  double orig_amt = this->mass(unit);
   for( entry= (*other).begin(); entry!= (*other).end(); ++entry ) {
     int iso = (*entry).first;
-    to_ret[iso] = (*orig)[iso]*orig_amt - (*other)[iso]*other_amt;
+    if( orig->count(iso) != 0 ){
+      amt = (*orig)[iso]*orig_amt - (*entry).second*other_amt ;
+    }
   }
+  for( entry= (*orig).begin(); entry!= (*orig).end(); ++entry ) {
+    int iso = (*entry).first;
+    if( other->count(iso) == 0 ){
+      amt = (*entry).second*orig_amt;
+      to_ret.insert(make_pair(iso,amt));
+    }
+  }
+
   return to_ret;
 }
 
@@ -119,8 +133,7 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
     MassUnit unit, double threshold){
 
   CompMapPtr final_comp = CompMapPtr(this->unnormalizeComp(MASS));
-  double final_amt = mass(unit);
-  remove_comp->massify();
+  double final_amt = this->mass(unit);
   map<Iso, double> remainder = diff(remove_comp, remove_amt, unit);
   map<Iso, double>::iterator it;
 
@@ -134,9 +147,9 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract "
          << amt
-         << "of the isotope : " << iso ;
+         << " of the isotope : " << iso ;
       throw CycNegativeValueException(ss.str());
-    } else {
+    } else { 
       (*final_comp)[iso] -= amt;
       final_amt-=amt;
     }
