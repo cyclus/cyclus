@@ -123,19 +123,32 @@ map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold){
+  map<Iso, double>::iterator it;
+  map<Iso, double> to_ret;
+
+  for(it=vec.begin(); it!= vec.end(); ++it){
+    if(abs((*it).second) > threshold) {
+      to_ret[(*it).first] = (*it).second;
+    }
+  }
+  return to_ret;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
   double final_amt = 0;
 
-  map<Iso, double> remainder = diff(remove_comp, remove_amt, unit);
+  map<Iso, double> remainder;
+  remainder = applyThreshold(diff(remove_comp, remove_amt, unit), threshold);
   map<Iso, double>::iterator it;
+  
   for(it=remainder.begin(); it!=remainder.end(); ++it){
     int iso = (*it).first;
-    double amt = (*it).second*remove_amt;
-    if(abs(amt) <= threshold){ 
-      amt=0;
-    } else if(amt <= -threshold){
+    double amt = (*it).second;
+    if(amt < 0){
       stringstream ss;
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract "

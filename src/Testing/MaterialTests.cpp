@@ -273,7 +273,7 @@ TEST_F(MaterialTest, diff_close_size) {
 TEST_F(MaterialTest, diff_close_comp) {
   std::map<Iso, double> remainder;
   CompMapPtr close_comp = CompMapPtr(new CompMap(*diff_comp_));
-  (*close_comp)[am241_]*=(1-cyclus::eps_rsrc());
+  (*close_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
   diff_mat_->setQuantity(test_size_, KG);
   EXPECT_NO_THROW(remainder = diff_mat_->diff(close_comp, test_size_, KG));
   double expected;
@@ -334,15 +334,12 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
   // this should succeed even if inexact, within eps.
   mat_rsrc_ptr m1;
   // make an inexact composition
-  CompMapPtr inexact_comp = CompMapPtr(new CompMap(MASS));
-  CompMap::iterator it;
-  // make an inexact composition
-  inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
-  (*inexact_comp)[am241_] += cyclus::eps_rsrc()/test_size_;
+  CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
+  (*inexact_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
   m1 = diff_mat_->extract(inexact_comp, test_size_, KG, cyclus::eps_rsrc());
-  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
-  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
+  EXPECT_TRUE( m1->isoVector().compEquals(inexact_comp));
   EXPECT_NEAR( test_size_, m1->quantity(), cyclus::eps_rsrc() );
+  EXPECT_NEAR( 0, diff_mat_->mass(am241_), cyclus::eps_rsrc() );
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {

@@ -250,6 +250,14 @@ public:
   virtual std::map<Iso, double> diff(const CompMapPtr other, double other_amt, MassUnit unit=KG);
 
   /**
+     Returns the vec, less the elements whose absolute value are less than the threshold.
+
+     @param vec the vector of isos and amounts to which to apply the threshold
+     @param threshold the smallest value considered nonzero
+     */
+  virtual std::map<Iso, double> applyThreshold(std::map<Iso, double> vec, double threshold);
+
+  /**
      Extracts from this material a composition
      specified by the given CompMapPtr. This operation will change
      the quantity_ and iso_vector_ members.
