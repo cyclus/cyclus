@@ -94,74 +94,63 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CompMapPtr Material::diff(const CompMapPtr orig, double orig_amt, CompMapPtr 
-    other, double other_amt, MassUnit unit){
+map<Iso, double> Material::diff(mat_rsrc_ptr other){
+  CompMapPtr comp = CompMapPtr(other->isoVector().comp());
+  double amt = other->mass(KG);
+  return diff(comp, amt, KG);
+}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit 
+    unit){
+  map<Iso, double> to_ret;
+  map<Iso, double>::iterator entry;
+  CompMapPtr orig = iso_vector_.comp();
+  double orig_amt = mass(unit);
+  for( entry= (*other).begin(); entry!= (*other).end(); ++entry ) {
+    int iso = (*entry).first;
+    to_ret[iso] = (*orig)[iso]*orig_amt - (*other)[iso]*other_amt;
+  }
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
-  
-}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, MassUnit unit) {
-  
   CompMapPtr final_comp = CompMapPtr(this->unnormalizeComp(MASS));
+  double final_amt = mass(unit);
   remove_comp->massify();
-  assert(!final_comp->normalized());
-  assert(remove_comp->normalized());
+  map<Iso, double> remainder = diff(remove_comp, remove_amt, unit);
+  map<Iso, double>::iterator it;
 
-  double original_amt = this->mass(unit);
-  double final_amt = original_amt - remove_amt;
-  if (final_amt < -cyclus::eps_rsrc()) {
-    stringstream ss;
-    ss << "Trying to extract " << remove_amt 
-       << " of a something from a material that has " 
-       << original_amt << " of something." << endl;
-    throw CycNegativeValueException(ss.str());
-  } else if (final_amt <= 0) {final_amt = 0;}
-
-  int iso;
-  double remove_amt_i, final_amt_i;
-  for (CompMap::iterator it = remove_comp->begin(); 
-       it != remove_comp->end(); it++) {
-    // get quantity of isotope to remove
-    remove_amt_i = it->second * remove_amt;
-    if ( remove_amt_i/remove_amt  <= cyclus::eps_rsrc() ) { remove_amt_i = 0; };
-
-    // get quantity of isotope to stay
-    iso = it->first;
-    final_amt_i = this->mass(iso, unit) - remove_amt_i;
-
-    // check information
-    double rel_err = final_amt_i/final_amt;
-    if (abs(rel_err) <= cyclus::eps_rsrc() || 
-       abs(final_amt) == 0 ){
-      final_amt_i = 0; 
-    } else  if ( rel_err < -cyclus::eps_rsrc() ) {
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    int iso = (*it).first;
+    double amt = (*it).second*remove_amt;
+    if(abs(amt) <= threshold){ 
+      amt=0;
+    } else if(amt <= -threshold){
       stringstream ss;
       ss << "The Material " << this->ID() 
-         << " has insufficient material to extract the isotope : " << iso ;
+         << " has insufficient material to extract "
+         << amt
+         << "of the isotope : " << iso ;
       throw CycNegativeValueException(ss.str());
+    } else {
+      (*final_comp)[iso] -= amt;
+      final_amt-=amt;
     }
-    
-    // add isotope to the final comp
-    (*final_comp)[iso] = final_amt_i;
   }
 
   // make new material
   mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(remove_comp));
   new_mat->setQuantity(remove_amt, unit);
   new_mat->setOriginalID( this->originalID() ); // book keeping
-  
   // adjust old material
   this->iso_vector_ = IsoVector(final_comp); 
   this->setQuantity(final_amt, unit);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
-
   return new_mat;
 }
 
@@ -192,7 +181,7 @@ bool Material::operator==(const mat_rsrc_ptr other){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::almostEqual(const mat_rsrc_ptr other, double threshold) const {
-  return comp()->almostEqual(other->comp(), threshold);
+  return iso_vector_.comp()->almostEqual((*other->isoVector().comp()), threshold);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -257,10 +257,13 @@ public:
      @param comp_to_rem the composition of material that will be removed against this Material. 
      @param amt_to_rem the amount in *unit* of material that will be removed against this Material. 
      @param unit the MassUnit to do the extraction operation in. Default is KG. 
+     @param threshold is the smallest amount considered negligible in this extraction.
+
      @throws CycNegativeValueException for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, MassUnit unit=KG);
+  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
+      MassUnit unit=KG, double threshold=cyclus::eps_rsrc());
 
   /**
      Extracts a specified mass from this material creating a new 
