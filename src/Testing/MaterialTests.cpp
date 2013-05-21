@@ -213,6 +213,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, mat_diff_same) {
   mat_rsrc_ptr same_as_orig = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_orig->setQuantity(test_size_);
   std::map<Iso, double> remainder;
   EXPECT_NO_THROW(remainder = test_mat_->diff(same_as_orig));
   std::map<Iso, double>::iterator it;
@@ -230,7 +231,7 @@ TEST_F(MaterialTest, mat_diff_no_thresh) {
   double expected;
   std::map<Iso, double>::iterator it;
   for(it=remainder.begin(); it!=remainder.end(); ++it){
-    expected = (*two_orig->isoVector().comp())[(*it).first]/2.0;
+    expected = test_size_*(*two_orig->isoVector().comp())[(*it).first];
     EXPECT_FLOAT_EQ( expected, (*it).second);
   }
 }

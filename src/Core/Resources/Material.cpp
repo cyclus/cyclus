@@ -104,25 +104,19 @@ map<Iso, double> Material::diff(mat_rsrc_ptr other){
 map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit 
     unit){
 
-  map<Iso, double> to_ret;
   map<Iso, double>::iterator entry;
-  CompMapPtr orig = CompMapPtr(iso_vector_.comp());
-  orig->massify();
-  assert(orig->normalized());
+  CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS));
+  map<Iso, double> to_ret = orig->map();
   double amt = 0;
   double orig_amt = this->mass(unit);
   for( entry= (*other).begin(); entry!= (*other).end(); ++entry ) {
     int iso = (*entry).first;
     if( orig->count(iso) != 0 ){
-      amt = (*orig)[iso]*orig_amt - (*entry).second*other_amt ;
+      amt = (*orig)[iso] - (*entry).second*other_amt ;
+    } else {
+      amt = -(*entry).second*other_amt;
     }
-  }
-  for( entry= (*orig).begin(); entry!= (*orig).end(); ++entry ) {
-    int iso = (*entry).first;
-    if( other->count(iso) == 0 ){
-      amt = (*entry).second*orig_amt;
-      to_ret.insert(make_pair(iso,amt));
-    }
+    to_ret[iso] = amt;
   }
 
   return to_ret;
