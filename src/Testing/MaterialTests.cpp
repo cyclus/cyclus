@@ -223,7 +223,7 @@ TEST_F(MaterialTest, mat_diff_same) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(MaterialTest, mat_diff_no_thresh) {
+TEST_F(MaterialTest, mat_diff) {
   mat_rsrc_ptr two_orig = mat_rsrc_ptr(new Material(test_comp_));
   two_orig->setQuantity(2*test_size_);
   std::map<Iso, double> remainder;
@@ -232,6 +232,27 @@ TEST_F(MaterialTest, mat_diff_no_thresh) {
   std::map<Iso, double>::iterator it;
   for(it=remainder.begin(); it!=remainder.end(); ++it){
     expected = test_size_*(*two_orig->isoVector().comp())[(*it).first];
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff_same) {
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(test_comp_, test_size_, KG));
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff) {
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(test_comp_, 0.5*test_size_, KG));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    expected = 0.5*test_size_*((*test_comp_)[(*it).first]);
     EXPECT_FLOAT_EQ( expected, (*it).second);
   }
 }
