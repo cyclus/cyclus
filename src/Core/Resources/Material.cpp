@@ -139,8 +139,9 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
       stringstream ss;
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract "
-         << amt
-         << " of the isotope : " << iso ;
+         << " the isotope : " << iso 
+         << ". The difference between the amounts is : "
+         << amt ;
       throw CycNegativeValueException(ss.str());
     } else { 
       (*final_comp)[iso] = amt;
