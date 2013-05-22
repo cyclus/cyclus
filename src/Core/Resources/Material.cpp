@@ -124,6 +124,13 @@ map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold){
+  if(threshold < 0){
+      stringstream ss;
+      ss << "The threshold cannot be negative. The value provided was " 
+         << threshold
+         << " .";
+      throw CycNegativeValueException(ss.str());
+  }
   map<Iso, double>::iterator it;
   map<Iso, double> to_ret;
 
