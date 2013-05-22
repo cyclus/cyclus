@@ -99,3 +99,17 @@ TEST_F(CompMapTests,equality) {
   EXPECT_TRUE(copy == comp_);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests, almostEquality) {
+  LoadMap();
+  comp_.setMap(map_);
+  comp_.normalize();
+  CompMap copy = CompMap(comp_);
+  CompMap::iterator it;
+  for(it=copy.begin(); it!=copy.end(); ++it){
+    (*it).second += 1.0;
+  }
+  EXPECT_FALSE(copy == comp_);
+  EXPECT_TRUE(copy.almostEqual(comp_, 2.0));
+}
+
