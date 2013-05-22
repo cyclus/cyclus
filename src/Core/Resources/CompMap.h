@@ -193,6 +193,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @param other the CompMap to compare to this one.
      @param threshold the smallest difference considered negligible 
 
+     @throw CycNegValueException if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
   bool almostEqual(const CompMap& other, double threshold=cyclus::eps()) const;

@@ -80,9 +80,15 @@ bool CompMap::operator<(const CompMap& rhs) const {
   return (ID_ < rhs.ID());
 }
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
+  if ( threshold < 0 ) {
+      stringstream ss;
+      ss << "The threshold cannot be negative. The value provided was " 
+         << threshold
+         << " .";
+      throw CycNegativeValueException(ss.str());
+  }
   if ( size() != rhs.size() ) {
     return false;
   }

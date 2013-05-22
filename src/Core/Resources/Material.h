@@ -254,6 +254,9 @@ public:
 
      @param vec the vector of isos and amounts to which to apply the threshold
      @param threshold the smallest value considered nonzero
+     
+     @throws CycNegValueException if the threshold provided is negative.
+     @returns to_ret, the vector less elements whose abs(val) is less than threshhold
      */
   virtual std::map<Iso, double> applyThreshold(std::map<Iso, double> vec, double threshold);
 

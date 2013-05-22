@@ -113,3 +113,13 @@ TEST_F(CompMapTests, almostEquality) {
   EXPECT_TRUE(copy.almostEqual(comp_, 2.0));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests, almostEqualNegThresh) {
+  LoadMap();
+  comp_.setMap(map_);
+  comp_.normalize();
+  CompMap copy = CompMap(comp_);
+  EXPECT_THROW(copy.almostEqual(comp_, -1.0), CycNegativeValueException);
+}
+
+
