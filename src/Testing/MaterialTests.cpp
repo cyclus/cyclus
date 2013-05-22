@@ -427,6 +427,49 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_zero){
+  // if the threshold is 0, applying the threshold should do nothing
+  std::map<Iso, double> result_vec;
+  EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, 0));
+  std::map<Iso, double>::iterator it;
+  for(it=result_vec.begin(); it != result_vec.end(); ++it){
+    EXPECT_FLOAT_EQ(test_vec_[(*it).first], (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_inf){
+  // if the threshold is infinit, applying it should zero any vector
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, infty));
+  std::map<Iso, double>::iterator it;
+  for(it=result_vec.begin(); it != result_vec.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_negative){
+  // if the threshold is negative, the function should throw
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), CycNegativeValueException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_medium){
+  // if the threshold is in a reasonable range, it should zero small vals
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  std::map<Iso, double>::iterator it;
+  for(it=test_vec_.begin(); it != test_vec_.end(); ++it){
+    EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, (*it).second));
+    EXPECT_FLOAT_EQ(0, result_vec[(*it).first]);
+  }
+}
+
 
 
 
