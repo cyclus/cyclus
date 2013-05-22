@@ -30,7 +30,7 @@ class MaterialTest : public ::testing::Test {
       one_g_ = 1.0;
       test_size_ = 10.0;
       fraction = 2.0 / 3.0;
-      
+
       // composition creation
       test_comp_ = CompMapPtr(new CompMap(MASS));
       (*test_comp_)[u235_]=one_g_;
