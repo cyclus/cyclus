@@ -423,6 +423,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_EQ(default_mat_->isoVector(),test_mat_->isoVector());
   EXPECT_FLOAT_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract part of the original composiiton IN GRAMS 
+  default_mat_->extract(comp_to_rem, g_to_rem, G);
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }

@@ -105,7 +105,7 @@ map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit
     unit){
 
   map<Iso, double>::iterator entry;
-  CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS));
+  CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS, unit));
   map<Iso, double> to_ret = orig->map();
   double amt = 0;
   double orig_amt = this->mass(unit);
@@ -297,14 +297,14 @@ double Material::moles(Iso tope){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-CompMapPtr Material::unnormalizeComp(Basis basis){
+CompMapPtr Material::unnormalizeComp(Basis basis, MassUnit unit){
   CompMapPtr norm_comp = isoVector().comp();
   double scaling;
 
   switch(basis) {
     case MASS :
       norm_comp->massify();
-      scaling = this->mass(KG);
+      scaling = this->mass(unit);
       break;
     case ATOM :
       norm_comp->atomify();

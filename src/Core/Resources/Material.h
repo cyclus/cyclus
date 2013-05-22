@@ -325,8 +325,11 @@ private:
   /**
      This scales the composition by the amount of moles or kg, depending on the 
      basis provided. It returns an unnormalized CompMapPtr
+
+     @param basis MASS or ATOMS
+     @param unit if the basis is mass, give a unit (KG or G) to calculate in
      */
-  CompMapPtr unnormalizeComp(Basis basis);
+  CompMapPtr unnormalizeComp(Basis basis, MassUnit unit=KG);
 
   /**
      used by print() to 'hide' print code when recording is not desired 
