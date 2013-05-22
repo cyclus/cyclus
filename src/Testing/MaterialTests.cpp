@@ -347,18 +347,12 @@ TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
   // Complete extraction
   // this should succeed even if inexact, within eps.
   mat_rsrc_ptr m1;
-  double inexact_size = test_size_ + 0.5*cyclus::eps_rsrc();
+  double inexact_size = test_size_*(1+cyclus::eps_rsrc()/test_size_);
   // make an inexact composition
-  CompMapPtr inexact_comp = CompMapPtr(new CompMap(MASS));
-  CompMap::iterator it;
-  double i = 1; 
-  for( it = (*diff_comp_).begin(); it != (*diff_comp_).end(); ++it ){
-    i++;
-    (*inexact_comp)[(*it).first]=(*it).second*(inexact_size+(1/i)*cyclus::eps_rsrc()); 
-  }
+  CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
+  (*inexact_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
   m1 = diff_mat_->extract(inexact_comp, inexact_size, KG, cyclus::eps_rsrc());
-  //EXPECT_NO_THROW(m1 = diff_mat_->extract(inexact_comp, inexact_size));
-  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
+  EXPECT_TRUE( m1->isoVector().compEquals(inexact_comp));
   EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
   EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
 }
