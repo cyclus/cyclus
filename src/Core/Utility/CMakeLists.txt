@@ -72,6 +72,7 @@ INSTALL(FILES
   Enrichment.h
   Env.h
   Event.h
+  EventBackend.h
   EventManager.h
   IntrusiveBase.h
   LMatrix.h

@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBack* sqlBack = new SqliteBack(output_path);
+  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
   EM->registerBackend(sqlBack);
 
   // read input file and setup simulation
@@ -116,6 +116,7 @@ int main(int argc, char* argv[]) {
     string inputFile = vm["input-file"].as<string>();
     set<string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(inputFile);
+    loader.init();
     loader.load_control_parameters();
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
