@@ -314,6 +314,15 @@ public:
   */
   static bool isMaterial(rsrc_ptr rsrc);
 
+  /**
+     This scales the composition by the amount of moles or kg, depending on the 
+     basis provided. It returns an unnormalized CompMapPtr
+
+     @param basis MASS or ATOMS
+     @param unit if the basis is mass, give a unit (KG or G) to calculate in
+     */
+  CompMapPtr unnormalizeComp(Basis basis, MassUnit unit=KG);
+
 protected:
   /**
      Decays this Material object for the given number of months and 
@@ -325,15 +334,6 @@ protected:
   
 
 private:
-  /**
-     This scales the composition by the amount of moles or kg, depending on the 
-     basis provided. It returns an unnormalized CompMapPtr
-
-     @param basis MASS or ATOMS
-     @param unit if the basis is mass, give a unit (KG or G) to calculate in
-     */
-  CompMapPtr unnormalizeComp(Basis basis, MassUnit unit=KG);
-
   /**
      used by print() to 'hide' print code when recording is not desired 
    */
