@@ -343,7 +343,7 @@ std::string CompMap::detail() {
   stringstream ss;
   vector<string> entries = compStrings();
   for (vector<string>::iterator entry = entries.begin(); 
-       entry != entries.end(); entry++) {
+       entry != entries.end(); ++entry) {
     CLOG(log_level_) << *entry;
   }
   return "";
@@ -353,7 +353,7 @@ std::string CompMap::detail() {
 std::vector<std::string> CompMap::compStrings() {
   stringstream ss;
   vector<string> comp_strings;
-  for (const_iterator entry = map_.begin(); entry != map_.end(); entry++) {
+  for (const_iterator entry = map_.begin(); entry != map_.end(); ++entry) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
     comp_strings.push_back(ss.str());
