@@ -99,7 +99,7 @@ bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
   if ( size() != rhs.size() ) {
     return false;
   }
-  for (const_iterator it = map_.begin(); it != map_.end(); it++) {
+  for (const_iterator it = map_.begin(); it != map_.end(); ++it) {
     if (rhs.count(it->first) == 0) {
       return false;
     }
