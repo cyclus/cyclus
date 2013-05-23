@@ -223,7 +223,7 @@ void CompMap::normalize() {
   vector<double> vec;
   vector<double> other_vec;
   bool atom = (basis_ == ATOM);
-  for (iterator it = map_.begin(); it != map_.end(); it++) {
+  for (iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);
     vec.push_back(it->second);
     if (atom) {
