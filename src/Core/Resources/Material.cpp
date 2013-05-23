@@ -1,6 +1,7 @@
 // Material.cpp
 #include "Material.h"
 
+#include "CycArithmetic.h"
 #include "CycException.h"
 #include "CycLimits.h"
 #include "Timer.h"
@@ -146,7 +147,7 @@ map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
-  double final_amt_vec = vector<double>();
+  vector<double> final_amt_vec = vector<double>();
   double final_amt = 0;
 
   map<Iso, double> remainder;

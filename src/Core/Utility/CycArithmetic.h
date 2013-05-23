@@ -30,7 +30,7 @@ public:
 
      @returns a set sorted from smallest to largest
      */
-  static std::vector<double> sort_ascending(std::vector<double> to_sort)
+  static std::vector<double> sort_ascending(std::vector<double> to_sort);
 
   /**
      orders the values in a map from smallest value to largest value.
@@ -39,5 +39,5 @@ public:
      @returns a set sorted from smallest to largest
      */
   static std::vector<double> sort_ascending(std::map<int, double> to_sort);
-}
+};
 #endif 
