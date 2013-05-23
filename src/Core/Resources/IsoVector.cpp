@@ -135,12 +135,12 @@ double IsoVector::intersectionFraction(const IsoVector& other) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::compEquals(const IsoVector& other) const {
-  return (compEquals(*other.comp()));
+  return (compEquals(other.comp()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEquals(const CompMap& comp) const {
-  return (*composition_ == comp);
+bool IsoVector::compEquals(const CompMapPtr comp) const {
+  return (composition_ == comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
