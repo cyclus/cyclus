@@ -107,10 +107,25 @@ TEST_F(CompMapTests, almostEquality) {
   CompMap copy = CompMap(comp_);
   CompMap::iterator it;
   for(it=copy.begin(); it!=copy.end(); ++it){
-    (*it).second += 1.0;
+    (*it).second *= 1.1;
   }
   EXPECT_FALSE(copy == comp_);
-  EXPECT_TRUE(copy.almostEqual(comp_, 2.0));
+  EXPECT_TRUE(copy.almostEqual(comp_, 1.1));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests, almostEqualZeroEntry) {
+  LoadMap();
+  comp_.setMap(map_);
+  comp_.normalize();
+  CompMap copy = CompMap(comp_);
+  CompMap::iterator it;
+  double the_max = 0.0;
+  for(it=copy.begin(); it!=copy.end(); ++it){
+    (*it).second = 0;
+  }
+  EXPECT_FALSE(copy == comp_);
+  EXPECT_TRUE(copy.almostEqual(comp_, 1.1));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -122,4 +137,13 @@ TEST_F(CompMapTests, almostEqualNegThresh) {
   EXPECT_THROW(copy.almostEqual(comp_, -1.0), CycNegativeValueException);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST_F(CompMapTests, zerocomp){
+  int u235=92235;
+  CompMapPtr comp = CompMapPtr(new CompMap(MASS));
+  (*comp)[u235] = 0;
+  EXPECT_FLOAT_EQ(0, (*comp)[u235]);
+  comp->massify();
+  EXPECT_FLOAT_EQ(0, (*comp)[u235]);
+}
 

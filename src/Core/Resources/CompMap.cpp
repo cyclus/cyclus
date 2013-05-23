@@ -105,7 +105,11 @@ bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
     double minuend = rhs.massFraction(it->first); 
     double subtrahend = massFraction(it->first); 
     double diff = minuend - subtrahend;
-    if (abs(diff) > minuend*threshold || abs(diff) > subtrahend*threshold) {
+    if (abs(minuend) == 0 || abs(subtrahend) == 0){
+      if (abs(diff) > abs(diff)*threshold){
+        return false;
+      }
+    } else if (abs(diff) > abs(minuend)*threshold || abs(diff) > abs(subtrahend)*threshold) {
       return false;
     }
   }
