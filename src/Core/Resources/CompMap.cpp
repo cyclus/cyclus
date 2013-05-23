@@ -262,7 +262,7 @@ void CompMap::change_basis(Basis b) {
     normalize();
   }
   if (basis_ != b) { // only change if we have to
-    for (iterator it = map_.begin(); it != map_.end(); it++) {
+    for (iterator it = map_.begin(); it != map_.end(); ++it) {
       switch (b) {
       case ATOM:
         map_[it->first] = atomFraction(it->first);
