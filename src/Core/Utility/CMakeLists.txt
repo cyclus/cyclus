@@ -38,6 +38,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Commodity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManager.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/CycArithmetic.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
@@ -66,6 +67,7 @@ INSTALL(FILES
   Commodity.h
   CommodityProducer.h
   CommodityProducerManager.h
+  CycArithmetic.h
   CycException.h
   CycLimits.h
   DecayHandler.h

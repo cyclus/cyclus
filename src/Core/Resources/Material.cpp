@@ -146,6 +146,7 @@ map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
+  double final_amt_vec = vector<double>();
   double final_amt = 0;
 
   map<Iso, double> remainder;
@@ -165,8 +166,11 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
       throw CycNegativeValueException(ss.str());
     } else { 
       (*final_comp)[iso] = amt;
-      final_amt += amt;
+      final_amt_vec.push_back(amt);
     }
+  }
+  if(!final_amt_vec.empty()){
+    final_amt = CycArithmetic::KahanSum(final_amt_vec);
   }
 
   // make new material

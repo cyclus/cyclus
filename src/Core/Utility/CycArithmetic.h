@@ -1,0 +1,43 @@
+/*! \file CycArithmetic.h
+  \brief Declares the CycArithmetic class, which holds arithmetic algorithms
+  \author Kathryn D. Huff
+ */
+#if !defined(_CYCARITHMETIC_H)
+#define _CYCARITHMETIC_H
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <map>
+
+/** 
+   @brief CycArithmetic is a toolkit for arithmetic 
+   **/
+class CycArithmetic { 
+public:
+
+  /**
+     sums the materials in the vector in an intelligent way, to avoid floating point issues.
+
+     @param input is the list of values to add to each other
+     @return is the sum of all the values in the input vector
+     */
+  static double KahanSum(std::vector<double> input);
+
+  /**
+     orders the vector from smallest value to largest value. 
+     This helps for addition algorithms which should be d.
+
+     @returns a set sorted from smallest to largest
+     */
+  static std::vector<double> sort_ascending(std::vector<double> to_sort)
+
+  /**
+     orders the values in a map from smallest value to largest value.
+     This helps for addition algorithms.
+
+     @returns a set sorted from smallest to largest
+     */
+  static std::vector<double> sort_ascending(std::map<int, double> to_sort);
+}
+#endif 
