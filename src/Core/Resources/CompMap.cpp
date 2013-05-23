@@ -303,7 +303,7 @@ int CompMap::getMassNum(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::validate() {
-  for (Map::iterator it = map_.begin(); it != map_.end(); it ++) {
+  for (Map::iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);
   }
 }
