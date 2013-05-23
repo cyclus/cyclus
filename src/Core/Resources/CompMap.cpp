@@ -82,6 +82,12 @@ bool CompMap::operator<(const CompMap& rhs) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
+  // I learned at 
+  // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
+  // that the following is less naive than the intuitive way of doing this...
+  // almost equal if :
+  // (abs(x-y) < abs(x)*eps) && (abs(x-y) < abs(y)*epsilon)
+  
   if ( threshold < 0 ) {
       stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 
@@ -96,8 +102,10 @@ bool CompMap::almostEqual(const CompMap& rhs, double threshold) const{
     if (rhs.count(it->first) == 0) {
       return false;
     }
-    double val = rhs.massFraction(it->first) - massFraction(it->first); 
-    if (abs(val) > threshold) {
+    minuend = rhs.massFraction(it->first); 
+    subtrahend = massFraction(it->first); 
+    double diff = minuend - subtrahend;
+    if (abs(diff) > minuend*threshold || abs(diff) > subtrahend*threshold) {
       return false;
     }
   }
