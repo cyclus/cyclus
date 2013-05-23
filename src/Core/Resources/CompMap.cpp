@@ -282,7 +282,7 @@ void CompMap::change_basis(Basis b) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize(double sum) {
   if (sum != 1 && sum != 0) { // only normalize if needed
-    for (iterator it = map_.begin(); it != map_.end(); it++) {
+    for (iterator it = map_.begin(); it != map_.end(); ++it) {
       it->second /= sum;
     }
   }
