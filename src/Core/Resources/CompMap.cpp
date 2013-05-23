@@ -2,6 +2,7 @@
 #include "CompMap.h"
 
 #include "MassTable.h"
+#include "CycArithmetic.h"
 #include "CycException.h"
 #include "CycLimits.h"
 
@@ -217,19 +218,23 @@ void CompMap::atomify() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize() {
-  double sum = 0.0;
-  double other_sum = 0.0;
+  double sum;
+  double other_sum;
+  vector<double> vec;
+  vector<double> other_vec;
   bool atom = (basis_ == ATOM);
   for (iterator it = map_.begin(); it != map_.end(); it++) {
     validateEntry(it->first,it->second);
-    sum += it->second;
+    vec.push_back(it->second);
     if (atom) {
-      other_sum += it->second * MT->gramsPerMol(it->first);
+      other_vec.push_back(it->second * MT->gramsPerMol(it->first));
     }
     else {
-      other_sum += it->second / MT->gramsPerMol(it->first);
+      other_vec.push_back(it->second / MT->gramsPerMol(it->first));
     }
   }
+  sum = CycArithmetic::KahanSum(vec);
+  other_sum = CycArithmetic::KahanSum(other_vec);
   if (sum == 0) {
     mass_to_atom_ratio_ = 0;
   } else if (atom){
