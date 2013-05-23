@@ -45,6 +45,11 @@ TEST_F(CycArithmeticTest, KahanSumZero){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(CycArithmeticTest, KahanSumEmpty){
+  EXPECT_FLOAT_EQ(0, CycArithmetic::KahanSum(empty_vec_));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, KahanSumOrdinary){
   EXPECT_FLOAT_EQ(10, CycArithmetic::KahanSum(ones_vec_));
 }
