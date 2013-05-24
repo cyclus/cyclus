@@ -211,6 +211,22 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, AbsorbZeroMaterial){
+  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_test_mat->setQuantity(0);
+  EXPECT_NO_THROW(test_mat_->absorb(same_as_test_mat));
+  EXPECT_FLOAT_EQ(test_size_, test_mat->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, AbsorbIntoZeroMaterial){
+  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_test_mat->setQuantity(0);
+  EXPECT_NO_THROW(same_as_test_mat->absorb(test_mat_));
+  EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, mat_diff_same) {
   mat_rsrc_ptr same_as_orig = mat_rsrc_ptr(new Material(test_comp_));
   same_as_orig->setQuantity(test_size_);

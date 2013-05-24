@@ -64,7 +64,7 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   double amt = matToAdd->quantity();
-  double ratio = ((quantity_ < cyclus::eps_rsrc()) ? 1 : quantity_/amt);
+  double ratio = ((quantity_ < 0) ? 1 : quantity_/amt);
   iso_vector_.mix(matToAdd->isoVector(),ratio); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
   quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
@@ -102,7 +102,7 @@ map<Iso, double> Material::diff(mat_rsrc_ptr other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, double> Material::diff(CompMapPtr other, double other_amt, MassUnit 
+map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUnit 
     unit){
 
   map<Iso, double>::iterator entry;
@@ -132,7 +132,7 @@ map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold
          << " .";
       throw CycNegativeValueException(ss.str());
   }
-  map<Iso, double>::iterator it;
+  map<Iso, double>::const_iterator it;
   map<Iso, double> to_ret;
 
   for(it=vec.begin(); it!= vec.end(); ++it){
@@ -162,8 +162,11 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract "
          << " the isotope : " << iso 
-         << ". The difference between the amounts is : "
-         << amt ;
+         << ". It has only "
+         << this->mass(iso)
+         << " of that iso. The difference between the amounts is : "
+         << amt 
+         << " . ";
       throw CycNegativeValueException(ss.str());
     } else { 
       (*final_comp)[iso] = amt;
