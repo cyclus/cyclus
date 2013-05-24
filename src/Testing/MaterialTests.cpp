@@ -215,7 +215,7 @@ TEST_F(MaterialTest, AbsorbZeroMaterial){
   mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
   same_as_test_mat->setQuantity(0);
   EXPECT_NO_THROW(test_mat_->absorb(same_as_test_mat));
-  EXPECT_FLOAT_EQ(test_size_, test_mat->quantity());
+  EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
