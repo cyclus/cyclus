@@ -98,6 +98,9 @@ bool CompMap::almostEqual(const CompMapPtr rhs, double threshold) const{
   }
   if ( size() != rhs->size() ) {
     return false;
+  } 
+  if ( empty() && rhs->empty()) {
+    return true;
   }
   for (const_iterator it = map_.begin(); it != map_.end(); ++it) {
     if (rhs->count(it->first) == 0) {
@@ -248,7 +251,7 @@ void CompMap::normalize() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::init(Basis b) {
   basis_ = b;
-  map_ = Map();
+  map_ = Map(); 
   normalized_ = false;
   mass_to_atom_ratio_ = 1;
   ID_ = 0;
