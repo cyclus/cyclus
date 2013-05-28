@@ -36,8 +36,7 @@ int XMLQueryEngine::nElements() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int XMLQueryEngine::nElementsMatchingQuery(std::string query) {
-  const NodeSet nodeset = current_node_->find(query);
-  return nodeset.size();
+  return current_node_->find(query).size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

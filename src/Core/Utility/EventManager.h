@@ -34,8 +34,9 @@ class CycInvalidSchemaErr: public CycException {
 };
 
 /*!
-Collects and manages output data generation for the cyclus core and
-agents during a simulation.
+Collects and manages output data generation for the cyclus core and agents
+during a simulation.  By default, event managers are auto-initialized with a
+unique uuid simulation id.
 
 Example usage:
 
@@ -68,7 +69,8 @@ class EventManager {
     std::map<std::string, event_ptr> schemas_;
     std::list<EventBackend*> backs_;
     unsigned int dump_count_;
-    std::string sim_id_;
+    std::string uuid_;
+    std::string prefix_;
 
     /// A pointer to singleton EventManager.
     static EventManager* instance_;
@@ -91,8 +93,11 @@ class EventManager {
     */
     void set_dump_count(unsigned int count);
 
-    /// returns the unique, auto-generated id associated with this cyclus simulation.
+    /// returns the unique id associated with this cyclus simulation.
     std::string sim_id();
+
+    /// adds a prefix to the auto-generated unique simulation id
+    void setSimPrefix(std::string val);
 
     /*!
     Creates a new event namespaced under the specified title.

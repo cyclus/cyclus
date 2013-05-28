@@ -14,7 +14,7 @@ EventManager* EventManager::instance_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EventManager::EventManager() : dump_count_(kDefaultDumpCount) {
   boost::uuids::uuid uuid = boost::uuids::random_generator()();
-  sim_id_ = boost::lexical_cast<std::string>(uuid);
+  uuid_ = boost::lexical_cast<std::string>(uuid);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,8 +31,13 @@ unsigned int EventManager::dump_count() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void EventManager::setSimPrefix(std::string val) {
+  prefix_ = val + "_";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string EventManager::sim_id() {
-  return sim_id_;
+  return prefix_ + uuid_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

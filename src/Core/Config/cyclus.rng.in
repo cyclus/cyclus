@@ -83,6 +83,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="control">
     <element name ="control">
       <interleave>
+        <ref name="simprefix"/>
         <ref name="duration"/>
         <ref name="startmonth"/>
         <ref name="startyear"/>
@@ -90,6 +91,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <ref name="decay"/>
       </interleave>
     </element>
+  </define>
+
+  <define name="simprefix">
+    <optional>
+      <element name="simprefix">
+        <data type="string"/>
+      </element>
+    </optional>
   </define>
 
   <define name="duration">
@@ -131,6 +140,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
 
     </element>
+
     <optional>
       <element name="enrichment">
         <data type="double"/>
@@ -449,3 +459,4 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- end section for recipes -->
 
 </grammar>
+
