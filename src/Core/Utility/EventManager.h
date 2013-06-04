@@ -25,15 +25,6 @@ typedef std::vector<event_ptr> EventList;
 static unsigned int const kDefaultDumpCount = 10000;
 
 /*!
-Indicates that a pre-recorded event of the same name (e.g. the same
-table) has one or more inconsistent field-value type pairs.
-*/
-class CycInvalidSchemaErr: public CycException {
-  public:
-    CycInvalidSchemaErr(std::string msg) : CycException(msg) {};
-};
-
-/*!
 Collects and manages output data generation for the cyclus core and agents
 during a simulation.  By default, event managers are auto-initialized with a
 unique uuid simulation id.
@@ -61,12 +52,10 @@ class EventManager {
     friend class Event;
 
   private:
-    bool isValidSchema(event_ptr ev);
     void notifyBackends();
     void addEvent(event_ptr ev);
 
     EventList events_;
-    std::map<std::string, event_ptr> schemas_;
     std::list<EventBackend*> backs_;
     unsigned int dump_count_;
     std::string uuid_;

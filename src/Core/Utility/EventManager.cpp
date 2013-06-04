@@ -52,28 +52,7 @@ event_ptr EventManager::newEvent( std::string title) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool EventManager::isValidSchema(event_ptr ev) {
-  if (schemas_.find(ev->title()) != schemas_.end()) {
-    event_ptr primary = schemas_[ev->title()];
-    if (! ev->schemaWithin(primary)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::addEvent(event_ptr ev) {
-  if (! isValidSchema(ev)) {
-    std::string msg;
-    msg = "Name '" + ev->title() + "' with different schema already exists.";
-    throw CycInvalidSchemaErr(msg);
-  }
-
-  if (schemas_.find(ev->title()) == schemas_.end()) {
-    schemas_[ev->title()] = ev;
-  }
-
   events_.push_back(ev);
   if (events_.size() >= dump_count_) {
     notifyBackends();
