@@ -20,7 +20,7 @@ class Event: IntrusiveBase<Event> {
 
   public:
     typedef std::pair<std::string, boost::any> Entry;
-    typedef std::vector<Entry> List;
+    typedef std::vector<Entry> Vals;
 
     virtual ~Event();
 
@@ -52,7 +52,7 @@ class Event: IntrusiveBase<Event> {
     std::string title();
 
     /// Returns a map of all field-value pairs that have been added to this event.
-    const List& vals();
+    const Vals& vals();
 
   private:
     /// events should only be created via an EventManager
@@ -61,7 +61,7 @@ class Event: IntrusiveBase<Event> {
 
     EventManager* manager_;
     std::string title_;
-    List vals_;
+    Vals vals_;
 };
 
 #endif

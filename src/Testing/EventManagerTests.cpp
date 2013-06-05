@@ -142,9 +142,6 @@ TEST(EventManagerTest, Event_addVal) {
   m.registerBackend(&back);
 
   event_ptr ev = m.newEvent("DumbTitle");
-
-  EXPECT_EQ(ev->vals().size(), 0);
-
   ev->addVal("animal", std::string("monkey"));
   ev->addVal("weight", 10);
   ev->addVal("height", 5.5);
@@ -152,7 +149,7 @@ TEST(EventManagerTest, Event_addVal) {
 
   ASSERT_EQ(ev->vals().size(), 3);
 
-  Event::List::const_iterator it = ev->vals().begin();
+  Event::Vals::const_iterator it = ev->vals().begin();
   EXPECT_EQ(it->first, "animal");
   EXPECT_EQ(boost::any_cast<std::string>(it->second), "monkey");
   ++it;
@@ -164,7 +161,7 @@ TEST(EventManagerTest, Event_addVal) {
 
   m.close();
 
-  Event::List vals = back.events.back()->vals();
+  Event::Vals vals = back.events.back()->vals();
   ASSERT_EQ(vals.size(), 3);
   EXPECT_EQ(vals.front().first, "animal");
   EXPECT_EQ(boost::any_cast<std::string>(vals.front().second), "monkey");

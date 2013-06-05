@@ -34,7 +34,7 @@ std::string Event::title() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Event::List& Event::vals() {
+const Event::Vals& Event::vals() {
   return vals_;
 }
 
