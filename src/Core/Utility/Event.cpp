@@ -4,7 +4,7 @@
 #include "Timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr Event::addVal(std::string field, boost::any val) {
+event_ptr Event::addVal(const char* field, boost::any val) {
   vals_[count_].first = field;
   vals_[count_].second = val;
   ++count_;

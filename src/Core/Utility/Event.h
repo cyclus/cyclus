@@ -19,7 +19,7 @@ class Event: IntrusiveBase<Event> {
     friend class EventManager;
 
   public:
-    typedef std::pair<std::string, boost::any> Entry;
+    typedef std::pair<const char*, boost::any> Entry;
     typedef std::vector<Entry> Vals;
 
     virtual ~Event();
@@ -39,7 +39,7 @@ class Event: IntrusiveBase<Event> {
     @throw CycDupEventFieldErr the passed field has been used already in
     this event
     */
-    event_ptr addVal(std::string field, boost::any val);
+    event_ptr addVal(const char* field, boost::any val);
 
     /*!
     Record this event to its EventManager. Recorded events of the same

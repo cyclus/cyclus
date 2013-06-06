@@ -55,7 +55,7 @@ void SqliteBack::createTable(event_ptr e) {
   Event::Vals vals = e->vals();
   Event::Vals::iterator it;
   for (it = vals.begin(); it != vals.end(); ++it) {
-    cmd += ", " + it->first + " " + valType(it->second);
+    cmd += ", " + std::string(it->first) + " " + valType(it->second);
   }
 
   cmd += ");";
