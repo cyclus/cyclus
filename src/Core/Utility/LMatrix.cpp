@@ -39,7 +39,6 @@
 using namespace std;
 
 // constructs a 1x1 matrix of zeroes
-
 LMatrix::LMatrix() {
   rows_ = 1;                   // sets number of rows
   cols_ = 1;                   // sets number of columns
@@ -48,7 +47,6 @@ LMatrix::LMatrix() {
 }
 
 // constructs an nxm matrix of zeroes
-
 LMatrix::LMatrix(int n, int m) {
   rows_ = n;                     // sets number of rows
   cols_ = m;                     // sets number of columns
@@ -57,34 +55,29 @@ LMatrix::LMatrix(int n, int m) {
 }
 
 // returns the number of rows n in the matrix
-
 int LMatrix::numRows() const {
   return rows_;
 }
 
 // returns the number of columns m in the matrix
-
 int LMatrix::numCols() const {
   return cols_;
 }
 
 // overloads the () operator so that A(i,j) will return a reference to 
 // the element aij
-
 const long double & LMatrix::operator()(int i, int j) const {
-  return M_.at(i-1).at(j-1);
+  return M_[i-1][j-1];
 }
 
 // sets the value for the element aij at row i and column j
-
 void LMatrix::setElement(int i, int j, long double aij) {
-  M_.at(i-1).at(j-1) = aij; 
+  M_[i-1][j-1] = aij; 
 }
 
 // overloads the () operator so that A(i,j) will write the element aij
-
 long double & LMatrix::operator()(int i, int j) {
-  return M_.at(i-1).at(j-1);
+  return M_[i-1][j-1];
 }
 
 // adds a row at the end of the Matrix if it contains the same number of
@@ -98,7 +91,6 @@ void LMatrix::addRow(std::vector<long double> row) {
 }
 
 // prints the matrix to standard output
-
 void LMatrix::print() const {
   cout.setf(ios::showpoint);
   cout.setf(ios::scientific);
@@ -108,7 +100,7 @@ void LMatrix::print() const {
   
   // prints single element if M is a 1x1 matrix
   if (M_.capacity() == 1 && M_[0].capacity() == 1) {
-    cout << "[ " << M_.at(0).at(0) << " ]" << endl;
+    cout << "[ " << M_[0][0] << " ]" << endl;
   }
   else {
     // loops through the rows of the matrix
@@ -116,32 +108,30 @@ void LMatrix::print() const {
       // prints all of the elements in the ith row of the matrix
       cout << "[";
       for (int j = 0; j < cols_ - 1; j++) {
-	cout << "  " << setw(9) << M_.at(i).at(j)  << "  ";
+        cout << "  " << setw(9) << M_[i][j]  << "  ";
       }
-      cout << setw(9) << M_.at(i).at(cols_ - 1) << "  ]" << endl;
+      cout << setw(9) << M_[i][cols_ - 1] << "  ]" << endl;
     }
   }
 }
 
 // overloads the assignment operator "A = B" for matrix objects
-
 const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
   if (this == &rhs) {
     return *this;     // returns A if it is already the same matrix as B
   }
   else {
-    M_.empty();        // removes the original elements of A
     rows_ = rhs.rows_;  // resets the number of rows to match B
     cols_ = rhs.cols_;  // resets the number of columns to match B 
     
     // rebuilds A with the dimensions of B
-    vector<long double> row(cols_);
-    M_.assign(rows_,row);
+    vector<long double> row(cols_);   // creates a row with m elements
+    M_.assign(rows_, row);
     
     // copies all of the elements from B into A
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
-        M_.at(i).at(j) = rhs(i+1, j+1);
+        M_[i][j] = rhs.M_[i][j];
       }
     }
 
@@ -151,13 +141,12 @@ const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
 
 // overloads the assignment operator "A = A + B" for matrix objects
 // Note: if the matrix dimensions do not match, then A is returned unchanged
-
 const LMatrix & LMatrix::operator+=(const LMatrix & rhs) {
   if (this->rows_ == rhs.rows_ && this->cols_ == rhs.cols_) {
     // performs matrix addition and stores the result in A
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
-        M_.at(i).at(j) = M_.at(i).at(j) + rhs(i+1, j+1);
+        M_[i][j] += rhs.M_[i][j];
       }
     }
   }
@@ -167,13 +156,12 @@ const LMatrix & LMatrix::operator+=(const LMatrix & rhs) {
 
 // overloads the assignment operator "A = A - B" for matrix objects
 // Note: if the matrix dimensions do not match, then A is returned unchanged
-
 const LMatrix & LMatrix::operator-=(const LMatrix & rhs) {
   if (this->rows_ == rhs.rows_ && this->cols_ == rhs.cols_) {
     // performs matrix subtraction and stores the result in A
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
-        M_.at(i).at(j) = M_.at(i).at(j) - rhs(i+1, j+1);
+        M_[i][j] -= rhs.M_[i][j];
       }
     }
   }
@@ -187,7 +175,6 @@ const LMatrix & LMatrix::operator-=(const LMatrix & rhs) {
 // of columns in A is equal to the number of rows in B.  If the matrices
 // cannot be multipled due to having incorrect dimensions for matrix
 // multiplication to be defined, then A will be returned unchanged
-
 const LMatrix & LMatrix::operator*=(const LMatrix & rhs) {
   long double aij;  // stores temporary matrix element for row i and column j
   
@@ -207,10 +194,10 @@ const LMatrix & LMatrix::operator*=(const LMatrix & rhs) {
         // sums the product of the row vector from A and the column vector
         // from B using the formula aij = ai1*b1j + ai2*b2j + ...
         for (int k = 0; k < rows_; k++) {
-          aij = aij + M_.at(i).at(k) * rhs(k+1,j+1);
+          aij = aij + M_[i][k] * rhs.M_[k][j];
         }
         
-        temp.setElement(i+1, j+1, aij);  // copies element aij into temp
+        temp.M_[i][j] = aij;  // copies element aij into temp
       }
     }   
     
@@ -254,7 +241,7 @@ LMatrix operator*(const long double k, const LMatrix & A) {
   for (int i = 0; i < A.rows_; i++) {
     for (int j = 0; j < A.cols_; j++) {
       aij = A(i+1, j+1) * k;
-      ans.setElement(i+1, j+1, aij);
+      ans.M_[i][j] = aij;
     }
   }
 
@@ -271,7 +258,7 @@ LMatrix operator*(const LMatrix & A, const long double k) {
   for (int i = 0; i < A.rows_; i++) {
     for (int j = 0; j < A.cols_; j++) {
       aij = A(i+1, j+1) * k;
-      ans.setElement(i+1, j+1, aij);
+      ans.M_[i][j] = aij;
     }
   }
 
