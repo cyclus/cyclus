@@ -325,6 +325,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for regions -->
   <define name="region">
     <element name="region">
+      <interleave>
 
       <element name="name">
          <text/>
@@ -345,6 +346,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <ref name="institution" />
       </oneOrMore>
 
+      </interleave>
     </element>
   </define>
 
@@ -353,6 +355,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for institutions -->
   <define name="institution">
     <element name="institution">
+      
+      <interleave>
 
       <element name="name">
          <text/>
@@ -385,6 +389,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <choice> @Inst_REFS@
       </choice>
       </element>
+      
+      </interleave>
     </element>
   </define>
 
