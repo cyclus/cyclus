@@ -209,6 +209,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   EXPECT_FLOAT_EQ(orig + origdiff, default_mat_->mass(KG) );
 
 }
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbThreeMaterials) { 
   mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
@@ -222,6 +223,18 @@ TEST_F(MaterialTest, AbsorbThreeMaterials) {
   glob->absorb(pu_mat_);
   EXPECT_FLOAT_EQ(3*test_size_, glob->mass(KG));
   EXPECT_FLOAT_EQ(test_size_, glob->mass(pu239_));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, AbsorbTotallyDifferentMaterial) { 
+  mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
+  glob->absorb(test_mat_);
+  EXPECT_FLOAT_EQ(test_size_, glob->mass(KG));
+  EXPECT_FLOAT_EQ(test_size_, glob->mass(u235_));
+  pu_mat_->setQuantity(2*test_size_);
+  glob->absorb(pu_mat_);
+  EXPECT_FLOAT_EQ(3*test_size_, glob->mass(KG));
+  EXPECT_FLOAT_EQ(2*test_size_, glob->mass(pu239_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
