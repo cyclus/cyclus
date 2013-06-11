@@ -222,6 +222,8 @@ TEST_F(MaterialTest, AbsorbThreeMaterials) {
   EXPECT_FLOAT_EQ(test_size_*(1./3.), glob->mass(am241_));
   glob->absorb(pu_mat_);
   EXPECT_FLOAT_EQ(3*test_size_, glob->mass(KG));
+  EXPECT_FLOAT_EQ(test_size_*(one_+ 2./3.), glob->mass(u235_));
+  EXPECT_FLOAT_EQ(test_size_*(1./3.), glob->mass(am241_));
   EXPECT_FLOAT_EQ(test_size_, glob->mass(pu239_));
 }
 
@@ -234,6 +236,7 @@ TEST_F(MaterialTest, AbsorbTotallyDifferentMaterial) {
   pu_mat_->setQuantity(2*test_size_);
   glob->absorb(pu_mat_);
   EXPECT_FLOAT_EQ(3*test_size_, glob->mass(KG));
+  EXPECT_FLOAT_EQ(test_size_, glob->mass(u235_));
   EXPECT_FLOAT_EQ(2*test_size_, glob->mass(pu239_));
 }
 
