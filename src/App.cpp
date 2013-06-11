@@ -98,19 +98,6 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
-  // Create the output file
-  string output_path = "cyclus.sqlite";
-  try {
-    if (vm.count("output-path")){
-      output_path = vm["output-path"].as<string>();
-    }
-  } catch (CycException ge) {
-    success = false;
-    CLOG(LEV_ERROR) << ge.what();
-  }
-  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
-  EM->registerBackend(sqlBack);
-
   // read input file and setup simulation
   try {
     string inputFile = vm["input-file"].as<string>();
@@ -124,6 +111,19 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << e.what();
   }
+
+  // Create the output file
+  string output_path = "cyclus.sqlite";
+  try {
+    if (vm.count("output-path")){
+      output_path = vm["output-path"].as<string>();
+    }
+  } catch (CycException ge) {
+    success = false;
+    CLOG(LEV_ERROR) << ge.what();
+  }
+  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
+  EM->registerBackend(sqlBack);
 
   // sim construction - should be handled by some entity
   Model::constructSimulation();
@@ -156,6 +156,7 @@ int main(int argc, char* argv[]) {
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
     cout << "Output location: " << output_path << endl;
+    cout << "Simulation ID: " << EM->sim_id() << endl;
     cout << endl;
   } else {
     cout << endl;
