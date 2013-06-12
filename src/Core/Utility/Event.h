@@ -9,13 +9,7 @@
 #include <string>
 #include <boost/any.hpp>
 
-typedef std::map<std::string, boost::any> ValMap;
-
-/// indicates a field has previously been added to an event.
-class CycDupEventFieldErr: public CycException {
-  public:
-    CycDupEventFieldErr(std::string msg) : CycException(msg) {};
-};
+typedef boost::intrusive_ptr<Event> event_ptr;
 
 /*!
 Used to specify and send a collection of key-value pairs to the
@@ -25,6 +19,8 @@ class Event: IntrusiveBase<Event> {
     friend class EventManager;
 
   public:
+    typedef std::pair<const char*, boost::any> Entry;
+    typedef std::vector<Entry> Vals;
 
     virtual ~Event();
 
@@ -43,15 +39,12 @@ class Event: IntrusiveBase<Event> {
     @throw CycDupEventFieldErr the passed field has been used already in
     this event
     */
-    event_ptr addVal(std::string field, boost::any val);
+    event_ptr addVal(const char* field, boost::any val);
 
     /*!
     Record this event to its EventManager. Recorded events of the same
     title (e.g. same table) must not contain any fields that were not
-    present in the first event recorded of that title.  They must also not
-    contain any fields of the same name but different value type.
-
-    @throw CycInvalidSchemaErr inconsistent event field-valtype schemas
+    present in the first event recorded of that title.
     */
     void record();
 
@@ -59,18 +52,16 @@ class Event: IntrusiveBase<Event> {
     std::string title();
 
     /// Returns a map of all field-value pairs that have been added to this event.
-    ValMap vals();
+    const Vals& vals();
 
   private:
     /// events should only be created via an EventManager
     Event(EventManager* m, std::string title);
-
-    /// checks whether this event schema is valid within the schema in primary.
-    bool schemaWithin(event_ptr primary);
+    int count_;
 
     EventManager* manager_;
     std::string title_;
-    ValMap vals_;
+    Vals vals_;
 };
 
 #endif

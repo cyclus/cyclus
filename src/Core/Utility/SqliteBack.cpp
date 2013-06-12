@@ -52,10 +52,10 @@ void SqliteBack::createTable(event_ptr e) {
   tbl_names_.push_back(name);
 
   std::string cmd = "CREATE TABLE " + name + " (" + kShortSimId + " INTEGER";
-  ValMap vals = e->vals();
-  ValMap::iterator it = vals.begin();
+  Event::Vals vals = e->vals();
+  Event::Vals::iterator it;
   for (it = vals.begin(); it != vals.end(); ++it) {
-    cmd += ", " + it->first + " " + valType(it->second);
+    cmd += ", " + std::string(it->first) + " " + valType(it->second);
   }
 
   cmd += ");";
@@ -109,11 +109,11 @@ bool SqliteBack::tableExists(std::string name) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::writeEvent(event_ptr e) {
   std::stringstream colss, valss, cmd;
-  ValMap vals = e->vals();
+  Event::Vals vals = e->vals();
 
   colss << kShortSimId;
   valss << short_sim_id_;
-  for (ValMap::iterator it = vals.begin(); it != vals.end(); ++it) {
+  for (Event::Vals::iterator it = vals.begin(); it != vals.end(); ++it) {
     colss << ", " << it->first;
     valss << ", " << valAsString(it->second);
   }
