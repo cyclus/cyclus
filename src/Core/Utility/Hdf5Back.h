@@ -22,14 +22,17 @@ class Hdf5Back : public EventBackend {
 
   private:
 
-    /// returns true if the table name already exists.
-    bool tableExists(std::string name);
+    /// creates and stores a valid hdf5 composite type set definition for ev.
+    H5::CompType* createMemType(event_ptr ev);
 
-    /// creates and stores a valid hdf5 composite type set definition for e.
-    void createMemType(event_ptr e);
+    /// creates and stores a valid hdf5 dataset definition for ev.
+    H5::DataSet* createDataSet(std::string title, H5::CompType* mtype);
 
-    /// constructs an SQL INSERT command for e and queues it for db insertion.
-    void writeSet(EventList set);
+    /// write a set of events with the same title to their corresponding hdf5 dataset
+    void writeSet(EventList& set);
+
+    /// fill a contiguous memory buffer with data from set for writing to an hdf5 dataset.
+    void fillBuf(char* buf, EventList& set, H5::CompType* mtype, size_t rowsize);
 
     /// An interface to a sqlite db managed by the SqliteBack class.
     H5::H5File* file_;
@@ -37,11 +40,14 @@ class Hdf5Back : public EventBackend {
     /// Stores the database's path+name, declared during construction.
     std::string path_;
 
-    std::map<std::string, H5::CompType*> types_;
+    /// hdf5 dataset composite rowtype information
+    std::map<std::string, H5::CompType*> mtypes_;
+
+    /// already created datasets kept available for extension as new events arrive.
     std::map<std::string, H5::DataSet*> datasets_;
 
-    /// table names already existing (created) in the hdf5 file.
-    std::map<std::string, size_t> table_sizes_;
+    /// names and memory sizes for already created datasets in the hdf5 file.
+    std::map<std::string, size_t> dataset_sizes_;
 };
 
 #endif

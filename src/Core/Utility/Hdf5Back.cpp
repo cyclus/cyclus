@@ -14,10 +14,12 @@ void Hdf5Back::notify(EventList evts) {
   std::map<std::string, EventList> sets;
   for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
     std::string name = (*it)->title();
-    if (! tableExists(name)) {
-      createMemType(*it);
+    if (mtypes_.count(name) == 0) {
+      event_ptr ev = *it;
+      CompType* mtype = createMemType(ev);
+      mtypes_[ev->title()] = mtype;
+      datasets_[ev->title()] = createDataSet(ev->title(), mtype);
     }
-
     sets[name].push_back(*it);
   }
 
@@ -31,7 +33,7 @@ void Hdf5Back::notify(EventList evts) {
 void Hdf5Back::close() {
   delete file_;
   std::map<std::string, CompType*>::iterator it;
-  for (it = types_.begin(); it != types_.end(); ++it) {
+  for (it = mtypes_.begin(); it != mtypes_.end(); ++it) {
     delete (it->second);
   }
 
@@ -47,7 +49,7 @@ std::string Hdf5Back::name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::createMemType(event_ptr ev) {
+CompType* Hdf5Back::createMemType(event_ptr ev) {
   Event::Vals vals = ev->vals();
   std::vector<size_t> offsets;
   offsets.resize(vals.size());
@@ -74,8 +76,7 @@ void Hdf5Back::createMemType(event_ptr ev) {
     H5std_string field(vals[i].first);
     if (vals[i].second.type() == typeid(int)) {
       mtype->insertMember(field, offsets[i], PredType::NATIVE_INT);
-    } else if (vals[i].second.type() == typeid(double)) {
-      mtype->insertMember(field, offsets[i], PredType::NATIVE_DOUBLE);
+    } else if (vals[i].second.type() == typeid(double)) { mtype->insertMember(field, offsets[i], PredType::NATIVE_DOUBLE);
     } else if (vals[i].second.type() == typeid(std::string)) {
       mtype->insertMember(field, offsets[i], StrType(0, strSize));
     } else if (vals[i].second.type() == typeid(float)) {
@@ -83,60 +84,37 @@ void Hdf5Back::createMemType(event_ptr ev) {
     }
   }
 
+  dataset_sizes_[ev->title()] = size;
+  return mtype;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+DataSet* Hdf5Back::createDataSet(std::string title, CompType* mtype) {
   int length = 0;
   int rank = 1;
   hsize_t dim[] = {length};
   hsize_t maxdims[] = {H5S_UNLIMITED};
+
   DataSpace space(rank, dim, maxdims);
 
+  int chunk_size = 50000;
   DSetCreatPropList cparms;
-  hsize_t chunk_dims[] = {50000};
+  hsize_t chunk_dims[] = {chunk_size};
   cparms.setChunk(rank, chunk_dims);
 
-  DataSet* dataset = new DataSet(file_->createDataSet(ev->title(), *mtype, space, cparms));
-
-  datasets_[ev->title()] = dataset;
-  types_[ev->title()] = mtype;
-  table_sizes_[ev->title()] = size;
+  return new DataSet(file_->createDataSet(title, *mtype, space, cparms));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Hdf5Back::tableExists(std::string name) {
-  return types_.count(name) == 1;
-}
+void Hdf5Back::writeSet(EventList& set) {
+  std::string title = set[0]->title();
+  CompType* mtype = mtypes_[title];
+  size_t rowsize = dataset_sizes_[title];
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::writeSet(EventList set) {
-  // pack events into a contiguous memory buffer
-  std::string name = set[0]->title();
-  CompType* mtype = types_[name];
-  size_t rowsize = table_sizes_[name];
   char* buf = new char[set.size() * rowsize];
-  size_t offset = 0;
-  for (int i = 0; i < set[0]->vals().size(); ++i) {
-    Event::Vals vals = set[0]->vals();
-    H5std_string field(vals[i].first);
-    int num = mtype->getMemberIndex(field);
-    size_t size = mtype->getMemberDataType(num).getSize();
-    const std::type_info& ti = vals[i].second.type();
-    for (int j = 0; j < set.size(); ++j) {
-      const void* val;
-      const boost::any* a = &set[j]->vals()[i].second;
-      if (ti == typeid(int)) {
-        val = boost::any_cast<int>(a);
-      } else if (ti == typeid(double)) {
-        val = boost::any_cast<double>(a);
-      } else if (ti == typeid(std::string)) {
-        val = boost::any_cast<std::string>(a)->c_str();
-      } else if (ti == typeid(float)) {
-        val = boost::any_cast<float>(a);
-      }
-      memcpy(buf + rowsize * j + offset, val, size);
-    }
-    offset += size;
-  }
+  fillBuf(buf, set, mtype, rowsize);
 
-  DataSet* dataset = datasets_[name];
+  DataSet* dataset = datasets_[title];
   hsize_t hoffset[] = {dataset->getSpace().getSimpleExtentNpoints()};
   hsize_t dim[] = {set.size() + hoffset[0]};
   hsize_t dim2[] = {set.size()};
@@ -149,5 +127,44 @@ void Hdf5Back::writeSet(EventList set) {
   dataset->write(buf, *mtype, mspace, fspace);
 
   delete[] buf;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Hdf5Back::fillBuf(char* buf, EventList& set, CompType* mtype, size_t rowsize) {
+  Event::Vals header = set[0]->vals();
+  size_t offset = 0;
+  for (int col = 0; col < header.size(); ++col) {
+    H5std_string field(header[col].first);
+    int num = mtype->getMemberIndex(field);
+    size_t field_size = mtype->getMemberDataType(num).getSize();
+    const std::type_info& ti = header[col].second.type();
+    const void* val;
+    if (ti == typeid(int)) {
+      for (int row = 0; row < set.size(); ++row) {
+        const boost::any* a = &set[row]->vals()[col].second;
+        val = boost::any_cast<int>(a);
+        memcpy(buf + rowsize * row + offset, val, field_size);
+      }
+    } else if (ti == typeid(double)) {
+      for (int row = 0; row < set.size(); ++row) {
+        const boost::any* a = &set[row]->vals()[col].second;
+        val = boost::any_cast<double>(a);
+        memcpy(buf + rowsize * row + offset, val, field_size);
+      }
+    } else if (ti == typeid(std::string)) {
+      for (int row = 0; row < set.size(); ++row) {
+        const boost::any* a = &set[row]->vals()[col].second;
+        val = boost::any_cast<std::string>(a)->c_str();
+        memcpy(buf + rowsize * row + offset, val, field_size);
+      }
+    } else if (ti == typeid(float)) {
+      for (int row = 0; row < set.size(); ++row) {
+        const boost::any* a = &set[row]->vals()[col].second;
+        val = boost::any_cast<float>(a);
+        memcpy(buf + rowsize * row + offset, val, field_size);
+      }
+    }
+    offset += field_size;
+  }
 }
 
