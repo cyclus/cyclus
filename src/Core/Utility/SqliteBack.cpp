@@ -37,6 +37,24 @@ void SqliteBack::notify(EventList evts) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::close() {
+  if (tableExists("Agent")) {
+    // merge agent and agentdeaths tables into the agent table
+    std::string cmd;
+    if (!tableExists("Agents")) {
+      cmd = "CREATE TABLE Agents AS ";
+      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
+      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
+      cmds_.push_back(cmd);
+    } else {
+      cmd = "INSERT INTO Agents ";
+      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
+      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
+      cmds_.push_back(cmd);
+    }
+    cmds_.push_back("DROP TABLE Agent");
+    cmds_.push_back("DROP TABLE AgentDeaths");
+  }
+
   flush();
   db_.close();
 }

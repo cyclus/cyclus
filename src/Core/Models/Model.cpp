@@ -386,7 +386,7 @@ void Model::addResource(Transaction trans,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addToTable(){
-  EM->newEvent("Agents")
+  EM->newEvent("Agent")
     ->addVal("ID", ID())
     ->addVal("AgentType", modelType())
     ->addVal("ModelType", modelImpl())
