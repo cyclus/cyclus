@@ -35,9 +35,6 @@ class Event: IntrusiveBase<Event> {
 
     @warning for the val argument - what variable types are supported
     depends on what the backend(s) in use are designed to handle.
-
-    @throw CycDupEventFieldErr the passed field has been used already in
-    this event
     */
     event_ptr addVal(const char* field, boost::any val);
 
