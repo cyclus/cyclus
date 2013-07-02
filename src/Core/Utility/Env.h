@@ -138,7 +138,7 @@ class Env {
        occurs across the default install location as well as any included in the
        CYCLUS_MODULE_PATH environment variable.
        @param name the name of the library to search for
-       @param path the variable to set with the path to the library
+       @param path_found the variable to set with the path to the library
        @return true if the library is found, false if not
      */
     static bool findModuleLib(std::string name,
