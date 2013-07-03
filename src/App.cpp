@@ -98,6 +98,20 @@ int main(int argc, char* argv[]) {
   string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
+  // read input file and setup simulation
+  try {
+    string inputFile = vm["input-file"].as<string>();
+    set<string> module_types = Model::dynamic_module_types();
+    XMLFileLoader loader(inputFile);
+    loader.init();
+    loader.load_control_parameters();
+    loader.load_recipes();
+    loader.load_dynamic_modules(module_types);
+  } catch (CycException e) {
+    success = false;
+    CLOG(LEV_ERROR) << e.what();
+  }
+
   // Create the output file
   string output_path = "cyclus.sqlite";
   try {
@@ -108,21 +122,8 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBack* sqlBack = new SqliteBack(output_path);
+  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
   EM->registerBackend(sqlBack);
-
-  // read input file and setup simulation
-  try {
-    string inputFile = vm["input-file"].as<string>();
-    set<string> module_types = Model::dynamic_module_types();
-    XMLFileLoader loader(inputFile);
-    loader.load_control_parameters();
-    loader.load_recipes();
-    loader.load_dynamic_modules(module_types);
-  } catch (CycException e) {
-    success = false;
-    CLOG(LEV_ERROR) << e.what();
-  }
 
   // sim construction - should be handled by some entity
   Model::constructSimulation();
@@ -138,6 +139,8 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
+  EM->close();
+
   // Close Dynamically loaded modules 
   try {
     Model::unloadModules();
@@ -146,8 +149,6 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
-  EM->close();
-
   if (success) {
     cout << endl;
     cout << "|--------------------------------------------|" << endl;
@@ -155,6 +156,7 @@ int main(int argc, char* argv[]) {
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
     cout << "Output location: " << output_path << endl;
+    cout << "Simulation ID: " << EM->sim_id() << endl;
     cout << endl;
   } else {
     cout << endl;
