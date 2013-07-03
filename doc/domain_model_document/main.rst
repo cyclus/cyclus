@@ -15,35 +15,44 @@ Within the Domain Model
 #. (Sample) use cases & ecosystem needs
 #. Core Component Concepts
 
-   a. Resources
+   a. Markets
+
+      i. Commodities
+
+      ii. Defining Objectives and Constrains
+
+   b. Agency of Facilities, Regions, and Institutions
+
+      i. Use Cases (inherited from Use Cases above)
+
+   c. Resources
 
       i. Materials
 
-   b. Agent properties
+   d. Messages
 
-      i. Communicators
+   e. Transactions
 
-      ii. Time agents
 
-      iii. prototypes
+   f. Agent properties
 
-      iv. dynamic loading
+      i. What are separabel properties of agents ??? 
+      
+      ii. Communicators
 
-      v. Specializations
+      iii. Time agents
+
+      iv. prototypes
+
+      v. dynamic loading
+
+      vi. Specializations
 
          1. Facilities
 
          2. Institutions
 
          3. Regions
-
-   c. Markets
-
-      i. Commodities
-
-   d. Messages
-
-   e. Transactions
 
 #. Utility Component Concepts
 
