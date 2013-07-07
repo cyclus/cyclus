@@ -302,6 +302,9 @@ TEST_F(MaterialTest, diff_close_comp) {
     }
     EXPECT_FLOAT_EQ( expected, (*it).second);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbThreeMaterials) { 
   mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
   glob->absorb(test_mat_);

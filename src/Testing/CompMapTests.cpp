@@ -109,8 +109,8 @@ TEST_F(CompMapTests, almostEquality) {
   for(it=copy.begin(); it!=copy.end(); ++it){
     (*it).second *= 1.1;
   }
-  EXPECT_FALSE(copy == comp_);
-  EXPECT_TRUE(copy.almostEqual(comp_, 1.1));
+  EXPECT_FALSE(copy == *comp_);
+  EXPECT_TRUE(copy.almostEqual(*comp_, 1.1));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -124,8 +124,8 @@ TEST_F(CompMapTests, almostEqualZeroEntry) {
   for(it=copy.begin(); it!=copy.end(); ++it){
     (*it).second = 0;
   }
-  EXPECT_FALSE(copy == comp_);
-  EXPECT_TRUE(copy.almostEqual(comp_, 1.1));
+  EXPECT_FALSE(copy == *comp_);
+  EXPECT_TRUE(copy.almostEqual(*comp_, 1.1));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -134,7 +134,7 @@ TEST_F(CompMapTests, almostEqualNegThresh) {
   comp_->setMap(map_);
   comp_->normalize();
   CompMap copy = CompMap(comp_);
-  EXPECT_THROW(copy.almostEqual(comp_, -1.0), CycNegativeValueException);
+  EXPECT_THROW(copy.almostEqual(*comp_, -1.0), CycNegativeValueException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

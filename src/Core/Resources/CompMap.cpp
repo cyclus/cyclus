@@ -72,17 +72,17 @@ int CompMap::size() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::operator==(const CompMapPtr rhs) const {
+bool CompMap::operator==(const CompMap& rhs) const {
   return almostEqual(rhs, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::operator<(const CompMapPtr rhs) const {
-  return (ID_ < rhs->ID());
+bool CompMap::operator<(const CompMap& rhs) const {
+  return (ID_ < rhs.ID());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::almostEqual(const CompMapPtr rhs, double threshold) const{
+bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
   // I learned at 
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the intuitive way of doing this...
@@ -96,24 +96,25 @@ bool CompMap::almostEqual(const CompMapPtr rhs, double threshold) const{
          << " .";
       throw CycNegativeValueException(ss.str());
   }
-  if ( size() != rhs->size() ) {
+  if ( size() != rhs.size() ) {
     return false;
   } 
-  if ( empty() && rhs->empty()) {
+  if ( empty() && rhs.empty()) {
     return true;
   }
   for (const_iterator it = map_.begin(); it != map_.end(); ++it) {
-    if (rhs->count(it->first) == 0) {
+    if (rhs.count(it->first) == 0) {
       return false;
     }
-    double minuend = rhs->massFraction(it->first); 
+    double minuend = rhs.massFraction(it->first); 
     double subtrahend = massFraction(it->first); 
     double diff = minuend - subtrahend;
     if (abs(minuend) == 0 || abs(subtrahend) == 0){
       if (abs(diff) > abs(diff)*threshold){
         return false;
       }
-    } else if (abs(diff) > abs(minuend)*threshold || abs(diff) > abs(subtrahend)*threshold) {
+    } else if (abs(diff) > abs(minuend)*threshold || 
+        abs(diff) > abs(subtrahend)*threshold) {
       return false;
     }
   }

@@ -177,14 +177,16 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      returns true if both comp maps have the same isotopic entries
      and the difference in each value is 0 
+
+     @param other the CompMap to compare to this one
    */
-  bool operator==(const CompMapPtr other) const;
+  bool operator==(const CompMap& other) const;
 
   /**
      the less-than operator to allowed compositions to be stored
      as keys in maps. compares IDs.
    */
-  bool operator<(const CompMapPtr other) const;
+  bool operator<(const CompMap& other) const;
 
   /**
      returns true if both comp maps have the same isotopic entries within the 
@@ -196,7 +198,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @throw CycNegValueException if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
-  bool almostEqual(const CompMapPtr other, double threshold=cyclus::eps()) const;
+  bool almostEqual(const CompMap other, double threshold=cyclus::eps()) const;
 
   /**
      returns number of topes in map
