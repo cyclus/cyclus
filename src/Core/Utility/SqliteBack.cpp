@@ -37,6 +37,24 @@ void SqliteBack::notify(EventList evts) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::close() {
+  if (tableExists("Agent")) {
+    // merge agent and agentdeaths tables into the agent table
+    std::string cmd;
+    if (!tableExists("Agents")) {
+      cmd = "CREATE TABLE Agents AS ";
+      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
+      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
+      cmds_.push_back(cmd);
+    } else {
+      cmd = "INSERT INTO Agents ";
+      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
+      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
+      cmds_.push_back(cmd);
+    }
+    cmds_.push_back("DROP TABLE Agent");
+    cmds_.push_back("DROP TABLE AgentDeaths");
+  }
+
   flush();
   db_.close();
 }
@@ -52,10 +70,10 @@ void SqliteBack::createTable(event_ptr e) {
   tbl_names_.push_back(name);
 
   std::string cmd = "CREATE TABLE " + name + " (" + kShortSimId + " INTEGER";
-  ValMap vals = e->vals();
-  ValMap::iterator it = vals.begin();
+  Event::Vals vals = e->vals();
+  Event::Vals::iterator it;
   for (it = vals.begin(); it != vals.end(); ++it) {
-    cmd += ", " + it->first + " " + valType(it->second);
+    cmd += ", " + std::string(it->first) + " " + valType(it->second);
   }
 
   cmd += ");";
@@ -109,11 +127,11 @@ bool SqliteBack::tableExists(std::string name) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::writeEvent(event_ptr e) {
   std::stringstream colss, valss, cmd;
-  ValMap vals = e->vals();
+  Event::Vals vals = e->vals();
 
   colss << kShortSimId;
   valss << short_sim_id_;
-  for (ValMap::iterator it = vals.begin(); it != vals.end(); ++it) {
+  for (Event::Vals::iterator it = vals.begin(); it != vals.end(); ++it) {
     colss << ", " << it->first;
     valss << ", " << valAsString(it->second);
   }

@@ -64,7 +64,7 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   double amt = matToAdd->quantity();
-  double ratio = ((quantity_ <= 0) ? 1 : quantity_/amt);
+  double ratio = ((quantity_ < cyclus::eps_rsrc()) ? 1 : amt/quantity_);
   iso_vector_.mix(matToAdd->isoVector(),ratio); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
   quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="

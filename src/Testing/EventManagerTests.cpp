@@ -119,41 +119,6 @@ TEST(EventManagerTest, Manager_CloseFlushing) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_EventSchemas) {
-  EventManager m;
-
-  event_ptr ev = m.newEvent("DumbTitle");
-  ev ->addVal("animal", std::string("monkey"))
-     ->addVal("weight", 10)
-     ->record();
-
-  // subset of fields
-  ev = m.newEvent("DumbTitle");
-  ev->addVal("weight", 17);
-  EXPECT_NO_THROW(ev->record());
-
-  // different subset of fields
-  ev = m.newEvent("DumbTitle");
-  ev->addVal("animal", std::string("elephant"));
-  EXPECT_NO_THROW(ev->record());
-
-  // inconsistent field name
-  ev = m.newEvent("DumbTitle");
-  ev->addVal("height", 20);
-  EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
-
-  // inconsistent field type
-  ev = m.newEvent("DumbTitle");
-  ev->addVal("animal", 10);
-  EXPECT_THROW(ev->record(), CycInvalidSchemaErr);
-
-  // different title/namespace
-  ev = m.newEvent("DifferentTitle");
-  ev->addVal("height", 20);
-  EXPECT_NO_THROW(ev->record());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Event_record) {
   TestBack back;
   EventManager m;
@@ -177,40 +142,28 @@ TEST(EventManagerTest, Event_addVal) {
   m.registerBackend(&back);
 
   event_ptr ev = m.newEvent("DumbTitle");
-
-  EXPECT_EQ(ev->vals().size(), 0);
-
   ev->addVal("animal", std::string("monkey"));
   ev->addVal("weight", 10);
   ev->addVal("height", 5.5);
   ev->record();
 
-  EXPECT_EQ(ev->vals().size(), 3);
+  ASSERT_EQ(ev->vals().size(), 3);
 
-  ValMap vals = ev->vals();
-  EXPECT_NE(vals.find("animal"), vals.end());
-  EXPECT_NE(vals.find("weight"), vals.end());
-  EXPECT_NE(vals.find("height"), vals.end());
-  EXPECT_EQ(boost::any_cast<std::string>(vals["animal"]), "monkey");
-  EXPECT_EQ(boost::any_cast<int>(vals["weight"]), 10);
-  EXPECT_FLOAT_EQ(boost::any_cast<double>(vals["height"]), 5.5);
+  Event::Vals::const_iterator it = ev->vals().begin();
+  EXPECT_EQ(it->first, "animal");
+  EXPECT_EQ(boost::any_cast<std::string>(it->second), "monkey");
+  ++it;
+  EXPECT_EQ(it->first, "weight");
+  EXPECT_EQ(boost::any_cast<int>(it->second), 10);
+  ++it;
+  EXPECT_EQ(it->first, "height");
+  EXPECT_DOUBLE_EQ(boost::any_cast<double>(it->second), 5.5);
 
   m.close();
 
-  vals = back.events.back()->vals();
-  EXPECT_EQ(vals.size(), 3);
-  EXPECT_EQ(boost::any_cast<std::string>(vals["animal"]), "monkey");
-
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Event_DuplicateField) {
-  TestBack back;
-  EventManager m;
-  m.registerBackend(&back);
-
-  event_ptr ev = m.newEvent("DumbTitle");
-  ev->addVal("animal", std::string("monkey"));
-  EXPECT_THROW(ev->addVal("animal", std::string("elephant")), CycDupEventFieldErr);
+  Event::Vals vals = back.events.back()->vals();
+  ASSERT_EQ(vals.size(), 3);
+  EXPECT_EQ(vals.front().first, "animal");
+  EXPECT_EQ(boost::any_cast<std::string>(vals.front().second), "monkey");
 }
 

@@ -6,7 +6,6 @@
 #include <vector>
 #include <boost/intrusive_ptr.hpp>
 
-typedef boost::intrusive_ptr<Event> event_ptr;
 typedef std::vector<event_ptr> EventList;
 
 /*!

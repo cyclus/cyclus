@@ -139,6 +139,8 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
+  EM->close();
+
   // Close Dynamically loaded modules 
   try {
     Model::unloadModules();
@@ -146,8 +148,6 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
-
-  EM->close();
 
   if (success) {
     cout << endl;

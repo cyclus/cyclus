@@ -9,11 +9,14 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
   protected:
-    Iso u235_, am241_, th228_, pb208_;
+    Iso u235_, am241_, th228_, pb208_, pu239_;
     int one_g_; // grams
-    CompMapPtr test_comp_, two_test_comp_, non_norm_test_comp_, diff_comp_;
+    double one_; // unitless
+    double half_; // unitless
+    CompMapPtr test_comp_, two_test_comp_, non_norm_test_comp_, diff_comp_, 
+               pu_comp_, u_am_comp_;
     double test_size_, fraction;
-    mat_rsrc_ptr test_mat_, two_test_mat_, ten_test_mat_;
+    mat_rsrc_ptr test_mat_, two_test_mat_, ten_test_mat_, pu_mat_, u_am_mat_;
     mat_rsrc_ptr diff_mat_;
     mat_rsrc_ptr default_mat_;
     long int u235_halflife_;
@@ -27,7 +30,10 @@ class MaterialTest : public ::testing::Test {
       am241_ = 95241;
       th228_ = 90228;
       pb208_ = 82208;
+      pu239_ = 94239;
       one_g_ = 1.0;
+      one_ = 1.0;
+      half_ = 0.5;
       test_size_ = 10.0;
       fraction = 2.0 / 3.0;
 
@@ -48,6 +54,15 @@ class MaterialTest : public ::testing::Test {
       (*diff_comp_)[am241_]=one_g_;
       (*diff_comp_).normalize();
 
+      // uranium and americium mat set up
+      u_am_comp_= CompMapPtr(new CompMap(MASS));
+      (*u_am_comp_)[u235_] = one_;
+      (*u_am_comp_)[am241_] = half_;
+
+      // plutonium composition set up
+      pu_comp_= CompMapPtr(new CompMap(MASS));
+      (*pu_comp_)[pu239_] = one_;
+
       // material creation
       test_mat_ = mat_rsrc_ptr(new Material(test_comp_));
       test_mat_->setQuantity(test_size_);
@@ -61,6 +76,11 @@ class MaterialTest : public ::testing::Test {
       diff_mat_->setQuantity(test_size_);
 
       default_mat_ = mat_rsrc_ptr(new Material());
+      u_am_mat_ = mat_rsrc_ptr(new Material(u_am_comp_));
+      u_am_mat_->setQuantity(test_size_);
+
+      pu_mat_ = mat_rsrc_ptr(new Material(pu_comp_));
+      pu_mat_->setQuantity(test_size_);
 
       // vec creation
       test_vec_[1]=1.0;

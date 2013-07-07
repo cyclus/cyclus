@@ -4,43 +4,29 @@
 #include "Timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr Event::addVal(std::string field, boost::any val) {
-  if (vals_.find(field) != vals_.end()) {
-    throw CycDupEventFieldErr("Field '" + field + "' already exists in the event.");
-  }
-  vals_[field] = val;
-
-  event_ptr ev(this);
-  return ev;
+event_ptr Event::addVal(const char* field, boost::any val) {
+  vals_[count_].first = field;
+  vals_[count_].second = val;
+  ++count_;
+  return event_ptr(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Event::record() {
-  event_ptr ev(this);
-  manager_->addEvent(ev);
+  vals_.resize(count_);
+  manager_->addEvent(event_ptr(this));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Event::Event(EventManager* m, std::string title)
   : title_(title),
-    manager_(m) { }
+    manager_(m),
+    count_(0) {
+  vals_.resize(10);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Event::~Event() { }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Event::schemaWithin(event_ptr primary) {
-  ValMap pvals = primary->vals_;
-
-  for (ValMap::iterator it = vals_.begin(); it != vals_.end(); it++) {
-    if (pvals.find(it->first) == pvals.end()) {
-      return false;
-    } else if (pvals[it->first].type() != it->second.type()) {
-      return false;
-    }
-  }
-  return true;
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Event::title() {
@@ -48,7 +34,7 @@ std::string Event::title() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ValMap Event::vals() {
+const Event::Vals& Event::vals() {
   return vals_;
 }
 
