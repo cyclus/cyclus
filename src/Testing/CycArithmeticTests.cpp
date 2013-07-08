@@ -40,6 +40,38 @@ class CycArithmeticTest : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(CycArithmeticTest, KahanVsRegSummation){
+  // 1.0 + (1e-16)*999 =  1.0000000000000999
+  vector<double> vec_to_sum;
+  double sum = 1.0;
+  vec_to_sum.push_back(sum);
+  for(int i=0; i<999; ++i){
+    double to_add = 1e-16;
+    vec_to_sum.push_back(1e-16);
+    sum += to_add;
+  }
+
+  ASSERT_EQ(vec_to_sum.size(), 1000);
+
+  ASSERT_TRUE(1.0000000000000999 == CycArithmetic::KahanSum(vec_to_sum));
+  ASSERT_FALSE(1.0000000000000999 == sum);
+
+  // you can test this in other ways : 
+  
+  // this passes : 
+  ASSERT_NEAR(1.0+999e-16, CycArithmetic::KahanSum(vec_to_sum), 1e-16);
+  // while this fails : 
+  // ASSERT_NEAR(1.0+999e-16, sum, 1e-16);
+  
+  // this passes:
+  ASSERT_DOUBLE_EQ(1.0000000000000999, CycArithmetic::KahanSum(vec_to_sum));
+  // while this fails:
+  // ASSERT_DOUBLE_EQ(1.0000000000000999, sum);
+
+
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, KahanSumZero){
   EXPECT_FLOAT_EQ(0, CycArithmetic::KahanSum(zeros_vec_));
 }
