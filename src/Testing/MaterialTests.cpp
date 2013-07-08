@@ -211,6 +211,100 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, AbsorbZeroMaterial){
+  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_test_mat->setQuantity(0);
+  EXPECT_NO_THROW(test_mat_->absorb(same_as_test_mat));
+  EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, AbsorbIntoZeroMaterial){
+  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_test_mat->setQuantity(0);
+  EXPECT_NO_THROW(same_as_test_mat->absorb(test_mat_));
+  EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, mat_diff_same) {
+  mat_rsrc_ptr same_as_orig = mat_rsrc_ptr(new Material(test_comp_));
+  same_as_orig->setQuantity(test_size_);
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(same_as_orig));
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, mat_diff) {
+  mat_rsrc_ptr two_orig = mat_rsrc_ptr(new Material(test_comp_));
+  two_orig->setQuantity(2*test_size_);
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = two_test_mat_->diff(test_mat_));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    expected = test_size_*(*two_orig->isoVector().comp())[(*it).first];
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff_same) {
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(test_comp_, test_size_, KG));
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff_half) {
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(test_comp_, 0.5*test_size_, KG));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    expected = 0.5*test_size_*((*test_comp_)[(*it).first]);
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff_close_size) {
+  std::map<Iso, double> remainder;
+  EXPECT_NO_THROW(remainder = test_mat_->diff(test_comp_, test_size_-cyclus::eps_rsrc(), KG));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    expected = cyclus::eps_rsrc()*((*test_comp_)[(*it).first]);
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, diff_close_comp) {
+  std::map<Iso, double> remainder;
+  CompMapPtr close_comp = CompMapPtr(new CompMap(*diff_comp_));
+  (*close_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
+  diff_mat_->setQuantity(test_size_, KG);
+  EXPECT_NO_THROW(remainder = diff_mat_->diff(close_comp, test_size_, KG));
+  double expected;
+  std::map<Iso, double>::iterator it;
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    if((*it).first == am241_) {
+      expected= (*diff_comp_)[am241_]*test_size_ - (*close_comp)[am241_]*test_size_;
+    } else {
+      expected =0;
+    }
+    EXPECT_FLOAT_EQ( expected, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbThreeMaterials) { 
   mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
   glob->absorb(test_mat_);
@@ -258,10 +352,55 @@ TEST_F(MaterialTest, Extract_complete) {
 
   // Complete extraction
   mat_rsrc_ptr m1;
-  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, test_size_));
+  EXPECT_NO_THROW( m1 = test_mat_->extract(test_comp_, test_size_, KG, 0));
   EXPECT_TRUE( m1->isoVector().compEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract_complete_inexact_size) {
+
+  // Complete extraction
+  // this should succeed even if inexact, within eps.
+  mat_rsrc_ptr m1;
+  assert(diff_comp_->normalized());
+  diff_mat_->setQuantity(test_size_, KG);
+  double inexact_size = test_size_ + 0.1*cyclus::eps_rsrc();
+  m1 = diff_mat_->extract(diff_comp_, inexact_size, KG, cyclus::eps_rsrc());
+  EXPECT_TRUE( m1->isoVector().compEquals(diff_comp_));
+  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
+  EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract_complete_inexact_comp) {
+
+  // Complete extraction
+  // this should succeed even if inexact, within eps.
+  mat_rsrc_ptr m1;
+  // make an inexact composition
+  CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
+  (*inexact_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
+  m1 = diff_mat_->extract(inexact_comp, test_size_, KG, cyclus::eps_rsrc());
+  EXPECT_TRUE( m1->isoVector().compEquals(inexact_comp));
+  EXPECT_NEAR( test_size_, m1->quantity(), cyclus::eps_rsrc() );
+  EXPECT_NEAR( 0, diff_mat_->mass(am241_), cyclus::eps_rsrc() );
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
+
+  // Complete extraction
+  // this should succeed even if inexact, within eps.
+  mat_rsrc_ptr m1;
+  double inexact_size = test_size_*(1+cyclus::eps_rsrc()/test_size_);
+  // make an inexact composition
+  CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
+  (*inexact_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
+  m1 = diff_mat_->extract(inexact_comp, inexact_size, KG, cyclus::eps_rsrc());
+  EXPECT_TRUE( m1->isoVector().compEquals(inexact_comp));
+  EXPECT_FLOAT_EQ( 0, diff_mat_->quantity() );
+  EXPECT_NEAR( inexact_size, m1->quantity(), cyclus::eps_rsrc() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -333,6 +472,50 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_NO_THROW(default_mat_->extract(comp_to_rem, g_to_rem, G));
   EXPECT_FLOAT_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_zero){
+  // if the threshold is 0, applying the threshold should do nothing
+  std::map<Iso, double> result_vec;
+  EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, 0));
+  std::map<Iso, double>::iterator it;
+  for(it=result_vec.begin(); it != result_vec.end(); ++it){
+    EXPECT_FLOAT_EQ(test_vec_[(*it).first], (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_inf){
+  // if the threshold is infinit, applying it should zero any vector
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, infty));
+  std::map<Iso, double>::iterator it;
+  for(it=result_vec.begin(); it != result_vec.end(); ++it){
+    EXPECT_FLOAT_EQ(0, (*it).second);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_negative){
+  // if the threshold is negative, the function should throw
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), CycNegativeValueException);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(MaterialTest, Apply_threshold_medium){
+  // if the threshold is in a reasonable range, it should zero small vals
+  std::map<Iso, double> result_vec;
+  double infty = std::numeric_limits<double>::infinity();
+  std::map<Iso, double>::iterator it;
+  for(it=test_vec_.begin(); it != test_vec_.end(); ++it){
+    EXPECT_NO_THROW( result_vec = test_mat_->applyThreshold(test_vec_, (*it).second));
+    EXPECT_FLOAT_EQ(0, result_vec[(*it).first]);
+  }
+}
+
 
 
 

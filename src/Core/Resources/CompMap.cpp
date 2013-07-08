@@ -2,6 +2,7 @@
 #include "CompMap.h"
 
 #include "MassTable.h"
+#include "CycArithmetic.h"
 #include "CycException.h"
 #include "CycLimits.h"
 
@@ -72,24 +73,52 @@ int CompMap::size() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::operator==(const CompMap& rhs) const {
-  if ( size() != rhs.size() ) {
-    return false;
-  }
-  for (const_iterator it = map_.begin(); it != map_.end(); it++) {
-    if (rhs.count(it->first) == 0) {
-      return false;
-    }
-    double val = rhs.massFraction(it->first) - massFraction(it->first); 
-    if (abs(val) > cyclus::eps()) {
-      return false;
-    }
-  }
-  return true;
+  return almostEqual(rhs, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::operator<(const CompMap& rhs) const {
   return (ID_ < rhs.ID());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
+  // I learned at 
+  // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
+  // that the following is less naive than the intuitive way of doing this...
+  // almost equal if :
+  // (abs(x-y) < abs(x)*eps) && (abs(x-y) < abs(y)*epsilon)
+  
+  if ( threshold < 0 ) {
+      stringstream ss;
+      ss << "The threshold cannot be negative. The value provided was " 
+         << threshold
+         << " .";
+      throw CycNegativeValueException(ss.str());
+  }
+  if ( size() != rhs.size() ) {
+    return false;
+  } 
+  if ( empty() && rhs.empty()) {
+    return true;
+  }
+  for (const_iterator it = map_.begin(); it != map_.end(); ++it) {
+    if (rhs.count(it->first) == 0) {
+      return false;
+    }
+    double minuend = rhs.massFraction(it->first); 
+    double subtrahend = massFraction(it->first); 
+    double diff = minuend - subtrahend;
+    if (abs(minuend) == 0 || abs(subtrahend) == 0){
+      if (abs(diff) > abs(diff)*threshold){
+        return false;
+      }
+    } else if (abs(diff) > abs(minuend)*threshold || 
+        abs(diff) > abs(subtrahend)*threshold) {
+      return false;
+    }
+  }
+  return true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -193,19 +222,23 @@ void CompMap::atomify() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize() {
-  double sum = 0.0;
-  double other_sum = 0.0;
+  double sum;
+  double other_sum;
+  vector<double> vec;
+  vector<double> other_vec;
   bool atom = (basis_ == ATOM);
-  for (iterator it = map_.begin(); it != map_.end(); it++) {
+  for (iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);
-    sum += it->second;
+    vec.push_back(it->second);
     if (atom) {
-      other_sum += it->second * MT->gramsPerMol(it->first);
+      other_vec.push_back(it->second * MT->gramsPerMol(it->first));
     }
     else {
-      other_sum += it->second / MT->gramsPerMol(it->first);
+      other_vec.push_back(it->second / MT->gramsPerMol(it->first));
     }
   }
+  sum = CycArithmetic::KahanSum(vec);
+  other_sum = CycArithmetic::KahanSum(other_vec);
   if (sum == 0) {
     mass_to_atom_ratio_ = 0;
   } else if (atom){
@@ -219,7 +252,7 @@ void CompMap::normalize() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::init(Basis b) {
   basis_ = b;
-  map_ = Map();
+  map_ = Map(); 
   normalized_ = false;
   mass_to_atom_ratio_ = 1;
   ID_ = 0;
@@ -233,7 +266,7 @@ void CompMap::change_basis(Basis b) {
     normalize();
   }
   if (basis_ != b) { // only change if we have to
-    for (iterator it = map_.begin(); it != map_.end(); it++) {
+    for (iterator it = map_.begin(); it != map_.end(); ++it) {
       switch (b) {
       case ATOM:
         map_[it->first] = atomFraction(it->first);
@@ -253,7 +286,7 @@ void CompMap::change_basis(Basis b) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize(double sum) {
   if (sum != 1 && sum != 0) { // only normalize if needed
-    for (iterator it = map_.begin(); it != map_.end(); it++) {
+    for (iterator it = map_.begin(); it != map_.end(); ++it) {
       it->second /= sum;
     }
   }
@@ -274,7 +307,7 @@ int CompMap::getMassNum(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::validate() {
-  for (Map::iterator it = map_.begin(); it != map_.end(); it ++) {
+  for (Map::iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);
   }
 }
@@ -314,7 +347,7 @@ std::string CompMap::detail() {
   stringstream ss;
   vector<string> entries = compStrings();
   for (vector<string>::iterator entry = entries.begin(); 
-       entry != entries.end(); entry++) {
+       entry != entries.end(); ++entry) {
     CLOG(log_level_) << *entry;
   }
   return "";
@@ -324,7 +357,7 @@ std::string CompMap::detail() {
 std::vector<std::string> CompMap::compStrings() {
   stringstream ss;
   vector<string> comp_strings;
-  for (const_iterator entry = map_.begin(); entry != map_.end(); entry++) {
+  for (const_iterator entry = map_.begin(); entry != map_.end(); ++entry) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
     comp_strings.push_back(ss.str());

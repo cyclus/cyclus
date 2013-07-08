@@ -1,6 +1,7 @@
 // Material.cpp
 #include "Material.h"
 
+#include "CycArithmetic.h"
 #include "CycException.h"
 #include "CycLimits.h"
 #include "Timer.h"
@@ -94,54 +95,98 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const CompMapPtr comp_to_rem, double amt_to_rem, MassUnit unit) {
- 
-  CompMapPtr new_comp = CompMapPtr(this->unnormalizeComp(MASS));
-  CompMapPtr remove_comp = comp_to_rem;
-  remove_comp->massify();
-  assert(!new_comp->normalized());
-  assert(remove_comp->normalized());
+map<Iso, double> Material::diff(mat_rsrc_ptr other){
+  CompMapPtr comp = CompMapPtr(other->isoVector().comp());
+  double amt = other->mass(KG);
+  return diff(comp, amt, KG);
+}
 
-  double new_amt, amt_to_rem_i, remainder_amt, remainder_amt_i;
-  remainder_amt = this->mass(unit);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUnit 
+    unit){
 
-  int iso;
+  map<Iso, double>::iterator entry;
+  CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS, unit));
+  map<Iso, double> to_ret = orig->map();
+  double amt = 0;
+  double orig_amt = this->mass(unit);
+  for( entry= (*other).begin(); entry!= (*other).end(); ++entry ) {
+    int iso = (*entry).first;
+    if( orig->count(iso) != 0 ){
+      amt = (*orig)[iso] - (*entry).second*other_amt ;
+    } else {
+      amt = -(*entry).second*other_amt;
+    }
+    to_ret[iso] = amt;
+  }
 
-  for (CompMap::iterator it = remove_comp->begin(); 
-       it != remove_comp->end(); it++) {
-    // get isotopic information
-    amt_to_rem_i = it->second * amt_to_rem;
-    if ( amt_to_rem_i <= cyclus::eps_rsrc() ) { amt_to_rem_i = 0; };
-    iso = it->first;
-    remainder_amt_i = this->mass(iso, unit) - amt_to_rem_i;
+  return to_ret;
+}
 
-    // check information
-    if ( remainder_amt_i < -cyclus::eps_rsrc() ) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold){
+  if(threshold < 0){
+      stringstream ss;
+      ss << "The threshold cannot be negative. The value provided was " 
+         << threshold
+         << " .";
+      throw CycNegativeValueException(ss.str());
+  }
+  map<Iso, double>::const_iterator it;
+  map<Iso, double> to_ret;
+
+  for(it=vec.begin(); it!= vec.end(); ++it){
+    if(abs((*it).second) > threshold) {
+      to_ret[(*it).first] = (*it).second;
+    }
+  }
+  return to_ret;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
+    MassUnit unit, double threshold){
+  CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
+  vector<double> final_amt_vec = vector<double>();
+  double final_amt = 0;
+
+  map<Iso, double> remainder;
+  remainder = applyThreshold(diff(remove_comp, remove_amt, unit), threshold);
+  map<Iso, double>::iterator it;
+  
+  for(it=remainder.begin(); it!=remainder.end(); ++it){
+    int iso = (*it).first;
+    double amt = (*it).second;
+    if(amt < 0){
       stringstream ss;
       ss << "The Material " << this->ID() 
-         << " has insufficient material to extract the isotope : " << iso ;
+         << " has insufficient material to extract "
+         << " the isotope : " << iso 
+         << ". It has only "
+         << this->mass(iso)
+         << " of that iso. The difference between the amounts is : "
+         << amt 
+         << " . ";
       throw CycNegativeValueException(ss.str());
-    } else if (remainder_amt_i <= cyclus::eps_rsrc()) {
-      remainder_amt_i = 0; 
+    } else { 
+      (*final_comp)[iso] = amt;
+      final_amt_vec.push_back(amt);
     }
-    
-    // operate on information
-    (*new_comp)[iso] = remainder_amt_i;
-    new_amt += amt_to_rem_i;
-    remainder_amt -= amt_to_rem_i;
+  }
+  if(!final_amt_vec.empty()){
+    final_amt = CycArithmetic::KahanSum(final_amt_vec);
   }
 
   // make new material
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(comp_to_rem));
-  new_mat->setQuantity(new_amt, unit);
+  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(remove_comp));
+  new_mat->setQuantity(remove_amt, unit);
   new_mat->setOriginalID( this->originalID() ); // book keeping
-  
   // adjust old material
-  this->iso_vector_ = IsoVector(new_comp); 
-  this->setQuantity(remainder_amt, unit);
+  final_comp->normalize();
+  this->iso_vector_ = IsoVector(CompMapPtr(final_comp)); 
+  this->setQuantity(final_amt, unit);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
-
   return new_mat;
 }
 
@@ -163,6 +208,19 @@ string Material::detail() {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
   return "";
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+bool Material::operator==(const mat_rsrc_ptr other){
+  return almostEqual(other, 0);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+bool Material::almostEqual(const mat_rsrc_ptr other, double threshold) const {
+  // I learned at 
+  // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
+  // that the following is less naive than the naive way to do it... 
+  return iso_vector_.comp()->almostEqual(*(other->isoVector().comp()), threshold);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -257,14 +315,14 @@ double Material::moles(Iso tope){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-CompMapPtr Material::unnormalizeComp(Basis basis){
+CompMapPtr Material::unnormalizeComp(Basis basis, MassUnit unit){
   CompMapPtr norm_comp = isoVector().comp();
   double scaling;
 
   switch(basis) {
     case MASS :
       norm_comp->massify();
-      scaling = this->mass(KG);
+      scaling = this->mass(unit);
       break;
     case ATOM :
       norm_comp->atomify();

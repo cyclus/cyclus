@@ -102,6 +102,25 @@ public:
   void print(); 
 
   /**
+     Returns a boolean indicating whether these materials are equivalent
+
+     @param other the material to compare to this one
+
+     @return equal true if compositions and size are equal. false otherwise.
+    */
+  virtual bool operator==(const mat_rsrc_ptr other);
+
+  /**
+     Returns a boolean indicating whether these materials are equivalent
+
+     @param other the material to compare to this one
+     @param threshold the smallest amount considered equal when comparing comps
+
+     @return equal true if equal within the threshold. false otherwise.
+    */
+  virtual bool almostEqual(const mat_rsrc_ptr other, double threshold) const;
+
+  /**
      Change/set the mass of the resource object. 
      Note that this does make matter (dis)appear and 
      should only be used on objects that are not part of 
@@ -210,6 +229,36 @@ public:
      @param matToAdd the Material to be absorbed (and deleted) 
    */
   virtual void absorb(mat_rsrc_ptr matToAdd);
+  /**
+     Reports the difference between this material and another material
+
+     @param other the other material
+
+     @return diff a map of isotope ids to amounts (in the MassUnit of unit)
+     */
+  virtual std::map<Iso, double> diff(const mat_rsrc_ptr other);
+
+  /**
+     Reports the difference between this material and a CompMap
+      
+     @param other the material to compare to the original material
+     @param other_amt the amount associated with 
+     @param unit the MassUnit with which to interperet the CompMap 
+
+     @return comp_diff a map of isotope ids to amounts (in the MassUnit of unit) 
+   */
+  virtual std::map<Iso, double> diff(const CompMapPtr other, double other_amt, MassUnit unit=KG);
+
+  /**
+     Returns the vec, less the elements whose absolute value are less than the threshold.
+
+     @param vec the vector of isos and amounts to which to apply the threshold
+     @param threshold the smallest value considered nonzero
+     
+     @throws CycNegValueException if the threshold provided is negative.
+     @returns to_ret, the vector less elements whose abs(val) is less than threshhold
+     */
+  virtual std::map<Iso, double> applyThreshold(std::map<Iso, double> vec, double threshold);
 
   /**
      Extracts from this material a composition
@@ -219,10 +268,13 @@ public:
      @param comp_to_rem the composition of material that will be removed against this Material. 
      @param amt_to_rem the amount in *unit* of material that will be removed against this Material. 
      @param unit the MassUnit to do the extraction operation in. Default is KG. 
+     @param threshold is the smallest amount considered negligible in this extraction.
+
      @throws CycNegativeValueException for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, MassUnit unit=KG);
+  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
+      MassUnit unit=KG, double threshold=cyclus::eps_rsrc());
 
   /**
      Extracts a specified mass from this material creating a new 
@@ -262,6 +314,15 @@ public:
   */
   static bool isMaterial(rsrc_ptr rsrc);
 
+  /**
+     This scales the composition by the amount of moles or kg, depending on the 
+     basis provided. It returns an unnormalized CompMapPtr
+
+     @param basis MASS or ATOMS
+     @param unit if the basis is mass, give a unit (KG or G) to calculate in
+     */
+  CompMapPtr unnormalizeComp(Basis basis, MassUnit unit=KG);
+
 protected:
   /**
      Decays this Material object for the given number of months and 
@@ -273,12 +334,6 @@ protected:
   
 
 private:
-  /**
-     This scales the composition by the amount of moles or kg, depending on the 
-     basis provided. It returns an unnormalized CompMapPtr
-     */
-  CompMapPtr unnormalizeComp(Basis basis);
-
   /**
      used by print() to 'hide' print code when recording is not desired 
    */
