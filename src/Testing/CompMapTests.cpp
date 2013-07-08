@@ -11,7 +11,7 @@ TEST_F(CompMapTests,default_constructor) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,copy_constructor) {
-  CompMap copy = CompMap(comp_);
+  CompMap copy = CompMap(*comp_);
   EXPECT_EQ(copy.basis(),comp_->basis());
   EXPECT_EQ(copy.map(),comp_->map());
 }
@@ -104,7 +104,7 @@ TEST_F(CompMapTests, almostEquality) {
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
-  CompMap copy = CompMap(comp_);
+  CompMap copy = CompMap(*comp_);
   CompMap::iterator it;
   for(it=copy.begin(); it!=copy.end(); ++it){
     (*it).second *= 1.1;
@@ -118,7 +118,7 @@ TEST_F(CompMapTests, almostEqualZeroEntry) {
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
-  CompMap copy = CompMap(comp_);
+  CompMap copy = CompMap(*comp_);
   CompMap::iterator it;
   double the_max = 0.0;
   for(it=copy.begin(); it!=copy.end(); ++it){
@@ -133,7 +133,7 @@ TEST_F(CompMapTests, almostEqualNegThresh) {
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
-  CompMap copy = CompMap(comp_);
+  CompMap copy = CompMap(*comp_);
   EXPECT_THROW(copy.almostEqual(*comp_, -1.0), CycNegativeValueException);
 }
 

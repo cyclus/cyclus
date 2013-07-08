@@ -140,7 +140,7 @@ bool IsoVector::compEquals(const IsoVector& other) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::compEquals(const CompMapPtr comp) const {
-  return (*composition_ == comp);
+  return (composition_ == comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

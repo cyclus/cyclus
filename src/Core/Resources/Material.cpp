@@ -220,7 +220,7 @@ bool Material::almostEqual(const mat_rsrc_ptr other, double threshold) const {
   // I learned at 
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the naive way to do it... 
-  return iso_vector_.comp()->almostEqual((other->isoVector().comp()), threshold);
+  return iso_vector_.comp()->almostEqual(*(other->isoVector().comp()), threshold);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -150,7 +150,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      copy constructor
    */
-  CompMap(const CompMapPtr other);
+  CompMap(const CompMap& other);
 
   /**
      default destructor
