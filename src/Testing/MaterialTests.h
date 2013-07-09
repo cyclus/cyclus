@@ -22,6 +22,7 @@ class MaterialTest : public ::testing::Test {
     long int u235_halflife_;
     int th228_halflife_;
     double u235_g_per_mol_;
+    std::map<Iso, double> test_vec_;
 
     virtual void SetUp(){
       // composition set up
@@ -80,6 +81,11 @@ class MaterialTest : public ::testing::Test {
 
       pu_mat_ = mat_rsrc_ptr(new Material(pu_comp_));
       pu_mat_->setQuantity(test_size_);
+
+      // vec creation
+      test_vec_[1]=1.0;
+      test_vec_[2]=2.0;
+      test_vec_[3]=3.0;
 
       // test info
       u235_g_per_mol_ = 235.044;

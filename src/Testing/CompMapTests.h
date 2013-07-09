@@ -9,6 +9,8 @@
 #include "MassTable.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class TestCompMap;
+typedef boost::shared_ptr<TestCompMap> TestCompMapPtr;
 class TestCompMap : public CompMap {
  public:
  TestCompMap() : CompMap(MASS) {};
@@ -24,7 +26,7 @@ class TestCompMap : public CompMap {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CompMapTests : public ::testing::Test {
  protected:
-  TestCompMap comp_;
+  TestCompMapPtr comp_;
   Map map_, atomified_, massified_;
   Basis basis_;
   double ratio_;
@@ -39,7 +41,7 @@ class CompMapTests : public ::testing::Test {
   virtual void SetUp() { 
     basis_ = MASS;
     map_ = Map();
-    comp_ = TestCompMap(basis_);
+    comp_ = TestCompMapPtr(new TestCompMap(basis_));
     isotopes_.push_back(1001),isotopes_.push_back(2004);
     masses_.push_back(10),masses_.push_back(20);
   }
@@ -73,11 +75,11 @@ class CompMapTests : public ::testing::Test {
     root_decay_time = t1+t2;
     root = CompMapPtr(new CompMap(basis_));
     // parent/
-    parent = boost::shared_ptr<TestCompMap>(new TestCompMap(basis_));
+    parent = TestCompMapPtr(new TestCompMap(basis_));
     parent->setParent(root);
     parent->setDecayTime(t1);
     // child
-    child = boost::shared_ptr<TestCompMap>(new TestCompMap(basis_));
+    child = TestCompMapPtr(new TestCompMap(basis_));
     child->setParent(parent->me());
     child->setDecayTime(t2);
   }
