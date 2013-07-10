@@ -6,11 +6,10 @@
 
 #include "CycException.h"
 #include "CycArithmetic.h"
-
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double CycArithmetic::KahanSum(vector<double> input){
+double CycArithmetic::KahanSum(std::vector<double> input){
   vector<double> sorted = sort_ascending(input);
   // http://en.wikipedia.org/wiki/Kahan_summation_algorithm
   double y, t;
@@ -32,13 +31,13 @@ double CycArithmetic::KahanSum(vector<double> input){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<double> CycArithmetic::sort_ascending(vector<double> to_sort){
+std::vector<double> CycArithmetic::sort_ascending(std::vector<double> to_sort){
   sort(to_sort.begin(), to_sort.end());
   return to_sort;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-vector<double> CycArithmetic::sort_ascending(map<int, double> to_sort){ 
+std::vector<double> CycArithmetic::sort_ascending(std::map<int, double> to_sort){ 
   vector<double> vec_to_sort;
   map<int, double>::const_iterator it;
   for(it=to_sort.begin(); it!=to_sort.end(); ++it){

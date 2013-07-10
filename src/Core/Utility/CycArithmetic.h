@@ -26,7 +26,9 @@ public:
 
   /**
      orders the vector from smallest value to largest value. 
-     This helps for addition algorithms which should be d.
+     This helps for addition algorithms.
+
+     @param to_sort is the vector of values to sort
 
      @returns a set sorted from smallest to largest
      */
@@ -35,6 +37,8 @@ public:
   /**
      orders the values in a map from smallest value to largest value.
      This helps for addition algorithms.
+
+     @param to_sort is a map of values to sort (according to the value of the double)
 
      @returns a set sorted from smallest to largest
      */
