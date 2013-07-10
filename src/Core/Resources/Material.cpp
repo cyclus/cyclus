@@ -124,7 +124,7 @@ map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUn
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, double> Material::applyThreshold(map<Iso, double> vec, double threshold){
+map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double threshold){
   if(threshold < 0){
       stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 

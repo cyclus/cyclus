@@ -6,6 +6,7 @@
 
 #include "CycException.h"
 #include "CycArithmetic.h"
+using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double CycArithmetic::KahanSum(std::vector<double> input){
