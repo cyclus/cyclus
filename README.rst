@@ -211,13 +211,9 @@ Workflow Notes
         branch and then run the CyclusUnitTestDriver (at the moment, ```make 
         test``` is insufficient). For example ::
       
-          mkdir build
           mkdir install
-          cd build
-          cmake ../src -DCMAKE_INSTALL_PREFIX=../install
-          make
-          make install
-          ../install/cyclus/bin/CyclusUnitTestDriver
+          python setup.py --prefix=install/ ....
+          install/cyclus/bin/CyclusUnitTestDriver
 
       - If your changes to the core repository have an effect on any module 
         repositories (such as `cyamore <https://github.com/cyclus/cycamore/>`_ 
