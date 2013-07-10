@@ -252,7 +252,7 @@ public:
   /**
      Returns the vec, less the elements whose absolute value are less than the threshold.
 
-     @param vec the vector of isos and amounts to which to apply the threshold
+     @param vec the map of isos and amounts to which to apply the threshold
      @param threshold the smallest value considered nonzero
      
      @throws CycNegValueException if the threshold provided is negative.
