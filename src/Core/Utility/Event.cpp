@@ -22,7 +22,7 @@ Event::Event(EventManager* m, std::string title)
   : title_(title),
     manager_(m),
     count_(0) {
-  vals_.resize(10);
+  vals_.resize(100);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
