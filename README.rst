@@ -101,9 +101,6 @@ in this guide:
      to install all Cyclus-related files
   #. you have acquired the Cyclus source code from the `Cyclus repo`_
   #. you have placed the Cyclus repository in .../cyclus/cyclus
-  #. you have a directory named .../cyclus/cyclus/build in which 
-     you plan to encapsulate all build-related files (they get in the
-     way otherwise)
   #. you have installed Cyclopts  to ../cyclus/install (see the `Cyclopts readme`_)
 
 Under these assumptions **and** if you used a package manager to 
@@ -111,9 +108,7 @@ install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
-    .../cyclus/cyclus$ mkdir build
-    .../cyclus/cyclus$ cd build
-    .../cyclus/cyclus/build$ python ../setup.py --prefix=../../install --cycloptsRoot=../../install
+    .../cyclus/cyclus$ python setup.py --prefix=../install --cyclopts_root=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
 installed in a non-standard location, you should make use of the 
@@ -122,7 +117,7 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus/build$  python ../setup.py --prefix=../../install --coinRoot=path/to/coin --cycloptsRoot=../../install
+    .../cyclus/cyclus$  python setup.py --prefix=../install --coin_root=path/to/coin --cyclopts_root=../install
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
@@ -130,7 +125,7 @@ you should make use of the boostRoot installation flag.
 .. code-block:: bash
 
 
-    .../cyclus/cyclus$ python ../setup.py --prefix=../../install --coinRoot=/path/to/coin --cycloptsRoot=../../install --boostRoot=/path/to/boost
+    .../cyclus/cyclus$ python setup.py --prefix=../install --coin_root=/path/to/coin --cyclopts_root=../install --boost_root=/path/to/boost
 
 Now, run it with some input file, for this example, call it 
 `input.xml`::
