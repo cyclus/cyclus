@@ -4,8 +4,8 @@
 #include "Timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr Event::addVal(const char* field, boost::any val) {
-  vals_.push_back(std::pair<const char*, boost::any>(field, val));
+event_ptr Event::addVal(const char* field, boost::spirit::hold_any val) {
+  vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
   return event_ptr(this);
 }
 
@@ -17,8 +17,8 @@ void Event::record() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Event::Event(EventManager* m, std::string title)
   : title_(title),
-    manager_(m),
-    count_(0) { }
+    manager_(m) {
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Event::~Event() { }

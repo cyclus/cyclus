@@ -7,7 +7,8 @@
 
 #include <list>
 #include <string>
-#include <boost/any.hpp>
+//#include <boost/spirit/home/support/detail/hold_any.hpp>
+#include "any.hpp"
 
 typedef boost::intrusive_ptr<Event> event_ptr;
 
@@ -19,7 +20,7 @@ class Event: IntrusiveBase<Event> {
     friend class EventManager;
 
   public:
-    typedef std::pair<const char*, boost::any> Entry;
+    typedef std::pair<const char*, boost::spirit::hold_any> Entry;
     typedef std::vector<Entry> Vals;
 
     virtual ~Event();
@@ -36,7 +37,7 @@ class Event: IntrusiveBase<Event> {
     @warning for the val argument - what variable types are supported
     depends on what the backend(s) in use are designed to handle.
     */
-    event_ptr addVal(const char* field, boost::any val);
+    event_ptr addVal(const char* field, boost::spirit::hold_any val);
 
     /*!
     Record this event to its EventManager. Recorded events of the same
@@ -54,7 +55,6 @@ class Event: IntrusiveBase<Event> {
   private:
     /// events should only be created via an EventManager
     Event(EventManager* m, std::string title);
-    int count_;
 
     EventManager* manager_;
     std::string title_;

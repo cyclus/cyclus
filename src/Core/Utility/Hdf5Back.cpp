@@ -124,20 +124,20 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
     const void* val;
     if (ti == typeid(int)) {
       for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<int>(a);
+        const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+        val = boost::spirit::any_cast<int>(a);
         memcpy(buf + rowsize * row + offset, val, field_size);
       }
     } else if (ti == typeid(double)) {
       for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<double>(a);
+        const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+        val = boost::spirit::any_cast<double>(a);
         memcpy(buf + rowsize * row + offset, val, field_size);
       }
     } else if (ti == typeid(std::string)) {
       for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        const std::string* s = boost::any_cast<std::string>(a);
+        const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+        const std::string* s = boost::spirit::any_cast<std::string>(a);
         val = s->c_str();
         size_t slen = std::min(s->size(), (unsigned long)STR_SIZE);
         memcpy(buf + rowsize * row + offset, val, slen);
@@ -145,8 +145,8 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
       }
     } else if (ti == typeid(float)) {
       for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<float>(a);
+        const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+        val = boost::spirit::any_cast<float>(a);
         memcpy(buf + rowsize * row + offset, val, field_size);
       }
     }

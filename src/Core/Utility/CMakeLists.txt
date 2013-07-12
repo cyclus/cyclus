@@ -63,6 +63,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   PARENT_SCOPE)
 
 INSTALL(FILES 
+  any.hpp
   Builder.h
   BuildingManager.h
   Commodity.h
