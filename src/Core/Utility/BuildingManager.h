@@ -121,7 +121,7 @@ namespace ActionBuilding {
        @param orders the set of orders to fill
        @param solution the solution determining how to fill the orders
      */
-    void constructBuildOrdersFromSolution(std::vector<BuildOrder>& orders,
+    void constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
                                           std::vector<Cyclopts::VariablePtr>& solution);
   private:
     /// the set of registered builders
