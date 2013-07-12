@@ -18,6 +18,7 @@ void Event::record() {
 Event::Event(EventManager* m, std::string title)
   : title_(title),
     manager_(m) {
+  vals_.reserve(10);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

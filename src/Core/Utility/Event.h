@@ -4,11 +4,10 @@
 
 #include "IntrusiveBase.h"
 #include "EventManager.h"
+#include "any.hpp"
 
 #include <list>
 #include <string>
-//#include <boost/spirit/home/support/detail/hold_any.hpp>
-#include "any.hpp"
 
 typedef boost::intrusive_ptr<Event> event_ptr;
 
