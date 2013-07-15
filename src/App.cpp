@@ -122,8 +122,8 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBack* sqlBack = new SqliteBack(EM->sim_id(), output_path);
-  EM->registerBackend(sqlBack);
+  SqliteBack sqlBack = SqliteBack(EM->sim_id(), output_path);
+  EM->registerBackend(&sqlBack);
 
   // sim construction - should be handled by some entity
   Model::constructSimulation();
