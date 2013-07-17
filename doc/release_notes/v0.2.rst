@@ -1,0 +1,112 @@
+========================
+Cyclus 0.2 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://cyclus.github.io/
+:Contact: cyclus-dev@googlegroups.com
+
+The Cyclus core team is excited to announce the second stable version 
+after over a year of development!  This includes nearly 1300 commits by 
+6 developers.  Major features include, 
+
+- A module separation effort. This required major changes to the building 
+  and testing system. See Cycamore [1].
+
+- Added tests and basic convenience features to various classes, mostly with 
+  respect to the critical material class.
+
+- Substantive performance improvements (~50x for some simulations).
+
+- Input code revamp.
+
+- Output recording code rewrite.  
+
+Changes from 0.1 to 0.2
+=======================
+
+New features
+------------
+
+- Added data type specification capability to rng system.
+- Made various ResourceBuffer, Material Class, and model memory management 
+  improvements and tests.
+- Made the relaxng schema system modular.
+- Made significant build system and installation changes to allow separating 
+  the modules into Cycamore and creating CycStub.
+- Moved modules into their own repository (Cycamore).
+- Improved or added material convenience functions for developers such as 
+  subtraction, un-normalization, and more.
+- Added significant testing in Material, CompMap, and related classes.
+- Added additional exception throwing for exceptional absorption and extraction 
+  cases (extracted too much, absorbed negative).
+- Made fixes to the build system to better address the needs of Mac OSX users.
+- Added libxml++ as a dependency.
+- Added features to the command line interface to allow output file 
+  specification.
+- Updated code base in accordance with Google Style Guide (0's to NULL when NULL 
+  is intended, prepended iterators, moved curly braces, etc.)
+- Expanded extraction by mass to allow various input units.
+- Added functions and tests for almost equality and thresholding in the 
+  material class.
+- Created the CycArithmetic class which holds tools for more sophisticated 
+  floating point arithmetic.
+- Fixed absorption method bug (#493, https://github.com/cyclus/cyclus/issues/493).
+- Substantive performance improvements (~50x for some simulations).
+- Easier to create/record custom data to output.  Modular, drop-in support for 
+  different output formats.  
+- Top-level simulation flow broken into clear module loading, simulation 
+  initialization/construction, simulation running, and module unloading steps.
+- Added ability to invoke daily actions (technically this reduces the timestep to 
+  a single day for modules that need to take advantage of the smaller granularity).
+- IsoVector's compmap encapsulated in a separate class.
+- IsoVector and material interfaces updated accordingly.
+- Added an enrichment toolkit to assist with SWU/NatlU calculations.
+- Added SWU/Natural uranium calculation methods.
+- Added a facility-building and management interface kit, allowing for 
+  intelligent facility build decision making.
+- Added a commodity supply/demand toolkit, providing an interface for 
+  supply/demand inquiry and supplier/demander registration with a manager.
+- Added a commodity production toolkit, providing an interface to query agents 
+  ability to produce commodities.
+- Added a toolkit for modeling general symbolic functions and factory methods 
+  to produce them.
+- Added derived classes to model linear, exponential, and piecewise functions.
+- Added a robust dynamic loading interface for dynamic libraries for easy opening, 
+  access, and closing.
+- Separated unix and windows-specific helper functions for dynamic loading.
+- Added a generic interface for input querying.
+- Added a specific interface for loading, parsing, and querying xml files, 
+  including rng schema verification.
+- Added interleaves to cyclus.rng's institution and region sections.
+- Added capacity members to cyclus.rng.
+
+Deprecations
+------------
+
+- Deprecated converter facilities.
+
+Known bugs
+----------
+
+- Known Bug (#514): decayed compositions are not recorded in output database.
+
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Matthew Gidden
+* Katy Huff
+* Anthony Scopatz*
+* Zach Welch*
+* Paul Wilson
+
+
+References
+==========
+
+[1] Cycamore: https://github.com/cyclus/cycamore
