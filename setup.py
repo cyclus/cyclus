@@ -57,13 +57,7 @@ def install_cyclus(args):
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir, shell=(os.name=='nt'))
 
 def main():
-    description = "Install Cyclus. Optional arguments include: " + \
-    "a path to the Cyclus source, " + \
-    "an installation prefix path, " + \
-    "a path to the coin-OR libraries, " + \
-    "a path to the Cyclopts installation, " + \
-    " and " + \
-    "a path to the Boost libraries." 
+    description = "A Cyclus installation helper script. For more information, please see cyclus.github.com." 
     parser = ap.ArgumentParser(description=description)
 
     build_dir = 'where to place the build directory'
