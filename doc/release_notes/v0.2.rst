@@ -18,6 +18,8 @@ after over a year of development!  This includes nearly 1300 commits by
 
 - Substantive performance improvements (~50x for some simulations).
 
+- Input code revamp.
+
 - Output recording code rewrite.  
 
 Changes from 0.1 to 0.2
