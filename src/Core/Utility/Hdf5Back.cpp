@@ -1,12 +1,14 @@
 
 #include "Hdf5Back.h"
 
-using namespace H5;
+#define STR_SIZE 16
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Hdf5Back::Hdf5Back(std::string path)
+Hdf5Back::Hdf5Back(const char* path)
     : path_(path) {
-  file_ = new H5File(H5std_string(path_), H5F_ACC_TRUNC );
+  file_ = H5Fcreate(path_, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  string_type_ = H5Tcopy(H5T_C_S1);
+  H5Tset_size(string_type_, STR_SIZE);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -14,11 +16,9 @@ void Hdf5Back::notify(EventList evts) {
   std::map<std::string, EventList> sets;
   for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
     std::string name = (*it)->title();
-    if (mtypes_.count(name) == 0) {
+    if (tbl_size_.count(name) == 0) {
       event_ptr ev = *it;
-      CompType* mtype = createMemType(ev);
-      mtypes_[ev->title()] = mtype;
-      datasets_[ev->title()] = createDataSet(ev->title(), mtype);
+      createTable(ev);
     }
     sets[name].push_back(*it);
   }
@@ -31,15 +31,15 @@ void Hdf5Back::notify(EventList evts) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::close() {
-  delete file_;
-  std::map<std::string, CompType*>::iterator it;
-  for (it = mtypes_.begin(); it != mtypes_.end(); ++it) {
-    delete (it->second);
-  }
+  H5Fclose(file_);
+  H5Tclose(string_type_);
 
-  std::map<std::string, DataSet*>::iterator it2;
-  for (it2 = datasets_.begin(); it2 != datasets_.end(); ++it2) {
-    delete (it2->second);
+  std::map<std::string, size_t*>::iterator it;
+  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
+    delete[] (it->second);
+  }
+  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
+    delete[] (it->second);
   }
 }
 
@@ -49,94 +49,76 @@ std::string Hdf5Back::name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CompType* Hdf5Back::createMemType(event_ptr ev) {
+void Hdf5Back::createTable(event_ptr ev) {
   Event::Vals vals = ev->vals();
-  std::vector<size_t> offsets;
-  offsets.resize(vals.size());
-  size_t size = 0;
-  size_t strSize = 16;
+
+  size_t dst_size = 0;
+  size_t* dst_offset = new size_t[vals.size()];
+  size_t* dst_sizes = new size_t[vals.size()];
+  hid_t field_types[vals.size()];
+  const char* field_names[vals.size()];
   for (int i = 0; i < vals.size(); ++i) {
+    dst_offset[i] = dst_size;
+   field_names[i] = vals[i].first;
     if (vals[i].second.type() == typeid(int)) {
-      offsets[i] = size;
-      size += sizeof(int);
+      field_types[i] = H5T_NATIVE_INT;
+      dst_sizes[i] = sizeof(int);
+      dst_size += sizeof(int);
     } else if (vals[i].second.type() == typeid(double)) {
-      offsets[i] = size;
-      size += sizeof(double);
+      field_types[i] = H5T_NATIVE_DOUBLE;
+      dst_sizes[i] = sizeof(double);
+      dst_size += sizeof(double);
     } else if (vals[i].second.type() == typeid(std::string)) {
-      offsets[i] = size;
-      size += strSize;
+      field_types[i] = string_type_;
+      dst_sizes[i] = STR_SIZE;
+      dst_size += STR_SIZE;
     } else if (vals[i].second.type() == typeid(float)) {
-      offsets[i] = size;
-      size += sizeof(float);
+      field_types[i] = H5T_NATIVE_FLOAT;
+      dst_sizes[i] = sizeof(float);
+      dst_size += sizeof(float);
     }
   }
 
-  CompType* mtype = new CompType(size);
-  for (int i = 0; i < vals.size(); ++i) {
-    H5std_string field(vals[i].first);
-    if (vals[i].second.type() == typeid(int)) {
-      mtype->insertMember(field, offsets[i], PredType::NATIVE_INT);
-    } else if (vals[i].second.type() == typeid(double)) { mtype->insertMember(field, offsets[i], PredType::NATIVE_DOUBLE);
-    } else if (vals[i].second.type() == typeid(std::string)) {
-      mtype->insertMember(field, offsets[i], StrType(0, strSize));
-    } else if (vals[i].second.type() == typeid(float)) {
-      mtype->insertMember(field, offsets[i], PredType::NATIVE_FLOAT);
-    }
-  }
-
-  dataset_sizes_[ev->title()] = size;
-  return mtype;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DataSet* Hdf5Back::createDataSet(std::string title, CompType* mtype) {
-  int length = 0;
-  int rank = 1;
-  hsize_t dim[] = {length};
-  hsize_t maxdims[] = {H5S_UNLIMITED};
-
-  DataSpace space(rank, dim, maxdims);
-
+  herr_t status;
+  const char* title = ev->title().c_str();
+  int compress = 0;
   int chunk_size = 50000;
-  DSetCreatPropList cparms;
-  hsize_t chunk_dims[] = {chunk_size};
-  cparms.setChunk(rank, chunk_dims);
+  void* fill_data = NULL;
+  void* data = NULL;
 
-  return new DataSet(file_->createDataSet(title, *mtype, space, cparms));
+  status = H5TBmake_table(title, file_, title, vals.size(), 0, dst_size,
+      field_names, dst_offset, field_types, chunk_size, fill_data, compress,
+      data);
+
+  // record everything for later
+  tbl_offset_[ev->title()] = dst_offset;
+  tbl_size_[ev->title()] = dst_size;
+  tbl_sizes_[ev->title()] = dst_sizes;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::writeSet(EventList& set) {
   std::string title = set[0]->title();
-  CompType* mtype = mtypes_[title];
-  size_t rowsize = dataset_sizes_[title];
+  herr_t status;
+
+  size_t* offsets = tbl_offset_[title];
+  size_t* sizes = tbl_sizes_[title];
+  size_t rowsize = tbl_size_[title];
+
 
   char* buf = new char[set.size() * rowsize];
-  fillBuf(buf, set, mtype, rowsize);
+  fillBuf(buf, set, sizes, rowsize);
 
-  DataSet* dataset = datasets_[title];
-  hsize_t hoffset[] = {dataset->getSpace().getSimpleExtentNpoints()};
-  hsize_t dim[] = {set.size() + hoffset[0]};
-  hsize_t dim2[] = {set.size()};
-  dataset->extend(dim);
-
-  int rank = 1;
-  DataSpace fspace = dataset->getSpace();
-  DataSpace mspace(rank, dim2);
-  fspace.selectHyperslab(H5S_SELECT_SET, dim2, hoffset);
-  dataset->write(buf, *mtype, mspace, fspace);
-
+  status = H5TBappend_records(file_, title.c_str(), set.size(), rowsize, offsets, sizes, buf);
   delete[] buf;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::fillBuf(char* buf, EventList& set, CompType* mtype, size_t rowsize) {
+void Hdf5Back::fillBuf(char* buf, EventList& set, size_t* sizes, size_t rowsize) {
   Event::Vals header = set[0]->vals();
   size_t offset = 0;
   for (int col = 0; col < header.size(); ++col) {
-    H5std_string field(header[col].first);
-    int num = mtype->getMemberIndex(field);
-    size_t field_size = mtype->getMemberDataType(num).getSize();
+    size_t field_size = sizes[col];
     const std::type_info& ti = header[col].second.type();
     const void* val;
     if (ti == typeid(int)) {
