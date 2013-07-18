@@ -4,6 +4,7 @@
 #include <string>
 #include "boost/program_options.hpp"
 #include "boost/shared_ptr.hpp"
+#include "boost/filesystem.hpp"
 
 #include "Model.h"
 #include "Timer.h"
@@ -13,9 +14,11 @@
 #include "XMLFileLoader.h"
 #include "EventManager.h"
 #include "SqliteBack.h"
+#include "Hdf5Back.h"
 
 using namespace std;
 namespace po = boost::program_options;
+namespace fs = boost::filesystem;
 
 //-----------------------------------------------------------------------
 // Main entry point for the test application...
@@ -122,8 +125,15 @@ int main(int argc, char* argv[]) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
-  SqliteBack sqlBack(EM->sim_id(), output_path);
-  EM->registerBackend(&sqlBack);
+
+  std::string ext = fs::path(output_path).extension().generic_string();
+  EventBackend* back;
+  if (ext == ".hdf5") {
+    back = new Hdf5Back(output_path.c_str());
+  } else {
+    back = new SqliteBack(EM->sim_id(), output_path);
+  }
+  EM->registerBackend(back);
 
   // sim construction - should be handled by some entity
   Model::constructSimulation();
@@ -140,6 +150,7 @@ int main(int argc, char* argv[]) {
   }
 
   EM->close();
+  delete back;
 
   // Close Dynamically loaded modules 
   try {
