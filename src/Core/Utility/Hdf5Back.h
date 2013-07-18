@@ -8,7 +8,11 @@
 #include <list>
 #include <string>
 
-/// Records simulation data in HDF5 format.
+/*!
+An EventManager backend that writes data to an hdf5 file.
+Identically named events have their data placed as rows in a single table.
+Handles the following event value types: int, float, double, std::string.
+*/
 class Hdf5Back : public EventBackend {
 
   public:

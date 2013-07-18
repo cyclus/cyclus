@@ -16,7 +16,7 @@ class FileDeleter {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(Hdf5BackTest, ReadWrite) {
-  //FileDeleter fd(path);
+  FileDeleter fd(path);
 
   int i = 1;
   double d = 2.2;
