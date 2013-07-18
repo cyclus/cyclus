@@ -1,6 +1,5 @@
 // Hdf5Back.h
-#if !defined(_HDF5BACK_H)
-#define _HDF5BACK_H
+#pragma once
 
 #include "EventBackend.h"
 #include "hdf5.h"
@@ -51,6 +50,3 @@ class Hdf5Back : public EventBackend {
     std::map<std::string, size_t*> tbl_sizes_;
     std::map<std::string, size_t> tbl_size_;
 };
-
-#endif
-
