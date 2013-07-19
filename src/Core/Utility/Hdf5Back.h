@@ -36,11 +36,11 @@ class Hdf5Back : public EventBackend {
     /// creates and initializes an hdf5 table
     void createTable(event_ptr ev);
 
-    /// write a set of events with the same title to their corresponding hdf5 dataset
-    void writeSet(EventList& set);
+    /// write a group of events with the same title to their corresponding hdf5 dataset
+    void writeGroup(EventList& group);
 
-    /// fill a contiguous memory buffer with data from set for writing to an hdf5 dataset.
-    void fillBuf(char* buf, EventList& set, size_t* sizes, size_t rowsize);
+    /// fill a contiguous memory buffer with data from group for writing to an hdf5 dataset.
+    void fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize);
 
     /// An interface to a sqlite db managed by the SqliteBack class.
     hid_t file_;
