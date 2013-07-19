@@ -354,6 +354,11 @@ namespace boost { namespace spirit
                 *reinterpret_cast<T const*>(object);
         }
 
+        const void* castsmallvoid() const
+        {
+          return &object;
+        }
+
 // implicit casting is disabled by default for compatibility with boost::any
 #ifdef BOOST_SPIRIT_ANY_IMPLICIT_CASTING
         // automatic casting operator
