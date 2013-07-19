@@ -45,6 +45,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Hdf5Back.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/LMatrix.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayer.cpp 
@@ -76,6 +77,7 @@ INSTALL(FILES
   Event.h
   EventBackend.h
   EventManager.h
+  Hdf5Back.h
   IntrusiveBase.h
   LMatrix.h
   Logger.h

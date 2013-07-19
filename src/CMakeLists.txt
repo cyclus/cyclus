@@ -76,6 +76,12 @@ FIND_PACKAGE( Sqlite3 REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
+# Find HDF5
+FIND_PACKAGE( HDF5 REQUIRED)
+SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
+ADD_DEFINITIONS(${HDF5_DEFINITIONS})
+set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
+
 # Include the boost header files and the program_options library
 # Please be sure to use Boost rather than BOOST. 
 # Capitalization matters on some platforms

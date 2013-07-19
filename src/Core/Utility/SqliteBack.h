@@ -29,6 +29,8 @@ class SqliteBack: public EventBackend {
     */
     SqliteBack(std::string sim_id, std::string path);
 
+    virtual ~SqliteBack() {};
+
     /*!
     Write events immediately to the database as a single transaction.
 
