@@ -4,9 +4,9 @@
 #define STR_SIZE 16
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Hdf5Back::Hdf5Back(const char* path)
+Hdf5Back::Hdf5Back(std::string path)
     : path_(path) {
-  file_ = H5Fcreate(path_, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   string_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(string_type_, STR_SIZE);
 }

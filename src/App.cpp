@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
 
   std::string ext = fs::path(output_path).extension().generic_string();
   EventBackend* back;
-  if (ext == ".hdf5") {
+  if (ext == ".h5") {
     back = new Hdf5Back(output_path.c_str());
   } else {
     back = new SqliteBack(EM->sim_id(), output_path);

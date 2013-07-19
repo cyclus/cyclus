@@ -5,7 +5,7 @@
 
 #include "Hdf5Back.h"
 
-static const char* path = "testdb.hdf5";
+static const char* path = "testdb.h5";
 
 class FileDeleter {
   public:

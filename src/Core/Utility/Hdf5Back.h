@@ -20,7 +20,7 @@ class Hdf5Back : public EventBackend {
     // Creates a new backend writing data to the specified file.
     //
     // @param path the file to write to. If it exists, it will be overwritten.
-    Hdf5Back(const char* path);
+    Hdf5Back(std::string path);
 
     virtual ~Hdf5Back() {};
 
@@ -48,7 +48,7 @@ class Hdf5Back : public EventBackend {
     hid_t string_type_;
 
     /// Stores the database's path+name, declared during construction.
-    const char* path_;
+    std::string path_;
 
     std::map<std::string, size_t*> tbl_offset_;
     std::map<std::string, size_t*> tbl_sizes_;
