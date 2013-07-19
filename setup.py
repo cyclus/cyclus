@@ -38,6 +38,8 @@ def install_cyclus(args):
         cmake_cmd = ['cmake', os.path.abspath(src_dir)]
         if args.prefix:
             cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' + absexpanduser(args.prefix)]
+        if args.cmake_prefix_path:
+            cmake_cmd += ['-DCMAKE_PREFIX_PATH=' + absexpanduser(args.cmake_prefix_path)]
         if args.coin_root:
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
@@ -55,13 +57,8 @@ def install_cyclus(args):
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir, shell=(os.name=='nt'))
 
 def main():
-    description = "Install Cyclus. Optional arguments include: " + \
-    "a path to the Cyclus source, " + \
-    "an installation prefix path, " + \
-    "a path to the coin-OR libraries, " + \
-    "a path to the Cyclopts installation, " + \
-    " and " + \
-    "a path to the Boost libraries." 
+    description = "A Cyclus installation helper script. "+\
+        "For more information, please see cyclus.github.com." 
     parser = ap.ArgumentParser(description=description)
 
     build_dir = 'where to place the build directory'
@@ -84,6 +81,10 @@ def main():
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
+
+    cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
+        "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
+    parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
     install_cyclus(parser.parse_args())
 
