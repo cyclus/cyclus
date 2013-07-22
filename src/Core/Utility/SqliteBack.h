@@ -67,10 +67,10 @@ class SqliteBack: public EventBackend {
     std::string valAsString(boost::spirit::hold_any v);
 
     /// Queue up a table-create command for e.
-    void createTable(event_ptr e);
+    void createTable(Event* e);
 
     /// constructs an SQL INSERT command for e and queues it for db insertion.
-    void writeEvent(event_ptr e);
+    void writeEvent(Event* e);
 
     /// An interface to a sqlite db managed by the SqliteBack class.
     SqliteDb db_;

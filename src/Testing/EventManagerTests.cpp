@@ -34,7 +34,7 @@ class TestBack : public EventBackend {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_NewEvent) {
   EventManager m;
-  event_ptr ev = m.newEvent("DumbTitle");
+  Event* ev = m.newEvent("DumbTitle");
   EXPECT_EQ(ev->title(), "DumbTitle");
 }
 
@@ -49,9 +49,6 @@ TEST(EventManagerTest, Manager_GetSetDumpFreq) {
   EventManager m;
   m.set_dump_count(1);
   EXPECT_EQ(m.dump_count(), 1);
-
-  m.set_dump_count(-1);
-  EXPECT_EQ(m.dump_count(), -1);
 
   m.set_dump_count(kDefaultDumpCount);
   EXPECT_EQ(m.dump_count(), kDefaultDumpCount);
@@ -125,7 +122,7 @@ TEST(EventManagerTest, Event_record) {
   m.set_dump_count(1);
   m.registerBackend(&back);
 
-  event_ptr ev = m.newEvent("DumbTitle");
+  Event* ev = m.newEvent("DumbTitle");
   ev->addVal("animal", std::string("monkey"));
 
   EXPECT_EQ(back.flush_count, 0);
@@ -141,7 +138,7 @@ TEST(EventManagerTest, Event_addVal) {
   EventManager m;
   m.registerBackend(&back);
 
-  event_ptr ev = m.newEvent("DumbTitle");
+  Event* ev = m.newEvent("DumbTitle");
   ev->addVal("animal", std::string("monkey"));
   ev->addVal("weight", 10);
   ev->addVal("height", 5.5);
