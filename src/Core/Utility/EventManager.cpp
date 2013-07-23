@@ -5,7 +5,6 @@
 #include "Event.h"
 #include "Logger.h"
 
-#include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
@@ -13,11 +12,9 @@
 EventManager* EventManager::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager::EventManager() {
-  boost::uuids::uuid uuid = boost::uuids::random_generator()();
-  uuid_ = boost::lexical_cast<std::string>(uuid);
+EventManager::EventManager() : index_(0) {
+  uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
-  index_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -41,13 +38,8 @@ unsigned int EventManager::dump_count() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::setSimPrefix(std::string val) {
-  prefix_ = val + "_";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string EventManager::sim_id() {
-  return prefix_ + uuid_;
+boost::uuids::uuid EventManager::sim_id() {
+  return uuid_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,7 +50,9 @@ void EventManager::set_dump_count(unsigned int count) {
   events_.clear();
   events_.reserve(count);
   for (int i = 0; i < count; ++i) {
-    events_.push_back(new Event(this, ""));
+    Event* ev = new Event(this, "");
+    ev->addVal("SimID", uuid_);
+    events_.push_back(ev);
   }
   dump_count_ = count;
 }
@@ -67,7 +61,7 @@ void EventManager::set_dump_count(unsigned int count) {
 Event* EventManager::newEvent(std::string title) {
   Event* ev = events_[index_];
   ev->title_ = title;
-  ev->vals_.clear();
+  ev->vals_.resize(1);
   index_++;
   return ev;
 }

@@ -83,7 +83,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <define name="control">
     <element name ="control">
       <interleave>
-        <ref name="simprefix"/>
+        <ref name="simhandle"/>
         <ref name="duration"/>
         <ref name="startmonth"/>
         <ref name="startyear"/>
@@ -93,9 +93,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </element>
   </define>
 
-  <define name="simprefix">
+  <define name="simhandle">
     <optional>
-      <element name="simprefix">
+      <element name="simhandle">
         <data type="string"/>
       </element>
     </optional>

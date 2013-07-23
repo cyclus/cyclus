@@ -8,10 +8,6 @@
 #include <list>
 #include <string>
 
-static std::string const kShortSimId = "SimId";
-static std::string const kLongSimId = "LongId";
-static std::string const kSimIdTable = "SimulationIds";
-
 /*!
 An EventManager backend that writes data to an sqlite database.
 Identically named events have their data placed as rows in a single table.
@@ -24,10 +20,9 @@ class SqliteBack: public EventBackend {
     Creates a new sqlite backend that will write to the database file
     specified by path. If the file doesn't exist, a new one is created.
 
-    @param sim_id the unique simulation id (i.e. from EventManager)
     @param path the filepath (including name) to write the sqlite file.
     */
-    SqliteBack(std::string sim_id, std::string path);
+    SqliteBack(std::string path);
 
     virtual ~SqliteBack() {};
 
@@ -54,9 +49,6 @@ class SqliteBack: public EventBackend {
 
   private:
 
-    /// Retrieves or creates an int id corresponding to the global EM->sim_id()
-    unsigned int getShortId(std::string sim_id);
-
     /// returns true if the table name already exists.
     bool tableExists(std::string name);
 
@@ -80,10 +72,6 @@ class SqliteBack: public EventBackend {
 
     /// table names already existing (created) in the sqlite db.
     StrList tbl_names_;
-
-    /// the short for used to tag every output row as belonging to a
-    /// specific simulation.
-    unsigned int short_sim_id_;
 };
 
 #endif

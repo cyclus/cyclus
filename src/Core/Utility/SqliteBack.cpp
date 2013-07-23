@@ -7,9 +7,10 @@
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SqliteBack::SqliteBack(std::string sim_id, std::string path)
+SqliteBack::SqliteBack(std::string path)
     : db_(path) {
   path_ = path;
   db_.open();
@@ -20,8 +21,6 @@ SqliteBack::SqliteBack(std::string sim_id, std::string path)
   for (int i = 0; i < rows.size(); ++i) {
     tbl_names_.push_back(rows.at(i).at(0));
   }
-
-  short_sim_id_ = getShortId(sim_id);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,24 +36,6 @@ void SqliteBack::notify(EventList evts) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::close() {
-  if (tableExists("Agent")) {
-    // merge agent and agentdeaths tables into the agent table
-    std::string cmd;
-    if (!tableExists("Agents")) {
-      cmd = "CREATE TABLE Agents AS ";
-      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
-      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
-      cmds_.push_back(cmd);
-    } else {
-      cmd = "INSERT INTO Agents ";
-      cmd += "SELECT A.SimId,ID,AgentType,ModelType,Prototype,ParentID,EnterDate,DeathDate ";
-      cmd += "FROM Agent AS A INNER JOIN AgentDeaths AS AD ON (A.ID=AD.AgentID AND A.SimId=AD.SimId);";
-      cmds_.push_back(cmd);
-    }
-    cmds_.push_back("DROP TABLE Agent");
-    cmds_.push_back("DROP TABLE AgentDeaths");
-  }
-
   flush();
   db_.close();
 }
@@ -69,11 +50,14 @@ void SqliteBack::createTable(Event* e) {
   std::string name = e->title();
   tbl_names_.push_back(name);
 
-  std::string cmd = "CREATE TABLE " + name + " (" + kShortSimId + " INTEGER";
   Event::Vals vals = e->vals();
-  Event::Vals::iterator it;
-  for (it = vals.begin(); it != vals.end(); ++it) {
+  Event::Vals::iterator it = vals.begin();
+  std::string cmd = "CREATE TABLE " + name + " (";
+  cmd += std::string(it->first) + " " + valType(it->second);
+  ++it;
+  while (it != vals.end()) {
     cmd += ", " + std::string(it->first) + " " + valType(it->second);
+    ++it;
   }
 
   cmd += ");";
@@ -81,42 +65,13 @@ void SqliteBack::createTable(Event* e) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-unsigned int SqliteBack::getShortId(std::string sim_id) {
-  std::string cmd, retrieve;
-  if (! tableExists(kSimIdTable)) {
-    tbl_names_.push_back(kSimIdTable);
-    cmd = "CREATE TABLE " + kSimIdTable + " ("
-          + kShortSimId + " INTEGER PRIMARY KEY, "
-          + kLongSimId + " INTEGER);";
-    db_.execute(cmd);
-  }
-
-  retrieve = "SELECT " + kShortSimId + " FROM " + kSimIdTable + " WHERE "
-             + kLongSimId + "='" + sim_id + "'";
-  std::vector<StrList> rows = db_.query(retrieve);
-
-  if (rows.size() != 1) {
-    cmd = "INSERT INTO " + kSimIdTable + " (" + kLongSimId
-          + ") VALUES ('" + sim_id + "');";
-    db_.execute(cmd);
-    rows = db_.query(retrieve);
-  }
-
-  return boost::lexical_cast<unsigned int>(rows.at(0).at(0));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::valType(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
-  } else if (v.type() == typeid(float)) {
+  } else if (v.type() == typeid(float) || v.type() == typeid(double)) {
     return "REAL";
-  } else if (v.type() == typeid(double)) {
-    return "REAL";
-  } else if (v.type() == typeid(std::string)) {
-    return "VARCHAR(128)";
   }
-  return "VARCHAR(128)";
+  return "TEXT";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -129,11 +84,14 @@ void SqliteBack::writeEvent(Event* e) {
   std::stringstream colss, valss, cmd;
   Event::Vals vals = e->vals();
 
-  colss << kShortSimId;
-  valss << short_sim_id_;
-  for (Event::Vals::iterator it = vals.begin(); it != vals.end(); ++it) {
+  Event::Vals::iterator it = vals.begin();
+  colss << it->first;
+  valss << valAsString(it->second);
+  ++it;
+  while (it != vals.end()) {
     colss << ", " << it->first;
     valss << ", " << valAsString(it->second);
+    ++it;
   }
 
   cmd << "INSERT INTO " << e->title() << " (" << colss.str() << ") "
@@ -146,17 +104,21 @@ std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
   // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
     std::stringstream ss;
-    ss << boost::spirit::any_cast<int>(v);
+    ss << v.cast<int>();
     return ss.str();
   } else if (v.type() == typeid(double)) {
     std::stringstream ss;
-    ss << boost::spirit::any_cast<double>(v);
+    ss << v.cast<double>();
     return ss.str();
   } else if (v.type() == typeid(std::string)) {
-    return "\"" + boost::spirit::any_cast<std::string>(v) + "\"";
+    return "\"" + v.cast<std::string>() + "\"";
+  } else if (v.type() == typeid(boost::uuids::uuid)) {
+    char data[16];
+    boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
+    return "\"" + boost::lexical_cast<std::string>(ui) + "\"";
   } else if (v.type() == typeid(float)) {
     std::stringstream ss;
-    ss << boost::spirit::any_cast<float>(v);
+    ss << v.cast<float>();
     return ss.str();
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "

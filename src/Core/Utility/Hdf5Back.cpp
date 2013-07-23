@@ -75,6 +75,10 @@ void Hdf5Back::createTable(Event* ev) {
       field_types[i] = string_type_;
       dst_sizes[i] = STR_SIZE;
       dst_size += STR_SIZE;
+    } else if (vals[i].second.type() == typeid(boost::uuids::uuid)) {
+      field_types[i] = string_type_;
+      dst_sizes[i] = STR_SIZE;
+      dst_size += STR_SIZE;
     } else if (vals[i].second.type() == typeid(float)) {
       field_types[i] = H5T_NATIVE_FLOAT;
       dst_sizes[i] = sizeof(float);
@@ -118,9 +122,16 @@ void Hdf5Back::writeGroup(EventList& group) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
   Event::Vals header = group.front()->vals();
-  bool is_string[header.size()];
+  int valtype[header.size()];
+  enum Type{Tstr, Tnum, Tuuid};
   for (int col = 0; col < header.size(); ++col) {
-    is_string[col] = header[col].second.type() == typeid(std::string);
+    if (header[col].second.type() == typeid(std::string)) {
+      valtype[col] = Tstr;
+    } else if (header[col].second.type() == typeid(boost::uuids::uuid)) {
+      valtype[col] = Tuuid;
+    } else {
+      valtype[col] = Tnum;
+    }
   }
 
   size_t offset = 0;
@@ -129,14 +140,27 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
   for (it = group.begin(); it != group.end(); ++it) {
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
-      if (is_string[col]) {
-        const std::string s = a->cast<std::string>();
-        size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
-        memcpy(buf + offset, s.c_str(), slen);
-        memset(buf + offset + slen, 0, STR_SIZE - slen);
-      } else {
-        val = a->castsmallvoid();
-        memcpy(buf + offset, val, sizes[col]);
+      switch (valtype[col]) {
+      case Tnum:
+        {
+          val = a->castsmallvoid();
+          memcpy(buf + offset, val, sizes[col]);
+          break;
+        }
+      case Tstr:
+        {
+          const std::string s = a->cast<std::string>();
+          size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
+          memcpy(buf + offset, s.c_str(), slen);
+          memset(buf + offset + slen, 0, STR_SIZE - slen);
+          break;
+        }
+      case Tuuid:
+        {
+          boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
+          memcpy(buf + offset, &uuid, STR_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }

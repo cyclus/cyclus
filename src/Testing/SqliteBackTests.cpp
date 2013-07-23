@@ -2,12 +2,14 @@
 #include <gtest/gtest.h>
 
 #include "SqliteBack.h"
+#include "boost/lexical_cast.hpp"
+#include <boost/uuid/uuid_io.hpp>
 
 static std::string const path = "testdb.sqlite";
 
 class FlushCatcher: public SqliteBack {
   public:
-    FlushCatcher(std::string sim_id, std::string path) : SqliteBack(sim_id, path) { };
+    FlushCatcher(std::string path) : SqliteBack(path) { };
     StrList cmds;
 
   protected:
@@ -35,7 +37,7 @@ class FileDeleter {
 TEST(SqliteBackTest, CmdGenRegression) {
   FileDeleter fd(path);
   EventManager m;
-  FlushCatcher back("fake-uuid", path);
+  FlushCatcher back(path);
   m.registerBackend(&back);
 
   m.newEvent("DumbTitle")
@@ -56,37 +58,12 @@ TEST(SqliteBackTest, CmdGenRegression) {
 
   m.close();
 
+  std::string sid = boost::lexical_cast<std::string>(m.sim_id());
+
   ASSERT_EQ(back.cmds.size(), 4);
-  EXPECT_EQ(back.cmds.at(0), "CREATE TABLE DumbTitle (" + kShortSimId + " INTEGER, animal VARCHAR(128), weight INTEGER, height REAL);");
-  EXPECT_EQ(back.cmds.at(1), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, weight, height) VALUES (1, \"monkey\", 10, 5.5);");
-  EXPECT_EQ(back.cmds.at(2), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, weight) VALUES (1, \"elephant\", 1000);");
-  EXPECT_EQ(back.cmds.at(3), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, height) VALUES (1, \"sea cucumber\", 1.2);");
+  EXPECT_EQ(back.cmds.at(0), "CREATE TABLE DumbTitle (SimID TEXT, animal TEXT, weight INTEGER, height REAL);");
+  EXPECT_EQ(back.cmds.at(1), "INSERT INTO DumbTitle (SimID, animal, weight, height) VALUES (\"" + sid + "\", \"monkey\", 10, 5.5);");
+  EXPECT_EQ(back.cmds.at(2), "INSERT INTO DumbTitle (SimID, animal, weight) VALUES (\"" + sid + "\", \"elephant\", 1000);");
+  EXPECT_EQ(back.cmds.at(3), "INSERT INTO DumbTitle (SimID, animal, height) VALUES (\"" + sid + "\", \"sea cucumber\", 1.2);");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(SqliteBackTest, MultiSim) {
-  FileDeleter fd(path);
-  EventManager m1, m2;
-
-  FlushCatcher back1("uuid-1", path);
-  m1.registerBackend(&back1);
-  m1.newEvent("DumbTitle")
-   ->addVal("animal", std::string("monkey"))
-   ->addVal("weight", 10)
-   ->record();
-  m1.close();
-
-  FlushCatcher back2("uuid-2", path);
-  m2.registerBackend(&back2);
-  m2.newEvent("DumbTitle")
-   ->addVal("animal", std::string("elephant"))
-   ->addVal("weight", 7)
-   ->record();
-  m2.close();
-
-  ASSERT_EQ(back1.cmds.size(), 2);
-  EXPECT_EQ(back1.cmds.at(0), "CREATE TABLE DumbTitle (" + kShortSimId + " INTEGER, animal VARCHAR(128), weight INTEGER);");
-  EXPECT_EQ(back1.cmds.at(1), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, weight) VALUES (1, \"monkey\", 10);");
-  ASSERT_EQ(back2.cmds.size(), 1);
-  EXPECT_EQ(back2.cmds.at(0), "INSERT INTO DumbTitle (" + kShortSimId + ", animal, weight) VALUES (2, \"elephant\", 7);");
-}
