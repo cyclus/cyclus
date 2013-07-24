@@ -117,40 +117,27 @@ void Hdf5Back::writeGroup(EventList& group) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
   Event::Vals header = group[0]->vals();
-  size_t offset = 0;
+  bool is_string[header.size()];
   for (int col = 0; col < header.size(); ++col) {
-    size_t field_size = sizes[col];
-    const std::type_info& ti = header[col].second.type();
-    const void* val;
-    if (ti == typeid(int)) {
-      for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<int>(a);
-        memcpy(buf + rowsize * row + offset, val, field_size);
+    is_string[col] = header[col].second.type() == typeid(std::string);
+  }
+
+  size_t offset = 0;
+  const void* val;
+  for (int row = 0; row < group.size(); ++row) {
+    for (int col = 0; col < header.size(); ++col) {
+      const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+      if (is_string[col]) {
+        const std::string s = a->cast<std::string>();
+        size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
+        memcpy(buf + offset, s.c_str(), slen);
+        memset(buf + offset + slen, 0, STR_SIZE - slen);
+      } else {
+        val = a->castsmallvoid();
+        memcpy(buf + offset, val, sizes[col]);
       }
-    } else if (ti == typeid(double)) {
-      for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<double>(a);
-        memcpy(buf + rowsize * row + offset, val, field_size);
-      }
-    } else if (ti == typeid(std::string)) {
-      for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        const std::string* s = boost::any_cast<std::string>(a);
-        val = s->c_str();
-        size_t slen = std::min(s->size(), (unsigned long)STR_SIZE);
-        memcpy(buf + rowsize * row + offset, val, slen);
-        memset(buf + rowsize * row + offset + s->size(), 0, STR_SIZE - slen);
-      }
-    } else if (ti == typeid(float)) {
-      for (int row = 0; row < group.size(); ++row) {
-        const boost::any* a = &group[row]->vals()[col].second;
-        val = boost::any_cast<float>(a);
-        memcpy(buf + rowsize * row + offset, val, field_size);
-      }
+      offset += sizes[col];
     }
-    offset += field_size;
   }
 }
 

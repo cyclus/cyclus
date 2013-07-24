@@ -106,7 +106,7 @@ unsigned int SqliteBack::getShortId(std::string sim_id) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SqliteBack::valType(boost::any v) {
+std::string SqliteBack::valType(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
   } else if (v.type() == typeid(float)) {
@@ -142,21 +142,21 @@ void SqliteBack::writeEvent(event_ptr e) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SqliteBack::valAsString(boost::any v) {
+std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
   // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
     std::stringstream ss;
-    ss << boost::any_cast<int>(v);
+    ss << boost::spirit::any_cast<int>(v);
     return ss.str();
   } else if (v.type() == typeid(double)) {
     std::stringstream ss;
-    ss << boost::any_cast<double>(v);
+    ss << boost::spirit::any_cast<double>(v);
     return ss.str();
   } else if (v.type() == typeid(std::string)) {
-    return "\"" + boost::any_cast<std::string>(v) + "\"";
+    return "\"" + boost::spirit::any_cast<std::string>(v) + "\"";
   } else if (v.type() == typeid(float)) {
     std::stringstream ss;
-    ss << boost::any_cast<float>(v);
+    ss << boost::spirit::any_cast<float>(v);
     return ss.str();
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "

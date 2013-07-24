@@ -151,19 +151,19 @@ TEST(EventManagerTest, Event_addVal) {
 
   Event::Vals::const_iterator it = ev->vals().begin();
   EXPECT_EQ(it->first, "animal");
-  EXPECT_EQ(boost::any_cast<std::string>(it->second), "monkey");
+  EXPECT_EQ(boost::spirit::any_cast<std::string>(it->second), "monkey");
   ++it;
   EXPECT_EQ(it->first, "weight");
-  EXPECT_EQ(boost::any_cast<int>(it->second), 10);
+  EXPECT_EQ(boost::spirit::any_cast<int>(it->second), 10);
   ++it;
   EXPECT_EQ(it->first, "height");
-  EXPECT_DOUBLE_EQ(boost::any_cast<double>(it->second), 5.5);
+  EXPECT_DOUBLE_EQ(boost::spirit::any_cast<double>(it->second), 5.5);
 
   m.close();
 
   Event::Vals vals = back.events.back()->vals();
   ASSERT_EQ(vals.size(), 3);
   EXPECT_EQ(vals.front().first, "animal");
-  EXPECT_EQ(boost::any_cast<std::string>(vals.front().second), "monkey");
+  EXPECT_EQ(boost::spirit::any_cast<std::string>(vals.front().second), "monkey");
 }
 
