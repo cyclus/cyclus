@@ -61,10 +61,10 @@ class SqliteBack: public EventBackend {
     bool tableExists(std::string name);
 
     /// returns a valid sql data type name for v (e.g.  INT, REAL, VARCHAR(128), etc).
-    std::string valType(boost::any v);
+    std::string valType(boost::spirit::hold_any v);
 
     /// converts the value to a string insertable into the sqlite db.
-    std::string valAsString(boost::any v);
+    std::string valAsString(boost::spirit::hold_any v);
 
     /// Queue up a table-create command for e.
     void createTable(event_ptr e);
