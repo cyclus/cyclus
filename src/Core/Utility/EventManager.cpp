@@ -3,6 +3,7 @@
 #include "EventManager.h"
 #include "EventBackend.h"
 #include "Event.h"
+#include "Logger.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -12,9 +13,18 @@
 EventManager* EventManager::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager::EventManager() : dump_count_(kDefaultDumpCount) {
+EventManager::EventManager() {
   boost::uuids::uuid uuid = boost::uuids::random_generator()();
   uuid_ = boost::lexical_cast<std::string>(uuid);
+  set_dump_count(kDefaultDumpCount);
+  index_ = 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+EventManager::~EventManager() {
+  for (int i = 0; i < events_.size(); ++i) {
+    delete events_[i];
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,25 +52,36 @@ std::string EventManager::sim_id() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::set_dump_count(unsigned int count) {
+  for (int i = 0; i < events_.size(); ++i) {
+    delete events_[i];
+  }
+  events_.clear();
+  events_.reserve(count);
+  for (int i = 0; i < count; ++i) {
+    events_.push_back(new Event(this, ""));
+  }
   dump_count_ = count;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-event_ptr EventManager::newEvent( std::string title) {
-  event_ptr ev(new Event(this, title));
+Event* EventManager::newEvent(std::string title) {
+  Event* ev = events_[index_];
+  ev->title_ = title;
+  ev->vals_.clear();
+  index_++;
   return ev;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::addEvent(event_ptr ev) {
-  events_.push_back(ev);
-  if (events_.size() >= dump_count_) {
+void EventManager::addEvent(Event* ev) {
+  if (index_ >= events_.size()) {
     notifyBackends();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::notifyBackends() {
+  index_ = 0;
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     try {
@@ -70,7 +91,6 @@ void EventManager::notifyBackends() {
                       << "' failed write with err: " << err.what();
     }
   }
-  events_.clear();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,6 +100,10 @@ void EventManager::registerBackend(EventBackend* b) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EventManager::close() {
+  for (int i = index_; i < events_.size(); ++i) {
+    delete events_[i];
+  }
+  events_.resize(index_);
   notifyBackends();
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {

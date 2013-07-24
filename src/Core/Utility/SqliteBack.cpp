@@ -65,7 +65,7 @@ std::string SqliteBack::name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::createTable(event_ptr e) {
+void SqliteBack::createTable(Event* e) {
   std::string name = e->title();
   tbl_names_.push_back(name);
 
@@ -125,7 +125,7 @@ bool SqliteBack::tableExists(std::string name) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::writeEvent(event_ptr e) {
+void SqliteBack::writeEvent(Event* e) {
   std::stringstream colss, valss, cmd;
   Event::Vals vals = e->vals();
 

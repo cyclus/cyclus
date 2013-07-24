@@ -6,7 +6,7 @@
 #include <vector>
 #include <boost/intrusive_ptr.hpp>
 
-typedef std::vector<event_ptr> EventList;
+typedef std::vector<Event*> EventList;
 
 /*!
 An abstract base class for listeners (e.g. output databases) that want

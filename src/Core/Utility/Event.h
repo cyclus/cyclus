@@ -2,20 +2,18 @@
 #if !defined(_EVENT_H)
 #define _EVENT_H
 
-#include "IntrusiveBase.h"
 #include "EventManager.h"
+#include <boost/pool/singleton_pool.hpp>
 #include "any.hpp"
 
 #include <list>
 #include <string>
 
-typedef boost::intrusive_ptr<Event> event_ptr;
-
 /*!
 Used to specify and send a collection of key-value pairs to the
 EventManager for recording.
 */
-class Event: IntrusiveBase<Event> {
+class Event {
     friend class EventManager;
 
   public:
@@ -36,7 +34,7 @@ class Event: IntrusiveBase<Event> {
     @warning for the val argument - what variable types are supported
     depends on what the backend(s) in use are designed to handle.
     */
-    event_ptr addVal(const char* field, boost::spirit::hold_any val);
+    Event* addVal(const char* field, boost::spirit::hold_any val);
 
     /*!
     Record this event to its EventManager. Recorded events of the same
@@ -50,6 +48,9 @@ class Event: IntrusiveBase<Event> {
 
     /// Returns a map of all field-value pairs that have been added to this event.
     const Vals& vals();
+
+    static void* operator new(size_t size); 
+    static void operator delete(void* rawMemory) throw();
 
   private:
     /// events should only be created via an EventManager

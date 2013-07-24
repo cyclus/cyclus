@@ -5,8 +5,8 @@
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
-#include <list>
 #include <string>
+#include <map>
 
 /*!
 An EventManager backend that writes data to an hdf5 file.
@@ -34,7 +34,7 @@ class Hdf5Back : public EventBackend {
   private:
 
     /// creates and initializes an hdf5 table
-    void createTable(event_ptr ev);
+    void createTable(Event* ev);
 
     /// write a group of events with the same title to their corresponding hdf5 dataset
     void writeGroup(EventList& group);

@@ -4,12 +4,9 @@
 
 #include "CycException.h"
 
-#include <list>
 #include <vector>
+#include <list>
 #include <string>
-#include <map>
-#include <boost/intrusive_ptr.hpp>
-#include <boost/any.hpp>
 
 // TODO: Move away from singleton pattern (that is why we kept EventManager constructor public)
 #define EM EventManager::Instance()
@@ -18,8 +15,7 @@ class Event;
 class EventManager;
 class EventBackend;
 
-typedef boost::intrusive_ptr<Event> event_ptr;
-typedef std::vector<event_ptr> EventList;
+typedef std::vector<Event*> EventList;
 
 /// default number of events to collect before flushing to backends.
 static unsigned int const kDefaultDumpCount = 10000;
@@ -53,9 +49,10 @@ class EventManager {
 
   private:
     void notifyBackends();
-    void addEvent(event_ptr ev);
+    void addEvent(Event* ev);
 
     EventList events_;
+    int index_;
     std::list<EventBackend*> backs_;
     unsigned int dump_count_;
     std::string uuid_;
@@ -69,6 +66,8 @@ class EventManager {
     /// create a new event manager with default dump frequency.
     EventManager();
     // TODO: Move away from singleton pattern (that is why we kept the constructor public)
+
+    ~EventManager();
 
     /// Return the dump frequency, # events buffered between flushes to backends.
     unsigned int dump_count();
@@ -96,7 +95,7 @@ class EventManager {
     result in multiple instances of this agent storing event data together
     (e.g. the same table).
     */
-    event_ptr newEvent(std::string title);
+    Event* newEvent(std::string title);
 
     /*!
     Registers b to receive event notifications for all events collected

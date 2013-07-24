@@ -1,6 +1,7 @@
 
 #include "Hdf5Back.h"
 #include <cmath>
+#include <string.h>
 
 #define STR_SIZE 16
 
@@ -19,7 +20,7 @@ void Hdf5Back::notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
     std::string name = (*it)->title();
     if (tbl_size_.count(name) == 0) {
-      event_ptr ev = *it;
+      Event* ev = *it;
       createTable(ev);
     }
     groups[name].push_back(*it);
@@ -51,7 +52,7 @@ std::string Hdf5Back::name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::createTable(event_ptr ev) {
+void Hdf5Back::createTable(Event* ev) {
   Event::Vals vals = ev->vals();
 
   size_t dst_size = 0;
@@ -100,7 +101,7 @@ void Hdf5Back::createTable(event_ptr ev) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::writeGroup(EventList& group) {
-  std::string title = group[0]->title();
+  std::string title = group.front()->title();
   herr_t status;
 
   size_t* offsets = tbl_offset_[title];
@@ -116,7 +117,7 @@ void Hdf5Back::writeGroup(EventList& group) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
-  Event::Vals header = group[0]->vals();
+  Event::Vals header = group.front()->vals();
   bool is_string[header.size()];
   for (int col = 0; col < header.size(); ++col) {
     is_string[col] = header[col].second.type() == typeid(std::string);
@@ -124,9 +125,10 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
 
   size_t offset = 0;
   const void* val;
-  for (int row = 0; row < group.size(); ++row) {
+  EventList::iterator it;
+  for (it = group.begin(); it != group.end(); ++it) {
     for (int col = 0; col < header.size(); ++col) {
-      const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
+      const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
       if (is_string[col]) {
         const std::string s = a->cast<std::string>();
         size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
