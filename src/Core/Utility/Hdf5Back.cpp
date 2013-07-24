@@ -129,7 +129,7 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
       const boost::spirit::hold_any* a = &group[row]->vals()[col].second;
       if (is_string[col]) {
         const std::string s = a->cast<std::string>();
-        size_t slen = std::min(s.size(), (unsigned long)STR_SIZE);
+        size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
         memcpy(buf + offset, s.c_str(), slen);
         memset(buf + offset + slen, 0, STR_SIZE - slen);
       } else {
