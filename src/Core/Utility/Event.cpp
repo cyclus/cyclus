@@ -18,6 +18,9 @@ void Event::record() {
 Event::Event(EventManager* m, std::string title)
   : title_(title),
     manager_(m) {
+  // The (vect) size to reserve is chosen to be just bigger than most/all cyclus
+  // core tables.  This prevents extra reallocations in the underlying
+  // vector as vals are added to the event.
   vals_.reserve(10);
 }
 

@@ -34,6 +34,10 @@ SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
 FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+==============================================================================
+WARNING: this file was modified by Robert Carlsen for Cyclus from the
+original Boost 1.54.0
+(http://www.boost.org/doc/libs/1_54_0/boost/spirit/home/support/detail/hold_any.hpp).
 ==============================================================================*/
 #if !defined(BOOST_SPIRIT_HOLD_ANY_MAY_02_2007_0857AM)
 #define BOOST_SPIRIT_HOLD_ANY_MAY_02_2007_0857AM
