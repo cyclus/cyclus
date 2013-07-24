@@ -87,11 +87,18 @@ set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
 # Capitalization matters on some platforms
 SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
+# SET(Boost_USE_MULTITHREADED    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+MESSAGE("--    Boost Root: ${Boost_ROOT}")
+MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
+MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
 SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+MESSAGE("--    Boost Program Options location: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
 SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
+MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
 
 # find cyclopts and link to it
 FIND_PACKAGE( CYCLOPTS REQUIRED )

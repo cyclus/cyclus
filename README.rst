@@ -21,7 +21,7 @@ dependencies is show below:
 Package                Minimum Version   
 ====================   ==================
 `CMake`                2.8            
-`boost`                1.34.1
+`boost`                1.46.1
 `libxml2`              2
 `libxml++`             2.6
 `sqlite3`              3.7.10            
