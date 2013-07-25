@@ -3,6 +3,7 @@
 #define _EVENTMANAGER_H
 
 #include "CycException.h"
+#include <boost/uuid/uuid.hpp>
 
 #include <vector>
 #include <list>
@@ -55,8 +56,7 @@ class EventManager {
     int index_;
     std::list<EventBackend*> backs_;
     unsigned int dump_count_;
-    std::string uuid_;
-    std::string prefix_;
+    boost::uuids::uuid uuid_;
 
     /// A pointer to singleton EventManager.
     static EventManager* instance_;
@@ -82,10 +82,7 @@ class EventManager {
     void set_dump_count(unsigned int count);
 
     /// returns the unique id associated with this cyclus simulation.
-    std::string sim_id();
-
-    /// adds a prefix to the auto-generated unique simulation id
-    void setSimPrefix(std::string val);
+    boost::uuids::uuid sim_id();
 
     /*!
     Creates a new event namespaced under the specified title.

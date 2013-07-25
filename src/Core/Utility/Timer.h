@@ -30,6 +30,8 @@ class Timer {
      started. 
    */
   int time_;
+
+  std::string handle_;
     
   /**
      The time at which the simulation started. 
@@ -254,7 +256,7 @@ public:
      
      @param qe is a pointer to a general QueryEngine that can 
    */
-  static void load_simulation(QueryEngine *qe);
+  void load_simulation(QueryEngine *qe);
 
   /**
      logs relevant time-related data with the output system, including:

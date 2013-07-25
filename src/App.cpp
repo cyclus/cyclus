@@ -5,6 +5,9 @@
 #include "boost/program_options.hpp"
 #include "boost/shared_ptr.hpp"
 #include "boost/filesystem.hpp"
+#include "boost/lexical_cast.hpp"
+#include "boost/lexical_cast.hpp"
+#include <boost/uuid/uuid_io.hpp>
 
 #include "Model.h"
 #include "Timer.h"
@@ -131,7 +134,7 @@ int main(int argc, char* argv[]) {
   if (ext == ".h5") {
     back = new Hdf5Back(output_path.c_str());
   } else {
-    back = new SqliteBack(EM->sim_id(), output_path);
+    back = new SqliteBack(output_path);
   }
   EM->registerBackend(back);
 
@@ -167,7 +170,7 @@ int main(int argc, char* argv[]) {
     cout << "|              run successful                |" << endl;
     cout << "|--------------------------------------------|" << endl;
     cout << "Output location: " << output_path << endl;
-    cout << "Simulation ID: " << EM->sim_id() << endl;
+    cout << "Simulation ID: " << boost::lexical_cast<std::string>(EM->sim_id()) << endl;
     cout << endl;
   } else {
     cout << endl;

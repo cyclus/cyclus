@@ -247,8 +247,8 @@ pair<int, int> Timer::convertDate(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::load_simulation(QueryEngine *qe) { 
-  if (qe->nElementsMatchingQuery("simprefix") > 0) {
-    EM->setSimPrefix(qe->getElementContent("simprefix"));
+  if (qe->nElementsMatchingQuery("simhandle") > 0) {
+    handle_ = qe->getElementContent("simhandle");
   }
 
   // get duration
@@ -271,9 +271,9 @@ void Timer::load_simulation(QueryEngine *qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Timer::logTimeData() 
-{
+void Timer::logTimeData() {
   EM->newEvent("SimulationTimeInfo")
+    ->addVal("SimHandle", handle_)
     ->addVal("InitialYear", year0_)
     ->addVal("InitialMonth", month0_)
     ->addVal("SimulationStart", time0_)

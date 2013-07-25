@@ -144,23 +144,26 @@ TEST(EventManagerTest, Event_addVal) {
   ev->addVal("height", 5.5);
   ev->record();
 
-  ASSERT_EQ(ev->vals().size(), 3);
+  ASSERT_EQ(ev->vals().size(), 4);
 
   Event::Vals::const_iterator it = ev->vals().begin();
-  EXPECT_EQ(it->first, "animal");
-  EXPECT_EQ(boost::spirit::any_cast<std::string>(it->second), "monkey");
+  EXPECT_STREQ(it->first, "SimID");
+  EXPECT_EQ(it->second.cast<boost::uuids::uuid>(), m.sim_id());
   ++it;
-  EXPECT_EQ(it->first, "weight");
-  EXPECT_EQ(boost::spirit::any_cast<int>(it->second), 10);
+  EXPECT_STREQ(it->first, "animal");
+  EXPECT_EQ(it->second.cast<std::string>(), "monkey");
   ++it;
-  EXPECT_EQ(it->first, "height");
-  EXPECT_DOUBLE_EQ(boost::spirit::any_cast<double>(it->second), 5.5);
+  EXPECT_STREQ(it->first, "weight");
+  EXPECT_EQ(it->second.cast<int>(), 10);
+  ++it;
+  EXPECT_STREQ(it->first, "height");
+  EXPECT_DOUBLE_EQ(it->second.cast<double>(), 5.5);
 
   m.close();
 
   Event::Vals vals = back.events.back()->vals();
-  ASSERT_EQ(vals.size(), 3);
-  EXPECT_EQ(vals.front().first, "animal");
-  EXPECT_EQ(boost::spirit::any_cast<std::string>(vals.front().second), "monkey");
+  ASSERT_EQ(vals.size(), 4);
+  EXPECT_STREQ(vals.front().first, "SimID");
+  EXPECT_EQ(vals.front().second.cast<boost::uuids::uuid>(), m.sim_id());
 }
 
