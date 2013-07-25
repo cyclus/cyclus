@@ -123,14 +123,14 @@ void Hdf5Back::writeGroup(EventList& group) {
 void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
   Event::Vals header = group.front()->vals();
   int valtype[header.size()];
-  enum Type{Tstr, Tnum, Tuuid};
+  enum Type{STR, NUM, UUID};
   for (int col = 0; col < header.size(); ++col) {
     if (header[col].second.type() == typeid(std::string)) {
-      valtype[col] = Tstr;
+      valtype[col] = STR;
     } else if (header[col].second.type() == typeid(boost::uuids::uuid)) {
-      valtype[col] = Tuuid;
+      valtype[col] = UUID;
     } else {
-      valtype[col] = Tnum;
+      valtype[col] = NUM;
     }
   }
 
@@ -141,13 +141,13 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
       switch (valtype[col]) {
-      case Tnum:
+      case NUM:
         {
           val = a->castsmallvoid();
           memcpy(buf + offset, val, sizes[col]);
           break;
         }
-      case Tstr:
+      case STR:
         {
           const std::string s = a->cast<std::string>();
           size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
@@ -155,7 +155,7 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
           memset(buf + offset + slen, 0, STR_SIZE - slen);
           break;
         }
-      case Tuuid:
+      case UUID:
         {
           boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
           memcpy(buf + offset, &uuid, STR_SIZE);
