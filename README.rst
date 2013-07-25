@@ -26,6 +26,7 @@ Package                Minimum Version
 `libxml++`             2.6
 `sqlite3`              3.7.10            
 `Cyclopts`             0.1            
+`HDF5`                 1.8.0
 ====================   ==================
 
 As with all software, the build/install can be broken into two steps:
@@ -67,6 +68,7 @@ list of required package names are:
   #. libboost-all-dev
   #. libxml++2.6-dev
   #. libsqlite3-dev
+  #. libhdf5-dev
 
 So, for example, in order to install libxml++ on your system, you will
 type:
