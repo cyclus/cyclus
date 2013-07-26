@@ -16,12 +16,12 @@ macro(cyclus_init  _path _name)
     )
   
   install(TARGETS ${_name}
-    LIBRARY DESTINATION cyclus/lib${_path}
+    LIBRARY DESTINATION lib${_path}
     COMPONENT ${_path}
     )
 
   install(FILES "${_name}.rng"
-    DESTINATION cyclus/lib${_path}
+    DESTINATION lib${_path}
     COMPONENT "${_path}.rng"
     )
 endmacro()

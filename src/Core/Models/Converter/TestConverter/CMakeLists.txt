@@ -1,6 +1,6 @@
 cyclus_init_model("Converter" "TestConverter")
 INSTALL(FILES
   TestConverter.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT testing
   )

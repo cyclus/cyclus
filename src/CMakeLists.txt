@@ -29,16 +29,16 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/cyclus/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Tell CMake where the modules are
@@ -127,7 +127,7 @@ SET( CYCLUS_SRC
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
 INSTALL(TARGETS cyclus
-  RUNTIME DESTINATION cyclus/bin
+  RUNTIME DESTINATION bin
   COMPONENT cyclus
   )
 
@@ -180,12 +180,12 @@ IF (CMAKE_USE_PTHREADS_INIT)
 ENDIF()
 
 SET_TARGET_PROPERTIES(gtest
-  PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/cyclus/lib"
-  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/cyclus/lib"
+  PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
 INSTALL(TARGETS gtest
-  LIBRARY DESTINATION cyclus/lib
+  LIBRARY DESTINATION lib
   COMPONENT testing
   )
 
@@ -201,7 +201,7 @@ add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver
   ${TestSource}) 
 
 INSTALL(TARGETS CyclusUnitTestDriver
-  RUNTIME DESTINATION cyclus/bin
+  RUNTIME DESTINATION bin
   COMPONENT testing
   )
 
@@ -209,7 +209,7 @@ INSTALL(TARGETS CyclusUnitTestDriver
 INSTALL(FILES 
   ${PROJECT_BINARY_DIR}/share/cyclus.rng
   ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
-  DESTINATION cyclus/share
+  DESTINATION share
   COMPONENT data
   )
 
@@ -249,3 +249,11 @@ ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
 
+# uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Config/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

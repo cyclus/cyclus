@@ -37,7 +37,7 @@ INSTALL(FILES
   StubTimeAgent.h
   TimeAgent.h
   Transaction.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT core
   )
 

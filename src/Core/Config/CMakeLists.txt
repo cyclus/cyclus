@@ -30,6 +30,6 @@ INSTALL(FILES
     UnixHelperFunctions.h
     WindowsHelperFunctions.h
     suffix.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT core
   )
