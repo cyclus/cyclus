@@ -17,7 +17,7 @@ INSTALL(FILES
   MatBuff.h
   Resource.h
   ResourceBuff.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT core
   )
 

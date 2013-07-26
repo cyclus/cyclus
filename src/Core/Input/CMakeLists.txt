@@ -13,6 +13,6 @@ INSTALL(FILES
   XMLFileLoader.h
   XMLParser.h
   XMLQueryEngine.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT core
   )

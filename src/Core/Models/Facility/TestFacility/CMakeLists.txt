@@ -1,6 +1,6 @@
 cyclus_init_model("Facility" "TestFacility")
 INSTALL(FILES
   TestFacility.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT testing
   )

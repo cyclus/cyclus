@@ -5,8 +5,7 @@ CONFIGURE_FILE(
   )
 INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
-  DESTINATION
-    cyclus/share
+  DESTINATION share
   COMPONENT core
   )
 
@@ -17,12 +16,11 @@ CONFIGURE_FILE(
   )
 INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
-  DESTINATION 
-    cyclus/share
+  DESTINATION share
   COMPONENT core
   )
 
-SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX}/cyclus)
+SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX})
 SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
 
 CONFIGURE_FILE(
@@ -96,7 +94,7 @@ INSTALL(FILES
   UseMatrixLib.h
   SqliteBack.h
   SqliteDb.h
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT core
   )
 
