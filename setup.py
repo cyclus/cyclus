@@ -71,7 +71,7 @@ def main():
     parser.add_argument('-j', '--threads', type=int, help=threads)
 
     install = "the relative path to the installation directory"
-    parser.add_argument('--prefix', help=install)
+    parser.add_argument('--prefix', help=install, default=absexpanduser('~/.local'))
 
     coin = "the relative path to the Coin-OR libraries directory"
     parser.add_argument('--coin_root', help=coin)
