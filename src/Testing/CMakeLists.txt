@@ -63,13 +63,13 @@ macro(ADD_GOOGLE_TESTS executable)
 endmacro()
 
 INSTALL(FILES GoogleTest/gtest/gtest.h
-  DESTINATION cyclus/include/gtest
+  DESTINATION include/gtest
   COMPONENT testing
   )
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*ModelTests.cpp")
 INSTALL(FILES ${header_files} ${model_test_files} 
-  DESTINATION cyclus/include
+  DESTINATION include
   COMPONENT testing
   )
