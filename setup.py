@@ -73,13 +73,13 @@ def main():
     parser.add_argument('-j', '--threads', type=int, help=threads)
 
     install = "the relative path to the installation directory"
-    parser.add_argument('--prefix', help=install, default=local)
+    parser.add_argument('--prefix', help=install, default=localdir)
 
     coin = "the relative path to the Coin-OR libraries directory"
     parser.add_argument('--coin_root', help=coin)
 
     cyclopts = "the relative path to Cyclopts installation directory"
-    parser.add_argument('--cyclopts_root',help=cyclopts, default=local)
+    parser.add_argument('--cyclopts_root',help=cyclopts, default=localdir)
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
