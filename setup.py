@@ -57,6 +57,8 @@ def install_cyclus(args):
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir, shell=(os.name=='nt'))
 
 def main():
+    localdir = absexpanduser('~/.local')
+
     description = "A Cyclus installation helper script. "+\
         "For more information, please see cyclus.github.com." 
     parser = ap.ArgumentParser(description=description)
@@ -65,19 +67,19 @@ def main():
     parser.add_argument('--build_dir', help=build_dir, default='build')
 
     replace = 'whether or not to remove the build directory if it exists'
-    parser.add_argument('--replace', type=bool, help=replace, default=True)
+    parser.add_argument('--replace', type=bool, help=replace, default=False)
 
     threads = "the number of threads to use in the make step"
     parser.add_argument('-j', '--threads', type=int, help=threads)
 
     install = "the relative path to the installation directory"
-    parser.add_argument('--prefix', help=install, default=absexpanduser('~/.local'))
+    parser.add_argument('--prefix', help=install, default=local)
 
     coin = "the relative path to the Coin-OR libraries directory"
     parser.add_argument('--coin_root', help=coin)
 
     cyclopts = "the relative path to Cyclopts installation directory"
-    parser.add_argument('--cyclopts_root',help=cyclopts)
+    parser.add_argument('--cyclopts_root',help=cyclopts, default=local)
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
