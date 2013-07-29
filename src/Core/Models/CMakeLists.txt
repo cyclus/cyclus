@@ -45,6 +45,3 @@ add_all_subdirs()
 
 SET( TestSource ${ModelTestSource} PARENT_SCOPE )
 
-CONFIGURE_FILE(${PROJECT_BINARY_DIR}/share/cyclus.rng 
-  ${PROJECT_BINARY_DIR}/share/cyclus.rng @ONLY)
-

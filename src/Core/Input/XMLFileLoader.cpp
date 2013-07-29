@@ -52,15 +52,6 @@ std::string XMLFileLoader::buildSchema() {
   types.push_back("Stub");
   types.push_back("StubComm_REFS@");
 
-
-  //SET(TYPE_PATH "${CYCLUS_ROOT_DIR}/lib/Models/${_type}/*/")
-  //FILE(GLOB all_valid_subdirs ${TYPE_PATH} "*/*.rng")
-  //FOREACH(dir ${all_valid_subdirs})
-  //  STRING(REPLACE "${CYCLUS_ROOT_DIR}/lib/Models/${_type}/" "" model_name "${dir}" )
-  //  SET(${_type}_REFS ${${_type}_REFS} "<ref name='${model_name}'/>")
-  //  SET(RNG_INCLUDES ${RNG_INCLUDES} "<include href='${CYCLUS_ROOT_DIR}/lib/Models/${_type}/${model_name}/${model_name}.rng'/>")
-  //ENDFOREACH(dir) 
-
   std::stringstream includes;
   for (int i = 0; i < types.size(); ++i) {
     std::stringstream refs;
