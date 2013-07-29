@@ -11,9 +11,11 @@
 #include "RecipeLibrary.h"
 #include "Model.h"
 #include "CycException.h"
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace boost;
+namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(const std::string load_filename) {
@@ -28,13 +30,75 @@ void XMLFileLoader::init(bool use_main_schema)  {
   parser_ = shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {
-    stringstream schema("");
-    loadStringstreamFromFile(schema,pathToMainSchema());
-    parser_->validate(schema);
+    std::string schema = buildSchema();
+    std::stringstream ss;
+    ss << schema;
+    parser_->validate(ss);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string XMLFileLoader::buildSchema() {
+  stringstream schema("");
+  loadStringstreamFromFile(schema, pathToMainSchema());
+  std::string master = schema.str();
+
+  std::vector<std::string> types;
+  types.push_back("Facility");
+  types.push_back("Inst");
+  types.push_back("Region");
+  types.push_back("Market");
+  types.push_back("Converter");
+  types.push_back("Stub");
+  types.push_back("StubComm_REFS@");
+
+
+  //SET(TYPE_PATH "${CYCLUS_ROOT_DIR}/lib/Models/${_type}/*/")
+  //FILE(GLOB all_valid_subdirs ${TYPE_PATH} "*/*.rng")
+  //FOREACH(dir ${all_valid_subdirs})
+  //  STRING(REPLACE "${CYCLUS_ROOT_DIR}/lib/Models/${_type}/" "" model_name "${dir}" )
+  //  SET(${_type}_REFS ${${_type}_REFS} "<ref name='${model_name}'/>")
+  //  SET(RNG_INCLUDES ${RNG_INCLUDES} "<include href='${CYCLUS_ROOT_DIR}/lib/Models/${_type}/${model_name}/${model_name}.rng'/>")
+  //ENDFOREACH(dir) 
+
+  std::stringstream includes;
+  for (int i = 0; i < types.size(); ++i) {
+    std::stringstream refs;
+
+    // find modules
+    refs << std::endl;
+    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + types[i];
+    fs::recursive_directory_iterator end;
+    try {
+      for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
+        fs::path p = it->path();
+        // build refs and includes
+        if (p.extension() == ".rng") {
+          refs << "<ref name='" << p.stem().string() << "'/>" << std::endl;
+          includes << "<include href='" << p.string() << "'/>" << std::endl;
+        }
+      }
+    } catch(...) { }
+
+    // replace refs
+    std::string searchStr = std::string("@") + types[i] + std::string("_REFS@");
+    size_t pos = master.find(searchStr);
+    if (pos != std::string::npos) {
+      master.replace(pos, searchStr.size(), refs.str());
+    }
+  }                                  
+
+  // replace includes
+  std::string searchStr = "@RNG_INCLUDES@";
+  size_t pos = master.find(searchStr);
+  if (pos != std::string::npos) {
+    master.replace(pos, searchStr.size(), includes.str());
+  }
+
+  return master;
+}                                    
+                                     
+// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
                                              std::string file) {
 
@@ -55,7 +119,7 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::pathToMainSchema() {
-  return Env::getInstallPath() + "/share/cyclus.rng";
+  return Env::getInstallPath() + "/share/cyclus.rng.in";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
