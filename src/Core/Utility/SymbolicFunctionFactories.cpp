@@ -1,11 +1,6 @@
-#include "SymbolicFunctionFactories.h"
-
-#include "SymbolicFunctions.h"
 #include "Logger.h"
 
-#include <map>
-#include <string>
-#include <sstream>
+#include "SymbolicFunctionFactories.h"
 
 //using namespace boost;
 
@@ -14,7 +9,7 @@ namespace cyclus {
 // -------------------------------------------------------------------
 FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params) 
 { 
-  stringstream ss(params);
+  std::stringstream ss(params);
   double slope, intercept;
   ss >> slope >> intercept;
 
@@ -28,7 +23,7 @@ FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params)
 // -------------------------------------------------------------------
 FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params) 
 { 
-  stringstream ss(params);
+  std::stringstream ss(params);
   double constant, exponent, intercept;
   ss >> constant >> exponent >> intercept;
 
@@ -44,7 +39,7 @@ FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params)
 // -------------------------------------------------------------------
 PiecewiseFunctionFactory::PiecewiseFunctionFactory()
 {
-  function_ = shared_ptr<PiecewiseFunction>(new PiecewiseFunction());
+  function_ = boost::shared_ptr<PiecewiseFunction>(new PiecewiseFunction());
 }
 
 // -------------------------------------------------------------------

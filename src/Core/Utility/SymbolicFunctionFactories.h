@@ -1,10 +1,11 @@
 #ifndef SYMBOLICFUNCTIONFACTORIES_H
 #define SYMBOLICFUNCTIONFACTORIES_H
 
-#include "SymbolicFunctions.h"
-
 #include <string>
 #include <map>
+#include <sstream>
+
+#include "SymbolicFunctions.h"
 
 namespace cyclus {
 

@@ -5,8 +5,8 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<string> Logger::level_to_string;
-map<string, LogLevel> Logger::string_to_level;
+std::vector<std::string> Logger::level_to_string;
+std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
 bool Logger::no_model = false;
 bool Logger::no_mem = false;
@@ -15,23 +15,23 @@ int Logger::spc_per_lev_ = 2;
 int Logger::field_width_ = 6;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ostringstream& Logger::Get(LogLevel level, std::string prefix) {
+std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
   int ind_level = level - LEV_INFO1;
   if (ind_level < 0) {ind_level = 0;}
 
   int prefix_len = 6;
   prefix = prefix.substr(0, prefix_len);
   if (prefix.length() < prefix_len) {
-    prefix = prefix + string(prefix_len - prefix.length(), ' ');
+    prefix = prefix + std::string(prefix_len - prefix.length(), ' ');
   }
   os << ToString(level) << "(" << prefix << "):";
-  os << string(ind_level * spc_per_lev_, ' ');
+  os << std::string(ind_level * spc_per_lev_, ' ');
   return os;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logger::~Logger() {
-  os << endl;
+  os << std::endl;
   // fprintf used to maintain thread safety
   fprintf(stdout, "%s", os.str().c_str());
   fflush(stdout);
@@ -63,8 +63,8 @@ LogLevel Logger::ToLogLevel(std::string text) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Logger::ToString(LogLevel level) {
-  string text;
+std::string Logger::ToString(LogLevel level) {
+  std::string text;
   try {
     text = level_to_string.at((int)level);
   } catch (...) {
@@ -78,7 +78,7 @@ void Logger::addLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
   text = text.substr(4);
-  text = string(field_width_ - text.size(), ' ') + text;
+  text = std::string(field_width_ - text.size(), ' ') + text;
   Logger::level_to_string.push_back(text);
 }
 

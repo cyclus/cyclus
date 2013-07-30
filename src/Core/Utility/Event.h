@@ -2,12 +2,13 @@
 #if !defined(_EVENT_H)
 #define _EVENT_H
 
-#include "EventManager.h"
+#include <list>
+#include <string>
+
 #include <boost/pool/singleton_pool.hpp>
 #include "any.hpp"
 
-#include <list>
-#include <string>
+#include "EventManager.h"
 
 namespace cyclus {
 

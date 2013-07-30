@@ -1,7 +1,7 @@
 // Event.cpp
 
-#include "Event.h"
 #include "Timer.h"
+#include "Event.h"
 
 namespace cyclus {
 

@@ -42,7 +42,7 @@ namespace cyclus {
 LMatrix::LMatrix() {
   rows_ = 1;                   // sets number of rows
   cols_ = 1;                   // sets number of columns
-  vector<long double> element(1);  // creates a single element
+  std::vector<long double> element(1);  // creates a single element
   M_.push_back(element);       // adds element to the matrix
 }
 
@@ -50,8 +50,8 @@ LMatrix::LMatrix() {
 LMatrix::LMatrix(int n, int m) {
   rows_ = n;                     // sets number of rows
   cols_ = m;                     // sets number of columns
-  vector<long double> row(m);   // creates a row with m elements
-  M_.assign(n,row);              // adds n rows_ to the matrix
+  std::vector<long double> row(m);   // creates a row with m elements
+  M_.assign(n, row);              // adds n rows_ to the matrix
 }
 
 // returns the number of rows n in the matrix
@@ -92,25 +92,25 @@ void LMatrix::addRow(std::vector<long double> row) {
 
 // prints the matrix to standard output
 void LMatrix::print() const {
-  cout.setf(ios::showpoint);
-  cout.setf(ios::scientific);
+  std::cout.setf(std::ios::showpoint);
+  std::cout.setf(std::ios::scientific);
 
   // sets elements to display 6 decimal places
-  cout << setiosflags(ios::fixed) << setprecision(10);
+  std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(10);
   
   // prints single element if M is a 1x1 matrix
   if (M_.capacity() == 1 && M_[0].capacity() == 1) {
-    cout << "[ " << M_[0][0] << " ]" << endl;
+    std::cout << "[ " << M_[0][0] << " ]" << std::endl;
   }
   else {
     // loops through the rows of the matrix
     for (int i = 0; i < rows_; i++) {
       // prints all of the elements in the ith row of the matrix
-      cout << "[";
+      std::cout << "[";
       for (int j = 0; j < cols_ - 1; j++) {
-        cout << "  " << setw(9) << M_[i][j]  << "  ";
+        std::cout << "  " << std::setw(9) << M_[i][j]  << "  ";
       }
-      cout << setw(9) << M_[i][cols_ - 1] << "  ]" << endl;
+      std::cout << std::setw(9) << M_[i][cols_ - 1] << "  ]" << std::endl;
     }
   }
 }
@@ -125,7 +125,7 @@ const LMatrix & LMatrix::operator=(const LMatrix & rhs) {
     cols_ = rhs.cols_;  // resets the number of columns to match B 
     
     // rebuilds A with the dimensions of B
-    vector<long double> row(cols_);   // creates a row with m elements
+    std::vector<long double> row(cols_);   // creates a row with m elements
     M_.assign(rows_, row);
     
     // copies all of the elements from B into A

@@ -2,14 +2,18 @@
 #ifndef MARKETPLAYER_H
 #define MARKETPLAYER_H
 
-#include "SupplyDemand.h"
-
+#include <utility>
 #include <map>
+#include <list>
 #include <vector>
+#include <sstream>
+
+#include "SupplyDemand.h"
 
 namespace cyclus {
 class MarketPlayer;
 } // namespace cyclus
+
 #include "MarketPlayerManager.h"
 
 namespace cyclus {
@@ -115,6 +119,7 @@ class MarketPlayer {
 } // namespace cyclus
 
 #include "CycException.h"
+
 namespace cyclus {
 /**
    an exception class for mismatched commodities and managers
@@ -124,4 +129,5 @@ class CycCommodityMismatchError: public CycException {
   CycException(msg) {};
 };
 } // namespace cyclus
+
 #endif

@@ -1,21 +1,19 @@
 #include "MarketPlayer.h"
 
-#include <sstream>
-
 namespace cyclus {
 
 // -------------------------------------------------------------------
 MarketPlayer::MarketPlayer() {
-  managers_ = map<Commodity,vector<MarketPlayerManager*>,
+  managers_ = std::map<Commodity, std::vector<MarketPlayerManager*>,
                   CommodityCompare> ();
-  production_capacity_ = map<Commodity,double,CommodityCompare>();
+  production_capacity_ = std::map<Commodity,double,CommodityCompare>();
 }
 
 // -------------------------------------------------------------------
 void MarketPlayer::registerCommodity(Commodity& commod) {
-  vector<MarketPlayerManager*> v;
-  managers_.insert(make_pair(commod,v));  
-  production_capacity_.insert(make_pair(commod,0.0));
+  std::vector<MarketPlayerManager*> v;
+  managers_.insert(std::make_pair(commod,v));  
+  production_capacity_.insert(std::make_pair(commod,0.0));
 }
 
 // -------------------------------------------------------------------
@@ -56,7 +54,7 @@ void MarketPlayer::enterMarket(Commodity& commod) {
 // -------------------------------------------------------------------
 void MarketPlayer::leaveMarket(Commodity& commod) {
   ManagerIterator mi = checkCommodityManagement(commod);
-  vector<MarketPlayerManager*> v = mi->second;
+  std::vector<MarketPlayerManager*> v = mi->second;
   for (int i = 0; i < v.size(); i++) {
     v.at(i)->playerLeavingMarket(this);
   }
@@ -84,10 +82,9 @@ MarketPlayer::checkCommodityManagement(Commodity& commod) {
 
 // -------------------------------------------------------------------
 void MarketPlayer::throwRegistrationException(Commodity& commod) {
-  stringstream ss("");
+  std::stringstream ss("");
   ss << "Commodity " << commod.name() << " is not registered with "
      << " this MarketPlayer.";
   throw CycKeyException(ss.str());
 }
 } // namespace cyclus
-

@@ -170,7 +170,8 @@ class Logger {
     value converted to a string (i.e. `LEV_WARN` is the longest with 11
     characters).
     */
-    static int field_width_; };
+    static int field_width_; 
+};
 } // namespace cyclus
 #endif
 
