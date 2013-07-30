@@ -63,6 +63,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 INSTALL(FILES 
   any.hpp
+  Blob.hpp
   Builder.h
   BuildingManager.h
   Commodity.h

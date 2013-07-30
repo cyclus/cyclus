@@ -9,9 +9,9 @@
 #include <string>
 
 /*!
-An EventManager backend that writes data to an sqlite database.
-Identically named events have their data placed as rows in a single table.
-Handles the following event value types: int, float, double, std::string.
+An EventManager backend that writes data to an sqlite database.  Identically
+named events have their data placed as rows in a single table.  Handles the
+following event value types: int, float, double, std::string, cyclus::Blob.
 Unsupported value types are stored as an empty string.
 */
 class SqliteBack: public EventBackend {

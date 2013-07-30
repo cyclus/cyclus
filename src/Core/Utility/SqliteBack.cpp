@@ -4,8 +4,10 @@
 #include "CycException.h"
 #include "Logger.h"
 #include "Event.h"
+#include "Blob.hpp"
 
-#include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -70,6 +72,8 @@ std::string SqliteBack::valType(boost::spirit::hold_any v) {
     return "INTEGER";
   } else if (v.type() == typeid(float) || v.type() == typeid(double)) {
     return "REAL";
+  } else if (v.type() == typeid(cyclus::Blob)) {
+    return "BLOB";
   }
   return "TEXT";
 }
@@ -100,6 +104,15 @@ void SqliteBack::writeEvent(Event* e) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string toHex(const std::string& s) {
+  std::ostringstream ret;
+  for (int i = 0; i < s.length(); ++i) {
+    ret << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(s[i]);
+  }
+  return ret.str();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
   // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
@@ -111,15 +124,18 @@ std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
     ss << v.cast<double>();
     return ss.str();
   } else if (v.type() == typeid(std::string)) {
-    return "\"" + v.cast<std::string>() + "\"";
+    return "'" + v.cast<std::string>() + "'";
   } else if (v.type() == typeid(boost::uuids::uuid)) {
     char data[16];
     boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
-    return "\"" + boost::lexical_cast<std::string>(ui) + "\"";
+    return "'" + boost::lexical_cast<std::string>(ui) + "'";
   } else if (v.type() == typeid(float)) {
     std::stringstream ss;
     ss << v.cast<float>();
     return ss.str();
+  } else if (v.type() == typeid(cyclus::Blob)) {
+    std::string s = v.cast<cyclus::Blob>().str;
+    return "X'" + toHex(s) + "'";
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
                   << name();

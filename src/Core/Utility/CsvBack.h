@@ -12,7 +12,7 @@ typedef std::vector<std::string> LineList;
 /*!
 An EventManager backend that writes data to a collection of csv files.
 Identically named events have their data placed in the same file.  Handles the
-following event value types: int, float, double, std::string.
+following event value types: int, float, double, std::string, cyclus::Blob.
 */
 class CsvBack: public EventBackend {
   public:

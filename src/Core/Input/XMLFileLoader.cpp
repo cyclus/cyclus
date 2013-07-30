@@ -12,6 +12,8 @@
 #include "Model.h"
 #include "CycException.h"
 #include <boost/filesystem.hpp>
+#include "EventManager.h"
+#include "Blob.hpp"
 
 using namespace std;
 using namespace boost;
@@ -27,6 +29,12 @@ XMLFileLoader::XMLFileLoader(const std::string load_filename) {
 void XMLFileLoader::init(bool use_main_schema)  {
   stringstream input("");
   loadStringstreamFromFile(input,file_);
+
+  cyclus::Blob b(input.str());
+  EM->newEvent("InputFiles")
+    ->addVal("Data", b)
+    ->record();
+
   parser_ = shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {

@@ -4,8 +4,10 @@
 #include "CycException.h"
 #include "Logger.h"
 #include "Event.h"
+#include "Blob.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
@@ -85,6 +87,18 @@ std::string CsvBack::valAsString(boost::spirit::hold_any& v) {
     ss << v.cast<double>();
   } else if (v.type() == typeid(std::string)) {
     ss << "\"" << v.cast<std::string>() << "\"";
+  } else if (v.type() == typeid(cyclus::Blob)) {
+    boost::uuids::uuid u = boost::uuids::random_generator()();
+    std::string fname = boost::lexical_cast<std::string>(u) + ".blob";
+    std::string path = (path_ / fname).string();
+
+    std::string s = v.cast<cyclus::Blob>().str;
+    std::ofstream file;
+    file.open(path.c_str(), std::fstream::in | std::fstream::app);
+    file << s;
+    file.close();
+    
+    ss << "\"" << fname << "\"";
   } else if (v.type() == typeid(boost::uuids::uuid)) {
     boost::uuids::uuid u = v.cast<boost::uuids::uuid>();
     ss << "\"" << boost::lexical_cast<std::string>(u) << "\"";

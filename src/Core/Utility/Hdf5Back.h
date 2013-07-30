@@ -11,7 +11,7 @@
 /*!
 An EventManager backend that writes data to an hdf5 file.  Identically named
 events have their data placed as rows in a single table.  Handles the following
-event value types: int, float, double, std::string, const char*.
+event value types: int, float, double, std::string, cyclus::Blob.
 */
 class Hdf5Back : public EventBackend {
 
@@ -46,6 +46,7 @@ class Hdf5Back : public EventBackend {
     hid_t file_;
 
     hid_t string_type_;
+    hid_t blob_type_;
 
     /// Stores the database's path+name, declared during construction.
     std::string path_;

@@ -1,5 +1,6 @@
 
 #include "Hdf5Back.h"
+#include "Blob.hpp"
 #include <cmath>
 #include <string.h>
 
@@ -9,9 +10,13 @@
 Hdf5Back::Hdf5Back(std::string path)
     : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
   string_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(string_type_, STR_SIZE);
   H5Tset_strpad(string_type_, H5T_STR_NULLPAD);
+
+  blob_type_ = H5Tcopy(H5T_C_S1);
+  H5Tset_size(blob_type_, H5T_VARIABLE);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,6 +41,7 @@ void Hdf5Back::notify(EventList evts) {
 void Hdf5Back::close() {
   H5Fclose(file_);
   H5Tclose(string_type_);
+  H5Tclose(blob_type_);
 
   std::map<std::string, size_t*>::iterator it;
   for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
@@ -75,6 +81,10 @@ void Hdf5Back::createTable(Event* ev) {
       field_types[i] = string_type_;
       dst_sizes[i] = STR_SIZE;
       dst_size += STR_SIZE;
+    } else if (vals[i].second.type() == typeid(cyclus::Blob)) {
+      field_types[i] = blob_type_;
+      dst_sizes[i] = sizeof(char*);
+      dst_size += sizeof(char*);
     } else if (vals[i].second.type() == typeid(boost::uuids::uuid)) {
       field_types[i] = string_type_;
       dst_sizes[i] = STR_SIZE;
@@ -123,12 +133,14 @@ void Hdf5Back::writeGroup(EventList& group) {
 void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
   Event::Vals header = group.front()->vals();
   int valtype[header.size()];
-  enum Type{STR, NUM, UUID};
+  enum Type{STR, NUM, UUID, BLOB};
   for (int col = 0; col < header.size(); ++col) {
     if (header[col].second.type() == typeid(std::string)) {
       valtype[col] = STR;
     } else if (header[col].second.type() == typeid(boost::uuids::uuid)) {
       valtype[col] = UUID;
+    } else if (header[col].second.type() == typeid(cyclus::Blob)) {
+      valtype[col] = BLOB;
     } else {
       valtype[col] = NUM;
     }
@@ -153,6 +165,12 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
           size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
           memcpy(buf + offset, s.c_str(), slen);
           memset(buf + offset + slen, 0, STR_SIZE - slen);
+          break;
+        }
+      case BLOB:
+        {
+          const char* data = a->cast<cyclus::Blob>().str.c_str();
+          memcpy(buf + offset, &data, sizes[col]);
           break;
         }
       case UUID:
