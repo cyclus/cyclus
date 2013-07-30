@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 
+namespace cyclus {
+
 /**
    An abstract factory for pointers to symbolic functions
  */
@@ -126,6 +128,6 @@ class PiecewiseFunctionOrderException : public CycException
   public: PiecewiseFunctionOrderException(std::string msg) : CycException(msg) {};
 };
 
-
+} // namespace cyclus
 
 #endif

@@ -12,6 +12,8 @@
 
 namespace fs = boost::filesystem;
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
   if (overwrite) {
@@ -113,3 +115,4 @@ void CsvBack::flush() {
   }
 }
 
+} // namespace cyclus

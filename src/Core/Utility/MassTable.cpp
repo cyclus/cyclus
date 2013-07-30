@@ -9,7 +9,7 @@
 #include "Env.h"
 #include "CycException.h"
 
-using namespace std;
+namespace cyclus {
 
 MassTable* MassTable::instance_ = 0;
 
@@ -71,4 +71,4 @@ void MassTable::initializeSQL() {
   delete db;
 }
 
-
+} // namespace cyclus

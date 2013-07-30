@@ -9,6 +9,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path)
     : db_(path) {
@@ -141,3 +143,4 @@ void SqliteBack::flush() {
   cmds_.clear();
 }
 
+} // namespace cyclus

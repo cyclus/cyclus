@@ -25,7 +25,6 @@ QueryEngine* QueryEngine::queryElement(std::string query,
                                        int index) {
   QueryEngine* qe_child = 
     getEngineFromQuery(query,index) ;
-  spawned_children_.insert(qe_child);
-  return qe_child;
+  spawned_children_.insert(qe_child);  return qe_child;
 }
 } // namespace cyclus

@@ -11,7 +11,7 @@
 #include "Material.h"
 #include "EventManager.h"
 
-using namespace std;
+namespace cyclus {
 
 Timer* Timer::instance_ = 0;
 
@@ -280,3 +280,5 @@ void Timer::logTimeData() {
     ->addVal("Duration", simDur_)
     ->record();
 }
+} // namespace cyclus
+

@@ -9,6 +9,8 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
+namespace cyclus {
+
 EventManager* EventManager::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,3 +111,5 @@ void EventManager::close() {
     }
   }
 }
+} // namespace cyclus
+

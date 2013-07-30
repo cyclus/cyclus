@@ -12,6 +12,8 @@
 // TODO: Move away from singleton pattern (that is why we kept EventManager constructor public)
 #define EM EventManager::Instance()
 
+namespace cyclus {
+
 class Event;
 class EventManager;
 class EventBackend;
@@ -110,6 +112,8 @@ class EventManager {
     static EventManager* Instance();
 
 };
+} // namespace cyclus
+
 
 /*!
 this allows files to use events without having to explicitly include

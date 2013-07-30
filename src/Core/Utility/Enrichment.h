@@ -4,6 +4,7 @@
 
 #include "Material.h"
 
+namespace cyclus {
 namespace enrichment {
   /**
      a simple container class for enrichment assays
@@ -78,5 +79,5 @@ namespace enrichment {
    */
   double value_func(double frac);
 };
-
+} // namespace cyclus
 #endif

@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 
+namespace cyclus {
+
 /*!
 An EventManager backend that writes data to an hdf5 file.  Identically named
 events have their data placed as rows in a single table.  Handles the following
@@ -54,3 +56,4 @@ class Hdf5Back : public EventBackend {
     std::map<std::string, size_t*> tbl_sizes_;
     std::map<std::string, size_t> tbl_size_;
 };
+} // namespace cyclus

@@ -5,6 +5,8 @@
 #include "UseMatrixLib.h"
 #include "IsoVector.h"
 
+namespace cyclus {
+
 /**
    A map type to represent all of the parent isotopes tracked.  The key 
    for this map type is the parent's Iso number, and the value is a pair 
@@ -116,6 +118,6 @@ class DecayHandler {
      */
     int trackedIsotope(int i){return IsotopesTracked_.at(i);}
 };
-
+} // namespace cyclus
 #endif
 

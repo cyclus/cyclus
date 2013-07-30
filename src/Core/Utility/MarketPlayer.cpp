@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-using namespace std;
+namespace cyclus {
 
 // -------------------------------------------------------------------
 MarketPlayer::MarketPlayer() {
@@ -89,3 +89,5 @@ void MarketPlayer::throwRegistrationException(Commodity& commod) {
      << " this MarketPlayer.";
   throw CycKeyException(ss.str());
 }
+} // namespace cyclus
+

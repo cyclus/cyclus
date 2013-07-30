@@ -7,7 +7,7 @@
 #include <cmath>
 #include <string>
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Vector UniformTaylor::matrixExpSolver(const Matrix & A,
@@ -153,3 +153,4 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
   return p;
 }
 
+} // namespace cyclus

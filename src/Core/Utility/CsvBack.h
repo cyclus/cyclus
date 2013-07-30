@@ -7,6 +7,8 @@
 #include <string>
 #include <boost/filesystem.hpp>
 
+namespace cyclus {
+
 typedef std::vector<std::string> LineList;
 
 /*!
@@ -56,3 +58,4 @@ class CsvBack: public EventBackend {
     boost::filesystem::path path_;
 };
 
+} // namespace cyclus

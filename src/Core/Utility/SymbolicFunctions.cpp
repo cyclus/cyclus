@@ -5,8 +5,9 @@
 #include <sstream>
 #include <limits>
 
-using namespace std;
-using namespace boost;
+//using namespace boost;
+
+namespace cyclus {
 
 // -------------------------------------------------------------------
 double LinearFunction::value(double x) 
@@ -69,3 +70,4 @@ std::string PiecewiseFunction::print()
     }
   return ss.str();
 }
+} // namespace cyclus

@@ -10,7 +10,8 @@
 #include "Logger.h"
 #include "UniformTaylor.h"
 
-using namespace std;
+
+namespace cyclus {
 
 bool DecayHandler::decay_info_loaded_ = false;
 ParentMap DecayHandler::parent_ = ParentMap();
@@ -211,3 +212,4 @@ void DecayHandler::decay(double years) {
   setComp(vect);
 }
 
+} // namespace cyclus

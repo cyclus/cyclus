@@ -6,6 +6,8 @@
 #include <vector>
 #include <boost/intrusive_ptr.hpp>
 
+namespace cyclus {
+
 typedef std::vector<Event*> EventList;
 
 /*!
@@ -30,5 +32,5 @@ class EventBackend {
     */
     virtual void close() = 0;
 };
-
+} // namespace cyclus
 #endif

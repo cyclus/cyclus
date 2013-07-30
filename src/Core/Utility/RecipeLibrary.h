@@ -10,6 +10,8 @@
 
 #define RL RecipeLibrary::Instance()
 
+namespace cyclus {
+
 /**
    map of recipe name to composition
  */
@@ -259,6 +261,6 @@ class RecipeLibrary {
   //  friend class CompMap;
   friend class IsoVector;
 };
-
+} // namespace cyclus
 #endif
 

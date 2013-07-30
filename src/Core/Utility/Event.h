@@ -9,6 +9,8 @@
 #include <list>
 #include <string>
 
+namespace cyclus {
+
 /*!
 Used to specify and send a collection of key-value pairs to the
 EventManager for recording.
@@ -60,5 +62,5 @@ class Event {
     std::string title_;
     Vals vals_;
 };
-
+} // namespace cyclus
 #endif

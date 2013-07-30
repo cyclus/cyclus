@@ -9,6 +9,9 @@
 #if !defined(_LOGGER_H)
 #define _LOGGER_H
 
+
+namespace cyclus {
+
 /**
    @def LOG(level, prefix) 
     
@@ -37,11 +40,15 @@ else Logger().Get(level, "core")
 if ((level > Logger::ReportLevel()) | Logger::NoMem()) ; \
 else Logger().Get(level, "memory")
 
+} // namespace cyclus
+
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <map>
+
+namespace cyclus {
 
 /**
    @enum LogLevel 
@@ -164,6 +171,6 @@ class Logger {
     characters).
     */
     static int field_width_; };
-
+} // namespace cyclus
 #endif
 

@@ -1,6 +1,6 @@
 #include "MarketPlayerManager.h"
 
-using namespace std;
+namespace cyclus {
 
 // -------------------------------------------------------------------
 MarketPlayerManager::MarketPlayerManager() {
@@ -36,3 +36,4 @@ double MarketPlayerManager::playerProductionCapacity() {
   }
   return value;
 }
+} // namespace cyclus

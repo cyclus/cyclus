@@ -36,7 +36,7 @@
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
+namespace cyclus {
 
 // constructs a 1x1 matrix of zeroes
 LMatrix::LMatrix() {
@@ -292,3 +292,4 @@ LMatrix identity(int n) {
   
   return I;  // returns the nxn identity matrix
 } 
+} // namespace cyclus

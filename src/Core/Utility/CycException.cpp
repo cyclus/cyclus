@@ -4,7 +4,7 @@
 
 #include "CycException.h"
 
-using namespace std;
+namespace cyclus {
 
 string itoa(int i)    { stringstream out; out << i; return out.str(); };
 string dtoa(double d) { stringstream out; out << d; return out.str(); };
@@ -29,3 +29,4 @@ const char* CycException::what() const throw() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CycException::~CycException() throw()  { }
 
+} // namespace cyclus

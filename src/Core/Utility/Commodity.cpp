@@ -1,6 +1,6 @@
 #include "Commodity.h"
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Commodity::Commodity() : name_("") {}
@@ -25,3 +25,4 @@ bool Commodity::operator!=(const Commodity& other) const
 {
   return !(*this == other);
 } 
+} // namespace cyclus

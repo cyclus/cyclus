@@ -8,6 +8,8 @@
 #include <list>
 #include <string>
 
+namespace cyclus {
+
 /*!
 An EventManager backend that writes data to an sqlite database.
 Identically named events have their data placed as rows in a single table.
@@ -73,5 +75,5 @@ class SqliteBack: public EventBackend {
     /// table names already existing (created) in the sqlite db.
     StrList tbl_names_;
 };
-
+} // namespace cyclus
 #endif

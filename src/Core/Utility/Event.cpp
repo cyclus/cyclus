@@ -3,6 +3,8 @@
 #include "Event.h"
 #include "Timer.h"
 
+namespace cyclus {
+
 typedef boost::singleton_pool<Event, sizeof(Event)> EventPool;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,3 +63,4 @@ void Event::operator delete(void * rawMemory) throw() {
   if(rawMemory == 0) return; 
   EventPool::free(rawMemory);
 }
+} // namespace cyclus

@@ -11,7 +11,7 @@
 #include <map>
 #include <sstream>
 
-using namespace std;
+namespace cyclus {
 
 // initialize singleton member
 RecipeLibrary* RecipeLibrary::instance_ = 0;
@@ -229,3 +229,4 @@ void RecipeLibrary::addToTable(CompMapPtr recipe){
       ->record();
   }
 }
+} // namespace cyclus

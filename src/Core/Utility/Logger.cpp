@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include <cstdio>
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 vector<string> Logger::level_to_string;
@@ -82,3 +82,4 @@ void Logger::addLevel(LogLevel level, std::string text) {
   Logger::level_to_string.push_back(text);
 }
 
+} // namespace cyclus

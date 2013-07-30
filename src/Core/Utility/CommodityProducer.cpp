@@ -4,8 +4,9 @@
 
 #include "CycloptsLimits.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
+
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation() :
@@ -120,3 +121,4 @@ void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commod
                                       + commodity.name());
     }
 }
+} // namespace cyclus

@@ -10,6 +10,8 @@
 //      #include "<Matrix Library>"
 #include "LMatrix.h"          
 
+namespace cyclus {
+
 // To change the matrix type: 
 //
 //      typedef <Matrix Type> Matrix;
@@ -19,5 +21,5 @@ typedef LMatrix Matrix;
 //
 //      typedef <Vector Type> Vector;
 typedef LMatrix Vector;
-
+} // namespace cyclus
 #endif

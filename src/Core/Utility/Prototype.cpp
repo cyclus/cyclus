@@ -4,7 +4,7 @@
 #include "CycException.h"
 #include <utility>
 
-using namespace std;
+namespace cyclus {
 
 // init members
 map<string,Prototype*> Prototype::prototype_registry_;
@@ -22,3 +22,4 @@ Prototype* Prototype::getRegisteredPrototype(std::string name) {
   }
   return it->second;
 }
+} // namespace cyclus

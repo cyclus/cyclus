@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 
+namespace cyclus {
 namespace ActionBuilding {
   /// a struct for a build order: the number of producers to build
   struct BuildOrder 
@@ -136,5 +137,5 @@ namespace ActionBuilding {
   //friend class BuildingManagerTests; 
   // @MJGFlag - removed for the same reason as above
 }
-
+} // namespace cyclus
 #endif

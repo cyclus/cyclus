@@ -5,6 +5,8 @@
 
 #define STR_SIZE 16
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Hdf5Back::Hdf5Back(std::string path)
     : path_(path) {
@@ -167,3 +169,4 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
   }
 }
 
+} // namespace cyclus

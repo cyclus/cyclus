@@ -2,8 +2,8 @@
 #include "CycLimits.h"
 #include <sstream>
 
-using namespace std;
-using namespace cyclus;
+
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 enrichment::Assays::Assays(double feed, double product, double tails) :
@@ -96,3 +96,4 @@ double enrichment::swu_required(double product_qty, const Assays& assays) {
     feed * value_func(assays.feed());
   return swu;
 }
+} // namespace cyclus

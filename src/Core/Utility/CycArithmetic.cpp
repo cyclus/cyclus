@@ -6,7 +6,8 @@
 
 #include "CycException.h"
 #include "CycArithmetic.h"
-using namespace std;
+
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double CycArithmetic::KahanSum(std::vector<double> input){
@@ -45,3 +46,4 @@ std::vector<double> CycArithmetic::sort_ascending(std::map<int, double> to_sort)
   }
   return sort_ascending(vec_to_sort);
 }
+} // namespace cyclus

@@ -4,6 +4,8 @@
 #include <ostream>
 #include "Commodity.h"
 
+namespace cyclus {
+
 /**
    a small class defining a producer
    a producer is associated with:
@@ -139,6 +141,5 @@ class CommodityInformation {
   /// a set of producers of the commodity
   std::vector<Producer> producers_;
 };
-
-
+} // namespace cyclus
 #endif

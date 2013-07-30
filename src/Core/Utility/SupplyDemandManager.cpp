@@ -2,8 +2,8 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+namespace cyclus {
+namespace SupplyDemand {
 
 // -------------------------------------------------------------------
 SupplyDemandManager::SupplyDemandManager() {}
@@ -73,3 +73,5 @@ void SupplyDemandManager::throwErrorIfCommodityNotManaged(Commodity& commodity)
                                       + commodity.name());
     }
 }
+} // namespace SupplyDemand
+} // namespace cyclus

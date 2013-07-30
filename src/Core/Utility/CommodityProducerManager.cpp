@@ -2,9 +2,10 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
 
+namespace cyclus {
+namespace SupplyDemand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducerManager::CommodityProducerManager() {}
 
@@ -49,3 +50,6 @@ void CommodityProducerManager::unRegisterProducer(SupplyDemand::CommodityProduce
       producers_.erase(producer);
     }
 }
+} // namespace SupplyDemand
+} // namespace cyclus
+

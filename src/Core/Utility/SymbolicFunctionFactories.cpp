@@ -7,8 +7,9 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-using namespace boost;
+//using namespace boost;
+
+namespace cyclus {
 
 // -------------------------------------------------------------------
 FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params) 
@@ -119,3 +120,4 @@ FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type,
       break;
     }
 }
+} // namespace cyclus

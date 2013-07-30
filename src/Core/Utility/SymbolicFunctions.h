@@ -5,6 +5,8 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
+namespace cyclus {
+
 // forward declarations
 class Function;
 class LinearFunction;
@@ -120,5 +122,5 @@ class PiecewiseFunction : public Function
 
   friend class PiecewiseFunctionFactory;
 };
-
+} // namespace cyclus
 #endif
