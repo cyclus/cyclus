@@ -11,9 +11,11 @@
 #include "RecipeLibrary.h"
 #include "Model.h"
 #include "CycException.h"
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace boost;
+namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(const std::string load_filename) {
@@ -28,13 +30,58 @@ void XMLFileLoader::init(bool use_main_schema)  {
   parser_ = shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {
-    stringstream schema("");
-    loadStringstreamFromFile(schema,pathToMainSchema());
-    parser_->validate(schema);
+    std::stringstream ss;
+    ss << buildSchema();
+    parser_->validate(ss);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string XMLFileLoader::buildSchema() {
+  stringstream schema("");
+  loadStringstreamFromFile(schema, pathToMainSchema());
+  std::string master = schema.str();
+
+  std::set<std::string> types = Model::dynamic_module_types();
+
+  std::stringstream includes;
+  std::set<std::string>::iterator type;
+  for (type = types.begin(); type != types.end(); ++type) {
+    // find modules
+    std::stringstream refs;
+    refs << std::endl;
+    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + *type;
+    fs::recursive_directory_iterator end;
+    try {
+      for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
+        fs::path p = it->path();
+        // build refs and includes
+        if (p.extension() == ".rng") {
+          refs << "<ref name='" << p.stem().string() << "'/>" << std::endl;
+          includes << "<include href='" << p.string() << "'/>" << std::endl;
+        }
+      }
+    } catch(...) { }
+
+    // replace refs
+    std::string searchStr = std::string("@") + *type + std::string("_REFS@");
+    size_t pos = master.find(searchStr);
+    if (pos != std::string::npos) {
+      master.replace(pos, searchStr.size(), refs.str());
+    }
+  }                                  
+
+  // replace includes
+  std::string searchStr = "@RNG_INCLUDES@";
+  size_t pos = master.find(searchStr);
+  if (pos != std::string::npos) {
+    master.replace(pos, searchStr.size(), includes.str());
+  }
+
+  return master;
+}                                    
+                                     
+// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
                                              std::string file) {
 
@@ -55,7 +102,7 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::pathToMainSchema() {
-  return Env::getInstallPath() + "/share/cyclus.rng";
+  return Env::getInstallPath() + "/share/cyclus.rng.in";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

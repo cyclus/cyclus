@@ -82,6 +82,9 @@ class XMLFileLoader {
                                 std::string file);
 
  private:
+  /// Fills out the cyclus.rng.in template with discovered modules.
+  std::string buildSchema();
+
   /// the input file name
   std::string file_;
 
