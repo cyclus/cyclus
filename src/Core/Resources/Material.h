@@ -13,6 +13,8 @@
 #include "Resource.h"
 #include "IsoVector.h"
 
+namespace cyclus {
+
 /* -- Typedefs -- */
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
@@ -403,5 +405,5 @@ private:
   virtual int stateID() {return iso_vector_.comp()->ID();}
 
 };
-
+} // namespace cyclus
 #endif

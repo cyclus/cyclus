@@ -11,8 +11,7 @@
 #include <vector>
 #include <list>
 
-using namespace std;
-using namespace boost;
+namespace cyclus {
 
 list<Material*> Material::materials_;
 
@@ -398,3 +397,4 @@ void Material::addToTable() {
   Resource::addToTable();
   iso_vector_.record();
 }
+} // namespace cyclus

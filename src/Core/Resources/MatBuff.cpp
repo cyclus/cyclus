@@ -1,6 +1,8 @@
 
 #include "MatBuff.h"
 
+namespace cyclus {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MatManifest MatBuff::popQty(double qty) {
   return toMat(ResourceBuff::popQty(qty));
@@ -26,3 +28,4 @@ void MatBuff::pushAll(MatManifest mats) {
   ResourceBuff::pushAll(toRes(mats));
 }
 
+} // namespace cyclus

@@ -10,6 +10,8 @@
 #include <set>
 #include <limits>
 
+namespace cyclus {
+
 static double const kBuffInfinity = std::numeric_limits<double>::max();
 
 class CycOverCapException: public CycException {
@@ -34,8 +36,7 @@ resource store has zero (finite) capacity. Resource popping occurs in the order
 the resources were pushed (i.e. oldest resources are popd first).
 */
 class ResourceBuff {
-
-public:
+ public:
 
   ResourceBuff();
 
@@ -148,7 +149,7 @@ public:
   */
   bool empty() {return mats_.empty();}
 
-private:
+ private:
 
   double qty_;
 
@@ -159,5 +160,5 @@ private:
   std::list<rsrc_ptr> mats_;
   std::set<rsrc_ptr> mats_present_;
 };
-
+} // namespace cyclus
 #endif

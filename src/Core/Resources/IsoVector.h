@@ -10,6 +10,8 @@
 #include <boost/enable_shared_from_this.hpp>
 /* -- */
 
+namespace cyclus {
+
 /* -- Typedefs -- */
 /**
    shared pointer to another isovector
@@ -243,5 +245,5 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   static CompMapPtr executeDecay(CompMapPtr parent, int time);
   /* --- */
 };
-
+} // namespace cyclus
 #endif

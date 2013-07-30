@@ -3,6 +3,8 @@
 #include "Resource.h"
 #include "EventManager.h"
 
+namespace cyclus {
+
 // Resource IDs
 int Resource::nextID_ = 0;
 
@@ -51,3 +53,4 @@ void Resource::recordNewType(){
     ->addVal("Units", units())
     ->record();
 }
+} // namespace cyclus

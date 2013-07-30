@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
+namespace cyclus {
 
 LogLevel IsoVector::record_level_ = LEV_INFO3;
 
@@ -257,3 +257,4 @@ CompMapPtr IsoVector::executeDecay(CompMapPtr parent, int time) {
   child->decay_time_ = time;
   return child;
 }
+} // namespace cyclus
