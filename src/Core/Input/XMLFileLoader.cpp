@@ -30,9 +30,8 @@ void XMLFileLoader::init(bool use_main_schema)  {
   parser_ = shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {
-    std::string schema = buildSchema();
     std::stringstream ss;
-    ss << schema;
+    ss << buildSchema();
     parser_->validate(ss);
   }
 }
@@ -43,22 +42,15 @@ std::string XMLFileLoader::buildSchema() {
   loadStringstreamFromFile(schema, pathToMainSchema());
   std::string master = schema.str();
 
-  std::vector<std::string> types;
-  types.push_back("Facility");
-  types.push_back("Inst");
-  types.push_back("Region");
-  types.push_back("Market");
-  types.push_back("Converter");
-  types.push_back("Stub");
-  types.push_back("StubComm_REFS@");
+  std::set<std::string> types = Model::dynamic_module_types();
 
   std::stringstream includes;
-  for (int i = 0; i < types.size(); ++i) {
-    std::stringstream refs;
-
+  std::set<std::string>::iterator type;
+  for (type = types.begin(); type != types.end(); ++type) {
     // find modules
+    std::stringstream refs;
     refs << std::endl;
-    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + types[i];
+    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + *type;
     fs::recursive_directory_iterator end;
     try {
       for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
@@ -72,7 +64,7 @@ std::string XMLFileLoader::buildSchema() {
     } catch(...) { }
 
     // replace refs
-    std::string searchStr = std::string("@") + types[i] + std::string("_REFS@");
+    std::string searchStr = std::string("@") + *type + std::string("_REFS@");
     size_t pos = master.find(searchStr);
     if (pos != std::string::npos) {
       master.replace(pos, searchStr.size(), refs.str());
