@@ -8,6 +8,8 @@
 #include "suffix.h"
 #include "CycException.h"
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::openLibrary() {
   module_library_ = dlopen(abs_path_.c_str(),RTLD_LAZY);
@@ -62,5 +64,6 @@ void DynamicModule::closeLibrary() {
     dlerror(); // reset errors
   }
 }
+} // namespace cyclus
 
 #endif

@@ -20,8 +20,7 @@
 
 #include "RegionModel.h"
 
-using namespace std;
-using namespace boost;
+namespace cyclus {
 
 // static members
 int Model::next_id_ = 0;
@@ -395,3 +394,4 @@ void Model::addToTable(){
     ->addVal("EnterDate", bornOn())
     ->record();
 }
+} // namespace cyclus

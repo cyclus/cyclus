@@ -5,6 +5,8 @@
 #include "Resource.h"
 #include "CycException.h"
 
+namespace cyclus {
+
 class CycGenResourceIncompatible: public CycException {
     public: CycGenResourceIncompatible(std::string msg) : CycException(msg) {};
 };
@@ -149,5 +151,5 @@ private:
    */ 
   static bool type_is_recorded_;
 };
-
+} // namespace cyclus
 #endif

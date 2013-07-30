@@ -11,6 +11,8 @@
 #include <set>
 #include <list>
 
+namespace cyclus {
+
 class QueryEngine;
 class Prototype;
 
@@ -223,6 +225,6 @@ class InstModel : public TimeAgent, public Communicator {
 /* ------------------- */ 
   
 };
-
+} // namespace cyclus
 #endif
 

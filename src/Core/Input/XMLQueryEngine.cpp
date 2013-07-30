@@ -7,9 +7,7 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace boost;
-using namespace xmlpp;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine(XMLParser& parser) : current_node_(0) {
@@ -109,3 +107,4 @@ QueryEngine* XMLQueryEngine::getEngineFromQuery(std::string query,
 
   return new XMLQueryEngine(element);
 }
+} // namespace cyclus

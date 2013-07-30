@@ -9,8 +9,9 @@
 
 #include DYNAMICLOADLIB
 
-using namespace std;
 namespace fs = boost::filesystem;
+
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const std::string DynamicModule::suffix() {
@@ -64,3 +65,4 @@ std::string DynamicModule::path() {
   }
   return abs_path_;
 }
+} // namespace cyclus

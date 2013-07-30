@@ -6,6 +6,8 @@
 #include "Logger.h"
 #include <set>
 
+namespace cyclus {
+
 /**
    An abstract class for deriving simulation entities 
    that can communicate via the Message class. 
@@ -38,7 +40,7 @@
  */
 class Communicator {
   
-public:
+ public:
   virtual ~Communicator() {
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
     std::set<msg_ptr>::iterator it;
@@ -51,7 +53,7 @@ public:
 
   friend class Message;
 
-private:
+ private:
 
   /**
      Models communicate desires for material, etc. by sending 
@@ -89,7 +91,7 @@ private:
     MLOG(LEV_DEBUG5) << "communicator " << this << " untracked Message " << msg;
   }
 
-protected:
+ protected:
   /**
      Copy the base class data members from one object to another 
       
@@ -98,5 +100,6 @@ protected:
   virtual void copy(Communicator* src) { };
 
 };
+} // namespace cyclus
 #endif
 

@@ -10,6 +10,8 @@
 #include "Communicator.h"
 #include "Prototype.h"
 
+namespace cyclus {
+
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 class InstModel;
@@ -275,8 +277,6 @@ class FacilityModel : public TimeAgent, public Communicator,
 /* ------------------- */ 
   
 };
+} // namespace cyclus
 
 #endif
-
-
-

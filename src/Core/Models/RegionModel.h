@@ -8,6 +8,8 @@
 #include "Communicator.h"
 #include "QueryEngine.h"
 
+namespace cyclus {
+
 /**
    @class RegionModel 
     
@@ -166,5 +168,5 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   std::set<std::string> inst_names_;
 };
-
+} // namespace cyclus
 #endif

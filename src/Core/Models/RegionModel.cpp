@@ -14,7 +14,7 @@
 #include "Prototype.h"
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RegionModel::RegionModel() { 
@@ -142,3 +142,4 @@ void RegionModel::handleDailyTasks(int time, int day){
     (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
   }
 }
+} // namespace cyclus

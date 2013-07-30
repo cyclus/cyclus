@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cmath> // std::abs
 
-using namespace std;
+namespace cyclus {
 
 LogLevel CompMap::log_level_ = LEV_INFO3;
 
@@ -364,3 +364,5 @@ std::vector<std::string> CompMap::compStrings() {
   }
   return comp_strings;
 }
+
+} // namespace cyclus

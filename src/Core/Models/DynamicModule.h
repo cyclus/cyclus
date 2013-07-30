@@ -4,6 +4,8 @@
 
 #include <string>
 
+namespace cyclus {
+
 class Model;
 
 typedef Model* create_t();
@@ -90,5 +92,6 @@ class DynamicModule {
     void setPath();
 
 };
+} // namespace cyclus
 
 #endif

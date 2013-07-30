@@ -9,7 +9,7 @@
 #include "Logger.h"
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 list<MarketModel*> MarketModel::markets_;
 
@@ -81,4 +81,4 @@ void MarketModel::initCoreMembers(QueryEngine* qe) {
 std::string MarketModel::str() { 
   return Model::str() + " trades commodity " + commodity_; 
 };
-
+} // namespace cyclus

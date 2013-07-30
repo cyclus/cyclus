@@ -13,7 +13,7 @@
 #include "FacilityModel.h"
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 InstModel::InstModel() {
@@ -198,3 +198,5 @@ void InstModel::registerCloneAsBuilt(Prototype* clone) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::registerCloneAsDecommissioned(Prototype* clone) {}
+
+} // namespace cyclus

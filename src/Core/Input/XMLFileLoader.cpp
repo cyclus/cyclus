@@ -12,8 +12,7 @@
 #include "Model.h"
 #include "CycException.h"
 
-using namespace std;
-using namespace boost;
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(const std::string load_filename) {
@@ -112,4 +111,4 @@ void XMLFileLoader::load_control_parameters() {
   QueryEngine* qe = xqe.queryElement(query);
   TI->load_simulation(qe);
 }
-  
+} // namespace cyclus

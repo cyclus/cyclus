@@ -8,9 +8,7 @@
 
 #include "Logger.h"
 
-using namespace std;
-using namespace xmlpp;
-using namespace boost;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLParser::XMLParser() {};
@@ -51,3 +49,5 @@ void XMLParser::validate(const std::stringstream& xml_schema_snippet) {
 xmlpp::Document* XMLParser::document() {
   return parser_->get_document();
 }
+} // namespace cyclus
+

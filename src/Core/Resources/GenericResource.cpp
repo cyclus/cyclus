@@ -7,9 +7,9 @@
 #include "Logger.h"
 #include "EventManager.h"
 
-bool GenericResource::type_is_recorded_ = false;
+namespace cyclus {
 
-using namespace std;
+bool GenericResource::type_is_recorded_ = false;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 GenericResource::GenericResource(std::string units,
@@ -90,4 +90,4 @@ void GenericResource::addToTable() {
     ->addVal("Quality", quality())
     ->record();
 }
-
+} // namespace cyclus

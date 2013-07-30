@@ -11,11 +11,10 @@
 #include "Logger.h"
 #include "Timer.h"
 
+namespace cyclus {
 
 std::map<std::string, std::map<int, double> > Message::offer_qtys_;
 std::map<std::string, std::map<int, double> > Message::request_qtys_;
-
-using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::constructBase(Communicator* sender) {
@@ -229,3 +228,4 @@ double Message::unmetDemand(std::string commod, int time) {
   return demand - supply;
 }
 
+} // namespace cyclus

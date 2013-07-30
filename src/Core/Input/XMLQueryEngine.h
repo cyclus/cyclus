@@ -8,6 +8,8 @@
 #include "XMLParser.h"
 #include <libxml++/libxml++.h>
 
+namespace cyclus {
+
 /**
    @class XMLQueryEngine
 
@@ -78,8 +80,10 @@ class XMLQueryEngine : public QueryEngine {
  private:
   xmlpp::Node* current_node_;
 };
+} // namespace cyclus
 
 #include "CycException.h"
+namespace cyclus {
 /**
    An exception class for an xpath that can not be evaluated
 */
@@ -87,4 +91,5 @@ class CycNodeTypeException : public CycNullQueryException {
  public: 
  CycNodeTypeException(std::string msg) : CycNullQueryException(msg) {};
 };
+} // namespace cyclus
 #endif

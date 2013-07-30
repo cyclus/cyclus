@@ -12,6 +12,8 @@
 #include "IntrusiveBase.h"
 #include "CycException.h"
 
+namespace cyclus {
+
 class Communicator;
 class Message;
 class Transaction;
@@ -322,5 +324,5 @@ class Message: IntrusiveBase<Message> {
   static std::map<std::string, std::map<int, double> > offer_qtys_;
   static std::map<std::string, std::map<int, double> > request_qtys_;
 };
-
+} // namespace cyclus
 #endif

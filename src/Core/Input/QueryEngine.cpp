@@ -2,7 +2,7 @@
 
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine::QueryEngine() {
@@ -28,3 +28,4 @@ QueryEngine* QueryEngine::queryElement(std::string query,
   spawned_children_.insert(qe_child);
   return qe_child;
 }
+} // namespace cyclus

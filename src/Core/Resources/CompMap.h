@@ -13,6 +13,8 @@
 #include <boost/enable_shared_from_this.hpp>
 /* -- */
 
+namespace cyclus {
+
 /* -- Typedefs -- */
 /**
    Isotope integer, ZZZAAA
@@ -440,5 +442,5 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   friend class RecipeLibrary;
   /* -- */
 };
-
+} // namespace cyclus
 #endif

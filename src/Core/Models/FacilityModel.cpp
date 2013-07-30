@@ -12,7 +12,7 @@
 #include "Logger.h"
 #include <limits>
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() : 
@@ -161,3 +161,4 @@ void FacilityModel::setDecommissionDate(int time) {
   CLOG(LEV_DEBUG3) << " * Final Time: " << final_time; 
   CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
+} // namespace cyclus

@@ -20,7 +20,6 @@
 #include "Hdf5Back.h"
 #include "CsvBack.h"
 
-using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
@@ -28,6 +27,8 @@ namespace fs = boost::filesystem;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  using cyclus;
+
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage += "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
