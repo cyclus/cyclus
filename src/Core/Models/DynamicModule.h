@@ -10,7 +10,7 @@ typedef Model* create_t();
 typedef void destroy_t(Model*);
 
 class DynamicModule {
-public:
+ public:
   /// @return the global library suffix
   static const std::string suffix();
   
@@ -49,7 +49,7 @@ public:
   */
   std::string path();
 
-private:
+ private:
   /// the path to the library
   std::string abs_path_;
 
