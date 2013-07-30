@@ -16,7 +16,7 @@ CommodityProducerManager::~CommodityProducerManager() {}
 double CommodityProducerManager::totalProductionCapacity(Commodity& commodity)
 {
   double total = 0.0;
-  set<CommodityProducer*>::iterator it;
+  std::set<CommodityProducer*>::iterator it;
   for (it = producers_.begin(); it != producers_.end(); it++)
     {
       if ( (*it)->producesCommodity(commodity) )

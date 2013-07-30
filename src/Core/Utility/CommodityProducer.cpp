@@ -4,9 +4,8 @@
 
 #include "CycloptsLimits.h"
 
-//using namespace SupplyDemand;
-
 namespace cyclus {
+namespace SupplyDemand {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation() :
@@ -33,8 +32,8 @@ CommodityProducer::~CommodityProducer() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::set<Commodity,CommodityCompare> CommodityProducer::producedCommodities()
 {
-  set<Commodity,CommodityCompare> commodities;
-  map<Commodity,CommodityInformation,CommodityCompare>::iterator it;
+  std::set<Commodity,CommodityCompare> commodities;
+  std::map<Commodity,CommodityInformation,CommodityCompare>::iterator it;
   for (it = produced_commodities_.begin(); 
        it != produced_commodities_.end(); 
        it++)
@@ -96,14 +95,14 @@ void CommodityProducer::addCommodityWithInformation(const Commodity& commodity,
       throw CycDoubleRegistrationException("This producer already has registered "
                                            + commodity.name());
     }
-  produced_commodities_.insert(make_pair(commodity,info));
+  produced_commodities_.insert(std::make_pair(commodity,info));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducer::copyProducedCommoditiesFrom(CommodityProducer* source) 
 {
-  set<Commodity,CommodityCompare> commodities = source->producedCommodities();
-  set<Commodity,CommodityCompare>::iterator it;
+  std::set<Commodity,CommodityCompare> commodities = source->producedCommodities();
+  std::set<Commodity,CommodityCompare>::iterator it;
   for (it = commodities.begin(); it != commodities.end(); it++)
     {
       addCommodity(*it);
@@ -121,4 +120,5 @@ void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commod
                                       + commodity.name());
     }
 }
+} // namespace SupplyDemand
 } // namespace cyclus

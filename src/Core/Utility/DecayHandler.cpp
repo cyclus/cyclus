@@ -1,6 +1,3 @@
-
-#include "DecayHandler.h"
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -10,6 +7,7 @@
 #include "Logger.h"
 #include "UniformTaylor.h"
 
+#include "DecayHandler.h"
 
 namespace cyclus {
 
@@ -29,8 +27,8 @@ DecayHandler::DecayHandler() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::loadDecayInfo() {
-  string path = Env::getBuildPath() + "/share/decayInfo.dat";
-  ifstream decayInfo (path.c_str());
+  std::string path = Env::getBuildPath() + "/share/decayInfo.dat";
+  std::ifstream decayInfo (path.c_str());
 
   if ( decayInfo.is_open() ) {
     int jcol = 1;
@@ -43,7 +41,7 @@ void DecayHandler::loadDecayInfo() {
     
     // checks to see if there are isotopes in 'decayInfo.dat'
     if ( decayInfo.eof() ) {
-      string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
+      std::string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
       throw CycParseException(err_msg);
     }
     
@@ -56,10 +54,10 @@ void DecayHandler::loadDecayInfo() {
 
       // checks for duplicate parent isotopes
       if ( parent_.find(iso) == parent_.end() ) {
-        parent_[iso] = make_pair(jcol, decayConst);
+        parent_[iso] = std::make_pair(jcol, decayConst);
            
         // make daughters
-        vector< pair<int,double> > temp(nDaughters);
+        std::vector< std::pair<int,double> > temp(nDaughters);
         for ( int i = 0; i < nDaughters; ++i ) {
           decayInfo >> iso;
           decayInfo >> branchRatio;
@@ -68,16 +66,16 @@ void DecayHandler::loadDecayInfo() {
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
-              throw CycParseException(string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
+              throw CycParseException(std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
             } 
           }
-          temp[i] = make_pair(iso, branchRatio);
+          temp[i] = std::make_pair(iso, branchRatio);
         }
            
         daughters_[jcol] = temp;
         ++jcol; // set next column
       } else {
-        string err_msg;
+        std::string err_msg;
         err_msg = "A duplicate parent isotope was found in 'decayInfo.dat'";
         throw CycParseException(err_msg);
       }
@@ -135,7 +133,7 @@ Vector DecayHandler::compAsVector() {
         
   Vector comp_vector = Vector(parent_.size(),1);
 
-  map<int, double>::const_iterator comp_iter = atom_comp_->begin();
+  std::map<int, double>::const_iterator comp_iter = atom_comp_->begin();
   while( comp_iter != atom_comp_->end() ) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
@@ -148,13 +146,13 @@ Vector DecayHandler::compAsVector() {
     } else {
       double decayConst = 0;
       int col = parent_.size() + 1;
-      parent_[iso] = make_pair(col, decayConst);  // add isotope to parent map
+      parent_[iso] = std::make_pair(col, decayConst);  // add isotope to parent map
 
       int nDaughters = 0;
-      vector< pair<int,double> > temp(nDaughters);
+      std::vector< std::pair<int,double> > temp(nDaughters);
       daughters_[col] = temp;  // add isotope to daughters map
       
-      vector<long double> row(1, atom_count);
+      std::vector<long double> row(1, atom_count);
       comp_vector.addRow(row);  // add isotope to the end of the Vector
     }
 
@@ -188,8 +186,8 @@ void DecayHandler::buildDecayMatrix() {
     if ( !daughters_.find(jcol)->second.empty() ) {
       // an iterator that points to 1st daughter in the vector
       // pair<isotope,branchratio>
-      vector< pair<int, double> >::const_iterator
-        iso_iter = daughters_.find(jcol)->second.begin();
+      std::vector< std::pair<int, double> >::const_iterator iso_iter = \
+                                              daughters_.find(jcol)->second.begin();
 
       // processes all daughters of the parent
       while ( iso_iter != daughters_.find(jcol)->second.end() ) {
@@ -211,5 +209,4 @@ void DecayHandler::decay(double years) {
   Vector vect = UniformTaylor::matrixExpSolver(decayMatrix_, compAsVector(), years);
   setComp(vect);
 }
-
 } // namespace cyclus

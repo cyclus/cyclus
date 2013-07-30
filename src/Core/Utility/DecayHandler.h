@@ -2,6 +2,12 @@
 #if !defined(_DECAYHANDLER_H)
 #define _DECAYHANDLER_H
 
+#include <string>
+#include <utility>
+#include <vector>
+#include <set>
+#include <map>
+
 #include "UseMatrixLib.h"
 #include "IsoVector.h"
 

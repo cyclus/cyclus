@@ -11,13 +11,13 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double CycArithmetic::KahanSum(std::vector<double> input){
-  vector<double> sorted = sort_ascending(input);
+  std::vector<double> sorted = sort_ascending(input);
   // http://en.wikipedia.org/wiki/Kahan_summation_algorithm
   double y, t;
   double sum = 0.0;
   //A running compensation for lost low-order bits.
   double c = 0.0; 
-  for(vector<double>::iterator i = sorted.begin(); i!=sorted.end(); ++i){
+  for(std::vector<double>::iterator i = sorted.begin(); i!=sorted.end(); ++i){
     y = *i - c;
     //So far, so good: c is zero.
     t = sum + y;
@@ -39,8 +39,8 @@ std::vector<double> CycArithmetic::sort_ascending(std::vector<double> to_sort){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 std::vector<double> CycArithmetic::sort_ascending(std::map<int, double> to_sort){ 
-  vector<double> vec_to_sort;
-  map<int, double>::const_iterator it;
+  std::vector<double> vec_to_sort;
+  std::map<int, double>::const_iterator it;
   for(it=to_sort.begin(); it!=to_sort.end(); ++it){
     vec_to_sort.push_back((*it).second);
   }

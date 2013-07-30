@@ -200,7 +200,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @throw CycNegValueException if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
-  bool almostEqual(const CompMap other, double threshold=cyclus::eps()) const;
+  bool almostEqual(const CompMap other, double threshold=eps()) const;
 
   /**
      returns number of topes in map

@@ -6,10 +6,10 @@
 
 namespace cyclus {
 
-string itoa(int i)    { stringstream out; out << i; return out.str(); };
-string dtoa(double d) { stringstream out; out << d; return out.str(); };
+std::string itoa(int i)    {std::stringstream out; out << i; return out.str(); };
+std::string dtoa(double d) {std::stringstream out; out << d; return out.str(); };
 
-string CycException::prepend_ = "cyclus exception";
+std::string CycException::prepend_ = "cyclus exception";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CycException::CycException() {

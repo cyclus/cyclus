@@ -276,7 +276,7 @@ public:
      @return the extracted material as a newly allocated material object
    */
   virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
-      MassUnit unit=KG, double threshold=cyclus::eps_rsrc());
+      MassUnit unit=KG, double threshold=eps_rsrc());
 
   /**
      Extracts a specified mass from this material creating a new 
