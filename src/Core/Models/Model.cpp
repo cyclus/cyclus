@@ -24,15 +24,15 @@ namespace cyclus {
 
 // static members
 int Model::next_id_ = 0;
-vector<Model*> Model::model_list_;
-map< string, shared_ptr<DynamicModule> > Model::loaded_modules_;
-vector<void*> Model::dynamic_libraries_;
-set<Model*> Model::markets_;
-set<Model*> Model::regions_;
+std::vector<Model*> Model::model_list_;
+std::map< std::string, boost::shared_ptr<DynamicModule> > Model::loaded_modules_;
+std::vector<void*> Model::dynamic_libraries_;
+std::set<Model*> Model::markets_;
+std::set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
-  set<string> types;
+  std::set<std::string> types;
   types.insert("Market");
   types.insert("Converter");
   types.insert("Region");
@@ -53,7 +53,7 @@ Model* Model::getModelByName(std::string name) {
   }
 
   if (found_model == NULL) {
-    string err_msg = "Model '" + name + "' doesn't exist.";
+    std::string err_msg = "Model '" + name + "' doesn't exist.";
     throw CycIndexException(err_msg);
   }
   return found_model;
@@ -70,14 +70,14 @@ void Model::printModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<Model*> Model::getModelList() {
+std::vector<Model*> Model::getModelList() {
   return Model::model_list_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::loadModule(std::string model_type, std::string module_name)
 {
-  shared_ptr<DynamicModule> 
+  boost::shared_ptr<DynamicModule> 
     module(new DynamicModule(model_type,module_name)); 
 
   module->initialize();
@@ -105,11 +105,11 @@ void Model::initializeSimulationEntity(std::string model_type,
                                        QueryEngine* qe) {
   // query data
   QueryEngine* module_data = qe->queryElement("model");
-  string module_name = module_data->getElementName();
+  std::string module_name = module_data->getElementName();
 
   // instantiate & init module
   /* --- */
-  loadModule(model_type,module_name);
+  loadModule(model_type, module_name);
   Model* model = constructModel(module_name);
   /* --- */
   model->initCoreMembers(qe);
@@ -140,7 +140,7 @@ void Model::initializeSimulationEntity(std::string model_type,
 void Model::registerMarketWithSimulation(Model* market) {
   MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
   if (!marketCast) {
-    string err_msg = "Model '" + market->name() + "' can't be registered as a market.";
+    std::string err_msg = "Model '" + market->name() + "' can't be registered as a market.";
     throw CycOverrideException(err_msg);
   }
   else {
@@ -152,7 +152,7 @@ void Model::registerMarketWithSimulation(Model* market) {
 void Model::registerRegionWithSimulation(Model* region) {
   RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
   if (!regionCast) {
-    string err_msg = "Model '" + region->name() + "' can't be registered as a region.";
+    std::string err_msg = "Model '" + region->name() + "' can't be registered as a region.";
     throw CycOverrideException(err_msg);
   }
   else {
@@ -162,7 +162,7 @@ void Model::registerRegionWithSimulation(Model* region) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::constructSimulation() {
-  set<Model*>::iterator it;
+  std::set<Model*>::iterator it;
   for (it = markets_.begin(); it != markets_.end(); it++) {
     Model* market = *it;
     market->enterSimulation(market);
@@ -181,7 +181,7 @@ void Model::initCoreMembers(QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model() {
-  children_ = vector<Model*>();
+  children_ = std::vector<Model*>();
   name_ = "";
   ID_ = next_id_++;
   born_ = false;
@@ -229,7 +229,7 @@ Model* Model::constructModel(std::string model_impl){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::deleteModel(Model* model){
-  map<string, shared_ptr<DynamicModule> >::iterator it;
+  std::map<std::string, boost::shared_ptr<DynamicModule> >::iterator it;
   it = loaded_modules_.find(model->modelImpl());
   if (it != loaded_modules_.end()) 
     it->second->destructInstance(model);
@@ -237,7 +237,7 @@ void Model::deleteModel(Model* model){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::removeFromList(Model* model, std::vector<Model*> &mlist) {
-  vector<Model*>::iterator it = find(mlist.begin(),mlist.end(),model);
+  std::vector<Model*>::iterator it = find(mlist.begin(),mlist.end(),model);
   if (it != mlist.end()) {
     mlist.erase(it);
   }
@@ -299,7 +299,7 @@ void Model::setParent(Model* parent){
 Model* Model::parent(){
   // if parent pointer is null, throw an error
   if (parent_ == NULL){
-    string null_err = "You have tried to access the parent of " +	\
+    std::string null_err = "You have tried to access the parent of " +	\
       this->name() + " but the parent pointer is NULL.";
     throw CycIndexException(null_err);
   }
@@ -335,10 +335,10 @@ void Model::removeChild(Model* child){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::printChildren() {
-  stringstream ss("");
-  ss << "Children of " << name() << ":" << endl;
+  std::stringstream ss("");
+  ss << "Children of " << name() << ":" << std::endl;
   for (int i = 0; i < children_.size(); i++) {
-    vector<string> print_outs = getTreePrintOuts(children_.at(i));
+    std::vector<std::string> print_outs = getTreePrintOuts(children_.at(i));
     for (int j = 0; j < print_outs.size(); j++) {
       ss << "\t" << print_outs.at(j);
     }
@@ -348,15 +348,15 @@ std::string Model::printChildren() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> Model::getTreePrintOuts(Model* m) {
-  vector<string> ret;
-  stringstream ss("");
-  ss << m->name() << endl;
+  std::vector<std::string> ret;
+  std::stringstream ss("");
+  ss << m->name() << std::endl;
   ret.push_back(ss.str());
   for (int i = 0; i < m->nChildren(); i++) {
-    vector<string> outs = getTreePrintOuts(m->children(i));
+    std::vector<std::string> outs = getTreePrintOuts(m->children(i));
     for (int j = 0; j < outs.size(); j++) {
       ss.str("");
-      ss << "\t" << outs.at(j) << endl;
+      ss << "\t" << outs.at(j) << std::endl;
       ret.push_back(ss.str());
     }
   }
@@ -364,13 +364,13 @@ std::vector<std::string> Model::getTreePrintOuts(Model* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const string Model::modelImpl() {
+const std::string Model::modelImpl() {
   return model_impl_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-vector<rsrc_ptr> Model::removeResource(Transaction order) {
-  string msg = "The model " + name();
+std::vector<rsrc_ptr> Model::removeResource(Transaction order) {
+  std::string msg = "The model " + name();
   msg += " doesn't support resource removal.";
   throw CycOverrideException(msg);
 }
@@ -378,7 +378,7 @@ vector<rsrc_ptr> Model::removeResource(Transaction order) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addResource(Transaction trans,
 			std::vector<rsrc_ptr> manifest) {
-  string err_msg = "The model " + name();
+  std::string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
   throw CycOverrideException(err_msg);
 }

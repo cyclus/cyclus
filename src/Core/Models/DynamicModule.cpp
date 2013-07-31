@@ -35,7 +35,7 @@ void DynamicModule::initialize() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setPath() {
-  string lib_name = "lib" + module_name_ + suffix();
+  std::string lib_name = "lib" + module_name_ + suffix();
   fs::path p;
   if (!Env::findModuleLib(lib_name, p)) {
     throw CycIOException("Could not find library: " + lib_name);

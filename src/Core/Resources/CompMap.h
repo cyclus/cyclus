@@ -15,6 +15,11 @@
 
 namespace cyclus {
 /**
+   Isotope integer, ZZZAAA
+ */
+typedef int Iso;
+
+/**
    a shared pointer to this class
  */
 class CompMap;
@@ -31,10 +36,6 @@ typedef boost::shared_ptr<CompMap> CompMapPtr;
 namespace cyclus {
 
 /* -- Typedefs -- */
-/**
-   Isotope integer, ZZZAAA
- */
-typedef int Iso;
 
 /**
    map of isotope integer to value (mass or atom)

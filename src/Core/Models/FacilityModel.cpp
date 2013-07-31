@@ -16,8 +16,8 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel() : 
-  fac_lifetime_(numeric_limits<int>::max()),
-  decommission_date_(numeric_limits<int>::max()),
+  fac_lifetime_(std::numeric_limits<int>::max()),
+  decommission_date_(std::numeric_limits<int>::max()),
   build_date_(0) {
   setModelType("Facility");
   in_commods_ = std::vector<std::string>();
@@ -88,7 +88,7 @@ void FacilityModel::cloneCoreMembersFrom(FacilityModel* source) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
-  stringstream ss("");
+  std::stringstream ss("");
   ss << Model::str() << " with: "
      << " lifetime: " << facLifetime()
      << " build date: " << build_date_

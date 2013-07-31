@@ -19,14 +19,14 @@ namespace cyclus {
 InstModel::InstModel() {
   setModelType("Inst");
   prototypes_ = PrototypeSet();
-  initial_build_order_ = map<Prototype*,int>();
+  initial_build_order_ = std::map<Prototype*, int>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::initCoreMembers(QueryEngine* qe) {
   Model::initCoreMembers(qe);
 
-  string name, query;
+  std::string name, query;
   int nEntries;
   Prototype* prototype;  
   
@@ -68,7 +68,7 @@ void InstModel::registerAvailablePrototype(Prototype* prototype) {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
   
-  string name = qe->getElementContent("prototype");
+  std::string name = qe->getElementContent("prototype");
   int number = atoi(qe->getElementContent("number").c_str());
 
   Prototype* p = Prototype::getRegisteredPrototype(name);
@@ -78,13 +78,13 @@ void InstModel::addPrototypeToInitialBuild(QueryEngine* qe) {
                    << number << " prototypes of type " << name 
                    << " to its list of initial facilities to build.";
 
-  initial_build_order_.insert(make_pair(p,number));
+  initial_build_order_.insert(std::make_pair(p, number));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
   if (!isAvailablePrototype(p)) {    
-    stringstream err("");
+    std::stringstream err("");
     err << "Inst " << this->name() << " does not have " 
         << dynamic_cast<Model*>(p)->name() 
         << " as one of its available prototypes.";
@@ -104,7 +104,7 @@ std::string InstModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 void InstModel::enterSimulationAsCoreEntity() {
   // build initial prototypes
-  map<Prototype*,int>::iterator it;
+  std::map<Prototype*,int>::iterator it;
   for (it = initial_build_order_.begin(); 
        it != initial_build_order_.end(); it ++) {
     
@@ -150,7 +150,7 @@ void InstModel::handleTick(int time) {
 
 void InstModel::handleTock(int time) {
   // tell all of the institution's child models to handle the tock
-  vector<FacilityModel*> children_to_decomm;
+  std::vector<FacilityModel*> children_to_decomm;
 
   for (int i = 0; i < children_.size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
@@ -174,7 +174,7 @@ void InstModel::handleTock(int time) {
 
 void InstModel::handleDailyTasks(int time, int day){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator fac=children_.begin();
+  for(std::vector<Model*>::iterator fac=children_.begin();
       fac != children_.end();
       fac++){
     dynamic_cast<FacilityModel*>(*fac)->handleDailyTasks(time,day);

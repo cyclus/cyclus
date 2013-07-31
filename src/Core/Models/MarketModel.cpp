@@ -11,7 +11,7 @@
 
 namespace cyclus {
 
-list<MarketModel*> MarketModel::markets_;
+std::list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
@@ -21,7 +21,7 @@ MarketModel::MarketModel() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::~MarketModel() {
   LOG(LEV_DEBUG2, "none!") << "removing market from static list of markets...";
-  list<MarketModel*>::iterator mkt;
+  std::list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt) {
     if (this == *mkt) {
       LOG(LEV_DEBUG2, "none!") << "  found match in static list";
@@ -35,7 +35,7 @@ MarketModel::~MarketModel() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel* MarketModel::marketForCommod(std::string commod) {
   MarketModel* market = NULL;
-  list<MarketModel*>::iterator mkt;
+  std::list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
     if ((*mkt)->commodity() == commod) {
       market = *mkt;
@@ -44,7 +44,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   }
 
   if (market == NULL) {
-    string err_msg = "No market found for commodity '";
+    std::string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
     throw CycMarketlessCommodException(err_msg);
   }

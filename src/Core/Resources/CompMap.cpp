@@ -90,7 +90,7 @@ bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
   // (abs(x-y) < abs(x)*eps) && (abs(x-y) < abs(y)*epsilon)
   
   if ( threshold < 0 ) {
-      stringstream ss;
+      std::stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 
          << threshold
          << " .";
@@ -224,8 +224,8 @@ void CompMap::atomify() {
 void CompMap::normalize() {
   double sum;
   double other_sum;
-  vector<double> vec;
-  vector<double> other_vec;
+  std::vector<double> vec;
+  std::vector<double> other_vec;
   bool atom = (basis_ == ATOM);
   for (iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);

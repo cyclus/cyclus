@@ -146,7 +146,7 @@ bool IsoVector::compEquals(const CompMapPtr comp) const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::mix(const IsoVector& other, double ratio) {
   if (ratio < 0) { // check ratio
-    stringstream ss("");
+    std::stringstream ss("");
     ss << "Ratio: " << ratio << " is not in [0,inf).";
     throw CycRangeException(ss.str());
   }
@@ -187,7 +187,7 @@ void IsoVector::mix(const IsoVectorPtr& p_other, double ratio) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void IsoVector::separate(const IsoVector& other, double efficiency) {  
   if (efficiency > 1.0 || efficiency < 0) {  // check efficiency
-    stringstream ss("");
+    std::stringstream ss("");
     ss << "Efficiency: " << efficiency << " is not in [0,1].";
     throw CycRangeException(ss.str());
   }

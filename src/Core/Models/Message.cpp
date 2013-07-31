@@ -207,7 +207,7 @@ Communicator* Message::sender() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::receiver() const {
   if (receiver_ == NULL) {
-    string err_msg = "Uninitilized message receiver.";
+    std::string err_msg = "Uninitilized message receiver.";
     throw CycNullMsgParamException(err_msg);
   }
   return receiver_;

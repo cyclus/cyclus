@@ -10,6 +10,17 @@
 #include "CompMap.h"
 /* -- */
 
+
+namespace cyclus {
+/**
+   shared pointer to another isovector
+ */
+class IsoVector;
+typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
+/* -- */
+} // namespace cyclus
+
+
 /* -- Sensitive Includes -- */
 #include "RecipeLibrary.h"
 /* -- */
@@ -18,12 +29,6 @@
 namespace cyclus {
 
 /* -- Typedefs -- */
-/**
-   shared pointer to another isovector
- */
-class IsoVector;
-typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
-/* -- */
 
 
 /** 
