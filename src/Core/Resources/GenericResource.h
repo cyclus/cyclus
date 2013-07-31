@@ -3,17 +3,8 @@
 #define _GENERICRESOURCE_H
 
 #include "Resource.h"
-#include "CycException.h"
 
 namespace cyclus {
-
-class CycGenResourceIncompatible: public CycException {
-    public: CycGenResourceIncompatible(std::string msg) : CycException(msg) {};
-};
-
-class CycGenResourceOverExtract: public CycException {
-    public: CycGenResourceOverExtract(std::string msg) : CycException(msg) {};
-};
 
 class GenericResource;
 typedef boost::intrusive_ptr<GenericResource> gen_rsrc_ptr;

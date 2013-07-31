@@ -1,6 +1,6 @@
 #include "CommodityProducerTests.h"
 
-#include "CycException.h"
+#include "Error.h"
 
 //using namespace SupplyDemand;
 
@@ -54,8 +54,8 @@ TEST_F(CommodityProducerTests,initialization)
 {
   using cyclus::CycNotRegisteredException;
   EXPECT_FALSE(producer_.producesCommodity(commodity_));
-  EXPECT_THROW(producer_.productionCapacity(commodity_),CycNotRegisteredException);
-  EXPECT_THROW(producer_.productionCost(commodity_),CycNotRegisteredException);
+  EXPECT_THROW(producer_.productionCapacity(commodity_),KeyError);
+  EXPECT_THROW(producer_.productionCost(commodity_),KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,7 +65,7 @@ TEST_F(CommodityProducerTests,addcommodity)
   EXPECT_NO_THROW(addCommodity());
   EXPECT_EQ(producer_.productionCapacity(commodity_),defaultCapacity());
   EXPECT_EQ(producer_.productionCost(commodity_),defaultCost());
-  EXPECT_THROW(addCommodity(),CycDoubleRegistrationException);
+  EXPECT_THROW(addCommodity(),KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

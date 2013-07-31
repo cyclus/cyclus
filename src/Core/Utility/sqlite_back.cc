@@ -8,7 +8,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include "blob.h"
-#include "CycException.h"
+#include "Error.h"
 #include "Event.h"
 #include "Logger.h"
 
@@ -150,7 +150,7 @@ void SqliteBack::Flush() {
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
     try {
       db_.execute(*it);
-    } catch (CycIOException err) {
+    } catch (IOError err) {
       CLOG(LEV_ERROR) << "backend '" << path_ << "' failed write: "
                       << err.what();
     }

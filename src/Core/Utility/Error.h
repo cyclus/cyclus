@@ -1,119 +1,56 @@
-// CycException.h
-#if !defined(_GEN_EXCEPTION)
-#define _GEN_EXCEPTION
+// Error.h
+#pragma once
 
 #include <exception>
 #include <string>
 
-
 namespace cyclus {
 
-/**
-   @class CycException 
-   A generic mechanism to manually manage exceptions 
- */
-class CycException : public std::exception {
+/// A generic mechanism to manually manage exceptions 
+class Error: public std::exception {
 
 protected:
-    /**
-       The message associated with this exception. 
-     */
-    std::string myMessage_;
-    
-    /**
-       A string to prepend to all message of this class. 
-     */
-    static std::string prepend_;
+    /// The message associated with this exception. 
+    std::string msg_;
     
 public:
-    /**
-       Constructs a new CycException with the default message. 
-     */
-    CycException();
+    /// Constructs a new Error with the default message. 
+    Error();
     
-    /**
-       Constructs a new CycException with a provided message 
-        
-       @param msg the message 
-     */
-    CycException(std::string  msg);
+    /// Constructs a new Error with a provided message 
+    Error(std::string  msg);
     
-    /**
-       Returns the error message associated with this CycException. 
-        
-       @return the message 
-     */
+    /// Returns the error message associated with this Error. 
     virtual const char* what() const throw();
-    
-    /**
-       Destroys this CycException. 
-     */
-    virtual ~CycException() throw();
+
+    virtual ~Error() throw(){};
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycIndexException: public CycException {
-  public: CycIndexException(std::string msg) : CycException(msg) {};
+/// For values that are too big, too small, etc.
+class ValueError: public Error {
+  public: ValueError(std::string msg) : Error(msg) {};
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycKeyException: public CycException {
-  public: CycKeyException(std::string msg) : CycException(msg) {};
+/// For failed retrieval/insertion of key-based data into/from data structures
+class KeyError: public Error {
+  public: KeyError(std::string msg) : Error(msg) {};
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycIOException: public CycException {
-  public: CycIOException(std::string msg) : CycException(msg) {};
+/// for failed reading/writing to files, network connections, etc..
+class IOError: public Error {
+  public: IOError(std::string msg) : Error(msg) {};
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycTypeException: public CycException {
-  public: CycTypeException(std::string msg) : CycException(msg) {};
+/// For failed casts that shouldn't
+class CastError: public Error {
+  public: CastError(std::string msg) : Error(msg) {};
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycRangeException: public CycException {
-  public: CycRangeException(std::string msg) : CycException(msg) {};
-};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycParseException: public CycException {
-  public: CycParseException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycOverrideException: public CycException {
-  public: CycOverrideException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycNegativeValueException : public CycException {
-///An exception class for something nonzero attempting to be decreased below 0.
-   public: 
-      CycNegativeValueException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycNotRegisteredException : public CycException {
-  /** 
-      An exception class for a not-registration event, i.e., when 
-      an object should be registered with another object but is not
-  */
- public: 
- CycNotRegisteredException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class CycDoubleRegistrationException : public CycException {
-  /** 
-      An exception class for a multiple registration event, i.e., when 
-      an object should only be registered with another object once but a 
-      second attempt has been made
-  */
- public: 
- CycDoubleRegistrationException(std::string msg) : CycException(msg) {};
+/// For validating files received via IO.
+class ValidationError: public Error {
+  public: ValidationError(std::string msg) : Error(msg) {};
 };
 } // namespace cyclus
 #endif
-
 

@@ -2,7 +2,7 @@
 
 #include "MarketPlayerTests.h"
 
-#include "CycException.h"
+#include "Error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void MarketPlayerTests::SetUp() {
@@ -84,11 +84,9 @@ TEST_F(MarketPlayerTests,EnterLeaveTests) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MarketPlayerTests,ExceptionTests) {
-  using cyclus::CycKeyException;
-  using cyclus::CycCommodityMismatchError;
-  EXPECT_THROW(player1_->productionCapacity(*commodC_),CycKeyException);
+  EXPECT_THROW(player1_->productionCapacity(*commodC_), cyclus::KeyError);
   EXPECT_THROW(player1_->registerManager(managerB_,*commodC_),
-               CycKeyException);
+               cyclus::KeyError);
   EXPECT_THROW(player1_->registerManager(managerA_,*commodB_),
-               CycCommodityMismatchError);
+               cyclus::Error);
 }

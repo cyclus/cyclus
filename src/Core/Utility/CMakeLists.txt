@@ -38,10 +38,10 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycArithmetic.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/Error.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
@@ -69,13 +69,13 @@ INSTALL(FILES
   Commodity.h
   CommodityProducer.h
   CommodityProducerManager.h
-  CycArithmetic.h
   csv_back.h
-  CycException.h
+  CycArithmetic.h
   CycLimits.h
   DecayHandler.h
   Enrichment.h
   Env.h
+  Error.h
   Event.h
   event_backend.h
   EventManager.h

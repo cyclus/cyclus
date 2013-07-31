@@ -2,7 +2,7 @@
 
 #include "BuildingManagerTests.h"
 
-#include "CycException.h"
+#include "Error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManagerTests::SetUp() 
@@ -42,16 +42,16 @@ void BuildingManagerTests::setUpProblem()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,init) 
 {
-  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::CycNotRegisteredException);
+  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,registration) 
 {
   EXPECT_NO_THROW(manager.registerBuilder(builder1));
-  EXPECT_THROW(manager.registerBuilder(builder1), cyclus::CycDoubleRegistrationException);
+  EXPECT_THROW(manager.registerBuilder(builder1), cyclus::KeyError);
   EXPECT_NO_THROW(manager.unRegisterBuilder(builder1));
-  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::CycNotRegisteredException);
+  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

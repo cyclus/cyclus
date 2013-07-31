@@ -4,7 +4,7 @@
 #include "Message.h"
 #include "Resource.h"
 #include "GenericResource.h"
-#include "CycException.h"
+#include "Error.h"
 
 #include <string>
 #include <vector>
@@ -145,7 +145,7 @@ TEST_F(MessagePassingTest, PassBeyondOrigin) {
   using cyclus::CycException;
   comm1->stop_at_return_ = false;
 
-  ASSERT_THROW(comm1->startMessage(), CycException);
+  ASSERT_THROW(comm1->startMessage(), Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -167,7 +167,7 @@ TEST_F(MessagePassingTest, ForgetToSetDest) {
   using cyclus::CycException;
   comm3->forget_set_dest_ = true;
 
-  ASSERT_THROW(comm1->startMessage(), CycException);
+  ASSERT_THROW(comm1->startMessage(), Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -185,7 +185,7 @@ TEST_F(MessagePassingTest, SendToSelf) {
   using cyclus::CycException;
   comm3->parent_ = comm3;
 
-  ASSERT_THROW(comm1->startMessage(), CycException);
+  ASSERT_THROW(comm1->startMessage(), Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();

@@ -9,7 +9,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include "blob.h"
-#include "CycException.h"
+#include "Error.h"
 #include "Event.h"
 #include "Logger.h"
 

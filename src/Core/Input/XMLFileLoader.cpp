@@ -7,8 +7,8 @@
 #include <boost/filesystem.hpp>
 
 #include "blob.h"
-#include "CycException.h"
 #include "Env.h"
+#include "Error.h"
 #include "EventManager.h"
 #include "Model.h"
 #include "RecipeLibrary.h"
@@ -97,7 +97,7 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
     stream << file_stream.rdbuf();
     file_stream.close();
   } else {
-    throw CycIOException("The file '" + file
+    throw IOError("The file '" + file
                          + "' could not be loaded.");
   }
 

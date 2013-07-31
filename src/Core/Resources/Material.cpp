@@ -2,7 +2,7 @@
 #include "Material.h"
 
 #include "CycArithmetic.h"
-#include "CycException.h"
+#include "Error.h"
 #include "CycLimits.h"
 #include "Timer.h"
 #include "Logger.h"
@@ -77,7 +77,7 @@ mat_rsrc_ptr Material::extract(double mass) {
     err += mass;
     err += " cannot be extracted from Material with ID ";
     err += ID_; 
-    throw CycNegativeValueException(err);
+    throw ValueError(err);
   }
   // remove our mass
   quantity_ -= mass;
@@ -129,7 +129,7 @@ std::map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double
       ss << "The threshold cannot be negative. The value provided was " 
          << threshold
          << " .";
-      throw CycNegativeValueException(ss.str());
+      throw ValueError(ss.str());
   }
   std::map<Iso, double>::const_iterator it;
   std::map<Iso, double> to_ret;
@@ -166,7 +166,7 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
          << " of that iso. The difference between the amounts is : "
          << amt 
          << " . ";
-      throw CycNegativeValueException(ss.str());
+      throw ValueError(ss.str());
     } else { 
       (*final_comp)[iso] = amt;
       final_amt_vec.push_back(amt);
@@ -273,7 +273,7 @@ double Material::convertFromKg(double mass, MassUnit to_unit) {
       converted = mass;
       break;
     default:
-      throw CycException("The unit provided is not a supported mass unit.");
+      throw Error("The unit provided is not a supported mass unit.");
   }
   return converted;
 }
@@ -289,7 +289,7 @@ double Material::convertToKg(double mass, MassUnit from_unit) {
       in_kg = mass;
       break;
     default:
-      throw CycException("The unit provided is not a supported mass unit.");
+      throw Error("The unit provided is not a supported mass unit.");
   }
   return in_kg;
 }
@@ -328,7 +328,7 @@ CompMapPtr Material::unnormalizeComp(Basis basis, MassUnit unit){
       scaling = this->moles();
       break;
     default : 
-      throw CycException("The basis provided is not a supported CompMap basis");
+      throw Error("The basis provided is not a supported CompMap basis");
   }
   CompMapPtr full_comp = CompMapPtr(new CompMap(*norm_comp));
   CompMap::iterator it;

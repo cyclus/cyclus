@@ -439,7 +439,7 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
   EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
-  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), CycException);
+  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), Error);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -520,8 +520,8 @@ TEST_F(MaterialTest, Extract_over_extract) {
   using cyclus::CycNegativeValueException;
 
   // Over-extraction should throw an exception
-  EXPECT_THROW( diff_mat_->extract(test_comp_, 2*test_size_), CycNegativeValueException);
-  EXPECT_THROW( test_mat_->extract(test_comp_, 2*test_size_), CycException);
+  EXPECT_THROW( diff_mat_->extract(test_comp_, 2*test_size_), ValueError);
+  EXPECT_THROW( test_mat_->extract(test_comp_, 2*test_size_), Error);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -619,7 +619,7 @@ TEST_F(MaterialTest, Apply_threshold_negative){
   using cyclus::CycNegativeValueException;
   std::map<Iso, double> result_vec;
   double infty = std::numeric_limits<double>::infinity();
-  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), CycNegativeValueException);
+  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-#include "CycException.h"
+#include "Error.h"
 #include "Logger.h"
 #include "Material.h"
 #include "EventManager.h"
@@ -55,7 +55,7 @@ void Timer::runSim() {
     Model* model = Model::getModelList().at(count);
     try {
       model->parent();
-    } catch (CycIndexException err) {
+    } catch (ValueError err) {
       delete model;
       count = 0;
       continue;
@@ -87,13 +87,9 @@ void Timer::sendResolve() {
   for(std::vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
        agent != resolve_listeners_.end(); 
        agent++) {
-    try {
-      CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name() << " {";
-      (*agent)->resolve();
-    } catch(CycException err) {
-      CLOG(LEV_ERROR) << "ERROR occured in sendResolve(): " << err.what();
-    }
+    CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->ID()
+                    << ", name=" << (*agent)->name() << " {";
+    (*agent)->resolve();
     CLOG(LEV_INFO3) << "}";
   }
 }
@@ -103,13 +99,9 @@ void Timer::sendTick() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    try {
-      CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name() << " {";
-      (*agent)->handleTick(time_);
-    } catch(CycException err) {
-      CLOG(LEV_ERROR) << "ERROR occured in sendTick(): " << err.what();
-    }
+    CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
+                    << ", name=" << (*agent)->name() << " {";
+    (*agent)->handleTick(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
@@ -119,13 +111,9 @@ void Timer::sendTock() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    try {
-      CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
-                      << ", name=" << (*agent)->name() << " {";
-      (*agent)->handleTock(time_);
-    } catch(CycException err) {
-      CLOG(LEV_ERROR) << "ERROR occured in sendTock(): " << err.what();
-    }
+    CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
+                    << ", name=" << (*agent)->name() << " {";
+    (*agent)->handleTock(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
@@ -135,11 +123,7 @@ void Timer::sendDailyTasks() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    try {
-      (*agent)->handleDailyTasks(time_,date_.day());
-    } catch(CycException err) {
-      CLOG(LEV_ERROR) << "ERROR occured in sendDailyTasks(): " << err.what();
-    }
+    (*agent)->handleDailyTasks(time_,date_.day());
   }
 }
 
@@ -183,16 +167,16 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   reset();
 
   if (m0 < 1 || m0 > 12)
-    throw CycRangeException("Invalid month0; must be between 1 and 12 (inclusive).");
+    throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
 
   if (y0 < 1942)
-    throw CycRangeException("Invalid year0; the first man-made nuclear reactor was build in 1942");
+    throw ValueError("Invalid year0; the first man-made nuclear reactor was build in 1942");
 
   if (y0 > 2063)
-    throw CycRangeException("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
+    throw ValueError("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
 
   if (decay > dur)
-    throw CycRangeException("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
+    throw ValueError("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
 
   decay_interval_ = decay;
 

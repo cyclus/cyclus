@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "CompMapTests.h"
+#include "Error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,default_constructor) {
@@ -145,7 +146,7 @@ TEST_F(CompMapTests, almostEqualNegThresh) {
   comp_->setMap(map_);
   comp_->normalize();
   CompMap copy = CompMap(*comp_);
-  EXPECT_THROW(copy.almostEqual(*comp_, -1.0), CycNegativeValueException);
+  EXPECT_THROW(copy.almostEqual(*comp_, -1.0), ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

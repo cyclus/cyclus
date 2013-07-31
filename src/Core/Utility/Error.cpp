@@ -1,32 +1,19 @@
-// CycException.cpp
-// Implements the CycException class
-#include <sstream>
-
-#include "CycException.h"
+// Error.cpp
+#include "Error.h"
 
 namespace cyclus {
 
-std::string itoa(int i)    {std::stringstream out; out << i; return out.str(); };
-std::string dtoa(double d) {std::stringstream out; out << d; return out.str(); };
-
-std::string CycException::prepend_ = "cyclus exception";
+static const std::string kErrorPrefix("cyclus error: ");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CycException::CycException() {
-	myMessage_ = prepend_;
+Error::Error() : msg_(kPrefix) { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Error::Error(std::string msg) {
+	msg_ = kPrefix + msg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CycException::CycException(std::string msg) {
-	myMessage_ = prepend_ + ": " + msg;
+const char* Error::what() const throw() {
+	return msg_.c_str();
 }
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* CycException::what() const throw() {
-	//const char* toRet = myMessage_;
-	//	return toRet;
-	return myMessage_.c_str();
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CycException::~CycException() throw()  { }
-
-} // namespace cyclus

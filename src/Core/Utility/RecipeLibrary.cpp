@@ -5,7 +5,7 @@
 
 #include "CompMap.h"
 #include "MassTable.h"
-#include "CycException.h"
+#include "Error.h"
 #include "EventManager.h"
 
 #include <map>
@@ -62,7 +62,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
     basis = MASS;
   }
   else {
-    throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
+    throw ValidationError(basis + " basis is not 'mass' or 'atom'.");
   }
 
   std::string name = qe->getElementContent("name");
@@ -149,7 +149,7 @@ void RecipeLibrary::checkRecipe(std::string name) {
   if (!recipeRecorded(name)) {
     std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with name: " << name << ".";
-    throw CycIndexException(err.str());
+    throw ValueError(err.str());
   }
 }
 
@@ -159,7 +159,7 @@ void RecipeLibrary::checkDecayable(CompMapPtr parent) {
     std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with id:" << parent->ID_
         << " as decayable.";
-    throw CycIndexException(err.str());
+    throw ValueError(err.str());
   }
 }
 
@@ -170,7 +170,7 @@ void RecipeLibrary::checkChild(CompMapPtr parent, int time) {
     err << "RecipeLibrary has not recorded a decayed recipe for the parent " 
         << "recipe with id:" << parent->ID_ << " and decay time:" << time 
         << ".";
-    throw CycIndexException(err.str());
+    throw ValueError(err.str());
   }
 }
 

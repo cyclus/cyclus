@@ -1,6 +1,7 @@
 // ResourceBuff.cpp
 #include "CycLimits.h"
 #include "ResourceBuff.h"
+#include "Error.h"
 
 namespace cyclus {
 
@@ -20,7 +21,7 @@ double ResourceBuff::capacity() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::setCapacity(double cap) {
   if (quantity() - cap > cyclus::eps_rsrc()) {
-    throw CycOverCapException("New capacity lower than existing quantity");
+    throw ValueError("New capacity lower than existing quantity");
   }
   capacity_ = cap;
 }
@@ -43,9 +44,9 @@ double ResourceBuff::space() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::popQty(double qty) {
   if (qty - quantity() > cyclus::eps_rsrc()) {
-    throw CycNegQtyException("Removal quantity larger than store tot quantity.");
+    throw ValueError("Removal quantity larger than store tot quantity.");
   } else if (qty < cyclus::eps_rsrc()) {
-    throw CycNegQtyException("Removal quantity cannot be negative.");
+    throw ValueError("Removal quantity cannot be negative.");
   }
 
   Manifest manifest;
@@ -64,6 +65,7 @@ Manifest ResourceBuff::popQty(double qty) {
       mats_.push_front(leftover);
       qty_ -= left;
     } else {
+      mats_present_.erase(mat);
       qty_ -= quan;
     }
 
@@ -77,7 +79,7 @@ Manifest ResourceBuff::popQty(double qty) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::popNum(int num) {
   if (mats_.size() < num) {
-    throw CycNegQtyException("Remove count larger than store count.");
+    throw ValueError("Remove count larger than store count.");
   }
 
   Manifest manifest;
@@ -95,7 +97,7 @@ Manifest ResourceBuff::popNum(int num) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rsrc_ptr ResourceBuff::popOne() {
   if (mats_.size() < 1) {
-    throw CycNegQtyException("Cannot pop material from an empty store.");
+    throw ValueError("Cannot pop material from an empty store.");
   }
   rsrc_ptr mat = mats_.front();
   qty_ -= mat->quantity();
@@ -108,9 +110,9 @@ rsrc_ptr ResourceBuff::popOne() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::pushOne(rsrc_ptr mat) {
   if (mat->quantity() - space() > cyclus::eps_rsrc()) {
-    throw CycOverCapException("Resource pushing of breaks capacity limit.");
+    throw ValueError("Resource pushing breaks capacity limit.");
   } else if (mats_present_.count(mat) == 1) {
-    throw CycDupResException("Duplicate resource pushing attempted");
+    throw KeyError("Duplicate resource pushing attempted");
   }
 
   qty_ += mat->quantity();
@@ -125,12 +127,12 @@ void ResourceBuff::pushAll(Manifest mats) {
     tot_qty += mats.at(i)->quantity();
   }
   if (tot_qty - space() > cyclus::eps_rsrc()) {
-    throw CycOverCapException("Resource pushing breaks capacity limit.");
+    throw ValueError("Resource pushing breaks capacity limit.");
   }
 
   for (int i = 0; i < mats.size(); i++) {
     if (mats_present_.count(mats.at(i)) == 1) {
-      throw CycDupResException("Duplicate resource pushing attempted");
+      throw KeyError("Duplicate resource pushing attempted");
     }
   }
 

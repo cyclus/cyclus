@@ -83,14 +83,4 @@ class XMLQueryEngine : public QueryEngine {
 };
 } // namespace cyclus
 
-#include "CycException.h"
-namespace cyclus {
-/**
-   An exception class for an xpath that can not be evaluated
-*/
-class CycNodeTypeException : public CycNullQueryException {
- public: 
- CycNodeTypeException(std::string msg) : CycNullQueryException(msg) {};
-};
-} // namespace cyclus
 #endif

@@ -2,7 +2,7 @@
 
 #include "SqliteDb.h"
 
-#include "CycException.h"
+#include "Error.h"
 #include "Logger.h"
 #include "Event.h"
 
@@ -32,7 +32,7 @@ void SqliteDb::close() {
     if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
     } else {
-      throw CycIOException("Failed to close database: " + path_);
+      throw IOError("Failed to close database: " + path_);
     }
   }
 }
@@ -58,7 +58,7 @@ void SqliteDb::open() {
     isOpen_ = true;
   } else {
     sqlite3_close(db_);
-    throw CycIOException("Unable to create/open database " + path_);
+    throw IOError("Unable to create/open database " + path_);
   }
 }
 
@@ -77,7 +77,7 @@ void SqliteDb::execute(std::string sql) {
   // collect sqlite errors
   std::string error = sqlite3_errmsg(db_);
   if (error != "not an error") {
-    throw CycIOException("SQL error: " + sql + " " + error);
+    throw IOError("SQL error: " + sql + " " + error);
   }
 }
 
@@ -119,7 +119,7 @@ std::vector<StrList> SqliteDb::query(std::string sql) {
   // collect errors
   std::string error = sqlite3_errmsg(db_);
   if (error != "not an error") {
-    throw CycIOException("SQL error: " + sql + " " + error);
+    throw IOError("SQL error: " + sql + " " + error);
   }
 
   return results;

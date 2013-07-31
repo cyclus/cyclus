@@ -4,7 +4,7 @@
  */
 #include <iostream>
 
-#include "CycException.h"
+#include "Error.h"
 #include "CycArithmetic.h"
 
 namespace cyclus {

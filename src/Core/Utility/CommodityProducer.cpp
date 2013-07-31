@@ -1,8 +1,7 @@
 #include "CommodityProducer.h"
 
 #include "cyclopts_limits.h"
-
-#include "CycException.h"
+#include "Error.h"
 
 namespace cyclus {
 namespace SupplyDemand {
@@ -92,7 +91,7 @@ void CommodityProducer::addCommodityWithInformation(const Commodity& commodity,
 {
   if (producesCommodity(commodity))
     {
-      throw CycDoubleRegistrationException("This producer already has registered "
+      throw KeyError("This producer already has registered "
                                            + commodity.name());
     }
   produced_commodities_.insert(std::make_pair(commodity,info));
@@ -116,7 +115,7 @@ void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commod
 {
   if(!producesCommodity(commodity))
     {
-      throw CycNotRegisteredException("Producer does not produce " 
+      throw KeyError("Producer does not produce " 
                                       + commodity.name());
     }
 }

@@ -6,7 +6,7 @@
 #include "solver.h"
 #include "solver_interface.h"
 
-#include "CycException.h"
+#include "Error.h"
 #include "Logger.h"
 
 using boost::any_cast;
@@ -44,7 +44,7 @@ BuildingManager::~BuildingManager() {}
 void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
   if (builders_.find(builder) != builders_.end())
     {
-      throw CycDoubleRegistrationException("A manager is trying to register a builder twice.");
+      throw KeyError("A manager is trying to register a builder twice.");
     }
   else
     {
@@ -56,7 +56,7 @@ void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
 void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
   if (builders_.find(builder) == builders_.end())
     {
-      throw CycNotRegisteredException("A manager is trying to unregister a builder not originally registered with it.");
+      throw KeyError("A manager is trying to unregister a builder not originally registered with it.");
     }
   else
     {

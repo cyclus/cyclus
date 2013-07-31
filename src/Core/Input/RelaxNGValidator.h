@@ -63,15 +63,4 @@ protected:
 };
 } // namespace cyclus
 
-
-#include "CycException.h"
-namespace cyclus {
-/**
-   Exception helper classes
- */
-class CycValidityException : public CycException {
-public: 
-  CycValidityException(std::string msg) : CycException(msg) {};
-};
-} // namespace cyclus
 #endif

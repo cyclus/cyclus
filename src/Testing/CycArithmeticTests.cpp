@@ -2,7 +2,7 @@
 #include <map>
 #include <gtest/gtest.h>
 
-#include "CycException.h"
+#include "Error.h"
 #include "CycArithmetic.h"
 
 using namespace std;

@@ -209,6 +209,9 @@ Communicator* Message::receiver() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction& Message::trans() const {
+  if (!trans_) {
+    throw Error("message has no transactionn payload");
+  }
   return *trans_;
 }
 

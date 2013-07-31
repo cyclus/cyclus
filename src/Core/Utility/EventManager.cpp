@@ -80,12 +80,7 @@ void EventManager::notifyBackends() {
   index_ = 0;
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
-    try {
-      (*it)->Notify(events_);
-    } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->Name()
-                      << "' failed write with err: " << err.what();
-    }
+    (*it)->Notify(events_);
   }
 }
 
@@ -103,12 +98,7 @@ void EventManager::close() {
   notifyBackends();
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
-    try {
-      (*it)->Close();
-    } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->Name()
-                      << "' failed to close with err: " << err.what();
-    }
+    (*it)->Close();
   }
 }
 } // namespace cyclus

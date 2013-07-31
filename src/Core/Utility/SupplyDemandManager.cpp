@@ -1,6 +1,6 @@
 #include "SupplyDemandManager.h"
 
-#include "CycException.h"
+#include "Error.h"
 
 namespace cyclus {
 namespace SupplyDemand {
@@ -69,7 +69,7 @@ void SupplyDemandManager::throwErrorIfCommodityNotManaged(Commodity& commodity)
 {
   if(!managesCommodity(commodity))
     {
-      throw CycNotRegisteredException("SDManager does not manage demand for " 
+      throw KeyError("SDManager does not manage demand for " 
                                       + commodity.name());
     }
 }

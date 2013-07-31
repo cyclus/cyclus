@@ -73,10 +73,6 @@ class QueryEngine {
   std::set<QueryEngine*> spawned_children_;
 };
 
-class CycNullQueryException : public CycException {
- public:
- CycNullQueryException(std::string msg) : CycException(msg) {};
-};
 } // namespace cyclus
 
 #endif
