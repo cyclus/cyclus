@@ -40,7 +40,7 @@ void RecipeLibrary::load_recipes(QueryEngine* qe) {
   CLOG(LEV_DEBUG2) << "loading recipes {";
   for (int i = 0; i < nRecipes; i++) {
     QueryEngine* recipe = qe->queryElement("recipe",i);
-    string name = recipe->getElementContent("name");
+    std::string name = recipe->getElementContent("name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
     load_recipe(recipe); // load recipe
   }
@@ -52,7 +52,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
   // set basis
   bool atom;
   Basis basis;
-  string basis_str = qe->getElementContent("basis");
+  std::string basis_str = qe->getElementContent("basis");
   if (basis_str == "atom") {
     atom = true;
     basis = ATOM;
@@ -65,7 +65,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
     throw CycIOException(basis + " basis is not 'mass' or 'atom'.");
   }
 
-  string name = qe->getElementContent("name");
+  std::string name = qe->getElementContent("name");
   CLOG(LEV_DEBUG3) << "loading recipe: " << name 
                    << " with basis: " << basis_str;
 
@@ -75,7 +75,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
   // get values needed for composition
   double value;
   int key;
-  string query = "isotope";
+  std::string query = "isotope";
   int nIsos = qe->nElementsMatchingQuery(query);
   
   for (int i = 0; i < nIsos; i++) 
@@ -128,8 +128,8 @@ void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
   decay_times times;
   ChildMap childs;
   // assign containers
-  decay_times_.insert( pair<CompMapPtr,decay_times>(recipe,times) );
-  decay_hist_.insert( pair<CompMapPtr,ChildMap>(recipe,childs) );
+  decay_times_.insert(std::pair<CompMapPtr,decay_times>(recipe,times) );
+  decay_hist_.insert(std::pair<CompMapPtr,ChildMap>(recipe,childs) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -147,7 +147,7 @@ int RecipeLibrary::recipeCount() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::checkRecipe(std::string name) {
   if (!recipeRecorded(name)) {
-    stringstream err;
+    std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with name: " << name << ".";
     throw CycIndexException(err.str());
   }
@@ -156,7 +156,7 @@ void RecipeLibrary::checkRecipe(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::checkDecayable(CompMapPtr parent) {
   if (!compositionDecayable(parent)) {
-    stringstream err;
+    std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with id:" << parent->ID_
         << " as decayable.";
     throw CycIndexException(err.str());
@@ -166,7 +166,7 @@ void RecipeLibrary::checkDecayable(CompMapPtr parent) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::checkChild(CompMapPtr parent, int time) {
   if (!childRecorded(parent,time)) {
-    stringstream err;
+    std::stringstream err;
     err << "RecipeLibrary has not recorded a decayed recipe for the parent " 
         << "recipe with id:" << parent->ID_ << " and decay time:" << time 
         << ".";

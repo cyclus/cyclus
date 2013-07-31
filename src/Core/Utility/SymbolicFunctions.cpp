@@ -18,7 +18,7 @@ double LinearFunction::value(double x)
 // -------------------------------------------------------------------
 std::string LinearFunction::print() 
 { 
-  stringstream ss("");
+  std::stringstream ss("");
   ss << "y = " << slope_ << " * x + " << intercept_;
   return ss.str();
 }
@@ -32,7 +32,7 @@ double ExponentialFunction::value(double x)
 // -------------------------------------------------------------------
 std::string ExponentialFunction::print() 
 { 
-  stringstream ss("");
+  std::stringstream ss("");
   ss << "y = " << constant_ 
      <<" * exp(" << exponent_ << " * x) + " << intercept_;
   return ss.str();
@@ -48,7 +48,7 @@ double PiecewiseFunction::value(double x)
     }
   else 
     {
-      list<PiecewiseFunctionInfo>::iterator f = functions_.begin();
+      std::list<PiecewiseFunctionInfo>::iterator f = functions_.begin();
       while ( f != functions_.end() && (x >= f->xoffset) ) ++f; // exceeds search by 1
       --f; // go back to the correct one
       ret = f->function->value(x - f->xoffset) + f->yoffset;
@@ -59,9 +59,9 @@ double PiecewiseFunction::value(double x)
 // -------------------------------------------------------------------
 std::string PiecewiseFunction::print() 
 { 
-  stringstream ss("");
+  std::stringstream ss("");
   ss << "Piecewise Function comprised of: ";
-  list<PiecewiseFunctionInfo>::iterator f;
+  std::list<PiecewiseFunctionInfo>::iterator f;
   for (f = functions_.begin(); f != functions_.end(); f++)
     {
       ss << " * " << f->function->print() 

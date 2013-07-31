@@ -5,19 +5,21 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
+// forward includes
+//#include "SymbolicFunctionFactories.h"
+
+
 namespace cyclus {
 
 // forward declarations
-class Function;
+//class Function;
 class LinearFunction;
 class ExponentialFunction;
 class PiecewiseFunction;
 
-// typedefs
-typedef boost::shared_ptr<Function> FunctionPtr;
 
 // forward includes
-#include "SymbolicFunctionFactories.h"
+//#include "SymbolicFunctionFactories.h"
 
 /// abstract base class for symbolic functions
 class Function 
@@ -32,6 +34,9 @@ class Function
   /// every function must print itself
   virtual std::string print() = 0;
 };
+
+// typedefs
+typedef boost::shared_ptr<Function> FunctionPtr;
 
 /**
    linear functions

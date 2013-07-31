@@ -77,7 +77,7 @@ void PiecewiseFunctionFactory::addFunction(FunctionPtr function, double starting
 // -------------------------------------------------------------------
 std::map<std::string,BasicFunctionFactory::FunctionType> 
 BasicFunctionFactory::enum_names_ = 
-  map<string,BasicFunctionFactory::FunctionType>();
+  std::map<std::string,BasicFunctionFactory::FunctionType>();
 
 // -------------------------------------------------------------------
 BasicFunctionFactory::BasicFunctionFactory() 
@@ -108,7 +108,7 @@ FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type,
       }
       break;
     default:
-      stringstream err("");
+      std::stringstream err("");
       err << type << " is not a registered function type" 
           << " of the basic function factory.";
       throw CycException(err.str());

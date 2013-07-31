@@ -15,7 +15,7 @@ SupplyDemandManager::~SupplyDemandManager() {}
 void SupplyDemandManager::registerCommodity(Commodity& commodity, 
                                             FunctionPtr fp) 
 {
-  demand_functions_.insert(make_pair(commodity,fp));  
+  demand_functions_.insert(std::make_pair(commodity,fp));  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -42,7 +42,7 @@ double SupplyDemandManager::supply(Commodity& commodity)
 {
   throwErrorIfCommodityNotManaged(commodity);
   double value = 0.0;
-  set<CommodityProducerManager*>::iterator it;
+  std::set<CommodityProducerManager*>::iterator it;
   for (it = managers_.begin(); it != managers_.end(); it++) 
     {
       value += (*it)->totalProductionCapacity(commodity);

@@ -42,7 +42,7 @@ double MassTable::gramsPerMol(int tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MassTable::initializeSQL() {
   // get the file location
-  string file_path = Env::getBuildPath() + "/share/mass.sqlite";
+  std::string file_path = Env::getBuildPath() + "/share/mass.sqlite";
   bool readonly=true;
   SqliteDb *db = new SqliteDb(file_path, readonly);
 
@@ -52,9 +52,9 @@ void MassTable::initializeSQL() {
   
   for (int i = 0; i < znums.size(); i++){
     // // obtain the database row and declare the appropriate members
-    string aStr = anums.at(i).at(0);
-    string zStr = znums.at(i).at(0);
-    string mStr = mnums.at(i).at(0);
+    std::string aStr = anums.at(i).at(0);
+    std::string zStr = znums.at(i).at(0);
+    std::string mStr = mnums.at(i).at(0);
     int z = atoi( zStr.c_str() );
     int a = atoi( aStr.c_str() );
     double mass = atof( mStr.c_str() );
@@ -63,7 +63,7 @@ void MassTable::initializeSQL() {
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
     int tope = z * 1000 + a;
-    isoIndex_.insert(make_pair(tope, i));
+    isoIndex_.insert(std::make_pair(tope, i));
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();

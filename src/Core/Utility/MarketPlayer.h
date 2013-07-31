@@ -21,6 +21,7 @@ namespace cyclus {
 /// an iterator for the manager map
 typedef std::map<Commodity,
   std::vector<MarketPlayerManager*> >::iterator ManagerIterator;
+
 /// an iterator for the production map
 typedef std::map<Commodity,double>::iterator ProductionIterator;
 

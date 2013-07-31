@@ -2,14 +2,16 @@
 #ifndef MARKETPLAYERMANAGER_H
 #define MARKETPLAYERMANAGER_H
 
-#include "SupplyDemand.h"
-
 #include <set>
+
+#include "SupplyDemand.h"
 
 namespace cyclus {
 class MarketPlayerManager;
 } // namespace cyclus
+
 #include "MarketPlayer.h"
+
 
 namespace cyclus {
 

@@ -34,7 +34,7 @@ void MarketPlayer::registerManager(MarketPlayerManager* m,
                                    Commodity& commod) {
   ManagerIterator mi = checkCommodityManagement(commod);
   if (m->commodity() != commod) {
-    stringstream ss("");
+    std::stringstream ss("");
     ss << "Cannot register a manager of " << m->commodity().name() 
        << " with the commodity: " << commod.name();
     throw CycCommodityMismatchError(ss.str());
@@ -45,7 +45,7 @@ void MarketPlayer::registerManager(MarketPlayerManager* m,
 // -------------------------------------------------------------------
 void MarketPlayer::enterMarket(Commodity& commod) {
   ManagerIterator mi = checkCommodityManagement(commod);
-  vector<MarketPlayerManager*> v = mi->second;
+  std::vector<MarketPlayerManager*> v = mi->second;
   for (int i = 0; i < v.size(); i++) {
     v.at(i)->playerEnteringMarket(this);
   }
@@ -82,7 +82,7 @@ MarketPlayer::checkCommodityManagement(Commodity& commod) {
 
 // -------------------------------------------------------------------
 void MarketPlayer::throwRegistrationException(Commodity& commod) {
-  std::stringstream ss("");
+  std::stringstream ss ("");
   ss << "Commodity " << commod.name() << " is not registered with "
      << " this MarketPlayer.";
   throw CycKeyException(ss.str());
