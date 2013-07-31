@@ -2,11 +2,11 @@
 #if !defined(_RECIPELIBRARY_H)
 #define _RECIPELIBRARY_H
 
-#include "CompMap.h"
-#include "QueryEngine.h"
-
 #include <set>
 #include <map>
+
+#include "QueryEngine.h"
+#include "CompMap.h"
 
 #define RL RecipeLibrary::Instance()
 
@@ -15,7 +15,7 @@ namespace cyclus {
 /**
    map of recipe name to composition
  */
-typedef std::map<std::string,CompMapPtr> RecipeMap; 
+typedef std::map<std::string, CompMapPtr> RecipeMap; 
 
 /**
    set of decay times

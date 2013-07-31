@@ -3,15 +3,30 @@
 #define _COMPMAP_H
 
 /* -- Includes -- */
-#include "Logger.h"
-#include "CycLimits.h"
-
 #include <map>
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+
+#include "Logger.h"
+#include "CycLimits.h"
 /* -- */
+
+namespace cyclus {
+/**
+   a shared pointer to this class
+ */
+class CompMap;
+typedef boost::shared_ptr<CompMap> CompMapPtr;
+} // namespace cyclus
+
+
+/* -- Sensitive Includes -- */
+#include "IsoVector.h"
+#include "RecipeLibrary.h"
+/* -- */
+
 
 namespace cyclus {
 
@@ -26,11 +41,6 @@ typedef int Iso;
  */
 typedef std::map<Iso,double> Map;  
 
-/**
-   a shared pointer to this class
- */
-class CompMap;
-typedef boost::shared_ptr<CompMap> CompMapPtr;
 /* -- */
 
 /* -- Enums -- */
@@ -40,10 +50,6 @@ typedef boost::shared_ptr<CompMap> CompMapPtr;
 enum Basis {MASS, ATOM};
 /* -- */
 
-/* -- Sensitive Includes -- */
-#include "IsoVector.h"
-#include "RecipeLibrary.h"
-/* -- */
 
 /** 
    @class CompMap
