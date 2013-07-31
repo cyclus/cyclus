@@ -30,9 +30,8 @@ void XMLFileLoader::init(bool use_main_schema)  {
   stringstream input("");
   loadStringstreamFromFile(input,file_);
 
-  cyclus::Blob b(input.str());
   EM->newEvent("InputFiles")
-    ->addVal("Data", b)
+    ->addVal("Data", cyclus::Blob(input.str()))
     ->record();
 
   parser_ = shared_ptr<XMLParser>(new XMLParser());
