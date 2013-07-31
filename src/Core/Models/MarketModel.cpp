@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Logger.h"
 #include "QueryEngine.h"
+#include "Error.h"
 
 namespace cyclus {
 
@@ -46,7 +47,7 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
   if (market == NULL) {
     std::string err_msg = "No market found for commodity '";
     err_msg += commod + "'.";
-    throw CycMarketlessCommodException(err_msg);
+    throw KeyError(err_msg);
   }
   return market;
 }

@@ -10,7 +10,6 @@
 #include "Resource.h"
 #include "Transaction.h"
 #include "IntrusiveBase.h"
-#include "CycException.h"
 
 namespace cyclus {
 
@@ -25,20 +24,6 @@ typedef boost::intrusive_ptr<Message> msg_ptr;
    (up or down the class hierarchy) this message is moving. 
  */
 enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
-
-class CycCircularMsgException: public CycException {
-  public: CycCircularMsgException() :
-      CycException("Message receiver and sender are the same.") { };
-};
-
-class CycNoMsgReceiverException: public CycException {
-  public: CycNoMsgReceiverException() : 
-      CycException("Can't send the message - must call setNextDest first") { };
-};
-
-class CycNullMsgParamException: public CycException {
-  public: CycNullMsgParamException(std::string msg) : CycException(msg) {};
-};
 
 /**
    A Message class for inter-entity communication. 
@@ -173,10 +158,10 @@ class Message: IntrusiveBase<Message> {
      Messages heading down (DOWN_MSG) are sent successively to each
      communicator in reverse order of their 'upward' sequence. 
       
-     @exception CycNoMsgReceiverException no receiver is designated (must call
+     @exception Error no receiver is designated (must call
      setNextDest first) 
       
-     @exception CycCircularMsgException attempted to send a message to the 
+     @exception Error attempted to send a message to the 
      message sender (circular messaging) 
    */
   virtual void sendOn();
@@ -262,8 +247,6 @@ class Message: IntrusiveBase<Message> {
      Set via the Message constructor and cannot be changed.
 
      @return the receiver of this Message, a destination set by the sender. 
-
-     @exception CycNullMsgParamException receiver is uninitialized (NULL)
    */
   Communicator* receiver() const;
 

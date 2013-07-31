@@ -5,7 +5,6 @@
 #define _TRANSACTION_H
 
 #include "Resource.h"
-#include "CycException.h"
 
 namespace cyclus {
 
@@ -13,11 +12,6 @@ class MarketModel;
 class Model;
 
 enum TransType {OFFER, REQUEST};
-
-class CycTransMismatchException: public CycException {
-  public: CycTransMismatchException() :
-      CycException("Matching requires 1 OFFER and 1 REQUEST typed transaction") { };
-};
 
 class Transaction {
 
@@ -68,7 +62,7 @@ class Transaction {
     @warning using a transaction more than once with this method will result in
              previous paring info being erased
 
-    @exception CycTransMismatchException this transaction and "other" are of
+    @exception ValueError this transaction and "other" are of
                the same TransType.
     */
     void matchWith(Transaction& other);
@@ -76,22 +70,18 @@ class Transaction {
     /**
        @return the market that deals in this this transaction's commodity
 
-       @exception CycMarketlessCommodException the transactions commodity has
-       no corresponding market.
+       @exception ValueError the transactions commodity has
+                  no corresponding market.
      */
     MarketModel* market() const;
     
     /**
        @return a pointer to the supplier in this transaction
-
-       @exception CycNullMsgParamException supplier is uninitialized (NULL)
      */
     Model* supplier() const;
 
     /**
        @return a pointer to the requester in this transaction. 
-
-       @exception CycNullMsgParamException requester is uninitialized (NULL)
      */
     Model* requester() const;
 

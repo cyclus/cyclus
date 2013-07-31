@@ -9,7 +9,7 @@
 
 #include "Logger.h"
 #include "Timer.h"
-#include "CycException.h"
+#include "Error.h"
 #include "FacilityModel.h"
 #include "QueryEngine.h"
 
@@ -88,7 +88,7 @@ void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
     err << "Inst " << this->name() << " does not have " 
         << dynamic_cast<Model*>(p)->name() 
         << " as one of its available prototypes.";
-    throw CycOverrideException(err.str());
+    throw ValidationError(err.str());
   }
 }
 
@@ -96,7 +96,7 @@ void InstModel::throwErrorIfPrototypeIsntAvailable(Prototype* p) {
 std::string InstModel::str() {
   try {
     return Model::str() + " in region" + parent()->name();
-  } catch (CycIndexException err) {
+  } catch (ValueError err) {
     return Model::str() + " with no region.";
   }
 }

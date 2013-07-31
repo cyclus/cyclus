@@ -10,7 +10,7 @@
 
 #include "DynamicModule.h"
 #include "Logger.h"
-#include "CycException.h"
+#include "Error.h"
 #include "Env.h"
 #include "Timer.h"
 #include "Resource.h"
@@ -54,7 +54,7 @@ Model* Model::getModelByName(std::string name) {
 
   if (found_model == NULL) {
     std::string err_msg = "Model '" + name + "' doesn't exist.";
-    throw CycIndexException(err_msg);
+    throw KeyError(err_msg);
   }
   return found_model;
 }
@@ -141,7 +141,7 @@ void Model::registerMarketWithSimulation(Model* market) {
   MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
   if (!marketCast) {
     std::string err_msg = "Model '" + market->name() + "' can't be registered as a market.";
-    throw CycOverrideException(err_msg);
+    throw CastError(err_msg);
   }
   else {
     markets_.insert(market);
@@ -153,7 +153,7 @@ void Model::registerRegionWithSimulation(Model* region) {
   RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
   if (!regionCast) {
     std::string err_msg = "Model '" + region->name() + "' can't be registered as a region.";
-    throw CycOverrideException(err_msg);
+    throw CastError(err_msg);
   }
   else {
     regions_.insert(region);
@@ -222,7 +222,7 @@ Model::~Model() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Model::constructModel(std::string model_impl){
   if (loaded_modules_.find(model_impl) == loaded_modules_.end())
-    throw CycOverrideException("No module is registered for " + model_impl);
+    throw KeyError("No module is registered for " + model_impl);
 
   return loaded_modules_[model_impl]->constructInstance();
 }
@@ -301,7 +301,7 @@ Model* Model::parent(){
   if (parent_ == NULL){
     std::string null_err = "You have tried to access the parent of " +	\
       this->name() + " but the parent pointer is NULL.";
-    throw CycIndexException(null_err);
+    throw ValueError(null_err);
   }
   // else return pointer to parent
   return parent_;
@@ -310,11 +310,11 @@ Model* Model::parent(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::addChild(Model* child){
   if (child == this)
-    throw CycOverrideException("Model " + name() + 
+    throw KeyError("Model " + name() + 
                                "is trying to add itself as its own child.");
       
   if (!child)
-    throw CycOverrideException("Model " + name() + 
+    throw ValueError("Model " + name() + 
                                "is trying to add an invalid model as its child.");
     
 
@@ -372,7 +372,7 @@ const std::string Model::modelImpl() {
 std::vector<rsrc_ptr> Model::removeResource(Transaction order) {
   std::string msg = "The model " + name();
   msg += " doesn't support resource removal.";
-  throw CycOverrideException(msg);
+  throw Error(msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -380,7 +380,7 @@ void Model::addResource(Transaction trans,
 			std::vector<rsrc_ptr> manifest) {
   std::string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
-  throw CycOverrideException(err_msg);
+  throw Error(err_msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
