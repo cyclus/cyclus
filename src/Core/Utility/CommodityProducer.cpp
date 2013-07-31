@@ -10,7 +10,7 @@ using namespace SupplyDemand;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation() :
   capacity(0),
-  cost(Cyclopts::Limits::modifier_limit) 
+  cost(cyclopts::modifier_limit) 
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -23,7 +23,7 @@ CommodityInformation::CommodityInformation(double a_capacity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::CommodityProducer() : 
   default_capacity_(0.0),
-  default_cost_(Cyclopts::Limits::modifier_limit)
+  default_cost_(cyclopts::modifier_limit)
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
