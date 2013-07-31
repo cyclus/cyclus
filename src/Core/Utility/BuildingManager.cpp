@@ -10,7 +10,7 @@
 
 using namespace std;
 using boost::any_cast;
-using namespace Cyclopts;
+using namespace cyclopts;
 using namespace SupplyDemand;
 using namespace ActionBuilding;
 
@@ -24,9 +24,9 @@ BuildOrder::BuildOrder(int n, ActionBuilding::Builder* b,
 
 // -------------------------------------------------------------------
 ProblemInstance::ProblemInstance(Commodity& commod, double demand, 
-                                 Cyclopts::SolverInterface& sinterface, 
-                                 Cyclopts::ConstraintPtr constr, 
-                                 std::vector<Cyclopts::VariablePtr>& soln) :
+                                 cyclopts::SolverInterface& sinterface, 
+                                 cyclopts::ConstraintPtr constr, 
+                                 std::vector<cyclopts::VariablePtr>& soln) :
   commodity(commod),
   unmet_demand(demand),
   interface(sinterface),
@@ -155,7 +155,7 @@ void BuildingManager::addProducerVariableToProblem(SupplyDemand::CommodityProduc
 
 // -------------------------------------------------------------------
 void BuildingManager::constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
-                                                       std::vector<Cyclopts::VariablePtr>& solution)
+                                                       std::vector<cyclopts::VariablePtr>& solution)
 {
   // construct the build orders
   for (int i = 0; i < solution.size(); i++) 

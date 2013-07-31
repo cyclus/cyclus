@@ -27,16 +27,16 @@ namespace ActionBuilding {
   {
     /// constructor
     ProblemInstance(Commodity& commod, double demand, 
-                    Cyclopts::SolverInterface& sinterface, 
-                    Cyclopts::ConstraintPtr constr, 
-                    std::vector<Cyclopts::VariablePtr>& soln);
+                    cyclopts::SolverInterface& sinterface, 
+                    cyclopts::ConstraintPtr constr, 
+                    std::vector<cyclopts::VariablePtr>& soln);
     
     // constituents
     Commodity& commodity;
     double unmet_demand;
-    Cyclopts::SolverInterface& interface;
-    Cyclopts::ConstraintPtr constraint;
-    std::vector<Cyclopts::VariablePtr>& solution;
+    cyclopts::SolverInterface& interface;
+    cyclopts::ConstraintPtr constraint;
+    std::vector<cyclopts::VariablePtr>& solution;
   };
  
   /**
@@ -122,13 +122,13 @@ namespace ActionBuilding {
        @param solution the solution determining how to fill the orders
      */
     void constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
-                                          std::vector<Cyclopts::VariablePtr>& solution);
+                                          std::vector<cyclopts::VariablePtr>& solution);
   private:
     /// the set of registered builders
     std::set<Builder*> builders_;
     
     /// a map of variables to their associated builder and producer
-    std::map<Cyclopts::VariablePtr, 
+    std::map<cyclopts::VariablePtr, 
       std::pair<ActionBuilding::Builder*,SupplyDemand::CommodityProducer*> > solution_map_;
   };
 
