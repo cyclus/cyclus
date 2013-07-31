@@ -148,12 +148,7 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
 void SqliteBack::Flush() {
   db_.execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
-    try {
-      db_.execute(*it);
-    } catch (IOError err) {
-      CLOG(LEV_ERROR) << "backend '" << path_ << "' failed write: "
-                      << err.what();
-    }
+    db_.execute(*it);
   }
   db_.execute("END TRANSACTION");
   cmds_.clear();
