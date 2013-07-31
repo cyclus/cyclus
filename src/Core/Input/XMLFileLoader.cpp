@@ -22,13 +22,13 @@ XMLFileLoader::XMLFileLoader(const std::string load_filename) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::init(bool use_main_schema)  {
-  stringstream input("");
-  loadStringstreamFromFile(input,file_);
-  parser_ = shared_ptr<XMLParser>(new XMLParser());
+  std::stringstream input("");
+  loadStringstreamFromFile(input, file_);
+  parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {
-    stringstream schema("");
-    loadStringstreamFromFile(schema,pathToMainSchema());
+    std::stringstream schema("");
+    loadStringstreamFromFile(schema, pathToMainSchema());
     parser_->validate(schema);
   }
 }
@@ -39,7 +39,7 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
 
   CLOG(LEV_DEBUG4) << "loading the file: " << file;
 
-  ifstream file_stream(file.c_str());
+  std::ifstream file_stream(file.c_str());
 
   if (file_stream) {
     stream << file_stream.rdbuf();
@@ -75,7 +75,7 @@ void XMLFileLoader::initialize_module_paths() {
 void XMLFileLoader::load_recipes() {
   XMLQueryEngine xqe(*parser_);
 
-  string query = "/*/recipe";
+  std::string query = "/*/recipe";
   int numRecipes = xqe.nElementsMatchingQuery(query);
   for (int i=0; i<numRecipes; i++) {
     QueryEngine* qe = xqe.queryElement(query,i);
@@ -85,7 +85,7 @@ void XMLFileLoader::load_recipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
-  set<string>::iterator it;
+  std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
     load_modules_of_type(*it,module_paths_[*it]);
   }
@@ -107,7 +107,7 @@ void XMLFileLoader::load_modules_of_type(std::string type,
 void XMLFileLoader::load_control_parameters() {
   XMLQueryEngine xqe(*parser_);
 
-  string query = "/*/control";
+  std::string query = "/*/control";
   QueryEngine* qe = xqe.queryElement(query);
   TI->load_simulation(qe);
 }

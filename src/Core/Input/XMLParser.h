@@ -6,6 +6,8 @@
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
 
+#include "CycException.h"
+
 namespace cyclus {
 
 /**
@@ -41,11 +43,7 @@ class XMLParser {
   /// file parser
   boost::shared_ptr<xmlpp::DomParser> parser_;
 };
-} // namespace cyclus
 
-#include "CycException.h"
-
-namespace cyclus {
 /**
    An exception class for an xpath that can not be evaluated
 */

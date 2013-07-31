@@ -6,7 +6,7 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine::QueryEngine() {
-  spawned_children_ = set<QueryEngine*>();
+  spawned_children_ = std::set<QueryEngine*>();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

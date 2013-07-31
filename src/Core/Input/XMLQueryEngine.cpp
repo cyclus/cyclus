@@ -21,9 +21,10 @@ XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) : current_node_(0) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 int XMLQueryEngine::nElements() {
+  using xmlpp::Element;
   int n = 0;
-  const Node::NodeList nodelist = current_node_->get_children();  
-  Node::NodeList::const_iterator it;
+  const xmlpp::Node::NodeList nodelist = current_node_->get_children();  
+  xmlpp::Node::NodeList::const_iterator it;
   for (it = nodelist.begin(); it != nodelist.end(); it++) {
     const Element* element = dynamic_cast<const Element*>(*it);
     if (element) 
@@ -40,8 +41,11 @@ int XMLQueryEngine::nElementsMatchingQuery(std::string query) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::getElementContent(std::string query,
                                               int index) {
+  using xmlpp::Node;
+  using xmlpp::NodeSet;
+  using xmlpp::TextNode;
+  using xmlpp::Element;
   const NodeSet nodeset = current_node_->find(query);
-
   if (nodeset.empty())
     throw CycNullQueryException("Could not find a node by the name: " 
                                 + query);
@@ -74,11 +78,13 @@ std::string XMLQueryEngine::getElementContent(std::string query,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngine::getElementName(int index) {
-  vector<Element*> elements;
+  using xmlpp::Node;
+  using xmlpp::NodeSet;
+  std::vector<xmlpp::Element*> elements;
   const Node::NodeList nodelist = current_node_->get_children();
   Node::NodeList::const_iterator it;
   for (it = nodelist.begin(); it != nodelist.end(); it++) {
-    Element* element = dynamic_cast<Element*>(*it);
+    xmlpp::Element* element = dynamic_cast<xmlpp::Element*>(*it);
     if (element) 
       elements.push_back(element);
   }
@@ -91,15 +97,16 @@ std::string XMLQueryEngine::getElementName(int index) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 QueryEngine* XMLQueryEngine::getEngineFromQuery(std::string query,
                                                 int index) {
-  
+  using xmlpp::Node;
+  using xmlpp::NodeSet;
   const NodeSet nodeset = current_node_->find(query);
 
   if (nodeset.size() < index+1)
     throw CycIndexException("Index exceeds number of nodes in query: " 
                             + query);
 
-  Element* element = 
-    dynamic_cast<Element*>(nodeset.at(index));
+  xmlpp::Element* element = 
+    dynamic_cast<xmlpp::Element*>(nodeset.at(index));
 
   if (!element) 
     throw CycNodeTypeException("Node: " + element->get_name() +

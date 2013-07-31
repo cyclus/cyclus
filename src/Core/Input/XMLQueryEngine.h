@@ -3,6 +3,7 @@
 #define _XMLQUERYENGINE_H
 
 #include <string>
+#include <vector>
 
 #include "QueryEngine.h"
 #include "XMLParser.h"

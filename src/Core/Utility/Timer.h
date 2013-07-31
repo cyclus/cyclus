@@ -8,10 +8,9 @@
 
 #include "TimeAgent.h"
 #include "MarketModel.h"
+#include "QueryEngine.h"
 
 namespace cyclus {
-
-class QueryEngine;
 
 #define TI Timer::Instance()
 

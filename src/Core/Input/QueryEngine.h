@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 
+#include "CycException.h"
+
 namespace cyclus {
 
 /**
@@ -70,12 +72,7 @@ class QueryEngine {
  private:
   std::set<QueryEngine*> spawned_children_;
 };
-} // namespace cyclus
 
-
-#include "CycException.h"
-#include <string>
-namespace cyclus {
 class CycNullQueryException : public CycException {
  public:
  CycNullQueryException(std::string msg) : CycException(msg) {};
