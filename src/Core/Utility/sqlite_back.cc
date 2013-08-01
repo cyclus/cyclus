@@ -13,8 +13,7 @@
 #include "Logger.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SqliteBack::SqliteBack(std::string path)
-  : db_(path) {
+SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
   db_.open();
 
