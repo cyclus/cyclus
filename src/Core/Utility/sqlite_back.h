@@ -16,7 +16,6 @@ class SqliteBack: public EventBackend {
  public:
   /// Creates a new sqlite backend that will write to the database file
   /// specified by path. If the file doesn't exist, a new one is created.
-
   /// @param path the filepath (including name) to write the sqlite file.
   SqliteBack(std::string path);
 
