@@ -37,14 +37,14 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducer.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycArithmetic.cpp  
-  ${CMAKE_CURRENT_SOURCE_DIR}/CsvBack.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/CycException.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Hdf5Back.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/LMatrix.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayer.cpp 
@@ -53,7 +53,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/Prototype.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/RecipeLibrary.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SupplyDemandManager.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBack.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDb.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionFactories.cpp  
   ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctions.cpp 
@@ -63,23 +63,23 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 INSTALL(FILES 
   any.hpp
-  Blob.hpp
+  blob.h
   Builder.h
   BuildingManager.h
   Commodity.h
   CommodityProducer.h
   CommodityProducerManager.h
   CycArithmetic.h
-  CsvBack.h
+  csv_back.h
   CycException.h
   CycLimits.h
   DecayHandler.h
   Enrichment.h
   Env.h
   Event.h
-  EventBackend.h
+  event_backend.h
   EventManager.h
-  Hdf5Back.h
+  hdf5_back.h
   IntrusiveBase.h
   LMatrix.h
   Logger.h
@@ -95,7 +95,7 @@ INSTALL(FILES
   Timer.h
   UniformTaylor.h
   UseMatrixLib.h
-  SqliteBack.h
+  sqlite_back.h
   SqliteDb.h
   DESTINATION include
   COMPONENT core

@@ -1,7 +1,7 @@
 
 
-#include "SqliteBack.h"
-#include "Blob.hpp"
+#include "sqlite_back.h"
+#include "blob.h"
 
 #include <gtest/gtest.h>
 #include "boost/lexical_cast.hpp"
@@ -15,9 +15,9 @@ public:
   StrList cmds;
 
 protected:
-  virtual void flush() {
+  virtual void Flush() {
     cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
-    SqliteBack::flush();
+    SqliteBack::Flush();
   };
 };
 

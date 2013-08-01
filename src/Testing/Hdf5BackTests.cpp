@@ -3,8 +3,8 @@
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
-#include "Hdf5Back.h"
-#include "Blob.hpp"
+#include "hdf5_back.h"
+#include "blob.h"
 
 static const char* path = "testdb.h5";
 

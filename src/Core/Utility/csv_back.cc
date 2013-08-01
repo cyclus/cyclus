@@ -1,10 +1,10 @@
-// CsvBack.cpp
-#include "CsvBack.h"
+// csv_back.cc
+#include "csv_back.h"
 
 #include "CycException.h"
 #include "Logger.h"
 #include "Event.h"
-#include "Blob.hpp"
+#include "blob.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -23,25 +23,25 @@ CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::notify(EventList evts) {
+void CsvBack::Notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
-    writeEvent(*it);
+    WriteEvent(*it);
   }
-  flush();
+  Flush();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::close() {
-  flush();
+void CsvBack::Close() {
+  Flush();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string CsvBack::name() {
+std::string CsvBack::Name() {
   return path_.string();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::writeEvent(Event* e) {
+void CsvBack::WriteEvent(Event* e) {
   std::stringstream line;
   std::stringstream header;
   Event::Vals vals = e->vals();
@@ -65,7 +65,7 @@ void CsvBack::writeEvent(Event* e) {
 
   it = vals.begin();
   while (true) {
-    line << valAsString(it->second);
+    line << ValAsString(it->second);
     ++it;
     if (it == vals.end()) {
       break;
@@ -77,7 +77,7 @@ void CsvBack::writeEvent(Event* e) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string CsvBack::valAsString(boost::spirit::hold_any& v) {
+std::string CsvBack::ValAsString(boost::spirit::hold_any& v) {
   std::stringstream ss;
   if (v.type() == typeid(int)) {
     ss << v.cast<int>();
@@ -92,12 +92,12 @@ std::string CsvBack::valAsString(boost::spirit::hold_any& v) {
     std::string fname = boost::lexical_cast<std::string>(u) + ".blob";
     std::string path = (path_ / fname).string();
 
-    std::string s = v.cast<cyclus::Blob>().str;
+    std::string s = v.cast<cyclus::Blob>().str();
     std::ofstream file;
     file.open(path.c_str(), std::fstream::in | std::fstream::app);
     file << s;
     file.close();
-    
+
     ss << "\"" << fname << "\"";
   } else if (v.type() == typeid(boost::uuids::uuid)) {
     boost::uuids::uuid u = v.cast<boost::uuids::uuid>();
@@ -106,13 +106,13 @@ std::string CsvBack::valAsString(boost::spirit::hold_any& v) {
     ss << "\"unsupported-type: " << v.type().name() << "\"";
     CLOG(LEV_ERROR) << "attempted to record unsupported type '"
                     << v.type().name() << "' in backend "
-                    << name();
+                    << Name();
   }
   return ss.str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::flush() {
+void CsvBack::Flush() {
   std::map<std::string, LineList>::iterator it;
   for (it = file_data_.begin(); it != file_data_.end(); it++) {
     LineList lines = it->second;

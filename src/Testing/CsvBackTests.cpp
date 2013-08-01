@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "CsvBack.h"
-#include "Blob.hpp"
+#include "csv_back.h"
+#include "blob.h"
 
 #include "boost/algorithm/string.hpp"
 #include "boost/lexical_cast.hpp"
@@ -113,6 +113,6 @@ TEST(CsvBackTest, Blob) {
     }
     ++count;
   }
-  EXPECT_EQ(data.str, rdata);
+  EXPECT_EQ(data.str(), rdata);
 }
 

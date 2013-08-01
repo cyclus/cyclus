@@ -13,7 +13,7 @@
 #include "CycException.h"
 #include <boost/filesystem.hpp>
 #include "EventManager.h"
-#include "Blob.hpp"
+#include "blob.h"
 
 using namespace std;
 using namespace boost;

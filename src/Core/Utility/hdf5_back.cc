@@ -1,14 +1,13 @@
 
-#include "Hdf5Back.h"
-#include "Blob.hpp"
+#include "hdf5_back.h"
+#include "blob.h"
 #include <cmath>
 #include <string.h>
 
 #define STR_SIZE 16
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Hdf5Back::Hdf5Back(std::string path)
-    : path_(path) {
+Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   string_type_ = H5Tcopy(H5T_C_S1);
@@ -20,45 +19,45 @@ Hdf5Back::Hdf5Back(std::string path)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::notify(EventList evts) {
+void Hdf5Back::Notify(EventList evts) {
   std::map<std::string, EventList> groups;
   for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
     std::string name = (*it)->title();
     if (tbl_size_.count(name) == 0) {
       Event* ev = *it;
-      createTable(ev);
+      CreateTable(ev);
     }
     groups[name].push_back(*it);
   }
 
   std::map<std::string, EventList>::iterator it;
   for (it = groups.begin(); it != groups.end(); ++it) {
-    writeGroup(it->second);
+    WriteGroup(it->second);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::close() {
+void Hdf5Back::Close() {
   H5Fclose(file_);
   H5Tclose(string_type_);
   H5Tclose(blob_type_);
 
   std::map<std::string, size_t*>::iterator it;
   for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
-    delete[] (it->second);
+    delete[](it->second);
   }
   for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
-    delete[] (it->second);
+    delete[](it->second);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Hdf5Back::name() {
+std::string Hdf5Back::Name() {
   return path_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::createTable(Event* ev) {
+void Hdf5Back::CreateTable(Event* ev) {
   Event::Vals vals = ev->vals();
 
   size_t dst_size = 0;
@@ -68,7 +67,7 @@ void Hdf5Back::createTable(Event* ev) {
   const char* field_names[vals.size()];
   for (int i = 0; i < vals.size(); ++i) {
     dst_offset[i] = dst_size;
-   field_names[i] = vals[i].first;
+    field_names[i] = vals[i].first;
     if (vals[i].second.type() == typeid(int)) {
       field_types[i] = H5T_NATIVE_INT;
       dst_sizes[i] = sizeof(int);
@@ -104,8 +103,8 @@ void Hdf5Back::createTable(Event* ev) {
   void* data = NULL;
 
   status = H5TBmake_table(title, file_, title, vals.size(), 0, dst_size,
-      field_names, dst_offset, field_types, chunk_size, fill_data, compress,
-      data);
+                          field_names, dst_offset, field_types, chunk_size, fill_data, compress,
+                          data);
 
   // record everything for later
   tbl_offset_[ev->title()] = dst_offset;
@@ -114,7 +113,7 @@ void Hdf5Back::createTable(Event* ev) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::writeGroup(EventList& group) {
+void Hdf5Back::WriteGroup(EventList& group) {
   std::string title = group.front()->title();
   herr_t status;
 
@@ -123,17 +122,19 @@ void Hdf5Back::writeGroup(EventList& group) {
   size_t rowsize = tbl_size_[title];
 
   char* buf = new char[group.size() * rowsize];
-  fillBuf(buf, group, sizes, rowsize);
+  FillBuf(buf, group, sizes, rowsize);
 
-  status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize, offsets, sizes, buf);
+  status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
+                              offsets, sizes, buf);
   delete[] buf;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize) {
+void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
+                       size_t rowsize) {
   Event::Vals header = group.front()->vals();
   int valtype[header.size()];
-  enum Type{STR, NUM, UUID, BLOB};
+  enum Type {STR, NUM, UUID, BLOB};
   for (int col = 0; col < header.size(); ++col) {
     if (header[col].second.type() == typeid(std::string)) {
       valtype[col] = STR;
@@ -153,32 +154,28 @@ void Hdf5Back::fillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsiz
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
       switch (valtype[col]) {
-      case NUM:
-        {
-          val = a->castsmallvoid();
-          memcpy(buf + offset, val, sizes[col]);
-          break;
-        }
-      case STR:
-        {
-          const std::string s = a->cast<std::string>();
-          size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
-          memcpy(buf + offset, s.c_str(), slen);
-          memset(buf + offset + slen, 0, STR_SIZE - slen);
-          break;
-        }
-      case BLOB:
-        {
-          const char* data = a->cast<cyclus::Blob>().str.c_str();
-          memcpy(buf + offset, &data, sizes[col]);
-          break;
-        }
-      case UUID:
-        {
-          boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
-          memcpy(buf + offset, &uuid, STR_SIZE);
-          break;
-        }
+      case NUM: {
+        val = a->castsmallvoid();
+        memcpy(buf + offset, val, sizes[col]);
+        break;
+      }
+      case STR: {
+        const std::string s = a->cast<std::string>();
+        size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
+        memcpy(buf + offset, s.c_str(), slen);
+        memset(buf + offset + slen, 0, STR_SIZE - slen);
+        break;
+      }
+      case BLOB: {
+        const char* data = a->cast<cyclus::Blob>().str().c_str();
+        memcpy(buf + offset, &data, sizes[col]);
+        break;
+      }
+      case UUID: {
+        boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
+        memcpy(buf + offset, &uuid, STR_SIZE);
+        break;
+      }
       }
       offset += sizes[col];
     }

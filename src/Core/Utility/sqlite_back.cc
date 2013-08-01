@@ -1,10 +1,10 @@
-// SqliteBack.cpp
-#include "SqliteBack.h"
+// sqlite_back.cc
+#include "sqlite_back.h"
 
 #include "CycException.h"
 #include "Logger.h"
 #include "Event.h"
-#include "Blob.hpp"
+#include "blob.h"
 
 #include <sstream>
 #include <iomanip>
@@ -13,7 +13,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path)
-    : db_(path) {
+  : db_(path) {
   path_ = path;
   db_.open();
 
@@ -26,39 +26,39 @@ SqliteBack::SqliteBack(std::string path)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::notify(EventList evts) {
+void SqliteBack::Notify(EventList evts) {
   for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
-    if (! tableExists((*it)->title())) {
-      createTable(*it);
+    if (! TableExists((*it)->title())) {
+      CreateTable(*it);
     }
-    writeEvent(*it);
+    WriteEvent(*it);
   }
-  flush();
+  Flush();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::close() {
-  flush();
+void SqliteBack::Close() {
+  Flush();
   db_.close();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SqliteBack::name() {
+std::string SqliteBack::Name() {
   return path_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::createTable(Event* e) {
+void SqliteBack::CreateTable(Event* e) {
   std::string name = e->title();
   tbl_names_.push_back(name);
 
   Event::Vals vals = e->vals();
   Event::Vals::iterator it = vals.begin();
   std::string cmd = "CREATE TABLE " + name + " (";
-  cmd += std::string(it->first) + " " + valType(it->second);
+  cmd += std::string(it->first) + " " + ValType(it->second);
   ++it;
   while (it != vals.end()) {
-    cmd += ", " + std::string(it->first) + " " + valType(it->second);
+    cmd += ", " + std::string(it->first) + " " + ValType(it->second);
     ++it;
   }
 
@@ -67,7 +67,7 @@ void SqliteBack::createTable(Event* e) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SqliteBack::valType(boost::spirit::hold_any v) {
+std::string SqliteBack::ValType(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
   } else if (v.type() == typeid(float) || v.type() == typeid(double)) {
@@ -79,22 +79,22 @@ std::string SqliteBack::valType(boost::spirit::hold_any v) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SqliteBack::tableExists(std::string name) {
+bool SqliteBack::TableExists(std::string name) {
   return find(tbl_names_.begin(), tbl_names_.end(), name) != tbl_names_.end();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::writeEvent(Event* e) {
+void SqliteBack::WriteEvent(Event* e) {
   std::stringstream colss, valss, cmd;
   Event::Vals vals = e->vals();
 
   Event::Vals::iterator it = vals.begin();
   colss << it->first;
-  valss << valAsString(it->second);
+  valss << ValAsString(it->second);
   ++it;
   while (it != vals.end()) {
     colss << ", " << it->first;
-    valss << ", " << valAsString(it->second);
+    valss << ", " << ValAsString(it->second);
     ++it;
   }
 
@@ -113,7 +113,7 @@ std::string toHex(const std::string& s) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
+std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
   // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
     std::stringstream ss;
@@ -134,16 +134,16 @@ std::string SqliteBack::valAsString(boost::spirit::hold_any v) {
     ss << v.cast<float>();
     return ss.str();
   } else if (v.type() == typeid(cyclus::Blob)) {
-    std::string s = v.cast<cyclus::Blob>().str;
+    std::string s = v.cast<cyclus::Blob>().str();
     return "X'" + toHex(s) + "'";
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
-                  << name();
+                  << Name();
   return "";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::flush() {
+void SqliteBack::Flush() {
   db_.execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
     try {
