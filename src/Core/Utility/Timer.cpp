@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 #include "Material.h"
 #include "EventManager.h"

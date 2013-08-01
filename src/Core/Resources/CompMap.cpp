@@ -3,7 +3,7 @@
 
 #include "MassTable.h"
 #include "CycArithmetic.h"
-#include "Error.h"
+#include "error.h"
 #include "CycLimits.h"
 
 #include <sstream>

@@ -2,7 +2,7 @@
 // Implements the UniformTaylor class
 #include "UniformTaylor.h"
 
-#include "Error.h"
+#include "error.h"
 
 #include <cmath>
 #include <string>

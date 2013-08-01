@@ -1,5 +1,5 @@
-// Error.cpp
-#include "Error.h"
+// error.cc
+#include "error.h"
 
 namespace cyclus {
 
@@ -10,10 +10,12 @@ Error::Error() : msg_(kPrefix) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Error::Error(std::string msg) {
-	msg_ = kPrefix + msg;
+  msg_ = kPrefix + msg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* Error::what() const throw() {
-	return msg_.c_str();
+  return msg_.c_str();
 }
+
+} // namespace cyclus

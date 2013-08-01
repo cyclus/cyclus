@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "Env.h"
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 #include "UniformTaylor.h"
 

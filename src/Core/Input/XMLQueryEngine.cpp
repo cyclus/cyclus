@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "XMLQueryEngine.h"
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 

@@ -6,7 +6,7 @@
 #include <dlfcn.h>
 
 #include "suffix.h"
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 

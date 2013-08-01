@@ -2,7 +2,7 @@
 
 #include "SqliteDb.h"
 
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 #include "Event.h"
 

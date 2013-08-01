@@ -4,7 +4,7 @@
 #include "Message.h"
 #include "Resource.h"
 #include "GenericResource.h"
-#include "Error.h"
+#include "error.h"
 
 #include <string>
 #include <vector>

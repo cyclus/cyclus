@@ -2,7 +2,7 @@
 #if !defined(_EVENTMANAGER_H)
 #define _EVENTMANAGER_H
 
-#include "Error.h"
+#include "error.h"
 #include <boost/uuid/uuid.hpp>
 
 #include <vector>

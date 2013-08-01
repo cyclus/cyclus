@@ -1,6 +1,6 @@
 #include "Enrichment.h"
 #include "CycLimits.h"
-#include "Error.h"
+#include "error.h"
 #include <sstream>
 
 namespace cyclus {

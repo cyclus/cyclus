@@ -2,7 +2,7 @@
 
 #include "MarketPlayerTests.h"
 
-#include "Error.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void MarketPlayerTests::SetUp() {

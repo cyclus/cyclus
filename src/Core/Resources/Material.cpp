@@ -2,7 +2,7 @@
 #include "Material.h"
 
 #include "CycArithmetic.h"
-#include "Error.h"
+#include "error.h"
 #include "CycLimits.h"
 #include "Timer.h"
 #include "Logger.h"

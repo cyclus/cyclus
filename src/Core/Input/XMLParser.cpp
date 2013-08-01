@@ -5,7 +5,7 @@
 #include <string>
 #include "XMLParser.h"
 #include "RelaxNGValidator.h"
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 
 namespace cyclus {

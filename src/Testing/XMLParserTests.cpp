@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "XMLParserTests.h"
-#include "Error.h"
+#include "error.h"
 #include <iostream>
 
 using namespace std;

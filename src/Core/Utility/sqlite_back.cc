@@ -8,7 +8,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include "blob.h"
-#include "Error.h"
+#include "error.h"
 #include "Event.h"
 #include "Logger.h"
 

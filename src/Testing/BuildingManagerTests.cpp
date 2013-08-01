@@ -2,7 +2,7 @@
 
 #include "BuildingManagerTests.h"
 
-#include "Error.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManagerTests::SetUp() 

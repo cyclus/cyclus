@@ -4,7 +4,7 @@
 #include "Message.h"
 
 #include "Communicator.h"
-#include "Error.h"
+#include "error.h"
 #include "Model.h"
 #include "MarketModel.h"
 #include "Resource.h"

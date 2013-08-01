@@ -5,7 +5,7 @@
 
 #include "CompMap.h"
 #include "MassTable.h"
-#include "Error.h"
+#include "error.h"
 #include "EventManager.h"
 
 #include <map>

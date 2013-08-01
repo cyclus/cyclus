@@ -1,7 +1,7 @@
 #include "Prototype.h"
 
 #include "Model.h"
-#include "Error.h"
+#include "error.h"
 #include <utility>
 
 namespace cyclus {

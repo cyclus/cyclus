@@ -1,5 +1,5 @@
 #include "Logger.h"
-#include "Error.h"
+#include "error.h"
 
 #include "SymbolicFunctionFactories.h"
 

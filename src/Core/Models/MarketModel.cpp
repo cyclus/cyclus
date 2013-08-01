@@ -8,7 +8,7 @@
 #include "Timer.h"
 #include "Logger.h"
 #include "QueryEngine.h"
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 

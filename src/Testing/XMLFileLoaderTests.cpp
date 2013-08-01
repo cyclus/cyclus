@@ -6,7 +6,7 @@
 #include <set>
 #include <iostream>
 #include "Model.h"
-#include "Error.h"
+#include "error.h"
 #include "DynamicModule.h"
 
 using namespace std;

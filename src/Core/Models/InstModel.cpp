@@ -9,7 +9,7 @@
 
 #include "Logger.h"
 #include "Timer.h"
-#include "Error.h"
+#include "error.h"
 #include "FacilityModel.h"
 #include "QueryEngine.h"
 

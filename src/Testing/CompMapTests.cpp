@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "CompMapTests.h"
-#include "Error.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,default_constructor) {

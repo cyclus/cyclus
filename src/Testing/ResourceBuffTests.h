@@ -4,7 +4,7 @@
 #include "IsoVector.h"
 #include "Material.h"
 #include "ResourceBuff.h"
-#include "Error.h"
+#include "error.h"
 #include "CycLimits.h"
 #include "Logger.h"
 

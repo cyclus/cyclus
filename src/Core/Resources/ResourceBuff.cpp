@@ -1,7 +1,7 @@
 // ResourceBuff.cpp
 #include "CycLimits.h"
 #include "ResourceBuff.h"
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 

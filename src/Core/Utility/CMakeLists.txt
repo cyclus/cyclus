@@ -41,7 +41,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayHandler.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Enrichment.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/Env.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Error.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/Event.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/EventManager.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
@@ -75,7 +75,7 @@ INSTALL(FILES
   DecayHandler.h
   Enrichment.h
   Env.h
-  Error.h
+  error.h
   Event.h
   event_backend.h
   EventManager.h

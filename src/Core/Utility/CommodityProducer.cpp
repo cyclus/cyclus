@@ -1,7 +1,7 @@
 #include "CommodityProducer.h"
 
 #include "cyclopts_limits.h"
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 namespace SupplyDemand {

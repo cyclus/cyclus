@@ -10,7 +10,7 @@
 
 #include "DynamicModule.h"
 #include "Logger.h"
-#include "Error.h"
+#include "error.h"
 #include "Env.h"
 #include "Timer.h"
 #include "Resource.h"

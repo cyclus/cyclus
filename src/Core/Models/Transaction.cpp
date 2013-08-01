@@ -3,7 +3,7 @@
 #include "Transaction.h"
 
 #include "Timer.h"
-#include "Error.h"
+#include "error.h"
 #include "Model.h"
 #include "MarketModel.h"
 #include "EventManager.h"

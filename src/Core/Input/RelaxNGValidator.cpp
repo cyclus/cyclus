@@ -9,7 +9,7 @@
  */
 
 #include "RelaxNGValidator.h"
-#include "Error.h"
+#include "error.h"
 #include <libxml/xmlerror.h>
 
 namespace cyclus {

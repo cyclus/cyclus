@@ -6,7 +6,7 @@
 #include "solver.h"
 #include "solver_interface.h"
 
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 
 using boost::any_cast;

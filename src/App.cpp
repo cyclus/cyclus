@@ -11,7 +11,7 @@
 
 #include "Model.h"
 #include "Timer.h"
-#include "Error.h"
+#include "error.h"
 #include "Env.h"
 #include "Logger.h"
 #include "XMLFileLoader.h"

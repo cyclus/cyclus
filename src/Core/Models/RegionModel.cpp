@@ -8,7 +8,7 @@
 
 #include "Model.h"
 #include "InstModel.h"
-#include "Error.h"
+#include "error.h"
 #include "Timer.h"
 #include "Logger.h"
 #include "Prototype.h"

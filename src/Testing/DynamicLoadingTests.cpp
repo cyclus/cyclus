@@ -6,7 +6,7 @@
 #include "boost/filesystem.hpp"
 
 #include "Env.h"
-#include "Error.h"
+#include "error.h"
 #include "Model.h"
 #include "Prototype.h"
 #include "DynamicModule.h"

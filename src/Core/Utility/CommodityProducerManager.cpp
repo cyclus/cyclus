@@ -1,6 +1,6 @@
 #include "CommodityProducerManager.h"
 
-#include "Error.h"
+#include "error.h"
 
 //using namespace SupplyDemand;
 

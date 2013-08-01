@@ -1,7 +1,7 @@
 #include "MarketPlayer.h"
 
 #include <sstream>
-#include "Error.h"
+#include "error.h"
 
 namespace cyclus {
 

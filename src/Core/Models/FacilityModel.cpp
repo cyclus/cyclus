@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "QueryEngine.h"
 #include "InstModel.h"
-#include "Error.h"
+#include "error.h"
 
 #include <stdlib.h>
 #include <sstream>

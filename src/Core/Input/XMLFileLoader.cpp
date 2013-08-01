@@ -8,7 +8,7 @@
 
 #include "blob.h"
 #include "Env.h"
-#include "Error.h"
+#include "error.h"
 #include "EventManager.h"
 #include "Model.h"
 #include "RecipeLibrary.h"

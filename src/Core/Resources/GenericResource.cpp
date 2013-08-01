@@ -3,7 +3,7 @@
 
 #include "GenericResource.h"
 
-#include "Error.h"
+#include "error.h"
 #include "Logger.h"
 #include "EventManager.h"
 

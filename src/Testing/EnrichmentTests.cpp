@@ -3,7 +3,7 @@
 #include "EnrichmentTests.h"
 
 #include "CompMap.h"
-#include "Error.h"
+#include "error.h"
 #include "CycLimits.h"
 
 #include <iostream>

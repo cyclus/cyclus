@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "XMLParser.h"
-#include "Error.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 std::string XMLQueryEngineTest::unknowncontent() {
