@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "EventManager.h"
-#include "EventBackend.h"
+#include "event_backend.h"
 
 class TestBack : public EventBackend {
   public:
@@ -11,17 +11,17 @@ class TestBack : public EventBackend {
       closed = false;
     };
 
-    virtual void notify(EventList evs) {
+    virtual void Notify(EventList evs) {
       flush_count = evs.size();
       events = evs;
       notify_count++;
     };
 
-    virtual std::string name() {
+    virtual std::string Name() {
       return "TestBack";
     };
 
-    virtual void close() {
+    virtual void Close() {
       closed = true;
     };
 
