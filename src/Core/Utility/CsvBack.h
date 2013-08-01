@@ -5,6 +5,8 @@
 #include "any.hpp"
 
 #include <string>
+#include <map>
+#include <vector>
 #include <boost/filesystem.hpp>
 
 typedef std::vector<std::string> LineList;
