@@ -3,7 +3,7 @@
 
 #include "CommodityProducer.h"
 #include "Builder.h"
-#include "SolverTools.h"
+#include "solver_tools.h"
 
 #include <vector>
 #include <map>
