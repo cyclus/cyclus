@@ -57,7 +57,7 @@ void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
 void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
   if (builders_.find(builder) == builders_.end())
     {
-      throw CycNotRegisteredException("A manager is trying to unregister a builder not originally Registered with it.");
+      throw CycNotRegisteredException("A manager is trying to unregister a builder not originally registered with it.");
     }
   else
     {
@@ -66,51 +66,49 @@ void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
 }
 
 // -------------------------------------------------------------------
-std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(Commodity& commodity, 
-                                                                           double unmet_demand) 
-{
+std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
+    Commodity& commodity, 
+    double unmet_demand) {
   vector<BuildOrder> orders;
-
-  if (unmet_demand > 0) 
-    {
-      // set up solver and interface
-      SolverPtr solver(new CBCSolver());
-      SolverInterface csi(solver);
-
-      // set up objective function
-      ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
-      csi.RegisterObjFunction(obj);
-
-      // set up constraint
-      ConstraintPtr constraint(new Constraint(Constraint::GTEQ,unmet_demand));
-      csi.RegisterConstraint(constraint);
-
-      // set up variables, constraints, and objective function
-      vector<VariablePtr> solution;
-      ProblemInstance problem(commodity,unmet_demand,csi,constraint,solution);
-      setUpProblem(problem);
-
-      // report problem
-      LOG(LEV_DEBUG2,"buildman") << "Building Manager is solving a decision problem with:";
-      LOG(LEV_DEBUG2,"buildman") << "  * Objective Function: " << obj->Print();
-      LOG(LEV_DEBUG2,"buildman") << "  * Constraint: " << constraint->Print();
   
-      // solve
-      csi.Solve();
+  if (unmet_demand > 0) {
+    // set up solver and interface
+    SolverPtr solver(new CBCSolver());
+    SolverInterface csi(solver);
 
-      // report solution
-      LOG(LEV_DEBUG2,"buildman") << "Building Manager has solved a decision problem with:";
-      LOG(LEV_DEBUG2,"buildman") << "  * Types of Prototypes to build: " << solution.size();
-      for (int i = 0; i < solution.size(); i++)
-        {
-          VariablePtr x = solution.at(i);
-          LOG(LEV_DEBUG2,"buildman") << "  * Type: " << x->name()
-                                     << "  * Value: " << any_cast<int>(x->value());
-        }
+    // set up objective function
+    ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+    csi.RegisterObjFunction(obj);
+
+    // set up constraint
+    ConstraintPtr constraint(new Constraint(Constraint::GTEQ,unmet_demand));
+    csi.RegisterConstraint(constraint);
+
+    // set up variables, constraints, and objective function
+    vector<VariablePtr> solution;
+    ProblemInstance problem(commodity,unmet_demand,csi,constraint,solution);
+    setUpProblem(problem);
+
+    // report problem
+    LOG(LEV_DEBUG2,"buildman") << "Building Manager is solving a decision problem with:";
+    LOG(LEV_DEBUG2,"buildman") << "  * Objective Function: " << obj->Print();
+    LOG(LEV_DEBUG2,"buildman") << "  * Constraint: " << constraint->Print();
   
-      // construct order
-      constructBuildOrdersFromSolution(orders,solution);
+    // solve
+    csi.Solve();
+
+    // report solution
+    LOG(LEV_DEBUG2,"buildman") << "Building Manager has solved a decision problem with:";
+    LOG(LEV_DEBUG2,"buildman") << "  * Types of Prototypes to build: " << solution.size();
+    for (int i = 0; i < solution.size(); i++) {
+      VariablePtr x = solution.at(i);
+      LOG(LEV_DEBUG2,"buildman") << "  * Type: " << x->name()
+                                 << "  * Value: " << any_cast<int>(x->value());
     }
+  
+    // construct order
+    constructBuildOrdersFromSolution(orders,solution);
+  }
 
   return orders;
 }
@@ -138,10 +136,10 @@ void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::addProducerVariableToProblem(SupplyDemand::CommodityProducer* producer,
-                                                   ActionBuilding::Builder* builder,
-                                                   ActionBuilding::ProblemInstance& problem)
-{
+void BuildingManager::addProducerVariableToProblem(
+    SupplyDemand::CommodityProducer* producer,
+    ActionBuilding::Builder* builder,
+    ActionBuilding::ProblemInstance& problem) {
   VariablePtr x(new IntegerVariable(0,Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);

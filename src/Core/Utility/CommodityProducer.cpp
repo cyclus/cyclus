@@ -8,22 +8,22 @@ using namespace std;
 using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CommodityInformation::CommodityInformation() :
-  capacity(0),
-  cost(cyclopts::kModifierLimit) 
+CommodityInformation::CommodityInformation()
+    : capacity(0),
+      cost(cyclopts::kModifierLimit) 
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation(double a_capacity, 
-                                           double a_cost) :
-  capacity(a_capacity),
-  cost(a_cost)
+                                           double a_cost)
+    : capacity(a_capacity),
+      cost(a_cost)
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CommodityProducer::CommodityProducer() : 
-  default_capacity_(0.0),
-  default_cost_(cyclopts::kModifierLimit)
+CommodityProducer::CommodityProducer()
+    : default_capacity_(0.0),
+      default_cost_(cyclopts::kModifierLimit)
 {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
