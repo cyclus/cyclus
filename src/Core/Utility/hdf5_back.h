@@ -1,12 +1,12 @@
 // hdf5_back.h
 #pragma once
 
+#include <map>
+#include <string>
+
 #include "event_backend.h"
 #include "hdf5.h"
 #include "hdf5_hl.h"
-
-#include <string>
-#include <map>
 
 /*!
 An EventManager backend that writes data to an hdf5 file.  Identically named

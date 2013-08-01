@@ -1,8 +1,10 @@
-
+// hdf5_back.cc
 #include "hdf5_back.h"
-#include "blob.h"
+
 #include <cmath>
 #include <string.h>
+
+#include "blob.h"
 
 #define STR_SIZE 16
 
@@ -154,28 +156,28 @@ void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
       switch (valtype[col]) {
-      case NUM: {
-        val = a->castsmallvoid();
-        memcpy(buf + offset, val, sizes[col]);
-        break;
-      }
-      case STR: {
-        const std::string s = a->cast<std::string>();
-        size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
-        memcpy(buf + offset, s.c_str(), slen);
-        memset(buf + offset + slen, 0, STR_SIZE - slen);
-        break;
-      }
-      case BLOB: {
-        const char* data = a->cast<cyclus::Blob>().str().c_str();
-        memcpy(buf + offset, &data, sizes[col]);
-        break;
-      }
-      case UUID: {
-        boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
-        memcpy(buf + offset, &uuid, STR_SIZE);
-        break;
-      }
+        case NUM: {
+          val = a->castsmallvoid();
+          memcpy(buf + offset, val, sizes[col]);
+          break;
+        }
+        case STR: {
+          const std::string s = a->cast<std::string>();
+          size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
+          memcpy(buf + offset, s.c_str(), slen);
+          memset(buf + offset + slen, 0, STR_SIZE - slen);
+          break;
+        }
+        case BLOB: {
+          const char* data = a->cast<cyclus::Blob>().str().c_str();
+          memcpy(buf + offset, &data, sizes[col]);
+          break;
+        }
+        case UUID: {
+          boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
+          memcpy(buf + offset, &uuid, STR_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }

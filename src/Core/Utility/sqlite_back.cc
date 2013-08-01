@@ -1,15 +1,16 @@
 // sqlite_back.cc
 #include "sqlite_back.h"
 
-#include "CycException.h"
-#include "Logger.h"
-#include "Event.h"
-#include "blob.h"
-
-#include <sstream>
 #include <iomanip>
+#include <sstream>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+
+#include "blob.h"
+#include "CycException.h"
+#include "Event.h"
+#include "Logger.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path)

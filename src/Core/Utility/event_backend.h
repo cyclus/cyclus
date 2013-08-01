@@ -1,9 +1,11 @@
 // event_backend.h
 #pragma once
 
-#include "Event.h"
 #include <vector>
+
 #include <boost/intrusive_ptr.hpp>
+
+#include "Event.h"
 
 typedef std::vector<Event*> EventList;
 

@@ -1,11 +1,11 @@
 // sqlite_back.h
 #pragma once
 
-#include "event_backend.h"
-#include "SqliteDb.h"
-
 #include <list>
 #include <string>
+
+#include "event_backend.h"
+#include "SqliteDb.h"
 
 /*!
 An EventManager backend that writes data to an sqlite database.  Identically
