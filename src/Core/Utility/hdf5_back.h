@@ -14,7 +14,6 @@
 /// event value types: int, float, double, std::string, cyclus::Blob.
 class Hdf5Back : public EventBackend {
  public:
-
   /// Creates a new backend writing data to the specified file.
   ///
   /// @param path the file to write to. If it exists, it will be overwritten.
@@ -30,7 +29,6 @@ class Hdf5Back : public EventBackend {
   virtual ~Hdf5Back() {};
 
  private:
-
   /// creates and initializes an hdf5 table
   void CreateTable(Event* ev);
 

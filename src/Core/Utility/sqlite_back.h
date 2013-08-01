@@ -34,7 +34,6 @@ class SqliteBack: public EventBackend {
   void Close();
 
  protected: // for testing
-
   /// Execute all pending commands.
   virtual void Flush();
 
@@ -42,7 +41,6 @@ class SqliteBack: public EventBackend {
   StrList cmds_;
 
  private:
-
   /// returns true if the table name already exists.
   bool TableExists(std::string name);
 

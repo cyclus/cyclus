@@ -34,7 +34,6 @@ class CsvBack: public EventBackend {
   void Close();
 
  protected: // for testing
-
   /// Write all buffered csv lines.
   virtual void Flush();
 
@@ -42,7 +41,6 @@ class CsvBack: public EventBackend {
   std::map<std::string, LineList> file_data_;
 
  private:
-
   /// converts the value to a valid csv value string.
   std::string ValAsString(boost::spirit::hold_any& v);
 
