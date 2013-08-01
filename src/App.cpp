@@ -16,9 +16,9 @@
 #include "Logger.h"
 #include "XMLFileLoader.h"
 #include "EventManager.h"
-#include "SqliteBack.h"
-#include "Hdf5Back.h"
-#include "CsvBack.h"
+#include "sqlite_back.h"
+#include "hdf5_back.h"
+#include "csv_back.h"
 
 using namespace std;
 namespace po = boost::program_options;
