@@ -1,6 +1,6 @@
 #include "CommodityProducer.h"
 
-#include "cyclopts/cyclopts_limits.h"
+#include "cyclopts/limits.h"
 
 #include "CycException.h"
 

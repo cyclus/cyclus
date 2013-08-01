@@ -3,8 +3,9 @@
 
 #include <vector>
 
+#include "function.h"
 #include "solver.h"
-#include "solver_tools.h"
+#include "variable.h"
 
 namespace cyclopts {
 /// interface class to set up and solve a constraint program

@@ -10,7 +10,7 @@
 #include "CbcModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
-#include "cyclopts_limits.h"
+#include "limits.h"
 
 using namespace std;
 using namespace boost;

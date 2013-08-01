@@ -11,7 +11,8 @@ class Solver;
 typedef boost::shared_ptr<Solver> SolverPtr;
 }
 
-#include "solver_tools.h"
+#include "function.h"
+#include "variable.h"
 
 namespace cyclopts {
 /// abstract base class for different types of constraint program solvers

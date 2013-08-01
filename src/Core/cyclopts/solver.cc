@@ -3,8 +3,6 @@
 #include <map>
 #include <vector>
 
-#include "solver_tools.h"
-
 using namespace std;
 using namespace cyclopts;
 

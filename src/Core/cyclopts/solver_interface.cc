@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "cyclopts_limits.h"
+#include "limits.h"
 
 using namespace std;
 using namespace cyclopts;
