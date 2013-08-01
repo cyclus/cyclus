@@ -9,7 +9,7 @@ class EnrichmentTests : public ::testing::Test
  protected:
   double feed_, product_, tails_;
   double assay_u_, mass_u_;
-  mat_rsrc_ptr mat_;
+  cyclus::mat_rsrc_ptr mat_;
 
   double feed_qty_, tails_qty_, swu_;
 

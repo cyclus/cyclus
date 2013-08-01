@@ -8,7 +8,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ConcreteInstModel : public InstModel {
+class ConcreteInstModel : public cyclus::InstModel {
  public:
   ConcreteInstModel() { };
   
@@ -17,7 +17,7 @@ class ConcreteInstModel : public InstModel {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class DieModel : public FacilityModel {
+class DieModel : public cyclus::FacilityModel {
  public:
   DieModel() {
     tickCount_ = 0;
@@ -33,7 +33,7 @@ class DieModel : public FacilityModel {
   //   return dynamic_cast<Prototype*>(clone);
   // };
 
-  virtual void receiveMessage(msg_ptr msg) { };
+  virtual void receiveMessage(cyclus::msg_ptr msg) { };
   virtual void cloneModuleMembersFrom(FacilityModel* source){};
   virtual void decommission() { delete this; }
 
@@ -79,7 +79,7 @@ class InstModelClassTests : public ::testing::Test {
     DieModel* child4_;
     DieModel* child5_;
 
-    TimeAgent* inst_;
+    cyclus::TimeAgent* inst_;
 
     virtual void SetUp() {
       child1_ = new DieModel();

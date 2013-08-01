@@ -16,6 +16,8 @@ class FileDeleter {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(Hdf5BackTest, ReadWrite) {
+  using cyclus::EventManager;
+  using cyclus::Hdf5Back;
   FileDeleter fd(path);
 
   int i = 1;

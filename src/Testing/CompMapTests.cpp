@@ -11,6 +11,7 @@ TEST_F(CompMapTests,default_constructor) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,copy_constructor) {
+  using cyclus::CompMap;
   CompMap copy = CompMap(*comp_);
   EXPECT_EQ(copy.basis(),comp_->basis());
   EXPECT_EQ(copy.map(),comp_->map());
@@ -18,6 +19,8 @@ TEST_F(CompMapTests,copy_constructor) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,map_interface) {
+  using cyclus::Map;
+  using cyclus::CompMap;
   LoadMap();
   for (Map::iterator it = map_.begin(); it != map_.end(); it++) {
     EXPECT_NO_THROW((*comp_)[it->first] = it->second);
@@ -34,6 +37,7 @@ TEST_F(CompMapTests,map_interface) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,normalize) { 
+  using cyclus::CompMap;
   LoadMap();
   comp_->setMap(map_);
   EXPECT_EQ(map_,comp_->map());
@@ -49,6 +53,7 @@ TEST_F(CompMapTests,normalize) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,atomify) { 
+  using cyclus::CompMap;
   LoadMap();
   comp_->setMap(map_);
   EXPECT_NO_THROW(comp_->atomify());
@@ -62,6 +67,7 @@ TEST_F(CompMapTests,atomify) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,massify) { 
+  using cyclus::CompMap;
   LoadMap();
   comp_->setMap(map_);
   EXPECT_NO_THROW(comp_->atomify());  
@@ -92,6 +98,7 @@ TEST_F(CompMapTests,empty_comp_behaviors) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests,equality) {
+  using cyclus::CompMapPtr;
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
@@ -101,6 +108,7 @@ TEST_F(CompMapTests,equality) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests, almostEquality) {
+  using cyclus::CompMap;
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
@@ -115,6 +123,7 @@ TEST_F(CompMapTests, almostEquality) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests, almostEqualZeroEntry) {
+  using cyclus::CompMap;
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
@@ -130,6 +139,8 @@ TEST_F(CompMapTests, almostEqualZeroEntry) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests, almostEqualNegThresh) {
+  using cyclus::CompMap;
+  using cyclus::CycNegativeValueException;
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
@@ -140,7 +151,7 @@ TEST_F(CompMapTests, almostEqualNegThresh) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests, zerocomp){
   int u235=92235;
-  CompMapPtr comp = CompMapPtr(new CompMap(MASS));
+  cyclus::CompMapPtr comp = cyclus::CompMapPtr(new cyclus::CompMap(cyclus::MASS));
   (*comp)[u235] = 0;
   EXPECT_FLOAT_EQ(0, (*comp)[u235]);
   comp->massify();

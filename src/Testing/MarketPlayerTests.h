@@ -9,13 +9,13 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MarketPlayerTests : public ::testing::Test {
  protected:
-  MarketPlayerManager* managerA_;
-  MarketPlayerManager* managerB_;
-  MarketPlayer* player1_;
-  MarketPlayer* player2_;
-  Commodity* commodA_;
-  Commodity* commodB_;
-  Commodity* commodC_;
+  cyclus::MarketPlayerManager* managerA_;
+  cyclus::MarketPlayerManager* managerB_;
+  cyclus::MarketPlayer* player1_;
+  cyclus::MarketPlayer* player2_;
+  cyclus::Commodity* commodA_;
+  cyclus::Commodity* commodB_;
+  cyclus::Commodity* commodC_;
   int nPlayers_;
   double capacityA1_;
   double capacityB1_;

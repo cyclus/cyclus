@@ -19,13 +19,13 @@ class CommodityTestHelper {
   std::string commodity_name;
 
   /// commodity
-  Commodity commodity;
+  cyclus::Commodity commodity;
 
   /// first producer
-  SupplyDemand::CommodityProducer* producer1;
+  cyclus::SupplyDemand::CommodityProducer* producer1;
 
   /// second producer
-  SupplyDemand::CommodityProducer* producer2;
+  cyclus::SupplyDemand::CommodityProducer* producer2;
   
   /// production capacity
   double capacity;
@@ -34,7 +34,7 @@ class CommodityTestHelper {
   int nproducers;
   
   /// a manager of commodity producers
-  SupplyDemand::CommodityProducerManager manager;
+  cyclus::SupplyDemand::CommodityProducerManager manager;
 
   /// initialize the producers
   void setUpProducers();

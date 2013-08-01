@@ -4,13 +4,10 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace ActionBuilding;
-using namespace SupplyDemand;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManagerTests::SetUp() 
 {
+  using cyclus::ActionBuilding::Builder;
   demand = 1001;
   capacity1 = 800, capacity2 = 200;
   cost1 = capacity1, cost2 = capacity2;
@@ -45,23 +42,24 @@ void BuildingManagerTests::setUpProblem()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,init) 
 {
-  EXPECT_THROW(manager.unRegisterBuilder(builder1),CycNotRegisteredException);
+  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::CycNotRegisteredException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,registration) 
 {
   EXPECT_NO_THROW(manager.registerBuilder(builder1));
-  EXPECT_THROW(manager.registerBuilder(builder1),CycDoubleRegistrationException);
+  EXPECT_THROW(manager.registerBuilder(builder1), cyclus::CycDoubleRegistrationException);
   EXPECT_NO_THROW(manager.unRegisterBuilder(builder1));
-  EXPECT_THROW(manager.unRegisterBuilder(builder1),CycNotRegisteredException);
+  EXPECT_THROW(manager.unRegisterBuilder(builder1), cyclus::CycNotRegisteredException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,DISABLED_problem) 
 {
+  using cyclus::ActionBuilding::BuildOrder;
   setUpProblem();
-  vector<BuildOrder> orders = manager.makeBuildDecision(helper->commodity,demand);
+  std::vector<BuildOrder> orders = manager.makeBuildDecision(helper->commodity,demand);
   EXPECT_EQ(orders.size(),2);
 
   BuildOrder order1 = orders.at(0);
@@ -78,7 +76,8 @@ TEST_F(BuildingManagerTests,DISABLED_problem)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests,emptyorder) 
 {
+  using cyclus::ActionBuilding::BuildOrder;
   setUpProblem();
-  vector<BuildOrder> orders = manager.makeBuildDecision(helper->commodity,0);
+  std::vector<BuildOrder> orders = manager.makeBuildDecision(helper->commodity,0);
   EXPECT_TRUE(orders.empty());
 }
