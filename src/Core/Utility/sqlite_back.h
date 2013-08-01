@@ -22,7 +22,6 @@ class SqliteBack: public EventBackend {
   virtual ~SqliteBack() {};
 
   /// Write events immediately to the database as a single transaction.
-
   /// @param events group of events to write to the database together.
   void Notify(EventList events);
 
