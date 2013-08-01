@@ -19,7 +19,6 @@ typedef std::vector<std::string> LineList;
 class CsvBack: public EventBackend {
  public:
   /// Creates a new csv backend that will write to a set of csv files in path
-
   /// @param path directory to place csv file into
   /// @param overwrite true to overwrite existing csv files with same path/name.
   CsvBack(std::string path, bool overwrite = false);
