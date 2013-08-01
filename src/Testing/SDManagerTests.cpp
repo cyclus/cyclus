@@ -4,15 +4,14 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SDManagerTests::SetUp()
 {
   helper = new CommodityTestHelper();
   helper->setUpProducerManager();
-  demand = FunctionPtr(new LinearFunction(100,100));
+  demand = cyclus::FunctionPtr(new cyclus::LinearFunction(100,100));
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -24,7 +23,7 @@ void SDManagerTests::TearDown()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SDManagerTests,initialization) {
   EXPECT_FALSE(manager.managesCommodity(helper->commodity));
-  EXPECT_THROW(manager.supply(helper->commodity),CycNotRegisteredException);
+  EXPECT_THROW(manager.supply(helper->commodity), cyclus::CycNotRegisteredException);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

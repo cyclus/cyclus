@@ -29,8 +29,8 @@ namespace cyclus {
    'level'.  
  */
 #define LOG(level, prefix) \
-if ((level > Logger::ReportLevel()) | Logger::NoModel()) ; \
-else Logger().Get(level, prefix)
+if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
+else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
 if (level > Logger::ReportLevel()) ; \
