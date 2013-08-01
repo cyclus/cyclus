@@ -1,12 +1,13 @@
-#ifndef BUILDINGMANAGER_H
-#define BUILDINGMANAGER_H
-
-#include "CommodityProducer.h"
-#include "Builder.h"
-#include "SolverTools.h"
+#ifndef CYCLUS_CORE_UTILITY_BUILDING_MANAGER_H_
+#define CYCLUS_CORE_UTILITY_BUILDING_MANAGER_H_
 
 #include <vector>
 #include <map>
+
+#include "solver_tools.h"
+
+#include "CommodityProducer.h"
+#include "Builder.h"
 
 namespace ActionBuilding {
   /// a struct for a build order: the number of producers to build
