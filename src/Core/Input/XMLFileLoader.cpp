@@ -90,7 +90,7 @@ std::string XMLFileLoader::buildSchema() {
 
 // - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
-    std::string file) {
+                                             std::string file) {
 
   CLOG(LEV_DEBUG4) << "loading the file: " << file;
 
@@ -148,7 +148,7 @@ void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_modules_of_type(std::string type,
-    std::string query_path) {
+                                         std::string query_path) {
   XMLQueryEngine xqe(*parser_);
 
   int numModels = xqe.nElementsMatchingQuery(query_path);

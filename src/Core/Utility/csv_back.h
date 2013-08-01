@@ -1,6 +1,6 @@
 // csv_back.h
-#ifndef CYCLUS_CORE_UTILITY_CSVBACK_H_
-#define CYCLUS_CORE_UTILITY_CSVBACK_H_
+#ifndef CYCLUS_CORE_UTILITY_CSV_BACK_H_
+#define CYCLUS_CORE_UTILITY_CSV_BACK_H_
 
 #include <map>
 #include <string>
@@ -13,26 +13,19 @@
 
 typedef std::vector<std::string> LineList;
 
-/*!
-An EventManager backend that writes data to a collection of csv files.
-Identically named events have their data placed in the same file.  Handles the
-following event value types: int, float, double, std::string, cyclus::Blob.
-*/
+/// An EventManager backend that writes data to a collection of csv files.
+/// Identically named events have their data placed in the same file.  Handles the
+/// following event value types: int, float, double, std::string, cyclus::Blob.
 class CsvBack: public EventBackend {
  public:
-  /*!
-  Creates a new csv backend that will write to a set of csv files in path
+  /// Creates a new csv backend that will write to a set of csv files in path
 
-  @param path directory to place csv file into
-  @param overwrite true to overwrite existing csv files with same path/name.
-  */
+  /// @param path directory to place csv file into
+  /// @param overwrite true to overwrite existing csv files with same path/name.
   CsvBack(std::string path, bool overwrite = false);
 
-  /*!
-  Collect events to be written to csv files.
-
-  @param events group of events to write to the csv file collection.
-  */
+  /// Collect events to be written to csv files.
+  /// @param events group of events to write to the csv file collection.
   void Notify(EventList events);
 
   std::string Name();

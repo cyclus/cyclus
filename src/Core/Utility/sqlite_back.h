@@ -1,6 +1,6 @@
 // sqlite_back.h
-#ifndef CYCLUS_CORE_UTILITY_SQLITEBACK_H_
-#define CYCLUS_CORE_UTILITY_SQLITEBACK_H_
+#ifndef CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
+#define CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
 
 #include <list>
 #include <string>
@@ -8,29 +8,23 @@
 #include "event_backend.h"
 #include "SqliteDb.h"
 
-/*!
-An EventManager backend that writes data to an sqlite database.  Identically
-named events have their data placed as rows in a single table.  Handles the
-following event value types: int, float, double, std::string, cyclus::Blob.
-Unsupported value types are stored as an empty string.
-*/
+/// An EventManager backend that writes data to an sqlite database.  Identically
+/// named events have their data placed as rows in a single table.  Handles the
+/// following event value types: int, float, double, std::string, cyclus::Blob.
+/// Unsupported value types are stored as an empty string.
 class SqliteBack: public EventBackend {
  public:
-  /*!
-  Creates a new sqlite backend that will write to the database file
-  specified by path. If the file doesn't exist, a new one is created.
+  /// Creates a new sqlite backend that will write to the database file
+  /// specified by path. If the file doesn't exist, a new one is created.
 
-  @param path the filepath (including name) to write the sqlite file.
-  */
+  /// @param path the filepath (including name) to write the sqlite file.
   SqliteBack(std::string path);
 
   virtual ~SqliteBack() {};
 
-  /*!
-  Write events immediately to the database as a single transaction.
+  /// Write events immediately to the database as a single transaction.
 
-  @param events group of events to write to the database together.
-  */
+  /// @param events group of events to write to the database together.
   void Notify(EventList events);
 
   /// Returns a unique name for this backend.

@@ -1,6 +1,6 @@
 // hdf5_back.h
-#ifndef CYCLUS_CORE_UTILITY_HDF5BACK_H_
-#define CYCLUS_CORE_UTILITY_HDF5BACK_H_
+#ifndef CYCLUS_CORE_UTILITY_HDF5_BACK_H_
+#define CYCLUS_CORE_UTILITY_HDF5_BACK_H_
 
 #include <map>
 #include <string>
@@ -9,27 +9,25 @@
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
-/*!
-An EventManager backend that writes data to an hdf5 file.  Identically named
-events have their data placed as rows in a single table.  Handles the following
-event value types: int, float, double, std::string, cyclus::Blob.
-*/
+/// An EventManager backend that writes data to an hdf5 file.  Identically named
+/// events have their data placed as rows in a single table.  Handles the following
+/// event value types: int, float, double, std::string, cyclus::Blob.
 class Hdf5Back : public EventBackend {
  public:
 
-  // Creates a new backend writing data to the specified file.
-  //
-  // @param path the file to write to. If it exists, it will be overwritten.
+  /// Creates a new backend writing data to the specified file.
+  ///
+  /// @param path the file to write to. If it exists, it will be overwritten.
   Hdf5Back(std::string path);
-
-  virtual ~Hdf5Back() {};
 
   virtual void Notify(EventList events);
 
   virtual std::string Name();
 
-  // cleans up resources and closes the file.
+  /// cleans up resources and closes the file.
   virtual void Close();
+
+  virtual ~Hdf5Back() {};
 
  private:
 
