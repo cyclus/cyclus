@@ -1,5 +1,6 @@
 // hdf5_back.h
-#pragma once
+#ifndef CYCLUS_CORE_UTILITY_HDF5BACK_H_
+#define CYCLUS_CORE_UTILITY_HDF5BACK_H_
 
 #include <map>
 #include <string>
@@ -54,3 +55,5 @@ class Hdf5Back : public EventBackend {
   std::map<std::string, size_t*> tbl_sizes_;
   std::map<std::string, size_t> tbl_size_;
 };
+
+#endif

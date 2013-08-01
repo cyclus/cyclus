@@ -1,5 +1,6 @@
 // sqlite_back.h
-#pragma once
+#ifndef CYCLUS_CORE_UTILITY_SQLITEBACK_H_
+#define CYCLUS_CORE_UTILITY_SQLITEBACK_H_
 
 #include <list>
 #include <string>
@@ -73,3 +74,4 @@ class SqliteBack: public EventBackend {
   StrList tbl_names_;
 };
 
+#endif

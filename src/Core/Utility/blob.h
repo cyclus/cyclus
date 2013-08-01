@@ -1,5 +1,6 @@
 // blob.h
-#pragma once
+#ifndef CYCLUS_CORE_UTILITY_BLOB_H_
+#define CYCLUS_CORE_UTILITY_BLOB_H_
 
 #include <string>
 
@@ -18,3 +19,5 @@ class Blob {
   std::string str_;
 };
 }
+
+#endif

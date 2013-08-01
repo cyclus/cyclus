@@ -1,5 +1,6 @@
 // event_backend.h
-#pragma once
+#ifndef CYCLUS_CORE_UTILITY_EVENTBACKEND_H_
+#define CYCLUS_CORE_UTILITY_EVENTBACKEND_H_
 
 #include <vector>
 
@@ -26,3 +27,4 @@ class EventBackend {
   virtual void Close() = 0;
 };
 
+#endif

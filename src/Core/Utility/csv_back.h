@@ -1,5 +1,6 @@
 // csv_back.h
-#pragma once
+#ifndef CYCLUS_CORE_UTILITY_CSVBACK_H_
+#define CYCLUS_CORE_UTILITY_CSVBACK_H_
 
 #include <map>
 #include <string>
@@ -59,3 +60,4 @@ class CsvBack: public EventBackend {
   boost::filesystem::path path_;
 };
 
+#endif
