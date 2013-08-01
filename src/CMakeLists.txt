@@ -51,7 +51,7 @@ INCLUDE(CyclusModuleMacros)
 # Include the core header files in the app build manually.
 # Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}/Core/cyclopts
+  ${CYCLUS_SRC_DIR}/Core
   ${CYCLUS_SRC_DIR}/Core/Utility
   ${CYCLUS_SRC_DIR}/Core/Config
   ${CYCLUS_SRC_DIR}/Core/Input
@@ -100,13 +100,6 @@ SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
 MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
-
-# # find cyclopts and link to it
-# FIND_PACKAGE( CYCLOPTS REQUIRED )
-# SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLOPTS_INCLUDE_DIR})
-# set(LIBS ${LIBS} ${CYCLOPTS_LIBRARY})
-# #MESSAGE("cyclopts include: ${CYCLOPTS_INCLUDE_DIR}")
-# #MESSAGE("cyclopts lib: ${CYCLOPTS_LIBRARY}")
 
 # find coin and link to it
 FIND_PACKAGE( COIN REQUIRED )

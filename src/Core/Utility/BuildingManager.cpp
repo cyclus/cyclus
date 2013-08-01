@@ -2,9 +2,9 @@
 
 #include <boost/any.hpp>
 
-#include "cbc_solver.h"
-#include "solver.h"
-#include "solver_interface.h"
+#include "cyclopts/cbc_solver.h"
+#include "cyclopts/solver.h"
+#include "cyclopts/solver_interface.h"
 
 #include "CycException.h"
 #include "Logger.h"

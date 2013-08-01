@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-#include "solver_tools.h"
+#include "cyclopts/solver_tools.h"
 
 #include "CommodityProducer.h"
 #include "Builder.h"
