@@ -4,16 +4,16 @@
 
 #include <fstream>
 
-#include "XMLQueryEngine.h"
-
-#include "Env.h"
-#include "Timer.h"
-#include "RecipeLibrary.h"
-#include "Model.h"
-#include "CycException.h"
 #include <boost/filesystem.hpp>
-#include "EventManager.h"
+
 #include "blob.h"
+#include "CycException.h"
+#include "Env.h"
+#include "EventManager.h"
+#include "Model.h"
+#include "RecipeLibrary.h"
+#include "Timer.h"
+#include "XMLQueryEngine.h"
 
 using namespace std;
 using namespace boost;
@@ -28,11 +28,7 @@ XMLFileLoader::XMLFileLoader(const std::string load_filename) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::init(bool use_main_schema)  {
   stringstream input("");
-  loadStringstreamFromFile(input,file_);
-
-  EM->newEvent("InputFiles")
-    ->addVal("Data", cyclus::Blob(input.str()))
-    ->record();
+  loadStringstreamFromFile(input, file_);
 
   parser_ = shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
@@ -41,6 +37,10 @@ void XMLFileLoader::init(bool use_main_schema)  {
     ss << buildSchema();
     parser_->validate(ss);
   }
+
+  EM->newEvent("InputFiles")
+  ->addVal("Data", cyclus::Blob(input.str()))
+  ->record();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,7 +68,7 @@ std::string XMLFileLoader::buildSchema() {
           includes << "<include href='" << p.string() << "'/>" << std::endl;
         }
       }
-    } catch(...) { }
+    } catch (...) { }
 
     // replace refs
     std::string searchStr = std::string("@") + *type + std::string("_REFS@");
@@ -76,7 +76,7 @@ std::string XMLFileLoader::buildSchema() {
     if (pos != std::string::npos) {
       master.replace(pos, searchStr.size(), refs.str());
     }
-  }                                  
+  }
 
   // replace includes
   std::string searchStr = "@RNG_INCLUDES@";
@@ -86,11 +86,11 @@ std::string XMLFileLoader::buildSchema() {
   }
 
   return master;
-}                                    
-                                     
+}
+
 // - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
-                                             std::string file) {
+void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
+    std::string file) {
 
   CLOG(LEV_DEBUG4) << "loading the file: " << file;
 
@@ -113,7 +113,7 @@ std::string XMLFileLoader::pathToMainSchema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::applySchema(const std::stringstream &schema) {
+void XMLFileLoader::applySchema(const std::stringstream& schema) {
   parser_->validate(schema);
 }
 
@@ -126,14 +126,14 @@ void XMLFileLoader::initialize_module_paths() {
   module_paths_["Facility"] = "/*/facility";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_recipes() {
   XMLQueryEngine xqe(*parser_);
 
   string query = "/*/recipe";
   int numRecipes = xqe.nElementsMatchingQuery(query);
-  for (int i=0; i<numRecipes; i++) {
-    QueryEngine* qe = xqe.queryElement(query,i);
+  for (int i = 0; i < numRecipes; i++) {
+    QueryEngine* qe = xqe.queryElement(query, i);
     RecipeLibrary::load_recipe(qe);
   }
 }
@@ -142,19 +142,19 @@ void XMLFileLoader::load_recipes() {
 void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
   set<string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    load_modules_of_type(*it,module_paths_[*it]);
+    load_modules_of_type(*it, module_paths_[*it]);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_modules_of_type(std::string type, 
-                                         std::string query_path) {  
+void XMLFileLoader::load_modules_of_type(std::string type,
+    std::string query_path) {
   XMLQueryEngine xqe(*parser_);
-  
+
   int numModels = xqe.nElementsMatchingQuery(query_path);
-  for (int i=0; i<numModels; i++) {
-    QueryEngine* qe = xqe.queryElement(query_path,i);
-    Model::initializeSimulationEntity(type,qe);
+  for (int i = 0; i < numModels; i++) {
+    QueryEngine* qe = xqe.queryElement(query_path, i);
+    Model::initializeSimulationEntity(type, qe);
   }
 }
 
@@ -166,4 +166,4 @@ void XMLFileLoader::load_control_parameters() {
   QueryEngine* qe = xqe.queryElement(query);
   TI->load_simulation(qe);
 }
-  
+
