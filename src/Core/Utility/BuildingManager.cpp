@@ -2,10 +2,13 @@
 
 #include <boost/any.hpp>
 
+// cyclopts includes
+#include "solver.h"
+#include "solver_interface.h"
+#include "cbc_solver.h"
+
+// cyclus includes
 #include "Logger.h"
-#include "Solver.h"
-#include "SolverInterface.h"
-#include "CBCSolver.h"
 #include "CycException.h"
 
 using namespace std;
@@ -44,7 +47,7 @@ BuildingManager::~BuildingManager() {}
 void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
   if (builders_.find(builder) != builders_.end())
     {
-      throw CycDoubleRegistrationException("A manager is trying to register a builder twice.");
+      throw CycDoubleRegistrationException("A manager is trying to Register a builder twice.");
     }
   else
     {
@@ -56,7 +59,7 @@ void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
 void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
   if (builders_.find(builder) == builders_.end())
     {
-      throw CycNotRegisteredException("A manager is trying to unregister a builder not originally registered with it.");
+      throw CycNotRegisteredException("A manager is trying to unRegister a builder not originally Registered with it.");
     }
   else
     {
@@ -78,11 +81,11 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(Commo
 
       // set up objective function
       ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
-      csi.registerObjFunction(obj);
+      csi.RegisterObjFunction(obj);
 
       // set up constraint
       ConstraintPtr constraint(new Constraint(Constraint::GTEQ,unmet_demand));
-      csi.registerConstraint(constraint);
+      csi.RegisterConstraint(constraint);
 
       // set up variables, constraints, and objective function
       vector<VariablePtr> solution;
@@ -91,11 +94,11 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(Commo
 
       // report problem
       LOG(LEV_DEBUG2,"buildman") << "Building Manager is solving a decision problem with:";
-      LOG(LEV_DEBUG2,"buildman") << "  * Objective Function: " << obj->print();
-      LOG(LEV_DEBUG2,"buildman") << "  * Constraint: " << constraint->print();
+      LOG(LEV_DEBUG2,"buildman") << "  * Objective Function: " << obj->Print();
+      LOG(LEV_DEBUG2,"buildman") << "  * Constraint: " << constraint->Print();
   
       // solve
-      csi.solve();
+      csi.Solve();
 
       // report solution
       LOG(LEV_DEBUG2,"buildman") << "Building Manager has solved a decision problem with:";
@@ -143,14 +146,14 @@ void BuildingManager::addProducerVariableToProblem(SupplyDemand::CommodityProduc
 {
   VariablePtr x(new IntegerVariable(0,Variable::INF));
   problem.solution.push_back(x);
-  problem.interface.registerVariable(x);
+  problem.interface.RegisterVariable(x);
   solution_map_.insert(make_pair(x,make_pair(builder,producer)));
 
   double constraint_modifier = producer->productionCapacity(problem.commodity);
-  problem.interface.addVarToConstraint(x,constraint_modifier,problem.constraint);
+  problem.interface.AddVarToConstraint(x,constraint_modifier,problem.constraint);
 
   double obj_modifier = producer->productionCost(problem.commodity);
-  problem.interface.addVarToObjFunction(x,obj_modifier);
+  problem.interface.AddVarToObjFunction(x,obj_modifier);
 }
 
 // -------------------------------------------------------------------
