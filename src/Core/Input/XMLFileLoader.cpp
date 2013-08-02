@@ -4,15 +4,19 @@
 
 #include <fstream>
 
+#include <boost/filesystem.hpp>
+
+#include "blob.h"
+#include "CycException.h"
+#include "Env.h"
+#include "EventManager.h"
+#include "Model.h"
+#include "RecipeLibrary.h"
+#include "Timer.h"
 #include "XMLQueryEngine.h"
 
-#include "Env.h"
-#include "Timer.h"
-#include "RecipeLibrary.h"
-#include "Model.h"
-#include "CycException.h"
-
 namespace cyclus {
+namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(const std::string load_filename) {
@@ -31,10 +35,59 @@ void XMLFileLoader::init(bool use_main_schema)  {
     loadStringstreamFromFile(schema, pathToMainSchema());
     parser_->validate(schema);
   }
+
+  EM->newEvent("InputFiles")
+  ->addVal("Data", cyclus::Blob(input.str()))
+  ->record();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
+std::string XMLFileLoader::buildSchema() {
+  stringstream schema("");
+  loadStringstreamFromFile(schema, pathToMainSchema());
+  std::string master = schema.str();
+
+  std::set<std::string> types = Model::dynamic_module_types();
+
+  std::stringstream includes;
+  std::set<std::string>::iterator type;
+  for (type = types.begin(); type != types.end(); ++type) {
+    // find modules
+    std::stringstream refs;
+    refs << std::endl;
+    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + *type;
+    fs::recursive_directory_iterator end;
+    try {
+      for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
+        fs::path p = it->path();
+        // build refs and includes
+        if (p.extension() == ".rng") {
+          refs << "<ref name='" << p.stem().string() << "'/>" << std::endl;
+          includes << "<include href='" << p.string() << "'/>" << std::endl;
+        }
+      }
+    } catch (...) { }
+
+    // replace refs
+    std::string searchStr = std::string("@") + *type + std::string("_REFS@");
+    size_t pos = master.find(searchStr);
+    if (pos != std::string::npos) {
+      master.replace(pos, searchStr.size(), refs.str());
+    }
+  }
+
+  // replace includes
+  std::string searchStr = "@RNG_INCLUDES@";
+  size_t pos = master.find(searchStr);
+  if (pos != std::string::npos) {
+    master.replace(pos, searchStr.size(), includes.str());
+  }
+
+  return master;
+}
+
+// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
                                              std::string file) {
 
   CLOG(LEV_DEBUG4) << "loading the file: " << file;
@@ -54,11 +107,11 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream &stream,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::pathToMainSchema() {
-  return Env::getInstallPath() + "/share/cyclus.rng";
+  return Env::getInstallPath() + "/share/cyclus.rng.in";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::applySchema(const std::stringstream &schema) {
+void XMLFileLoader::applySchema(const std::stringstream& schema) {
   parser_->validate(schema);
 }
 
@@ -71,14 +124,14 @@ void XMLFileLoader::initialize_module_paths() {
   module_paths_["Facility"] = "/*/facility";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::load_recipes() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
   int numRecipes = xqe.nElementsMatchingQuery(query);
-  for (int i=0; i<numRecipes; i++) {
-    QueryEngine* qe = xqe.queryElement(query,i);
+  for (int i = 0; i < numRecipes; i++) {
+    QueryEngine* qe = xqe.queryElement(query, i);
     RecipeLibrary::load_recipe(qe);
   }
 }
@@ -87,19 +140,19 @@ void XMLFileLoader::load_recipes() {
 void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    load_modules_of_type(*it,module_paths_[*it]);
+    load_modules_of_type(*it, module_paths_[*it]);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_modules_of_type(std::string type, 
-                                         std::string query_path) {  
+void XMLFileLoader::load_modules_of_type(std::string type,
+                                         std::string query_path) {
   XMLQueryEngine xqe(*parser_);
-  
+
   int numModels = xqe.nElementsMatchingQuery(query_path);
-  for (int i=0; i<numModels; i++) {
-    QueryEngine* qe = xqe.queryElement(query_path,i);
-    Model::initializeSimulationEntity(type,qe);
+  for (int i = 0; i < numModels; i++) {
+    QueryEngine* qe = xqe.queryElement(query_path, i);
+    Model::initializeSimulationEntity(type, qe);
   }
 }
 

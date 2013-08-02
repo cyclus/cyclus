@@ -1,7 +1,7 @@
 // EventManager.cpp
 
 #include "EventManager.h"
-#include "EventBackend.h"
+#include "event_backend.h"
 #include "Event.h"
 #include "Logger.h"
 
@@ -81,9 +81,9 @@ void EventManager::notifyBackends() {
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     try {
-      (*it)->notify(events_);
+      (*it)->Notify(events_);
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name()
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->Name()
                       << "' failed write with err: " << err.what();
     }
   }
@@ -104,9 +104,9 @@ void EventManager::close() {
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     try {
-      (*it)->close();
+      (*it)->Close();
     } catch (CycException err) {
-      CLOG(LEV_ERROR) << "Backend '" << (*it)->name()
+      CLOG(LEV_ERROR) << "Backend '" << (*it)->Name()
                       << "' failed to close with err: " << err.what();
     }
   }
