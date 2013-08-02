@@ -11,35 +11,34 @@
 
 using namespace std;
 using boost::any_cast;
-using namespace cyclopts;
 using namespace SupplyDemand;
 using namespace ActionBuilding;
 
 // -------------------------------------------------------------------
 BuildOrder::BuildOrder(int n, ActionBuilding::Builder* b,
-                       SupplyDemand::CommodityProducer* cp) :
-  number(n),
-  builder(b),
-  producer(cp)
-{}
+                       SupplyDemand::CommodityProducer* cp) 
+  : number(n),
+    builder(b),
+    producer(cp)
+{ }
 
 // -------------------------------------------------------------------
 ProblemInstance::ProblemInstance(Commodity& commod, double demand, 
-                                 cyclopts::SolverInterface& sinterface, 
-                                 cyclopts::ConstraintPtr constr, 
-                                 std::vector<cyclopts::VariablePtr>& soln) :
-  commodity(commod),
-  unmet_demand(demand),
-  interface(sinterface),
-  constraint(constr),
-  solution(soln)
-{}
+                                 cyclus::cyclopts::SolverInterface& sinterface, 
+                                 cyclus::cyclopts::ConstraintPtr constr, 
+                                 std::vector<cyclus::cyclopts::VariablePtr>& soln) 
+  : commodity(commod),
+    unmet_demand(demand),
+    interface(sinterface),
+    constraint(constr),
+    solution(soln)
+{ }
 
 // -------------------------------------------------------------------
-BuildingManager::BuildingManager() {}
+BuildingManager::BuildingManager() { }
 
 // -------------------------------------------------------------------
-BuildingManager::~BuildingManager() {}
+BuildingManager::~BuildingManager() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManager::registerBuilder(ActionBuilding::Builder* builder) {
@@ -73,19 +72,19 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
   
   if (unmet_demand > 0) {
     // set up solver and interface
-    SolverPtr solver(new CBCSolver());
-    SolverInterface csi(solver);
+    cyclus::cyclopts::SolverPtr solver(new cyclus::cyclopts::CBCSolver());
+    cyclus::cyclopts::SolverInterface csi(solver);
 
     // set up objective function
-    ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+    cyclus::cyclopts::ObjFuncPtr obj(new cyclus::cyclopts::ObjectiveFunction(cyclus::cyclopts::ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    ConstraintPtr constraint(new Constraint(Constraint::GTEQ,unmet_demand));
+    cyclus::cyclopts::ConstraintPtr constraint(new cyclus::cyclopts::Constraint(cyclus::cyclopts::Constraint::GTEQ,unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
-    vector<VariablePtr> solution;
+    vector<cyclus::cyclopts::VariablePtr> solution;
     ProblemInstance problem(commodity,unmet_demand,csi,constraint,solution);
     setUpProblem(problem);
 
@@ -101,7 +100,7 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
     LOG(LEV_DEBUG2,"buildman") << "Building Manager has solved a decision problem with:";
     LOG(LEV_DEBUG2,"buildman") << "  * Types of Prototypes to build: " << solution.size();
     for (int i = 0; i < solution.size(); i++) {
-      VariablePtr x = solution.at(i);
+      cyclus::cyclopts::VariablePtr x = solution.at(i);
       LOG(LEV_DEBUG2,"buildman") << "  * Type: " << x->name()
                                  << "  * Value: " << any_cast<int>(x->value());
     }
@@ -116,7 +115,7 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
 // -------------------------------------------------------------------
 void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
 {
-  solution_map_ = map< VariablePtr, pair<Builder*,CommodityProducer*> >();
+  solution_map_ = map< cyclus::cyclopts::VariablePtr, pair<Builder*,CommodityProducer*> >();
 
   set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end(); builder_it++)
@@ -140,7 +139,7 @@ void BuildingManager::addProducerVariableToProblem(
     SupplyDemand::CommodityProducer* producer,
     ActionBuilding::Builder* builder,
     ActionBuilding::ProblemInstance& problem) {
-  VariablePtr x(new IntegerVariable(0,Variable::INF));
+  cyclus::cyclopts::VariablePtr x(new cyclus::cyclopts::IntegerVariable(0,cyclus::cyclopts::Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
   solution_map_.insert(make_pair(x,make_pair(builder,producer)));
@@ -153,18 +152,16 @@ void BuildingManager::addProducerVariableToProblem(
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
-                                                       std::vector<cyclopts::VariablePtr>& solution)
-{
+void BuildingManager::constructBuildOrdersFromSolution(
+    std::vector<ActionBuilding::BuildOrder>& orders,
+    std::vector<cyclus::cyclopts::VariablePtr>& solution) {
   // construct the build orders
-  for (int i = 0; i < solution.size(); i++) 
-    {
+  for (int i = 0; i < solution.size(); i++) {
       int number = any_cast<int>(solution.at(i)->value());
-      if (number > 0) 
-        {
+      if (number > 0) {
           Builder* builder = solution_map_[solution.at(i)].first;
           CommodityProducer* producer = solution_map_[solution.at(i)].second;
-          BuildOrder order(number,builder,producer);
+          BuildOrder order(number, builder, producer);
           orders.push_back(order);
         }
     }

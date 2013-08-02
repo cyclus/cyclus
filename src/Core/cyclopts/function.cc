@@ -8,43 +8,42 @@
 #include "variable.h"
 
 using namespace std;
-using namespace cyclopts;
 
 // -----------------------------------------------------------------------------
-Function::Function() {
-  constituents_ = map<VariablePtr,double>();
+cyclus::cyclopts::Function::Function() {
+  constituents_ = map<cyclus::cyclopts::VariablePtr,double>();
 }
 
 // -----------------------------------------------------------------------------
-void Function::AddConstituent(VariablePtr v, double modifier) {
-  constituents_.insert(pair<VariablePtr,double>(v,modifier));
+void cyclus::cyclopts::Function::AddConstituent(cyclus::cyclopts::VariablePtr v, double modifier) {
+  constituents_.insert(pair<cyclus::cyclopts::VariablePtr,double>(v,modifier));
 }
 
 // -----------------------------------------------------------------------------
-double Function::GetModifier(VariablePtr v) {
+double cyclus::cyclopts::Function::GetModifier(cyclus::cyclopts::VariablePtr v) {
   return constituents_[v];
 }
 
 // -----------------------------------------------------------------------------
-std::map<VariablePtr,double>::iterator Function::begin() {
+std::map<cyclus::cyclopts::VariablePtr,double>::iterator cyclus::cyclopts::Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<VariablePtr,double>::iterator Function::end() {
+std::map<cyclus::cyclopts::VariablePtr,double>::iterator cyclus::cyclopts::Function::end() {
   return constituents_.end();
 }
 
 // -----------------------------------------------------------------------------
-int Function::NumConstituents() { 
+int cyclus::cyclopts::Function::NumConstituents() { 
   return constituents_.size(); 
 }
 
 // -----------------------------------------------------------------------------
-std::string Function::Print() { 
+std::string cyclus::cyclopts::Function::Print() { 
   stringstream ss;
   int count = 0;
-  map<VariablePtr,double>::iterator it;
+  map<cyclus::cyclopts::VariablePtr,double>::iterator it;
   for (it = constituents_.begin(); it != constituents_.end(); it++) {
     ss << it->second << it->first->name();
     if (count < constituents_.size()-1) {
@@ -56,71 +55,79 @@ std::string Function::Print() {
 }
 
 // -----------------------------------------------------------------------------
-Constraint::Constraint(Constraint::EqualityRelation eq_r, double rhs)
-    : eq_relation_(eq_r), rhs_(rhs) {};
+cyclus::cyclopts::Constraint::Constraint(
+    cyclus::cyclopts::Constraint::EqualityRelation eq_r, 
+    double rhs)
+    : eq_relation_(eq_r), 
+      rhs_(rhs) 
+{ };
 
 // -----------------------------------------------------------------------------
-Constraint::EqualityRelation Constraint::eq_relation() { 
+cyclus::cyclopts::Constraint::EqualityRelation 
+cyclus::cyclopts::Constraint::eq_relation() { 
   return eq_relation_; 
 }
 
 // -----------------------------------------------------------------------------
-double Constraint::rhs() { 
+double cyclus::cyclopts::Constraint::rhs() { 
   return rhs_; 
 }
 
 // -----------------------------------------------------------------------------
-std::string Constraint::Print() {
+std::string cyclus::cyclopts::Constraint::Print() {
   stringstream ss;
-  ss << "s.t. " << Function::Print() << " " << EqRToStr() << " " << rhs_;
+  ss << "s.t. " << cyclus::cyclopts::Function::Print() 
+     << " " << EqRToStr() << " " << rhs_;
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string Constraint::EqRToStr() {
+std::string cyclus::cyclopts::Constraint::EqRToStr() {
   switch(eq_relation_) {
-  case EQ:
-    return "=";
-    break;
-  case GT:
-    return ">";
-    break;
-  case GTEQ:
-    return ">=";
-    break;
-  case LT:
-    return "<";
-    break;
-  case LTEQ:
-    return "<=";
-    break;
+    case EQ:
+      return "=";
+      break;
+    case GT:
+      return ">";
+      break;
+    case GTEQ:
+      return ">=";
+      break;
+    case LT:
+      return "<";
+      break;
+    case LTEQ:
+      return "<=";
+      break;
   }
 }
 
 // -----------------------------------------------------------------------------
-ObjectiveFunction::ObjectiveFunction(ObjectiveFunction::Direction dir)
-    : dir_(dir) {};
+cyclus::cyclopts::ObjectiveFunction::ObjectiveFunction(
+    cyclus::cyclopts::ObjectiveFunction::Direction dir) : dir_(dir) 
+{ }
 
 // -----------------------------------------------------------------------------
-ObjectiveFunction::Direction ObjectiveFunction::dir() {
+cyclus::cyclopts::ObjectiveFunction::Direction 
+cyclus::cyclopts::ObjectiveFunction::dir() {
   return dir_;
 }
 
 // -----------------------------------------------------------------------------
-std::string ObjectiveFunction::Print() {
+std::string cyclus::cyclopts::ObjectiveFunction::Print() {
   stringstream ss;
   ss << DirToStr() << " " << Function::Print();
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string ObjectiveFunction::DirToStr() {
+std::string cyclus::cyclopts::ObjectiveFunction::DirToStr() {
   switch(dir_) {
-  case MIN:
-    return "min";
-    break;
-  case MAX:
-    return "max";
-    break;
+    case MIN:
+      return "min";
+      break;
+    case MAX:
+      return "max";
+      break;
   }
 }

@@ -15,7 +15,7 @@ namespace ActionBuilding {
   struct BuildOrder 
   {
     // constructor
-    BuildOrder(int n, ActionBuilding::Builder* b,
+    BuildOrder(int n, ActionBuilding::Builder* b, 
                SupplyDemand::CommodityProducer* cp);
 
     // constituents
@@ -29,16 +29,16 @@ namespace ActionBuilding {
   {
     /// constructor
     ProblemInstance(Commodity& commod, double demand, 
-                    cyclopts::SolverInterface& sinterface, 
-                    cyclopts::ConstraintPtr constr, 
-                    std::vector<cyclopts::VariablePtr>& soln);
+                    cyclus::cyclopts::SolverInterface& sinterface, 
+                    cyclus::cyclopts::ConstraintPtr constr, 
+                    std::vector<cyclus::cyclopts::VariablePtr>& soln);
     
     // constituents
     Commodity& commodity;
     double unmet_demand;
-    cyclopts::SolverInterface& interface;
-    cyclopts::ConstraintPtr constraint;
-    std::vector<cyclopts::VariablePtr>& solution;
+    cyclus::cyclopts::SolverInterface& interface;
+    cyclus::cyclopts::ConstraintPtr constraint;
+    std::vector<cyclus::cyclopts::VariablePtr>& solution;
   };
  
   /**
@@ -96,8 +96,9 @@ namespace ActionBuilding {
        @param unmet_demand the additional capacity required
        @return a vector of build orders as decided
     */
-    std::vector<ActionBuilding::BuildOrder> makeBuildDecision(Commodity& commodity, 
-                                                              double unmet_demand);
+    std::vector<ActionBuilding::BuildOrder> makeBuildDecision(
+        Commodity& commodity, 
+        double unmet_demand);
 
     // protected: @MJGFlag - should be protected. revise when tests can
     // be found by classes in the Utility folder
@@ -123,15 +124,18 @@ namespace ActionBuilding {
        @param orders the set of orders to fill
        @param solution the solution determining how to fill the orders
      */
-    void constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
-                                          std::vector<cyclopts::VariablePtr>& solution);
+    void constructBuildOrdersFromSolution(
+        std::vector<ActionBuilding::BuildOrder>& orders,
+        std::vector<cyclus::cyclopts::VariablePtr>& solution);
+
   private:
     /// the set of registered builders
     std::set<Builder*> builders_;
     
     /// a map of variables to their associated builder and producer
-    std::map<cyclopts::VariablePtr, 
-      std::pair<ActionBuilding::Builder*,SupplyDemand::CommodityProducer*> > solution_map_;
+    std::map<cyclus::cyclopts::VariablePtr, 
+      std::pair<ActionBuilding::Builder*, SupplyDemand::CommodityProducer*> > 
+        solution_map_;
   };
 
   //#include "BuildingManagerTests.h"

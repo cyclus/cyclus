@@ -9,15 +9,19 @@
 
 #include "variable.h"
 
+namespace cyclus {
 namespace cyclopts {
 class Constraint;
 typedef boost::shared_ptr<Constraint> ConstraintPtr;
 class ObjectiveFunction;
 typedef boost::shared_ptr<ObjectiveFunction> ObjFuncPtr;
-}
+} // namespace cyclopts
+} // namespace cyclus
+
 
 #include "solver_interface.h"
 
+namespace cyclus {
 namespace cyclopts {
 /// function base class
 class Function {
@@ -29,13 +33,13 @@ class Function {
   virtual ~Function() {};
 
   /// get a modifier
-  double GetModifier(VariablePtr v);
+  double GetModifier(cyclus::cyclopts::VariablePtr v);
 
   /// get the beginning iterator to constituents_
-  std::map<VariablePtr,double>::iterator begin();
+  std::map<cyclus::cyclopts::VariablePtr, double>::iterator begin();
 
   /// get the ending iterator to constituents_
-  std::map<VariablePtr,double>::iterator end();
+  std::map<cyclus::cyclopts::VariablePtr, double>::iterator end();
 
   /// get number of constituents
   int NumConstituents();
@@ -45,10 +49,10 @@ class Function {
 
  private:
   /// a container of all variables and their corresponding constant
-  std::map<VariablePtr,double> constituents_;    
+  std::map<cyclus::cyclopts::VariablePtr, double> constituents_;    
 
   /// add a constituent
-  void AddConstituent(VariablePtr v, double modifer);
+  void AddConstituent(cyclus::cyclopts::VariablePtr v, double modifer);
 
   /// the solver interface builds functions knowing what variables exist
   friend class SolverInterface;
@@ -58,7 +62,7 @@ class Function {
 class Constraint : public Function {
  public:
   /// the equality relation
-  enum EqualityRelation {EQ,GT,GTEQ,LT,LTEQ};
+  enum EqualityRelation {EQ, GT, GTEQ, LT, LTEQ};
   
   /// constructor
   Constraint(EqualityRelation eq_r, double rhs);
@@ -87,7 +91,7 @@ class Constraint : public Function {
 class ObjectiveFunction : public Function {
  public: 
   /// the possible direction
-  enum Direction {MIN,MAX};
+  enum Direction {MIN, MAX};
 
   /// constructor
   explicit ObjectiveFunction(Direction dir);
@@ -105,6 +109,7 @@ class ObjectiveFunction : public Function {
   /// turn dir_ into a string
   std::string DirToStr();
 };
-}
+} // namespace cyclopts
+} // namespace cyclus
 
 #endif

@@ -8,46 +8,46 @@
 #include "function.h"
 #include "variable.h"
 
-/// typedef cbc model to abstract away coin's library
 typedef CbcModel CoinCbcModel;
 
+namespace cyclus {
 namespace cyclopts {
 /// the coin branch-and-cut solver
 class CBCSolver : public Solver {
  public:
   /// solve an MIP
-  virtual void Solve(std::vector<VariablePtr>& variables, ObjFuncPtr obj, 
-                     std::vector<ConstraintPtr>& constraints);
+  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, cyclus::cyclopts::ObjFuncPtr obj, 
+                     std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);
 
  private:
   /// the model builder
   CoinModel builder_;
 
   /// return +/- COIN_DBL_MAX 
-  double DoubleBound(Variable::Bound b);
+  double DoubleBound(cyclus::cyclopts::Variable::Bound b);
 
   /// return +/- COIN_INT_MAX 
-  int IntBound(Variable::Bound b);
+  int IntBound(cyclus::cyclopts::Variable::Bound b);
 
   /// get coin-specific bound for a constraint
-  std::pair<double,double> ConstraintBounds(ConstraintPtr c);
+  std::pair<double, double> ConstraintBounds(cyclus::cyclopts::ConstraintPtr c);
 
   /// set variable/objective function values
-  void SetUpVariablesAndObj(std::vector<VariablePtr>& variables, 
-                            ObjFuncPtr obj);
+  void SetUpVariablesAndObj(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+                            cyclus::cyclopts::ObjFuncPtr obj);
 
   /// set up constraints
-  void SetUpConstraints(std::vector<ConstraintPtr>& constraints);
+  void SetUpConstraints(std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);
 
   /// set the objective direction
-  double ObjDirection(ObjFuncPtr obj);
+  double ObjDirection(cyclus::cyclopts::ObjFuncPtr obj);
 
   /// solve the model
   void SolveModel(CoinCbcModel& model);
 
   /// populate the solution in the variable vector
   void PopulateSolution(CoinCbcModel& model,
-                        std::vector<VariablePtr>& variables);
+                        std::vector<cyclus::cyclopts::VariablePtr>& variables);
 
   /// print variables info
   void PrintVariables(int n_const);
@@ -60,7 +60,8 @@ class CBCSolver : public Solver {
 
   /// prints each other printing function
   void Print(int n_const, int n_vars);
-  };
-}
+};
+} // namespace cyclopts
+} // namespace cyclus
 
 #endif

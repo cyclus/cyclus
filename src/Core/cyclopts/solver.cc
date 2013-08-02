@@ -4,15 +4,15 @@
 #include <vector>
 
 using namespace std;
-using namespace cyclopts;
 
 // -----------------------------------------------------------------------------
-Solver::Solver() {
-  index_ = map<VariablePtr,int>();
+cyclus::cyclopts::Solver::Solver() {
+  index_ = map<cyclus::cyclopts::VariablePtr,int>();
 }
 
 // -----------------------------------------------------------------------------
-void Solver::PopulateIndices(std::vector<VariablePtr>& variables) {
+void cyclus::cyclopts::Solver::PopulateIndices(
+    std::vector<cyclus::cyclopts::VariablePtr>& variables) {
   for (int i = 0; i < variables.size(); i++) {
     index_[variables.at(i)] = i;
   }

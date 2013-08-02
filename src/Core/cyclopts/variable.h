@@ -6,6 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
 
+namespace cyclus {
 namespace cyclopts {
 class Variable;
 
@@ -16,10 +17,10 @@ typedef boost::shared_ptr<Variable> VariablePtr;
 class Variable {
  public:  
   /// enum for possible bound types
-  enum Bound {NEG_INF,INF,FINITE};
+  enum Bound {NEG_INF, INF, FINITE};
 
   /// enum for possible types
-  enum VarType {INT,LINEAR};
+  enum VarType {INT, LINEAR};
 
   /// constructor, sets id_, lbound_, ubound_
   Variable(Bound l, Bound u, VarType t);
@@ -131,5 +132,7 @@ class IntegerVariable : public Variable {
   /// upper Bound value
   int ubound_val_;
 };
-}
+} // namespace cyclopts
+} // namespace cyclus
+
 #endif
