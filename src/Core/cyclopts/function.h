@@ -1,5 +1,5 @@
-#ifndef CYCLOPTS_FUNCTION_H_
-#define CYCLOPTS_FUNCTION_H_
+#ifndef CYCLUS_CYCLOPTS_FUNCTION_H_
+#define CYCLUS_CYCLOPTS_FUNCTION_H_
 
 #include <map>
 #include <utility>
