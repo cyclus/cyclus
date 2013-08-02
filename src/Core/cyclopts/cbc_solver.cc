@@ -102,7 +102,8 @@ void cyclus::cyclopts::CBCSolver::SetUpConstraints(
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::CBCSolver::ObjDirection(cyclus::cyclopts::ObjFuncPtr obj) {
+double cyclus::cyclopts::CBCSolver::ObjDirection(
+    cyclus::cyclopts::ObjFuncPtr obj) {
   double sense_value;
   switch(obj->dir()) {
     case ObjectiveFunction::MIN:
@@ -184,9 +185,10 @@ void cyclus::cyclopts::CBCSolver::Print(int n_const, int n_vars) {
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::CBCSolver::Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
-                                      cyclus::cyclopts::ObjFuncPtr obj, 
-                                      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) {
+void cyclus::cyclopts::CBCSolver::Solve(
+    std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+    cyclus::cyclopts::ObjFuncPtr obj, 
+    std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) {
   // use builder_ to build constraint probelm
   Solver::PopulateIndices(variables);
   SetUpConstraints(constraints);

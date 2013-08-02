@@ -15,25 +15,29 @@ cyclus::cyclopts::SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
 };
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::SolverInterface::RegisterVariable(cyclus::cyclopts::VariablePtr v) {
+void cyclus::cyclopts::SolverInterface::RegisterVariable(
+    cyclus::cyclopts::VariablePtr v) {
   variables_.push_back(v);
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::SolverInterface::RegisterObjFunction(cyclus::cyclopts::ObjFuncPtr obj) {
+void cyclus::cyclopts::SolverInterface::RegisterObjFunction(
+    cyclus::cyclopts::ObjFuncPtr obj) {
   obj_ = obj;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::SolverInterface::AddVarToObjFunction(cyclus::cyclopts::VariablePtr v, 
-                                                            double modifier) {
+void cyclus::cyclopts::SolverInterface::AddVarToObjFunction(
+    cyclus::cyclopts::VariablePtr v, 
+    double modifier) {
   // need to check that v is in variables_
   CheckModifierBounds(modifier);
   obj_->AddConstituent(v, modifier);
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::SolverInterface::RegisterConstraint(cyclus::cyclopts::ConstraintPtr c) {
+void cyclus::cyclopts::SolverInterface::RegisterConstraint(
+    cyclus::cyclopts::ConstraintPtr c) {
   constraints_.push_back(c);
 }
 

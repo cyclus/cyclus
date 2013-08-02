@@ -15,7 +15,8 @@ cyclus::cyclopts::Function::Function() {
 // -----------------------------------------------------------------------------
 void cyclus::cyclopts::Function::AddConstituent(cyclus::cyclopts::VariablePtr v,
                                                 double modifier) {
-  constituents_.insert(std::pair<cyclus::cyclopts::VariablePtr, double>(v,modifier));
+  constituents_.insert(
+      std::pair<cyclus::cyclopts::VariablePtr, double>(v, modifier));
 }
 
 // -----------------------------------------------------------------------------
@@ -24,12 +25,14 @@ double cyclus::cyclopts::Function::GetModifier(cyclus::cyclopts::VariablePtr v) 
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::iterator cyclus::cyclopts::Function::begin() {
+std::map<cyclus::cyclopts::VariablePtr, double>::iterator 
+cyclus::cyclopts::Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::iterator cyclus::cyclopts::Function::end() {
+std::map<cyclus::cyclopts::VariablePtr, double>::iterator 
+cyclus::cyclopts::Function::end() {
   return constituents_.end();
 }
 

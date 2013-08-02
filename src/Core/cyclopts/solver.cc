@@ -5,7 +5,7 @@
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::Solver::Solver() {
-  index_ = std::map<cyclus::cyclopts::VariablePtr,int>();
+  index_ = std::map<cyclus::cyclopts::VariablePtr, int>();
 }
 
 // -----------------------------------------------------------------------------
