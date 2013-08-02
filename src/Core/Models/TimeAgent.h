@@ -6,6 +6,8 @@
 
 #include "Model.h"
 
+namespace cyclus {
+
 /**
    The TimeAgent class is an inheritable class for any Agent 
    that requires knowlege of ticks and tocks. 
@@ -43,6 +45,6 @@ class TimeAgent : public Model {
   virtual void handleDailyTasks(int time, int day) = 0;
   
 };
-
+} // namespace cyclus
 #endif
 

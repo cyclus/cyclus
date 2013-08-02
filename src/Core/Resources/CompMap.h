@@ -3,32 +3,45 @@
 #define _COMPMAP_H
 
 /* -- Includes -- */
-#include "Logger.h"
-#include "CycLimits.h"
-
 #include <map>
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+
+#include "Logger.h"
+#include "CycLimits.h"
 /* -- */
 
-/* -- Typedefs -- */
+namespace cyclus {
 /**
    Isotope integer, ZZZAAA
  */
 typedef int Iso;
 
 /**
-   map of isotope integer to value (mass or atom)
- */
-typedef std::map<Iso,double> Map;  
-
-/**
    a shared pointer to this class
  */
 class CompMap;
 typedef boost::shared_ptr<CompMap> CompMapPtr;
+} // namespace cyclus
+
+
+/* -- Sensitive Includes -- */
+#include "IsoVector.h"
+#include "RecipeLibrary.h"
+/* -- */
+
+
+namespace cyclus {
+
+/* -- Typedefs -- */
+
+/**
+   map of isotope integer to value (mass or atom)
+ */
+typedef std::map<Iso,double> Map;  
+
 /* -- */
 
 /* -- Enums -- */
@@ -38,10 +51,6 @@ typedef boost::shared_ptr<CompMap> CompMapPtr;
 enum Basis {MASS, ATOM};
 /* -- */
 
-/* -- Sensitive Includes -- */
-#include "IsoVector.h"
-#include "RecipeLibrary.h"
-/* -- */
 
 /** 
    @class CompMap
@@ -198,7 +207,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @throw CycNegValueException if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
-  bool almostEqual(const CompMap other, double threshold=cyclus::eps()) const;
+  bool almostEqual(const CompMap other, double threshold=eps()) const;
 
   /**
      returns number of topes in map
@@ -440,5 +449,5 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   friend class RecipeLibrary;
   /* -- */
 };
-
+} // namespace cyclus
 #endif

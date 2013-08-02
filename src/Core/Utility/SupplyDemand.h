@@ -2,7 +2,12 @@
 #define SUPPLYDEMAND_H
 
 #include <ostream>
+#include <vector>
+
+#include "SymbolicFunctions.h"
 #include "Commodity.h"
+
+namespace cyclus {
 
 /**
    a small class defining a producer
@@ -54,9 +59,6 @@ class Producer {
   /// production cost
   double production_cost_;
 };
-
-#include "SymbolicFunctions.h"
-#include <vector>
 
 /**
    a simple container class to hold commodity information
@@ -139,6 +141,5 @@ class CommodityInformation {
   /// a set of producers of the commodity
   std::vector<Producer> producers_;
 };
-
-
+} // namespace cyclus
 #endif

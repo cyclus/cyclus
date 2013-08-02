@@ -1,16 +1,14 @@
 // XMLParser.cpp
 
-#include "XMLParser.h"
 
 #include <stdlib.h>
 #include <string>
+#include "XMLParser.h"
 #include "RelaxNGValidator.h"
 
 #include "Logger.h"
 
-using namespace std;
-using namespace xmlpp;
-using namespace boost;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLParser::XMLParser() {};
@@ -22,7 +20,7 @@ XMLParser::~XMLParser() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLParser::init(const std::stringstream& xml_input_snippet) {
-  parser_ = shared_ptr<DomParser>(new DomParser());
+  parser_ = boost::shared_ptr<xmlpp::DomParser>(new xmlpp::DomParser());
   try {    
     CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet.str();
 
@@ -32,7 +30,7 @@ void XMLParser::init(const std::stringstream& xml_input_snippet) {
     }
   } catch(const std::exception& ex) {
     throw CycLoadXMLException("Error loading xml file: " + 
-                              string(ex.what()));
+                              std::string(ex.what()));
   }
 }
 
@@ -51,3 +49,5 @@ void XMLParser::validate(const std::stringstream& xml_schema_snippet) {
 xmlpp::Document* XMLParser::document() {
   return parser_->get_document();
 }
+} // namespace cyclus
+

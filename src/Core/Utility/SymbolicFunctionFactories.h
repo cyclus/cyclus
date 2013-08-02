@@ -1,10 +1,14 @@
 #ifndef SYMBOLICFUNCTIONFACTORIES_H
 #define SYMBOLICFUNCTIONFACTORIES_H
 
-#include "SymbolicFunctions.h"
-
 #include <string>
 #include <map>
+#include <sstream>
+
+#include "CycException.h"
+#include "SymbolicFunctions.h"
+
+namespace cyclus {
 
 /**
    An abstract factory for pointers to symbolic functions
@@ -113,7 +117,10 @@ class BasicFunctionFactory
     enum_names_;
 };
 
-#include "CycException.h"
+//} // namespace cyclus
+//#include "CycException.h"
+//namespace cyclus {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class InvalidFunctionParamterException : public CycException 
 {
@@ -125,7 +132,6 @@ class PiecewiseFunctionOrderException : public CycException
 {
   public: PiecewiseFunctionOrderException(std::string msg) : CycException(msg) {};
 };
-
-
+} // namespace cyclus
 
 #endif

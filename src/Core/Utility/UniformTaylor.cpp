@@ -7,7 +7,7 @@
 #include <cmath>
 #include <string>
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Vector UniformTaylor::matrixExpSolver(const Matrix & A,
@@ -18,7 +18,7 @@ Vector UniformTaylor::matrixExpSolver(const Matrix & A,
   // checks if the dimensions of A and x_o are compatible for matrix-vector
   // computations
   if ( x_o.numRows() != n ) {
-    string error = "Error: Matrix-Vector dimensions are not compatible.";
+    std::string error = "Error: Matrix-Vector dimensions are not compatible.";
     throw CycRangeException(error);
   }
 
@@ -71,7 +71,7 @@ Vector UniformTaylor::getSolutionVector(const Matrix & B,
   long double expat = exp(-alpha_t);
    
   if ( expat == 0 ) {
-    string error = "Error: exp(-alpha * t) exceeds the range of a long double.";
+    std::string error = "Error: exp(-alpha * t) exceeds the range of a long double.";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
     throw CycRangeException(error);
   }
@@ -120,7 +120,7 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
 
   // checks to see if exp(alpha * t) is infinite
   if ( lowerBound == HUGE_VAL ) {
-    string error = "Error: exp(alpha * t) exceeds the range of a long double";
+    std::string error = "Error: exp(alpha * t) exceeds the range of a long double";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
     throw CycRangeException(error);
   }
@@ -153,3 +153,4 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
   return p;
 }
 
+} // namespace cyclus

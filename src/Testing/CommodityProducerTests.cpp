@@ -2,12 +2,13 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerTests::SetUp() 
 {
+  using cyclus::Commodity;
+  using cyclus::SupplyDemand::CommodityProducer;
   commodity_name_ = "commodity";
   commodity_ = Commodity(commodity_name_);
   producer_ = CommodityProducer();
@@ -51,6 +52,7 @@ void CommodityProducerTests::setCost()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerTests,initialization) 
 {
+  using cyclus::CycNotRegisteredException;
   EXPECT_FALSE(producer_.producesCommodity(commodity_));
   EXPECT_THROW(producer_.productionCapacity(commodity_),CycNotRegisteredException);
   EXPECT_THROW(producer_.productionCost(commodity_),CycNotRegisteredException);
@@ -59,6 +61,7 @@ TEST_F(CommodityProducerTests,initialization)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerTests,addcommodity) 
 {
+  using cyclus::CycDoubleRegistrationException;
   EXPECT_NO_THROW(addCommodity());
   EXPECT_EQ(producer_.productionCapacity(commodity_),defaultCapacity());
   EXPECT_EQ(producer_.productionCost(commodity_),defaultCost());
@@ -78,6 +81,8 @@ TEST_F(CommodityProducerTests,info)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerTests,copy) 
 {
+  using cyclus::Commodity;
+  using cyclus::SupplyDemand::CommodityProducer;
   EXPECT_NO_THROW(addCommodity());
   EXPECT_NO_THROW(setCapacity());
   EXPECT_NO_THROW(setCost());

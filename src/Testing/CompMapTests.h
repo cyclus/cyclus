@@ -11,15 +11,15 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TestCompMap;
 typedef boost::shared_ptr<TestCompMap> TestCompMapPtr;
-class TestCompMap : public CompMap {
+class TestCompMap : public cyclus::CompMap {
  public:
- TestCompMap() : CompMap(MASS) {};
- TestCompMap(Basis b) : CompMap(b) {};
+ TestCompMap() : cyclus::CompMap(cyclus::MASS) {};
+ TestCompMap(cyclus::Basis b) : cyclus::CompMap(b) {};
   
   virtual ~TestCompMap() {};
   
-  void setMap(Map m) {map_ = m;}
-  void setParent(CompMapPtr p) {parent_ = p;}
+  void setMap(cyclus::Map m) {map_ = m;}
+  void setParent(cyclus::CompMapPtr p) {parent_ = p;}
   void setDecayTime(double t) {decay_time_ = t;}
 };
 
@@ -27,20 +27,20 @@ class TestCompMap : public CompMap {
 class CompMapTests : public ::testing::Test {
  protected:
   TestCompMapPtr comp_;
-  Map map_, atomified_, massified_;
-  Basis basis_;
+  cyclus::Map map_, atomified_, massified_;
+  cyclus::Basis basis_;
   double ratio_;
   int n_species_;
   std::vector<int> isotopes_, masses_;
 
   boost::shared_ptr<TestCompMap> child, parent;
-  CompMapPtr root;
+  cyclus::CompMapPtr root;
   int t1, t2, root_decay_time;
 
  public:
   virtual void SetUp() { 
-    basis_ = MASS;
-    map_ = Map();
+    basis_ = cyclus::MASS;
+    map_ = cyclus::Map();
     comp_ = TestCompMapPtr(new TestCompMap(basis_));
     isotopes_.push_back(1001),isotopes_.push_back(2004);
     masses_.push_back(10),masses_.push_back(20);
@@ -54,7 +54,7 @@ class CompMapTests : public ::testing::Test {
     for (int i = 0; i < n_species_; i++) {
       int iso = isotopes_.at(i);
       double mass_value = (double)masses_.at(i);
-      double atom_value = mass_value / MT->gramsPerMol(iso);
+      double atom_value = mass_value / cyclus::MT->gramsPerMol(iso);
       map_[iso] = mass_value;
       massified_[iso] = mass_value;
       atomified_[iso] = atom_value;
@@ -62,7 +62,7 @@ class CompMapTests : public ::testing::Test {
       atom_sum += atom_value;
     }
     ratio_ = mass_sum/atom_sum;
-    for (Map::iterator it = atomified_.begin(); it != atomified_.end(); it++) {
+    for (cyclus::Map::iterator it = atomified_.begin(); it != atomified_.end(); it++) {
       massified_[it->first] /= mass_sum;
       atomified_[it->first] /= atom_sum;
     }
@@ -73,7 +73,7 @@ class CompMapTests : public ::testing::Test {
     t2 = 1001;
     // root
     root_decay_time = t1+t2;
-    root = CompMapPtr(new CompMap(basis_));
+    root = cyclus::CompMapPtr(new cyclus::CompMap(basis_));
     // parent/
     parent = TestCompMapPtr(new TestCompMap(basis_));
     parent->setParent(root);

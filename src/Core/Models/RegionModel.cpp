@@ -14,7 +14,7 @@
 #include "Prototype.h"
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RegionModel::RegionModel() { 
@@ -31,7 +31,7 @@ void RegionModel::initCoreMembers(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::initAllowedFacilities(QueryEngine* qe) {   
   int num_allowed_fac = qe->nElementsMatchingQuery("allowedfacility");
-  string fac_name;
+  std::string fac_name;
   Model* new_fac;
   for (int i=0;i<num_allowed_fac;i++) {
     fac_name = qe->getElementContent("allowedfacility",i);
@@ -43,7 +43,7 @@ void RegionModel::initAllowedFacilities(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::initInstitutionNames(QueryEngine* qe) {
   int nInsts = qe->nElementsMatchingQuery("institution");
-  string name;
+  std::string name;
   for (int i=0; i<nInsts; i++) {
     QueryEngine* inst_data = qe->queryElement("institution",i);
     name = inst_data->getElementContent("name");
@@ -65,7 +65,7 @@ void RegionModel::addRegionAsRootNode() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RegionModel::addChildrenToTree() {
   Model* inst;
-  set<string>::iterator it;
+  std::set<std::string>::iterator it;
   for (it = inst_names_.begin(); it != inst_names_.end(); it++){
     inst = Model::getModelByName((*it));
     inst->enterSimulation(this);
@@ -77,14 +77,14 @@ std::string RegionModel::str() {
   std::string s = Model::str();
 
   s += "allows facs: ";
-  for(set<Model*>::iterator fac=allowedFacilities_.begin();
+  for(std::set<Model*>::iterator fac=allowedFacilities_.begin();
       fac != allowedFacilities_.end();
       fac++){
     s += (*fac)->name() + ", ";
   }
 
   s += ". And has insts: ";
-  for(vector<Model*>::iterator inst=children_.begin();
+  for(std::vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
     s += (*inst)->name() + ", ";
@@ -136,9 +136,10 @@ void RegionModel::handleTock(int time){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 void RegionModel::handleDailyTasks(int time, int day){
   // tell all of the institution models to handle the tick
-  for(vector<Model*>::iterator inst=children_.begin();
+  for(std::vector<Model*>::iterator inst=children_.begin();
       inst != children_.end();
       inst++){
     (dynamic_cast<InstModel*>(*inst))->handleDailyTasks(time,day);
   }
 }
+} // namespace cyclus

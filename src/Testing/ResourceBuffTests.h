@@ -13,14 +13,14 @@ class ResourceBuffTest : public ::testing::Test {
 protected:
   int oxygen, u235, u238, pu240;
   double m_oxygen, m_u235, m_u238, m_pu240;
-  IsoVector vect1_, vect2_;
+  cyclus::IsoVector vect1_, vect2_;
   
-  rsrc_ptr mat1_, mat2_;
+  cyclus::rsrc_ptr mat1_, mat2_;
   double mass1, mass2;
-  Manifest mats;
+  cyclus::Manifest mats;
   
-  ResourceBuff store_; // default constructed mat store
-  ResourceBuff filled_store_;
+  cyclus::ResourceBuff store_; // default constructed mat store
+  cyclus::ResourceBuff filled_store_;
   
   double neg_cap, zero_cap, cap, low_cap;
   double exact_qty; // mass in filled_store_
@@ -31,6 +31,11 @@ protected:
   double overeps, undereps;
 
   virtual void SetUp() {
+    using cyclus::CompMap;
+    using cyclus::CompMapPtr;
+    using cyclus::IsoVector;
+    using cyclus::Material;
+    using cyclus::rsrc_ptr;
     try {
       // composition
       CompMapPtr comp;
@@ -82,7 +87,7 @@ protected:
       filled_store_.pushOne(mat1_);
       filled_store_.pushOne(mat2_);
     } catch (std::exception err) {
-      LOG(LEV_ERROR, "MSTest") << err.what();
+      LOG(cyclus::LEV_ERROR, "MSTest") << err.what();
       FAIL() << "An exception was thrown in the fixture SetUp.";
     }
   }

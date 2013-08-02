@@ -13,6 +13,8 @@
 #include "Resource.h"
 #include "IsoVector.h"
 
+namespace cyclus {
+
 /* -- Typedefs -- */
 class Material;
 typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
@@ -274,7 +276,7 @@ public:
      @return the extracted material as a newly allocated material object
    */
   virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
-      MassUnit unit=KG, double threshold=cyclus::eps_rsrc());
+      MassUnit unit=KG, double threshold=eps_rsrc());
 
   /**
      Extracts a specified mass from this material creating a new 
@@ -403,5 +405,5 @@ private:
   virtual int stateID() {return iso_vector_.comp()->ID();}
 
 };
-
+} // namespace cyclus
 #endif

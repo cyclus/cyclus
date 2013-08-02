@@ -1,10 +1,10 @@
 #include "MarketPlayerManager.h"
 
-using namespace std;
+namespace cyclus {
 
 // -------------------------------------------------------------------
 MarketPlayerManager::MarketPlayerManager() {
-  players_ = set<MarketPlayer*>();
+  players_ = std::set<MarketPlayer*>();
 }
 
 // -------------------------------------------------------------------
@@ -30,9 +30,10 @@ void MarketPlayerManager::playerLeavingMarket(MarketPlayer* m) {
 // -------------------------------------------------------------------
 double MarketPlayerManager::playerProductionCapacity() {
   double value = 0;
-  set<MarketPlayer*>::iterator it;
+  std::set<MarketPlayer*>::iterator it;
   for (it = players_.begin(); it != players_.end(); it++) {
     value += (*it)->productionCapacity(*commod_);
   }
   return value;
 }
+} // namespace cyclus

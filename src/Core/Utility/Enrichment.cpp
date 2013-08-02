@@ -1,9 +1,8 @@
-#include "Enrichment.h"
-#include "CycLimits.h"
 #include <sstream>
+#include "CycLimits.h"
+#include "Enrichment.h"
 
-using namespace std;
-using namespace cyclus;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 enrichment::Assays::Assays(double feed, double product, double tails) :
@@ -70,14 +69,14 @@ double enrichment::tails_qty(double product_qty, const Assays& assays) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double enrichment::value_func(double frac) {
   if (frac < 0) {
-    stringstream msg;
+    std::stringstream msg;
     msg << "The provided fraction (" << frac 
         << ") is lower than the acceptable range.";
     throw CycRangeException(msg.str());
   }
   
   if (frac >= 1) {
-    stringstream msg;
+    std::stringstream msg;
     msg << "The provided fraction (" << frac 
         << ") is higher than the acceptable range.";
     throw CycRangeException(msg.str());
@@ -96,3 +95,4 @@ double enrichment::swu_required(double product_qty, const Assays& assays) {
     feed * value_func(assays.feed());
   return swu;
 }
+} // namespace cyclus

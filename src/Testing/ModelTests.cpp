@@ -31,25 +31,25 @@ TEST_P(ModelTests, SetAndGetName) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, SetAndGetModelType) {
-  for(int i=REGION; i<END_MODEL_TYPES; i++){
+  for(int i=cyclus::REGION; i<cyclus::END_MODEL_TYPES; i++){
     switch(i){
-      case (REGION):
+      case (cyclus::REGION):
         EXPECT_NO_THROW(model_->setModelType("Region"));
         EXPECT_EQ("Region", model_->modelType());
         break;
-      case (INST):
+      case (cyclus::INST):
         EXPECT_NO_THROW(model_->setModelType("Inst"));
         EXPECT_EQ("Inst", model_->modelType());
         break;
-      case (FACILITY):
+      case (cyclus::FACILITY):
         EXPECT_NO_THROW(model_->setModelType("Facility"));
         EXPECT_EQ("Facility", model_->modelType());
         break;
-      case (MARKET):
+      case (cyclus::MARKET):
         EXPECT_NO_THROW(model_->setModelType("Market"));
         EXPECT_EQ("Market", model_->modelType());
         break;
-      case (CONVERTER):
+      case (cyclus::CONVERTER):
         EXPECT_NO_THROW(model_->setModelType("Converter"));
         EXPECT_EQ("Converter", model_->modelType());
         break;

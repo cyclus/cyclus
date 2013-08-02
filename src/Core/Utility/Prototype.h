@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+namespace cyclus {
+
 /**
    Prototypes are Models in the simulation that are created through
    the process of cloning. All prototypes have a subset of their
@@ -62,5 +64,5 @@ class Prototype {
   /// the set of registered prototyeps
   static std::map<std::string,Prototype*> prototype_registry_;
 };
-
+} // namespace cyclus
 #endif

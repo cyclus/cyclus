@@ -2,9 +2,10 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
 
+namespace cyclus {
+namespace SupplyDemand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducerManager::CommodityProducerManager() {}
 
@@ -15,7 +16,7 @@ CommodityProducerManager::~CommodityProducerManager() {}
 double CommodityProducerManager::totalProductionCapacity(Commodity& commodity)
 {
   double total = 0.0;
-  set<CommodityProducer*>::iterator it;
+  std::set<CommodityProducer*>::iterator it;
   for (it = producers_.begin(); it != producers_.end(); it++)
     {
       if ( (*it)->producesCommodity(commodity) )
@@ -49,3 +50,6 @@ void CommodityProducerManager::unRegisterProducer(SupplyDemand::CommodityProduce
       producers_.erase(producer);
     }
 }
+} // namespace SupplyDemand
+} // namespace cyclus
+

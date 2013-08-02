@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cmath> // std::abs
 
-using namespace std;
+namespace cyclus {
 
 LogLevel CompMap::log_level_ = LEV_INFO3;
 
@@ -90,7 +90,7 @@ bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
   // (abs(x-y) < abs(x)*eps) && (abs(x-y) < abs(y)*epsilon)
   
   if ( threshold < 0 ) {
-      stringstream ss;
+      std::stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 
          << threshold
          << " .";
@@ -224,8 +224,8 @@ void CompMap::atomify() {
 void CompMap::normalize() {
   double sum;
   double other_sum;
-  vector<double> vec;
-  vector<double> other_vec;
+  std::vector<double> vec;
+  std::vector<double> other_vec;
   bool atom = (basis_ == ATOM);
   for (iterator it = map_.begin(); it != map_.end(); ++it) {
     validateEntry(it->first,it->second);
@@ -323,7 +323,7 @@ void CompMap::validateIsotopeNumber(const Iso& tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;  
   if (tope < lower_limit || tope > upper_limit) {
-    stringstream ss("");
+    std::stringstream ss("");
     ss << tope;
     throw CycRangeException("Isotope identifier '" + ss.str() + "' is not valid.");
   }
@@ -332,7 +332,7 @@ void CompMap::validateIsotopeNumber(const Iso& tope) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::validateValue(const double& value) {
   if (value < 0.0) {
-    string err_msg = "CompMap has negative quantity for an isotope.";
+    std::string err_msg = "CompMap has negative quantity for an isotope.";
     throw CycRangeException(err_msg);
   }
 }
@@ -344,9 +344,9 @@ void CompMap::print() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string CompMap::detail() {
-  stringstream ss;
-  vector<string> entries = compStrings();
-  for (vector<string>::iterator entry = entries.begin(); 
+  std::stringstream ss;
+  std::vector<std::string> entries = compStrings();
+  for (std::vector<std::string>::iterator entry = entries.begin(); 
        entry != entries.end(); ++entry) {
     CLOG(log_level_) << *entry;
   }
@@ -355,8 +355,8 @@ std::string CompMap::detail() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> CompMap::compStrings() {
-  stringstream ss;
-  vector<string> comp_strings;
+  std::stringstream ss;
+  std::vector<std::string> comp_strings;
   for (const_iterator entry = map_.begin(); entry != map_.end(); ++entry) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
@@ -364,3 +364,5 @@ std::vector<std::string> CompMap::compStrings() {
   }
   return comp_strings;
 }
+
+} // namespace cyclus

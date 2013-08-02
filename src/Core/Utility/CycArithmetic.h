@@ -10,6 +10,8 @@
 #include <vector>
 #include <map>
 
+namespace cyclus {
+
 /** 
    @brief CycArithmetic is a toolkit for arithmetic 
    **/
@@ -44,4 +46,5 @@ public:
      */
   static std::vector<double> sort_ascending(std::map<int, double> to_sort);
 };
+} // namespace cyclus
 #endif 

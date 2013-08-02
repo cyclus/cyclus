@@ -10,6 +10,9 @@
 
 #include "RelaxNGValidator.h"
 #include <libxml/xmlerror.h>
+
+namespace cyclus {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 RelaxNGValidator::RelaxNGValidator() : schema_(0), valid_context_(0) {}
 
@@ -73,3 +76,5 @@ bool RelaxNGValidator::validate(const xmlpp::Document* doc) {
 
   return res;
 }
+} // namespace cyclus
+

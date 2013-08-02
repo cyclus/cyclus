@@ -12,6 +12,8 @@
 #include "Event.h"
 #include "Logger.h"
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
@@ -157,3 +159,4 @@ void SqliteBack::Flush() {
   cmds_.clear();
 }
 
+} // namespace cyclus

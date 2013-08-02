@@ -8,6 +8,8 @@
 
 #include <fstream>
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteDb::SqliteDb(std::string path, bool readonly)
   : db_(NULL),
@@ -123,3 +125,4 @@ std::vector<StrList> SqliteDb::query(std::string sql) {
   return results;
 }
 
+} // namespace cyclus

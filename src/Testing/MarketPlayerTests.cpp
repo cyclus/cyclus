@@ -4,10 +4,11 @@
 
 #include "CycException.h"
 
-using namespace std;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void MarketPlayerTests::SetUp() {
+  using cyclus::Commodity;
+  using cyclus::MarketPlayer;
+  using cyclus::MarketPlayerManager;
   commodA_ = new Commodity("A");
   commodB_ = new Commodity("B");
   commodC_ = new Commodity("C");
@@ -83,6 +84,8 @@ TEST_F(MarketPlayerTests,EnterLeaveTests) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MarketPlayerTests,ExceptionTests) {
+  using cyclus::CycKeyException;
+  using cyclus::CycCommodityMismatchError;
   EXPECT_THROW(player1_->productionCapacity(*commodC_),CycKeyException);
   EXPECT_THROW(player1_->registerManager(managerB_,*commodC_),
                CycKeyException);

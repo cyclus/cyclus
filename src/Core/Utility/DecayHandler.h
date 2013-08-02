@@ -2,8 +2,16 @@
 #if !defined(_DECAYHANDLER_H)
 #define _DECAYHANDLER_H
 
+#include <string>
+#include <utility>
+#include <vector>
+#include <set>
+#include <map>
+
 #include "UseMatrixLib.h"
 #include "IsoVector.h"
+
+namespace cyclus {
 
 /**
    A map type to represent all of the parent isotopes tracked.  The key 
@@ -116,6 +124,6 @@ class DecayHandler {
      */
     int trackedIsotope(int i){return IsotopesTracked_.at(i);}
 };
-
+} // namespace cyclus
 #endif
 

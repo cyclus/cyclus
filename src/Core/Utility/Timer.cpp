@@ -11,7 +11,8 @@
 #include "Material.h"
 #include "EventManager.h"
 
-using namespace std;
+
+namespace cyclus {
 
 Timer* Timer::instance_ = 0;
 
@@ -71,9 +72,9 @@ int Timer::lastDayOfMonth(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-string Timer::reportListeners() {
-  string report = "";
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+std::string Timer::reportListeners() {
+  std::string report = "";
+  for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
       agent != tick_listeners_.end(); 
       agent++) {
     report += (*agent)->name() + " ";
@@ -83,7 +84,7 @@ string Timer::reportListeners() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendResolve() {
-  for(vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
+  for(std::vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
        agent != resolve_listeners_.end(); 
        agent++) {
     try {
@@ -99,7 +100,7 @@ void Timer::sendResolve() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendTick() {
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+  for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
     try {
@@ -115,7 +116,7 @@ void Timer::sendTick() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendTock() {
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+  for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
     try {
@@ -131,7 +132,7 @@ void Timer::sendTock() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::sendDailyTasks() {
-  for(vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
+  for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
     try {
@@ -239,10 +240,10 @@ int Timer::convertDate(int month, int year) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pair<int, int> Timer::convertDate(int time) {
+std::pair<int, int> Timer::convertDate(int time) {
   int month = (time - time0_) % 12 + 1;
   int year = (time - time0_ - (month - 1)) / 12 + year0_;
-  return make_pair(month, year);
+  return std::make_pair(month, year);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -280,3 +281,5 @@ void Timer::logTimeData() {
     ->addVal("Duration", simDur_)
     ->record();
 }
+} // namespace cyclus
+

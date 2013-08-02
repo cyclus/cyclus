@@ -8,6 +8,8 @@
 #include "Material.h"
 #include <vector>
 
+namespace cyclus {
+
 typedef std::vector<mat_rsrc_ptr> MatManifest;
 
 /*!
@@ -53,5 +55,5 @@ public:
 
   void pushAll(MatManifest mats);
 };
-
+} // namespace cyclus
 #endif

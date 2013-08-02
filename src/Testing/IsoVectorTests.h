@@ -4,23 +4,23 @@
 
 class IsoVectorTests : public ::testing::Test {
 protected:
-  CompMapPtr comp;
-  IsoVector vec;
-  IsoVector zero_vec;
+  cyclus::CompMapPtr comp;
+  cyclus::IsoVector vec;
+  cyclus::IsoVector zero_vec;
 
   std::vector<int> isotopes;
   double ratio;
-  CompMapPtr add_result, mix_result;
-  IsoVector add_to_vec, to_add_vec;
+  cyclus::CompMapPtr add_result, mix_result;
+  cyclus::IsoVector add_to_vec, to_add_vec;
   double efficiency;
-  CompMapPtr subtract_result, separate_result;
-  IsoVector subtract_from_vec, to_subtract_vec;
+  cyclus::CompMapPtr subtract_result, separate_result;
+  cyclus::IsoVector subtract_from_vec, to_subtract_vec;
   
 
   // this sets up the fixtures
   virtual void SetUp() {
-    comp = CompMapPtr(new CompMap(MASS));
-    vec = IsoVector(comp);
+    comp = cyclus::CompMapPtr(new cyclus::CompMap(cyclus::MASS));
+    vec = cyclus::IsoVector(comp);
   };
   
   // this tears down the fixtures
@@ -28,6 +28,11 @@ protected:
   }
 
   void LoadMaps() {
+    using cyclus::IsoVector;
+    using cyclus::CompMap;
+    using cyclus::CompMapPtr;
+    using cyclus::MASS;
+
     isotopes.push_back(1001),isotopes.push_back(2004);
     
     // add, mix terms

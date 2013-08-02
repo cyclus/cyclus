@@ -5,6 +5,10 @@
 #include <string>
 #include <set>
 
+#include "CycException.h"
+
+namespace cyclus {
+
 /**
    This is a base class that defines the API used by any engine
    representing an input format. 
@@ -69,11 +73,10 @@ class QueryEngine {
   std::set<QueryEngine*> spawned_children_;
 };
 
-#include "CycException.h"
-#include <string>
 class CycNullQueryException : public CycException {
  public:
  CycNullQueryException(std::string msg) : CycException(msg) {};
 };
+} // namespace cyclus
 
 #endif

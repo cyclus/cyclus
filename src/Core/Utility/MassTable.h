@@ -8,6 +8,8 @@
 
 #define MT MassTable::Instance()
 
+namespace cyclus {
+
 /**
    @class MassTable 
    The MassTable class provides an interface to the mass.sqlite 
@@ -95,5 +97,5 @@ protected:
   void initializeSQL();
 
 };
-
+} // namespace cyclus
 #endif

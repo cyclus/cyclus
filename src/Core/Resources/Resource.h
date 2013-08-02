@@ -6,6 +6,8 @@
 #include "IntrusiveBase.h"
 #include <boost/intrusive_ptr.hpp>
 
+namespace cyclus {
+
 class Resource;
 typedef boost::intrusive_ptr<Resource> rsrc_ptr;
 
@@ -33,7 +35,7 @@ enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES };
  */
 
 class Resource: IntrusiveBase<Resource> {
-public:
+ public:
   /**
      A boolean comparing the quality of the other resource 
      to the quality of the base 
@@ -175,5 +177,5 @@ public:
   bool book_kept_;
 
 };
-
+} // namespace cyclus
 #endif

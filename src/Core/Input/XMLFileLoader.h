@@ -9,6 +9,8 @@
 #include <boost/shared_ptr.hpp>
 #include "XMLParser.h"
 
+namespace cyclus {
+
 /**
    a class that encapsulates the methods needed to load input to
    a cyclus simulation from xml
@@ -91,6 +93,6 @@ class XMLFileLoader {
   /// the parser
   boost::shared_ptr<XMLParser> parser_;
 };
-
+} // namespace cyclus
 
 #endif

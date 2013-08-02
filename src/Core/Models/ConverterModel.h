@@ -8,6 +8,8 @@
 #include "Message.h"
 #include "Model.h"
 
+namespace cyclus {
+
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 
@@ -98,6 +100,7 @@ public:
   virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
   
 };
+} // namespace cyclus
 
 #endif
 

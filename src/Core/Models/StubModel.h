@@ -4,6 +4,8 @@
 
 #include "Model.h"
 
+namespace cyclus {
+
 /**
    The StubModel class is the abstract class/interface used by all stub 
    models. 
@@ -44,7 +46,7 @@ class StubModel : public Model {
 /* ------------------- */ 
 
 };
-
+} // namespace cyclus
 #endif
 
 

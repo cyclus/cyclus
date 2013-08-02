@@ -2,9 +2,12 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
-using namespace ActionBuilding;
+
+//using namespace SupplyDemand;
+//using namespace ActionBuilding;
+
+namespace cyclus {
+namespace ActionBuilding {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Builder::Builder() {}
@@ -43,13 +46,15 @@ double Builder::nBuildingPrototypes()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<CommodityProducer*>::iterator Builder::beginningProducer()
+std::set<SupplyDemand::CommodityProducer*>::iterator Builder::beginningProducer()
 {
   return producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<CommodityProducer*>::iterator Builder::endingProducer()
+std::set<SupplyDemand::CommodityProducer*>::iterator Builder::endingProducer()
 {
   return producers_.end();
 }
+} // namespace ActionBuilder
+} // namespace cyclus

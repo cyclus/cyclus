@@ -12,9 +12,9 @@ class BuildingTestHelper {
   ~BuildingTestHelper();
   
   /// first builder
-  ActionBuilding::Builder* builder1;
+  cyclus::ActionBuilding::Builder* builder1;
 
   /// second builder
-  ActionBuilding::Builder* builder2;
+  cyclus::ActionBuilding::Builder* builder2;
 
 };

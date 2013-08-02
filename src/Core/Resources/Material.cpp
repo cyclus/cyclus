@@ -11,10 +11,9 @@
 #include <vector>
 #include <list>
 
-using namespace std;
-using namespace boost;
+namespace cyclus {
 
-list<Material*> Material::materials_;
+std::list<Material*> Material::materials_;
 
 bool Material::decay_wanted_ = false;
 
@@ -74,7 +73,7 @@ void Material::absorb(mat_rsrc_ptr matToAdd) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mat_rsrc_ptr Material::extract(double mass) {
   if(quantity_ < mass){
-    string err = "The mass ";
+    std::string err = "The mass ";
     err += mass;
     err += " cannot be extracted from Material with ID ";
     err += ID_; 
@@ -95,19 +94,19 @@ mat_rsrc_ptr Material::extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, double> Material::diff(mat_rsrc_ptr other){
+std::map<Iso, double> Material::diff(mat_rsrc_ptr other){
   CompMapPtr comp = CompMapPtr(other->isoVector().comp());
   double amt = other->mass(KG);
   return diff(comp, amt, KG);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUnit 
+std::map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUnit 
     unit){
 
-  map<Iso, double>::iterator entry;
+  std::map<Iso, double>::iterator entry;
   CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS, unit));
-  map<Iso, double> to_ret = orig->map();
+  std::map<Iso, double> to_ret = orig->map();
   double amt = 0;
   double orig_amt = this->mass(unit);
   for( entry= (*other).begin(); entry!= (*other).end(); ++entry ) {
@@ -124,16 +123,16 @@ map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, MassUn
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double threshold){
+std::map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double threshold){
   if(threshold < 0){
-      stringstream ss;
+      std::stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 
          << threshold
          << " .";
       throw CycNegativeValueException(ss.str());
   }
-  map<Iso, double>::const_iterator it;
-  map<Iso, double> to_ret;
+  std::map<Iso, double>::const_iterator it;
+  std::map<Iso, double> to_ret;
 
   for(it=vec.begin(); it!= vec.end(); ++it){
     if(abs((*it).second) > threshold) {
@@ -147,18 +146,18 @@ map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double thre
 mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
-  vector<double> final_amt_vec = vector<double>();
+  std::vector<double> final_amt_vec = std::vector<double>();
   double final_amt = 0;
 
-  map<Iso, double> remainder;
+  std::map<Iso, double> remainder;
   remainder = applyThreshold(diff(remove_comp, remove_amt, unit), threshold);
-  map<Iso, double>::iterator it;
+  std::map<Iso, double>::iterator it;
   
   for(it=remainder.begin(); it!=remainder.end(); ++it){
     int iso = (*it).first;
     double amt = (*it).second;
     if(amt < 0){
-      stringstream ss;
+      std::stringstream ss;
       ss << "The Material " << this->ID() 
          << " has insufficient material to extract "
          << " the isotope : " << iso 
@@ -201,9 +200,9 @@ void Material::print() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-string Material::detail() {
-  vector<string>::iterator entry;
-  vector<string> entries = iso_vector_.comp()->compStrings();
+std::string Material::detail() {
+  std::vector<std::string>::iterator entry;
+  std::vector<std::string> entries = iso_vector_.comp()->compStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
@@ -356,7 +355,7 @@ bool Material::checkQuality(rsrc_ptr other){
 
   try {
     // Make sure the other is a material
-    mat_rsrc_ptr mat = dynamic_pointer_cast<Material>(other);
+    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(other);
     if (mat) {
       toRet = true;
     }
@@ -379,7 +378,7 @@ void Material::decay() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Material::decayMaterials() {
-  for (list<Material*>::iterator mat = materials_.begin();
+  for (std::list<Material*>::iterator mat = materials_.begin();
       mat != materials_.end();
       mat++){
      (*mat)->decay();
@@ -389,7 +388,7 @@ void Material::decayMaterials() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool Material::isMaterial(rsrc_ptr rsrc)
 {
-  mat_rsrc_ptr cast = dynamic_pointer_cast<Material>(rsrc);
+  mat_rsrc_ptr cast = boost::dynamic_pointer_cast<Material>(rsrc);
   return !(cast.get() == 0);
 }
 
@@ -398,3 +397,4 @@ void Material::addToTable() {
   Resource::addToTable();
   iso_vector_.record();
 }
+} // namespace cyclus

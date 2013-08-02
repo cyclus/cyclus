@@ -17,6 +17,8 @@
 #include <libxml++/document.h>
 #include <glibmm/ustring.h>
 
+namespace cyclus {
+
 /** 
     RelaxNGValidator
 
@@ -24,7 +26,7 @@
     agaisnt a given RelaxNG schema.
  */
 class RelaxNGValidator {
- public:
+public:
   /// constructor
   RelaxNGValidator();
   
@@ -43,7 +45,7 @@ class RelaxNGValidator {
    */
   bool validate(const xmlpp::Document* doc);
 
- protected:
+protected:
   /// free xml-related memory
   void release_underlying();
 
@@ -59,13 +61,17 @@ class RelaxNGValidator {
   /// the validated context
   xmlRelaxNGValidCtxtPtr valid_context_;
 };
+} // namespace cyclus
+
 
 #include "CycException.h"
+namespace cyclus {
 /**
    Exception helper classes
  */
 class CycValidityException : public CycException {
- public: 
- CycValidityException(std::string msg) : CycException(msg) {};
+public: 
+  CycValidityException(std::string msg) : CycException(msg) {};
 };
+} // namespace cyclus
 #endif

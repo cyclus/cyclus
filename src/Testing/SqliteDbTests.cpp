@@ -9,6 +9,8 @@ static std::string const path = "testdb.sqlite";
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(SqliteDbTest, CreateAndInsert) {
+  using cyclus::SqliteDb;
+  using cyclus::StrList;
   remove(path.c_str());
   std::vector<StrList> result;
   SqliteDb db(path);
@@ -28,6 +30,8 @@ TEST(SqliteDbTest, CreateAndInsert) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(SqliteDbTest, OpenExistingAndRetrieve) {
+  using cyclus::SqliteDb;
+  using cyclus::StrList;
   std::vector<StrList> result;
   SqliteDb db(path);
 
@@ -44,6 +48,8 @@ TEST(SqliteDbTest, OpenExistingAndRetrieve) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(SqliteDbTest, Overwrite) {
+  using cyclus::SqliteDb;
+  using cyclus::StrList;
   std::vector<StrList> result;
   SqliteDb db(path);
   db.overwrite();

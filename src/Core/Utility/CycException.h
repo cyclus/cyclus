@@ -5,11 +5,14 @@
 #include <exception>
 #include <string>
 
+
+namespace cyclus {
+
 /**
    @class CycException 
    A generic mechanism to manually manage exceptions 
  */
-class CycException: public std::exception {
+class CycException : public std::exception {
 
 protected:
     /**
@@ -110,7 +113,7 @@ class CycDoubleRegistrationException : public CycException {
  public: 
  CycDoubleRegistrationException(std::string msg) : CycException(msg) {};
 };
-
+} // namespace cyclus
 #endif
 
 

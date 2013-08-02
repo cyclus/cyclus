@@ -4,6 +4,8 @@
 
 #include "UseMatrixLib.h"
 
+namespace cyclus {
+
 /**
    @class UniformTaylor 
     
@@ -74,5 +76,5 @@ class UniformTaylor {
      */
     static int maxNumTerms(long double alpha_t, double epsilon);
 };
-
+} // namespace cyclus
 #endif

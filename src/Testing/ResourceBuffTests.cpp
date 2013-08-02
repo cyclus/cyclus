@@ -13,6 +13,7 @@
 //- - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, SetCapacity_ExceptionsEmpty) {
+  using cyclus::CycOverCapException;
   EXPECT_THROW(store_.setCapacity(neg_cap), CycOverCapException);
   EXPECT_NO_THROW(store_.setCapacity(zero_cap));
   EXPECT_NO_THROW(store_.setCapacity(cap));
@@ -20,6 +21,7 @@ TEST_F(ResourceBuffTest, SetCapacity_ExceptionsEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, SetCapacity_ExceptionsFilled) {
+  using cyclus::CycOverCapException;
   EXPECT_THROW(filled_store_.setCapacity(low_cap), CycOverCapException);
   EXPECT_NO_THROW(filled_store_.setCapacity(cap));
 }
@@ -97,6 +99,8 @@ TEST_F(ResourceBuffTest, GetCount_Filled) {
 //- - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
+  using cyclus::Manifest;
+  using cyclus::CycNegQtyException;
   Manifest manifest;
   double qty = cap + overeps;
   ASSERT_THROW(manifest = filled_store_.popQty(qty), CycNegQtyException);
@@ -104,6 +108,8 @@ TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
+  using cyclus::Manifest;
+  using cyclus::CycNegQtyException;
   Manifest manifest;
   double qty = cap + overeps;
   ASSERT_THROW(manifest = store_.popQty(qty), CycNegQtyException);
@@ -111,6 +117,7 @@ TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_NoSplitExactFilled) {
+  using cyclus::Manifest;
   // pop one no splitting leaving one mat in the store
   Manifest manifest;
 
@@ -125,6 +132,7 @@ TEST_F(ResourceBuffTest, RemoveQty_NoSplitExactFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_NoSplitOverFilled) {
   // pop one no splitting leaving one mat in the store
+  using cyclus::Manifest;
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(exact_qty_over));
@@ -138,6 +146,7 @@ TEST_F(ResourceBuffTest, RemoveQty_NoSplitOverFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_NoSplitUnderFilled) {
   // pop one no splitting leaving one mat in the store
+  using cyclus::Manifest;
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popQty(exact_qty_under));
@@ -151,6 +160,7 @@ TEST_F(ResourceBuffTest, RemoveQty_NoSplitUnderFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_SplitOverFilled) {
   // pop two with splitting leaving one mat in the store
+  using cyclus::Manifest;
   Manifest manifest;
   double store_final = mat1_->quantity() + mat2_->quantity() - over_qty;
 
@@ -167,6 +177,7 @@ TEST_F(ResourceBuffTest, RemoveQty_SplitOverFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_SplitUnderFilled) {
   // pop one with splitting leaving two mats in the store
+  using cyclus::Manifest;
   Manifest manifest;
   double store_final = mat1_->quantity() + mat2_->quantity() - under_qty;
 
@@ -180,6 +191,8 @@ TEST_F(ResourceBuffTest, RemoveQty_SplitUnderFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
+  using cyclus::Manifest;
+  using cyclus::CycNegQtyException;
   Manifest manifest;
   ASSERT_THROW(manifest = filled_store_.popNum(3), CycNegQtyException);
   ASSERT_THROW(manifest = filled_store_.popNum(-1), CycNegQtyException);
@@ -187,6 +200,7 @@ TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
+  using cyclus::Manifest;
   Manifest manifest;
   double tot_qty = filled_store_.quantity();
 
@@ -198,6 +212,7 @@ TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
+  using cyclus::Manifest;
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popNum(1));
@@ -210,6 +225,7 @@ TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
+  using cyclus::Manifest;
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.popNum(2));
@@ -224,6 +240,8 @@ TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveOne_Filled) {
+  using cyclus::rsrc_ptr;
+  using cyclus::CycNegQtyException;
   rsrc_ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.popOne());
@@ -258,6 +276,9 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
+  using cyclus::rsrc_ptr;
+  using cyclus::CycDupResException;
+  using cyclus::CycOverCapException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -281,6 +302,7 @@ TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_DuplicateEmpty) {
+  using cyclus::CycDupResException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -300,6 +322,7 @@ TEST_F(ResourceBuffTest, PushAll_Empty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
+  using cyclus::Manifest;
   Manifest manifest;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(manifest));
@@ -309,6 +332,7 @@ TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
+  using cyclus::rsrc_ptr;
   rsrc_ptr mat;
 
   ASSERT_NO_THROW(store_.setCapacity(cap));
@@ -321,6 +345,10 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
+  using cyclus::rsrc_ptr;
+  using cyclus::Manifest;
+  using cyclus::CycDupResException;
+  using cyclus::CycOverCapException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
 
@@ -347,6 +375,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
+  using cyclus::CycDupResException;
   ASSERT_NO_THROW(store_.setCapacity(2 * cap));
 
   ASSERT_NO_THROW(store_.pushAll(mats));

@@ -5,6 +5,7 @@
 
 #include "CommodityProducer.h"
 
+namespace cyclus {
 namespace ActionBuilding
 {
   /**
@@ -58,4 +59,5 @@ namespace ActionBuilding
     // @MJGFlag - removed for the same reason as above
   };
 }
+} // namespace cyclus
 #endif

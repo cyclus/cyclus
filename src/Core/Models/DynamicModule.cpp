@@ -9,8 +9,9 @@
 
 #include DYNAMICLOADLIB
 
-using namespace std;
 namespace fs = boost::filesystem;
+
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const std::string DynamicModule::suffix() {
@@ -34,7 +35,7 @@ void DynamicModule::initialize() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::setPath() {
-  string lib_name = "lib" + module_name_ + suffix();
+  std::string lib_name = "lib" + module_name_ + suffix();
   fs::path p;
   if (!Env::findModuleLib(lib_name, p)) {
     throw CycIOException("Could not find library: " + lib_name);
@@ -64,3 +65,4 @@ std::string DynamicModule::path() {
   }
   return abs_path_;
 }
+} // namespace cyclus

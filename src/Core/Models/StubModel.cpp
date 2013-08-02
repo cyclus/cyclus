@@ -5,6 +5,8 @@
 
 #include "Logger.h"
 
+namespace cyclus {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -24,3 +26,4 @@ std::string StubModel::str() {
 };
 
 /* ------------------- */ 
+} // namespace cyclus

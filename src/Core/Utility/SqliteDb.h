@@ -6,6 +6,8 @@
 #include <string>
 #include <sqlite3.h>
 
+namespace cyclus {
+
 typedef std::vector<std::string> StrList;
 
 /*!
@@ -76,6 +78,6 @@ class SqliteDb {
     /// indicates true if the db is readonly false otherwise
     bool readonly_;
 };
-
+} // namespace cyclus
 #endif
 
