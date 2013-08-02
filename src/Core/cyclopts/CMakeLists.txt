@@ -14,6 +14,6 @@ INSTALL(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/solver.h
   ${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.h
   ${CMAKE_CURRENT_SOURCE_DIR}/variable.h
-  DESTINATION include
+  DESTINATION include/cyclopts
   COMPONENT core
   )
