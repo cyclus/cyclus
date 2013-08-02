@@ -15,7 +15,7 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete FacilityModel instance 
-typedef FacilityModel* FacilityModelConstructor();
+typedef cyclus::FacilityModel* FacilityModelConstructor();
 
 class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
  public:
@@ -34,7 +34,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
   }
     
  protected:
-  FacilityModel* facility_model_;
+  cyclus::FacilityModel* facility_model_;
   TestMarket* test_out_market_;
   TestMarket* test_in_market_;
   TestInst* test_inst_;

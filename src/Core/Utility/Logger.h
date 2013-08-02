@@ -33,12 +33,12 @@ if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
 else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
-if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level, "core")
+if (level > cyclus::Logger::ReportLevel()) ; \
+else cyclus::Logger().Get(level, "core")
 
 #define MLOG(level) \
-if ((level > Logger::ReportLevel()) | Logger::NoMem()) ; \
-else Logger().Get(level, "memory")
+if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
+else cyclus::Logger().Get(level, "memory")
 
 } // namespace cyclus
 

@@ -13,7 +13,7 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete StubModel instance 
-typedef StubModel* StubModelConstructor();
+typedef cyclus::StubModel* StubModelConstructor();
 
 class StubModelTests : public TestWithParam<StubModelConstructor*> {
   public:
@@ -25,7 +25,7 @@ class StubModelTests : public TestWithParam<StubModelConstructor*> {
     }
 
   protected:
-    StubModel* stub_model_;
+    cyclus::StubModel* stub_model_;
 
 };
 
