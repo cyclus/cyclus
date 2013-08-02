@@ -31,9 +31,8 @@ void XMLFileLoader::init(bool use_main_schema)  {
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->init(input);
   if (use_main_schema) {
-    std::stringstream schema("");
-    loadStringstreamFromFile(schema, pathToMainSchema());
-    parser_->validate(schema);
+    std::stringstream ss(buildSchema());
+    parser_->validate(ss);
   }
 
   EM->newEvent("InputFiles")
