@@ -2,10 +2,10 @@
 
 #include "Model.h"
 
-extern "C" Model* constructTestFacility() {
+extern "C" cyclus::Model* constructTestFacility() {
   return new TestFacility();
 }
 
-extern "C" Model* destructTestFacility(Model* model) {
+extern "C" cyclus::Model* destructTestFacility(cyclus::Model* model) {
   delete model;
 }

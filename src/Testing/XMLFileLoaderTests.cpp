@@ -142,22 +142,26 @@ std::string XMLFileLoaderTests::controlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests,openfile) {
+  using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile); 
   EXPECT_NO_THROW(xmlFile.init(false));
 }
 
 TEST_F(XMLFileLoaderTests,throws) {
+  using cyclus::XMLFileLoader;
   XMLFileLoader file("blah");
-  EXPECT_THROW(file.init(false), CycIOException);
+  EXPECT_THROW(file.init(false), cyclus::CycIOException);
 }
 
 TEST_F(XMLFileLoaderTests,control) {
+  using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile);
   xmlFile.init(false);
   EXPECT_NO_THROW(xmlFile.load_control_parameters());
 }
 
 TEST_F(XMLFileLoaderTests,recipes) {
+  using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(recipeFile);
   xmlFile.init(false);
   EXPECT_NO_THROW(xmlFile.load_recipes());
@@ -166,16 +170,18 @@ TEST_F(XMLFileLoaderTests,recipes) {
 // This needs to be moved somewhere else! maybe to a new simulation
 // constructor class..
 TEST_F(XMLFileLoaderTests,modulesandsim) {
+  using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(moduleFile);
   xmlFile.init(false);
-  set<string> module_types = Model::dynamic_module_types();
+  std::set<std::string> module_types = cyclus::Model::dynamic_module_types();
   xmlFile.load_dynamic_modules(module_types);
-  EXPECT_NO_THROW(Model::constructSimulation());
+  EXPECT_NO_THROW(cyclus::Model::constructSimulation());
 }
 
 TEST_F(XMLFileLoaderTests,schema) {
+  using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile);
   xmlFile.init(false);
-  stringstream schema(controlSchema());
+  std::stringstream schema(controlSchema());
   EXPECT_NO_THROW(xmlFile.applySchema(schema););
 }

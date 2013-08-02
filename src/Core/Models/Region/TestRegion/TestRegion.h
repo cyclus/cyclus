@@ -6,10 +6,10 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Region, for testing
-class TestRegion: public RegionModel {
+class TestRegion: public cyclus::RegionModel {
   
-  void receiveMessage(msg_ptr msg) {
-    msg->setDir(DOWN_MSG);
+  void receiveMessage(cyclus::msg_ptr msg) {
+    msg->setDir(cyclus::DOWN_MSG);
   }
 };
 

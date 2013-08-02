@@ -6,18 +6,19 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing
-class TestFacility: public FacilityModel {
+class TestFacility: public cyclus::FacilityModel {
  public:
   
-  void receiveMessage(msg_ptr msg) {
-    msg->setDir(DOWN_MSG);
+  void receiveMessage(cyclus::msg_ptr msg) {
+    msg->setDir(cyclus::DOWN_MSG);
   }
 
-  void receiveMaterial(Transaction trans, std::vector<mat_rsrc_ptr> manifest) { }
+  void receiveMaterial(cyclus::Transaction trans, 
+                       std::vector<cyclus::mat_rsrc_ptr> manifest) { }
   
-  Prototype* clone() { return new TestFacility(); }
+  cyclus::Prototype* clone() { return new TestFacility(); }
 
-  void cloneModuleMembersFrom(FacilityModel* source) { }
+  void cloneModuleMembersFrom(cyclus::FacilityModel* source) { }
   void handleTick(int time) { };
   void handleTock(int time) { };
 };

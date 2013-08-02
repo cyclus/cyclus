@@ -7,15 +7,15 @@
 
 static std::string const path = "testdb.sqlite";
 
-class FlushCatcher: public SqliteBack {
+class FlushCatcher: public cyclus::SqliteBack {
   public:
     FlushCatcher(std::string path) : SqliteBack(path) { };
-    StrList cmds;
+    cyclus::StrList cmds;
 
   protected:
     virtual void flush() {
       cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
-      SqliteBack::flush();
+      cyclus::SqliteBack::flush();
     };
 };
 
@@ -35,6 +35,7 @@ class FileDeleter {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(SqliteBackTest, CmdGenRegression) {
+  using cyclus::EventManager;
   FileDeleter fd(path);
   EventManager m;
   FlushCatcher back(path);

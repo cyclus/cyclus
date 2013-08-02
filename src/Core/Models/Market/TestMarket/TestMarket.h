@@ -4,7 +4,7 @@
 #include "MarketModel.h"
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Market, for testing.
-class TestMarket : public MarketModel {
+class TestMarket : public cyclus::MarketModel {
   public :
     TestMarket() {}
     virtual ~TestMarket() {
@@ -12,7 +12,7 @@ class TestMarket : public MarketModel {
     TestMarket(std::string commod) {
       commodity_ = commod;
     }
-    virtual void receiveMessage(msg_ptr msg) {
+    virtual void receiveMessage(cyclus::msg_ptr msg) {
     }
     virtual void resolve() {
     }

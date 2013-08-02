@@ -21,15 +21,15 @@ void XMLParserTests::fillBadSnippet(std::stringstream &ss) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLParserTests::fillSchema(std::stringstream &ss) {
-  ss << "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\"" << endl
-     << "datatypeLibrary=\"http://www.w3.org/2001/XMLSchema-datatypes\">" << endl
-     << "  " << "<start>" << endl
-     << "  " << "<element name =\"" << outer_node_ << "\">" << endl
-     << "  " << "  " << "<element name =\"" << inner_node_ << "\">" << endl
-     << "  " << "    " << "<text/>" << endl
-     << "  " << "  " << "</element>" << endl
-     << "  " << "</element>" << endl
-     << "  " << "</start>" << endl
+  ss << "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\"" << std::endl
+     << "datatypeLibrary=\"http://www.w3.org/2001/XMLSchema-datatypes\">" << std::endl
+     << "  " << "<start>" << std::endl
+     << "  " << "<element name =\"" << outer_node_ << "\">" << std::endl
+     << "  " << "  " << "<element name =\"" << inner_node_ << "\">" << std::endl
+     << "  " << "    " << "<text/>" << std::endl
+     << "  " << "  " << "</element>" << std::endl
+     << "  " << "</element>" << std::endl
+     << "  " << "</start>" << std::endl
      << "</grammar>";
 }
 
@@ -45,19 +45,19 @@ void XMLParserTests::TearDown() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithoutSchema) {  
-  stringstream snippet("");
+  std::stringstream snippet("");
   fillSnippet(snippet);
-  XMLParser parser;
+  cyclus::XMLParser parser;
   EXPECT_NO_THROW(parser.init(snippet));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithSchema) {
-  stringstream snippet("");
+  std::stringstream snippet("");
   fillSnippet(snippet);  
   stringstream schema("");
   fillSchema(schema);
-  XMLParser parser;
+  cyclus::XMLParser parser;
   EXPECT_NO_THROW(parser.init(snippet));
   EXPECT_NO_THROW(parser.validate(schema));
 } 
@@ -66,9 +66,9 @@ TEST_F(XMLParserTests,WithSchema) {
 TEST_F(XMLParserTests,WithError) {
   stringstream snippet("");
   fillBadSnippet(snippet);  
-  stringstream schema("");
+  std::stringstream schema("");
   fillSchema(schema);
-  XMLParser parser;
+  cyclus::XMLParser parser;
   EXPECT_NO_THROW(parser.init(snippet));
-  EXPECT_THROW(parser.validate(schema),CycLoadXMLException);
+  EXPECT_THROW(parser.validate(schema), cyclus::CycLoadXMLException);
 } 
