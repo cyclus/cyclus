@@ -7,7 +7,7 @@ MESSAGE(STATUS "CYCLOPTS_ROOT_DIR hint is : ${CYCLOPTS_ROOT_DIR}")
 
 # if installed in a non-standard location,
 # the include directory must be added to the PATH variable
-FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/Variable.h
+FIND_PATH(CYCLOPTS_INCLUDE_DIR cyclopts/variable.h
   HINTS "${CYCLOPTS_INCLUDE_DIR}"
   HINTS "${CYCLOPTS_ROOT_DIR}"
   HINTS "${CYCLOPTS_ROOT_DIR}/include"
