@@ -28,13 +28,14 @@ class Solver {
   virtual ~Solver() {};
 
   /// solve method to be overloaded by derived classes
-  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
-                     cyclus::cyclopts::ObjFuncPtr obj, 
-                     std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) = 0;
+  virtual void Solve(
+      std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+      cyclus::cyclopts::ObjFuncPtr obj, 
+      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) = 0;
 
  protected:
   /// the indices used for each variable
-  std::map<cyclus::cyclopts::VariablePtr,int> index_;
+  std::map<cyclus::cyclopts::VariablePtr, int> index_;
 
   /// match variable pointers to indices, populating indicies_
   void PopulateIndices(std::vector<cyclus::cyclopts::VariablePtr>& variables);
