@@ -8,6 +8,8 @@
 #include "event_backend.h"
 #include "SqliteDb.h"
 
+namespace cyclus {
+
 /// An EventManager backend that writes data to an sqlite database.  Identically
 /// named events have their data placed as rows in a single table.  Handles the
 /// following event value types: int, float, double, std::string, cyclus::Blob.
@@ -63,5 +65,5 @@ class SqliteBack: public EventBackend {
   /// table names already existing (created) in the sqlite db.
   StrList tbl_names_;
 };
-
+} // namespace cyclus
 #endif

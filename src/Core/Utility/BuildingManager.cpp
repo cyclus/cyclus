@@ -68,6 +68,17 @@ void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
 std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
     Commodity& commodity, 
     double unmet_demand) {
+  using std::vector;
+  using cyclopts::SolverPtr;
+  using cyclopts::CBCSolver;
+  using cyclopts::Constraint;
+  using cyclopts::ConstraintPtr;
+  using cyclopts::ObjFuncPtr;
+  using cyclopts::SolverInterface;
+//  using cyclopts::ProblemInstance;
+  using cyclopts::VariablePtr;
+  using cyclopts::IntegerVariable;
+  using cyclopts::ObjectiveFunction;
   vector<BuildOrder> orders;
   
   if (unmet_demand > 0) {
@@ -115,7 +126,7 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
 // -------------------------------------------------------------------
 void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
 {
-  solution_map_ = std::map< Cyclopts::VariablePtr, 
+  solution_map_ = std::map< cyclopts::VariablePtr, 
                     std::pair<Builder *, SupplyDemand::CommodityProducer *> >();
 
   std::set<Builder*>::iterator builder_it;
@@ -140,6 +151,10 @@ void BuildingManager::addProducerVariableToProblem(
     SupplyDemand::CommodityProducer* producer,
     ActionBuilding::Builder* builder,
     ActionBuilding::ProblemInstance& problem) {
+  using std::make_pair;
+  using cyclopts::Variable;
+  using cyclopts::VariablePtr;
+  using cyclopts::IntegerVariable;
   VariablePtr x(new IntegerVariable(0,Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);

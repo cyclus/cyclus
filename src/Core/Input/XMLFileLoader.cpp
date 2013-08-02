@@ -43,7 +43,7 @@ void XMLFileLoader::init(bool use_main_schema)  {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::buildSchema() {
-  stringstream schema("");
+  std::stringstream schema("");
   loadStringstreamFromFile(schema, pathToMainSchema());
   std::string master = schema.str();
 

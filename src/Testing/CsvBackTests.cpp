@@ -85,6 +85,8 @@ std::string ReadAll(std::string fname) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CsvBackTest, Blob) {
+  using cyclus::EventManager;
+  using cyclus::CsvBack;
   DirDel dd(path);
 
   cyclus::Blob data("my name is flipper");

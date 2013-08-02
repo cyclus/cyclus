@@ -8,6 +8,8 @@
 
 #include "Event.h"
 
+namespace cyclus {
+
 typedef std::vector<Event*> EventList;
 
 /// An abstract base class for listeners (e.g. output databases) that want
@@ -25,5 +27,5 @@ class EventBackend {
   /// the simulatoin is over).
   virtual void Close() = 0;
 };
-
+} // namespace cyclus
 #endif
