@@ -16,7 +16,8 @@ namespace cyclopts {
 class CBCSolver : public Solver {
  public:
   /// solve an MIP
-  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, cyclus::cyclopts::ObjFuncPtr obj, 
+  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+                     cyclus::cyclopts::ObjFuncPtr obj, 
                      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);
 
  private:
@@ -33,11 +34,13 @@ class CBCSolver : public Solver {
   std::pair<double, double> ConstraintBounds(cyclus::cyclopts::ConstraintPtr c);
 
   /// set variable/objective function values
-  void SetUpVariablesAndObj(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
-                            cyclus::cyclopts::ObjFuncPtr obj);
+  void SetUpVariablesAndObj(
+      std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+      cyclus::cyclopts::ObjFuncPtr obj);
 
   /// set up constraints
-  void SetUpConstraints(std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);
+  void SetUpConstraints(
+      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);
 
   /// set the objective direction
   double ObjDirection(cyclus::cyclopts::ObjFuncPtr obj);

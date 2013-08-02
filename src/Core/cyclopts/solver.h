@@ -28,7 +28,8 @@ class Solver {
   virtual ~Solver() {};
 
   /// solve method to be overloaded by derived classes
-  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, cyclus::cyclopts::ObjFuncPtr obj, 
+  virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
+                     cyclus::cyclopts::ObjFuncPtr obj, 
                      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) = 0;
 
  protected:

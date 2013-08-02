@@ -28,7 +28,8 @@ class SolverInterface {
   void RegisterConstraint(cyclus::cyclopts::ConstraintPtr c);
 
   /// add a variable to a constraint
-  void AddVarToConstraint(cyclus::cyclopts::VariablePtr v, double modifier, cyclus::cyclopts::ConstraintPtr c);
+  void AddVarToConstraint(cyclus::cyclopts::VariablePtr v, double modifier, 
+                          cyclus::cyclopts::ConstraintPtr c);
 
   /// solve the constraint program
   void Solve();
