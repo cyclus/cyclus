@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+namespace cyclus {
+
 // initialize static variables
 int Transaction::next_trans_id_ = 1;
 
@@ -185,4 +187,4 @@ void Transaction::addResourceToTable(int transPos, rsrc_ptr r){
     ->addVal("Quantity", r->quantity())
     ->record();
 }
-
+} // namespace cyclus

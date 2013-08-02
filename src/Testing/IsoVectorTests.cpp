@@ -7,12 +7,20 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,default_constructor) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   CompMapPtr zero_comp = CompMapPtr(new CompMap(MASS));
   EXPECT_TRUE(zero_vec.compEquals(zero_comp));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,constructors) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   IsoVector equality = IsoVector(comp);
   EXPECT_EQ(equality,vec); // equality
   IsoVector copy = IsoVector(vec);
@@ -23,6 +31,10 @@ TEST_F(IsoVectorTests,constructors) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,equivalence) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   IsoVector v1 = IsoVector(subtract_result);
   IsoVector v2 = IsoVector(subtract_result);
@@ -32,6 +44,10 @@ TEST_F(IsoVectorTests,equivalence) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,addition) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec += to_add_vec);
   EXPECT_TRUE(add_to_vec.compEquals(add_result));
@@ -42,6 +58,10 @@ TEST_F(IsoVectorTests,addition) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,simple_mixing) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   IsoVector v1 = IsoVector(subtract_result);
   IsoVector v2 = IsoVector(subtract_result);
@@ -53,15 +73,23 @@ TEST_F(IsoVectorTests,simple_mixing) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,mixing) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,ratio));
   EXPECT_TRUE(add_to_vec.compEquals(mix_result));
-  EXPECT_THROW(add_to_vec.mix(to_add_vec,-1),CycRangeException);
+  EXPECT_THROW(add_to_vec.mix(to_add_vec,-1), cyclus::CycRangeException);
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,0)); // corner
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,mixing_zero_vector) { 
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   EXPECT_NO_THROW(zero_vec.mix(to_add_vec, .1)); // should just ignore ratio
   EXPECT_TRUE(zero_vec.compEquals(to_add_vec)); // the resulting vector is the added vector
@@ -78,6 +106,10 @@ TEST_F(IsoVectorTests,intersection_fraction) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,subtraction) {
+  using cyclus::IsoVector;
+  using cyclus::CompMap;
+  using cyclus::CompMapPtr;
+  using cyclus::MASS;
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec -= to_subtract_vec);
   EXPECT_TRUE(subtract_from_vec.compEquals(subtract_result));
@@ -88,6 +120,7 @@ TEST_F(IsoVectorTests,subtraction) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,separation) {
+  using cyclus::CycRangeException;
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec.separate(to_subtract_vec,efficiency));
   EXPECT_TRUE(subtract_from_vec.compEquals(separate_result));

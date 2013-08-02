@@ -10,6 +10,8 @@
 
 #include "Transaction.h"
 
+namespace cyclus { 
+
 class DynamicModule;
 class Model;
 class Message;
@@ -428,6 +430,6 @@ class Model {
   void addToTable();
 
 };
-
+} // namespace cyclus
 #endif
 

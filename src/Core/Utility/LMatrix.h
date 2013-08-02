@@ -9,6 +9,8 @@
 
 #include <vector>
 
+namespace cyclus {
+
 class LMatrix {
 
   // friend arithmetic operators involving a scalar k and matrix A
@@ -54,6 +56,6 @@ LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs);  // A * B
 
 // non-member functions
 LMatrix identity(int n);  // creates an nxn identity matrix
-
+} // namespace cyclus
 #endif
 

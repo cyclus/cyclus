@@ -8,6 +8,8 @@
 #include <map>
 #include <set>
 
+namespace cyclus {
+namespace SupplyDemand {
 /**
    This is a manager class that manages a set of commodities. Those 
    commodities have a certain demand function associated with them 
@@ -91,5 +93,6 @@ class SupplyDemandManager {
   /// a container of all production managers known to the manager
   std::set<SupplyDemand::CommodityProducerManager*> managers_;
 };
-
+} // namespace SupplyDemand
+} // namespace cyclus
 #endif

@@ -6,6 +6,7 @@
 
 #include "Commodity.h"
 
+namespace cyclus {
 namespace SupplyDemand
 {
   /**
@@ -112,5 +113,5 @@ namespace SupplyDemand
     // @MJGFlag - removed for the same reason as above
   };
 }
-
+} // namespace cyclus
 #endif

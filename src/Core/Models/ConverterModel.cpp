@@ -3,6 +3,8 @@
 
 #include "ConverterModel.h"
 
+namespace cyclus {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConverterModel::ConverterModel() {
   setModelType("Converter");
@@ -23,3 +25,5 @@ msg_ptr ConverterModel::convert(msg_ptr convMsg, msg_ptr refMsg) {
 std::string ConverterModel::str() {
   return Model::str();
 };
+
+} // namespace cyclus

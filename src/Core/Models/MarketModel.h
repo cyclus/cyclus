@@ -10,6 +10,8 @@
 #include "Communicator.h"
 #include "CycException.h"
 
+namespace cyclus {
+
 class QueryEngine;
 
 class CycMarketlessCommodException: public CycException {
@@ -132,7 +134,7 @@ class MarketModel : public Model, public Communicator {
  * all MARKETMODEL classes have these members
  * --------------------
  */
-public:
+ public:
   /**
      every market should provide its commodity 
    */
@@ -144,7 +146,7 @@ public:
    */
   virtual void resolve() = 0;
 
-protected: 
+ protected: 
   /**
      every market has a commodity 
    */
@@ -168,7 +170,7 @@ protected:
 /* ------------------- */ 
   
 };
-
+} // namespace cyclus
 #endif
 
 

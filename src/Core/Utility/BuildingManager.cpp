@@ -9,11 +9,10 @@
 #include "CycException.h"
 #include "Logger.h"
 
-using namespace std;
 using boost::any_cast;
-using namespace cyclopts;
-using namespace SupplyDemand;
-using namespace ActionBuilding;
+
+namespace cyclus {
+namespace ActionBuilding {
 
 // -------------------------------------------------------------------
 BuildOrder::BuildOrder(int n, ActionBuilding::Builder* b,
@@ -69,6 +68,17 @@ void BuildingManager::unRegisterBuilder(ActionBuilding::Builder* builder) {
 std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
     Commodity& commodity, 
     double unmet_demand) {
+  using std::vector;
+  using cyclopts::SolverPtr;
+  using cyclopts::CBCSolver;
+  using cyclopts::Constraint;
+  using cyclopts::ConstraintPtr;
+  using cyclopts::ObjFuncPtr;
+  using cyclopts::SolverInterface;
+//  using cyclopts::ProblemInstance;
+  using cyclopts::VariablePtr;
+  using cyclopts::IntegerVariable;
+  using cyclopts::ObjectiveFunction;
   vector<BuildOrder> orders;
   
   if (unmet_demand > 0) {
@@ -116,17 +126,18 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
 // -------------------------------------------------------------------
 void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
 {
-  solution_map_ = map< VariablePtr, pair<Builder*,CommodityProducer*> >();
+  solution_map_ = std::map< cyclopts::VariablePtr, 
+                    std::pair<Builder *, SupplyDemand::CommodityProducer *> >();
 
-  set<Builder*>::iterator builder_it;
+  std::set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end(); builder_it++)
     {
       Builder* builder = (*builder_it);
       
-      set<CommodityProducer*>::iterator producer_it;
+      std::set<SupplyDemand::CommodityProducer *>::iterator producer_it;
       for (producer_it = builder->beginningProducer(); producer_it != builder->endingProducer(); producer_it++)
         {
-          CommodityProducer* producer = (*producer_it);
+          SupplyDemand::CommodityProducer * producer = (*producer_it);
           if (producer->producesCommodity(problem.commodity))
             {
               addProducerVariableToProblem(producer,builder,problem);
@@ -140,6 +151,10 @@ void BuildingManager::addProducerVariableToProblem(
     SupplyDemand::CommodityProducer* producer,
     ActionBuilding::Builder* builder,
     ActionBuilding::ProblemInstance& problem) {
+  using std::make_pair;
+  using cyclopts::Variable;
+  using cyclopts::VariablePtr;
+  using cyclopts::IntegerVariable;
   VariablePtr x(new IntegerVariable(0,Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
@@ -163,9 +178,12 @@ void BuildingManager::constructBuildOrdersFromSolution(std::vector<ActionBuildin
       if (number > 0) 
         {
           Builder* builder = solution_map_[solution.at(i)].first;
-          CommodityProducer* producer = solution_map_[solution.at(i)].second;
+          SupplyDemand::CommodityProducer* producer = \
+                                                solution_map_[solution.at(i)].second;
           BuildOrder order(number,builder,producer);
           orders.push_back(order);
         }
     }
 }
+} // namespace ActionBuilding
+} // namespace cyclus

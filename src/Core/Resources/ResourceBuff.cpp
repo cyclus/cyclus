@@ -2,6 +2,8 @@
 #include "CycLimits.h"
 #include "ResourceBuff.h"
 
+namespace cyclus {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ResourceBuff::ResourceBuff()
   : capacity_(0),
@@ -140,3 +142,4 @@ void ResourceBuff::pushAll(Manifest mats) {
   qty_ += tot_qty;
 }
 
+} // namespace cyclus

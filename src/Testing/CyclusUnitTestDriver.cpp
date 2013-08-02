@@ -8,9 +8,11 @@
 
 int main(int argc, char* argv[]) {
   // tell ENV the path between the cwd and the cyclus executable
+  using cyclus::Env;
+  using cyclus::Logger;
   std::string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
-  Logger::ReportLevel() = LEV_ERROR;
+  Logger::ReportLevel() = cyclus::LEV_ERROR;
   
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];

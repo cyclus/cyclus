@@ -2,17 +2,26 @@
 #ifndef MARKETPLAYER_H
 #define MARKETPLAYER_H
 
+#include <utility>
+#include <map>
+#include <list>
+#include <vector>
+#include <sstream>
+
 #include "SupplyDemand.h"
 
-#include <map>
-#include <vector>
-
+namespace cyclus {
 class MarketPlayer;
+} // namespace cyclus
+
 #include "MarketPlayerManager.h"
+
+namespace cyclus {
 
 /// an iterator for the manager map
 typedef std::map<Commodity,
   std::vector<MarketPlayerManager*> >::iterator ManagerIterator;
+
 /// an iterator for the production map
 typedef std::map<Commodity,double>::iterator ProductionIterator;
 
@@ -108,8 +117,11 @@ class MarketPlayer {
    */
   ManagerIterator checkCommodityManagement(Commodity& commod);
 };
+} // namespace cyclus
 
 #include "CycException.h"
+
+namespace cyclus {
 /**
    an exception class for mismatched commodities and managers
  */
@@ -117,5 +129,6 @@ class CycCommodityMismatchError: public CycException {
   public: CycCommodityMismatchError(std::string msg) : 
   CycException(msg) {};
 };
+} // namespace cyclus
 
 #endif

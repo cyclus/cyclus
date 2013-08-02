@@ -8,6 +8,8 @@
 #include <boost/assert.hpp>
 #include "Logger.h"
 
+namespace cyclus {
+
 /**
    IntrusiveBase provides a base class that fulfulls basic requirements 
    for a (sub) class to be used in a boost::intrusive_ptr. 
@@ -87,6 +89,6 @@ template <class Derived> class IntrusiveBase {
      */
     mutable unsigned long counter_;
 };
-
+} // namespace cyclus
 #endif
 

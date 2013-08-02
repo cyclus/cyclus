@@ -11,6 +11,8 @@
 #include "any.hpp"
 #include "event_backend.h"
 
+namespace cyclus {
+
 typedef std::vector<std::string> LineList;
 
 /// An EventManager backend that writes data to a collection of csv files.
@@ -49,5 +51,5 @@ class CsvBack: public EventBackend {
   /// Stores the database's path, declared during construction.
   boost::filesystem::path path_;
 };
-
+}  // namespace cyclus
 #endif

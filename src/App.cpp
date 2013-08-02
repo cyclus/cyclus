@@ -20,7 +20,6 @@
 #include "hdf5_back.h"
 #include "csv_back.h"
 
-using namespace std;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
@@ -28,6 +27,21 @@ namespace fs = boost::filesystem;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  using cyclus::Logger;
+  using cyclus::Env;
+  using cyclus::Model;
+  using cyclus::Timer;
+  using cyclus::Logger;
+  using cyclus::LogLevel;
+  using cyclus::LEV_ERROR;
+  using cyclus::EventManager;
+  using cyclus::EventBackend;
+  using cyclus::Hdf5Back;
+  using cyclus::SqliteBack;
+  using cyclus::CsvBack;
+  using cyclus::XMLFileLoader;
+  using cyclus::CycException;
+
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage += "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
@@ -39,9 +53,9 @@ int main(int argc, char* argv[]) {
     ("help,h", "produce help message")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
-    ("verb,v", po::value<string>(), vmessage.c_str())
-    ("output-path,o", po::value<string>(), "output path")
-    ("input-file", po::value<string>(), "input file")
+    ("verb,v", po::value<std::string>(), vmessage.c_str())
+    ("output-path,o", po::value<std::string>(), "output path")
+    ("input-file", po::value<std::string>(), "input file")
     ;
 
   po::variables_map vm;
@@ -57,22 +71,22 @@ int main(int argc, char* argv[]) {
   po::notify(vm);
 
   // announce yourself
-  cout << endl;
-  cout << "|--------------------------------------------|" << endl;
-  cout << "|                  Cyclus                    |" << endl;
-  cout << "|       a nuclear fuel cycle simulator       |" << endl;
-  cout << "|  from the University of Wisconsin-Madison  |" << endl;
-  cout << "|--------------------------------------------|" << endl;
-  cout << endl;
+  std::cout << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "|                  Cyclus                    |" << std::endl;
+  std::cout << "|       a nuclear fuel cycle simulator       |" << std::endl;
+  std::cout << "|  from the University of Wisconsin-Madison  |" << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << std::endl;
 
   bool success = true;
 
   // respond to command line args
   if (vm.count("help")) {
-    string err_msg = "Cyclus usage requires an input file.\n";
+    std::string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   cyclus [path/to/input/filename]\n";
-    cout << err_msg << endl;
-    cout << desc << "\n";
+    std::cout << err_msg << std::endl;
+    std::cout << desc << "\n";
     return 0;
   }
 
@@ -85,15 +99,15 @@ int main(int argc, char* argv[]) {
   }
 
   if (! vm.count("input-file")) {
-    string err_msg = "Cyclus usage requires an input file.\n";
+    std::string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   cyclus [path/to/input/filename]\n";
-    cout << err_msg << endl;
-    cout << desc << "\n";
+    std::cout << err_msg << std::endl;
+    std::cout << desc << "\n";
     return 0;
   }
 
   if (vm.count("verb")) {
-    std::string v_level = vm["verb"].as<string>();
+    std::string v_level = vm["verb"].as<std::string>();
     if (v_level.length() < 3) {
       Logger::ReportLevel() = (LogLevel)strtol(v_level.c_str(), NULL, 10);
     } else {
@@ -102,13 +116,13 @@ int main(int argc, char* argv[]) {
   }
 
   // tell ENV the path between the cwd and the cyclus executable
-  string path = Env::pathBase(argv[0]);
+  std::string path = Env::pathBase(argv[0]);
   Env::setCyclusRelPath(path);
 
   // read input file and setup simulation
   try {
-    string inputFile = vm["input-file"].as<string>();
-    set<string> module_types = Model::dynamic_module_types();
+    std::string inputFile = vm["input-file"].as<std::string>();
+    std::set<std::string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(inputFile);
     loader.init();
     loader.load_control_parameters();
@@ -120,10 +134,10 @@ int main(int argc, char* argv[]) {
   }
 
   // Create the output file
-  string output_path = "cyclus.sqlite";
+  std::string output_path = "cyclus.sqlite";
   try {
     if (vm.count("output-path")){
-      output_path = vm["output-path"].as<string>();
+      output_path = vm["output-path"].as<std::string>();
     }
   } catch (CycException ge) {
     success = false;
@@ -161,27 +175,27 @@ int main(int argc, char* argv[]) {
   // Close Dynamically loaded modules 
   try {
     Model::unloadModules();
-  } catch (CycException err) {
+  } catch (cyclus::CycException err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
 
   if (success) {
-    cout << endl;
-    cout << "|--------------------------------------------|" << endl;
-    cout << "|                  Cyclus                    |" << endl;
-    cout << "|              run successful                |" << endl;
-    cout << "|--------------------------------------------|" << endl;
-    cout << "Output location: " << output_path << endl;
-    cout << "Simulation ID: " << boost::lexical_cast<std::string>(EM->sim_id()) << endl;
-    cout << endl;
+    std::cout << std::endl;
+    std::cout << "|--------------------------------------------|" << std::endl;
+    std::cout << "|                  Cyclus                    |" << std::endl;
+    std::cout << "|              run successful                |" << std::endl;
+    std::cout << "|--------------------------------------------|" << std::endl;
+    std::cout << "Output location: " << output_path << std::endl;
+    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(EM->sim_id()) << std::endl;
+    std::cout << std::endl;
   } else {
-    cout << endl;
-    cout << "|--------------------------------------------|" << endl;
-    cout << "|                  Cyclus                    |" << endl;
-    cout << "|           run *not* successful             |" << endl;
-    cout << "|--------------------------------------------|" << endl;
-    cout << endl;
+    std::cout << std::endl;
+    std::cout << "|--------------------------------------------|" << std::endl;
+    std::cout << "|                  Cyclus                    |" << std::endl;
+    std::cout << "|           run *not* successful             |" << std::endl;
+    std::cout << "|--------------------------------------------|" << std::endl;
+    std::cout << std::endl;
   }
 
   return 0;

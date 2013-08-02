@@ -4,6 +4,8 @@
 
 #include "TimeAgent.h"
 
+namespace cyclus {
+
 /**
    The StubTimeAgent class is the abstract class/interface used by all 
    stub models  
@@ -59,6 +61,6 @@ class StubTimeAgent : public TimeAgent {
 /* ------------------- */ 
 
 };
-
+} // namespace cyclus
 #endif
 

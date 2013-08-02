@@ -7,6 +7,8 @@
 #include "Resource.h"
 #include "CycException.h"
 
+namespace cyclus {
+
 class MarketModel;
 class Model;
 
@@ -191,6 +193,6 @@ class Transaction {
    */
   void addResourceToTable(int position, rsrc_ptr resource);
 };
-
+} // namespace cyclus
 #endif
 

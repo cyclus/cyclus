@@ -7,7 +7,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ConcreteRegionModel : public RegionModel {
+class ConcreteRegionModel : public cyclus::RegionModel {
  public:
   ConcreteRegionModel() { };
   
@@ -16,7 +16,7 @@ class ConcreteRegionModel : public RegionModel {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class DieInst : public InstModel {
+class DieInst : public cyclus::InstModel {
  public:
   DieInst() {
     tickCount_ = 0;
@@ -68,7 +68,7 @@ class RegionModelClassTests : public ::testing::Test {
     DieInst* child4_;
     DieInst* child5_;
 
-    TimeAgent* reg_;
+    cyclus::TimeAgent* reg_;
 
     virtual void SetUp() {
       child1_ = new DieInst();

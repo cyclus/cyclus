@@ -1,10 +1,9 @@
 #include "BuildingTestHelper.h"
 
-using namespace ActionBuilding;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 BuildingTestHelper::BuildingTestHelper()
 {
+  using cyclus::ActionBuilding::Builder;
   builder1 = new Builder();
   builder2 = new Builder();
 }

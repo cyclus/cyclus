@@ -15,12 +15,12 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete InstModel instance 
-typedef InstModel* InstModelConstructor();
+typedef cyclus::InstModel* InstModelConstructor();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class FakeInstModel : public InstModel {
+class FakeInstModel : public cyclus::InstModel {
  public:
-  FakeInstModel() : InstModel() {};
+  FakeInstModel() : cyclus::InstModel() {};
   
   virtual ~FakeInstModel() {};
 };

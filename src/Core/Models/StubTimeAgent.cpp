@@ -5,6 +5,8 @@
 
 #include "Logger.h"
 
+namespace cyclus {
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
@@ -30,3 +32,5 @@ void StubTimeAgent::handleTick(int time) {}
 void StubTimeAgent::handleTock(int time) {}
 
 /* ------------------- */ 
+
+} // namespace cyclus

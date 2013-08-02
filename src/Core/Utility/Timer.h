@@ -8,8 +8,9 @@
 
 #include "TimeAgent.h"
 #include "MarketModel.h"
+#include "QueryEngine.h"
 
-class QueryEngine;
+namespace cyclus {
 
 #define TI Timer::Instance()
 
@@ -264,5 +265,6 @@ public:
    */
   void logTimeData();
 };
+} // namespace cyclus
 #endif
 

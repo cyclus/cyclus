@@ -9,6 +9,9 @@
 #if !defined(_LOGGER_H)
 #define _LOGGER_H
 
+
+namespace cyclus {
+
 /**
    @def LOG(level, prefix) 
     
@@ -26,22 +29,26 @@
    'level'.  
  */
 #define LOG(level, prefix) \
-if ((level > Logger::ReportLevel()) | Logger::NoModel()) ; \
-else Logger().Get(level, prefix)
+if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
+else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
-if (level > Logger::ReportLevel()) ; \
-else Logger().Get(level, "core")
+if (level > cyclus::Logger::ReportLevel()) ; \
+else cyclus::Logger().Get(level, "core")
 
 #define MLOG(level) \
-if ((level > Logger::ReportLevel()) | Logger::NoMem()) ; \
-else Logger().Get(level, "memory")
+if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
+else cyclus::Logger().Get(level, "memory")
+
+} // namespace cyclus
 
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <map>
+
+namespace cyclus {
 
 /**
    @enum LogLevel 
@@ -163,7 +170,8 @@ class Logger {
     value converted to a string (i.e. `LEV_WARN` is the longest with 11
     characters).
     */
-    static int field_width_; };
-
+    static int field_width_; 
+};
+} // namespace cyclus
 #endif
 

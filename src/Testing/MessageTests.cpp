@@ -9,21 +9,19 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
-class TrackerMessage : public Message {
+class TrackerMessage : public cyclus::Message {
   public:
-    TrackerMessage(Communicator* originator) : Message(originator) { }
+    TrackerMessage(cyclus::Communicator* originator) : cyclus::Message(originator) { }
 
-    vector<string> dest_list_;
+    std::vector<std::string> dest_list_;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class TestCommunicator : public Communicator {
+class TestCommunicator : public cyclus::Communicator {
   public:
 
-    TestCommunicator(string name) {
-      msg_ = msg_ptr(new TrackerMessage(this));
+    TestCommunicator(std::string name) {
+      msg_ = cyclus::msg_ptr(new TrackerMessage(this));
 
       name_ = name;
       stop_at_return_ = true;
@@ -37,10 +35,10 @@ class TestCommunicator : public Communicator {
 
     virtual ~TestCommunicator() { }
 
-    Communicator* parent_;
-    msg_ptr msg_;
+    cyclus::Communicator* parent_;
+    cyclus::msg_ptr msg_;
 
-    string name_;
+    std::string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
     bool flip_down_to_up_;
     bool keep_;
@@ -62,7 +60,9 @@ class TestCommunicator : public Communicator {
 
   private:
 
-    void receiveMessage(msg_ptr msg) {
+    void receiveMessage(cyclus::msg_ptr msg) {
+      using cyclus::UP_MSG;
+      using cyclus::DOWN_MSG;
       boost::intrusive_ptr<TrackerMessage> ptr;
       ptr = boost::intrusive_ptr<TrackerMessage>(dynamic_cast<TrackerMessage*>(msg.get()));
       ptr->dest_list_.push_back(name_);
@@ -125,7 +125,7 @@ class MessagePassingTest : public ::testing::Test {
 TEST_F(MessagePassingTest, CleanThrough) {
   ASSERT_NO_THROW(comm1->startMessage());
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
@@ -142,11 +142,12 @@ TEST_F(MessagePassingTest, CleanThrough) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, PassBeyondOrigin) {
+  using cyclus::CycException;
   comm1->stop_at_return_ = false;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 7;
 
@@ -163,11 +164,12 @@ TEST_F(MessagePassingTest, PassBeyondOrigin) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, ForgetToSetDest) {
+  using cyclus::CycException;
   comm3->forget_set_dest_ = true;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -180,11 +182,12 @@ TEST_F(MessagePassingTest, ForgetToSetDest) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, SendToSelf) {
+  using cyclus::CycException;
   comm3->parent_ = comm3;
 
   ASSERT_THROW(comm1->startMessage(), CycException);
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -201,7 +204,7 @@ TEST_F(MessagePassingTest, YoYo) {
 
   ASSERT_NO_THROW(comm1->startMessage());
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 15;
 
@@ -226,6 +229,7 @@ TEST_F(MessagePassingTest, YoYo) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, KillByDeletingSender) {
+  using cyclus::msg_ptr;
   msg_ptr msg = comm1->msg_;
   comm3->keep_ = true;
 
@@ -235,7 +239,7 @@ TEST_F(MessagePassingTest, KillByDeletingSender) {
   ASSERT_TRUE(msg->isDead());
   ASSERT_NO_THROW(comm3->returnMessage());
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(msg.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(msg.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -251,7 +255,7 @@ TEST_F(MessagePassingTest, KillSendOn) {
   comm3->kill_ = true;
   ASSERT_NO_THROW(comm1->startMessage());
 
-  vector<string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
+  std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
   int expected_num_stops = 3;
 
@@ -270,23 +274,23 @@ TEST_F(MessagePassingTest, KillSendOn) {
 class MessagePublicInterfaceTest : public ::testing::Test {
   protected:
 
-    rsrc_ptr resource;
+    cyclus::rsrc_ptr resource;
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
     TestCommunicator* comm2;
-    msg_ptr msg1;
-    Model* foo;
+    cyclus::msg_ptr msg1;
+    cyclus::Model* foo;
 
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = gen_rsrc_ptr(new GenericResource("kg", "bananas", quantity1));
+      resource = cyclus::gen_rsrc_ptr(new cyclus::GenericResource("kg", "bananas", quantity1));
 
-      Transaction* trans = new Transaction(foo, OFFER, NULL);
+      cyclus::Transaction* trans = new cyclus::Transaction(foo, cyclus::OFFER, NULL);
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
-      msg1 = msg_ptr(new Message(comm1, comm2, *trans));
+      msg1 = cyclus::msg_ptr(new cyclus::Message(comm1, comm2, *trans));
     };
 
     virtual void TearDown() {
@@ -299,6 +303,9 @@ class MessagePublicInterfaceTest : public ::testing::Test {
 //- - - - - - - - -Constructors and Cloning - - - - - - - - - - - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, FullConstructor) {
+  using cyclus::Transaction;
+  using cyclus::OFFER;
+  using cyclus::REQUEST;
   double price = 1.2;
   double minfrac = 0.2;
   Transaction* trans;
@@ -328,6 +335,8 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
+  using cyclus::msg_ptr;
+  using cyclus::rsrc_ptr;
   msg1->trans().setResource(resource);
   msg_ptr msg2 = msg1->clone();
 

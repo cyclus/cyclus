@@ -13,7 +13,7 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete ConverterModel instance 
-typedef ConverterModel* ConverterModelConstructor();
+typedef cyclus::ConverterModel* ConverterModelConstructor();
 
 class ConverterModelTests : public TestWithParam<ConverterModelConstructor*> {
   public:
@@ -25,7 +25,7 @@ class ConverterModelTests : public TestWithParam<ConverterModelConstructor*> {
     }
 
   protected:
-    ConverterModel* converter_model_;
+    cyclus::ConverterModel* converter_model_;
 
 };
 

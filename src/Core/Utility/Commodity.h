@@ -3,6 +3,7 @@
 
 #include <string>
 
+namespace cyclus {
 /**
    a simple class defining a commodity; it is currently super simple.
    the reason this class exists is so that code may be cleaner and more straightforward
@@ -45,5 +46,5 @@ struct CommodityCompare {
     return lhs.name() < rhs.name(); 
   }
 };
-
+} // namespace cyclus
 #endif

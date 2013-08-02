@@ -6,6 +6,10 @@
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
 
+#include "CycException.h"
+
+namespace cyclus {
+
 /**
    A helper class to hold xml file data and provide automatic 
    validation
@@ -40,12 +44,13 @@ class XMLParser {
   boost::shared_ptr<xmlpp::DomParser> parser_;
 };
 
-#include "CycException.h"
 /**
    An exception class for an xpath that can not be evaluated
 */
 class CycLoadXMLException : public CycException {
  public: 
- CycLoadXMLException(std::string msg) : CycException(msg) {};
+  CycLoadXMLException(std::string msg) : CycException(msg) {};
 };
+} // namespace cyclus
+
 #endif

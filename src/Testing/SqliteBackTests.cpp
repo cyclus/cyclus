@@ -9,15 +9,15 @@
 
 static std::string const path = "testdb.sqlite";
 
-class FlushCatcher: public SqliteBack {
+class FlushCatcher: public cyclus::SqliteBack {
 public:
   FlushCatcher(std::string path) : SqliteBack(path) { };
-  StrList cmds;
+  cyclus::StrList cmds;
 
 protected:
   virtual void Flush() {
     cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
-    SqliteBack::Flush();
+    cyclus::SqliteBack::Flush();
   };
 };
 
@@ -37,6 +37,7 @@ private:
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
+  using cyclus::EventManager;
   FileDeleter fd(path);
   EventManager m;
   FlushCatcher back(path);

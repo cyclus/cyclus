@@ -2,8 +2,11 @@
 #ifndef _ENRICHMENT_H
 #define _ENRICHMENT_H
 
+#include <set>
+#include "CycException.h"
 #include "Material.h"
 
+namespace cyclus {
 namespace enrichment {
   /**
      a simple container class for enrichment assays
@@ -78,5 +81,5 @@ namespace enrichment {
    */
   double value_func(double frac);
 };
-
+} // namespace cyclus
 #endif

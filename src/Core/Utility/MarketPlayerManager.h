@@ -2,12 +2,18 @@
 #ifndef MARKETPLAYERMANAGER_H
 #define MARKETPLAYERMANAGER_H
 
-#include "SupplyDemand.h"
-
 #include <set>
 
+#include "SupplyDemand.h"
+
+namespace cyclus {
 class MarketPlayerManager;
+} // namespace cyclus
+
 #include "MarketPlayer.h"
+
+
+namespace cyclus {
 
 class MarketPlayerManager {
  public:
@@ -61,5 +67,5 @@ class MarketPlayerManager {
   /// MarketPlayer is a friend class for access to enter/leaving
   friend class MarketPlayer;
 };
-
+} // namespace cyclus
 #endif

@@ -8,9 +8,9 @@
 class BuildingManagerTests : public ::testing::Test {
  protected:
   CommodityTestHelper* helper;
-  ActionBuilding::BuildingManager manager;
-  ActionBuilding::Builder* builder1;
-  ActionBuilding::Builder* builder2;
+  cyclus::ActionBuilding::BuildingManager manager;
+  cyclus::ActionBuilding::Builder* builder1;
+  cyclus::ActionBuilding::Builder* builder2;
   double demand, capacity1, capacity2, cost1, cost2;
   int build1, build2;
 

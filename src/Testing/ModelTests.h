@@ -13,7 +13,7 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete Model instance 
-typedef Model* ModelConstructor();
+typedef cyclus::Model* ModelConstructor();
 
 class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
@@ -25,7 +25,7 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
     }
 
   protected:
-    Model* model_;
+    cyclus::Model* model_;
 
 };
 

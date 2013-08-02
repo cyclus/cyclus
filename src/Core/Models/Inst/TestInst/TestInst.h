@@ -10,17 +10,17 @@
 /**
    This is the simplest possible Institution, for testing
  */
-class TestInst: public InstModel {
+class TestInst: public cyclus::InstModel {
  public:
   virtual ~TestInst() {};
   
-  void receiveMessage(msg_ptr msg) {
-    msg->setDir(DOWN_MSG);
+  void receiveMessage(cyclus::msg_ptr msg) {
+    msg->setDir(cyclus::DOWN_MSG);
   }
 
-  bool canBuild(Model* mdl) {return true;}
+  bool canBuild(cyclus::Model* mdl) {return true;}
 
-  void wrapAddAvailablePrototype(Prototype* prototype) {
+  void wrapAddAvailablePrototype(cyclus::Prototype* prototype) {
     addAvailablePrototype(prototype);
   }
 };

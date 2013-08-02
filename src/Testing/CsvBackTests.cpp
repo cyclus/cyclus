@@ -29,8 +29,8 @@ class DirDel {
 TEST(CsvBackTest, ReadWrite) {
   DirDel dd(path);
 
-  EventManager m;
-  CsvBack back(path);
+  cyclus::EventManager m;
+  cyclus::CsvBack back(path);
   m.registerBackend(&back);
   m.newEvent("DumbTitle")
   ->addVal("animal", std::string("monkey"))
@@ -45,8 +45,8 @@ TEST(CsvBackTest, ReadWrite) {
   m.close();
 
   // make sure append works
-  EventManager m2;
-  CsvBack back2(path);
+  cyclus::EventManager m2;
+  cyclus::CsvBack back2(path);
   m2.registerBackend(&back2);
   m2.newEvent("DumbTitle")
   ->addVal("animal", std::string("sea cucumber"))
@@ -85,6 +85,8 @@ std::string ReadAll(std::string fname) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CsvBackTest, Blob) {
+  using cyclus::EventManager;
+  using cyclus::CsvBack;
   DirDel dd(path);
 
   cyclus::Blob data("my name is flipper");

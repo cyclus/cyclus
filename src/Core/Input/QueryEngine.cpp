@@ -2,11 +2,11 @@
 
 #include "QueryEngine.h"
 
-using namespace std;
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryEngine::QueryEngine() {
-  spawned_children_ = set<QueryEngine*>();
+  spawned_children_ = std::set<QueryEngine*>();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,6 +25,6 @@ QueryEngine* QueryEngine::queryElement(std::string query,
                                        int index) {
   QueryEngine* qe_child = 
     getEngineFromQuery(query,index) ;
-  spawned_children_.insert(qe_child);
-  return qe_child;
+  spawned_children_.insert(qe_child);  return qe_child;
 }
+} // namespace cyclus

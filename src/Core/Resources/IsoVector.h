@@ -3,24 +3,33 @@
 #define _ISOVECTOR_H
 
 /* -- Includes -- */
-#include "CompMap.h"
-#include "Logger.h"
-
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+
+#include "Logger.h"
+#include "CompMap.h"
 /* -- */
 
-/* -- Typedefs -- */
+
+namespace cyclus {
 /**
    shared pointer to another isovector
  */
 class IsoVector;
 typedef boost::shared_ptr<IsoVector> IsoVectorPtr;
 /* -- */
+} // namespace cyclus
+
 
 /* -- Sensitive Includes -- */
 #include "RecipeLibrary.h"
 /* -- */
+
+
+namespace cyclus {
+
+/* -- Typedefs -- */
+
 
 /** 
     @class IsoVector
@@ -243,5 +252,5 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   static CompMapPtr executeDecay(CompMapPtr parent, int time);
   /* --- */
 };
-
+} // namespace cyclus
 #endif

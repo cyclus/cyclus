@@ -5,7 +5,7 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Converter, for testing
-class TestConverter: public ConverterModel {
+class TestConverter: public cyclus::ConverterModel {
  public:
   TestConverter(){};
   virtual ~TestConverter(){};

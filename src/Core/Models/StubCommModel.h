@@ -5,6 +5,8 @@
 #include "Model.h"
 #include "Communicator.h"
 
+namespace cyclus {
+
 /**
    The StubCommModel class is the abstract class/interface used by all 
    stub models. This StubCommModel is intended as a skeleton to guide 
@@ -56,6 +58,8 @@ class StubCommModel : public Model, public Communicator {
 };
 
 /* ------------------- */ 
+} // namespace cyclus
+
 
 #endif
 

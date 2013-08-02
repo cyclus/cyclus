@@ -17,7 +17,7 @@ class XMLQueryEngineTest : public ::testing::Test {
   int ninner_nodes_;
 
   // loading helpers
-  XMLParser* parser_;
+  cyclus::XMLParser* parser_;
   void loadParser();
   void getContent(std::stringstream &ss);
   std::string subcontent();

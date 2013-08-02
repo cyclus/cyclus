@@ -9,9 +9,10 @@
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
+namespace cyclus {
 /// An EventManager backend that writes data to an hdf5 file.  Identically named
 /// events have their data placed as rows in a single table.  Handles the following
-/// event value types: int, float, double, std::string, cyclus::Blob.
+/// event value types: int, float, double, std::string, cyclus::Blob
 class Hdf5Back : public EventBackend {
  public:
   /// Creates a new backend writing data to the specified file.
@@ -51,5 +52,5 @@ class Hdf5Back : public EventBackend {
   std::map<std::string, size_t*> tbl_sizes_;
   std::map<std::string, size_t> tbl_size_;
 };
-
+} // namespace cyclus
 #endif

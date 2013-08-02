@@ -8,6 +8,8 @@
 
 #define STR_SIZE 16
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -184,3 +186,4 @@ void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
   }
 }
 
+} // namespace cyclus

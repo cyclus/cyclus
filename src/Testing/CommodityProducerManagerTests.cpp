@@ -2,8 +2,7 @@
 
 #include "CycException.h"
 
-using namespace std;
-using namespace SupplyDemand;
+//using namespace SupplyDemand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::SetUp() 
@@ -19,13 +18,15 @@ void CommodityProducerManagerTests::TearDown()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManagerTests::registerProducer(SupplyDemand::CommodityProducer* producer) 
+void CommodityProducerManagerTests::registerProducer(
+  cyclus::SupplyDemand::CommodityProducer* producer) 
 {
   manager.registerProducer(producer);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManagerTests::unRegisterProducer(SupplyDemand::CommodityProducer* producer) 
+void CommodityProducerManagerTests::unRegisterProducer(
+  cyclus::SupplyDemand::CommodityProducer* producer) 
 {
   manager.unRegisterProducer(producer);
 }
@@ -39,6 +40,8 @@ TEST_F(CommodityProducerManagerTests,initialization)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests,registerunregister)
 {
+  using cyclus::CycDoubleRegistrationException;
+  using cyclus::CycNotRegisteredException;
   // 1 producer
   EXPECT_NO_THROW(registerProducer(helper->producer1));
   EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->capacity);
@@ -65,6 +68,6 @@ TEST_F(CommodityProducerManagerTests,differentcommodity)
 {
   EXPECT_NO_THROW(registerProducer(helper->producer1));
   
-  Commodity differentcommodity("differentcommodity");
+  cyclus::Commodity differentcommodity("differentcommodity");
   EXPECT_EQ(manager.totalProductionCapacity(differentcommodity),0.0);
 }
