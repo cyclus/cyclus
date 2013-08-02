@@ -8,7 +8,7 @@ TEST(VariableTests, constructor) {
   cyclopts::Variable::Bound ubound(cyclopts::Variable::FINITE);
   cyclopts::Variable::VarType type(cyclopts::Variable::LINEAR);
   
-  cyclopts::Variable::Variable var(lbound, ubound, type);
+  cyclopts::Variable var(lbound, ubound, type);
   EXPECT_EQ(var.lbound(), lbound);
   EXPECT_EQ(var.ubound(), ubound);
   EXPECT_EQ(var.type(), type);
