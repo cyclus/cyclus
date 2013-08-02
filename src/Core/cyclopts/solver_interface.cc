@@ -7,12 +7,10 @@
 
 #include "limits.h"
 
-using namespace std;
-
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
-  constraints_ = vector<cyclus::cyclopts::ConstraintPtr>();
-  variables_ = vector<cyclus::cyclopts::VariablePtr>();
+  constraints_ = std::vector<cyclus::cyclopts::ConstraintPtr>();
+  variables_ = std::vector<cyclus::cyclopts::VariablePtr>();
   modifier_limit_ = kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc
 };
 
@@ -31,7 +29,7 @@ void cyclus::cyclopts::SolverInterface::AddVarToObjFunction(cyclus::cyclopts::Va
                                                             double modifier) {
   // need to check that v is in variables_
   CheckModifierBounds(modifier);
-  obj_->AddConstituent(v,modifier);
+  obj_->AddConstituent(v, modifier);
 }
 
 // -----------------------------------------------------------------------------
@@ -46,24 +44,24 @@ void cyclus::cyclopts::SolverInterface::AddVarToConstraint(
     cyclus::cyclopts::ConstraintPtr c) {
   CheckModifierBounds(modifier);
   // need to check that v is in variables_ and c is in constraints_
-  vector<cyclus::cyclopts::ConstraintPtr>::iterator it;
-  it = find(constraints_.begin(),constraints_.end(),c);
-  it->get()->AddConstituent(v,modifier);
+  std::vector<cyclus::cyclopts::ConstraintPtr>::iterator it;
+  it = find(constraints_.begin(), constraints_.end(), c);
+  it->get()->AddConstituent(v, modifier);
 }
 
 // -----------------------------------------------------------------------------
 void cyclus::cyclopts::SolverInterface::Solve() {
-  solver_->Solve(variables_,obj_,constraints_);
+  solver_->Solve(variables_, obj_, constraints_);
 }
 
 // -------------------------------------------------------------------
 void cyclus::cyclopts::SolverInterface::CheckModifierBounds(double modifier) {
   if (modifier > modifier_limit_) {
-      stringstream msg;
-      msg << "Cannot add modifier " 
-          << modifier
-          << " which is greater than the modifier limit " 
-          << modifier_limit_;
-      throw runtime_error(msg.str());
-    }
+    std::stringstream msg;
+    msg << "Cannot add modifier " 
+        << modifier
+        << " which is greater than the modifier limit " 
+        << modifier_limit_;
+    throw std::runtime_error(msg.str());
+  }
 }

@@ -7,16 +7,15 @@
 
 #include "variable.h"
 
-using namespace std;
-
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::Function::Function() {
-  constituents_ = map<cyclus::cyclopts::VariablePtr,double>();
+  constituents_ = std::map<cyclus::cyclopts::VariablePtr, double>();
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Function::AddConstituent(cyclus::cyclopts::VariablePtr v, double modifier) {
-  constituents_.insert(pair<cyclus::cyclopts::VariablePtr,double>(v,modifier));
+void cyclus::cyclopts::Function::AddConstituent(cyclus::cyclopts::VariablePtr v,
+                                                double modifier) {
+  constituents_.insert(std::pair<cyclus::cyclopts::VariablePtr, double>(v,modifier));
 }
 
 // -----------------------------------------------------------------------------
@@ -25,12 +24,12 @@ double cyclus::cyclopts::Function::GetModifier(cyclus::cyclopts::VariablePtr v) 
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr,double>::iterator cyclus::cyclopts::Function::begin() {
+std::map<cyclus::cyclopts::VariablePtr, double>::iterator cyclus::cyclopts::Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr,double>::iterator cyclus::cyclopts::Function::end() {
+std::map<cyclus::cyclopts::VariablePtr, double>::iterator cyclus::cyclopts::Function::end() {
   return constituents_.end();
 }
 
@@ -41,9 +40,9 @@ int cyclus::cyclopts::Function::NumConstituents() {
 
 // -----------------------------------------------------------------------------
 std::string cyclus::cyclopts::Function::Print() { 
-  stringstream ss;
+  std::stringstream ss;
   int count = 0;
-  map<cyclus::cyclopts::VariablePtr,double>::iterator it;
+  std::map<cyclus::cyclopts::VariablePtr, double>::iterator it;
   for (it = constituents_.begin(); it != constituents_.end(); it++) {
     ss << it->second << it->first->name();
     if (count < constituents_.size()-1) {
@@ -75,7 +74,7 @@ double cyclus::cyclopts::Constraint::rhs() {
 
 // -----------------------------------------------------------------------------
 std::string cyclus::cyclopts::Constraint::Print() {
-  stringstream ss;
+  std::stringstream ss;
   ss << "s.t. " << cyclus::cyclopts::Function::Print() 
      << " " << EqRToStr() << " " << rhs_;
   return ss.str();
@@ -115,7 +114,7 @@ cyclus::cyclopts::ObjectiveFunction::dir() {
 
 // -----------------------------------------------------------------------------
 std::string cyclus::cyclopts::ObjectiveFunction::Print() {
-  stringstream ss;
+  std::stringstream ss;
   ss << DirToStr() << " " << Function::Print();
   return ss.str();
 }

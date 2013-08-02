@@ -3,9 +3,6 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-using namespace boost;
-
 // -----------------------------------------------------------------------------
 int cyclus::cyclopts::Variable::next_id_ = 0;
 
@@ -15,7 +12,7 @@ cyclus::cyclopts::Variable::Variable(Bound l, Bound u, VarType t)
       lbound_(l),
       ubound_(u),
       type_(t) {
-  stringstream ss;
+  std::stringstream ss;
   ss << "var_" << id_;
   name_ = ss.str();
 }
@@ -51,12 +48,12 @@ void cyclus::cyclopts::Variable::set_name(std::string name) {
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Variable::set_value(any v) {
+void cyclus::cyclopts::Variable::set_value(boost::any v) {
   value_ = v;
 }
 
 // -----------------------------------------------------------------------------
-any cyclus::cyclopts::Variable::value() {
+boost::any cyclus::cyclopts::Variable::value() {
   return value_;
 }
 

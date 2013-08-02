@@ -3,11 +3,9 @@
 #include <map>
 #include <vector>
 
-using namespace std;
-
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::Solver::Solver() {
-  index_ = map<cyclus::cyclopts::VariablePtr,int>();
+  index_ = std::map<cyclus::cyclopts::VariablePtr,int>();
 }
 
 // -----------------------------------------------------------------------------

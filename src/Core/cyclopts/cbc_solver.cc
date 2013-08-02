@@ -12,19 +12,17 @@
 
 #include "limits.h"
 
-using namespace std;
-using namespace boost;
-
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::CBCSolver::DoubleBound(cyclus::cyclopts::Variable::Bound b) {
+double cyclus::cyclopts::CBCSolver::DoubleBound(
+    cyclus::cyclopts::Variable::Bound b) {
   double val;
   switch(b) {
-  case cyclus::cyclopts::Variable::NEG_INF:
-    val = -COIN_DBL_MAX;
-    break;
-  case cyclus::cyclopts::Variable::INF:
-    val = COIN_DBL_MAX;
-    break;
+    case cyclus::cyclopts::Variable::NEG_INF:
+      val = -COIN_DBL_MAX;
+      break;
+    case cyclus::cyclopts::Variable::INF:
+      val = COIN_DBL_MAX;
+      break;
   }
   return val;
 }
@@ -44,25 +42,28 @@ int cyclus::cyclopts::CBCSolver::IntBound(cyclus::cyclopts::Variable::Bound b) {
 }
 
 // -----------------------------------------------------------------------------
-std::pair<double,double> cyclus::cyclopts::CBCSolver::ConstraintBounds(
+std::pair<double, double> cyclus::cyclopts::CBCSolver::ConstraintBounds(
     cyclus::cyclopts::ConstraintPtr c) {
   double lval, rval;
   switch(c->eq_relation()) {
     case Constraint::EQ:
-      lval = c->rhs(); rval = c->rhs();
+      lval = c->rhs(); 
+      rval = c->rhs();
       break;
     case Constraint::GTEQ:
-      lval = c->rhs(); rval = COIN_DBL_MAX;
+      lval = c->rhs(); 
+      rval = COIN_DBL_MAX;
     case Constraint::GT: // explicit fall through
       lval += kConstraintEps; 
       break;
     case Constraint::LTEQ:
-      lval = COIN_DBL_MAX; rval = c->rhs();
+      lval = COIN_DBL_MAX; 
+      rval = c->rhs();
     case Constraint::LT: // explicit fall through
       rval -= kConstraintEps; 
       break;
   }
-  return pair<double,double>(lval,rval);
+  return std::pair<double, double>(lval, rval);
 }
 
 // -----------------------------------------------------------------------------
@@ -73,16 +74,16 @@ void cyclus::cyclopts::CBCSolver::SetUpVariablesAndObj(
     cyclus::cyclopts::VariablePtr v = variables.at(i);
     switch(v->type()) {
       case cyclus::cyclopts::Variable::INT:
-        builder_.setColumnBounds(i,IntBound(v->lbound()),
+        builder_.setColumnBounds(i, IntBound(v->lbound()),
                                  IntBound(v->ubound()));
         builder_.setInteger(i);
         break;
       case cyclus::cyclopts::Variable::LINEAR:
-        builder_.setColumnBounds(i,DoubleBound(v->lbound()),
+        builder_.setColumnBounds(i, DoubleBound(v->lbound()),
                                  DoubleBound(v->ubound()));
         break;
     }
-    builder_.setObjective(i,obj->GetModifier(v));
+    builder_.setObjective(i, obj->GetModifier(v));
   }
 }
 
@@ -91,11 +92,11 @@ void cyclus::cyclopts::CBCSolver::SetUpConstraints(
     std::vector<cyclus::cyclopts::ConstraintPtr>& constraints) {
   for (int i = 0; i < constraints.size(); i++) {
     cyclus::cyclopts::ConstraintPtr c = constraints.at(i);
-    pair<double,double> bounds = ConstraintBounds(c);
-    builder_.setRowBounds(i,bounds.first,bounds.second);
-    std::map<cyclus::cyclopts::VariablePtr,double>::iterator it;
-    for (it = c->begin(); it != c->end(); it++) {
-      builder_.setElement(i,index_[it->first],it->second);
+    std::pair<double, double> bounds = ConstraintBounds(c);
+    builder_.setRowBounds(i, bounds.first, bounds.second);
+    std::map<cyclus::cyclopts::VariablePtr, double>::iterator it;
+    for (it = c->begin(); it != c->end(); ++it) {
+      builder_.setElement(i, index_[it->first], it->second);
     }
   }
 }
@@ -129,7 +130,7 @@ void cyclus::cyclopts::CBCSolver::PopulateSolution(
   const double* solution = model.solver()->getColSolution();
   
   for (int i = 0; i < variables.size(); i++) {
-    any value = solution[i]; 
+    boost::any value = solution[i]; 
     switch(variables.at(i)->type()) { 
       case cyclus::cyclopts::Variable::INT:
         value = (int) solution[i];
@@ -141,37 +142,37 @@ void cyclus::cyclopts::CBCSolver::PopulateSolution(
 
 // -----------------------------------------------------------------------------
 void cyclus::cyclopts::CBCSolver::PrintVariables(int num) {
-  cout << "Variables:" << endl;
+  std::cout << "Variables:" << std::endl;
   for (int i = 0; i < num; i++) {
-    cout << "  lbound: " << builder_.getColLower(i) << " ubound: " << 
+    std::cout << "  lbound: " << builder_.getColLower(i) << " ubound: " << 
       builder_.getColUpper(i) << " integer: " 
-         << builder_.getColIsInteger(i) << endl;
+         << builder_.getColIsInteger(i) << std::endl;
   }
-  cout << "note true = " << true << endl;
+  std::cout << "note true = " << true << std::endl;
 }
 
 // -----------------------------------------------------------------------------
 void cyclus::cyclopts::CBCSolver::PrintObjFunction(int num) {
-  cout << "Objective Function:" << endl;
-  cout << "  direction: " << builder_.optimizationDirection() << endl;
-  cout << "    values: ";
+  std::cout << "Objective Function:" << std::endl;
+  std::cout << "  direction: " << builder_.optimizationDirection() << std::endl;
+  std::cout << "    values: ";
   for (int i = 0; i < num; i++) {
-    cout << builder_.getColumnObjective(i) <<  " ";
+    std::cout << builder_.getColumnObjective(i) <<  " ";
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
 // -----------------------------------------------------------------------------
 void cyclus::cyclopts::CBCSolver::PrintConstraints(int n_const, int n_vars) {
-  cout << "Constraints:" << endl;
+  std::cout << "Constraints:" << std::endl;
   for (int i = 0; i < n_const; i++) {
-    cout << "  lbound: " << builder_.getRowLower(i) << " ubound: " << 
-      builder_.getRowUpper(i) << endl;
-    cout << "    values: ";
+    std::cout << "  lbound: " << builder_.getRowLower(i) << " ubound: " << 
+      builder_.getRowUpper(i) << std::endl;
+    std::cout << "    values: ";
     for (int j = 0; j < n_vars; j++) {
-      cout << builder_.getElement(i,j) << " ";
+      std::cout << builder_.getElement(i, j) << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
@@ -179,7 +180,7 @@ void cyclus::cyclopts::CBCSolver::PrintConstraints(int n_const, int n_vars) {
 void cyclus::cyclopts::CBCSolver::Print(int n_const, int n_vars) {
   PrintVariables(n_vars);
   PrintObjFunction(n_vars);
-  PrintConstraints(n_const,n_vars);
+  PrintConstraints(n_const, n_vars);
 }
 
 // -----------------------------------------------------------------------------
@@ -189,7 +190,7 @@ void cyclus::cyclopts::CBCSolver::Solve(std::vector<cyclus::cyclopts::VariablePt
   // use builder_ to build constraint probelm
   Solver::PopulateIndices(variables);
   SetUpConstraints(constraints);
-  SetUpVariablesAndObj(variables,obj);
+  SetUpVariablesAndObj(variables, obj);
   builder_.setOptimizationDirection(ObjDirection(obj));
   // Print(constraints.size(),variables.size());
 
@@ -199,5 +200,5 @@ void cyclus::cyclopts::CBCSolver::Solve(std::vector<cyclus::cyclopts::VariablePt
   solver->loadFromCoinModel(builder_);
   CbcModel model(*solver);
   SolveModel(model);
-  PopulateSolution(model,variables);
+  PopulateSolution(model, variables);
 }
