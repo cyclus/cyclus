@@ -101,11 +101,6 @@ MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
 
-# find blas and link to it
-FIND_PACKAGE( BLAS REQUIRED )
-set(LIBS ${LIBS} ${BLAS_LIBRARIES})
-MESSAGE("\tFound BLAS Libraries: ${BLAS_LIBRARIES}")
-
 # find lapack and link to it
 FIND_PACKAGE( LAPACK REQUIRED )
 set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
