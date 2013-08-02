@@ -87,14 +87,13 @@ void CommodityProducer::setCost(const Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodityWithInformation(const Commodity& commodity, 
-                                                    const CommodityInformation& info) 
-{
-  if (producesCommodity(commodity))
-    {
-      throw CycDoubleRegistrationException("This producer already has registered "
-                                           + commodity.name());
-    }
+void CommodityProducer::addCommodityWithInformation(
+    const Commodity& commodity, 
+    const CommodityInformation& info) {
+  if (producesCommodity(commodity)) {
+    throw CycDoubleRegistrationException("This producer already has registered "
+                                         + commodity.name());
+  }
   produced_commodities_.insert(make_pair(commodity,info));
 }
 
@@ -112,11 +111,10 @@ void CommodityProducer::copyProducedCommoditiesFrom(CommodityProducer* source)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commodity)
-{
-  if(!producesCommodity(commodity))
-    {
-      throw CycNotRegisteredException("Producer does not produce " 
-                                      + commodity.name());
-    }
+void CommodityProducer::throwErrorIfCommodityNotProduced(
+    const Commodity& commodity) {
+  if(!producesCommodity(commodity)) {
+    throw CycNotRegisteredException("Producer does not produce " 
+                                    + commodity.name());
+  }
 }

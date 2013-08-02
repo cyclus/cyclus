@@ -23,10 +23,12 @@ BuildOrder::BuildOrder(int n, ActionBuilding::Builder* b,
 { }
 
 // -------------------------------------------------------------------
-ProblemInstance::ProblemInstance(Commodity& commod, double demand, 
-                                 cyclus::cyclopts::SolverInterface& sinterface, 
-                                 cyclus::cyclopts::ConstraintPtr constr, 
-                                 std::vector<cyclus::cyclopts::VariablePtr>& soln) 
+ProblemInstance::ProblemInstance(
+    Commodity& commod, 
+    double demand, 
+    cyclus::cyclopts::SolverInterface& sinterface, 
+    cyclus::cyclopts::ConstraintPtr constr, 
+    std::vector<cyclus::cyclopts::VariablePtr>& soln) 
   : commodity(commod),
     unmet_demand(demand),
     interface(sinterface),
@@ -76,11 +78,15 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
     cyclus::cyclopts::SolverInterface csi(solver);
 
     // set up objective function
-    cyclus::cyclopts::ObjFuncPtr obj(new cyclus::cyclopts::ObjectiveFunction(cyclus::cyclopts::ObjectiveFunction::MIN));
+    cyclus::cyclopts::ObjFuncPtr obj(
+        new cyclus::cyclopts::ObjectiveFunction(
+            cyclus::cyclopts::ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    cyclus::cyclopts::ConstraintPtr constraint(new cyclus::cyclopts::Constraint(cyclus::cyclopts::Constraint::GTEQ,unmet_demand));
+    cyclus::cyclopts::ConstraintPtr constraint(
+        new cyclus::cyclopts::Constraint(
+            cyclus::cyclopts::Constraint::GTEQ,unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
@@ -113,25 +119,26 @@ std::vector<ActionBuilding::BuildOrder> BuildingManager::makeBuildDecision(
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem)
-{
-  solution_map_ = map< cyclus::cyclopts::VariablePtr, pair<Builder*,CommodityProducer*> >();
+void BuildingManager::setUpProblem(ActionBuilding::ProblemInstance& problem) {
+  solution_map_ = 
+      map<cyclus::cyclopts::VariablePtr, pair<Builder*, CommodityProducer*> >();
 
   set<Builder*>::iterator builder_it;
-  for (builder_it = builders_.begin(); builder_it != builders_.end(); builder_it++)
-    {
-      Builder* builder = (*builder_it);
-      
-      set<CommodityProducer*>::iterator producer_it;
-      for (producer_it = builder->beginningProducer(); producer_it != builder->endingProducer(); producer_it++)
-        {
-          CommodityProducer* producer = (*producer_it);
-          if (producer->producesCommodity(problem.commodity))
-            {
-              addProducerVariableToProblem(producer,builder,problem);
-            }
-        }
+  for (builder_it = builders_.begin(); 
+       builder_it != builders_.end(); 
+       ++builder_it) {
+    Builder* builder = (*builder_it);
+    
+    set<CommodityProducer*>::iterator producer_it;
+    for (producer_it = builder->beginningProducer(); 
+         producer_it != builder->endingProducer(); 
+         ++producer_it) {
+      CommodityProducer* producer = (*producer_it);
+      if (producer->producesCommodity(problem.commodity)) {
+        addProducerVariableToProblem(producer,builder,problem);
+      }
     }
+  }
 }
 
 // -------------------------------------------------------------------
@@ -139,16 +146,19 @@ void BuildingManager::addProducerVariableToProblem(
     SupplyDemand::CommodityProducer* producer,
     ActionBuilding::Builder* builder,
     ActionBuilding::ProblemInstance& problem) {
-  cyclus::cyclopts::VariablePtr x(new cyclus::cyclopts::IntegerVariable(0,cyclus::cyclopts::Variable::INF));
+  cyclus::cyclopts::VariablePtr x(
+      new cyclus::cyclopts::IntegerVariable(0, 
+                                            cyclus::cyclopts::Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
-  solution_map_.insert(make_pair(x,make_pair(builder,producer)));
+  solution_map_.insert(make_pair(x, make_pair(builder,producer)));
 
   double constraint_modifier = producer->productionCapacity(problem.commodity);
-  problem.interface.AddVarToConstraint(x,constraint_modifier,problem.constraint);
+  problem.interface.AddVarToConstraint(x, 
+                                       constraint_modifier,problem.constraint);
 
   double obj_modifier = producer->productionCost(problem.commodity);
-  problem.interface.AddVarToObjFunction(x,obj_modifier);
+  problem.interface.AddVarToObjFunction(x, obj_modifier);
 }
 
 // -------------------------------------------------------------------
