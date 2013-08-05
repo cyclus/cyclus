@@ -18,5 +18,5 @@ class BuildingManagerTests : public ::testing::Test {
 
   virtual void SetUp();  
   virtual void TearDown();
-  void setUpProblem();
+  void SetUpProblem();
 };

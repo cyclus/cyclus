@@ -38,14 +38,14 @@ TEST(Hdf5BackTest, ReadWrite) {
 
   EventManager m;
   Hdf5Back back(path);
-  m.registerBackend(&back);
-  m.newEvent("DumbTitle")
-  ->addVal("string", str)
-  ->addVal("int", i)
-  ->addVal("float", f)
-  ->addVal("double", d)
-  ->addVal("blob", cyclus::Blob(blob))
-  ->record();
+  m.RegisterBackend(&back);
+  m.NewEvent("DumbTitle")
+  ->AddVal("string", str)
+  ->AddVal("int", i)
+  ->AddVal("float", f)
+  ->AddVal("double", d)
+  ->AddVal("blob", cyclus::Blob(blob))
+  ->Record();
   m.close();
 
   hid_t file = H5Fopen(path, H5F_ACC_RDONLY, H5P_DEFAULT);

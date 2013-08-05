@@ -22,7 +22,7 @@ SqliteDb::SqliteDb(std::string path, bool readonly)
 SqliteDb::~SqliteDb() { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteDb::overwrite() {
+void SqliteDb::Overwrite() {
   overwrite_ = true;
 }
 
@@ -63,7 +63,7 @@ void SqliteDb::open() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteDb::execute(std::string sql) {
+void SqliteDb::Execute(std::string sql) {
   open();
 
   sqlite3_stmt* statement;
@@ -82,7 +82,7 @@ void SqliteDb::execute(std::string sql) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<StrList> SqliteDb::query(std::string sql) {
+std::vector<StrList> SqliteDb::Query(std::string sql) {
   open();
 
   sqlite3_stmt* statement;

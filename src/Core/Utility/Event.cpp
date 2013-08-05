@@ -8,14 +8,14 @@ namespace cyclus {
 typedef boost::singleton_pool<Event, sizeof(Event)> EventPool;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event* Event::addVal(const char* field, boost::spirit::hold_any val) {
+Event* Event::AddVal(const char* field, boost::spirit::hold_any val) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
   return this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Event::record() {
-  manager_->addEvent(this);
+void Event::Record() {
+  manager_->AddEvent(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -21,10 +21,10 @@ QueryEngine::~QueryEngine() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QueryEngine* QueryEngine::queryElement(std::string query, 
+QueryEngine* QueryEngine::QueryElement(std::string query, 
                                        int index) {
   QueryEngine* qe_child = 
-    getEngineFromQuery(query,index) ;
+    GetEngineFromQuery(query,index) ;
   spawned_children_.insert(qe_child);  return qe_child;
 }
 } // namespace cyclus

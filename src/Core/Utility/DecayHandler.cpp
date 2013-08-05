@@ -20,14 +20,14 @@ IsoList DecayHandler::IsotopesTracked_ = IsoList();
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DecayHandler::DecayHandler() {
   if (!decay_info_loaded_) {
-    DecayHandler::loadDecayInfo();
+    DecayHandler::LoadDecayInfo();
     decay_info_loaded_ = true;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::loadDecayInfo() {
-  std::string path = Env::getBuildPath() + "/share/decayInfo.dat";
+void DecayHandler::LoadDecayInfo() {
+  std::string path = Env::GetBuildPath() + "/share/decayInfo.dat";
   std::ifstream decayInfo (path.c_str());
 
   if ( decayInfo.is_open() ) {
@@ -50,7 +50,7 @@ void DecayHandler::loadDecayInfo() {
       // make parent
       decayInfo >> decayConst;
       decayInfo >> nDaughters;
-      addIsoToList(iso);
+      AddIsoToList(iso);
 
       // checks for duplicate parent isotopes
       if ( parent_.find(iso) == parent_.end() ) {
@@ -61,7 +61,7 @@ void DecayHandler::loadDecayInfo() {
         for ( int i = 0; i < nDaughters; ++i ) {
           decayInfo >> iso;
           decayInfo >> branchRatio;
-          addIsoToList(iso);
+          AddIsoToList(iso);
           
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
@@ -82,14 +82,14 @@ void DecayHandler::loadDecayInfo() {
       decayInfo >> iso; // get next parent
     }
     // builds the decay matrix from the parent and daughter maps
-    buildDecayMatrix();
+    BuildDecayMatrix();
   } else {
     throw IOError("Could not find file 'decayInfo.dat'.");
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::addIsoToList(int iso) {
+void DecayHandler::AddIsoToList(int iso) {
   bool exists = (find(IsotopesTracked_.begin(), IsotopesTracked_.end(),iso)!=IsotopesTracked_.end());
   if (!exists){
     IsotopesTracked_.push_back(iso);
@@ -97,13 +97,13 @@ void DecayHandler::addIsoToList(int iso) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::setComp(CompMapPtr comp) {
+void DecayHandler::SetComp(CompMapPtr comp) {
   atom_comp_ = comp;
-  buildDecayMatrix();
+  BuildDecayMatrix();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::setComp(Vector comp) {
+void DecayHandler::SetComp(Vector comp) {
   atom_comp_.reset(new CompMap(ATOM));
 
   // loops through the ParentMap and populates the new composition map with
@@ -114,7 +114,7 @@ void DecayHandler::setComp(Vector comp) {
     int col = parent_.find(iso)->second.first; // get Vector position
     
     // checks to see if the Vector position is valid
-    if ( col <= comp.numRows() ) {
+    if ( col <= comp.NumRows() ) {
       double atom_count = comp(col,1);
       // adds isotope to the map if its number density is non-zero
       if ( atom_count != 0 )
@@ -127,7 +127,7 @@ void DecayHandler::setComp(Vector comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector DecayHandler::compAsVector() {
+Vector DecayHandler::CompAsVector() {
 
   // solves the decay equation for the final composition
         
@@ -153,7 +153,7 @@ Vector DecayHandler::compAsVector() {
       daughters_[col] = temp;  // add isotope to daughters map
       
       std::vector<long double> row(1, atom_count);
-      comp_vector.addRow(row);  // add isotope to the end of the Vector
+      comp_vector.AddRow(row);  // add isotope to the end of the Vector
     }
 
     ++comp_iter; // get next isotope
@@ -168,7 +168,7 @@ CompMapPtr DecayHandler::comp() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::buildDecayMatrix() {
+void DecayHandler::BuildDecayMatrix() {
   double decayConst = 0; // decay constant, in inverse years
   int jcol = 1;
   int n = parent_.size();
@@ -204,9 +204,9 @@ void DecayHandler::buildDecayMatrix() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::decay(double years) {
+void DecayHandler::Decay(double years) {
   // solves the decay equation for the final composition
-  Vector vect = UniformTaylor::matrixExpSolver(decayMatrix_, compAsVector(), years);
-  setComp(vect);
+  Vector vect = UniformTaylor::MatrixExpSolver(decayMatrix_, CompAsVector(), years);
+  SetComp(vect);
 }
 } // namespace cyclus

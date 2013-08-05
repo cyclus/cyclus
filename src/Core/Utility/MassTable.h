@@ -51,7 +51,7 @@ public:
      typedef  
      @return int the atomic number of the tope isotope. 
    */
-  int getAtomicNum(int tope);
+  int GetAtomicNum(int tope);
 
   /**
      get the Mass, a double, of an isotope according to its 
@@ -61,7 +61,7 @@ public:
      typedef  
      @return the mass, a double, of the tope isotope. 
    */
-   double gramsPerMol(int tope);
+   double GramsPerMol(int tope);
 
 protected:
   /**
@@ -94,7 +94,7 @@ protected:
      a function to initialize a large array of nuclide_t structs via the 
      SQLite/C++ API 
    */
-  void initializeSQL();
+  void InitializeSQL();
 
 };
 } // namespace cyclus

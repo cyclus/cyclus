@@ -95,7 +95,7 @@ enum Basis {MASS, ATOM};
    composition to its original basis.
 
    The internal storage of the CompMap can be changed on the fly via
-   the massify() and atomify() methods. Both of which call the 
+   the Massify() and Atomify() methods. Both of which call the 
    normalize() method.
 
    During the normalize() method, the mass to atom ratio is calculated.
@@ -106,10 +106,10 @@ enum Basis {MASS, ATOM};
    @section Access
    The CompMap class offers, nominally, two ways to access atom
    or mass fractions of a given isotope. The first is by simply using
-   the array index operator. The second are the massFraction() and 
-   atomFraction() methods. The latter will intelligently return a
+   the array index operator. The second are the MassFraction() and 
+   AtomFraction() methods. The latter will intelligently return a
    value corrected for a different basis (i.e., if the CompMap is in
-   an atom-based state and a massFraction() call occurs, it will 
+   an atom-based state and a MassFraction() call occurs, it will 
    return the correct mass fraction).
 
    @section Lineage & Decay
@@ -131,13 +131,13 @@ enum Basis {MASS, ATOM};
    have negative compostiion). Functionality is provided to
    validate both of these numbers for all Map entries via:
    
-   * validateEntry()
+   * ValidateEntry()
 
    * validateIsotope()
 
-   * validateValue()
+   * ValidateValue()
 
-   * validate() Note: this calls validateEntry() on all entries
+   * Validate() Note: this calls ValidateEntry() on all entries
 
    When a CompMap is normalized, validation is performed on all
    entries.
@@ -207,7 +207,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @throw CycNegValueError if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
-  bool almostEqual(const CompMap other, double threshold=eps()) const;
+  bool AlmostEqual(const CompMap other, double threshold=eps()) const;
 
   /**
      returns number of topes in map
@@ -237,7 +237,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      returns true if the composition's id has been set
    */
-  bool recorded() const;
+  bool Recorded() const;
 
   /**
      returns the current basis
@@ -262,12 +262,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(const Iso& tope) const;
+  double MassFraction(const Iso& tope) const;
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(const Iso& tope) const;
+  double AtomFraction(const Iso& tope) const;
 
   /**
      returns the composition's id
@@ -303,21 +303,21 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   int root_decay_time();
   
   /**
-     calls validateEntry() on each entry in the map
+     calls ValidateEntry() on each entry in the map
   */
-  void validate();
+  void Validate();
   /* --- */
 
   /* --- Transformations --- */
   /**
      alters comp, multiplying each entry by its molar weight (g/mol)
   */
-  void massify();
+  void Massify();
   
   /**
      alters comp, deviding each entry by its molar weight (g/mol)
   */
-  void atomify();
+  void Atomify();
   
   /**
      alters comp, summing the total values and calling the normalize(sum)
@@ -328,21 +328,21 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
 
   /* --- Printing  --- */ 
   /**
-     pipes the result of detail() into LEV_INFO3
+     pipes the result of Detail() into LEV_INFO3
    */
-  void print();
+  void Print();
 
   /**
-     calls compStrings() and pipes each string in the result into
+     calls CompStrings() and pipes each string in the result into
      LEV_INFO3
    */
-  std::string detail();
+  std::string Detail();
 
   /**
      populates a vector, each entry being a string describing an isotope and its
      % mass value
    */
-  std::vector<std::string> compStrings();
+  std::vector<std::string> CompStrings();
   /* --- */
 
  protected:  
@@ -390,11 +390,11 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      initializes all relevant members
   */
-  void init(Basis b);
+  void Init(Basis b);
 
   /**
    */
-  void change_basis(Basis b);
+  void Change_basis(Basis b);
 
   /**
      divides each entry in the map by a value labeled sum. it is assumed
@@ -412,7 +412,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @param tope the isotope whose atomic number is being returned 
      @return the atomic number 
   */
-  static int getAtomicNum(Iso tope);
+  static int GetAtomicNum(Iso tope);
   
   /**
      Returns the mass number of the isotope with the given identifier. 
@@ -420,28 +420,28 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @param tope the isotope whose mass number is being returned 
      @return the mass number 
   */
-  static int getMassNum(Iso tope);
+  static int GetMassNum(Iso tope);
   
   /**
-     calls validateIsotopeNumber() and validateFraction() 
+     calls ValidateIsotopeNumber() and validateFraction() 
      @param tope - isotope number to check
      @param value - value to check
   */
-  static void validateEntry(const Iso& tope, const double& value);
+  static void ValidateEntry(const Iso& tope, const double& value);
 
   /**
      Used to determine validity of isotope defnition. 
      @param tope isotope identifier 
      @exception thrown if isotope identifier is invalid 
   */
-  static void validateIsotopeNumber(const Iso& tope);
+  static void ValidateIsotopeNumber(const Iso& tope);
   
   /**
      Used to determine validity of isotope's value
      @param value isotope identifier 
      @exception throws an error if fraction < 0.0
   */
-  static void validateValue(const double& value);  
+  static void ValidateValue(const double& value);  
   /* --- */
 
   /* -- Friends -- */

@@ -34,13 +34,13 @@ Example usage:
 
 EventManager* manager = new EventManager();
 CustomBackend* myback = new CustomBackend();
-manager->registerBackend(myback);
+manager->RegisterBackend(myback);
 ...
 ...
-manager->newEvent("CapacityFactor");
-       ->addVal("Name", aname)
-       ->addVal("Capacity", cap)
-       ->record();
+manager->NewEvent("CapacityFactor");
+       ->AddVal("Name", aname)
+       ->AddVal("Capacity", cap)
+       ->Record();
 ...
 ...
 manager->close();
@@ -51,8 +51,8 @@ class EventManager {
     friend class Event;
 
   private:
-    void notifyBackends();
-    void addEvent(Event* ev);
+    void NotifyBackends();
+    void AddEvent(Event* ev);
 
     EventList events_;
     int index_;
@@ -94,7 +94,7 @@ class EventManager {
     result in multiple instances of this agent storing event data together
     (e.g. the same table).
     */
-    Event* newEvent(std::string title);
+    Event* NewEvent(std::string title);
 
     /*!
     Registers b to receive event notifications for all events collected
@@ -103,7 +103,7 @@ class EventManager {
 
     @param b backend to receive events
     */
-    void registerBackend(EventBackend* b);
+    void RegisterBackend(EventBackend* b);
 
     /// Flushes all events and closes all registered backends.
     void close();

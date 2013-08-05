@@ -25,7 +25,7 @@ MassTable* MassTable::Instance() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MassTable::MassTable() {
-  initializeSQL();
+  InitializeSQL();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,21 +34,21 @@ MassTable::~MassTable() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double MassTable::gramsPerMol(int tope) {
+double MassTable::GramsPerMol(int tope) {
   double toRet = nuclide_vec_[isoIndex_[tope]].mass;
   return toRet;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MassTable::initializeSQL() {
+void MassTable::InitializeSQL() {
   // get the file location
-  std::string file_path = Env::getBuildPath() + "/share/mass.sqlite";
+  std::string file_path = Env::GetBuildPath() + "/share/mass.sqlite";
   bool readonly=true;
   SqliteDb *db = new SqliteDb(file_path, readonly);
 
-  std::vector<StrList> znums = db->query("SELECT Z FROM isotopemasses");
-  std::vector<StrList> anums = db->query("SELECT A FROM isotopemasses");
-  std::vector<StrList> mnums = db->query("SELECT Mass FROM isotopemasses");
+  std::vector<StrList> znums = db->Query("SELECT Z FROM isotopemasses");
+  std::vector<StrList> anums = db->Query("SELECT A FROM isotopemasses");
+  std::vector<StrList> mnums = db->Query("SELECT Mass FROM isotopemasses");
   
   for (int i = 0; i < znums.size(); i++){
     // // obtain the database row and declare the appropriate members

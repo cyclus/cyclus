@@ -29,7 +29,7 @@ CommodityProducer::CommodityProducer()
 CommodityProducer::~CommodityProducer() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<Commodity,CommodityCompare> CommodityProducer::producedCommodities()
+std::set<Commodity,CommodityCompare> CommodityProducer::ProducedCommodities()
 {
   std::set<Commodity,CommodityCompare> commodities;
   std::map<Commodity,CommodityInformation,CommodityCompare>::iterator it;
@@ -43,53 +43,53 @@ std::set<Commodity,CommodityCompare> CommodityProducer::producedCommodities()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CommodityProducer::producesCommodity(const Commodity& commodity)
+bool CommodityProducer::ProducesCommodity(const Commodity& commodity)
 {
   return (produced_commodities_.find(commodity) != 
           produced_commodities_.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducer::productionCapacity(const Commodity& commodity)
+double CommodityProducer::ProductionCapacity(const Commodity& commodity)
 {
-  throwErrorIfCommodityNotProduced(commodity);
+  ThrowErrorIfCommodityNotProduced(commodity);
   return produced_commodities_[commodity].capacity;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducer::productionCost(const Commodity& commodity)
+double CommodityProducer::ProductionCost(const Commodity& commodity)
 {
-  throwErrorIfCommodityNotProduced(commodity);
+  ThrowErrorIfCommodityNotProduced(commodity);
   return produced_commodities_[commodity].cost;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodity(const Commodity& commodity) {
+void CommodityProducer::AddCommodity(const Commodity& commodity) {
   CommodityInformation info(default_capacity_,default_cost_);
-  addCommodityWithInformation(commodity,info);
+  AddCommodityWithInformation(commodity,info);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::setCapacity(const Commodity& commodity, 
+void CommodityProducer::SetCapacity(const Commodity& commodity, 
                                     double capacity)
 {
-  throwErrorIfCommodityNotProduced(commodity);
+  ThrowErrorIfCommodityNotProduced(commodity);
   produced_commodities_[commodity].capacity = capacity;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::setCost(const Commodity& commodity, 
+void CommodityProducer::SetCost(const Commodity& commodity, 
                                 double cost)
 {
-  throwErrorIfCommodityNotProduced(commodity);
+  ThrowErrorIfCommodityNotProduced(commodity);
   produced_commodities_[commodity].cost = cost;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::addCommodityWithInformation(const Commodity& commodity, 
+void CommodityProducer::AddCommodityWithInformation(const Commodity& commodity, 
                                                     const CommodityInformation& info) 
 {
-  if (producesCommodity(commodity))
+  if (ProducesCommodity(commodity))
     {
       throw KeyError("This producer already has registered "
                                            + commodity.name());
@@ -98,22 +98,22 @@ void CommodityProducer::addCommodityWithInformation(const Commodity& commodity,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::copyProducedCommoditiesFrom(CommodityProducer* source) 
+void CommodityProducer::CopyProducedCommoditiesFrom(CommodityProducer* source) 
 {
-  std::set<Commodity,CommodityCompare> commodities = source->producedCommodities();
+  std::set<Commodity,CommodityCompare> commodities = source->ProducedCommodities();
   std::set<Commodity,CommodityCompare>::iterator it;
   for (it = commodities.begin(); it != commodities.end(); it++)
     {
-      addCommodity(*it);
-      setCapacity(*it,source->productionCapacity(*it));
-      setCost(*it,source->productionCost(*it));
+      AddCommodity(*it);
+      SetCapacity(*it,source->ProductionCapacity(*it));
+      SetCost(*it,source->ProductionCost(*it));
     }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commodity)
+void CommodityProducer::ThrowErrorIfCommodityNotProduced(const Commodity& commodity)
 {
-  if(!producesCommodity(commodity))
+  if(!ProducesCommodity(commodity))
     {
       throw KeyError("Producer does not produce " 
                                       + commodity.name());

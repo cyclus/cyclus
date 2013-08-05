@@ -13,16 +13,16 @@ using namespace std;
 
 void XMLFileLoaderTests::SetUp() {
     falseFile = "false.xml";
-    createTestInputFile(falseFile,falseSequence());
+    CreateTestInputFile(falseFile,FalseSequence());
 
     controlFile = "control.xml";
-    createTestInputFile(controlFile,controlSequence());
+    CreateTestInputFile(controlFile,ControlSequence());
 
     recipeFile = "recipes.xml";
-    createTestInputFile(recipeFile,recipeSequence());
+    CreateTestInputFile(recipeFile,RecipeSequence());
 
     moduleFile = "modules.xml";
-    createTestInputFile(moduleFile,moduleSequence());
+    CreateTestInputFile(moduleFile,ModuleSequence());
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -32,11 +32,11 @@ void XMLFileLoaderTests::TearDown() {
     unlink(moduleFile.c_str());
 }
 
-std::string XMLFileLoaderTests::falseSequence() {
+std::string XMLFileLoaderTests::FalseSequence() {
   return "XML is nice, but boooooooooooooooo";
 }
 
-std::string XMLFileLoaderTests::controlSequence() {
+std::string XMLFileLoaderTests::ControlSequence() {
   return  "<simulation>"
           " <control>"
           "  <duration>1200</duration>"
@@ -48,7 +48,7 @@ std::string XMLFileLoaderTests::controlSequence() {
           "</simulation>";
 }
 
-std::string XMLFileLoaderTests::recipeSequence() {
+std::string XMLFileLoaderTests::RecipeSequence() {
   return  "<simulation>"
           " <control>"
           "  <recipe>"
@@ -77,7 +77,7 @@ std::string XMLFileLoaderTests::recipeSequence() {
           "</simulation>";
 }
 
-std::string XMLFileLoaderTests::moduleSequence() {
+std::string XMLFileLoaderTests::ModuleSequence() {
   return  "<simulation>"
           "  <!-- markets -->"
           "  <market>"
@@ -114,7 +114,7 @@ std::string XMLFileLoaderTests::moduleSequence() {
           "</simulation>";
 }
 
-std::string XMLFileLoaderTests::controlSchema() {
+std::string XMLFileLoaderTests::ControlSchema() {
   return 
     "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\""
     "datatypeLibrary=\"http://www.w3.org/2001/XMLSchema-datatypes\">"
@@ -145,27 +145,27 @@ std::string XMLFileLoaderTests::controlSchema() {
 TEST_F(XMLFileLoaderTests,openfile) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile); 
-  EXPECT_NO_THROW(xmlFile.init(false));
+  EXPECT_NO_THROW(xmlFile.Init(false));
 }
 
 TEST_F(XMLFileLoaderTests,throws) {
   using cyclus::XMLFileLoader;
   XMLFileLoader file("blah");
-  EXPECT_THROW(file.init(false), cyclus::IOError);
+  EXPECT_THROW(file.Init(false), cyclus::IOError);
 }
 
 TEST_F(XMLFileLoaderTests,control) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile);
-  xmlFile.init(false);
-  EXPECT_NO_THROW(xmlFile.load_control_parameters());
+  xmlFile.Init(false);
+  EXPECT_NO_THROW(xmlFile.Load_control_parameters());
 }
 
 TEST_F(XMLFileLoaderTests,recipes) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(recipeFile);
-  xmlFile.init(false);
-  EXPECT_NO_THROW(xmlFile.load_recipes());
+  xmlFile.Init(false);
+  EXPECT_NO_THROW(xmlFile.Load_recipes());
 }
 
 // This needs to be moved somewhere else! maybe to a new simulation
@@ -173,16 +173,16 @@ TEST_F(XMLFileLoaderTests,recipes) {
 TEST_F(XMLFileLoaderTests,modulesandsim) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(moduleFile);
-  xmlFile.init(false);
+  xmlFile.Init(false);
   std::set<std::string> module_types = cyclus::Model::dynamic_module_types();
-  xmlFile.load_dynamic_modules(module_types);
-  EXPECT_NO_THROW(cyclus::Model::constructSimulation());
+  xmlFile.Load_dynamic_modules(module_types);
+  EXPECT_NO_THROW(cyclus::Model::ConstructSimulation());
 }
 
 TEST_F(XMLFileLoaderTests,schema) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(controlFile);
-  xmlFile.init(false);
-  std::stringstream schema(controlSchema());
-  EXPECT_NO_THROW(xmlFile.applySchema(schema););
+  xmlFile.Init(false);
+  std::stringstream schema(ControlSchema());
+  EXPECT_NO_THROW(xmlFile.ApplySchema(schema););
 }

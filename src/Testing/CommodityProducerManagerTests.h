@@ -14,9 +14,9 @@ class CommodityProducerManagerTests : public ::testing::Test {
   virtual void SetUp();
   virtual void TearDown();
 
-  void addCommodity(cyclus::supply_demand::CommodityProducer* producer);
-  void setCapacity(cyclus::supply_demand::CommodityProducer* producer);
-  void setUpProducers();
-  void registerProducer(cyclus::supply_demand::CommodityProducer* producer);
-  void unRegisterProducer(cyclus::supply_demand::CommodityProducer* producer);
+  void AddCommodity(cyclus::supply_demand::CommodityProducer* producer);
+  void SetCapacity(cyclus::supply_demand::CommodityProducer* producer);
+  void SetUpProducers();
+  void RegisterProducer(cyclus::supply_demand::CommodityProducer* producer);
+  void UnRegisterProducer(cyclus::supply_demand::CommodityProducer* producer);
 };

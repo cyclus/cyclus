@@ -9,18 +9,18 @@
 class TestFacility: public cyclus::FacilityModel {
  public:
   
-  void receiveMessage(cyclus::msg_ptr msg) {
-    msg->setDir(cyclus::DOWN_MSG);
+  void ReceiveMessage(cyclus::msg_ptr msg) {
+    msg->SetDir(cyclus::DOWN_MSG);
   }
 
-  void receiveMaterial(cyclus::Transaction trans, 
+  void ReceiveMaterial(cyclus::Transaction trans, 
                        std::vector<cyclus::mat_rsrc_ptr> manifest) { }
   
   cyclus::Prototype* clone() { return new TestFacility(); }
 
-  void cloneModuleMembersFrom(cyclus::FacilityModel* source) { }
-  void handleTick(int time) { };
-  void handleTock(int time) { };
+  void CloneModuleMembersFrom(cyclus::FacilityModel* source) { }
+  void HandleTick(int time) { };
+  void HandleTock(int time) { };
 };
 
 #endif

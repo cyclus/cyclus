@@ -23,7 +23,7 @@ bool Material::type_is_recorded_ = false;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material() {
-  setQuantity(0);
+  SetQuantity(0);
   last_update_time_ = TI->time();
   CLOG(LEV_INFO4) << "Material ID=" << ID_ << " was created.";
   materials_.push_back(this);
@@ -36,7 +36,7 @@ Material::~Material() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 Material::Material(CompMapPtr comp) {
-  setQuantity(0);
+  SetQuantity(0);
   IsoVector vec = IsoVector(comp);
   last_update_time_ = TI->time();
   iso_vector_ = vec;
@@ -59,19 +59,19 @@ Material::Material(const Material& other) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::absorb(mat_rsrc_ptr matToAdd) { 
+void Material::Absorb(mat_rsrc_ptr matToAdd) { 
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   double amt = matToAdd->quantity();
   double ratio = ((quantity_ < cyclus::eps_rsrc()) ? 1 : amt/quantity_);
-  iso_vector_.mix(matToAdd->isoVector(),ratio); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
+  iso_vector_.Mix(matToAdd->isoVector(),ratio); // @MJG_FLAG this looks like it copies isoVector()... should this return a pointer?
   quantity_ += amt;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " absorbed material ID="
                    << matToAdd->ID() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(double mass) {
+mat_rsrc_ptr Material::Extract(double mass) {
   if(quantity_ < mass){
     std::string err = "The mass ";
     err += mass;
@@ -83,9 +83,9 @@ mat_rsrc_ptr Material::extract(double mass) {
   quantity_ -= mass;
   // make a new material, set its mass
   mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(iso_vector_));
-  new_mat->setQuantity(mass);
+  new_mat->SetQuantity(mass);
   // we just split a resource, so keep track of the original for book keeping
-  new_mat->setOriginalID( this->originalID() );
+  new_mat->SetOriginalID( this->OriginalID() );
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had " << mass
                    << " kg extracted from it. New mass=" << quantity() << " kg.";
@@ -105,7 +105,7 @@ std::map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, M
     unit){
 
   std::map<Iso, double>::iterator entry;
-  CompMapPtr orig = CompMapPtr(this->unnormalizeComp(MASS, unit));
+  CompMapPtr orig = CompMapPtr(this->UnnormalizeComp(MASS, unit));
   std::map<Iso, double> to_ret = orig->map();
   double amt = 0;
   double orig_amt = this->mass(unit);
@@ -123,7 +123,7 @@ std::map<Iso, double> Material::diff(const CompMapPtr other, double other_amt, M
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double threshold){
+std::map<Iso, double> Material::ApplyThreshold(std::map<Iso, double> vec, double threshold){
   if(threshold < 0){
       std::stringstream ss;
       ss << "The threshold cannot be negative. The value provided was " 
@@ -143,14 +143,14 @@ std::map<Iso, double> Material::applyThreshold(std::map<Iso, double> vec, double
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt, 
+mat_rsrc_ptr Material::Extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
   std::vector<double> final_amt_vec = std::vector<double>();
   double final_amt = 0;
 
   std::map<Iso, double> remainder;
-  remainder = applyThreshold(diff(remove_comp, remove_amt, unit), threshold);
+  remainder = ApplyThreshold(diff(remove_comp, remove_amt, unit), threshold);
   std::map<Iso, double>::iterator it;
   
   for(it=remainder.begin(); it!=remainder.end(); ++it){
@@ -178,31 +178,31 @@ mat_rsrc_ptr Material::extract(const CompMapPtr remove_comp, double remove_amt,
 
   // make new material
   mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(remove_comp));
-  new_mat->setQuantity(remove_amt, unit);
-  new_mat->setOriginalID( this->originalID() ); // book keeping
+  new_mat->SetQuantity(remove_amt, unit);
+  new_mat->SetOriginalID( this->OriginalID() ); // book keeping
   // adjust old material
   final_comp->normalize();
   this->iso_vector_ = IsoVector(CompMapPtr(final_comp)); 
-  this->setQuantity(final_amt, unit);
+  this->SetQuantity(final_amt, unit);
 
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had composition extracted.";
   return new_mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::print() {
+void Material::Print() {
   CLOG(LEV_INFO4) << "Material ID=" << ID_
                    << ", quantity=" << quantity() << ", units=" << units();
 
   CLOG(LEV_INFO5) << "Composition {";
-  CLOG(LEV_INFO5) << detail();
+  CLOG(LEV_INFO5) << Detail();
   CLOG(LEV_INFO5) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string Material::detail() {
+std::string Material::Detail() {
   std::vector<std::string>::iterator entry;
-  std::vector<std::string> entries = iso_vector_.comp()->compStrings();
+  std::vector<std::string> entries = iso_vector_.comp()->CompStrings();
   for (entry = entries.begin(); entry != entries.end(); entry++) {
     CLOG(LEV_INFO5) << "   " << *entry;
   }
@@ -211,27 +211,27 @@ std::string Material::detail() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 bool Material::operator==(const mat_rsrc_ptr other){
-  return almostEqual(other, 0);
+  return AlmostEqual(other, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::almostEqual(const mat_rsrc_ptr other, double threshold) const {
+bool Material::AlmostEqual(const mat_rsrc_ptr other, double threshold) const {
   // I learned at 
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the naive way to do it... 
-  return iso_vector_.comp()->almostEqual(*(other->isoVector().comp()), threshold);
+  return iso_vector_.comp()->AlmostEqual(*(other->isoVector().comp()), threshold);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::setQuantity(double quantity) {
+void Material::SetQuantity(double quantity) {
   quantity_ = quantity;
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " had mass set to"
                    << quantity << " kg";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void Material::setQuantity(double quantity, MassUnit unit) {
-  setQuantity( convertToKg(quantity,unit) );
+void Material::SetQuantity(double quantity, MassUnit unit) {
+  SetQuantity( ConvertToKg(quantity,unit) );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -241,21 +241,21 @@ double Material::quantity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::mass(MassUnit unit) {
-  return convertFromKg(quantity(),unit);
+  return ConvertFromKg(quantity(),unit);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::mass(Iso tope, MassUnit unit) {
-  return convertFromKg(mass(tope),unit);
+  return ConvertFromKg(mass(tope),unit);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double Material::mass(Iso tope){
   double to_ret;
   CompMapPtr the_comp = isoVector().comp();
-  the_comp->massify();
+  the_comp->Massify();
   if(the_comp->count(tope) != 0) {
-    to_ret = the_comp->massFraction(tope)*mass(KG);
+    to_ret = the_comp->MassFraction(tope)*mass(KG);
   } else {
     to_ret = 0;
   }
@@ -263,7 +263,7 @@ double Material::mass(Iso tope){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double Material::convertFromKg(double mass, MassUnit to_unit) {
+double Material::ConvertFromKg(double mass, MassUnit to_unit) {
   double converted;
   switch( to_unit ) {
     case G :
@@ -279,7 +279,7 @@ double Material::convertFromKg(double mass, MassUnit to_unit) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double Material::convertToKg(double mass, MassUnit from_unit) {
+double Material::ConvertToKg(double mass, MassUnit from_unit) {
   double in_kg;
   switch( from_unit ) {
     case G :
@@ -295,18 +295,18 @@ double Material::convertToKg(double mass, MassUnit from_unit) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double Material::moles(){
+double Material::Moles(){
   double m_a_ratio = isoVector().comp()->mass_to_atom_ratio();
   return mass(G)/m_a_ratio;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-double Material::moles(Iso tope){
+double Material::Moles(Iso tope){
   double to_ret;
   CompMapPtr the_comp = isoVector().comp();
-  the_comp->atomify();
+  the_comp->Atomify();
   if(the_comp->count(tope) != 0) {
-    to_ret = moles()*isoVector().comp()->atomFraction(tope);
+    to_ret = Moles()*isoVector().comp()->AtomFraction(tope);
   } else {
     to_ret = 0;
   }
@@ -314,18 +314,18 @@ double Material::moles(Iso tope){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-CompMapPtr Material::unnormalizeComp(Basis basis, MassUnit unit){
+CompMapPtr Material::UnnormalizeComp(Basis basis, MassUnit unit){
   CompMapPtr norm_comp = isoVector().comp();
   double scaling;
 
   switch(basis) {
     case MASS :
-      norm_comp->massify();
+      norm_comp->Massify();
       scaling = this->mass(unit);
       break;
     case ATOM :
-      norm_comp->atomify();
-      scaling = this->moles();
+      norm_comp->Atomify();
+      scaling = this->Moles();
       break;
     default : 
       throw Error("The basis provided is not a supported CompMap basis");
@@ -342,12 +342,12 @@ CompMapPtr Material::unnormalizeComp(Basis basis, MassUnit unit){
 rsrc_ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
   rsrc_ptr mat(new Material(*this));
-  mat->setQuantity(this->quantity());
+  mat->SetQuantity(this->quantity());
   return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::checkQuality(rsrc_ptr other){
+bool Material::CheckQuality(rsrc_ptr other){
   
   // This will be false until proven true
   bool toRet = false;
@@ -368,33 +368,33 @@ bool Material::checkQuality(rsrc_ptr other){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::decay() {
+void Material::Decay() {
   int curr_time = TI->time();
   int delta_time = curr_time - last_update_time_;
 
-  isoVector().decay(delta_time);
+  isoVector().Decay(delta_time);
   last_update_time_ = curr_time;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::decayMaterials() {
+void Material::DecayMaterials() {
   for (std::list<Material*>::iterator mat = materials_.begin();
       mat != materials_.end();
       mat++){
-     (*mat)->decay();
+     (*mat)->Decay();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Material::isMaterial(rsrc_ptr rsrc)
+bool Material::IsMaterial(rsrc_ptr rsrc)
 {
   mat_rsrc_ptr cast = boost::dynamic_pointer_cast<Material>(rsrc);
   return !(cast.get() == 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::addToTable() {
-  Resource::addToTable();
-  iso_vector_.record();
+void Material::AddToTable() {
+  Resource::AddToTable();
+  iso_vector_.Record();
 }
 } // namespace cyclus

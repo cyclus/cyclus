@@ -14,7 +14,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubCommModel::StubCommModel() { 
-  setModelType("StubComm");
+  SetModelType("StubComm");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

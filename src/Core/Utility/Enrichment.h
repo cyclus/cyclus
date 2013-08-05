@@ -19,19 +19,19 @@ namespace enrichment {
        @return the feed assay as an atomic fraction, i.e. for
        0.711% U-235 in natural uranium, this will return 0.00711.
     */
-    double feed() const;
+    double Feed() const;
 
     /**
        @return the product assay as an atomic fraction, i.e. for
        3% U-235 in enriched uranium, this will return 0.03.
     */
-    double product() const;
+    double Product() const;
 
     /**
        @return the tails assay as an atomic fraction, i.e. for
        0.2% U-235 in depleted uranium, this will return 0.002.
     */
-    double tails() const;
+    double Tails() const;
 
   private:
     double feed_, product_, tails_;

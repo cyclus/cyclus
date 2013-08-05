@@ -17,9 +17,9 @@ TEST(SqliteDbTest, CreateAndInsert) {
 
   ASSERT_NO_THROW(db.open());
 
-  ASSERT_NO_THROW(db.execute("create table t1 (data1 TEXT, data2 TEXT);"));
-  ASSERT_NO_THROW(db.execute("insert into t1 (data1, data2) values ('hello', 'goodbye');"));
-  ASSERT_NO_THROW(result = db.query("select * from t1"));
+  ASSERT_NO_THROW(db.Execute("create table t1 (data1 TEXT, data2 TEXT);"));
+  ASSERT_NO_THROW(db.Execute("insert into t1 (data1, data2) values ('hello', 'goodbye');"));
+  ASSERT_NO_THROW(result = db.Query("select * from t1"));
   ASSERT_EQ(result.size(), 1);
   ASSERT_EQ(result.front().size(), 2);
   EXPECT_EQ(result.front().front(), "hello");
@@ -37,7 +37,7 @@ TEST(SqliteDbTest, OpenExistingAndRetrieve) {
 
   ASSERT_NO_THROW(db.open());
 
-  ASSERT_NO_THROW(result = db.query("select * from t1"));
+  ASSERT_NO_THROW(result = db.Query("select * from t1"));
   ASSERT_EQ(result.size(), 1);
   ASSERT_EQ(result.front().size(), 2);
   EXPECT_EQ(result.front().front(), "hello");
@@ -52,11 +52,11 @@ TEST(SqliteDbTest, Overwrite) {
   using cyclus::StrList;
   std::vector<StrList> result;
   SqliteDb db(path);
-  db.overwrite();
+  db.Overwrite();
 
   ASSERT_NO_THROW(db.open());
 
-  ASSERT_NO_THROW(result = db.query("select * from sqlite_master"));
+  ASSERT_NO_THROW(result = db.Query("select * from sqlite_master"));
   EXPECT_EQ(result.size(), 0);
 
   ASSERT_NO_THROW(db.close());

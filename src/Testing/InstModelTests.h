@@ -37,7 +37,7 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
     inst_model_ = new FakeInstModel();
     test_facility_ = new TestFacility();
     test_region_ = new TestRegion();
-    inst_model_->setParent(test_region_);
+    inst_model_->SetParent(test_region_);
     
   }
   virtual void TearDown(){ 

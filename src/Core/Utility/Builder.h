@@ -27,28 +27,28 @@ namespace action_building
        register a commodity producer with the manager
        @param producer the producer
      */
-    void registerProducer(supply_demand::CommodityProducer* producer);
+    void RegisterProducer(supply_demand::CommodityProducer* producer);
 
     /**
        unregister a commodity producer with the manager
        @param producer the producer
      */
-    void unRegisterProducer(supply_demand::CommodityProducer* producer);
+    void UnRegisterProducer(supply_demand::CommodityProducer* producer);
 
     /**
        @return the number of buildings managed by this builder
      */
-    double nBuildingPrototypes();
+    double NBuildingPrototypes();
     
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<supply_demand::CommodityProducer*>::iterator beginningProducer();
+    std::set<supply_demand::CommodityProducer*>::iterator BeginningProducer();
 
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<supply_demand::CommodityProducer*>::iterator endingProducer();
+    std::set<supply_demand::CommodityProducer*>::iterator EndingProducer();
 
   private:
     /// the set of managed producers

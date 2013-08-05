@@ -20,13 +20,13 @@ class SymbolicFunctionTests : public ::testing::Test
   virtual void SetUp();  
   virtual void TearDown();
 
-  void setUpPiecewiseEnvironment();
+  void SetUpPiecewiseEnvironment();
 
-  cyclus::FunctionPtr getLinFunction();
-  cyclus::FunctionPtr getExpFunction();
-  cyclus::FunctionPtr getPiecewiseFunction();
+  cyclus::FunctionPtr GetLinFunction();
+  cyclus::FunctionPtr GetExpFunction();
+  cyclus::FunctionPtr GetPiecewiseFunction();
 
-  double linear_value(double value);
-  double exp_value(double value);
-  double piecewise_value(double value, int index);
+  double Linear_value(double value);
+  double Exp_value(double value);
+  double Piecewise_value(double value, int index);
 };

@@ -6,7 +6,7 @@
 #include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngineTest::unknowncontent() {
+std::string XMLQueryEngineTest::Unknowncontent() {
   std::stringstream ss("");
   ss << "    <" << unknown_node_ << ">" << std::endl
      << "      <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << std::endl
@@ -15,20 +15,20 @@ std::string XMLQueryEngineTest::unknowncontent() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngineTest::subcontent() {
+std::string XMLQueryEngineTest::Subcontent() {
   std::stringstream ss("");
   ss  << "  <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << std::endl;
   return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLQueryEngineTest::getContent(std::stringstream &ss) {  
+void XMLQueryEngineTest::GetContent(std::stringstream &ss) {  
   ss << "<" << root_node_ << ">" << std::endl;
   for (int i = 0; i < ncontent_; i++) {
-    ss << subcontent();
+    ss << Subcontent();
   }
   ss << "  <" << inner_node_ << ">"  << std::endl
-     << unknowncontent()
+     << Unknowncontent()
      << "  </" << inner_node_ << ">" << std::endl
      << "</" << root_node_ << ">";
 }
@@ -51,59 +51,59 @@ void XMLQueryEngineTest::TearDown() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLQueryEngineTest::loadParser() {
+void XMLQueryEngineTest::LoadParser() {
   std::stringstream ss("");
-  getContent(ss);
+  GetContent(ss);
   //cout << ss.str() << std::endl;
   parser_ = new cyclus::XMLParser();
-  parser_->init(ss);
+  parser_->Init(ss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,constructor) {  
-  loadParser();
+  LoadParser();
   EXPECT_NO_THROW(cyclus::XMLQueryEngine engine(*parser_));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,top_level_queries) {  
-  loadParser();
+  LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
-  EXPECT_EQ(engine.nElements(),ninner_nodes_);
-  EXPECT_EQ(engine.nElementsMatchingQuery(content_node_),ncontent_);
-  EXPECT_EQ(engine.nElementsMatchingQuery(inner_node_),1);
-  EXPECT_EQ(engine.getElementName(),content_node_);
-  EXPECT_EQ(engine.getElementContent(content_node_),content_);
+  EXPECT_EQ(engine.NElements(),ninner_nodes_);
+  EXPECT_EQ(engine.NElementsMatchingQuery(content_node_),ncontent_);
+  EXPECT_EQ(engine.NElementsMatchingQuery(inner_node_),1);
+  EXPECT_EQ(engine.GetElementName(),content_node_);
+  EXPECT_EQ(engine.GetElementContent(content_node_),content_);
   for (int i = 0; i < ncontent_; i++) {
-    EXPECT_EQ(engine.getElementName(i),content_node_);
-    EXPECT_EQ(engine.getElementContent(content_node_,i),content_);
+    EXPECT_EQ(engine.GetElementName(i),content_node_);
+    EXPECT_EQ(engine.GetElementContent(content_node_,i),content_);
   }
-  EXPECT_EQ(engine.getElementName(ncontent_),inner_node_);
+  EXPECT_EQ(engine.GetElementName(ncontent_),inner_node_);
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,top_level_throws) {  
-  loadParser();
+  LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
-  EXPECT_THROW(engine.getElementContent(content_node_,ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.getElementContent(inner_node_), cyclus::ValueError);
-  EXPECT_THROW(engine.getElementName(ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.queryElement(content_node_,ninner_nodes_+1), cyclus::ValueError);  
+  EXPECT_THROW(engine.GetElementContent(content_node_,ninner_nodes_+1), cyclus::ValueError);
+  EXPECT_THROW(engine.GetElementContent(inner_node_), cyclus::ValueError);
+  EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
+  EXPECT_THROW(engine.QueryElement(content_node_,ninner_nodes_+1), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,mid_level_queries) {  
-  loadParser();
+  LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
-  EXPECT_NO_THROW(cyclus::QueryEngine* qe = engine.queryElement(inner_node_));
+  EXPECT_NO_THROW(cyclus::QueryEngine* qe = engine.QueryElement(inner_node_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,low_level_queries) {  
-  loadParser();
+  LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
-  cyclus::QueryEngine* qe = engine.queryElement(inner_node_);
-  EXPECT_EQ(qe->getElementName(),unknown_node_);
-  cyclus::QueryEngine* qe2 = qe->queryElement(unknown_node_);
-  EXPECT_EQ(qe2->getElementContent(content_node_),content_);
+  cyclus::QueryEngine* qe = engine.QueryElement(inner_node_);
+  EXPECT_EQ(qe->GetElementName(),unknown_node_);
+  cyclus::QueryEngine* qe2 = qe->QueryElement(unknown_node_);
+  EXPECT_EQ(qe2->GetElementContent(content_node_),content_);
 }

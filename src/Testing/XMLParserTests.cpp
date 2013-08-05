@@ -7,7 +7,7 @@
 using namespace std;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParserTests::fillSnippet(std::stringstream &ss) {
+void XMLParserTests::FillSnippet(std::stringstream &ss) {
   ss << "<" << outer_node_ << ">"
      << "<" << inner_node_ << ">" << inner_content_
      << "</" << inner_node_ << ">"
@@ -15,13 +15,13 @@ void XMLParserTests::fillSnippet(std::stringstream &ss) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParserTests::fillBadSnippet(std::stringstream &ss) {
+void XMLParserTests::FillBadSnippet(std::stringstream &ss) {
   ss << "<" << outer_node_ << ">"
      << "</" << outer_node_ << ">";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParserTests::fillSchema(std::stringstream &ss) {
+void XMLParserTests::FillSchema(std::stringstream &ss) {
   ss << "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\"" << std::endl
      << "datatypeLibrary=\"http://www.w3.org/2001/XMLSchema-datatypes\">" << std::endl
      << "  " << "<start>" << std::endl
@@ -47,29 +47,29 @@ void XMLParserTests::TearDown() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithoutSchema) {  
   std::stringstream snippet("");
-  fillSnippet(snippet);
+  FillSnippet(snippet);
   cyclus::XMLParser parser;
-  EXPECT_NO_THROW(parser.init(snippet));
+  EXPECT_NO_THROW(parser.Init(snippet));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithSchema) {
   std::stringstream snippet("");
-  fillSnippet(snippet);  
+  FillSnippet(snippet);  
   stringstream schema("");
-  fillSchema(schema);
+  FillSchema(schema);
   cyclus::XMLParser parser;
-  EXPECT_NO_THROW(parser.init(snippet));
-  EXPECT_NO_THROW(parser.validate(schema));
+  EXPECT_NO_THROW(parser.Init(snippet));
+  EXPECT_NO_THROW(parser.Validate(schema));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLParserTests,WithError) {
   stringstream snippet("");
-  fillBadSnippet(snippet);  
+  FillBadSnippet(snippet);  
   std::stringstream schema("");
-  fillSchema(schema);
+  FillSchema(schema);
   cyclus::XMLParser parser;
-  EXPECT_NO_THROW(parser.init(snippet));
-  EXPECT_THROW(parser.validate(schema), cyclus::ValidationError);
+  EXPECT_NO_THROW(parser.Init(snippet));
+  EXPECT_THROW(parser.Validate(schema), cyclus::ValidationError);
 } 

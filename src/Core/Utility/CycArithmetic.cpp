@@ -11,7 +11,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 double CycArithmetic::KahanSum(std::vector<double> input){
-  std::vector<double> sorted = sort_ascending(input);
+  std::vector<double> sorted = Sort_ascending(input);
   // http://en.wikipedia.org/wiki/Kahan_summation_algorithm
   double y, t;
   double sum = 0.0;
@@ -32,18 +32,18 @@ double CycArithmetic::KahanSum(std::vector<double> input){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<double> CycArithmetic::sort_ascending(std::vector<double> to_sort){
+std::vector<double> CycArithmetic::Sort_ascending(std::vector<double> to_sort){
   sort(to_sort.begin(), to_sort.end());
   return to_sort;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::vector<double> CycArithmetic::sort_ascending(std::map<int, double> to_sort){ 
+std::vector<double> CycArithmetic::Sort_ascending(std::map<int, double> to_sort){ 
   std::vector<double> vec_to_sort;
   std::map<int, double>::const_iterator it;
   for(it=to_sort.begin(); it!=to_sort.end(); ++it){
     vec_to_sort.push_back((*it).second);
   }
-  return sort_ascending(vec_to_sort);
+  return Sort_ascending(vec_to_sort);
 }
 } // namespace cyclus

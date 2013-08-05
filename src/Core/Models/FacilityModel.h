@@ -84,7 +84,7 @@ class FacilityModel : public TimeAgent, public Communicator,
      Initalize the FacilityModel from xml. Calls the init function. 
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void initCoreMembers(QueryEngine* qe);
+  virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
      prototypes are required to provide the capacity to copy their
@@ -96,13 +96,13 @@ class FacilityModel : public TimeAgent, public Communicator,
      Copy core members from a source model
      @param source the model to copy from
    */
-  void cloneCoreMembersFrom(FacilityModel* source);
+  void CloneCoreMembersFrom(FacilityModel* source);
 
   /**
      Copy module members from a source model
      @param source the model to copy from
    */
-  virtual void cloneModuleMembersFrom(FacilityModel* source)=0;
+  virtual void CloneModuleMembersFrom(FacilityModel* source)=0;
 
   /**
      every model should be able to print a verbose description 
@@ -122,7 +122,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      Each derived class must implement an offer/request receiver 
    */ 
-  virtual void receiveMessage(msg_ptr msg)=0;
+  virtual void ReceiveMessage(msg_ptr msg)=0;
 
 /* ------------------- */ 
 
@@ -172,79 +172,79 @@ class FacilityModel : public TimeAgent, public Communicator,
      set the build date
      @param current_time the current sim time
    */
-  void setBuildDate(int current_time);
+  void SetBuildDate(int current_time);
 
   /**
      set the decommission date
      @param time the time to be decommissioned
    */
-  void setDecommissionDate(int time);
+  void SetDecommissionDate(int time);
 
   /**
      decommissions the facility, default behavior is for the facility
      to delete itself
    */
-  virtual void decommission();
+  virtual void Decommission();
 
   /**
      facilities over write this method if a condition must be met 
      before their destructors can be called
    */
-  virtual bool checkDecommissionCondition();
+  virtual bool CheckDecommissionCondition();
 
  public:
   /**
      Sets the facility's name 
      @param facName is the new name of the facility 
    */
-  virtual void setFacName(std::string facName) { this->setName(facName); };
+  virtual void SetFacName(std::string facName) { this->SetName(facName); };
 
   /**
      Returns the facility's name 
      @return fac_name_ the name of this facility, a string 
    */
-  virtual std::string facName() { return this->name(); };
+  virtual std::string FacName() { return this->name(); };
 
   /**
      Sets this facility's instutution name 
      @param name the name of the institution associated with this 
    */
-  virtual void setInstName(std::string name){ inst_name_ = name;};
+  virtual void SetInstName(std::string name){ inst_name_ = name;};
 
   /**
      Returns this facility's institution 
      @return the institution assosicated with this facility 
    */
-  virtual InstModel* facInst();
+  virtual InstModel* FacInst();
 
   /**
      Sets the facility's lifetime 
      @param lifetime is the new lifetime of the facility in months 
    */
-  virtual void setFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
+  virtual void SetFacLifetime(int lifetime) { fac_lifetime_ = lifetime; };
 
   /**
      Returns the facility's lifetime     
      @return fac_lifetime_ the lifetime of this facility, an int, in 
    */
-  virtual int facLifetime() { return fac_lifetime_; };
+  virtual int FacLifetime() { return fac_lifetime_; };
   
   /**
      @return the input commodities
   */
-  std::vector<std::string> inputCommodities();
+  std::vector<std::string> InputCommodities();
 
   /**
      @return the output commodities
   */
-  std::vector<std::string> outputCommodities();
+  std::vector<std::string> OutputCommodities();
   
   /**
      @param time the time used to query whether it is past the 
      facility's decommission date
      @return true if the time is greater than the decommission date
    */
-  bool lifetimeReached(int time);
+  bool LifetimeReached(int time);
 
   /**
      Each facility is prompted to do its beginning-of-time-step 
@@ -252,7 +252,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time)=0;
+  virtual void HandleTick(int time)=0;
 
   /**
      Each facility is prompted to its end-of-time-step 
@@ -263,7 +263,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time)=0;
+  virtual void HandleTock(int time)=0;
 
   /**
      Each facility is prompted to do its daily tasks 
@@ -271,7 +271,7 @@ class FacilityModel : public TimeAgent, public Communicator,
      @param time is the number of months since the beginning of the 
      simulation @param day is the current day in this month 
    */
-  virtual void handleDailyTasks(int time, int day);
+  virtual void HandleDailyTasks(int time, int day);
 
   friend class InstModel;
 /* ------------------- */ 

@@ -41,24 +41,24 @@ TEST(SqliteBackTest, Regression) {
   FileDeleter fd(path);
   EventManager m;
   FlushCatcher back(path);
-  m.registerBackend(&back);
+  m.RegisterBackend(&back);
 
-  m.newEvent("DumbTitle")
-  ->addVal("animal", std::string("monkey"))
-  ->addVal("weight", 10)
-  ->addVal("height", 5.5)
-  ->addVal("data", cyclus::Blob("banana"))
-  ->record();
+  m.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("monkey"))
+  ->AddVal("weight", 10)
+  ->AddVal("height", 5.5)
+  ->AddVal("data", cyclus::Blob("banana"))
+  ->Record();
 
-  m.newEvent("DumbTitle")
-  ->addVal("animal", std::string("elephant"))
-  ->addVal("weight", 1000)
-  ->record();
+  m.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("elephant"))
+  ->AddVal("weight", 1000)
+  ->Record();
 
-  m.newEvent("DumbTitle")
-  ->addVal("animal", std::string("sea cucumber"))
-  ->addVal("height", 1.2)
-  ->record();
+  m.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("sea cucumber"))
+  ->AddVal("height", 1.2)
+  ->Record();
 
   m.close();
 

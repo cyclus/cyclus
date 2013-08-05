@@ -31,28 +31,28 @@ TEST(CsvBackTest, ReadWrite) {
 
   cyclus::EventManager m;
   cyclus::CsvBack back(path);
-  m.registerBackend(&back);
-  m.newEvent("DumbTitle")
-  ->addVal("animal", std::string("monkey"))
-  ->addVal("weight", 10)
-  ->addVal("height", 5.5)
-  ->record();
-  m.newEvent("DumbTitle")
-  ->addVal("animal", std::string("elephant"))
-  ->addVal("weight", 1000)
-  ->addVal("height", 7.2)
-  ->record();
+  m.RegisterBackend(&back);
+  m.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("monkey"))
+  ->AddVal("weight", 10)
+  ->AddVal("height", 5.5)
+  ->Record();
+  m.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("elephant"))
+  ->AddVal("weight", 1000)
+  ->AddVal("height", 7.2)
+  ->Record();
   m.close();
 
   // make sure append works
   cyclus::EventManager m2;
   cyclus::CsvBack back2(path);
-  m2.registerBackend(&back2);
-  m2.newEvent("DumbTitle")
-  ->addVal("animal", std::string("sea cucumber"))
-  ->addVal("weight", 1)
-  ->addVal("height", .4)
-  ->record();
+  m2.RegisterBackend(&back2);
+  m2.NewEvent("DumbTitle")
+  ->AddVal("animal", std::string("sea cucumber"))
+  ->AddVal("weight", 1)
+  ->AddVal("height", .4)
+  ->Record();
   m2.close();
 
   std::string sid1 = boost::lexical_cast<std::string>(m.sim_id());
@@ -93,10 +93,10 @@ TEST(CsvBackTest, Blob) {
 
   EventManager m;
   CsvBack back(path);
-  m.registerBackend(&back);
-  m.newEvent("Blobs")
-  ->addVal("data", data)
-  ->record();
+  m.RegisterBackend(&back);
+  m.NewEvent("Blobs")
+  ->AddVal("data", data)
+  ->Record();
   m.close();
 
   std::string fname = path + "/" + "Blobs.csv";

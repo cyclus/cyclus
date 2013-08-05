@@ -25,5 +25,5 @@ class MarketPlayerTests : public ::testing::Test {
  public:
   virtual void SetUp();
   virtual void TearDown();
-  void initPlayers();
+  void InitPlayers();
 };

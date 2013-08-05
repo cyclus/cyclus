@@ -17,12 +17,12 @@ LogLevel IsoVector::record_level_ = LEV_INFO3;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector() {
   CompMapPtr comp = CompMapPtr(new CompMap(MASS));
-  setComp(comp);
+  SetComp(comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(CompMapPtr comp) {
-  setComp(comp);
+  SetComp(comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -34,24 +34,24 @@ IsoVector::~IsoVector() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 IsoVector::IsoVector(const IsoVector& other) {
-  setComp(other.comp());
+  SetComp(other.comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector& IsoVector::operator= (IsoVector rhs) {
-  setComp(rhs.comp());
+  SetComp(rhs.comp());
   return *this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector& IsoVector::operator+= (const IsoVector& rhs) {
-  this->mix(rhs,1.0);
+  this->Mix(rhs,1.0);
   return *this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IsoVector& IsoVector::operator-= (const IsoVector& rhs) {
-  this->separate(rhs,1.0);
+  this->Separate(rhs,1.0);
   return *this;
 }
 
@@ -71,7 +71,7 @@ const IsoVector IsoVector::operator- (const IsoVector& rhs) const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool IsoVector::operator== (const IsoVector& rhs) const {
-  return compEquals(rhs);
+  return CompEquals(rhs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,13 +85,13 @@ CompMapPtr IsoVector::comp() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::massFraction(Iso tope) {
-  return composition_->massFraction(tope);
+double IsoVector::MassFraction(Iso tope) {
+  return composition_->MassFraction(tope);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double IsoVector::atomFraction(Iso tope) {
-  return composition_->atomFraction(tope);
+double IsoVector::AtomFraction(Iso tope) {
+  return composition_->AtomFraction(tope);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -100,8 +100,8 @@ void IsoVector::normalize() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::validate() {
-  composition_->validate();
+void IsoVector::Validate() {
+  composition_->Validate();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -110,41 +110,41 @@ void IsoVector::reset() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::print() {
+void IsoVector::Print() {
   CLOG(record_level_) << "This IsoVector manages: ";
-  composition_->print();
+  composition_->Print();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void IsoVector::record() {
-  RL->recordRecipe(composition_);
+void IsoVector::Record() {
+  RL->RecordRecipe(composition_);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double IsoVector::intersectionFraction(const IsoVector& other) {
+double IsoVector::IntersectionFraction(const IsoVector& other) {
   double fraction = 0;
   CompMapPtr other_comp = other.comp();
   for (CompMap::iterator it = other_comp->begin(); it 
          != other_comp->end(); it++) {
     if (composition_->count(it->first) > 0) {
-      fraction += massFraction(it->first);
+      fraction += MassFraction(it->first);
     }
   }
   return fraction;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEquals(const IsoVector& other) const {
-  return (compEquals(other.comp()));
+bool IsoVector::CompEquals(const IsoVector& other) const {
+  return (CompEquals(other.comp()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool IsoVector::compEquals(const CompMapPtr comp) const {
+bool IsoVector::CompEquals(const CompMapPtr comp) const {
   return (*composition_ == *comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::mix(const IsoVector& other, double ratio) {
+void IsoVector::Mix(const IsoVector& other, double ratio) {
   if (ratio < 0) { // check ratio
     std::stringstream ss("");
     ss << "Ratio: " << ratio << " is not in [0,inf).";
@@ -162,10 +162,10 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
       value = it->second;
     }
     else if (add_comp->basis() == MASS){ 
-      value = add_comp->massFraction(it->first);
+      value = add_comp->MassFraction(it->first);
     }
     else {
-      value = add_comp->atomFraction(it->first);
+      value = add_comp->AtomFraction(it->first);
     }
     value *= ratio; // adjust value
     // add it
@@ -176,16 +176,16 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
       (*new_comp)[it->first] = value;
     }
   }
-  setComp(new_comp);
+  SetComp(new_comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::mix(const IsoVectorPtr& p_other, double ratio) {
-  mix(*p_other,ratio);
+void IsoVector::Mix(const IsoVectorPtr& p_other, double ratio) {
+  Mix(*p_other,ratio);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::separate(const IsoVector& other, double efficiency) {  
+void IsoVector::Separate(const IsoVector& other, double efficiency) {  
   if (efficiency > 1.0 || efficiency < 0) {  // check efficiency
     std::stringstream ss("");
     ss << "Efficiency: " << efficiency << " is not in [0,1].";
@@ -205,39 +205,39 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
       }
     }
   }
-  setComp(new_comp);
+  SetComp(new_comp);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::separate(const IsoVectorPtr& p_other, double efficiency) {
-  separate(*p_other,efficiency);
+void IsoVector::Separate(const IsoVectorPtr& p_other, double efficiency) {
+  Separate(*p_other,efficiency);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::decay(int time) {
+void IsoVector::Decay(int time) {
   CompMapPtr parent = composition_;
   CompMapPtr root = parent->root_comp();
   CompMapPtr child;
 
-  if (root->recorded()) { 
+  if (root->Recorded()) { 
     int t_f = parent->root_decay_time() + time;
-    if (RL->childRecorded(parent, t_f)) {
+    if (RL->ChildRecorded(parent, t_f)) {
       child = RL->Child(parent, t_f);
     }
     else {
-      child = executeDecay(parent, time); // do decay and record it
-      RL->recordRecipeDecay(parent, child, t_f);
+      child = ExecuteDecay(parent, time); // do decay and record it
+      RL->RecordRecipeDecay(parent, child, t_f);
     }
   }
   else {
-    child = executeDecay(parent, time); // just do decay
+    child = ExecuteDecay(parent, time); // just do decay
   }
-  child->change_basis(parent->basis());
-  setComp(child);
+  child->Change_basis(parent->basis());
+  SetComp(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void IsoVector::setComp(CompMapPtr comp) {
+void IsoVector::SetComp(CompMapPtr comp) {
   if (!comp->normalized()) {
     comp->normalize();
   }
@@ -245,13 +245,13 @@ void IsoVector::setComp(CompMapPtr comp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMapPtr IsoVector::executeDecay(CompMapPtr parent, int time) {
+CompMapPtr IsoVector::ExecuteDecay(CompMapPtr parent, int time) {
   double months_per_year = 12;
   double years = double(time) / months_per_year;
   DecayHandler handler;
-  parent->atomify();
-  handler.setComp(parent); // handler will not change parent's map
-  handler.decay(years);
+  parent->Atomify();
+  handler.SetComp(parent); // handler will not change parent's map
+  handler.Decay(years);
   CompMapPtr child = handler.comp();
   child->parent_ = parent;
   child->decay_time_ = time;

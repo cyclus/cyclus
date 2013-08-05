@@ -37,14 +37,14 @@ class Event {
     @warning for the val argument - what variable types are supported
     depends on what the backend(s) in use are designed to handle.
     */
-    Event* addVal(const char* field, boost::spirit::hold_any val);
+    Event* AddVal(const char* field, boost::spirit::hold_any val);
 
     /*!
     Record this event to its EventManager. Recorded events of the same
     title (e.g. same table) must not contain any fields that were not
     present in the first event recorded of that title.
     */
-    void record();
+    void Record();
 
     /// Returns the event's title as specified during the event's creation.
     std::string title();

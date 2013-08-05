@@ -7,7 +7,7 @@ class SubMaterial : public cyclus::Material {
   public:
     std::vector<int> decay_times;
 
-    virtual void decay() {
+    virtual void Decay() {
       decay_times.push_back(cyclus::TI->time());
     }
 };
@@ -22,8 +22,8 @@ TEST(DecayTest, DISABLED_GlobalFreq) {
 
   int decay_interval = 3;
   int duration = 20;
-  cyclus::TI->initialize(duration, 1, 2010, 0, decay_interval);
-  cyclus::TI->runSim();
+  cyclus::TI->Initialize(duration, 1, 2010, 0, decay_interval);
+  cyclus::TI->RunSim();
 
   EXPECT_EQ(mat.decay_times.size(), duration / decay_interval);
 
@@ -44,14 +44,14 @@ TEST(DecayTest, DISABLED_MaterialDeltaTracking) {
   // object.
   int times[5] = {0, 19, 30, 37, 49};
 
-  cyclus::TI->initialize(times[0], 1, 2010, 0, 0);
+  cyclus::TI->Initialize(times[0], 1, 2010, 0, 0);
   cyclus::Material mat;
 
   for (int i = 1; i < 5; i++) {
     int curr_time = times[i];
-    cyclus::TI->initialize(times[i], 1, 2010, 0, 0);
-    cyclus::TI->runSim();
-    mat.decay();
+    cyclus::TI->Initialize(times[i], 1, 2010, 0, 0);
+    cyclus::TI->RunSim();
+    mat.Decay();
     int exp_delta = times[i] - times[i-1];
     EXPECT_EQ(mat.isoVector().comp()->decay_time(), exp_delta);
   }

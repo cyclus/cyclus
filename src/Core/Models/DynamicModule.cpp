@@ -14,7 +14,7 @@ namespace fs = boost::filesystem;
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const std::string DynamicModule::suffix() {
+const std::string DynamicModule::Suffix() {
   return SUFFIX;
 }
 
@@ -26,30 +26,30 @@ DynamicModule::DynamicModule(std::string type, std::string name) :
 {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::initialize() {
-  setPath();
-  openLibrary();
-  setConstructor();
-  setDestructor();
+void DynamicModule::Initialize() {
+  SetPath();
+  OpenLibrary();
+  SetConstructor();
+  SetDestructor();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::setPath() {
-  std::string lib_name = "lib" + module_name_ + suffix();
+void DynamicModule::SetPath() {
+  std::string lib_name = "lib" + module_name_ + Suffix();
   fs::path p;
-  if (!Env::findModuleLib(lib_name, p)) {
+  if (!Env::FindModuleLib(lib_name, p)) {
     throw IOError("Could not find library: " + lib_name);
   }
   abs_path_ = p.string();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* DynamicModule::constructInstance() {
+Model* DynamicModule::ConstructInstance() {
   return constructor_();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::destructInstance(Model* model) {
+void DynamicModule::DestructInstance(Model* model) {
   destructor_(model);
 }
 
@@ -61,7 +61,7 @@ std::string DynamicModule::name() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string DynamicModule::path() {
   if (abs_path_.length() == 0) {
-    setPath();
+    SetPath();
   }
   return abs_path_;
 }

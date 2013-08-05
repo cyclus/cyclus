@@ -8,7 +8,7 @@ MarketPlayerManager::MarketPlayerManager() {
 }
 
 // -------------------------------------------------------------------
-void MarketPlayerManager::setCommodity(Commodity& commod) {
+void MarketPlayerManager::SetCommodity(Commodity& commod) {
   commod_ = &commod;
 }
 
@@ -18,21 +18,21 @@ Commodity MarketPlayerManager::commodity() {
 }
 
 // -------------------------------------------------------------------
-void MarketPlayerManager::playerEnteringMarket(MarketPlayer* m) {
+void MarketPlayerManager::PlayerEnteringMarket(MarketPlayer* m) {
   players_.insert(m);
 }
 
 // -------------------------------------------------------------------
-void MarketPlayerManager::playerLeavingMarket(MarketPlayer* m) {
+void MarketPlayerManager::PlayerLeavingMarket(MarketPlayer* m) {
     players_.erase(m);
 }
 
 // -------------------------------------------------------------------
-double MarketPlayerManager::playerProductionCapacity() {
+double MarketPlayerManager::PlayerProductionCapacity() {
   double value = 0;
   std::set<MarketPlayer*>::iterator it;
   for (it = players_.begin(); it != players_.end(); it++) {
-    value += (*it)->productionCapacity(*commod_);
+    value += (*it)->ProductionCapacity(*commod_);
   }
   return value;
 }

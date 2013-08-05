@@ -86,35 +86,35 @@ class CommodityInformation {
   commodity_(commodity), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
 
   /// supply
-  double supply() {return supply_;}
+  double Supply() {return supply_;}
 
   /**
      increase the supply by an amount
      @param amt the amount in the unit characteristic to the commodity
    */ 
-  void increaseSupply(double amt) {supply_ += amt;}
+  void IncreaseSupply(double amt) {supply_ += amt;}
 
   /**
      decrease the supply by an amount
      @param amt the amount in the unit characteristic to the commodity
    */ 
-  void decreaseSupply(double amt) {supply_ -= amt;}
+  void DecreaseSupply(double amt) {supply_ -= amt;}
 
   /**
      the demand function
    */
-  FunctionPtr demandFunction() {return demand_;}
+  FunctionPtr DemandFunction() {return demand_;}
 
   /**
      the demand at a given time
      @param time the time
    */
-  double demand(int time) {return demand_->value(time);}
+  double Demand(int time) {return demand_->value(time);}
   
   /**
      @return the number of producers
   */
-  int nProducers() {return producers_.size();}
+  int NProducers() {return producers_.size();}
   
   /**
      a pointer to a producer
@@ -126,7 +126,7 @@ class CommodityInformation {
      register producer of a commodity
      @param p the commodity
   */
-  void registerProducer(const Producer& p) {producers_.push_back(Producer(p));}
+  void RegisterProducer(const Producer& p) {producers_.push_back(Producer(p));}
   
  private:
   /// the commodity

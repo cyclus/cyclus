@@ -34,7 +34,7 @@ class TestBack : public cyclus::EventBackend {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(EventManagerTest, Manager_NewEvent) {
   cyclus::EventManager m;
-  cyclus::Event* ev = m.newEvent("DumbTitle");
+  cyclus::Event* ev = m.NewEvent("DumbTitle");
   EXPECT_EQ(ev->title(), "DumbTitle");
 }
 
@@ -62,8 +62,8 @@ TEST(EventManagerTest, Manager_Closing) {
   EventManager m;
   TestBack back1;
   TestBack back2;
-  m.registerBackend(&back1);
-  m.registerBackend(&back2);
+  m.RegisterBackend(&back1);
+  m.RegisterBackend(&back2);
 
   ASSERT_FALSE(back1.closed);
   ASSERT_FALSE(back2.closed);
@@ -81,18 +81,18 @@ TEST(EventManagerTest, Manager_Buffering) {
 
   EventManager m;
   m.set_dump_count(2);
-  m.registerBackend(&back1);
+  m.RegisterBackend(&back1);
 
-  m.newEvent("DumbTitle")
-   ->addVal("animal", std::string("monkey"))
-   ->record();
+  m.NewEvent("DumbTitle")
+   ->AddVal("animal", std::string("monkey"))
+   ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
-  m.newEvent("DumbTitle")
-   ->addVal("animal", std::string("elephant"))
-   ->record();
+  m.NewEvent("DumbTitle")
+   ->AddVal("animal", std::string("elephant"))
+   ->Record();
 
   EXPECT_EQ(back1.flush_count, 2);
   EXPECT_EQ(back1.notify_count, 1);
@@ -105,11 +105,11 @@ TEST(EventManagerTest, Manager_CloseFlushing) {
 
   EventManager m;
   m.set_dump_count(2);
-  m.registerBackend(&back1);
+  m.RegisterBackend(&back1);
 
-  m.newEvent("DumbTitle")
-   ->addVal("animal", std::string("monkey"))
-   ->record();
+  m.NewEvent("DumbTitle")
+   ->AddVal("animal", std::string("monkey"))
+   ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
@@ -127,14 +127,14 @@ TEST(EventManagerTest, Event_record) {
   TestBack back;
   EventManager m;
   m.set_dump_count(1);
-  m.registerBackend(&back);
+  m.RegisterBackend(&back);
 
-  Event* ev = m.newEvent("DumbTitle");
-  ev->addVal("animal", std::string("monkey"));
+  Event* ev = m.NewEvent("DumbTitle");
+  ev->AddVal("animal", std::string("monkey"));
 
   EXPECT_EQ(back.flush_count, 0);
 
-  ev->record();
+  ev->Record();
 
   EXPECT_EQ(back.flush_count, 1);
 }
@@ -145,13 +145,13 @@ TEST(EventManagerTest, Event_addVal) {
   using cyclus::EventManager;
   TestBack back;
   EventManager m;
-  m.registerBackend(&back);
+  m.RegisterBackend(&back);
 
-  cyclus::Event* ev = m.newEvent("DumbTitle");
-  ev->addVal("animal", std::string("monkey"));
-  ev->addVal("weight", 10);
-  ev->addVal("height", 5.5);
-  ev->record();
+  cyclus::Event* ev = m.NewEvent("DumbTitle");
+  ev->AddVal("animal", std::string("monkey"));
+  ev->AddVal("weight", 10);
+  ev->AddVal("height", 5.5);
+  ev->Record();
 
   ASSERT_EQ(ev->vals().size(), 4);
 
