@@ -1,10 +1,10 @@
 #include "variable_tests.h"
 
+#include <gtest/gtest.h>
+
 #include <string>
 
 #include "boost/any.hpp"
-
-#include <gtest/gtest.h>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(VariableTests, constructors) {
