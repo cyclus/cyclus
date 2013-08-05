@@ -12,10 +12,14 @@ typedef CbcModel CoinCbcModel;
 
 namespace cyclus {
 namespace cyclopts {
-/// the coin branch-and-cut solver
+/// the coin branch-and-cut solver, see https://projects.coin-or.org/Cbc.
 class CBCSolver : public Solver {
  public:
-  /// solve an MIP
+  /// Solve an Mixed-Integer Program.
+  /// @param variables A container of variables. The solution is preserved in
+  /// the value() member.
+  /// @param obj A pointer to the objective function.
+  /// @param constraints A container of pointers to the problem's constraints.
   virtual void Solve(std::vector<cyclus::cyclopts::VariablePtr>& variables, 
                      cyclus::cyclopts::ObjFuncPtr obj, 
                      std::vector<cyclus::cyclopts::ConstraintPtr>& constraints);

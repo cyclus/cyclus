@@ -10,7 +10,7 @@
 #include "cyclopts/variable.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CycloptsIntegrationTests, SimpleIP) {
+TEST(CBCSolverTests, SimpleIP) {
   // usings
   using boost::any_cast;
   using cyclus::cyclopts::SolverPtr;
