@@ -99,7 +99,6 @@ enterSimulation
 enterSimulationAsCoreEntity
 enterSimulationAsModule
 envDelimiter
-erase
 execute
 executeDecay
 exp_value

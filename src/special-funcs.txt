@@ -4,6 +4,8 @@
 
 begin()
 
+erase()
+
 end()
 
 size()
