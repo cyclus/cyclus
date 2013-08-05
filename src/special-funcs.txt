@@ -20,3 +20,4 @@ empty() : CompMap , ResourceBuff , boost::spirit::basic_hold_any< Char >
 reset() : Timer , boost::spirit::basic_hold_any< Char > , IsoVector
 type() : GenericResource , boost::spirit::basic_hold_any< Char > , Resource , Material
 normalize
+diff
