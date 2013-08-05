@@ -1,0 +1,21 @@
+///////////////////////////////////////////////
+////////////////// Special ////////////////////
+///////////////////////////////////////////////
+
+begin()
+
+end()
+
+size()
+
+str()
+
+open()
+
+clone() : boost::spirit::detail::fxns< mpl::false_ >::type< T, Char > , Prototype , TestFacility , FacilityModel , Message , Transaction , GenericResource , Material , Resource , boost::spirit::detail::fxns< mpl::true_ >::type< T, Char >
+
+empty() : CompMap , ResourceBuff , boost::spirit::basic_hold_any< Char >
+
+reset() : Timer , boost::spirit::basic_hold_any< Char > , IsoVector
+
+type() : GenericResource , boost::spirit::basic_hold_any< Char > , Resource , Material
