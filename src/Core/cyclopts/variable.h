@@ -22,34 +22,39 @@ class Variable {
   /// enum for possible types
   enum VarType {INT, LINEAR};
 
-  /// constructor, sets id_, lbound_, ubound_
+  /// constructor
+  /// @param l the lower bound
+  /// @param u the upper bound
+  /// @param the variable type
   Variable(Bound l, Bound u, VarType t);
 
   /// virtual destructor for a base class
   virtual ~Variable() {};
 
-  /// id getter
+  /// @return the variable's id
   int id();
 
-  /// get value
+  /// @return variable type
   VarType type();
 
-  /// lbound getter
+  /// @return lower bound type
   Bound lbound();
 
-  /// ubound getter
+  /// @return upper bound type
   Bound ubound();
 
-  /// get name
+  /// @return name
   std::string name();
 
   /// set name
+  /// @param name the name
   void set_name(std::string name);
 
-  /// get value
+  /// @return value
   boost::any value();
 
   /// set value
+  /// @param v the value
   void set_value(boost::any v);
 
  private:
@@ -78,22 +83,30 @@ class Variable {
 /// derived class for linear variables
 class LinearVariable : public Variable {
  public:
-  /// constructor for bounds NEG_INF : INF
+  /// constructor
+  /// @param lb the non-finite lower bound type
+  /// @param ub the non-finite upper bound type
   LinearVariable(Bound lb, Bound ub);
 
-  /// constructor for bounds FINITE : INF
+  /// constructor 
+  /// @param lb_val the value of the finite lower bound
+  /// @param ub the non-finite upper bound type
   LinearVariable(double lb_val, Bound ub);
 
-  /// constructor for NEG_INF : FINITE
+  /// constructor 
+  /// @param lb the non-finite lower bound type
+  /// @param ub_val the value of the finite upper bound
   LinearVariable(Bound lb, double ub_val);
 
-  /// constructor for FINITE : FINITE
+  /// constructor 
+  /// @param lb_val the value of the non-finite lower bound
+  /// @param ub_val the value of the non-finite upper bound
   LinearVariable(double lb_val, double ub_val);
 
-  /// lBound value getter
+  /// @return lower bound value
   double lbound_val();
 
-  /// uBound value getter
+  /// @return upper bound value
   double ubound_val();
 
  private:
@@ -107,22 +120,30 @@ class LinearVariable : public Variable {
 /// derived class for integer variables
 class IntegerVariable : public Variable {
  public:
-  /// constructor for bounds NEG_INF : INF
+  /// constructor
+  /// @param lb the non-finite lower bound type
+  /// @param ub the non-finite upper bound type
   IntegerVariable(Bound lb, Bound ub);
 
-  /// constructor for bounds FINITE : INF
-  IntegerVariable(int lb_val, Bound ub);  
+  /// constructor 
+  /// @param lb_val the value of the finite lower bound
+  /// @param ub the non-finite upper bound type
+  IntegerVariable(int lb_val, Bound ub);
 
-  /// constructor for NEG_INF : FINITE
+  /// constructor 
+  /// @param lb the non-finite lower bound type
+  /// @param ub_val the value of the finite upper bound
   IntegerVariable(Bound lb, int ub_val);
 
-  /// constructor for FINITE : FINITE
-  IntegerVariable(int lb_val, int ub_val);    
+  /// constructor 
+  /// @param lb_val the value of the non-finite lower bound
+  /// @param ub_val the value of the non-finite upper bound
+  IntegerVariable(int lb_val, int ub_val);
 
-  /// lBound value getter
+  /// @return lower bound value
   int lbound_val();
 
-  /// uBound value getter
+  /// @return upper bound value
   int ubound_val();
 
  private:

@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 
+#include "cyclopts/limits.h"
+
 // -----------------------------------------------------------------------------
 int cyclus::cyclopts::Variable::next_id_ = 0;
 
@@ -59,28 +61,28 @@ boost::any cyclus::cyclopts::Variable::value() {
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, Bound ub)
-    : Variable(lb,ub,LINEAR),
-      lbound_val_(0.0),
-      ubound_val_(0.0) 
+    : Variable(lb, ub, LINEAR),
+      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
+      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, Bound ub)
-    : Variable(FINITE,ub,LINEAR),
+    : Variable(FINITE, ub, LINEAR),
       lbound_val_(lb_val),
-      ubound_val_(0.0) 
+      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, double ub_val)
-    : Variable(lb,FINITE,LINEAR),
-      lbound_val_(0.0),
+    : Variable(lb, FINITE, LINEAR),
+      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, double ub_val)
-    : Variable(FINITE,FINITE,LINEAR),
+    : Variable(FINITE, FINITE, LINEAR),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { }
@@ -97,28 +99,28 @@ double cyclus::cyclopts::LinearVariable::ubound_val() {
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, Bound ub)
-    : Variable(lb,ub,INT),
-      lbound_val_(0),
-      ubound_val_(0) 
+    : Variable(lb, ub, INT),
+      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
+      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, Bound ub)
-    : Variable(FINITE,ub,INT),
+    : Variable(FINITE, ub, INT),
       lbound_val_(lb_val),
-      ubound_val_(0) 
+      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, int ub_val)
-    : Variable(lb,FINITE,INT),
-      lbound_val_(0),
+    : Variable(lb, FINITE, INT),
+      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, int ub_val)
-    : Variable(FINITE,FINITE,INT),
+    : Variable(FINITE, FINITE, INT),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { } 
