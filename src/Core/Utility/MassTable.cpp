@@ -7,7 +7,7 @@
 #include "SqliteDb.h"
 
 #include "Env.h"
-#include "CycException.h"
+#include "error.h"
 
 namespace cyclus {
 

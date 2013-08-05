@@ -1,7 +1,7 @@
 // IsoVector.cpp
 #include "IsoVector.h"
 
-#include "CycException.h"
+#include "error.h"
 #include "Logger.h"
 #include "DecayHandler.h"
 #include "RecipeLibrary.h"
@@ -148,7 +148,7 @@ void IsoVector::mix(const IsoVector& other, double ratio) {
   if (ratio < 0) { // check ratio
     std::stringstream ss("");
     ss << "Ratio: " << ratio << " is not in [0,inf).";
-    throw CycRangeException(ss.str());
+    throw ValueError(ss.str());
   }
   // get base comp and comp to add
   CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_)); // copy
@@ -189,7 +189,7 @@ void IsoVector::separate(const IsoVector& other, double efficiency) {
   if (efficiency > 1.0 || efficiency < 0) {  // check efficiency
     std::stringstream ss("");
     ss << "Efficiency: " << efficiency << " is not in [0,1].";
-    throw CycRangeException(ss.str());
+    throw ValueError(ss.str());
   }
   CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_));
   CompMapPtr remove_comp = other.comp();

@@ -6,7 +6,7 @@
 #include <dlfcn.h>
 
 #include "suffix.h"
-#include "CycException.h"
+#include "error.h"
 
 namespace cyclus {
 
@@ -17,7 +17,7 @@ void DynamicModule::openLibrary() {
   if (!module_library_) {
     std::string err_msg = "Unable to load model shared object file: ";
     err_msg  += dlerror();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
   dlerror(); // reset errors
@@ -32,7 +32,7 @@ void DynamicModule::setConstructor() {
   if (!constructor_) {
     std::string err_msg = "Unable to load module constructor: ";
     err_msg  += dlerror();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
   dlerror(); // reset errors
@@ -46,7 +46,7 @@ void DynamicModule::setDestructor() {
   if (!destructor_) {
     std::string err_msg = "Unable to load module destructor: ";
     err_msg  += dlerror();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
   dlerror(); // reset errors
@@ -59,7 +59,7 @@ void DynamicModule::closeLibrary() {
     if (exit_code != 0)  {
       std::string err_msg = "Error closing shared object file: ";
       err_msg  += dlerror();
-      throw CycIOException(err_msg);
+      throw IOError(err_msg);
     }  
     dlerror(); // reset errors
   }

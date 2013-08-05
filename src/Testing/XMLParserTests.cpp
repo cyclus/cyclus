@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "XMLParserTests.h"
+#include "error.h"
 #include <iostream>
 
 using namespace std;
@@ -70,5 +71,5 @@ TEST_F(XMLParserTests,WithError) {
   fillSchema(schema);
   cyclus::XMLParser parser;
   EXPECT_NO_THROW(parser.init(snippet));
-  EXPECT_THROW(parser.validate(schema), cyclus::CycLoadXMLException);
+  EXPECT_THROW(parser.validate(schema), cyclus::ValidationError);
 } 

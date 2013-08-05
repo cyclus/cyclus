@@ -11,7 +11,7 @@
 
 #include "Model.h"
 #include "Timer.h"
-#include "CycException.h"
+#include "error.h"
 #include "Env.h"
 #include "Logger.h"
 #include "XMLFileLoader.h"
@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
   using cyclus::SqliteBack;
   using cyclus::CsvBack;
   using cyclus::XMLFileLoader;
-  using cyclus::CycException;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
@@ -128,7 +127,7 @@ int main(int argc, char* argv[]) {
     loader.load_control_parameters();
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
-  } catch (CycException e) {
+  } catch (cyclus::Error e) {
     success = false;
     CLOG(LEV_ERROR) << e.what();
   }
@@ -139,7 +138,7 @@ int main(int argc, char* argv[]) {
     if (vm.count("output-path")){
       output_path = vm["output-path"].as<std::string>();
     }
-  } catch (CycException ge) {
+  } catch (cyclus::Error ge) {
     success = false;
     CLOG(LEV_ERROR) << ge.what();
   }
@@ -164,7 +163,7 @@ int main(int argc, char* argv[]) {
   // Run the simulation 
   try {
     TI->runSim();
-  } catch (CycException err) {
+  } catch (cyclus::Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
   // Close Dynamically loaded modules 
   try {
     Model::unloadModules();
-  } catch (cyclus::CycException err) {
+  } catch (cyclus::Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }

@@ -9,6 +9,7 @@
  */
 
 #include "RelaxNGValidator.h"
+#include "error.h"
 #include <libxml/xmlerror.h>
 
 namespace cyclus {
@@ -26,7 +27,7 @@ void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
   release_underlying(); // Free any existing info
   schema_ = xmlRelaxNGParse( context );
   if ( !schema_ )
-   throw CycParseException("Schema could not be parsed");
+   throw ValidationError("Schema could not be parsed");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -52,27 +53,27 @@ void RelaxNGValidator::release_underlying() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool RelaxNGValidator::validate(const xmlpp::Document* doc) {
   if (!doc)
-    throw CycValidityException("Document pointer cannot be 0");
+    throw ValidationError("Document pointer cannot be 0");
 
   if (!schema_)
-    throw CycValidityException("Must have a schema to validate document");
+    throw ValidationError("Must have a schema to validate document");
 
   // A context is required at this stage only
   if (!valid_context_)
     valid_context_ = xmlRelaxNGNewValidCtxt( schema_ );
 
   if(!valid_context_)
-    throw CycValidityException("Couldn't create validating context");
+    throw ValidationError("Couldn't create validating context");
   
   int res;
   try {
     res = xmlRelaxNGValidateDoc( valid_context_, (xmlDocPtr)doc->cobj() );
   } catch (xmlError e) {
-    throw CycValidityException(e.message);
+    throw ValidationError(e.message);
   }
   
   if(res != 0)
-    throw CycValidityException("Document failed schema validation");
+    throw ValidationError("Document failed schema validation");
 
   return res;
 }

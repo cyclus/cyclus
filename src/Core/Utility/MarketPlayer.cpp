@@ -1,5 +1,8 @@
 #include "MarketPlayer.h"
 
+#include <sstream>
+#include "error.h"
+
 namespace cyclus {
 
 // -------------------------------------------------------------------
@@ -37,7 +40,7 @@ void MarketPlayer::registerManager(MarketPlayerManager* m,
     std::stringstream ss("");
     ss << "Cannot register a manager of " << m->commodity().name() 
        << " with the commodity: " << commod.name();
-    throw CycCommodityMismatchError(ss.str());
+    throw ValueError(ss.str());
   }
   mi->second.push_back(m);
 }
@@ -85,6 +88,6 @@ void MarketPlayer::throwRegistrationException(Commodity& commod) {
   std::stringstream ss ("");
   ss << "Commodity " << commod.name() << " is not registered with "
      << " this MarketPlayer.";
-  throw CycKeyException(ss.str());
+  throw KeyError(ss.str());
 }
 } // namespace cyclus

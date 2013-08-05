@@ -1,6 +1,6 @@
 #include "Builder.h"
 
-#include "CycException.h"
+#include "error.h"
 
 
 //using namespace SupplyDemand;
@@ -19,7 +19,7 @@ Builder::~Builder() {}
 void Builder::registerProducer(SupplyDemand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
-      throw CycDoubleRegistrationException("A builder is trying to register a producer twice.");
+      throw KeyError("A builder is trying to register a producer twice.");
     }
   else
     {
@@ -31,7 +31,7 @@ void Builder::registerProducer(SupplyDemand::CommodityProducer* producer) {
 void Builder::unRegisterProducer(SupplyDemand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
-      throw CycNotRegisteredException("A builder is trying to unregister a producer not originally registered with it.");
+      throw KeyError("A builder is trying to unregister a producer not originally registered with it.");
     }
   else
     {

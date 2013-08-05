@@ -1,7 +1,7 @@
 #include "Prototype.h"
 
 #include "Model.h"
-#include "CycException.h"
+#include "error.h"
 #include <utility>
 
 namespace cyclus {
@@ -18,7 +18,7 @@ void Prototype::registerPrototype(std::string name, Prototype* p) {
 Prototype* Prototype::getRegisteredPrototype(std::string name) {
   std::map<std::string, Prototype*>::iterator it = prototype_registry_.find(name);
   if (it == prototype_registry_.end()) {
-    throw CycKeyException(name + "is not a registered prototype.");
+    throw KeyError(name + "is not a registered prototype.");
   }
   return it->second;
 }

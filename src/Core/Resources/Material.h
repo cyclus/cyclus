@@ -257,7 +257,7 @@ public:
      @param vec the map of isos and amounts to which to apply the threshold
      @param threshold the smallest value considered nonzero
      
-     @throws CycNegValueException if the threshold provided is negative.
+     @throws CycNegValueError if the threshold provided is negative.
      @returns to_ret, the vector less elements whose abs(val) is less than threshhold
      */
   virtual std::map<Iso, double> applyThreshold(std::map<Iso, double> vec, double threshold);
@@ -272,7 +272,7 @@ public:
      @param unit the MassUnit to do the extraction operation in. Default is KG. 
      @param threshold is the smallest amount considered negligible in this extraction.
 
-     @throws CycNegativeValueException for overextraction events
+     @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object
    */
   virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
@@ -283,7 +283,7 @@ public:
      material object with the same isotopic ratios. 
       
      @param mass the amount (mass) of material that will be removed 
-     @throws CycNegativeValueException for overextraction events
+     @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object 
    */
   virtual mat_rsrc_ptr extract(double mass);

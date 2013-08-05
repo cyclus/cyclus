@@ -1,6 +1,7 @@
-#include <sstream>
-#include "CycLimits.h"
 #include "Enrichment.h"
+#include "CycLimits.h"
+#include "error.h"
+#include <sstream>
 
 namespace cyclus {
 
@@ -72,14 +73,14 @@ double enrichment::value_func(double frac) {
     std::stringstream msg;
     msg << "The provided fraction (" << frac 
         << ") is lower than the acceptable range.";
-    throw CycRangeException(msg.str());
+    throw ValueError(msg.str());
   }
   
   if (frac >= 1) {
     std::stringstream msg;
     msg << "The provided fraction (" << frac 
         << ") is higher than the acceptable range.";
-    throw CycRangeException(msg.str());
+    throw ValueError(msg.str());
   }
   
   return (1-2*frac)*log(1/frac - 1);

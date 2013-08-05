@@ -6,6 +6,7 @@
 #include <set>
 #include <iostream>
 #include "Model.h"
+#include "error.h"
 #include "DynamicModule.h"
 
 using namespace std;
@@ -150,7 +151,7 @@ TEST_F(XMLFileLoaderTests,openfile) {
 TEST_F(XMLFileLoaderTests,throws) {
   using cyclus::XMLFileLoader;
   XMLFileLoader file("blah");
-  EXPECT_THROW(file.init(false), cyclus::CycIOException);
+  EXPECT_THROW(file.init(false), cyclus::IOError);
 }
 
 TEST_F(XMLFileLoaderTests,control) {

@@ -5,14 +5,7 @@
 #include <string>
 #include "boost/filesystem.hpp"
 
-#include "CycException.h"
-
 namespace cyclus {
-
-class CycNoEnvVarException: public CycException {
-  public:
-    CycNoEnvVarException(std::string msg) : CycException(msg) {};
-};
 
 /**
    @class Env

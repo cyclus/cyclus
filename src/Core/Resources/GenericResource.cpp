@@ -3,7 +3,7 @@
 
 #include "GenericResource.h"
 
-#include "CycException.h"
+#include "error.h"
 #include "Logger.h"
 #include "EventManager.h"
 
@@ -58,7 +58,7 @@ bool GenericResource::checkQuality(rsrc_ptr other)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void GenericResource::absorb(gen_rsrc_ptr other) {
   if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {
-    throw CycGenResourceIncompatible("incompatible resource types.");
+    throw ValueError("incompatible resource types.");
   }
 
   quantity_ += other->quantity();
@@ -68,7 +68,7 @@ void GenericResource::absorb(gen_rsrc_ptr other) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 gen_rsrc_ptr GenericResource::extract(double quantity) {
   if (quantity > quantity_) {
-    throw CycGenResourceOverExtract("Attempted to extract more quantity than exists.");
+    throw ValueError("Attempted to extract more quantity than exists.");
   }
 
   quantity_ -= quantity;

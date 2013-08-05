@@ -4,7 +4,7 @@
 #include "GenericResource.h"
 #include "IsoVector.h"
 #include "Timer.h"
-#include "CycException.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {

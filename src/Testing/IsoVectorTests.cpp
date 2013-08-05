@@ -3,7 +3,7 @@
 
 #include "IsoVectorTests.h"
 
-#include "CycException.h"
+#include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,default_constructor) {
@@ -80,7 +80,7 @@ TEST_F(IsoVectorTests,mixing) {
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,ratio));
   EXPECT_TRUE(add_to_vec.compEquals(mix_result));
-  EXPECT_THROW(add_to_vec.mix(to_add_vec,-1), cyclus::CycRangeException);
+  EXPECT_THROW(add_to_vec.mix(to_add_vec,-1), cyclus::ValueError);
   EXPECT_NO_THROW(add_to_vec.mix(to_add_vec,0)); // corner
 }
 
@@ -120,12 +120,11 @@ TEST_F(IsoVectorTests,subtraction) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,separation) {
-  using cyclus::CycRangeException;
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec.separate(to_subtract_vec,efficiency));
   EXPECT_TRUE(subtract_from_vec.compEquals(separate_result));
-  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,-1),CycRangeException);
-  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,2),CycRangeException);
+  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,-1),cyclus::ValueError);
+  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,2),cyclus::ValueError);
   EXPECT_NO_THROW(subtract_from_vec.separate(to_subtract_vec,0)); // corner
 }
 

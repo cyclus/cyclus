@@ -1,6 +1,6 @@
 #include "CommodityProducerManager.h"
 
-#include "CycException.h"
+#include "error.h"
 
 //using namespace SupplyDemand;
 
@@ -31,7 +31,7 @@ double CommodityProducerManager::totalProductionCapacity(Commodity& commodity)
 void CommodityProducerManager::registerProducer(SupplyDemand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
-      throw CycDoubleRegistrationException("A manager is trying to register a producer twice.");
+      throw KeyError("A manager is trying to register a producer twice.");
     }
   else
     {
@@ -43,7 +43,7 @@ void CommodityProducerManager::registerProducer(SupplyDemand::CommodityProducer*
 void CommodityProducerManager::unRegisterProducer(SupplyDemand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
-      throw CycNotRegisteredException("A manager is trying to unregister a producer not originally registered with it.");
+      throw KeyError("A manager is trying to unregister a producer not originally registered with it.");
     }
   else
     {

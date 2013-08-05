@@ -2,7 +2,7 @@
 
 #include "SDManagerTests.h"
 
-#include "CycException.h"
+#include "error.h"
 
 //using namespace SupplyDemand;
 
@@ -23,7 +23,7 @@ void SDManagerTests::TearDown()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SDManagerTests,initialization) {
   EXPECT_FALSE(manager.managesCommodity(helper->commodity));
-  EXPECT_THROW(manager.supply(helper->commodity), cyclus::CycNotRegisteredException);
+  EXPECT_THROW(manager.supply(helper->commodity), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

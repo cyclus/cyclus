@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "Env.h"
-#include "CycException.h"
+#include "error.h"
 #include "Logger.h"
 #include "UniformTaylor.h"
 
@@ -42,7 +42,7 @@ void DecayHandler::loadDecayInfo() {
     // checks to see if there are isotopes in 'decayInfo.dat'
     if ( decayInfo.eof() ) {
       std::string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
-      throw CycParseException(err_msg);
+      throw ValidationError(err_msg);
     }
     
     // processes 'decayInfo.dat'
@@ -66,7 +66,7 @@ void DecayHandler::loadDecayInfo() {
           // checks for duplicate daughter isotopes
           for ( int j = 0; j < nDaughters; ++j ) {
             if ( temp[j].first == iso ) {
-              throw CycParseException(std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
+              throw ValidationError(std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
             } 
           }
           temp[i] = std::make_pair(iso, branchRatio);
@@ -77,14 +77,14 @@ void DecayHandler::loadDecayInfo() {
       } else {
         std::string err_msg;
         err_msg = "A duplicate parent isotope was found in 'decayInfo.dat'";
-        throw CycParseException(err_msg);
+        throw ValidationError(err_msg);
       }
       decayInfo >> iso; // get next parent
     }
     // builds the decay matrix from the parent and daughter maps
     buildDecayMatrix();
   } else {
-    throw CycIOException("Could not find file 'decayInfo.dat'.");
+    throw IOError("Could not find file 'decayInfo.dat'.");
   }
 }
 

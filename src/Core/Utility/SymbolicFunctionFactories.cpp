@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "error.h"
 
 #include "SymbolicFunctionFactories.h"
 
@@ -47,7 +48,7 @@ FunctionPtr PiecewiseFunctionFactory::getFunctionPtr(std::string params)
 { 
   if (!params.empty()) 
     {
-      throw InvalidFunctionParamterException("Piecewise Functions cannot be created with a list of parameters");
+      throw Error("Piecewise Functions cannot be created with a list of parameters");
     }
   
   LOG(LEV_DEBUG2,"Funct") << "A piecewise function has been created: "
@@ -64,7 +65,7 @@ void PiecewiseFunctionFactory::addFunction(FunctionPtr function, double starting
       const PiecewiseFunction::PiecewiseFunctionInfo& last = function_->functions_.back();  
       if (starting_coord <= last.xoffset)
         {
-          throw PiecewiseFunctionOrderException("Cannot append a function before the last registered function");
+          throw Error("Cannot append a function before the last registered function");
         }
     }
   
@@ -111,7 +112,7 @@ FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type,
       std::stringstream err("");
       err << type << " is not a registered function type" 
           << " of the basic function factory.";
-      throw CycException(err.str());
+      throw Error(err.str());
       break;
     }
 }

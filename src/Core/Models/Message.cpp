@@ -4,9 +4,9 @@
 #include "Message.h"
 
 #include "Communicator.h"
+#include "error.h"
 #include "Model.h"
 #include "MarketModel.h"
-
 #include "Resource.h"
 #include "Logger.h"
 #include "Timer.h"
@@ -63,9 +63,7 @@ msg_ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   msg_ptr new_msg(new Message(*this));
-  try {
-    new_msg->trans_ = trans_->clone();
-  } catch(CycNullMsgParamException) { }
+  new_msg->trans_ = trans_->clone();
   return new_msg;
 }
 
@@ -115,7 +113,7 @@ void Message::autoSetNextDest() {
     Model* next_model = curr->parent();
     tallyOrder(next_model);
     next_dest = dynamic_cast<Communicator*>(next_model);
-  } catch (CycIndexException err) {
+  } catch (ValueError err) {
     next_dest = receiver_;
   }
   setNextDest(next_dest);
@@ -141,13 +139,13 @@ void Message::validateForSend() {
   bool has_receiver = (path_stack_.size() > 0);
 
   if (!has_receiver) {
-    throw CycNoMsgReceiverException();
+    throw Error("Can't send the message - must call setNextDest first");
   }
 
   Communicator* next_stop = path_stack_[next_stop_i];
 
   if (next_stop == curr_owner_) {
-    throw CycCircularMsgException();
+    throw Error("Message receiver and sender are the same.");
   }
 }
 
@@ -206,17 +204,13 @@ Communicator* Message::sender() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Communicator* Message::receiver() const {
-  if (receiver_ == NULL) {
-    std::string err_msg = "Uninitilized message receiver.";
-    throw CycNullMsgParamException(err_msg);
-  }
   return receiver_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction& Message::trans() const {
-  if (trans_ == NULL) {
-    throw CycNullMsgParamException("Uninitialized transaction parameter.");
+  if (!trans_) {
+    throw Error("message has no transactionn payload");
   }
   return *trans_;
 }

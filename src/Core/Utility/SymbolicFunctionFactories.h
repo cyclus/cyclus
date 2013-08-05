@@ -5,7 +5,6 @@
 #include <map>
 #include <sstream>
 
-#include "CycException.h"
 #include "SymbolicFunctions.h"
 
 namespace cyclus {
@@ -117,21 +116,6 @@ class BasicFunctionFactory
     enum_names_;
 };
 
-//} // namespace cyclus
-//#include "CycException.h"
-//namespace cyclus {
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-class InvalidFunctionParamterException : public CycException 
-{
-  public: InvalidFunctionParamterException(std::string msg) : CycException(msg) {};
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-class PiecewiseFunctionOrderException : public CycException 
-{
-  public: PiecewiseFunctionOrderException(std::string msg) : CycException(msg) {};
-};
 } // namespace cyclus
 
 #endif

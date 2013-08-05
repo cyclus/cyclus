@@ -6,7 +6,7 @@
 #include <windows.h>
 
 #include "suffix.h"
-#include "CycException.h"
+#include "error.h"
 
 namespace cyclus {
 
@@ -19,7 +19,7 @@ void DynamicModule::openLibrary() {
     err_msg += model_name;
     err_msg += ". Error code is: ";
     err_msg += GetLastError();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
 }
@@ -32,7 +32,7 @@ void DynamicModule::setConstructor() {
   if (!constructor_) {
     string err_msg = "Unable to load model constructor: ";
     err_msg += GetLastError();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
 }
@@ -45,7 +45,7 @@ void DynamicModule::setDestructor() {
   if (!destructor_) {
     string err_msg = "Unable to load model constructor: ";
     err_msg += GetLastError();
-    throw CycIOException(err_msg);
+    throw IOError(err_msg);
   }
 
 }

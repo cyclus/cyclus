@@ -5,7 +5,7 @@
 #include <string>
 #include "XMLParser.h"
 #include "RelaxNGValidator.h"
-
+#include "error.h"
 #include "Logger.h"
 
 namespace cyclus {
@@ -26,10 +26,10 @@ void XMLParser::init(const std::stringstream& xml_input_snippet) {
 
     parser_->parse_memory(xml_input_snippet.str());
     if(!parser_) {
-      throw CycLoadXMLException("Could not parse xml file.");
+      throw ValidationError("Could not parse xml file.");
     }
   } catch(const std::exception& ex) {
-    throw CycLoadXMLException("Error loading xml file: " + 
+    throw ValidationError("Error loading xml file: " + 
                               std::string(ex.what()));
   }
 }
@@ -38,11 +38,7 @@ void XMLParser::init(const std::stringstream& xml_input_snippet) {
 void XMLParser::validate(const std::stringstream& xml_schema_snippet) {
   RelaxNGValidator validator;
   validator.parse_memory(xml_schema_snippet.str());
-  try {
-    validator.validate(this->document());
-  } catch(CycValidityException& e) {
-    throw CycLoadXMLException(e.what());
-  }
+  validator.validate(this->document());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

@@ -2,7 +2,7 @@
 // Implements the UniformTaylor class
 #include "UniformTaylor.h"
 
-#include "CycException.h"
+#include "error.h"
 
 #include <cmath>
 #include <string>
@@ -19,7 +19,7 @@ Vector UniformTaylor::matrixExpSolver(const Matrix & A,
   // computations
   if ( x_o.numRows() != n ) {
     std::string error = "Error: Matrix-Vector dimensions are not compatible.";
-    throw CycRangeException(error);
+    throw ValueError(error);
   }
 
   // step 1 of algorithm: calculates the largest diagonal element (alpha)
@@ -73,7 +73,7 @@ Vector UniformTaylor::getSolutionVector(const Matrix & B,
   if ( expat == 0 ) {
     std::string error = "Error: exp(-alpha * t) exceeds the range of a long double.";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
-    throw CycRangeException(error);
+    throw ValueError(error);
   }
 
   // step 4 of algorithm: initializes the next term Ck, the total sum of Ck
@@ -122,7 +122,7 @@ int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
   if ( lowerBound == HUGE_VAL ) {
     std::string error = "Error: exp(alpha * t) exceeds the range of a long double";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
-    throw CycRangeException(error);
+    throw ValueError(error);
   }
 
   lowerBound = lowerBound * (1 - epsilon);

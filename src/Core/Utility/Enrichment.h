@@ -3,7 +3,6 @@
 #define _ENRICHMENT_H
 
 #include <set>
-#include "CycException.h"
 #include "Material.h"
 
 namespace cyclus {

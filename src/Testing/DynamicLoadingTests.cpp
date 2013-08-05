@@ -6,6 +6,7 @@
 #include "boost/filesystem.hpp"
 
 #include "Env.h"
+#include "error.h"
 #include "Model.h"
 #include "Prototype.h"
 #include "DynamicModule.h"
@@ -49,7 +50,7 @@ TEST(DynamicLoadingTests, FindNonStandardPath) {
 TEST(DynamicLoadingTests, LoadLibError) {
   using cyclus::DynamicModule;
   DynamicModule mod = DynamicModule("Facility", "not_a_fac");
-  EXPECT_THROW(mod.initialize(), cyclus::CycIOException);
+  EXPECT_THROW(mod.initialize(), cyclus::IOError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

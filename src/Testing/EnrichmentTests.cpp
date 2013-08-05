@@ -3,7 +3,7 @@
 #include "EnrichmentTests.h"
 
 #include "CompMap.h"
-#include "CycException.h"
+#include "error.h"
 #include "CycLimits.h"
 
 #include <iostream>
@@ -62,9 +62,8 @@ TEST_F(EnrichmentTests,assays)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests,valuefunction) 
 {
-  using cyclus::CycRangeException;
-  EXPECT_THROW(cyclus::enrichment::value_func(0-cyclus::eps()),CycRangeException);
-  EXPECT_THROW(cyclus::enrichment::value_func(1),CycRangeException);
+  EXPECT_THROW(cyclus::enrichment::value_func(0-cyclus::eps()), cyclus::ValueError);
+  EXPECT_THROW(cyclus::enrichment::value_func(1), cyclus::ValueError);
 
   double step = 0.001;
   double test_value=0;

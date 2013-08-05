@@ -46,7 +46,7 @@ class DynamicModule {
 
   /**
      If this path for this module has not been discovered yet, path searches for it.
-     @exception CycIOException the library path was not found
+     @exception IOError the library path was not found
      @return the filepath of the dynamic library.
   */
   std::string path();

@@ -3,6 +3,7 @@
 #include "Transaction.h"
 
 #include "Timer.h"
+#include "error.h"
 #include "Model.h"
 #include "MarketModel.h"
 #include "EventManager.h"
@@ -44,15 +45,8 @@ Transaction* Transaction::clone() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Transaction::approveTransfer() {
   std::vector<rsrc_ptr> manifest;
-  try {
-    manifest = supplier_->removeResource(*this);
-    requester_->addResource(*this, manifest);
-  } catch (CycException err) {
-    CLOG(LEV_ERROR) << "Material transfer failed from " 
-                    << supplier_->ID() << " to " << requester_->ID() << ": " 
-                    << err.what();
-    return;
-  }
+  manifest = supplier_->removeResource(*this);
+  requester_->addResource(*this, manifest);
 
   // register that this transaction occured
   this->Transaction::addTransToTable();
@@ -74,7 +68,7 @@ void Transaction::approveTransfer() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Transaction::matchWith(Transaction& other) {
   if (other.type_ == type_) {
-    throw CycTransMismatchException();
+    throw ValueError("Cannot match incompatible transactino types.");
   }
 
   if (type_ == OFFER) {
@@ -91,31 +85,18 @@ void Transaction::matchWith(Transaction& other) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* Transaction::market() const {
-  // put here to make explicit that this method throws
   MarketModel* market;
-  try {
-    market = MarketModel::marketForCommod(commod_);
-  } catch(CycMarketlessCommodException e) {
-    throw e;
-  }
+  market = MarketModel::marketForCommod(commod_);
   return market;
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Transaction::supplier() const {
-  if (supplier_ == NULL) {
-    std::string err_msg = "Uninitilized message supplier.";
-    throw CycNullMsgParamException(err_msg);
-  }
   return supplier_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* Transaction::requester() const {
-  if (requester_ == NULL) {
-    std::string err_msg = "Uninitilized message requester.";
-    throw CycNullMsgParamException(err_msg);
-  }
   return requester_;
 }
 

@@ -429,8 +429,6 @@ TEST_F(MaterialTest, ExtractMass) {
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
-  using cyclus::CycException;
-  using cyclus::CycNegativeValueException;
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;  
   mat_rsrc_ptr extracted;
@@ -439,7 +437,7 @@ TEST_F(MaterialTest, ExtractMass) {
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
   EXPECT_FLOAT_EQ(test_mat_->quantity(),diff); // check correctness
   EXPECT_EQ(test_mat_->isoVector(),extracted->isoVector());
-  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), CycException);
+  EXPECT_THROW(two_test_mat_->extract(2*two_test_mat_->quantity()), cyclus::Error);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -516,12 +514,10 @@ TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_over_extract) {
-  using cyclus::CycException;
-  using cyclus::CycNegativeValueException;
 
   // Over-extraction should throw an exception
-  EXPECT_THROW( diff_mat_->extract(test_comp_, 2*test_size_), CycNegativeValueException);
-  EXPECT_THROW( test_mat_->extract(test_comp_, 2*test_size_), CycException);
+  EXPECT_THROW( diff_mat_->extract(test_comp_, 2*test_size_), cyclus::ValueError);
+  EXPECT_THROW( test_mat_->extract(test_comp_, 2*test_size_), cyclus::Error);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -616,10 +612,9 @@ TEST_F(MaterialTest, Apply_threshold_inf){
 TEST_F(MaterialTest, Apply_threshold_negative){
   // if the threshold is negative, the function should throw
   using cyclus::Iso;
-  using cyclus::CycNegativeValueException;
   std::map<Iso, double> result_vec;
   double infty = std::numeric_limits<double>::infinity();
-  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), CycNegativeValueException);
+  EXPECT_THROW( result_vec = test_mat_->applyThreshold(test_vec_, -1), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

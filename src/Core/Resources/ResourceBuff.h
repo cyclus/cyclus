@@ -4,7 +4,6 @@
 
 #include "Resource.h"
 
-#include "CycException.h"
 #include <list>
 #include <vector>
 #include <set>
@@ -13,16 +12,6 @@
 namespace cyclus {
 
 static double const kBuffInfinity = std::numeric_limits<double>::max();
-
-class CycOverCapException: public CycException {
-    public: CycOverCapException(std::string msg) : CycException(msg) {};
-};
-class CycNegQtyException: public CycException {
-    public: CycNegQtyException(std::string msg) : CycException(msg) {};
-};
-class CycDupResException: public CycException {
-    public: CycDupResException(std::string msg) : CycException(msg) {};
-};
 
 typedef std::vector<rsrc_ptr> Manifest;
 
@@ -53,7 +42,7 @@ class ResourceBuff {
   setCapacity sets the maximum quantity this store can hold (units based
   on constituent resource objects' units).
 
-  @throws CycOverCapException the new capacity is lower (by cyclus::eps_rsrc()) than the
+  @throws ValueError the new capacity is lower (by cyclus::eps_rsrc()) than the
   quantity of resources that already exist in the store.
   */
   void setCapacity(double cap);
@@ -86,7 +75,7 @@ class ResourceBuff {
   specified (within cyclus::eps_rsrc()).  Resources are retrieved in the order they were
   pushed (i.e. oldest first).
 
-  @throws CycNegQtyException the specified pop quantity is larger (by
+  @throws ValueError the specified pop quantity is larger (by
   cyclus::eps_rsrc()) than the store's current quantity.
   */
   std::vector<rsrc_ptr> popQty(double qty);
@@ -98,7 +87,7 @@ class ResourceBuff {
   Resources are not split.  Resources are retrieved in the order they were
   pushed (i.e. oldest first).
 
-  @throws CycNegQtyException the specified pop number is larger than the
+  @throws ValueError the specified pop number is larger than the
   store's current inventoryNum or the specified number is negative.
   */
   std::vector<rsrc_ptr> popNum(int num);
@@ -109,7 +98,7 @@ class ResourceBuff {
   Resources are not split.  Resources are retrieved in the order they were
   pushed (i.e. oldest first).
 
-  @throws CycNegQtyException the store is empty.
+  @throws ValueError the store is empty.
   */
   rsrc_ptr popOne();
 
@@ -120,10 +109,10 @@ class ResourceBuff {
   unique objects. The resource object is only pushed to the store if it does not
   cause the store to exceed its capacity
 
-  @throws CycOverCapException the pushing of the given resource object would
+  @throws ValueError the pushing of the given resource object would
   cause the store to exceed its capacity.
 
-  @throws CycDupResException the resource object to be pushed is already present
+  @throws KeyError the resource object to be pushed is already present
   in the store.
   */
   void pushOne(rsrc_ptr mat);
@@ -136,10 +125,10 @@ class ResourceBuff {
   not cause the store to exceed its capacity; otherwise none of the given
   resource objects are pushed to the store.
 
-  @throws CycOverCapException the pushing of the given resource objects would
+  @throws ValueError the pushing of the given resource objects would
   cause the store to exceed its capacity.
 
-  @throws CycDupResException one or more of the resource objects to be pushed
+  @throws KeyError one or more of the resource objects to be pushed
   are already present in the store.
   */
   void pushAll(Manifest mats);

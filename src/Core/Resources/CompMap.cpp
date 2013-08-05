@@ -3,7 +3,7 @@
 
 #include "MassTable.h"
 #include "CycArithmetic.h"
-#include "CycException.h"
+#include "error.h"
 #include "CycLimits.h"
 
 #include <sstream>
@@ -94,7 +94,7 @@ bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
       ss << "The threshold cannot be negative. The value provided was " 
          << threshold
          << " .";
-      throw CycNegativeValueException(ss.str());
+      throw ValueError(ss.str());
   }
   if ( size() != rhs.size() ) {
     return false;
@@ -275,7 +275,7 @@ void CompMap::change_basis(Basis b) {
         map_[it->first] = massFraction(it->first);
         break;
       default:
-        throw CycRangeException("Basis not atom or mass.");
+        throw ValueError("Basis not atom or mass.");
         break;
       }
     }
@@ -325,7 +325,7 @@ void CompMap::validateIsotopeNumber(const Iso& tope) {
   if (tope < lower_limit || tope > upper_limit) {
     std::stringstream ss("");
     ss << tope;
-    throw CycRangeException("Isotope identifier '" + ss.str() + "' is not valid.");
+    throw ValueError("Isotope identifier '" + ss.str() + "' is not valid.");
   }
 }
 
@@ -333,7 +333,7 @@ void CompMap::validateIsotopeNumber(const Iso& tope) {
 void CompMap::validateValue(const double& value) {
   if (value < 0.0) {
     std::string err_msg = "CompMap has negative quantity for an isotope.";
-    throw CycRangeException(err_msg);
+    throw ValueError(err_msg);
   }
 }
 

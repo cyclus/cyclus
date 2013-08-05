@@ -3,7 +3,7 @@
 
 #include "InstModel.h"
 
-#include "CycException.h"
+#include "error.h"
 
 #include <sstream>
 

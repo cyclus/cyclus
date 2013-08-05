@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "QueryEngine.h"
 #include "InstModel.h"
+#include "error.h"
 
 #include <stdlib.h>
 #include <sstream>
@@ -35,7 +36,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
   try {
     setFacLifetime(atoi(qe->getElementContent("lifetime").c_str()));
   }
-  catch (CycNullQueryException e) {
+  catch (Error e) {
     setFacLifetime(TI->simDur());
   }
   
@@ -49,7 +50,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
       LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity" << commod;
     }
   }
-  catch (CycNullQueryException e) {
+  catch (Error e) {
   }
 
   // get the outcommodities
@@ -61,7 +62,7 @@ void FacilityModel::initCoreMembers(QueryEngine* qe) {
       LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added outcommodity" << commod;
     }
   }
-  catch (CycNullQueryException e) {
+  catch (Error e) {
   }
 }
 
@@ -109,7 +110,7 @@ void FacilityModel::handleDailyTasks(int time, int day){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::decommission() {
   if (!checkDecommissionCondition()) 
-    throw CycOverrideException("Cannot decommission " + name());
+    throw Error("Cannot decommission " + name());
 
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
   deleteModel(this);
