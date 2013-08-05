@@ -152,7 +152,6 @@ isAvailablePrototype
 isDead
 isMaterial
 isOffer
-isoVector
 kill
 lastDayOfMonth
 leaveMarket
