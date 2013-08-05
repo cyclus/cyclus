@@ -4,7 +4,7 @@
 #include "error.h"
 
 namespace cyclus {
-namespace SupplyDemand {
+namespace supply_demand {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation()
@@ -119,5 +119,5 @@ void CommodityProducer::throwErrorIfCommodityNotProduced(const Commodity& commod
                                       + commodity.name());
     }
 }
-} // namespace SupplyDemand
+} // namespace supply_demand
 } // namespace cyclus

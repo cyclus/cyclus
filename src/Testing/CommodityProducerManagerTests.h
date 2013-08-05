@@ -7,16 +7,16 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerManagerTests : public ::testing::Test {
  public:
-  cyclus::SupplyDemand::CommodityProducerManager manager;
+  cyclus::supply_demand::CommodityProducerManager manager;
   CommodityTestHelper* helper;
 
  public:
   virtual void SetUp();
   virtual void TearDown();
 
-  void addCommodity(cyclus::SupplyDemand::CommodityProducer* producer);
-  void setCapacity(cyclus::SupplyDemand::CommodityProducer* producer);
+  void addCommodity(cyclus::supply_demand::CommodityProducer* producer);
+  void setCapacity(cyclus::supply_demand::CommodityProducer* producer);
   void setUpProducers();
-  void registerProducer(cyclus::SupplyDemand::CommodityProducer* producer);
-  void unRegisterProducer(cyclus::SupplyDemand::CommodityProducer* producer);
+  void registerProducer(cyclus::supply_demand::CommodityProducer* producer);
+  void unRegisterProducer(cyclus::supply_demand::CommodityProducer* producer);
 };

@@ -3,7 +3,7 @@
 #include "error.h"
 
 namespace cyclus {
-namespace SupplyDemand {
+namespace supply_demand {
 
 // -------------------------------------------------------------------
 SupplyDemandManager::SupplyDemandManager() {}
@@ -26,13 +26,13 @@ bool SupplyDemandManager::managesCommodity(Commodity& commodity)
 }
 
 // -------------------------------------------------------------------
-void SupplyDemandManager::registerProducerManager(SupplyDemand::CommodityProducerManager* cpm) 
+void SupplyDemandManager::registerProducerManager(supply_demand::CommodityProducerManager* cpm) 
 {
   managers_.insert(cpm);
 }
 
 // -------------------------------------------------------------------
-void SupplyDemandManager::unRegisterProducerManager(SupplyDemand::CommodityProducerManager* cpm) 
+void SupplyDemandManager::unRegisterProducerManager(supply_demand::CommodityProducerManager* cpm) 
 {
   managers_.erase(cpm);
 }
@@ -73,5 +73,5 @@ void SupplyDemandManager::throwErrorIfCommodityNotManaged(Commodity& commodity)
                                       + commodity.name());
     }
 }
-} // namespace SupplyDemand
+} // namespace supply_demand
 } // namespace cyclus

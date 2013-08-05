@@ -1,6 +1,6 @@
 #include "CommodityTestHelper.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityTestHelper::CommodityTestHelper() :
@@ -9,7 +9,7 @@ CommodityTestHelper::CommodityTestHelper() :
   capacity(5.0),
   nproducers(2)
 {
-  using cyclus::SupplyDemand::CommodityProducer;
+  using cyclus::supply_demand::CommodityProducer;
   producer1 = new CommodityProducer();
   producer2 = new CommodityProducer();
 }

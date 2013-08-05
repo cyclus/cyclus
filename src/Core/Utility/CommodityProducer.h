@@ -7,7 +7,7 @@
 #include "Commodity.h"
 
 namespace cyclus {
-namespace SupplyDemand
+namespace supply_demand
 {
   /**
      a container to hold information about a commodity
