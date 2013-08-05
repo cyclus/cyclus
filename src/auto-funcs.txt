@@ -206,7 +206,6 @@ outputCommodities
 overwrite
 parentID
 parse_context
-parse_memory
 pathBase
 pathDelimiter
 pathToMainSchema
