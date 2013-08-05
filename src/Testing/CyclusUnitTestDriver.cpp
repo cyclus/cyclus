@@ -10,8 +10,8 @@ int main(int argc, char* argv[]) {
   // tell ENV the path between the cwd and the cyclus executable
   using cyclus::Env;
   using cyclus::Logger;
-  std::string path = Env::pathBase(argv[0]);
-  Env::setCyclusRelPath(path);
+  std::string path = Env::PathBase(argv[0]);
+  Env::SetCyclusRelPath(path);
   Logger::ReportLevel() = cyclus::LEV_ERROR;
   
   for ( int i = 0; i < argc; i++ ) {

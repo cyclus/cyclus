@@ -43,17 +43,17 @@ public:
      validate an xml file agaisnt the given schema
      @param doc the xml file document
    */
-  bool validate(const xmlpp::Document* doc);
+  bool Validate(const xmlpp::Document* doc);
 
 protected:
   /// free xml-related memory
-  void release_underlying();
+  void Release_underlying();
 
   /**
      parse a relaxng schema context
      @param context the context
    */
-  void parse_context(xmlRelaxNGParserCtxtPtr context);
+  void Parse_context(xmlRelaxNGParserCtxtPtr context);
   
   /// the schema
   xmlRelaxNGPtr schema_;

@@ -45,7 +45,7 @@ class Resource: IntrusiveBase<Resource> {
      @return True if other is sufficiently equal in quality to 
      the base, False otherwise. 
    */
-  virtual bool checkQuality(rsrc_ptr other) =0;
+  virtual bool CheckQuality(rsrc_ptr other) =0;
 
   /**
      Returns the base unit of this resource 
@@ -65,7 +65,7 @@ class Resource: IntrusiveBase<Resource> {
      Set the quantity of the resource in its default units to 'val'. 
       
    */
-  virtual void setQuantity(double val) = 0;
+  virtual void SetQuantity(double val) = 0;
     
   /**
   The current state of the resource object.
@@ -75,7 +75,7 @@ class Resource: IntrusiveBase<Resource> {
   'state' that has not yet been recorded in the output db. Note that new states
   should be pulled from the static Resource::nextStateID() method;
   **/
-  virtual int stateID() = 0;
+  virtual int StateID() = 0;
 
   /**
      Returns the concrete resource type, an enum 
@@ -90,7 +90,7 @@ class Resource: IntrusiveBase<Resource> {
   /**
      Prints information about the resource 
    */
-  virtual void print() = 0;
+  virtual void Print() = 0;
 
   /**
      return this resource's unique ID 
@@ -100,12 +100,12 @@ class Resource: IntrusiveBase<Resource> {
   /**
      return this resource's original ID 
    */
-  const int originalID() {return originalID_;};
+  const int OriginalID() {return originalID_;};
 
   /**
      a resource has been split, set the id to the original resource's 
    */ 
-  void setOriginalID(int id);
+  void SetOriginalID(int id);
 
   /**
      Destructor 
@@ -147,7 +147,7 @@ class Resource: IntrusiveBase<Resource> {
   /**
      adds a resource to the resouce table 
    */
-  virtual void addToTable();
+  virtual void AddToTable();
 
   /**
      the name of the resource's type 
@@ -157,7 +157,7 @@ class Resource: IntrusiveBase<Resource> {
   /**
      returns if this type of resource is recorded 
    */
-  virtual bool is_resource_type_recorded() = 0;
+  virtual bool Is_resource_type_recorded() = 0;
 
   /**
      declares that this resource type is now recorded 
@@ -169,7 +169,7 @@ class Resource: IntrusiveBase<Resource> {
   /**
      adds a resource type to the resource type table 
    */
-  void recordNewType();
+  void RecordNewType();
 
   /**
   True if this resource object has already been recorded to the output db

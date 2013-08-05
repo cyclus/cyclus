@@ -1,6 +1,6 @@
 #include "CommodityTestHelper.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityTestHelper::CommodityTestHelper() :
@@ -9,7 +9,7 @@ CommodityTestHelper::CommodityTestHelper() :
   capacity(5.0),
   nproducers(2)
 {
-  using cyclus::SupplyDemand::CommodityProducer;
+  using cyclus::supply_demand::CommodityProducer;
   producer1 = new CommodityProducer();
   producer2 = new CommodityProducer();
 }
@@ -22,18 +22,18 @@ CommodityTestHelper::~CommodityTestHelper()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityTestHelper::setUpProducerManager()
+void CommodityTestHelper::SetUpProducerManager()
 {
-  setUpProducers();
-  manager.registerProducer(producer1);
-  manager.registerProducer(producer2);
+  SetUpProducers();
+  manager.RegisterProducer(producer1);
+  manager.RegisterProducer(producer2);
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityTestHelper::setUpProducers()
+void CommodityTestHelper::SetUpProducers()
 {
-  producer1->addCommodity(commodity);
-  producer1->setCapacity(commodity,capacity);
-  producer2->addCommodity(commodity);
-  producer2->setCapacity(commodity,capacity);
+  producer1->AddCommodity(commodity);
+  producer1->SetCapacity(commodity,capacity);
+  producer2->AddCommodity(commodity);
+  producer2->SetCapacity(commodity,capacity);
 }

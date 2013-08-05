@@ -59,86 +59,86 @@ class Model {
       
      @param name name of the template as defined in the input file 
    */
-  static Model* getTemplateByName(std::string name);
+  static Model* GetTemplateByName(std::string name);
 
   /**
      returns a model given the template's name 
       
      @param name name of the template as defined in the input file 
    */
-  static Model* getModelByName(std::string name);
+  static Model* GetModelByName(std::string name);
 
   /**
      prints the current list of models 
    */
-  static void printModelList();
+  static void PrintModelList();
 
   /**
      returns the current list of models 
    */
-  static std::vector<Model*> getModelList();
+  static std::vector<Model*> GetModelList();
 
   /**
      load a dynamic module
      @param model_type the type of model
      @param module_name the name of the module
    */
-  static void loadModule(std::string model_type, std::string module_name);
+  static void LoadModule(std::string model_type, std::string module_name);
 
   /**
      closes the library of each dynamically loaded module and erases
      it from the loaded modules container
    */
-  static void unloadModules();
+  static void UnloadModules();
 
   /**
      constructs and initializes an entity
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void initializeSimulationEntity(std::string model_type, QueryEngine* qe);
+  static void InitializeSimulationEntity(std::string model_type, QueryEngine* qe);
 
   /**
      uses the loaded modules to properly construct a model
      @param model_impl the implementation to construct
      @return the constructed model
    */
-  static Model* constructModel(std::string model_impl);
+  static Model* ConstructModel(std::string model_impl);
 
   /**
      uses the loaded modules to properly destruct a model
      @param model the model to delete
    */
-  static void deleteModel(Model* model);
+  static void DeleteModel(Model* model);
   
   /**
      register a model as a market
      @param market the model to register
    */
-  static void registerMarketWithSimulation(Model* market);
+  static void RegisterMarketWithSimulation(Model* market);
 
   /**
      register a model as a region
      @param region the model to register
    */
-  static void registerRegionWithSimulation(Model* region);
+  static void RegisterRegionWithSimulation(Model* region);
 
   /**
      constructs the simulation in its initial state
    */
-  static void constructSimulation();
+  static void ConstructSimulation();
 
   /**
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void initCoreMembers(QueryEngine* qe);
+  virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
      Initialize members related to derived module class
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void initModuleMembers(QueryEngine* qe) {};
+  virtual void InitModuleMembers(QueryEngine* qe) {};
 
   /**
      Constructor for the Model Class 
@@ -161,7 +161,7 @@ class Model {
   /**
      set model instance name 
    */
-  void setName(std::string name) { name_ = name; };
+  void SetName(std::string name) { name_ = name; };
 
   /**
      get model instance SN 
@@ -171,22 +171,22 @@ class Model {
   /**
      get model implementation name 
    */
-  const std::string modelImpl();
+  const std::string ModelImpl();
 
   /**
      set model implementation 
    */
-  void setModelImpl(std::string new_impl) { model_impl_ = new_impl; };
+  void SetModelImpl(std::string new_impl) { model_impl_ = new_impl; };
 
   /**
      get model type 
    */
-  const std::string modelType() { return model_type_; };
+  const std::string ModelType() { return model_type_; };
 
   /**
      set model type 
    */
-  void setModelType(std::string new_type) { model_type_ = new_type; };
+  void SetModelType(std::string new_type) { model_type_ = new_type; };
 
   /**
      every model should be able to print a verbose description 
@@ -201,74 +201,74 @@ class Model {
   /**
      return the parent' id 
    */
-  int parentID() {return parentID_;};
+  int ParentID() {return parentID_;};
 
   /**
      return the born on date of this model 
    */
-  int bornOn() {return bornOn_;};
+  int BornOn() {return bornOn_;};
 
   /**
      return the died on of this model 
    */
-  int diedOn() {return diedOn_;};
+  int DiedOn() {return diedOn_;};
 
   /**
      add a child to the list of children.
 
      This does NOT set the specified child's parent to be this model.
    */
-  void addChild(Model* child);
+  void AddChild(Model* child);
 
   /**
      add a child to the list of children 
    */
-  void removeChild(Model* child);
+  void RemoveChild(Model* child);
 
   /**
      Return the number of children the model has 
    */
-  int nChildren() {return children_.size();}
+  int NChildren() {return children_.size();}
 
   /**
      recursively prints the parent-child tree
    */
-  std::string printChildren();
+  std::string PrintChildren();
 
   /**
      returns a vector of strings representing the parent-child tree
      at the node for Model m
      @param m the model node to base as the root of this print tree
    */
-  std::vector<std::string> getTreePrintOuts(Model* m);
+  std::vector<std::string> GetTreePrintOuts(Model* m);
 
   /**
      creates the parent-child link and invokes the core-level and
      module-level enter simulation methods
      @param parent this model's parent
    */
-  void enterSimulation(Model* parent);
+  void EnterSimulation(Model* parent);
 
   /**
      perform core-related tasks when entering the simulation
    */
-  virtual void enterSimulationAsCoreEntity();
+  virtual void EnterSimulationAsCoreEntity();
 
   /**
      perform module-specific tasks when entering the simulation
    */
-  virtual void enterSimulationAsModule();
+  virtual void EnterSimulationAsModule();
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
-  virtual void setParent(Model* parent);
+  virtual void SetParent(Model* parent);
 
   /**
      set the bornOn date of this model 
    */
-  void setBornOn(int date) {bornOn_ = date;};
+  void SetBornOn(int date) {bornOn_ = date;};
 
   /**
      return the ith child 
@@ -280,27 +280,27 @@ class Model {
       
      @warning This method should never be directly invoked.  All 
      resource transfers should take place using the 
-     Message.approveTransfer() method.  
+     Message.ApproveTransfer() method.  
 
-     @param order the transaction for which resource(s) are to be prepared 
+     @param order the transaction for which Resource(s) are to be prepared 
 
      @return list of resources to be sent for this order 
    */ 
-  virtual std::vector<rsrc_ptr> removeResource(Transaction order);
+  virtual std::vector<rsrc_ptr> RemoveResource(Transaction order);
 
   /**
      Transacted resources are received through this method. 
       
      @warning This method should never be directly invoked.  All 
      resource transfers should take place using the 
-     Message.approveTransfer() method.  
+     Message.ApproveTransfer() method.  
 
      @param trans the transaction that corresponds with the materials 
      being received
 
      @param manifest is the set of resources being 
    */ 
-  virtual void addResource(Transaction trans,
+  virtual void AddResource(Transaction trans,
                               std::vector<rsrc_ptr> manifest);
 
  protected:
@@ -343,27 +343,27 @@ class Model {
      @param ns the string to append to the current namespace modifier 
      @param format format of the file (currently cyclus supports only 
    */
-  static void load_facilitycatalog(std::string filename, std::string ns, std::string format);
+  static void Load_facilitycatalog(std::string filename, std::string ns, std::string format);
 
   /**
      load all markets 
    */
-  static void load_markets();
+  static void Load_markets();
 
   /**
      load all converters 
    */
-  static void load_converters();
+  static void Load_converters();
 
   /**
      load all regions 
    */
-  static void load_regions();
+  static void Load_regions();
 
   /**
      load all institutions 
    */
-  static void load_institutions();
+  static void Load_institutions();
 
   /**
      Stores the next available facility ID 
@@ -378,7 +378,7 @@ class Model {
   /**
      used to remove model instance refs from static model lists 
    */
-  void removeFromList(Model* model, std::vector<Model*> &mlist);
+  void RemoveFromList(Model* model, std::vector<Model*> &mlist);
 
   /**
      parent's ID of this model 
@@ -427,7 +427,7 @@ class Model {
   /**
      add an agent to the transactiont table 
    */
-  void addToTable();
+  void AddToTable();
 
 };
 } // namespace cyclus

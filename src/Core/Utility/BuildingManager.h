@@ -10,18 +10,18 @@
 #include "Builder.h"
 
 namespace cyclus {
-namespace ActionBuilding {
+namespace action_building {
   /// a struct for a build order: the number of producers to build
   struct BuildOrder 
   {
     // constructor
-    BuildOrder(int n, ActionBuilding::Builder* b,
-               SupplyDemand::CommodityProducer* cp);
+    BuildOrder(int n, action_building::Builder* b,
+               supply_demand::CommodityProducer* cp);
 
     // constituents
     int number;
-    ActionBuilding::Builder* builder;
-    SupplyDemand::CommodityProducer* producer;
+    action_building::Builder* builder;
+    supply_demand::CommodityProducer* producer;
   };
 
   /// a struct for a problem instance
@@ -79,13 +79,13 @@ namespace ActionBuilding {
        register a builder with the manager
        @param builder the builder
      */
-    void registerBuilder(ActionBuilding::Builder* builder);
+    void RegisterBuilder(action_building::Builder* builder);
 
     /**
        unregister a builder with the manager
        @param builder the builder
      */
-    void unRegisterBuilder(ActionBuilding::Builder* builder);
+    void UnRegisterBuilder(action_building::Builder* builder);
     
     /**
        given a certain commodity and demand, a decision is made as to 
@@ -96,7 +96,7 @@ namespace ActionBuilding {
        @param unmet_demand the additional capacity required
        @return a vector of build orders as decided
     */
-    std::vector<ActionBuilding::BuildOrder> makeBuildDecision(Commodity& commodity, 
+    std::vector<action_building::BuildOrder> MakeBuildDecision(Commodity& commodity, 
                                                               double unmet_demand);
 
     // protected: @MJGFlag - should be protected. revise when tests can
@@ -105,7 +105,7 @@ namespace ActionBuilding {
        set up the constraint problem
        @param problem the problem instance
      */
-    void setUpProblem(ActionBuilding::ProblemInstance& problem);
+    void SetUpProblem(action_building::ProblemInstance& problem);
 
     /**
        add a variable to the constraint problem
@@ -113,9 +113,9 @@ namespace ActionBuilding {
        @param builder the builder of that producer
        @param problem the problem instance
      */
-    void addProducerVariableToProblem(SupplyDemand::CommodityProducer* producer,
-                                      ActionBuilding::Builder* builder,
-                                      ActionBuilding::ProblemInstance& problem);
+    void AddProducerVariableToProblem(supply_demand::CommodityProducer* producer,
+                                      action_building::Builder* builder,
+                                      action_building::ProblemInstance& problem);
 
     /**
        given a solution to the constraint problem, construct the 
@@ -123,7 +123,7 @@ namespace ActionBuilding {
        @param orders the set of orders to fill
        @param solution the solution determining how to fill the orders
      */
-    void constructBuildOrdersFromSolution(std::vector<ActionBuilding::BuildOrder>& orders,
+    void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>& orders,
                                           std::vector<cyclopts::VariablePtr>& solution);
   private:
     /// the set of registered builders
@@ -131,7 +131,7 @@ namespace ActionBuilding {
     
     /// a map of variables to their associated builder and producer
     std::map<cyclopts::VariablePtr, 
-      std::pair<ActionBuilding::Builder*,SupplyDemand::CommodityProducer*> > solution_map_;
+      std::pair<action_building::Builder*,supply_demand::CommodityProducer*> > solution_map_;
   };
 
   //#include "BuildingManagerTests.h"

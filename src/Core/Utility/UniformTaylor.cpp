@@ -10,20 +10,20 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector UniformTaylor::matrixExpSolver(const Matrix & A,
+Vector UniformTaylor::MatrixExpSolver(const Matrix & A,
     const Vector & x_o, const double t)
 {
-  int n = A.numRows();
+  int n = A.NumRows();
   
   // checks if the dimensions of A and x_o are compatible for matrix-vector
   // computations
-  if ( x_o.numRows() != n ) {
+  if ( x_o.NumRows() != n ) {
     std::string error = "Error: Matrix-Vector dimensions are not compatible.";
     throw ValueError(error);
   }
 
   // step 1 of algorithm: calculates the largest diagonal element (alpha)
-  double alpha = maxAbsDiag(A);
+  double alpha = MaxAbsDiag(A);
   
   // step 2 of algorithm: creates the matrix B = A + alpha * I
   Matrix B = identity(n);
@@ -34,14 +34,14 @@ Vector UniformTaylor::matrixExpSolver(const Matrix & A,
   double tol = 1e-3;
   Vector x_t = x_o;
 
-  x_t = getSolutionVector(B, x_o, alpha, t, tol);
+  x_t = GetSolutionVector(B, x_o, alpha, t, tol);
 
   return x_t;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double UniformTaylor::maxAbsDiag(const Matrix & A) {
-  int n = A.numRows();       // stores the order of the matrix A    
+double UniformTaylor::MaxAbsDiag(const Matrix & A) {
+  int n = A.NumRows();       // stores the order of the matrix A    
   double a_ii = A(1,1);      // begins with the first diagonal element
 
   // Initializes the maximum diagonal element to the absolute value of the
@@ -63,7 +63,7 @@ double UniformTaylor::maxAbsDiag(const Matrix & A) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector UniformTaylor::getSolutionVector(const Matrix & B,
+Vector UniformTaylor::GetSolutionVector(const Matrix & B,
     const Vector & x_o, double alpha, double t, double tol)
 {
   // step 3 of algorithm: calculates exp( -alpha * t)
@@ -87,7 +87,7 @@ Vector UniformTaylor::getSolutionVector(const Matrix & B,
   Vector C_prev = C_next;      
 
   // step 5 of algorithm: determines the maximum number of terms needed
-  int maxTerms = maxNumTerms(alpha_t, tol);
+  int maxTerms = MaxNumTerms(alpha_t, tol);
 
   // step 6 of algorithm: computes the sum of Ck terms until the maximum
   // number of terms has been reached 
@@ -108,7 +108,7 @@ Vector UniformTaylor::getSolutionVector(const Matrix & B,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int UniformTaylor::maxNumTerms(long double alpha_t, double epsilon) {
+int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
   long double nextTerm;           // stores the next term in the series     
   
   // initializes the previous term and the sum of terms in the series

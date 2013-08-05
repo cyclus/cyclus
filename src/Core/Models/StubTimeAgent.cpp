@@ -14,7 +14,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::StubTimeAgent() { 
-  setModelType("Stub");
+  SetModelType("Stub");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,10 +26,10 @@ std::string StubTimeAgent::str() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::handleTick(int time) {}
+void StubTimeAgent::HandleTick(int time) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubTimeAgent::handleTock(int time) {}
+void StubTimeAgent::HandleTock(int time) {}
 
 /* ------------------- */ 
 

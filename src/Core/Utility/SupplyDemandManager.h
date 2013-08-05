@@ -9,7 +9,7 @@
 #include <set>
 
 namespace cyclus {
-namespace SupplyDemand {
+namespace supply_demand {
 /**
    This is a manager class that manages a set of commodities. Those 
    commodities have a certain demand function associated with them 
@@ -38,61 +38,61 @@ class SupplyDemandManager {
      @param commodity the commodity
      @param demand a smart pointer to the demand function
    */
-  void registerCommodity(Commodity& commodity,FunctionPtr demand);
+  void RegisterCommodity(Commodity& commodity,FunctionPtr demand);
 
   /**
      @return true if the demand for a commodity is managed by this entity
      @param commodity the commodity in question
   */
-  bool managesCommodity(Commodity& commodity);
+  bool ManagesCommodity(Commodity& commodity);
   
   /**
      adds a commodity producer manager to the set of producer managers
    */
-  void registerProducerManager(SupplyDemand::CommodityProducerManager* cpm);
+  void RegisterProducerManager(supply_demand::CommodityProducerManager* cpm);
 
   /**
      removes a commodity producer manager from the set of producer 
      managers
    */
-  void unRegisterProducerManager(SupplyDemand::CommodityProducerManager* cpm);
+  void UnRegisterProducerManager(supply_demand::CommodityProducerManager* cpm);
 
   /**
      returns the current supply of a commodity
      @param commodity the commodity
      @return the current supply of the commodity
    */
-  double supply(Commodity& commodity);
+  double Supply(Commodity& commodity);
 
   /**
      the demand for a commodity at a given time
      @param commodity the commodity
      @param time the time
    */
-  double demand(Commodity& commodity, int time);
+  double Demand(Commodity& commodity, int time);
 
   /**
      returns the demand function for a commodity
      @param commodity the commodity being queried
    */
-  FunctionPtr demandFunction(Commodity& commodity);
+  FunctionPtr DemandFunction(Commodity& commodity);
 
   // protected: @MJGFlag - should be protected. revise when tests can
   // be found by classes in the Utility folder
   /**
-     checks if managesCommodity() is true. if it is false, an 
+     checks if ManagesCommodity() is true. if it is false, an 
      error is thrown.
      @param commodity the commodity in question
   */
-  void throwErrorIfCommodityNotManaged(Commodity& commodity);
+  void ThrowErrorIfCommodityNotManaged(Commodity& commodity);
 
  private:
   /// a container of all demand functions known to the manager
   std::map<Commodity,FunctionPtr,CommodityCompare> demand_functions_;
 
   /// a container of all production managers known to the manager
-  std::set<SupplyDemand::CommodityProducerManager*> managers_;
+  std::set<supply_demand::CommodityProducerManager*> managers_;
 };
-} // namespace SupplyDemand
+} // namespace supply_demand
 } // namespace cyclus
 #endif

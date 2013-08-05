@@ -18,9 +18,9 @@ class TestCompMap : public cyclus::CompMap {
   
   virtual ~TestCompMap() {};
   
-  void setMap(cyclus::Map m) {map_ = m;}
-  void setParent(cyclus::CompMapPtr p) {parent_ = p;}
-  void setDecayTime(double t) {decay_time_ = t;}
+  void SetMap(cyclus::Map m) {map_ = m;}
+  void SetParent(cyclus::CompMapPtr p) {parent_ = p;}
+  void SetDecayTime(double t) {decay_time_ = t;}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,7 +54,7 @@ class CompMapTests : public ::testing::Test {
     for (int i = 0; i < n_species_; i++) {
       int iso = isotopes_.at(i);
       double mass_value = (double)masses_.at(i);
-      double atom_value = mass_value / cyclus::MT->gramsPerMol(iso);
+      double atom_value = mass_value / cyclus::MT->GramsPerMol(iso);
       map_[iso] = mass_value;
       massified_[iso] = mass_value;
       atomified_[iso] = atom_value;
@@ -76,12 +76,12 @@ class CompMapTests : public ::testing::Test {
     root = cyclus::CompMapPtr(new cyclus::CompMap(basis_));
     // parent/
     parent = TestCompMapPtr(new TestCompMap(basis_));
-    parent->setParent(root);
-    parent->setDecayTime(t1);
+    parent->SetParent(root);
+    parent->SetDecayTime(t1);
     // child
     child = TestCompMapPtr(new TestCompMap(basis_));
-    child->setParent(parent->me());
-    child->setDecayTime(t2);
+    child->SetParent(parent->me());
+    child->SetDecayTime(t2);
   }
 };
 

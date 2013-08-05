@@ -33,11 +33,11 @@ class DieModel : public cyclus::FacilityModel {
   //   return dynamic_cast<Prototype*>(clone);
   // };
 
-  virtual void receiveMessage(cyclus::msg_ptr msg) { };
-  virtual void cloneModuleMembersFrom(FacilityModel* source){};
-  virtual void decommission() { delete this; }
+  virtual void ReceiveMessage(cyclus::msg_ptr msg) { };
+  virtual void CloneModuleMembersFrom(FacilityModel* source){};
+  virtual void Decommission() { delete this; }
 
-  virtual void handleTick(int time) {
+  virtual void HandleTick(int time) {
     tickCount_++;
     totalTicks++;
 
@@ -46,13 +46,13 @@ class DieModel : public cyclus::FacilityModel {
     }
   }
 
-  virtual void handleTock(int time) {
+  virtual void HandleTock(int time) {
     tockCount_++;
     totalTocks++;
     
     if (tockDie_) {
-      setFacLifetime(1);
-      setBuildDate(time);
+      SetFacLifetime(1);
+      SetBuildDate(time);
     }
   }
 
@@ -89,11 +89,11 @@ class InstModelClassTests : public ::testing::Test {
       child5_ = new DieModel();
 
       inst_ = new ConcreteInstModel();
-      child1_->enterSimulation(inst_);
-      child2_->enterSimulation(inst_);
-      child3_->enterSimulation(inst_);
-      child4_->enterSimulation(inst_);
-      child5_->enterSimulation(inst_);
+      child1_->EnterSimulation(inst_);
+      child2_->EnterSimulation(inst_);
+      child3_->EnterSimulation(inst_);
+      child4_->EnterSimulation(inst_);
+      child5_->EnterSimulation(inst_);
     }
 };
 
@@ -101,7 +101,7 @@ class InstModelClassTests : public ::testing::Test {
 TEST_F(InstModelClassTests, TickIter) {
   child2_->tickDie_ = true;
 
-  ASSERT_NO_THROW(inst_->handleTick(0));
+  ASSERT_NO_THROW(inst_->HandleTick(0));
   EXPECT_EQ(DieModel::totalTicks, 5);
   EXPECT_EQ(child1_->tickCount_, 1);
   EXPECT_EQ(child3_->tickCount_, 1);
@@ -111,7 +111,7 @@ TEST_F(InstModelClassTests, TickIter) {
   child1_->tickDie_ = true;
   child3_->tickDie_ = true;
 
-  ASSERT_NO_THROW(inst_->handleTick(0));
+  ASSERT_NO_THROW(inst_->HandleTick(0));
   EXPECT_EQ(DieModel::totalTicks, 9);
   EXPECT_EQ(child4_->tickCount_, 2);
   EXPECT_EQ(child5_->tickCount_, 2);
@@ -121,8 +121,8 @@ TEST_F(InstModelClassTests, TickIter) {
 TEST_F(InstModelClassTests, TockIter) {
   child2_->tockDie_ = true;
 
-  EXPECT_EQ(inst_->nChildren(),5);
-  ASSERT_NO_THROW(inst_->handleTock(0));
+  EXPECT_EQ(inst_->NChildren(),5);
+  ASSERT_NO_THROW(inst_->HandleTock(0));
   EXPECT_EQ(DieModel::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
   EXPECT_EQ(child3_->tockCount_, 1);
@@ -132,8 +132,8 @@ TEST_F(InstModelClassTests, TockIter) {
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
 
-  EXPECT_EQ(inst_->nChildren(),4);
-  ASSERT_NO_THROW(inst_->handleTock(1));
+  EXPECT_EQ(inst_->NChildren(),4);
+  ASSERT_NO_THROW(inst_->HandleTock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
   EXPECT_EQ(child5_->tockCount_, 2);

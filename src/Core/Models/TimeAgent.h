@@ -26,7 +26,7 @@ class TimeAgent : public Model {
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time) = 0;
+  virtual void HandleTick(int time) = 0;
 
   /**
      Each simulation agent is prompted to its end-of-time-step 
@@ -34,7 +34,7 @@ class TimeAgent : public Model {
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time) = 0;
+  virtual void HandleTock(int time) = 0;
 
   /**
      Each simulation agent is prompted to do its daily tasks. 
@@ -42,7 +42,7 @@ class TimeAgent : public Model {
      @param time is current month since the start of the simulation 
      @param day is the current day of that month 
    */
-  virtual void handleDailyTasks(int time, int day) = 0;
+  virtual void HandleDailyTasks(int time, int day) = 0;
   
 };
 } // namespace cyclus

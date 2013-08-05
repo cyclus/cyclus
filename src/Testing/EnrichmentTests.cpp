@@ -28,9 +28,9 @@ void EnrichmentTests::SetUp()
   (*comp)[92238] = 1 - assay_u_;
 
   mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(comp));
-  mat_->setQuantity(mass_u_);
+  mat_->SetQuantity(mass_u_);
 
-  setEnrichmentParameters();
+  SetEnrichmentParameters();
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -39,7 +39,7 @@ void EnrichmentTests::TearDown()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void EnrichmentTests::setEnrichmentParameters()
+void EnrichmentTests::SetEnrichmentParameters()
 {
   double feed_val = (1-2*feed_)*log(1/feed_ - 1);
   double tails_val = (1-2*tails_)*log(1/tails_ - 1);
@@ -54,9 +54,9 @@ void EnrichmentTests::setEnrichmentParameters()
 TEST_F(EnrichmentTests,assays) 
 {
   cyclus::enrichment::Assays a(feed_,product_,tails_);
-  EXPECT_DOUBLE_EQ(feed_,a.feed());
-  EXPECT_DOUBLE_EQ(product_,a.product());
-  EXPECT_DOUBLE_EQ(tails_,a.tails());
+  EXPECT_DOUBLE_EQ(feed_,a.Feed());
+  EXPECT_DOUBLE_EQ(product_,a.Product());
+  EXPECT_DOUBLE_EQ(tails_,a.Tails());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

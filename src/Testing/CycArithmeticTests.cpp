@@ -94,21 +94,21 @@ TEST_F(CycArithmeticTest, KahanSumExtremeVals){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingVecEmpty) {
   std::vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(empty_vec_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(empty_vec_));
   EXPECT_TRUE(sorted.empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingMapEmpty) {
   std::vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(empty_map_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(empty_map_));
   EXPECT_TRUE(sorted.empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingVecZeros) {
   std::vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(zeros_vec_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(zeros_vec_));
   std::vector<double>::iterator it;
   EXPECT_FALSE(sorted.empty());
   for(it=sorted.begin(); it!=sorted.end(); ++it) { 
@@ -119,7 +119,7 @@ TEST_F(CycArithmeticTest, sortAscendingVecZeros) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingMapZeros) {
   std::vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(zeros_map_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(zeros_map_));
   std::vector<double>::iterator it;
   EXPECT_FALSE(sorted.empty());
   for(it=sorted.begin(); it!=sorted.end(); ++it) { 
@@ -130,7 +130,7 @@ TEST_F(CycArithmeticTest, sortAscendingMapZeros) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingVec) {
   std::vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(ten_to_one_vec_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(ten_to_one_vec_));
   std::vector<double>::iterator it;
   EXPECT_FALSE(sorted.empty());
   int i=1;
@@ -143,7 +143,7 @@ TEST_F(CycArithmeticTest, sortAscendingVec) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(CycArithmeticTest, sortAscendingMap) {
   vector<double> sorted;
-  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::sort_ascending(ten_to_one_map_));
+  EXPECT_NO_THROW(sorted = cyclus::CycArithmetic::Sort_ascending(ten_to_one_map_));
   vector<double>::iterator it;
   EXPECT_FALSE(sorted.empty());
   int i = 1;

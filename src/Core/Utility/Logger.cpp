@@ -7,7 +7,7 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
-LogLevel Logger::report_level = (Logger::initialize(), LEV_ERROR);
+LogLevel Logger::report_level = (Logger::Initialize(), LEV_ERROR);
 bool Logger::no_model = false;
 bool Logger::no_mem = false;
 
@@ -38,19 +38,19 @@ Logger::~Logger() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logger::initialize() {
-  Logger::addLevel(LEV_ERROR, "LEV_ERROR");
-  Logger::addLevel(LEV_WARN, "LEV_WARN");
-  Logger::addLevel(LEV_INFO1, "LEV_INFO1");
-  Logger::addLevel(LEV_INFO2, "LEV_INFO2");
-  Logger::addLevel(LEV_INFO3, "LEV_INFO3");
-  Logger::addLevel(LEV_INFO4, "LEV_INFO4");
-  Logger::addLevel(LEV_INFO5, "LEV_INFO5");
-  Logger::addLevel(LEV_DEBUG1, "LEV_DEBUG1");
-  Logger::addLevel(LEV_DEBUG2, "LEV_DEBUG2");
-  Logger::addLevel(LEV_DEBUG3, "LEV_DEBUG3");
-  Logger::addLevel(LEV_DEBUG4, "LEV_DEBUG4");
-  Logger::addLevel(LEV_DEBUG5, "LEV_DEBUG5");
+void Logger::Initialize() {
+  Logger::AddLevel(LEV_ERROR, "LEV_ERROR");
+  Logger::AddLevel(LEV_WARN, "LEV_WARN");
+  Logger::AddLevel(LEV_INFO1, "LEV_INFO1");
+  Logger::AddLevel(LEV_INFO2, "LEV_INFO2");
+  Logger::AddLevel(LEV_INFO3, "LEV_INFO3");
+  Logger::AddLevel(LEV_INFO4, "LEV_INFO4");
+  Logger::AddLevel(LEV_INFO5, "LEV_INFO5");
+  Logger::AddLevel(LEV_DEBUG1, "LEV_DEBUG1");
+  Logger::AddLevel(LEV_DEBUG2, "LEV_DEBUG2");
+  Logger::AddLevel(LEV_DEBUG3, "LEV_DEBUG3");
+  Logger::AddLevel(LEV_DEBUG4, "LEV_DEBUG4");
+  Logger::AddLevel(LEV_DEBUG5, "LEV_DEBUG5");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,7 +74,7 @@ std::string Logger::ToString(LogLevel level) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Logger::addLevel(LogLevel level, std::string text) {
+void Logger::AddLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
   text = text.substr(4);

@@ -22,10 +22,10 @@ class CommodityTestHelper {
   cyclus::Commodity commodity;
 
   /// first producer
-  cyclus::SupplyDemand::CommodityProducer* producer1;
+  cyclus::supply_demand::CommodityProducer* producer1;
 
   /// second producer
-  cyclus::SupplyDemand::CommodityProducer* producer2;
+  cyclus::supply_demand::CommodityProducer* producer2;
   
   /// production capacity
   double capacity;
@@ -34,13 +34,13 @@ class CommodityTestHelper {
   int nproducers;
   
   /// a manager of commodity producers
-  cyclus::SupplyDemand::CommodityProducerManager manager;
+  cyclus::supply_demand::CommodityProducerManager manager;
 
   /// initialize the producers
-  void setUpProducers();
+  void SetUpProducers();
 
   /// initialize the producer manager
-  void setUpProducerManager();
+  void SetUpProducerManager();
 };
 
 #endif

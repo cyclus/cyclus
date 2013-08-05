@@ -18,10 +18,10 @@ class XMLQueryEngineTest : public ::testing::Test {
 
   // loading helpers
   cyclus::XMLParser* parser_;
-  void loadParser();
-  void getContent(std::stringstream &ss);
-  std::string subcontent();
-  std::string unknowncontent();
+  void LoadParser();
+  void GetContent(std::stringstream &ss);
+  std::string Subcontent();
+  std::string Unknowncontent();
 
  public:
   virtual void SetUp();

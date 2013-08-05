@@ -2,14 +2,14 @@
 // A LMatrix object contains n rows and m columns.  When a LMatrix object is
 // created, it is initialized with zeros in all of the elements by default.
 // To change the value of the element aij at row i and column j, use the
-// setElement(int i, int j, long double aij) function.  The only difference
+// SetElement(int i, int j, long double aij) function.  The only difference
 // between LMatrix and Matrix is that LMatrix elements are long doubles instead
 // of doubles.
 //
-// The function numRows() returns the number of rows n in the LMatrix object,
-// and the function numCols() returns the number of columns m in the LMatrix
+// The function NumRows() returns the number of rows n in the LMatrix object,
+// and the function NumCols() returns the number of columns m in the LMatrix
 // object.  To access the element in the ith row and jth column of a LMatrix A,
-// use the syntax A(i,j).  To print the matrix, use the print() function.
+// use the syntax A(i,j).  To print the matrix, use the Print() function.
 //
 // Mathematical functions that can be performed on two LMatrix objects include:
 //
@@ -55,12 +55,12 @@ LMatrix::LMatrix(int n, int m) {
 }
 
 // returns the number of rows n in the matrix
-int LMatrix::numRows() const {
+int LMatrix::NumRows() const {
   return rows_;
 }
 
 // returns the number of columns m in the matrix
-int LMatrix::numCols() const {
+int LMatrix::NumCols() const {
   return cols_;
 }
 
@@ -71,7 +71,7 @@ const long double & LMatrix::operator()(int i, int j) const {
 }
 
 // sets the value for the element aij at row i and column j
-void LMatrix::setElement(int i, int j, long double aij) {
+void LMatrix::SetElement(int i, int j, long double aij) {
   M_[i-1][j-1] = aij; 
 }
 
@@ -82,7 +82,7 @@ long double & LMatrix::operator()(int i, int j) {
 
 // adds a row at the end of the Matrix if it contains the same number of
 // elements as the number of columns in the Matrix
-void LMatrix::addRow(std::vector<long double> row) {
+void LMatrix::AddRow(std::vector<long double> row) {
   int size = row.size();
   if ( size == cols_ ) {
     M_.push_back(row);
@@ -91,7 +91,7 @@ void LMatrix::addRow(std::vector<long double> row) {
 }
 
 // prints the matrix to standard output
-void LMatrix::print() const {
+void LMatrix::Print() const {
   std::cout.setf(std::ios::showpoint);
   std::cout.setf(std::ios::scientific);
 
@@ -287,7 +287,7 @@ LMatrix identity(int n) {
   LMatrix I(n,n);
 
   for (int i = 0; i < n ; i++) {
-    I.setElement(i+1, i+1, 1);
+    I.SetElement(i+1, i+1, 1);
   }
   
   return I;  // returns the nxn identity matrix

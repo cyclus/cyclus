@@ -65,22 +65,22 @@ class MaterialTest : public ::testing::Test {
 
       // material creation
       test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
-      test_mat_->setQuantity(test_size_);
+      test_mat_->SetQuantity(test_size_);
 
       two_test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
-      two_test_mat_->setQuantity(2*test_size_);
+      two_test_mat_->SetQuantity(2*test_size_);
 
       ten_test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
-      ten_test_mat_->setQuantity(10*test_size_);
+      ten_test_mat_->SetQuantity(10*test_size_);
       diff_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(diff_comp_));
-      diff_mat_->setQuantity(test_size_);
+      diff_mat_->SetQuantity(test_size_);
 
       default_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material());
       u_am_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(u_am_comp_));
-      u_am_mat_->setQuantity(test_size_);
+      u_am_mat_->SetQuantity(test_size_);
 
       pu_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(pu_comp_));
-      pu_mat_->setQuantity(test_size_);
+      pu_mat_->SetQuantity(test_size_);
 
       // vec creation
       test_vec_[1]=1.0;

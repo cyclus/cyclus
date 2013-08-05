@@ -7,7 +7,7 @@
 #include "CommodityProducer.h"
 
 namespace cyclus {
-namespace SupplyDemand
+namespace supply_demand
 {
   /**
      a mixin to provide information about commodity producers
@@ -25,7 +25,7 @@ namespace SupplyDemand
        @return the total production capacity for a commodity amongst producers
        @param commodity the commodity in question
      */
-    double totalProductionCapacity(Commodity& commodity);
+    double TotalProductionCapacity(Commodity& commodity);
 
     // protected: @MJGFlag - should be protected. revise when tests can
     // be found by classes in the Utility folder
@@ -33,13 +33,13 @@ namespace SupplyDemand
        register a commodity producer with the manager
        @param producer the producer
      */
-    void registerProducer(SupplyDemand::CommodityProducer* producer);
+    void RegisterProducer(supply_demand::CommodityProducer* producer);
 
     /**
        unregister a commodity producer with the manager
        @param producer the producer
      */
-    void unRegisterProducer(SupplyDemand::CommodityProducer* producer);
+    void UnRegisterProducer(supply_demand::CommodityProducer* producer);
 
     /// the set of managed producers
     std::set<CommodityProducer*> producers_;

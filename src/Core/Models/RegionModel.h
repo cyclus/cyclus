@@ -84,12 +84,12 @@ class RegionModel : public TimeAgent, public Communicator {
      
      @param qe A pointer to a QueryEngine object containing initialization data
    */
-  virtual void initCoreMembers(QueryEngine* qe);
+  virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
      perform actions required when entering the simulation
    */
-   virtual void enterSimulationAsCoreEntity();
+   virtual void EnterSimulationAsCoreEntity();
 
   /**
      every model should be able to print a verbose description 
@@ -100,7 +100,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      default RegionModel receiver is to ignore messages 
    */
-  virtual void receiveMessage(msg_ptr msg);
+  virtual void ReceiveMessage(msg_ptr msg);
 
   /**
      Each region is prompted to do its beginning-of-time-step 
@@ -109,7 +109,7 @@ class RegionModel : public TimeAgent, public Communicator {
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time);
+  virtual void HandleTick(int time);
 
   /**
      Each region is prompted to do its end-of-time-step 
@@ -118,7 +118,7 @@ class RegionModel : public TimeAgent, public Communicator {
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time);
+  virtual void HandleTock(int time);
 
   /**
      Each region is prompted to do its daily task. 
@@ -126,13 +126,13 @@ class RegionModel : public TimeAgent, public Communicator {
      @param time is the month since the start of the simulation 
      @param day is the current day of that month 
    */
-  virtual void handleDailyTasks(int time, int day);
+  virtual void HandleDailyTasks(int time, int day);
 
  public:
   /**
      returns if the facility is in this region's allowed facs 
    */
-  bool isAllowedFacility(Model* test_fac) 
+  bool IsAllowedFacility(Model* test_fac) 
   { return ( allowedFacilities_.find(test_fac) 
 	     != allowedFacilities_.end() ); } ;
     
@@ -140,23 +140,23 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      populate the region's list of allowed facilities
    */
-  virtual void initAllowedFacilities(QueryEngine* qe);
+  virtual void InitAllowedFacilities(QueryEngine* qe);
 
   /**
      populate the region's list of institution names
    */
-  virtual void initInstitutionNames(QueryEngine* qe);
+  virtual void InitInstitutionNames(QueryEngine* qe);
 
   /**
      set the parameters necessary for RegionModel to interact
      with the simulation
    */
-  virtual void addRegionAsRootNode();
+  virtual void AddRegionAsRootNode();
 
   /**
      populate the region's list of child institutions
    */
-  virtual void addChildrenToTree();
+  virtual void AddChildrenToTree();
 
   /**
      every region has a list of allowed facilities 

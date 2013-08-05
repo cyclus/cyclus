@@ -8,7 +8,7 @@
 namespace cyclus {
 
 // -------------------------------------------------------------------
-FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params) 
+FunctionPtr LinFunctionFactory::GetFunctionPtr(std::string params) 
 { 
   std::stringstream ss(params);
   double slope, intercept;
@@ -22,7 +22,7 @@ FunctionPtr LinFunctionFactory::getFunctionPtr(std::string params)
 }
 
 // -------------------------------------------------------------------
-FunctionPtr ExpFunctionFactory::getFunctionPtr(std::string params) 
+FunctionPtr ExpFunctionFactory::GetFunctionPtr(std::string params) 
 { 
   std::stringstream ss(params);
   double constant, exponent, intercept;
@@ -44,7 +44,7 @@ PiecewiseFunctionFactory::PiecewiseFunctionFactory()
 }
 
 // -------------------------------------------------------------------
-FunctionPtr PiecewiseFunctionFactory::getFunctionPtr(std::string params) 
+FunctionPtr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) 
 { 
   if (!params.empty()) 
     {
@@ -52,13 +52,13 @@ FunctionPtr PiecewiseFunctionFactory::getFunctionPtr(std::string params)
     }
   
   LOG(LEV_DEBUG2,"Funct") << "A piecewise function has been created: "
-                          << function_->print();
+                          << function_->Print();
   
   return function_;
 }
 
 // -------------------------------------------------------------------
-void PiecewiseFunctionFactory::addFunction(FunctionPtr function, double starting_coord, bool continuous) 
+void PiecewiseFunctionFactory::AddFunction(FunctionPtr function, double starting_coord, bool continuous) 
 {
   if (!function_->functions_.empty())
     {
@@ -91,7 +91,7 @@ BasicFunctionFactory::BasicFunctionFactory()
 } 
 
 // -------------------------------------------------------------------
-FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type, 
+FunctionPtr BasicFunctionFactory::GetFunctionPtr(std::string type, 
                                                  std::string params) 
 {
   switch(enum_names_[type]) 
@@ -99,13 +99,13 @@ FunctionPtr BasicFunctionFactory::getFunctionPtr(std::string type,
     case LIN:
       {
         LinFunctionFactory lff;
-        return lff.getFunctionPtr(params);
+        return lff.GetFunctionPtr(params);
       }
       break;
     case EXP:
       {
         ExpFunctionFactory eff;
-        return eff.getFunctionPtr(params);
+        return eff.GetFunctionPtr(params);
       }
       break;
     default:

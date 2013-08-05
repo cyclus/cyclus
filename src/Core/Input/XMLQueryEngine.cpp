@@ -10,7 +10,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 XMLQueryEngine::XMLQueryEngine(XMLParser& parser) : current_node_(0) {
-  current_node_ = parser.document()->get_root_node();
+  current_node_ = parser.Document()->get_root_node();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -19,7 +19,7 @@ XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) : current_node_(0) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int XMLQueryEngine::nElements() {
+int XMLQueryEngine::NElements() {
   using xmlpp::Element;
   int n = 0;
   const xmlpp::Node::NodeList nodelist = current_node_->get_children();  
@@ -33,12 +33,12 @@ int XMLQueryEngine::nElements() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int XMLQueryEngine::nElementsMatchingQuery(std::string query) {
+int XMLQueryEngine::NElementsMatchingQuery(std::string query) {
   return current_node_->find(query).size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngine::getElementContent(std::string query,
+std::string XMLQueryEngine::GetElementContent(std::string query,
                                               int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
@@ -76,7 +76,7 @@ std::string XMLQueryEngine::getElementContent(std::string query,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string XMLQueryEngine::getElementName(int index) {
+std::string XMLQueryEngine::GetElementName(int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   std::vector<xmlpp::Element*> elements;
@@ -94,7 +94,7 @@ std::string XMLQueryEngine::getElementName(int index) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-QueryEngine* XMLQueryEngine::getEngineFromQuery(std::string query,
+QueryEngine* XMLQueryEngine::GetEngineFromQuery(std::string query,
                                                 int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;

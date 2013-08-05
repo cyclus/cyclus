@@ -30,7 +30,7 @@ class MarketPlayerManager {
   /**
      set's the commodity associated with this manager
    */
-  void setCommodity(Commodity& commod);
+  void SetCommodity(Commodity& commod);
 
   /**
      return the commodity associated with this manager
@@ -43,7 +43,7 @@ class MarketPlayerManager {
      market
      @return the total production capacity of the market
    */
-  double playerProductionCapacity();
+  double PlayerProductionCapacity();
   
  private:
   /// the commodity associated with this manager
@@ -56,13 +56,13 @@ class MarketPlayerManager {
      add a player from the list of players
      @param m the player to add
    */
-  void playerEnteringMarket(MarketPlayer* m);
+  void PlayerEnteringMarket(MarketPlayer* m);
 
   /**
      remove a player from the list of players
      @param m the player to remove
    */
-  void playerLeavingMarket(MarketPlayer* m);
+  void PlayerLeavingMarket(MarketPlayer* m);
 
   /// MarketPlayer is a friend class for access to enter/leaving
   friend class MarketPlayer;

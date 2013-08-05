@@ -3,11 +3,11 @@
 #include "error.h"
 
 
-//using namespace SupplyDemand;
-//using namespace ActionBuilding;
+//using namespace supply_demand;
+//using namespace action_building;
 
 namespace cyclus {
-namespace ActionBuilding {
+namespace action_building {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 Builder::Builder() {}
@@ -16,7 +16,7 @@ Builder::Builder() {}
 Builder::~Builder() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Builder::registerProducer(SupplyDemand::CommodityProducer* producer) {
+void Builder::RegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
       throw KeyError("A builder is trying to register a producer twice.");
@@ -28,7 +28,7 @@ void Builder::registerProducer(SupplyDemand::CommodityProducer* producer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Builder::unRegisterProducer(SupplyDemand::CommodityProducer* producer) {
+void Builder::UnRegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
       throw KeyError("A builder is trying to unregister a producer not originally registered with it.");
@@ -40,19 +40,19 @@ void Builder::unRegisterProducer(SupplyDemand::CommodityProducer* producer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Builder::nBuildingPrototypes() 
+double Builder::NBuildingPrototypes() 
 {
   return producers_.size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<SupplyDemand::CommodityProducer*>::iterator Builder::beginningProducer()
+std::set<supply_demand::CommodityProducer*>::iterator Builder::BeginningProducer()
 {
   return producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<SupplyDemand::CommodityProducer*>::iterator Builder::endingProducer()
+std::set<supply_demand::CommodityProducer*>::iterator Builder::EndingProducer()
 {
   return producers_.end();
 }

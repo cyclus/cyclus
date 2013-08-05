@@ -12,13 +12,13 @@ TEST_P(MarketModelTests, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(MarketModelTests, ReceiveMessage) {
-  EXPECT_NO_THROW(market_model_->resolve());
+  EXPECT_NO_THROW(market_model_->Resolve());
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(MarketModelTests, Resolve) {
-  EXPECT_NO_THROW(market_model_->resolve());
+  EXPECT_NO_THROW(market_model_->Resolve());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

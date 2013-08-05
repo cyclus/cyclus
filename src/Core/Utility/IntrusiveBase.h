@@ -28,7 +28,7 @@ namespace cyclus {
    } 
     
    int main(...) { 
-   boost::intrusive_ptr<Resource> resource(new Resource()); 
+   boost::intrusive_ptr<Resource> Resource(new Resource()); 
    boost::intrusive_ptr<Resource> resource2(new Resource()); 
     
    // use resource as if it were a regular pointer, e.g. 

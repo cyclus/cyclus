@@ -16,7 +16,7 @@ double LinearFunction::value(double x)
 }
 
 // -------------------------------------------------------------------
-std::string LinearFunction::print() 
+std::string LinearFunction::Print() 
 { 
   std::stringstream ss("");
   ss << "y = " << slope_ << " * x + " << intercept_;
@@ -30,7 +30,7 @@ double ExponentialFunction::value(double x)
 }
 
 // -------------------------------------------------------------------
-std::string ExponentialFunction::print() 
+std::string ExponentialFunction::Print() 
 { 
   std::stringstream ss("");
   ss << "y = " << constant_ 
@@ -57,14 +57,14 @@ double PiecewiseFunction::value(double x)
 }
   
 // -------------------------------------------------------------------
-std::string PiecewiseFunction::print() 
+std::string PiecewiseFunction::Print() 
 { 
   std::stringstream ss("");
   ss << "Piecewise Function comprised of: ";
   std::list<PiecewiseFunctionInfo>::iterator f;
   for (f = functions_.begin(); f != functions_.end(); f++)
     {
-      ss << " * " << f->function->print() 
+      ss << " * " << f->function->Print() 
          << " starting at coordinate (" << f->xoffset << "," 
          << f->yoffset << ")";
     }

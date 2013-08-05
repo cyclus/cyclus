@@ -72,7 +72,7 @@ class InstModel : public TimeAgent, public Communicator {
      
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void initCoreMembers(QueryEngine* qe);
+  virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
@@ -83,7 +83,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      default InstModel receiver is to ignore message. 
    */
-  virtual void receiveMessage(msg_ptr msg);
+  virtual void ReceiveMessage(msg_ptr msg);
   
   /**
      Each institution is prompted to do its beginning-of-time-step 
@@ -92,7 +92,7 @@ class InstModel : public TimeAgent, public Communicator {
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time);
+  virtual void HandleTick(int time);
 
   /**
      Each institution is prompted to its end-of-time-step 
@@ -101,7 +101,7 @@ class InstModel : public TimeAgent, public Communicator {
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time);
+  virtual void HandleTock(int time);
 
   /**
      Each inst is prompted to do its daily tasks. 
@@ -111,12 +111,12 @@ class InstModel : public TimeAgent, public Communicator {
      @param time is the number of months since the beginning of the 
      simulation @param day is the current day in this month 
    */
-  virtual void handleDailyTasks(int time, int day);
+  virtual void HandleDailyTasks(int time, int day);
 
   /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void enterSimulationAsCoreEntity();
+  virtual void EnterSimulationAsCoreEntity();
 /* ------------------- */ 
 
 
@@ -139,41 +139,41 @@ class InstModel : public TimeAgent, public Communicator {
      add a prtotoype to the set of available prototypes
      @param prototype the prototype to add
    */
-  void addAvailablePrototype(Prototype* prototype);
+  void AddAvailablePrototype(Prototype* prototype);
 
   /**
      perform any actions required after prototype has been added to
      the list of available prototypes
      @param prototype the prototype to register
    */
-  virtual void registerAvailablePrototype(Prototype* prototype);
+  virtual void RegisterAvailablePrototype(Prototype* prototype);
 
   /**
      Adds a prototype build order to initial_build_order_
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  void addPrototypeToInitialBuild(QueryEngine* qe);
+  void AddPrototypeToInitialBuild(QueryEngine* qe);
 
  public:
   /**
      return the number of prototypes this inst can build
    */
-  int nPrototypes() { return prototypes_.size(); }
+  int NPrototypes() { return prototypes_.size(); }
   
   /**
      return the first prototype
    */
-  PrototypeIterator beginPrototype() { return prototypes_.begin(); }
+  PrototypeIterator BeginPrototype() { return prototypes_.begin(); }
 
   /**
      return the last prototype
    */
-  PrototypeIterator endPrototype() { return prototypes_.end(); }
+  PrototypeIterator EndPrototype() { return prototypes_.end(); }
 
   /**
      Checks if prototype is in the prototype list 
    */
-  bool isAvailablePrototype(Prototype* p) {
+  bool IsAvailablePrototype(Prototype* p) {
     return ( prototypes_.find(p) != prototypes_.end() ); 
   }
 
@@ -181,8 +181,8 @@ class InstModel : public TimeAgent, public Communicator {
      another moniker for isAvailablePrototype
      @param prototype the prototype to be built
    */
-  virtual bool canBuild(Prototype* prototype) {
-    return isAvailablePrototype(prototype);
+  virtual bool CanBuild(Prototype* prototype) {
+    return IsAvailablePrototype(prototype);
   }
   
   /**
@@ -190,37 +190,37 @@ class InstModel : public TimeAgent, public Communicator {
      if not, it throws an error
      @param p the prototype to check for
    */
-  void throwErrorIfPrototypeIsntAvailable(Prototype* p);
+  void ThrowErrorIfPrototypeIsntAvailable(Prototype* p);
 
   /**
      returns this institution's region 
    */
-  RegionModel* getRegion() { return (dynamic_cast<RegionModel*>( this->parent() )); };
+  RegionModel* GetRegion() { return (dynamic_cast<RegionModel*>( this->parent() )); };
 
   /**
      reports number of facilities in this inst 
    */
-  int getNumFacilities(){ return this->nChildren();};
+  int GetNumFacilities(){ return this->NChildren();};
 
   /**
      builds a prototype 
      @param prototype the prototype to build
    */
-  void build(Prototype* prototype);
+  void Build(Prototype* prototype);
 
   /**
      perform any registration functionality after a clone has been 
      built
      @param clone the built (cloned) prototype
    */
-  virtual void registerCloneAsBuilt(Prototype* clone);
+  virtual void RegisterCloneAsBuilt(Prototype* clone);
 
   /**
      perform any registration functionality before a clone is 
      decommissioned(deleted)
      @param clone the to-be-decommissioned prototype
    */
-  virtual void registerCloneAsDecommissioned(Prototype* clone);
+  virtual void RegisterCloneAsDecommissioned(Prototype* clone);
 
 /* ------------------- */ 
   

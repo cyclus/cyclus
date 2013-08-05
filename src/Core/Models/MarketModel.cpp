@@ -16,7 +16,7 @@ std::list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 MarketModel::MarketModel() {
-  setModelType("Market"); 
+  SetModelType("Market"); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -34,7 +34,7 @@ MarketModel::~MarketModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-MarketModel* MarketModel::marketForCommod(std::string commod) {
+MarketModel* MarketModel::MarketForCommod(std::string commod) {
   MarketModel* market = NULL;
   std::list<MarketModel*>::iterator mkt;
   for (mkt=markets_.begin(); mkt!=markets_.end(); ++mkt){
@@ -53,29 +53,29 @@ MarketModel* MarketModel::marketForCommod(std::string commod) {
 }
  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::registerMarket(MarketModel* mkt) {
+void MarketModel::RegisterMarket(MarketModel* mkt) {
   markets_.push_back(mkt);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::enterSimulationAsCoreEntity() {
+void MarketModel::EnterSimulationAsCoreEntity() {
   // register the model
-  TI->registerResolveListener(this);
-  MarketModel::registerMarket(this);
+  TI->RegisterResolveListener(this);
+  MarketModel::RegisterMarket(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::setCommodity(std::string name) {
+void MarketModel::SetCommodity(std::string name) {
   commodity_ = name;
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void MarketModel::initCoreMembers(QueryEngine* qe) {
+void MarketModel::InitCoreMembers(QueryEngine* qe) {
   // general initializations
-  Model::initCoreMembers(qe);
+  Model::InitCoreMembers(qe);
 
   // specific initalizations
-  setCommodity(qe->getElementContent("mktcommodity"));
+  SetCommodity(qe->GetElementContent("mktcommodity"));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

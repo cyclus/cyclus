@@ -151,13 +151,13 @@ class Logger {
     Used to populate the level_to_string and string_to_level vector/map before
     cyclus code execution begins
     */
-    static void initialize();
+    static void Initialize();
     
     /*!
     Used by the initialize method to populate the level_to_string and
     string_to_level static variables.
     */
-    static void addLevel(LogLevel level, std::string text);
+    static void AddLevel(LogLevel level, std::string text);
 
     /*!
     The number of spaces indentation between different LogLevel enum values.

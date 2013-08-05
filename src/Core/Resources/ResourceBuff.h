@@ -45,7 +45,7 @@ class ResourceBuff {
   @throws ValueError the new capacity is lower (by cyclus::eps_rsrc()) than the
   quantity of resources that already exist in the store.
   */
-  void setCapacity(double cap);
+  void SetCapacity(double cap);
 
   /*!
   count returns the total number of constituent resource objects
@@ -78,7 +78,7 @@ class ResourceBuff {
   @throws ValueError the specified pop quantity is larger (by
   cyclus::eps_rsrc()) than the store's current quantity.
   */
-  std::vector<rsrc_ptr> popQty(double qty);
+  std::vector<rsrc_ptr> PopQty(double qty);
 
   /*!
   popNum pops the specified number or count of resource objects from the
@@ -90,7 +90,7 @@ class ResourceBuff {
   @throws ValueError the specified pop number is larger than the
   store's current inventoryNum or the specified number is negative.
   */
-  std::vector<rsrc_ptr> popNum(int num);
+  std::vector<rsrc_ptr> PopNum(int num);
 
   /*!
   popOne pops one resource object from the store.
@@ -100,7 +100,7 @@ class ResourceBuff {
 
   @throws ValueError the store is empty.
   */
-  rsrc_ptr popOne();
+  rsrc_ptr PopOne();
 
   /*!
   pushOne pushs a single resource object to the store.
@@ -115,7 +115,7 @@ class ResourceBuff {
   @throws KeyError the resource object to be pushed is already present
   in the store.
   */
-  void pushOne(rsrc_ptr mat);
+  void PushOne(rsrc_ptr mat);
 
   /*!
   pushAll pushs one or more resource objects (as a std::vector) to the store.
@@ -131,7 +131,7 @@ class ResourceBuff {
   @throws KeyError one or more of the resource objects to be pushed
   are already present in the store.
   */
-  void pushAll(Manifest mats);
+  void PushAll(Manifest mats);
 
   /**
      returns true if there are no mats in mats_

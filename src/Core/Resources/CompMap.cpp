@@ -15,12 +15,12 @@ LogLevel CompMap::log_level_ = LEV_INFO3;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(Basis b) {
-  init(b);
+  Init(b);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMap::CompMap(const CompMap& other) {
-  init(other.basis());
+  Init(other.basis());
   map_ = other.map();
 }
 
@@ -73,7 +73,7 @@ int CompMap::size() const {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 bool CompMap::operator==(const CompMap& rhs) const {
-  return almostEqual(rhs, 0);
+  return AlmostEqual(rhs, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -82,7 +82,7 @@ bool CompMap::operator<(const CompMap& rhs) const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
+bool CompMap::AlmostEqual(const CompMap rhs, double threshold) const{
   // I learned at 
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the intuitive way of doing this...
@@ -106,8 +106,8 @@ bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
     if (rhs.count(it->first) == 0) {
       return false;
     }
-    double minuend = rhs.massFraction(it->first); 
-    double subtrahend = massFraction(it->first); 
+    double minuend = rhs.MassFraction(it->first); 
+    double subtrahend = MassFraction(it->first); 
     double diff = minuend - subtrahend;
     if (abs(minuend) == 0 || abs(subtrahend) == 0){
       if (abs(diff) > abs(diff)*threshold){
@@ -122,7 +122,7 @@ bool CompMap::almostEqual(const CompMap rhs, double threshold) const{
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool CompMap::recorded() const {
+bool CompMap::Recorded() const {
   return (ID_ > 0);
 }
 
@@ -142,25 +142,25 @@ int CompMap::ID() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CompMap::massFraction(const Iso& tope) const {
+double CompMap::MassFraction(const Iso& tope) const {
   if (count(tope) == 0 || mass_to_atom_ratio_ == 0) {
     return 0.0;
   }
   double factor = 1.0;
   if (basis_ != MASS) {
-    factor = MT->gramsPerMol(tope) / mass_to_atom_ratio_;
+    factor = MT->GramsPerMol(tope) / mass_to_atom_ratio_;
   }
   return factor * map_.find(tope)->second;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CompMap::atomFraction(const Iso& tope) const {
+double CompMap::AtomFraction(const Iso& tope) const {
   if (count(tope) == 0 || mass_to_atom_ratio_ == 0) {
     return 0.0;
   }
   double factor = 1.0;
   if (basis_ != ATOM) {
-    factor = 1 / (MT->gramsPerMol(tope) / mass_to_atom_ratio_);
+    factor = 1 / (MT->GramsPerMol(tope) / mass_to_atom_ratio_);
   }
   return factor * map_.find(tope)->second;
 }
@@ -211,13 +211,13 @@ int CompMap::root_decay_time() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::massify() {
-  change_basis(MASS);
+void CompMap::Massify() {
+  Change_basis(MASS);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::atomify() {
-  change_basis(ATOM);
+void CompMap::Atomify() {
+  Change_basis(ATOM);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -228,13 +228,13 @@ void CompMap::normalize() {
   std::vector<double> other_vec;
   bool atom = (basis_ == ATOM);
   for (iterator it = map_.begin(); it != map_.end(); ++it) {
-    validateEntry(it->first,it->second);
+    ValidateEntry(it->first,it->second);
     vec.push_back(it->second);
     if (atom) {
-      other_vec.push_back(it->second * MT->gramsPerMol(it->first));
+      other_vec.push_back(it->second * MT->GramsPerMol(it->first));
     }
     else {
-      other_vec.push_back(it->second / MT->gramsPerMol(it->first));
+      other_vec.push_back(it->second / MT->GramsPerMol(it->first));
     }
   }
   sum = CycArithmetic::KahanSum(vec);
@@ -250,7 +250,7 @@ void CompMap::normalize() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::init(Basis b) {
+void CompMap::Init(Basis b) {
   basis_ = b;
   map_ = Map(); 
   normalized_ = false;
@@ -261,7 +261,7 @@ void CompMap::init(Basis b) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::change_basis(Basis b) {
+void CompMap::Change_basis(Basis b) {
   if (!normalized()) {
     normalize();
   }
@@ -269,10 +269,10 @@ void CompMap::change_basis(Basis b) {
     for (iterator it = map_.begin(); it != map_.end(); ++it) {
       switch (b) {
       case ATOM:
-        map_[it->first] = atomFraction(it->first);
+        map_[it->first] = AtomFraction(it->first);
         break;
       case MASS:
-        map_[it->first] = massFraction(it->first);
+        map_[it->first] = MassFraction(it->first);
         break;
       default:
         throw ValueError("Basis not atom or mass.");
@@ -294,32 +294,32 @@ void CompMap::normalize(double sum) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int CompMap::getAtomicNum(Iso tope) {
-  validateIsotopeNumber(tope);
+int CompMap::GetAtomicNum(Iso tope) {
+  ValidateIsotopeNumber(tope);
   return tope / 1000; // integer division;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-int CompMap::getMassNum(Iso tope) {
-  validateIsotopeNumber(tope);
+int CompMap::GetMassNum(Iso tope) {
+  ValidateIsotopeNumber(tope);
   return tope % 1000;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::validate() {
+void CompMap::Validate() {
   for (Map::iterator it = map_.begin(); it != map_.end(); ++it) {
-    validateEntry(it->first,it->second);
+    ValidateEntry(it->first,it->second);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::validateEntry(const Iso& tope, const double& value) {
-  validateIsotopeNumber(tope);
-  validateValue(value);
+void CompMap::ValidateEntry(const Iso& tope, const double& value) {
+  ValidateIsotopeNumber(tope);
+  ValidateValue(value);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::validateIsotopeNumber(const Iso& tope) {
+void CompMap::ValidateIsotopeNumber(const Iso& tope) {
   int lower_limit = 1001;
   int upper_limit = 1182949;  
   if (tope < lower_limit || tope > upper_limit) {
@@ -330,7 +330,7 @@ void CompMap::validateIsotopeNumber(const Iso& tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::validateValue(const double& value) {
+void CompMap::ValidateValue(const double& value) {
   if (value < 0.0) {
     std::string err_msg = "CompMap has negative quantity for an isotope.";
     throw ValueError(err_msg);
@@ -338,14 +338,14 @@ void CompMap::validateValue(const double& value) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CompMap::print() {
-  CLOG(log_level_) << detail();
+void CompMap::Print() {
+  CLOG(log_level_) << Detail();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string CompMap::detail() {
+std::string CompMap::Detail() {
   std::stringstream ss;
-  std::vector<std::string> entries = compStrings();
+  std::vector<std::string> entries = CompStrings();
   for (std::vector<std::string>::iterator entry = entries.begin(); 
        entry != entries.end(); ++entry) {
     CLOG(log_level_) << *entry;
@@ -354,7 +354,7 @@ std::string CompMap::detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<std::string> CompMap::compStrings() {
+std::vector<std::string> CompMap::CompStrings() {
   std::stringstream ss;
   std::vector<std::string> comp_strings;
   for (const_iterator entry = map_.begin(); entry != map_.end(); ++entry) {
