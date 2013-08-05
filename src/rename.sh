@@ -5,7 +5,7 @@ function capFirst {
 
 function rename {
   newname=`capFirst $1`
-  ag -l --ignore=CMake*, --ignore=GoogleTest* --ignore=doc $1 $2 | xargs sed -i "s/\(\.\|->\|::\| \)$1(/\1$newname(/"
+  ag -l --ignore=CMake*, --ignore=GoogleTest* --ignore=doc $1 $2 | xargs sed -i "s/\(\.\|->\|::\| \)$1(/\1$newname(/g"
 }
 
 while read funcname; do
