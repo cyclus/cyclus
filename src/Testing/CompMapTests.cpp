@@ -141,12 +141,11 @@ TEST_F(CompMapTests, almostEqualZeroEntry) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(CompMapTests, almostEqualNegThresh) {
   using cyclus::CompMap;
-  using cyclus::CycNegativeValueException;
   LoadMap();
   comp_->setMap(map_);
   comp_->normalize();
   CompMap copy = CompMap(*comp_);
-  EXPECT_THROW(copy.almostEqual(*comp_, -1.0), ValueError);
+  EXPECT_THROW(copy.almostEqual(*comp_, -1.0), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

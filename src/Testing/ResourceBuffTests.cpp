@@ -98,19 +98,17 @@ TEST_F(ResourceBuffTest, GetCount_Filled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
   using cyclus::Manifest;
-  using cyclus::CycNegQtyException;
   Manifest manifest;
   double qty = cap + overeps;
-  ASSERT_THROW(manifest = filled_store_.popQty(qty), ValueError);
+  ASSERT_THROW(manifest = filled_store_.popQty(qty), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
   using cyclus::Manifest;
-  using cyclus::CycNegQtyException;
   Manifest manifest;
   double qty = cap + overeps;
-  ASSERT_THROW(manifest = store_.popQty(qty), ValueError);
+  ASSERT_THROW(manifest = store_.popQty(qty), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -190,10 +188,9 @@ TEST_F(ResourceBuffTest, RemoveQty_SplitUnderFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
   using cyclus::Manifest;
-  using cyclus::CycNegQtyException;
   Manifest manifest;
-  ASSERT_THROW(manifest = filled_store_.popNum(3), ValueError);
-  ASSERT_THROW(manifest = filled_store_.popNum(-1), ValueError);
+  ASSERT_THROW(manifest = filled_store_.popNum(3), cyclus::ValueError);
+  ASSERT_THROW(manifest = filled_store_.popNum(-1), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -239,7 +236,6 @@ TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveOne_Filled) {
   using cyclus::rsrc_ptr;
-  using cyclus::CycNegQtyException;
   rsrc_ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.popOne());
@@ -254,7 +250,7 @@ TEST_F(ResourceBuffTest, RemoveOne_Filled) {
   EXPECT_EQ(filled_store_.count(), 0);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
 
-  ASSERT_THROW(mat = filled_store_.popOne(), ValueError);
+  ASSERT_THROW(mat = filled_store_.popOne(), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -275,8 +271,6 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
   using cyclus::rsrc_ptr;
-  using cyclus::CycDupResException;
-  using cyclus::CycOverCapException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
@@ -286,7 +280,7 @@ TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
   rsrc_ptr overmat = mat1_->clone();
   overmat->setQuantity(topush + overeps);
 
-  ASSERT_THROW(store_.pushOne(overmat), ValueError);
+  ASSERT_THROW(store_.pushOne(overmat), cyclus::ValueError);
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
@@ -300,11 +294,10 @@ TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_DuplicateEmpty) {
-  using cyclus::CycDupResException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
 
   ASSERT_NO_THROW(store_.pushOne(mat1_));
-  ASSERT_THROW(store_.pushOne(mat1_), KeyError);
+  ASSERT_THROW(store_.pushOne(mat1_), cyclus::KeyError);
 
   ASSERT_EQ(store_.count(), 1);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
@@ -345,8 +338,6 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   using cyclus::rsrc_ptr;
   using cyclus::Manifest;
-  using cyclus::CycDupResException;
-  using cyclus::CycOverCapException;
   ASSERT_NO_THROW(store_.setCapacity(cap));
   ASSERT_NO_THROW(store_.pushAll(mats));
 
@@ -356,7 +347,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   Manifest overmats;
   overmats.push_back(overmat);
 
-  ASSERT_THROW(store_.pushAll(overmats), ValueError);
+  ASSERT_THROW(store_.pushAll(overmats), cyclus::ValueError);
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
@@ -373,13 +364,12 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
-  using cyclus::CycDupResException;
   ASSERT_NO_THROW(store_.setCapacity(2 * cap));
 
   ASSERT_NO_THROW(store_.pushAll(mats));
-  ASSERT_THROW(store_.pushOne(mat1_), KeyError);
-  ASSERT_THROW(store_.pushOne(mat2_), KeyError);
-  ASSERT_THROW(store_.pushAll(mats), KeyError);
+  ASSERT_THROW(store_.pushOne(mat1_), cyclus::KeyError);
+  ASSERT_THROW(store_.pushOne(mat2_), cyclus::KeyError);
+  ASSERT_THROW(store_.pushAll(mats), cyclus::KeyError);
 
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());

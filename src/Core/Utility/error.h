@@ -10,10 +10,6 @@ namespace cyclus {
 /// A generic mechanism to manually manage exceptions
 class Error: public std::exception {
 
- protected:
-  /// The message associated with this exception.
-  std::string msg_;
-
  public:
   /// Constructs a new Error with the default message.
   Error();
@@ -25,6 +21,14 @@ class Error: public std::exception {
   virtual const char* what() const throw();
 
   virtual ~Error() throw() {};
+
+ protected:
+  /// The message associated with this exception.
+  std::string msg_;
+
+ private:
+  static const std::string kPrefix;
+
 };
 
 /// For values that are too big, too small, etc.
@@ -50,7 +54,6 @@ class CastError: public Error {
  public:
   CastError(std::string msg) : Error(msg) {};
 };
-
 
 /// For validating files received via IO.
 class ValidationError: public Error {

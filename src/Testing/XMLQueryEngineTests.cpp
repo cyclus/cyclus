@@ -83,8 +83,6 @@ TEST_F(XMLQueryEngineTest,top_level_queries) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(XMLQueryEngineTest,top_level_throws) {  
-  using cyclus::CycIndexException;
-  using cyclus::CycRangeException;
   loadParser();
   cyclus::XMLQueryEngine engine(*parser_);
   EXPECT_THROW(engine.getElementContent(content_node_,ninner_nodes_+1), cyclus::ValueError);

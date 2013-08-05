@@ -120,12 +120,11 @@ TEST_F(IsoVectorTests,subtraction) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(IsoVectorTests,separation) {
-  using cyclus::CycRangeException;
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec.separate(to_subtract_vec,efficiency));
   EXPECT_TRUE(subtract_from_vec.compEquals(separate_result));
-  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,-1),ValueError);
-  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,2),ValueError);
+  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,-1),cyclus::ValueError);
+  EXPECT_THROW(subtract_from_vec.separate(to_subtract_vec,2),cyclus::ValueError);
   EXPECT_NO_THROW(subtract_from_vec.separate(to_subtract_vec,0)); // corner
 }
 

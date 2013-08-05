@@ -40,27 +40,25 @@ TEST_F(CommodityProducerManagerTests,initialization)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests,registerunregister)
 {
-  using cyclus::CycDoubleRegistrationException;
-  using cyclus::CycNotRegisteredException;
   // 1 producer
   EXPECT_NO_THROW(registerProducer(helper->producer1));
   EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->capacity);
-  EXPECT_THROW(registerProducer(helper->producer1),KeyError);
+  EXPECT_THROW(registerProducer(helper->producer1),cyclus::KeyError);
 
   // 2 producers
   EXPECT_NO_THROW(registerProducer(helper->producer2));
   EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->nproducers*helper->capacity);
-  EXPECT_THROW(registerProducer(helper->producer2),KeyError);
+  EXPECT_THROW(registerProducer(helper->producer2),cyclus::KeyError);
   
   // 1 producer
   EXPECT_NO_THROW(unRegisterProducer(helper->producer1));
   EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),helper->capacity);
-  EXPECT_THROW(unRegisterProducer(helper->producer1),KeyError);
+  EXPECT_THROW(unRegisterProducer(helper->producer1),cyclus::KeyError);
 
   // 0 producers
   EXPECT_NO_THROW(unRegisterProducer(helper->producer2));
   EXPECT_EQ(manager.totalProductionCapacity(helper->commodity),0.0);
-  EXPECT_THROW(unRegisterProducer(helper->producer2),KeyError);
+  EXPECT_THROW(unRegisterProducer(helper->producer2),cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

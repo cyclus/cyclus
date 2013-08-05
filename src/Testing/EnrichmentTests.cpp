@@ -62,7 +62,7 @@ TEST_F(EnrichmentTests,assays)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests,valuefunction) 
 {
-  EXPECT_THROW(cyclus::enrichment::value_func(0-eps()), cyclus::ValueError);
+  EXPECT_THROW(cyclus::enrichment::value_func(0-cyclus::eps()), cyclus::ValueError);
   EXPECT_THROW(cyclus::enrichment::value_func(1), cyclus::ValueError);
 
   double step = 0.001;

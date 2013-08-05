@@ -6,8 +6,6 @@
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
 
-#include "CycException.h"
-
 namespace cyclus {
 
 /**

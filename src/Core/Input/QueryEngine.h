@@ -5,8 +5,6 @@
 #include <string>
 #include <set>
 
-#include "CycException.h"
-
 namespace cyclus {
 
 /**

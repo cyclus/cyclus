@@ -5,7 +5,6 @@
 #include <map>
 #include <sstream>
 
-#include "CycException.h"
 #include "SymbolicFunctions.h"
 
 namespace cyclus {

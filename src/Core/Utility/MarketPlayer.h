@@ -117,4 +117,6 @@ class MarketPlayer {
    */
   ManagerIterator checkCommodityManagement(Commodity& commod);
 };
+
+} // namespace cyclus
 #endif

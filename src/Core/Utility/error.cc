@@ -3,14 +3,14 @@
 
 namespace cyclus {
 
-static const std::string kErrorPrefix("cyclus error: ");
+const std::string Error::kPrefix("cyclus error: ");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Error::Error() : msg_(kPrefix) { }
+Error::Error() : msg_(Error::kPrefix) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Error::Error(std::string msg) {
-  msg_ = kPrefix + msg;
+  msg_ = Error::kPrefix + msg;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
