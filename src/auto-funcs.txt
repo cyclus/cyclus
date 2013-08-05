@@ -81,7 +81,6 @@ diedOn
 diff
 dir
 document
-endDate
 endingProducer
 endPrototype
 enterMarket
