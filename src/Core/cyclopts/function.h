@@ -61,16 +61,18 @@ class Function {
 /// derived class for constraints
 class Constraint : public Function {
  public:
-  /// the equality relation
+  /// the possible equality relations
   enum EqualityRelation {EQ, GT, GTEQ, LT, LTEQ};
   
   /// constructor
+  /// @param eq_r the equality relation, e.g., <=, =, >, etc.
+  /// @param rhs the value of the right hand side
   Constraint(EqualityRelation eq_r, double rhs);
 
-  /// get the equality relation
+  /// @return the equality relation
   EqualityRelation eq_relation();
 
-  /// get the rhs
+  /// @return the rhs
   double rhs();
 
   /// print the constraint
@@ -94,9 +96,10 @@ class ObjectiveFunction : public Function {
   enum Direction {MIN, MAX};
 
   /// constructor
+  /// @param dir the direction of optimization (max or min)
   explicit ObjectiveFunction(Direction dir);
 
-  /// get the Direction
+  /// @return the Direction
   Direction dir();
 
   /// print the objective function

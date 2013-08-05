@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "variable.h"
+#include "CycException.h"
 
 // -----------------------------------------------------------------------------
 cyclus::cyclopts::Function::Function() {
@@ -101,6 +102,8 @@ std::string cyclus::cyclopts::Constraint::EqRToStr() {
     case LTEQ:
       return "<=";
       break;
+    default:
+      throw CycException("Enumeration value not recognized by Constraint.");
   }
 }
 
@@ -131,5 +134,7 @@ std::string cyclus::cyclopts::ObjectiveFunction::DirToStr() {
     case MAX:
       return "max";
       break;
+    default:
+      throw CycException("Enumeration value not recognized by ObjectiveFunction.");
   }
 }

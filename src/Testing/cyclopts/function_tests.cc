@@ -1,5 +1,7 @@
 #include "cyclopts/function.h"
 
+#include <stdlib.h>
+
 #include <gtest/gtest.h>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,3 +44,51 @@ TEST(CycloptsFunctionTests, GetModifiers) {
 
   EXPECT_EQ(val1, f.GetModifier(var1));
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CycloptsObjectiveFunctionTests, Constructor) {
+  // usings
+  using cyclus::cyclopts::ObjectiveFunction;
+
+  ObjectiveFunction::Direction dir;
+
+  dir = ObjectiveFunction::MIN;
+  ObjectiveFunction o(dir);
+  EXPECT_EQ(dir, o.dir());
+  
+  dir = ObjectiveFunction::MAX;
+  o = ObjectiveFunction(dir);
+  EXPECT_EQ(dir, o.dir());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// class for parameterized constraint function testing
+class ConstraintTests :
+    public
+::testing::TestWithParam<cyclus::cyclopts::Constraint::EqualityRelation> { };
+
+// parameterized test
+TEST_P(ConstraintTests, Constructor) {
+  // usings
+  using cyclus::cyclopts::Constraint;
+
+  Constraint::EqualityRelation eq_r = GetParam();
+  double rhs = static_cast<double>(std::rand());
+  Constraint c(eq_r, rhs);
+
+  EXPECT_EQ(eq_r, c.eq_relation());
+  EXPECT_EQ(rhs, c.rhs());
+}
+
+// call test
+const cyclus::cyclopts::Constraint::EqualityRelation relations[] = {
+  cyclus::cyclopts::Constraint::EQ,
+  cyclus::cyclopts::Constraint::GT,
+  cyclus::cyclopts::Constraint::GTEQ,
+  cyclus::cyclopts::Constraint::LT,
+  cyclus::cyclopts::Constraint::LTEQ
+};
+
+INSTANTIATE_TEST_CASE_P(CycloptsConstraintConstructor, ConstraintTests,
+                        ::testing::ValuesIn(relations));
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
