@@ -7,7 +7,7 @@
 #include "boost/any.hpp"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(VariableTests, constructors) {
+TEST(CycloptsVariableTests, constructors) {
   // usings
   using cyclus::cyclopts::Variable;
 
@@ -30,7 +30,7 @@ TEST(VariableTests, constructors) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(VariableTests, settersgetters) {
+TEST(CycloptsVariableTests, settersgetters) {
   // usings
   using cyclus::cyclopts::Variable;
 
