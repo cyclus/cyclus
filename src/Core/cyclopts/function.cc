@@ -25,13 +25,13 @@ double cyclus::cyclopts::Function::GetModifier(cyclus::cyclopts::VariablePtr v) 
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::iterator 
+std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator 
 cyclus::cyclopts::Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::iterator 
+std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator 
 cyclus::cyclopts::Function::end() {
   return constituents_.end();
 }

@@ -94,7 +94,7 @@ void cyclus::cyclopts::CBCSolver::SetUpConstraints(
     cyclus::cyclopts::ConstraintPtr c = constraints.at(i);
     std::pair<double, double> bounds = ConstraintBounds(c);
     builder_.setRowBounds(i, bounds.first, bounds.second);
-    std::map<cyclus::cyclopts::VariablePtr, double>::iterator it;
+    std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator it;
     for (it = c->begin(); it != c->end(); ++it) {
       builder_.setElement(i, index_[it->first], it->second);
     }

@@ -37,10 +37,10 @@ class Function {
   double GetModifier(cyclus::cyclopts::VariablePtr v);
 
   /// @return the beginning iterator to the function variable
-  std::map<cyclus::cyclopts::VariablePtr, double>::iterator begin();
+  std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator begin();
 
   /// @return the ending iterator to the function variable
-  std::map<cyclus::cyclopts::VariablePtr, double>::iterator end();
+  std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator end();
 
   /// add a variable to the constraitn
   /// @param v a pointer to the variable to add
