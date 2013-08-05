@@ -8,19 +8,22 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(VariableTests, constructors) {
-  cyclus::cyclopts::Variable::Bound lbound(cyclus::cyclopts::Variable::NEG_INF);
-  cyclus::cyclopts::Variable::Bound ubound(cyclus::cyclopts::Variable::INF);
-  cyclus::cyclopts::Variable::VarType type(cyclus::cyclopts::Variable::LINEAR);
+  // usings
+  using cyclus::cyclopts::Variable;
+
+  Variable::Bound lbound(Variable::NEG_INF);
+  Variable::Bound ubound(Variable::INF);
+  Variable::VarType type(Variable::LINEAR);
   
-  cyclus::cyclopts::Variable var(lbound, ubound, type);
+  Variable var(lbound, ubound, type);
   EXPECT_EQ(var.lbound(), lbound);
   EXPECT_EQ(var.ubound(), ubound);
   EXPECT_EQ(var.type(), type);
 
-  lbound = cyclus::cyclopts::Variable::FINITE;
-  ubound = cyclus::cyclopts::Variable::FINITE;
-  type = cyclus::cyclopts::Variable::INT;
-  var = cyclus::cyclopts::Variable(lbound, ubound, type);
+  lbound = Variable::FINITE;
+  ubound = Variable::FINITE;
+  type = Variable::INT;
+  var = Variable(lbound, ubound, type);
   EXPECT_EQ(var.lbound(), lbound);
   EXPECT_EQ(var.ubound(), ubound);
   EXPECT_EQ(var.type(), type);
@@ -28,11 +31,14 @@ TEST(VariableTests, constructors) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(VariableTests, settersgetters) {
-  cyclus::cyclopts::Variable::Bound lbound(cyclus::cyclopts::Variable::NEG_INF);
-  cyclus::cyclopts::Variable::Bound ubound(cyclus::cyclopts::Variable::INF);
-  cyclus::cyclopts::Variable::VarType type(cyclus::cyclopts::Variable::LINEAR);
+  // usings
+  using cyclus::cyclopts::Variable;
+
+  Variable::Bound lbound(Variable::NEG_INF);
+  Variable::Bound ubound(Variable::INF);
+  Variable::VarType type(Variable::LINEAR);
   
-  cyclus::cyclopts::Variable var(lbound, ubound, type);
+  Variable var(lbound, ubound, type);
 
   std::string name = "name";
   var.set_name(name);
