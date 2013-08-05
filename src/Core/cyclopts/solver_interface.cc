@@ -32,7 +32,7 @@ void cyclus::cyclopts::SolverInterface::AddVarToObjFunction(
     double modifier) {
   // need to check that v is in variables_
   CheckModifierBounds(modifier);
-  obj_->AddConstituent(v, modifier);
+  obj_->AddVariable(v, modifier);
 }
 
 // -----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ void cyclus::cyclopts::SolverInterface::AddVarToConstraint(
   // need to check that v is in variables_ and c is in constraints_
   std::vector<cyclus::cyclopts::ConstraintPtr>::iterator it;
   it = find(constraints_.begin(), constraints_.end(), c);
-  it->get()->AddConstituent(v, modifier);
+  it->get()->AddVariable(v, modifier);
 }
 
 // -----------------------------------------------------------------------------

@@ -13,8 +13,8 @@ cyclus::cyclopts::Function::Function() {
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Function::AddConstituent(cyclus::cyclopts::VariablePtr v,
-                                                double modifier) {
+void cyclus::cyclopts::Function::AddVariable(cyclus::cyclopts::VariablePtr v,
+                                             double modifier) {
   constituents_.insert(
       std::pair<cyclus::cyclopts::VariablePtr, double>(v, modifier));
 }
@@ -37,7 +37,7 @@ cyclus::cyclopts::Function::end() {
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Function::NumConstituents() { 
+int cyclus::cyclopts::Function::NumVars() { 
   return constituents_.size(); 
 }
 

@@ -33,19 +33,22 @@ class Function {
   virtual ~Function() {};
 
   /// get a modifier
+  /// @param v the variable being modified
   double GetModifier(cyclus::cyclopts::VariablePtr v);
 
-  /// get the beginning iterator to constituents_
+  /// @return the beginning iterator to the function variable
   std::map<cyclus::cyclopts::VariablePtr, double>::iterator begin();
 
-  /// get the ending iterator to constituents_
+  /// @return the ending iterator to the function variable
   std::map<cyclus::cyclopts::VariablePtr, double>::iterator end();
 
-  /// add a constituent
-  void AddConstituent(cyclus::cyclopts::VariablePtr v, double modifer);
+  /// add a variable to the constraitn
+  /// @param v a pointer to the variable to add
+  /// @param modifier the modifier for that variable in the function
+  void AddVariable(cyclus::cyclopts::VariablePtr v, double modifer);
 
-  /// get number of constituents
-  int NumConstituents();
+  /// @return number of variables in the function
+  int NumVars();
 
   /// print the function
   virtual std::string Print();
