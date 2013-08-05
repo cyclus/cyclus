@@ -65,8 +65,6 @@ convertFromKg
 convertToKg
 copy
 copyProducedCommoditiesFrom
-cost
-count
 createTestInputFile
 decay
 decayMaterials
