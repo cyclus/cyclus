@@ -41,6 +41,9 @@ class Function {
   /// get the ending iterator to constituents_
   std::map<cyclus::cyclopts::VariablePtr, double>::iterator end();
 
+  /// add a constituent
+  void AddConstituent(cyclus::cyclopts::VariablePtr v, double modifer);
+
   /// get number of constituents
   int NumConstituents();
 
@@ -50,12 +53,6 @@ class Function {
  private:
   /// a container of all variables and their corresponding constant
   std::map<cyclus::cyclopts::VariablePtr, double> constituents_;    
-
-  /// add a constituent
-  void AddConstituent(cyclus::cyclopts::VariablePtr v, double modifer);
-
-  /// the solver interface builds functions knowing what variables exist
-  friend class SolverInterface;
 };
 
 /// derived class for constraints
