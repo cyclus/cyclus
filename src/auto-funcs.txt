@@ -52,7 +52,6 @@ cloneModuleMembersFrom
 close
 closeLibrary
 commod
-commodity
 comp
 compAsVector
 compEquals
@@ -228,7 +227,6 @@ parent
 parentID
 parse_context
 parse_memory
-path
 pathBase
 pathDelimiter
 pathToMainSchema
@@ -245,7 +243,6 @@ printChildren
 printModelList
 printRecipes
 producedCommodities
-producer
 producesCommodity
 product
 productionCapacity
