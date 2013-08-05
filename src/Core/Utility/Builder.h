@@ -6,7 +6,7 @@
 #include "CommodityProducer.h"
 
 namespace cyclus {
-namespace ActionBuilding
+namespace action_building
 {
   /**
      a mixin to provide information about commodity producers that can
@@ -27,13 +27,13 @@ namespace ActionBuilding
        register a commodity producer with the manager
        @param producer the producer
      */
-    void registerProducer(SupplyDemand::CommodityProducer* producer);
+    void registerProducer(supply_demand::CommodityProducer* producer);
 
     /**
        unregister a commodity producer with the manager
        @param producer the producer
      */
-    void unRegisterProducer(SupplyDemand::CommodityProducer* producer);
+    void unRegisterProducer(supply_demand::CommodityProducer* producer);
 
     /**
        @return the number of buildings managed by this builder
@@ -43,16 +43,16 @@ namespace ActionBuilding
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<SupplyDemand::CommodityProducer*>::iterator beginningProducer();
+    std::set<supply_demand::CommodityProducer*>::iterator beginningProducer();
 
     /**
        @return the beginning iterator of the set of producers
      */
-    std::set<SupplyDemand::CommodityProducer*>::iterator endingProducer();
+    std::set<supply_demand::CommodityProducer*>::iterator endingProducer();
 
   private:
     /// the set of managed producers
-    std::set<SupplyDemand::CommodityProducer*> producers_;
+    std::set<supply_demand::CommodityProducer*> producers_;
 
     //#include "CommodityProducerManagerTests.h"
     //friend class CommodityProducerManagerTests; 

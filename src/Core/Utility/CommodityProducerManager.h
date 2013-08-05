@@ -7,7 +7,7 @@
 #include "CommodityProducer.h"
 
 namespace cyclus {
-namespace SupplyDemand
+namespace supply_demand
 {
   /**
      a mixin to provide information about commodity producers
@@ -33,13 +33,13 @@ namespace SupplyDemand
        register a commodity producer with the manager
        @param producer the producer
      */
-    void registerProducer(SupplyDemand::CommodityProducer* producer);
+    void registerProducer(supply_demand::CommodityProducer* producer);
 
     /**
        unregister a commodity producer with the manager
        @param producer the producer
      */
-    void unRegisterProducer(SupplyDemand::CommodityProducer* producer);
+    void unRegisterProducer(supply_demand::CommodityProducer* producer);
 
     /// the set of managed producers
     std::set<CommodityProducer*> producers_;

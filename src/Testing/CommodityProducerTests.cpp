@@ -2,13 +2,13 @@
 
 #include "CycException.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerTests::SetUp() 
 {
   using cyclus::Commodity;
-  using cyclus::SupplyDemand::CommodityProducer;
+  using cyclus::supply_demand::CommodityProducer;
   commodity_name_ = "commodity";
   commodity_ = Commodity(commodity_name_);
   producer_ = CommodityProducer();
@@ -82,7 +82,7 @@ TEST_F(CommodityProducerTests,info)
 TEST_F(CommodityProducerTests,copy) 
 {
   using cyclus::Commodity;
-  using cyclus::SupplyDemand::CommodityProducer;
+  using cyclus::supply_demand::CommodityProducer;
   EXPECT_NO_THROW(addCommodity());
   EXPECT_NO_THROW(setCapacity());
   EXPECT_NO_THROW(setCost());

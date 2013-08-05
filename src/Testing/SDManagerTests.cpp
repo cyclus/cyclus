@@ -4,7 +4,7 @@
 
 #include "CycException.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void SDManagerTests::SetUp()

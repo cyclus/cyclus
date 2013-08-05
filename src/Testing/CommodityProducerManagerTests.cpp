@@ -2,7 +2,7 @@
 
 #include "CycException.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::SetUp() 
@@ -19,14 +19,14 @@ void CommodityProducerManagerTests::TearDown()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::registerProducer(
-  cyclus::SupplyDemand::CommodityProducer* producer) 
+  cyclus::supply_demand::CommodityProducer* producer) 
 {
   manager.registerProducer(producer);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::unRegisterProducer(
-  cyclus::SupplyDemand::CommodityProducer* producer) 
+  cyclus::supply_demand::CommodityProducer* producer) 
 {
   manager.unRegisterProducer(producer);
 }

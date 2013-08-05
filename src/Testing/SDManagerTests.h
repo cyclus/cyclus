@@ -8,7 +8,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SDManagerTests : public ::testing::Test {
  public:
-  cyclus::SupplyDemand::SupplyDemandManager manager;
+  cyclus::supply_demand::SupplyDemandManager manager;
   cyclus::FunctionPtr demand;
   CommodityTestHelper* helper;
 

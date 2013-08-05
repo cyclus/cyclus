@@ -2,10 +2,10 @@
 
 #include "CycException.h"
 
-//using namespace SupplyDemand;
+//using namespace supply_demand;
 
 namespace cyclus {
-namespace SupplyDemand {
+namespace supply_demand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducerManager::CommodityProducerManager() {}
 
@@ -28,7 +28,7 @@ double CommodityProducerManager::totalProductionCapacity(Commodity& commodity)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManager::registerProducer(SupplyDemand::CommodityProducer* producer) {
+void CommodityProducerManager::registerProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
       throw CycDoubleRegistrationException("A manager is trying to register a producer twice.");
@@ -40,7 +40,7 @@ void CommodityProducerManager::registerProducer(SupplyDemand::CommodityProducer*
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManager::unRegisterProducer(SupplyDemand::CommodityProducer* producer) {
+void CommodityProducerManager::unRegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
       throw CycNotRegisteredException("A manager is trying to unregister a producer not originally registered with it.");
@@ -50,6 +50,6 @@ void CommodityProducerManager::unRegisterProducer(SupplyDemand::CommodityProduce
       producers_.erase(producer);
     }
 }
-} // namespace SupplyDemand
+} // namespace supply_demand
 } // namespace cyclus
 
