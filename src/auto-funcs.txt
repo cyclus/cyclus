@@ -25,7 +25,6 @@ approveTransfer
 atomFraction
 atomify
 autoSetNextDest
-basis
 beginningProducer
 beginPrototype
 bornOn
@@ -33,7 +32,6 @@ build
 buildDecayMatrix
 buildSchema
 canBuild
-capacity
 change_basis
 checkChild
 checkCommodityManagement
@@ -46,13 +44,10 @@ checkEnv
 checkQuality
 checkRecipe
 childRecorded
-children
 cloneCoreMembersFrom
 cloneModuleMembersFrom
 close
 closeLibrary
-commod
-comp
 compAsVector
 compEquals
 compositionDecayable
@@ -73,7 +68,6 @@ copyProducedCommoditiesFrom
 cost
 count
 createTestInputFile
-date
 decay
 decayMaterials
 decayTimes
@@ -185,16 +179,13 @@ loadStringstreamFromFile
 logTimeData
 makeBuildDecision
 managesCommodity
-market
 marketForCommod
-mass
 massFraction
 massify
 matchWith
 matrixExpSolver
 maxAbsDiag
 maxNumTerms
-me
 minfrac
 mix
 modelImpl
@@ -203,8 +194,6 @@ moduleEnvVar
 moduleEnvVarName
 moduleSequence
 moles
-move
-name
 nBuildingPrototypes
 nChildren
 nElements
@@ -212,7 +201,6 @@ nElementsMatchingQuery
 newEvent
 normalize
 normalized
-notes
 notifyBackends
 nProducers
 nPrototypes
@@ -223,7 +211,6 @@ openLibrary
 originalID
 outputCommodities
 overwrite
-parent
 parentID
 parse_context
 parse_memory
@@ -237,7 +224,6 @@ playerProductionCapacity
 popNum
 popOne
 popQty
-price
 print
 printChildren
 printModelList
@@ -250,13 +236,10 @@ productionCost
 prototypeConstructor
 pushAll
 pushOne
-quality
-quantity
 query
 queryElement
 receiveMaterial
 receiveMessage
-receiver
 recipeCount
 recipeRecorded
 recipeSequence
@@ -286,15 +269,11 @@ removeChild
 removeFromList
 removeResource
 reportListeners
-requester
 resolve
 resource
 returnMessage
-root_comp
-root_decay_time
 runSim
 sendDailyTasks
-sender
 sendOn
 sendResolve
 sendTick
@@ -341,7 +320,6 @@ setUpProducerManager
 setUpProducers
 simDur
 sort_ascending
-space
 startDate
 startMessage
 startTime
@@ -349,7 +327,6 @@ stateID
 storeDecayableRecipe
 subcontent
 suffix
-supplier
 supply
 tails
 tallyOrder
@@ -357,15 +334,11 @@ throwErrorIfCommodityNotManaged
 throwErrorIfCommodityNotProduced
 throwErrorIfPrototypeIsntAvailable
 throwRegistrationException
-time
-title
 toMat
 toRes
 totalProductionCapacity
 trackedIsotope
 trackMessage
-trans
-units
 unknowncontent
 unloadModules
 unmetDemand
@@ -379,5 +352,4 @@ validateEntry
 validateForSend
 validateIsotopeNumber
 validateValue
-value
 wrapAddAvailablePrototype
