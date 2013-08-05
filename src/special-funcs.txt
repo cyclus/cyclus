@@ -18,6 +18,8 @@ size()
 
 str()
 
+close()
+
 open()
 
 clone() : boost::spirit::detail::fxns< mpl::false_ >::type< T, Char > , Prototype , TestFacility , FacilityModel , Message , Transaction , GenericResource , Material , Resource , boost::spirit::detail::fxns< mpl::true_ >::type< T, Char >

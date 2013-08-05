@@ -46,7 +46,6 @@ checkRecipe
 childRecorded
 cloneCoreMembersFrom
 cloneModuleMembersFrom
-close
 closeLibrary
 compAsVector
 compEquals
