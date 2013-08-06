@@ -235,8 +235,8 @@ TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, RemoveOne_Filled) {
-  using cyclus::rsrc_ptr;
-  rsrc_ptr mat;
+  using cyclus::Resource;
+  Resource::Ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.PopOne());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
@@ -270,14 +270,14 @@ TEST_F(ResourceBuffTest, PushOne_Empty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
-  using cyclus::rsrc_ptr;
+  using cyclus::Resource;
   ASSERT_NO_THROW(store_.SetCapacity(cap));
 
   ASSERT_NO_THROW(store_.PushOne(mat1_));
   ASSERT_NO_THROW(store_.PushOne(mat2_));
 
   double topush = cap - store_.quantity();
-  rsrc_ptr overmat = mat1_->clone();
+  Resource::Ptr overmat = mat1_->clone();
   overmat->SetQuantity(topush + overeps);
 
   ASSERT_THROW(store_.PushOne(overmat), cyclus::ValueError);
@@ -323,8 +323,8 @@ TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
-  using cyclus::rsrc_ptr;
-  rsrc_ptr mat;
+  using cyclus::Resource;
+  Resource::Ptr mat;
 
   ASSERT_NO_THROW(store_.SetCapacity(cap));
   ASSERT_NO_THROW(store_.PushAll(mats));
@@ -336,13 +336,13 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
-  using cyclus::rsrc_ptr;
+  using cyclus::Resource;
   using cyclus::Manifest;
   ASSERT_NO_THROW(store_.SetCapacity(cap));
   ASSERT_NO_THROW(store_.PushAll(mats));
 
   double topush = cap - store_.quantity();
-  rsrc_ptr overmat = mat1_->clone();
+  Resource::Ptr overmat = mat1_->clone();
   overmat->SetQuantity(topush + overeps);
   Manifest overmats;
   overmats.push_back(overmat);

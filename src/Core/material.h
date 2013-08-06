@@ -15,11 +15,6 @@
 
 namespace cyclus {
 
-/* -- Typedefs -- */
-class Material;
-typedef boost::intrusive_ptr<Material> mat_rsrc_ptr;
-/* -- */
-
 // A type definition for mass units
 enum MassUnit { KG, G };
 
@@ -63,6 +58,8 @@ enum MassUnit { KG, G };
 */
 class Material : public Resource {
 public:
+  typedef boost::intrusive_ptr<Material> Ptr;
+
   /**
      default constructor 
    */
@@ -110,7 +107,7 @@ public:
 
      @return equal true if compositions and size are equal. false otherwise.
     */
-  virtual bool operator==(const mat_rsrc_ptr other);
+  virtual bool operator==(const Ptr other);
 
   /**
      Returns a boolean indicating whether these materials are equivalent
@@ -120,7 +117,7 @@ public:
 
      @return equal true if equal within the threshold. false otherwise.
     */
-  virtual bool AlmostEqual(const mat_rsrc_ptr other, double threshold) const;
+  virtual bool AlmostEqual(const Ptr other, double threshold) const;
 
   /**
      Change/set the mass of the resource object. 
@@ -157,7 +154,7 @@ public:
   /**
      Resource class method 
    */
-  bool CheckQuality(rsrc_ptr other);
+  bool CheckQuality(Resource::Ptr other);
 
   /**
      Resource class method 
@@ -167,7 +164,7 @@ public:
   /**
      Resource class method 
    */
-  rsrc_ptr clone();
+  Resource::Ptr clone();
 
   /**
      Calls the resource class method, but checks 
@@ -230,7 +227,7 @@ public:
       
      @param matToAdd the Material to be absorbed (and deleted) 
    */
-  virtual void Absorb(mat_rsrc_ptr matToAdd);
+  virtual void Absorb(Ptr matToAdd);
   /**
      Reports the difference between this material and another material
 
@@ -238,7 +235,7 @@ public:
 
      @return diff a map of isotope ids to amounts (in the MassUnit of unit)
      */
-  virtual std::map<Iso, double> diff(const mat_rsrc_ptr other);
+  virtual std::map<Iso, double> diff(const Ptr other);
 
   /**
      Reports the difference between this material and a CompMap
@@ -275,7 +272,7 @@ public:
      @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr Extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
+  virtual Ptr Extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
       MassUnit unit=KG, double threshold=eps_rsrc());
 
   /**
@@ -286,7 +283,7 @@ public:
      @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object 
    */
-  virtual mat_rsrc_ptr Extract(double mass);
+  virtual Ptr Extract(double mass);
 
   /**
      Decays this Material object for the amount of time that has passed since
@@ -314,7 +311,7 @@ public:
   /**
      returns true if the resource pointer points to a material resource
   */
-  static bool IsMaterial(rsrc_ptr rsrc);
+  static bool IsMaterial(Resource::Ptr rsrc);
 
   /**
      This scales the composition by the amount of moles or kg, depending on the 

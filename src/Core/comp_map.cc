@@ -29,12 +29,12 @@ CompMap::~CompMap() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMap::iterator CompMap::begin() {
+CompMap::Iterator CompMap::begin() {
   return map_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CompMap::iterator CompMap::end() {
+CompMap::Iterator CompMap::end() {
   return map_.end();
 }
 
@@ -56,7 +56,7 @@ void CompMap::erase(Iso tope) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CompMap::erase(CompMap::iterator position) {
+void CompMap::erase(CompMap::Iterator position) {
   normalized_ = false;
   map_.erase(position);
 }
@@ -102,7 +102,7 @@ bool CompMap::AlmostEqual(const CompMap rhs, double threshold) const{
   if ( empty() && rhs.empty()) {
     return true;
   }
-  for (const_iterator it = map_.begin(); it != map_.end(); ++it) {
+  for (ConstIterator it = map_.begin(); it != map_.end(); ++it) {
     if (rhs.count(it->first) == 0) {
       return false;
     }
@@ -227,7 +227,7 @@ void CompMap::normalize() {
   std::vector<double> vec;
   std::vector<double> other_vec;
   bool atom = (basis_ == ATOM);
-  for (iterator it = map_.begin(); it != map_.end(); ++it) {
+  for (Iterator it = map_.begin(); it != map_.end(); ++it) {
     ValidateEntry(it->first,it->second);
     vec.push_back(it->second);
     if (atom) {
@@ -266,7 +266,7 @@ void CompMap::change_basis(Basis b) {
     normalize();
   }
   if (basis_ != b) { // only change if we have to
-    for (iterator it = map_.begin(); it != map_.end(); ++it) {
+    for (Iterator it = map_.begin(); it != map_.end(); ++it) {
       switch (b) {
       case ATOM:
         map_[it->first] = AtomFraction(it->first);
@@ -286,7 +286,7 @@ void CompMap::change_basis(Basis b) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::normalize(double sum) {
   if (sum != 1 && sum != 0) { // only normalize if needed
-    for (iterator it = map_.begin(); it != map_.end(); ++it) {
+    for (Iterator it = map_.begin(); it != map_.end(); ++it) {
       it->second /= sum;
     }
   }
@@ -307,7 +307,7 @@ int CompMap::GetMassNum(Iso tope) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CompMap::Validate() {
-  for (Map::iterator it = map_.begin(); it != map_.end(); ++it) {
+  for (Iterator it = map_.begin(); it != map_.end(); ++it) {
     ValidateEntry(it->first,it->second);
   }
 }
@@ -357,7 +357,7 @@ std::string CompMap::Detail() {
 std::vector<std::string> CompMap::CompStrings() {
   std::stringstream ss;
   std::vector<std::string> comp_strings;
-  for (const_iterator entry = map_.begin(); entry != map_.end(); ++entry) {
+  for (ConstIterator entry = map_.begin(); entry != map_.end(); ++entry) {
     ss.str("");
     ss << entry->first << ": " << entry->second << " % / kg";
     comp_strings.push_back(ss.str());

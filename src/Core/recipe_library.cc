@@ -125,10 +125,10 @@ CompMapPtr RecipeLibrary::Recipe(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::StoreDecayableRecipe(CompMapPtr recipe) {
   // initialize containers
-  decay_times times;
+  DecayTimes times;
   ChildMap childs;
   // assign containers
-  decay_times_.insert(std::pair<CompMapPtr,decay_times>(recipe,times) );
+  decay_times_.insert(std::pair<CompMapPtr,DecayTimes>(recipe,times) );
   decay_hist_.insert(std::pair<CompMapPtr,ChildMap>(recipe,childs) );
 }
 
@@ -177,11 +177,11 @@ void RecipeLibrary::CheckChild(CompMapPtr parent, int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::AddDecayTime(CompMapPtr parent, int time) {
   CheckDecayable(parent);
-  DecayTimes(parent).insert(time);
+  decay_times(parent).insert(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLibrary::DecayTimes(CompMapPtr parent) {
+DecayTimes& RecipeLibrary::decay_times(CompMapPtr parent) {
   CheckDecayable(parent);
   return decay_times_[parent];
 }
@@ -220,7 +220,7 @@ bool RecipeLibrary::CompositionDecayable(CompMapPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::AddToTable(CompMapPtr recipe){
-  for (CompMap::iterator item = recipe->begin();
+  for (CompMap::Iterator item = recipe->begin();
        item != recipe->end(); item++) {
     EM->NewEvent("IsotopicStates")
       ->AddVal("ID", recipe->ID())

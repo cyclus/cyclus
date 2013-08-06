@@ -41,14 +41,14 @@ namespace enrichment {
      @param mat the material inquired about
      @return the atom percent of U-235 w.r.t Uranium in a material
    */
-  double uranium_assay(mat_rsrc_ptr mat);
+  double uranium_assay(Material::Ptr mat);
 
   /**
      @param mat the material inquired about
      @return the quantity of uranium in a material whose units match
      those of the given material
    */
-  double uranium_qty(mat_rsrc_ptr mat);
+  double uranium_qty(Material::Ptr mat);
 
   /**
      @param product_qty the amount of product Uranium

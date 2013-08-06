@@ -27,7 +27,7 @@ double enrichment::Assays::Tails() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::uranium_assay(mat_rsrc_ptr rsrc) {
+double enrichment::uranium_assay(Material::Ptr rsrc) {
   double value;
   double u235 = rsrc->isoVector().AtomFraction(92235);
   double u238 = rsrc->isoVector().AtomFraction(92238);
@@ -45,7 +45,7 @@ double enrichment::uranium_assay(mat_rsrc_ptr rsrc) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::uranium_qty(mat_rsrc_ptr rsrc) {
+double enrichment::uranium_qty(Material::Ptr rsrc) {
   return rsrc->mass(92238,KG) + rsrc->mass(92235,KG);
 }
 

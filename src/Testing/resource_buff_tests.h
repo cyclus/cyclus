@@ -15,7 +15,7 @@ protected:
   double m_oxygen, m_u235, m_u238, m_pu240;
   cyclus::IsoVector vect1_, vect2_;
   
-  cyclus::rsrc_ptr mat1_, mat2_;
+  cyclus::Resource::Ptr mat1_, mat2_;
   double mass1, mass2;
   cyclus::Manifest mats;
   
@@ -35,7 +35,7 @@ protected:
     using cyclus::CompMapPtr;
     using cyclus::IsoVector;
     using cyclus::Material;
-    using cyclus::rsrc_ptr;
+    using cyclus::Resource;
     try {
       // composition
       CompMapPtr comp;
@@ -62,10 +62,10 @@ protected:
 
       // materials
       mass1 = 111;
-      mat1_ = rsrc_ptr(new Material(vect1_));
+      mat1_ = Resource::Ptr(new Material(vect1_));
       mat1_->SetQuantity(mass1);
       mass2 = 222;
-      mat2_ = rsrc_ptr(new Material(vect2_));
+      mat2_ = Resource::Ptr(new Material(vect2_));
       mat2_->SetQuantity(mass2);
       mats.push_back(mat1_);
       mats.push_back(mat2_);

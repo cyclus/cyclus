@@ -16,9 +16,9 @@ class MaterialTest : public ::testing::Test {
     cyclus::CompMapPtr test_comp_, two_test_comp_, non_norm_test_comp_, diff_comp_, 
                pu_comp_, u_am_comp_;
     double test_size_, fraction;
-    cyclus::mat_rsrc_ptr test_mat_, two_test_mat_, ten_test_mat_, pu_mat_, u_am_mat_;
-    cyclus::mat_rsrc_ptr diff_mat_;
-    cyclus::mat_rsrc_ptr default_mat_;
+    cyclus::Material::Ptr test_mat_, two_test_mat_, ten_test_mat_, pu_mat_, u_am_mat_;
+    cyclus::Material::Ptr diff_mat_;
+    cyclus::Material::Ptr default_mat_;
     long int u235_halflife_;
     int th228_halflife_;
     double u235_g_per_mol_;
@@ -64,22 +64,22 @@ class MaterialTest : public ::testing::Test {
       (*pu_comp_)[pu239_] = one_;
 
       // material creation
-      test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
+      test_mat_ = cyclus::Material::Ptr(new cyclus::Material(test_comp_));
       test_mat_->SetQuantity(test_size_);
 
-      two_test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
+      two_test_mat_ = cyclus::Material::Ptr(new cyclus::Material(test_comp_));
       two_test_mat_->SetQuantity(2*test_size_);
 
-      ten_test_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(test_comp_));
+      ten_test_mat_ = cyclus::Material::Ptr(new cyclus::Material(test_comp_));
       ten_test_mat_->SetQuantity(10*test_size_);
-      diff_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(diff_comp_));
+      diff_mat_ = cyclus::Material::Ptr(new cyclus::Material(diff_comp_));
       diff_mat_->SetQuantity(test_size_);
 
-      default_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material());
-      u_am_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(u_am_comp_));
+      default_mat_ = cyclus::Material::Ptr(new cyclus::Material());
+      u_am_mat_ = cyclus::Material::Ptr(new cyclus::Material(u_am_comp_));
       u_am_mat_->SetQuantity(test_size_);
 
-      pu_mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(pu_comp_));
+      pu_mat_ = cyclus::Material::Ptr(new cyclus::Material(pu_comp_));
       pu_mat_->SetQuantity(test_size_);
 
       // vec creation

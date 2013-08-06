@@ -147,8 +147,8 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      masking Map
   */
-  typedef Map::iterator iterator;
-  typedef Map::const_iterator const_iterator;
+  typedef Map::iterator Iterator;
+  typedef Map::const_iterator ConstIterator;
 
   /* --- Constructors and Destructors --- */
   /**
@@ -171,12 +171,12 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      beginning iterator
    */
-  CompMap::iterator begin();
+  CompMap::Iterator begin();
 
   /**
      ending iterator
    */
-  CompMap::iterator end();
+  CompMap::Iterator end();
 
   /**
      accesses the subscript operator of the map
@@ -222,7 +222,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /**
      erases tope at position from map
    */
-  void erase(CompMap::iterator position);
+  void erase(CompMap::Iterator position);
 
   /**
      returns map_.empty()

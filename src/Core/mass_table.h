@@ -68,12 +68,12 @@ protected:
      Defines the structure of data associated with each row entry in the 
      mass database. Right now, strings are a little funky, so the names 
    */
-  typedef struct nuclide_t
+  typedef struct Nuclide
   {
     int  Z; /**< an integer indicating the atomic (proton) number of an atom >**/
     int  A; /**< an integer indicating the A (mass A=N+Z) number of an atom.  >**/
     double  mass; /**< a double indicating the mass of an atom >**/
-  } nuclide_t;
+  } Nuclide;
 
   /**
      The integer length (number of rows) of the mass.h5/ame03/nuclide/ 
@@ -83,7 +83,7 @@ protected:
   /**
      The vector of nuclide structs that holds the data in the mass table 
    */
-  std::vector<nuclide_t> nuclide_vec_;
+  std::vector<Nuclide> nuclide_vec_;
 
   /** 
      a map for index lookup in the nuclide vector. 
@@ -91,7 +91,7 @@ protected:
   std::map<int, int> isoIndex_;
 
   /** 
-     a function to initialize a large array of nuclide_t structs via the 
+     a function to initialize a large array of Nuclide structs via the 
      SQLite/C++ API 
    */
   void InitializeSQL();

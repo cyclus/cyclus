@@ -13,8 +13,8 @@ TEST_F(MaterialTest, Constructors){
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Clone) {
-  using cyclus::rsrc_ptr;
-  rsrc_ptr clone_mat;
+  using cyclus::Resource;
+  Resource::Ptr clone_mat;
   ASSERT_NO_THROW(clone_mat = test_mat_->clone());
 
 
@@ -30,7 +30,7 @@ TEST_F(MaterialTest, Clone) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, setQuantity) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -49,10 +49,10 @@ TEST_F(MaterialTest, setQuantity) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckQuality) {
-  using cyclus::rsrc_ptr;
-  rsrc_ptr test(test_mat_);
-  rsrc_ptr diff(diff_mat_);
-  rsrc_ptr gen(new cyclus::GenericResource("kg", "foo", 10));
+  using cyclus::Resource;
+  Resource::Ptr test(test_mat_);
+  Resource::Ptr diff(diff_mat_);
+  Resource::Ptr gen(new cyclus::GenericResource("kg", "foo", 10));
 
   EXPECT_TRUE(test->CheckQuality(diff));
   EXPECT_TRUE(diff->CheckQuality(test));
@@ -62,7 +62,7 @@ TEST_F(MaterialTest, CheckQuality) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckMass) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -82,7 +82,7 @@ TEST_F(MaterialTest, CheckMass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckIsoMass) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -106,7 +106,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
   double test_total = 0;
-  CompMap::iterator comp; 
+  CompMap::Iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;
@@ -117,7 +117,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, CheckIsoAtoms){
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -132,7 +132,7 @@ TEST_F(MaterialTest, CheckIsoAtoms){
 
   // a mat's total atoms should be the total of all the contained isotopes. 
   double total_atoms = 0;
-  CompMap::iterator comp; 
+  CompMap::Iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;
@@ -148,7 +148,6 @@ TEST_F(MaterialTest, CheckConvertFromKg){
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
   EXPECT_FLOAT_EQ(1000, test_mat_->ConvertFromKg(1,G)); // 1000g = 1 kg
   EXPECT_FLOAT_EQ(1000, test_mat_->ConvertFromKg(1000,KG)); // 1000 kg = 1000 kg
   EXPECT_FLOAT_EQ(1, test_mat_->ConvertFromKg(1,KG)); // 1 kg = 1 kg
@@ -160,7 +159,6 @@ TEST_F(MaterialTest, CheckConvertToKg){
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
   EXPECT_FLOAT_EQ(1, test_mat_->ConvertToKg(1000,G)); // 1kg = 1000 g
   EXPECT_FLOAT_EQ(1000, test_mat_->ConvertToKg(1000,KG)); // 1000kg = 1000kg
   EXPECT_FLOAT_EQ(1, test_mat_->ConvertToKg(1,KG)); // 1kg = 1kg
@@ -171,10 +169,9 @@ TEST_F(MaterialTest, SimpleAbsorb) {
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
   double val = 1.5;
-  mat_rsrc_ptr m1 = mat_rsrc_ptr(new Material(test_comp_));
-  mat_rsrc_ptr m2 = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr m1 = Material::Ptr(new Material(test_comp_));
+  Material::Ptr m2 = Material::Ptr(new Material(test_comp_));
   m1->SetQuantity(val);
   m2->SetQuantity(val);
   ASSERT_EQ(m1->isoVector(),m2->isoVector());
@@ -191,17 +188,16 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr one_test_mat;
-  mat_rsrc_ptr two_test_mat;
-  mat_rsrc_ptr ten_test_mat;
-  one_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr one_test_mat;
+  Material::Ptr two_test_mat;
+  Material::Ptr ten_test_mat;
+  one_test_mat = Material::Ptr(new Material(test_comp_));
   int one = 1;
   one_test_mat->SetQuantity(one*test_size_);
-  two_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  two_test_mat = Material::Ptr(new Material(test_comp_));
   int two = 2;
   two_test_mat->SetQuantity(two*test_size_);
-  ten_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  ten_test_mat = Material::Ptr(new Material(test_comp_));
   int ten = 10;
   ten_test_mat->SetQuantity(ten*test_size_);
 
@@ -232,14 +228,13 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr same_as_orig_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr same_as_orig_test_mat = Material::Ptr(new Material(test_comp_));
 
   CompMapPtr diff_test_comp = CompMapPtr(new CompMap(MASS));
   (*diff_test_comp)[pb208_] = 1.0;
   (*diff_test_comp)[am241_] = 1.0;
   (*diff_test_comp)[th228_] = 1.0;
-  mat_rsrc_ptr diff_test_mat = mat_rsrc_ptr(new Material(diff_test_comp));
+  Material::Ptr diff_test_mat = Material::Ptr(new Material(diff_test_comp));
   diff_test_mat->SetQuantity(test_size_/2);
 
   double orig = test_mat_->quantity();
@@ -264,8 +259,7 @@ TEST_F(MaterialTest, AbsorbZeroMaterial){
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr same_as_test_mat = Material::Ptr(new Material(test_comp_));
   same_as_test_mat->SetQuantity(0);
   EXPECT_NO_THROW(test_mat_->Absorb(same_as_test_mat));
   EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
@@ -276,8 +270,7 @@ TEST_F(MaterialTest, AbsorbIntoZeroMaterial){
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr same_as_test_mat = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr same_as_test_mat = Material::Ptr(new Material(test_comp_));
   same_as_test_mat->SetQuantity(0);
   EXPECT_NO_THROW(same_as_test_mat->Absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
@@ -288,8 +281,7 @@ TEST_F(MaterialTest, mat_diff_same) {
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr same_as_orig = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr same_as_orig = Material::Ptr(new Material(test_comp_));
   same_as_orig->SetQuantity(test_size_);
   std::map<Iso, double> remainder;
   EXPECT_NO_THROW(remainder = test_mat_->diff(same_as_orig));
@@ -304,8 +296,7 @@ TEST_F(MaterialTest, mat_diff) {
   using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  using cyclus::mat_rsrc_ptr;
-  mat_rsrc_ptr two_orig = mat_rsrc_ptr(new Material(test_comp_));
+  Material::Ptr two_orig = Material::Ptr(new Material(test_comp_));
   two_orig->SetQuantity(2*test_size_);
   std::map<Iso, double> remainder;
   EXPECT_NO_THROW(remainder = two_test_mat_->diff(test_mat_));
@@ -344,7 +335,7 @@ TEST_F(MaterialTest, diff_half) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, diff_close_size) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -361,7 +352,7 @@ TEST_F(MaterialTest, diff_close_size) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, diff_close_comp) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
@@ -385,12 +376,11 @@ TEST_F(MaterialTest, diff_close_comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbThreeMaterials) { 
-  using cyclus::mat_rsrc_ptr;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
   using cyclus::Material;
-  mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
+  Material::Ptr glob = Material::Ptr(new Material());
   glob->Absorb(test_mat_);
   EXPECT_FLOAT_EQ(test_size_, glob->mass(KG));
   EXPECT_FLOAT_EQ(test_size_, glob->mass(u235_));
@@ -407,12 +397,11 @@ TEST_F(MaterialTest, AbsorbThreeMaterials) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbTotallyDifferentMaterial) { 
-  using cyclus::mat_rsrc_ptr;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
   using cyclus::Material;
-  mat_rsrc_ptr glob = mat_rsrc_ptr(new Material());
+  Material::Ptr glob = Material::Ptr(new Material());
   glob->Absorb(test_mat_);
   EXPECT_FLOAT_EQ(test_size_, glob->mass(KG));
   EXPECT_FLOAT_EQ(test_size_, glob->mass(u235_));
@@ -425,13 +414,13 @@ TEST_F(MaterialTest, AbsorbTotallyDifferentMaterial) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, ExtractMass) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;  
-  mat_rsrc_ptr extracted;
+  Material::Ptr extracted;
   EXPECT_FLOAT_EQ(test_mat_->quantity(),test_size_); // we expect this amt
   EXPECT_NO_THROW(extracted = test_mat_->Extract(amt)); // extract an amt
   EXPECT_FLOAT_EQ(extracted->quantity(),amt); // check correctness
@@ -442,13 +431,13 @@ TEST_F(MaterialTest, ExtractMass) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_complete) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
 
   // Complete extraction
-  mat_rsrc_ptr m1;
+  Material::Ptr m1;
   EXPECT_NO_THROW( m1 = test_mat_->Extract(test_comp_, test_size_, KG, 0));
   EXPECT_TRUE( m1->isoVector().CompEquals(test_comp_));
   EXPECT_FLOAT_EQ( 0, test_mat_->quantity() );
@@ -457,14 +446,14 @@ TEST_F(MaterialTest, Extract_complete) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_complete_inexact_size) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
 
   // Complete extraction
   // this should succeed even if inexact, within eps.
-  mat_rsrc_ptr m1;
+  Material::Ptr m1;
   assert(diff_comp_->normalized());
   diff_mat_->SetQuantity(test_size_, KG);
   double inexact_size = test_size_ + 0.1*cyclus::eps_rsrc();
@@ -479,11 +468,11 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
 
   // Complete extraction
   // this should succeed even if inexact, within eps.
-  mat_rsrc_ptr m1;
+  Material::Ptr m1;
   // make an inexact composition
   CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
   (*inexact_comp)[am241_]*=(1-cyclus::eps_rsrc()/test_size_);
@@ -494,14 +483,14 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   using cyclus::CompMapPtr;
   using cyclus::CompMap;
   using cyclus::KG;
 
   // Complete extraction
   // this should succeed even if inexact, within eps.
-  mat_rsrc_ptr m1;
+  Material::Ptr m1;
   double inexact_size = test_size_*(1+cyclus::eps_rsrc()/test_size_);
   // make an inexact composition
   CompMapPtr inexact_comp = CompMapPtr(new CompMap(*diff_comp_));
@@ -523,16 +512,16 @@ TEST_F(MaterialTest, Extract_over_extract) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_half) {
   // two minus one equals one.
-  cyclus::mat_rsrc_ptr m1;
+  cyclus::Material::Ptr m1;
   m1 = two_test_mat_->Extract(test_comp_, test_size_);
   EXPECT_FLOAT_EQ( test_size_, m1->quantity() );
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_diff_comp) {
-  using cyclus::mat_rsrc_ptr;
+  using cyclus::Material;
   // differing comp minus one element equals old comp minus new
-  mat_rsrc_ptr m1;
+  Material::Ptr m1;
   double orig = diff_mat_->quantity();
   double orig_u235 = diff_mat_->Moles(u235_);
   double orig_am241 = diff_mat_->Moles(am241_);

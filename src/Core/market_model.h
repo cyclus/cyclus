@@ -118,7 +118,7 @@ class MarketModel : public Model, public Communicator {
      @param msg the message being sent to and received by this market model
      instance, being sent from another simulation agent
    */
-  virtual void ReceiveMessage(msg_ptr msg) 
+  virtual void ReceiveMessage(Message::Ptr msg) 
   { messages_.insert(msg); };
 
 /* ------------------- */ 
@@ -149,12 +149,12 @@ class MarketModel : public Model, public Communicator {
   /**
      every market collects offers & requests 
    */
-  std::set<msg_ptr> messages_;
+  std::set<Message::Ptr> messages_;
 
   /**
      every market generates a set of orders 
    */
-  std::deque<msg_ptr> orders_;
+  std::deque<Message::Ptr> orders_;
 
   /**
      every market knows its number of firm orders 

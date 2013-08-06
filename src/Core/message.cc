@@ -26,7 +26,7 @@ void Message::ConstructBase(Communicator* sender) {
   dir_ = UP_MSG;
 
   path_stack_.push_back(sender_);
-  sender->TrackMessage(msg_ptr(this));
+  sender->TrackMessage(Message::Ptr(this));
 
   MLOG(LEV_DEBUG4) << "Message " << this << " created.";
 }
@@ -59,10 +59,10 @@ Message::~Message() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr Message::clone() {
+Message::Ptr Message::clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
-  msg_ptr new_msg(new Message(*this));
+  Message::Ptr new_msg(new Message(*this));
   new_msg->trans_ = trans_->clone();
   return new_msg;
 }
@@ -70,7 +70,7 @@ msg_ptr Message::clone() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::SendOn() {
   if (dead_) {return;}
-  msg_ptr me = msg_ptr(this);
+  Message::Ptr me = Message::Ptr(this);
 
   if (dir_ == DOWN_MSG) {
     path_stack_.back()->UntrackMessage(me);
@@ -127,9 +127,9 @@ void Message::TallyOrder(Model* next_model) {
 
   Transaction tran = trans();
   if (tran.IsOffer()) {
-    Message::offer_qtys_[tran.commod()][TI->time()] += tran.Resource()->quantity();
+    Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
   } else {
-    Message::request_qtys_[tran.commod()][TI->time()] += tran.Resource()->quantity();
+    Message::request_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
   }
 }
 

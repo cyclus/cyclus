@@ -14,7 +14,7 @@ class TestInst: public cyclus::InstModel {
  public:
   virtual ~TestInst() {};
   
-  void ReceiveMessage(cyclus::msg_ptr msg) {
+  void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
   }
 

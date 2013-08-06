@@ -122,7 +122,7 @@ class FacilityModel : public TimeAgent, public Communicator,
       
      Each derived class must implement an offer/request receiver 
    */ 
-  virtual void ReceiveMessage(msg_ptr msg)=0;
+  virtual void ReceiveMessage(Message::Ptr msg)=0;
 
 /* ------------------- */ 
 

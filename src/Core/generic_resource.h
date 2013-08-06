@@ -6,9 +6,6 @@
 
 namespace cyclus {
 
-class GenericResource;
-typedef boost::intrusive_ptr<GenericResource> gen_rsrc_ptr;
-
 /**
    A Generic Resource is a general type of resource in the Cyclus 
    simulation, and is a catch-all for non-standard resources. 
@@ -19,6 +16,8 @@ typedef boost::intrusive_ptr<GenericResource> gen_rsrc_ptr;
 
 class GenericResource : public Resource {
 public:
+  typedef boost::intrusive_ptr<GenericResource> Ptr;
+
   /**
      Constructor 
       
@@ -40,7 +39,7 @@ public:
   /**
      Returns a reference to a newly allocated copy of this resource 
    */ 
-  virtual rsrc_ptr clone();
+  virtual Resource::Ptr clone();
 
   /**
      Prints information about the resource 
@@ -56,7 +55,7 @@ public:
      @return True if other is sufficiently equal in quality to 
      the base, False otherwise. 
    */
-  virtual bool CheckQuality(rsrc_ptr other);
+  virtual bool CheckQuality(Resource::Ptr other);
 
   /**
      Returns the total quantity of this resource in its base unit 
@@ -107,7 +106,7 @@ public:
      resource  
      @throws CycGenResourceIncompatible 'other' resource is of a 
    */
-  virtual void Absorb(gen_rsrc_ptr other);
+  virtual void Absorb(Ptr other);
 
   /**
      Extracts the specified mass from this resource and returns it as a 
@@ -115,7 +114,7 @@ public:
       
      @throws CycGenResourceOverExtract 
    */
-  virtual gen_rsrc_ptr Extract(double mass);
+  virtual Ptr Extract(double mass);
 
   virtual void AddToTable();
 

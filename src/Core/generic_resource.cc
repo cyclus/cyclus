@@ -34,10 +34,10 @@ GenericResource::GenericResource(const GenericResource& other) {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-rsrc_ptr GenericResource::clone() {
+Resource::Ptr GenericResource::clone() {
   CLOG(LEV_DEBUG2) << "GenericResource ID=" << ID_ << " was cloned.";
   Print();
-  return rsrc_ptr(new GenericResource(*this));
+  return Resource::Ptr(new GenericResource(*this));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
@@ -47,7 +47,7 @@ void GenericResource::Print() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GenericResource::CheckQuality(rsrc_ptr other)
+bool GenericResource::CheckQuality(Resource::Ptr other)
 {
   CLOG(LEV_DEBUG1) << "GenericResource is checking quality, this = " 
                    << units_ << " other = " << other->units();
@@ -56,7 +56,7 @@ bool GenericResource::CheckQuality(rsrc_ptr other)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void GenericResource::Absorb(gen_rsrc_ptr other) {
+void GenericResource::Absorb(GenericResource::Ptr other) {
   if (! CheckQuality(boost::dynamic_pointer_cast<Resource>(other))) {
     throw ValueError("incompatible resource types.");
   }
@@ -66,14 +66,14 @@ void GenericResource::Absorb(gen_rsrc_ptr other) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-gen_rsrc_ptr GenericResource::Extract(double quantity) {
+GenericResource::Ptr GenericResource::Extract(double quantity) {
   if (quantity > quantity_) {
     throw ValueError("Attempted to extract more quantity than exists.");
   }
 
   quantity_ -= quantity;
 
-  return gen_rsrc_ptr(new GenericResource(units_, quality_, quantity));
+  return GenericResource::Ptr(new GenericResource(units_, quality_, quantity));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

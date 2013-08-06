@@ -14,10 +14,7 @@
 namespace cyclus {
 
 class Communicator;
-class Message;
 class Transaction;
-
-typedef boost::intrusive_ptr<Message> msg_ptr;
 
 /**
    An enumerative type to specify which direction 
@@ -111,6 +108,8 @@ class Message: IntrusiveBase<Message> {
   void ConstructBase(Communicator* sender);
 
  public:
+  typedef boost::intrusive_ptr<Message> Ptr;
+
   /**
      Creates an empty upward message from some communicator. 
       
@@ -145,7 +144,7 @@ class Message: IntrusiveBase<Message> {
 
      @return a newly allocated copy of this message object
    */
-  msg_ptr clone();
+  Ptr clone();
 
   /**
      Send this message to the next communicator in it's path 

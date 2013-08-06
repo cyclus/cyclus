@@ -8,8 +8,8 @@ namespace cyclus {
 
 class Model;
 
-typedef Model* create_t();
-typedef void destroy_t(Model*);
+typedef Model* ModelCtor();
+typedef void ModelDtor(Model*);
 
 class DynamicModule {
  public:
@@ -71,10 +71,10 @@ class DynamicModule {
   void* module_library_;
 
   /// a functor for the constructor
-  create_t* constructor_;
+  ModelCtor* constructor_;
 
   /// a functor for the destructor
-  destroy_t* destructor_;
+  ModelDtor* destructor_;
 
   /// uses dlopen to open the module shared lib
   void OpenLibrary();

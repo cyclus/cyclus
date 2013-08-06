@@ -100,7 +100,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      default RegionModel receiver is to ignore messages 
    */
-  virtual void ReceiveMessage(msg_ptr msg);
+  virtual void ReceiveMessage(Message::Ptr msg);
 
   /**
      Each region is prompted to do its beginning-of-time-step 

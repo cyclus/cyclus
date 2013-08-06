@@ -13,7 +13,7 @@ namespace cyclus {
 
 static double const kBuffInfinity = std::numeric_limits<double>::max();
 
-typedef std::vector<rsrc_ptr> Manifest;
+typedef std::vector<Resource::Ptr> Manifest;
 
 /*!
 ResourceBuff is a helper function that provides semi-automated management of
@@ -78,7 +78,7 @@ class ResourceBuff {
   @throws ValueError the specified pop quantity is larger (by
   cyclus::eps_rsrc()) than the store's current quantity.
   */
-  std::vector<rsrc_ptr> PopQty(double qty);
+  std::vector<Resource::Ptr> PopQty(double qty);
 
   /*!
   popNum pops the specified number or count of resource objects from the
@@ -90,7 +90,7 @@ class ResourceBuff {
   @throws ValueError the specified pop number is larger than the
   store's current inventoryNum or the specified number is negative.
   */
-  std::vector<rsrc_ptr> PopNum(int num);
+  std::vector<Resource::Ptr> PopNum(int num);
 
   /*!
   popOne pops one resource object from the store.
@@ -100,7 +100,7 @@ class ResourceBuff {
 
   @throws ValueError the store is empty.
   */
-  rsrc_ptr PopOne();
+  Resource::Ptr PopOne();
 
   /*!
   pushOne pushs a single resource object to the store.
@@ -115,7 +115,7 @@ class ResourceBuff {
   @throws KeyError the resource object to be pushed is already present
   in the store.
   */
-  void PushOne(rsrc_ptr mat);
+  void PushOne(Resource::Ptr mat);
 
   /*!
   pushAll pushs one or more resource objects (as a std::vector) to the store.
@@ -146,8 +146,8 @@ class ResourceBuff {
   double capacity_;
 
   /// list of constituent resource objects forming the store's inventory
-  std::list<rsrc_ptr> mats_;
-  std::set<rsrc_ptr> mats_present_;
+  std::list<Resource::Ptr> mats_;
+  std::set<Resource::Ptr> mats_present_;
 };
 } // namespace cyclus
 #endif

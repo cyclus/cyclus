@@ -16,7 +16,7 @@ namespace cyclus {
 int Transaction::next_trans_id_ = 1;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction::Transaction(Model* creator, TransType type, rsrc_ptr res, 
+Transaction::Transaction(Model* creator, TransType type, Resource::Ptr res, 
     const double price, const double minfrac) : price_(price), minfrac_(minfrac) { 
   type_ = type;
 
@@ -44,7 +44,7 @@ Transaction* Transaction::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Transaction::ApproveTransfer() {
-  std::vector<rsrc_ptr> manifest;
+  std::vector<Resource::Ptr> manifest;
   manifest = supplier_->RemoveResource(*this);
   requester_->AddResource(*this, manifest);
 
@@ -126,12 +126,12 @@ void Transaction::SetPrice(double new_price) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr Transaction::Resource() const {
+Resource::Ptr Transaction::resource() const {
   return resource_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::SetResource(rsrc_ptr new_resource) {
+void Transaction::SetResource(Resource::Ptr new_resource) {
   if (new_resource.get()) {
     resource_ = new_resource->clone();
   }
@@ -159,7 +159,7 @@ void Transaction::AddTransToTable() {
     ->Record();
 }
 
-void Transaction::AddResourceToTable(int transPos, rsrc_ptr r){  
+void Transaction::AddResourceToTable(int transPos, Resource::Ptr r){  
   EM->NewEvent("TransactedResources")
     ->AddVal("TransactionID", trans_id_)
     ->AddVal("Position", transPos)

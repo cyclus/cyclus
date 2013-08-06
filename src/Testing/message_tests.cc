@@ -21,7 +21,7 @@ class TestCommunicator : public cyclus::Communicator {
   public:
 
     TestCommunicator(std::string name) {
-      msg_ = cyclus::msg_ptr(new TrackerMessage(this));
+      msg_ = cyclus::Message::Ptr(new TrackerMessage(this));
 
       name_ = name;
       stop_at_return_ = true;
@@ -36,7 +36,7 @@ class TestCommunicator : public cyclus::Communicator {
     virtual ~TestCommunicator() { }
 
     cyclus::Communicator* parent_;
-    cyclus::msg_ptr msg_;
+    cyclus::Message::Ptr msg_;
 
     std::string name_;
     bool stop_at_return_, flip_at_receive_, forget_set_dest_;
@@ -60,7 +60,7 @@ class TestCommunicator : public cyclus::Communicator {
 
   private:
 
-    void ReceiveMessage(cyclus::msg_ptr msg) {
+    void ReceiveMessage(cyclus::Message::Ptr msg) {
       using cyclus::UP_MSG;
       using cyclus::DOWN_MSG;
       boost::intrusive_ptr<TrackerMessage> ptr;
@@ -226,8 +226,8 @@ TEST_F(MessagePassingTest, YoYo) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, KillByDeletingSender) {
-  using cyclus::msg_ptr;
-  msg_ptr msg = comm1->msg_;
+  using cyclus::Message;
+  Message::Ptr msg = comm1->msg_;
   comm3->keep_ = true;
 
   ASSERT_NO_THROW(comm1->StartMessage());
@@ -271,23 +271,23 @@ TEST_F(MessagePassingTest, KillSendOn) {
 class MessagePublicInterfaceTest : public ::testing::Test {
   protected:
 
-    cyclus::rsrc_ptr resource;
+    cyclus::Resource::Ptr resource;
     double quantity1, quantity2;
 
     TestCommunicator* comm1;
     TestCommunicator* comm2;
-    cyclus::msg_ptr msg1;
+    cyclus::Message::Ptr msg1;
     cyclus::Model* foo;
 
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = cyclus::gen_rsrc_ptr(new cyclus::GenericResource("kg", "bananas", quantity1));
+      resource = cyclus::GenericResource::Ptr(new cyclus::GenericResource("kg", "bananas", quantity1));
 
       cyclus::Transaction* trans = new cyclus::Transaction(foo, cyclus::OFFER, NULL);
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
-      msg1 = cyclus::msg_ptr(new cyclus::Message(comm1, comm2, *trans));
+      msg1 = cyclus::Message::Ptr(new cyclus::Message(comm1, comm2, *trans));
     };
 
     virtual void TearDown() {
@@ -332,21 +332,21 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
-  using cyclus::msg_ptr;
-  using cyclus::rsrc_ptr;
+  using cyclus::Message;
+  using cyclus::Resource;
   msg1->trans().SetResource(resource);
-  msg_ptr msg2 = msg1->clone();
+  Message::Ptr msg2 = msg1->clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  rsrc_ptr resource2 = msg2->trans().Resource();
+  Resource::Ptr resource2 = msg2->trans().resource();
   resource2->SetQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(msg2->trans().Resource()->quantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->trans().Resource()->quantity(), quantity2);
-  ASSERT_NE(resource, msg1->trans().Resource());
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_NE(resource, msg1->trans().resource());
   ASSERT_NE(resource, resource2);
 
   EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
@@ -363,11 +363,11 @@ TEST_F(MessagePublicInterfaceTest, GetSetResource) {
 
   msg1->trans().SetResource(resource);
 
-  ASSERT_NE(resource, msg1->trans().Resource());
+  ASSERT_NE(resource, msg1->trans().resource());
 
-  msg1->trans().Resource()->SetQuantity(quantity2);
+  msg1->trans().resource()->SetQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->trans().Resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg1->trans().resource()->quantity(), quantity2);
 }
 

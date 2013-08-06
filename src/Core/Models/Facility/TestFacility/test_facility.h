@@ -9,12 +9,12 @@
 class TestFacility: public cyclus::FacilityModel {
  public:
   
-  void ReceiveMessage(cyclus::msg_ptr msg) {
+  void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
   }
 
   void ReceiveMaterial(cyclus::Transaction trans, 
-                       std::vector<cyclus::mat_rsrc_ptr> manifest) { }
+                       std::vector<cyclus::Material::Ptr> manifest) { }
   
   cyclus::Prototype* clone() { return new TestFacility(); }
 

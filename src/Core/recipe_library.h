@@ -20,12 +20,12 @@ typedef std::map<std::string, CompMapPtr> RecipeMap;
 /**
    set of decay times
  */
-typedef std::set<int> decay_times;
+typedef std::set<int> DecayTimes;
 
 /**
    map of composition times decayed
  */
-typedef std::map<CompMapPtr,decay_times> DecayTimesMap; 
+typedef std::map<CompMapPtr,DecayTimes> DecayTimesMap; 
 
 /**
    map of decay time to composition
@@ -170,7 +170,7 @@ class RecipeLibrary {
 
      @param parent the recipe whose decay times are to be retrieved
    */
-  static decay_times& DecayTimes(CompMapPtr parent);
+  static DecayTimes& decay_times(CompMapPtr parent);
 
   /**
      accesses the child recipes of a parent recipe

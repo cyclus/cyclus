@@ -50,7 +50,7 @@ Manifest ResourceBuff::PopQty(double qty) {
   }
 
   Manifest manifest;
-  rsrc_ptr mat, leftover;
+  Resource::Ptr mat, leftover;
   double left = qty;
   double quan;
   while (left > cyclus::eps_rsrc()) {
@@ -84,7 +84,7 @@ Manifest ResourceBuff::PopNum(int num) {
 
   Manifest manifest;
   for (int i = 0; i < num; i++) {
-    rsrc_ptr mat = mats_.front();
+    Resource::Ptr mat = mats_.front();
     mats_.pop_front();
     manifest.push_back(mat);
     mats_present_.erase(mat);
@@ -95,11 +95,11 @@ Manifest ResourceBuff::PopNum(int num) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr ResourceBuff::PopOne() {
+Resource::Ptr ResourceBuff::PopOne() {
   if (mats_.size() < 1) {
     throw ValueError("Cannot pop material from an empty store.");
   }
-  rsrc_ptr mat = mats_.front();
+  Resource::Ptr mat = mats_.front();
   qty_ -= mat->quantity();
 
   mats_.pop_front();
@@ -108,7 +108,7 @@ rsrc_ptr ResourceBuff::PopOne() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::PushOne(rsrc_ptr mat) {
+void ResourceBuff::PushOne(Resource::Ptr mat) {
   if (mat->quantity() - space() > cyclus::eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
   } else if (mats_present_.count(mat) == 1) {
@@ -137,7 +137,7 @@ void ResourceBuff::PushAll(Manifest mats) {
   }
 
   for (int i = 0; i < mats.size(); i++) {
-    rsrc_ptr mat = mats.at(i);
+    Resource::Ptr mat = mats.at(i);
     mats_.push_back(mat);
     mats_present_.insert(mat);
   }

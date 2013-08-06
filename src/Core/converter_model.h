@@ -97,7 +97,7 @@ public:
      convert it to  
      @return the converted message 
    */
-  virtual msg_ptr Convert(msg_ptr convMsg, msg_ptr refMsg); 
+  virtual Message::Ptr Convert(Message::Ptr convMsg, Message::Ptr refMsg); 
   
 };
 } // namespace cyclus

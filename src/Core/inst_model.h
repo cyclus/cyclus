@@ -83,7 +83,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      default InstModel receiver is to ignore message. 
    */
-  virtual void ReceiveMessage(msg_ptr msg);
+  virtual void ReceiveMessage(Message::Ptr msg);
   
   /**
      Each institution is prompted to do its beginning-of-time-step 
