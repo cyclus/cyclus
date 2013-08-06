@@ -25,7 +25,6 @@ Package                Minimum Version
 `libxml2`              2
 `libxml++`             2.6
 `sqlite3`              3.7.10            
-`Cyclopts`             0.1            
 `HDF5`                 1.8.0
 ====================   ==================
 
@@ -41,15 +40,6 @@ This guide assumes that the user has root access (to issue sudo
 commands) and access to a package manager or has some other suitable 
 method of automatically installing established libraries. This process
 was tested using a fresh install of Ubuntu 12.10. 
-
-Cyclopts
---------
-
-Cyclopts is an optimization wrapper library used by Cyclus and is
-part of the general Cyclus software suite. Detailed build/install
-instructions are provided in the `Cyclopts readme`_. We assume that the 
-user has successfully built and installed Cyclopts (and CMake) for 
-the following discussion. 
 
 All Others
 ----------
@@ -103,14 +93,13 @@ in this guide:
      to install all Cyclus-related files
   #. you have acquired the Cyclus source code from the `Cyclus repo`_
   #. you have placed the Cyclus repository in .../cyclus/cyclus
-  #. you have installed Cyclopts  to ../cyclus/install (see the `Cyclopts readme`_)
 
 Under these assumptions **and** if you used a package manager to 
 install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
-    .../cyclus/cyclus$ python setup.py --prefix=../install --cyclopts_root=../install
+    .../cyclus/cyclus$ python setup.py --prefix=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
 installed in a non-standard location, you should make use of the 
@@ -119,7 +108,7 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python setup.py --prefix=../install --coin_root=path/to/coin --cyclopts_root=../install
+    .../cyclus/cyclus$  python setup.py --prefix=../install --coin_root=path/to/coin
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
@@ -127,7 +116,7 @@ you should make use of the boostRoot installation flag.
 .. code-block:: bash
 
 
-    .../cyclus/cyclus$ python setup.py --prefix=../install --coin_root=/path/to/coin --cyclopts_root=../install --boost_root=/path/to/boost
+    .../cyclus/cyclus$ python setup.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 Now, run it with some input file, for this example, call it 
 `input.xml`::
@@ -146,7 +135,6 @@ CMake variable flag. Simply add the following to your cmake command:
 .. _`Cyclus Homepage`: http://cyclus.github.com
 .. _`CMake`: http://www.cmake.org
 .. _`apt-get`: http://linux.die.net/man/8/apt-get
-.. _`Cyclopts readme`: https://github.com/cyclus/cyclopts
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 
 **********************
