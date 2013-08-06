@@ -1,6 +1,6 @@
 #include "CommodityProducer.h"
 
-#include "cyclopts_limits.h"
+#include "cyclopts/limits.h"
 #include "error.h"
 
 namespace cyclus {
@@ -9,21 +9,21 @@ namespace supply_demand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation()
     : capacity(0),
-      cost(cyclopts::kModifierLimit) 
-{}
+      cost(cyclus::cyclopts::kModifierLimit) 
+{ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityInformation::CommodityInformation(double a_capacity, 
                                            double a_cost)
     : capacity(a_capacity),
       cost(a_cost)
-{}
+{ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::CommodityProducer()
     : default_capacity_(0.0),
-      default_cost_(cyclopts::kModifierLimit)
-{}
+      default_cost_(cyclus::cyclopts::kModifierLimit)
+{ }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CommodityProducer::~CommodityProducer() {}
