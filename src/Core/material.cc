@@ -331,7 +331,7 @@ CompMapPtr Material::UnnormalizeComp(Basis basis, MassUnit unit){
       throw Error("The basis provided is not a supported CompMap basis");
   }
   CompMapPtr full_comp = CompMapPtr(new CompMap(*norm_comp));
-  CompMap::iterator it;
+  CompMap::Iterator it;
   for( it=norm_comp->begin(); it!= norm_comp->end(); ++it ){
     (*full_comp)[it->first] = scaling*(it->second);
   }

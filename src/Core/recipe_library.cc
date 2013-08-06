@@ -177,11 +177,11 @@ void RecipeLibrary::CheckChild(CompMapPtr parent, int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::AddDecayTime(CompMapPtr parent, int time) {
   CheckDecayable(parent);
-  DecayTimes(parent).insert(time);
+  decay_times(parent).insert(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-DecayTimes& RecipeLibrary::DecayTimes(CompMapPtr parent) {
+DecayTimes& RecipeLibrary::decay_times(CompMapPtr parent) {
   CheckDecayable(parent);
   return decay_times_[parent];
 }
@@ -220,7 +220,7 @@ bool RecipeLibrary::CompositionDecayable(CompMapPtr comp) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::AddToTable(CompMapPtr recipe){
-  for (CompMap::iterator item = recipe->begin();
+  for (CompMap::Iterator item = recipe->begin();
        item != recipe->end(); item++) {
     EM->NewEvent("IsotopicStates")
       ->AddVal("ID", recipe->ID())

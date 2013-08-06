@@ -106,7 +106,7 @@ TEST_F(MaterialTest, CheckIsoMass) {
   // if the mat has many isotopes, their individual masses should scale with 
   // their atomic numbers.
   double test_total = 0;
-  CompMap::iterator comp; 
+  CompMap::Iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;
@@ -132,7 +132,7 @@ TEST_F(MaterialTest, CheckIsoAtoms){
 
   // a mat's total atoms should be the total of all the contained isotopes. 
   double total_atoms = 0;
-  CompMap::iterator comp; 
+  CompMap::Iterator comp; 
   int i;
   for( comp = (*test_comp_).begin(); comp != (*test_comp_).end(); ++comp){
     i = (*comp).first;

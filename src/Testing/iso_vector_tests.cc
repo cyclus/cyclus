@@ -51,7 +51,7 @@ TEST_F(IsoVectorTests,addition) {
   LoadMaps();
   EXPECT_NO_THROW(add_to_vec += to_add_vec);
   EXPECT_TRUE(add_to_vec.CompEquals(add_result));
-  for (CompMap::iterator it = add_to_vec.comp()->begin(); it != add_to_vec.comp()->end(); it++) {
+  for (CompMap::Iterator it = add_to_vec.comp()->begin(); it != add_to_vec.comp()->end(); it++) {
     EXPECT_DOUBLE_EQ((*add_result)[it->first],it->second);
   }
 }
@@ -113,7 +113,7 @@ TEST_F(IsoVectorTests,subtraction) {
   LoadMaps();
   EXPECT_NO_THROW(subtract_from_vec -= to_subtract_vec);
   EXPECT_TRUE(subtract_from_vec.CompEquals(subtract_result));
-  for (CompMap::iterator it = subtract_from_vec.comp()->begin(); it != subtract_from_vec.comp()->end(); it++) {
+  for (CompMap::Iterator it = subtract_from_vec.comp()->begin(); it != subtract_from_vec.comp()->end(); it++) {
     EXPECT_DOUBLE_EQ((*subtract_result)[it->first],it->second);
   }
 }

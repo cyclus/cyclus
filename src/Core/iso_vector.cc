@@ -124,7 +124,7 @@ void IsoVector::Record() {
 double IsoVector::IntersectionFraction(const IsoVector& other) {
   double fraction = 0;
   CompMapPtr other_comp = other.comp();
-  for (CompMap::iterator it = other_comp->begin(); it 
+  for (CompMap::Iterator it = other_comp->begin(); it 
          != other_comp->end(); it++) {
     if (composition_->count(it->first) > 0) {
       fraction += MassFraction(it->first);
@@ -154,7 +154,7 @@ void IsoVector::Mix(const IsoVector& other, double ratio) {
   CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_)); // copy
   CompMapPtr add_comp = other.comp();
   // loop over comp to add
-  for (CompMap::iterator it = add_comp->begin(); it 
+  for (CompMap::Iterator it = add_comp->begin(); it 
          != add_comp->end(); it++) {
     // get correct value to add
     double value;
@@ -193,7 +193,7 @@ void IsoVector::Separate(const IsoVector& other, double efficiency) {
   }
   CompMapPtr new_comp = CompMapPtr(new CompMap(*composition_));
   CompMapPtr remove_comp = other.comp();
-  for (CompMap::iterator it = remove_comp->begin(); 
+  for (CompMap::Iterator it = remove_comp->begin(); 
        it != remove_comp->end(); it++) {
     // reduce isotope, if it exists in new_comp
     if (new_comp->count(it->first) != 0) {

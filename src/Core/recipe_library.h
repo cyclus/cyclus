@@ -170,7 +170,7 @@ class RecipeLibrary {
 
      @param parent the recipe whose decay times are to be retrieved
    */
-  static DecayTimes& DecayTimes(CompMapPtr parent);
+  static DecayTimes& decay_times(CompMapPtr parent);
 
   /**
      accesses the child recipes of a parent recipe
