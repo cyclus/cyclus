@@ -59,7 +59,7 @@ void MassTable::InitializeSQL() {
     int a = atoi( aStr.c_str() );
     double mass = atof( mStr.c_str() );
     // create a nuclide member and add it to the nuclide vector
-    nuclide_t n = {z, a, mass};
+    Nuclide n = {z, a, mass};
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
     int tope = z * 1000 + a;

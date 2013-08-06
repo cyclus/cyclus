@@ -125,10 +125,10 @@ CompMapPtr RecipeLibrary::Recipe(std::string name) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::StoreDecayableRecipe(CompMapPtr recipe) {
   // initialize containers
-  decay_times times;
+  DecayTimes times;
   ChildMap childs;
   // assign containers
-  decay_times_.insert(std::pair<CompMapPtr,decay_times>(recipe,times) );
+  decay_times_.insert(std::pair<CompMapPtr,DecayTimes>(recipe,times) );
   decay_hist_.insert(std::pair<CompMapPtr,ChildMap>(recipe,childs) );
 }
 
@@ -181,7 +181,7 @@ void RecipeLibrary::AddDecayTime(CompMapPtr parent, int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLibrary::DecayTimes(CompMapPtr parent) {
+DecayTimes& RecipeLibrary::DecayTimes(CompMapPtr parent) {
   CheckDecayable(parent);
   return decay_times_[parent];
 }

@@ -26,7 +26,7 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  constructor_ = (create_t*) 
+  constructor_ = (ModelCtor*) 
     GetProcAddress(module_library_,constructor_name_.c_str());
 
   if (!constructor_) {
@@ -39,7 +39,7 @@ void DynamicModule::SetConstructor() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetDestructor() {
-  destructor_ = (destroy_t*) 
+  destructor_ = (ModelDtor*) 
     GetProcAddress(module_library_,destructor_name_.c_str());
 
   if (!destructor_) {

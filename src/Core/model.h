@@ -18,8 +18,6 @@ class Message;
 class Transaction;
 class QueryEngine;
 
-typedef Model* mdl_ctor();
-
 /** 
    defines the possible model types 
     
