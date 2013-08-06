@@ -32,7 +32,6 @@ build
 buildDecayMatrix
 buildSchema
 canBuild
-change_basis
 checkChild
 checkCommodityManagement
 checkCommodityProduction
@@ -89,7 +88,6 @@ enterSimulationAsModule
 envDelimiter
 execute
 executeDecay
-exp_value
 extract
 facInst
 facLifetime
@@ -136,7 +134,6 @@ init
 initAllowedFacilities
 initCoreMembers
 initialize
-initialize_module_paths
 initializeSimulationEntity
 initializeSQL
 initInstitutionNames
@@ -144,7 +141,6 @@ initModuleMembers
 initPlayers
 inputCommodities
 intersectionFraction
-is_resource_type_recorded
 isAllowedFacility
 isAvailablePrototype
 isDead
@@ -154,18 +150,6 @@ kill
 lastDayOfMonth
 leaveMarket
 lifetimeReached
-linear_value
-load_control_parameters
-load_converters
-load_dynamic_modules
-load_facilitycatalog
-load_institutions
-load_markets
-load_modules_of_type
-load_recipe
-load_recipes
-load_regions
-load_simulation
 loadDecayInfo
 loadModule
 loadParser
@@ -204,11 +188,9 @@ originalID
 outputCommodities
 overwrite
 parentID
-parse_context
 pathBase
 pathDelimiter
 pathToMainSchema
-piecewise_value
 playerEnteringMarket
 playerLeavingMarket
 playerProductionCapacity
@@ -255,7 +237,6 @@ registerPrototype
 registerRegionWithSimulation
 registerResolveListener
 registerTickListener
-release_underlying
 removeChild
 removeFromList
 removeResource
@@ -310,7 +291,6 @@ setUpProblem
 setUpProducerManager
 setUpProducers
 simDur
-sort_ascending
 startDate
 startMessage
 startTime
