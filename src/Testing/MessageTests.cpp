@@ -45,22 +45,22 @@ class TestCommunicator : public cyclus::Communicator {
     int down_up_count_;
     bool kill_;
 
-    void startMessage() {
+    void StartMessage() {
       dynamic_cast<TrackerMessage*>(msg_.get())->dest_list_.push_back(name_);
-      msg_->setNextDest(parent_);
-      msg_->sendOn();
+      msg_->SetNextDest(parent_);
+      msg_->SendOn();
     }
 
-    void returnMessage() {
+    void ReturnMessage() {
       if (!keep_) {
         return;
       }
-      msg_->sendOn();
+      msg_->SendOn();
     }
 
   private:
 
-    void receiveMessage(cyclus::msg_ptr msg) {
+    void ReceiveMessage(cyclus::msg_ptr msg) {
       using cyclus::UP_MSG;
       using cyclus::DOWN_MSG;
       boost::intrusive_ptr<TrackerMessage> ptr;
@@ -71,25 +71,25 @@ class TestCommunicator : public cyclus::Communicator {
         return;
       }
       if (kill_) {
-        msg->kill();
+        msg->Kill();
       }
       if (stop_at_return_ && this == msg->sender()) {
         return;
       } else if (flip_at_receive_) {
-        msg->setDir(DOWN_MSG);
+        msg->SetDir(DOWN_MSG);
       } else if (flip_down_to_up_) {
         int max_num_flips = 2;
-        if (msg->dir() == DOWN_MSG && down_up_count_ < max_num_flips) {
-          msg->setDir(UP_MSG);
+        if (msg->Dir() == DOWN_MSG && down_up_count_ < max_num_flips) {
+          msg->SetDir(UP_MSG);
           down_up_count_++;
         }
       }
 
       if ( !forget_set_dest_ ) {
-        msg->setNextDest(parent_);
+        msg->SetNextDest(parent_);
       }
 
-      msg->sendOn();
+      msg->SendOn();
     }
 };
 
@@ -123,7 +123,7 @@ class MessagePassingTest : public ::testing::Test {
 };
 
 TEST_F(MessagePassingTest, CleanThrough) {
-  ASSERT_NO_THROW(comm1->startMessage());
+  ASSERT_NO_THROW(comm1->StartMessage());
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -144,7 +144,7 @@ TEST_F(MessagePassingTest, CleanThrough) {
 TEST_F(MessagePassingTest, PassBeyondOrigin) {
   comm1->stop_at_return_ = false;
 
-  ASSERT_THROW(comm1->startMessage(), cyclus::Error);
+  ASSERT_THROW(comm1->StartMessage(), cyclus::Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -165,7 +165,7 @@ TEST_F(MessagePassingTest, PassBeyondOrigin) {
 TEST_F(MessagePassingTest, ForgetToSetDest) {
   comm3->forget_set_dest_ = true;
 
-  ASSERT_THROW(comm1->startMessage(), cyclus::Error);
+  ASSERT_THROW(comm1->StartMessage(), cyclus::Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -182,7 +182,7 @@ TEST_F(MessagePassingTest, ForgetToSetDest) {
 TEST_F(MessagePassingTest, SendToSelf) {
   comm3->parent_ = comm3;
 
-  ASSERT_THROW(comm1->startMessage(), cyclus::Error);
+  ASSERT_THROW(comm1->StartMessage(), cyclus::Error);
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -199,7 +199,7 @@ TEST_F(MessagePassingTest, SendToSelf) {
 TEST_F(MessagePassingTest, YoYo) {
   comm2->flip_down_to_up_ = true;
 
-  ASSERT_NO_THROW(comm1->startMessage());
+  ASSERT_NO_THROW(comm1->StartMessage());
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -230,11 +230,11 @@ TEST_F(MessagePassingTest, KillByDeletingSender) {
   msg_ptr msg = comm1->msg_;
   comm3->keep_ = true;
 
-  ASSERT_NO_THROW(comm1->startMessage());
-  ASSERT_FALSE(msg->isDead());
+  ASSERT_NO_THROW(comm1->StartMessage());
+  ASSERT_FALSE(msg->IsDead());
   delete comm1;
-  ASSERT_TRUE(msg->isDead());
-  ASSERT_NO_THROW(comm3->returnMessage());
+  ASSERT_TRUE(msg->IsDead());
+  ASSERT_NO_THROW(comm3->ReturnMessage());
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(msg.get())->dest_list_;
   int num_stops = stops.size();
@@ -250,7 +250,7 @@ TEST_F(MessagePassingTest, KillByDeletingSender) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(MessagePassingTest, KillSendOn) {
   comm3->kill_ = true;
-  ASSERT_NO_THROW(comm1->startMessage());
+  ASSERT_NO_THROW(comm1->StartMessage());
 
   std::vector<std::string> stops = dynamic_cast<TrackerMessage*>(comm1->msg_.get())->dest_list_;
   int num_stops = stops.size();
@@ -310,12 +310,12 @@ TEST_F(MessagePublicInterfaceTest, FullConstructor) {
   Transaction* trans_no_price;
   EXPECT_NO_THROW(trans = new Transaction(foo, OFFER, resource, price, minfrac)); 
   ASSERT_FLOAT_EQ(price, trans->price());
-  ASSERT_FLOAT_EQ(minfrac, trans->minfrac());
-  ASSERT_EQ(true, trans->isOffer());
+  ASSERT_FLOAT_EQ(minfrac, trans->Minfrac());
+  ASSERT_EQ(true, trans->IsOffer());
   EXPECT_NO_THROW(trans_no_min = new Transaction(foo, REQUEST, resource, price)); 
   ASSERT_FLOAT_EQ(price, trans_no_min->price());
-  ASSERT_FLOAT_EQ(0.0, trans_no_min->minfrac());
-  ASSERT_EQ(false, trans_no_min->isOffer());
+  ASSERT_FLOAT_EQ(0.0, trans_no_min->Minfrac());
+  ASSERT_EQ(false, trans_no_min->IsOffer());
   EXPECT_NO_THROW(trans_no_price = new Transaction(foo, REQUEST, resource)); 
   ASSERT_FLOAT_EQ(0,trans_no_price->price());
 }
@@ -334,19 +334,19 @@ TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
 TEST_F(MessagePublicInterfaceTest, Cloning) {
   using cyclus::msg_ptr;
   using cyclus::rsrc_ptr;
-  msg1->trans().setResource(resource);
+  msg1->trans().SetResource(resource);
   msg_ptr msg2 = msg1->clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());
 
   // check proper cloning of message's resource
-  rsrc_ptr resource2 = msg2->trans().resource();
-  resource2->setQuantity(quantity2);
+  rsrc_ptr resource2 = msg2->trans().Resource();
+  resource2->SetQuantity(quantity2);
 
-  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
-  ASSERT_NE(resource, msg1->trans().resource());
+  ASSERT_DOUBLE_EQ(msg2->trans().Resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg2->trans().Resource()->quantity(), quantity2);
+  ASSERT_NE(resource, msg1->trans().Resource());
   ASSERT_NE(resource, resource2);
 
   EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
@@ -361,13 +361,13 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 TEST_F(MessagePublicInterfaceTest, GetSetResource) {
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
 
-  msg1->trans().setResource(resource);
+  msg1->trans().SetResource(resource);
 
-  ASSERT_NE(resource, msg1->trans().resource());
+  ASSERT_NE(resource, msg1->trans().Resource());
 
-  msg1->trans().resource()->setQuantity(quantity2);
+  msg1->trans().Resource()->SetQuantity(quantity2);
 
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->trans().resource()->quantity(), quantity2);
+  ASSERT_DOUBLE_EQ(msg1->trans().Resource()->quantity(), quantity2);
 }
 

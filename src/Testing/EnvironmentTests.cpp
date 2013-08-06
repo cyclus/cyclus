@@ -12,9 +12,9 @@ namespace fs = boost::filesystem;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(EnvironmentTests, ModuleEnvVar) {
   std::string path = "/my/nice/path";
-  std::string cmd = cyclus::Env::moduleEnvVarName() + '=' + path;
+  std::string cmd = cyclus::Env::ModuleEnvVarName() + '=' + path;
   putenv((char*) cmd.c_str());
-  EXPECT_EQ(cyclus::Env::moduleEnvVar(), path);
+  EXPECT_EQ(cyclus::Env::ModuleEnvVar(), path);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,11 +29,11 @@ TEST(EnvironmentTests, FindNonStandardPath) {
   f.close();
 
   // add path to env
-  std::string cmd = cyclus::Env::moduleEnvVarName() + '=' + dir.string();
+  std::string cmd = cyclus::Env::ModuleEnvVarName() + '=' + dir.string();
   putenv((char*) cmd.c_str());
 
   fs::path actual_path;
-  ASSERT_TRUE(cyclus::Env::findModuleLib(fname.string(), actual_path));
+  ASSERT_TRUE(cyclus::Env::FindModuleLib(fname.string(), actual_path));
   EXPECT_EQ(full, actual_path);
 
   fs::remove_all(dir);

@@ -30,14 +30,14 @@ class TestQueryEngine : public QueryEngine {
 
   ~TestQueryEngine();
   
-  virtual int nElementsMatchingQuery(std::string query) {
+  virtual int NElementsMatchingQuery(std::string query) {
     if (query == name_)
       return 1;
     else
       return 0;
   }
 
-  virtual std::string getElementContent(std::string query, int index = 0) {
+  virtual std::string GetElementContent(std::string query, int index = 0) {
     if (query == name_)
       return content_;
     else
@@ -45,7 +45,7 @@ class TestQueryEngine : public QueryEngine {
 	
   }
 
-  virtual std::string getElementName(std::string query, int index = 0) {
+  virtual std::string GetElementName(std::string query, int index = 0) {
     if (query == name_)
       return name_;
     else if (query == "*")
@@ -55,7 +55,7 @@ class TestQueryEngine : public QueryEngine {
   }
 
  protected:
-  virtual QueryEngine* getEngineFromSnippet(std::string snippet) {
+  virtual QueryEngine* GetEngineFromSnippet(std::string snippet) {
     return new TestQueryEngine(snippet);
   }
 

@@ -8,8 +8,8 @@
 /// This is the simplest possible Region, for testing
 class TestRegion: public cyclus::RegionModel {
   
-  void receiveMessage(cyclus::msg_ptr msg) {
-    msg->setDir(cyclus::DOWN_MSG);
+  void ReceiveMessage(cyclus::msg_ptr msg) {
+    msg->SetDir(cyclus::DOWN_MSG);
   }
 };
 

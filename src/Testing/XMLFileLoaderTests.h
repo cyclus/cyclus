@@ -15,7 +15,7 @@ class XMLFileLoaderTests : public ::testing::Test {
 
  private:
 
-  void createTestInputFile(std::string fname, std::string contents) {
+  void CreateTestInputFile(std::string fname, std::string contents) {
     std::ofstream outFile(fname.c_str());
     outFile<<contents;
     outFile.close();
@@ -30,11 +30,11 @@ class XMLFileLoaderTests : public ::testing::Test {
 
   virtual void TearDown();
 
-  std::string falseSequence();
-  std::string controlSequence();
-  std::string recipeSequence();
-  std::string moduleSequence();
-  std::string controlSchema();
+  std::string FalseSequence();
+  std::string ControlSequence();
+  std::string RecipeSequence();
+  std::string ModuleSequence();
+  std::string ControlSchema();
 
 };
 

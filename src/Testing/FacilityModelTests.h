@@ -22,7 +22,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
   virtual void SetUp() { 
     facility_model_ = (*GetParam())();
     test_inst_ = new TestInst();
-    facility_model_->setParent(test_inst_);
+    facility_model_->SetParent(test_inst_);
     test_out_market_ = new TestMarket("out-commod");
     test_in_market_ = new TestMarket("in-commod");
   }

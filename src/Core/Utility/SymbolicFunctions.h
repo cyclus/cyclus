@@ -32,7 +32,7 @@ class Function
   virtual double value(double x) = 0; 
 
   /// every function must print itself
-  virtual std::string print() = 0;
+  virtual std::string Print() = 0;
 };
 
 // typedefs
@@ -57,7 +57,7 @@ class LinearFunction : public Function
   virtual double value(double x);
   
   /// print a string of the function
-  virtual std::string print();
+  virtual std::string Print();
 
  private:
   /// the slope
@@ -87,7 +87,7 @@ class ExponentialFunction : public Function
   virtual double value(double x);
 
   /// print a string of the function
-  virtual std::string print();
+  virtual std::string Print();
 
  private:
   /// the constant factor
@@ -120,7 +120,7 @@ class PiecewiseFunction : public Function
   virtual double value(double x);
   
   /// print a string of the function
-  virtual std::string print();
+  virtual std::string Print();
   
  private:
   std::list<PiecewiseFunctionInfo> functions_;

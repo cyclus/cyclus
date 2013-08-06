@@ -44,19 +44,19 @@ namespace cyclus {
     methods to combine different compositions.
 
     @section Addition
-    Addition of compositions is a specific case of the mix() method. All
+    Addition of compositions is a specific case of the Mix() method. All
     values of a given composition are added to another at a ratio of 1:1. The
     finalized composition is then normalized.
 
     @section Subtraction
     Subtraction is not the reverse of addition, because it models the process
-    of separation (and calls the separate() method). Isotopic separation removes
+    of separation (and calls the Separate() method). Isotopic separation removes
     all isotopes at a given efficiency (if the efficiency is less than 1, some
     of those isotopes remain). Subtraction, accordingly, is separation with
     efficiency = 1. All isotopes are removed, and the remaining are normalized.
 
     @section Decay
-    The IsoVector class manages the decay of CompMaps via the decay(time) 
+    The IsoVector class manages the decay of CompMaps via the Decay(time) 
     method. New children will have their parent and decay time set accordingly.
 */
 class IsoVector : public boost::enable_shared_from_this<IsoVector> {  
@@ -92,7 +92,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 
   /**
      adds two compositions
-     uses the mix() function with a ratio of 1
+     uses the Mix() function with a ratio of 1
    */
   IsoVector& operator+=(const IsoVector& rhs);
 
@@ -103,7 +103,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 
   /**
      adds two compositions
-     uses the mix() function with a ratio of 1
+     uses the Mix() function with a ratio of 1
    */
   const IsoVector operator+(const IsoVector& rhs) const;
 
@@ -132,12 +132,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      Return the mass fraction of an isotope in the composition
    */
-  double massFraction(Iso tope);
+  double MassFraction(Iso tope);
 
   /**
      returns the atom fraction of an isotope in the composition
    */
-  double atomFraction(Iso tope);
+  double AtomFraction(Iso tope);
 
   /**
      calls composition_'s normalize
@@ -148,7 +148,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      validates the composition_, insuring all Isotopes numbers 
      and fraction values comply
   */
-  void validate();
+  void Validate();
 
   /**
      resets all members to their initialized values
@@ -158,30 +158,30 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      calls CompMap's printing functionality
    */
-  void print();
+  void Print();
 
   /**
      records composition_ with the RecipeLibrary
    */
-  void record();
+  void Record();
 
   /**
      computes the total mass fraction that this isovector has in
      common with other
      @param other the isovector to check for intersection
    */
-  double intersectionFraction(const IsoVector& other);
+  double IntersectionFraction(const IsoVector& other);
 
   /**
      calls compEqual on other.comp()
    */
-  bool compEquals(const IsoVector& other) const;
+  bool CompEquals(const IsoVector& other) const;
 
   /**
      calls equality operator on the values of composition_ and
      comp
    */
-  bool compEquals(const CompMapPtr comp) const;
+  bool CompEquals(const CompMapPtr comp) const;
   /* --- */
 
   /* --- Transformations --- */
@@ -191,12 +191,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param ratio the amount of c1 compared to c2
      @return a shared pointer to the resulting composition
    */
-  void mix(const IsoVector& other, double ratio);
+  void Mix(const IsoVector& other, double ratio);
 
   /**
-     calls mix() on values of p_c1 and p_c2
+     calls Mix() on values of p_c1 and p_c2
    */
-  void mix(const IsoVectorPtr& p_other, double ratio);
+  void Mix(const IsoVectorPtr& p_other, double ratio);
 
   /**
      separates an IsoVector from this one 
@@ -204,12 +204,12 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param efficiency the effiency of the separation
      @return a shared pointer to the resulting composition
    */
-  void separate(const IsoVector& other, double efficiency);
+  void Separate(const IsoVector& other, double efficiency);
 
   /**
-     calls separate() on values of p_c1 and p_c2
+     calls Separate() on values of p_c1 and p_c2
    */
-  void separate(const IsoVectorPtr& p_other, double efficiency);
+  void Separate(const IsoVectorPtr& p_other, double efficiency);
 
   /**
      decays a composition for a given time, assumed to be in months
@@ -221,7 +221,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
-  virtual void decay(int time);
+  virtual void Decay(int time);
   /* --- */
   
  private:
@@ -239,7 +239,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   /**
      sets composition_ to comp
    */
-  void setComp(CompMapPtr comp);
+  void SetComp(CompMapPtr comp);
 
   /**
      this private function uses the DecayHandler to decay a composition
@@ -249,7 +249,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
      @param time the decay time, in months
      @return a pointer to the result of this decay
    */
-  static CompMapPtr executeDecay(CompMapPtr parent, int time);
+  static CompMapPtr ExecuteDecay(CompMapPtr parent, int time);
   /* --- */
 };
 } // namespace cyclus

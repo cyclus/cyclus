@@ -12,25 +12,25 @@ enrichment::Assays::Assays(double feed, double product, double tails) :
   tails_(tails) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::Assays::feed() const {
+double enrichment::Assays::Feed() const {
   return feed_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::Assays::product() const {
+double enrichment::Assays::Product() const {
   return product_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::Assays::tails() const {
+double enrichment::Assays::Tails() const {
   return tails_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double enrichment::uranium_assay(mat_rsrc_ptr rsrc) {
   double value;
-  double u235 = rsrc->isoVector().atomFraction(92235);
-  double u238 = rsrc->isoVector().atomFraction(92238);
+  double u235 = rsrc->isoVector().AtomFraction(92235);
+  double u238 = rsrc->isoVector().AtomFraction(92238);
   
   LOG(LEV_DEBUG1, "CEnr") << "Comparing u235 atom fraction : " 
                           << u235 << " with u238 atom fraction: "
@@ -52,18 +52,18 @@ double enrichment::uranium_qty(mat_rsrc_ptr rsrc) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double enrichment::feed_qty(double product_qty, const Assays& assays) {
   double factor = 
-    (assays.product() - assays.tails())
+    (assays.Product() - assays.Tails())
     /
-    (assays.feed() - assays.tails());
+    (assays.Feed() - assays.Tails());
   return product_qty * factor;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 double enrichment::tails_qty(double product_qty, const Assays& assays) {
   double factor = 
-    (assays.product() - assays.feed())
+    (assays.Product() - assays.Feed())
     /
-    (assays.feed() - assays.tails());
+    (assays.Feed() - assays.Tails());
   return product_qty * factor;
 }
 
@@ -91,9 +91,9 @@ double enrichment::swu_required(double product_qty, const Assays& assays) {
   double feed = feed_qty(product_qty,assays);
   double tails = tails_qty(product_qty,assays);
   double swu = 
-    product_qty * value_func(assays.product()) +
-    tails * value_func(assays.tails()) -
-    feed * value_func(assays.feed());
+    product_qty * value_func(assays.Product()) +
+    tails * value_func(assays.Tails()) -
+    feed * value_func(assays.Feed());
   return swu;
 }
 } // namespace cyclus

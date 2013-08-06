@@ -13,12 +13,12 @@ TEST_P(RegionModelTests, Print) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, IsRegion) {
-  EXPECT_EQ("Region",region_model_->modelType());
+  EXPECT_EQ("Region",region_model_->ModelType());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, AllowedFacilityModels) {
   TestFacility* test_fac = new TestFacility(); 
-  EXPECT_NO_THROW(region_model_->isAllowedFacility(test_fac));
+  EXPECT_NO_THROW(region_model_->IsAllowedFacility(test_fac));
 }
 

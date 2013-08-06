@@ -73,7 +73,7 @@ class MarketModel : public Model, public Communicator {
      sets the commodity for this market
      @param name the commodity name
    */
-  void setCommodity(std::string name);
+  void SetCommodity(std::string name);
   
   /**
      Queries the list of known markets for one associated with the 
@@ -83,12 +83,12 @@ class MarketModel : public Model, public Communicator {
 
      @exception KeyError commod has no corresponding market
    */
-  static MarketModel* marketForCommod(std::string commod);
+  static MarketModel* MarketForCommod(std::string commod);
 
   /**
      enters the market into the simulation
    */
-  virtual void enterSimulationAsCoreEntity();
+  virtual void EnterSimulationAsCoreEntity();
 
   /**
      every model needs a method to initialize from a QueryEngine
@@ -96,7 +96,7 @@ class MarketModel : public Model, public Communicator {
      method
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void initCoreMembers(QueryEngine* qe);
+  virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description 
@@ -109,7 +109,7 @@ class MarketModel : public Model, public Communicator {
      @param mkt the market to register, usually a this pointer
      during init
    */
-  static void registerMarket(MarketModel* mkt);
+  static void RegisterMarket(MarketModel* mkt);
 
  private:
   /**
@@ -118,7 +118,7 @@ class MarketModel : public Model, public Communicator {
      @param msg the message being sent to and received by this market model
      instance, being sent from another simulation agent
    */
-  virtual void receiveMessage(msg_ptr msg) 
+  virtual void ReceiveMessage(msg_ptr msg) 
   { messages_.insert(msg); };
 
 /* ------------------- */ 
@@ -138,7 +138,7 @@ class MarketModel : public Model, public Communicator {
      Primary funcation of a Market is to resolve the set of 
      requests with the set of offers. 
    */
-  virtual void resolve() = 0;
+  virtual void Resolve() = 0;
 
  protected: 
   /**

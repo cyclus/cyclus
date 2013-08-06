@@ -63,10 +63,10 @@ protected:
       // materials
       mass1 = 111;
       mat1_ = rsrc_ptr(new Material(vect1_));
-      mat1_->setQuantity(mass1);
+      mat1_->SetQuantity(mass1);
       mass2 = 222;
       mat2_ = rsrc_ptr(new Material(vect2_));
-      mat2_->setQuantity(mass2);
+      mat2_->SetQuantity(mass2);
       mats.push_back(mat1_);
       mats.push_back(mat2_);
 
@@ -83,9 +83,9 @@ protected:
       under_qty = exact_qty - overeps;
       over_qty = exact_qty + overeps;
 
-      filled_store_.setCapacity(cap);
-      filled_store_.pushOne(mat1_);
-      filled_store_.pushOne(mat2_);
+      filled_store_.SetCapacity(cap);
+      filled_store_.PushOne(mat1_);
+      filled_store_.PushOne(mat2_);
     } catch (std::exception err) {
       LOG(cyclus::LEV_ERROR, "MSTest") << err.what();
       FAIL() << "An exception was thrown in the fixture SetUp.";

@@ -43,7 +43,7 @@ public:
      validate an xml file agaisnt the given schema
      @param doc the xml file document
    */
-  bool validate(const xmlpp::Document* doc);
+  bool Validate(const xmlpp::Document* doc);
 
 protected:
   /// free xml-related memory

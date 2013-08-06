@@ -13,22 +13,22 @@ CommodityProducerManager::CommodityProducerManager() {}
 CommodityProducerManager::~CommodityProducerManager() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double CommodityProducerManager::totalProductionCapacity(Commodity& commodity)
+double CommodityProducerManager::TotalProductionCapacity(Commodity& commodity)
 {
   double total = 0.0;
   std::set<CommodityProducer*>::iterator it;
   for (it = producers_.begin(); it != producers_.end(); it++)
     {
-      if ( (*it)->producesCommodity(commodity) )
+      if ( (*it)->ProducesCommodity(commodity) )
         {
-          total += (*it)->productionCapacity(commodity);
+          total += (*it)->ProductionCapacity(commodity);
         }
     }
   return total;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManager::registerProducer(supply_demand::CommodityProducer* producer) {
+void CommodityProducerManager::RegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
       throw KeyError("A manager is trying to register a producer twice.");
@@ -40,7 +40,7 @@ void CommodityProducerManager::registerProducer(supply_demand::CommodityProducer
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityProducerManager::unRegisterProducer(supply_demand::CommodityProducer* producer) {
+void CommodityProducerManager::UnRegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
       throw KeyError("A manager is trying to unregister a producer not originally registered with it.");

@@ -20,7 +20,7 @@ Transaction::Transaction(Model* creator, TransType type, rsrc_ptr res,
     const double price, const double minfrac) : price_(price), minfrac_(minfrac) { 
   type_ = type;
 
-  this->setResource(res);
+  this->SetResource(res);
   supplier_ = NULL;
   requester_ = NULL;
 
@@ -38,27 +38,27 @@ Transaction::~Transaction() { }
 Transaction* Transaction::clone() {
   // clones resource_ and gives copy to the transaction clone
   Transaction* trans = new Transaction(*this);
-  trans->setResource(resource_);
+  trans->SetResource(resource_);
   return trans;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::approveTransfer() {
+void Transaction::ApproveTransfer() {
   std::vector<rsrc_ptr> manifest;
-  manifest = supplier_->removeResource(*this);
-  requester_->addResource(*this, manifest);
+  manifest = supplier_->RemoveResource(*this);
+  requester_->AddResource(*this, manifest);
 
   // register that this transaction occured
-  this->Transaction::addTransToTable();
+  this->Transaction::AddTransToTable();
   int nResources = manifest.size();
   
   for (int pos = 0; pos < nResources; pos++) {
     // MUST PRECEDE 'addResourceToTable' call! record the resource with its state
     // because this can potentially update the material's stateID
-    manifest.at(pos)->addToTable();
+    manifest.at(pos)->AddToTable();
   
     // record that what resources belong to this transaction
-    this->Transaction::addResourceToTable(pos + 1, manifest.at(pos));
+    this->Transaction::AddResourceToTable(pos + 1, manifest.at(pos));
   }
   
   CLOG(LEV_INFO3) << "Material sent from " << supplier_->ID() << " to " 
@@ -66,7 +66,7 @@ void Transaction::approveTransfer() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::matchWith(Transaction& other) {
+void Transaction::MatchWith(Transaction& other) {
   if (other.type_ == type_) {
     throw ValueError("Cannot match incompatible transactino types.");
   }
@@ -86,7 +86,7 @@ void Transaction::matchWith(Transaction& other) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 MarketModel* Transaction::market() const {
   MarketModel* market;
-  market = MarketModel::marketForCommod(commod_);
+  market = MarketModel::MarketForCommod(commod_);
   return market;
 } 
 
@@ -106,12 +106,12 @@ std::string Transaction::commod() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setCommod(std::string new_commod) {
+void Transaction::SetCommod(std::string new_commod) {
   commod_ = new_commod;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Transaction::isOffer() const {
+bool Transaction::IsOffer() const {
   return type_ == OFFER;
 }
 
@@ -121,51 +121,51 @@ double Transaction::price() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setPrice(double new_price) {
+void Transaction::SetPrice(double new_price) {
   price_ = new_price;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr Transaction::resource() const {
+rsrc_ptr Transaction::Resource() const {
   return resource_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setResource(rsrc_ptr new_resource) {
+void Transaction::SetResource(rsrc_ptr new_resource) {
   if (new_resource.get()) {
     resource_ = new_resource->clone();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Transaction::minfrac() const {
+double Transaction::Minfrac() const {
   return minfrac_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Transaction::setMinFrac(double new_minfrac) {
+void Transaction::SetMinFrac(double new_minfrac) {
   minfrac_ = new_minfrac;
 }
 
-void Transaction::addTransToTable() {  
-  EM->newEvent("Transactions")
-    ->addVal("ID", trans_id_)
-    ->addVal("SenderID", supplier_->ID())
-    ->addVal("ReceiverID", requester_->ID())
-    ->addVal("MarketID", market()->ID())
-    ->addVal("Commodity", commod())
-    ->addVal("Price", price_)
-    ->addVal("Time", TI->time())
-    ->record();
+void Transaction::AddTransToTable() {  
+  EM->NewEvent("Transactions")
+    ->AddVal("ID", trans_id_)
+    ->AddVal("SenderID", supplier_->ID())
+    ->AddVal("ReceiverID", requester_->ID())
+    ->AddVal("MarketID", market()->ID())
+    ->AddVal("Commodity", commod())
+    ->AddVal("Price", price_)
+    ->AddVal("Time", TI->time())
+    ->Record();
 }
 
-void Transaction::addResourceToTable(int transPos, rsrc_ptr r){  
-  EM->newEvent("TransactedResources")
-    ->addVal("TransactionID", trans_id_)
-    ->addVal("Position", transPos)
-    ->addVal("ResourceID", r->originalID())
-    ->addVal("StateID", r->stateID())
-    ->addVal("Quantity", r->quantity())
-    ->record();
+void Transaction::AddResourceToTable(int transPos, rsrc_ptr r){  
+  EM->NewEvent("TransactedResources")
+    ->AddVal("TransactionID", trans_id_)
+    ->AddVal("Position", transPos)
+    ->AddVal("ResourceID", r->OriginalID())
+    ->AddVal("StateID", r->StateID())
+    ->AddVal("Quantity", r->quantity())
+    ->Record();
 }
 } // namespace cyclus

@@ -39,13 +39,13 @@ class DecayHandler {
        the parent and daughters map variables.  The resulting matrix is 
        stored in the static variable decayMatrix. 
      */
-    static void buildDecayMatrix();
+    static void BuildDecayMatrix();
 
     /**
        Reads the decay information found in the 'decayInfo.dat' file 
        into the parent and daughters maps.Uses these maps to create the 
      */
-    static void loadDecayInfo();
+    static void LoadDecayInfo();
 
     /**
        The IsoVector's parent 
@@ -80,7 +80,7 @@ class DecayHandler {
     /**
        Add the Isotope to our list of tracked isotopes IFF it is not 
      */
-    static void addIsoToList(int iso);
+    static void AddIsoToList(int iso);
 
   public:    
     /**
@@ -91,17 +91,17 @@ class DecayHandler {
     /**
        set the composition from a CompMap 
      */
-    void setComp(CompMapPtr comp);
+    void SetComp(CompMapPtr comp);
 
     /**
        set the composition from a composition vector 
      */
-    void setComp(Vector comp);
+    void SetComp(Vector comp);
 
     /**
        return the composition as a composition vector 
      */ 
-    Vector compAsVector();
+    Vector CompAsVector();
 
     /**
        return the composition as a composition map 
@@ -112,17 +112,17 @@ class DecayHandler {
        decay the material 
        @param years the number of years to decay 
      */ 
-    void decay(double years);
+    void Decay(double years);
     
     /**
        the number of tracked isotopes 
      */
-    int nTrackedIsotopes(){return IsotopesTracked_.size();}
+    int NTrackedIsotopes(){return IsotopesTracked_.size();}
 
     /**
        the tracked isotope at position i 
      */
-    int trackedIsotope(int i){return IsotopesTracked_.at(i);}
+    int TrackedIsotope(int i){return IsotopesTracked_.at(i);}
 };
 } // namespace cyclus
 #endif

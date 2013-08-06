@@ -15,9 +15,9 @@ class CommodityProducerTests : public ::testing::Test {
  public:
   virtual void SetUp();
   virtual void TearDown();
-  double defaultCapacity();
-  double defaultCost();
-  void addCommodity();
-  void setCapacity();
-  void setCost();
+  double DefaultCapacity();
+  double DefaultCost();
+  void AddCommodity();
+  void SetCapacity();
+  void SetCost();
 };

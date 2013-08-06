@@ -19,7 +19,7 @@ double ResourceBuff::capacity() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::setCapacity(double cap) {
+void ResourceBuff::SetCapacity(double cap) {
   if (quantity() - cap > cyclus::eps_rsrc()) {
     throw ValueError("New capacity lower than existing quantity");
   }
@@ -42,7 +42,7 @@ double ResourceBuff::space() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Manifest ResourceBuff::popQty(double qty) {
+Manifest ResourceBuff::PopQty(double qty) {
   if (qty - quantity() > cyclus::eps_rsrc()) {
     throw ValueError("Removal quantity larger than store tot quantity.");
   } else if (qty < cyclus::eps_rsrc()) {
@@ -60,8 +60,8 @@ Manifest ResourceBuff::popQty(double qty) {
     if ((quan - left) > cyclus::eps_rsrc()) {
       // too big - split the mat before pushing
       leftover = mat->clone();
-      leftover->setQuantity(quan - left);
-      mat->setQuantity(left);
+      leftover->SetQuantity(quan - left);
+      mat->SetQuantity(left);
       mats_.push_front(leftover);
       qty_ -= left;
     } else {
@@ -77,7 +77,7 @@ Manifest ResourceBuff::popQty(double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Manifest ResourceBuff::popNum(int num) {
+Manifest ResourceBuff::PopNum(int num) {
   if (mats_.size() < num) {
     throw ValueError("Remove count larger than store count.");
   }
@@ -95,7 +95,7 @@ Manifest ResourceBuff::popNum(int num) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rsrc_ptr ResourceBuff::popOne() {
+rsrc_ptr ResourceBuff::PopOne() {
   if (mats_.size() < 1) {
     throw ValueError("Cannot pop material from an empty store.");
   }
@@ -108,7 +108,7 @@ rsrc_ptr ResourceBuff::popOne() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::pushOne(rsrc_ptr mat) {
+void ResourceBuff::PushOne(rsrc_ptr mat) {
   if (mat->quantity() - space() > cyclus::eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
   } else if (mats_present_.count(mat) == 1) {
@@ -121,7 +121,7 @@ void ResourceBuff::pushOne(rsrc_ptr mat) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::pushAll(Manifest mats) {
+void ResourceBuff::PushAll(Manifest mats) {
   double tot_qty = 0;
   for (int i = 0; i < mats.size(); i++) {
     tot_qty += mats.at(i)->quantity();

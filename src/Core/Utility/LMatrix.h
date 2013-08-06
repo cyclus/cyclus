@@ -24,17 +24,17 @@ class LMatrix {
     LMatrix(int n, int m);  // constructs an nxm matrix of zeroes
     
     // member access functions
-    int numRows() const;                    // returns number of rows
-    int numCols() const;                    // returns number of columns
+    int NumRows() const;                    // returns number of rows
+    int NumCols() const;                    // returns number of columns
     const long double & operator()(int i, int j) const;  // returns the element aij
 
     // population functions
-    void setElement(int i, int j, long double aij);  // sets value of element aij
+    void SetElement(int i, int j, long double aij);  // sets value of element aij
     long double & operator()(int i, int j);  // sets value of element A(i,j)
-    void addRow(std::vector<long double> row);  // adds a row at the end of the Matrix
+    void AddRow(std::vector<long double> row);  // adds a row at the end of the Matrix
 
     // other member functions
-    void print() const;  // prints the matrix
+    void Print() const;  // prints the matrix
 
     // assignment operators for matrix objects
     const LMatrix & operator=(const LMatrix & rhs);

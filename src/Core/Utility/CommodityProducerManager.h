@@ -25,7 +25,7 @@ namespace supply_demand
        @return the total production capacity for a commodity amongst producers
        @param commodity the commodity in question
      */
-    double totalProductionCapacity(Commodity& commodity);
+    double TotalProductionCapacity(Commodity& commodity);
 
     // protected: @MJGFlag - should be protected. revise when tests can
     // be found by classes in the Utility folder
@@ -33,13 +33,13 @@ namespace supply_demand
        register a commodity producer with the manager
        @param producer the producer
      */
-    void registerProducer(supply_demand::CommodityProducer* producer);
+    void RegisterProducer(supply_demand::CommodityProducer* producer);
 
     /**
        unregister a commodity producer with the manager
        @param producer the producer
      */
-    void unRegisterProducer(supply_demand::CommodityProducer* producer);
+    void UnRegisterProducer(supply_demand::CommodityProducer* producer);
 
     /// the set of managed producers
     std::set<CommodityProducer*> producers_;

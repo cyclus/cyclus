@@ -28,7 +28,7 @@ void SymbolicFunctionTests::TearDown()
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void SymbolicFunctionTests::setUpPiecewiseEnvironment()
+void SymbolicFunctionTests::SetUpPiecewiseEnvironment()
 {
   double offset = 4;
 
@@ -54,36 +54,36 @@ void SymbolicFunctionTests::setUpPiecewiseEnvironment()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::getExpFunction() 
+cyclus::FunctionPtr SymbolicFunctionTests::GetExpFunction() 
 {
   cyclus::ExpFunctionFactory eff;
   std::stringstream input;
   input << constant << " " << exponent;
-  return eff.getFunctionPtr(input.str());
+  return eff.GetFunctionPtr(input.str());
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::getLinFunction() 
+cyclus::FunctionPtr SymbolicFunctionTests::GetLinFunction() 
 {
   cyclus::LinFunctionFactory lff;
   std::stringstream input;
   input << slope << " " << intercept;
-  return lff.getFunctionPtr(input.str());
+  return lff.GetFunctionPtr(input.str());
 }  
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::getPiecewiseFunction()
+cyclus::FunctionPtr SymbolicFunctionTests::GetPiecewiseFunction()
 {
-  setUpPiecewiseEnvironment();
-  cyclus::FunctionPtr lin = getLinFunction();
-  cyclus::FunctionPtr exp = getExpFunction();
+  SetUpPiecewiseEnvironment();
+  cyclus::FunctionPtr lin = GetLinFunction();
+  cyclus::FunctionPtr exp = GetExpFunction();
   
   cyclus::PiecewiseFunctionFactory pff;
-  pff.addFunction(lin,check_points.at(1));
-  pff.addFunction(exp,check_points.at(3));
+  pff.AddFunction(lin,check_points.at(1));
+  pff.AddFunction(exp,check_points.at(3));
 
-  return pff.getFunctionPtr();
+  return pff.GetFunctionPtr();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -122,7 +122,7 @@ double SymbolicFunctionTests::piecewise_value(double value, int index)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SymbolicFunctionTests,linearfunc) 
 {
-  cyclus::FunctionPtr f = getLinFunction();
+  cyclus::FunctionPtr f = GetLinFunction();
   
   int n = 10;
   int start = -10;
@@ -138,7 +138,7 @@ TEST_F(SymbolicFunctionTests,linearfunc)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SymbolicFunctionTests,expfunc) 
 {
-  cyclus::FunctionPtr f = getExpFunction();
+  cyclus::FunctionPtr f = GetExpFunction();
   
   int n = 10;
   int start = -10;
@@ -159,7 +159,7 @@ TEST_F(SymbolicFunctionTests,piecewisefunc)
   //ofstream output;
   //output.open ("out");
 
-  cyclus::FunctionPtr f = getPiecewiseFunction();
+  cyclus::FunctionPtr f = GetPiecewiseFunction();
 
   for (int i = 0; i < check_points.size() - 1; i++)
     {

@@ -1,7 +1,7 @@
 * initalize file pointer
 * validate file
 * initializeSimulationTimeData
-   * [Timer::initialize(snippet)]
+   * [Timer::Initialize(snippet)]
 * load non-modules (elements)
    * load recipe information [XMLFileLoader::load_recipes]
       * find & parse recipe_catalogs

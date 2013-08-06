@@ -23,7 +23,7 @@ class SymbFunctionFactory
      @param params a string of required parameters for the function
      @return a FunctionPtr to the constructed function
    */
-  virtual FunctionPtr getFunctionPtr(std::string params) = 0;
+  virtual FunctionPtr GetFunctionPtr(std::string params) = 0;
 };
 
 /**
@@ -38,7 +38,7 @@ class LinFunctionFactory : public SymbFunctionFactory
      slope, intercept
      @return the linear function
    */
-  virtual FunctionPtr getFunctionPtr(std::string params);
+  virtual FunctionPtr GetFunctionPtr(std::string params);
 };
 
 /**
@@ -53,7 +53,7 @@ class ExpFunctionFactory : public SymbFunctionFactory
      order: constant, exponent, intercept
      @return the exponential function
    */
-  virtual FunctionPtr getFunctionPtr(std::string params);
+  virtual FunctionPtr GetFunctionPtr(std::string params);
 };
 
 /**
@@ -71,7 +71,7 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory
      an error is thrown
      @return the piecewise function
    */
-  virtual FunctionPtr getFunctionPtr(std::string params = "");
+  virtual FunctionPtr GetFunctionPtr(std::string params = "");
   
   /**
      add a function to the piecewise function being constructed
@@ -80,7 +80,7 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory
      @param continuous  if true, the added function and previous 
      function will be continuous, if false, discontinuous
    */
-  void addFunction(FunctionPtr function, double starting_coord = 0.0, bool continuous = true);
+  void AddFunction(FunctionPtr function, double starting_coord = 0.0, bool continuous = true);
 
  private:
   /// the piecewise function to construct
@@ -108,7 +108,7 @@ class BasicFunctionFactory
      @param params the function parameters
      @return the function
    */
-  FunctionPtr getFunctionPtr(std::string type, std::string params);
+  FunctionPtr GetFunctionPtr(std::string type, std::string params);
     
  private:
   /// a map between enums and names

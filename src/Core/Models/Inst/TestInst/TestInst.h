@@ -14,14 +14,14 @@ class TestInst: public cyclus::InstModel {
  public:
   virtual ~TestInst() {};
   
-  void receiveMessage(cyclus::msg_ptr msg) {
-    msg->setDir(cyclus::DOWN_MSG);
+  void ReceiveMessage(cyclus::msg_ptr msg) {
+    msg->SetDir(cyclus::DOWN_MSG);
   }
 
-  bool canBuild(cyclus::Model* mdl) {return true;}
+  bool CanBuild(cyclus::Model* mdl) {return true;}
 
-  void wrapAddAvailablePrototype(cyclus::Prototype* prototype) {
-    addAvailablePrototype(prototype);
+  void WrapAddAvailablePrototype(cyclus::Prototype* prototype) {
+    AddAvailablePrototype(prototype);
   }
 };
 

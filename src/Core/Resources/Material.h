@@ -101,7 +101,7 @@ public:
      standard verbose printer includes both an 
      atom and mass composition output 
    */
-  void print(); 
+  void Print(); 
 
   /**
      Returns a boolean indicating whether these materials are equivalent
@@ -120,7 +120,7 @@ public:
 
      @return equal true if equal within the threshold. false otherwise.
     */
-  virtual bool almostEqual(const mat_rsrc_ptr other, double threshold) const;
+  virtual bool AlmostEqual(const mat_rsrc_ptr other, double threshold) const;
 
   /**
      Change/set the mass of the resource object. 
@@ -128,7 +128,7 @@ public:
      should only be used on objects that are not part of 
      any actual tracked inventory. 
    */
-  void setQuantity(double quantity);
+  void SetQuantity(double quantity);
 
   /**
      Change/set the mass of the resource object. 
@@ -139,7 +139,7 @@ public:
      @param quantity the new mass, in units of the unit provided
      @param unit the unit of the mass provided, choose kg, g..
     */
-  void setQuantity(double quantity, MassUnit unit);
+  void SetQuantity(double quantity, MassUnit unit);
 
   /**
      Resource class method 
@@ -157,7 +157,7 @@ public:
   /**
      Resource class method 
    */
-  bool checkQuality(rsrc_ptr other);
+  bool CheckQuality(rsrc_ptr other);
 
   /**
      Resource class method 
@@ -200,7 +200,7 @@ public:
      @param kg the mass in kg to convert
      @param to_unit the unit to convert it to
      */
-  double convertFromKg(double kg, MassUnit to_unit);
+  double ConvertFromKg(double kg, MassUnit to_unit);
 
   /** 
      conversion from kg to some other unit
@@ -208,20 +208,20 @@ public:
      @param mass the mass in kg to convert
      @param from_unit the unit to convert it from
      */
-  double convertToKg(double mass, MassUnit from_unit);
+  double ConvertToKg(double mass, MassUnit from_unit);
 
   /**
      returns the number of atoms, in moles in the material.
 
     */
-  double moles();
+  double Moles();
 
   /**
      returns the number of atomes (in moles) of a certain isotope in a material
 
      @param tope is the isotope identifier. (e.g. 92235)
     */
-  double moles(Iso tope);
+  double Moles(Iso tope);
 
   /**
      Absorbs the contents of the given 
@@ -230,7 +230,7 @@ public:
       
      @param matToAdd the Material to be absorbed (and deleted) 
    */
-  virtual void absorb(mat_rsrc_ptr matToAdd);
+  virtual void Absorb(mat_rsrc_ptr matToAdd);
   /**
      Reports the difference between this material and another material
 
@@ -260,7 +260,7 @@ public:
      @throws CycNegValueError if the threshold provided is negative.
      @returns to_ret, the vector less elements whose abs(val) is less than threshhold
      */
-  virtual std::map<Iso, double> applyThreshold(std::map<Iso, double> vec, double threshold);
+  virtual std::map<Iso, double> ApplyThreshold(std::map<Iso, double> vec, double threshold);
 
   /**
      Extracts from this material a composition
@@ -275,7 +275,7 @@ public:
      @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object
    */
-  virtual mat_rsrc_ptr extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
+  virtual mat_rsrc_ptr Extract(const CompMapPtr comp_to_rem, double amt_to_rem, 
       MassUnit unit=KG, double threshold=eps_rsrc());
 
   /**
@@ -286,7 +286,7 @@ public:
      @throws ValueError for overextraction events
      @return the extracted material as a newly allocated material object 
    */
-  virtual mat_rsrc_ptr extract(double mass);
+  virtual mat_rsrc_ptr Extract(double mass);
 
   /**
      Decays this Material object for the amount of time that has passed since
@@ -295,7 +295,7 @@ public:
      Calling decay effectively updates the material decay to the current
      simulation time-step.
    */
-  virtual void decay();
+  virtual void Decay();
 
   /**
      Returns a copy of this material's isotopic composition 
@@ -309,12 +309,12 @@ public:
       
      @todo should be private (khuff/rcarlsen) 
    */
-  static void decayMaterials();
+  static void DecayMaterials();
 
   /**
      returns true if the resource pointer points to a material resource
   */
-  static bool isMaterial(rsrc_ptr rsrc);
+  static bool IsMaterial(rsrc_ptr rsrc);
 
   /**
      This scales the composition by the amount of moles or kg, depending on the 
@@ -323,7 +323,7 @@ public:
      @param basis MASS or ATOMS
      @param unit if the basis is mass, give a unit (KG or G) to calculate in
      */
-  CompMapPtr unnormalizeComp(Basis basis, MassUnit unit=KG);
+  CompMapPtr UnnormalizeComp(Basis basis, MassUnit unit=KG);
 
 protected:
   /**
@@ -332,14 +332,14 @@ protected:
       
      @param months the number of months to decay a material 
    */
-  void decay(double months);
+  void Decay(double months);
   
 
 private:
   /**
-     used by print() to 'hide' print code when recording is not desired 
+     used by Print() to 'hide' print code when recording is not desired 
    */
-  std::string detail(); 
+  std::string Detail(); 
 
   /**
      last time this material object's state 
@@ -397,12 +397,12 @@ private:
   /**
      add a material to table 
    */
-  virtual void addToTable();
+  virtual void AddToTable();
 
   /**
      return the state id for the iso vector 
    */
-  virtual int stateID() {return iso_vector_.comp()->ID();}
+  virtual int StateID() {return iso_vector_.comp()->ID();}
 
 };
 } // namespace cyclus

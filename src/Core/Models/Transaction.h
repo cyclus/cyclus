@@ -41,21 +41,21 @@ class Transaction {
     Transaction* clone();
 
     /**
-       Initiate the market-matched transaction - resource(s) are taken from the
+       Initiate the market-matched transaction - Resource(s) are taken from the
        supplier and sent to the requester.
         
        This should be the sole way of transferring resources between simulation
        agents/models. Book keeping of transactions (and corresponding resource
        states) are taken care of automatically.
      */
-    void approveTransfer();
+    void ApproveTransfer();
 
     /**
     Used by markets to pair matched offers and requests.
 
     This method automatically sets the supplier/requester of both this and the
-    "other" transaction. Note that "offerTrans.matchWith(requestTrans)" is
-    equivelent to "requestTrans.matchWith(offerTrans)".
+    "other" transaction. Note that "offerTrans.MatchWith(requestTrans)" is
+    equivelent to "requestTrans.MatchWith(offerTrans)".
 
     @param other the offer or request transaction to pair with
 
@@ -65,7 +65,7 @@ class Transaction {
     @exception ValueError this transaction and "other" are of
                the same TransType.
     */
-    void matchWith(Transaction& other);
+    void MatchWith(Transaction& other);
   
     /**
        @return the market that deals in this this transaction's commodity
@@ -94,12 +94,12 @@ class Transaction {
        @param new_commod the commodity to be requested or offered in this
        transaction
      */
-    void setCommod(std::string new_commod);
+    void SetCommod(std::string new_commod);
 
     /**
        @return true if the transaction is an offer, false if it is a request.
      */
-    bool isOffer() const;
+    bool IsOffer() const;
 
     /**
       Price for this transaction's resource.
@@ -114,33 +114,33 @@ class Transaction {
 
        @param new_price price in dollars
      */
-    void setPrice(double new_price);
+    void SetPrice(double new_price);
 
     /**
        @return a pointer to the resource being requested or offered in this
        transaction. 
      */
-    rsrc_ptr resource() const;
+    rsrc_ptr Resource() const;
 
     /**
        Sets the transaction's resource to a copy of the passed resource.
 
        @param new_resource its clone will be stored in this transaction
      */
-    void setResource(rsrc_ptr new_resource);
+    void SetResource(rsrc_ptr new_resource);
 
     /**
        @return the minimum fraction (0-1) acceptible by the supplier or 
        receiver of this transaction
      */
-    double minfrac() const;
+    double Minfrac() const;
 
     /**
        Sets the transaction's minimum fraction to new_minfrac (0-1).
 
        @param new_minfrac the minimum commodity fraction acceptible
      */
-    void setMinFrac(double new_minfrac);
+    void SetMinFrac(double new_minfrac);
 
   private:
     /**
@@ -174,14 +174,14 @@ class Transaction {
   /**
      add a transaction to the transaction table 
    */
-  void addTransToTable();
+  void AddTransToTable();
 
   /**
      add a transaction to the transaction table 
      @param position the position in the manifest 
      @param resource the resource being transacted 
    */
-  void addResourceToTable(int position, rsrc_ptr resource);
+  void AddResourceToTable(int position, rsrc_ptr resource);
 };
 } // namespace cyclus
 #endif

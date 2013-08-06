@@ -7,11 +7,11 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ConverterModel::ConverterModel() {
-  setModelType("Converter");
+  SetModelType("Converter");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr ConverterModel::convert(msg_ptr convMsg, msg_ptr refMsg) {
+msg_ptr ConverterModel::Convert(msg_ptr convMsg, msg_ptr refMsg) {
   // converters should override this method, unless they're very naiive.
   // generally, a converter's convert behavior should be to 
   // return the amount of the commodity in the convMsg to the units

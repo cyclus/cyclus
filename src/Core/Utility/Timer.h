@@ -81,7 +81,7 @@ class Timer {
   /**
      Returns a string of all models listening to the tick 
    */
-  std::string reportListeners();
+  std::string ReportListeners();
 
   /**
      Concrete models that desire to receive resolve (markets) 
@@ -92,24 +92,24 @@ class Timer {
      sends the resolve signal to all of the (market) models receiving 
      resolve notifications. 
    */
-  void sendResolve();
+  void SendResolve();
 
   /**
      sends the tick signal to all of the models receiving time 
      notifications. 
    */
-  void sendTick();
+  void SendTick();
 
   /**
      sends the tock signal to all of the models receiving time 
      notifications. 
    */
-  void sendTock();
+  void SendTock();
     
   /**
      sends a notification to Tick listeners that a day has passed 
    */
-  void sendDailyTasks();
+  void SendDailyTasks();
 
   /// reset all data (registered listeners, etc.) to empty or initial state
   void reset();
@@ -141,26 +141,26 @@ public:
      @param decay interval between decay calculations in months. <=0 if 
      decay is off (default = 0) 
    */
-  void initialize(int dur = 1, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
+  void Initialize(int dur = 1, int m0 = 1, int y0 = 2010, int start = 0, int decay = 0);
 
   /**
      Runs the simulation. 
    */ 
-  void runSim();
+  void RunSim();
 
   /**
      registers a sim. agent to receive time step notifications. 
       
      @param agent agent that will receive time-step notifications 
    */
-  void registerTickListener(TimeAgent* agent);
+  void RegisterTickListener(TimeAgent* agent);
 
   /**
      registers a sim. agent to receive (market) resolve notifications. 
       
      @param agent agent that will receive resolve notifications 
    */
-  void registerResolveListener(MarketModel* agent);
+  void RegisterResolveListener(MarketModel* agent);
 
   /**
      Returns the current time, in months since the simulation started. 
@@ -172,26 +172,26 @@ public:
   /**
      Returns the the start time of the simulation
    */
-  int startTime() {return time0_;}
+  int StartTime() {return time0_;}
 
   /**
      Returns the the start time of the simulation
    */
-  int finalTime() {return time0_+simDur_;}
+  int FinalTime() {return time0_+simDur_;}
 
   /**
      Returns the duration of the simulation this Timer's timing. 
       
      @return the duration, in months 
    */
-  int simDur();
+  int SimDur();
 
   /**
      Returns the starting date of the simulation. 
       
      @return the start date as a datetime object 
    */
-  boost::gregorian::date startDate(){return startDate_;}
+  boost::gregorian::date StartDate(){return startDate_;}
 
   /**
      Calculates the ending date of the simulation. 
@@ -201,7 +201,7 @@ public:
       
      @return the end date as a datetime object 
    */
-  boost::gregorian::date getEndDate(boost::gregorian::date startDate, int simDur);
+  boost::gregorian::date GetEndDate(boost::gregorian::date startDate, int simDur);
 
   /**
      Returns the ending date of the simulation. 
@@ -215,21 +215,21 @@ public:
       
      @return whether it is the last day of the simulation 
    */
-  bool checkEndDate() {return (date_ == endDate_);}
+  bool CheckEndDate() {return (date_ == endDate_);}
 
   /**
      Returns true if it is the ending month of the simulation 
       
      @return whether it is the last day of the simulation 
    */
-  bool checkEndMonth() {return ( date_.month() == endDate_.month() );}
+  bool CheckEndMonth() {return ( date_.month() == endDate_.month() );}
   
   /**
      Given the current date, returns the last day of the current month 
       
      @return the last date of the current month 
    */
-  int lastDayOfMonth();
+  int LastDayOfMonth();
 
   /**
      Returns the current date of the simulation. 
@@ -245,12 +245,12 @@ public:
      @param year the year corresponding to the date 
      @return the GENIUS date 
    */
-  int convertDate(int month, int year);
+  int ConvertDate(int month, int year);
 
   /**
      Converts the given GENIUS time into a (month, year) pair. 
    */
-  std::pair<int, int> convertDate(int time);
+  std::pair<int, int> ConvertDate(int time);
 
   /**
      Loads the information about the simulation timing 
@@ -263,7 +263,7 @@ public:
      logs relevant time-related data with the output system, including:
      the simulation start time and the simulation duration
    */
-  void logTimeData();
+  void LogTimeData();
 };
 } // namespace cyclus
 #endif
