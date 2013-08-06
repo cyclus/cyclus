@@ -1,13 +1,13 @@
-macro(cyclus_init  _path _name)
+macro(cyclus_init  _path _dir _name)
 
   SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${_path})
 
   # Build the cyclus executable from the CYCLUS_SRC source files
-  ADD_LIBRARY( ${_name}       ${_name}.cpp )
+  ADD_LIBRARY( ${_dir}       ${_name}.cc )
   # Link the libraries to libcycluscore
-  TARGET_LINK_LIBRARIES(${_name} dl cycluscore)
-  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_name} )
+  TARGET_LINK_LIBRARIES(${_dir} dl cycluscore)
+  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_dir} )
   
   CONFIGURE_FILE(
     ${CYCLUS_SOURCE_DIR}/Core${_path}/${_name}.rng
@@ -15,7 +15,7 @@ macro(cyclus_init  _path _name)
     COPYONLY
     )
   
-  install(TARGETS ${_name}
+  install(TARGETS ${_dir}
     LIBRARY DESTINATION lib${_path}
     COMPONENT ${_path}
     )
@@ -26,12 +26,12 @@ macro(cyclus_init  _path _name)
     )
 endmacro()
   
-macro(cyclus_init_model _type _name)
-  SET(MODEL_PATH "/Models/${_type}/${_name}")
-  cyclus_init(${MODEL_PATH} ${_name})
+macro(cyclus_init_model _type _dir _name)
+  SET(MODEL_PATH "/Models/${_type}/${_dir}")
+  cyclus_init(${MODEL_PATH} ${_dir} ${_name})
 
   SET(${_type}TestSource ${${_type}TestSource} 
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}Tests.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc
     PARENT_SCOPE)
 endmacro()
 

@@ -1,11 +1,11 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
-  <include href='../lib/Models/Market/TestMarket/TestMarket.rng'/>
-  <include href='../lib/Models/Converter/TestConverter/TestConverter.rng'/>
-  <include href='../lib/Models/Region/TestRegion/TestRegion.rng'/>
-  <include href='../lib/Models/Inst/TestInst/TestInst.rng'/>
-  <include href='../lib/Models/Facility/TestFacility/TestFacility.rng'/>
+  <include href='../lib/Models/Market/TestMarket/test_market.rng'/>
+  <include href='../lib/Models/Converter/TestConverter/test_converter.rng'/>
+  <include href='../lib/Models/Region/TestRegion/test_region.rng'/>
+  <include href='../lib/Models/Inst/TestInst/test_inst.rng'/>
+  <include href='../lib/Models/Facility/TestFacility/test_facility.rng'/>
 
   <start>
   <choice>
