@@ -114,13 +114,13 @@ class Timer {
   /// reset all data (registered listeners, etc.) to empty or initial state
   void reset();
 
-protected:
+ protected:
   /**
      Constructs a new Timer for this simulation. 
    */
   Timer();
   
-public:
+ public:
   /**
      Gives all simulation objects global access to the Timer by 
      returning a pointer to it. 

@@ -15,7 +15,7 @@ namespace cyclus {
  */
 
 class GenericResource : public Resource {
-public:
+ public:
   typedef boost::intrusive_ptr<GenericResource> Ptr;
 
   /**
@@ -118,7 +118,7 @@ public:
 
   virtual void AddToTable();
 
-private:  
+ private:  
   /**
      The units of the resource 
    */ 

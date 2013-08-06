@@ -12,40 +12,39 @@
 namespace cyclus {
 
 class LMatrix {
-
   // friend arithmetic operators involving a scalar k and matrix A
   friend LMatrix operator*(const long double k, const LMatrix & A);  // k * A
   friend LMatrix operator*(const LMatrix & A, const long double k);  // A * k
   friend LMatrix operator^(const LMatrix & A, const int k);     // A^k
 
-  public:
-    // constructors
-    LMatrix();              // constructs a 1x1 matrix of zeroes
-    LMatrix(int n, int m);  // constructs an nxm matrix of zeroes
+ public:
+  // constructors
+  LMatrix();              // constructs a 1x1 matrix of zeroes
+  LMatrix(int n, int m);  // constructs an nxm matrix of zeroes
     
-    // member access functions
-    int NumRows() const;                    // returns number of rows
-    int NumCols() const;                    // returns number of columns
-    const long double & operator()(int i, int j) const;  // returns the element aij
+  // member access functions
+  int NumRows() const;                    // returns number of rows
+  int NumCols() const;                    // returns number of columns
+  const long double & operator()(int i, int j) const;  // returns the element aij
 
-    // population functions
-    void SetElement(int i, int j, long double aij);  // sets value of element aij
-    long double & operator()(int i, int j);  // sets value of element A(i,j)
-    void AddRow(std::vector<long double> row);  // adds a row at the end of the Matrix
+  // population functions
+  void SetElement(int i, int j, long double aij);  // sets value of element aij
+  long double & operator()(int i, int j);  // sets value of element A(i,j)
+  void AddRow(std::vector<long double> row);  // adds a row at the end of the Matrix
 
-    // other member functions
-    void Print() const;  // prints the matrix
+  // other member functions
+  void Print() const;  // prints the matrix
 
-    // assignment operators for matrix objects
-    const LMatrix & operator=(const LMatrix & rhs);
-    const LMatrix & operator+=(const LMatrix & rhs);
-    const LMatrix & operator-=(const LMatrix & rhs);
-    const LMatrix & operator*=(const LMatrix & rhs);
+  // assignment operators for matrix objects
+  const LMatrix & operator=(const LMatrix & rhs);
+  const LMatrix & operator+=(const LMatrix & rhs);
+  const LMatrix & operator-=(const LMatrix & rhs);
+  const LMatrix & operator*=(const LMatrix & rhs);
 
-  private:
-    std::vector< std::vector<long double> > M_;  // 2D vector containing matrix elements
-    int rows_;                    // number of rows
-    int cols_;                    // number of columns
+ private:
+  std::vector< std::vector<long double> > M_;  // 2D vector containing matrix elements
+  int rows_;                    // number of rows
+  int cols_;                    // number of columns
 
 };
 
@@ -56,6 +55,7 @@ LMatrix operator*(const LMatrix & lhs, const LMatrix & rhs);  // A * B
 
 // non-member functions
 LMatrix identity(int n);  // creates an nxn identity matrix
+
 } // namespace cyclus
 #endif
 
