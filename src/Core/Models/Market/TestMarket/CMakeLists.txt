@@ -1,6 +1,6 @@
-cyclus_init_model("Market" "TestMarket")
+cyclus_init_model("Market" "TestMarket" "test_market")
 INSTALL(FILES
-  TestMarket.h
+  test_market.h
   DESTINATION include
   COMPONENT testing
   )

@@ -1,6 +1,6 @@
-cyclus_init_model("Facility" "TestFacility")
+cyclus_init_model("Facility" "TestFacility" "test_facility")
 INSTALL(FILES
-  TestFacility.h
+  test_facility.h
   DESTINATION include
   COMPONENT testing
   )
