@@ -284,7 +284,7 @@ class Model {
 
      @return list of resources to be sent for this order 
    */ 
-  virtual std::vector<rsrc_ptr> RemoveResource(Transaction order);
+  virtual std::vector<Resource::Ptr> RemoveResource(Transaction order);
 
   /**
      Transacted resources are received through this method. 
@@ -299,7 +299,7 @@ class Model {
      @param manifest is the set of resources being 
    */ 
   virtual void AddResource(Transaction trans,
-                              std::vector<rsrc_ptr> manifest);
+                              std::vector<Resource::Ptr> manifest);
 
  protected:
   /**

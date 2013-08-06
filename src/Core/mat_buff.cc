@@ -14,12 +14,12 @@ MatManifest MatBuff::PopNum(int num) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr MatBuff::PopOne() {
+Material::Ptr MatBuff::PopOne() {
   return boost::dynamic_pointer_cast<Material>(ResourceBuff::PopOne());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MatBuff::PushOne(mat_rsrc_ptr mat) {
+void MatBuff::PushOne(Material::Ptr mat) {
   ResourceBuff::PushOne(boost::dynamic_pointer_cast<Material>(mat));
 }
 

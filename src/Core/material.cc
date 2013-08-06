@@ -59,7 +59,7 @@ Material::Material(const Material& other) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Material::Absorb(mat_rsrc_ptr matToAdd) { 
+void Material::Absorb(Material::Ptr matToAdd) { 
   // @gidden figure out how to handle this with the database - mjg
   // Get the given Material's composition.
   double amt = matToAdd->quantity();
@@ -71,7 +71,7 @@ void Material::Absorb(mat_rsrc_ptr matToAdd) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::Extract(double mass) {
+Material::Ptr Material::Extract(double mass) {
   if(quantity_ < mass){
     std::string err = "The mass ";
     err += mass;
@@ -82,7 +82,7 @@ mat_rsrc_ptr Material::Extract(double mass) {
   // remove our mass
   quantity_ -= mass;
   // make a new material, set its mass
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(iso_vector_));
+  Material::Ptr new_mat = Material::Ptr(new Material(iso_vector_));
   new_mat->SetQuantity(mass);
   // we just split a resource, so keep track of the original for book keeping
   new_mat->SetOriginalID( this->OriginalID() );
@@ -94,7 +94,7 @@ mat_rsrc_ptr Material::Extract(double mass) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::map<Iso, double> Material::diff(mat_rsrc_ptr other){
+std::map<Iso, double> Material::diff(Material::Ptr other){
   CompMapPtr comp = CompMapPtr(other->isoVector().comp());
   double amt = other->mass(KG);
   return diff(comp, amt, KG);
@@ -143,7 +143,7 @@ std::map<Iso, double> Material::ApplyThreshold(std::map<Iso, double> vec, double
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr Material::Extract(const CompMapPtr remove_comp, double remove_amt, 
+Material::Ptr Material::Extract(const CompMapPtr remove_comp, double remove_amt, 
     MassUnit unit, double threshold){
   CompMapPtr final_comp = CompMapPtr(new CompMap(MASS));
   std::vector<double> final_amt_vec = std::vector<double>();
@@ -177,7 +177,7 @@ mat_rsrc_ptr Material::Extract(const CompMapPtr remove_comp, double remove_amt,
   }
 
   // make new material
-  mat_rsrc_ptr new_mat = mat_rsrc_ptr(new Material(remove_comp));
+  Material::Ptr new_mat = Material::Ptr(new Material(remove_comp));
   new_mat->SetQuantity(remove_amt, unit);
   new_mat->SetOriginalID( this->OriginalID() ); // book keeping
   // adjust old material
@@ -210,12 +210,12 @@ std::string Material::Detail() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::operator==(const mat_rsrc_ptr other){
+bool Material::operator==(const Material::Ptr other){
   return AlmostEqual(other, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::AlmostEqual(const mat_rsrc_ptr other, double threshold) const {
+bool Material::AlmostEqual(const Material::Ptr other, double threshold) const {
   // I learned at 
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the naive way to do it... 
@@ -339,15 +339,15 @@ CompMapPtr Material::UnnormalizeComp(Basis basis, MassUnit unit){
   return full_comp;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-rsrc_ptr Material::clone() {
+Resource::Ptr Material::clone() {
   CLOG(LEV_DEBUG2) << "Material ID=" << ID_ << " was cloned.";
-  rsrc_ptr mat(new Material(*this));
+  Resource::Ptr mat(new Material(*this));
   mat->SetQuantity(this->quantity());
   return mat;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-bool Material::CheckQuality(rsrc_ptr other){
+bool Material::CheckQuality(Resource::Ptr other){
   
   // This will be false until proven true
   bool toRet = false;
@@ -355,7 +355,7 @@ bool Material::CheckQuality(rsrc_ptr other){
 
   try {
     // Make sure the other is a material
-    mat_rsrc_ptr mat = boost::dynamic_pointer_cast<Material>(other);
+    Material::Ptr mat = boost::dynamic_pointer_cast<Material>(other);
     if (mat) {
       toRet = true;
     }
@@ -386,9 +386,9 @@ void Material::DecayMaterials() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool Material::IsMaterial(rsrc_ptr rsrc)
+bool Material::IsMaterial(Resource::Ptr rsrc)
 {
-  mat_rsrc_ptr cast = boost::dynamic_pointer_cast<Material>(rsrc);
+  Material::Ptr cast = boost::dynamic_pointer_cast<Material>(rsrc);
   return !(cast.get() == 0);
 }
 

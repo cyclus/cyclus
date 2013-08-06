@@ -43,7 +43,7 @@ class Communicator {
  public:
   virtual ~Communicator() {
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
-    std::set<msg_ptr>::iterator it;
+    std::set<Message::Ptr>::iterator it;
     for (it = tracked_.begin(); it != tracked_.end(); it++) {
       (*it)->Kill();
       LOG(LEV_DEBUG3, "delete") << "killing tracked message";
@@ -63,9 +63,9 @@ class Communicator {
      @warning This method should never be called directly by any Model 
      object. Message sending should be handled via methods on the 
    */
-  virtual void ReceiveMessage(msg_ptr msg) = 0;
+  virtual void ReceiveMessage(Message::Ptr msg) = 0;
 
-  std::set<msg_ptr> tracked_;
+  std::set<Message::Ptr> tracked_;
 
   /** 
      Add msg to a list of msgs to be killed when this communicator is 
@@ -74,7 +74,7 @@ class Communicator {
      objects that have been deallocated.  
      @param msg the Message to be tracked. 
    */
-  void TrackMessage(msg_ptr msg) {
+  void TrackMessage(Message::Ptr msg) {
     tracked_.insert(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " tracks Message " << msg;
   }
@@ -86,7 +86,7 @@ class Communicator {
      objects that have been deallocated.  
      @param msg the Message to untrack 
    */
-  void UntrackMessage(msg_ptr msg) {
+  void UntrackMessage(Message::Ptr msg) {
     tracked_.erase(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " untracked Message " << msg;
   }

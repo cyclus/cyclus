@@ -12,7 +12,7 @@ class TestMarket : public cyclus::MarketModel {
     TestMarket(std::string commod) {
       commodity_ = commod;
     }
-    virtual void ReceiveMessage(cyclus::msg_ptr msg) {
+    virtual void ReceiveMessage(cyclus::Message::Ptr msg) {
     }
     virtual void Resolve() {
     }

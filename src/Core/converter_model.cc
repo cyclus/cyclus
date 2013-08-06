@@ -11,7 +11,7 @@ ConverterModel::ConverterModel() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-msg_ptr ConverterModel::Convert(msg_ptr convMsg, msg_ptr refMsg) {
+Message::Ptr ConverterModel::Convert(Message::Ptr convMsg, Message::Ptr refMsg) {
   // converters should override this method, unless they're very naiive.
   // generally, a converter's convert behavior should be to 
   // return the amount of the commodity in the convMsg to the units

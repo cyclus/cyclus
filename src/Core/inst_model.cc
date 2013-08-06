@@ -124,7 +124,7 @@ void InstModel::EnterSimulationAsCoreEntity() {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::ReceiveMessage(msg_ptr msg){
+void InstModel::ReceiveMessage(Message::Ptr msg){
   // Default institutions aren't insterested in fooling with messages.
   // Just pass them along. 
   // If it's going up, send it to the region.

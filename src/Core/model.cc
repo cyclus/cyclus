@@ -369,7 +369,7 @@ const std::string Model::ModelImpl() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<rsrc_ptr> Model::RemoveResource(Transaction order) {
+std::vector<Resource::Ptr> Model::RemoveResource(Transaction order) {
   std::string msg = "The model " + name();
   msg += " doesn't support resource removal.";
   throw Error(msg);
@@ -377,7 +377,7 @@ std::vector<rsrc_ptr> Model::RemoveResource(Transaction order) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddResource(Transaction trans,
-			std::vector<rsrc_ptr> manifest) {
+			std::vector<Resource::Ptr> manifest) {
   std::string err_msg = "The model " + name();
   err_msg += " doesn't support resource receiving.";
   throw Error(err_msg);

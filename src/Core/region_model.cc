@@ -97,7 +97,7 @@ std::string RegionModel::str() {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::ReceiveMessage(msg_ptr msg){
+void RegionModel::ReceiveMessage(Message::Ptr msg){
   msg->SendOn();
 }
 

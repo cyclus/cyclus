@@ -27,7 +27,7 @@ class Transaction {
     @param price The price per unit of the commodity being requested or offered. 
     @param minfrac minimum commodity fraction acceptible for sending/receiving
     */
-    Transaction(Model* creator, TransType type, rsrc_ptr res=NULL, const double price=0.0, 
+    Transaction(Model* creator, TransType type, Resource::Ptr res=NULL, const double price=0.0, 
         const double minfrac=0.0);
 
     virtual ~Transaction();
@@ -120,14 +120,14 @@ class Transaction {
        @return a pointer to the resource being requested or offered in this
        transaction. 
      */
-    rsrc_ptr Resource() const;
+    Resource::Ptr resource() const;
 
     /**
        Sets the transaction's resource to a copy of the passed resource.
 
        @param new_resource its clone will be stored in this transaction
      */
-    void SetResource(rsrc_ptr new_resource);
+    void SetResource(Resource::Ptr new_resource);
 
     /**
        @return the minimum fraction (0-1) acceptible by the supplier or 
@@ -158,7 +158,7 @@ class Transaction {
     double price_;
 
     /// A specific resource with which this transaction is concerned.
-    rsrc_ptr resource_;
+    Resource::Ptr resource_;
 
     Model* supplier_;
 
@@ -181,7 +181,7 @@ class Transaction {
      @param position the position in the manifest 
      @param resource the resource being transacted 
    */
-  void AddResourceToTable(int position, rsrc_ptr resource);
+  void AddResourceToTable(int position, Resource::Ptr resource);
 };
 } // namespace cyclus
 #endif

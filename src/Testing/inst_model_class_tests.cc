@@ -33,7 +33,7 @@ class DieModel : public cyclus::FacilityModel {
   //   return dynamic_cast<Prototype*>(clone);
   // };
 
-  virtual void ReceiveMessage(cyclus::msg_ptr msg) { };
+  virtual void ReceiveMessage(cyclus::Message::Ptr msg) { };
   virtual void CloneModuleMembersFrom(FacilityModel* source){};
   virtual void Decommission() { delete this; }
 

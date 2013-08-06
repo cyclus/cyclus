@@ -27,7 +27,7 @@ void EnrichmentTests::SetUp()
   (*comp)[92235] = assay_u_;
   (*comp)[92238] = 1 - assay_u_;
 
-  mat_ = cyclus::mat_rsrc_ptr(new cyclus::Material(comp));
+  mat_ = cyclus::Material::Ptr(new cyclus::Material(comp));
   mat_->SetQuantity(mass_u_);
 
   SetEnrichmentParameters();

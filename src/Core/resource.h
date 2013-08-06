@@ -8,9 +8,6 @@
 
 namespace cyclus {
 
-class Resource;
-typedef boost::intrusive_ptr<Resource> rsrc_ptr;
-
 /**
    A list of concrete types of resource
 */
@@ -36,6 +33,8 @@ enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES };
 
 class Resource: IntrusiveBase<Resource> {
  public:
+  typedef boost::intrusive_ptr<Resource> Ptr;
+
   /**
      A boolean comparing the quality of the other resource 
      to the quality of the base 
@@ -45,7 +44,7 @@ class Resource: IntrusiveBase<Resource> {
      @return True if other is sufficiently equal in quality to 
      the base, False otherwise. 
    */
-  virtual bool CheckQuality(rsrc_ptr other) =0;
+  virtual bool CheckQuality(Ptr other) =0;
 
   /**
      Returns the base unit of this resource 
@@ -85,7 +84,7 @@ class Resource: IntrusiveBase<Resource> {
   /**
      Returns a newly allocated copy of the resource 
    */ 
-  virtual rsrc_ptr clone() = 0;
+  virtual Ptr clone() = 0;
 
   /**
      Prints information about the resource 

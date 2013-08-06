@@ -53,7 +53,7 @@ class StubCommModel : public Model, public Communicator {
     /**
        No default STUBCOMMMODEL message receiver. 
      */
-    virtual void ReceiveMessage(msg_ptr msg) = 0;
+    virtual void ReceiveMessage(Message::Ptr msg) = 0;
 
 };
 
