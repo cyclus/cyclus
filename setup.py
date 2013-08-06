@@ -44,8 +44,6 @@ def install_cyclus(args):
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
-        if args.cyclopts_root:
-            cmake_cmd += ['-DCYCLOPTS_ROOT_DIR=' + absexpanduser(args.cyclopts_root)]
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir, 
                                     shell=(os.name=='nt'))
@@ -77,9 +75,6 @@ def main():
 
     coin = "the relative path to the Coin-OR libraries directory"
     parser.add_argument('--coin_root', help=coin)
-
-    cyclopts = "the relative path to Cyclopts installation directory"
-    parser.add_argument('--cyclopts_root',help=cyclopts, default=localdir)
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
