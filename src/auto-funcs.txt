@@ -242,7 +242,6 @@ removeFromList
 removeResource
 reportListeners
 resolve
-resource
 returnMessage
 runSim
 sendDailyTasks
