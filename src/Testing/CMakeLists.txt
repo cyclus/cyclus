@@ -2,9 +2,12 @@
 message("GENERATED TESTS DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 
+ADD_SUBDIRECTORY(cyclopts)
+
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
+  ${CYCLUS_TEST_CORE}
   # --
   ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp
@@ -70,7 +73,7 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*ModelTests.cpp")
-INSTALL(FILES ${header_files} ${model_test_files} 
+INSTALL(FILES ${header_files} ${model_test_files}
   DESTINATION include
   COMPONENT testing
   )

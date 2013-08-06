@@ -4,7 +4,8 @@
 #include <vector>
 #include <map>
 
-#include "solver_tools.h"
+#include "cyclopts/variable.h"
+#include "cyclopts/function.h"
 
 #include "CommodityProducer.h"
 #include "Builder.h"
@@ -29,16 +30,16 @@ namespace action_building {
   {
     /// constructor
     ProblemInstance(Commodity& commod, double demand, 
-                    cyclopts::SolverInterface& sinterface, 
-                    cyclopts::ConstraintPtr constr, 
-                    std::vector<cyclopts::VariablePtr>& soln);
+                    cyclus::cyclopts::SolverInterface& sinterface, 
+                    cyclus::cyclopts::ConstraintPtr constr, 
+                    std::vector<cyclus::cyclopts::VariablePtr>& soln);
     
     // constituents
     Commodity& commodity;
     double unmet_demand;
-    cyclopts::SolverInterface& interface;
-    cyclopts::ConstraintPtr constraint;
-    std::vector<cyclopts::VariablePtr>& solution;
+    cyclus::cyclopts::SolverInterface& interface;
+    cyclus::cyclopts::ConstraintPtr constraint;
+    std::vector<cyclus::cyclopts::VariablePtr>& solution;
   };
  
   /**
@@ -125,6 +126,7 @@ namespace action_building {
      */
     void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>& orders,
                                           std::vector<cyclopts::VariablePtr>& solution);
+    
   private:
     /// the set of registered builders
     std::set<Builder*> builders_;
