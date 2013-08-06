@@ -16,13 +16,13 @@ namespace cyclus {
    database, providing a robust and correct mass lookup by isotope 
  */
 class MassTable {
-private:
+ private:
   /**
      A pointer to this MassTable once it has been initialized. 
    */
   static MassTable* instance_;
 
-public:
+ public:
   /**
      Gives all simulation objects global access to the Env by 
      returning a pointer to it. 
@@ -63,7 +63,7 @@ public:
    */
    double GramsPerMol(int tope);
 
-protected:
+ protected:
   /**
      Defines the structure of data associated with each row entry in the 
      mass database. Right now, strings are a little funky, so the names 

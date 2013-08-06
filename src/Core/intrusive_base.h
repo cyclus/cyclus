@@ -48,19 +48,14 @@ namespace cyclus {
     
  */
 template <class Derived> class IntrusiveBase {
-  
-  /**
-     used by boost::intrusive_ptr to increase object's reference count 
-   */
+  /// used by boost::intrusive_ptr to increase object's reference count 
   friend void intrusive_ptr_add_ref(const Derived* p) { 
     BOOST_ASSERT(p);
     ++((const IntrusiveBase*) p)->counter_;
   }
 
-  /** 
-     used by boost::intrusive_ptr to decrease object's reference count 
-     and deallocate the object if the ref count is zero. 
-   */
+  /// used by boost::intrusive_ptr to decrease object's reference count 
+  /// and deallocate the object if the ref count is zero. 
   friend void intrusive_ptr_release(const Derived* p) {
     BOOST_ASSERT(p);
     if (--((const IntrusiveBase*) p)->counter_ == 0) {
@@ -68,26 +63,20 @@ template <class Derived> class IntrusiveBase {
     }
   }
 
-  protected:
-    /**
-       protected because we don't want direct instantiations of 
-     */
-    IntrusiveBase(): counter_(0) { }
+ protected:
+  /// protected because we don't want direct instantiations of 
+  IntrusiveBase(): counter_(0) { }
 
-    ~IntrusiveBase() { }
+  ~IntrusiveBase() { }
 
-    /**
-       the copy constructor must zero out the ref count 
-     */
-    IntrusiveBase(const IntrusiveBase&) : counter_(0) { }
+  /// the copy constructor must zero out the ref count 
+  IntrusiveBase(const IntrusiveBase&) : counter_(0) { }
 
-    IntrusiveBase& operator=(const IntrusiveBase&) { return *this; }
+  IntrusiveBase& operator=(const IntrusiveBase&) { return *this; }
 
-  private:
-    /**
-       tracks an object's reference count 
-     */
-    mutable unsigned long counter_;
+ private:
+  /// tracks an object's reference count 
+  mutable unsigned long counter_;
 };
 } // namespace cyclus
 #endif
