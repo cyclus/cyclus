@@ -6,11 +6,11 @@ IF (WIN32)
 ELSEIF(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup" PARENT_SCOPE)
   set(suffix ".dylib")
-  set(dynamicloadlib "UnixHelperFunctions.h")
+  set(dynamicloadlib "unix_helper_functions.h")
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ELSE()
   set(suffix ".so")
-  set(dynamicloadlib "UnixHelperFunctions.h")
+  set(dynamicloadlib "unix_helper_functions.h")
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ENDIF()
 
@@ -27,8 +27,8 @@ CONFIGURE_FILE(
   )
 
 INSTALL(FILES
-    UnixHelperFunctions.h
-    WindowsHelperFunctions.h
+    unix_helper_functions.h
+    windows_helper_functions.h
     suffix.h
   DESTINATION include
   COMPONENT core

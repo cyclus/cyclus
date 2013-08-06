@@ -1,6 +1,6 @@
-cyclus_init_model("Inst" "TestInst")
+cyclus_init_model("Inst" "TestInst" "test_inst")
 INSTALL(FILES
-  TestInst.h
+  test_inst.h
   DESTINATION include
   COMPONENT testing
   )
