@@ -51,7 +51,7 @@ void RelaxNGValidator::release_underlying() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RelaxNGValidator::validate(const xmlpp::Document* doc) {
+bool RelaxNGValidator::Validate(const xmlpp::Document* doc) {
   if (!doc)
     throw ValidationError("Document pointer cannot be 0");
 

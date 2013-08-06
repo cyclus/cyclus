@@ -16,5 +16,5 @@ class EnrichmentTests : public ::testing::Test
  public:
   virtual void SetUp();  
   virtual void TearDown();
-  void setEnrichmentParameters();
+  void SetEnrichmentParameters();
 };

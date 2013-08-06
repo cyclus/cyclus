@@ -21,7 +21,7 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
 
   // cache pre-existing table names
   std::string cmd = "SELECT name FROM sqlite_master WHERE type='table';";
-  std::vector<StrList> rows = db_.query(cmd);
+  std::vector<StrList> rows = db_.Query(cmd);
   for (int i = 0; i < rows.size(); ++i) {
     tbl_names_.push_back(rows.at(i).at(0));
   }
@@ -146,11 +146,11 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::Flush() {
-  db_.execute("BEGIN TRANSACTION");
+  db_.Execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
-    db_.execute(*it);
+    db_.Execute(*it);
   }
-  db_.execute("END TRANSACTION");
+  db_.Execute("END TRANSACTION");
   cmds_.clear();
 }
 

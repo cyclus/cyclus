@@ -37,10 +37,10 @@ class CommodityTestHelper {
   cyclus::supply_demand::CommodityProducerManager manager;
 
   /// initialize the producers
-  void setUpProducers();
+  void SetUpProducers();
 
   /// initialize the producer manager
-  void setUpProducerManager();
+  void SetUpProducerManager();
 };
 
 #endif

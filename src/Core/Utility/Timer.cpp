@@ -17,7 +17,7 @@ namespace cyclus {
 Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::runSim() {
+void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << startDate_ << " to end=" << endDate_;
   time_ = time0_;
@@ -25,21 +25,21 @@ void Timer::runSim() {
   while (date_ < endDate()){
     if (date_.day() == 1){
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ << " {";
-      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << reportListeners();
+      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " << ReportListeners();
 
       if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
-        Material::decayMaterials();
+        Material::DecayMaterials();
       }
 
-      sendTick();
-      sendResolve();
+      SendTick();
+      SendResolve();
     }
     
-    int eom_day = lastDayOfMonth();
+    int eom_day = LastDayOfMonth();
     for (int i = 1; i < eom_day+1; i++){
-      sendDailyTasks();
+      SendDailyTasks();
       if (i == eom_day){
-        sendTock();
+        SendTock();
         CLOG(LEV_INFO2) << "}";
       }
       date_ += boost::gregorian::days(1);
@@ -51,8 +51,8 @@ void Timer::runSim() {
   // initiate deletion of models that don't have parents.
   // dealloc will propogate through hierarchy as models delete their children
   int count = 0;
-  while (Model::getModelList().size() > 0) {
-    Model* model = Model::getModelList().at(count);
+  while (Model::GetModelList().size() > 0) {
+    Model* model = Model::GetModelList().at(count);
     try {
       model->parent();
     } catch (ValueError err) {
@@ -64,7 +64,7 @@ void Timer::runSim() {
   }
 }
 
-int Timer::lastDayOfMonth(){
+int Timer::LastDayOfMonth(){
   int lastDay = 
     boost::gregorian::gregorian_calendar::end_of_month_day(date_.year(),
 							   date_.month());
@@ -72,7 +72,7 @@ int Timer::lastDayOfMonth(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Timer::reportListeners() {
+std::string Timer::ReportListeners() {
   std::string report = "";
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
       agent != tick_listeners_.end(); 
@@ -83,59 +83,59 @@ std::string Timer::reportListeners() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::sendResolve() {
+void Timer::SendResolve() {
   for(std::vector<MarketModel*>::iterator agent=resolve_listeners_.begin();
        agent != resolve_listeners_.end(); 
        agent++) {
     CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->ID()
                     << ", name=" << (*agent)->name() << " {";
-    (*agent)->resolve();
+    (*agent)->Resolve();
     CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::sendTick() {
+void Timer::SendTick() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
     CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
                     << ", name=" << (*agent)->name() << " {";
-    (*agent)->handleTick(time_);
+    (*agent)->HandleTick(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::sendTock() {
+void Timer::SendTock() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
     CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
                     << ", name=" << (*agent)->name() << " {";
-    (*agent)->handleTock(time_);
+    (*agent)->HandleTock(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::sendDailyTasks() {
+void Timer::SendDailyTasks() {
   for(std::vector<TimeAgent*>::iterator agent=tick_listeners_.begin();
        agent != tick_listeners_.end(); 
        agent++) {
-    (*agent)->handleDailyTasks(time_,date_.day());
+    (*agent)->HandleDailyTasks(time_,date_.day());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::registerTickListener(TimeAgent* agent) {
+void Timer::RegisterTickListener(TimeAgent* agent) {
   CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
                   << " has registered to receive 'ticks' and 'tocks'.";
   tick_listeners_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::registerResolveListener(MarketModel* agent) {
+void Timer::RegisterResolveListener(MarketModel* agent) {
   CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
                   << " has registered to receive 'resolves'.";
   resolve_listeners_.push_back(agent);
@@ -163,7 +163,7 @@ void Timer::reset() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
+void Timer::Initialize(int dur, int m0, int y0, int start, int decay) {
   reset();
 
   if (m0 < 1 || m0 > 12)
@@ -188,14 +188,14 @@ void Timer::initialize(int dur, int m0, int y0, int start, int decay) {
   simDur_ = dur;
   
   startDate_ = boost::gregorian::date(year0_,month0_,1);
-  endDate_ = getEndDate(startDate_,simDur_);
+  endDate_ = GetEndDate(startDate_,simDur_);
   date_ = boost::gregorian::date(startDate_);
   
-  logTimeData();
+  LogTimeData();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-boost::gregorian::date Timer::getEndDate(boost::gregorian::date startDate, int simDur_){
+boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate, int simDur_){
   boost::gregorian::date endDate(startDate);
   endDate += boost::gregorian::months(simDur_-1);
   endDate += boost::gregorian::days(boost::gregorian::gregorian_calendar::end_of_month_day(endDate.year(),endDate.month())-1);
@@ -203,7 +203,7 @@ boost::gregorian::date Timer::getEndDate(boost::gregorian::date startDate, int s
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::simDur() {
+int Timer::SimDur() {
   return simDur_;
 }
 
@@ -219,12 +219,12 @@ Timer::Timer() :
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::convertDate(int month, int year) {
+int Timer::ConvertDate(int month, int year) {
   return (year - year0_) * 12 + (month - month0_) + time0_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::pair<int, int> Timer::convertDate(int time) {
+std::pair<int, int> Timer::ConvertDate(int time) {
   int month = (time - time0_) % 12 + 1;
   int year = (time - time0_ - (month - 1)) / 12 + year0_;
   return std::make_pair(month, year);
@@ -232,38 +232,38 @@ std::pair<int, int> Timer::convertDate(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::load_simulation(QueryEngine *qe) { 
-  if (qe->nElementsMatchingQuery("simhandle") > 0) {
-    handle_ = qe->getElementContent("simhandle");
+  if (qe->NElementsMatchingQuery("simhandle") > 0) {
+    handle_ = qe->GetElementContent("simhandle");
   }
 
   // get duration
-  std::string dur_str = qe->getElementContent("duration");
+  std::string dur_str = qe->GetElementContent("duration");
   int dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month
-  std::string m0_str = qe->getElementContent("startmonth");
+  std::string m0_str = qe->GetElementContent("startmonth");
   int m0 = strtol(m0_str.c_str(), NULL, 10);
   // get start year
-  std::string y0_str = qe->getElementContent("startyear");
+  std::string y0_str = qe->GetElementContent("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get simulation start
-  std::string sim0_str = qe->getElementContent("simstart");
+  std::string sim0_str = qe->GetElementContent("simstart");
   int sim0 = strtol(sim0_str.c_str(), NULL, 10);
   // get decay interval
-  std::string decay_str = qe->getElementContent("decay");
+  std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  TI->initialize(dur, m0, y0, sim0, dec);
+  TI->Initialize(dur, m0, y0, sim0, dec);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Timer::logTimeData() {
-  EM->newEvent("SimulationTimeInfo")
-    ->addVal("SimHandle", handle_)
-    ->addVal("InitialYear", year0_)
-    ->addVal("InitialMonth", month0_)
-    ->addVal("SimulationStart", time0_)
-    ->addVal("Duration", simDur_)
-    ->record();
+void Timer::LogTimeData() {
+  EM->NewEvent("SimulationTimeInfo")
+    ->AddVal("SimHandle", handle_)
+    ->AddVal("InitialYear", year0_)
+    ->AddVal("InitialMonth", month0_)
+    ->AddVal("SimulationStart", time0_)
+    ->AddVal("Duration", simDur_)
+    ->Record();
 }
 } // namespace cyclus
 

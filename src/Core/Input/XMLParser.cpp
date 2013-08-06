@@ -19,7 +19,7 @@ XMLParser::~XMLParser() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParser::init(const std::stringstream& xml_input_snippet) {
+void XMLParser::Init(const std::stringstream& xml_input_snippet) {
   parser_ = boost::shared_ptr<xmlpp::DomParser>(new xmlpp::DomParser());
   try {    
     CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet.str();
@@ -35,14 +35,14 @@ void XMLParser::init(const std::stringstream& xml_input_snippet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void XMLParser::validate(const std::stringstream& xml_schema_snippet) {
+void XMLParser::Validate(const std::stringstream& xml_schema_snippet) {
   RelaxNGValidator validator;
   validator.parse_memory(xml_schema_snippet.str());
-  validator.validate(this->document());
+  validator.Validate(this->Document());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-xmlpp::Document* XMLParser::document() {
+xmlpp::Document* XMLParser::Document() {
   return parser_->get_document();
 }
 } // namespace cyclus

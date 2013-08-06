@@ -36,11 +36,11 @@ RecipeLibrary::RecipeLibrary() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void RecipeLibrary::load_recipes(QueryEngine* qe) {
   // load recipes from file
-  int nRecipes = qe->nElementsMatchingQuery("recipe");
+  int nRecipes = qe->NElementsMatchingQuery("recipe");
   CLOG(LEV_DEBUG2) << "loading recipes {";
   for (int i = 0; i < nRecipes; i++) {
-    QueryEngine* recipe = qe->queryElement("recipe",i);
-    std::string name = recipe->getElementContent("name");
+    QueryEngine* recipe = qe->QueryElement("recipe",i);
+    std::string name = recipe->GetElementContent("name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
     load_recipe(recipe); // load recipe
   }
@@ -52,7 +52,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
   // set basis
   bool atom;
   Basis basis;
-  std::string basis_str = qe->getElementContent("basis");
+  std::string basis_str = qe->GetElementContent("basis");
   if (basis_str == "atom") {
     atom = true;
     basis = ATOM;
@@ -65,7 +65,7 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
     throw ValidationError(basis + " basis is not 'mass' or 'atom'.");
   }
 
-  std::string name = qe->getElementContent("name");
+  std::string name = qe->GetElementContent("name");
   CLOG(LEV_DEBUG3) << "loading recipe: " << name 
                    << " with basis: " << basis_str;
 
@@ -76,54 +76,54 @@ void RecipeLibrary::load_recipe(QueryEngine* qe) {
   double value;
   int key;
   std::string query = "isotope";
-  int nIsos = qe->nElementsMatchingQuery(query);
+  int nIsos = qe->NElementsMatchingQuery(query);
   
   for (int i = 0; i < nIsos; i++) 
     {
-      QueryEngine* isotope = qe->queryElement(query,i);
-      key = strtol(isotope->getElementContent("id").c_str(), NULL, 10);
-      value = strtod(isotope->getElementContent("comp").c_str(), NULL);
+      QueryEngine* isotope = qe->QueryElement(query,i);
+      key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
+      value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
       // update our mass-related values
       (*recipe)[key] = value;
       CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << value;
     }
   
-  recipe->massify();
+  recipe->Massify();
   // record this composition (static members and database)
-  recordRecipe(name,recipe);
+  RecordRecipe(name,recipe);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::recordRecipe(std::string name, CompMapPtr recipe) {
-  if ( !recipeRecorded(name) ) {
-    recordRecipe(recipe); // record this with the database, assigns id
+void RecipeLibrary::RecordRecipe(std::string name, CompMapPtr recipe) {
+  if ( !RecipeRecorded(name) ) {
+    RecordRecipe(recipe); // record this with the database, assigns id
     recipes_[name] = recipe; // store this as a named recipe, copies recipe
-    storeDecayableRecipe(Recipe(name)); // store this as a decayable recipe
+    StoreDecayableRecipe(Recipe(name)); // store this as a decayable recipe
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::recipeRecorded(std::string name) {
+bool RecipeLibrary::RecipeRecorded(std::string name) {
   int count = recipes_.count(name);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::recordRecipe(CompMapPtr recipe) {
-  if (!recipe->recorded()) {
+void RecipeLibrary::RecordRecipe(CompMapPtr recipe) {
+  if (!recipe->Recorded()) {
     recipe->ID_ = nextStateID_++;
-    addToTable(recipe);
+    AddToTable(recipe);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMapPtr RecipeLibrary::Recipe(std::string name) {
-  checkRecipe(name);
+  CheckRecipe(name);
   return recipes_[name];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
+void RecipeLibrary::StoreDecayableRecipe(CompMapPtr recipe) {
   // initialize containers
   decay_times times;
   ChildMap childs;
@@ -133,20 +133,20 @@ void RecipeLibrary::storeDecayableRecipe(CompMapPtr recipe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::recordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f) {
-  addDecayTime(parent,t_f);
-  addChild(parent,child,t_f);
-  recordRecipe(child);
+void RecipeLibrary::RecordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f) {
+  AddDecayTime(parent,t_f);
+  AddChild(parent,child,t_f);
+  RecordRecipe(child);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int RecipeLibrary::recipeCount() { 
+int RecipeLibrary::RecipeCount() { 
   return RecipeLibrary::recipes_.size(); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::checkRecipe(std::string name) {
-  if (!recipeRecorded(name)) {
+void RecipeLibrary::CheckRecipe(std::string name) {
+  if (!RecipeRecorded(name)) {
     std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with name: " << name << ".";
     throw ValueError(err.str());
@@ -154,8 +154,8 @@ void RecipeLibrary::checkRecipe(std::string name) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::checkDecayable(CompMapPtr parent) {
-  if (!compositionDecayable(parent)) {
+void RecipeLibrary::CheckDecayable(CompMapPtr parent) {
+  if (!CompositionDecayable(parent)) {
     std::stringstream err;
     err << "RecipeLibrary has not recorded recipe with id:" << parent->ID_
         << " as decayable.";
@@ -164,8 +164,8 @@ void RecipeLibrary::checkDecayable(CompMapPtr parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::checkChild(CompMapPtr parent, int time) {
-  if (!childRecorded(parent,time)) {
+void RecipeLibrary::CheckChild(CompMapPtr parent, int time) {
+  if (!ChildRecorded(parent,time)) {
     std::stringstream err;
     err << "RecipeLibrary has not recorded a decayed recipe for the parent " 
         << "recipe with id:" << parent->ID_ << " and decay time:" << time 
@@ -175,58 +175,58 @@ void RecipeLibrary::checkChild(CompMapPtr parent, int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::addDecayTime(CompMapPtr parent, int time) {
-  checkDecayable(parent);
-  decayTimes(parent).insert(time);
+void RecipeLibrary::AddDecayTime(CompMapPtr parent, int time) {
+  CheckDecayable(parent);
+  DecayTimes(parent).insert(time);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-decay_times& RecipeLibrary::decayTimes(CompMapPtr parent) {
-  checkDecayable(parent);
+decay_times& RecipeLibrary::DecayTimes(CompMapPtr parent) {
+  CheckDecayable(parent);
   return decay_times_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ChildMap& RecipeLibrary::Children(CompMapPtr parent) {
-  checkDecayable(parent);
+  CheckDecayable(parent);
   return decay_hist_[parent];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 CompMapPtr& RecipeLibrary::Child(CompMapPtr parent, int time) {
-  checkChild(parent,time);
+  CheckChild(parent,time);
   return Children(parent)[time];
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::childRecorded(CompMapPtr parent, int time) {
+bool RecipeLibrary::ChildRecorded(CompMapPtr parent, int time) {
   int count = Children(parent).count(time);
   return (count != 0); // true iff name in recipes_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RecipeLibrary::addChild(CompMapPtr parent, CompMapPtr child, int time) {
+void RecipeLibrary::AddChild(CompMapPtr parent, CompMapPtr child, int time) {
   child->parent_ = parent;
   child->decay_time_ = time;
   Child(parent,time) = child; // child is copied
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-bool RecipeLibrary::compositionDecayable(CompMapPtr comp) {
+bool RecipeLibrary::CompositionDecayable(CompMapPtr comp) {
   int count1 = decay_times_.count(comp);
   int count2 = decay_hist_.count(comp);
   return (count1 != 0 && count2 != 0); // true iff comp in both 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::addToTable(CompMapPtr recipe){
+void RecipeLibrary::AddToTable(CompMapPtr recipe){
   for (CompMap::iterator item = recipe->begin();
        item != recipe->end(); item++) {
-    EM->newEvent("IsotopicStates")
-      ->addVal("ID", recipe->ID())
-      ->addVal("IsoID", item->first)
-      ->addVal("Value", item->second)
-      ->record();
+    EM->NewEvent("IsotopicStates")
+      ->AddVal("ID", recipe->ID())
+      ->AddVal("IsoID", item->first)
+      ->AddVal("Value", item->second)
+      ->Record();
   }
 }
 } // namespace cyclus

@@ -29,18 +29,18 @@ class XMLFileLoader {
      @param use_main_schema whether or not to use the main schema to 
      validate the file; defaults to using the main schema
    */
-  void init(bool use_main_schema=true);
+  void Init(bool use_main_schema=true);
 
   /**
      @return the path to the main file schema (cyclus.rng)
    */
-  std::string pathToMainSchema();
+  std::string PathToMainSchema();
 
   /**
      applies a schema agaisnt the parser used by the file loader
      @param schema the schema representation
    */
-  void applySchema(const std::stringstream &schema);
+  void ApplySchema(const std::stringstream &schema);
 
   /**
      Method to load the simulation control parameters.
@@ -80,12 +80,12 @@ class XMLFileLoader {
      @param stream the stream to load the file into
      @param file the file name
    */
-  void loadStringstreamFromFile(std::stringstream &stream,
+  void LoadStringstreamFromFile(std::stringstream &stream,
                                 std::string file);
 
  private:
   /// Fills out the cyclus.rng.in template with discovered modules.
-  std::string buildSchema();
+  std::string BuildSchema();
 
   /// the input file name
   std::string file_;

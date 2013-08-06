@@ -11,7 +11,7 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::openLibrary() {  
+void DynamicModule::OpenLibrary() {  
   module_library_ = LoadLibrary(abs_path_.c_str());
 
   if (!module_library_) {
@@ -25,7 +25,7 @@ void DynamicModule::openLibrary() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::setConstructor() {
+void DynamicModule::SetConstructor() {
   constructor_ = (create_t*) 
     GetProcAddress(module_library_,constructor_name_.c_str());
 
@@ -38,7 +38,7 @@ void DynamicModule::setConstructor() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::setDestructor() {
+void DynamicModule::SetDestructor() {
   destructor_ = (destroy_t*) 
     GetProcAddress(module_library_,destructor_name_.c_str());
 
@@ -51,7 +51,7 @@ void DynamicModule::setDestructor() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::closeLibrary() {
+void DynamicModule::CloseLibrary() {
   if (module_library_)
     FreeLibrary(module_library_);
 }

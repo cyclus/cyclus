@@ -22,14 +22,14 @@ class QueryEngine {
   /**
      @return the number of elements in the current query state
    */
-  virtual int nElements() = 0;
+  virtual int NElements() = 0;
 
   /**
      investigates the current status and returns a string representing
      the name of a given index
      @param index the index of the queried element
    */
-  virtual std::string getElementName(int index = 0) = 0;
+  virtual std::string GetElementName(int index = 0) = 0;
 
   /**
      investigates the current status and returns the number of elements
@@ -37,7 +37,7 @@ class QueryEngine {
      @param query the query
      @return the number of elements matching the query
    */
-  virtual int nElementsMatchingQuery(std::string query) = 0;
+  virtual int NElementsMatchingQuery(std::string query) = 0;
   
   /**
      investigates the current status and returns a string representing
@@ -45,7 +45,7 @@ class QueryEngine {
      @param query the query
      @param index the index of the queried element
    */
-  virtual std::string getElementContent(std::string query, 
+  virtual std::string GetElementContent(std::string query, 
                                         int index = 0) = 0;
 
   /**
@@ -54,7 +54,7 @@ class QueryEngine {
      @param index the index of the queried element
      @return a initialized query engine based on the query and index
    */
-  QueryEngine* queryElement(std::string query, int index = 0);
+  QueryEngine* QueryElement(std::string query, int index = 0);
 
  protected:
   /**
@@ -64,7 +64,7 @@ class QueryEngine {
      @param index the index of the queried element
      @return a query engine initialized via the snippet
    */
-  virtual QueryEngine* getEngineFromQuery(std::string query,
+  virtual QueryEngine* GetEngineFromQuery(std::string query,
                                           int index) = 0;
 
  private:

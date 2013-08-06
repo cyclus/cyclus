@@ -25,25 +25,25 @@ XMLFileLoader::XMLFileLoader(const std::string load_filename) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::init(bool use_main_schema)  {
+void XMLFileLoader::Init(bool use_main_schema)  {
   std::stringstream input("");
-  loadStringstreamFromFile(input, file_);
+  LoadStringstreamFromFile(input, file_);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
-  parser_->init(input);
+  parser_->Init(input);
   if (use_main_schema) {
-    std::stringstream ss(buildSchema());
-    parser_->validate(ss);
+    std::stringstream ss(BuildSchema());
+    parser_->Validate(ss);
   }
 
-  EM->newEvent("InputFiles")
-  ->addVal("Data", cyclus::Blob(input.str()))
-  ->record();
+  EM->NewEvent("InputFiles")
+  ->AddVal("Data", cyclus::Blob(input.str()))
+  ->Record();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string XMLFileLoader::buildSchema() {
+std::string XMLFileLoader::BuildSchema() {
   std::stringstream schema("");
-  loadStringstreamFromFile(schema, pathToMainSchema());
+  LoadStringstreamFromFile(schema, PathToMainSchema());
   std::string master = schema.str();
 
   std::set<std::string> types = Model::dynamic_module_types();
@@ -54,7 +54,7 @@ std::string XMLFileLoader::buildSchema() {
     // find modules
     std::stringstream refs;
     refs << std::endl;
-    fs::path models_path = Env::getInstallPath() + "/lib/Models/" + *type;
+    fs::path models_path = Env::GetInstallPath() + "/lib/Models/" + *type;
     fs::recursive_directory_iterator end;
     try {
       for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
@@ -86,7 +86,7 @@ std::string XMLFileLoader::buildSchema() {
 }
 
 // - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
+void XMLFileLoader::LoadStringstreamFromFile(std::stringstream& stream,
                                              std::string file) {
 
   CLOG(LEV_DEBUG4) << "loading the file: " << file;
@@ -105,13 +105,13 @@ void XMLFileLoader::loadStringstreamFromFile(std::stringstream& stream,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string XMLFileLoader::pathToMainSchema() {
-  return Env::getInstallPath() + "/share/cyclus.rng.in";
+std::string XMLFileLoader::PathToMainSchema() {
+  return Env::GetInstallPath() + "/share/cyclus.rng.in";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::applySchema(const std::stringstream& schema) {
-  parser_->validate(schema);
+void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
+  parser_->Validate(schema);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -128,9 +128,9 @@ void XMLFileLoader::load_recipes() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
-  int numRecipes = xqe.nElementsMatchingQuery(query);
+  int numRecipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < numRecipes; i++) {
-    QueryEngine* qe = xqe.queryElement(query, i);
+    QueryEngine* qe = xqe.QueryElement(query, i);
     RecipeLibrary::load_recipe(qe);
   }
 }
@@ -148,10 +148,10 @@ void XMLFileLoader::load_modules_of_type(std::string type,
                                          std::string query_path) {
   XMLQueryEngine xqe(*parser_);
 
-  int numModels = xqe.nElementsMatchingQuery(query_path);
+  int numModels = xqe.NElementsMatchingQuery(query_path);
   for (int i = 0; i < numModels; i++) {
-    QueryEngine* qe = xqe.queryElement(query_path, i);
-    Model::initializeSimulationEntity(type, qe);
+    QueryEngine* qe = xqe.QueryElement(query_path, i);
+    Model::InitializeSimulationEntity(type, qe);
   }
 }
 
@@ -160,7 +160,7 @@ void XMLFileLoader::load_control_parameters() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/control";
-  QueryEngine* qe = xqe.queryElement(query);
+  QueryEngine* qe = xqe.QueryElement(query);
   TI->load_simulation(qe);
 }
 } // namespace cyclus

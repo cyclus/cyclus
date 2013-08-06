@@ -41,7 +41,7 @@ class Env {
        @param path_found the path, which is populated if the file is found
        @return true if the file is found, false if it isn't
      */
-    static bool findFile(const boost::filesystem::path& dir_path,
+    static bool FindFile(const boost::filesystem::path& dir_path,
                          const std::string& file_name,
                          boost::filesystem::path& path_found);
 
@@ -51,35 +51,35 @@ class Env {
 
        @return path with the last item removed
      */
-    static std::string pathBase(std::string path);
+    static std::string PathBase(std::string path);
 
     /**
        the relative cyclus path
 
        @return the relative path from the cwd to the cyclus executable
      */
-    static std::string getCyclusPath();
+    static std::string GetCyclusPath();
 
     /**
        the cyclus output path
 
        @return the full path to the directory of the cyclus output
      */
-    static std::string getCyclusOutputPath();
+    static std::string GetCyclusOutputPath();
 
     /**
        the relative path to the root install directory (containing bin, lib, etc.)
 
        @return the absolute path to the build directory
       */
-    static const std::string getInstallPath();
+    static const std::string GetInstallPath();
 
     /**
        the relative path to the root build directory (containing bin, lib, etc.)
 
        @return the absolute path to the build directory
       */
-    static const std::string getBuildPath();
+    static const std::string GetBuildPath();
 
     /**
        Allows configuration and other files to be located independent
@@ -89,7 +89,7 @@ class Env {
        (i.e. the relative path from the cwd to cyclus including
        the name of the cyclus executable)
      */
-    static void setCyclusRelPath(std::string path);
+    static void SetCyclusRelPath(std::string path);
 
     /**
        Allows the user to set the cyclus output path
@@ -98,35 +98,35 @@ class Env {
        main function (i.e. the relative path from the cwd to the desired
        output directory)
      */
-    static void setCyclusOutputPath(std::string path);
+    static void SetCyclusOutputPath(std::string path);
 
     /**
        Method to check the existence of and return an environment variable
 
        @param var is the variable to check and return
      */
-    static std::string checkEnv(std::string var);
+    static std::string CheckEnv(std::string var);
 
     /**
        @return the name of the environment variable used for module
        installations, currently set to CYCLUS_MODULE_PATH
     */
-    static const std::string moduleEnvVarName();
+    static const std::string ModuleEnvVarName();
 
     /**
        @return the current value of the module environment variable
     */
-    static const std::string moduleEnvVar();
+    static const std::string ModuleEnvVar();
 
     /**
        @return the correct environment variable delimeter based on the file system
     */
-    static const std::string envDelimiter();
+    static const std::string EnvDelimiter();
 
     /**
        @return the correct path delimeter based on the file system
     */
-    static const std::string pathDelimiter();
+    static const std::string PathDelimiter();
 
     /**
        Environment searches for a library and, if found, sets the path. The search
@@ -136,7 +136,7 @@ class Env {
        @param path_found the variable to set with the path to the library
        @return true if the library is found, false if not
      */
-    static bool findModuleLib(std::string name,
+    static bool FindModuleLib(std::string name,
                               boost::filesystem::path& path_found);
 
 };

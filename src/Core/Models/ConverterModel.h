@@ -82,12 +82,12 @@ public:
       
      @param convName is the new name of the converter 
    */
-  void setConvName(std::string convName) { conv_name_ = convName; };
+  void SetConvName(std::string convName) { conv_name_ = convName; };
 
   /**
      Returns the converter's name 
    */
-  std::string getConvName() { return conv_name_; };
+  std::string GetConvName() { return conv_name_; };
 
   /**
      Converts between amounts of two commodities 
@@ -97,7 +97,7 @@ public:
      convert it to  
      @return the converted message 
    */
-  virtual msg_ptr convert(msg_ptr convMsg, msg_ptr refMsg); 
+  virtual msg_ptr Convert(msg_ptr convMsg, msg_ptr refMsg); 
   
 };
 } // namespace cyclus

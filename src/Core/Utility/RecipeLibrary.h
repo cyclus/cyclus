@@ -86,40 +86,40 @@ class RecipeLibrary {
 
      @param recipe the recipe to be recorded, a CompMapPtr
    */
-  static void recordRecipe(CompMapPtr recipe);
+  static void RecordRecipe(CompMapPtr recipe);
 
   /**
      records a new named recipe in the simulation
      - adds recipe to CompMap's static containers
-     - calls the recordRecipe(recipe) method
+     - calls the RecordRecipe(recipe) method
 
      @param name the recipe name to be used as a key in the recipes_ map, a string
      @param recipe the recipe to be recorded, a CompMapPtr
    */
-  static void recordRecipe(std::string name, CompMapPtr recipe);
+  static void RecordRecipe(std::string name, CompMapPtr recipe);
 
   /**
      records a new named recipe with the simulation
      - sets the parent of and decay time child
-     - calls the recordRecipe() method
+     - calls the RecordRecipe() method
 
      @param parent the initial recipe in a recipe map 
      @param child the child recipe
      @param t_f -> total time decayed from parent to child
    */
-  static void recordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f);
+  static void RecordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f);
   
   /**
      checks if the named recipe has been recorded (i.e. it exists in the simulation)
 
      @param name the name of the parent recipe, a key in the recipes_ map
    */
-  static bool recipeRecorded(std::string name);
+  static bool RecipeRecorded(std::string name);
 
   /**
      the total number of recipes in the recipes_ map  
    */
-  static int recipeCount();   
+  static int RecipeCount();   
 
   /**
      This returns a CompMapPtr to the named recipe in the recipes_ map 
@@ -131,7 +131,7 @@ class RecipeLibrary {
   /**
      print all recipes 
    */
-  static void printRecipes();
+  static void PrintRecipes();
 
   /**
      checks if the composition is recorded. Returns true if the composition 
@@ -139,7 +139,7 @@ class RecipeLibrary {
 
      @param comp a pointer to the composition to check
    */
-  static bool compositionDecayable(CompMapPtr comp);
+  static bool CompositionDecayable(CompMapPtr comp);
 
   /**
      checks if the parent has already been decayed by this time
@@ -147,7 +147,7 @@ class RecipeLibrary {
      @param parent a pointer to the composition that might have a child
      @param time the time at which a child might exist for a parent
    */
-  static bool childRecorded(CompMapPtr parent, int time);
+  static bool ChildRecorded(CompMapPtr parent, int time);
 
  private:
   /**
@@ -155,7 +155,7 @@ class RecipeLibrary {
 
      @param recipe the recipe to store in the decay_hist_ and decay_times_ maps
    */
-  static void storeDecayableRecipe(CompMapPtr recipe);
+  static void StoreDecayableRecipe(CompMapPtr recipe);
 
   /**
      add a new decay time for a parent composition
@@ -163,14 +163,14 @@ class RecipeLibrary {
      @param parent the recipe with which a new decay_time should be associated
      @param time the time to be added to the keys of the decay_times_ map 
    */
-  static void addDecayTime(CompMapPtr parent, int time);
+  static void AddDecayTime(CompMapPtr parent, int time);
 
   /**
      accesses a set of decay times that have been recorded (associated with this parent)
 
      @param parent the recipe whose decay times are to be retrieved
    */
-  static decay_times& decayTimes(CompMapPtr parent);
+  static decay_times& DecayTimes(CompMapPtr parent);
 
   /**
      accesses the child recipes of a parent recipe
@@ -194,29 +194,29 @@ class RecipeLibrary {
      @param child the child recipe to be added to the evolution of the parent recipe 
      @param time the time at which the child recipe of interest is indexed 
    */
-  static void addChild(CompMapPtr parent, CompMapPtr child, int time);
+  static void AddChild(CompMapPtr parent, CompMapPtr child, int time);
 
   /**
-     calls recipeRecorded() and throws an error if false
+     calls RecipeRecorded() and throws an error if false
 
      @param name the name of the recipe to be found
    */
-  static void checkRecipe(std::string name);
+  static void CheckRecipe(std::string name);
 
   /**
-     calls compositionDecayable() and throws an error if false
+     calls CompositionDecayable() and throws an error if false
 
      @param parent the recipe whose composition record is to be queried
    */
-  static void checkDecayable(CompMapPtr parent);
+  static void CheckDecayable(CompMapPtr parent);
 
   /**
-     calls childRecorded() and throws an error if false
+     calls ChildRecorded() and throws an error if false
 
      @param parent the recipe whose composition record is to be queried
      @param time the time at which the child recipe of interest is indexed 
    */
-  static void checkChild(CompMapPtr parent, int time);
+  static void CheckChild(CompMapPtr parent, int time);
 
   /**
      Stores the next available state ID 
@@ -249,14 +249,14 @@ class RecipeLibrary {
   /**
      returns true if a new state was recorded, false if already in db
   */
-  void recordState();
+  void RecordState();
   
  private:
 
   /**
      Add an isotopic state to the table 
    */
-  static void addToTable(CompMapPtr recipe);
+  static void AddToTable(CompMapPtr recipe);
 
   //  friend class CompMap;
   friend class IsoVector;

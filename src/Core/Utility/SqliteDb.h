@@ -45,7 +45,7 @@ class SqliteDb {
     Instead of opening a file of the specified name (if it already exists),
     overwrite it with a new empty database.
     */
-    void overwrite();
+    void Overwrite();
 
     /*!
     Execute an SQL command.
@@ -53,7 +53,7 @@ class SqliteDb {
     @param cmd an Sqlite compatible SQL command
     @throw IOError SQL command execution failed (e.g. invalid SQL)
     */
-    void execute(std::string cmd);
+    void Execute(std::string cmd);
 
     /*!
     Execute an SQL query and return its results
@@ -62,7 +62,7 @@ class SqliteDb {
     @return a list of row entries
     @throw IOError SQL command execution failed (e.g. invalid SQL)
     */
-    std::vector<StrList> query(std::string cmd);
+    std::vector<StrList> Query(std::string cmd);
 
   private:
 

@@ -115,15 +115,15 @@ int main(int argc, char* argv[]) {
   }
 
   // tell ENV the path between the cwd and the cyclus executable
-  std::string path = Env::pathBase(argv[0]);
-  Env::setCyclusRelPath(path);
+  std::string path = Env::PathBase(argv[0]);
+  Env::SetCyclusRelPath(path);
 
   // read input file and setup simulation
   try {
     std::string inputFile = vm["input-file"].as<std::string>();
     std::set<std::string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(inputFile);
-    loader.init();
+    loader.Init();
     loader.load_control_parameters();
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
@@ -152,17 +152,17 @@ int main(int argc, char* argv[]) {
   } else {
     back = new SqliteBack(output_path);
   }
-  EM->registerBackend(back);
+  EM->RegisterBackend(back);
 
   // sim construction - should be handled by some entity
-  Model::constructSimulation();
+  Model::ConstructSimulation();
 
   // print the model list
-  Model::printModelList();
+  Model::PrintModelList();
   
   // Run the simulation 
   try {
-    TI->runSim();
+    TI->RunSim();
   } catch (cyclus::Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 
   // Close Dynamically loaded modules 
   try {
-    Model::unloadModules();
+    Model::UnloadModules();
   } catch (cyclus::Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();

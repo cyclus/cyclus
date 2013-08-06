@@ -21,7 +21,7 @@ GenericResource::GenericResource(std::string units,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-int GenericResource::stateID() {
+int GenericResource::StateID() {
   return 0;
 }
 
@@ -36,18 +36,18 @@ GenericResource::GenericResource(const GenericResource& other) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
 rsrc_ptr GenericResource::clone() {
   CLOG(LEV_DEBUG2) << "GenericResource ID=" << ID_ << " was cloned.";
-  print();
+  Print();
   return rsrc_ptr(new GenericResource(*this));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void GenericResource::print() {
+void GenericResource::Print() {
   CLOG(LEV_DEBUG3) << "GenericResource ID=" << ID_ << ", quality=" << quality_
                    << ", quantity=" << quantity_ << ", units=" << units_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-bool GenericResource::checkQuality(rsrc_ptr other)
+bool GenericResource::CheckQuality(rsrc_ptr other)
 {
   CLOG(LEV_DEBUG1) << "GenericResource is checking quality, this = " 
                    << units_ << " other = " << other->units();
@@ -56,17 +56,17 @@ bool GenericResource::checkQuality(rsrc_ptr other)
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void GenericResource::absorb(gen_rsrc_ptr other) {
-  if (! checkQuality(boost::dynamic_pointer_cast<Resource>(other))) {
+void GenericResource::Absorb(gen_rsrc_ptr other) {
+  if (! CheckQuality(boost::dynamic_pointer_cast<Resource>(other))) {
     throw ValueError("incompatible resource types.");
   }
 
   quantity_ += other->quantity();
-  other->setQuantity(0);
+  other->SetQuantity(0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-gen_rsrc_ptr GenericResource::extract(double quantity) {
+gen_rsrc_ptr GenericResource::Extract(double quantity) {
   if (quantity > quantity_) {
     throw ValueError("Attempted to extract more quantity than exists.");
   }
@@ -77,17 +77,17 @@ gen_rsrc_ptr GenericResource::extract(double quantity) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GenericResource::addToTable() {
-  Resource::addToTable();
+void GenericResource::AddToTable() {
+  Resource::AddToTable();
 
   if (recorded_) {
     return;
   }
   recorded_ = true;
 
-  EM->newEvent("GenericResources")
-    ->addVal("ResourceID", ID())
-    ->addVal("Quality", quality())
-    ->record();
+  EM->NewEvent("GenericResources")
+    ->AddVal("ResourceID", ID())
+    ->AddVal("Quality", quality())
+    ->Record();
 }
 } // namespace cyclus

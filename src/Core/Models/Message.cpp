@@ -17,7 +17,7 @@ std::map<std::string, std::map<int, double> > Message::offer_qtys_;
 std::map<std::string, std::map<int, double> > Message::request_qtys_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::constructBase(Communicator* sender) {
+void Message::ConstructBase(Communicator* sender) {
   sender_ = sender;
   curr_owner_ = sender;
   receiver_ = NULL;
@@ -26,26 +26,26 @@ void Message::constructBase(Communicator* sender) {
   dir_ = UP_MSG;
 
   path_stack_.push_back(sender_);
-  sender->trackMessage(msg_ptr(this));
+  sender->TrackMessage(msg_ptr(this));
 
   MLOG(LEV_DEBUG4) << "Message " << this << " created.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender) {
-  constructBase(sender);
+  ConstructBase(sender);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver) {
-  constructBase(sender);
+  ConstructBase(sender);
   receiver_ = receiver;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Message::Message(Communicator* sender, Communicator* receiver,
                  Transaction& trans) {
-  constructBase(sender);
+  ConstructBase(sender);
   receiver_ = receiver;
   trans_ = new Transaction(trans);
 }
@@ -68,21 +68,21 @@ msg_ptr Message::clone() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::sendOn() {
+void Message::SendOn() {
   if (dead_) {return;}
   msg_ptr me = msg_ptr(this);
 
   if (dir_ == DOWN_MSG) {
-    path_stack_.back()->untrackMessage(me);
+    path_stack_.back()->UntrackMessage(me);
     path_stack_.pop_back();
   } else if (dir_ == UP_MSG) {
-    autoSetNextDest();
-    path_stack_.back()->trackMessage(me);
+    AutoSetNextDest();
+    path_stack_.back()->TrackMessage(me);
   } else {
     return;
   }
 
-  validateForSend();
+  ValidateForSend();
 
   Communicator* next_stop = path_stack_.back();
   curr_owner_ = next_stop;
@@ -90,14 +90,14 @@ void Message::sendOn() {
   CLOG(LEV_DEBUG1) << "Message " << this << " going to comm "
                    << next_stop << " {";
 
-  next_stop->receiveMessage(me);
+  next_stop->ReceiveMessage(me);
 
   CLOG(LEV_DEBUG1) << "} Message " << this << " send to comm "
                    << next_stop << " completed";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::autoSetNextDest() {
+void Message::AutoSetNextDest() {
   if (path_stack_.back() != curr_owner_) {
     return;
   }
@@ -111,30 +111,30 @@ void Message::autoSetNextDest() {
   Communicator* next_dest;
   try {
     Model* next_model = curr->parent();
-    tallyOrder(next_model);
+    TallyOrder(next_model);
     next_dest = dynamic_cast<Communicator*>(next_model);
   } catch (ValueError err) {
     next_dest = receiver_;
   }
-  setNextDest(next_dest);
+  SetNextDest(next_dest);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::tallyOrder(Model* next_model) {
-  if (next_model->modelType() != "Market") {
+void Message::TallyOrder(Model* next_model) {
+  if (next_model->ModelType() != "Market") {
     return;
   }
 
   Transaction tran = trans();
-  if (tran.isOffer()) {
-    Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+  if (tran.IsOffer()) {
+    Message::offer_qtys_[tran.commod()][TI->time()] += tran.Resource()->quantity();
   } else {
-    Message::request_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+    Message::request_qtys_[tran.commod()][TI->time()] += tran.Resource()->quantity();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::validateForSend() {
+void Message::ValidateForSend() {
   int next_stop_i = path_stack_.size() - 1;
   bool has_receiver = (path_stack_.size() > 0);
 
@@ -150,7 +150,7 @@ void Message::validateForSend() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setNextDest(Communicator* next_stop) {
+void Message::SetNextDest(Communicator* next_stop) {
   if (dir_ == DOWN_MSG) {
     CLOG(LEV_DEBUG4) << "Message " << this
                      << " next stop set attempt ignored";
@@ -164,23 +164,23 @@ void Message::setNextDest(Communicator* next_stop) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::kill() {
+void Message::Kill() {
   MLOG(LEV_DEBUG5) << "Message " << this << " was killed.";
   dead_ = true;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool Message::isDead() {
+bool Message::IsDead() {
   return dead_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MessageDir Message::dir() const {
+MessageDir Message::Dir() const {
   return dir_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setDir(MessageDir new_dir) {
+void Message::SetDir(MessageDir new_dir) {
   CLOG(LEV_DEBUG4) << "Message " << this << " direction manually set to "
                    << new_dir << ".";
 
@@ -193,7 +193,7 @@ std::string Message::notes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Message::setNotes(std::string text) {
+void Message::SetNotes(std::string text) {
   notes_ = text;
 }
 
@@ -216,7 +216,7 @@ Transaction& Message::trans() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Message::unmetDemand(std::string commod, int time) {
+double Message::UnmetDemand(std::string commod, int time) {
   double supply = Message::offer_qtys_[commod][time];
   double demand = Message::request_qtys_[commod][time];
   return demand - supply;

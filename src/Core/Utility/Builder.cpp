@@ -16,7 +16,7 @@ Builder::Builder() {}
 Builder::~Builder() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Builder::registerProducer(supply_demand::CommodityProducer* producer) {
+void Builder::RegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end())
     {
       throw KeyError("A builder is trying to register a producer twice.");
@@ -28,7 +28,7 @@ void Builder::registerProducer(supply_demand::CommodityProducer* producer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void Builder::unRegisterProducer(supply_demand::CommodityProducer* producer) {
+void Builder::UnRegisterProducer(supply_demand::CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end())
     {
       throw KeyError("A builder is trying to unregister a producer not originally registered with it.");
@@ -40,19 +40,19 @@ void Builder::unRegisterProducer(supply_demand::CommodityProducer* producer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double Builder::nBuildingPrototypes() 
+double Builder::NBuildingPrototypes() 
 {
   return producers_.size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<supply_demand::CommodityProducer*>::iterator Builder::beginningProducer()
+std::set<supply_demand::CommodityProducer*>::iterator Builder::BeginningProducer()
 {
   return producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::set<supply_demand::CommodityProducer*>::iterator Builder::endingProducer()
+std::set<supply_demand::CommodityProducer*>::iterator Builder::EndingProducer()
 {
   return producers_.end();
 }

@@ -48,7 +48,7 @@ class StubTimeAgent : public TimeAgent {
       
      @param time is the time to perform the tick 
    */
-  virtual void handleTick(int time);
+  virtual void HandleTick(int time);
 
   /**
      Each simulation agent is prompted to its end-of-time-step 
@@ -56,7 +56,7 @@ class StubTimeAgent : public TimeAgent {
       
      @param time is the time to perform the tock 
    */
-  virtual void handleTock(int time);
+  virtual void HandleTock(int time);
 
 /* ------------------- */ 
 

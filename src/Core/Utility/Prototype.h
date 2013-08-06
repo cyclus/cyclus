@@ -20,7 +20,7 @@ namespace cyclus {
    Some prototypes may require an additional intialization or 
    construction step after being connected into the simulation. Such 
    functionality is provided through the virtual 
-   prototypeConstructor() function.
+   PrototypeConstructor() function.
 
    Note!!! To date, *all* classes that inherite from Prototype must
    also inherit from Model. This is required in order to remove the
@@ -34,13 +34,13 @@ class Prototype {
       @param name the prototype's name
       @param p a pointer to the Prototype
    */
-  static void registerPrototype(std::string name, Prototype* p);
+  static void RegisterPrototype(std::string name, Prototype* p);
 
   /**
      get a registered prototype
      @param name the name of the prototype
    */
-  static Prototype* getRegisteredPrototype(std::string name);
+  static Prototype* GetRegisteredPrototype(std::string name);
 
   /// constructor
   Prototype() {};
@@ -58,7 +58,7 @@ class Prototype {
      a function to be overridden if a prototype needs a constructing
      function once it has been set up to enter the simulation
    */
-  virtual void prototypeConstructor() {};
+  virtual void PrototypeConstructor() {};
 
  private:
   /// the set of registered prototyeps

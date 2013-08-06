@@ -33,7 +33,7 @@ class UniformTaylor {
        @return the solution Vector x(t) 
        @throw <string> if the Uniform Taylor method cannot be used 
      */
-    static Vector matrixExpSolver(const Matrix & A,
+    static Vector MatrixExpSolver(const Matrix & A,
                                   const Vector & x_o,
 				  const double t);
 
@@ -45,7 +45,7 @@ class UniformTaylor {
        @param A the Matrix 
        @return the diagonal element of A with the largest absolute value 
      */
-    static double maxAbsDiag(const Matrix & A);
+    static double MaxAbsDiag(const Matrix & A);
 
     /**
        Computes the solution Vector x_t using the Taylor Series with 
@@ -59,7 +59,7 @@ class UniformTaylor {
        @return the solution Vector x_t for the given value of t 
        @throw <string> if exp(-alpha * t) or exp(alpha * t) exceeds 
      */
-    static Vector getSolutionVector(const Matrix & B,
+    static Vector GetSolutionVector(const Matrix & B,
                                     const Vector & x_o,
 		        	    double alpha,
 			            double t,
@@ -74,7 +74,7 @@ class UniformTaylor {
        @return the maximum number of terms needed 
        @throw <string> if exp(alpha * t) exceeds range 
      */
-    static int maxNumTerms(long double alpha_t, double epsilon);
+    static int MaxNumTerms(long double alpha_t, double epsilon);
 };
 } // namespace cyclus
 #endif

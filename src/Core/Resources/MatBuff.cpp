@@ -4,28 +4,28 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MatManifest MatBuff::popQty(double qty) {
-  return toMat(ResourceBuff::popQty(qty));
+MatManifest MatBuff::PopQty(double qty) {
+  return ToMat(ResourceBuff::PopQty(qty));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MatManifest MatBuff::popNum(int num) {
-  return toMat(ResourceBuff::popNum(num));
+MatManifest MatBuff::PopNum(int num) {
+  return ToMat(ResourceBuff::PopNum(num));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mat_rsrc_ptr MatBuff::popOne() {
-  return boost::dynamic_pointer_cast<Material>(ResourceBuff::popOne());
+mat_rsrc_ptr MatBuff::PopOne() {
+  return boost::dynamic_pointer_cast<Material>(ResourceBuff::PopOne());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MatBuff::pushOne(mat_rsrc_ptr mat) {
-  ResourceBuff::pushOne(boost::dynamic_pointer_cast<Material>(mat));
+void MatBuff::PushOne(mat_rsrc_ptr mat) {
+  ResourceBuff::PushOne(boost::dynamic_pointer_cast<Material>(mat));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MatBuff::pushAll(MatManifest mats) {
-  ResourceBuff::pushAll(toRes(mats));
+void MatBuff::PushAll(MatManifest mats) {
+  ResourceBuff::PushAll(ToRes(mats));
 }
 
 } // namespace cyclus

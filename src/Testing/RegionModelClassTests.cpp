@@ -27,7 +27,7 @@ class DieInst : public cyclus::InstModel {
   
   virtual ~DieInst() {};
   
-  virtual void handleTick(int time) {
+  virtual void HandleTick(int time) {
     tickCount_++;
     totalTicks++;
 
@@ -36,7 +36,7 @@ class DieInst : public cyclus::InstModel {
     }
   }
 
-  virtual void handleTock(int time) {
+  virtual void HandleTock(int time) {
     tockCount_++;
     totalTocks++;
     
@@ -78,11 +78,11 @@ class RegionModelClassTests : public ::testing::Test {
       child5_ = new DieInst();
 
       reg_ = new ConcreteRegionModel();
-      child1_->enterSimulation(reg_);
-      child2_->enterSimulation(reg_);
-      child3_->enterSimulation(reg_);
-      child4_->enterSimulation(reg_);
-      child5_->enterSimulation(reg_);
+      child1_->EnterSimulation(reg_);
+      child2_->EnterSimulation(reg_);
+      child3_->EnterSimulation(reg_);
+      child4_->EnterSimulation(reg_);
+      child5_->EnterSimulation(reg_);
     }
 };
 
@@ -90,7 +90,7 @@ class RegionModelClassTests : public ::testing::Test {
 TEST_F(RegionModelClassTests, TickIter) {
   child2_->tickDie_ = true;
 
-  ASSERT_NO_THROW(reg_->handleTick(0));
+  ASSERT_NO_THROW(reg_->HandleTick(0));
   EXPECT_EQ(DieInst::totalTicks, 5);
   EXPECT_EQ(child1_->tickCount_, 1);
   EXPECT_EQ(child3_->tickCount_, 1);
@@ -100,7 +100,7 @@ TEST_F(RegionModelClassTests, TickIter) {
   child1_->tickDie_ = true;
   child3_->tickDie_ = true;
 
-  ASSERT_NO_THROW(reg_->handleTick(0));
+  ASSERT_NO_THROW(reg_->HandleTick(0));
   EXPECT_EQ(DieInst::totalTicks, 9);
   EXPECT_EQ(child4_->tickCount_, 2);
   EXPECT_EQ(child5_->tickCount_, 2);
@@ -110,7 +110,7 @@ TEST_F(RegionModelClassTests, TickIter) {
 TEST_F(RegionModelClassTests, TockIter) {
   child2_->tockDie_ = true;
 
-  ASSERT_NO_THROW(reg_->handleTock(0));
+  ASSERT_NO_THROW(reg_->HandleTock(0));
   EXPECT_EQ(DieInst::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
   EXPECT_EQ(child3_->tockCount_, 1);
@@ -120,7 +120,7 @@ TEST_F(RegionModelClassTests, TockIter) {
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
 
-  ASSERT_NO_THROW(reg_->handleTock(0));
+  ASSERT_NO_THROW(reg_->HandleTock(0));
   EXPECT_EQ(DieInst::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
   EXPECT_EQ(child5_->tockCount_, 2);

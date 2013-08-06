@@ -53,14 +53,14 @@ void EventManager::set_dump_count(unsigned int count) {
   events_.reserve(count);
   for (int i = 0; i < count; ++i) {
     Event* ev = new Event(this, "");
-    ev->addVal("SimID", uuid_);
+    ev->AddVal("SimID", uuid_);
     events_.push_back(ev);
   }
   dump_count_ = count;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event* EventManager::newEvent(std::string title) {
+Event* EventManager::NewEvent(std::string title) {
   Event* ev = events_[index_];
   ev->title_ = title;
   ev->vals_.resize(1);
@@ -69,14 +69,14 @@ Event* EventManager::newEvent(std::string title) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::addEvent(Event* ev) {
+void EventManager::AddEvent(Event* ev) {
   if (index_ >= events_.size()) {
-    notifyBackends();
+    NotifyBackends();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::notifyBackends() {
+void EventManager::NotifyBackends() {
   index_ = 0;
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
@@ -85,7 +85,7 @@ void EventManager::notifyBackends() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::registerBackend(EventBackend* b) {
+void EventManager::RegisterBackend(EventBackend* b) {
   backs_.push_back(b);
 }
 
@@ -95,7 +95,7 @@ void EventManager::close() {
     delete events_[i];
   }
   events_.resize(index_);
-  notifyBackends();
+  NotifyBackends();
   std::list<EventBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     (*it)->Close();

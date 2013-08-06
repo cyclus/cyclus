@@ -46,38 +46,38 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
    intended receiver. The message class is designed to facilitate a two leg
    path. The first leg, the message is in an "outgoing" state. The originator
    will specify the next stop (next communicator) to receive the message and
-   invoke the sendOn() method of the message. The next stop communicator
+   invoke the SendOn() method of the message. The next stop communicator
    receives the message, does necessary processing, sets the message's "next
-   stop", and invokes the message's sendOn() method. This process is repeated
+   stop", and invokes the message's SendOn() method. This process is repeated
    until the message direction is flipped to the incoming (return leg) state.
    The message will attempt to auto set the next destination to the current
    owner's parent (see sendOn API documentation).  When in the incomming
-   state, a communicator invokes the sendOn() method and the message is sent
+   state, a communicator invokes the SendOn() method and the message is sent
    to the communicator from which this communicator received the message. An
    example of the message passing is outlined below:  
 
    - Up/outgoing message: 
    -# Inside originator 
-   -# msg->setNextDest(next_stop) 
-   -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# msg->SetNextDest(next_stop) 
+   -# msg->SendOn() 
+   -# message object invokes ReceiveMessage(this) for next_stop 
    -# Inside stop A 
-   -# msg->setNextDest(next_stop) 
-   -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# msg->SetNextDest(next_stop) 
+   -# msg->SendOn() 
+   -# message object invokes ReceiveMessage(this) for next_stop 
    -# Inside stop B 
-   -# msg->setNextDest(next_stop) 
-   -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for next_stop 
+   -# msg->SetNextDest(next_stop) 
+   -# msg->SendOn() 
+   -# message object invokes ReceiveMessage(this) for next_stop 
    -# Inside stop C 
    -# flip message direction 
    - Down/incoming message: 
    -# Inside stop C 
-   -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for stop B 
+   -# msg->SendOn() 
+   -# message object invokes ReceiveMessage(this) for stop B 
    -# Inside stop B 
-   -# msg->sendOn() 
-   -# message object invokes receiveMessage(this) for stop A 
+   -# msg->SendOn() 
+   -# message object invokes ReceiveMessage(this) for stop A 
    -# message arrives back at its originating communicator. 
     
    Note that all attempts to specify a "next stop" for a down/incoming 
@@ -85,7 +85,7 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
    path in reverse order. This paradigm allows for an arbitrary 
    communicator to communicator path (for the outgoing leg). The message 
    is also guaranteed to retrace its path on an incoming leg provided 
-   each communicator invokes the message's sendOn() method. 
+   each communicator invokes the message's SendOn() method. 
     
    In order for a message to arrive at the destination as intended by 
    its originator, each communicator may check to see if it is the 
@@ -108,7 +108,7 @@ enum MessageDir {UP_MSG, DOWN_MSG, NONE_MSG};
 class Message: IntrusiveBase<Message> {
 
  private:
-  void constructBase(Communicator* sender);
+  void ConstructBase(Communicator* sender);
 
  public:
   /**
@@ -151,7 +151,7 @@ class Message: IntrusiveBase<Message> {
      Send this message to the next communicator in it's path 
       
      Messages heading up (UP_MSG) are forwareded to the communicator
-     designated by the setNextDest(Communicator*) function. If setNextDest
+     designated by the SetNextDest(Communicator*) function. If setNextDest
      hasn't been called, the current owner's parent model will be used as the
      next destination.  If the current owner is a root (region) node, the
      next destination will be auto set to the message's specified receiver.
@@ -164,11 +164,11 @@ class Message: IntrusiveBase<Message> {
      @exception Error attempted to send a message to the 
      message sender (circular messaging) 
    */
-  virtual void sendOn();
+  virtual void SendOn();
 
  private:
 
-  void autoSetNextDest();
+  void AutoSetNextDest();
 
   /**
    Keeps history of total order vs request qtys for every commodity.
@@ -177,9 +177,9 @@ class Message: IntrusiveBase<Message> {
    @param next_model the model queued to receive this message on the next
    send
   */
-  void tallyOrder(Model* next_model);
+  void TallyOrder(Model* next_model);
 
-  void validateForSend();
+  void ValidateForSend();
 
  public:
 
@@ -190,7 +190,7 @@ class Message: IntrusiveBase<Message> {
      @param next_stop the communicator that will receive this message when
      sendOn is next invoked
    */
-  void setNextDest(Communicator* next_stop);
+  void SetNextDest(Communicator* next_stop);
   
   /**
      Renders the sendOn method disfunctional, preventing it from being sent
@@ -198,29 +198,29 @@ class Message: IntrusiveBase<Message> {
       
      Used to prevent messages from returning through/to deallocated Communicators
    */
-  void kill();
+  void Kill();
 
   /**
      Indicates whether this message is active and sendable.
 
      @return true if this message has been killed, false otherwise - see
-     Message::kill() 
+     Message::Kill() 
    */
-  bool isDead();
+  bool IsDead();
   
   /**
      setNextDest must be called before sendOn is invoked only if dir is UP_MSG.
 
      @return the direction this Message is traveling (UP_MSG or DOWN_MSG). 
    */
-  MessageDir dir() const;
+  MessageDir Dir() const;
   
   /**
      Sets the direction of the message 
       
      @param new_dir is the new direction 
    */
-  void setDir(MessageDir new_dir);
+  void SetDir(MessageDir new_dir);
 
   /**
   Retrieve notes associated with this message.
@@ -234,7 +234,7 @@ class Message: IntrusiveBase<Message> {
 
   @param text (potentially serialized) notes pertinent to the message's purpose
   */
-  void setNotes(std::string text);
+  void SetNotes(std::string text);
 
   /**
      Set via the Message constructor and cannot be changed.
@@ -273,7 +273,7 @@ class Message: IntrusiveBase<Message> {
           quantity (negative values indicate a supply heavy state)
 
   */
-  static double unmetDemand(std::string commod, int time);
+  static double UnmetDemand(std::string commod, int time);
 
  private:
 

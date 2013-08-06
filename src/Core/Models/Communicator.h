@@ -45,7 +45,7 @@ class Communicator {
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
     std::set<msg_ptr>::iterator it;
     for (it = tracked_.begin(); it != tracked_.end(); it++) {
-      (*it)->kill();
+      (*it)->Kill();
       LOG(LEV_DEBUG3, "delete") << "killing tracked message";
     }
     MLOG(LEV_DEBUG4) << "communicator " << this << " destructed";
@@ -63,7 +63,7 @@ class Communicator {
      @warning This method should never be called directly by any Model 
      object. Message sending should be handled via methods on the 
    */
-  virtual void receiveMessage(msg_ptr msg) = 0;
+  virtual void ReceiveMessage(msg_ptr msg) = 0;
 
   std::set<msg_ptr> tracked_;
 
@@ -74,7 +74,7 @@ class Communicator {
      objects that have been deallocated.  
      @param msg the Message to be tracked. 
    */
-  void trackMessage(msg_ptr msg) {
+  void TrackMessage(msg_ptr msg) {
     tracked_.insert(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " tracks Message " << msg;
   }
@@ -86,7 +86,7 @@ class Communicator {
      objects that have been deallocated.  
      @param msg the Message to untrack 
    */
-  void untrackMessage(msg_ptr msg) {
+  void UntrackMessage(msg_ptr msg) {
     tracked_.erase(msg);
     MLOG(LEV_DEBUG5) << "communicator " << this << " untracked Message " << msg;
   }
@@ -97,7 +97,7 @@ class Communicator {
       
      @param src the Communicator to copy 
    */ 
-  virtual void copy(Communicator* src) { };
+  virtual void Copy(Communicator* src) { };
 
 };
 } // namespace cyclus

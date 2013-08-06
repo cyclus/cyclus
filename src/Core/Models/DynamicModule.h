@@ -14,7 +14,7 @@ typedef void destroy_t(Model*);
 class DynamicModule {
  public:
   /// @return the global library suffix
-  static const std::string suffix();
+  static const std::string Suffix();
   
   /**
      Creates a new dynamically loadable module.
@@ -30,19 +30,19 @@ class DynamicModule {
      construct an instance of this module
      @return a fresh instance
   */
-  Model* constructInstance();
+  Model* ConstructInstance();
 
   /**
      call this destructor on an instance of a Model
      @param model the model to destruct
   */
-  void destructInstance(Model* model);
+  void DestructInstance(Model* model);
 
   /// Locates and initializes a dynamic module for use in the simulation
-  void initialize();
+  void Initialize();
 
   /// closes the loaded module dynamic lib
-  void closeLibrary();
+  void CloseLibrary();
 
   /**
      If this path for this module has not been discovered yet, path searches for it.
@@ -77,19 +77,19 @@ class DynamicModule {
   destroy_t* destructor_;
 
   /// uses dlopen to open the module shared lib
-  void openLibrary();
+  void OpenLibrary();
 
   /// sets the constructor member
-  void setConstructor();
+  void SetConstructor();
 
   /// sets the destructor member
-  void setDestructor();
+  void SetDestructor();
 
   /**
      sets the absolute path to the dynamic library based on parameters set
      during construction
   */
-  void setPath();
+  void SetPath();
 
 };
 } // namespace cyclus
