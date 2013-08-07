@@ -1,7 +1,7 @@
 // Regionmodel_tests.cc 
 #include <gtest/gtest.h>
 
-#include "Regionmodel_tests.h"
+#include "region_model_tests.h"
 #include "test_facility.h"
 #include <string>
 

@@ -1,7 +1,7 @@
 // Regionmodel_tests.h
 #include <gtest/gtest.h>
 
-#include "Regionmodel.h"
+#include "region_model.h"
 #include "suffix.h"
 #include "test_region.h"
 
