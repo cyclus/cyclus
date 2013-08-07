@@ -32,34 +32,34 @@ class Assays {
 
 /// @param mat the material inquired about
 /// @return the atom percent of U-235 w.r.t Uranium in a material
-double uranium_assay(Material::Ptr mat);
+double UraniumAssay(Material::Ptr mat);
 
 /// @param mat the material inquired about
 /// @return the quantity of uranium in a material whose units match
 /// those of the given material
-double uranium_qty(Material::Ptr mat);
+double UraniumQty(Material::Ptr mat);
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
 /// @return the quantity of feedstock required to make the product 
 /// whose units match those of the given product
-double feed_qty(double product_qty, const Assays& assays);
+double FeedQty(double product_qty, const Assays& assays);
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
 /// @return the quantity of tails resulting from enriching the product
 /// whose units match those of the given product
-double tails_qty(double product_qty, const Assays& assays);
+double TailsQty(double product_qty, const Assays& assays);
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
 /// @return the amount of swu required to enrich the product
-double swu_required(double product_qty, const Assays& assays);
+double SwuRequired(double product_qty, const Assays& assays);
 
 /// @param frac the fraction input, this will throw if the fraction
 /// value is not in [0,1)
 /// @return the value function for a given fraction in [0,1)
-double value_func(double frac);
+double ValueFunc(double frac);
 
 }; // namespace enrichment
 } // namespace cyclus

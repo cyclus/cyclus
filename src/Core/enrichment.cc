@@ -27,7 +27,7 @@ double enrichment::Assays::Tails() const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::uranium_assay(Material::Ptr rsrc) {
+double enrichment::UraniumAssay(Material::Ptr rsrc) {
   double value;
   double u235 = rsrc->isoVector().AtomFraction(92235);
   double u238 = rsrc->isoVector().AtomFraction(92238);
@@ -45,12 +45,12 @@ double enrichment::uranium_assay(Material::Ptr rsrc) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::uranium_qty(Material::Ptr rsrc) {
+double enrichment::UraniumQty(Material::Ptr rsrc) {
   return rsrc->mass(92238,KG) + rsrc->mass(92235,KG);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::feed_qty(double product_qty, const Assays& assays) {
+double enrichment::FeedQty(double product_qty, const Assays& assays) {
   double factor = 
     (assays.Product() - assays.Tails())
     /
@@ -59,7 +59,7 @@ double enrichment::feed_qty(double product_qty, const Assays& assays) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::tails_qty(double product_qty, const Assays& assays) {
+double enrichment::TailsQty(double product_qty, const Assays& assays) {
   double factor = 
     (assays.Product() - assays.Feed())
     /
@@ -68,7 +68,7 @@ double enrichment::tails_qty(double product_qty, const Assays& assays) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::value_func(double frac) {
+double enrichment::ValueFunc(double frac) {
   if (frac < 0) {
     std::stringstream msg;
     msg << "The provided fraction (" << frac 
@@ -87,13 +87,13 @@ double enrichment::value_func(double frac) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-double enrichment::swu_required(double product_qty, const Assays& assays) {
-  double feed = feed_qty(product_qty,assays);
-  double tails = tails_qty(product_qty,assays);
+double enrichment::SwuRequired(double product_qty, const Assays& assays) {
+  double feed = FeedQty(product_qty,assays);
+  double tails = TailsQty(product_qty,assays);
   double swu = 
-    product_qty * value_func(assays.Product()) +
-    tails * value_func(assays.Tails()) -
-    feed * value_func(assays.Feed());
+    product_qty * ValueFunc(assays.Product()) +
+    tails * ValueFunc(assays.Tails()) -
+    feed * ValueFunc(assays.Feed());
   return swu;
 }
 } // namespace cyclus

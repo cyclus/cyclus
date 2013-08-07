@@ -8,9 +8,6 @@
 
 #include <iostream>
 
-//using namespace cyclus;
-//using namespace enrichment;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void EnrichmentTests::SetUp() 
 {
@@ -62,15 +59,15 @@ TEST_F(EnrichmentTests,assays)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests,valuefunction) 
 {
-  EXPECT_THROW(cyclus::enrichment::value_func(0-cyclus::eps()), cyclus::ValueError);
-  EXPECT_THROW(cyclus::enrichment::value_func(1), cyclus::ValueError);
+  EXPECT_THROW(cyclus::enrichment::ValueFunc(0-cyclus::eps()), cyclus::ValueError);
+  EXPECT_THROW(cyclus::enrichment::ValueFunc(1), cyclus::ValueError);
 
   double step = 0.001;
   double test_value=0;
   while (test_value < 1)
     {
       double expected = (1-2*test_value)*log(1/test_value - 1);
-      EXPECT_DOUBLE_EQ(expected, cyclus::enrichment::value_func(test_value));
+      EXPECT_DOUBLE_EQ(expected, cyclus::enrichment::ValueFunc(test_value));
       test_value += step;
     }
 }
@@ -78,17 +75,17 @@ TEST_F(EnrichmentTests,valuefunction)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests,material) 
 {
-  EXPECT_DOUBLE_EQ(assay_u_, cyclus::enrichment::uranium_assay(mat_));
-  EXPECT_DOUBLE_EQ(mass_u_, cyclus::enrichment::uranium_qty(mat_));
+  EXPECT_DOUBLE_EQ(assay_u_, cyclus::enrichment::UraniumAssay(mat_));
+  EXPECT_DOUBLE_EQ(mass_u_, cyclus::enrichment::UraniumQty(mat_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests,enrichmentcalcs) 
 {
-  cyclus::enrichment::Assays assays(feed_, cyclus::enrichment::uranium_assay(mat_),
+  cyclus::enrichment::Assays assays(feed_, cyclus::enrichment::UraniumAssay(mat_),
                                     tails_);
-  double product_qty = cyclus::enrichment::uranium_qty(mat_);
-  EXPECT_DOUBLE_EQ(feed_qty_,feed_qty(product_qty,assays));
-  EXPECT_DOUBLE_EQ(tails_qty_,tails_qty(product_qty,assays));
-  EXPECT_DOUBLE_EQ(swu_,swu_required(product_qty,assays));
+  double product_qty = cyclus::enrichment::UraniumQty(mat_);
+  EXPECT_DOUBLE_EQ(feed_qty_, FeedQty(product_qty, assays));
+  EXPECT_DOUBLE_EQ(tails_qty_, TailsQty(product_qty, assays));
+  EXPECT_DOUBLE_EQ(swu_, SwuRequired(product_qty, assays));
 }
