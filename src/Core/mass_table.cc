@@ -43,21 +43,21 @@ double MassTable::GramsPerMol(int tope) {
 void MassTable::InitializeSQL() {
   // get the file location
   std::string file_path = Env::GetBuildPath() + "/share/mass.sqlite";
-  bool readonly=true;
-  SqliteDb *db = new SqliteDb(file_path, readonly);
+  bool readonly = true;
+  SqliteDb* db = new SqliteDb(file_path, readonly);
 
   std::vector<StrList> znums = db->Query("SELECT Z FROM isotopemasses");
   std::vector<StrList> anums = db->Query("SELECT A FROM isotopemasses");
   std::vector<StrList> mnums = db->Query("SELECT Mass FROM isotopemasses");
-  
-  for (int i = 0; i < znums.size(); i++){
+
+  for (int i = 0; i < znums.size(); i++) {
     // // obtain the database row and declare the appropriate members
     std::string aStr = anums.at(i).at(0);
     std::string zStr = znums.at(i).at(0);
     std::string mStr = mnums.at(i).at(0);
-    int z = atoi( zStr.c_str() );
-    int a = atoi( aStr.c_str() );
-    double mass = atof( mStr.c_str() );
+    int z = atoi(zStr.c_str());
+    int a = atoi(aStr.c_str());
+    double mass = atof(mStr.c_str());
     // create a nuclide member and add it to the nuclide vector
     Nuclide n = {z, a, mass};
     nuclide_vec_.push_back(n);

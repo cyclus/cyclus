@@ -23,7 +23,7 @@ convert between Resource::Ptr and Material::Ptr.
 */
 class MatBuff: public ResourceBuff {
 
-public:
+ public:
 
   /// toRes is a helper function for casting std::vector<Material> to
   /// std::vector<Resource>

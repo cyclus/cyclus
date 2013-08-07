@@ -1,7 +1,7 @@
 /**
-   @file logger.h 
-    
-   Code providing rudimentary logging capability for the Cyclus core. 
+   @file logger.h
+
+   Code providing rudimentary logging capability for the Cyclus core.
    Details outlining proper use of this logging functionality can be found
    at http://cyclus.github.com/devdoc/main.html
  */
@@ -13,32 +13,32 @@
 namespace cyclus {
 
 /**
-   @def LOG(level, prefix) 
-    
-   allows easy logging via the streaming operator similar to std::cout; 
+   @def LOG(level, prefix)
+
+   allows easy logging via the streaming operator similar to std::cout;
    this is the primary way to use the Logging functionality.
-   
-   @param level #LogLevel category or type of log statement. 
 
-   @param prefix A std::string value that functions as a unique 
-   identifier for the module. Prefixes longer than 6 characters will be 
-   truncated.  
+   @param level #LogLevel category or type of log statement.
 
-   @warning do not place any state-changing expressions with this macro 
-   as they may not run if the report level excludes the specified log 
-   'level'.  
+   @param prefix A std::string value that functions as a unique
+   identifier for the module. Prefixes longer than 6 characters will be
+   truncated.
+
+   @warning do not place any state-changing expressions with this macro
+   as they may not run if the report level excludes the specified log
+   'level'.
  */
 #define LOG(level, prefix) \
-if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
-else cyclus::Logger().Get(level, prefix)
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
+  else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
-if (level > cyclus::Logger::ReportLevel()) ; \
-else cyclus::Logger().Get(level, "core")
+  if (level > cyclus::Logger::ReportLevel()) ; \
+  else cyclus::Logger().Get(level, "core")
 
 #define MLOG(level) \
-if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
-else cyclus::Logger().Get(level, "memory")
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
+  else cyclus::Logger().Get(level, "memory")
 
 } // namespace cyclus
 
@@ -51,9 +51,9 @@ else cyclus::Logger().Get(level, "memory")
 namespace cyclus {
 
 /**
-   @enum LogLevel 
-    
-   categorical (verbosity) levels for log statements. 
+   @enum LogLevel
+
+   categorical (verbosity) levels for log statements.
  */
 enum LogLevel {
   LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
@@ -67,15 +67,15 @@ enum LogLevel {
   LEV_DEBUG2, //!< debugging information
   LEV_DEBUG3, //!< debugging information
   LEV_DEBUG4, //!< debugging information
-  LEV_DEBUG5 //!< debugging information - most verbose               
+  LEV_DEBUG5 //!< debugging information - most verbose
 };
 
 /**
-   A logging tool providing finer grained control over standard output 
-   for debugging and other purposes.  
+   A logging tool providing finer grained control over standard output
+   for debugging and other purposes.
 
-   @warning do not place any state-changing expressions with the LOG 
-   macro as they may not run if the report level excludes the specified level.  
+   @warning do not place any state-changing expressions with the LOG
+   macro as they may not run if the report level excludes the specified level.
  */
 class Logger {
 
@@ -94,13 +94,19 @@ class Logger {
 
   @return the report level cutoff by reference
   */
-  static LogLevel& ReportLevel() {return report_level;};
+  static LogLevel& ReportLevel() {
+    return report_level;
+  };
 
   /// Set whether or not agent/model log entries should be printed
-  static bool& NoModel() {return no_model;};
+  static bool& NoModel() {
+    return no_model;
+  };
 
   /// Set whether or not agent/model log entries should be printed
-  static bool& NoMem() {return no_mem;};
+  static bool& NoMem() {
+    return no_mem;
+  };
 
   /*!
   Converts a string into a corresponding LogLevel value.
@@ -152,7 +158,7 @@ class Logger {
   cyclus code execution begins
   */
   static void Initialize();
-    
+
   /*!
   Used by the initialize method to populate the level_to_string and
   string_to_level static variables.
@@ -170,7 +176,7 @@ class Logger {
   value converted to a string (i.e. `LEV_WARN` is the longest with 11
   characters).
   */
-  static int field_width_; 
+  static int field_width_;
 };
 } // namespace cyclus
 #endif

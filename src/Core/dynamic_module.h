@@ -15,7 +15,7 @@ class DynamicModule {
  public:
   /// @return the global library suffix
   static const std::string Suffix();
-  
+
   /**
      Creates a new dynamically loadable module.
      @param type the module type

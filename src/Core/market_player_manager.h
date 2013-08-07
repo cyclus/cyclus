@@ -26,7 +26,7 @@ class MarketPlayerManager {
      destructor
    */
   virtual ~MarketPlayerManager() {};
-  
+
   /**
      set's the commodity associated with this manager
    */
@@ -44,7 +44,7 @@ class MarketPlayerManager {
      @return the total production capacity of the market
    */
   double PlayerProductionCapacity();
-  
+
  private:
   /// the commodity associated with this manager
   Commodity* commod_;

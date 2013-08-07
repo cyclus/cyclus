@@ -8,11 +8,11 @@
 // To change the matrix library used:
 //
 //      #include "<Matrix Library>"
-#include "l_matrix.h"          
+#include "l_matrix.h"
 
 namespace cyclus {
 
-// To change the matrix type: 
+// To change the matrix type:
 //
 //      typedef <Matrix Type> Matrix;
 typedef LMatrix Matrix;

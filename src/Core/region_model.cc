@@ -16,25 +16,25 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-RegionModel::RegionModel() { 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+RegionModel::RegionModel() {
   SetModelType("Region");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void RegionModel::InitCoreMembers(QueryEngine* qe) { 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe); // name_
   RegionModel::InitAllowedFacilities(qe); // allowedFacilities_
   RegionModel::InitInstitutionNames(qe); // inst_names_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::InitAllowedFacilities(QueryEngine* qe) {   
+void RegionModel::InitAllowedFacilities(QueryEngine* qe) {
   int num_allowed_fac = qe->NElementsMatchingQuery("allowedfacility");
   std::string fac_name;
   Model* new_fac;
-  for (int i=0;i<num_allowed_fac;i++) {
-    fac_name = qe->GetElementContent("allowedfacility",i);
+  for (int i = 0; i < num_allowed_fac; i++) {
+    fac_name = qe->GetElementContent("allowedfacility", i);
     new_fac = dynamic_cast<Model*>(Prototype::GetRegisteredPrototype(fac_name));
     allowedFacilities_.insert(new_fac);
   }
@@ -44,8 +44,8 @@ void RegionModel::InitAllowedFacilities(QueryEngine* qe) {
 void RegionModel::InitInstitutionNames(QueryEngine* qe) {
   int nInsts = qe->NElementsMatchingQuery("institution");
   std::string name;
-  for (int i=0; i<nInsts; i++) {
-    QueryEngine* inst_data = qe->QueryElement("institution",i);
+  for (int i = 0; i < nInsts; i++) {
+    QueryEngine* inst_data = qe->QueryElement("institution", i);
     name = inst_data->GetElementContent("name");
     inst_names_.insert(name);
   }
@@ -62,31 +62,31 @@ void RegionModel::AddRegionAsRootNode() {
   TI->RegisterTickListener(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::AddChildrenToTree() {
   Model* inst;
   std::set<std::string>::iterator it;
-  for (it = inst_names_.begin(); it != inst_names_.end(); it++){
+  for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
     inst = Model::GetModelByName((*it));
     inst->EnterSimulation(this);
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string RegionModel::str() {
   std::string s = Model::str();
 
   s += "allows facs: ";
-  for(std::set<Model*>::iterator fac=allowedFacilities_.begin();
-      fac != allowedFacilities_.end();
-      fac++){
+  for (std::set<Model*>::iterator fac = allowedFacilities_.begin();
+       fac != allowedFacilities_.end();
+       fac++) {
     s += (*fac)->name() + ", ";
   }
 
   s += ". And has insts: ";
-  for(std::vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
+  for (std::vector<Model*>::iterator inst = children_.begin();
+       inst != children_.end();
+       inst++) {
     s += (*inst)->name() + ", ";
   }
   return s;
@@ -96,13 +96,13 @@ std::string RegionModel::str() {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::ReceiveMessage(Message::Ptr msg){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::ReceiveMessage(Message::Ptr msg) {
   msg->SendOn();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::HandleTick(int time){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::HandleTick(int time) {
   int currsize = children_.size();
   int i = 0;
   while (i < children_.size()) {
@@ -117,8 +117,8 @@ void RegionModel::HandleTick(int time){
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::HandleTock(int time){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::HandleTock(int time) {
   int currsize = children_.size();
   int i = 0;
   while (i < children_.size()) {
@@ -133,13 +133,13 @@ void RegionModel::HandleTock(int time){
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
-void RegionModel::HandleDailyTasks(int time, int day){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::HandleDailyTasks(int time, int day) {
   // tell all of the institution models to handle the tick
-  for(std::vector<Model*>::iterator inst=children_.begin();
-      inst != children_.end();
-      inst++){
-    (dynamic_cast<InstModel*>(*inst))->HandleDailyTasks(time,day);
+  for (std::vector<Model*>::iterator inst = children_.begin();
+       inst != children_.end();
+       inst++) {
+    (dynamic_cast<InstModel*>(*inst))->HandleDailyTasks(time, day);
   }
 }
 } // namespace cyclus

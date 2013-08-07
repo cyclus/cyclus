@@ -19,19 +19,19 @@ class MarketPlayer;
 namespace cyclus {
 
 /// an iterator for the manager map
-typedef std::map<Commodity,
-  std::vector<MarketPlayerManager*> >::iterator ManagerIterator;
+typedef std::map < Commodity,
+        std::vector<MarketPlayerManager*> >::iterator ManagerIterator;
 
 /// an iterator for the production map
-typedef std::map<Commodity,double>::iterator ProductionIterator;
+typedef std::map<Commodity, double>::iterator ProductionIterator;
 
 /**
    A MarketPlayer is an agent mixin that allows for querying
    capability regarding its market-based interactions. For each
-   commodity which the player produces, this class provides an 
+   commodity which the player produces, this class provides an
    interface for its current production capacity.
 
-   Additionally, an interface is provided to inform a 
+   Additionally, an interface is provided to inform a
    MarketPlayerManager as to when the Player enters and leaves the
    market.
  */
@@ -58,7 +58,7 @@ class MarketPlayer {
      @param value the value of the production capacity
      @param commod the produced commodity
    */
-  void SetProductionCapacity(double value,Commodity& commod);
+  void SetProductionCapacity(double value, Commodity& commod);
 
   /**
      return the production capacity for a commodity
@@ -74,14 +74,14 @@ class MarketPlayer {
   void RegisterManager(MarketPlayerManager* m, Commodity& commod);
 
   /**
-     inform the manager that you are entering the market for a 
+     inform the manager that you are entering the market for a
      commodity
      @param commod the commodity of the market to enter
    */
   void EnterMarket(Commodity& commod);
 
   /**
-     inform the manager that you are leaving the market for a 
+     inform the manager that you are leaving the market for a
      commodity
      @param commod the commodity of the market to leave
    */
@@ -89,12 +89,12 @@ class MarketPlayer {
 
  private:
   /// the production capacity of each commodity
-  std::map<Commodity,double,CommodityCompare> production_capacity_;
+  std::map<Commodity, double, CommodityCompare> production_capacity_;
 
   /// the managers of each commodity
-  std::map<Commodity,std::vector<MarketPlayerManager*>,
-    CommodityCompare> managers_;
-  
+  std::map < Commodity, std::vector<MarketPlayerManager*>,
+      CommodityCompare > managers_;
+
   /**
      throws an error saying the commodity is not registered
      @param commod the commodity that is ot registered
@@ -102,7 +102,7 @@ class MarketPlayer {
   void ThrowRegistrationException(Commodity& commod);
 
   /**
-     Verifies that commod is in production_capacity_. If not, 
+     Verifies that commod is in production_capacity_. If not,
      ThrowRegistrationException() is called.
      @param commod the commodity to verify
      @return an iterator to the value/key pair in production_capacity_
@@ -110,7 +110,7 @@ class MarketPlayer {
   ProductionIterator CheckCommodityProduction(Commodity& commod);
 
   /**
-     Verifies that commod is in managers_. If not, 
+     Verifies that commod is in managers_. If not,
      ThrowRegistrationException() is called.
      @param commod the commodity to verify
      @return an iterator to the value/key pair in managers_

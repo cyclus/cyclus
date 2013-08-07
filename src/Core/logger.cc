@@ -17,7 +17,9 @@ int Logger::field_width_ = 6;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
   int ind_level = level - LEV_INFO1;
-  if (ind_level < 0) {ind_level = 0;}
+  if (ind_level < 0) {
+    ind_level = 0;
+  }
 
   int prefix_len = 6;
   prefix = prefix.substr(0, prefix_len);

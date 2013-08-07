@@ -16,7 +16,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-FacilityModel::FacilityModel() : 
+FacilityModel::FacilityModel() :
   fac_lifetime_(std::numeric_limits<int>::max()),
   decommission_date_(std::numeric_limits<int>::max()),
   build_date_(0) {
@@ -27,7 +27,7 @@ FacilityModel::FacilityModel() :
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::~FacilityModel() {};
-  
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe);
@@ -35,40 +35,38 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   // get lifetime
   try {
     SetFacLifetime(atoi(qe->GetElementContent("lifetime").c_str()));
-  }
-  catch (Error e) {
+  } catch (Error e) {
     SetFacLifetime(TI->SimDur());
   }
-  
+
   // get the incommodities
   std::string commod;
   try {
     int numInCommod = qe->NElementsMatchingQuery("incommodity");
-    for (int i=0;i<numInCommod;i++){
-      commod = qe->GetElementContent("incommodity",i);
+    for (int i = 0; i < numInCommod; i++) {
+      commod = qe->GetElementContent("incommodity", i);
       in_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity" << commod;
+      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity"
+                               << commod;
     }
-  }
-  catch (Error e) {
-  }
+  } catch (Error e) { }
 
   // get the outcommodities
   try {
     int numOutCommod = qe->NElementsMatchingQuery("outcommodity");
-    for (int i=0;i<numOutCommod;i++){
-      commod = qe->GetElementContent("outcommodity",i);
+    for (int i = 0; i < numOutCommod; i++) {
+      commod = qe->GetElementContent("outcommodity", i);
       out_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added outcommodity" << commod;
+      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() <<
+                               " has just added outcommodity" << commod;
     }
-  }
-  catch (Error e) {
-  }
+  } catch (Error e) { }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Prototype* FacilityModel::clone() {
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(Model::ConstructModel(ModelImpl()));
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(Model::ConstructModel(
+                                                        ModelImpl()));
   clone->CloneCoreMembersFrom(this);
   clone->CloneModuleMembersFrom(this);
   clone->SetBuildDate(TI->time());
@@ -84,7 +82,7 @@ void FacilityModel::CloneCoreMembersFrom(FacilityModel* source) {
   SetModelType(source->ModelType());
   SetFacLifetime(source->FacLifetime());
   in_commods_ = source->InputCommodities();
-  out_commods_ = source->OutputCommodities();  
+  out_commods_ = source->OutputCommodities();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,18 +97,19 @@ std::string FacilityModel::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::FacInst() {
-  return dynamic_cast<InstModel*>( parent() );
+  return dynamic_cast<InstModel*>(parent());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::HandleDailyTasks(int time, int day){
+void FacilityModel::HandleDailyTasks(int time, int day) {
   // facilities who have more intricate details should utilize this function
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Decommission() {
-  if (!CheckDecommissionCondition()) 
+  if (!CheckDecommissionCondition()) {
     throw Error("Cannot decommission " + name());
+  }
 
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
   DeleteModel(this);
@@ -139,27 +138,25 @@ bool FacilityModel::LifetimeReached(int time) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::SetBuildDate(int current_time) {
   build_date_ = current_time;
-  SetDecommissionDate(build_date_ + fac_lifetime_ - 1); // -1 because you want the decommission to occur on the previous time's tock
+  SetDecommissionDate(build_date_ + fac_lifetime_ -
+                      1); // -1 because you want the decommission to occur on the previous time's tock
   CLOG(LEV_DEBUG3) << name() << " has set its time-related members: ";
-  CLOG(LEV_DEBUG3) << " * lifetime: " << fac_lifetime_; 
-  CLOG(LEV_DEBUG3) << " * build date: " << build_date_; 
+  CLOG(LEV_DEBUG3) << " * lifetime: " << fac_lifetime_;
+  CLOG(LEV_DEBUG3) << " * build date: " << build_date_;
   CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::SetDecommissionDate(int time) {
-  double final_time = TI->FinalTime();  
-  if (time < final_time)
-    {
-      decommission_date_ = time;
-    }
-  else
-    {
-      decommission_date_ = final_time;
-    }
+  double final_time = TI->FinalTime();
+  if (time < final_time) {
+    decommission_date_ = time;
+  } else {
+    decommission_date_ = final_time;
+  }
   CLOG(LEV_DEBUG3) << name() << " is setting its decommission date: ";
-  CLOG(LEV_DEBUG3) << " * Set Time: " << time; 
-  CLOG(LEV_DEBUG3) << " * Final Time: " << final_time; 
+  CLOG(LEV_DEBUG3) << " * Set Time: " << time;
+  CLOG(LEV_DEBUG3) << " * Final Time: " << final_time;
   CLOG(LEV_DEBUG3) << " * decommisison date: " << decommission_date_;
 }
 } // namespace cyclus

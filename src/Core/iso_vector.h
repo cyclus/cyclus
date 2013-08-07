@@ -31,13 +31,13 @@ namespace cyclus {
 /* -- Typedefs -- */
 
 
-/** 
+/**
     @class IsoVector
-    
+
     @section Introduction
-    The IsoVector class is designed to intelligently manage a given 
-    isotopic composition in the form of a CompMap. Specifically, the IsoVector 
-    class defines all relevant operators to manage the decay, mixing, and 
+    The IsoVector class is designed to intelligently manage a given
+    isotopic composition in the form of a CompMap. Specifically, the IsoVector
+    class defines all relevant operators to manage the decay, mixing, and
     separation of compositions.
 
     While a CompMap stores a normalized composition, an IsoVector provides
@@ -56,10 +56,10 @@ namespace cyclus {
     efficiency = 1. All isotopes are removed, and the remaining are normalized.
 
     @section Decay
-    The IsoVector class manages the decay of CompMaps via the Decay(time) 
+    The IsoVector class manages the decay of CompMaps via the Decay(time)
     method. New children will have their parent and decay time set accordingly.
 */
-class IsoVector : public boost::enable_shared_from_this<IsoVector> {  
+class IsoVector : public boost::enable_shared_from_this<IsoVector> {
  public:
   /* --- Constructors and Destructors --- */
   /**
@@ -145,7 +145,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void normalize();
 
   /**
-     validates the composition_, insuring all Isotopes numbers 
+     validates the composition_, insuring all Isotopes numbers
      and fraction values comply
   */
   void Validate();
@@ -199,7 +199,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
   void Mix(const IsoVectorPtr& p_other, double ratio);
 
   /**
-     separates an IsoVector from this one 
+     separates an IsoVector from this one
      @param other the IsoVector to extract from this
      @param efficiency the effiency of the separation
      @return a shared pointer to the resulting composition
@@ -213,7 +213,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
 
   /**
      decays a composition for a given time, assumed to be in months
-     
+
      this public function checks with the RecipeLibrary to see if comp is
      recorded as a decayable parent. if so, it will intelligently decay comp
      if a child has not already been decayed. if one has, a copy will be
@@ -223,7 +223,7 @@ class IsoVector : public boost::enable_shared_from_this<IsoVector> {
    */
   virtual void Decay(int time);
   /* --- */
-  
+
  private:
   /* --- Instance Management --- */
   /**

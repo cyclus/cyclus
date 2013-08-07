@@ -9,7 +9,7 @@ namespace cyclus {
 
 /**
    This is a base class that defines the API used by any engine
-   representing an input format. 
+   representing an input format.
  */
 class QueryEngine {
  public:
@@ -18,7 +18,7 @@ class QueryEngine {
 
   /// virtual destructor
   virtual ~QueryEngine();
-    
+
   /**
      @return the number of elements in the current query state
    */
@@ -38,14 +38,14 @@ class QueryEngine {
      @return the number of elements matching the query
    */
   virtual int NElementsMatchingQuery(std::string query) = 0;
-  
+
   /**
      investigates the current status and returns a string representing
      the content of a query at a given index
      @param query the query
      @param index the index of the queried element
    */
-  virtual std::string GetElementContent(std::string query, 
+  virtual std::string GetElementContent(std::string query,
                                         int index = 0) = 0;
 
   /**

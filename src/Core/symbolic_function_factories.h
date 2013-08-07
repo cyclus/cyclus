@@ -12,8 +12,7 @@ namespace cyclus {
 /**
    An abstract factory for pointers to symbolic functions
  */
-class SymbFunctionFactory 
-{
+class SymbFunctionFactory {
  public:
   /// virtual destructor for an abstract base class
   virtual ~SymbFunctionFactory() {};
@@ -29,8 +28,7 @@ class SymbFunctionFactory
 /**
    a concrete factory for linear functions
  */
-class LinFunctionFactory : public SymbFunctionFactory 
-{
+class LinFunctionFactory : public SymbFunctionFactory {
  public:
   /**
      return a function pointer to a linear function
@@ -44,8 +42,7 @@ class LinFunctionFactory : public SymbFunctionFactory
 /**
    a concrete factory for exponential functions
  */
-class ExpFunctionFactory : public SymbFunctionFactory 
-{
+class ExpFunctionFactory : public SymbFunctionFactory {
  public:
   /**
      return a function pointer to a exponential function
@@ -59,8 +56,7 @@ class ExpFunctionFactory : public SymbFunctionFactory
 /**
    a concrete factory for piecewise functions
  */
-class PiecewiseFunctionFactory : public SymbFunctionFactory 
-{
+class PiecewiseFunctionFactory : public SymbFunctionFactory {
  public:
   /// constructor
   PiecewiseFunctionFactory();
@@ -72,15 +68,16 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory
      @return the piecewise function
    */
   virtual FunctionPtr GetFunctionPtr(std::string params = "");
-  
+
   /**
      add a function to the piecewise function being constructed
      @param function the function to append
      @param starting_coord the x coordinate to begin this function
-     @param continuous  if true, the added function and previous 
+     @param continuous  if true, the added function and previous
      function will be continuous, if false, discontinuous
    */
-  void AddFunction(FunctionPtr function, double starting_coord = 0.0, bool continuous = true);
+  void AddFunction(FunctionPtr function, double starting_coord = 0.0,
+                   bool continuous = true);
 
  private:
   /// the piecewise function to construct
@@ -88,15 +85,14 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory
 };
 
 /**
-   a concrete factory that can provide access to  basic symbolic 
+   a concrete factory that can provide access to  basic symbolic
    functions
  */
-class BasicFunctionFactory 
-{
+class BasicFunctionFactory {
  public:
   /// the type of functions this factory can provide
-  enum FunctionType {LIN,EXP};
-  
+  enum FunctionType {LIN, EXP};
+
   /**
      constructor sets up the enum names map
    */
@@ -109,11 +105,11 @@ class BasicFunctionFactory
      @return the function
    */
   FunctionPtr GetFunctionPtr(std::string type, std::string params);
-    
+
  private:
   /// a map between enums and names
-  static std::map<std::string,BasicFunctionFactory::FunctionType> 
-    enum_names_;
+  static std::map<std::string, BasicFunctionFactory::FunctionType>
+  enum_names_;
 };
 
 } // namespace cyclus

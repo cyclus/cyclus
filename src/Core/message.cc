@@ -69,7 +69,9 @@ Message::Ptr Message::clone() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Message::SendOn() {
-  if (dead_) {return;}
+  if (dead_) {
+    return;
+  }
   Message::Ptr me = Message::Ptr(this);
 
   if (dir_ == DOWN_MSG) {
@@ -129,7 +131,8 @@ void Message::TallyOrder(Model* next_model) {
   if (tran.IsOffer()) {
     Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
   } else {
-    Message::request_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+    Message::request_qtys_[tran.commod()][TI->time()] +=
+      tran.resource()->quantity();
   }
 }
 

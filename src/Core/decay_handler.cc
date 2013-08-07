@@ -28,50 +28,52 @@ DecayHandler::DecayHandler() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::LoadDecayInfo() {
   std::string path = Env::GetBuildPath() + "/share/decayInfo.dat";
-  std::ifstream decayInfo (path.c_str());
+  std::ifstream decayInfo(path.c_str());
 
-  if ( decayInfo.is_open() ) {
+  if (decayInfo.is_open()) {
     int jcol = 1;
     int iso = 0;
     int nDaughters = 0;
     double decayConst = 0; // decay constant, in inverse years
     double branchRatio = 0;
-      
+
     decayInfo >> iso;  // get first parent
-    
+
     // checks to see if there are isotopes in 'decayInfo.dat'
-    if ( decayInfo.eof() ) {
+    if (decayInfo.eof()) {
       std::string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
       throw ValidationError(err_msg);
     }
-    
+
     // processes 'decayInfo.dat'
-    while ( !decayInfo.eof() ) {
+    while (!decayInfo.eof()) {
       // make parent
       decayInfo >> decayConst;
       decayInfo >> nDaughters;
       AddIsoToList(iso);
 
       // checks for duplicate parent isotopes
-      if ( parent_.find(iso) == parent_.end() ) {
+      if (parent_.find(iso) == parent_.end()) {
         parent_[iso] = std::make_pair(jcol, decayConst);
-           
+
         // make daughters
-        std::vector< std::pair<int,double> > temp(nDaughters);
-        for ( int i = 0; i < nDaughters; ++i ) {
+        std::vector< std::pair<int, double> > temp(nDaughters);
+        for (int i = 0; i < nDaughters; ++i) {
           decayInfo >> iso;
           decayInfo >> branchRatio;
           AddIsoToList(iso);
-          
+
           // checks for duplicate daughter isotopes
-          for ( int j = 0; j < nDaughters; ++j ) {
-            if ( temp[j].first == iso ) {
-              throw ValidationError(std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat", iso));
-            } 
+          for (int j = 0; j < nDaughters; ++j) {
+            if (temp[j].first == iso) {
+              throw ValidationError(
+                std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat",
+                            iso));
+            }
           }
           temp[i] = std::make_pair(iso, branchRatio);
         }
-           
+
         daughters_[jcol] = temp;
         ++jcol; // set next column
       } else {
@@ -90,8 +92,9 @@ void DecayHandler::LoadDecayInfo() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::AddIsoToList(int iso) {
-  bool exists = (find(IsotopesTracked_.begin(), IsotopesTracked_.end(),iso)!=IsotopesTracked_.end());
-  if (!exists){
+  bool exists = (find(IsotopesTracked_.begin(), IsotopesTracked_.end(),
+                      iso) != IsotopesTracked_.end());
+  if (!exists) {
     IsotopesTracked_.push_back(iso);
   }
 }
@@ -109,16 +112,17 @@ void DecayHandler::SetComp(Vector comp) {
   // loops through the ParentMap and populates the new composition map with
   // the number density from the comp parameter for each isotope
   ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
-  while( parent_iter != parent_.end() ) {
+  while (parent_iter != parent_.end()) {
     int iso = parent_iter->first;
     int col = parent_.find(iso)->second.first; // get Vector position
-    
+
     // checks to see if the Vector position is valid
-    if ( col <= comp.NumRows() ) {
-      double atom_count = comp(col,1);
+    if (col <= comp.NumRows()) {
+      double atom_count = comp(col, 1);
       // adds isotope to the map if its number density is non-zero
-      if ( atom_count != 0 )
+      if (atom_count != 0) {
         (*atom_comp_)[iso] = atom_count;
+      }
     } else {
       LOG(LEV_ERROR, "none!") << "Decay Error - invalid Vector position";
     }
@@ -130,28 +134,28 @@ void DecayHandler::SetComp(Vector comp) {
 Vector DecayHandler::CompAsVector() {
 
   // solves the decay equation for the final composition
-        
-  Vector comp_vector = Vector(parent_.size(),1);
+
+  Vector comp_vector = Vector(parent_.size(), 1);
 
   std::map<int, double>::const_iterator comp_iter = atom_comp_->begin();
-  while( comp_iter != atom_comp_->end() ) {
+  while (comp_iter != atom_comp_->end()) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
 
-    // if the isotope is tracked in the decay matrix  
-    if ( parent_.count(iso) > 0 ) {
+    // if the isotope is tracked in the decay matrix
+    if (parent_.count(iso) > 0) {
       int col = parent_.find(iso)->second.first; // get Vector position
-      comp_vector(col,1) = atom_count;
-    // if it is not in the decay matrix, then it is added as a stable isotope
+      comp_vector(col, 1) = atom_count;
+      // if it is not in the decay matrix, then it is added as a stable isotope
     } else {
       double decayConst = 0;
       int col = parent_.size() + 1;
       parent_[iso] = std::make_pair(col, decayConst);  // add isotope to parent map
 
       int nDaughters = 0;
-      std::vector< std::pair<int,double> > temp(nDaughters);
+      std::vector< std::pair<int, double> > temp(nDaughters);
       daughters_[col] = temp;  // add isotope to daughters map
-      
+
       std::vector<long double> row(1, atom_count);
       comp_vector.AddRow(row);  // add isotope to the end of the Vector
     }
@@ -172,30 +176,30 @@ void DecayHandler::BuildDecayMatrix() {
   double decayConst = 0; // decay constant, in inverse years
   int jcol = 1;
   int n = parent_.size();
-  decayMatrix_ = Matrix(n,n);
+  decayMatrix_ = Matrix(n, n);
 
   ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
 
   // populates the decay matrix column by column
-  while( parent_iter != parent_.end() ) {
+  while (parent_iter != parent_.end()) {
     jcol = parent_iter->second.first; // determines column index
     decayConst = parent_iter->second.second;
-    decayMatrix_(jcol,jcol) = -1 * decayConst; // sets A(i,i) value
- 
+    decayMatrix_(jcol, jcol) = -1 * decayConst; // sets A(i,i) value
+
     // processes the vector in the daughters map if it is not empty
-    if ( !daughters_.find(jcol)->second.empty() ) {
+    if (!daughters_.find(jcol)->second.empty()) {
       // an iterator that points to 1st daughter in the vector
       // pair<isotope,branchratio>
       std::vector< std::pair<int, double> >::const_iterator iso_iter = \
-                                              daughters_.find(jcol)->second.begin();
+          daughters_.find(jcol)->second.begin();
 
       // processes all daughters of the parent
-      while ( iso_iter != daughters_.find(jcol)->second.end() ) {
+      while (iso_iter != daughters_.find(jcol)->second.end()) {
         int iso = iso_iter->first;
         int irow = parent_.find(iso)->second.first; // determines row index
         double branchRatio = iso_iter->second;
-        decayMatrix_(irow,jcol) = branchRatio * decayConst; // sets A(i,j) value
-    
+        decayMatrix_(irow, jcol) = branchRatio * decayConst; // sets A(i,j) value
+
         ++iso_iter; // get next daughter
       }
     }
@@ -206,7 +210,8 @@ void DecayHandler::BuildDecayMatrix() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DecayHandler::Decay(double years) {
   // solves the decay equation for the final composition
-  Vector vect = UniformTaylor::MatrixExpSolver(decayMatrix_, CompAsVector(), years);
+  Vector vect = UniformTaylor::MatrixExpSolver(decayMatrix_, CompAsVector(),
+                                               years);
   SetComp(vect);
 }
 } // namespace cyclus

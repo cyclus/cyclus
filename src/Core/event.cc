@@ -43,24 +43,32 @@ const Event::Vals& Event::vals() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Event::operator new(size_t size) {
-  if (size != sizeof(Event)) 
+  if (size != sizeof(Event)) {
     return ::operator new(size);
+  }
 
-  while(true) {
+  while (true) {
     void* ptr = EventPool::malloc();
-    if (ptr != NULL) return ptr;
+    if (ptr != NULL) {
+      return ptr;
+    }
 
     std::new_handler globalNewHandler = std::set_new_handler(0);
     std::set_new_handler(globalNewHandler);
 
-    if(globalNewHandler) globalNewHandler();
-    else throw std::bad_alloc();
+    if (globalNewHandler) {
+      globalNewHandler();
+    } else {
+      throw std::bad_alloc();
+    }
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Event::operator delete(void * rawMemory) throw() {
-  if(rawMemory == 0) return; 
+void Event::operator delete(void* rawMemory) throw() {
+  if (rawMemory == 0) {
+    return;
+  }
   EventPool::free(rawMemory);
 }
 } // namespace cyclus

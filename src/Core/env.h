@@ -56,7 +56,7 @@ class Env {
 
   /// Allows configuration and other files to be located independent
   /// of the working directory from which cyclus is executed.
-  /// 
+  ///
   /// @param path this should be argv[0] as passed to the main function
   /// (i.e. the relative path from the cwd to cyclus including
   /// the name of the cyclus executable)
@@ -91,7 +91,8 @@ class Env {
   /// @param name the name of the library to search for
   /// @param path_found the variable to set with the path to the library
   /// @return true if the library is found, false if not
-  static bool FindModuleLib(std::string name, boost::filesystem::path& path_found);
+  static bool FindModuleLib(std::string name,
+                            boost::filesystem::path& path_found);
 
 };
 } // namespace cyclus

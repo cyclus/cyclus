@@ -33,7 +33,7 @@ class ResourceBuff {
 
   /*!
   capacity returns the maximum resource quantity this store can hold (units
-  based on constituent resource objects' units). 
+  based on constituent resource objects' units).
   Never throws.
   */
   double capacity();
@@ -136,7 +136,9 @@ class ResourceBuff {
   /**
      returns true if there are no mats in mats_
   */
-  bool empty() {return mats_.empty();}
+  bool empty() {
+    return mats_.empty();
+  }
 
  private:
 

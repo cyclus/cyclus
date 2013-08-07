@@ -24,7 +24,7 @@ void MarketPlayerManager::PlayerEnteringMarket(MarketPlayer* m) {
 
 // -------------------------------------------------------------------
 void MarketPlayerManager::PlayerLeavingMarket(MarketPlayer* m) {
-    players_.erase(m);
+  players_.erase(m);
 }
 
 // -------------------------------------------------------------------

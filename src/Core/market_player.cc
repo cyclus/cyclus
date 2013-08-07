@@ -7,16 +7,16 @@ namespace cyclus {
 
 // -------------------------------------------------------------------
 MarketPlayer::MarketPlayer() {
-  managers_ = std::map<Commodity, std::vector<MarketPlayerManager*>,
-                  CommodityCompare> ();
-  production_capacity_ = std::map<Commodity,double,CommodityCompare>();
+  managers_ = std::map < Commodity, std::vector<MarketPlayerManager*>,
+  CommodityCompare > ();
+  production_capacity_ = std::map<Commodity, double, CommodityCompare>();
 }
 
 // -------------------------------------------------------------------
 void MarketPlayer::RegisterCommodity(Commodity& commod) {
   std::vector<MarketPlayerManager*> v;
-  managers_.insert(std::make_pair(commod,v));  
-  production_capacity_.insert(std::make_pair(commod,0.0));
+  managers_.insert(std::make_pair(commod, v));
+  production_capacity_.insert(std::make_pair(commod, 0.0));
 }
 
 // -------------------------------------------------------------------
@@ -33,12 +33,12 @@ double MarketPlayer::ProductionCapacity(Commodity& commod) {
 }
 
 // -------------------------------------------------------------------
-void MarketPlayer::RegisterManager(MarketPlayerManager* m, 
+void MarketPlayer::RegisterManager(MarketPlayerManager* m,
                                    Commodity& commod) {
   ManagerIterator mi = CheckCommodityManagement(commod);
   if (m->commodity() != commod) {
     std::stringstream ss("");
-    ss << "Cannot register a manager of " << m->commodity().name() 
+    ss << "Cannot register a manager of " << m->commodity().name()
        << " with the commodity: " << commod.name();
     throw ValueError(ss.str());
   }
@@ -64,7 +64,7 @@ void MarketPlayer::LeaveMarket(Commodity& commod) {
 }
 
 // -------------------------------------------------------------------
-ProductionIterator 
+ProductionIterator
 MarketPlayer::CheckCommodityProduction(Commodity& commod) {
   ProductionIterator pi = production_capacity_.find(commod);
   if (pi == production_capacity_.end()) {
@@ -74,7 +74,7 @@ MarketPlayer::CheckCommodityProduction(Commodity& commod) {
 }
 
 // -------------------------------------------------------------------
-ManagerIterator 
+ManagerIterator
 MarketPlayer::CheckCommodityManagement(Commodity& commod) {
   ManagerIterator mi = managers_.find(commod);
   if (mi == managers_.end()) {
@@ -85,7 +85,7 @@ MarketPlayer::CheckCommodityManagement(Commodity& commod) {
 
 // -------------------------------------------------------------------
 void MarketPlayer::ThrowRegistrationException(Commodity& commod) {
-  std::stringstream ss ("");
+  std::stringstream ss("");
   ss << "Commodity " << commod.name() << " is not registered with "
      << " this MarketPlayer.";
   throw KeyError(ss.str());

@@ -7,8 +7,7 @@
 #include "commodity.h"
 
 namespace cyclus {
-namespace supply_demand
-{
+namespace supply_demand {
 /// a container to hold information about a commodity
 struct CommodityInformation {
   CommodityInformation();
@@ -27,7 +26,7 @@ class CommodityProducer {
   virtual ~CommodityProducer();
 
   /// @return the set of commodities produced by this producers
-  std::set<Commodity,CommodityCompare> ProducedCommodities();
+  std::set<Commodity, CommodityCompare> ProducedCommodities();
 
   /// @param commodity the commodity in question
   /// @return true if the commodity is produced by this entity
@@ -61,19 +60,19 @@ class CommodityProducer {
   /// its relevant info
   /// @param commodity the commodity being produced
   /// @param info the information describing the commodity
-  void AddCommodityWithInformation(const Commodity& commodity, 
+  void AddCommodityWithInformation(const Commodity& commodity,
                                    const CommodityInformation& info);
 
   /// add all commodities produced by a source
   /// @param source the original commodity producer
   void CopyProducedCommoditiesFrom(CommodityProducer* source);
-    
-  /// checks if ProducesCommodity() is true. if it is false, an 
+
+  /// checks if ProducesCommodity() is true. if it is false, an
   /// error is thrown.
   /// @param commodity the commodity in question
   void ThrowErrorIfCommodityNotProduced(const Commodity& commodity);
-    
-  /// a default production capacity 
+
+  /// a default production capacity
   double default_capacity_;
 
   /// a default production cost
@@ -81,10 +80,11 @@ class CommodityProducer {
 
  private:
   /// a collection of commodities and their production capacities
-  std::map<Commodity,CommodityInformation,CommodityCompare> produced_commodities_;
+  std::map<Commodity, CommodityInformation, CommodityCompare>
+  produced_commodities_;
 
   //#include "commodity_producer_tests.h"
-  //friend class CommodityProducerTests; 
+  //friend class CommodityProducerTests;
   // @MJGFlag - removed for the same reason as above
 };
 }

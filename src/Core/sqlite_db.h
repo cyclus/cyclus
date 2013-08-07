@@ -23,7 +23,7 @@ class SqliteDb {
   @param path the path+name for the sqlite database file
   @param readonly a boolean indicating true if db is readonly
   */
-  SqliteDb(std::string path, bool readonly=false);
+  SqliteDb(std::string path, bool readonly = false);
 
   virtual ~SqliteDb();
 

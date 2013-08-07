@@ -7,8 +7,8 @@
 /// This is the simplest possible Converter, for testing
 class TestConverter: public cyclus::ConverterModel {
  public:
-  TestConverter(){};
-  virtual ~TestConverter(){};
+  TestConverter() {};
+  virtual ~TestConverter() {};
 };
 
 #endif
