@@ -1,7 +1,7 @@
 // stub_comm_model_tests.h
 #include <gtest/gtest.h>
 
-#include "StubCommmodel.h"
+#include "stub_comm_model.h"
 #include "suffix.h"
 
 #if GTEST_HAS_PARAM_TEST

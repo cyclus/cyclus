@@ -1,7 +1,7 @@
 // market_model_tests.cc 
 #include <gtest/gtest.h>
 
-#include "Marketmodel_tests.h"
+#include "market_model_tests.h"
 #include <string>
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

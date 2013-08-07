@@ -1,7 +1,7 @@
 // Convertermodel_tests.cc 
 #include <gtest/gtest.h>
 
-#include "Convertermodel_tests.h"
+#include "converter_model_tests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ConverterModelTests, ConverterType) {

@@ -1,7 +1,7 @@
 // inst_model_tests.cc 
 #include <gtest/gtest.h>
 
-#include "Instmodel_tests.h"
+#include "inst_model_tests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 //- - - - - - - - - - - Param per-Inst Tests  - - - - - - - - - - - - - - - 
