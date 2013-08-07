@@ -13,16 +13,16 @@ namespace cyclus {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubTimeAgent::StubTimeAgent() { 
+StubTimeAgent::StubTimeAgent() {
   SetModelType("Stub");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubTimeAgent::~StubTimeAgent() {};
-  
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubTimeAgent::str() { 
-  return TimeAgent::str() + ""; 
+std::string StubTimeAgent::str() {
+  return TimeAgent::str() + "";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,6 +31,6 @@ void StubTimeAgent::HandleTick(int time) {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubTimeAgent::HandleTock(int time) {}
 
-/* ------------------- */ 
+/* ------------------- */
 
 } // namespace cyclus

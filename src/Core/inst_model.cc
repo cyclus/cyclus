@@ -15,32 +15,32 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel::InstModel() {
   SetModelType("Inst");
   prototypes_ = PrototypeSet();
   initial_build_order_ = std::map<Prototype*, int>();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe);
 
   std::string name, query;
   int nEntries;
-  Prototype* prototype;  
-  
+  Prototype* prototype;
+
   // populate prototypes_
   query = "availableprototype";
   nEntries = qe->NElementsMatchingQuery(query);
   if (nEntries > 0) {
     // populate prototypes_
-    for (int i=0;i<nEntries;i++){
-      name = qe->GetElementContent(query,i);
+    for (int i = 0; i < nEntries; i++) {
+      name = qe->GetElementContent(query, i);
       prototype = Prototype::GetRegisteredPrototype(name);
       AddAvailablePrototype(prototype);
     }
-  } 
+  }
 
   query = "initialfacilitylist";
   nEntries = qe->NElementsMatchingQuery(query);
@@ -48,26 +48,26 @@ void InstModel::InitCoreMembers(QueryEngine* qe) {
   if (nEntries > 0) {
     QueryEngine* list = qe->QueryElement(query);
     int numInitFacs = list->NElementsMatchingQuery("entry");
-    for (int i=0;i<numInitFacs;i++){
-      QueryEngine* entry = list->QueryElement("entry",i);
+    for (int i = 0; i < numInitFacs; i++) {
+      QueryEngine* entry = list->QueryElement("entry", i);
       AddPrototypeToInitialBuild(entry);
     }
   }
 
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::AddAvailablePrototype(Prototype* prototype) {
   prototypes_.insert(prototype);
   RegisterAvailablePrototype(prototype);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::RegisterAvailablePrototype(Prototype* prototype) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
-  
+
   std::string name = qe->GetElementContent("prototype");
   int number = atoi(qe->GetElementContent("number").c_str());
 
@@ -75,24 +75,24 @@ void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
   ThrowErrorIfPrototypeIsntAvailable(p);
 
   CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
-                   << number << " prototypes of type " << name 
+                   << number << " prototypes of type " << name
                    << " to its list of initial facilities to build.";
 
   initial_build_order_.insert(std::make_pair(p, number));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::ThrowErrorIfPrototypeIsntAvailable(Prototype* p) {
-  if (!IsAvailablePrototype(p)) {    
+  if (!IsAvailablePrototype(p)) {
     std::stringstream err("");
-    err << "Inst " << this->name() << " does not have " 
-        << dynamic_cast<Model*>(p)->name() 
+    err << "Inst " << this->name() << " does not have "
+        << dynamic_cast<Model*>(p)->name()
         << " as one of its available prototypes.";
     throw ValidationError(err.str());
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InstModel::str() {
   try {
     return Model::str() + " in region" + parent()->name();
@@ -101,13 +101,13 @@ std::string InstModel::str() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::EnterSimulationAsCoreEntity() {
   // build initial prototypes
-  std::map<Prototype*,int>::iterator it;
-  for (it = initial_build_order_.begin(); 
+  std::map<Prototype*, int>::iterator it;
+  for (it = initial_build_order_.begin();
        it != initial_build_order_.end(); it ++) {
-    
+
     // for each prototype
     Prototype* p = it->first;
     int number = it->second;
@@ -123,10 +123,10 @@ void InstModel::EnterSimulationAsCoreEntity() {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void InstModel::ReceiveMessage(Message::Ptr msg){
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::ReceiveMessage(Message::Ptr msg) {
   // Default institutions aren't insterested in fooling with messages.
-  // Just pass them along. 
+  // Just pass them along.
   // If it's going up, send it to the region.
   // If it's going down, send it to the facility.
   msg->SendOn();
@@ -155,16 +155,16 @@ void InstModel::HandleTock(int time) {
   for (int i = 0; i < children_.size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
     child->HandleTock(time);
-    
-    if ( child->LifetimeReached(time) ) {
+
+    if (child->LifetimeReached(time)) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
         children_to_decomm.push_back(child);
       }
     }
   }
-  
-  while(!children_to_decomm.empty()) {
+
+  while (!children_to_decomm.empty()) {
     FacilityModel* child = children_to_decomm.back();
     children_to_decomm.pop_back();
     RegisterCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
@@ -172,12 +172,12 @@ void InstModel::HandleTock(int time) {
   }
 }
 
-void InstModel::HandleDailyTasks(int time, int day){
+void InstModel::HandleDailyTasks(int time, int day) {
   // tell all of the institution models to handle the tick
-  for(std::vector<Model*>::iterator fac=children_.begin();
-      fac != children_.end();
-      fac++){
-    dynamic_cast<FacilityModel*>(*fac)->HandleDailyTasks(time,day);
+  for (std::vector<Model*>::iterator fac = children_.begin();
+       fac != children_.end();
+       fac++) {
+    dynamic_cast<FacilityModel*>(*fac)->HandleDailyTasks(time, day);
   }
 }
 

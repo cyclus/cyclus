@@ -11,7 +11,7 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::OpenLibrary() {  
+void DynamicModule::OpenLibrary() {
   module_library_ = LoadLibrary(abs_path_.c_str());
 
   if (!module_library_) {
@@ -26,8 +26,8 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  constructor_ = (ModelCtor*) 
-    GetProcAddress(module_library_,constructor_name_.c_str());
+  constructor_ = (ModelCtor*)
+                 GetProcAddress(module_library_, constructor_name_.c_str());
 
   if (!constructor_) {
     string err_msg = "Unable to load model constructor: ";
@@ -39,8 +39,8 @@ void DynamicModule::SetConstructor() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetDestructor() {
-  destructor_ = (ModelDtor*) 
-    GetProcAddress(module_library_,destructor_name_.c_str());
+  destructor_ = (ModelDtor*)
+                GetProcAddress(module_library_, destructor_name_.c_str());
 
   if (!destructor_) {
     string err_msg = "Unable to load model constructor: ";
@@ -52,8 +52,9 @@ void DynamicModule::SetDestructor() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::CloseLibrary() {
-  if (module_library_)
+  if (module_library_) {
     FreeLibrary(module_library_);
+  }
 }
 } // namespace cyclus
 

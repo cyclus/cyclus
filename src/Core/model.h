@@ -10,7 +10,7 @@
 
 #include "transaction.h"
 
-namespace cyclus { 
+namespace cyclus {
 
 class DynamicModule;
 class Model;
@@ -18,32 +18,32 @@ class Message;
 class Transaction;
 class QueryEngine;
 
-/** 
-   defines the possible model types 
-    
-   @warning DO NOT manually set int values for the constants - other 
-   code will break. 
-    
-   @todo consider changing to a vector of strings & consolidating with 
-   the model_type instance variable of the model class 
+/**
+   defines the possible model types
+
+   @warning DO NOT manually set int values for the constants - other
+   code will break.
+
+   @todo consider changing to a vector of strings & consolidating with
+   the model_type instance variable of the model class
  */
 enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
 
 /**
-   @class Model 
-    
-   @section desc Description 
-   The Model class is the abstract class used by all types of models 
-   that will be available for dynamic loading.  This common interface 
-   means that the basic process of loading and registering models can 
-   be implemented in a single place. 
-    
-   To allow serialization of different types of models in unified 
-   ID space, this interface is inherited by type-specific abstract 
-   classes, such as MarketModel, that has its own static integer 
-   to keep track of the next available ID. 
-    
-   @warning all constructors must set ID_ and increment next_id_ 
+   @class Model
+
+   @section desc Description
+   The Model class is the abstract class used by all types of models
+   that will be available for dynamic loading.  This common interface
+   means that the basic process of loading and registering models can
+   be implemented in a single place.
+
+   To allow serialization of different types of models in unified
+   ID space, this interface is inherited by type-specific abstract
+   classes, such as MarketModel, that has its own static integer
+   to keep track of the next available ID.
+
+   @warning all constructors must set ID_ and increment next_id_
  */
 class Model {
  public:
@@ -53,26 +53,26 @@ class Model {
   static std::set<std::string> dynamic_module_types();
 
   /**
-     returns a model template given the template's name 
-      
-     @param name name of the template as defined in the input file 
+     returns a model template given the template's name
+
+     @param name name of the template as defined in the input file
    */
   static Model* GetTemplateByName(std::string name);
 
   /**
-     returns a model given the template's name 
-      
-     @param name name of the template as defined in the input file 
+     returns a model given the template's name
+
+     @param name name of the template as defined in the input file
    */
   static Model* GetModelByName(std::string name);
 
   /**
-     prints the current list of models 
+     prints the current list of models
    */
   static void PrintModelList();
 
   /**
-     returns the current list of models 
+     returns the current list of models
    */
   static std::vector<Model*> GetModelList();
 
@@ -108,7 +108,7 @@ class Model {
      @param model the model to delete
    */
   static void DeleteModel(Model* model);
-  
+
   /**
      register a model as a market
      @param market the model to register
@@ -139,77 +139,95 @@ class Model {
   virtual void InitModuleMembers(QueryEngine* qe) {};
 
   /**
-     Constructor for the Model Class 
-      
-     @warning all constructors must set ID_ and increment next_id_ 
-      
+     Constructor for the Model Class
+
+     @warning all constructors must set ID_ and increment next_id_
+
    */
   Model();
 
   /**
-     Destructor for the Model Class 
+     Destructor for the Model Class
    */
   virtual ~Model();
 
   /**
-     get model instance name 
+     get model instance name
    */
-  const std::string name() const { return name_; };
+  const std::string name() const {
+    return name_;
+  };
 
   /**
-     set model instance name 
+     set model instance name
    */
-  void SetName(std::string name) { name_ = name; };
+  void SetName(std::string name) {
+    name_ = name;
+  };
 
   /**
-     get model instance SN 
+     get model instance SN
    */
-  const int ID() const { return ID_; };
+  const int ID() const {
+    return ID_;
+  };
 
   /**
-     get model implementation name 
+     get model implementation name
    */
   const std::string ModelImpl();
 
   /**
-     set model implementation 
+     set model implementation
    */
-  void SetModelImpl(std::string new_impl) { model_impl_ = new_impl; };
+  void SetModelImpl(std::string new_impl) {
+    model_impl_ = new_impl;
+  };
 
   /**
-     get model type 
+     get model type
    */
-  const std::string ModelType() { return model_type_; };
+  const std::string ModelType() {
+    return model_type_;
+  };
 
   /**
-     set model type 
+     set model type
    */
-  void SetModelType(std::string new_type) { model_type_ = new_type; };
+  void SetModelType(std::string new_type) {
+    model_type_ = new_type;
+  };
 
   /**
-     every model should be able to print a verbose description 
+     every model should be able to print a verbose description
    */
   virtual std::string str();
 
   /**
-     return parent of this model 
+     return parent of this model
    */
   Model* parent();
 
   /**
-     return the parent' id 
+     return the parent' id
    */
-  int ParentID() {return parentID_;};
+  int ParentID() {
+    return parentID_;
+  };
 
   /**
-     return the born on date of this model 
+     return the born on date of this model
    */
-  int BornOn() {return bornOn_;};
+  int BornOn() {
+    return bornOn_;
+  };
 
   /**
-     return the died on of this model 
+     return the died on of this model
    */
-  int DiedOn() {return diedOn_;};
+  int DiedOn() {
+    return diedOn_;
+  };
 
   /**
      add a child to the list of children.
@@ -219,14 +237,16 @@ class Model {
   void AddChild(Model* child);
 
   /**
-     add a child to the list of children 
+     add a child to the list of children
    */
   void RemoveChild(Model* child);
 
   /**
-     Return the number of children the model has 
+     Return the number of children the model has
    */
-  int NChildren() {return children_.size();}
+  int NChildren() {
+    return children_.size();
+  }
 
   /**
      recursively prints the parent-child tree
@@ -264,49 +284,54 @@ class Model {
   virtual void SetParent(Model* parent);
 
   /**
-     set the bornOn date of this model 
+     set the bornOn date of this model
    */
-  void SetBornOn(int date) {bornOn_ = date;};
+  void SetBornOn(int date) {
+    bornOn_ = date;
+  };
 
   /**
-     return the ith child 
+     return the ith child
    */
-  Model* children(int i){return children_[i];}
+  Model* children(int i) {
+    return children_[i];
+  }
 
   /**
-     Transacted resources are extracted through this method. 
-      
-     @warning This method should never be directly invoked.  All 
-     resource transfers should take place using the 
-     Message.ApproveTransfer() method.  
+     Transacted resources are extracted through this method.
 
-     @param order the transaction for which Resource(s) are to be prepared 
+     @warning This method should never be directly invoked.  All
+     resource transfers should take place using the
+     Message.ApproveTransfer() method.
 
-     @return list of resources to be sent for this order 
-   */ 
+     @param order the transaction for which Resource(s) are to be prepared
+
+     @return list of resources to be sent for this order
+   */
   virtual std::vector<Resource::Ptr> RemoveResource(Transaction order);
 
   /**
-     Transacted resources are received through this method. 
-      
-     @warning This method should never be directly invoked.  All 
-     resource transfers should take place using the 
-     Message.ApproveTransfer() method.  
+     Transacted resources are received through this method.
 
-     @param trans the transaction that corresponds with the materials 
+     @warning This method should never be directly invoked.  All
+     resource transfers should take place using the
+     Message.ApproveTransfer() method.
+
+     @param trans the transaction that corresponds with the materials
      being received
 
-     @param manifest is the set of resources being 
-   */ 
+     @param manifest is the set of resources being
+   */
   virtual void AddResource(Transaction trans,
-                              std::vector<Resource::Ptr> manifest);
+                           std::vector<Resource::Ptr> manifest);
 
  protected:
   /**
-     a map of loaded modules. all dynamically loaded modules are 
+     a map of loaded modules. all dynamically loaded modules are
      registered with this map when loaded.
    */
-  static std::map< std::string, boost::shared_ptr<DynamicModule> > loaded_modules_;
+  static std::map< std::string, boost::shared_ptr<DynamicModule> >
+  loaded_modules_;
 
   /**
      the set of loaded dynamic libraries
@@ -322,108 +347,109 @@ class Model {
      a set of registered regions
    */
   static std::set<Model*> regions_;
-  
+
   /**
-     children of this model 
+     children of this model
    */
   std::vector<Model*> children_;
 
   /**
-     parent of this model 
+     parent of this model
    */
   Model* parent_;
 
  private:
   /**
-     loads the facilities specified in a file 
-      
-     @param filename name of the file holding the facility specification 
-     @param ns the string to append to the current namespace modifier 
-     @param format format of the file (currently cyclus supports only 
+     loads the facilities specified in a file
+
+     @param filename name of the file holding the facility specification
+     @param ns the string to append to the current namespace modifier
+     @param format format of the file (currently cyclus supports only
    */
-  static void load_facilitycatalog(std::string filename, std::string ns, std::string format);
+  static void load_facilitycatalog(std::string filename, std::string ns,
+                                   std::string format);
 
   /**
-     load all markets 
+     load all markets
    */
   static void load_markets();
 
   /**
-     load all converters 
+     load all converters
    */
   static void load_converters();
 
   /**
-     load all regions 
+     load all regions
    */
   static void load_regions();
 
   /**
-     load all institutions 
+     load all institutions
    */
   static void load_institutions();
 
   /**
-     Stores the next available facility ID 
+     Stores the next available facility ID
    */
   static int next_id_;
 
   /**
-     comprehensive list of all initialized models. 
+     comprehensive list of all initialized models.
    */
   static std::vector<Model*> model_list_;
 
   /**
-     used to remove model instance refs from static model lists 
+     used to remove model instance refs from static model lists
    */
-  void RemoveFromList(Model* model, std::vector<Model*> &mlist);
+  void RemoveFromList(Model* model, std::vector<Model*>& mlist);
 
   /**
-     parent's ID of this model 
-     Note: we keep the parent id in the model so we can reference it 
-     even if the parent is deallocated. 
+     parent's ID of this model
+     Note: we keep the parent id in the model so we can reference it
+     even if the parent is deallocated.
    */
   int parentID_;
 
   /**
-     born on date of this model 
+     born on date of this model
    */
   int bornOn_;
 
   /**
-     died on date of this model 
+     died on date of this model
    */
   int diedOn_;
-  
+
   /**
-     every instance of a model should have a name 
+     every instance of a model should have a name
    */
   std::string name_;
 
-  /** 
-     every instance of a model should know its type 
+  /**
+     every instance of a model should know its type
    */
   std::string model_type_;
 
   /**
-     every instance of a model should know its implementation 
+     every instance of a model should know its implementation
    */
   std::string model_impl_;
 
   /**
-     every instance of a model will have a serialized ID 
+     every instance of a model will have a serialized ID
    */
   int ID_;
 
   /**
-     wheter or not the model has been born 
+     wheter or not the model has been born
    */
   bool born_;
 
  private:
 
   /**
-     add an agent to the transactiont table 
+     add an agent to the transactiont table
    */
   void AddToTable();
 

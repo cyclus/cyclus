@@ -12,7 +12,7 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  module_library_ = dlopen(abs_path_.c_str(),RTLD_LAZY);
+  module_library_ = dlopen(abs_path_.c_str(), RTLD_LAZY);
 
   if (!module_library_) {
     std::string err_msg = "Unable to load model shared object file: ";
@@ -26,8 +26,8 @@ void DynamicModule::OpenLibrary() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
 
-  constructor_ = (ModelCtor*) 
-    dlsym(module_library_,constructor_name_.c_str());
+  constructor_ = (ModelCtor*)
+                 dlsym(module_library_, constructor_name_.c_str());
 
   if (!constructor_) {
     std::string err_msg = "Unable to load module constructor: ";
@@ -40,8 +40,8 @@ void DynamicModule::SetConstructor() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetDestructor() {
-  destructor_ = (ModelDtor*) 
-    dlsym(module_library_,destructor_name_.c_str());
+  destructor_ = (ModelDtor*)
+                dlsym(module_library_, destructor_name_.c_str());
 
   if (!destructor_) {
     std::string err_msg = "Unable to load module destructor: ";
@@ -60,7 +60,7 @@ void DynamicModule::CloseLibrary() {
       std::string err_msg = "Error closing shared object file: ";
       err_msg  += dlerror();
       throw IOError(err_msg);
-    }  
+    }
     dlerror(); // reset errors
   }
 }

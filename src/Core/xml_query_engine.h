@@ -26,7 +26,7 @@ class XMLQueryEngine : public QueryEngine {
 
   /// virtual destructor
   virtual ~XMLQueryEngine() {};
-    
+
   /**
      @return the number of elements in the current query state
    */
@@ -46,14 +46,14 @@ class XMLQueryEngine : public QueryEngine {
      @return the number of elements matching the query
    */
   virtual int NElementsMatchingQuery(std::string query);
-  
+
   /**
      investigates the current status and returns a string representing
      the content of a query at a given index
      @param query the query
      @param index the index of the queried element
    */
-  virtual std::string GetElementContent(std::string query, 
+  virtual std::string GetElementContent(std::string query,
                                         int index = 0);
 
  protected:

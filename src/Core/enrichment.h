@@ -13,7 +13,7 @@ class Assays {
  public:
   /// constructor
   Assays(double feed, double product, double tails);
-    
+
   /// @return the feed assay as an atomic fraction, i.e. for
   /// 0.711% U-235 in natural uranium, this will return 0.00711.
   double Feed() const;
@@ -41,7 +41,7 @@ double UraniumQty(Material::Ptr mat);
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
-/// @return the quantity of feedstock required to make the product 
+/// @return the quantity of feedstock required to make the product
 /// whose units match those of the given product
 double FeedQty(double product_qty, const Assays& assays);
 

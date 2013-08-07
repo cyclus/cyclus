@@ -6,8 +6,7 @@
 #include "commodity_producer.h"
 
 namespace cyclus {
-namespace action_building
-{
+namespace action_building {
 /// a mixin to provide information about commodity producers that can
 /// be built
 class Builder {
@@ -30,7 +29,7 @@ class Builder {
 
   /// @return the number of buildings managed by this builder
   double NBuildingPrototypes();
-    
+
   /// @return the beginning iterator of the set of producers
   std::set<supply_demand::CommodityProducer*>::iterator BeginningProducer();
 
@@ -42,7 +41,7 @@ class Builder {
   std::set<supply_demand::CommodityProducer*> producers_;
 
   //#include "commodity_producer_manager_tests.h"
-  //friend class CommodityProducerManagerTests; 
+  //friend class CommodityProducerManagerTests;
   // @MJGFlag - removed for the same reason as above
 };
 }

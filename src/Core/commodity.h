@@ -22,7 +22,7 @@ class Commodity {
      @param name the name of the commodity
   */
   Commodity(std::string name);
-  
+
   /// the commodity's name
   std::string name() const;
 
@@ -31,7 +31,7 @@ class Commodity {
 
   /// inequality operator
   bool operator!=(const Commodity& other) const;
-  
+
  private:
   /// the name of the commodity
   std::string name_;
@@ -42,8 +42,8 @@ class Commodity {
    we do not care how they are compared, only that they can be
  */
 struct CommodityCompare {
-  inline bool operator() (const Commodity& lhs, const Commodity& rhs) { 
-    return lhs.name() < rhs.name(); 
+  inline bool operator()(const Commodity& lhs, const Commodity& rhs) {
+    return lhs.name() < rhs.name();
   }
 };
 } // namespace cyclus

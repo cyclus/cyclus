@@ -9,7 +9,7 @@
 namespace cyclus {
 
 /**
-   A helper class to hold xml file data and provide automatic 
+   A helper class to hold xml file data and provide automatic
    validation
  */
 class XMLParser {
@@ -31,7 +31,7 @@ class XMLParser {
      @param schema the schema to validate agaisnt
    */
   void Validate(const std::stringstream& schema);
-  
+
   /**
      @return the parser's document
    */

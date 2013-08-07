@@ -40,7 +40,7 @@ namespace cyclus {
 /**
    map of isotope integer to value (mass or atom)
  */
-typedef std::map<Iso,double> Map;  
+typedef std::map<Iso, double> Map;
 
 /* -- */
 
@@ -52,12 +52,12 @@ enum Basis {MASS, ATOM};
 /* -- */
 
 
-/** 
+/**
    @class CompMap
 
    @section Introduction
    The CompMap class provides an intelligent wrapper for the
-   standard Cyclus Isotopic Composition map, a map of integer 
+   standard Cyclus Isotopic Composition map, a map of integer
    values (ZZZAAA) to double values.
 
    This class forwards the relevant function calls to the actual
@@ -72,18 +72,18 @@ enum Basis {MASS, ATOM};
 
    @section Map-Like Behavior
    The core constituent of a CompMap is its Map member. Having to
-   explicitly call methods on this member is cumbersome, so a 
+   explicitly call methods on this member is cumbersome, so a
    number of methods are provided which directly access the Map,
    including:
-   
+
    * array index operator[](key)
 
    * iterators: begin() and end()
 
    * count(key)
-   
+
    @section Internal Storage
-   The CompMap class offers a developer the ability to store 
+   The CompMap class offers a developer the ability to store
    normalized compositions of isotopes and access either their
    mass or atom fractions. The type of internal storage (either
    mass or atom based) is largely up to the developer in order to
@@ -91,35 +91,35 @@ enum Basis {MASS, ATOM};
 
    However, it should be noted that decay mechanisms in Cyclus require
    atom-based compositions, and logging with the BookKeeper requires
-   mass-based compositions. Both of these operations will return the 
+   mass-based compositions. Both of these operations will return the
    composition to its original basis.
 
    The internal storage of the CompMap can be changed on the fly via
-   the Massify() and Atomify() methods. Both of which call the 
+   the Massify() and Atomify() methods. Both of which call the
    normalize() method.
 
    During the normalize() method, the mass to atom ratio is calculated.
    This ratio is the sum of all mass values divided by the sum of all
    atom values (mass value = atom value / grams-per-mol). This factor
    allows for quick access between the two bases.
-   
+
    @section Access
    The CompMap class offers, nominally, two ways to access atom
    or mass fractions of a given isotope. The first is by simply using
-   the array index operator. The second are the MassFraction() and 
+   the array index operator. The second are the MassFraction() and
    AtomFraction() methods. The latter will intelligently return a
    value corrected for a different basis (i.e., if the CompMap is in
-   an atom-based state and a MassFraction() call occurs, it will 
+   an atom-based state and a MassFraction() call occurs, it will
    return the correct mass fraction).
 
    @section Lineage & Decay
    The CompMap class provides functionality to track the lineage of
    parents and their children due to decay. This lineage takes the
    form of a tree, rooted at some initial composition, with branches
-   based upon total time decayed from the root composition. 
+   based upon total time decayed from the root composition.
 
    Accordingly, any given composition stores immediate knowlege of
-   its parent and the decay time between itself and its parent. 
+   its parent and the decay time between itself and its parent.
    Accessing the root composition invokes climbing the parent-child
    ladder up to the root composition. The total decay time is similarly
    calculated by summing the decay times of each child as the tree is
@@ -127,10 +127,10 @@ enum Basis {MASS, ATOM};
 
    @section Validation
    Isotopic integers have a limited valid range (between 1001
-   and 1182949), and all Map values must be positive (you can't 
+   and 1182949), and all Map values must be positive (you can't
    have negative compostiion). Functionality is provided to
    validate both of these numbers for all Map entries via:
-   
+
    * ValidateEntry()
 
    * validateIsotope()
@@ -142,7 +142,7 @@ enum Basis {MASS, ATOM};
    When a CompMap is normalized, validation is performed on all
    entries.
 */
-class CompMap : public boost::enable_shared_from_this<CompMap> {  
+class CompMap : public boost::enable_shared_from_this<CompMap> {
  public:
   /**
      masking Map
@@ -166,8 +166,8 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
    */
   ~CompMap();
   /* --- */
-  
-  /* --- Instance Interaction --- */    
+
+  /* --- Instance Interaction --- */
   /**
      beginning iterator
    */
@@ -185,7 +185,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
 
   /**
      returns true if both comp maps have the same isotopic entries
-     and the difference in each value is 0 
+     and the difference in each value is 0
 
      @param other the CompMap to compare to this one
    */
@@ -198,16 +198,16 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   bool operator<(const CompMap& other) const;
 
   /**
-     returns true if both comp maps have the same isotopic entries within the 
+     returns true if both comp maps have the same isotopic entries within the
      threshold of each other
 
      @param other the CompMap to compare to this one.
-     @param threshold the smallest difference considered negligible 
+     @param threshold the smallest difference considered negligible
 
      @throw CycNegValueError if the threshold is negative
      @return true if they are within the threshold of each other, false otherwise.
     */
-  bool AlmostEqual(const CompMap other, double threshold=eps()) const;
+  bool AlmostEqual(const CompMap other, double threshold = eps()) const;
 
   /**
      returns number of topes in map
@@ -301,7 +301,7 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      @return the total decay time between this CompMap and its root comp
    */
   int root_decay_time();
-  
+
   /**
      calls ValidateEntry() on each entry in the map
   */
@@ -313,20 +313,20 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
      alters comp, multiplying each entry by its molar weight (g/mol)
   */
   void Massify();
-  
+
   /**
      alters comp, deviding each entry by its molar weight (g/mol)
   */
   void Atomify();
-  
+
   /**
      alters comp, summing the total values and calling the normalize(sum)
-     method 
+     method
   */
   void normalize();
   /* --- */
 
-  /* --- Printing  --- */ 
+  /* --- Printing  --- */
   /**
      pipes the result of Detail() into LEV_INFO3
    */
@@ -345,8 +345,8 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   std::vector<std::string> CompStrings();
   /* --- */
 
- protected:  
-  /* --- Instance Management --- */  
+ protected:
+  /* --- Instance Management --- */
   /**
      the log level for all CompMap instances
    */
@@ -405,43 +405,43 @@ class CompMap : public boost::enable_shared_from_this<CompMap> {
   /* --- */
 
  public:
-  /* --- Isotope Wikipedia  --- */ 
+  /* --- Isotope Wikipedia  --- */
   /**
-     Returns the atomic number of the isotope with the given identifier. 
-     
-     @param tope the isotope whose atomic number is being returned 
-     @return the atomic number 
+     Returns the atomic number of the isotope with the given identifier.
+
+     @param tope the isotope whose atomic number is being returned
+     @return the atomic number
   */
   static int GetAtomicNum(Iso tope);
-  
+
   /**
-     Returns the mass number of the isotope with the given identifier. 
-     
-     @param tope the isotope whose mass number is being returned 
-     @return the mass number 
+     Returns the mass number of the isotope with the given identifier.
+
+     @param tope the isotope whose mass number is being returned
+     @return the mass number
   */
   static int GetMassNum(Iso tope);
-  
+
   /**
-     calls ValidateIsotopeNumber() and validateFraction() 
+     calls ValidateIsotopeNumber() and validateFraction()
      @param tope - isotope number to check
      @param value - value to check
   */
   static void ValidateEntry(const Iso& tope, const double& value);
 
   /**
-     Used to determine validity of isotope defnition. 
-     @param tope isotope identifier 
-     @exception thrown if isotope identifier is invalid 
+     Used to determine validity of isotope defnition.
+     @param tope isotope identifier
+     @exception thrown if isotope identifier is invalid
   */
   static void ValidateIsotopeNumber(const Iso& tope);
-  
+
   /**
      Used to determine validity of isotope's value
-     @param value isotope identifier 
+     @param value isotope identifier
      @exception throws an error if fraction < 0.0
   */
-  static void ValidateValue(const double& value);  
+  static void ValidateValue(const double& value);
   /* --- */
 
   /* -- Friends -- */

@@ -35,7 +35,7 @@ class CommodityProducerManager {
   std::set<CommodityProducer*> producers_;
 
   //#include "commodity_producer_manager_tests.h"
-  //friend class CommodityProducerManagerTests; 
+  //friend class CommodityProducerManagerTests;
   // @MJGFlag - removed for the same reason as above
 };
 } // namespace supply_demand

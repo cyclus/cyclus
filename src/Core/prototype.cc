@@ -11,7 +11,7 @@ std::map<std::string, Prototype*> Prototype::prototype_registry_;
 
 // -------------------------------------------------------------------
 void Prototype::RegisterPrototype(std::string name, Prototype* p) {
-  prototype_registry_.insert(std::make_pair(name,p));
+  prototype_registry_.insert(std::make_pair(name, p));
 }
 
 // -------------------------------------------------------------------

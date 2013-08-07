@@ -3,7 +3,7 @@
 /* relaxngvalidator.h
  * this class is modeled off of the schemavalidator in libxml++
  * here is their license statement:
- * 
+ *
  * libxml++ and this file are copyright (C) 2000 by Ari Johnson,
  * (C) 2002-2004 by the libxml dev team and
  * are covered by the GNU Lesser General Public License, which should be
@@ -19,20 +19,20 @@
 
 namespace cyclus {
 
-/** 
+/**
     RelaxNGValidator
 
     This class provides a simple interface to validate xml documents
     agaisnt a given RelaxNG schema.
  */
 class RelaxNGValidator {
-public:
+ public:
   /// constructor
   RelaxNGValidator();
-  
+
   /// destructor
   ~RelaxNGValidator();
-  
+
   /**
      parse a relaxng schema xml file
      @param contents the contents of the xml file
@@ -45,7 +45,7 @@ public:
    */
   bool Validate(const xmlpp::Document* doc);
 
-protected:
+ protected:
   /// free xml-related memory
   void release_underlying();
 
@@ -54,7 +54,7 @@ protected:
      @param context the context
    */
   void parse_context(xmlRelaxNGParserCtxtPtr context);
-  
+
   /// the schema
   xmlRelaxNGPtr schema_;
 

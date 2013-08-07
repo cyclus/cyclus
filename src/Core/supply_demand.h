@@ -21,20 +21,28 @@ class Producer {
   /**
      constructor, sets name, commodity, capacity, and cost
    */
- Producer(std::string name, Commodity p, double capacity, double cost) :
-  name_(name), commodity_(p), capacity_(capacity), production_cost_(cost) {};
+  Producer(std::string name, Commodity p, double capacity, double cost) :
+    name_(name), commodity_(p), capacity_(capacity), production_cost_(cost) {};
 
   /// name getter
-  std::string name() const {return name_;}
-  
+  std::string name() const {
+    return name_;
+  }
+
   /// commodity getter
-  Commodity commodity() const {return commodity_;}
+  Commodity commodity() const {
+    return commodity_;
+  }
 
   /// capacity getter
-  double capacity() const {return capacity_;}
+  double capacity() const {
+    return capacity_;
+  }
 
   /// cost getter
-  double cost() const {return production_cost_;}
+  double cost() const {
+    return production_cost_;
+  }
 
   /// equality operator
   bool operator==(const Producer& other) const {
@@ -45,7 +53,7 @@ class Producer {
     test = test && (production_cost_ == other.cost());
     return test;
   }
-  
+
  private:
   /// name
   std::string name_;
@@ -74,67 +82,86 @@ class CommodityInformation {
      @param fp a shared pointer to the demand function
      @param producers a vector of producers of the commodity
   */
-    CommodityInformation(Commodity commodity, FunctionPtr fp, std::vector<Producer> producers) : 
-  commodity_(commodity), demand_(fp), supply_(0), producers_(producers) {};
+  CommodityInformation(Commodity commodity, FunctionPtr fp,
+                       std::vector<Producer> producers) :
+    commodity_(commodity), demand_(fp), supply_(0), producers_(producers) {};
 
   /**
      constructor given a commodity and a demand function
      @param commodity the commodity
      @param fp a shared pointer to the demand function
    */
- CommodityInformation(Commodity commodity, FunctionPtr fp) : 
-  commodity_(commodity), demand_(fp), supply_(0) {producers_ = std::vector<Producer>();}
+  CommodityInformation(Commodity commodity, FunctionPtr fp) :
+    commodity_(commodity), demand_(fp), supply_(0) {
+    producers_ = std::vector<Producer>();
+  }
 
   /// supply
-  double Supply() {return supply_;}
+  double Supply() {
+    return supply_;
+  }
 
   /**
      increase the supply by an amount
      @param amt the amount in the unit characteristic to the commodity
-   */ 
-  void IncreaseSupply(double amt) {supply_ += amt;}
+   */
+  void IncreaseSupply(double amt) {
+    supply_ += amt;
+  }
 
   /**
      decrease the supply by an amount
      @param amt the amount in the unit characteristic to the commodity
-   */ 
-  void DecreaseSupply(double amt) {supply_ -= amt;}
+   */
+  void DecreaseSupply(double amt) {
+    supply_ -= amt;
+  }
 
   /**
      the demand function
    */
-  FunctionPtr DemandFunction() {return demand_;}
+  FunctionPtr DemandFunction() {
+    return demand_;
+  }
 
   /**
      the demand at a given time
      @param time the time
    */
-  double Demand(int time) {return demand_->value(time);}
-  
+  double Demand(int time) {
+    return demand_->value(time);
+  }
+
   /**
      @return the number of producers
   */
-  int NProducers() {return producers_.size();}
-  
+  int NProducers() {
+    return producers_.size();
+  }
+
   /**
      a pointer to a producer
-     @param i the index in producers_ 
+     @param i the index in producers_
    */
-  Producer* producer(int i) {return &producers_.at(i);}
+  Producer* producer(int i) {
+    return &producers_.at(i);
+  }
 
   /**
      register producer of a commodity
      @param p the commodity
   */
-  void RegisterProducer(const Producer& p) {producers_.push_back(Producer(p));}
-  
+  void RegisterProducer(const Producer& p) {
+    producers_.push_back(Producer(p));
+  }
+
  private:
   /// the commodity
   Commodity commodity_;
-  
+
   /// the supply of the commodity
   double supply_;
-  
+
   /// the demand function
   FunctionPtr demand_;
 

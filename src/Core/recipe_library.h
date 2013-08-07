@@ -15,7 +15,7 @@ namespace cyclus {
 /**
    map of recipe name to composition
  */
-typedef std::map<std::string, CompMapPtr> RecipeMap; 
+typedef std::map<std::string, CompMapPtr> RecipeMap;
 
 /**
    set of decay times
@@ -25,17 +25,17 @@ typedef std::set<int> DecayTimes;
 /**
    map of composition times decayed
  */
-typedef std::map<CompMapPtr,DecayTimes> DecayTimesMap; 
+typedef std::map<CompMapPtr, DecayTimes> DecayTimesMap;
 
 /**
    map of decay time to composition
  */
-typedef std::map<int,CompMapPtr> ChildMap; 
+typedef std::map<int, CompMapPtr> ChildMap;
 
 /**
    map of recipe composition to its decayed children
  */
-typedef std::map<CompMapPtr,ChildMap> DecayHistMap; 
+typedef std::map<CompMapPtr, ChildMap> DecayHistMap;
 
 /**
    The RecipeLibrary manages the list of recipes held in memory
@@ -44,26 +44,26 @@ typedef std::map<CompMapPtr,ChildMap> DecayHistMap;
  */
 class RecipeLibrary {
   /* --- Singleton Members and Methods --- */
- public: 
+ public:
   /**
-     Gives all simulation objects global access to the RecipeLibrary by 
-     returning a pointer to it. 
-     Like the Highlander, there can be only one. 
-      
-     @return a pointer to the RecipeLibrary 
+     Gives all simulation objects global access to the RecipeLibrary by
+     returning a pointer to it.
+     Like the Highlander, there can be only one.
+
+     @return a pointer to the RecipeLibrary
    */
   static RecipeLibrary* Instance();
 
  protected:
   /**
-     The (protected) constructor for this class, which can only be 
-     called indirectly by the client. 
+     The (protected) constructor for this class, which can only be
+     called indirectly by the client.
    */
   RecipeLibrary();
 
  private:
   /**
-     A pointer to this RecipeLibrary once it has been initialized. 
+     A pointer to this RecipeLibrary once it has been initialized.
    */
   static RecipeLibrary* instance_;
   /* --- */
@@ -71,15 +71,15 @@ class RecipeLibrary {
   /* --- Recipe Record --- */
  public:
   /**
-     loads the recipes from the input file 
+     loads the recipes from the input file
    */
   static void load_recipes(QueryEngine* qe);
 
   /**
-     loads a specific recipe 
+     loads a specific recipe
    */
   static void load_recipe(QueryEngine* qe);
-  
+
   /**
      records a new recipe in the simulation
      - records the recipe in the BookKeeper
@@ -103,12 +103,12 @@ class RecipeLibrary {
      - sets the parent of and decay time child
      - calls the RecordRecipe() method
 
-     @param parent the initial recipe in a recipe map 
+     @param parent the initial recipe in a recipe map
      @param child the child recipe
      @param t_f -> total time decayed from parent to child
    */
   static void RecordRecipeDecay(CompMapPtr parent, CompMapPtr child, int t_f);
-  
+
   /**
      checks if the named recipe has been recorded (i.e. it exists in the simulation)
 
@@ -117,25 +117,25 @@ class RecipeLibrary {
   static bool RecipeRecorded(std::string name);
 
   /**
-     the total number of recipes in the recipes_ map  
+     the total number of recipes in the recipes_ map
    */
-  static int RecipeCount();   
+  static int RecipeCount();
 
   /**
-     This returns a CompMapPtr to the named recipe in the recipes_ map 
+     This returns a CompMapPtr to the named recipe in the recipes_ map
 
      @param name the name of the parent recipe, a key in the recipes_ map
    */
   static CompMapPtr Recipe(std::string name);
 
   /**
-     print all recipes 
+     print all recipes
    */
   static void PrintRecipes();
 
   /**
-     checks if the composition is recorded. Returns true if the composition 
-     appears in the decay_hist_ map. 
+     checks if the composition is recorded. Returns true if the composition
+     appears in the decay_hist_ map.
 
      @param comp a pointer to the composition to check
    */
@@ -161,7 +161,7 @@ class RecipeLibrary {
      add a new decay time for a parent composition
 
      @param parent the recipe with which a new decay_time should be associated
-     @param time the time to be added to the keys of the decay_times_ map 
+     @param time the time to be added to the keys of the decay_times_ map
    */
   static void AddDecayTime(CompMapPtr parent, int time);
 
@@ -180,10 +180,10 @@ class RecipeLibrary {
   static ChildMap& Children(CompMapPtr parent);
 
   /**
-     accesses a specific child recipe 
+     accesses a specific child recipe
 
      @param parent the recipe whose composition evolution is to be retrieved
-     @param time the time at which the child recipe of interest is indexed 
+     @param time the time at which the child recipe of interest is indexed
    */
   static CompMapPtr& Child(CompMapPtr parent, int time);
 
@@ -191,8 +191,8 @@ class RecipeLibrary {
      add a child to a map of children
 
      @param parent the recipe with which a new child should be associated
-     @param child the child recipe to be added to the evolution of the parent recipe 
-     @param time the time at which the child recipe of interest is indexed 
+     @param child the child recipe to be added to the evolution of the parent recipe
+     @param time the time at which the child recipe of interest is indexed
    */
   static void AddChild(CompMapPtr parent, CompMapPtr child, int time);
 
@@ -214,17 +214,17 @@ class RecipeLibrary {
      calls ChildRecorded() and throws an error if false
 
      @param parent the recipe whose composition record is to be queried
-     @param time the time at which the child recipe of interest is indexed 
+     @param time the time at which the child recipe of interest is indexed
    */
   static void CheckChild(CompMapPtr parent, int time);
 
   /**
-     Stores the next available state ID 
+     Stores the next available state ID
    */
   static int nextStateID_;
 
   /**
-     a container of recipes 
+     a container of recipes
    */
   static RecipeMap recipes_;
 
@@ -238,23 +238,23 @@ class RecipeLibrary {
    */
   static DecayTimesMap decay_times_;
 
- /* -- Output Database Interaction  -- */ 
+  /* -- Output Database Interaction  -- */
  public:
-  
+
   /* /\** */
   /*    return the agent table's primary key  */
   /*  *\/ */
   /* primary_key_ref pkref(); */
-  
+
   /**
      returns true if a new state was recorded, false if already in db
   */
   void RecordState();
-  
+
  private:
 
   /**
-     Add an isotopic state to the table 
+     Add an isotopic state to the table
    */
   static void AddToTable(CompMapPtr recipe);
 

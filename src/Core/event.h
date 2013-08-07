@@ -33,7 +33,7 @@ class Event {
 
   @param val a value of any type (int, bool, string, vector) supported by
   the backends being used.
-   
+
   @warning for the val argument - what variable types are supported
   depends on what the backend(s) in use are designed to handle.
   */
@@ -52,7 +52,7 @@ class Event {
   /// Returns a map of all field-value pairs that have been added to this event.
   const Vals& vals();
 
-  static void* operator new(size_t size); 
+  static void* operator new(size_t size);
   static void operator delete(void* rawMemory) throw();
 
  private:

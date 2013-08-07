@@ -6,14 +6,14 @@
 #include "logger.h"
 
 namespace cyclus {
-  
+
 /* --------------------
  * all MODEL classes have these members
  * --------------------
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubCommModel::StubCommModel() { 
+StubCommModel::StubCommModel() {
   SetModelType("StubComm");
 };
 
@@ -21,9 +21,9 @@ StubCommModel::StubCommModel() {
 StubCommModel::~StubCommModel() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubCommModel::str() { 
-  return Model::str() + ""; 
+std::string StubCommModel::str() {
+  return Model::str() + "";
 };
 
-/* ------------------- */ 
+/* ------------------- */
 } // namespace cyclus

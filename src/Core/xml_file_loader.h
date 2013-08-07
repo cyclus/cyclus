@@ -16,20 +16,20 @@ namespace cyclus {
    a cyclus simulation from xml
  */
 class XMLFileLoader {
- public:    
+ public:
   /**
-     Constructor to create a new XML for loading 
-     @param load_filename The filename for the file to be loaded; defaults to 
+     Constructor to create a new XML for loading
+     @param load_filename The filename for the file to be loaded; defaults to
      an empty string
   */
   XMLFileLoader(const std::string load_filename = "");
-    
+
   /**
      Initializes the internal data structures of the file loader
-     @param use_main_schema whether or not to use the main schema to 
+     @param use_main_schema whether or not to use the main schema to
      validate the file; defaults to using the main schema
    */
-  void Init(bool use_main_schema=true);
+  void Init(bool use_main_schema = true);
 
   /**
      @return the path to the main file schema (cyclus.rng)
@@ -40,7 +40,7 @@ class XMLFileLoader {
      applies a schema agaisnt the parser used by the file loader
      @param schema the schema representation
    */
-  void ApplySchema(const std::stringstream &schema);
+  void ApplySchema(const std::stringstream& schema);
 
   /**
      Method to load the simulation control parameters.
@@ -48,11 +48,11 @@ class XMLFileLoader {
   void load_control_parameters();
 
   /**
-     Method to load recipes from either the primary input file 
+     Method to load recipes from either the primary input file
      or a recipeBook catalog.
   */
   void load_recipes();
-  
+
   /**
      Method to load all dyamic modules
      @param module_types the set of all types of modules
@@ -65,11 +65,11 @@ class XMLFileLoader {
      @param query_path the path to the set of module nodes
    */
   void load_modules_of_type(std::string type, std::string query_path);
-  
+
  protected:
   /// a map of module types to their paths in xml
-  std::map<std::string,std::string> module_paths_;
-  
+  std::map<std::string, std::string> module_paths_;
+
   /**
      initialize the paths to modules
    */
@@ -80,7 +80,7 @@ class XMLFileLoader {
      @param stream the stream to load the file into
      @param file the file name
    */
-  void LoadStringstreamFromFile(std::stringstream &stream,
+  void LoadStringstreamFromFile(std::stringstream& stream,
                                 std::string file);
 
  private:

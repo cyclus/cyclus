@@ -13,17 +13,17 @@ namespace cyclus {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubModel::StubModel() { 
+StubModel::StubModel() {
   SetModelType("Stub");
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubModel::~StubModel() {};
-  
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubModel::str() { 
-  return Model::str() + ""; 
+std::string StubModel::str() {
+  return Model::str() + "";
 };
 
-/* ------------------- */ 
+/* ------------------- */
 } // namespace cyclus

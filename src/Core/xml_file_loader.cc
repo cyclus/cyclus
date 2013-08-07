@@ -98,7 +98,7 @@ void XMLFileLoader::LoadStringstreamFromFile(std::stringstream& stream,
     file_stream.close();
   } else {
     throw IOError("The file '" + file
-                         + "' could not be loaded.");
+                  + "' could not be loaded.");
   }
 
   CLOG(LEV_DEBUG5) << "file loaded as a string: " << stream.str();
