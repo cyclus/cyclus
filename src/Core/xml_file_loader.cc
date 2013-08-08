@@ -3,6 +3,7 @@
 #include "xml_file_loader.h"
 
 #include <fstream>
+#include <streambuf>
 
 #include <boost/filesystem.hpp>
 
@@ -61,8 +62,16 @@ std::string XMLFileLoader::BuildSchema() {
         fs::path p = it->path();
         // build refs and includes
         if (p.extension() == ".rng") {
-          refs << "<ref name='" << p.stem().string() << "'/>" << std::endl;
           includes << "<include href='" << p.string() << "'/>" << std::endl;
+
+          std::ifstream in(p.string().c_str(), std::ios::in | std::ios::binary);
+          std::string rng_data((std::istreambuf_iterator<char>(in)),
+                                std::istreambuf_iterator<char>());
+          std::string find_str("<define name=\"");
+          size_t start = rng_data.find(find_str) + find_str.size();
+          size_t end = rng_data.find("\"", start + 1);
+          std::string ref = rng_data.substr(start, end - start);
+          refs << "<ref name='" << ref << "'/>" << std::endl;
         }
       }
     } catch (...) { }
