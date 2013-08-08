@@ -1,6 +1,6 @@
-cyclus_init_model("Region" "TestRegion")
+cyclus_init_model("Region" "TestRegion" "test_region")
 INSTALL(FILES
-  TestRegion.h
+  test_region.h
   DESTINATION include
   COMPONENT testing
   )

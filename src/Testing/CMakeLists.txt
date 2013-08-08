@@ -2,39 +2,42 @@
 message("GENERATED TESTS DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 
+ADD_SUBDIRECTORY(cyclopts)
+
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_TEST_CORE 
+  ${CYCLUS_TEST_CORE}
   # --
-  ${CMAKE_CURRENT_SOURCE_DIR}/DecayTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoadingTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingManagerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BuildingTestHelper.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CompMapTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CommodityProducerManagerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CommodityTestHelper.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CsvBackTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CycArithmeticTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/EnrichmentTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/EnvironmentTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/EventManagerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/Hdf5BackTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/InstModelClassTests.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/IsoVectorTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MarketPlayerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MassTableTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MaterialTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MessageTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/RegionModelClassTests.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/ResourceBuffTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/SDManagerTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteDbTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/SqliteBackTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/SymbolicFunctionTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/XMLParserTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/XMLFileLoaderTests.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/XMLQueryEngineTests.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/decay_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/comp_map_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/iso_vector_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
   PARENT_SCOPE)
 
 # Add all the tests by parsing the source code
@@ -69,8 +72,8 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   )
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*ModelTests.cpp")
-INSTALL(FILES ${header_files} ${model_test_files} 
+FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
+INSTALL(FILES ${header_files} ${model_test_files}
   DESTINATION include
   COMPONENT testing
   )

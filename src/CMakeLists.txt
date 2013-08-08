@@ -51,9 +51,8 @@ INCLUDE(CyclusModuleMacros)
 # Include the core header files in the app build manually.
 # Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
-  ${CYCLUS_SRC_DIR}/Core/Utility
+  ${CYCLUS_SRC_DIR}/Core
   ${CYCLUS_SRC_DIR}/Core/Config
-  ${CYCLUS_SRC_DIR}/Core/Input
   ${CYCLUS_SRC_DIR}/Core/Resources
   ${CYCLUS_SRC_DIR}/Core/Models
   )
@@ -100,12 +99,10 @@ MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
 MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
 
-# find cyclopts and link to it
-FIND_PACKAGE( CYCLOPTS REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${CYCLOPTS_INCLUDE_DIR})
-set(LIBS ${LIBS} ${CYCLOPTS_LIBRARY})
-#MESSAGE("cyclopts include: ${CYCLOPTS_INCLUDE_DIR}")
-#MESSAGE("cyclopts lib: ${CYCLOPTS_LIBRARY}")
+# find lapack and link to it
+FIND_PACKAGE( LAPACK REQUIRED )
+set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
+MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
 # find coin and link to it
 FIND_PACKAGE( COIN REQUIRED )
@@ -122,7 +119,7 @@ MESSAGE("libs: ${LIBS}")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 SET( CYCLUS_SRC
-  App.cpp
+  app.cc
   )
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
@@ -191,7 +188,7 @@ INSTALL(TARGETS gtest
 
 # Build CyclusUnitTestDriver
 ADD_EXECUTABLE( CyclusUnitTestDriver
-  Testing/CyclusUnitTestDriver.cpp ${TestSource}
+  Testing/cyclus_unit_test_driver.cc ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)
