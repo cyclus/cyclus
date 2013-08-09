@@ -42,10 +42,10 @@ class Function {
   /// @return the ending iterator to the function variable
   std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator end();
 
-  /// add a variable to the constraitn
+  /// add a variable to the constraint
   /// @param v a pointer to the variable to add
   /// @param modifier the modifier for that variable in the function
-  void AddVariable(cyclus::cyclopts::VariablePtr v, double modifer);
+  void AddVariable(cyclus::cyclopts::VariablePtr v, double modifier);
 
   /// @return number of variables in the function
   int NumVars();
