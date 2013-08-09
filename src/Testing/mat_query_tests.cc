@@ -10,7 +10,7 @@ TEST(MatQueryTests, contains) {
   using cyclus::Composition;
   using cyclus::Material;
   using cyclus::MatQuery;
-  using cyclus::units;
+  namespace units = cyclus::units;
 
   Composition::Vect v1;
   v1[92235] = 1;

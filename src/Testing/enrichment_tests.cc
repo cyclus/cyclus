@@ -2,17 +2,19 @@
 
 #include "enrichment_tests.h"
 
-#include "comp_map.h"
-#include "error.h"
-#include "cyc_limits.h"
+#include <cmath>
 
-#include <iostream>
+#include "composition.h"
+#include "cyc_limits.h"
+#include "error.h"
+#include "material.h"
+
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void EnrichmentTests::SetUp() 
 {
-  using cyclus::CompMap;
-  using cyclus::CompMapPtr;
+  using cyclus::Composition;
+  using cyclus::Material;
   feed_ = 0.0072;
   product_ = 0.05;
   tails_ = 0.002;
@@ -20,12 +22,11 @@ void EnrichmentTests::SetUp()
   assay_u_ = product_;
   mass_u_ = 10;
 
-  CompMapPtr comp = CompMapPtr(new CompMap(cyclus::ATOM));
-  (*comp)[92235] = assay_u_;
-  (*comp)[92238] = 1 - assay_u_;
-
-  mat_ = cyclus::Material::Ptr(new cyclus::Material(comp));
-  mat_->SetQuantity(mass_u_);
+  Composition::Vect v;
+  v[92235] = assay_u_;
+  v[92238] = 1 - assay_u_;
+  Composition::Ptr comp = Composition::CreateFromAtom(v);
+  mat_ = Material::Create(mass_u_, comp);
 
   SetEnrichmentParameters();
 }
@@ -38,9 +39,9 @@ void EnrichmentTests::TearDown()
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void EnrichmentTests::SetEnrichmentParameters()
 {
-  double feed_val = (1-2*feed_)*log(1/feed_ - 1);
-  double tails_val = (1-2*tails_)*log(1/tails_ - 1);
-  double product_val = (1-2*product_)*log(1/product_ - 1);
+  double feed_val = (1-2*feed_)*std::log(1/feed_ - 1);
+  double tails_val = (1-2*tails_)*std::log(1/tails_ - 1);
+  double product_val = (1-2*product_)*std::log(1/product_ - 1);
 
   feed_qty_ = mass_u_ * (product_-tails_)/(feed_-tails_);
   tails_qty_ = mass_u_ * (product_-feed_)/(feed_-tails_);
@@ -66,7 +67,7 @@ TEST_F(EnrichmentTests,valuefunction)
   double test_value=0;
   while (test_value < 1)
     {
-      double expected = (1-2*test_value)*log(1/test_value - 1);
+      double expected = (1-2*test_value)*std::log(1/test_value - 1);
       EXPECT_DOUBLE_EQ(expected, cyclus::enrichment::ValueFunc(test_value));
       test_value += step;
     }

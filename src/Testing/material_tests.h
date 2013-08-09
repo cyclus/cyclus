@@ -7,12 +7,12 @@
 #include "timer.h"
 #include "error.h"
 
-using namespace units;
+namespace units = cyclus::units;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 class MaterialTest : public ::testing::Test {
   protected:
-    Iso u235_, am241_, th228_, pb208_, pu239_;
+    cyclus::Iso u235_, am241_, th228_, pb208_, pu239_;
     int one_g_; // grams
     cyclus::Composition::Ptr test_comp_, diff_comp_;
     double test_size_, fraction;
@@ -29,7 +29,7 @@ class MaterialTest : public ::testing::Test {
       am241_ = 95241;
       th228_ = 90228;
       pb208_ = 82208;
-      test_size_ = 10 * g;
+      test_size_ = 10 * units::g;
       fraction = 2.0 / 3.0;
 
       // composition creation
@@ -40,9 +40,9 @@ class MaterialTest : public ::testing::Test {
       v[u235_] = 1;
       v[pb208_] = 1;
       v[am241_] = 1;
-      diff_comp_ = Composition::CreateFromMass(v);
+      diff_comp_ = cyclus::Composition::CreateFromMass(v);
 
-      default_mat_ = cyclus::Material::Create(0 * g, test_comp_);
+      default_mat_ = cyclus::Material::Create(0 * units::g, test_comp_);
       test_mat_ = cyclus::Material::Create(test_size_, test_comp_);
       two_test_mat_ = cyclus::Material::Create(2 * test_size_, test_comp_);
       ten_test_mat_ = cyclus::Material::Create(10 * test_size_, test_comp_);

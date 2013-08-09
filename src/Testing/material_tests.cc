@@ -1,5 +1,5 @@
 // material_tests.cpp
-#include "MaterialTests.h"
+#include "material_tests.h"
 
 #include <cmath>
 #include <gtest/gtest.h>
@@ -11,14 +11,14 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Constructors){
   EXPECT_EQ(default_mat_->units(), "kg");
-  EXPECT_EQ(default_mat_->type(), cyclus::Material::Type);
+  EXPECT_EQ(default_mat_->type(), cyclus::Material::kType);
   EXPECT_GE(default_mat_->id(), 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Clone) {
   cyclus::Resource::Ptr clone_mat;
-  ASSERT_NO_THROW(clone_mat = test_mat_->clone());
+  ASSERT_NO_THROW(clone_mat = test_mat_->Clone());
 
   EXPECT_EQ(test_mat_->type(), clone_mat->type());
   EXPECT_EQ(test_mat_->units(), clone_mat->units());
@@ -31,16 +31,15 @@ TEST_F(MaterialTest, extractRes) {
   double other_size = test_size_/3;
   cyclus::Resource::Ptr other;
   ASSERT_NO_THROW(other = test_mat_->ExtractRes(other_size));
-  EXPECT_DOUBLE_EQ(test_size - other_size, test_mat_->quantity());
+  EXPECT_DOUBLE_EQ(test_size_ - other_size, test_mat_->quantity());
   EXPECT_DOUBLE_EQ(other_size, other->quantity());
-  EXPECT_EQ(other->comp(), test_mat_->comp());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, SimpleAbsorb) {
-  double val = 1.5 * kg;
-  cyclus::Material::Ptr m1 = cyclus::Material::create(val, test_comp_);
-  cyclus::Material::Ptr m2 = cyclus::Material::create(val, test_comp_);
+  double val = 1.5 * units::kg;
+  cyclus::Material::Ptr m1 = cyclus::Material::Create(val, test_comp_);
+  cyclus::Material::Ptr m2 = cyclus::Material::Create(val, test_comp_);
   ASSERT_EQ(m1->comp(), m2->comp());
   ASSERT_EQ(m1->quantity(),m2->quantity());
 
@@ -81,14 +80,14 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // make a number of materials masses 1, 2, and 10 
-  cyclus::Material::Ptr same_as_orig_test_mat = Material::Create(0, test_comp_);
+  cyclus::Material::Ptr same_as_orig_test_mat = cyclus::Material::Create(0, test_comp_);
 
   cyclus::Composition::Vect v;
-  v[pb208_] = 1.0 * g;
-  v[am241_] = 1.0 * g;
-  v[th228_] = 1.0 * g;
+  v[pb208_] = 1.0 * units::g;
+  v[am241_] = 1.0 * units::g;
+  v[th228_] = 1.0 * units::g;
   cyclus::Composition::Ptr diff_test_comp = cyclus::Composition::CreateFromMass(v);
-  cyclus::Material::Ptr diff_test_mat = cyclus::Material::create(test_size_ / 2, diff_test_comp);
+  cyclus::Material::Ptr diff_test_mat = cyclus::Material::Create(test_size_ / 2, diff_test_comp);
 
   double orig = test_mat_->quantity();
   double origdiff = diff_test_mat->quantity();
@@ -108,20 +107,18 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbZeroMaterial){
-  using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  Material::Ptr same_as_test_mat = Material::Create(0, test_comp_));
+  Material::Ptr same_as_test_mat = Material::Create(0, test_comp_);
   EXPECT_NO_THROW(test_mat_->Absorb(same_as_test_mat));
   EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, AbsorbIntoZeroMaterial){
-  using cyclus::KG;
   using cyclus::Iso;
   using cyclus::Material;
-  Material::Ptr same_as_test_mat = Material::Create(0, test_comp_));
+  Material::Ptr same_as_test_mat = Material::Create(0, test_comp_);
   EXPECT_NO_THROW(same_as_test_mat->Absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
 }
@@ -178,14 +175,16 @@ TEST_F(MaterialTest, Extract_complete_inexact_comp) {
   Material::Ptr m1;
   // make an inexact composition
 
-  Composition::Vect inexact = diff_comp_.mass_vect();
+  Composition::Vect inexact = diff_comp_->mass_vect();
   inexact[am241_] *= (1-cyclus::eps_rsrc()/test_size_);
-  Composition::Ptr inexact_comp = Composition::createFromMass(inexact);
+  Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
 
   m1 = diff_mat_->ExtractComp(test_size_, inexact_comp);
   EXPECT_EQ( m1->comp(), inexact_comp);
   EXPECT_NEAR( test_size_, m1->quantity(), cyclus::eps_rsrc() );
-  EXPECT_NEAR( 0, diff_mat_->mass(am241_), cyclus::eps_rsrc() );
+
+  cyclus::MatQuery mq(diff_mat_);
+  EXPECT_NEAR( 0, mq.mass(am241_), cyclus::eps_rsrc() );
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
@@ -197,9 +196,9 @@ TEST_F(MaterialTest, Extract_complete_inexact_size_and_comp) {
   Material::Ptr m1;
   double inexact_size = test_size_*(1+cyclus::eps_rsrc()/test_size_);
 
-  Composition::Vect inexact = diff_comp_.mass_vect();
+  Composition::Vect inexact = diff_comp_->mass_vect();
   inexact[am241_] *= (1-cyclus::eps_rsrc()/test_size_);
-  Composition::Ptr inexact_comp = Composition::createFromMass(inexact);
+  Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
 
   m1 = diff_mat_->ExtractComp(inexact_size, inexact_comp);
   EXPECT_EQ( m1->comp(), inexact_comp);
@@ -265,7 +264,7 @@ TEST_F(MaterialTest, Extract_in_grams) {
   EXPECT_EQ(default_mat_->comp(), test_mat_->comp());
   EXPECT_DOUBLE_EQ(test_size_, default_mat_->quantity());
   // and it should be okay to extract part of the original composiiton IN GRAMS 
-  EXPECT_NO_THROW(default_mat_->ExtractComp(g_to_rem * g, comp_to_rem));
+  EXPECT_NO_THROW(default_mat_->ExtractComp(g_to_rem * units::g, comp_to_rem));
   EXPECT_DOUBLE_EQ(test_size_-kg_to_rem, default_mat_->quantity());
 }
 
