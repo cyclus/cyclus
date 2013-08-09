@@ -10,7 +10,7 @@ Composition::Vect Add(const Composition::Vect& v1, double qty1,
                       const Composition::Vect& v2, double qty2);
 
 Composition::Vect Sub(const Composition::Vect& v1, double qty1,
-                       const Composition::Vect& v2, double qty2);
+                      const Composition::Vect& v2, double qty2);
 
 void ApplyThreshold(Composition::Vect* v, double threshold);
 

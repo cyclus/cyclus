@@ -2,10 +2,10 @@
 #include "composition.h"
 
 #include "comp_math.h"
-#include "CycException.h"
-#include "DecayHandler.h"
-#include "EventManager.h"
-#include "MassTable.h"
+#include "error.h"
+#include "decay_handler.h"
+#include "event_manager.h"
+#include "mass_table.h"
 
 namespace cyclus {
 
@@ -40,7 +40,7 @@ const Composition::Vect& Composition::atom_vect() {
     Composition::Vect::iterator it;
     for (it = massv_.begin(); it != massv_.end(); ++it) {
       Iso iso = it->first;
-      atomv_[iso] = massv_[iso] / MT->gramsPerMol(iso);
+      atomv_[iso] = massv_[iso] / MT->GramsPerMol(iso);
     }
   }
   return atomv_;
@@ -51,7 +51,7 @@ const Composition::Vect& Composition::mass_vect() {
     Composition::Vect::iterator it;
     for (it = atomv_.begin(); it != atomv_.end(); ++it) {
       Iso iso = it->first;
-      massv_[iso] = atomv_[iso] * MT->gramsPerMol(iso);
+      massv_[iso] = atomv_[iso] * MT->GramsPerMol(iso);
     }
   }
   return massv_;
@@ -68,12 +68,12 @@ Composition::Ptr Composition::Decay(int delta) {
 void Composition::Record() {
   if (!recorded_) {
     Composition::Vect::const_iterator it;
-    for (it = massVect().begin(); it != massVect().end(); ++it) {
-      EM->newEvent("Compositions")
-        ->addVal("ID", id())
-        ->addVal("IsoID", it->first)
-        ->addVal("Quantity", it->second)
-        ->record();
+    for (it = mass_vect().begin(); it != mass_vect().end(); ++it) {
+      EM->NewEvent("Compositions")
+        ->AddVal("ID", id())
+        ->AddVal("IsoID", it->first)
+        ->AddVal("Quantity", it->second)
+        ->Record();
     }
     recorded_ = true;
   }

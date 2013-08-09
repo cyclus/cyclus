@@ -18,6 +18,8 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/decay_handler.cc 

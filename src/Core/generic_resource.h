@@ -16,8 +16,9 @@ class GenericResource : public Resource {
   typedef boost::shared_ptr<GenericResource> Ptr;
   static const ResourceType kType;
 
-  static Ptr Create(double quantity, std::string units);
-  static Ptr CreateUntracked(double quantity, std::string units);
+  static Ptr Create(double quantity, std::string quality, std::string units);
+  static Ptr CreateUntracked(double quantity, std::string quality,
+                             std::string units);
 
   virtual const int id() const;
 
@@ -46,6 +47,10 @@ class GenericResource : public Resource {
     return quantity_;
   };
 
+  virtual const std::string& quality() const {
+    return quality_;
+  };
+
   virtual Resource::Ptr ExtractRes(double quantity);
 
   /// Extracts the specified mass from this resource and returns it as a
@@ -62,9 +67,10 @@ class GenericResource : public Resource {
  private:
   /// @param quantity is a double indicating the quantity
   /// @param units is a string indicating the resource unit
-  GenericResource(double quantity, std::string units);
+  GenericResource(double quantity, std::string quality, std::string units);
 
   std::string units_;
+  std::string quality_;
   double quantity_;
   ResTracker tracker_;
 };
