@@ -50,10 +50,10 @@ class CBCSolver : public Solver {
   double ObjDirection(cyclus::cyclopts::ObjFuncPtr obj);
 
   /// solve the model
-  void SolveModel(CoinCbcModel& model);
+  void SolveModel(CbcModel& model);
 
   /// populate the solution in the variable vector
-  void PopulateSolution(CoinCbcModel& model,
+  void PopulateSolution(CbcModel& model,
                         std::vector<cyclus::cyclopts::VariablePtr>& variables);
 
   /// print variables info

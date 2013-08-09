@@ -25,7 +25,7 @@ class Variable {
   /// constructor
   /// @param l the lower bound
   /// @param u the upper bound
-  /// @param the variable type
+  /// @param t the variable type
   Variable(Bound l, Bound u, VarType t);
 
   /// virtual destructor for a base class
