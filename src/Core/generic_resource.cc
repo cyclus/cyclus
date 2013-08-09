@@ -1,67 +1,53 @@
-// resource.cc
+// Resource.cpp
 // Implements the Resource Class
 
 #include "generic_resource.h"
 
 #include "error.h"
 #include "logger.h"
-#include "event_manager.h"
 
 namespace cyclus {
 
-bool GenericResource::type_is_recorded_ = false;
+const ResourceType GenericResource::kType = "GenericResource";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::GenericResource(std::string units,
-                                 std::string quality, double quantity) : Resource() {
-  units_ = units;
-  quality_ = quality;
-  quantity_ = quantity;
-  recorded_ = false;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int GenericResource::StateID() {
-  return 0;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::GenericResource(const GenericResource& other) {
-  units_ = other.units_;
-  quality_ = other.quality_;
-  quantity_ = other.quantity_;
-  recorded_ = false;
-};
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr GenericResource::clone() {
-  CLOG(LEV_DEBUG2) << "GenericResource ID=" << ID_ << " was cloned.";
-  Print();
-  return Resource::Ptr(new GenericResource(*this));
+const int GenericResource::id() const {
+  return tracker_.id();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GenericResource::Print() {
-  CLOG(LEV_DEBUG3) << "GenericResource ID=" << ID_ << ", quality=" << quality_
-                   << ", quantity=" << quantity_ << ", units=" << units_;
+GenericResource::Ptr GenericResource::Create(double quantity,
+                                             std::string units) {
+  GenericResource::Ptr r(new GenericResource(quantity, units));
+  r->tracker_.Create();
+  return r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool GenericResource::CheckQuality(Resource::Ptr other) {
-  CLOG(LEV_DEBUG1) << "GenericResource is checking quality, this = "
-                   << units_ << " other = " << other->units();
+GenericResource::Ptr GenericResource::CreateUntracked(double quantity,
+                                                      std::string units) {
+  GenericResource::Ptr r(new GenericResource(quantity, units));
+  r->tracker_.DontTrack();
+  return r;
+}
 
-  return units_ == other->units();
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Resource::Ptr GenericResource::Clone() const {
+  GenericResource* g = new GenericResource(*this);
+  Resource::Ptr c = Resource::Ptr(g);
+  g->tracker_.DontTrack();
+  return c;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GenericResource::Absorb(GenericResource::Ptr other) {
-  if (! CheckQuality(boost::dynamic_pointer_cast<Resource>(other))) {
+  if (other->units() != units()) {
     throw ValueError("incompatible resource types.");
   }
-
   quantity_ += other->quantity();
-  other->SetQuantity(0);
+  other->quantity_ = 0;
+
+  tracker_.Absorb(&other->tracker_);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,21 +58,19 @@ GenericResource::Ptr GenericResource::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  return GenericResource::Ptr(new GenericResource(units_, quality_, quantity));
+  GenericResource::Ptr other(new GenericResource(quantity, units_));
+  tracker_.Extract(&other->tracker_);
+  return other;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GenericResource::AddToTable() {
-  Resource::AddToTable();
-
-  if (recorded_) {
-    return;
-  }
-  recorded_ = true;
-
-  EM->NewEvent("GenericResources")
-  ->AddVal("ResourceID", ID())
-  ->AddVal("Quality", quality())
-  ->Record();
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Resource::Ptr GenericResource::ExtractRes(double qty) {
+  return boost::static_pointer_cast<Resource>(Extract(qty));
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GenericResource::GenericResource(double quantity, std::string units)
+  : units_(units), quantity_(quantity), tracker_(this) {
+}
+
 } // namespace cyclus

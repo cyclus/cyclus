@@ -34,6 +34,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/prototype.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/recipe_library.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc 
@@ -41,12 +42,9 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/timer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/comp_map.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/iso_vector.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/converter_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
@@ -94,6 +92,7 @@ INSTALL(FILES
   mass_table.h
   prototype.h
   recipe_library.h
+  res_tracker.h
   supply_demand.h
   supply_demand_manager.h
   symbolic_function_factories.h
@@ -103,8 +102,7 @@ INSTALL(FILES
   use_matrix_lib.h
   sqlite_back.h
   sqlite_db.h
-  comp_map.h
-  iso_vector.h
+  composition.h
   generic_resource.h
   material.h
   mat_buff.h
