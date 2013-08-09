@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"
+#include "cyc_limits.h"
 #include "resource.h"
 #include "res_tracker.h"
 
@@ -47,7 +48,7 @@ class Material: public Resource {
 
   Ptr ExtractQty(double qty);
 
-  Ptr ExtractComp(double qty, Composition::Ptr c);
+  Ptr ExtractComp(double qty, Composition::Ptr c, double threshold=eps_rsrc());
 
   void Absorb(Ptr mat);
 

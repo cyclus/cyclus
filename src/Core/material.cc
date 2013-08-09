@@ -66,12 +66,14 @@ Material::Ptr Material::ExtractQty(double qty) {
   return ExtractComp(qty, comp_);
 }
 
-Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c) {
+Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c, double threshold) {
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
 
   Composition::Vect v = compmath::Sub(comp_->atom_vect(), qty_, c->atom_vect(), qty);
+  compmath::ApplyThreshold(&v, threshold);
+
   comp_ = Composition::CreateFromAtom(v);
   qty_ -= qty;
 
