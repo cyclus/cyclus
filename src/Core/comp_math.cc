@@ -15,7 +15,7 @@ Composition::Vect Add(const Composition::Vect& v1, double qty1,
   Composition::Vect n1(v1);
   Composition::Vect n2(v2);
   Normalize(&n1, qty1);
-  Normalize(&n2, -qty2);
+  Normalize(&n2, qty2);
 
   Composition::Vect out(v1);
   for (Composition::Vect::iterator it = n2.begin(); it != n2.end(); ++it) {

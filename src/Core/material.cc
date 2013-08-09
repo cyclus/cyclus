@@ -66,15 +66,19 @@ Material::Ptr Material::ExtractQty(double qty) {
   return ExtractComp(qty, comp_);
 }
 
-Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c, double threshold) {
+Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
+                                    double threshold) {
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
 
-  Composition::Vect v = compmath::Sub(comp_->atom_vect(), qty_, c->atom_vect(), qty);
-  compmath::ApplyThreshold(&v, threshold);
+  if (comp_ != c) {
+    Composition::Vect v = compmath::Sub(comp_->atom_vect(), qty_, c->atom_vect(),
+                                        qty);
+    compmath::ApplyThreshold(&v, threshold);
+    comp_ = Composition::CreateFromAtom(v);
+  }
 
-  comp_ = Composition::CreateFromAtom(v);
   qty_ -= qty;
 
   Material::Ptr other(new Material(qty, c));
@@ -85,9 +89,11 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c, double thres
 }
 
 void Material::Absorb(Material::Ptr mat) {
-  Composition::Vect v = compmath::Add(comp_->atom_vect(), qty_,
-                                      mat->comp()->atom_vect(), mat->quantity());
-  comp_ = Composition::CreateFromAtom(v);
+  if (comp_ != mat->comp()) {
+    Composition::Vect v = compmath::Add(comp_->atom_vect(), qty_,
+                                        mat->comp()->atom_vect(), mat->quantity());
+    comp_ = Composition::CreateFromAtom(v);
+  }
   qty_ += mat->qty_;
   mat->qty_ = 0;
 
