@@ -69,10 +69,10 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   if (comp_ != c) {
-    Composition::Vect v = compmath::Sub(comp_->atom_vect(), qty_, c->atom_vect(),
+    Composition::Vect v = compmath::Sub(comp_->mass_vect(), qty_, c->mass_vect(),
                                         qty);
     compmath::ApplyThreshold(&v, threshold);
-    comp_ = Composition::CreateFromAtom(v);
+    comp_ = Composition::CreateFromMass(v);
   }
 
   qty_ -= qty;

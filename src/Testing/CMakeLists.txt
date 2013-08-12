@@ -15,7 +15,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
-  #${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc

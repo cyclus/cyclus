@@ -17,12 +17,16 @@ class Resource {
 
   /// returns the unique id corresponding to this resource and its current
   /// state.
-  const int id() const {return id_;};
+  const int id() const {
+    return id_;
+  };
 
   /// assigns a new, unique id to this resource and its state.
   void BumpId();
 
-  /// returns an id representing the specific resource implementation's internal state.
+  /// returns an id representing the specific resource implementation's
+  /// internal state.  Any change to the state_id should be accompanied by a
+  /// call to BumpId.
   virtual int state_id() const = 0;
 
   virtual const ResourceType type() const = 0;
@@ -31,15 +35,14 @@ class Resource {
   virtual Ptr Clone() const = 0;
   // the clone method implementations should set tracked_ = false.
 
-  /// records the resource's state that is not accessible via the Resource /
-  /// class interface (e.g. don't record units, quantity, etc) in its own
-  /// table.
+  /// records the resource's state to the output database.
   virtual void Record() const = 0;
 
   /// Returns the units this resource is based in.
   virtual std::string units() const = 0;
 
-  /// returns the quantity of this resource with dimensions as specified by units().
+  /// returns the quantity of this resource with dimensions as specified by
+  /// units().
   virtual double quantity() const = 0;
 
   /// splits the resource and returns the extracted portion as a new resource

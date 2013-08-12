@@ -17,7 +17,7 @@ Composition::Vect Add(const Composition::Vect& v1, double qty1,
   Normalize(&n1, qty1);
   Normalize(&n2, qty2);
 
-  Composition::Vect out(v1);
+  Composition::Vect out(n1);
   for (Composition::Vect::iterator it = n2.begin(); it != n2.end(); ++it) {
     int iso = it->first;
     out[iso] += n2[iso];
@@ -33,7 +33,7 @@ Composition::Vect Sub(const Composition::Vect& v1, double qty1,
   Normalize(&n1, qty1);
   Normalize(&n2, -qty2);
 
-  Composition::Vect out(v1);
+  Composition::Vect out(n1);
   for (Composition::Vect::iterator it = n2.begin(); it != n2.end(); ++it) {
     int iso = it->first;
     out[iso] += n2[iso];

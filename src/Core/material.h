@@ -46,7 +46,7 @@ class Material: public Resource {
 
   Ptr ExtractQty(double qty);
 
-  Ptr ExtractComp(double qty, Composition::Ptr c, double threshold=eps_rsrc());
+  Ptr ExtractComp(double qty, Composition::Ptr c, double threshold = eps_rsrc());
 
   void Absorb(Ptr mat);
 
