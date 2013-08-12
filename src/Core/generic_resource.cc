@@ -11,11 +11,6 @@ namespace cyclus {
 const ResourceType GenericResource::kType = "GenericResource";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const int GenericResource::id() const {
-  return tracker_.id();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::Ptr GenericResource::Create(double quantity,
                                              std::string quality,
                                              std::string units) {

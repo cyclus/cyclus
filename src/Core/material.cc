@@ -27,10 +27,6 @@ Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
   return m;
 }
 
-const int Material::id() const {
-  return tracker_.id();
-}
-
 int Material::state_id() const {
   return comp_->id();
 }
@@ -46,7 +42,7 @@ Resource::Ptr Material::Clone() const {
   return c;
 }
 
-void Material::RecordSpecial() const {
+void Material::Record() const {
   comp_->Record();
 }
 

@@ -5,18 +5,11 @@
 
 namespace cyclus {
 
-int ResTracker::nextId_ = 1;
-
-ResTracker::ResTracker(const Resource* r)
+ResTracker::ResTracker(Resource* r)
   : tracked_(true),
     res_(r),
     parent1_(0),
-    parent2_(0),
-    id_(0) { }
-
-const int ResTracker::id() const {
-  return id_;
-}
+    parent2_(0) { }
 
 void ResTracker::DontTrack() {
   tracked_ = false;
@@ -35,7 +28,7 @@ void ResTracker::Modify() {
     return;
   }
 
-  parent1_ = id_;
+  parent1_ = res_->id();
   parent2_ = 0;
   Record();
 }
@@ -45,12 +38,12 @@ void ResTracker::Extract(ResTracker* removed) {
     return;
   }
 
-  parent1_ = id_;
+  parent1_ = res_->id();
   parent2_ = 0;
   Record();
 
   removed->tracked_ = tracked_;
-  removed->parent1_ = id_;
+  removed->parent1_ = res_->id();
   removed->parent2_ = 0;
   removed->Record();
 }
@@ -60,20 +53,15 @@ void ResTracker::Absorb(ResTracker* absorbed) {
     return;
   }
 
-  parent1_ = id_;
-  parent2_ = absorbed->id_;
+  parent1_ = res_->id();
+  parent2_ = absorbed->res_->id();
   Record();
 }
 
-void ResTracker::BumpId() {
-  id_ = nextId_;
-  nextId_++;
-}
-
 void ResTracker::Record() {
-  BumpId();
+  res_->BumpId();
   EM->NewEvent("Resources")
-  ->AddVal("ID", id_)
+  ->AddVal("ID", res_->id())
   ->AddVal("Type", res_->type())
   ->AddVal("Quantity", res_->quantity())
   ->AddVal("Parent1", parent1_)
@@ -81,7 +69,7 @@ void ResTracker::Record() {
   ->AddVal("StateId", res_->state_id())
   ->Record();
 
-  res_->RecordSpecial();
+  res_->Record();
 }
 
 } // namespace cyclus

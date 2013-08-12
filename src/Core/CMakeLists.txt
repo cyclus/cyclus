@@ -56,6 +56,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_comm_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_time_agent.cc

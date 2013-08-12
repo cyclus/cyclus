@@ -12,12 +12,7 @@ namespace cyclus {
 class ResTracker {
  public:
   /// Create a new tracker following r.
-  ResTracker(const Resource* r);
-
-  /// returns the unique id associated with the tracker's state. Invocations to
-  /// Create, Extract, Absorb, and Modify bump the id. Multiple trackers will
-  /// never share the same id.
-  const int id() const;
+  ResTracker(Resource* r);
 
   /// Prevents a resource's heritage from being tracked and recorded.
   void DontTrack();
@@ -37,16 +32,12 @@ class ResTracker {
   void Modify();
 
  private:
-  void BumpId();
-
   void Record();
 
-  static int nextId_;
-  int id_;
   int parent1_;
   int parent2_;
   bool tracked_;
-  const Resource* res_;
+  Resource* res_;
 };
 
 } // namespace cyclus

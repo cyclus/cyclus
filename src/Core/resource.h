@@ -15,9 +15,12 @@ class Resource {
 
   virtual ~Resource() { };
 
-  /// Unique for each material object.  Changes whenever *any* state changing
-  /// operation is made.
-  virtual const int id() const = 0;
+  /// returns the unique id corresponding to this resource and its current
+  /// state.
+  const int id() const {return id_;};
+
+  /// assigns a new, unique id to this resource and its state.
+  void BumpId();
 
   /// returns an id representing the specific resource implementation's internal state.
   virtual int state_id() const = 0;
@@ -31,7 +34,7 @@ class Resource {
   /// records the resource's state that is not accessible via the Resource /
   /// class interface (e.g. don't record units, quantity, etc) in its own
   /// table.
-  virtual void RecordSpecial() const = 0;
+  virtual void Record() const = 0;
 
   /// Returns the units this resource is based in.
   virtual std::string units() const = 0;
@@ -44,6 +47,9 @@ class Resource {
   /// split offers/requests of arbitrary resource implementation type.
   virtual Ptr ExtractRes(double quantity) = 0;
 
+ private:
+  static int nextid_;
+  int id_;
 };
 
 } // namespace cyclus

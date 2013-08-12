@@ -28,15 +28,13 @@ class Material: public Resource {
   static Ptr Create(double quantity, Composition::Ptr c);
   static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
-  const int id() const;
-
   virtual int state_id() const;
 
   virtual const ResourceType type() const;
 
   virtual Resource::Ptr Clone() const;
 
-  virtual void RecordSpecial() const;
+  virtual void Record() const;
 
   /// returns "kg"
   virtual std::string units() const;

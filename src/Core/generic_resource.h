@@ -20,8 +20,6 @@ class GenericResource : public Resource {
   static Ptr CreateUntracked(double quantity, std::string quality,
                              std::string units);
 
-  virtual const int id() const;
-
   /// not needed/no meaning for generic resources
   virtual int state_id() const {
     return 0;
@@ -35,7 +33,7 @@ class GenericResource : public Resource {
   /// Returns a reference to a newly allocated copy of this resource
   virtual Resource::Ptr Clone() const;
 
-  virtual void RecordSpecial() const { };
+  virtual void Record() const { };
 
   /// Returns the total quantity of this resource in its base unit
   virtual std::string units() const {
