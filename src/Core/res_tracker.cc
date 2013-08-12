@@ -60,13 +60,10 @@ void ResTracker::Absorb(ResTracker* absorbed) {
 
 void ResTracker::Record() {
   res_->BumpId();
-  EM->NewEvent("Resources")
+  EM->NewEvent("ResourceHeritage")
   ->AddVal("ID", res_->id())
-  ->AddVal("Type", res_->type())
-  ->AddVal("Quantity", res_->quantity())
   ->AddVal("Parent1", parent1_)
   ->AddVal("Parent2", parent2_)
-  ->AddVal("StateId", res_->state_id())
   ->Record();
 
   res_->Record();

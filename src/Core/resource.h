@@ -35,7 +35,9 @@ class Resource {
   virtual Ptr Clone() const = 0;
   // the clone method implementations should set tracked_ = false.
 
-  /// records the resource's state to the output database.
+  /// records the resource's state to the output database.  This method should
+  /// NOT record data accessible via the Resource class public methods (e.g.
+  /// state_id, units, type, quantity)
   virtual void Record() const = 0;
 
   /// Returns the units this resource is based in.
