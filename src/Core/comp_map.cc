@@ -87,7 +87,6 @@ bool CompMap::AlmostEqual(const CompMap rhs, double threshold) const {
   // that the following is less naive than the intuitive way of doing this...
   // almost equal if :
   // (abs(x-y) < abs(x)*eps) && (abs(x-y) < abs(y)*epsilon)
-
   if (threshold < 0) {
     std::stringstream ss;
     ss << "The threshold cannot be negative. The value provided was "
@@ -108,12 +107,12 @@ bool CompMap::AlmostEqual(const CompMap rhs, double threshold) const {
     double minuend = rhs.MassFraction(it->first);
     double subtrahend = MassFraction(it->first);
     double diff = minuend - subtrahend;
-    if (abs(minuend) == 0 || abs(subtrahend) == 0) {
-      if (abs(diff) > abs(diff)*threshold) {
+    if (fabs(minuend) == 0 || fabs(subtrahend) == 0) {
+      if (fabs(diff) > fabs(diff)*threshold) {
         return false;
       }
-    } else if (abs(diff) > abs(minuend)*threshold ||
-               abs(diff) > abs(subtrahend)*threshold) {
+    } else if (fabs(diff) > fabs(minuend)*threshold ||
+               fabs(diff) > fabs(subtrahend)*threshold) {
       return false;
     }
   }
