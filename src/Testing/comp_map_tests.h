@@ -42,8 +42,8 @@ class CompMapTests : public ::testing::Test {
     basis_ = cyclus::MASS;
     map_ = cyclus::Map();
     comp_ = TestCompMapPtr(new TestCompMap(basis_));
-    isotopes_.push_back(1001),isotopes_.push_back(2004);
-    masses_.push_back(10),masses_.push_back(20);
+    isotopes_.push_back(1001); isotopes_.push_back(2004);
+    masses_.push_back(10); masses_.push_back(20);
   }
 
   virtual void TearDown() {}
