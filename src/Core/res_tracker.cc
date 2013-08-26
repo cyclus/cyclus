@@ -62,6 +62,10 @@ void ResTracker::Record() {
   res_->BumpId();
   EM->NewEvent("ResourceHeritage")
   ->AddVal("ID", res_->id())
+  ->AddVal("Type", res_->type())
+  ->AddVal("Quantity", res_->quantity())
+  ->AddVal("units", res_->units())
+  ->AddVal("StateId", res->state_id())
   ->AddVal("Parent1", parent1_)
   ->AddVal("Parent2", parent2_)
   ->Record();
