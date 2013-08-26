@@ -32,12 +32,13 @@ class Resource {
   virtual const ResourceType type() const = 0;
 
   /// returns an untracked (not part of the simulation) copy of the resource.
+  /// A cloned resource should not ever record anything in the output
+  /// database.
   virtual Ptr Clone() const = 0;
-  // the clone method implementations should set tracked_ = false.
 
-  /// records the resource's state to the output database.  This method should
-  /// NOT record data accessible via the Resource class public methods (e.g.
-  /// state_id, units, type, quantity)
+  /// records the resource's state to the output database.  This method
+  /// should generally NOT record data accessible via the Resource class
+  /// public methods (e.g.  state_id, units, type, quantity)
   virtual void Record() const = 0;
 
   /// Returns the units this resource is based in.
