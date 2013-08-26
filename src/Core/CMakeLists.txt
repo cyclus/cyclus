@@ -57,6 +57,8 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/source_fac.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/sink_fac.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_comm_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_time_agent.cc
@@ -120,6 +122,8 @@ INSTALL(FILES
   message.h
   model.h
   region_model.h
+  source_fac.h
+  sink_fac.h
   stub_comm_model.h
   stub_model.h
   stub_time_agent.h

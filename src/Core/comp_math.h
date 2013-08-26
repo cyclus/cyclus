@@ -6,15 +6,15 @@
 namespace cyclus {
 namespace compmath {
 
-Composition::Vect Add(const Composition::Vect& v1, double qty1,
-                      const Composition::Vect& v2, double qty2);
+Composition::Vect Add(const Composition::Vect& v1,
+                      const Composition::Vect& v2);
 
-Composition::Vect Sub(const Composition::Vect& v1, double qty1,
-                      const Composition::Vect& v2, double qty2);
+Composition::Vect Sub(const Composition::Vect& v1,
+                      const Composition::Vect& v2);
 
 void ApplyThreshold(Composition::Vect* v, double threshold);
 
-void Normalize(cyclus::Composition::Vect* v, double val);
+void Normalize(cyclus::Composition::Vect* v, double val = 1.0);
 
 bool ValidIsos(const Composition::Vect& v);
 

@@ -10,35 +10,25 @@
 namespace cyclus {
 namespace compmath {
 
-Composition::Vect Add(const Composition::Vect& v1, double qty1,
-                      const Composition::Vect& v2, double qty2) {
-  Composition::Vect n1(v1);
-  Composition::Vect n2(v2);
-  Normalize(&n1, qty1);
-  Normalize(&n2, qty2);
-
-  Composition::Vect out(n1);
-  for (Composition::Vect::iterator it = n2.begin(); it != n2.end(); ++it) {
+Composition::Vect Add(const Composition::Vect& v1,
+                      const Composition::Vect& v2) {
+  Composition::Vect out(v1);
+  Composition::Vect vv2(v2);
+  for (Composition::Vect::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int iso = it->first;
-    out[iso] += n2[iso];
+    out[iso] += vv2[iso];
   }
-
   return out;
 }
 
-Composition::Vect Sub(const Composition::Vect& v1, double qty1,
-                      const Composition::Vect& v2, double qty2) {
-  Composition::Vect n1(v1);
-  Composition::Vect n2(v2);
-  Normalize(&n1, qty1);
-  Normalize(&n2, -qty2);
-
-  Composition::Vect out(n1);
-  for (Composition::Vect::iterator it = n2.begin(); it != n2.end(); ++it) {
+Composition::Vect Sub(const Composition::Vect& v1,
+                      const Composition::Vect& v2) {
+  Composition::Vect out(v1);
+  Composition::Vect vv2(v2);
+  for (Composition::Vect::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int iso = it->first;
-    out[iso] += n2[iso];
+    out[iso] -= vv2[iso];
   }
-
   return out;
 }
 
