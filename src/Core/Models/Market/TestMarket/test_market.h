@@ -2,13 +2,15 @@
 #define _TESTMARKET_H_
 
 #include "market_model.h"
+#include "context.h"
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Market, for testing.
 class TestMarket : public cyclus::MarketModel {
  public:
-  TestMarket() {}
+  TestMarket(cyclus::Context* ctx) : cyclus::MarketModel(ctx) {}
   virtual ~TestMarket() { }
-  TestMarket(std::string commod) {
+  TestMarket(cyclus::Context* ctx, std::string commod) : cyclus::MarketModel(ctx) {
     commodity_ = commod;
   }
   virtual void ReceiveMessage(cyclus::Message::Ptr msg) { }

@@ -2,8 +2,8 @@
 
 #include "model.h"
 
-extern "C" cyclus::Model* constructTestConverter() {
-  return new TestConverter();
+extern "C" cyclus::Model* constructTestConverter(cyclus::Context* ctx) {
+  return new TestConverter(ctx);
 }
 
 extern "C" cyclus::Model* destructTestConverter(cyclus::Model* model) {

@@ -13,7 +13,7 @@ namespace cyclus {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubCommModel::StubCommModel() {
+StubCommModel::StubCommModel(Context* ctx) : Model(ctx) {
   SetModelType("StubComm");
 };
 

@@ -35,7 +35,6 @@ class Context {
   Composition::Ptr GetRecipe(std::string name);
 
   void RegisterTickListener(TimeAgent* ta);
-  void RegisterTockListener(TimeAgent* ta);
   void RegisterResolveListener(MarketModel* mkt);
 
   int time();

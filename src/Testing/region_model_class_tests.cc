@@ -1,15 +1,18 @@
 // Instmodel_tests.h
 #include <gtest/gtest.h>
 
+#include "context.h"
+#include "event_manager.h"
 #include "inst_model.h"
 #include "region_model.h"
+#include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ConcreteRegionModel : public cyclus::RegionModel {
  public:
-  ConcreteRegionModel() { };
+  ConcreteRegionModel(cyclus::Context* ctx) : cyclus::RegionModel(ctx) { };
   
   virtual ~ConcreteRegionModel() { };
   
@@ -18,7 +21,7 @@ class ConcreteRegionModel : public cyclus::RegionModel {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::InstModel {
  public:
-  DieInst() {
+  DieInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) {
     tickCount_ = 0;
     tockCount_ = 0;
     tickDie_ = false;
@@ -69,15 +72,20 @@ class RegionModelClassTests : public ::testing::Test {
     DieInst* child5_;
 
     cyclus::TimeAgent* reg_;
+    cyclus::EventManager em_;
+    cyclus::Timer ti_;
+    cyclus::Context* ctx_;
 
     virtual void SetUp() {
-      child1_ = new DieInst();
-      child2_ = new DieInst();
-      child3_ = new DieInst();
-      child4_ = new DieInst();
-      child5_ = new DieInst();
+      ctx_ = new cyclus::Context(&ti_, &em_);
 
-      reg_ = new ConcreteRegionModel();
+      child1_ = new DieInst(ctx_);
+      child2_ = new DieInst(ctx_);
+      child3_ = new DieInst(ctx_);
+      child4_ = new DieInst(ctx_);
+      child5_ = new DieInst(ctx_);
+
+      reg_ = new ConcreteRegionModel(ctx_);
       child1_->EnterSimulation(reg_);
       child2_->EnterSimulation(reg_);
       child3_->EnterSimulation(reg_);

@@ -12,10 +12,10 @@ namespace cyclus {
 class RecipeLibrary {
  public:
   /// loads the recipes from the input file
-  static void LoadRecipes(QueryEngine* qe, Context* ctx);
+  static void LoadRecipes(Context* ctx, QueryEngine* qe);
 
   /// loads a specific recipe
-  static void LoadRecipe(QueryEngine* qe, Context* ctx);
+  static void LoadRecipe(Context* ctx, QueryEngine* qe);
 };
 
 } // namespace cyclus

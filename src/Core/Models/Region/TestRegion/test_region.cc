@@ -2,8 +2,8 @@
 
 #include "model.h"
 
-extern "C" cyclus::Model* constructTestRegion() {
-  return new TestRegion();
+extern "C" cyclus::Model* constructTestRegion(cyclus::Context* ctx) {
+  return new TestRegion(ctx);
 }
 
 extern "C" cyclus::Model* destructTestRegion(cyclus::Model* model) {

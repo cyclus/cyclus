@@ -15,14 +15,15 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(double quantity, Composition::Ptr c, Context* ctx) {
-  Material::Ptr m(new Material(quantity, c, ctx));
+Material::Ptr Material::Create(Context* ctx, double quantity,
+                               Composition::Ptr c) {
+  Material::Ptr m(new Material(ctx, quantity, c));
   m->tracker_.Create();
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(quantity, c, NULL));
+  Material::Ptr m(new Material(NULL, quantity, c));
   m->tracker_.DontTrack();
   return m;
 }
@@ -80,7 +81,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   qty_ -= qty;
 
-  Material::Ptr other(new Material(qty, c, ctx_));
+  Material::Ptr other(new Material(ctx_, qty, c));
 
   tracker_.Extract(&other->tracker_);
 
@@ -125,8 +126,8 @@ Composition::Ptr Material::comp() const {
   return comp_;
 }
 
-Material::Material(double quantity, Composition::Ptr c, Context* ctx)
-  : qty_(quantity), comp_(c), tracker_(this, ctx) {
+Material::Material(Context* ctx, double quantity, Composition::Ptr c)
+  : qty_(quantity), comp_(c), tracker_(ctx, this) {
   all_mats_[this] = true;
   prev_decay_time_ = ctx->time();
 }

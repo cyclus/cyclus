@@ -141,7 +141,7 @@ void XMLFileLoader::load_recipes() {
   int numRecipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < numRecipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    cyclus::RecipeLibrary::LoadRecipe(qe, ctx_);
+    RecipeLibrary::LoadRecipe(ctx_, qe);
   }
 }
 

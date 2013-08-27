@@ -13,7 +13,7 @@ namespace cyclus {
  */
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubTimeAgent::StubTimeAgent() {
+StubTimeAgent::StubTimeAgent(Context* ctx) : TimeAgent(ctx) {
   SetModelType("Stub");
 };
 
