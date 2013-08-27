@@ -53,13 +53,6 @@ class Model {
   static std::set<std::string> dynamic_module_types();
 
   /**
-     returns a model template given the template's name
-
-     @param name name of the template as defined in the input file
-   */
-  static Model* GetTemplateByName(std::string name);
-
-  /**
      returns a model given the template's name
 
      @param name name of the template as defined in the input file
