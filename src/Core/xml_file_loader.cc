@@ -20,7 +20,8 @@ namespace cyclus {
 namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(const std::string load_filename) {
+XMLFileLoader::XMLFileLoader(Context* ctx,
+                             const std::string load_filename) : ctx_(ctx) {
   file_ = load_filename;
   initialize_module_paths();
 }
@@ -66,7 +67,7 @@ std::string XMLFileLoader::BuildSchema() {
 
           std::ifstream in(p.string().c_str(), std::ios::in | std::ios::binary);
           std::string rng_data((std::istreambuf_iterator<char>(in)),
-                                std::istreambuf_iterator<char>());
+                               std::istreambuf_iterator<char>());
           std::string find_str("<define name=\"");
           size_t start = rng_data.find(find_str) + find_str.size();
           size_t end = rng_data.find("\"", start + 1);
@@ -140,12 +141,13 @@ void XMLFileLoader::load_recipes() {
   int numRecipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < numRecipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    cyclus::RL->LoadRecipe(qe);
+    cyclus::RecipeLibrary::LoadRecipe(qe, ctx_);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
+void XMLFileLoader::load_dynamic_modules(
+  std::set<std::string>& module_types) {
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
     load_modules_of_type(*it, module_paths_[*it]);
@@ -160,16 +162,16 @@ void XMLFileLoader::load_modules_of_type(std::string type,
   int numModels = xqe.NElementsMatchingQuery(query_path);
   for (int i = 0; i < numModels; i++) {
     QueryEngine* qe = xqe.QueryElement(query_path, i);
-    Model::InitializeSimulationEntity(type, qe);
+    Model::InitializeSimulationEntity(ctx_, type, qe);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_control_parameters() {
+void XMLFileLoader::load_control_parameters(Timer* ti) {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
-  TI->load_simulation(qe);
+  ti->load_simulation(qe);
 }
 } // namespace cyclus

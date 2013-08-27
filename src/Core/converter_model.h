@@ -53,7 +53,7 @@ class ConverterModel : public Model {
   /**
      Default constructor for ConverterModel Class
    */
-  ConverterModel();
+  ConverterModel(Context* ctx);
 
   /**
      every model should be destructable

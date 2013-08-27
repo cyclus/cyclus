@@ -127,11 +127,13 @@ void Message::TallyOrder(Model* next_model) {
     return;
   }
 
+  Context* ctx = next_model->context();
+
   Transaction tran = trans();
   if (tran.IsOffer()) {
-    Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+    Message::offer_qtys_[tran.commod()][ctx->time()] += tran.resource()->quantity();
   } else {
-    Message::request_qtys_[tran.commod()][TI->time()] +=
+    Message::request_qtys_[tran.commod()][ctx->time()] +=
       tran.resource()->quantity();
   }
 }

@@ -12,122 +12,14 @@
 
 namespace cyclus {
 
-#define TI Timer::Instance()
-
 /**
    @class Timer
 
    A (singleton) timer to control a simulation with a one-month time
  */
 class Timer {
- private:
-  /**
-     A pointer to this Timer once it has been initialized.
-   */
-  static Timer* instance_;
-
-  /**
-     The current time, measured in months from when the simulation
-     started.
-   */
-  int time_;
-
-  std::string handle_;
-
-  /**
-     The time at which the simulation started.
-   */
-  int time0_;
-
-  /**
-     The duration of this simulation, in months.
-   */
-  int simDur_;
-
-  /// time steps between automated global material decay driving
-  int decay_interval_;
-
-  /**
-     The start date of the simulation
-   */
-  boost::gregorian::date startDate_;
-
-  /**
-     The end date of the simulation
-   */
-  boost::gregorian::date endDate_;
-
-  /**
-     The current date of the simulation
-   */
-  boost::gregorian::date date_;
-
-  /**
-     The number of the month (Jan = 1, etc.) corresponding to t = 0 for
-     the scenario being run.
-   */
-  int month0_;
-
-  /**
-     The year corresponding to t = 0 for the scenario being run.
-   */
-  int year0_;
-
-  /**
-     Concrete models that desire to receive tick and tock notifications
-   */
-  std::vector<TimeAgent*> tick_listeners_;
-
-  /**
-     Returns a string of all models listening to the tick
-   */
-  std::string ReportListeners();
-
-  /**
-     Concrete models that desire to receive resolve (markets)
-   */
-  std::vector<MarketModel*> resolve_listeners_;
-
-  /**
-     sends the resolve signal to all of the (market) models receiving
-     resolve notifications.
-   */
-  void SendResolve();
-
-  /**
-     sends the tick signal to all of the models receiving time
-     notifications.
-   */
-  void SendTick();
-
-  /**
-     sends the tock signal to all of the models receiving time
-     notifications.
-   */
-  void SendTock();
-
-  /**
-     sends a notification to Tick listeners that a day has passed
-   */
-  void SendDailyTasks();
-
-  /// reset all data (registered listeners, etc.) to empty or initial state
-  void reset();
-
- protected:
-  /**
-     Constructs a new Timer for this simulation.
-   */
-  Timer();
-
  public:
-  /**
-     Gives all simulation objects global access to the Timer by
-     returning a pointer to it.
-
-     @return a pointer to the Timer
-   */
-  static Timer* Instance();
+  Timer();
 
   /**
      Initialize this Timer by setting the specs for the simulation.
@@ -279,6 +171,96 @@ class Timer {
      the simulation start time and the simulation duration
    */
   void LogTimeData();
+
+ private:
+  /**
+     The current time, measured in months from when the simulation
+     started.
+   */
+  int time_;
+
+  std::string handle_;
+
+  /**
+     The time at which the simulation started.
+   */
+  int time0_;
+
+  /**
+     The duration of this simulation, in months.
+   */
+  int simDur_;
+
+  /// time steps between automated global material decay driving
+  int decay_interval_;
+
+  /**
+     The start date of the simulation
+   */
+  boost::gregorian::date startDate_;
+
+  /**
+     The end date of the simulation
+   */
+  boost::gregorian::date endDate_;
+
+  /**
+     The current date of the simulation
+   */
+  boost::gregorian::date date_;
+
+  /**
+     The number of the month (Jan = 1, etc.) corresponding to t = 0 for
+     the scenario being run.
+   */
+  int month0_;
+
+  /**
+     The year corresponding to t = 0 for the scenario being run.
+   */
+  int year0_;
+
+  /**
+     Concrete models that desire to receive tick and tock notifications
+   */
+  std::vector<TimeAgent*> tick_listeners_;
+
+  /**
+     Returns a string of all models listening to the tick
+   */
+  std::string ReportListeners();
+
+  /**
+     Concrete models that desire to receive resolve (markets)
+   */
+  std::vector<MarketModel*> resolve_listeners_;
+
+  /**
+     sends the resolve signal to all of the (market) models receiving
+     resolve notifications.
+   */
+  void SendResolve();
+
+  /**
+     sends the tick signal to all of the models receiving time
+     notifications.
+   */
+  void SendTick();
+
+  /**
+     sends the tock signal to all of the models receiving time
+     notifications.
+   */
+  void SendTock();
+
+  /**
+     sends a notification to Tick listeners that a day has passed
+   */
+  void SendDailyTasks();
+
+  /// reset all data (registered listeners, etc.) to empty or initial state
+  void reset();
+
 };
 } // namespace cyclus
 #endif

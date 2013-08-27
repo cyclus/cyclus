@@ -6,6 +6,8 @@
 
 namespace cyclus {
 
+class Context;
+
 typedef int Iso;
 
 /// a raw definition of isotopes and corresponding (dimensionless quantities).
@@ -62,7 +64,7 @@ class Composition {
 
   /// Records the isotopic composition in output database Compositions table (if
   /// not done previously).
-  void Record();
+  void Record(Context* ctx);
 
  protected:
 

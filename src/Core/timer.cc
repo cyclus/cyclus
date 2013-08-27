@@ -14,8 +14,6 @@
 
 namespace cyclus {
 
-Timer* Timer::instance_ = 0;
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
@@ -148,17 +146,6 @@ int Timer::time() {
   return time_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer* Timer::Instance() {
-  // If we haven't created a Timer yet, create it, and then and return it
-  // either way.
-  if (0 == instance_) {
-    instance_ = new Timer();
-  }
-
-  return instance_;
-}
-
 void Timer::reset() {
   resolve_listeners_.clear();
   tick_listeners_.clear();
@@ -259,7 +246,7 @@ void Timer::load_simulation(QueryEngine* qe) {
   std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  TI->Initialize(dur, m0, y0, sim0, dec);
+  Initialize(dur, m0, y0, sim0, dec);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

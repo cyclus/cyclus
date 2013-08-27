@@ -42,17 +42,16 @@ class MaterialTest : public ::testing::Test {
     v[am241_] = 1;
     diff_comp_ = cyclus::Composition::CreateFromMass(v);
 
-    default_mat_ = cyclus::Material::Create(0 * units::g, test_comp_);
-    test_mat_ = cyclus::Material::Create(test_size_, test_comp_);
-    two_test_mat_ = cyclus::Material::Create(2 * test_size_, test_comp_);
-    ten_test_mat_ = cyclus::Material::Create(10 * test_size_, test_comp_);
-    diff_mat_ = cyclus::Material::Create(test_size_, diff_comp_);
+    default_mat_ = cyclus::Material::CreateUntracked(0 * units::g, test_comp_);
+    test_mat_ = cyclus::Material::CreateUntracked(test_size_, test_comp_);
+    two_test_mat_ = cyclus::Material::CreateUntracked(2 * test_size_, test_comp_);
+    ten_test_mat_ = cyclus::Material::CreateUntracked(10 * test_size_, test_comp_);
+    diff_mat_ = cyclus::Material::CreateUntracked(test_size_, diff_comp_);
 
     // test info
     u235_g_per_mol_ = 235.044;
     u235_halflife_ = 8445600000; // approximate, in months
     th228_halflife_ = 2 * 11; // approximate, in months
-    int time_ = cyclus::TI->time();
   }
 
   virtual void TearDown() { }

@@ -15,14 +15,14 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(quantity, c));
+Material::Ptr Material::Create(double quantity, Composition::Ptr c, Context* ctx) {
+  Material::Ptr m(new Material(quantity, c, ctx));
   m->tracker_.Create();
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(quantity, c));
+  Material::Ptr m(new Material(quantity, c, NULL));
   m->tracker_.DontTrack();
   return m;
 }
@@ -42,8 +42,8 @@ Resource::Ptr Material::Clone() const {
   return c;
 }
 
-void Material::Record() const {
-  comp_->Record();
+void Material::Record(Context* ctx) const {
+  comp_->Record(ctx);
 }
 
 std::string Material::units() const {
@@ -80,7 +80,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   qty_ -= qty;
 
-  Material::Ptr other(new Material(qty, c));
+  Material::Ptr other(new Material(qty, c, ctx_));
 
   tracker_.Extract(&other->tracker_);
 
@@ -125,10 +125,10 @@ Composition::Ptr Material::comp() const {
   return comp_;
 }
 
-Material::Material(double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(this) {
+Material::Material(double quantity, Composition::Ptr c, Context* ctx)
+  : qty_(quantity), comp_(c), tracker_(this, ctx) {
   all_mats_[this] = true;
-  prev_decay_time_ = TI->time();
+  prev_decay_time_ = ctx->time();
 }
 
 } // namespace cyclus

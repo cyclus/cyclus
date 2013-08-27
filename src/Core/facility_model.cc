@@ -16,10 +16,11 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-FacilityModel::FacilityModel() :
-  fac_lifetime_(std::numeric_limits<int>::max()),
-  decommission_date_(std::numeric_limits<int>::max()),
-  build_date_(0) {
+FacilityModel::FacilityModel(Context* ctx)
+    : TimeAgent(ctx),
+      fac_lifetime_(std::numeric_limits<int>::max()),
+      decommission_date_(std::numeric_limits<int>::max()),
+      build_date_(0) {
   SetModelType("Facility");
   in_commods_ = std::vector<std::string>();
   out_commods_ = std::vector<std::string>();
@@ -36,7 +37,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   try {
     SetFacLifetime(atoi(qe->GetElementContent("lifetime").c_str()));
   } catch (Error e) {
-    SetFacLifetime(TI->SimDur());
+    SetFacLifetime(context()->sim_dur());
   }
 
   // get the incommodities
@@ -66,10 +67,11 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Prototype* FacilityModel::clone() {
   FacilityModel* clone = dynamic_cast<FacilityModel*>(Model::ConstructModel(
+                                                        context(),
                                                         ModelImpl()));
   clone->CloneCoreMembersFrom(this);
   clone->CloneModuleMembersFrom(this);
-  clone->SetBuildDate(TI->time());
+  clone->SetBuildDate(context()->time());
   CLOG(LEV_DEBUG3) << clone->ModelImpl() << " cloned: " << clone->str();
   CLOG(LEV_DEBUG3) << "               From: " << this->str();
   return clone;
@@ -148,7 +150,7 @@ void FacilityModel::SetBuildDate(int current_time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::SetDecommissionDate(int time) {
-  double final_time = TI->FinalTime();
+  double final_time = context()->start_time() + context()->sim_dur();
   if (time < final_time) {
     decommission_date_ = time;
   } else {

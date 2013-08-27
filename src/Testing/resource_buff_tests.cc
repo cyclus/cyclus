@@ -278,13 +278,13 @@ TEST_F(ResourceBuffTest, PushOne_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.PushOne(mat2_));
 
   double topush = cap - store_.quantity();
-  Resource::Ptr overmat = GenericResource::Create(topush + overeps, "food", "kg")->Clone();
+  Resource::Ptr overmat = GenericResource::CreateUntracked(topush + overeps, "food", "kg")->Clone();
 
   ASSERT_THROW(store_.PushOne(overmat), cyclus::ValueError);
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat = GenericResource::Create(topush + undereps, "food", "kg")->Clone();
+  overmat = GenericResource::CreateUntracked(topush + undereps, "food", "kg")->Clone();
   ASSERT_NO_THROW(store_.PushOne(overmat));
   ASSERT_EQ(store_.count(), 3);
 
@@ -343,7 +343,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.PushAll(mats));
 
   double topush = cap - store_.quantity();
-  Resource::Ptr overmat = GenericResource::Create(topush + overeps, "food", "kg")->Clone();
+  Resource::Ptr overmat = GenericResource::CreateUntracked(topush + overeps, "food", "kg")->Clone();
   Manifest overmats;
   overmats.push_back(overmat);
 
@@ -352,7 +352,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
   overmats.clear();
-  overmat = GenericResource::Create(topush + undereps, "food", "kg")->Clone();
+  overmat = GenericResource::CreateUntracked(topush + undereps, "food", "kg")->Clone();
   overmats.push_back(overmat);
 
   ASSERT_NO_THROW(store_.PushAll(overmats));

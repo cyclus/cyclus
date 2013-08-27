@@ -60,7 +60,7 @@ void MarketModel::RegisterMarket(MarketModel* mkt) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::EnterSimulationAsCoreEntity() {
   // register the model
-  TI->RegisterResolveListener(this);
+  context()->RegisterResolveListener(this);
   MarketModel::RegisterMarket(this);
 }
 
