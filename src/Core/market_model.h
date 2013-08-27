@@ -62,7 +62,7 @@ class MarketModel : public Model, public Communicator {
   /**
      default constructor
    */
-  MarketModel();
+  MarketModel(Context* ctx);
 
   /**
      MarketModels should not be indestructible.

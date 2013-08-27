@@ -15,7 +15,7 @@ namespace cyclus {
 std::list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel::MarketModel() {
+MarketModel::MarketModel(Context* ctx) : Model(ctx) {
   SetModelType("Market");
 }
 

@@ -72,7 +72,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      Default constructor for RegionModel Class
    */
-  RegionModel();
+  RegionModel(Context* ctx);
 
   /**
      RegionModels should not be indestructible.

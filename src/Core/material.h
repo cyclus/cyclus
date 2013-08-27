@@ -76,7 +76,7 @@ class Material: public Resource {
 
   /// Creates a new material resource that is "live" and tracked. All future
   /// output data recorded will be done using the passed simulation context ctx.
-  static Ptr Create(double quantity, Composition::Ptr c, Context* ctx);
+  static Ptr Create(Context* ctx, double quantity, Composition::Ptr c);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -129,7 +129,7 @@ class Material: public Resource {
   Composition::Ptr comp() const;
 
  protected:
-  Material(double quantity, Composition::Ptr c, Context* ctx);
+  Material(Context* ctx, double quantity, Composition::Ptr c);
 
  private:
   static std::map<Material*, bool> all_mats_;

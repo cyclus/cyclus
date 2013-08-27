@@ -5,7 +5,7 @@
 
 namespace cyclus {
 
-ResTracker::ResTracker(Resource* r, Context* ctx)
+ResTracker::ResTracker(Context* ctx, Resource* r)
   : tracked_(true),
     res_(r),
     ctx_(ctx),

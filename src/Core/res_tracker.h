@@ -22,7 +22,7 @@ namespace cyclus {
 class ResTracker {
  public:
   /// Create a new tracker following r.
-  ResTracker(Resource* r, Context* ctx);
+  ResTracker(Context* ctx, Resource* r);
 
   /// Prevents a resource's heritage from being tracked and recorded.
   void DontTrack();

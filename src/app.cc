@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
   using cyclus::SqliteBack;
   using cyclus::CsvBack;
   using cyclus::XMLFileLoader;
+  using cyclus::Context;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";

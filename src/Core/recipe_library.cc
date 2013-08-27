@@ -13,7 +13,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipes(QueryEngine* qe, Context* ctx) {
+void RecipeLibrary::LoadRecipes(Context* ctx, QueryEngine* qe) {
   // load recipes from file
   int nRecipes = qe->NElementsMatchingQuery("recipe");
   CLOG(LEV_DEBUG2) << "loading recipes {";
@@ -21,14 +21,14 @@ void RecipeLibrary::LoadRecipes(QueryEngine* qe, Context* ctx) {
     QueryEngine* recipe = qe->QueryElement("recipe", i);
     std::string name = recipe->GetElementContent("name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    LoadRecipe(recipe, ctx); // load recipe
+    LoadRecipe(ctx, recipe); // load recipe
   }
 
   CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipe(QueryEngine* qe, Context* ctx) {
+void RecipeLibrary::LoadRecipe(Context* ctx, QueryEngine* qe) {
   bool atom_basis;
   std::string basis_str = qe->GetElementContent("basis");
   if (basis_str == "atom") {
