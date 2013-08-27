@@ -65,7 +65,7 @@ void ResTracker::Record() {
   ->AddVal("Type", res_->type())
   ->AddVal("Quantity", res_->quantity())
   ->AddVal("units", res_->units())
-  ->AddVal("StateId", res->state_id())
+  ->AddVal("StateId", res_->state_id())
   ->AddVal("Parent1", parent1_)
   ->AddVal("Parent2", parent2_)
   ->Record();
