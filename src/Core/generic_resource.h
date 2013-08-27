@@ -4,6 +4,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "context.h"
 #include "resource.h"
 #include "res_tracker.h"
 
@@ -19,8 +20,9 @@ class GenericResource : public Resource {
   boost::shared_ptr<GenericResource> Ptr;
   static const ResourceType kType;
 
-  /// Creates a new generic resource that is "live" and tracked.
-  static Ptr Create(double quantity, std::string quality, std::string units);
+  /// Creates a new generic resource that is "live" and tracked. All future
+  /// output data recorded will be done using the passed simulation context ctx.
+  static Ptr Create(double quantity, std::string quality, std::string units, Context* ctx);
 
   /// Creates a new generic resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -40,7 +42,7 @@ class GenericResource : public Resource {
 
   virtual Resource::Ptr Clone() const;
 
-  virtual void Record() const { };
+  virtual void Record(Context* ctx) const { };
 
   virtual std::string units() const {
     return units_;
@@ -70,8 +72,9 @@ class GenericResource : public Resource {
  private:
   /// @param quantity is a double indicating the quantity
   /// @param units is a string indicating the resource unit
-  GenericResource(double quantity, std::string quality, std::string units);
+  GenericResource(double quantity, std::string quality, std::string units, Context* ctx);
 
+  Context* ctx_;
   std::string units_;
   std::string quality_;
   double quantity_;

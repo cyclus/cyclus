@@ -12,8 +12,9 @@ const ResourceType GenericResource::kType = "GenericResource";
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::Ptr GenericResource::Create(double quantity,
                                              std::string quality,
-                                             std::string units) {
-  GenericResource::Ptr r(new GenericResource(quantity, quality, units));
+                                             std::string units,
+                                             Context* ctx) {
+  GenericResource::Ptr r(new GenericResource(quantity, quality, units, ctx));
   r->tracker_.Create();
   return r;
 }
@@ -22,7 +23,7 @@ GenericResource::Ptr GenericResource::Create(double quantity,
 GenericResource::Ptr GenericResource::CreateUntracked(double quantity,
                                                       std::string quality,
                                                       std::string units) {
-  GenericResource::Ptr r(new GenericResource(quantity, quality, units));
+  GenericResource::Ptr r(new GenericResource(quantity, quality, units, NULL));
   r->tracker_.DontTrack();
   return r;
 }
@@ -54,7 +55,7 @@ GenericResource::Ptr GenericResource::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  GenericResource::Ptr other(new GenericResource(quantity, quality_, units_));
+  GenericResource::Ptr other(new GenericResource(quantity, quality_, units_, ctx_));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -66,7 +67,7 @@ Resource::Ptr GenericResource::ExtractRes(double qty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::GenericResource(double quantity, std::string quality,
-                                 std::string units)
-  : units_(units), quality_(quality), quantity_(quantity), tracker_(this) { }
+                                 std::string units, Context* ctx)
+  : units_(units), quality_(quality), quantity_(quantity), tracker_(this, ctx) { }
 
 } // namespace cyclus

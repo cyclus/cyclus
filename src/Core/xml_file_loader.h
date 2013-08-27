@@ -7,7 +7,10 @@
 #include <string>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
+
+#include "context.h"
 #include "xml_parser.h"
+#include "timer.h"
 
 namespace cyclus {
 
@@ -22,7 +25,7 @@ class XMLFileLoader {
      @param load_filename The filename for the file to be loaded; defaults to
      an empty string
   */
-  XMLFileLoader(const std::string load_filename = "");
+  XMLFileLoader(Context* ctx, const std::string load_filename = "");
 
   /**
      Initializes the internal data structures of the file loader
@@ -45,7 +48,7 @@ class XMLFileLoader {
   /**
      Method to load the simulation control parameters.
   */
-  void load_control_parameters();
+  void load_control_parameters(Timer* ti);
 
   /**
      Method to load recipes from either the primary input file
@@ -84,6 +87,8 @@ class XMLFileLoader {
                                 std::string file);
 
  private:
+  Context* ctx_;
+
   /// Fills out the cyclus.rng.in template with discovered modules.
   std::string BuildSchema();
 

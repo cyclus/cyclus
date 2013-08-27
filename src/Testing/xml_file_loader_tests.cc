@@ -8,6 +8,7 @@
 #include "model.h"
 #include "error.h"
 #include "dynamic_module.h"
+#include "timer.h"
 
 using namespace std;
 
@@ -165,7 +166,10 @@ TEST_F(XMLFileLoaderTests,recipes) {
   using cyclus::XMLFileLoader;
   xmlFile = XMLFileLoader(recipeFile);
   xmlFile.Init(false);
-  EXPECT_NO_THROW(xmlFile.load_recipes());
+  cyclus::Timer t;
+  cyclus::EventManager m;
+  cyclus::Context ctx(&t, &m);
+  EXPECT_NO_THROW(xmlFile.load_recipes(&ctx));
 }
 
 // This needs to be moved somewhere else! maybe to a new simulation

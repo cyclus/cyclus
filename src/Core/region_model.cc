@@ -59,7 +59,7 @@ void RegionModel::EnterSimulationAsCoreEntity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::AddRegionAsRootNode() {
-  TI->RegisterTickListener(this);
+  context()->RegisterTickListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

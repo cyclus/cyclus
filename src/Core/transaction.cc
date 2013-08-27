@@ -151,7 +151,7 @@ void Transaction::AddTransToTable() {
   ->AddVal("MarketID", market()->ID())
   ->AddVal("Commodity", commod())
   ->AddVal("Price", price_)
-  ->AddVal("Time", TI->time())
+  ->AddVal("Time", supplier_->context()->time())
   ->Record();
 }
 

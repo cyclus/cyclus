@@ -4,11 +4,13 @@
 
 #include <string>
 
+#include "context.h"
+
 namespace cyclus {
 
 class Model;
 
-typedef Model* ModelCtor();
+typedef Model* ModelCtor(Context*);
 typedef void ModelDtor(Model*);
 
 class DynamicModule {
@@ -30,7 +32,7 @@ class DynamicModule {
      construct an instance of this module
      @return a fresh instance
   */
-  Model* ConstructInstance();
+  Model* ConstructInstance(Context* ctx);
 
   /**
      call this destructor on an instance of a Model

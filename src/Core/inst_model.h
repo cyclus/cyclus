@@ -60,7 +60,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Default constructor for InstModel Class
    */
-  InstModel();
+  InstModel(Context* ctx);
 
   /**
      every model should be destructable

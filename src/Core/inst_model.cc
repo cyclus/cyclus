@@ -16,7 +16,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel::InstModel() {
+InstModel::InstModel(Context* ctx) : TimeAgent(ctx) {
   SetModelType("Inst");
   prototypes_ = PrototypeSet();
   initial_build_order_ = std::map<Prototype*, int>();

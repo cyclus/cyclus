@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "context.h"
 #include "model.h"
 
 namespace cyclus {
@@ -15,6 +16,9 @@ namespace cyclus {
 
 class TimeAgent : public Model {
  public:
+
+  TimeAgent(Context* ctx) : Model(ctx) { };
+
   /**
      destructor
    */

@@ -12,20 +12,8 @@
 
 namespace cyclus {
 
-// initialize singleton member
-RecipeLibrary* RecipeLibrary::instance_ = 0;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RecipeLibrary* RecipeLibrary::Instance() {
-  // If we haven't created a RecipeLibrary yet, create and return it.
-  if (0 == instance_) {
-    instance_ = new RecipeLibrary();
-  }
-  return instance_;
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipes(QueryEngine* qe) {
+void RecipeLibrary::LoadRecipes(QueryEngine* qe, Context* ctx) {
   // load recipes from file
   int nRecipes = qe->NElementsMatchingQuery("recipe");
   CLOG(LEV_DEBUG2) << "loading recipes {";
@@ -33,14 +21,14 @@ void RecipeLibrary::LoadRecipes(QueryEngine* qe) {
     QueryEngine* recipe = qe->QueryElement("recipe", i);
     std::string name = recipe->GetElementContent("name");
     CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    LoadRecipe(recipe); // load recipe
+    LoadRecipe(recipe, ctx); // load recipe
   }
 
   CLOG(LEV_DEBUG2) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipe(QueryEngine* qe) {
+void RecipeLibrary::LoadRecipe(QueryEngine* qe, Context* ctx) {
   bool atom_basis;
   std::string basis_str = qe->GetElementContent("basis");
   if (basis_str == "atom") {
@@ -69,25 +57,10 @@ void RecipeLibrary::LoadRecipe(QueryEngine* qe) {
   }
 
   if (atom_basis) {
-    AddRecipe(name, Composition::CreateFromAtom(v));
+    ctx->RegisterRecipe(name, Composition::CreateFromAtom(v));
   } else {
-    AddRecipe(name, Composition::CreateFromMass(v));
+    ctx->RegisterRecipe(name, Composition::CreateFromMass(v));
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::AddRecipe(std::string name, Composition::Ptr recipe) {
-  recipes_[name] = recipe;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Composition::Ptr RecipeLibrary::GetRecipe(std::string name) {
-  if (recipes_.count(name) == 0) {
-    std::stringstream err;
-    err << "RecipeLibrary has not recorded recipe with name: " << name << ".";
-    throw KeyError(err.str());
-  }
-  return recipes_[name];
 }
 
 } // namespace cyclus

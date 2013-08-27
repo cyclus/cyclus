@@ -43,8 +43,8 @@ void DynamicModule::SetPath() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* DynamicModule::ConstructInstance() {
-  return constructor_();
+Model* DynamicModule::ConstructInstance(Context* ctx) {
+  return constructor_(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
