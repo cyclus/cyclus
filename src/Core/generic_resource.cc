@@ -38,7 +38,7 @@ Resource::Ptr GenericResource::Clone() const {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GenericResource::Absorb(GenericResource::Ptr other) {
-  if (other->units() != units()) {
+  if (other->units() != units() || other->quality() != quality()) {
     throw ValueError("incompatible resource types.");
   }
   quantity_ += other->quantity();

@@ -9,42 +9,48 @@
 
 namespace cyclus {
 
-/// A Generic Resource is a general type of resource in the Cyclus
-/// simulation, and is a catch-all for non-standard resources.
+/// A Generic Resource is a general type of resource in the Cyclus simulation,
+/// and is a catch-all for non-standard resources.  It implements the Resource
+/// class interface in a simple way usable for things such as: bananas,
+/// man-hours, water, buying power, etc.
 class GenericResource : public Resource {
  public:
-  typedef boost::shared_ptr<GenericResource> Ptr;
+  typedef
+  boost::shared_ptr<GenericResource> Ptr;
   static const ResourceType kType;
 
+  /// Creates a new generic resource that is "live" and tracked.
   static Ptr Create(double quantity, std::string quality, std::string units);
-  static Ptr CreateUntracked(double quantity, std::string quality,
-                             std::string units);
 
-  /// not needed/no meaning for generic resources
+  /// Creates a new generic resource that does not actually exist as part of
+  /// the simulation and is untracked.
+  static Ptr CreateUntracked(double quantity, std::string quality, std::string
+                             units);
+
+  /// Returns 0 (for now).
   virtual int state_id() const {
     return 0;
   };
+  // TODO: give each quality its own state_id. and have it recorded in the output db.
 
-  /// Returns the concrete type of this resource
+  /// Returns GenericResource::kType.
   virtual const ResourceType type() const {
     return kType;
   };
 
-  /// Returns a reference to a newly allocated copy of this resource
   virtual Resource::Ptr Clone() const;
 
   virtual void Record() const { };
 
-  /// Returns the total quantity of this resource in its base unit
   virtual std::string units() const {
     return units_;
   };
 
-  /// Returns the total quantity of this resource in its base unit
   virtual double quantity() const {
     return quantity_;
   };
 
+  /// Returns the quality of this resource (e.g. bananas, human labor, water, etc.).
   virtual const std::string& quality() const {
     return quality_;
   };
@@ -53,13 +59,12 @@ class GenericResource : public Resource {
 
   /// Extracts the specified mass from this resource and returns it as a
   /// new generic resource object with the same quality/type.
-
-  /// @throws CycGenResourceOverExtract
+  ///
+  /// @throws ValueError tried to extract more than exists.
   GenericResource::Ptr Extract(double quantity);
 
-  /// Absorbs the contents of the given 'other' resource into this
-  /// resource
-  /// @throws CycGenResourceIncompatible 'other' resource is of a
+  /// Absorbs the contents of the given 'other' resource into this resource.
+  /// @throws ValueError 'other' resource is of different units and/or quality
   void Absorb(GenericResource::Ptr other);
 
  private:
