@@ -109,8 +109,6 @@ bool AlmostEq(const Composition::Vect& v1,
 
   Composition::Vect n1(v1);
   Composition::Vect n2(v2);
-  Normalize(&n1, 1);
-  Normalize(&n2, 1);
 
   Composition::Vect::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {

@@ -12,11 +12,11 @@ double MatQuery::qty() {
 
 double MatQuery::mass(Iso iso) {
   return mass_frac(iso) * qty();
-}
+};
 
 double MatQuery::moles(Iso iso) {
   return mass(iso) / (MT->GramsPerMol(iso) * units::g);
-}
+};
 
 double MatQuery::mass_frac(Iso iso) {
   Composition::Vect v = m_->comp()->mass_vect();
@@ -31,10 +31,10 @@ double MatQuery::atom_frac(Iso iso) {
 };
 
 bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {
-  bool compeq = compmath::AlmostEq(m_->comp()->mass_vect(),
-                                   other->comp()->mass_vect(),
-                                   threshold);
-  return compeq
-         && std::abs(m_->quantity() - other->quantity()) < threshold;
+  Composition::Vect n1 = m_->comp()->mass_vect();
+  Composition::Vect n2 = other->comp()->mass_vect();
+  compmath::Normalize(&n1);
+  compmath::Normalize(&n2);
+  return compmath::AlmostEq(n1, n2, threshold);
 };
 } // namespace cyclus

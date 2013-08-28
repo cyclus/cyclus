@@ -126,7 +126,7 @@ TEST(CompMathTest, ApplyThresholdMedium) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, AlmostEquality) {
+TEST(CompMathTest, AlmostEq) {
   Composition::Vect v1;
   v1[1] = 0.1;
   v1[2] = 0.1;
@@ -135,7 +135,7 @@ TEST(CompMathTest, AlmostEquality) {
   Composition::Vect v2(v1);
   Composition::Vect::iterator it;
   for (it = v2.begin(); it != v2.end(); ++it) {
-    v2[it->first] *= 1.1;
+    v2[it->first] = 0.11;
   }
 
   EXPECT_TRUE(cm::AlmostEq(v1, v2, 0.1));

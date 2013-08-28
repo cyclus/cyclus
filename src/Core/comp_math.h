@@ -44,10 +44,10 @@ bool ValidIsos(const Composition::Vect& v);
 /// zero.
 bool AllPositive(const Composition::Vect& v);
 
-/// Returns true if all nuclides of v1 and v2 are the same within threshold.
-bool AlmostEq(const Composition::Vect& v1,
-              const Composition::Vect& v2,
-              double threshold);
+/// Returns true if all nuclides of v1 and v2 are the same within threshold. No
+/// normalization is performed.
+bool AlmostEq(const Composition::Vect& v1, const Composition::Vect& v2, double
+              threshold);
 
 } // namespace compmath
 } // namespace cyclus
