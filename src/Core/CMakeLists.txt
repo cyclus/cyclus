@@ -47,6 +47,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/converter_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
@@ -111,6 +112,7 @@ INSTALL(FILES
   generic_resource.h
   material.h
   mat_buff.h
+  mat_query.h
   resource.h
   resource_buff.h
   communicator.h
