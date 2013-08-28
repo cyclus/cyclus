@@ -6,9 +6,10 @@
 #include <vector>
 #include "boost/date_time/gregorian/gregorian.hpp"
 
-#include "time_agent.h"
+#include "context.h"
 #include "market_model.h"
 #include "query_engine.h"
+#include "time_agent.h"
 
 namespace cyclus {
 
@@ -33,7 +34,8 @@ class Timer {
      @param decay interval between decay calculations in months. <=0 if
      decay is off (default = 0)
    */
-  void Initialize(int dur = 1, int m0 = 1, int y0 = 2010, int start = 0,
+  void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
+                  int start = 0,
                   int decay = 0);
 
   /**
@@ -164,13 +166,13 @@ class Timer {
 
      @param qe is a pointer to a general QueryEngine that can
    */
-  void load_simulation(QueryEngine* qe);
+  void load_simulation(Context* ctx, QueryEngine* qe);
 
   /**
      logs relevant time-related data with the output system, including:
      the simulation start time and the simulation duration
    */
-  void LogTimeData();
+  void LogTimeData(Context* ctx);
 
  private:
   /**

@@ -12,7 +12,7 @@
 #include "env.h"
 #include "error.h"
 #include "model.h"
-#include "recipe_library.h"
+#include "recipe.h"
 #include "timer.h"
 #include "xml_query_engine.h"
 
@@ -141,7 +141,7 @@ void XMLFileLoader::load_recipes() {
   int numRecipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < numRecipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    RecipeLibrary::LoadRecipe(ctx_, qe);
+    recipe::Load(ctx_, qe);
   }
 }
 
@@ -172,6 +172,6 @@ void XMLFileLoader::load_control_parameters(Timer* ti) {
 
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
-  ti->load_simulation(qe);
+  ti->load_simulation(ctx_, qe);
 }
 } // namespace cyclus
