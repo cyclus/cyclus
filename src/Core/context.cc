@@ -2,9 +2,6 @@
 #include "context.h"
 
 #include "error.h"
-#include "event_manager.h"
-#include "model.h"
-#include "prototype.h"
 #include "timer.h"
 
 namespace cyclus {
@@ -25,8 +22,7 @@ T* Context::GetModel(std::string name) {
   Model* m = models_[name];
   T* casted(NULL);
   casted = dynamic_cast<T*>(m);
-  if (casted == NULL) {
-    throw CastError("Invalid model cast for model name " + name);
+  if (casted == NULL) { throw CastError("Invalid model cast for model name " + name);
   }
   return casted;
 };

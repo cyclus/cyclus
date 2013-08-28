@@ -1,7 +1,9 @@
-// mat_query_tests.cc 
+// mat_query_tests.cc
 #include <gtest/gtest.h>
 
 #include "composition.h"
+#include "context.h"
+#include "event_manager.h"
 #include "mass_table.h"
 #include "mat_query.h"
 #include "material.h"

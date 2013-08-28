@@ -5,9 +5,12 @@
 #include <cmath>
 
 #include "composition.h"
+#include "context.h"
 #include "cyc_limits.h"
+#include "event_manager.h"
 #include "error.h"
 #include "material.h"
+#include "timer.h"
 
 using cyclus::CompMap;
 using cyclus::Composition;
@@ -22,11 +25,15 @@ void EnrichmentTests::SetUp() {
   assay_u_ = product_;
   mass_u_ = 10;
 
+  cyclus::Timer ti;
+  cyclus::EventManager em;
+  cyclus::Context ctx(&ti, &em);
+
   CompMap v;
   v[92235] = assay_u_;
   v[92238] = 1 - assay_u_;
   Composition::Ptr comp = Composition::CreateFromAtom(v);
-  mat_ = Material::CreateUntracked(mass_u_, comp);
+  mat_ = Material::Create(&ctx, mass_u_, comp);
 
   SetEnrichmentParameters();
 }

@@ -1,13 +1,12 @@
 // market_model.cc
 // Implements the MarketModel Class
 
-#include <string>
-
 #include "market_model.h"
+
+#include <string>
 
 #include "timer.h"
 #include "logger.h"
-#include "query_engine.h"
 #include "error.h"
 
 namespace cyclus {

@@ -6,10 +6,11 @@
 #include <string>
 
 #include "composition.h"
+#include "event_manager.h"
+#include "prototype.h"
 
 namespace cyclus {
 
-class Prototype;
 class EventManager;
 class Event;
 class MarketModel;

@@ -8,9 +8,9 @@
 #include <boost/filesystem.hpp>
 
 #include "blob.h"
+#include "context.h"
 #include "env.h"
 #include "error.h"
-#include "event_manager.h"
 #include "model.h"
 #include "recipe_library.h"
 #include "timer.h"
@@ -37,7 +37,7 @@ void XMLFileLoader::Init(bool use_main_schema)  {
     parser_->Validate(ss);
   }
 
-  EM->NewEvent("InputFiles")
+  ctx_->NewEvent("InputFiles")
   ->AddVal("Data", cyclus::Blob(input.str()))
   ->Record();
 }

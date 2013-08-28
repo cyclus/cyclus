@@ -8,11 +8,12 @@
 #include <sstream>
 #include <boost/shared_ptr.hpp>
 
-#include "context.h"
 #include "xml_parser.h"
-#include "timer.h"
 
 namespace cyclus {
+
+class Context;
+class Timer;
 
 /**
    a class that encapsulates the methods needed to load input to

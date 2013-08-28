@@ -2,9 +2,9 @@
 #include "material.h"
 
 #include "comp_math.h"
+#include "context.h"
 #include "error.h"
 #include "logger.h"
-#include "timer.h"
 
 namespace cyclus {
 
@@ -22,8 +22,9 @@ Material::Ptr Material::Create(Context* ctx, double quantity,
   return m;
 }
 
-Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(NULL, quantity, c));
+Material::Ptr Material::CreateUntracked(Context* ctx, double quantity,
+                                        Composition::Ptr c) {
+  Material::Ptr m(new Material(ctx, quantity, c));
   m->tracker_.DontTrack();
   return m;
 }
@@ -127,7 +128,7 @@ Composition::Ptr Material::comp() const {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(ctx, this) {
+  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx) {
   all_mats_[this] = true;
   prev_decay_time_ = ctx->time();
 }

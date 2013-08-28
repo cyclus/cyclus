@@ -1,5 +1,5 @@
-#ifndef PROTOTYPE_H
-#define PROTOTYPE_H
+#ifndef PROTOTYPE_H_
+#define PROTOTYPE_H_
 
 #include <map>
 #include <string>

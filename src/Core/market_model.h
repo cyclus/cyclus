@@ -6,12 +6,11 @@
 #include <set>
 #include <list>
 
-#include "model.h"
 #include "communicator.h"
+#include "model.h"
+#include "query_engine.h"
 
 namespace cyclus {
-
-class QueryEngine;
 
 /**
    Markets are used to allocate transactions between agents. Each
