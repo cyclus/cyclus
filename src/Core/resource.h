@@ -5,9 +5,10 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "context.h"
 
 namespace cyclus {
+
+class Context;
 
 typedef std::string ResourceType;
 

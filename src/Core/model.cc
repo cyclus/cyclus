@@ -1,24 +1,18 @@
 // model.cc
 // Implements the Model Class
+#include "model.h"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <algorithm>
 
-#include "model.h"
-
-#include "dynamic_module.h"
-#include "logger.h"
 #include "error.h"
-#include "env.h"
-#include "timer.h"
-#include "resource.h"
+#include "logger.h"
+#include "market_model.h"
 #include "prototype.h"
-#include "query_engine.h"
-#include "event_manager.h"
-
 #include "region_model.h"
+#include "resource.h"
 
 namespace cyclus {
 

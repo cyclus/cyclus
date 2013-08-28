@@ -1,22 +1,18 @@
 // model.h
-#if !defined(_MODEL_H)
-#define _MODEL_H
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 #include <boost/shared_ptr.hpp>
 
+#include "dynamic_module.h"
 #include "transaction.h"
+#include "query_engine.h"
 
 namespace cyclus {
-
-class DynamicModule;
-class Model;
-class Message;
-class Transaction;
-class QueryEngine;
 
 /**
    defines the possible model types

@@ -5,12 +5,13 @@
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"
-#include "context.h"
 #include "cyc_limits.h"
 #include "resource.h"
 #include "res_tracker.h"
 
 namespace cyclus {
+
+class Context;
 
 namespace units {
 const double kg = 1.0;
@@ -80,7 +81,7 @@ class Material: public Resource {
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
-  static Ptr CreateUntracked(double quantity, Composition::Ptr c);
+  static Ptr CreateUntracked(Context* ctx, double quantity, Composition::Ptr c);
 
   /// Returns the id of the material's internal nuclide composition.
   virtual int state_id() const;

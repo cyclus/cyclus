@@ -3,13 +3,12 @@
 
 #include "message.h"
 
+#include <map>
+
 #include "communicator.h"
 #include "error.h"
-#include "model.h"
-#include "market_model.h"
-#include "resource.h"
 #include "logger.h"
-#include "timer.h"
+#include "model.h"
 
 namespace cyclus {
 

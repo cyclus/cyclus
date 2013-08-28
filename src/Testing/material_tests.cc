@@ -43,8 +43,8 @@ TEST_F(MaterialTest, ExtractRes) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, SimpleAbsorb) {
   double val = 1.5 * units::kg;
-  cyclus::Material::Ptr m1 = cyclus::Material::CreateUntracked(val, test_comp_);
-  cyclus::Material::Ptr m2 = cyclus::Material::CreateUntracked(val, test_comp_);
+  cyclus::Material::Ptr m1 = cyclus::Material::Create(ctx_, val, test_comp_);
+  cyclus::Material::Ptr m2 = cyclus::Material::Create(ctx_, val, test_comp_);
   ASSERT_EQ(m1->comp(), m2->comp());
   ASSERT_EQ(m1->quantity(), m2->quantity());
 
@@ -60,9 +60,9 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   cyclus::Material::Ptr mat1;
   cyclus::Material::Ptr mat2;
   cyclus::Material::Ptr mat10;
-  mat1 = cyclus::Material::CreateUntracked(1 * test_size_, test_comp_);
-  mat2 = cyclus::Material::CreateUntracked(2 * test_size_, test_comp_);
-  mat10 = cyclus::Material::CreateUntracked(10 * test_size_, test_comp_);
+  mat1 = cyclus::Material::Create(ctx_, 1 * test_size_, test_comp_);
+  mat2 = cyclus::Material::Create(ctx_, 2 * test_size_, test_comp_);
+  mat10 = cyclus::Material::Create(ctx_, 10 * test_size_, test_comp_);
 
   // see that two materials with the same composition do the right thing
   double orig = test_mat_->quantity();
@@ -85,7 +85,7 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // make a number of materials masses 1, 2, and 10
-  cyclus::Material::Ptr same_as_orig_test_mat = cyclus::Material::CreateUntracked(0,
+  cyclus::Material::Ptr same_as_orig_test_mat = cyclus::Material::Create(ctx_, 0,
                                                 test_comp_);
 
   CompMap v;
@@ -94,7 +94,8 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   v[th228_] = 1.0 * units::g;
   cyclus::Composition::Ptr diff_test_comp = cyclus::Composition::CreateFromMass(
                                               v);
-  cyclus::Material::Ptr diff_test_mat = cyclus::Material::CreateUntracked(test_size_ / 2,
+  cyclus::Material::Ptr diff_test_mat = cyclus::Material::Create(ctx_,
+                                        test_size_ / 2,
                                         diff_test_comp);
 
   double orig = test_mat_->quantity();
@@ -115,14 +116,14 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbZeroMaterial) {
-  Material::Ptr same_as_test_mat = Material::CreateUntracked(0, test_comp_);
+  Material::Ptr same_as_test_mat = Material::Create(ctx_, 0, test_comp_);
   EXPECT_NO_THROW(test_mat_->Absorb(same_as_test_mat));
   EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbIntoZeroMaterial) {
-  Material::Ptr same_as_test_mat = Material::CreateUntracked(0, test_comp_);
+  Material::Ptr same_as_test_mat = Material::Create(ctx_, 0, test_comp_);
   EXPECT_NO_THROW(same_as_test_mat->Absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
 }

@@ -20,13 +20,13 @@ double MatQuery::moles(Iso iso) {
 
 double MatQuery::mass_frac(Iso iso) {
   CompMap v = m_->comp()->mass();
-  compmath::Normalize(&v, 1);
+  compmath::Normalize(&v);
   return v[iso];
 };
 
 double MatQuery::atom_frac(Iso iso) {
   CompMap v = m_->comp()->atom();
-  compmath::Normalize(&v, 1);
+  compmath::Normalize(&v);
   return v[iso];
 };
 

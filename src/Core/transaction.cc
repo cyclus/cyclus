@@ -2,13 +2,12 @@
 
 #include "transaction.h"
 
-#include "timer.h"
-#include "error.h"
-#include "model.h"
-#include "market_model.h"
-#include "event_manager.h"
 #include <string>
 #include <vector>
+
+#include "error.h"
+#include "market_model.h"
+#include "model.h"
 
 namespace cyclus {
 

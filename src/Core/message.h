@@ -7,14 +7,13 @@
 #include <vector>
 #include <string>
 
-#include "resource.h"
-#include "transaction.h"
 #include "intrusive_base.h"
+#include "transaction.h"
 
 namespace cyclus {
 
 class Communicator;
-class Transaction;
+class Model;
 
 /**
    An enumerative type to specify which direction

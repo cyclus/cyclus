@@ -1,8 +1,6 @@
 
 #include "resource.h"
 
-#include "event_manager.h"
-
 namespace cyclus {
 
 int Resource::nextid_ = 1;
