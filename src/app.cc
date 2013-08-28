@@ -19,6 +19,7 @@
 #include "sqlite_back.h"
 #include "hdf5_back.h"
 #include "csv_back.h"
+#include "context.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -192,7 +193,7 @@ int main(int argc, char* argv[]) {
     std::cout << "|              run successful                |" << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << "Output location: " << output_path << std::endl;
-    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(EM->sim_id()) << std::endl;
+    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
     std::cout << std::endl;
   } else {
     std::cout << std::endl;

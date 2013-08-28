@@ -1,17 +1,16 @@
 // event_manager.cc
 
 #include "event_manager.h"
-#include "event_backend.h"
-#include "event.h"
-#include "logger.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace cyclus {
+#include "event_backend.h"
+#include "event.h"
+#include "logger.h"
 
-EventManager* EventManager::instance_ = 0;
+namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 EventManager::EventManager() : index_(0) {
@@ -24,14 +23,6 @@ EventManager::~EventManager() {
   for (int i = 0; i < events_.size(); ++i) {
     delete events_[i];
   }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager* EventManager::Instance() {
-  if (0 == instance_) {
-    instance_ = new EventManager();
-  }
-  return instance_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

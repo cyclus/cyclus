@@ -38,6 +38,8 @@ class Context {
   void RegisterTickListener(TimeAgent* ta);
   void RegisterResolveListener(MarketModel* mkt);
 
+  boost::uuids::uuid sim_id();
+
   int time();
   int start_time();
   int sim_dur();

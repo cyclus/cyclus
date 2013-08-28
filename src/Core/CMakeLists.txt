@@ -36,7 +36,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/prototype.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/recipe_library.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/recipe.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
@@ -96,7 +96,7 @@ INSTALL(FILES
   market_player_manager.h
   mass_table.h
   prototype.h
-  recipe_library.h
+  recipe.h
   res_tracker.h
   supply_demand.h
   supply_demand_manager.h

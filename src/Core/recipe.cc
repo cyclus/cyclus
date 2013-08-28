@@ -1,34 +1,18 @@
-// recipe_library.cpp
+// recipe.cpp
 // Implements the RecipeLibrary class
 
-#include "recipe_library.h"
+#include "recipe.h"
 
 #include <map>
 #include <sstream>
 
 #include "error.h"
 #include "logger.h"
-#include "mass_table.h"
 
 namespace cyclus {
+namespace recipe {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipes(Context* ctx, QueryEngine* qe) {
-  // load recipes from file
-  int nRecipes = qe->NElementsMatchingQuery("recipe");
-  CLOG(LEV_DEBUG2) << "loading recipes {";
-  for (int i = 0; i < nRecipes; i++) {
-    QueryEngine* recipe = qe->QueryElement("recipe", i);
-    std::string name = recipe->GetElementContent("name");
-    CLOG(LEV_DEBUG2) << "Adding recipe '" << name << "'.";
-    LoadRecipe(ctx, recipe); // load recipe
-  }
-
-  CLOG(LEV_DEBUG2) << "}";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RecipeLibrary::LoadRecipe(Context* ctx, QueryEngine* qe) {
+void Load(Context* ctx, QueryEngine* qe) {
   bool atom_basis;
   std::string basis_str = qe->GetElementContent("basis");
   if (basis_str == "atom") {
@@ -63,5 +47,6 @@ void RecipeLibrary::LoadRecipe(Context* ctx, QueryEngine* qe) {
   }
 }
 
+} // namespace recipe
 } // namespace cyclus
 

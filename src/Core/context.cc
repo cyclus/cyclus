@@ -57,6 +57,10 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 };
 
+boost::uuids::uuid Context::sim_id() {
+  return em_->sim_id();
+};
+
 int Context::time() {
   return ti_->time();
 };

@@ -9,8 +9,6 @@
 #include "error.h"
 #include "logger.h"
 #include "material.h"
-#include "event_manager.h"
-
 
 namespace cyclus {
 
@@ -152,7 +150,8 @@ void Timer::reset() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::Initialize(int dur, int m0, int y0, int start, int decay) {
+void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
+                       int decay) {
   reset();
 
   if (m0 < 1 || m0 > 12) {
@@ -184,7 +183,7 @@ void Timer::Initialize(int dur, int m0, int y0, int start, int decay) {
   endDate_ = GetEndDate(startDate_, simDur_);
   date_ = boost::gregorian::date(startDate_);
 
-  LogTimeData();
+  LogTimeData(ctx);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -225,7 +224,7 @@ std::pair<int, int> Timer::ConvertDate(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation(QueryEngine* qe) {
+void Timer::load_simulation(Context* ctx, QueryEngine* qe) {
   if (qe->NElementsMatchingQuery("simhandle") > 0) {
     handle_ = qe->GetElementContent("simhandle");
   }
@@ -246,12 +245,12 @@ void Timer::load_simulation(QueryEngine* qe) {
   std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  Initialize(dur, m0, y0, sim0, dec);
+  Initialize(ctx, dur, m0, y0, sim0, dec);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::LogTimeData() {
-  EM->NewEvent("SimulationTimeInfo")
+void Timer::LogTimeData(Context* ctx) {
+  ctx->NewEvent("SimulationTimeInfo")
   ->AddVal("SimHandle", handle_)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
