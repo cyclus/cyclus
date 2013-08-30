@@ -11,21 +11,50 @@
 #include "cyclopts/solver_interface.h"
 #include "cyclopts/variable.h"
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CycloptsCBCSolverTests, 1VarIPUnbounded) {
-  // usings
-  using boost::any_cast;
-  using cyclus::cyclopts::SolverPtr;
-  using cyclus::cyclopts::CBCSolver;
-  using cyclus::cyclopts::Constraint;
-  using cyclus::cyclopts::ConstraintPtr;
-  using cyclus::cyclopts::ObjFuncPtr;
-  using cyclus::cyclopts::SolverInterface;
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::IntegerVariable;
-  using cyclus::cyclopts::ObjectiveFunction;
+// usings
+using boost::any_cast;
+using cyclus::cyclopts::SolverPtr;
+using cyclus::cyclopts::CBCSolver;
+using cyclus::cyclopts::Constraint;
+using cyclus::cyclopts::ConstraintPtr;
+using cyclus::cyclopts::ObjFuncPtr;
+using cyclus::cyclopts::SolverInterface;
+using cyclus::cyclopts::Variable;
+using cyclus::cyclopts::VariablePtr;
+using cyclus::cyclopts::IntegerVariable;
+using cyclus::cyclopts::ObjectiveFunction;
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
+  // problem instance values
+  int x_exp = 0;
+  int lower = 0;
+  double obj_mod = 1.0;
+  
+  // set up solver and interface
+  SolverPtr solver(new CBCSolver());
+  SolverInterface csi(solver);
+
+  // set up objective function
+  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  csi.RegisterObjFunction(obj);
+
+  // set up variables
+  VariablePtr x(new IntegerVariable(lower, Variable::INF));
+  csi.RegisterVariable(x);
+
+  // objective function
+  csi.AddVarToObjFunction(x, obj_mod);
+  
+  // solve and get solution
+  csi.Solve();
+
+  // check
+  EXPECT_EQ(x_exp, any_cast<int>(x->value()));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   // problem instance values
   int x_exp = 0;
   int upper = 1;
@@ -41,7 +70,66 @@ TEST(CycloptsCBCSolverTests, 1VarIPUnbounded) {
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, Variable::INF));
+  VariablePtr x(new IntegerVariable(lower, upper));
+  csi.RegisterVariable(x);
+
+  // objective function
+  csi.AddVarToObjFunction(x, obj_mod);
+  
+  // solve and get solution
+  csi.Solve();
+
+  // check
+  EXPECT_EQ(x_exp, any_cast<int>(x->value()));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CycloptsCBCSolverTests, DISABLED_1VarIPUpperBoundMax) {
+  // problem instance values
+  int x_exp = 1;
+  int upper = 1;
+  double obj_mod = 1.0;
+  
+  // set up solver and interface
+  SolverPtr solver(new CBCSolver());
+  SolverInterface csi(solver);
+
+  // set up objective function
+  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  csi.RegisterObjFunction(obj);
+
+  // set up variables
+  VariablePtr x(new IntegerVariable(Variable::NEG_INF, upper));
+  csi.RegisterVariable(x);
+
+  // objective function
+  csi.AddVarToObjFunction(x, obj_mod);
+  
+  // solve and get solution
+  csi.Solve();
+
+  // check
+  EXPECT_EQ(x_exp, any_cast<int>(x->value()));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CycloptsCBCSolverTests, DISABLED_1VarIPBothBoundsMax) {
+  // problem instance values
+  int x_exp = 1;
+  int lower = 0;
+  int upper = 1;
+  double obj_mod = 1.0;
+  
+  // set up solver and interface
+  SolverPtr solver(new CBCSolver());
+  SolverInterface csi(solver);
+
+  // set up objective function
+  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  csi.RegisterObjFunction(obj);
+
+  // set up variables
+  VariablePtr x(new IntegerVariable(lower, upper));
   csi.RegisterVariable(x);
 
   // objective function
