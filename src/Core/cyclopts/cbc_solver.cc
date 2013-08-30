@@ -134,7 +134,7 @@ void cyclus::cyclopts::CBCSolver::PopulateSolution(
     boost::any value = solution[i]; 
     switch(variables.at(i)->type()) { 
       case cyclus::cyclopts::Variable::INT:
-        value = (int) solution[i];
+        value = static_cast<int>(solution[i]);
         break;
     }
     variables.at(i)->set_value(value);
