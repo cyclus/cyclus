@@ -11,7 +11,7 @@ namespace cyclus {
 
 int Composition::nextId_ = 0;
 
-Composition::Ptr Composition::CreateFromAtom(Composition::Vect v) {
+Composition::Ptr Composition::CreateFromAtom(CompMap v) {
   if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
     throw ValueError("invalid isotope or negative quantity in composition vector");
   }
@@ -21,7 +21,7 @@ Composition::Ptr Composition::CreateFromAtom(Composition::Vect v) {
   return c;
 }
 
-Composition::Ptr Composition::CreateFromMass(Composition::Vect v) {
+Composition::Ptr Composition::CreateFromMass(CompMap v) {
   if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
     throw ValueError("invalid isotope or negative quantity in composition vector");
   }
@@ -35,9 +35,9 @@ int Composition::id() {
   return id_;
 }
 
-const Composition::Vect& Composition::atom_vect() {
+const CompMap& Composition::atom_vect() {
   if (atomv_.size() == 0) {
-    Composition::Vect::iterator it;
+    CompMap::iterator it;
     for (it = massv_.begin(); it != massv_.end(); ++it) {
       Iso iso = it->first;
       atomv_[iso] = massv_[iso] / MT->GramsPerMol(iso);
@@ -46,9 +46,9 @@ const Composition::Vect& Composition::atom_vect() {
   return atomv_;
 }
 
-const Composition::Vect& Composition::mass_vect() {
+const CompMap& Composition::mass_vect() {
   if (massv_.size() == 0) {
-    Composition::Vect::iterator it;
+    CompMap::iterator it;
     for (it = atomv_.begin(); it != atomv_.end(); ++it) {
       Iso iso = it->first;
       massv_[iso] = atomv_[iso] * MT->GramsPerMol(iso);
@@ -67,7 +67,7 @@ Composition::Ptr Composition::Decay(int delta) {
 
 void Composition::Record() {
   if (!recorded_) {
-    Composition::Vect::const_iterator it;
+    CompMap::const_iterator it;
     for (it = mass_vect().begin(); it != mass_vect().end(); ++it) {
       EM->NewEvent("Compositions")
         ->AddVal("ID", id())

@@ -83,12 +83,12 @@ class DecayHandler {
   /**
      default constructor
    */
-  DecayHandler(const Composition::Vect& comp);
+  DecayHandler(const CompMap& comp);
 
   /**
      set the composition from a CompMap
    */
-  void getResult(Composition::Vect& comp);
+  void getResult(CompMap& comp);
 
   /**
      decay the material

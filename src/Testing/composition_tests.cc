@@ -17,7 +17,7 @@ class TestComp : public cyclus::Composition {
 TEST(CompositionTests, create_atom) {
   using cyclus::Composition;
 
-  Composition::Vect v;
+  cyclus::CompMap v;
   v[92235] = 2;
   v[92233] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(v);
@@ -32,7 +32,7 @@ TEST(CompositionTests, create_atom) {
 TEST(CompositionTests, create_mass) {
   using cyclus::Composition;
 
-  Composition::Vect v;
+  cyclus::CompMap v;
   v[92235] = 2;
   v[92233] = 1;
   Composition::Ptr c = Composition::CreateFromMass(v);

@@ -11,7 +11,7 @@
 TEST(MatQueryTests, MassAndMoles) { 
   cyclus::MassTable* mt = cyclus::MT;
 
-  cyclus::Composition::Vect v;
+  cyclus::CompMap v;
   v[92235] = 1.5;
   v[1008] = 2.5;
   cyclus::Composition::Ptr c = cyclus::Composition::CreateFromMass(v);
@@ -32,7 +32,7 @@ TEST(MatQueryTests, MassAndMoles) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(MatQueryTests, AlmostEq) { 
-  cyclus::Composition::Vect v;
+  cyclus::CompMap v;
   cyclus::Composition::Ptr c;
 
   v[92235] = 1.5;

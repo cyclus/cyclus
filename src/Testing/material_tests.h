@@ -33,7 +33,7 @@ class MaterialTest : public ::testing::Test {
     fraction = 2.0 / 3.0;
 
     // composition creation
-    cyclus::Composition::Vect v;
+    cyclus::CompMap v;
     v[u235_] = 1;
     test_comp_ = cyclus::Composition::CreateFromMass(v);
 

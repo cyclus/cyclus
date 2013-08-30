@@ -8,6 +8,9 @@ namespace cyclus {
 
 typedef int Iso;
 
+/// a raw definition of isotopes and corresponding (dimensionless quantities).
+typedef std::map<Iso, double> CompMap;
+
 /// An immutable object responsible for holding a nuclide composition. It tracks
 /// decay lineages to prevent duplicate calculations and output recording and is
 /// able to record its composition data to output when told.  Each composition
@@ -16,12 +19,12 @@ typedef int Iso;
 ///
 /// Compositions are immutable and thus their state must be created/defined
 /// entirely at their creation. Compositions are created by passing in a
-/// Composition::Vect (a map of nuclides to quantities). In general Vects are
+/// CompMap (a map of nuclides to quantities). In general CompMaps are
 /// not assumed to be normalized to any particular value.  A Uranium dioxide
 /// composition can be created as follows:
 ///
 /// @code
-/// Composition::Vect v;
+/// CompMap v;
 /// v[92235] = 2.4;
 /// v[8016] = 4.8;
 /// Composition c = Composition::CreateFromAtom(v);
@@ -31,18 +34,15 @@ class Composition {
  public:
   typedef boost::shared_ptr<Composition> Ptr;
 
-  /// a raw definition of isotopes and corresponding (dimensionless quantities).
-  typedef std::map<Iso, double> Vect;
-
   /// Creates a new composition from v with its components having appropriate
   /// atom-based ratios. v does not need to be normalized to any particular
   /// value.
-  static Ptr CreateFromAtom(Vect v);
+  static Ptr CreateFromAtom(CompMap v);
 
   /// Creates a new composition from v with its components having appropriate
   /// mass-based ratios. v does not need to be normalized to any particular
   /// value.
-  static Ptr CreateFromMass(Vect v);
+  static Ptr CreateFromMass(CompMap v);
 
   /// Returns a unique id associated with this composition.  Note that multiple
   /// material objects can share the same composition. Also Note that the id is
@@ -51,10 +51,10 @@ class Composition {
   int id();
 
   /// Returns the unnormalized atom composition vect.
-  const Vect& atom_vect();
+  const CompMap& atom_vect();
 
   /// Returns the unnormalized mass composition vect.
-  const Vect& mass_vect();
+  const CompMap& mass_vect();
 
   /// Calculates and returns a decayed version of this composition (decayed
   /// delta timesteps). This composition remains unchanged.
@@ -83,8 +83,8 @@ class Composition {
 
   int id_;
   bool recorded_;
-  Vect atomv_;
-  Vect massv_;
+  CompMap atomv_;
+  CompMap massv_;
   int prev_decay_;
 };
 

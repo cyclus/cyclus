@@ -18,7 +18,7 @@ Matrix DecayHandler::decayMatrix_ = Matrix();
 IsoList DecayHandler::IsotopesTracked_ = IsoList();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DecayHandler::DecayHandler(const Composition::Vect& comp) {
+DecayHandler::DecayHandler(const CompMap& comp) {
   if (!decay_info_loaded_) {
     DecayHandler::loadDecayInfo();
     decay_info_loaded_ = true;
@@ -123,8 +123,8 @@ void DecayHandler::addIsoToList(int iso) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DecayHandler::getResult(Composition::Vect& comp) {
-  // loops through the ParentMap and populates the passed Composition::Vect with
+void DecayHandler::getResult(CompMap& comp) {
+  // loops through the ParentMap and populates the passed CompMap with
   // the number density from the comp parameter for each isotope
   ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
   while (parent_iter != parent_.end()) {

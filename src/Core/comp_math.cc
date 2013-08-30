@@ -10,29 +10,29 @@
 namespace cyclus {
 namespace compmath {
 
-Composition::Vect Add(const Composition::Vect& v1,
-                      const Composition::Vect& v2) {
-  Composition::Vect out(v1);
-  Composition::Vect vv2(v2);
-  for (Composition::Vect::const_iterator it = v2.begin(); it != v2.end(); ++it) {
+CompMap Add(const CompMap& v1,
+                      const CompMap& v2) {
+  CompMap out(v1);
+  CompMap vv2(v2);
+  for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int iso = it->first;
     out[iso] += vv2[iso];
   }
   return out;
 }
 
-Composition::Vect Sub(const Composition::Vect& v1,
-                      const Composition::Vect& v2) {
-  Composition::Vect out(v1);
-  Composition::Vect vv2(v2);
-  for (Composition::Vect::const_iterator it = v2.begin(); it != v2.end(); ++it) {
+CompMap Sub(const CompMap& v1,
+                      const CompMap& v2) {
+  CompMap out(v1);
+  CompMap vv2(v2);
+  for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int iso = it->first;
     out[iso] -= vv2[iso];
   }
   return out;
 }
 
-void ApplyThreshold(Composition::Vect* v, double threshold) {
+void ApplyThreshold(CompMap* v, double threshold) {
   if (threshold < 0) {
     std::stringstream ss;
     ss << "The threshold cannot be negative. The value provided was '"
@@ -40,7 +40,7 @@ void ApplyThreshold(Composition::Vect* v, double threshold) {
     throw ValueError(ss.str());
   }
 
-  Composition::Vect::iterator it;
+  CompMap::iterator it;
   for (it = v->begin(); it != v->end(); ++it) {
     if (std::abs(it->second) <= threshold) {
       v->erase(it);
@@ -48,25 +48,25 @@ void ApplyThreshold(Composition::Vect* v, double threshold) {
   }
 }
 
-void Normalize(Composition::Vect* v, double val) {
+void Normalize(CompMap* v, double val) {
   std::vector<double> vec;
-  for (Composition::Vect::iterator it = v->begin(); it != v->end(); ++it) {
+  for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
     vec.push_back(it->second);
   }
 
   double sum = CycArithmetic::KahanSum(vec);
   if (sum != val && sum != 0) {
-    for (Composition::Vect::iterator it = v->begin(); it != v->end(); ++it) {
+    for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
       (*v)[it->first] = it->second / sum * val;
     }
   }
 }
 
-bool ValidIsos(const Composition::Vect& v) {
+bool ValidIsos(const CompMap& v) {
   int min = 1001;
   int max = 1182949;
 
-  Composition::Vect::const_iterator it;
+  CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
     cyclus::Iso iso = it->first;
     if (iso < min || iso > max) {
@@ -76,8 +76,8 @@ bool ValidIsos(const Composition::Vect& v) {
   return true;
 }
 
-bool AllPositive(const Composition::Vect& v) {
-  Composition::Vect::const_iterator it;
+bool AllPositive(const CompMap& v) {
+  CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
     if (it->second < 0) {
       return false;
@@ -86,8 +86,8 @@ bool AllPositive(const Composition::Vect& v) {
   return true;
 }
 
-bool AlmostEq(const Composition::Vect& v1,
-              const Composition::Vect& v2,
+bool AlmostEq(const CompMap& v1,
+              const CompMap& v2,
               double threshold) {
   // I learned at
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
@@ -107,10 +107,10 @@ bool AlmostEq(const Composition::Vect& v1,
     return true;
   }
 
-  Composition::Vect n1(v1);
-  Composition::Vect n2(v2);
+  CompMap n1(v1);
+  CompMap n2(v2);
 
-  Composition::Vect::iterator it;
+  CompMap::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {
     cyclus::Iso iso = it->first;
     if (n2.count(iso) == 0) {

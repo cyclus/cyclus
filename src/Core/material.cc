@@ -69,11 +69,11 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   if (comp_ != c) {
-    Composition::Vect v(comp_->mass_vect());
+    CompMap v(comp_->mass_vect());
     compmath::Normalize(&v, qty_);
-    Composition::Vect otherv(c->mass_vect());
+    CompMap otherv(c->mass_vect());
     compmath::Normalize(&otherv, qty);
-    Composition::Vect newv = compmath::Sub(v, otherv);
+    CompMap newv = compmath::Sub(v, otherv);
     compmath::ApplyThreshold(&newv, threshold);
     comp_ = Composition::CreateFromMass(newv);
   }
@@ -89,9 +89,9 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
 void Material::Absorb(Material::Ptr mat) {
   if (comp_ != mat->comp()) {
-    Composition::Vect v(comp_->mass_vect());
+    CompMap v(comp_->mass_vect());
     compmath::Normalize(&v, qty_);
-    Composition::Vect otherv(mat->comp()->mass_vect());
+    CompMap otherv(mat->comp()->mass_vect());
     compmath::Normalize(&otherv, mat->quantity());
     comp_ = Composition::CreateFromAtom(compmath::Add(v, otherv));
   }

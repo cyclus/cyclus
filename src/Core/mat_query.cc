@@ -19,20 +19,20 @@ double MatQuery::moles(Iso iso) {
 };
 
 double MatQuery::mass_frac(Iso iso) {
-  Composition::Vect v = m_->comp()->mass_vect();
+  CompMap v = m_->comp()->mass_vect();
   compmath::Normalize(&v, 1);
   return v[iso];
 };
 
 double MatQuery::atom_frac(Iso iso) {
-  Composition::Vect v = m_->comp()->atom_vect();
+  CompMap v = m_->comp()->atom_vect();
   compmath::Normalize(&v, 1);
   return v[iso];
 };
 
 bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {
-  Composition::Vect n1 = m_->comp()->mass_vect();
-  Composition::Vect n2 = other->comp()->mass_vect();
+  CompMap n1 = m_->comp()->mass_vect();
+  CompMap n2 = other->comp()->mass_vect();
   compmath::Normalize(&n1);
   compmath::Normalize(&n2);
   return compmath::AlmostEq(n1, n2, threshold);

@@ -26,7 +26,7 @@ RecipeLibrary* RecipeLibrary::Instance() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RecipeLibrary::RecipeLibrary() {
-  AddRecipe("blank", Composition::CreateFromAtom(Composition::Vect()));
+  AddRecipe("blank", Composition::CreateFromAtom(CompMap()));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,7 +64,7 @@ void RecipeLibrary::LoadRecipe(QueryEngine* qe) {
   int key;
   std::string query = "isotope";
   int nIsos = qe->NElementsMatchingQuery(query);
-  Composition::Vect v;
+  CompMap v;
   for (int i = 0; i < nIsos; i++) {
     QueryEngine* isotope = qe->QueryElement(query, i);
     key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
