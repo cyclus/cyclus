@@ -10,6 +10,7 @@
 #include "cyclopts/solver.h"
 #include "cyclopts/solver_interface.h"
 #include "cyclopts/variable.h"
+#include "cyclopts/limits.h"
 
 // usings
 using boost::any_cast;
