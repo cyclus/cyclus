@@ -55,7 +55,7 @@ TEST_F(BuildingManagerTests,registration)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,DISABLED_problem) 
+TEST_F(BuildingManagerTests,problem) 
 {
   using cyclus::action_building::BuildOrder;
   SetUpProblem();
