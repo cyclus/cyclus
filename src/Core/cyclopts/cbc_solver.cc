@@ -10,36 +10,7 @@
 #include "CbcModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 
-#include "limits.h"
-
-// -----------------------------------------------------------------------------
-double cyclus::cyclopts::CBCSolver::DoubleBound(
-    cyclus::cyclopts::Variable::Bound b) {
-  double val;
-  switch(b) {
-    case cyclus::cyclopts::Variable::NEG_INF:
-      val = -COIN_DBL_MAX;
-      break;
-    case cyclus::cyclopts::Variable::INF:
-      val = COIN_DBL_MAX;
-      break;
-  }
-  return val;
-}
-
-// -----------------------------------------------------------------------------
-int cyclus::cyclopts::CBCSolver::IntBound(cyclus::cyclopts::Variable::Bound b) {
-  int val;
-  switch(b) {
-    case cyclus::cyclopts::Variable::NEG_INF:
-      val = -COIN_INT_MAX;
-      break;
-    case cyclus::cyclopts::Variable::INF:
-      val = COIN_INT_MAX;
-      break;
-  }
-  return val;
-}
+#include "cyclopts/limits.h"
 
 // -----------------------------------------------------------------------------
 std::pair<double, double> cyclus::cyclopts::CBCSolver::ConstraintBounds(
@@ -60,7 +31,7 @@ std::pair<double, double> cyclus::cyclopts::CBCSolver::ConstraintBounds(
       lval = COIN_DBL_MAX; 
       rval = c->rhs();
     case Constraint::LT: // explicit fall through
-      rval -= kConstraintEps; 
+      rval -= cyclus::cyclopts::kConstraintEps; 
       break;
   }
   return std::pair<double, double>(lval, rval);
@@ -72,15 +43,17 @@ void cyclus::cyclopts::CBCSolver::SetUpVariablesAndObj(
     cyclus::cyclopts::ObjFuncPtr obj) {
   for (int i = 0; i < variables.size(); i++) {
     cyclus::cyclopts::VariablePtr v = variables.at(i);
+    std::pair<int, int> ibounds;
+    std::pair<double, double> lbounds;
     switch(v->type()) {
       case cyclus::cyclopts::Variable::INT:
-        builder_.setColumnBounds(i, IntBound(v->lbound()),
-                                 IntBound(v->ubound()));
+        ibounds = cyclus::cyclopts::GetIntBounds(v);
+        builder_.setColumnBounds(i, ibounds.first, ibounds.second);
         builder_.setInteger(i);
         break;
       case cyclus::cyclopts::Variable::LINEAR:
-        builder_.setColumnBounds(i, DoubleBound(v->lbound()),
-                                 DoubleBound(v->ubound()));
+        lbounds = cyclus::cyclopts::GetLinBounds(v);
+        builder_.setColumnBounds(i, lbounds.first, lbounds.second);
         break;
     }
     builder_.setObjective(i, obj->GetModifier(v));
@@ -134,7 +107,7 @@ void cyclus::cyclopts::CBCSolver::PopulateSolution(
     boost::any value = solution[i]; 
     switch(variables.at(i)->type()) { 
       case cyclus::cyclopts::Variable::INT:
-        value = (int) solution[i];
+        value = static_cast<int>(solution[i]);
         break;
     }
     variables.at(i)->set_value(value);

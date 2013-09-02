@@ -2,6 +2,7 @@
 #define CYCLUS_CYCLOPTS_VARIABLE_H_
 
 #include <string>
+#include <utility>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
@@ -153,6 +154,15 @@ class IntegerVariable : public Variable {
   /// upper Bound value
   int ubound_val_;
 };
+
+/// @return a pair of integers representing the lower and upper bounds of an
+/// integer variable
+std::pair<int, int> GetIntBounds(VariablePtr v);
+  
+/// @return a pair of doubles representing the lower and upper bounds of a
+/// linear variable
+std::pair<double, double> GetLinBounds(VariablePtr v);
+  
 } // namespace cyclopts
 } // namespace cyclus
 

@@ -134,3 +134,19 @@ int cyclus::cyclopts::IntegerVariable::lbound_val() {
 int cyclus::cyclopts::IntegerVariable::ubound_val() {
   return ubound_val_;
 }
+
+// -----------------------------------------------------------------------------
+std::pair<int, int> cyclus::cyclopts::GetIntBounds(
+    cyclus::cyclopts::VariablePtr v) {
+  using cyclus::cyclopts::IntegerVariable;
+  IntegerVariable* clone = dynamic_cast<IntegerVariable*>(v.get());
+  return std::pair<int, int>(clone->lbound_val(), clone->ubound_val());
+}
+
+// -----------------------------------------------------------------------------
+std::pair<double, double> cyclus::cyclopts::GetLinBounds(
+    cyclus::cyclopts::VariablePtr v) {
+  using cyclus::cyclopts::LinearVariable;
+  LinearVariable* clone = dynamic_cast<LinearVariable*>(v.get());
+  return std::pair<double, double>(clone->lbound_val(), clone->ubound_val());
+}

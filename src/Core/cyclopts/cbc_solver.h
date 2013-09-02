@@ -1,6 +1,8 @@
 #ifndef CYCLUS_CYCLOPTS_CBC_SOLVER_H_
 #define CYCLUS_CYCLOPTS_CBC_SOLVER_H_
 
+#include <utility>
+
 // coin includes
 #include "CoinModel.hpp"
 #include "CbcModel.hpp"
@@ -27,12 +29,6 @@ class CBCSolver : public Solver {
  private:
   /// the model builder
   CoinModel builder_;
-
-  /// return +/- COIN_DBL_MAX 
-  double DoubleBound(cyclus::cyclopts::Variable::Bound b);
-
-  /// return +/- COIN_INT_MAX 
-  int IntBound(cyclus::cyclopts::Variable::Bound b);
 
   /// get coin-specific bound for a constraint
   std::pair<double, double> ConstraintBounds(cyclus::cyclopts::ConstraintPtr c);
@@ -68,6 +64,7 @@ class CBCSolver : public Solver {
   /// prints each other printing function
   void Print(int n_const, int n_vars);
 };
+
 } // namespace cyclopts
 } // namespace cyclus
 
