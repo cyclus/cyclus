@@ -85,7 +85,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CycloptsCBCSolverTests, DISABLED_1VarIPUpperBoundMax) {
+TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   // problem instance values
   int x_exp = 1;
   int upper = 1;
@@ -114,7 +114,7 @@ TEST(CycloptsCBCSolverTests, DISABLED_1VarIPUpperBoundMax) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CycloptsCBCSolverTests, DISABLED_1VarIPBothBoundsMax) {
+TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   // problem instance values
   int x_exp = 1;
   int lower = 0;
