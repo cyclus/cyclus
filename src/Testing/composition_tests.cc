@@ -22,9 +22,9 @@ TEST(CompositionTests, create_atom) {
   v[92233] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(v);
 
-  v = c->atom_vect();
+  v = c->atom();
   EXPECT_DOUBLE_EQ(v[92235] / v[92233], 2 / 1);
-  v = c->mass_vect();
+  v = c->mass();
   EXPECT_DOUBLE_EQ(v[92235] / v[92233], 2 * cyclus::MT->GramsPerMol(92235) / cyclus::MT->GramsPerMol(92233));
 }
 
@@ -37,9 +37,9 @@ TEST(CompositionTests, create_mass) {
   v[92233] = 1;
   Composition::Ptr c = Composition::CreateFromMass(v);
 
-  v = c->mass_vect();
+  v = c->mass();
   EXPECT_DOUBLE_EQ(v[92235] / v[92233], 2 / 1);
-  v = c->atom_vect();
+  v = c->atom();
   EXPECT_DOUBLE_EQ(v[92235] / v[92233], 2 / cyclus::MT->GramsPerMol(92235) * cyclus::MT->GramsPerMol(92233));
 }
 

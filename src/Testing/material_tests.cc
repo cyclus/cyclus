@@ -186,7 +186,7 @@ TEST_F(MaterialTest, ExtractCompleteInexactComp) {
   Material::Ptr m1;
   // make an inexact composition
 
-  CompMap inexact = diff_comp_->mass_vect();
+  CompMap inexact = diff_comp_->mass();
   inexact[am241_] *= (1 - cyclus::eps_rsrc() / test_size_);
   Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
 
@@ -208,7 +208,7 @@ TEST_F(MaterialTest, DISABLED_ExtractCompleteInexactSizeAndComp) {
   Material::Ptr m1;
   double inexact_size = test_size_ * (1 + cyclus::eps_rsrc() / test_size_);
 
-  CompMap inexact = diff_comp_->mass_vect();
+  CompMap inexact = diff_comp_->mass();
   inexact[am241_] *= (1 - cyclus::eps_rsrc() / test_size_);
   Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
 
@@ -229,7 +229,7 @@ TEST_F(MaterialTest, ExtractDiffComp) {
   // differing comp minus one element equals old comp minus new
   cyclus::Material::Ptr m1;
   double orig = diff_mat_->quantity();
-  CompMap v = diff_mat_->comp()->atom_vect();
+  CompMap v = diff_mat_->comp()->atom();
 
   cyclus::MatQuery mq(diff_mat_);
   const double orig_u235 = mq.mass(u235_);

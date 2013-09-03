@@ -47,14 +47,14 @@ class Composition {
   /// Returns a unique id associated with this composition.  Note that multiple
   /// material objects can share the same composition. Also Note that the id is
   /// not the same for two compositions that were separately created from the
-  /// same composition vect.
+  /// same CompMap.
   int id();
 
-  /// Returns the unnormalized atom composition vect.
-  const CompMap& atom_vect();
+  /// Returns the unnormalized atom composition.
+  const CompMap& atom();
 
-  /// Returns the unnormalized mass composition vect.
-  const CompMap& mass_vect();
+  /// Returns the unnormalized mass composition.
+  const CompMap& mass();
 
   /// Calculates and returns a decayed version of this composition (decayed
   /// delta timesteps). This composition remains unchanged.
@@ -79,12 +79,12 @@ class Composition {
 
   Ptr NewDecay(int delta);
 
-  static int nextId_;
+  static int next_id_;
 
   int id_;
   bool recorded_;
-  CompMap atomv_;
-  CompMap massv_;
+  CompMap atom_;
+  CompMap mass_;
   int prev_decay_;
 };
 

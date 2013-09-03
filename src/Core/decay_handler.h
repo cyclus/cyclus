@@ -44,12 +44,12 @@ class DecayHandler {
   static void loadDecayInfo();
 
   /**
-     The IsoVector's parent
+     The CompMap's parent
    */
   static ParentMap parent_;
 
   /**
-     The IsoVector's daughters
+     The CompMap's daughters
    */
   static DaughtersMap daughters_;
 
