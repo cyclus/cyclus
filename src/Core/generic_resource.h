@@ -1,6 +1,6 @@
-// GenericResource.h
-#if !defined(_GENERICRESOURCE_H)
-#define _GENERICRESOURCE_H
+// generic_resource.h
+#ifndef GENERICRESOURCE_H_
+#define GENERICRESOURCE_H_
 
 #include <boost/shared_ptr.hpp>
 

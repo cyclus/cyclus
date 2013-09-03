@@ -1,6 +1,6 @@
-// DecayHandler.h
-#if !defined(_DECAYHANDLER_H)
-#define _DECAYHANDLER_H
+// decayer.h
+#ifndef DECAYER_H_
+#define DECAYER_H_
 
 #include <map>
 
@@ -28,20 +28,20 @@ typedef std::map<int, std::vector<std::pair<int, double> > > DaughtersMap;
 
 typedef std::vector<int> IsoList;
 
-class DecayHandler {
+class Decayer {
  private:
   /**
      Builds the decay matrix needed for the decay calculations from
      the parent and daughters map variables.  The resulting matrix is
      stored in the static variable decayMatrix.
    */
-  static void buildDecayMatrix();
+  static void BuildDecayMatrix();
 
   /**
      Reads the decay information found in the 'decayInfo.dat' file
      into the parent and daughters maps.Uses these maps to create the
    */
-  static void loadDecayInfo();
+  static void LoadDecayInfo();
 
   /**
      The CompMap's parent
@@ -56,7 +56,7 @@ class DecayHandler {
   /**
      The decay matrix
    */
-  static Matrix decayMatrix_;
+  static Matrix decay_matrix_;
 
   /**
      The atomic composition map
@@ -72,42 +72,42 @@ class DecayHandler {
   /**
      the list of tracked isotopes
    */
-  static IsoList IsotopesTracked_;
+  static IsoList isotopes_tracked_;
 
   /**
      Add the Isotope to our list of tracked isotopes IFF it is not
    */
-  static void addIsoToList(int iso);
+  static void AddIsoToList(int iso);
 
  public:
   /**
      default constructor
    */
-  DecayHandler(const CompMap& comp);
+  Decayer(const CompMap& comp);
 
   /**
      set the composition from a CompMap
    */
-  void getResult(CompMap& comp);
+  void GetResult(CompMap& comp);
 
   /**
      decay the material
      @param years the number of years to decay
    */
-  void decay(double years);
+  void Decay(double years);
 
   /**
      the number of tracked isotopes
    */
-  int nTrackedIsotopes() {
-    return IsotopesTracked_.size();
+  int n_tracked_isotopes() {
+    return isotopes_tracked_.size();
   }
 
   /**
      the tracked isotope at position i
    */
-  int trackedIsotope(int i) {
-    return IsotopesTracked_.at(i);
+  int TrackedIsotope(int i) {
+    return isotopes_tracked_.at(i);
   }
 };
 

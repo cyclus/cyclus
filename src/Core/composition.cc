@@ -3,7 +3,7 @@
 
 #include "comp_math.h"
 #include "error.h"
-#include "decay_handler.h"
+#include "decayer.h"
 #include "event_manager.h"
 #include "mass_table.h"
 
@@ -99,11 +99,11 @@ Composition::Ptr Composition::NewDecay(int delta) {
   double months_per_year = 12;
   double years = double(delta) / months_per_year;
 
-  DecayHandler handler(atom_);
-  handler.decay(years);
+  Decayer handler(atom_);
+  handler.Decay(years);
 
   Composition::Ptr decayed(new Composition(tot_decay, decay_line_));
-  handler.getResult(decayed->atom_);
+  handler.GetResult(decayed->atom_);
   (*decay_line_)[tot_decay] = decayed;
 
   return decayed;

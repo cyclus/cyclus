@@ -1,5 +1,5 @@
-#if !defined(_MATERIAL_H)
-#define _MATERIAL_H
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 
 #include <list>
 #include <boost/shared_ptr.hpp>

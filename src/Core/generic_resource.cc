@@ -1,5 +1,4 @@
-// Resource.cpp
-// Implements the Resource Class
+// generic_resource.cc
 
 #include "generic_resource.h"
 

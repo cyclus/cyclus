@@ -22,7 +22,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/decay_handler.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
@@ -80,7 +80,7 @@ INSTALL(FILES
   csv_back.h
   cyc_arithmetic.h
   cyc_limits.h
-  decay_handler.h
+  decayer.h
   enrichment.h
   env.h
   error.h
