@@ -75,9 +75,6 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
     compmath::Normalize(&otherv, qty);
     CompMap newv = compmath::Sub(v, otherv);
     compmath::ApplyThreshold(&newv, threshold);
-    if (!compmath::AllPositive(newv)) {
-      throw ValueError("mass extraction causes negative quantity");
-    }
     comp_ = Composition::CreateFromMass(newv);
   }
 

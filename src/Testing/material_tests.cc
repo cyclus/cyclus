@@ -8,7 +8,10 @@
 #include "error.h"
 #include "mat_query.h"
 
+using cyclus::Iso;
 using cyclus::CompMap;
+using cyclus::Composition;
+using cyclus::Material;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, Constructors) {
@@ -112,8 +115,6 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbZeroMaterial) {
-  using cyclus::Iso;
-  using cyclus::Material;
   Material::Ptr same_as_test_mat = Material::Create(0, test_comp_);
   EXPECT_NO_THROW(test_mat_->Absorb(same_as_test_mat));
   EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
@@ -121,8 +122,6 @@ TEST_F(MaterialTest, AbsorbZeroMaterial) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbIntoZeroMaterial) {
-  using cyclus::Iso;
-  using cyclus::Material;
   Material::Ptr same_as_test_mat = Material::Create(0, test_comp_);
   EXPECT_NO_THROW(same_as_test_mat->Absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
@@ -152,35 +151,27 @@ TEST_F(MaterialTest, ExtractComplete) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MaterialTest, ExtractOverExtract) {
+TEST_F(MaterialTest, ExtractOverQty) {
   EXPECT_THROW(diff_mat_->ExtractComp(2 * test_size_, test_comp_),
                cyclus::ValueError);
-  EXPECT_THROW(test_mat_->ExtractComp(2 * test_size_, test_comp_), cyclus::Error);
+  EXPECT_THROW(test_mat_->ExtractComp(2 * test_size_, test_comp_),
+               cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//this is disabled because it doesn't make sense.  Since the caller can easily
-//know **exactly** the quantity contained in a material, there is no reason to
-//allow fudging the extraction quantity.  Caller can
-//"m->ExtractQty(m->quantity());".
-TEST_F(MaterialTest, DISABLED_ExtractCompleteInexactSize) {
-  using cyclus::Material;
+TEST_F(MaterialTest, ExtractOverComp) {
+  Material::Ptr m;
 
-  // Complete extraction
-  // this should succeed even if inexact, within eps.
-  Material::Ptr m1;
-  double inexact_size = test_size_ + 0.1 * cyclus::eps_rsrc();
-  m1 = diff_mat_->ExtractComp(inexact_size, diff_comp_);
-  EXPECT_EQ(m1->comp(), diff_comp_);
-  EXPECT_FLOAT_EQ(0, diff_mat_->quantity());
-  EXPECT_NEAR(inexact_size, m1->quantity(), cyclus::eps_rsrc());
+  CompMap inexact = diff_comp_->mass();
+  inexact[am241_] *= 2;
+  Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
+
+  EXPECT_THROW(diff_mat_->ExtractComp(test_size_, inexact_comp),
+               cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractCompleteInexactComp) {
-  using cyclus::Composition;
-  using cyclus::Material;
-
   // Complete extraction
   // this should succeed even if inexact, within eps.
   Material::Ptr m1;
@@ -196,26 +187,6 @@ TEST_F(MaterialTest, ExtractCompleteInexactComp) {
 
   cyclus::MatQuery mq(diff_mat_);
   EXPECT_NEAR(0, mq.mass(am241_), cyclus::eps_rsrc());
-}
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// see comment on ExtractCompleteInexactSize for disabled reason
-TEST_F(MaterialTest, DISABLED_ExtractCompleteInexactSizeAndComp) {
-  using cyclus::Material;
-  using cyclus::Composition;
-
-  // Complete extraction
-  // this should succeed even if inexact, within eps.
-  Material::Ptr m1;
-  double inexact_size = test_size_ * (1 + cyclus::eps_rsrc() / test_size_);
-
-  CompMap inexact = diff_comp_->mass();
-  inexact[am241_] *= (1 - cyclus::eps_rsrc() / test_size_);
-  Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
-
-  m1 = diff_mat_->ExtractComp(inexact_size, inexact_comp);
-  EXPECT_EQ(m1->comp(), inexact_comp);
-  EXPECT_FLOAT_EQ(0, diff_mat_->quantity());
-  EXPECT_NEAR(inexact_size, m1->quantity(), cyclus::eps_rsrc());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
