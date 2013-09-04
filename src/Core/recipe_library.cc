@@ -41,12 +41,12 @@ void RecipeLibrary::LoadRecipes(QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::LoadRecipe(QueryEngine* qe) {
-  bool atomBasis;
+  bool atom_basis;
   std::string basis_str = qe->GetElementContent("basis");
   if (basis_str == "atom") {
-    atomBasis = true;
+    atom_basis = true;
   } else if (basis_str == "mass") {
-    atomBasis = false;
+    atom_basis = false;
   } else {
     throw IOError(basis_str + " basis is not 'mass' or 'atom'.");
   }
@@ -68,7 +68,7 @@ void RecipeLibrary::LoadRecipe(QueryEngine* qe) {
     CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
   }
 
-  if (atomBasis) {
+  if (atom_basis) {
     AddRecipe(name, Composition::CreateFromAtom(v));
   } else {
     AddRecipe(name, Composition::CreateFromMass(v));
