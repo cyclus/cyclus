@@ -60,9 +60,17 @@ const CompMap& Composition::mass() {
 Composition::Ptr Composition::Decay(int delta) {
   int tot_decay = prev_decay_ + delta;
   if (decay_line_->count(tot_decay) == 1) {
+    // decay_line_ already has a comp decayed tot_decay.
     return (*decay_line_)[tot_decay];
   }
-  return NewDecay(delta);
+
+  // Calculate a new decayed composition and insert it into the decay chain.
+  // It will automagically appear in the decay chain for all other compositions
+  // that are a part of this decay chain because decay_line_ is a pointer that
+  // all compositions in the chain share.
+  Composition::Ptr decayed = NewDecay(delta);
+  (*decay_line_)[tot_decay] = decayed;
+  return decayed;
 }
 
 void Composition::Record() {
@@ -102,10 +110,10 @@ Composition::Ptr Composition::NewDecay(int delta) {
   Decayer handler(atom_);
   handler.Decay(years);
 
+  // the new composition is a part of this decay chain and so is created with a
+  // pointer to the exact same decay_line_.
   Composition::Ptr decayed(new Composition(tot_decay, decay_line_));
   handler.GetResult(decayed->atom_);
-  (*decay_line_)[tot_decay] = decayed;
-
   return decayed;
 }
 

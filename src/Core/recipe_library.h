@@ -59,8 +59,6 @@ class RecipeLibrary {
   Composition::Ptr GetRecipe(std::string name);
 
  private:
-  RecipeLibrary();
-
   /// A pointer to this RecipeLibrary once it has been initialized.
   static RecipeLibrary* instance_;
 

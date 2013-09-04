@@ -28,7 +28,7 @@ typedef std::map<Iso, double> CompMap;
 /// v[92235] = 2.4;
 /// v[8016] = 4.8;
 /// Composition c = Composition::CreateFromAtom(v);
-/// @endcodce
+/// @endcode
 ///
 class Composition {
  public:
@@ -56,7 +56,7 @@ class Composition {
   /// Returns the unnormalized mass composition.
   const CompMap& mass();
 
-  /// Calculates and returns a decayed version of this composition (decayed
+  /// Returns a decayed version of this composition (decayed
   /// delta timesteps). This composition remains unchanged.
   Ptr Decay(int delta);
 
@@ -65,7 +65,12 @@ class Composition {
   void Record();
 
  protected:
+
+  /// a chain containing compositions that are a result of decay from a common
+  /// ancestor composition. The key is the total amount of time a composition
+  /// has been decayed from its root parent.
   typedef std::map<int, Composition::Ptr> Chain;
+
   typedef boost::shared_ptr<Chain> ChainPtr;
 
   Composition();
@@ -73,18 +78,20 @@ class Composition {
   ChainPtr decay_line_;
 
  private:
-  // This constructor allows the creation of decayed versions of
-  // compositions while avoiding extra memory allocations.
+  /// This constructor allows the creation of decayed versions of
+  /// compositions while avoiding extra memory allocations.
   Composition(int prev_decay, ChainPtr decay_line);
 
+  /// Performs a decay calculation and creates a new decayed composition.
   Ptr NewDecay(int delta);
 
   static int next_id_;
-
   int id_;
   bool recorded_;
   CompMap atom_;
   CompMap mass_;
+
+  /// the total time delta this composition has been decayed from its root ancestor.
   int prev_decay_;
 };
 

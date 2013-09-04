@@ -24,11 +24,6 @@ RecipeLibrary* RecipeLibrary::Instance() {
   return instance_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RecipeLibrary::RecipeLibrary() {
-  AddRecipe("blank", Composition::CreateFromAtom(CompMap()));
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RecipeLibrary::LoadRecipes(QueryEngine* qe) {
   // load recipes from file
