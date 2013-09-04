@@ -49,7 +49,7 @@ class XMLFileLoader {
   /**
      Method to load the simulation control parameters.
   */
-  void load_control_parameters(Timer* ti);
+  void load_control_parameters();
 
   /**
      Method to load recipes from either the primary input file

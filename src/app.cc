@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
     std::set<std::string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(&ctx, inputFile);
     loader.Init();
-    loader.load_control_parameters(&ti);
+    loader.load_control_parameters();
     loader.load_recipes();
     loader.load_dynamic_modules(module_types);
   } catch (cyclus::Error e) {

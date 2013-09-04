@@ -33,10 +33,10 @@ class Timer {
      simulation (default = 0)
      @param decay interval between decay calculations in months. <=0 if
      decay is off (default = 0)
+     @param handle a user specified name for the simulation run
    */
   void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
-                  int start = 0,
-                  int decay = 0);
+                  int start = 0, int decay = 0, std::string handle = "");
 
   /**
      Runs the simulation.
@@ -161,27 +161,18 @@ class Timer {
    */
   std::pair<int, int> ConvertDate(int time);
 
-  /**
-     Loads the information about the simulation timing
-
-     @param qe is a pointer to a general QueryEngine that can
-   */
-  void load_simulation(Context* ctx, QueryEngine* qe);
-
+ private:
   /**
      logs relevant time-related data with the output system, including:
      the simulation start time and the simulation duration
    */
-  void LogTimeData(Context* ctx);
+  void LogTimeData(Context* ctx, std::string handle);
 
- private:
   /**
      The current time, measured in months from when the simulation
      started.
    */
   int time_;
-
-  std::string handle_;
 
   /**
      The time at which the simulation started.

@@ -167,11 +167,32 @@ void XMLFileLoader::load_modules_of_type(std::string type,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_control_parameters(Timer* ti) {
+void XMLFileLoader::load_control_parameters() {
   XMLQueryEngine xqe(*parser_);
-
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
-  ti->load_simulation(ctx_, qe);
+
+  std::string handle;
+  if (qe->NElementsMatchingQuery("simhandle") > 0) {
+    handle = qe->GetElementContent("simhandle");
+  }
+
+  // get duration
+  std::string dur_str = qe->GetElementContent("duration");
+  int dur = strtol(dur_str.c_str(), NULL, 10);
+  // get start month
+  std::string m0_str = qe->GetElementContent("startmonth");
+  int m0 = strtol(m0_str.c_str(), NULL, 10);
+  // get start year
+  std::string y0_str = qe->GetElementContent("startyear");
+  int y0 = strtol(y0_str.c_str(), NULL, 10);
+  // get simulation start
+  std::string sim0_str = qe->GetElementContent("simstart");
+  int sim0 = strtol(sim0_str.c_str(), NULL, 10);
+  // get decay interval
+  std::string decay_str = qe->GetElementContent("decay");
+  int dec = strtol(decay_str.c_str(), NULL, 10);
+
+  ctx_->InitTime(sim0, dur, dec, m0, y0, handle);
 }
 } // namespace cyclus
