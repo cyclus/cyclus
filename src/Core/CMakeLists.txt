@@ -18,9 +18,11 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/decay_handler.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/env.cpp 
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
@@ -34,6 +36,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/prototype.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/recipe_library.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc 
@@ -41,12 +44,10 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/timer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/comp_map.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/iso_vector.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/converter_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
@@ -56,6 +57,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_comm_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_time_agent.cc
@@ -78,7 +80,7 @@ INSTALL(FILES
   csv_back.h
   cyc_arithmetic.h
   cyc_limits.h
-  decay_handler.h
+  decayer.h
   enrichment.h
   env.h
   error.h
@@ -94,6 +96,7 @@ INSTALL(FILES
   mass_table.h
   prototype.h
   recipe_library.h
+  res_tracker.h
   supply_demand.h
   supply_demand_manager.h
   symbolic_function_factories.h
@@ -103,11 +106,11 @@ INSTALL(FILES
   use_matrix_lib.h
   sqlite_back.h
   sqlite_db.h
-  comp_map.h
-  iso_vector.h
+  composition.h
   generic_resource.h
   material.h
   mat_buff.h
+  mat_query.h
   resource.h
   resource_buff.h
   communicator.h

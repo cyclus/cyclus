@@ -30,7 +30,7 @@ void Timer::RunSim() {
                        ReportListeners();
 
       if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
-        Material::DecayMaterials();
+        Material::DecayAll(time_);
       }
 
       SendTick();

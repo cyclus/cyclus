@@ -9,14 +9,14 @@ ADD_SUBDIRECTORY(cyclopts)
 set ( CYCLUS_TEST_CORE 
   ${CYCLUS_TEST_CORE}
   # --
-  ${CMAKE_CURRENT_SOURCE_DIR}/decay_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/comp_map_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
@@ -24,9 +24,9 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/iso_vector_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 

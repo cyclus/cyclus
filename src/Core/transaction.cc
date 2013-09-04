@@ -53,10 +53,6 @@ void Transaction::ApproveTransfer() {
   int nResources = manifest.size();
 
   for (int pos = 0; pos < nResources; pos++) {
-    // MUST PRECEDE 'addResourceToTable' call! record the resource with its state
-    // because this can potentially update the material's stateID
-    manifest.at(pos)->AddToTable();
-
     // record that what resources belong to this transaction
     this->Transaction::AddResourceToTable(pos + 1, manifest.at(pos));
   }
@@ -133,7 +129,7 @@ Resource::Ptr Transaction::resource() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Transaction::SetResource(Resource::Ptr new_resource) {
   if (new_resource.get()) {
-    resource_ = new_resource->clone();
+    resource_ = new_resource->Clone();
   }
 }
 
@@ -163,9 +159,7 @@ void Transaction::AddResourceToTable(int transPos, Resource::Ptr r) {
   EM->NewEvent("TransactedResources")
   ->AddVal("TransactionID", trans_id_)
   ->AddVal("Position", transPos)
-  ->AddVal("ResourceID", r->OriginalID())
-  ->AddVal("StateID", r->StateID())
-  ->AddVal("Quantity", r->quantity())
+  ->AddVal("ResourceID", r->id())
   ->Record();
 }
 } // namespace cyclus

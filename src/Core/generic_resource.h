@@ -1,161 +1,83 @@
 // generic_resource.h
-#if !defined(_GENERICRESOURCE_H)
-#define _GENERICRESOURCE_H
+#ifndef GENERICRESOURCE_H_
+#define GENERICRESOURCE_H_
+
+#include <boost/shared_ptr.hpp>
 
 #include "resource.h"
+#include "res_tracker.h"
 
 namespace cyclus {
 
-/**
-   A Generic Resource is a general type of resource in the Cyclus
-   simulation, and is a catch-all for non-standard resources.
-
-   @section definition Defining a Generic Resource
-   Generic Resources must have a unit, and quality and a quantity.
- */
-
+/// A Generic Resource is a general type of resource in the Cyclus simulation,
+/// and is a catch-all for non-standard resources.  It implements the Resource
+/// class interface in a simple way usable for things such as: bananas,
+/// man-hours, water, buying power, etc.
 class GenericResource : public Resource {
  public:
-  typedef boost::intrusive_ptr<GenericResource> Ptr;
+  typedef
+  boost::shared_ptr<GenericResource> Ptr;
+  static const ResourceType kType;
 
-  /**
-     Constructor
+  /// Creates a new generic resource that is "live" and tracked.
+  static Ptr Create(double quantity, std::string quality, std::string units);
 
-     @param units is a string indicating the resource unit
-     @param quality is a string indicating a quality
-     @param quantity is a double indicating the quantity
-   */
-  GenericResource(std::string units, std::string quality, double quantity);
+  /// Creates a new generic resource that does not actually exist as part of
+  /// the simulation and is untracked.
+  static Ptr CreateUntracked(double quantity, std::string quality, std::string
+                             units);
 
-  /**
-     Copy constructor
+  /// Returns 0 (for now).
+  virtual int state_id() const {
+    return 0;
+  };
+  // TODO: give each quality its own state_id. and have it recorded in the output db.
 
-     @param other the resource to copy
-   */
-  GenericResource(const GenericResource& other);
-
-  virtual int StateID();
-
-  /**
-     Returns a reference to a newly allocated copy of this resource
-   */
-  virtual Resource::Ptr clone();
-
-  /**
-     Prints information about the resource
-   */
-  virtual void Print();
-
-  /**
-     A boolean comparing the quality of the other resource
-     to the quality of the base
-
-     @param other The resource to evaluate against the base
-
-     @return True if other is sufficiently equal in quality to
-     the base, False otherwise.
-   */
-  virtual bool CheckQuality(Resource::Ptr other);
-
-  /**
-     Returns the total quantity of this resource in its base unit
-
-     @return the total quantity of this resource in its base unit
-   */
-  virtual double quantity() {
-    return quantity_;
+  /// Returns GenericResource::kType.
+  virtual const ResourceType type() const {
+    return kType;
   };
 
-  /**
-     Returns the total quantity of this resource in its base unit
+  virtual Resource::Ptr Clone() const;
 
-     @return the total quantity of this resource in its base unit
-   */
-  virtual std::string units() {
+  virtual void Record() const { };
+
+  virtual std::string units() const {
     return units_;
   };
 
-  /**
-     Sets the total quantity of this resource in its base unit
-   */
-  void SetQuantity(double new_quantity) {
-    quantity_ = new_quantity;
+  virtual double quantity() const {
+    return quantity_;
   };
 
-  /**
-     Gets the quality of this resource
-   */
-  std::string quality() {
+  /// Returns the quality of this resource (e.g. bananas, human labor, water, etc.).
+  virtual const std::string& quality() const {
     return quality_;
   };
 
-  /**
-     Returns the concrete type of this resource
-   */
-  virtual ResourceType type() {
-    return GENERIC_RES;
-  };
+  virtual Resource::Ptr ExtractRes(double quantity);
 
-  /**
-     Returns the type name of this resource
-   */
-  virtual std::string type_name() {
-    return "Generic Resource";
-  }
+  /// Extracts the specified mass from this resource and returns it as a
+  /// new generic resource object with the same quality/type.
+  ///
+  /// @throws ValueError tried to extract more than exists.
+  GenericResource::Ptr Extract(double quantity);
 
-  /**
-     Return if this resource type has been recorded for the database
-   */
-  bool is_resource_type_recorded() {
-    return type_is_recorded_;
-  }
-
-  /**
-     Tells this resource that it has, indeed, been recorded
-   */
-  void type_recorded() {
-    type_is_recorded_ = true;
-  }
-
-  /**
-     Absorbs the contents of the given 'other' resource into this
-     resource
-     @throws CycGenResourceIncompatible 'other' resource is of a
-   */
-  virtual void Absorb(Ptr other);
-
-  /**
-     Extracts the specified mass from this resource and returns it as a
-     new generic resource object with the same quality/type.
-
-     @throws CycGenResourceOverExtract
-   */
-  virtual Ptr Extract(double mass);
-
-  virtual void AddToTable();
+  /// Absorbs the contents of the given 'other' resource into this resource.
+  /// @throws ValueError 'other' resource is of different units and/or quality
+  void Absorb(GenericResource::Ptr other);
 
  private:
-  /**
-     The units of the resource
-   */
+  /// @param quantity is a double indicating the quantity
+  /// @param units is a string indicating the resource unit
+  GenericResource(double quantity, std::string quality, std::string units);
+
   std::string units_;
-
-  /**
-     The quality distinguishing this resource will be traded as.
-   */
   std::string quality_;
-
-  /**
-     The quantity of the resource
-   */
   double quantity_;
-
-  bool recorded_;
-
-  /**
-     A boolean to tell if the resource has been recorded
-   */
-  static bool type_is_recorded_;
+  ResTracker tracker_;
 };
+
 } // namespace cyclus
+
 #endif
