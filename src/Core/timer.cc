@@ -151,7 +151,7 @@ void Timer::reset() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
-                       int decay) {
+                       int decay, std::string handle) {
   reset();
 
   if (m0 < 1 || m0 > 12) {
@@ -183,7 +183,7 @@ void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
   endDate_ = GetEndDate(startDate_, simDur_);
   date_ = boost::gregorian::date(startDate_);
 
-  LogTimeData(ctx);
+  LogTimeData(ctx, handle);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -223,35 +223,10 @@ std::pair<int, int> Timer::ConvertDate(int time) {
   return std::make_pair(month, year);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation(Context* ctx, QueryEngine* qe) {
-  if (qe->NElementsMatchingQuery("simhandle") > 0) {
-    handle_ = qe->GetElementContent("simhandle");
-  }
-
-  // get duration
-  std::string dur_str = qe->GetElementContent("duration");
-  int dur = strtol(dur_str.c_str(), NULL, 10);
-  // get start month
-  std::string m0_str = qe->GetElementContent("startmonth");
-  int m0 = strtol(m0_str.c_str(), NULL, 10);
-  // get start year
-  std::string y0_str = qe->GetElementContent("startyear");
-  int y0 = strtol(y0_str.c_str(), NULL, 10);
-  // get simulation start
-  std::string sim0_str = qe->GetElementContent("simstart");
-  int sim0 = strtol(sim0_str.c_str(), NULL, 10);
-  // get decay interval
-  std::string decay_str = qe->GetElementContent("decay");
-  int dec = strtol(decay_str.c_str(), NULL, 10);
-
-  Initialize(ctx, dur, m0, y0, sim0, dec);
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::LogTimeData(Context* ctx) {
+void Timer::LogTimeData(Context* ctx, std::string handle) {
   ctx->NewEvent("SimulationTimeInfo")
-  ->AddVal("SimHandle", handle_)
+  ->AddVal("SimHandle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
   ->AddVal("SimulationStart", time0_)

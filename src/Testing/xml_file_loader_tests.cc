@@ -160,7 +160,7 @@ TEST_F(XMLFileLoaderTests, control) {
   using cyclus::XMLFileLoader;
   XMLFileLoader file(ctx_, controlFile);
   file.Init(false);
-  EXPECT_NO_THROW(file.load_control_parameters(&ti_));
+  EXPECT_NO_THROW(file.load_control_parameters());
 }
 
 TEST_F(XMLFileLoaderTests, recipes) {

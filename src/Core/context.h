@@ -40,6 +40,9 @@ class Context {
 
   boost::uuids::uuid sim_id();
 
+  void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
+                std::string handle = "");
+
   int time();
   int start_time();
   int sim_dur();

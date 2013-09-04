@@ -22,7 +22,8 @@ T* Context::GetModel(std::string name) {
   Model* m = models_[name];
   T* casted(NULL);
   casted = dynamic_cast<T*>(m);
-  if (casted == NULL) { throw CastError("Invalid model cast for model name " + name);
+  if (casted == NULL) {
+    throw CastError("Invalid model cast for model name " + name);
   }
   return casted;
 };
@@ -59,6 +60,11 @@ Composition::Ptr Context::GetRecipe(std::string name) {
 
 boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();
+};
+
+void Context::InitTime(int start, int duration, int decay, int m0, int y0,
+                       std::string handle) {
+  ti_->Initialize(this, duration, m0, y0, start, decay, handle);
 };
 
 int Context::time() {
