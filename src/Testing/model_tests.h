@@ -1,11 +1,9 @@
 // model_tests.h
 #include <gtest/gtest.h>
 
-#include "context.h"
-#include "event_manager.h"
 #include "model.h"
 #include "suffix.h"
-#include "timer.h"
+#include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -21,20 +19,15 @@ typedef cyclus::Model* ModelConstructor(cyclus::Context* ctx);
 class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
     virtual void SetUp() { 
-      ctx_ = new cyclus::Context(&ti_, &em_);
-      model_ = (*GetParam())(ctx_);
+      model_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){ 
       delete model_;
-      delete ctx_;
     }
 
   protected:
-    cyclus::Context* ctx_;
-    cyclus::Timer ti_;
-    cyclus::EventManager em_;
     cyclus::Model* model_;
-
+    cyclus::TestContext tc_;
 };
 
 #else
@@ -48,5 +41,4 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
 TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
-
 

@@ -1,12 +1,10 @@
 // Regionmodel_tests.h
 #include <gtest/gtest.h>
 
-#include "context.h"
-#include "event_manager.h"
 #include "region_model.h"
 #include "suffix.h"
 #include "test_region.h"
-#include "timer.h"
+#include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -22,18 +20,14 @@ typedef cyclus::RegionModel* RegionModelConstructor(cyclus::Context* ctx);
 class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
   public:
     virtual void SetUp() { 
-      ctx_ = new cyclus::Context(&ti_, &em_);
-      region_model_ = (*GetParam())(ctx_);
+      region_model_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){ 
       delete region_model_;
-      delete ctx_;
     }
 
   protected:
-    cyclus::Context* ctx_;
-    cyclus::Timer ti_;
-    cyclus::EventManager em_;
+    cyclus::TestContext tc_;
     cyclus::RegionModel* region_model_;
 
 };

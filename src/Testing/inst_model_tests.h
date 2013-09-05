@@ -1,13 +1,11 @@
 // Instmodel_tests.h
 #include <gtest/gtest.h>
 
-#include "context.h"
-#include "event_manager.h"
 #include "inst_model.h"
 #include "suffix.h"
+#include "test_context.h"
 #include "test_region.h"
 #include "test_facility.h"
-#include "timer.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -31,22 +29,16 @@ class FakeInstModel : public cyclus::InstModel {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InstModelTests : public TestWithParam<InstModelConstructor*> {
  protected:
-  cyclus::Context* ctx_;
-  cyclus::Timer ti_;
-  cyclus::EventManager em_;
   FakeInstModel* inst_model_;
   TestFacility* test_facility_;
   TestRegion* test_region_;
-  cyclus::Context* ctx;
-  cyclus::Timer* t;
-  cyclus::EventManager* em;
+  cyclus::TestContext tc_;
   
  public:
   virtual void SetUp() { 
-    ctx_ = new cyclus::Context(&ti_, &em_);
-    inst_model_ = new FakeInstModel(ctx_);
-    test_facility_ = new TestFacility(ctx_);
-    test_region_ = new TestRegion(ctx_);
+    inst_model_ = new FakeInstModel(tc_.get());
+    test_facility_ = new TestFacility(tc_.get());
+    test_region_ = new TestRegion(tc_.get());
     inst_model_->SetParent(test_region_);
     
   }
@@ -54,7 +46,6 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
     delete inst_model_;
     delete test_facility_;
     delete test_region_;
-    delete ctx_;
   }   
 };
 
