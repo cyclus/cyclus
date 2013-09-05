@@ -41,6 +41,9 @@ class XMLFileLoader {
    */
   void ApplySchema(const std::stringstream& schema);
 
+  /**
+   Load an entire simulation from the inputfile.
+   */
   void LoadAll();
 
   /**

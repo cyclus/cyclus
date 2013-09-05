@@ -13,18 +13,23 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete Model instance 
-typedef cyclus::Model* ModelConstructor();
+typedef cyclus::Model* ModelConstructor(cyclus::Context* ctx);
 
 class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
     virtual void SetUp() { 
-      model_ = (*GetParam())();
+      ctx_ = new cyclus::Context(&ti_, &em_);
+      model_ = (*GetParam())(ctx_);
     }
     virtual void TearDown(){ 
       delete model_;
+      delete ctx_;
     }
 
   protected:
+    cyclus::Context* ctx_;
+    cyclus::Timer ti_;
+    cyclus::EventManager em_;
     cyclus::Model* model_;
 
 };

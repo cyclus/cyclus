@@ -187,6 +187,9 @@ class Model {
     model_type_ = new_type;
   };
 
+  /**
+   Returns this model's current simulation context.
+   */
   Context* context() {
     return ctx_;
   };
