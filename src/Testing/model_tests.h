@@ -1,8 +1,11 @@
 // model_tests.h
 #include <gtest/gtest.h>
 
+#include "context.h"
+#include "event_manager.h"
 #include "model.h"
 #include "suffix.h"
+#include "timer.h"
 
 #if GTEST_HAS_PARAM_TEST
 

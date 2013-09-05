@@ -37,7 +37,10 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
   FakeInstModel* inst_model_;
   TestFacility* test_facility_;
   TestRegion* test_region_;
-
+  cyclus::Context* ctx;
+  cyclus::Timer* t;
+  cyclus::EventManager* em;
+  
  public:
   virtual void SetUp() { 
     ctx_ = new cyclus::Context(&ti_, &em_);
