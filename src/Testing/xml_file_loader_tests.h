@@ -1,15 +1,15 @@
 // xml_file_loader_tests.h
 #include <gtest/gtest.h>
 
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
 #include <unistd.h>
 
-#include "xml_file_loader.h"
-#include "timer.h"
-#include "event_manager.h"
 #include "context.h"
+#include "event_manager.h"
+#include "timer.h"
+#include "xml_file_loader.h"
 
 //- - - - - - - - 
 class XMLFileLoaderTests : public ::testing::Test {

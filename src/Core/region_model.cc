@@ -31,12 +31,10 @@ void RegionModel::InitCoreMembers(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::InitAllowedFacilities(QueryEngine* qe) {
   int num_allowed_fac = qe->NElementsMatchingQuery("allowedfacility");
-  std::string fac_name;
-  Model* new_fac;
+  std::string proto_name;
   for (int i = 0; i < num_allowed_fac; i++) {
-    fac_name = qe->GetElementContent("allowedfacility", i);
-    new_fac = dynamic_cast<Model*>(Prototype::GetRegisteredPrototype(fac_name));
-    allowedFacilities_.insert(new_fac);
+    proto_name = qe->GetElementContent("allowedfacility", i);
+    allowedFacilities_.insert(proto_name);
   }
 }
 
@@ -59,7 +57,7 @@ void RegionModel::EnterSimulationAsCoreEntity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::AddRegionAsRootNode() {
-  context()->RegisterTickListener(this);
+  context()->RegisterTicker(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,10 +75,10 @@ std::string RegionModel::str() {
   std::string s = Model::str();
 
   s += "allows facs: ";
-  for (std::set<Model*>::iterator fac = allowedFacilities_.begin();
+  for (std::set<std::string>::iterator fac = allowedFacilities_.begin();
        fac != allowedFacilities_.end();
        fac++) {
-    s += (*fac)->name() + ", ";
+    s += *fac + ", ";
   }
 
   s += ". And has insts: ";

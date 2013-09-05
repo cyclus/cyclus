@@ -21,12 +21,8 @@ class TestInst: public cyclus::InstModel {
     msg->SetDir(cyclus::DOWN_MSG);
   }
 
-  bool CanBuild(cyclus::Model* mdl) {
-    return true;
-  }
-
-  void WrapAddAvailablePrototype(cyclus::Prototype* prototype) {
-    AddAvailablePrototype(prototype);
+  void WrapAddAvailablePrototype(std::string proto_name) {
+    AddAvailablePrototype(proto_name);
   }
 };
 

@@ -1,16 +1,17 @@
 // xml_file_loader_tests.cc
 #include "xml_file_loader_tests.h"
 
-#include <string>
-#include <sstream>
-#include <set>
 #include <iostream>
+#include <set>
+#include <sstream>
+#include <string>
+
 #include "model.h"
 #include "error.h"
 #include "dynamic_module.h"
-#include "timer.h"
 
 using namespace std;
+using cyclus::XMLFileLoader;
 
 void XMLFileLoaderTests::SetUp() {
   ctx_ = new cyclus::Context(&ti_, &em_);
@@ -145,46 +146,33 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, controlFile);
-  EXPECT_NO_THROW(file.Init(false));
+  EXPECT_NO_THROW(XMLFileLoader file(ctx_, controlFile, false));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, "blah");
-  EXPECT_THROW(file.Init(false), cyclus::IOError);
+  EXPECT_THROW(XMLFileLoader file(ctx_, "blah", false), cyclus::IOError);
 }
 
 TEST_F(XMLFileLoaderTests, control) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, controlFile);
-  file.Init(false);
-  EXPECT_NO_THROW(file.load_control_parameters());
+  XMLFileLoader file(ctx_, controlFile, false);
+  EXPECT_NO_THROW(file.LoadControlParams());
 }
 
 TEST_F(XMLFileLoaderTests, recipes) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, recipeFile);
-  file.Init(false);
-  EXPECT_NO_THROW(file.load_recipes());
+  XMLFileLoader file(ctx_, recipeFile, false);
+  EXPECT_NO_THROW(file.LoadRecipes());
 }
 
 // This needs to be moved somewhere else! maybe to a new simulation
 // constructor class..
 TEST_F(XMLFileLoaderTests, modulesandsim) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, moduleFile);
-  file.Init(false);
-  std::set<std::string> module_types = cyclus::Model::dynamic_module_types();
-  file.load_dynamic_modules(module_types);
+  XMLFileLoader file(ctx_, moduleFile, false);
+  file.LoadDynamicModules();
   EXPECT_NO_THROW(cyclus::Model::ConstructSimulation());
 }
 
 TEST_F(XMLFileLoaderTests, schema) {
-  using cyclus::XMLFileLoader;
-  XMLFileLoader file(ctx_, controlFile);
-  file.Init(false);
+  XMLFileLoader file(ctx_, controlFile, false);
   std::stringstream schema(ControlSchema());
   EXPECT_NO_THROW(file.ApplySchema(schema););
 }

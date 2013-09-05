@@ -132,8 +132,8 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      returns if the facility is in this region's allowed facs
    */
-  bool IsAllowedFacility(Model* test_fac) {
-    return (allowedFacilities_.find(test_fac)
+  bool IsAllowedFacility(std::string proto_name) {
+    return (allowedFacilities_.find(proto_name)
             != allowedFacilities_.end());
   } ;
 
@@ -162,7 +162,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      every region has a list of allowed facilities
    */
-  std::set<Model*> allowedFacilities_;
+  std::set<std::string> allowedFacilities_;
 
   /**
      the names of the institutions in this region
