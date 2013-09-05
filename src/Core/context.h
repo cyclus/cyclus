@@ -14,7 +14,6 @@ namespace cyclus {
 class EventManager;
 class Event;
 class MarketModel;
-class Model;
 class Timer;
 class TimeAgent;
 
@@ -23,23 +22,6 @@ class Context {
   Context(Timer* ti, EventManager* em);
 
   boost::uuids::uuid sim_id();
-
-  void RegisterModel(std::string name, Model* m);
-
-  template <class T>
-  T* GetModel(std::string name) {
-    if (models_.count(name) == 0) {
-      throw KeyError("Invalid model name " + name);
-    }
-
-    Model* m = models_[name];
-    T* casted(NULL);
-    casted = dynamic_cast<T*>(m);
-    if (casted == NULL) {
-      throw CastError("Invalid model cast for model name " + name);
-    }
-    return casted;
-  };
 
   void RegisterProto(std::string name, Prototype* p);
 
@@ -74,7 +56,6 @@ class Context {
   Event* NewEvent(std::string title);
 
  private:
-  std::map<std::string, Model*> models_;
   std::map<std::string, Prototype*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
 
