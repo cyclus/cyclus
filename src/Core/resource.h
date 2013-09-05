@@ -1,184 +1,71 @@
-// resource.h
-#if !defined(_RESOURCE_H)
-#define _RESOURCE_H
+#ifndef RESOURCE_H_
+#define RESOURCE_H_
 
 #include <string>
-#include "intrusive_base.h"
-#include <boost/intrusive_ptr.hpp>
+#include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace cyclus {
 
-/**
-   A list of concrete types of resource
-*/
-enum ResourceType { MATERIAL_RES, GENERIC_RES, LAST_RES };
+typedef std::string ResourceType;
 
-/**
-   A resource is the base class for items that are passed between
-   agents in a Cyclus simulation.
-
-   @section intro Introduction
-   A resource must have knowlege of what is and how it was created.
-   Accordingly, it keeps track of its units, quality, quantity, the
-   id of its creator, and if it was spawned from the splitting of a
-   different resource.
-
-   @section output Database Output
-   The Resource class keeps track of two Tables in the Cyclus output
-   database: Resource Types and Resources. For each new type of resource
-   introduced in the simulation, a row is added to the Resource Types
-   Table. When a new resource is created in the simulation, a row is
-   added to the Resources table.
- */
-
-class Resource: IntrusiveBase<Resource> {
+/// Resource defines an abstract interface implemented by types that are
+/// offered, requested, and transferred between simulation agents. Resources
+/// represent the lifeblood of a simulation.
+class Resource {
  public:
-  typedef boost::intrusive_ptr<Resource> Ptr;
+  typedef boost::shared_ptr<Resource> Ptr;
 
-  /**
-     A boolean comparing the quality of the other resource
-     to the quality of the base
+  virtual ~Resource() { };
 
-     @param other The resource to evaluate against the base
-
-     @return True if other is sufficiently equal in quality to
-     the base, False otherwise.
-   */
-  virtual bool CheckQuality(Ptr other) = 0;
-
-  /**
-     Returns the base unit of this resource
-
-     @return resource_unit_ the base unit of this resource
-   */
-  virtual std::string units() = 0;
-
-  /**
-     Returns the total quantity of this resource in its base unit
-
-     @return the total quantity of this resource in its base unit
-   */
-  virtual double quantity() = 0;
-
-  /**
-     Set the quantity of the resource in its default units to 'val'.
-
-   */
-  virtual void SetQuantity(double val) = 0;
-
-  /**
-  The current state of the resource object.
-
-  This can be used to prevent writing of redundant information into the output
-  database.  e.g. concrete resources only get a new stateID if they enter a
-  'state' that has not yet been recorded in the output db. Note that new states
-  should be pulled from the static Resource::nextStateID() method;
-  **/
-  virtual int StateID() = 0;
-
-  /**
-     Returns the concrete resource type, an enum
-   */
-  virtual ResourceType type() = 0;
-
-  /**
-     Returns a newly allocated copy of the resource
-   */
-  virtual Ptr clone() = 0;
-
-  /**
-     Prints information about the resource
-   */
-  virtual void Print() = 0;
-
-  /**
-     return this resource's unique ID
-   */
-  const int ID() {
-    return ID_;
+  /// Returns the unique id corresponding to this resource and its current
+  /// state.  All resource id's are unique - even across different resource
+  /// types/implementations.
+  const int id() const {
+    return id_;
   };
 
-  /**
-     return this resource's original ID
-   */
-  const int OriginalID() {
-    return originalID_;
-  };
+  /// Assigns a new, unique id to this resource and its state. This should be
+  /// called by resource implementations whenever their state changes.  A call to
+  /// BumpId is not always accompanied by a change to the state id.
+  void BumpId();
 
-  /**
-     a resource has been split, set the id to the original resource's
-   */
-  void SetOriginalID(int id);
+  /// Returns an id representing the specific resource implementation's
+  /// internal state that is not accessible via the Resource class public
+  /// interface.  Any change to the state_id should be accompanied by a call to
+  /// BumpId.
+  virtual int state_id() const = 0;
 
-  /**
-     Destructor
-   */
-  virtual ~Resource();
+  /// A unique type/name for the concrete resource implementation.
+  virtual const ResourceType type() const = 0;
 
- protected:
-  /**
-     Constructor
-   */
-  Resource();
+  /// Returns an untracked (not part of the simulation) copy of the resource.
+  /// A cloned resource should never record anything in the output database.
+  virtual Ptr Clone() const = 0;
 
-  /**
-     amount of a resource
-   */
-  double quantity_;
+  /// Records the resource's state to the output database.  This method
+  /// should generally NOT record data accessible via the Resource class
+  /// public methods (e.g.  state_id, units, type, quantity)
+  virtual void Record() const = 0;
 
-  /**
-     Resource ID
-   */
-  int ID_;
+  /// Returns the units this resource is based in (e.g. "kg").
+  virtual std::string units() const = 0;
 
-  /**
-     After a split, this is the original resource's id
-   */
-  int originalID_;
+  /// Returns the quantity of this resource with dimensions as specified by
+  /// the return value of units().
+  virtual double quantity() const = 0;
 
- private:
-
-  /**
-     the next resource id
-   */
-  static int nextID_;
-
-  // -------- output database related members  --------
-
- public:
-
-  /**
-     adds a resource to the resouce table
-   */
-  virtual void AddToTable();
-
-  /**
-     the name of the resource's type
-   */
-  virtual std::string type_name() = 0;
-
-  /**
-     returns if this type of resource is recorded
-   */
-  virtual bool is_resource_type_recorded() = 0;
-
-  /**
-     declares that this resource type is now recorded
-   */
-  virtual void type_recorded() = 0;
+  /// Splits the resource and returns the extracted portion as a new resource
+  /// object.  Allows for things like ResourceBuff and market matching to
+  /// split offers/requests of arbitrary resource implementation type.
+  ///
+  /// @return a new resource object with same state id and quantity == quantity
+  virtual Ptr ExtractRes(double quantity) = 0;
 
  private:
-
-  /**
-     adds a resource type to the resource type table
-   */
-  void RecordNewType();
-
-  /**
-  True if this resource object has already been recorded to the output db
-  */
-  bool book_kept_;
-
+  static int nextid_;
+  int id_;
 };
+
 } // namespace cyclus
 #endif

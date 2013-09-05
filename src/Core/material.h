@@ -1,422 +1,144 @@
-// material.h
-#if !defined(_MATERIAL_H)
-#define _MATERIAL_H
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 
-#include <map>
-#include <utility>
-#include <math.h>
-#include <vector>
 #include <list>
-#include <string>
+#include <boost/shared_ptr.hpp>
 
-#include "use_matrix_lib.h"
+#include "composition.h"
+#include "cyc_limits.h"
 #include "resource.h"
-#include "iso_vector.h"
+#include "res_tracker.h"
 
 namespace cyclus {
 
-// A type definition for mass units
-enum MassUnit { KG, G };
+namespace units {
+const double kg = 1.0;
+const double g =  kg* .001;
+const double mg = kg* .000001;
+const double ug = kg* .000000001;
+} // namespace units
 
-/*!
-   @class Material
-
-    The Cyclus Material class provides the data structure that supports
-   the isotopic composition of materials passed around in a Cyclus simulation
-   and the functions as the interface with which models interact
-   with materials.
-
-   @section intro Introduction
-
-   This class keeps track of the isotopic composition of a material.
-   Composition can be queried as either atom-based (moles) or mass-based (kg).
-   The material state is book-kept each time a material object is transacted
-   between simulation agents.
-
-   @section dataTables Data Tables
-   Material data can be added with a Table class. This is currently under
-   development for the MassTable.
-
-   @subsection interface Interface Models in a Cyclus simulation must interact
-   with materials in order to perform their fuel cycle tasks. Some models will
-   need to create, destroy, query and alter materials and their compositions.
-   In order to do this, the Material class, in concert with the IsoVector
-   class, provides an interface that supports these actions by any model that
-   includes its header file.
-
-   @section modifyMaterials Modifying Materials
-
-   Most interaction with material objects will take the form of checking their
-   composition properties by querying the material object's stored IsoVector.
-   The only methods available to modify the material object are the 'absorb'
-   and 'extract' methods.  Changing a material object's composition is not
-   possible.  If the composition needs to be changed, a new material object
-   will need to be created with the desired composition.  In general, the
-   setQuantity method should NOT be used to change the mass of a material
-   object. An IsoVector containing the desired composition and mass properties
-   should be configured prior to the material object creation
-*/
-class Material : public Resource {
+/// The material class is primarily responsible for enabling basic material
+/// manipulation while helping enforce mass conservation.  It also provides the
+/// ability to easily decay a material up to the current simulation time; it
+/// does not perform any decay related logic itself.
+///
+/// There are four basic operations that can be performed on materials: create,
+/// transmute (change material composition - e.g. fission by reactor), absorb
+/// (combine materials), extract (split a material). All material
+/// handling/manipulation will be performed using these operations - and all
+/// operations performed will be tracked and recorded. Usage examples:
+///
+/// * A mining facility that "creates" new material
+///
+///   @code
+///   Composition::Ptr nat_u = ...
+///   double qty = 10.0;
+///
+///   Material::Ptr m = Material::Create(qty, nat_u);
+///   @endcode
+///
+/// * A conversion facility mixing uranium and flourine:
+///
+///   @code
+///   Material::Ptr uf6 = uranium_buf.PopOne();
+///   Material::Ptr f = flourine_buf.PopOne();
+///
+///   uf6.Absorb(f);
+///   @endcode
+///
+/// * A reactor transmuting fuel:
+///
+///   @code
+///   Composition::Ptr burned_comp = ... // fancy code to calculate burned isotopics
+///   Material::Ptr assembly = core_fuel.PopOne();
+///
+///   assembly.Transmute(burned_comp);
+///   @endcode
+///
+/// * A separations plant extracting stuff from spent fuel:
+///
+///   @code
+///   Composition::Ptr comp = ... // fancy code to calculate extraction isotopics
+///   Material::Ptr bucket = spent_fuel.PopOne();
+///   double qty = 3.0;
+///
+///   Material::Ptr mox = bucket.ExtractComp(qty, comp);
+///   @endcode
+///
+class Material: public Resource {
  public:
-  typedef boost::intrusive_ptr<Material> Ptr;
+  typedef boost::shared_ptr<Material> Ptr;
+  static const ResourceType kType;
 
-  /**
-     default constructor
-   */
-  Material();
+  virtual ~Material();
 
-  /**
-     a constructor for making a material object
-     from a known recipe.
+  /// Creates a new material resource that is "live" and tracked.
+  static Ptr Create(double quantity, Composition::Ptr c);
 
-     @param comp isotopic makeup of this material object
-   */
-  Material(CompMapPtr comp);
+  /// Creates a new material resource that does not actually exist as part of
+  /// the simulation and is untracked.
+  static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
-  /**
-     a constructor for making a material object
-     from a known isovector.
+  /// Returns the id of the material's internal nuclide composition.
+  virtual int state_id() const;
 
-     @param vec isotopic makeup of this material object
-   */
-  Material(IsoVector vec);
+  /// Returns Material::kType.
+  virtual const ResourceType type() const;
 
-  /**
-     a constructor for making a material object
-     from another material object
+  virtual Resource::Ptr Clone() const;
 
-     @param other the material object to copy from
-   */
-  Material(const Material& other);
+  /// Records the internal nuclide composition of this resource.
+  virtual void Record() const;
 
-  /**
-     default destructor
-   */
-  ~Material();
+  /// Returns "kg"
+  virtual std::string units() const;
 
-  /**
-     standard verbose printer includes both an
-     atom and mass composition output
-   */
-  void Print();
+  /// Returns the mass of this material in kg.
+  virtual double quantity() const;
 
-  /**
-     Returns a boolean indicating whether these materials are equivalent
+  virtual Resource::Ptr ExtractRes(double qty);
 
-     @param other the material to compare to this one
+  /// Same as ExtractComp with c = this->comp().
+  Ptr ExtractQty(double qty);
 
-     @return equal true if compositions and size are equal. false otherwise.
-    */
-  virtual bool operator==(const Ptr other);
+  /// Creates a new material by extracting quantity qty of composition c from this one.
+  /// @return a new material with quantity qty and composition c.
+  Ptr ExtractComp(double qty, Composition::Ptr c, double threshold = eps_rsrc());
 
-  /**
-     Returns a boolean indicating whether these materials are equivalent
+  /// Combines material mat with this one.  mat's quantity becomes zero.
+  void Absorb(Ptr mat);
 
-     @param other the material to compare to this one
-     @param threshold the smallest amount considered equal when comparing comps
+  /// Changes the material's composition to c without changing its mass.  Use
+  /// this method for things like converting fresh to spent fuel via burning in
+  /// a reactor.
+  void Transmute(Composition::Ptr c);
 
-     @return equal true if equal within the threshold. false otherwise.
-    */
-  virtual bool AlmostEqual(const Ptr other, double threshold) const;
+  /// A special case of Transmute where the new composition is calculated by
+  /// performing a decay calculation on the material's composition.  The time
+  /// delta is calculated as the difference between curr_time and the last time
+  /// Decay was invoked.
+  void Decay(int curr_time);
 
-  /**
-     Change/set the mass of the resource object.
-     Note that this does make matter (dis)appear and
-     should only be used on objects that are not part of
-     any actual tracked inventory.
-   */
-  void SetQuantity(double quantity);
+  /// Calls Decay for all materials currently existing in the simulation.
+  static void DecayAll(int curr_time);
 
-  /**
-     Change/set the mass of the resource object.
-     Note that this does make matter (dis)appear and
-     should only be used on objects that are not part of
-     any actual tracked inventory.
-
-     @param quantity the new mass, in units of the unit provided
-     @param unit the unit of the mass provided, choose kg, g..
-    */
-  void SetQuantity(double quantity, MassUnit unit);
-
-  /**
-     Resource class method
-
-     @return the mass in kg
-   */
-  double quantity();
-
-
-  /**
-     Resource class method
-   */
-  std::string units() {
-    return "kg";
-  };
-
-  /**
-     Resource class method
-   */
-  bool CheckQuality(Resource::Ptr other);
-
-  /**
-     Resource class method
-   */
-  ResourceType type() {
-    return MATERIAL_RES;
-  };
-
-  /**
-     Resource class method
-   */
-  Resource::Ptr clone();
-
-  /**
-     Calls the resource class method, but checks
-     the units.
-
-     @param unit is the mass unit. Choose kg, g...
-   */
-  double mass(MassUnit unit);
-
-  /**
-     returns the mass (in kg) of a certain isotope contained
-     in the material.
-
-     @param tope is the isotope identifier. (e.g. 92235)
-   */
-  double mass(Iso tope);
-
-  /**
-     returns the mass of a certain isotope contained
-     in the material.
-
-     @param tope is the isotope identifier. (e.g. 92235)
-     @param unit is the mass unit. Choose kg, g...
-   */
-  double mass(Iso tope, MassUnit unit);
-
-  /**
-     conversion from kg to some other unit
-
-     @param kg the mass in kg to convert
-     @param to_unit the unit to convert it to
-     */
-  double ConvertFromKg(double kg, MassUnit to_unit);
-
-  /**
-     conversion from kg to some other unit
-
-     @param mass the mass in kg to convert
-     @param from_unit the unit to convert it from
-     */
-  double ConvertToKg(double mass, MassUnit from_unit);
-
-  /**
-     returns the number of atoms, in moles in the material.
-
-    */
-  double Moles();
-
-  /**
-     returns the number of atomes (in moles) of a certain isotope in a material
-
-     @param tope is the isotope identifier. (e.g. 92235)
-    */
-  double Moles(Iso tope);
-
-  /**
-     Absorbs the contents of the given
-     Material into this Material and deletes
-     the given Material.
-
-     @param matToAdd the Material to be absorbed (and deleted)
-   */
-  virtual void Absorb(Ptr matToAdd);
-  /**
-     Reports the difference between this material and another material
-
-     @param other the other material
-
-     @return diff a map of isotope ids to amounts (in the MassUnit of unit)
-     */
-  virtual std::map<Iso, double> diff(const Ptr other);
-
-  /**
-     Reports the difference between this material and a CompMap
-
-     @param other the material to compare to the original material
-     @param other_amt the amount associated with
-     @param unit the MassUnit with which to interperet the CompMap
-
-     @return comp_diff a map of isotope ids to amounts (in the MassUnit of unit)
-   */
-  virtual std::map<Iso, double> diff(const CompMapPtr other, double other_amt,
-                                     MassUnit unit = KG);
-
-  /**
-     Returns the vec, less the elements whose absolute value are less than the threshold.
-
-     @param vec the map of isos and amounts to which to apply the threshold
-     @param threshold the smallest value considered nonzero
-
-     @throws CycNegValueError if the threshold provided is negative.
-     @returns to_ret, the vector less elements whose abs(val) is less than threshhold
-     */
-  virtual std::map<Iso, double> ApplyThreshold(std::map<Iso, double> vec,
-                                               double threshold);
-
-  /**
-     Extracts from this material a composition
-     specified by the given CompMapPtr. This operation will change
-     the quantity_ and iso_vector_ members.
-
-     @param comp_to_rem the composition of material that will be removed against this Material.
-     @param amt_to_rem the amount in *unit* of material that will be removed against this Material.
-     @param unit the MassUnit to do the extraction operation in. Default is KG.
-     @param threshold is the smallest amount considered negligible in this extraction.
-
-     @throws ValueError for overextraction events
-     @return the extracted material as a newly allocated material object
-   */
-  virtual Ptr Extract(const CompMapPtr comp_to_rem, double amt_to_rem,
-                      MassUnit unit = KG, double threshold = eps_rsrc());
-
-  /**
-     Extracts a specified mass from this material creating a new
-     material object with the same isotopic ratios.
-
-     @param mass the amount (mass) of material that will be removed
-     @throws ValueError for overextraction events
-     @return the extracted material as a newly allocated material object
-   */
-  virtual Ptr Extract(double mass);
-
-  /**
-     Decays this Material object for the amount of time that has passed since
-     decay was last called.
-
-     Calling decay effectively updates the material decay to the current
-     simulation time-step.
-   */
-  virtual void Decay();
-
-  /**
-     Returns a copy of this material's isotopic composition
-
-     @return a copy of the isovector
-   */
-  IsoVector& isoVector() {
-    return iso_vector_;
-  }
-
-  /**
-     Decays all of the materials if decay is on
-
-     @todo should be private (khuff/rcarlsen)
-   */
-  static void DecayMaterials();
-
-  /**
-     returns true if the resource pointer points to a material resource
-  */
-  static bool IsMaterial(Resource::Ptr rsrc);
-
-  /**
-     This scales the composition by the amount of moles or kg, depending on the
-     basis provided. It returns an unnormalized CompMapPtr
-
-     @param basis MASS or ATOMS
-     @param unit if the basis is mass, give a unit (KG or G) to calculate in
-     */
-  CompMapPtr UnnormalizeComp(Basis basis, MassUnit unit = KG);
+  /// Returns the nuclide composition of this material.
+  Composition::Ptr comp() const;
 
  protected:
-  /**
-     Decays this Material object for the given number of months and
-     updates its composition map with the new number densities.
-
-     @param months the number of months to decay a material
-   */
-  void Decay(double months);
-
+  Material(double quantity, Composition::Ptr c);
 
  private:
-  /**
-     used by Print() to 'hide' print code when recording is not desired
-   */
-  std::string Detail();
+  static std::map<Material*, bool> all_mats_;
 
-  /**
-     last time this material object's state
-     was accurate (e.g. time of last decay, etc.)
-   */
-  int last_update_time_;
-
-  /**
-     all isotopic details of this material object
-   */
-  IsoVector iso_vector_;
-
-  /**
-     list of materials
-   */
-  static std::list<Material*> materials_;
-
-  /**
-     true if decay should occur, false if not.
-   */
-  static bool decay_wanted_;
-
-  /**
-     how many months between decay calculations
-   */
-  static int decay_interval_;
-
-  // -------- resource class related members  --------
- public:
-  /**
-     the material class resouce type
-   */
-  std::string type_name() {
-    return "material";
-  }
-
-  /**
-     resouce type recording state
-   */
-  bool is_resource_type_recorded() {
-    return type_is_recorded_;
-  }
-
-  /**
-     tells the simulation this resource type is recorded
-   */
-  void type_recorded() {
-    type_is_recorded_ = true;
-  }
-
- private:
-  /**
-     the state of recording for this resource type
-   */
-  static bool type_is_recorded_;
-  // -------- resource class related members  --------
-
-
- public:
-
-  /**
-     add a material to table
-   */
-  virtual void AddToTable();
-
-  /**
-     return the state id for the iso vector
-   */
-  virtual int StateID() {
-    return iso_vector_.comp()->ID();
-  }
+  double qty_;
+  Composition::Ptr comp_;
+  int prev_decay_time_;
+  ResTracker tracker_;
 
 };
+
 } // namespace cyclus
+
 #endif

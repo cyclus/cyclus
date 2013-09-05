@@ -59,9 +59,7 @@ Manifest ResourceBuff::PopQty(double qty) {
     quan = mat->quantity();
     if ((quan - left) > cyclus::eps_rsrc()) {
       // too big - split the mat before pushing
-      leftover = mat->clone();
-      leftover->SetQuantity(quan - left);
-      mat->SetQuantity(left);
+      leftover = mat->ExtractRes(quan - left);
       mats_.push_front(leftover);
       qty_ -= left;
     } else {

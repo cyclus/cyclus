@@ -282,9 +282,9 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = cyclus::GenericResource::Ptr(new cyclus::GenericResource("kg", "bananas", quantity1));
+      resource = cyclus::GenericResource::Create(quantity1, "bananas", "kg");
 
-      cyclus::Transaction* trans = new cyclus::Transaction(foo, cyclus::OFFER, NULL);
+      cyclus::Transaction* trans = new cyclus::Transaction(foo, cyclus::OFFER);
       comm1 = new TestCommunicator("comm1");
       comm2 = new TestCommunicator("comm2");
       msg1 = cyclus::Message::Ptr(new cyclus::Message(comm1, comm2, *trans));
@@ -321,16 +321,6 @@ TEST_F(MessagePublicInterfaceTest, FullConstructor) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorTwo) {
-  
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MessagePublicInterfaceTest, DISABLED_ConstructorThree) {
-  
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MessagePublicInterfaceTest, Cloning) {
   using cyclus::Message;
   using cyclus::Resource;
@@ -342,15 +332,11 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
 
   // check proper cloning of message's resource
   Resource::Ptr resource2 = msg2->trans().resource();
-  resource2->SetQuantity(quantity2);
+  resource2->ExtractRes(quantity1 / 2);
 
-  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
-  ASSERT_DOUBLE_EQ(msg2->trans().resource()->quantity(), quantity2);
+  ASSERT_NE(msg2->trans().resource()->quantity(), quantity1);
   ASSERT_NE(resource, msg1->trans().resource());
   ASSERT_NE(resource, resource2);
-
-  EXPECT_DOUBLE_EQ(resource->quantity(), quantity1);
-  EXPECT_DOUBLE_EQ(resource2->quantity(), quantity2);
 }
 
 
@@ -365,9 +351,9 @@ TEST_F(MessagePublicInterfaceTest, GetSetResource) {
 
   ASSERT_NE(resource, msg1->trans().resource());
 
-  msg1->trans().resource()->SetQuantity(quantity2);
+  msg1->trans().resource()->ExtractRes(quantity1 / 2);
 
   ASSERT_DOUBLE_EQ(resource->quantity(), quantity1);
-  ASSERT_DOUBLE_EQ(msg1->trans().resource()->quantity(), quantity2);
+  ASSERT_NE(msg1->trans().resource()->quantity(), quantity1);
 }
 

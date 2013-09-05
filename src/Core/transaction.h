@@ -27,7 +27,7 @@ class Transaction {
   @param price The price per unit of the commodity being requested or offered.
   @param minfrac minimum commodity fraction acceptible for sending/receiving
   */
-  Transaction(Model* creator, TransType type, Resource::Ptr res = NULL,
+  Transaction(Model* creator, TransType type, Resource::Ptr res = Resource::Ptr(),
               const double price = 0.0,
               const double minfrac = 0.0);
 

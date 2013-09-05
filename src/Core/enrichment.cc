@@ -1,7 +1,14 @@
+
 #include "enrichment.h"
-#include "cyc_limits.h"
-#include "error.h"
+
+#include <cmath>
 #include <sstream>
+
+#include "error.h"
+#include "cyc_limits.h"
+#include "logger.h"
+#include "mass_table.h"
+#include "mat_query.h"
 
 namespace cyclus {
 
@@ -29,8 +36,9 @@ double enrichment::Assays::Tails() const {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double enrichment::UraniumAssay(Material::Ptr rsrc) {
   double value;
-  double u235 = rsrc->isoVector().AtomFraction(92235);
-  double u238 = rsrc->isoVector().AtomFraction(92238);
+  MatQuery mq(rsrc);
+  double u235 = mq.atom_frac(92235);
+  double u238 = mq.atom_frac(92238);
 
   LOG(LEV_DEBUG1, "CEnr") << "Comparing u235 atom fraction : "
                           << u235 << " with u238 atom fraction: "
@@ -46,7 +54,8 @@ double enrichment::UraniumAssay(Material::Ptr rsrc) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double enrichment::UraniumQty(Material::Ptr rsrc) {
-  return rsrc->mass(92238, KG) + rsrc->mass(92235, KG);
+  MatQuery mq(rsrc);
+  return mq.mass(92235) + mq.mass(92238);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,7 +92,7 @@ double enrichment::ValueFunc(double frac) {
     throw ValueError(msg.str());
   }
 
-  return (1 - 2 * frac) * log(1 / frac - 1);
+  return (1 - 2 * frac) * std::log(1 / frac - 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
