@@ -128,12 +128,8 @@ int main(int argc, char* argv[]) {
   // read input file and setup simulation
   try {
     std::string inputFile = vm["input-file"].as<std::string>();
-    std::set<std::string> module_types = Model::dynamic_module_types();
     XMLFileLoader loader(&ctx, inputFile);
-    loader.Init();
-    loader.load_control_parameters();
-    loader.load_recipes();
-    loader.load_dynamic_modules(module_types);
+    loader.LoadAll();
   } catch (cyclus::Error e) {
     success = false;
     CLOG(LEV_ERROR) << e.what();

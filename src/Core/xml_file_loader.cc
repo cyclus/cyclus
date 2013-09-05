@@ -11,9 +11,8 @@
 #include "context.h"
 #include "env.h"
 #include "error.h"
+#include "logger.h"
 #include "model.h"
-#include "recipe.h"
-#include "timer.h"
 #include "xml_query_engine.h"
 
 namespace cyclus {
@@ -21,13 +20,11 @@ namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(Context* ctx,
-                             const std::string load_filename) : ctx_(ctx) {
+                             const std::string load_filename,
+                             bool use_main_schema) : ctx_(ctx) {
   file_ = load_filename;
   initialize_module_paths();
-}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::Init(bool use_main_schema)  {
   std::stringstream input("");
   LoadStringstreamFromFile(input, file_);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
@@ -133,30 +130,73 @@ void XMLFileLoader::initialize_module_paths() {
   module_paths_["Facility"] = "/*/facility";
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadAll() {
+  LoadControlParams();
+  LoadRecipes();
+  LoadDynamicModules();
+};
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_recipes() {
+void XMLFileLoader::LoadRecipes() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
   int numRecipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < numRecipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    recipe::Load(ctx_, qe);
+    LoadRecipe(qe);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
+  bool atom_basis;
+  std::string basis_str = qe->GetElementContent("basis");
+  if (basis_str == "atom") {
+    atom_basis = true;
+  } else if (basis_str == "mass") {
+    atom_basis = false;
+  } else {
+    throw IOError(basis_str + " basis is not 'mass' or 'atom'.");
+  }
+
+  std::string name = qe->GetElementContent("name");
+  CLOG(LEV_DEBUG3) << "loading recipe: " << name
+                   << " with basis: " << basis_str;
+
+  double value;
+  int key;
+  std::string query = "isotope";
+  int nIsos = qe->NElementsMatchingQuery(query);
+  CompMap v;
+  for (int i = 0; i < nIsos; i++) {
+    QueryEngine* isotope = qe->QueryElement(query, i);
+    key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
+    value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
+    v[key] = value;
+    CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
+  }
+
+  if (atom_basis) {
+    ctx_->RegisterRecipe(name, Composition::CreateFromAtom(v));
+  } else {
+    ctx_->RegisterRecipe(name, Composition::CreateFromMass(v));
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_dynamic_modules(
-  std::set<std::string>& module_types) {
+void XMLFileLoader::LoadDynamicModules() {
+  std::set<std::string> module_types = Model::dynamic_module_types();
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    load_modules_of_type(*it, module_paths_[*it]);
+    LoadModulesOfType(*it, module_paths_[*it]);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_modules_of_type(std::string type,
-                                         std::string query_path) {
+void XMLFileLoader::LoadModulesOfType(std::string type,
+                                      std::string query_path) {
   XMLQueryEngine xqe(*parser_);
 
   int numModels = xqe.NElementsMatchingQuery(query_path);
@@ -167,7 +207,7 @@ void XMLFileLoader::load_modules_of_type(std::string type,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_control_parameters() {
+void XMLFileLoader::LoadControlParams() {
   XMLQueryEngine xqe(*parser_);
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);

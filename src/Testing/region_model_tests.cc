@@ -18,7 +18,6 @@ TEST_P(RegionModelTests, IsRegion) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(RegionModelTests, AllowedFacilityModels) {
-  TestFacility* test_fac = new TestFacility(); 
-  EXPECT_NO_THROW(region_model_->IsAllowedFacility(test_fac));
+  EXPECT_NO_THROW(region_model_->IsAllowedFacility(""));
 }
 
