@@ -13,11 +13,11 @@ boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();
 };
 
-void Context::RegisterProto(std::string name, Prototype* p) {
+void Context::AddPrototype(std::string name, Prototype* p) {
   protos_[name] = p;
 }
 
-void Context::RegisterRecipe(std::string name, Composition::Ptr c) {
+void Context::AddRecipe(std::string name, Composition::Ptr c) {
   recipes_[name] = c;
 };
 
@@ -38,11 +38,11 @@ int Context::time() {
 };
 
 int Context::start_time() {
-  return ti_->StartTime();
+  return ti_->start_time();
 };
 
 int Context::sim_dur() {
-  return ti_->SimDur();
+  return ti_->dur();
 };
 
 void Context::RegisterTicker(TimeAgent* ta) {

@@ -15,8 +15,8 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << startDate_ << " to end=" << endDate_;
-  time_ = time0_;
+                  << start_date_ << " to end=" << end_date_;
+  time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()) {
     if (date_.day() == 1) {
@@ -175,22 +175,22 @@ void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
   month0_ = m0;
   year0_ = y0;
 
-  time0_ = start;
+  start_time_ = start;
   time_ = start;
-  simDur_ = dur;
+  dur_ = dur;
 
-  startDate_ = boost::gregorian::date(year0_, month0_, 1);
-  endDate_ = GetEndDate(startDate_, simDur_);
-  date_ = boost::gregorian::date(startDate_);
+  start_date_ = boost::gregorian::date(year0_, month0_, 1);
+  end_date_ = GetEndDate(start_date_, dur_);
+  date_ = boost::gregorian::date(start_date_);
 
   LogTimeData(ctx, handle);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate,
-                                         int simDur_) {
+                                         int dur_) {
   boost::gregorian::date endDate(startDate);
-  endDate += boost::gregorian::months(simDur_ - 1);
+  endDate += boost::gregorian::months(dur_ - 1);
   endDate += boost::gregorian::days(
                boost::gregorian::gregorian_calendar::end_of_month_day(endDate.year(),
                    endDate.month()) - 1);
@@ -198,28 +198,28 @@ boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::SimDur() {
-  return simDur_;
+int Timer::dur() {
+  return dur_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer::Timer() :
   time_(0),
-  time0_(0),
-  simDur_(0),
+  start_time_(0),
+  dur_(0),
   decay_interval_(0),
   month0_(0),
   year0_(0) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::ConvertDate(int month, int year) {
-  return (year - year0_) * 12 + (month - month0_) + time0_;
+  return (year - year0_) * 12 + (month - month0_) + start_time_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::pair<int, int> Timer::ConvertDate(int time) {
-  int month = (time - time0_) % 12 + 1;
-  int year = (time - time0_ - (month - 1)) / 12 + year0_;
+  int month = (time - start_time_) % 12 + 1;
+  int year = (time - start_time_ - (month - 1)) / 12 + year0_;
   return std::make_pair(month, year);
 }
 
@@ -229,8 +229,8 @@ void Timer::LogTimeData(Context* ctx, std::string handle) {
   ->AddVal("SimHandle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
-  ->AddVal("SimulationStart", time0_)
-  ->AddVal("Duration", simDur_)
+  ->AddVal("SimulationStart", start_time_)
+  ->AddVal("Duration", dur_)
   ->Record();
 }
 } // namespace cyclus
