@@ -75,18 +75,18 @@ std::string XMLFileLoader::BuildSchema() {
     } catch (...) { }
 
     // replace refs
-    std::string searchStr = std::string("@") + *type + std::string("_REFS@");
-    size_t pos = master.find(searchStr);
+    std::string search_str = std::string("@") + *type + std::string("_REFS@");
+    size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
-      master.replace(pos, searchStr.size(), refs.str());
+      master.replace(pos, search_str.size(), refs.str());
     }
   }
 
   // replace includes
-  std::string searchStr = "@RNG_INCLUDES@";
-  size_t pos = master.find(searchStr);
+  std::string search_str = "@RNG_INCLUDES@";
+  size_t pos = master.find(search_str);
   if (pos != std::string::npos) {
-    master.replace(pos, searchStr.size(), includes.str());
+    master.replace(pos, search_str.size(), includes.str());
   }
 
   return master;
@@ -142,8 +142,8 @@ void XMLFileLoader::LoadRecipes() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
-  int numRecipes = xqe.NElementsMatchingQuery(query);
-  for (int i = 0; i < numRecipes; i++) {
+  int num_recipes = xqe.NElementsMatchingQuery(query);
+  for (int i = 0; i < num_recipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
     LoadRecipe(qe);
   }
@@ -199,8 +199,8 @@ void XMLFileLoader::LoadModulesOfType(std::string type,
                                       std::string query_path) {
   XMLQueryEngine xqe(*parser_);
 
-  int numModels = xqe.NElementsMatchingQuery(query_path);
-  for (int i = 0; i < numModels; i++) {
+  int num_models = xqe.NElementsMatchingQuery(query_path);
+  for (int i = 0; i < num_models; i++) {
     QueryEngine* qe = xqe.QueryElement(query_path, i);
     Model::InitializeSimulationEntity(ctx_, type, qe);
   }
