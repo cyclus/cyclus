@@ -52,9 +52,13 @@ class Context {
   };
 
   /// Adds a composition recipe to a simulation-wide accessible list.
+  /// Agents should NOT add their own recipes.
   void AddRecipe(std::string name, Composition::Ptr c);
   
-  /// Retrieve a registered recipe.
+  /// Retrieve a registered recipe.  This is intended for retrieving
+  /// compositions loaded from an input file(s) at the start of a
+  /// simulation and NOT for communicating compositions between facilities
+  /// during the simulation.
   Composition::Ptr GetRecipe(std::string name);
 
   /// See Timer::RegisterTickListener documentation.
