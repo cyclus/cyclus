@@ -2,10 +2,10 @@
 
 #include "model.h"
 
-extern "C" cyclus::Model* constructTestConverter(cyclus::Context* ctx) {
+extern "C" cyclus::Model* ConstructTestConverter(cyclus::Context* ctx) {
   return new TestConverter(ctx);
 }
 
-extern "C" cyclus::Model* destructTestConverter(cyclus::Model* model) {
+extern "C" cyclus::Model* DestructTestConverter(cyclus::Model* model) {
   delete model;
 }
