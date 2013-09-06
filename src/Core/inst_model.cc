@@ -16,10 +16,8 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel::InstModel() {
+InstModel::InstModel(Context* ctx) : TimeAgent(ctx) {
   SetModelType("Inst");
-  prototypes_ = PrototypeSet();
-  initial_build_order_ = std::map<Prototype*, int>();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,7 +26,6 @@ void InstModel::InitCoreMembers(QueryEngine* qe) {
 
   std::string name, query;
   int nEntries;
-  Prototype* prototype;
 
   // populate prototypes_
   query = "availableprototype";
@@ -37,8 +34,7 @@ void InstModel::InitCoreMembers(QueryEngine* qe) {
     // populate prototypes_
     for (int i = 0; i < nEntries; i++) {
       name = qe->GetElementContent(query, i);
-      prototype = Prototype::GetRegisteredPrototype(name);
-      AddAvailablePrototype(prototype);
+      AddAvailablePrototype(name);
     }
   }
 
@@ -57,13 +53,13 @@ void InstModel::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::AddAvailablePrototype(Prototype* prototype) {
-  prototypes_.insert(prototype);
-  RegisterAvailablePrototype(prototype);
+void InstModel::AddAvailablePrototype(std::string proto_name) {
+  prototypes_.insert(proto_name);
+  RegisterAvailablePrototype(proto_name);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterAvailablePrototype(Prototype* prototype) {}
+void InstModel::RegisterAvailablePrototype(std::string proto_name) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
@@ -71,22 +67,21 @@ void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
   std::string name = qe->GetElementContent("prototype");
   int number = atoi(qe->GetElementContent("number").c_str());
 
-  Prototype* p = Prototype::GetRegisteredPrototype(name);
-  ThrowErrorIfPrototypeIsntAvailable(p);
+  ThrowErrorIfPrototypeIsntAvailable(name);
 
   CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
                    << number << " prototypes of type " << name
                    << " to its list of initial facilities to build.";
 
-  initial_build_order_.insert(std::make_pair(p, number));
+  initial_build_order_.insert(std::make_pair(name, number));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::ThrowErrorIfPrototypeIsntAvailable(Prototype* p) {
+void InstModel::ThrowErrorIfPrototypeIsntAvailable(std::string p) {
   if (!IsAvailablePrototype(p)) {
     std::stringstream err("");
     err << "Inst " << this->name() << " does not have "
-        << dynamic_cast<Model*>(p)->name()
+        << p
         << " as one of its available prototypes.";
     throw ValidationError(err.str());
   }
@@ -104,17 +99,17 @@ std::string InstModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::EnterSimulationAsCoreEntity() {
   // build initial prototypes
-  std::map<Prototype*, int>::iterator it;
+  std::map<std::string, int>::iterator it;
   for (it = initial_build_order_.begin();
        it != initial_build_order_.end(); it ++) {
 
     // for each prototype
-    Prototype* p = it->first;
+    std::string proto_name = it->first;
     int number = it->second;
 
     for (int i = 0; i < number; i++) {
       // build as many as required
-      Build(p);
+      Build(proto_name);
     }
   }
 }
@@ -167,7 +162,7 @@ void InstModel::HandleTock(int time) {
   while (!children_to_decomm.empty()) {
     FacilityModel* child = children_to_decomm.back();
     children_to_decomm.pop_back();
-    RegisterCloneAsDecommissioned(dynamic_cast<Prototype*>(child));
+    RegisterCloneAsDecommissioned(child);
     child->Decommission();
   }
 }
@@ -186,17 +181,17 @@ void InstModel::HandleDailyTasks(int time, int day) {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::Build(Prototype* prototype) {
-  ThrowErrorIfPrototypeIsntAvailable(prototype);
-  Prototype* clone = prototype->clone();
-  dynamic_cast<Model*>(clone)->EnterSimulation(this);
+void InstModel::Build(std::string proto_name) {
+  ThrowErrorIfPrototypeIsntAvailable(proto_name);
+  Model* clone = context()->CreateModel<Model>(proto_name);
+  clone->EnterSimulation(this);
   RegisterCloneAsBuilt(clone);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterCloneAsBuilt(Prototype* clone) {}
+void InstModel::RegisterCloneAsBuilt(Model* clone) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterCloneAsDecommissioned(Prototype* clone) {}
+void InstModel::RegisterCloneAsDecommissioned(Model* clone) {}
 
 } // namespace cyclus

@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "suffix.h"
+#include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -13,12 +14,12 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete Model instance 
-typedef cyclus::Model* ModelConstructor();
+typedef cyclus::Model* ModelConstructor(cyclus::Context* ctx);
 
 class ModelTests : public TestWithParam<ModelConstructor*> {
   public:
     virtual void SetUp() { 
-      model_ = (*GetParam())();
+      model_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){ 
       delete model_;
@@ -26,7 +27,7 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
 
   protected:
     cyclus::Model* model_;
-
+    cyclus::TestContext tc_;
 };
 
 #else
@@ -40,5 +41,4 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
 TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
-
 

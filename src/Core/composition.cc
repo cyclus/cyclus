@@ -2,6 +2,7 @@
 #include "composition.h"
 
 #include "comp_math.h"
+#include "context.h"
 #include "error.h"
 #include "decayer.h"
 #include "event_manager.h"
@@ -73,15 +74,15 @@ Composition::Ptr Composition::Decay(int delta) {
   return decayed;
 }
 
-void Composition::Record() {
+void Composition::Record(Context* ctx) {
   if (!recorded_) {
     CompMap::const_iterator it;
     for (it = mass().begin(); it != mass().end(); ++it) {
-      EM->NewEvent("Compositions")
-      ->AddVal("ID", id())
-      ->AddVal("IsoID", it->first)
-      ->AddVal("Quantity", it->second)
-      ->Record();
+      ctx->NewEvent("Compositions")
+         ->AddVal("ID", id())
+         ->AddVal("IsoID", it->first)
+         ->AddVal("Quantity", it->second)
+         ->Record();
     }
     recorded_ = true;
   }

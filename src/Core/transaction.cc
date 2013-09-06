@@ -2,13 +2,12 @@
 
 #include "transaction.h"
 
-#include "timer.h"
-#include "error.h"
-#include "model.h"
-#include "market_model.h"
-#include "event_manager.h"
 #include <string>
 #include <vector>
+
+#include "error.h"
+#include "market_model.h"
+#include "model.h"
 
 namespace cyclus {
 
@@ -144,19 +143,21 @@ void Transaction::SetMinFrac(double new_minfrac) {
 }
 
 void Transaction::AddTransToTable() {
-  EM->NewEvent("Transactions")
+  Context* ctx = supplier_->context();
+  ctx->NewEvent("Transactions")
   ->AddVal("ID", trans_id_)
   ->AddVal("SenderID", supplier_->ID())
   ->AddVal("ReceiverID", requester_->ID())
   ->AddVal("MarketID", market()->ID())
   ->AddVal("Commodity", commod())
   ->AddVal("Price", price_)
-  ->AddVal("Time", TI->time())
+  ->AddVal("Time", supplier_->context()->time())
   ->Record();
 }
 
 void Transaction::AddResourceToTable(int transPos, Resource::Ptr r) {
-  EM->NewEvent("TransactedResources")
+  Context* ctx = supplier_->context();
+  ctx->NewEvent("TransactedResources")
   ->AddVal("TransactionID", trans_id_)
   ->AddVal("Position", transPos)
   ->AddVal("ResourceID", r->id())

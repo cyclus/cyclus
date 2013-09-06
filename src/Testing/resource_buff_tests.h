@@ -30,9 +30,9 @@ class ResourceBuffTest : public ::testing::Test {
     using cyclus::GenericResource;
     try {
       mass1 = 111;
-      mat1_ = GenericResource::Create(mass1, "bananas", "kg")->Clone();
+      mat1_ = GenericResource::CreateUntracked(mass1, "bananas", "kg")->Clone();
       mass2 = 222;
-      mat2_ = GenericResource::Create(mass2, "bananas", "kg")->Clone();
+      mat2_ = GenericResource::CreateUntracked(mass2, "bananas", "kg")->Clone();
       mats.push_back(mat1_);
       mats.push_back(mat2_);
 

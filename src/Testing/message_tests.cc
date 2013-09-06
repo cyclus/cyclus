@@ -282,7 +282,7 @@ class MessagePublicInterfaceTest : public ::testing::Test {
     virtual void SetUp(){
       quantity1 = 1.0;
       quantity2 = 2.0;
-      resource = cyclus::GenericResource::Create(quantity1, "bananas", "kg");
+      resource = cyclus::GenericResource::CreateUntracked(quantity1, "bananas", "kg");
 
       cyclus::Transaction* trans = new cyclus::Transaction(foo, cyclus::OFFER);
       comm1 = new TestCommunicator("comm1");

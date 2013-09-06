@@ -3,13 +3,12 @@
 
 #include "message.h"
 
+#include <map>
+
 #include "communicator.h"
 #include "error.h"
-#include "model.h"
-#include "market_model.h"
-#include "resource.h"
 #include "logger.h"
-#include "timer.h"
+#include "model.h"
 
 namespace cyclus {
 
@@ -127,11 +126,13 @@ void Message::TallyOrder(Model* next_model) {
     return;
   }
 
+  Context* ctx = next_model->context();
+
   Transaction tran = trans();
   if (tran.IsOffer()) {
-    Message::offer_qtys_[tran.commod()][TI->time()] += tran.resource()->quantity();
+    Message::offer_qtys_[tran.commod()][ctx->time()] += tran.resource()->quantity();
   } else {
-    Message::request_qtys_[tran.commod()][TI->time()] +=
+    Message::request_qtys_[tran.commod()][ctx->time()] +=
       tran.resource()->quantity();
   }
 }

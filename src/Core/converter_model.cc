@@ -6,7 +6,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ConverterModel::ConverterModel() {
+ConverterModel::ConverterModel(Context* ctx) : Model(ctx) {
   SetModelType("Converter");
 }
 

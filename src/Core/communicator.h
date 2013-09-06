@@ -2,9 +2,10 @@
 #if !defined(_COMMUNICATOR_H)
 #define _COMMUNICATOR_H
 
+#include <set>
+
 #include "message.h"
 #include "logger.h"
-#include <set>
 
 namespace cyclus {
 

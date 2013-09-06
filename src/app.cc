@@ -19,6 +19,7 @@
 #include "sqlite_back.h"
 #include "hdf5_back.h"
 #include "csv_back.h"
+#include "context.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -40,6 +41,7 @@ int main(int argc, char* argv[]) {
   using cyclus::SqliteBack;
   using cyclus::CsvBack;
   using cyclus::XMLFileLoader;
+  using cyclus::Context;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
@@ -118,15 +120,16 @@ int main(int argc, char* argv[]) {
   std::string path = Env::PathBase(argv[0]);
   Env::SetCyclusRelPath(path);
 
+  // setup context
+  EventManager em;
+  Timer ti;
+  Context ctx(&ti, &em);
+
   // read input file and setup simulation
   try {
     std::string inputFile = vm["input-file"].as<std::string>();
-    std::set<std::string> module_types = Model::dynamic_module_types();
-    XMLFileLoader loader(inputFile);
-    loader.Init();
-    loader.load_control_parameters();
-    loader.load_recipes();
-    loader.load_dynamic_modules(module_types);
+    XMLFileLoader loader(&ctx, inputFile);
+    loader.LoadAll();
   } catch (cyclus::Error e) {
     success = false;
     CLOG(LEV_ERROR) << e.what();
@@ -152,23 +155,23 @@ int main(int argc, char* argv[]) {
   } else {
     back = new SqliteBack(output_path);
   }
-  EM->RegisterBackend(back);
+  em.RegisterBackend(back);
 
   // sim construction - should be handled by some entity
   Model::ConstructSimulation();
 
   // print the model list
   Model::PrintModelList();
-  
+
   // Run the simulation 
   try {
-    TI->RunSim();
+    ti.RunSim();
   } catch (cyclus::Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
 
-  EM->close();
+  em.close();
   delete back;
 
   // Close Dynamically loaded modules 
@@ -186,7 +189,7 @@ int main(int argc, char* argv[]) {
     std::cout << "|              run successful                |" << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << "Output location: " << output_path << std::endl;
-    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(EM->sim_id()) << std::endl;
+    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
     std::cout << std::endl;
   } else {
     std::cout << std::endl;

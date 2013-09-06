@@ -9,18 +9,14 @@
 #include "error.h"
 #include "logger.h"
 #include "material.h"
-#include "event_manager.h"
-
 
 namespace cyclus {
-
-Timer* Timer::instance_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << startDate_ << " to end=" << endDate_;
-  time_ = time0_;
+                  << start_date_ << " to end=" << end_date_;
+  time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
   while (date_ < endDate()) {
     if (date_.day() == 1) {
@@ -148,24 +144,14 @@ int Timer::time() {
   return time_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer* Timer::Instance() {
-  // If we haven't created a Timer yet, create it, and then and return it
-  // either way.
-  if (0 == instance_) {
-    instance_ = new Timer();
-  }
-
-  return instance_;
-}
-
 void Timer::reset() {
   resolve_listeners_.clear();
   tick_listeners_.clear();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::Initialize(int dur, int m0, int y0, int start, int decay) {
+void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
+                       int decay, std::string handle) {
   reset();
 
   if (m0 < 1 || m0 > 12) {
@@ -189,22 +175,22 @@ void Timer::Initialize(int dur, int m0, int y0, int start, int decay) {
   month0_ = m0;
   year0_ = y0;
 
-  time0_ = start;
+  start_time_ = start;
   time_ = start;
-  simDur_ = dur;
+  dur_ = dur;
 
-  startDate_ = boost::gregorian::date(year0_, month0_, 1);
-  endDate_ = GetEndDate(startDate_, simDur_);
-  date_ = boost::gregorian::date(startDate_);
+  start_date_ = boost::gregorian::date(year0_, month0_, 1);
+  end_date_ = GetEndDate(start_date_, dur_);
+  date_ = boost::gregorian::date(start_date_);
 
-  LogTimeData();
+  LogTimeData(ctx, handle);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate,
-                                         int simDur_) {
+                                         int dur_) {
   boost::gregorian::date endDate(startDate);
-  endDate += boost::gregorian::months(simDur_ - 1);
+  endDate += boost::gregorian::months(dur_ - 1);
   endDate += boost::gregorian::days(
                boost::gregorian::gregorian_calendar::end_of_month_day(endDate.year(),
                    endDate.month()) - 1);
@@ -212,64 +198,39 @@ boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::SimDur() {
-  return simDur_;
+int Timer::dur() {
+  return dur_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer::Timer() :
   time_(0),
-  time0_(0),
-  simDur_(0),
+  start_time_(0),
+  dur_(0),
   decay_interval_(0),
   month0_(0),
   year0_(0) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::ConvertDate(int month, int year) {
-  return (year - year0_) * 12 + (month - month0_) + time0_;
+  return (year - year0_) * 12 + (month - month0_) + start_time_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::pair<int, int> Timer::ConvertDate(int time) {
-  int month = (time - time0_) % 12 + 1;
-  int year = (time - time0_ - (month - 1)) / 12 + year0_;
+  int month = (time - start_time_) % 12 + 1;
+  int year = (time - start_time_ - (month - 1)) / 12 + year0_;
   return std::make_pair(month, year);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::load_simulation(QueryEngine* qe) {
-  if (qe->NElementsMatchingQuery("simhandle") > 0) {
-    handle_ = qe->GetElementContent("simhandle");
-  }
-
-  // get duration
-  std::string dur_str = qe->GetElementContent("duration");
-  int dur = strtol(dur_str.c_str(), NULL, 10);
-  // get start month
-  std::string m0_str = qe->GetElementContent("startmonth");
-  int m0 = strtol(m0_str.c_str(), NULL, 10);
-  // get start year
-  std::string y0_str = qe->GetElementContent("startyear");
-  int y0 = strtol(y0_str.c_str(), NULL, 10);
-  // get simulation start
-  std::string sim0_str = qe->GetElementContent("simstart");
-  int sim0 = strtol(sim0_str.c_str(), NULL, 10);
-  // get decay interval
-  std::string decay_str = qe->GetElementContent("decay");
-  int dec = strtol(decay_str.c_str(), NULL, 10);
-
-  TI->Initialize(dur, m0, y0, sim0, dec);
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::LogTimeData() {
-  EM->NewEvent("SimulationTimeInfo")
-  ->AddVal("SimHandle", handle_)
+void Timer::LogTimeData(Context* ctx, std::string handle) {
+  ctx->NewEvent("SimulationTimeInfo")
+  ->AddVal("SimHandle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
-  ->AddVal("SimulationStart", time0_)
-  ->AddVal("Duration", simDur_)
+  ->AddVal("SimulationStart", start_time_)
+  ->AddVal("Duration", dur_)
   ->Record();
 }
 } // namespace cyclus

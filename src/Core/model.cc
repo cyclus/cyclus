@@ -1,24 +1,18 @@
 // model.cc
 // Implements the Model Class
+#include "model.h"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <algorithm>
 
-#include "model.h"
-
-#include "dynamic_module.h"
-#include "logger.h"
 #include "error.h"
-#include "env.h"
-#include "timer.h"
-#include "resource.h"
+#include "logger.h"
+#include "market_model.h"
 #include "prototype.h"
-#include "query_engine.h"
-#include "event_manager.h"
-
 #include "region_model.h"
+#include "resource.h"
 
 namespace cyclus {
 
@@ -99,7 +93,7 @@ void Model::UnloadModules() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::InitializeSimulationEntity(std::string model_type,
+void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
                                        QueryEngine* qe) {
   // query data
   QueryEngine* module_data = qe->QueryElement("model");
@@ -108,7 +102,7 @@ void Model::InitializeSimulationEntity(std::string model_type,
   // instantiate & init module
   /* --- */
   LoadModule(model_type, module_name);
-  Model* model = ConstructModel(module_name);
+  Model* model = ConstructModel(ctx, module_name);
   /* --- */
   model->InitCoreMembers(qe);
   model->SetModelImpl(module_name);
@@ -122,7 +116,7 @@ void Model::InitializeSimulationEntity(std::string model_type,
 
   // register module
   if ("Facility" == model_type) {
-    Prototype::RegisterPrototype(model->name(),
+    ctx->AddPrototype(model->name(),
                                  dynamic_cast<Prototype*>(model));
   } else if ("Market" == model_type) {
     RegisterMarketWithSimulation(model);
@@ -178,7 +172,7 @@ void Model::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model::Model() {
+Model::Model(Context* ctx) : ctx_(ctx) {
   children_ = std::vector<Model*>();
   name_ = "";
   ID_ = next_id_++;
@@ -193,9 +187,9 @@ Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
 
   // set died on date and record it in the table
-  diedOn_ = TI->time();
+  diedOn_ = ctx_->time();
 
-  EM->NewEvent("AgentDeaths")
+  ctx_->NewEvent("AgentDeaths")
   ->AddVal("AgentID", ID())
   ->AddVal("DeathDate", diedOn_)
   ->Record();
@@ -218,12 +212,12 @@ Model::~Model() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::ConstructModel(std::string model_impl) {
+Model* Model::ConstructModel(Context* ctx, std::string model_impl) {
   if (loaded_modules_.find(model_impl) == loaded_modules_.end()) {
     throw KeyError("No module is registered for " + model_impl);
   }
 
-  return loaded_modules_[model_impl]->ConstructInstance();
+  return loaded_modules_[model_impl]->ConstructInstance(ctx);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -271,7 +265,7 @@ void Model::EnterSimulation(Model* parent) {
   if (parent != this) {
     parent->AddChild(this);
   }
-  bornOn_ = TI->time();
+  bornOn_ = ctx_->time();
 
   // add model to the database
   this->AddToTable();
@@ -386,7 +380,7 @@ void Model::AddResource(Transaction trans,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
-  EM->NewEvent("Agents")
+  ctx_->NewEvent("Agents")
   ->AddVal("ID", ID())
   ->AddVal("AgentType", ModelType())
   ->AddVal("ModelType", ModelImpl())

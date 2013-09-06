@@ -8,25 +8,23 @@
 #include <boost/filesystem.hpp>
 
 #include "blob.h"
+#include "context.h"
 #include "env.h"
 #include "error.h"
-#include "event_manager.h"
+#include "logger.h"
 #include "model.h"
-#include "recipe_library.h"
-#include "timer.h"
 #include "xml_query_engine.h"
 
 namespace cyclus {
 namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(const std::string load_filename) {
+XMLFileLoader::XMLFileLoader(Context* ctx,
+                             const std::string load_filename,
+                             bool use_main_schema) : ctx_(ctx) {
   file_ = load_filename;
   initialize_module_paths();
-}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::Init(bool use_main_schema)  {
   std::stringstream input("");
   LoadStringstreamFromFile(input, file_);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
@@ -36,7 +34,7 @@ void XMLFileLoader::Init(bool use_main_schema)  {
     parser_->Validate(ss);
   }
 
-  EM->NewEvent("InputFiles")
+  ctx_->NewEvent("InputFiles")
   ->AddVal("Data", cyclus::Blob(input.str()))
   ->Record();
 }
@@ -66,7 +64,7 @@ std::string XMLFileLoader::BuildSchema() {
 
           std::ifstream in(p.string().c_str(), std::ios::in | std::ios::binary);
           std::string rng_data((std::istreambuf_iterator<char>(in)),
-                                std::istreambuf_iterator<char>());
+                               std::istreambuf_iterator<char>());
           std::string find_str("<define name=\"");
           size_t start = rng_data.find(find_str) + find_str.size();
           size_t end = rng_data.find("\"", start + 1);
@@ -77,18 +75,18 @@ std::string XMLFileLoader::BuildSchema() {
     } catch (...) { }
 
     // replace refs
-    std::string searchStr = std::string("@") + *type + std::string("_REFS@");
-    size_t pos = master.find(searchStr);
+    std::string search_str = std::string("@") + *type + std::string("_REFS@");
+    size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
-      master.replace(pos, searchStr.size(), refs.str());
+      master.replace(pos, search_str.size(), refs.str());
     }
   }
 
   // replace includes
-  std::string searchStr = "@RNG_INCLUDES@";
-  size_t pos = master.find(searchStr);
+  std::string search_str = "@RNG_INCLUDES@";
+  size_t pos = master.find(search_str);
   if (pos != std::string::npos) {
-    master.replace(pos, searchStr.size(), includes.str());
+    master.replace(pos, search_str.size(), includes.str());
   }
 
   return master;
@@ -132,44 +130,109 @@ void XMLFileLoader::initialize_module_paths() {
   module_paths_["Facility"] = "/*/facility";
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadAll() {
+  LoadControlParams();
+  LoadRecipes();
+  LoadDynamicModules();
+};
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_recipes() {
+void XMLFileLoader::LoadRecipes() {
   XMLQueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
-  int numRecipes = xqe.NElementsMatchingQuery(query);
-  for (int i = 0; i < numRecipes; i++) {
+  int num_recipes = xqe.NElementsMatchingQuery(query);
+  for (int i = 0; i < num_recipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    cyclus::RL->LoadRecipe(qe);
+    LoadRecipe(qe);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
+  bool atom_basis;
+  std::string basis_str = qe->GetElementContent("basis");
+  if (basis_str == "atom") {
+    atom_basis = true;
+  } else if (basis_str == "mass") {
+    atom_basis = false;
+  } else {
+    throw IOError(basis_str + " basis is not 'mass' or 'atom'.");
+  }
+
+  std::string name = qe->GetElementContent("name");
+  CLOG(LEV_DEBUG3) << "loading recipe: " << name
+                   << " with basis: " << basis_str;
+
+  double value;
+  int key;
+  std::string query = "isotope";
+  int nisos = qe->NElementsMatchingQuery(query);
+  CompMap v;
+  for (int i = 0; i < nisos; i++) {
+    QueryEngine* isotope = qe->QueryElement(query, i);
+    key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
+    value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
+    v[key] = value;
+    CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
+  }
+
+  if (atom_basis) {
+    ctx_->AddRecipe(name, Composition::CreateFromAtom(v));
+  } else {
+    ctx_->AddRecipe(name, Composition::CreateFromMass(v));
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_dynamic_modules(std::set<std::string>& module_types) {
+void XMLFileLoader::LoadDynamicModules() {
+  std::set<std::string> module_types = Model::dynamic_module_types();
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    load_modules_of_type(*it, module_paths_[*it]);
+    LoadModulesOfType(*it, module_paths_[*it]);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_modules_of_type(std::string type,
-                                         std::string query_path) {
+void XMLFileLoader::LoadModulesOfType(std::string type,
+                                      std::string query_path) {
   XMLQueryEngine xqe(*parser_);
 
-  int numModels = xqe.NElementsMatchingQuery(query_path);
-  for (int i = 0; i < numModels; i++) {
+  int num_models = xqe.NElementsMatchingQuery(query_path);
+  for (int i = 0; i < num_models; i++) {
     QueryEngine* qe = xqe.QueryElement(query_path, i);
-    Model::InitializeSimulationEntity(type, qe);
+    Model::InitializeSimulationEntity(ctx_, type, qe);
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::load_control_parameters() {
+void XMLFileLoader::LoadControlParams() {
   XMLQueryEngine xqe(*parser_);
-
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
-  TI->load_simulation(qe);
+
+  std::string handle;
+  if (qe->NElementsMatchingQuery("simhandle") > 0) {
+    handle = qe->GetElementContent("simhandle");
+  }
+
+  // get duration
+  std::string dur_str = qe->GetElementContent("duration");
+  int dur = strtol(dur_str.c_str(), NULL, 10);
+  // get start month
+  std::string m0_str = qe->GetElementContent("startmonth");
+  int m0 = strtol(m0_str.c_str(), NULL, 10);
+  // get start year
+  std::string y0_str = qe->GetElementContent("startyear");
+  int y0 = strtol(y0_str.c_str(), NULL, 10);
+  // get simulation start
+  std::string sim0_str = qe->GetElementContent("simstart");
+  int sim0 = strtol(sim0_str.c_str(), NULL, 10);
+  // get decay interval
+  std::string decay_str = qe->GetElementContent("decay");
+  int dec = strtol(decay_str.c_str(), NULL, 10);
+
+  ctx_->InitTime(sim0, dur, dec, m0, y0, handle);
 }
 } // namespace cyclus

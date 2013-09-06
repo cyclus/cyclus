@@ -76,7 +76,7 @@ class FacilityModel : public TimeAgent, public Communicator,
    * --------------------
    */
  public:
-  FacilityModel();
+  FacilityModel(Context* ctx);
 
   virtual ~FacilityModel();
 

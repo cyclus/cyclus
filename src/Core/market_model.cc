@@ -1,13 +1,12 @@
 // market_model.cc
 // Implements the MarketModel Class
 
-#include <string>
-
 #include "market_model.h"
+
+#include <string>
 
 #include "timer.h"
 #include "logger.h"
-#include "query_engine.h"
 #include "error.h"
 
 namespace cyclus {
@@ -15,7 +14,7 @@ namespace cyclus {
 std::list<MarketModel*> MarketModel::markets_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel::MarketModel() {
+MarketModel::MarketModel(Context* ctx) : Model(ctx) {
   SetModelType("Market");
 }
 
@@ -60,7 +59,7 @@ void MarketModel::RegisterMarket(MarketModel* mkt) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MarketModel::EnterSimulationAsCoreEntity() {
   // register the model
-  TI->RegisterResolveListener(this);
+  context()->RegisterResolver(this);
   MarketModel::RegisterMarket(this);
 }
 

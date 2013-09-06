@@ -21,7 +21,7 @@ const std::string DynamicModule::Suffix() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string type, std::string name) :
   type_(type), module_name_(name),
-  constructor_name_("construct" + name), destructor_name_("destruct" + name),
+  constructor_name_("Construct" + name), destructor_name_("Destruct" + name),
   abs_path_(""), module_library_(0), constructor_(0), destructor_(0) { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,8 +43,8 @@ void DynamicModule::SetPath() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* DynamicModule::ConstructInstance() {
-  return constructor_();
+Model* DynamicModule::ConstructInstance(Context* ctx) {
+  return constructor_(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -5,10 +5,13 @@
 #include <iostream>
 #include "boost/filesystem.hpp"
 
+#include "context.h"
 #include "env.h"
 #include "error.h"
+#include "event_manager.h"
 #include "model.h"
 #include "prototype.h"
+#include "timer.h"
 #include "dynamic_module.h"
 
 namespace fs = boost::filesystem;
@@ -56,8 +59,11 @@ TEST(DynamicLoadingTests, LoadLibError) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, ConstructTestFacility) {
   using cyclus::Model;
+  cyclus::EventManager em;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &em);
   EXPECT_NO_THROW(Model::LoadModule("Facility", "TestFacility");
-                  Model* fac = Model::ConstructModel("TestFacility");
+                  Model* fac = Model::ConstructModel(&ctx, "TestFacility");
                   Model::DeleteModel(fac);
                   Model::UnloadModules(););
 }
@@ -66,8 +72,11 @@ TEST(DynamicLoadingTests, ConstructTestFacility) {
 TEST(DynamicLoadingTests, cloneTestFacility) {
   using cyclus::Model;
   using cyclus::Prototype;
+  cyclus::EventManager em;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &em);
   EXPECT_NO_THROW(Model::LoadModule("Facility", "TestFacility");
-                  Model* fac = Model::ConstructModel("TestFacility");
+                  Model* fac = Model::ConstructModel(&ctx, "TestFacility");
                   Prototype* clone = dynamic_cast<Prototype*>(fac)->clone();
                   Model::DeleteModel(dynamic_cast<Model*>(clone));
                   Model::DeleteModel(fac);

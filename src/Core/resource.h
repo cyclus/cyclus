@@ -5,7 +5,10 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+
 namespace cyclus {
+
+class Context;
 
 typedef std::string ResourceType;
 
@@ -45,8 +48,9 @@ class Resource {
 
   /// Records the resource's state to the output database.  This method
   /// should generally NOT record data accessible via the Resource class
-  /// public methods (e.g.  state_id, units, type, quantity)
-  virtual void Record() const = 0;
+  /// public methods (e.g.  state_id, units, type, quantity).
+  /// @param ctx the simulation context used to record the data.
+  virtual void Record(Context* ctx) const = 0;
 
   /// Returns the units this resource is based in (e.g. "kg").
   virtual std::string units() const = 0;

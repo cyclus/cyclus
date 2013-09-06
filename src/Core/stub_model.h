@@ -31,7 +31,7 @@ class StubModel : public Model {
   /**
      Default constructor for StubModel Class
    */
-  StubModel();
+  StubModel(Context* ctx);
 
   /**
      every model should be destructable

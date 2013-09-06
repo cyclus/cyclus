@@ -8,6 +8,7 @@
 /// This is the simplest possible Facility, for testing
 class TestFacility: public cyclus::FacilityModel {
  public:
+  TestFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) { };
 
   void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
@@ -17,7 +18,7 @@ class TestFacility: public cyclus::FacilityModel {
                        std::vector<cyclus::Material::Ptr> manifest) { }
 
   cyclus::Prototype* clone() {
-    return new TestFacility();
+    return new TestFacility(context());
   }
 
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) { }

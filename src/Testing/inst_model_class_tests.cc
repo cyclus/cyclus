@@ -1,16 +1,18 @@
 // Instmodel_tests.h
 #include <gtest/gtest.h>
 
-#include "inst_model.h"
+#include "event_manager.h"
 #include "facility_model.h"
+#include "inst_model.h"
 #include "prototype.h"
+#include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ConcreteInstModel : public cyclus::InstModel {
  public:
-  ConcreteInstModel() { };
+  ConcreteInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
   
   virtual ~ConcreteInstModel() {};
   
@@ -19,7 +21,7 @@ class ConcreteInstModel : public cyclus::InstModel {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieModel : public cyclus::FacilityModel {
  public:
-  DieModel() {
+  DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
     tickCount_ = 0;
     tockCount_ = 0;
     tickDie_ = false;
@@ -80,15 +82,20 @@ class InstModelClassTests : public ::testing::Test {
     DieModel* child5_;
 
     cyclus::TimeAgent* inst_;
+    cyclus::EventManager em_;
+    cyclus::Timer ti_;
+    cyclus::Context* ctx_;
 
     virtual void SetUp() {
-      child1_ = new DieModel();
-      child2_ = new DieModel();
-      child3_ = new DieModel();
-      child4_ = new DieModel();
-      child5_ = new DieModel();
+      ctx_ = new cyclus::Context(&ti_, &em_);
 
-      inst_ = new ConcreteInstModel();
+      child1_ = new DieModel(ctx_);
+      child2_ = new DieModel(ctx_);
+      child3_ = new DieModel(ctx_);
+      child4_ = new DieModel(ctx_);
+      child5_ = new DieModel(ctx_);
+
+      inst_ = new ConcreteInstModel(ctx_);
       child1_->EnterSimulation(inst_);
       child2_->EnterSimulation(inst_);
       child3_->EnterSimulation(inst_);

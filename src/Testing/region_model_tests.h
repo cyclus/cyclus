@@ -4,6 +4,7 @@
 #include "region_model.h"
 #include "suffix.h"
 #include "test_region.h"
+#include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -14,18 +15,19 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete RegionModel instance 
-typedef cyclus::RegionModel* RegionModelConstructor();
+typedef cyclus::RegionModel* RegionModelConstructor(cyclus::Context* ctx);
 
 class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
   public:
     virtual void SetUp() { 
-      region_model_ = (*GetParam())();
+      region_model_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){ 
       delete region_model_;
     }
 
   protected:
+    cyclus::TestContext tc_;
     cyclus::RegionModel* region_model_;
 
 };

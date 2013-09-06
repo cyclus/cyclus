@@ -5,6 +5,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "context.h"
 #include "resource.h"
 
 namespace cyclus {
@@ -21,7 +22,7 @@ namespace cyclus {
 class ResTracker {
  public:
   /// Create a new tracker following r.
-  ResTracker(Resource* r);
+  ResTracker(Context* ctx, Resource* r);
 
   /// Prevents a resource's heritage from being tracked and recorded.
   void DontTrack();
@@ -49,6 +50,7 @@ class ResTracker {
   int parent2_;
   bool tracked_;
   Resource* res_;
+  Context* ctx_;
 };
 
 } // namespace cyclus

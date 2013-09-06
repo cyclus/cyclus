@@ -1,8 +1,5 @@
-#ifndef PROTOTYPE_H
-#define PROTOTYPE_H
-
-#include <map>
-#include <string>
+#ifndef PROTOTYPE_H_
+#define PROTOTYPE_H_
 
 namespace cyclus {
 
@@ -29,28 +26,12 @@ namespace cyclus {
  */
 class Prototype {
  public:
-  /**
-      add a prototype to the registry
-      @param name the prototype's name
-      @param p a pointer to the Prototype
-   */
-  static void RegisterPrototype(std::string name, Prototype* p);
-
-  /**
-     get a registered prototype
-     @param name the name of the prototype
-   */
-  static Prototype* GetRegisteredPrototype(std::string name);
-
-  /// constructor
   Prototype() {};
 
-  /// virtual destructor
   virtual ~Prototype() {};
 
   /**
-     prototypes are required to provide the capacity to copy their
-     initialized members
+     Return a newly created/allocated prototype that is an exact copy of this.
    */
   virtual Prototype* clone() = 0;
 
@@ -59,10 +40,6 @@ class Prototype {
      function once it has been set up to enter the simulation
    */
   virtual void PrototypeConstructor() {};
-
- private:
-  /// the set of registered prototyeps
-  static std::map<std::string, Prototype*> prototype_registry_;
 };
 } // namespace cyclus
 #endif

@@ -30,7 +30,7 @@ class StubCommModel : public Model, public Communicator {
   /**
      Default constructor for StubCommModel Class
    */
-  StubCommModel();
+  StubCommModel(Context* ctx);
 
   /**
      every model should be destructable

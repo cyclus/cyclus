@@ -1,22 +1,18 @@
 // model.h
-#if !defined(_MODEL_H)
-#define _MODEL_H
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 #include <boost/shared_ptr.hpp>
 
+#include "dynamic_module.h"
 #include "transaction.h"
+#include "query_engine.h"
 
 namespace cyclus {
-
-class DynamicModule;
-class Model;
-class Message;
-class Transaction;
-class QueryEngine;
 
 /**
    defines the possible model types
@@ -53,13 +49,6 @@ class Model {
   static std::set<std::string> dynamic_module_types();
 
   /**
-     returns a model template given the template's name
-
-     @param name name of the template as defined in the input file
-   */
-  static Model* GetTemplateByName(std::string name);
-
-  /**
      returns a model given the template's name
 
      @param name name of the template as defined in the input file
@@ -94,14 +83,14 @@ class Model {
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void InitializeSimulationEntity(std::string model_type, QueryEngine* qe);
+  static void InitializeSimulationEntity(Context* ctx, std::string model_type, QueryEngine* qe);
 
   /**
      uses the loaded modules to properly construct a model
      @param model_impl the implementation to construct
      @return the constructed model
    */
-  static Model* ConstructModel(std::string model_impl);
+  static Model* ConstructModel(Context* ctx, std::string model_impl);
 
   /**
      uses the loaded modules to properly destruct a model
@@ -144,7 +133,7 @@ class Model {
      @warning all constructors must set ID_ and increment next_id_
 
    */
-  Model();
+  Model(Context* ctx);
 
   /**
      Destructor for the Model Class
@@ -196,6 +185,13 @@ class Model {
    */
   void SetModelType(std::string new_type) {
     model_type_ = new_type;
+  };
+
+  /**
+   Returns this model's current simulation context.
+   */
+  Context* context() {
+    return ctx_;
   };
 
   /**
@@ -447,6 +443,7 @@ class Model {
   bool born_;
 
  private:
+  Context* ctx_;
 
   /**
      add an agent to the transactiont table

@@ -4,6 +4,7 @@
 #include "inst_model.h"
 
 #include "error.h"
+#include "context.h"
 
 #include <sstream>
 
@@ -12,18 +13,16 @@
  */
 class TestInst: public cyclus::InstModel {
  public:
+  TestInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
+
   virtual ~TestInst() {};
 
   void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
   }
 
-  bool CanBuild(cyclus::Model* mdl) {
-    return true;
-  }
-
-  void WrapAddAvailablePrototype(cyclus::Prototype* prototype) {
-    AddAvailablePrototype(prototype);
+  void WrapAddAvailablePrototype(std::string proto_name) {
+    AddAvailablePrototype(proto_name);
   }
 };
 

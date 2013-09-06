@@ -30,7 +30,7 @@ class StubTimeAgent : public TimeAgent {
   /**
      Default constructor for StubTimeAgent Class
    */
-  StubTimeAgent();
+  StubTimeAgent(Context* ctx);
 
   /**
      every model should be destructable

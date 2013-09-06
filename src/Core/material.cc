@@ -2,9 +2,9 @@
 #include "material.h"
 
 #include "comp_math.h"
+#include "context.h"
 #include "error.h"
 #include "logger.h"
-#include "timer.h"
 
 namespace cyclus {
 
@@ -15,14 +15,16 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(quantity, c));
+Material::Ptr Material::Create(Context* ctx, double quantity,
+                               Composition::Ptr c) {
+  Material::Ptr m(new Material(ctx, quantity, c));
   m->tracker_.Create();
   return m;
 }
 
-Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(quantity, c));
+Material::Ptr Material::CreateUntracked(Context* ctx, double quantity,
+                                        Composition::Ptr c) {
+  Material::Ptr m(new Material(ctx, quantity, c));
   m->tracker_.DontTrack();
   return m;
 }
@@ -42,8 +44,8 @@ Resource::Ptr Material::Clone() const {
   return c;
 }
 
-void Material::Record() const {
-  comp_->Record();
+void Material::Record(Context* ctx) const {
+  comp_->Record(ctx);
 }
 
 std::string Material::units() const {
@@ -80,7 +82,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   qty_ -= qty;
 
-  Material::Ptr other(new Material(qty, c));
+  Material::Ptr other(new Material(ctx_, qty, c));
 
   tracker_.Extract(&other->tracker_);
 
@@ -125,10 +127,10 @@ Composition::Ptr Material::comp() const {
   return comp_;
 }
 
-Material::Material(double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(this) {
+Material::Material(Context* ctx, double quantity, Composition::Ptr c)
+  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx) {
   all_mats_[this] = true;
-  prev_decay_time_ = TI->time();
+  prev_decay_time_ = ctx->time();
 }
 
 } // namespace cyclus

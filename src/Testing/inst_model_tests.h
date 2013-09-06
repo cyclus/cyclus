@@ -3,6 +3,7 @@
 
 #include "inst_model.h"
 #include "suffix.h"
+#include "test_context.h"
 #include "test_region.h"
 #include "test_facility.h"
 
@@ -15,12 +16,12 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete InstModel instance 
-typedef cyclus::InstModel* InstModelConstructor();
+typedef cyclus::InstModel* InstModelConstructor(cyclus::Context* ctx);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class FakeInstModel : public cyclus::InstModel {
  public:
-  FakeInstModel() : cyclus::InstModel() {};
+  FakeInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) {};
   
   virtual ~FakeInstModel() {};
 };
@@ -31,12 +32,13 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
   FakeInstModel* inst_model_;
   TestFacility* test_facility_;
   TestRegion* test_region_;
-
+  cyclus::TestContext tc_;
+  
  public:
   virtual void SetUp() { 
-    inst_model_ = new FakeInstModel();
-    test_facility_ = new TestFacility();
-    test_region_ = new TestRegion();
+    inst_model_ = new FakeInstModel(tc_.get());
+    test_facility_ = new TestFacility(tc_.get());
+    test_region_ = new TestRegion(tc_.get());
     inst_model_->SetParent(test_region_);
     
   }

@@ -2,10 +2,10 @@
 
 #include "model.h"
 
-extern "C" cyclus::Model* constructTestFacility() {
-  return new TestFacility();
+extern "C" cyclus::Model* ConstructTestFacility(cyclus::Context* ctx) {
+  return new TestFacility(ctx);
 }
 
-extern "C" cyclus::Model* destructTestFacility(cyclus::Model* model) {
+extern "C" cyclus::Model* DestructTestFacility(cyclus::Model* model) {
   delete model;
 }

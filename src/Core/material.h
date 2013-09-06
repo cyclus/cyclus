@@ -11,6 +11,8 @@
 
 namespace cyclus {
 
+class Context;
+
 namespace units {
 const double kg = 1.0;
 const double g =  kg* .001;
@@ -35,7 +37,7 @@ const double ug = kg* .000000001;
 ///   Composition::Ptr nat_u = ...
 ///   double qty = 10.0;
 ///
-///   Material::Ptr m = Material::Create(qty, nat_u);
+///   Material::Ptr m = Material::Create(qty, nat_u, ctx);
 ///   @endcode
 ///
 /// * A conversion facility mixing uranium and flourine:
@@ -73,12 +75,13 @@ class Material: public Resource {
 
   virtual ~Material();
 
-  /// Creates a new material resource that is "live" and tracked.
-  static Ptr Create(double quantity, Composition::Ptr c);
+  /// Creates a new material resource that is "live" and tracked. All future
+  /// output data recorded will be done using the passed simulation context ctx.
+  static Ptr Create(Context* ctx, double quantity, Composition::Ptr c);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
-  static Ptr CreateUntracked(double quantity, Composition::Ptr c);
+  static Ptr CreateUntracked(Context* ctx, double quantity, Composition::Ptr c);
 
   /// Returns the id of the material's internal nuclide composition.
   virtual int state_id() const;
@@ -89,7 +92,7 @@ class Material: public Resource {
   virtual Resource::Ptr Clone() const;
 
   /// Records the internal nuclide composition of this resource.
-  virtual void Record() const;
+  virtual void Record(Context* ctx) const;
 
   /// Returns "kg"
   virtual std::string units() const;
@@ -127,11 +130,12 @@ class Material: public Resource {
   Composition::Ptr comp() const;
 
  protected:
-  Material(double quantity, Composition::Ptr c);
+  Material(Context* ctx, double quantity, Composition::Ptr c);
 
  private:
   static std::map<Material*, bool> all_mats_;
 
+  Context* ctx_;
   double qty_;
   Composition::Ptr comp_;
   int prev_decay_time_;

@@ -3,6 +3,7 @@
 
 #include "facility_model.h"
 #include "suffix.h"
+#include "test_context.h"
 #include "test_inst.h"
 #include "test_market.h"
 
@@ -15,16 +16,16 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete FacilityModel instance 
-typedef cyclus::FacilityModel* FacilityModelConstructor();
+typedef cyclus::FacilityModel* FacilityModelConstructor(cyclus::Context* ctx);
 
 class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
  public:
-  virtual void SetUp() { 
-    facility_model_ = (*GetParam())();
-    test_inst_ = new TestInst();
+  virtual void SetUp() {    
+    facility_model_ = (*GetParam())(tc_.get());
+    test_inst_ = new TestInst(tc_.get());
     facility_model_->SetParent(test_inst_);
-    test_out_market_ = new TestMarket("out-commod");
-    test_in_market_ = new TestMarket("in-commod");
+    test_out_market_ = new TestMarket(tc_.get(), "out-commod");
+    test_in_market_ = new TestMarket(tc_.get(), "in-commod");
   }
   virtual void TearDown(){ 
     delete facility_model_;
@@ -38,6 +39,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
   TestMarket* test_out_market_;
   TestMarket* test_in_market_;
   TestInst* test_inst_;
+  cyclus::TestContext tc_;
 };
 
 #else

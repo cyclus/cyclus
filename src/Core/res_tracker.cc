@@ -5,9 +5,10 @@
 
 namespace cyclus {
 
-ResTracker::ResTracker(Resource* r)
+ResTracker::ResTracker(Context* ctx, Resource* r)
   : tracked_(true),
     res_(r),
+    ctx_(ctx),
     parent1_(0),
     parent2_(0) { }
 
@@ -60,7 +61,7 @@ void ResTracker::Absorb(ResTracker* absorbed) {
 
 void ResTracker::Record() {
   res_->BumpId();
-  EM->NewEvent("ResourceHeritage")
+  ctx_->NewEvent("ResourceHeritage")
   ->AddVal("ID", res_->id())
   ->AddVal("Type", res_->type())
   ->AddVal("Quantity", res_->quantity())
@@ -70,7 +71,7 @@ void ResTracker::Record() {
   ->AddVal("Parent2", parent2_)
   ->Record();
 
-  res_->Record();
+  res_->Record(ctx_);
 }
 
 } // namespace cyclus

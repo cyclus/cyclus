@@ -20,6 +20,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/context.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
@@ -34,8 +35,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/prototype.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/recipe_library.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
@@ -95,7 +94,6 @@ INSTALL(FILES
   market_player_manager.h
   mass_table.h
   prototype.h
-  recipe_library.h
   res_tracker.h
   supply_demand.h
   supply_demand_manager.h
@@ -107,6 +105,7 @@ INSTALL(FILES
   sqlite_back.h
   sqlite_db.h
   composition.h
+  context.h
   generic_resource.h
   material.h
   mat_buff.h

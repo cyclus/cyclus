@@ -17,8 +17,8 @@ class QueryEngine;
 class Prototype;
 
 // Usefull Typedefs
-typedef std::set<Prototype*> PrototypeSet;
-typedef std::set<Prototype*>::iterator PrototypeIterator;
+typedef std::set<std::string> PrototypeSet;
+typedef std::set<std::string>::iterator PrototypeIterator;
 
 /**
    The InstModel class is the abstract class/interface
@@ -60,7 +60,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Default constructor for InstModel Class
    */
-  InstModel();
+  InstModel(Context* ctx);
 
   /**
      every model should be destructable
@@ -133,20 +133,20 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      the initial prototypes to build
    */
-  std::map<Prototype*, int> initial_build_order_;
+  std::map<std::string, int> initial_build_order_;
 
   /**
      add a prtotoype to the set of available prototypes
      @param prototype the prototype to add
    */
-  void AddAvailablePrototype(Prototype* prototype);
+  void AddAvailablePrototype(std::string proto_name);
 
   /**
      perform any actions required after prototype has been added to
      the list of available prototypes
      @param prototype the prototype to register
    */
-  virtual void RegisterAvailablePrototype(Prototype* prototype);
+  virtual void RegisterAvailablePrototype(std::string proto_name);
 
   /**
      Adds a prototype build order to initial_build_order_
@@ -179,16 +179,8 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      Checks if prototype is in the prototype list
    */
-  bool IsAvailablePrototype(Prototype* p) {
-    return (prototypes_.find(p) != prototypes_.end());
-  }
-
-  /**
-     another moniker for isAvailablePrototype
-     @param prototype the prototype to be built
-   */
-  virtual bool CanBuild(Prototype* prototype) {
-    return IsAvailablePrototype(prototype);
+  bool IsAvailablePrototype(std::string proto_name) {
+    return (prototypes_.find(proto_name) != prototypes_.end());
   }
 
   /**
@@ -196,7 +188,7 @@ class InstModel : public TimeAgent, public Communicator {
      if not, it throws an error
      @param p the prototype to check for
    */
-  void ThrowErrorIfPrototypeIsntAvailable(Prototype* p);
+  void ThrowErrorIfPrototypeIsntAvailable(std::string p);
 
   /**
      returns this institution's region
@@ -216,21 +208,21 @@ class InstModel : public TimeAgent, public Communicator {
      builds a prototype
      @param prototype the prototype to build
    */
-  void Build(Prototype* prototype);
+  void Build(std::string proto_name);
 
   /**
      perform any registration functionality after a clone has been
      built
      @param clone the built (cloned) prototype
    */
-  virtual void RegisterCloneAsBuilt(Prototype* clone);
+  virtual void RegisterCloneAsBuilt(Model* clone);
 
   /**
      perform any registration functionality before a clone is
      decommissioned(deleted)
      @param clone the to-be-decommissioned prototype
    */
-  virtual void RegisterCloneAsDecommissioned(Prototype* clone);
+  virtual void RegisterCloneAsDecommissioned(Model* clone);
 
   /* ------------------- */
 
