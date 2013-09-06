@@ -67,15 +67,8 @@ class Timer {
   /**
      Returns the the start time of the simulation
    */
-  int StartTime() {
-    return time0_;
-  }
-
-  /**
-     Returns the the start time of the simulation
-   */
-  int FinalTime() {
-    return time0_ + simDur_;
+  int start_time() {
+    return start_time_;
   }
 
   /**
@@ -83,7 +76,7 @@ class Timer {
 
      @return the duration, in months
    */
-  int SimDur();
+  int dur();
 
   /**
      Returns the starting date of the simulation.
@@ -91,7 +84,7 @@ class Timer {
      @return the start date as a datetime object
    */
   boost::gregorian::date StartDate() {
-    return startDate_;
+    return start_date_;
   }
 
   /**
@@ -110,7 +103,7 @@ class Timer {
      @return the end date as a datetime object
    */
   boost::gregorian::date endDate() {
-    return endDate_;
+    return end_date_;
   }
 
   /**
@@ -119,7 +112,7 @@ class Timer {
      @return whether it is the last day of the simulation
    */
   bool CheckEndDate() {
-    return (date_ == endDate_);
+    return (date_ == end_date_);
   }
 
   /**
@@ -128,7 +121,7 @@ class Timer {
      @return whether it is the last day of the simulation
    */
   bool CheckEndMonth() {
-    return (date_.month() == endDate_.month());
+    return (date_.month() == end_date_.month());
   }
 
   /**
@@ -177,12 +170,12 @@ class Timer {
   /**
      The time at which the simulation started.
    */
-  int time0_;
+  int start_time_;
 
   /**
      The duration of this simulation, in months.
    */
-  int simDur_;
+  int dur_;
 
   /// time steps between automated global material decay driving
   int decay_interval_;
@@ -190,12 +183,12 @@ class Timer {
   /**
      The start date of the simulation
    */
-  boost::gregorian::date startDate_;
+  boost::gregorian::date start_date_;
 
   /**
      The end date of the simulation
    */
-  boost::gregorian::date endDate_;
+  boost::gregorian::date end_date_;
 
   /**
      The current date of the simulation

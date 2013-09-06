@@ -168,9 +168,9 @@ void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
   double value;
   int key;
   std::string query = "isotope";
-  int nIsos = qe->NElementsMatchingQuery(query);
+  int nisos = qe->NElementsMatchingQuery(query);
   CompMap v;
-  for (int i = 0; i < nIsos; i++) {
+  for (int i = 0; i < nisos; i++) {
     QueryEngine* isotope = qe->QueryElement(query, i);
     key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
     value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
@@ -179,9 +179,9 @@ void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
   }
 
   if (atom_basis) {
-    ctx_->RegisterRecipe(name, Composition::CreateFromAtom(v));
+    ctx_->AddRecipe(name, Composition::CreateFromAtom(v));
   } else {
-    ctx_->RegisterRecipe(name, Composition::CreateFromMass(v));
+    ctx_->AddRecipe(name, Composition::CreateFromMass(v));
   }
 }
 

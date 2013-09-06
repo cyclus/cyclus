@@ -32,7 +32,7 @@ class Context {
   boost::uuids::uuid sim_id();
 
   /// Adds a prototype to a simulation-wide accessible list.
-  void RegisterProto(std::string name, Prototype* p);
+  void AddPrototype(std::string name, Prototype* p);
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
@@ -52,7 +52,7 @@ class Context {
   };
 
   /// Adds a composition recipe to a simulation-wide accessible list.
-  void RegisterRecipe(std::string name, Composition::Ptr c);
+  void AddRecipe(std::string name, Composition::Ptr c);
   
   /// Retrieve a registered recipe.
   Composition::Ptr GetRecipe(std::string name);

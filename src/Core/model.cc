@@ -116,7 +116,7 @@ void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
 
   // register module
   if ("Facility" == model_type) {
-    ctx->RegisterProto(model->name(),
+    ctx->AddPrototype(model->name(),
                                  dynamic_cast<Prototype*>(model));
   } else if ("Market" == model_type) {
     RegisterMarketWithSimulation(model);
