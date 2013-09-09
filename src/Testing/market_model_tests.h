@@ -5,6 +5,7 @@
 #include "suffix.h"
 #include "test_inst.h"
 #include "test_market.h"
+#include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -15,12 +16,12 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete MarketModel instance 
-typedef cyclus::MarketModel* MarketModelConstructor();
+typedef cyclus::MarketModel* MarketModelConstructor(cyclus::Context* ctx);
 
 class MarketModelTests : public TestWithParam<MarketModelConstructor*> {
   public:
     virtual void SetUp() { 
-      market_model_ = (*GetParam())();
+      market_model_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){ 
       delete market_model_;
@@ -28,6 +29,7 @@ class MarketModelTests : public TestWithParam<MarketModelConstructor*> {
 
   protected:
     cyclus::MarketModel* market_model_;
+    cyclus::TestContext tc_;
 
 };
 
