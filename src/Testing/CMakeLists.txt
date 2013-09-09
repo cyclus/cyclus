@@ -74,6 +74,6 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
 INSTALL(FILES ${header_files} ${model_test_files}
-  DESTINATION include
+  DESTINATION include/cyclus
   COMPONENT testing
   )

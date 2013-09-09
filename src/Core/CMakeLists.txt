@@ -127,7 +127,7 @@ INSTALL(FILES
   stub_time_agent.h
   time_agent.h
   transaction.h
-  DESTINATION include
+  DESTINATION include/cyclus
   COMPONENT core
   )
 
