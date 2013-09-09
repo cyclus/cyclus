@@ -54,19 +54,19 @@ void XMLQueryEngineTest::TearDown() {
 void XMLQueryEngineTest::LoadParser() {
   std::stringstream ss("");
   GetContent(ss);
-  //cout << ss.str() << std::endl;
+  //std::cout << ss.str() << std::endl;
   parser_ = new cyclus::XMLParser();
   parser_->Init(ss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLQueryEngineTest,constructor) {  
+TEST_F(XMLQueryEngineTest, constructor) {  
   LoadParser();
   EXPECT_NO_THROW(cyclus::XMLQueryEngine engine(*parser_));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLQueryEngineTest,top_level_queries) {  
+TEST_F(XMLQueryEngineTest, top_level_queries) {  
   LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
   EXPECT_EQ(engine.NElements(),ninner_nodes_);
@@ -82,7 +82,7 @@ TEST_F(XMLQueryEngineTest,top_level_queries) {
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLQueryEngineTest,top_level_throws) {  
+TEST_F(XMLQueryEngineTest, top_level_throws) {  
   LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
   EXPECT_THROW(engine.GetElementContent(content_node_,ninner_nodes_+1), cyclus::ValueError);
@@ -92,14 +92,23 @@ TEST_F(XMLQueryEngineTest,top_level_throws) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLQueryEngineTest,mid_level_queries) {  
+TEST_F(XMLQueryEngineTest, null_query) {  
+  LoadParser();
+  cyclus::XMLQueryEngine engine(*parser_);
+  std::string query = "something_silly";
+  EXPECT_EQ(engine.NElementsMatchingQuery(query), 0);
+  EXPECT_THROW(engine.GetElementContent(query), cyclus::KeyError);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest, mid_level_queries) {  
   LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
   EXPECT_NO_THROW(cyclus::QueryEngine* qe = engine.QueryElement(inner_node_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLQueryEngineTest,low_level_queries) {  
+TEST_F(XMLQueryEngineTest, low_level_queries) {  
   LoadParser();
   cyclus::XMLQueryEngine engine(*parser_);
   cyclus::QueryEngine* qe = engine.QueryElement(inner_node_);
