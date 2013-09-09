@@ -29,3 +29,4 @@ QueryEngine* QueryEngine::QueryElement(std::string query,
   return qe_child;
 }
 } // namespace cyclus
+

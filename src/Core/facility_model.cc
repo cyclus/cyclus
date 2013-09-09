@@ -34,10 +34,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe);
 
   // get lifetime
-  int lifetime;
-  qe->NElementsMatchingQuery("incommodity") == 1 ?
-      lifetime = atoi(qe->GetElementContent("lifetime").c_str()) :
-      lifetime = context()->sim_dur();
+  int lifetime = GetOptionalQuery<int>(qe, "lifetime", context()->sim_dur());
   SetFacLifetime(lifetime);
 
   // get the incommodities

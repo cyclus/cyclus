@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 
+#include <boost/lexical_cast.hpp>
+
 namespace cyclus {
 
 /**
@@ -71,6 +73,24 @@ class QueryEngine {
   std::set<QueryEngine*> spawned_children_;
 };
 
+/**
+   @brief a query method for optional parameters
+   @param qe the query engine to use
+   @param query the query to be made
+   @param default_val the default value to use
+   @return either return the optional value if it exists or return the default
+   value
+ */
+template <class T> inline T GetOptionalQuery(QueryEngine* qe,
+                                            std::string query,
+                                            T default_val) {
+  T val;
+  qe->NElementsMatchingQuery(query) == 1 ?
+      val = boost::lexical_cast<T>(qe->GetElementContent(query).c_str()) :
+      val = default_val;
+  return val;
+};
+  
 } // namespace cyclus
 
 #endif
