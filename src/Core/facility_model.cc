@@ -34,34 +34,30 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe);
 
   // get lifetime
-  try {
-    SetFacLifetime(atoi(qe->GetElementContent("lifetime").c_str()));
-  } catch (Error e) {
-    SetFacLifetime(context()->sim_dur());
-  }
+  int lifetime;
+  qe->NElementsMatchingQuery("incommodity") == 1 ?
+      lifetime = atoi(qe->GetElementContent("lifetime").c_str()) :
+      lifetime = context()->sim_dur();
+  SetFacLifetime(lifetime);
 
   // get the incommodities
   std::string commod;
-  try {
-    int numInCommod = qe->NElementsMatchingQuery("incommodity");
-    for (int i = 0; i < numInCommod; i++) {
-      commod = qe->GetElementContent("incommodity", i);
-      in_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() << " has just added incommodity"
-                               << commod;
-    }
-  } catch (Error e) { }
+  int numInCommod = qe->NElementsMatchingQuery("incommodity");
+  for (int i = 0; i < numInCommod; i++) {
+    commod = qe->GetElementContent("incommodity", i);
+    in_commods_.push_back(commod);
+    LOG(LEV_DEBUG2, "none!") << "Facility " << ID()
+                             << " has just added incommodity" << commod;
+  }
 
   // get the outcommodities
-  try {
-    int numOutCommod = qe->NElementsMatchingQuery("outcommodity");
-    for (int i = 0; i < numOutCommod; i++) {
-      commod = qe->GetElementContent("outcommodity", i);
-      out_commods_.push_back(commod);
-      LOG(LEV_DEBUG2, "none!") << "Facility " << ID() <<
-                               " has just added outcommodity" << commod;
-    }
-  } catch (Error e) { }
+  int numOutCommod = qe->NElementsMatchingQuery("outcommodity");
+  for (int i = 0; i < numOutCommod; i++) {
+    commod = qe->GetElementContent("outcommodity", i);
+    out_commods_.push_back(commod);
+    LOG(LEV_DEBUG2, "none!") << "Facility " << ID()
+                             << " has just added outcommodity" << commod;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
