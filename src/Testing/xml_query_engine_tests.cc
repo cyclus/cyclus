@@ -42,12 +42,12 @@ void XMLQueryEngineTest::SetUp() {
   unknown_node_ = "unknown_module_name";
   ncontent_ = 2;
   ninner_nodes_ = ncontent_+1;
+  parser_ = new cyclus::XMLParser();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLQueryEngineTest::TearDown() {
-  if (parser_)
-    delete parser_;
+  delete parser_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -55,7 +55,6 @@ void XMLQueryEngineTest::LoadParser() {
   std::stringstream ss("");
   GetContent(ss);
   //std::cout << ss.str() << std::endl;
-  parser_ = new cyclus::XMLParser();
   parser_->Init(ss);
 }
 
