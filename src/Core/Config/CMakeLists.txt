@@ -14,16 +14,11 @@ ELSE()
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ENDIF()
 
-CONFIGURE_FILE(
+# Here we set some components for installation with cpack
+INSTALL(FILES 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
-  ${PROJECT_BINARY_DIR}/share/cyclus.rng.in
-  COPYONLY
-  )
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng
-  ${PROJECT_BINARY_DIR}/share/cyclus.rng
-  COPYONLY
+  DESTINATION share
+  COMPONENT data
   )
 
 INSTALL(FILES
