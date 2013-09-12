@@ -8,8 +8,9 @@
 namespace cyclus {
 
 /// @class Env
-/// A (singleton) environment utility to help locate
-/// files and find environment settings
+/// An environment utility to help locate files and find environment
+/// settings. The environment for a given simulation can be accessed via the
+/// simulation's Context.
 class Env {
  private:
   /// the relative path from cwd to cyclus

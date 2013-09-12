@@ -16,7 +16,8 @@ namespace cyclus {
 /**
    @class Timer
 
-   A (singleton) timer to control a simulation with a one-month time
+   A timer to control a simulation with a one-month time step. The timer for a
+   given simulation can be accessed via the simulation's Context.
  */
 class Timer {
  public:
