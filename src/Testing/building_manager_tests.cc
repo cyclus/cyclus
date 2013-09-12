@@ -40,13 +40,13 @@ void BuildingManagerTests::SetUpProblem()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,init) 
+TEST_F(BuildingManagerTests, init) 
 {
   EXPECT_THROW(manager.UnRegisterBuilder(builder1), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,registration) 
+TEST_F(BuildingManagerTests, registration) 
 {
   EXPECT_NO_THROW(manager.RegisterBuilder(builder1));
   EXPECT_THROW(manager.RegisterBuilder(builder1), cyclus::KeyError);
@@ -55,7 +55,7 @@ TEST_F(BuildingManagerTests,registration)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,DISABLED_problem) 
+TEST_F(BuildingManagerTests, problem) 
 {
   using cyclus::action_building::BuildOrder;
   SetUpProblem();
@@ -74,7 +74,7 @@ TEST_F(BuildingManagerTests,DISABLED_problem)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(BuildingManagerTests,emptyorder) 
+TEST_F(BuildingManagerTests, emptyorder) 
 {
   using cyclus::action_building::BuildOrder;
   SetUpProblem();
