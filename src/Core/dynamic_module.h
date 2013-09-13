@@ -4,11 +4,10 @@
 
 #include <string>
 
-#include "context.h"
-
 namespace cyclus {
 
 class Model;
+class Context;
 
 typedef Model* ModelCtor(Context*);
 typedef void ModelDtor(Model*);
@@ -33,15 +32,6 @@ class DynamicModule {
      @return a fresh instance
   */
   Model* ConstructInstance(Context* ctx);
-
-  /**
-     call this destructor on an instance of a Model
-     @param model the model to destruct
-  */
-  void DestructInstance(Model* model);
-
-  /// Locates and initializes a dynamic module for use in the simulation
-  void Initialize();
 
   /// closes the loaded module dynamic lib
   void CloseLibrary();

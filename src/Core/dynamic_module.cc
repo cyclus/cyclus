@@ -2,6 +2,7 @@
 
 #include "dynamic_module.h"
 
+#include "context.h"
 #include "env.h"
 #include "suffix.h"
 #include "model.h"
@@ -22,10 +23,8 @@ const std::string DynamicModule::Suffix() {
 DynamicModule::DynamicModule(std::string type, std::string name) :
   type_(type), module_name_(name),
   constructor_name_("Construct" + name), destructor_name_("Destruct" + name),
-  abs_path_(""), module_library_(0), constructor_(0), destructor_(0) { }
+  abs_path_(""), module_library_(0), constructor_(0), destructor_(0) {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::Initialize() {
   SetPath();
   OpenLibrary();
   SetConstructor();
@@ -45,11 +44,6 @@ void DynamicModule::SetPath() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* DynamicModule::ConstructInstance(Context* ctx) {
   return constructor_(ctx);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::DestructInstance(Model* model) {
-  destructor_(model);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

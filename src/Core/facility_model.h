@@ -8,7 +8,6 @@
 #include "model.h"
 #include "time_agent.h"
 #include "communicator.h"
-#include "prototype.h"
 
 namespace cyclus {
 
@@ -69,8 +68,7 @@ class InstModel;
    pages that describe how to get the models and the detailed behavior
  */
 
-class FacilityModel : public TimeAgent, public Communicator,
-  public Prototype {
+class FacilityModel : public TimeAgent, public Communicator {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -87,22 +85,14 @@ class FacilityModel : public TimeAgent, public Communicator,
   virtual void InitCoreMembers(QueryEngine* qe);
 
   /**
-     prototypes are required to provide the capacity to copy their
-     initialized members
-   */
-  virtual Prototype* clone();
-
-  /**
-     Copy core members from a source model
-     @param source the model to copy from
-   */
-  void CloneCoreMembersFrom(FacilityModel* source);
-
-  /**
      Copy module members from a source model
      @param source the model to copy from
    */
-  virtual void CloneModuleMembersFrom(FacilityModel* source) = 0;
+  virtual void clonefrom(Model* m);
+
+  virtual void Deploy(Model* parent) {
+    Model::Deploy(parent);
+  }
 
   /**
      every model should be able to print a verbose description
@@ -157,28 +147,6 @@ class FacilityModel : public TimeAgent, public Communicator,
      each facility needs a lifetime
    */
   int fac_lifetime_;
-
-  /**
-     each facility must keep track when it should be decommissioned
-   */
-  int decommission_date_;
-
-  /**
-     the date the facility is built
-   */
-  int build_date_;
-
-  /**
-     set the build date
-     @param current_time the current sim time
-   */
-  void SetBuildDate(int current_time);
-
-  /**
-     set the decommission date
-     @param time the time to be decommissioned
-   */
-  void SetDecommissionDate(int time);
 
   /**
      decommissions the facility, default behavior is for the facility

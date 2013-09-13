@@ -66,13 +66,6 @@ class Model {
   static std::vector<Model*> GetModelList();
 
   /**
-     load a dynamic module
-     @param model_type the type of model
-     @param module_name the name of the module
-   */
-  static void LoadModule(std::string model_type, std::string module_name);
-
-  /**
      closes the library of each dynamically loaded module and erases
      it from the loaded modules container
    */
@@ -84,19 +77,6 @@ class Model {
      @param qe a pointer to a QueryEngine object containing initialization data
    */
   static void InitializeSimulationEntity(Context* ctx, std::string model_type, QueryEngine* qe);
-
-  /**
-     uses the loaded modules to properly construct a model
-     @param model_impl the implementation to construct
-     @return the constructed model
-   */
-  static Model* ConstructModel(Context* ctx, std::string model_impl);
-
-  /**
-     uses the loaded modules to properly destruct a model
-     @param model the model to delete
-   */
-  static void DeleteModel(Model* model);
 
   /**
      register a model as a market
@@ -139,6 +119,12 @@ class Model {
      Destructor for the Model Class
    */
   virtual ~Model();
+
+  /**
+     Return a newly created/allocated prototype that is an exact copy of this.
+   */
+  virtual Model* clone() = 0;
+
 
   /**
      get model instance name
@@ -214,15 +200,15 @@ class Model {
   /**
      return the born on date of this model
    */
-  int BornOn() {
-    return bornOn_;
+  int birthday() {
+    return birthday_;
   };
 
   /**
      return the died on of this model
    */
-  int DiedOn() {
-    return diedOn_;
+  int deathday() {
+    return deathday_;
   };
 
   /**
@@ -261,30 +247,13 @@ class Model {
      module-level enter simulation methods
      @param parent this model's parent
    */
-  void EnterSimulation(Model* parent);
-
-  /**
-     perform core-related tasks when entering the simulation
-   */
-  virtual void EnterSimulationAsCoreEntity();
-
-  /**
-     perform module-specific tasks when entering the simulation
-   */
-  virtual void EnterSimulationAsModule();
+  virtual void Deploy(Model* parent);
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
   virtual void SetParent(Model* parent);
-
-  /**
-     set the bornOn date of this model
-   */
-  void SetBornOn(int date) {
-    bornOn_ = date;
-  };
 
   /**
      return the ith child
@@ -322,17 +291,13 @@ class Model {
                            std::vector<Resource::Ptr> manifest);
 
  protected:
+  virtual void clonefrom(Model* m);
+
   /**
      a map of loaded modules. all dynamically loaded modules are
      registered with this map when loaded.
    */
-  static std::map< std::string, boost::shared_ptr<DynamicModule> >
-  loaded_modules_;
-
-  /**
-     the set of loaded dynamic libraries
-   */
-  static std::vector<void*> dynamic_libraries_;
+  static std::map< std::string, DynamicModule*> loaded_modules_;
 
   /**
      a set of registered markets
@@ -410,12 +375,12 @@ class Model {
   /**
      born on date of this model
    */
-  int bornOn_;
+  int birthday_;
 
   /**
      died on date of this model
    */
-  int diedOn_;
+  int deathday_;
 
   /**
      every instance of a model should have a name
@@ -437,12 +402,6 @@ class Model {
    */
   int ID_;
 
-  /**
-     wheter or not the model has been born
-   */
-  bool born_;
-
- private:
   Context* ctx_;
 
   /**

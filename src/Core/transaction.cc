@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "context.h"
 #include "error.h"
 #include "market_model.h"
 #include "model.h"

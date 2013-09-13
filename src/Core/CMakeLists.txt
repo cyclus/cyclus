@@ -93,7 +93,6 @@ INSTALL(FILES
   market_player.h
   market_player_manager.h
   mass_table.h
-  prototype.h
   res_tracker.h
   supply_demand.h
   supply_demand_manager.h

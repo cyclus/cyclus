@@ -97,7 +97,9 @@ std::string InstModel::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::EnterSimulationAsCoreEntity() {
+void InstModel::Deploy(Model* parent) {
+  Model::Deploy(parent);
+
   // build initial prototypes
   std::map<std::string, int>::iterator it;
   for (it = initial_build_order_.begin();
@@ -184,7 +186,7 @@ void InstModel::HandleDailyTasks(int time, int day) {
 void InstModel::Build(std::string proto_name) {
   ThrowErrorIfPrototypeIsntAvailable(proto_name);
   Model* clone = context()->CreateModel<Model>(proto_name);
-  clone->EnterSimulation(this);
+  clone->Deploy(this);
   RegisterCloneAsBuilt(clone);
 }
 

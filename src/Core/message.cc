@@ -5,6 +5,7 @@
 
 #include <map>
 
+#include "context.h"
 #include "communicator.h"
 #include "error.h"
 #include "logger.h"
