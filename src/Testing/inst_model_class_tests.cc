@@ -4,7 +4,6 @@
 #include "event_manager.h"
 #include "facility_model.h"
 #include "inst_model.h"
-#include "prototype.h"
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -15,7 +14,10 @@ class ConcreteInstModel : public cyclus::InstModel {
   ConcreteInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
   
   virtual ~ConcreteInstModel() {};
-  
+
+  virtual cyclus::Model* clone() {
+    return new ConcreteInstModel(context());
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,11 +31,6 @@ class DieModel : public cyclus::FacilityModel {
   };
   
   virtual ~DieModel() {};
-  
-  // virtual Prototype* clone() {
-  //   DieModel* clone = new DieModel();
-  //   return dynamic_cast<Prototype*>(clone);
-  // };
 
   virtual void ReceiveMessage(cyclus::Message::Ptr msg) { };
   virtual void CloneModuleMembersFrom(FacilityModel* source){};
@@ -54,8 +51,11 @@ class DieModel : public cyclus::FacilityModel {
     
     if (tockDie_) {
       SetFacLifetime(1);
-      SetBuildDate(time);
     }
+  }
+
+  virtual cyclus::Model* clone() {
+    return new DieModel(context());
   }
 
   int tickCount_;
@@ -96,11 +96,11 @@ class InstModelClassTests : public ::testing::Test {
       child5_ = new DieModel(ctx_);
 
       inst_ = new ConcreteInstModel(ctx_);
-      child1_->EnterSimulation(inst_);
-      child2_->EnterSimulation(inst_);
-      child3_->EnterSimulation(inst_);
-      child4_->EnterSimulation(inst_);
-      child5_->EnterSimulation(inst_);
+      child1_->Deploy(inst_);
+      child2_->Deploy(inst_);
+      child3_->Deploy(inst_);
+      child4_->Deploy(inst_);
+      child5_->Deploy(inst_);
     }
 };
 

@@ -13,9 +13,12 @@
 class ConcreteRegionModel : public cyclus::RegionModel {
  public:
   ConcreteRegionModel(cyclus::Context* ctx) : cyclus::RegionModel(ctx) { };
-  
+
   virtual ~ConcreteRegionModel() { };
-  
+
+  virtual cyclus::Model* clone() {
+    return new ConcreteRegionModel(context());
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,6 +33,10 @@ class DieInst : public cyclus::InstModel {
   
   virtual ~DieInst() {};
   
+  virtual cyclus::Model* clone() {
+    return new DieInst(context());
+  }
+
   virtual void HandleTick(int time) {
     tickCount_++;
     totalTicks++;
@@ -86,11 +93,11 @@ class RegionModelClassTests : public ::testing::Test {
       child5_ = new DieInst(ctx_);
 
       reg_ = new ConcreteRegionModel(ctx_);
-      child1_->EnterSimulation(reg_);
-      child2_->EnterSimulation(reg_);
-      child3_->EnterSimulation(reg_);
-      child4_->EnterSimulation(reg_);
-      child5_->EnterSimulation(reg_);
+      child1_->Deploy(reg_);
+      child2_->Deploy(reg_);
+      child3_->Deploy(reg_);
+      child4_->Deploy(reg_);
+      child5_->Deploy(reg_);
     }
 };
 
