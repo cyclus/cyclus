@@ -10,6 +10,7 @@ class TestConverter: public cyclus::ConverterModel {
  public:
   TestConverter(cyclus::Context* ctx) : cyclus::ConverterModel(ctx) {};
   virtual ~TestConverter() {};
+  virtual cyclus::Model* clone() {return new TestConverter(context());};
 };
 
 #endif

@@ -17,6 +17,8 @@ class TestInst: public cyclus::InstModel {
 
   virtual ~TestInst() {};
 
+  virtual cyclus::Model* clone() {return new TestInst(context());};
+
   void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
   }
