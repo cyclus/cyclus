@@ -6,6 +6,3 @@ extern "C" cyclus::Model* ConstructTestConverter(cyclus::Context* ctx) {
   return new TestConverter(ctx);
 }
 
-extern "C" cyclus::Model* DestructTestConverter(cyclus::Model* model) {
-  delete model;
-}
