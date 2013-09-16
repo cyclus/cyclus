@@ -12,7 +12,7 @@
 class ConcreteInstModel : public cyclus::InstModel {
  public:
   ConcreteInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
-  
+
   virtual ~ConcreteInstModel() {};
 
   virtual cyclus::Model* clone() {
@@ -27,12 +27,14 @@ class DieModel : public cyclus::FacilityModel {
     tickCount_ = 0;
     tockCount_ = 0;
   };
-  
+
   virtual ~DieModel() {};
 
   virtual void ReceiveMessage(cyclus::Message::Ptr msg) { };
-  virtual void CloneModuleMembersFrom(FacilityModel* source){};
-  virtual void Decommission() { delete this; }
+  virtual void CloneModuleMembersFrom(FacilityModel* source) {};
+  virtual void Decommission() {
+    delete this;
+  }
 
   virtual void HandleTick(int time) {
     tickCount_++;
@@ -42,8 +44,6 @@ class DieModel : public cyclus::FacilityModel {
   virtual void HandleTock(int time) {
     tockCount_++;
     totalTocks++;
-    
-    SetFacLifetime(1);
   }
 
   virtual cyclus::Model* clone() {
@@ -62,42 +62,42 @@ int DieModel::totalTocks = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InstModelClassTests : public ::testing::Test {
-  protected:
+ protected:
 
-    DieModel* child1_;
-    DieModel* child2_;
-    DieModel* child3_;
-    DieModel* child4_;
-    DieModel* child5_;
+  DieModel* child1_;
+  DieModel* child2_;
+  DieModel* child3_;
+  DieModel* child4_;
+  DieModel* child5_;
 
-    cyclus::TimeAgent* inst_;
-    cyclus::EventManager em_;
-    cyclus::Timer ti_;
-    cyclus::Context* ctx_;
+  cyclus::TimeAgent* inst_;
+  cyclus::EventManager em_;
+  cyclus::Timer ti_;
+  cyclus::Context* ctx_;
 
-    virtual void SetUp() {
-      ctx_ = new cyclus::Context(&ti_, &em_);
+  virtual void SetUp() {
+    ctx_ = new cyclus::Context(&ti_, &em_);
 
-      child1_ = new DieModel(ctx_);
-      child2_ = new DieModel(ctx_);
-      child3_ = new DieModel(ctx_);
-      child4_ = new DieModel(ctx_);
-      child5_ = new DieModel(ctx_);
+    child1_ = new DieModel(ctx_);
+    child2_ = new DieModel(ctx_);
+    child3_ = new DieModel(ctx_);
+    child4_ = new DieModel(ctx_);
+    child5_ = new DieModel(ctx_);
 
-      inst_ = new ConcreteInstModel(ctx_);
-      child1_->Deploy(inst_);
-      child2_->Deploy(inst_);
-      child3_->Deploy(inst_);
-      child4_->Deploy(inst_);
-      child5_->Deploy(inst_);
-    }
+    inst_ = new ConcreteInstModel(ctx_);
+    child1_->Deploy(inst_);
+    child2_->Deploy(inst_);
+    child3_->Deploy(inst_);
+    child4_->Deploy(inst_);
+    child5_->Deploy(inst_);
+  }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InstModelClassTests, TockIter) {
-  child2_->SetFacLifetime(1);
+  child2_->SetFacLifetime(0);
 
-  EXPECT_EQ(inst_->NChildren(),5);
+  EXPECT_EQ(inst_->NChildren(), 5);
   ASSERT_NO_THROW(inst_->HandleTock(0));
   EXPECT_EQ(DieModel::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
@@ -105,10 +105,10 @@ TEST_F(InstModelClassTests, TockIter) {
   EXPECT_EQ(child4_->tockCount_, 1);
   EXPECT_EQ(child5_->tockCount_, 1);
 
-  child1_->SetFacLifetime(1);
-  child3_->SetFacLifetime(1);
+  child1_->SetFacLifetime(0);
+  child3_->SetFacLifetime(0);
 
-  EXPECT_EQ(inst_->NChildren(),4);
+  EXPECT_EQ(inst_->NChildren(), 4);
   ASSERT_NO_THROW(inst_->HandleTock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
