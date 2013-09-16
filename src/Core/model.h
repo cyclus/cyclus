@@ -125,7 +125,6 @@ class Model {
    */
   virtual Model* clone() = 0;
 
-
   /**
      get model instance name
    */

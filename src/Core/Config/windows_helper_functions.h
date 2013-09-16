@@ -38,19 +38,6 @@ void DynamicModule::SetConstructor() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::SetDestructor() {
-  destructor_ = (ModelDtor*)
-                GetProcAddress(module_library_, destructor_name_.c_str());
-
-  if (!destructor_) {
-    string err_msg = "Unable to load model constructor: ";
-    err_msg += GetLastError();
-    throw IOError(err_msg);
-  }
-
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::CloseLibrary() {
   if (module_library_) {
     FreeLibrary(module_library_);

@@ -26,8 +26,6 @@ class DieModel : public cyclus::FacilityModel {
   DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
     tickCount_ = 0;
     tockCount_ = 0;
-    tickDie_ = false;
-    tockDie_ = false;
   };
   
   virtual ~DieModel() {};
@@ -39,19 +37,13 @@ class DieModel : public cyclus::FacilityModel {
   virtual void HandleTick(int time) {
     tickCount_++;
     totalTicks++;
-
-    if (tickDie_) {
-      delete this;
-    }
   }
 
   virtual void HandleTock(int time) {
     tockCount_++;
     totalTocks++;
     
-    if (tockDie_) {
-      SetFacLifetime(1);
-    }
+    SetFacLifetime(1);
   }
 
   virtual cyclus::Model* clone() {
@@ -60,9 +52,6 @@ class DieModel : public cyclus::FacilityModel {
 
   int tickCount_;
   int tockCount_;
-
-  bool tickDie_;
-  bool tockDie_;
 
   static int totalTicks;
   static int totalTocks;
@@ -105,28 +94,8 @@ class InstModelClassTests : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(InstModelClassTests, TickIter) {
-  child2_->tickDie_ = true;
-
-  ASSERT_NO_THROW(inst_->HandleTick(0));
-  EXPECT_EQ(DieModel::totalTicks, 5);
-  EXPECT_EQ(child1_->tickCount_, 1);
-  EXPECT_EQ(child3_->tickCount_, 1);
-  EXPECT_EQ(child4_->tickCount_, 1);
-  EXPECT_EQ(child5_->tickCount_, 1);
-
-  child1_->tickDie_ = true;
-  child3_->tickDie_ = true;
-
-  ASSERT_NO_THROW(inst_->HandleTick(0));
-  EXPECT_EQ(DieModel::totalTicks, 9);
-  EXPECT_EQ(child4_->tickCount_, 2);
-  EXPECT_EQ(child5_->tickCount_, 2);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(InstModelClassTests, TockIter) {
-  child2_->tockDie_ = true;
+  child2_->SetFacLifetime(1);
 
   EXPECT_EQ(inst_->NChildren(),5);
   ASSERT_NO_THROW(inst_->HandleTock(0));
@@ -136,8 +105,8 @@ TEST_F(InstModelClassTests, TockIter) {
   EXPECT_EQ(child4_->tockCount_, 1);
   EXPECT_EQ(child5_->tockCount_, 1);
 
-  child1_->tockDie_ = true;
-  child3_->tockDie_ = true;
+  child1_->SetFacLifetime(1);
+  child3_->SetFacLifetime(1);
 
   EXPECT_EQ(inst_->NChildren(),4);
   ASSERT_NO_THROW(inst_->HandleTock(1));

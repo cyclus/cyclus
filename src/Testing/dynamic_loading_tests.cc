@@ -26,30 +26,6 @@ TEST(DynamicLoadingTests, LoadTestFacility) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(DynamicLoadingTests, FindNonStandardPath) {
-  // set up
-  std::string name = "otherfac";
-  std::string lib_name = "lib" + name + DynamicModule::Suffix();
-  fs::path path = fs::path(getenv("HOME")) / fs::path(".tmp-cyclus-test") / fs::path(lib_name);
-
-  // create file
-  fs::create_directory(path.parent_path());
-  std::ofstream f(path.string().c_str());
-  f.close();
-
-  // add path to env 
-  std::string cmd = cyclus::Env::ModuleEnvVarName() + '=' + \
-                    path.parent_path().string();
-  putenv((char*)cmd.c_str());
-
-  // test
-  DynamicModule mod("Facility", name);
-  EXPECT_EQ(path.string(), mod.path()); // note path calls (private) SetPath()
-
-  fs::remove_all(path);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, LoadLibError) {
   EXPECT_THROW(new DynamicModule("Facility", "not_a_fac"), cyclus::IOError);
 }
