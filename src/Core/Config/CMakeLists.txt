@@ -14,6 +14,9 @@ ELSE()
   CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 ENDIF()
 
+EXECUTE_PROCESS(COMMAND git describe OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+CONFIGURE_FILE(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h @ONLY)
+
 # Here we set some components for installation with cpack
 INSTALL(FILES 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
@@ -25,6 +28,7 @@ INSTALL(FILES
     unix_helper_functions.h
     windows_helper_functions.h
     suffix.h
+    version.h
   DESTINATION include/cyclus
   COMPONENT core
   )
