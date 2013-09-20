@@ -28,6 +28,28 @@ Package                Minimum Version
 `HDF5`                 1.8.0
 ====================   ==================
 
+In case you have skipped the installation instructions of deprecated Cyclopts,
+you need to install the following dependencies for Cyclus:
+
+====================   ==================
+Package                Minimum Version   
+====================   ==================
+'g++'
+'libbz2'
+'coinor-libcoinutils'
+'coinor-libclp'
+'coinor-libcbc'
+'coinor-libcgl'
+====================   ==================
+
+In addition, there is an optional dependency:
+
+====================   ==================
+Package                Minimum Version   
+====================   ==================
+doxygen
+====================   ==================
+
 As with all software, the build/install can be broken into two steps:
 
   #. building and installing the dependencies
@@ -55,10 +77,22 @@ commands will take the form of:
 Where you will replace "package" with the correct package name. The
 list of required package names are:
 
+  #. cmake
   #. libboost-all-dev
   #. libxml++2.6-dev
   #. libsqlite3-dev
-  #. libhdf5-dev
+  #. libhdf5-serial-dev
+  #. g++
+  #. libbz2-dev
+  #. coinor-libcoinutils-dev
+  #. coinor-libosi-dev
+  #. coinor-libclp-dev
+  #. coinor-libcbc-dev
+  #. coinor-libcgl-dev
+
+Optional dependencies:
+
+  #. doxygen
 
 So, for example, in order to install libxml++ on your system, you will
 type:
@@ -99,7 +133,7 @@ install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
-    .../cyclus/cyclus$ python setup.py --prefix=../install
+    .../cyclus/cyclus$ python install.py --prefix=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
 installed in a non-standard location, you should make use of the 
@@ -108,7 +142,7 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python setup.py --prefix=../install --coin_root=path/to/coin
+    .../cyclus/cyclus$  python install.py --prefix=../install --coin_root=path/to/coin
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
@@ -116,7 +150,7 @@ you should make use of the boostRoot installation flag.
 .. code-block:: bash
 
 
-    .../cyclus/cyclus$ python setup.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
+    .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 Now, run it with some input file, for this example, call it 
 `input.xml`::
@@ -198,7 +232,7 @@ Workflow Notes
         test``` is insufficient). For example ::
       
           mkdir install
-          python setup.py --prefix=install/ ....
+          python install.py --prefix=install/ ....
           install/cyclus/bin/CyclusUnitTestDriver
 
       - If your changes to the core repository have an effect on any module 
