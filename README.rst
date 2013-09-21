@@ -31,24 +31,24 @@ Package                Minimum Version
 In case you have skipped the installation instructions of deprecated Cyclopts,
 you need to install the following dependencies for Cyclus:
 
-====================   ==================
-Package                Minimum Version   
-====================   ==================
-'g++'
-'libbz2'
+====================  
+Package                 
+====================   
+'A C++ compiler'
+'libbz2'                
 'coinor-libcoinutils'
 'coinor-libclp'
 'coinor-libcbc'
 'coinor-libcgl'
-====================   ==================
+====================  
 
 In addition, there is an optional dependency:
 
-====================   ==================
-Package                Minimum Version   
-====================   ==================
+====================  
+Package                 
+==================== 
 doxygen
-====================   ==================
+====================
 
 As with all software, the build/install can be broken into two steps:
 
@@ -153,7 +153,9 @@ you should make use of the boostRoot installation flag.
     .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 Now, run it with some input file, for this example, call it 
-`input.xml`::
+`input.xml`. You can find instructions for writng an input file
+for cyclus from `Cyclus User Guide`_  or use sample input files
+from `cycamore repository`_ ::
 
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
@@ -170,6 +172,8 @@ CMake variable flag. Simply add the following to your cmake command:
 .. _`CMake`: http://www.cmake.org
 .. _`apt-get`: http://linux.die.net/man/8/apt-get
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
+.. _`cycamore repository`: https://github.com/cyclus/cycamore
 
 **********************
 The Developer Workflow
