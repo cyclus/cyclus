@@ -34,12 +34,12 @@ you need to install the following dependencies for Cyclus:
 ====================  
 Package                 
 ====================   
-'A C++ compiler'
-'libbz2'                
-'coinor-libcoinutils'
-'coinor-libclp'
-'coinor-libcbc'
-'coinor-libcgl'
+`A C++ compiler`
+`libbz2`                
+`coinor-libcoinutils`
+`coinor-libclp`
+`coinor-libcbc`
+`coinor-libcgl`
 ====================  
 
 In addition, there is an optional dependency:
@@ -47,7 +47,7 @@ In addition, there is an optional dependency:
 ====================  
 Package                 
 ==================== 
-doxygen
+`doxygen`
 ====================
 
 As with all software, the build/install can be broken into two steps:
@@ -155,7 +155,7 @@ you should make use of the boostRoot installation flag.
 Now, run it with some input file, for this example, call it 
 `input.xml`. You can find instructions for writng an input file
 for cyclus from `Cyclus User Guide`_  or use sample input files
-from `cycamore repository`_ ::
+from `Cycamore Repo`_ ::
 
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
@@ -173,7 +173,7 @@ CMake variable flag. Simply add the following to your cmake command:
 .. _`apt-get`: http://linux.die.net/man/8/apt-get
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
-.. _`cycamore repository`: https://github.com/cyclus/cycamore
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
 **********************
 The Developer Workflow
