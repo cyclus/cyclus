@@ -42,12 +42,12 @@ void XMLQueryEngineTest::SetUp() {
   unknown_node_ = "unknown_module_name";
   ncontent_ = 2;
   ninner_nodes_ = ncontent_+1;
+  parser_ = new cyclus::XMLParser();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void XMLQueryEngineTest::TearDown() {
-  if (parser_)
-    delete parser_;
+  delete parser_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -55,7 +55,6 @@ void XMLQueryEngineTest::LoadParser() {
   std::stringstream ss("");
   GetContent(ss);
   //std::cout << ss.str() << std::endl;
-  parser_ = new cyclus::XMLParser();
   parser_->Init(ss);
 }
 
@@ -115,4 +114,41 @@ TEST_F(XMLQueryEngineTest, low_level_queries) {
   EXPECT_EQ(qe->GetElementName(),unknown_node_);
   cyclus::QueryEngine* qe2 = qe->QueryElement(unknown_node_);
   EXPECT_EQ(qe2->GetElementContent(content_node_),content_);
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLQueryEngineTest, optional_queries) {
+  using std::string;
+  using cyclus::GetOptionalQuery;
+  
+  std::stringstream ss;
+  string other = "other";
+  double dbl_val = 1.4;
+  double dbl_other = 1.5;
+  string dbl_str = "double";
+  int int_val = 3;
+  int int_other = 5;
+  string int_str = "int";
+  string str_val = "str";
+  string str_other = "some_str";
+  string str_str = "string";
+  ss << "<root>"
+     << "<" << dbl_str << ">" << dbl_val << "</" << dbl_str << ">"
+     << "<" << int_str << ">" << int_val << "</" << int_str << ">"
+     << "<" << str_str << ">" << str_val << "</" << str_str << ">"
+     << "</root>";
+
+  cyclus::XMLParser parser;
+  parser.Init(ss);
+  cyclus::XMLQueryEngine qe(parser);
+
+  EXPECT_DOUBLE_EQ(dbl_val, GetOptionalQuery<double>(&qe, dbl_str, dbl_other));
+  EXPECT_DOUBLE_EQ(dbl_other, GetOptionalQuery<double>(&qe, other, dbl_other));
+  
+  EXPECT_EQ(int_val, GetOptionalQuery<int>(&qe, int_str, int_other));
+  EXPECT_EQ(int_other, GetOptionalQuery<int>(&qe, other, int_other));
+  
+  EXPECT_EQ(str_val, GetOptionalQuery<string>(&qe, str_str, str_other));
+  EXPECT_EQ(str_other, GetOptionalQuery<string>(&qe, other, str_other));
 }
