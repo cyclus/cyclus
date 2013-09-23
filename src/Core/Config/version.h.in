@@ -1,0 +1,46 @@
+#ifndef VERSION_H_
+#define VERSION_H_
+
+#include <sstream>
+
+#include "boost/version.hpp"
+#include "sqlite3.h"
+#include "hdf5.h"
+#include "libxml/xmlversion.h"
+#include "coin/CbcConfig.h"
+
+
+namespace cyclus {
+namespace version {
+  const char* core() {
+    return "@core_version@";
+  };
+
+  const char* boost() {
+    return BOOST_LIB_VERSION;
+  };
+
+  const char* sqlite3() {
+    return SQLITE_VERSION;
+  };
+
+  const char* hdf5() {
+    std::stringstream ss;
+    ss << H5_VERS_MAJOR << ".";
+    ss << H5_VERS_MINOR << ".";
+    ss << H5_VERS_RELEASE << "-";
+    ss << H5_VERS_SUBRELEASE;
+    return ss.str().c_str();
+  };
+
+  const char* xml2() {
+    return LIBXML_DOTTED_VERSION;
+  };
+
+  const char* coincbc() {
+    return CBC_VERSION;
+  };
+};
+} // namespace cyclus
+
+#endif
