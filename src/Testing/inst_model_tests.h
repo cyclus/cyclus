@@ -24,6 +24,12 @@ class FakeInstModel : public cyclus::InstModel {
   FakeInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) {};
   
   virtual ~FakeInstModel() {};
+
+  virtual cyclus::Model* clone() {
+    FakeInstModel* m = new FakeInstModel(*this);
+    m->initfrom(this);
+    return m;
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
