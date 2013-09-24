@@ -124,13 +124,14 @@ void Model::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model::Model(Context* ctx) : ctx_(ctx) {
+Model::Model(Context* ctx)
+  : ctx_(ctx),
+    ID_(next_id_++),
+    parentID_(-1),
+    birthtime_(-1),
+    deathtime_(-1),
+    parent_(NULL) {
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
-  ID_ = next_id_++;
-  birthtime_ = -1;
-  deathtime_ = -1;
-  parentID_ = -1;
-  parent_ = NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
