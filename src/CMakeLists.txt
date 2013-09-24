@@ -193,9 +193,9 @@ ADD_EXECUTABLE( CyclusUnitTestDriver
 )
 TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)
 
-# Here we add all the tests
-add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 
-  ${TestSource}) 
+# # Here we add all the tests
+# add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 
+#   ${TestSource}) 
 
 INSTALL(TARGETS CyclusUnitTestDriver
   RUNTIME DESTINATION bin
@@ -246,7 +246,21 @@ ENDIF (DOXYGEN_FOUND)
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/Config/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
+    IMMEDIATE @ONLY
+    )
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+set( tgt "CyclusUnitTestDriver")
+set( cmd "python ${CYCLUS_SRC_DIR}/Testing/generate_tests.py --executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt} --output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake" )
+set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}")
+set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake")
+add_custom_command(TARGET ${tgt}
+  POST_BUILD
+  COMMAND python ${CYCLUS_SRC_DIR}/Testing/generate_tests.py ${exec} ${out}
+  COMMENT "adding tests from ${tgt}"
+  DEPENDS
+  VERBATIM
+  )
+  

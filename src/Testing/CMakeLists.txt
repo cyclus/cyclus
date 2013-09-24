@@ -66,6 +66,9 @@ macro(ADD_GOOGLE_TESTS executable)
   endforeach()
 endmacro()
 
+macro(CHECK_GOOGLE_TESTS script exe_path target output)
+endmacro()
+
 INSTALL(FILES GoogleTest/gtest/gtest.h
   DESTINATION include/gtest
   COMPONENT testing
