@@ -49,7 +49,6 @@ void InstModel::InitCoreMembers(QueryEngine* qe) {
       AddPrototypeToInitialBuild(entry);
     }
   }
-
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

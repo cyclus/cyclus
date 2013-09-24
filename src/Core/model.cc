@@ -20,8 +20,6 @@ int Model::next_id_ = 0;
 std::vector<Model*> Model::model_list_;
 std::map< std::string, DynamicModule*>
 Model::loaded_modules_;
-std::set<Model*> Model::markets_;
-std::set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
@@ -78,18 +76,12 @@ void Model::UnloadModules() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::clonefrom(Model* m) {
+void Model::initfrom(Model* m) {
   name_ = m->name_;
   model_type_ = m->model_type_;
   model_impl_ = m->model_impl_;
   model_type_ = m->model_type_;
   ctx_ = m->ctx_;
-
-  ID_ = next_id_++;
-  birthday_ = -1;
-  deathday_ = -1;
-  parent_ = NULL;
-  children_.clear();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -119,52 +111,10 @@ void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
   // register module
   if ("Facility" == model_type) {
     ctx->AddPrototype(model->name(), model);
-                                 
-  } else if ("Market" == model_type) {
-    RegisterMarketWithSimulation(model);
-  }  else {
-    model_list_.push_back(model);
+  } else if (model_type == "Market" || model_type == "Region") {
+    model->Deploy(model);
   }
-  if ("Region" == model_type) {
-    RegisterRegionWithSimulation(model);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RegisterMarketWithSimulation(Model* market) {
-  MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
-  if (!marketCast) {
-    std::string err_msg = "Model '" + market->name() +
-                          "' can't be registered as a market.";
-    throw CastError(err_msg);
-  } else {
-    markets_.insert(market);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RegisterRegionWithSimulation(Model* region) {
-  RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
-  if (!regionCast) {
-    std::string err_msg = "Model '" + region->name() +
-                          "' can't be registered as a region.";
-    throw CastError(err_msg);
-  } else {
-    regions_.insert(region);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::ConstructSimulation() {
-  std::set<Model*>::iterator it;
-  for (it = markets_.begin(); it != markets_.end(); it++) {
-    Model* market = *it;
-    market->Deploy(market);
-  }
-  for (it = regions_.begin(); it != regions_.end(); it++) {
-    Model* region = *it;
-    region->Deploy(region);
-  }
+  model_list_.push_back(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,25 +125,25 @@ void Model::InitCoreMembers(QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model(Context* ctx) : ctx_(ctx) {
-  children_ = std::vector<Model*>();
-  name_ = "";
-  ID_ = next_id_++;
-  parent_ = NULL;
-  parentID_ = -1;
   MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
+  ID_ = next_id_++;
+  birthtime_ = -1;
+  deathtime_ = -1;
+  parentID_ = -1;
+  parent_ = NULL;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
-
-  // set died on date and record it in the table
-  deathday_ = ctx_->time();
-
-  ctx_->NewEvent("AgentDeaths")
-  ->AddVal("AgentID", ID())
-  ->AddVal("DeathDate", deathday_)
-  ->Record();
+  // set died on date and record it in the table if it was ever deployed
+  if (birthtime_ > -1) {
+    deathtime_ = ctx_->time();
+    ctx_->NewEvent("AgentDeaths")
+    ->AddVal("AgentID", ID())
+    ->AddVal("DeathDate", deathtime_)
+    ->Record();
+  }
 
   // remove references to self
   RemoveFromList(this, model_list_);
@@ -248,7 +198,7 @@ void Model::Deploy(Model* parent) {
   if (parent != this) {
     parent->AddChild(this);
   }
-  birthday_ = ctx_->time();
+  birthtime_ = ctx_->time();
 
   // add model to the database
   this->AddToTable();
@@ -360,7 +310,7 @@ void Model::AddToTable() {
   ->AddVal("ModelType", ModelImpl())
   ->AddVal("Prototype", name())
   ->AddVal("ParentID", ParentID())
-  ->AddVal("EnterDate", birthday())
+  ->AddVal("EnterDate", birthtime())
   ->Record();
 }
 } // namespace cyclus

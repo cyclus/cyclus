@@ -79,23 +79,6 @@ class Model {
   static void InitializeSimulationEntity(Context* ctx, std::string model_type, QueryEngine* qe);
 
   /**
-     register a model as a market
-     @param market the model to register
-   */
-  static void RegisterMarketWithSimulation(Model* market);
-
-  /**
-     register a model as a region
-     @param region the model to register
-   */
-  static void RegisterRegionWithSimulation(Model* region);
-
-  /**
-     constructs the simulation in its initial state
-   */
-  static void ConstructSimulation();
-
-  /**
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
@@ -199,15 +182,15 @@ class Model {
   /**
      return the born on date of this model
    */
-  int birthday() {
-    return birthday_;
+  int birthtime() {
+    return birthtime_;
   };
 
   /**
      return the died on of this model
    */
-  int deathday() {
-    return deathday_;
+  int deathtime() {
+    return deathtime_;
   };
 
   /**
@@ -290,23 +273,13 @@ class Model {
                            std::vector<Resource::Ptr> manifest);
 
  protected:
-  virtual void clonefrom(Model* m);
+  virtual void initfrom(Model* m);
 
   /**
      a map of loaded modules. all dynamically loaded modules are
      registered with this map when loaded.
    */
   static std::map< std::string, DynamicModule*> loaded_modules_;
-
-  /**
-     a set of registered markets
-   */
-  static std::set<Model*> markets_;
-
-  /**
-     a set of registered regions
-   */
-  static std::set<Model*> regions_;
 
   /**
      children of this model
@@ -319,36 +292,6 @@ class Model {
   Model* parent_;
 
  private:
-  /**
-     loads the facilities specified in a file
-
-     @param filename name of the file holding the facility specification
-     @param ns the string to append to the current namespace modifier
-     @param format format of the file (currently cyclus supports only
-   */
-  static void load_facilitycatalog(std::string filename, std::string ns,
-                                   std::string format);
-
-  /**
-     load all markets
-   */
-  static void load_markets();
-
-  /**
-     load all converters
-   */
-  static void load_converters();
-
-  /**
-     load all regions
-   */
-  static void load_regions();
-
-  /**
-     load all institutions
-   */
-  static void load_institutions();
-
   /**
      Stores the next available facility ID
    */
@@ -374,12 +317,12 @@ class Model {
   /**
      born on date of this model
    */
-  int birthday_;
+  int birthtime_;
 
   /**
      died on date of this model
    */
-  int deathday_;
+  int deathtime_;
 
   /**
      every instance of a model should have a name

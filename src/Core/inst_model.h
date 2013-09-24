@@ -219,7 +219,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      perform any registration functionality before a clone is
      decommissioned(deleted)
-     @param clone the to-be-decommissioned prototype
+     @param clone the to-be-decommissioned
    */
   virtual void RegisterCloneAsDecommissioned(Model* clone);
 

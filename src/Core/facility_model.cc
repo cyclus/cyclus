@@ -55,8 +55,8 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::clonefrom(Model* m) {
-  Model::clonefrom(m);
+void FacilityModel::initfrom(Model* m) {
+  Model::initfrom(m);
   FacilityModel* fm = dynamic_cast<FacilityModel*>(m);
   fac_lifetime_ = fm->fac_lifetime_;
   in_commods_ = fm->in_commods_;
@@ -68,8 +68,8 @@ std::string FacilityModel::str() {
   std::stringstream ss("");
   ss << Model::str() << " with: "
      << " lifetime: " << FacLifetime()
-     << " build date: " << birthday()
-     << " decommission date: " << birthday() + fac_lifetime_;
+     << " build date: " << birthtime()
+     << " decommission date: " << birthtime() + fac_lifetime_;
   return ss.str();
 };
 
@@ -110,7 +110,7 @@ std::vector<std::string> FacilityModel::OutputCommodities() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool FacilityModel::LifetimeReached(int time) {
-  return (time >= birthday() + fac_lifetime_);
+  return (time >= birthtime() + fac_lifetime_);
 }
 
 } // namespace cyclus

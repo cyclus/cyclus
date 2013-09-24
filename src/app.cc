@@ -157,9 +157,6 @@ int main(int argc, char* argv[]) {
   }
   em.RegisterBackend(back);
 
-  // sim construction - should be handled by some entity
-  Model::ConstructSimulation();
-
   // print the model list
   Model::PrintModelList();
 
