@@ -7,6 +7,7 @@ google-test-based executable.
 The default main function writes a list of macros to the given output 
 file. 
 """
+from __future__ import print_function
 
 import os
 import subprocess
@@ -27,6 +28,7 @@ def parse_tests(test_lines):
     test_lines are the result of file.readlines().
     """
     tests = []
+    current_test = None
     for test_line in test_lines:
         line = test_line.strip()
         if line[-1] == ".":
