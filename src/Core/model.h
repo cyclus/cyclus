@@ -108,8 +108,8 @@ class Model {
      Return a newly created/allocated prototype that is an exact copy of this.
      This method should ONLY be impelemented by the LEAVES of the model
      inheritance hierarchy (i.e. not superclasses). It must call the
-     superclass' initfrom method with "this" as the argument.  All
-     initialization/cloning operations must be done AFTER calling initfrom.
+     superclass' InitFrom method with "this" as the argument.  All
+     initialization/cloning operations must be done AFTER calling InitFrom.
      Example:
 
      @begincode
@@ -118,7 +118,7 @@ class Model {
 
        virtual Model* Clone() {
          MyModelClass* m = new MyModelClass(*this);
-         m->initfrom(this);
+         m->InitFrom(this);
 
          // put custom initialization/cloning details here
          ...
@@ -302,12 +302,12 @@ class Model {
   /**
      A method that must be implemented by and only by classes in the model
      heirarchy that have been subclassed.  This method must call the
-     superclass' initfrom method. The initfrom method should only initialize
+     superclass' InitFrom method. The InitFrom method should only initialize
      this class' members - not inherited state.
 
      @param m the model containing state that should be used to initialize this model.
   */
-  virtual void initfrom(Model* m);
+  virtual void InitFrom(Model* m);
 
   /**
      a map of loaded modules. all dynamically loaded modules are

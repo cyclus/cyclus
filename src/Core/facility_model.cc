@@ -55,8 +55,8 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::initfrom(Model* m) {
-  Model::initfrom(m);
+void FacilityModel::InitFrom(Model* m) {
+  Model::InitFrom(m);
   FacilityModel* fm = dynamic_cast<FacilityModel*>(m);
   fac_lifetime_ = fm->fac_lifetime_;
   in_commods_ = fm->in_commods_;

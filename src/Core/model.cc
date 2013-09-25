@@ -76,7 +76,7 @@ void Model::UnloadModules() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::initfrom(Model* m) {
+void Model::InitFrom(Model* m) {
   ID_ = next_id_++;
   name_ = m->name_;
   model_type_ = m->model_type_;

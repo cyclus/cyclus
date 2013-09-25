@@ -88,7 +88,7 @@ class FacilityModel : public TimeAgent, public Communicator {
      Copy module members from a source model
      @param source the model to copy from
    */
-  virtual void initfrom(Model* m);
+  virtual void InitFrom(Model* m);
 
   virtual void Deploy(Model* parent) {
     Model::Deploy(parent);
