@@ -15,7 +15,7 @@ class ConcreteInstModel : public cyclus::InstModel {
 
   virtual ~ConcreteInstModel() {};
 
-  virtual cyclus::Model* clone() {
+  virtual cyclus::Model* Clone() {
     return new ConcreteInstModel(context());
   }
 };
@@ -46,7 +46,7 @@ class DieModel : public cyclus::FacilityModel {
     totalTocks++;
   }
 
-  virtual cyclus::Model* clone() {
+  virtual cyclus::Model* Clone() {
     return new DieModel(context());
   }
 

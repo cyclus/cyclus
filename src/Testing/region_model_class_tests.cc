@@ -16,7 +16,7 @@ class ConcreteRegionModel : public cyclus::RegionModel {
 
   virtual ~ConcreteRegionModel() { };
 
-  virtual cyclus::Model* clone() {
+  virtual cyclus::Model* Clone() {
     return new ConcreteRegionModel(context());
   }
 };
@@ -33,7 +33,7 @@ class DieInst : public cyclus::InstModel {
   
   virtual ~DieInst() {};
   
-  virtual cyclus::Model* clone() {
+  virtual cyclus::Model* Clone() {
     return new DieInst(context());
   }
 

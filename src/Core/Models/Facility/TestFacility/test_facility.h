@@ -9,7 +9,7 @@
 class TestFacility: public cyclus::FacilityModel {
  public:
   TestFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) { };
-  virtual cyclus::Model* clone() {return new TestFacility(context());};
+  virtual cyclus::Model* Clone() {return new TestFacility(context());};
 
   void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);

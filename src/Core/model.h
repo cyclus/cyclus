@@ -116,7 +116,7 @@ class Model {
      class MyModelClass : public Model {
        ...
 
-       virtual Model* clone() {
+       virtual Model* Clone() {
          MyModelClass* m = new MyModelClass(*this);
          m->initfrom(this);
 
@@ -130,7 +130,7 @@ class Model {
      };
      @endcode
    */
-  virtual Model* clone() = 0;
+  virtual Model* Clone() = 0;
 
   /**
      get model instance name

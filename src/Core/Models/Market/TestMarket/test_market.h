@@ -10,7 +10,7 @@ class TestMarket : public cyclus::MarketModel {
  public:
   TestMarket(cyclus::Context* ctx) : cyclus::MarketModel(ctx) {}
   virtual ~TestMarket() { }
-  virtual cyclus::Model* clone() {return new TestMarket(context());};
+  virtual cyclus::Model* Clone() {return new TestMarket(context());};
   TestMarket(cyclus::Context* ctx, std::string commod) : cyclus::MarketModel(ctx) {
     commodity_ = commod;
   }

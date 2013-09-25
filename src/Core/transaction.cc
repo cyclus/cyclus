@@ -35,7 +35,7 @@ Transaction::Transaction(Model* creator, TransType type, Resource::Ptr res,
 Transaction::~Transaction() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction* Transaction::clone() {
+Transaction* Transaction::Clone() {
   // clones resource_ and gives copy to the transaction clone
   Transaction* trans = new Transaction(*this);
   trans->SetResource(resource_);

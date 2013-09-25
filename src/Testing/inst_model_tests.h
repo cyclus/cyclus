@@ -25,7 +25,7 @@ class FakeInstModel : public cyclus::InstModel {
   
   virtual ~FakeInstModel() {};
 
-  virtual cyclus::Model* clone() {
+  virtual cyclus::Model* Clone() {
     FakeInstModel* m = new FakeInstModel(*this);
     m->initfrom(this);
     return m;

@@ -50,7 +50,7 @@ TEST(DynamicLoadingTests, cloneTestFacility) {
   cyclus::DynamicModule* module = new DynamicModule("Facility", "TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);
-                  Model* clone = fac->clone();
+                  Model* clone = fac->Clone();
                   delete clone;
                   delete fac;
                   );

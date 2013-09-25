@@ -44,7 +44,7 @@ class Context {
 
     Model* m = protos_[proto_name];
     T* casted(NULL);
-    Model* clone = m->clone();
+    Model* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       delete clone;
