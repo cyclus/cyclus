@@ -39,20 +39,6 @@ void DynamicModule::SetConstructor() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::SetDestructor() {
-  destructor_ = (ModelDtor*)
-                dlsym(module_library_, destructor_name_.c_str());
-
-  if (!destructor_) {
-    std::string err_msg = "Unable to load module destructor: ";
-    err_msg  += dlerror();
-    throw IOError(err_msg);
-  }
-
-  dlerror(); // reset errors
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::CloseLibrary() {
   if (module_library_) {
     int exit_code = dlclose(module_library_);

@@ -78,11 +78,9 @@ void CommodityProducer::SetCost(const Commodity& commodity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducer::AddCommodityWithInformation(const Commodity& commodity,
                                                     const CommodityInformation& info) {
-  if (ProducesCommodity(commodity)) {
-    throw KeyError("This producer already has registered "
-                   + commodity.name());
+  if (!ProducesCommodity(commodity)) {
+    produced_commodities_.insert(std::make_pair(commodity, info));
   }
-  produced_commodities_.insert(std::make_pair(commodity, info));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

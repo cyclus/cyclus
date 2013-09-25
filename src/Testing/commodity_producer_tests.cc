@@ -63,7 +63,7 @@ TEST_F(CommodityProducerTests,addcommodity)
   EXPECT_NO_THROW(AddCommodity());
   EXPECT_EQ(producer_.ProductionCapacity(commodity_),DefaultCapacity());
   EXPECT_EQ(producer_.ProductionCost(commodity_),DefaultCost());
-  EXPECT_THROW(AddCommodity(), cyclus::KeyError);
+  EXPECT_NO_THROW(AddCommodity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

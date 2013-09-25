@@ -13,7 +13,7 @@ boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();
 };
 
-void Context::AddPrototype(std::string name, Prototype* p) {
+void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
 }
 

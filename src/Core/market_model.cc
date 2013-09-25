@@ -57,7 +57,8 @@ void MarketModel::RegisterMarket(MarketModel* mkt) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MarketModel::EnterSimulationAsCoreEntity() {
+void MarketModel::Deploy(Model* parent) {
+  Model::Deploy(parent);
   // register the model
   context()->RegisterResolver(this);
   MarketModel::RegisterMarket(this);

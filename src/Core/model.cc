@@ -10,7 +10,6 @@
 #include "error.h"
 #include "logger.h"
 #include "market_model.h"
-#include "prototype.h"
 #include "region_model.h"
 #include "resource.h"
 
@@ -19,11 +18,8 @@ namespace cyclus {
 // static members
 int Model::next_id_ = 0;
 std::vector<Model*> Model::model_list_;
-std::map< std::string, boost::shared_ptr<DynamicModule> >
+std::map< std::string, DynamicModule*>
 Model::loaded_modules_;
-std::vector<void*> Model::dynamic_libraries_;
-std::set<Model*> Model::markets_;
-std::set<Model*> Model::regions_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
@@ -70,26 +66,23 @@ std::vector<Model*> Model::GetModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::LoadModule(std::string model_type, std::string module_name) {
-  boost::shared_ptr<DynamicModule>
-  module(new DynamicModule(model_type, module_name));
-
-  module->Initialize();
-
-  loaded_modules_.insert(make_pair(module_name, module));
-
-  CLOG(LEV_DEBUG1) << "Module '" << module_name
-                   << "' of type: " << model_type
-                   << " has been loaded.";
+void Model::UnloadModules() {
+  std::map<std::string, DynamicModule*>::iterator it;
+  for (it = loaded_modules_.begin(); it != loaded_modules_.end(); it++) {
+    it->second->CloseLibrary();
+    delete it->second;
+  }
+  loaded_modules_.clear();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::UnloadModules() {
-  std::map<std::string, boost::shared_ptr<DynamicModule> >::iterator it;
-  for (it = loaded_modules_.begin(); it != loaded_modules_.end(); it++) {
-    it->second->CloseLibrary();
-  }
-  loaded_modules_.erase(loaded_modules_.begin(), loaded_modules_.end());
+void Model::InitFrom(Model* m) {
+  id_ = next_id_++;
+  name_ = m->name_;
+  model_type_ = m->model_type_;
+  model_impl_ = m->model_impl_;
+  model_type_ = m->model_type_;
+  ctx_ = m->ctx_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,11 +92,13 @@ void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
   QueryEngine* module_data = qe->QueryElement("model");
   std::string module_name = module_data->GetElementName();
 
-  // instantiate & init module
-  /* --- */
-  LoadModule(model_type, module_name);
-  Model* model = ConstructModel(ctx, module_name);
-  /* --- */
+  DynamicModule* module = new DynamicModule(model_type, module_name);
+  loaded_modules_[module_name] = module;
+  CLOG(LEV_DEBUG1) << "Module '" << module_name
+                   << "' of type: " << model_type
+                   << " has been loaded.";
+  
+  Model* model = module->ConstructInstance(ctx);
   model->InitCoreMembers(qe);
   model->SetModelImpl(module_name);
   model->InitModuleMembers(module_data->QueryElement(module_name));
@@ -112,57 +107,15 @@ void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
                    << "' has had its module members initialized:";
   CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
   CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
-  CLOG(LEV_DEBUG3) << " * ID: " << model->ID();
+  CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 
   // register module
   if ("Facility" == model_type) {
-    ctx->AddPrototype(model->name(),
-                                 dynamic_cast<Prototype*>(model));
-  } else if ("Market" == model_type) {
-    RegisterMarketWithSimulation(model);
-  }  else {
-    model_list_.push_back(model);
+    ctx->AddPrototype(model->name(), model);
+  } else if (model_type == "Market" || model_type == "Region") {
+    model->Deploy(model);
   }
-  if ("Region" == model_type) {
-    RegisterRegionWithSimulation(model);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RegisterMarketWithSimulation(Model* market) {
-  MarketModel* marketCast = dynamic_cast<MarketModel*>(market);
-  if (!marketCast) {
-    std::string err_msg = "Model '" + market->name() +
-                          "' can't be registered as a market.";
-    throw CastError(err_msg);
-  } else {
-    markets_.insert(market);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RegisterRegionWithSimulation(Model* region) {
-  RegionModel* regionCast = dynamic_cast<RegionModel*>(region);
-  if (!regionCast) {
-    std::string err_msg = "Model '" + region->name() +
-                          "' can't be registered as a region.";
-    throw CastError(err_msg);
-  } else {
-    regions_.insert(region);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::ConstructSimulation() {
-  std::set<Model*>::iterator it;
-  for (it = markets_.begin(); it != markets_.end(); it++) {
-    Model* market = *it;
-    market->EnterSimulation(market);
-  }
-  for (it = regions_.begin(); it != regions_.end(); it++) {
-    Model* region = *it;
-    region->EnterSimulation(region);
-  }
+  model_list_.push_back(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -172,27 +125,27 @@ void Model::InitCoreMembers(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model::Model(Context* ctx) : ctx_(ctx) {
-  children_ = std::vector<Model*>();
-  name_ = "";
-  ID_ = next_id_++;
-  born_ = false;
-  parent_ = NULL;
-  parentID_ = -1;
-  MLOG(LEV_DEBUG3) << "Model ID=" << ID_ << ", ptr=" << this << " created.";
+Model::Model(Context* ctx)
+  : ctx_(ctx),
+    id_(next_id_++),
+    parent_id_(-1),
+    birthtime_(-1),
+    deathtime_(-1),
+    parent_(NULL) {
+  MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
-  MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << ID_ << " {";
-
-  // set died on date and record it in the table
-  diedOn_ = ctx_->time();
-
-  ctx_->NewEvent("AgentDeaths")
-  ->AddVal("AgentID", ID())
-  ->AddVal("DeathDate", diedOn_)
-  ->Record();
+  MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
+  // set died on date and record it in the table if it was ever deployed
+  if (birthtime_ > -1) {
+    deathtime_ = ctx_->time();
+    ctx_->NewEvent("AgentDeaths")
+    ->AddVal("AgentID", id())
+    ->AddVal("DeathDate", deathtime_)
+    ->Record();
+  }
 
   // remove references to self
   RemoveFromList(this, model_list_);
@@ -204,29 +157,11 @@ Model::~Model() {
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
-    MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->ID() << " {";
-    DeleteModel(child);
+    MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
+    delete child;
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::ConstructModel(Context* ctx, std::string model_impl) {
-  if (loaded_modules_.find(model_impl) == loaded_modules_.end()) {
-    throw KeyError("No module is registered for " + model_impl);
-  }
-
-  return loaded_modules_[model_impl]->ConstructInstance(ctx);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::DeleteModel(Model* model) {
-  std::map<std::string, boost::shared_ptr<DynamicModule> >::iterator it;
-  it = loaded_modules_.find(model->ModelImpl());
-  if (it != loaded_modules_.end()) {
-    it->second->DestructInstance(model);
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -242,43 +177,34 @@ std::string Model::str() {
   std::stringstream ss;
   ss << model_type_ << "_" << name_
      << " ( "
-     << "ID=" << ID_
+     << "ID=" << id_
      << ", implementation=" << model_impl_
      << ",  name=" << name_
-     << ",  parentID=" << parentID_
+     << ",  parentID=" << parent_id_
      << " ) " ;
   return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::EnterSimulation(Model* parent) {
+void Model::Deploy(Model* parent) {
 
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
   CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
-  CLOG(LEV_DEBUG3) << " * ID: " << ID();
+  CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   // set model-specific members
-  parentID_ = parent->ID();
+  parent_id_ = parent->id();
   SetParent(parent);
   if (parent != this) {
     parent->AddChild(this);
   }
-  bornOn_ = ctx_->time();
+  birthtime_ = ctx_->time();
 
   // add model to the database
   this->AddToTable();
-
-  EnterSimulationAsCoreEntity();
-  EnterSimulationAsModule();
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::EnterSimulationAsCoreEntity() {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::EnterSimulationAsModule() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::SetParent(Model* parent) {
@@ -313,18 +239,18 @@ void Model::AddChild(Model* child) {
                      "is trying to add an invalid model as its child.");
 
 
-  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << ID()
+  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << id()
                    << " has added child '" << child->name() << "' ID="
-                   << child->ID() << " to its list of children.";
+                   << child->id() << " to its list of children.";
 
   children_.push_back(child);
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::RemoveChild(Model* child) {
-  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->ID()
+  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->id()
                    << " has removed child '" << child->name() << "' ID="
-                   << child->ID() << " from its list of children.";
+                   << child->id() << " from its list of children.";
   RemoveFromList(child, children_);
 };
 
@@ -381,12 +307,12 @@ void Model::AddResource(Transaction trans,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
   ctx_->NewEvent("Agents")
-  ->AddVal("ID", ID())
+  ->AddVal("ID", id())
   ->AddVal("AgentType", ModelType())
   ->AddVal("ModelType", ModelImpl())
   ->AddVal("Prototype", name())
-  ->AddVal("ParentID", ParentID())
-  ->AddVal("EnterDate", BornOn())
+  ->AddVal("ParentID", parent_id())
+  ->AddVal("EnterDate", birthtime())
   ->Record();
 }
 } // namespace cyclus

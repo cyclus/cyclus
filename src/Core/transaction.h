@@ -39,7 +39,7 @@ class Transaction {
 
   @return a copy of this transaction.
   */
-  Transaction* clone();
+  Transaction* Clone();
 
   /**
      Initiate the market-matched transaction - Resource(s) are taken from the

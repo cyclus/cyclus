@@ -9,6 +9,7 @@
 class TestFacility: public cyclus::FacilityModel {
  public:
   TestFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) { };
+  virtual cyclus::Model* Clone() {return new TestFacility(context());};
 
   void ReceiveMessage(cyclus::Message::Ptr msg) {
     msg->SetDir(cyclus::DOWN_MSG);
@@ -16,10 +17,6 @@ class TestFacility: public cyclus::FacilityModel {
 
   void ReceiveMaterial(cyclus::Transaction trans,
                        std::vector<cyclus::Material::Ptr> manifest) { }
-
-  cyclus::Prototype* clone() {
-    return new TestFacility(context());
-  }
 
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) { }
   void HandleTick(int time) { };

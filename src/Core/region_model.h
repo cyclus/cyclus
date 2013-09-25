@@ -89,7 +89,7 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      perform actions required when entering the simulation
    */
-  virtual void EnterSimulationAsCoreEntity();
+  virtual void Deploy(Model* parent);
 
   /**
      every model should be able to print a verbose description

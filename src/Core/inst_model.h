@@ -14,7 +14,6 @@
 namespace cyclus {
 
 class QueryEngine;
-class Prototype;
 
 // Usefull Typedefs
 typedef std::set<std::string> PrototypeSet;
@@ -116,7 +115,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void EnterSimulationAsCoreEntity();
+  virtual void Deploy(Model* parent);
   /* ------------------- */
 
 
@@ -220,7 +219,7 @@ class InstModel : public TimeAgent, public Communicator {
   /**
      perform any registration functionality before a clone is
      decommissioned(deleted)
-     @param clone the to-be-decommissioned prototype
+     @param clone the to-be-decommissioned
    */
   virtual void RegisterCloneAsDecommissioned(Model* clone);
 

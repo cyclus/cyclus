@@ -39,7 +39,7 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
    classes, such as MarketModel, that has its own static integer
    to keep track of the next available ID.
 
-   @warning all constructors must set ID_ and increment next_id_
+   @warning all constructors must set id_ and increment next_id_
  */
 class Model {
  public:
@@ -66,13 +66,6 @@ class Model {
   static std::vector<Model*> GetModelList();
 
   /**
-     load a dynamic module
-     @param model_type the type of model
-     @param module_name the name of the module
-   */
-  static void LoadModule(std::string model_type, std::string module_name);
-
-  /**
      closes the library of each dynamically loaded module and erases
      it from the loaded modules container
    */
@@ -83,37 +76,8 @@ class Model {
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void InitializeSimulationEntity(Context* ctx, std::string model_type, QueryEngine* qe);
-
-  /**
-     uses the loaded modules to properly construct a model
-     @param model_impl the implementation to construct
-     @return the constructed model
-   */
-  static Model* ConstructModel(Context* ctx, std::string model_impl);
-
-  /**
-     uses the loaded modules to properly destruct a model
-     @param model the model to delete
-   */
-  static void DeleteModel(Model* model);
-
-  /**
-     register a model as a market
-     @param market the model to register
-   */
-  static void RegisterMarketWithSimulation(Model* market);
-
-  /**
-     register a model as a region
-     @param region the model to register
-   */
-  static void RegisterRegionWithSimulation(Model* region);
-
-  /**
-     constructs the simulation in its initial state
-   */
-  static void ConstructSimulation();
+  static void InitializeSimulationEntity(Context* ctx, std::string model_type,
+                                         QueryEngine* qe);
 
   /**
      Initialize members related to core classes
@@ -130,7 +94,7 @@ class Model {
   /**
      Constructor for the Model Class
 
-     @warning all constructors must set ID_ and increment next_id_
+     @warning all constructors must set id_ and increment next_id_
 
    */
   Model(Context* ctx);
@@ -139,6 +103,34 @@ class Model {
      Destructor for the Model Class
    */
   virtual ~Model();
+
+  /**
+     Return a newly created/allocated prototype that is an exact copy of this.
+     This method should ONLY be impelemented by the LEAVES of the model
+     inheritance hierarchy (i.e. not superclasses). It must call the
+     superclass' InitFrom method with "this" as the argument.  All
+     initialization/cloning operations must be done AFTER calling InitFrom.
+     Example:
+
+     @begincode
+     class MyModelClass : public Model {
+       ...
+
+       virtual Model* Clone() {
+         MyModelClass* m = new MyModelClass(*this);
+         m->InitFrom(this);
+
+         // put custom initialization/cloning details here
+         ...
+
+         return m;
+       };
+
+       ...
+     };
+     @endcode
+   */
+  virtual Model* Clone() = 0;
 
   /**
      get model instance name
@@ -157,8 +149,8 @@ class Model {
   /**
      get model instance SN
    */
-  const int ID() const {
-    return ID_;
+  const int id() const {
+    return id_;
   };
 
   /**
@@ -207,22 +199,24 @@ class Model {
   /**
      return the parent' id
    */
-  int ParentID() {
-    return parentID_;
+  int parent_id() {
+    return parent_id_;
   };
 
   /**
-     return the born on date of this model
+     returns the time this model began operation (-1 if the model has never been
+     deployed).
    */
-  int BornOn() {
-    return bornOn_;
+  int birthtime() {
+    return birthtime_;
   };
 
   /**
-     return the died on of this model
+     returns the time this model ceased operation (-1 if the model is still
+     operating).
    */
-  int DiedOn() {
-    return diedOn_;
+  int deathtime() {
+    return deathtime_;
   };
 
   /**
@@ -261,30 +255,13 @@ class Model {
      module-level enter simulation methods
      @param parent this model's parent
    */
-  void EnterSimulation(Model* parent);
-
-  /**
-     perform core-related tasks when entering the simulation
-   */
-  virtual void EnterSimulationAsCoreEntity();
-
-  /**
-     perform module-specific tasks when entering the simulation
-   */
-  virtual void EnterSimulationAsModule();
+  virtual void Deploy(Model* parent);
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
   virtual void SetParent(Model* parent);
-
-  /**
-     set the bornOn date of this model
-   */
-  void SetBornOn(int date) {
-    bornOn_ = date;
-  };
 
   /**
      return the ith child
@@ -323,26 +300,20 @@ class Model {
 
  protected:
   /**
+     A method that must be implemented by and only by classes in the model
+     heirarchy that have been subclassed.  This method must call the
+     superclass' InitFrom method. The InitFrom method should only initialize
+     this class' members - not inherited state.
+
+     @param m the model containing state that should be used to initialize this model.
+  */
+  virtual void InitFrom(Model* m);
+
+  /**
      a map of loaded modules. all dynamically loaded modules are
      registered with this map when loaded.
    */
-  static std::map< std::string, boost::shared_ptr<DynamicModule> >
-  loaded_modules_;
-
-  /**
-     the set of loaded dynamic libraries
-   */
-  static std::vector<void*> dynamic_libraries_;
-
-  /**
-     a set of registered markets
-   */
-  static std::set<Model*> markets_;
-
-  /**
-     a set of registered regions
-   */
-  static std::set<Model*> regions_;
+  static std::map< std::string, DynamicModule*> loaded_modules_;
 
   /**
      children of this model
@@ -355,36 +326,6 @@ class Model {
   Model* parent_;
 
  private:
-  /**
-     loads the facilities specified in a file
-
-     @param filename name of the file holding the facility specification
-     @param ns the string to append to the current namespace modifier
-     @param format format of the file (currently cyclus supports only
-   */
-  static void load_facilitycatalog(std::string filename, std::string ns,
-                                   std::string format);
-
-  /**
-     load all markets
-   */
-  static void load_markets();
-
-  /**
-     load all converters
-   */
-  static void load_converters();
-
-  /**
-     load all regions
-   */
-  static void load_regions();
-
-  /**
-     load all institutions
-   */
-  static void load_institutions();
-
   /**
      Stores the next available facility ID
    */
@@ -405,17 +346,17 @@ class Model {
      Note: we keep the parent id in the model so we can reference it
      even if the parent is deallocated.
    */
-  int parentID_;
+  int parent_id_;
 
   /**
      born on date of this model
    */
-  int bornOn_;
+  int birthtime_;
 
   /**
      died on date of this model
    */
-  int diedOn_;
+  int deathtime_;
 
   /**
      every instance of a model should have a name
@@ -435,14 +376,8 @@ class Model {
   /**
      every instance of a model will have a serialized ID
    */
-  int ID_;
+  int id_;
 
-  /**
-     wheter or not the model has been born
-   */
-  bool born_;
-
- private:
   Context* ctx_;
 
   /**

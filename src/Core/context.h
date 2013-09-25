@@ -7,7 +7,7 @@
 
 #include "composition.h"
 #include "event_manager.h"
-#include "prototype.h"
+#include "model.h"
 
 namespace cyclus {
 
@@ -32,7 +32,7 @@ class Context {
   boost::uuids::uuid sim_id();
 
   /// Adds a prototype to a simulation-wide accessible list.
-  void AddPrototype(std::string name, Prototype* p);
+  void AddPrototype(std::string name, Model* m);
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
@@ -42,11 +42,13 @@ class Context {
       throw KeyError("Invalid prototype name " + proto_name);
     }
 
-    Prototype* p = protos_[proto_name];
+    Model* m = protos_[proto_name];
     T* casted(NULL);
-    casted = dynamic_cast<T*>(p->clone());
+    Model* clone = m->Clone();
+    casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
-      throw CastError("Invalid prototype cast for prototype " + proto_name);
+      delete clone;
+      throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
   };
@@ -84,7 +86,7 @@ class Context {
   Event* NewEvent(std::string title);
 
  private:
-  std::map<std::string, Prototype*> protos_;
+  std::map<std::string, Model*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
 
   Timer* ti_;
