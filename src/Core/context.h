@@ -46,7 +46,7 @@ class Context {
     T* casted(NULL);
     casted = dynamic_cast<T*>(m->clone());
     if (casted == NULL) {
-      throw CastError("Invalid prototype cast for prototype " + proto_name);
+      throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
   };
