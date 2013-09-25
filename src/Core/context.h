@@ -44,8 +44,10 @@ class Context {
 
     Model* m = protos_[proto_name];
     T* casted(NULL);
-    casted = dynamic_cast<T*>(m->clone());
+    Model* clone = m->clone();
+    casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
+      delete clone;
       throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;

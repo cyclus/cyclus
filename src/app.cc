@@ -131,8 +131,8 @@ int main(int argc, char* argv[]) {
     XMLFileLoader loader(&ctx, inputFile);
     loader.LoadAll();
   } catch (Error e) {
-    success = false;
     CLOG(LEV_ERROR) << e.what();
+    return 1;
   }
 
   // Create the output file
@@ -142,8 +142,8 @@ int main(int argc, char* argv[]) {
       output_path = vm["output-path"].as<std::string>();
     }
   } catch (Error ge) {
-    success = false;
     CLOG(LEV_ERROR) << ge.what();
+    return 1;
   }
 
   std::string ext = fs::path(output_path).extension().generic_string();
@@ -179,23 +179,23 @@ int main(int argc, char* argv[]) {
     CLOG(LEV_ERROR) << err.what();
   }
 
-  if (success) {
-    std::cout << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
-    std::cout << "|                  Cyclus                    |" << std::endl;
-    std::cout << "|              run successful                |" << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
-    std::cout << "Output location: " << output_path << std::endl;
-    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
-    std::cout << std::endl;
-  } else {
+  if (!success) {
     std::cout << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << "|                  Cyclus                    |" << std::endl;
     std::cout << "|           run *not* successful             |" << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << std::endl;
+    return 1;
   }
 
+  std::cout << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "|                  Cyclus                    |" << std::endl;
+  std::cout << "|              run successful                |" << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "Output location: " << output_path << std::endl;
+  std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
+  std::cout << std::endl;
   return 0;
 }
