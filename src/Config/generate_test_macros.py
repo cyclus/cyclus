@@ -53,7 +53,7 @@ def write_macros_to_output(tests, executable, output=None):
                          executable + " " + "--gtest_filter=" + test + ")")
     if output is None:
         for line in lines:
-            print line
+            print(line)
     else:
         with open(output, 'a') as f:
             for line in lines:
