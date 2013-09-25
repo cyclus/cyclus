@@ -40,7 +40,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   for (int i = 0; i < numInCommod; i++) {
     commod = qe->GetElementContent("incommodity", i);
     in_commods_.push_back(commod);
-    LOG(LEV_DEBUG2, "none!") << "Facility " << ID()
+    LOG(LEV_DEBUG2, "none!") << "Facility " << id()
                              << " has just added incommodity" << commod;
   }
 
@@ -49,7 +49,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
   for (int i = 0; i < numOutCommod; i++) {
     commod = qe->GetElementContent("outcommodity", i);
     out_commods_.push_back(commod);
-    LOG(LEV_DEBUG2, "none!") << "Facility " << ID()
+    LOG(LEV_DEBUG2, "none!") << "Facility " << id()
                              << " has just added outcommodity" << commod;
   }
 }

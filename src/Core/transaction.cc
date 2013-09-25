@@ -57,8 +57,8 @@ void Transaction::ApproveTransfer() {
     this->Transaction::AddResourceToTable(pos + 1, manifest.at(pos));
   }
 
-  CLOG(LEV_INFO3) << "Material sent from " << supplier_->ID() << " to "
-                  << requester_->ID() << ".";
+  CLOG(LEV_INFO3) << "Material sent from " << supplier_->id() << " to "
+                  << requester_->id() << ".";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -147,9 +147,9 @@ void Transaction::AddTransToTable() {
   Context* ctx = supplier_->context();
   ctx->NewEvent("Transactions")
   ->AddVal("ID", trans_id_)
-  ->AddVal("SenderID", supplier_->ID())
-  ->AddVal("ReceiverID", requester_->ID())
-  ->AddVal("MarketID", market()->ID())
+  ->AddVal("SenderID", supplier_->id())
+  ->AddVal("ReceiverID", requester_->id())
+  ->AddVal("MarketID", market()->id())
   ->AddVal("Commodity", commod())
   ->AddVal("Price", price_)
   ->AddVal("Time", supplier_->context()->time())

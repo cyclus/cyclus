@@ -39,7 +39,7 @@ enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
    classes, such as MarketModel, that has its own static integer
    to keep track of the next available ID.
 
-   @warning all constructors must set ID_ and increment next_id_
+   @warning all constructors must set id_ and increment next_id_
  */
 class Model {
  public:
@@ -94,7 +94,7 @@ class Model {
   /**
      Constructor for the Model Class
 
-     @warning all constructors must set ID_ and increment next_id_
+     @warning all constructors must set id_ and increment next_id_
 
    */
   Model(Context* ctx);
@@ -149,8 +149,8 @@ class Model {
   /**
      get model instance SN
    */
-  const int ID() const {
-    return ID_;
+  const int id() const {
+    return id_;
   };
 
   /**
@@ -199,8 +199,8 @@ class Model {
   /**
      return the parent' id
    */
-  int ParentID() {
-    return parentID_;
+  int parent_id() {
+    return parent_id_;
   };
 
   /**
@@ -346,7 +346,7 @@ class Model {
      Note: we keep the parent id in the model so we can reference it
      even if the parent is deallocated.
    */
-  int parentID_;
+  int parent_id_;
 
   /**
      born on date of this model
@@ -376,7 +376,7 @@ class Model {
   /**
      every instance of a model will have a serialized ID
    */
-  int ID_;
+  int id_;
 
   Context* ctx_;
 

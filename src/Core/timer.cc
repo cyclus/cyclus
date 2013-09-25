@@ -85,7 +85,7 @@ void Timer::SendResolve() {
   for (std::vector<MarketModel*>::iterator agent = resolve_listeners_.begin();
        agent != resolve_listeners_.end();
        agent++) {
-    CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->ID()
+    CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->id()
                     << ", name=" << (*agent)->name() << " {";
     (*agent)->Resolve();
     CLOG(LEV_INFO3) << "}";
@@ -97,7 +97,7 @@ void Timer::SendTick() {
   for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
-    CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->ID()
+    CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->id()
                     << ", name=" << (*agent)->name() << " {";
     (*agent)->HandleTick(time_);
     CLOG(LEV_INFO3) << "}";
@@ -109,7 +109,7 @@ void Timer::SendTock() {
   for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
-    CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->ID()
+    CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->id()
                     << ", name=" << (*agent)->name() << " {";
     (*agent)->HandleTock(time_);
     CLOG(LEV_INFO3) << "}";
@@ -127,14 +127,14 @@ void Timer::SendDailyTasks() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RegisterTickListener(TimeAgent* agent) {
-  CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
+  CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
                   << " has registered to receive 'ticks' and 'tocks'.";
   tick_listeners_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RegisterResolveListener(MarketModel* agent) {
-  CLOG(LEV_INFO2) << "Model ID=" << agent->ID() << ", name=" << agent->name()
+  CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
                   << " has registered to receive 'resolves'.";
   resolve_listeners_.push_back(agent);
 }
