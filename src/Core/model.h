@@ -76,7 +76,8 @@ class Model {
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  static void InitializeSimulationEntity(Context* ctx, std::string model_type, QueryEngine* qe);
+  static void InitializeSimulationEntity(Context* ctx, std::string model_type,
+                                         QueryEngine* qe);
 
   /**
      Initialize members related to core classes
@@ -105,6 +106,29 @@ class Model {
 
   /**
      Return a newly created/allocated prototype that is an exact copy of this.
+     This method should ONLY be impelemented by the LEAVES of the model
+     inheritance hierarchy (i.e. not superclasses). It must call the
+     superclass' initfrom method with "this" as the argument.  All
+     initialization/cloning operations must be done AFTER calling initfrom.
+     Example:
+
+     @begincode
+     class MyModelClass : public Model {
+       ...
+
+       virtual Model* clone() {
+         MyModelClass* m = new MyModelClass(*this);
+         m->initfrom(this);
+
+         // put custom initialization/cloning details here
+         ...
+
+         return m;
+       };
+
+       ...
+     };
+     @endcode
    */
   virtual Model* clone() = 0;
 
@@ -180,14 +204,16 @@ class Model {
   };
 
   /**
-     return the born on date of this model
+     returns the time this model began operation (-1 if the model has never been
+     deployed).
    */
   int birthtime() {
     return birthtime_;
   };
 
   /**
-     return the died on of this model
+     returns the time this model ceased operation (-1 if the model is still
+     operating).
    */
   int deathtime() {
     return deathtime_;
@@ -273,6 +299,14 @@ class Model {
                            std::vector<Resource::Ptr> manifest);
 
  protected:
+  /**
+     A method that must be implemented by and only by classes in the model
+     heirarchy that have been subclassed.  This method must call the
+     superclass' initfrom method. The initfrom method should only initialize
+     this class' members - not inherited state.
+
+     @param m the model containing state that should be used to initialize this model.
+  */
   virtual void initfrom(Model* m);
 
   /**
