@@ -155,7 +155,6 @@ ENDIF()
 ADD_SUBDIRECTORY(Testing)
 SET(TestSource 
   ${TestSource} 
-#  ${CYCLUS_CORE_SRC}
   ${CYCLUS_TEST_CORE}
   )
 
@@ -193,13 +192,22 @@ ADD_EXECUTABLE( CyclusUnitTestDriver
 )
 TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)
 
-# # Here we add all the tests
-# add_google_tests( ${EXECUTABLE_OUTPUT_PATH}/bin/CyclusUnitTestDriver 
-#   ${TestSource}) 
-
 INSTALL(TARGETS CyclusUnitTestDriver
   RUNTIME DESTINATION bin
   COMPONENT testing
+  )
+
+# read tests after building the driver, and add them to ctest
+set( tgt "CyclusUnitTestDriver")
+set( script "${CYCLUS_SRC_DIR}/Config/generate_test_macros.py")
+set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}")
+set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake")
+add_custom_command(TARGET ${tgt}
+  POST_BUILD
+  COMMAND python ${script} ${exec} ${out}
+  COMMENT "adding tests from ${tgt}"
+  DEPENDS
+  VERBATIM
   )
 
 SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
@@ -224,7 +232,6 @@ CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Core/Config/CyclusCPackOptions.cmake.in"
   "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake" @ONLY)
 SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Core/Config/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
-
 
 INCLUDE(CPack)
 
@@ -251,16 +258,4 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-set( tgt "CyclusUnitTestDriver")
-set( cmd "python ${CYCLUS_SRC_DIR}/Testing/generate_tests.py --executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt} --output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake" )
-set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}")
-set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake")
-add_custom_command(TARGET ${tgt}
-  POST_BUILD
-  COMMAND python ${CYCLUS_SRC_DIR}/Testing/generate_tests.py ${exec} ${out}
-  COMMENT "adding tests from ${tgt}"
-  DEPENDS
-  VERBATIM
-  )
   
