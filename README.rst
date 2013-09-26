@@ -26,12 +26,7 @@ Package                Minimum Version
 `libxml++`             2.6
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
-A C++ compiler
-libbz2                 1.0.6
-coinor-libcoinutils    2.6.4
-coinor-libclp          1.12
-coinor-libcbc          2.5
-coinor-libcgl          0.55
+Coin-Cbc               2.5
 ====================   ==================
 
 In addition, there is an optional dependency:
@@ -74,11 +69,7 @@ list of required package names are:
   #. libxml++2.6-dev
   #. libsqlite3-dev
   #. libhdf5-serial-dev
-  #. g++
   #. libbz2-dev
-  #. coinor-libcoinutils-dev
-  #. coinor-libosi-dev
-  #. coinor-libclp-dev
   #. coinor-libcbc-dev
   #. coinor-libcgl-dev
 
