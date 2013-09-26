@@ -35,7 +35,8 @@ def parse_tests(test_lines):
             current_test = line
         else:        
             assert current_test is not None
-            tests.append(current_test + line) 
+            if str(line).lower().find("disabled") == -1:
+                tests.append(current_test + line) 
     return tests
 
 def write_macros_to_output(tests, executable, output=None):
