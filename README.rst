@@ -27,29 +27,16 @@ Package                Minimum Version
 `python`               2.6
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
+Coin-Cbc               2.5
 ====================   ==================
-
-In case you have skipped the installation instructions of deprecated Cyclopts,
-you need to install the following dependencies for Cyclus:
-
-====================  
-Package                 
-====================   
-`A C++ compiler`
-`libbz2`                
-`coinor-libcoinutils`
-`coinor-libclp`
-`coinor-libcbc`
-`coinor-libcgl`
-====================  
 
 In addition, there is an optional dependency:
 
-====================  
-Package                 
-==================== 
-`doxygen`
-====================
+====================   ==================
+Package                Minimum Version   
+====================   ==================
+doxygen                1.7.6.1
+====================   ==================
 
 As with all software, the build/install can be broken into two steps:
 
@@ -83,11 +70,7 @@ list of required package names are:
   #. libxml++2.6-dev
   #. libsqlite3-dev
   #. libhdf5-serial-dev
-  #. g++
   #. libbz2-dev
-  #. coinor-libcoinutils-dev
-  #. coinor-libosi-dev
-  #. coinor-libclp-dev
   #. coinor-libcbc-dev
   #. coinor-libcgl-dev
 
