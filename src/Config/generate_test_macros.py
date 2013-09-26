@@ -30,7 +30,7 @@ def parse_tests(test_lines):
     tests = []
     current_test = None
     for test_line in test_lines:
-        line = test_line.strip()
+        line = test_line.decode().strip()
         if line[-1] == ".":
             current_test = line
         else:        
@@ -62,14 +62,15 @@ def write_macros_to_output(tests, executable, output=None):
                 f.write(line + '\n')
 
 def main():
-    description = "A simple program to print a list of all full test names " +\
-    "in a google-test-based executable." 
+    description = "A simple script to add CTest ADD_TEST macros to a "+\
+        "file for every test in a google-test executable." 
     parser = ap.ArgumentParser(description=description)
 
     executable = 'the path to the test exectuable to call'
     parser.add_argument('--executable', help=executable, required=True)
 
-    output = 'the cmake script to write test addition to'
+    output = "the file to write the ADD_TEST macros to "+\
+        "(nominally CTestTestfile.cmake)"
     parser.add_argument('--output', help=output, required=True)
 
     args = parser.parse_args()
