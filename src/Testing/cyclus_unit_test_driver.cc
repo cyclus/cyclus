@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stdio.h>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +14,11 @@ int main(int argc, char* argv[]) {
   std::string path = Env::PathBase(argv[0]);
   Env::SetCyclusRelPath(path);
   Logger::ReportLevel() = cyclus::LEV_ERROR;
-  
+
+  std::string module_path = Env::ModuleEnvVarName() + "=" +
+                            Env::GetBuildPath();
+  putenv(const_cast<char *>(module_path.c_str()));
+    
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];
     if ( arg == "--help" ) {
