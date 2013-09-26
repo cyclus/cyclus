@@ -5,6 +5,7 @@
 
 #include <map>
 
+#include "context.h"
 #include "communicator.h"
 #include "error.h"
 #include "logger.h"
@@ -58,11 +59,11 @@ Message::~Message() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Message::Ptr Message::clone() {
+Message::Ptr Message::Clone() {
   CLOG(LEV_DEBUG3) << "Message " << this << "was cloned.";
 
   Message::Ptr new_msg(new Message(*this));
-  new_msg->trans_ = trans_->clone();
+  new_msg->trans_ = trans_->Clone();
   return new_msg;
 }
 

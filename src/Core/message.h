@@ -143,7 +143,7 @@ class Message: IntrusiveBase<Message> {
 
      @return a newly allocated copy of this message object
    */
-  Ptr clone();
+  Ptr Clone();
 
   /**
      Send this message to the next communicator in it's path

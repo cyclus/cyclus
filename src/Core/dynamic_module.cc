@@ -2,6 +2,7 @@
 
 #include "dynamic_module.h"
 
+#include "context.h"
 #include "env.h"
 #include "suffix.h"
 #include "model.h"
@@ -21,35 +22,23 @@ const std::string DynamicModule::Suffix() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string type, std::string name) :
   type_(type), module_name_(name),
-  constructor_name_("Construct" + name), destructor_name_("Destruct" + name),
-  abs_path_(""), module_library_(0), constructor_(0), destructor_(0) { }
+  constructor_name_("Construct" + name),
+  module_library_(0), constructor_(0) {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::Initialize() {
-  SetPath();
-  OpenLibrary();
-  SetConstructor();
-  SetDestructor();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::SetPath() {
   std::string lib_name = "lib" + module_name_ + Suffix();
   fs::path p;
   if (!Env::FindModuleLib(lib_name, p)) {
     throw IOError("Could not find library: " + lib_name);
   }
   abs_path_ = p.string();
+
+  OpenLibrary();
+  SetConstructor();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* DynamicModule::ConstructInstance(Context* ctx) {
   return constructor_(ctx);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void DynamicModule::DestructInstance(Model* model) {
-  destructor_(model);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,9 +48,6 @@ std::string DynamicModule::name() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string DynamicModule::path() {
-  if (abs_path_.length() == 0) {
-    SetPath();
-  }
   return abs_path_;
 }
 } // namespace cyclus

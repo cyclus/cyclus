@@ -20,28 +20,17 @@
 #include "hdf5_back.h"
 #include "csv_back.h"
 #include "context.h"
+#include "version.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
+
+using namespace cyclus;
 
 //-----------------------------------------------------------------------
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  using cyclus::Logger;
-  using cyclus::Env;
-  using cyclus::Model;
-  using cyclus::Timer;
-  using cyclus::Logger;
-  using cyclus::LogLevel;
-  using cyclus::LEV_ERROR;
-  using cyclus::EventManager;
-  using cyclus::EventBackend;
-  using cyclus::Hdf5Back;
-  using cyclus::SqliteBack;
-  using cyclus::CsvBack;
-  using cyclus::XMLFileLoader;
-  using cyclus::Context;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
@@ -52,6 +41,7 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
+    ("version", "print cyclus core and dependency versions and quit")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
     ("verb,v", po::value<std::string>(), vmessage.c_str())
@@ -88,6 +78,16 @@ int main(int argc, char* argv[]) {
     err_msg += "Usage:   cyclus [path/to/input/filename]\n";
     std::cout << err_msg << std::endl;
     std::cout << desc << "\n";
+    return 0;
+  }
+
+  if (vm.count("version")) {
+    std::cout << "Cyclus Core " << version::core() << "\n\nDependencies:\n";
+    std::cout << "   Boost    " << version::boost() << "\n";
+    std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
+    std::cout << "   Hdf5     " << version::hdf5() << "\n";
+    std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
+    std::cout << "   xml2     " << version::xml2() << "\n";
     return 0;
   }
 
@@ -130,9 +130,9 @@ int main(int argc, char* argv[]) {
     std::string inputFile = vm["input-file"].as<std::string>();
     XMLFileLoader loader(&ctx, inputFile);
     loader.LoadAll();
-  } catch (cyclus::Error e) {
-    success = false;
+  } catch (Error e) {
     CLOG(LEV_ERROR) << e.what();
+    return 1;
   }
 
   // Create the output file
@@ -141,9 +141,9 @@ int main(int argc, char* argv[]) {
     if (vm.count("output-path")){
       output_path = vm["output-path"].as<std::string>();
     }
-  } catch (cyclus::Error ge) {
-    success = false;
+  } catch (Error ge) {
     CLOG(LEV_ERROR) << ge.what();
+    return 1;
   }
 
   std::string ext = fs::path(output_path).extension().generic_string();
@@ -157,16 +157,13 @@ int main(int argc, char* argv[]) {
   }
   em.RegisterBackend(back);
 
-  // sim construction - should be handled by some entity
-  Model::ConstructSimulation();
-
   // print the model list
   Model::PrintModelList();
 
   // Run the simulation 
   try {
     ti.RunSim();
-  } catch (cyclus::Error err) {
+  } catch (Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
@@ -177,28 +174,28 @@ int main(int argc, char* argv[]) {
   // Close Dynamically loaded modules 
   try {
     Model::UnloadModules();
-  } catch (cyclus::Error err) {
+  } catch (Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
   }
 
-  if (success) {
-    std::cout << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
-    std::cout << "|                  Cyclus                    |" << std::endl;
-    std::cout << "|              run successful                |" << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
-    std::cout << "Output location: " << output_path << std::endl;
-    std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
-    std::cout << std::endl;
-  } else {
+  if (!success) {
     std::cout << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << "|                  Cyclus                    |" << std::endl;
     std::cout << "|           run *not* successful             |" << std::endl;
     std::cout << "|--------------------------------------------|" << std::endl;
     std::cout << std::endl;
+    return 1;
   }
 
+  std::cout << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "|                  Cyclus                    |" << std::endl;
+  std::cout << "|              run successful                |" << std::endl;
+  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "Output location: " << output_path << std::endl;
+  std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
+  std::cout << std::endl;
   return 0;
 }

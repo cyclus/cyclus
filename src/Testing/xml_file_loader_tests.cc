@@ -167,8 +167,7 @@ TEST_F(XMLFileLoaderTests, recipes) {
 // constructor class..
 TEST_F(XMLFileLoaderTests, modulesandsim) {
   XMLFileLoader file(ctx_, moduleFile, false);
-  file.LoadDynamicModules();
-  EXPECT_NO_THROW(cyclus::Model::ConstructSimulation());
+  EXPECT_NO_THROW(file.LoadDynamicModules());
 }
 
 TEST_F(XMLFileLoaderTests, schema) {

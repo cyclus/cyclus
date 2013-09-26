@@ -87,7 +87,7 @@ class MarketModel : public Model, public Communicator {
   /**
      enters the market into the simulation
    */
-  virtual void EnterSimulationAsCoreEntity();
+  virtual void Deploy(Model* parent);
 
   /**
      every model needs a method to initialize from a QueryEngine

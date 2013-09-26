@@ -325,7 +325,7 @@ TEST_F(MessagePublicInterfaceTest, Cloning) {
   using cyclus::Message;
   using cyclus::Resource;
   msg1->trans().SetResource(resource);
-  Message::Ptr msg2 = msg1->clone();
+  Message::Ptr msg2 = msg1->Clone();
 
   // check proper cloning of message members
   EXPECT_EQ(msg1->sender(), msg2->sender());

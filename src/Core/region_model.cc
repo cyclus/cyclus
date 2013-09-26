@@ -11,7 +11,6 @@
 #include "error.h"
 #include "timer.h"
 #include "logger.h"
-#include "prototype.h"
 #include "query_engine.h"
 
 namespace cyclus {
@@ -50,7 +49,8 @@ void RegionModel::InitInstitutionNames(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::EnterSimulationAsCoreEntity() {
+void RegionModel::Deploy(Model* parent) {
+  Model::Deploy(parent);
   AddRegionAsRootNode();
   AddChildrenToTree();
 }
@@ -66,7 +66,7 @@ void RegionModel::AddChildrenToTree() {
   std::set<std::string>::iterator it;
   for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
     inst = Model::GetModelByName((*it));
-    inst->EnterSimulation(this);
+    inst->Deploy(this);
   }
 }
 
