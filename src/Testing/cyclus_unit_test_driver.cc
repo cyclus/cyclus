@@ -15,9 +15,14 @@ int main(int argc, char* argv[]) {
   Env::SetCyclusRelPath(path);
   Logger::ReportLevel() = cyclus::LEV_ERROR;
 
-  std::string module_path = Env::ModuleEnvVarName() + "=" +
-                            Env::GetBuildPath();
-  putenv(const_cast<char *>(module_path.c_str()));
+  // add the build path to the environment for testing
+  std::string test_env = Env::ModuleEnvVarName() + "=" + Env::GetBuildPath();
+  std::string curr_var = Env::ModuleEnvVar();
+  std::string new_var = "";
+  if (curr_var != "") {
+    test_env += ":" + curr_var;
+  }
+  putenv(const_cast<char *>(test_env.c_str()));
     
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];
