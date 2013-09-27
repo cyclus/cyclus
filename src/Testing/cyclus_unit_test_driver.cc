@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
   // add the build path to the environment for testing
   std::string test_env = Env::ModuleEnvVarName() + "=" + Env::GetBuildPath();
   std::string curr_var = Env::ModuleEnvVar();
-  std::string new_var = "";
   if (curr_var != "") {
     test_env += ":" + curr_var;
   }
