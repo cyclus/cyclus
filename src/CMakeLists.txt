@@ -54,7 +54,7 @@ SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   ${CYCLUS_SRC_DIR}/Core
   ${CYCLUS_SRC_DIR}/Core/Config
   ${CYCLUS_SRC_DIR}/Core/Resources
-  ${CYCLUS_SRC_DIR}/Core/Models
+  ${CYCLUS_SRC_DIR}/tests/Models
   )
 
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
@@ -119,7 +119,7 @@ MESSAGE("libs: ${LIBS}")
 
 # Build the cyclus executable from the CYCLUS_SRC source files
 SET( CYCLUS_SRC
-  app.cc
+  cli/cyclus.cc
   )
 ADD_EXECUTABLE( cyclus ${CYCLUS_SRC} )
 TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
@@ -136,7 +136,7 @@ SET( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
 SET( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # The gtest include file directories.
-SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/Testing/GoogleTest")
+SET(GTEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/tests/GoogleTest")
 
 # The gtest library directories.
 SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/lib")
@@ -152,7 +152,7 @@ IF( USE_TESTING )
   INCLUDE(CTest)
 ENDIF()
 
-ADD_SUBDIRECTORY(Testing)
+ADD_SUBDIRECTORY(tests)
 SET(TestSource 
   ${TestSource} 
   ${CYCLUS_TEST_CORE}
@@ -165,9 +165,9 @@ ENDIF()
 
 # Build libgtest
 SET( GTest
-  Testing/GoogleTest/gtest/gtest-all.cc
+  tests/GoogleTest/gtest/gtest-all.cc
 )
-INCLUDE_DIRECTORIES( Testing )
+INCLUDE_DIRECTORIES( tests )
 
 ADD_LIBRARY(gtest ${GTest})
 
@@ -187,7 +187,7 @@ INSTALL(TARGETS gtest
 
 # Build CyclusUnitTestDriver
 ADD_EXECUTABLE( CyclusUnitTestDriver
-  Testing/cyclus_unit_test_driver.cc ${TestSource}
+  tests/cyclus_unit_test_driver.cc ${TestSource}
   ${GENERATED_TEST_SOURCE}
 )
 TARGET_LINK_LIBRARIES( CyclusUnitTestDriver dl ${LIBS} cycluscore gtest)

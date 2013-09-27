@@ -10,7 +10,7 @@ macro(cyclus_init  _path _dir _name)
   SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_dir} )
   
   CONFIGURE_FILE(
-    ${CYCLUS_SOURCE_DIR}/Core${_path}/${_name}.rng
+    ${CYCLUS_SOURCE_DIR}/tests${_path}/${_name}.rng
     ${PROJECT_BINARY_DIR}/lib${_path}/${_name}.rng
     COPYONLY
     )
