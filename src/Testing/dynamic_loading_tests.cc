@@ -49,7 +49,6 @@ TEST(DynamicLoadingTests, cloneTestFacility) {
   cyclus::EventManager em;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &em);
-  std::cout << "env var" << cyclus::Env::ModuleEnvVar() << std::endl;
   cyclus::DynamicModule* module = new DynamicModule("Facility", "TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);
