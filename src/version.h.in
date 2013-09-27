@@ -7,7 +7,7 @@
 #include "sqlite3.h"
 #include "hdf5.h"
 #include "libxml/xmlversion.h"
-#include "coin/CbcConfig.h"
+#include "CbcConfig.h"
 
 
 namespace cyclus {
