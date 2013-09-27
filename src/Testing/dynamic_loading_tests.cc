@@ -40,6 +40,8 @@ TEST(DynamicLoadingTests, ConstructTestFacility) {
                   Model* fac = module->ConstructInstance(&ctx);
                   delete fac;
                   );
+  module->CloseLibrary();
+  delete module;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,4 +56,6 @@ TEST(DynamicLoadingTests, cloneTestFacility) {
                   delete clone;
                   delete fac;
                   );
+  module->CloseLibrary();
+  delete module;
 }
