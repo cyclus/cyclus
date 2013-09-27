@@ -52,7 +52,6 @@ INCLUDE(CyclusModuleMacros)
 # Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
   ${CYCLUS_SRC_DIR}
-  ${CYCLUS_SRC_DIR}/Config
   ${CYCLUS_SRC_DIR}/tests/Models
   )
 
@@ -195,7 +194,7 @@ INSTALL(TARGETS CyclusUnitTestDriver
 
 # read tests after building the driver, and add them to ctest
 set( tgt "CyclusUnitTestDriver")
-set( script "${CYCLUS_SRC_DIR}/Config/generate_test_macros.py")
+set( script "${CYCLUS_SRC_DIR}/tests/generate_test_macros.py")
 set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}")
 set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake")
 add_custom_command(TARGET ${tgt}
@@ -214,8 +213,8 @@ SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator f
 SET(CPACK_GENERATOR "DEB")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
 SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Config/README.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Config/LICENSE.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../README.rst")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.rst")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "2")
 #SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
@@ -224,9 +223,9 @@ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
 set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/Config/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/Config/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/Config/CyclusCPackOptions.cmake")
+CONFIGURE_FILE("${CYCLUS_SOURCE_DIR}/CMake/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 INCLUDE(CPack)
@@ -247,7 +246,7 @@ ENDIF (DOXYGEN_FOUND)
 
 # uninstall target
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/Config/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
     )
@@ -263,7 +262,6 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/Config
   )
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
@@ -284,7 +282,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cpp 
+  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
@@ -382,11 +380,35 @@ INSTALL(FILES
   stub_comm_model.h
   stub_model.h
   stub_time_agent.h
+  suffix.h
   time_agent.h
   transaction.h
+  unix_helper_functions.h
+  version.h
+  windows_helper_functions.h
   DESTINATION include/cyclus
   COMPONENT core
   )
+
+############################################################
+############# special configuration ########################
+############################################################
+
+IF (WIN32)
+  set(suffix ".dll")
+  set(dynamicloadlib "windows_helper_functions.h")
+ELSEIF(APPLE)
+  set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup" PARENT_SCOPE)
+  set(suffix ".dylib")
+  set(dynamicloadlib "unix_helper_functions.h")
+ELSE()
+  set(suffix ".so")
+  set(dynamicloadlib "unix_helper_functions.h")
+ENDIF()
+CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
+
+EXECUTE_PROCESS(COMMAND git describe OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+CONFIGURE_FILE(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h @ONLY)
 
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
@@ -394,34 +416,33 @@ CONFIGURE_FILE(
   COPYONLY
   )
 
-INSTALL(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
-  DESTINATION share
-  COMPONENT core
-  )
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
   ${CYCLUS_BINARY_DIR}/share/decayInfo.dat
   COPYONLY
   )
+
+SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX})
+SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc
+  @ONLY
+  )
+
 INSTALL(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
+    ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
     ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
   DESTINATION share
   COMPONENT core
   )
 
-SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX})
-SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
-
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cpp.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cpp
-  @ONLY
-  )
+############################################################
+############# end special configuration ####################
+############################################################
 
 ADD_SUBDIRECTORY(cyclopts)
-ADD_SUBDIRECTORY(Config)
 ADD_LIBRARY(cycluscore ${CYCLUS_CORE_SRC})
 
 SET_TARGET_PROPERTIES( cycluscore 
