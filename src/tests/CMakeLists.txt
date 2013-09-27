@@ -3,6 +3,13 @@ message("GENERATED TESTS DIR ${CMAKE_CURRENT_BINARY_DIR}")
 message("GENERATED TESTS ${GENERATED_FILTER_LIST}")
 
 ADD_SUBDIRECTORY(cyclopts)
+ADD_SUBDIRECTORY(Models)
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Models
+  )
+
+SET( TestSource ${TestSource} PARENT_SCOPE )
 
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
