@@ -7,8 +7,12 @@
 #include "sqlite3.h"
 #include "hdf5.h"
 #include "libxml/xmlversion.h"
-#include "coin/CbcConfig.h"
+#include "CbcConfig.h"
 
+// required for coin-cbc v < 2.5
+#ifndef CBC_VERSION
+  #define CBC_VERSION CBCVERSION
+#endif
 
 namespace cyclus {
 namespace version {
