@@ -333,9 +333,11 @@ INSTALL(FILES
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
+  comp_math.h
   csv_back.h
   cyc_arithmetic.h
   cyc_limits.h
+  cyclus.h
   decayer.h
   enrichment.h
   env.h

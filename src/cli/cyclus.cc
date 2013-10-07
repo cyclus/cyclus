@@ -9,18 +9,7 @@
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
 
-#include "model.h"
-#include "timer.h"
-#include "error.h"
-#include "env.h"
-#include "logger.h"
-#include "xml_file_loader.h"
-#include "event_manager.h"
-#include "sqlite_back.h"
-#include "hdf5_back.h"
-#include "csv_back.h"
-#include "context.h"
-#include "version.h"
+#include "cyclus.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
