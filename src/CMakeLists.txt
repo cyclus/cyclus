@@ -169,6 +169,7 @@ INSTALL(FILES
   unix_helper_functions.h
   version.h
   windows_helper_functions.h
+  request.h
   DESTINATION include/cyclus
   COMPONENT core
   )
