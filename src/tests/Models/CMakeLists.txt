@@ -1,5 +1,7 @@
 
 add_all_subdirs()
 
-SET( TestSource ${ModelTestSource} PARENT_SCOPE )
+SET( TestSource ${TestSource}
+  ${ModelTestSource} 
+  PARENT_SCOPE )
 

@@ -136,6 +136,10 @@ INSTALL(TARGETS cyclus
   COMPONENT cyclus
   )
 
+# add stub directory; this positioning is required because the stubs have tests
+# defined, and thus must be incorporated before the test target is made
+ADD_SUBDIRECTORY(stubs)
+
 # ------------------------- Google Test -----------------------------------
 
 # Be sure to clear these each time
