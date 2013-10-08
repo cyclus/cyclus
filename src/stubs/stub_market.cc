@@ -1,78 +1,47 @@
-// StubMarket.cpp
-// Implements the StubMarket class
+#include "stub_market.h"
 
-#include "StubMarket.h"
-
-#include "Logger.h"
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
+using stubs::StubMarket;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubMarket::StubMarket() {};
+StubMarket::StubMarket(cyclus::Context* ctx)
+    : cyclus::MarketModel(ctx)
+    {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubMarket::~StubMarket() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::initModuleMembers(QueryEngine* qe) { 
-  QueryEngine* input = qe->queryElement("input");
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubMarket::InitModuleMembers(cyclus::QueryEngine* qe) {
   //retrieve input data members here. For example :  
-  //string query = "commodity";
-  //commodity_ = lexical_cast<double>(input->getElementContent(query));
-};
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::cloneModuleMembersFrom(MarketModel* src) { 
-  StubMarket* src_stub = dynamic_cast<StubMarket*>(src);
-  //copy data members here. For example : 
-  //commodity_ = src_stub->commodity();
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubMarket::str() { 
-  return MarketModel::str(); 
-};
-
-/* -------------------- */
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::receiveMessage(msg_ptr msg) {};
-
-/* -------------------- */
-
-
-/* --------------------
- * all MARKETMODEL classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubMarket::resolve() {};
-
-/* -------------------- */
-
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" Model* constructStubMarket() {
-  return new StubMarket();
+  //string query = "incommodity";
+  //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
 
-extern "C" void destructStubMarket(Model* model) {
-  delete model;
-}
-/* -------------------- */
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Model* StubMarket::Clone() {
+  StubMarket* m = new StubMarket(*this);
 
+  // required to copy parent class members
+  m->InitFrom(this);
+
+  // clone specific members for your module, e.g.
+  // m->SetSomeMember(someMember());
+
+  return m;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string StubMarket::str() {
+  return MarketModel::str();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubMarket::Resolve() {};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubMarket::ReceiveMessage(cyclus::Message::Ptr msg) {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+extern "C" cyclus::Model* ConstructStubMarket(cyclus::Context* ctx) {
+  return new StubMarket(ctx);
+}

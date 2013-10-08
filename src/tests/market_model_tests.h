@@ -1,10 +1,8 @@
 // Marketmodel_tests.h
 #include <gtest/gtest.h>
 
+#include "context.h"
 #include "market_model.h"
-#include "suffix.h"
-#include "test_inst.h"
-#include "test_market.h"
 #include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST

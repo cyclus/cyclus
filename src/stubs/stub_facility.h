@@ -1,4 +1,3 @@
-// StubFacility.h
 #ifndef STUB_FACILITY_H_
 #define STUB_FACILITY_H_
 

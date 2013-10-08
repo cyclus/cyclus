@@ -1,4 +1,3 @@
-// StubRegionTests.cpp
 #include <gtest/gtest.h>
 
 #include "stub_region.h"

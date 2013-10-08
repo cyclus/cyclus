@@ -1,4 +1,3 @@
-// StubRegion.h
 #ifndef STUB_REGION_H_
 #define STUB_REGION_H_
 

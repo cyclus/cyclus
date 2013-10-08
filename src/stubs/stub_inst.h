@@ -1,4 +1,3 @@
-// StubInst.h
 #ifndef STUB_INST_H_
 #define STUB_INST_H_
 

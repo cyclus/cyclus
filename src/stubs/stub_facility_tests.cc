@@ -1,4 +1,3 @@
-// StubFacilityTests.cpp
 #include <gtest/gtest.h>
 
 #include "stub_facility.h"

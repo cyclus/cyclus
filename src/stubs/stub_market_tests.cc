@@ -1,86 +1,64 @@
-// StubMarketTests.cpp
 #include <gtest/gtest.h>
 
-#include "StubMarket.h"
-#include "CycException.h"
-#include "Message.h"
-#include "MarketModelTests.h"
-#include "ModelTests.h"
+#include "stub_market.h"
 
-#include <string>
-#include <queue>
+#include "market_model_tests.h"
+#include "model_tests.h"
 
-using namespace std;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class FakeStubMarket : public StubMarket {
-  public:
-    FakeStubMarket() : StubMarket() {
-    }
-
-    virtual ~FakeStubMarket() {
-    }
-};
+using stubs::StubMarket;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubMarketTest : public ::testing::Test {
   protected:
-    FakeStubMarket* src_market;
-    FakeStubMarket* new_market; 
+    cyclus::TestContext tc_;
+    StubMarket* src_market_;
 
     virtual void SetUp(){
-      src_market = new FakeStubMarket();
-      new_market = new FakeStubMarket();
+      src_market_ = new StubMarket(tc_.get());
     };
 
     virtual void TearDown() {
-      delete src_market;
-      delete new_market;
+      delete src_market_;
     }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* StubMarketModelConstructor(){
-  return dynamic_cast<Model*>(new FakeStubMarket());
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(StubMarketTest, clone) {
+  StubMarket* cloned_fac =
+      dynamic_cast<StubMarket*> (src_market_->Clone());
+  delete cloned_fac;
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-MarketModel* StubMarketConstructor(){
-  return dynamic_cast<MarketModel*>(new FakeStubMarket());
-}
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, InitialState) {
-  EXPECT_TRUE(true);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubMarketTest, CopyMarket) {
-  new_market->cloneModuleMembersFrom(src_market); 
-  EXPECT_TRUE(true);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubMarketTest, CopyFreshModel) {
-  new_market->cloneModuleMembersFrom(src_market); // deep copy
-  EXPECT_NO_THROW(dynamic_cast<StubMarket*>(new_market)); // still a source market
-  EXPECT_NO_THROW(dynamic_cast<FakeStubMarket*>(new_market)); // still a fake source market
+  // Test things about the initial state of the market here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, Print) {
-  EXPECT_NO_THROW(std::string s = src_market->str());
+  EXPECT_NO_THROW(std::string s = src_market_->str());
+  // Test StubMarket specific aspects of the print method here
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubMarketTest, ReceiveMessage) {
-  msg_ptr msg;
-  EXPECT_NO_THROW(src_market->receiveMessage(msg));
+  // Test StubMarket specific behaviors of the receiveMessage function here
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Model* StubMarketModelConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Model*>(new StubMarket(ctx));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::MarketModel* StubMarketConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::MarketModel*>(new StubMarket(ctx));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-INSTANTIATE_TEST_CASE_P(StubMarket, MarketModelTests, Values(&StubMarketConstructor));
-INSTANTIATE_TEST_CASE_P(StubMarket, ModelTests, Values(&StubMarketModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubMarket, MarketModelTests,
+                        ::testing::Values(&StubMarketConstructor));
+INSTANTIATE_TEST_CASE_P(StubMarket, ModelTests,
+                        ::testing::Values(&StubMarketModelConstructor));
 

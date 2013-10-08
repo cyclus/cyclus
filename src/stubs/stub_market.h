@@ -1,10 +1,14 @@
-// StubMarket.h
-#ifndef _STUBMARKET_H
-#define _STUBMARKET_H
+#ifndef STUB_MARKET_H_
+#define STUB_MARKET_H_
 
-#include "Logger.h"
-#include "MarketModel.h"
-#include "QueryEngine.h"
+#include <string>
+
+#include "context.h"
+#include "market_model.h"
+#include "message.h"
+#include "query_engine.h"
+
+namespace stubs {
 
 /**
    @class StubMarket 
@@ -31,16 +35,17 @@
    describing the behavior at the tick and tock as well as the behavior 
    upon sending and receiving materials and messages. 
  */
-class StubMarket : public MarketModel {
+class StubMarket : public cyclus::MarketModel {
 /* --------------------
- * all MODEL classes have these public members
+ * all MARKETMODEL classes have these members
  * --------------------
  */
  public:
   /**
-     Default constructor for StubMarket Class 
+     Constructor for StubMarket Class 
+     @param ctx the cyclus context for access to simulation-wide parameters
    */
-  StubMarket();
+  StubMarket(cyclus::Context* ctx);
 
   /**
      every model should be destructable 
@@ -48,52 +53,34 @@ class StubMarket : public MarketModel {
   virtual ~StubMarket();
     
   /**
-     Initializes module data members from the data contained in QueryEngine object
-      
-     @param qe is a pointer to a QueryEngine object containing initialization data
+     Initialize members related to derived module class
+
+     @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void initModuleMembers(QueryEngine* qe);
+  virtual void InitModuleMembers(cyclus::QueryEngine* qe);
   
   /**
-     Initializes data members by cloning those of the source MarketModel
-      
-     @param src is the MarketModel to copy 
-   */
-  virtual void cloneModuleMembersFrom(MarketModel* src);
-
-  /**
-     every model should be able to print a verbose description 
+     A verbose printer for the StubMarket
    */
    virtual std::string str();
 
-/* ------------------- */ 
+  /**
+     Initializes a StubMarket object by copying the members of another.
+   */
+   virtual cyclus::Model* Clone();
 
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
- public:
    /**
-      The StubMarket should ignore incoming messages 
-    */
-   virtual void receiveMessage(msg_ptr msg);
-   
-/* -------------------- */
+     The StubMarket should ignore incoming messages 
+   */
+   virtual void ReceiveMessage(cyclus::Message::Ptr msg);
 
-
-/* --------------------
- * all MARKETMODEL classes have these members
- * --------------------
- */
- public:
    /**
       Primary funcation of a Market is to resolve the set of 
       requests with the set of offers. 
        
       In this stub - do nothing! 
     */
-   virtual void resolve();
+   virtual void Resolve();
 
 /* -------------------- */
 
@@ -107,4 +94,6 @@ class StubMarket : public MarketModel {
 
 };
 
-#endif
+} // namespace stubs
+  
+#endif // STUB_MARKET_H_

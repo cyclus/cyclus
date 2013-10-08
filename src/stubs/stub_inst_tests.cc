@@ -1,4 +1,3 @@
-// StubInstTests.cpp
 #include <gtest/gtest.h>
 
 #include <string>

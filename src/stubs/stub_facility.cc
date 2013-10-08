@@ -1,6 +1,3 @@
-// StubFacility.cpp
-// Implements the StubFacility class
-
 #include "stub_facility.h"
 
 using stubs::StubFacility;

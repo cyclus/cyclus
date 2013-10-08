@@ -1,6 +1,3 @@
-// StubRegion.cpp
-// Implements the StubStubRegion class
-
 #include "stub_region.h"
 
 using stubs::StubRegion;

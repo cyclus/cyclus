@@ -1,6 +1,3 @@
-// StubInst.cpp
-// Implements the StubInst class
-
 #include "stub_inst.h"
 
 using stubs::StubInst;
