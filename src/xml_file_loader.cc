@@ -124,7 +124,6 @@ void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::initialize_module_paths() {
   module_paths_["Market"] = "/*/market";
-  module_paths_["Converter"] = "/*/converter";
   module_paths_["Region"] = "/*/region";
   module_paths_["Inst"] = "/*/region/institution";
   module_paths_["Facility"] = "/*/facility";

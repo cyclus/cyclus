@@ -305,7 +305,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/converter_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
@@ -371,7 +370,6 @@ INSTALL(FILES
   resource.h
   resource_buff.h
   communicator.h
-  converter_model.h
   dynamic_module.h
   facility_model.h
   inst_model.h
