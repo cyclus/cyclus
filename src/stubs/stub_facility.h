@@ -1,11 +1,13 @@
 // StubFacility.h
-#ifndef _STUBFACILITY_H
-#define _STUBFACILITY_H
+#ifndef STUB_FACILITY_H_
+#define STUB_FACILITY_H_
 
 #include "context.h"
 #include "facility_model.h"
 #include "logger.h"
 #include "query_engine.h"
+
+namespace stub {
 
 /**
    @class StubFacility 
@@ -112,5 +114,7 @@ class StubFacility : public cyclus::FacilityModel  {
 
 };
 
-#endif
+} // namespace stub
+  
+#endif // STUB_FACILITY_H_
 

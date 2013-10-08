@@ -5,21 +5,12 @@
 #include "event_manager.h"
 #include "inst_model.h"
 #include "region_model.h"
+#include "mock_region.h"
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ConcreteRegionModel : public cyclus::RegionModel {
- public:
-  ConcreteRegionModel(cyclus::Context* ctx) : cyclus::RegionModel(ctx) { };
-
-  virtual ~ConcreteRegionModel() { };
-
-  virtual cyclus::Model* Clone() {
-    return new ConcreteRegionModel(context());
-  }
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::InstModel {
@@ -92,7 +83,7 @@ class RegionModelClassTests : public ::testing::Test {
       child4_ = new DieInst(ctx_);
       child5_ = new DieInst(ctx_);
 
-      reg_ = new ConcreteRegionModel(ctx_);
+      reg_ = new MockRegion(ctx_);
       child1_->Deploy(reg_);
       child2_->Deploy(reg_);
       child3_->Deploy(reg_);

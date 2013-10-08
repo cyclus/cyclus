@@ -29,6 +29,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
@@ -36,6 +37,7 @@ set ( CYCLUS_TEST_CORE
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc

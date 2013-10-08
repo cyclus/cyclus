@@ -2,10 +2,11 @@
 #include <gtest/gtest.h>
 
 #include "inst_model.h"
+#include "mock_facility.h"
+#include "mock_inst.h"
+#include "mock_region.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "test_region.h"
-#include "test_facility.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -19,32 +20,18 @@ using ::testing::Values;
 typedef cyclus::InstModel* InstModelConstructor(cyclus::Context* ctx);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class FakeInstModel : public cyclus::InstModel {
- public:
-  FakeInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) {};
-  
-  virtual ~FakeInstModel() {};
-
-  virtual cyclus::Model* Clone() {
-    FakeInstModel* m = new FakeInstModel(*this);
-    m->InitFrom(this);
-    return m;
-  }
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InstModelTests : public TestWithParam<InstModelConstructor*> {
  protected:
-  FakeInstModel* inst_model_;
-  TestFacility* test_facility_;
-  TestRegion* test_region_;
+  MockInst* inst_model_;
+  MockFacility* test_facility_;
+  MockRegion* test_region_;
   cyclus::TestContext tc_;
   
  public:
   virtual void SetUp() { 
-    inst_model_ = new FakeInstModel(tc_.get());
-    test_facility_ = new TestFacility(tc_.get());
-    test_region_ = new TestRegion(tc_.get());
+    inst_model_ = new MockInst(tc_.get());
+    test_facility_ = new MockFacility(tc_.get());
+    test_region_ = new MockRegion(tc_.get());
     inst_model_->SetParent(test_region_);
     
   }

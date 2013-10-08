@@ -7,6 +7,8 @@
 #include "facility_model_tests.h"
 #include "model_tests.h"
 
+using stub::StubFacility;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubFacilityTest : public ::testing::Test {
  protected:
@@ -27,23 +29,14 @@ class StubFacilityTest : public ::testing::Test {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, clone) {
-  cyclus::Context* ctx = tc_.get();
   StubFacility* cloned_fac =
-      dynamic_cast<cycamore::StubFacility*> (src_facility->Clone());
+      dynamic_cast<StubFacility*> (src_facility->Clone());
   delete cloned_fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubFacilityTest, InitialState) {
   // Test things about the initial state of the facility here
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubFacilityTest, CopyFreshModel) {
-  new_facility->cloneModuleMembersFrom(src_facility); // deep copy
-  EXPECT_NO_THROW(dynamic_cast<StubFacility*>(new_facility)); // still a stub facility
-  EXPECT_NO_THROW(dynamic_cast<FakeStubFacility*>(new_facility)); // still a fake stub facility
-  // Test that StubFacility specific parameters are initialized in the deep copy method here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -83,6 +76,8 @@ cyclus::FacilityModel* StubFacilityConstructor(cyclus::Context* ctx) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-INSTANTIATE_TEST_CASE_P(StubFac, FacilityModelTests, Values(&StubFacilityConstructor));
-INSTANTIATE_TEST_CASE_P(StubFac, ModelTests, Values(&StubFacilityModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubFac, FacilityModelTests,
+                        ::testing::Values(&StubFacilityConstructor));
 
+INSTANTIATE_TEST_CASE_P(StubFac, ModelTests,
+                        ::testing::Values(&StubFacilityModelConstructor));

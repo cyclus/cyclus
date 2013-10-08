@@ -4,8 +4,8 @@
 #include "facility_model.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "test_inst.h"
-#include "test_market.h"
+#include "mock_inst.h"
+#include "mock_market.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -22,10 +22,10 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
  public:
   virtual void SetUp() {    
     facility_model_ = (*GetParam())(tc_.get());
-    test_inst_ = new TestInst(tc_.get());
+    test_inst_ = new MockInst(tc_.get());
     facility_model_->SetParent(test_inst_);
-    test_out_market_ = new TestMarket(tc_.get(), "out-commod");
-    test_in_market_ = new TestMarket(tc_.get(), "in-commod");
+    test_out_market_ = new MockMarket(tc_.get(), "out-commod");
+    test_in_market_ = new MockMarket(tc_.get(), "in-commod");
   }
   virtual void TearDown(){ 
     delete facility_model_;
@@ -36,9 +36,9 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
     
  protected:
   cyclus::FacilityModel* facility_model_;
-  TestMarket* test_out_market_;
-  TestMarket* test_in_market_;
-  TestInst* test_inst_;
+  MockMarket* test_out_market_;
+  MockMarket* test_in_market_;
+  MockInst* test_inst_;
   cyclus::TestContext tc_;
 };
 

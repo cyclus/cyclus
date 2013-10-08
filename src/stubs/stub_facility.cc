@@ -3,6 +3,8 @@
 
 #include "stub_facility.h"
 
+using stub::StubFacility;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx)

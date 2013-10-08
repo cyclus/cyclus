@@ -4,21 +4,12 @@
 #include "event_manager.h"
 #include "facility_model.h"
 #include "inst_model.h"
+#include "mock_inst.h"
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - Tests specific to the InstModel class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ConcreteInstModel : public cyclus::InstModel {
- public:
-  ConcreteInstModel(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
-
-  virtual ~ConcreteInstModel() {};
-
-  virtual cyclus::Model* Clone() {
-    return new ConcreteInstModel(context());
-  }
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieModel : public cyclus::FacilityModel {
@@ -84,7 +75,7 @@ class InstModelClassTests : public ::testing::Test {
     child4_ = new DieModel(ctx_);
     child5_ = new DieModel(ctx_);
 
-    inst_ = new ConcreteInstModel(ctx_);
+    inst_ = new MockInst(ctx_);
     child1_->Deploy(inst_);
     child2_->Deploy(inst_);
     child3_->Deploy(inst_);
