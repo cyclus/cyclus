@@ -1,78 +1,47 @@
-// StubStubInst.cpp
-// Implements the StubStubInst class
+// StubInst.cpp
+// Implements the StubInst class
 
+#include "stub_inst.h"
 
-#include "StubInst.h"
-
-#include "Logger.h"
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
+using stubs::StubInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::StubInst() {};
+StubInst::StubInst(cyclus::Context* ctx)
+    : cyclus::InstModel(ctx)
+    {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::~StubInst() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::initModuleMembers(QueryEngine* qe) { 
-  QueryEngine* input = qe->queryElement("input");
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubInst::InitModuleMembers(cyclus::QueryEngine* qe) {
   //retrieve input data members here. For example :  
-  //string query = "tax_rate";
-  //tax_rate_ = lexical_cast<double>(input->getElementContent(query));
-};
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::cloneModuleMembersFrom(InstModel* src) { 
-  StubInst* src_stub = dynamic_cast<StubInst*>(src);
-  //copy data members here. For example : 
-  //tax_rate_ = src_stub->taxRate();
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubInst::str() { 
-  return InstModel::str(); 
-};
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::receiveMessage(msg_ptr msg) {};
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all INSTMODEL classes have these members
- * --------------------
- */
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" Model* constructStubInst() {
-  return new StubInst();
+  //string query = "incommodity";
+  //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
 
-extern "C" void destructStubInst(Model* model) { 
-  delete model;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Model* StubInst::Clone() {
+  StubInst* m = new StubInst(*this);
+
+  // required to copy parent class members
+  m->InitFrom(this);
+
+  // clone specific members for your module, e.g.
+  // m->SetSomeMember(someMember());
+
+  return m;
 }
-/* ------------------- */ 
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string StubInst::str() {
+  return InstModel::str();
+};
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubInst::ReceiveMessage(cyclus::Message::Ptr msg) {}
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
+  return new StubInst(ctx);
+}

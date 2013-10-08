@@ -2,9 +2,11 @@
 #ifndef STUB_FACILITY_H_
 #define STUB_FACILITY_H_
 
+#include <string>
+
 #include "context.h"
 #include "facility_model.h"
-#include "logger.h"
+#include "message.h"
 #include "query_engine.h"
 
 namespace stubs {
@@ -35,6 +37,10 @@ namespace stubs {
    upon sending and receiving materials and messages. 
  */
 class StubFacility : public cyclus::FacilityModel  {
+/* --------------------
+ * all FACILITYMODEL classes have these members
+ * --------------------
+ */
  public:
   /**
      Constructor for StubFacility Class 
@@ -61,9 +67,9 @@ class StubFacility : public cyclus::FacilityModel  {
 
   /**
      Initializes a StubFacility object by copying the members of another.
-    */
+   */
    virtual cyclus::Model* Clone();
-
+   
   /**
      Transacted resources are extracted through this method 
       

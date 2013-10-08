@@ -3,16 +3,17 @@
 
 #include "context.h"
 #include "facility_model.h"
+#include "material.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class MockFac : public cyclus::FacilityModel {
+class MockFacility : public cyclus::FacilityModel {
  public:
-  MockFac(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) {};
+  MockFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) {};
 
-  virtual ~MockFac() {};
+  virtual ~MockFacility() {};
 
   virtual cyclus::Model* Clone() {
-    MockFac* m = new MockFac(*this);
+    MockFacility* m = new MockFacility(*this);
     m->InitFrom(this);
     return m;
   };

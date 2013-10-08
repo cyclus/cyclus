@@ -1,9 +1,9 @@
 // Regionmodel_tests.h
 #include <gtest/gtest.h>
 
+#include "context.h"
 #include "region_model.h"
 #include "suffix.h"
-#include "test_region.h"
 #include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST

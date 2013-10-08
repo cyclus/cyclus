@@ -1,74 +1,47 @@
 // StubRegion.cpp
-// Implements the StubRegion class
+// Implements the StubStubRegion class
 
-#include "StubRegion.h"
+#include "stub_region.h"
 
-#include "Logger.h"
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
+using stubs::StubRegion;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::StubRegion() {};
+StubRegion::StubRegion(cyclus::Context* ctx)
+    : cyclus::RegionModel(ctx)
+    {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::~StubRegion() {};
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::initModuleMembers(QueryEngine* qe) { 
-  QueryEngine* input = qe->queryElement("input");
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubRegion::InitModuleMembers(cyclus::QueryEngine* qe) {
   //retrieve input data members here. For example :  
-  //string query = "tax_rate";
-  //tax_rate_ = lexical_cast<double>(input->getElementContent(query));
-};
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::cloneModuleMembersFrom(RegionModel* src) { 
-  StubRegion* src_stub = dynamic_cast<StubRegion*>(src);
-  //copy data members here. For example : 
-  //tax_rate_ = src_stub->taxRate();
-};
-
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubRegion::str() { 
-  return RegionModel::str(); 
-};
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::receiveMessage(msg_ptr msg) {};
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all REGIONMODEL classes have these members
- * --------------------
- */
-
-/* ------------------- */ 
-
-
-/* --------------------
- * all MODEL classes have these members
- * --------------------
- */
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" Model* constructStubRegion() {
-  return new StubRegion();
+  //string query = "incommodity";
+  //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
-extern "C" void destructStubRegion(Model* model) { 
-  delete model;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Model* StubRegion::Clone() {
+  StubRegion* m = new StubRegion(*this);
+
+  // required to copy parent class members
+  m->InitFrom(this);
+
+  // clone specific members for your module, e.g.
+  // m->SetSomeMember(someMember());
+
+  return m;
 }
-/* ------------------- */ 
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+std::string StubRegion::str() {
+  return RegionModel::str();
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubRegion::ReceiveMessage(cyclus::Message::Ptr msg) {}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+extern "C" cyclus::Model* ConstructStubRegion(cyclus::Context* ctx) {
+  return new StubRegion(ctx);
+}

@@ -13,24 +13,23 @@ using stubs::StubFacility;
 class StubFacilityTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  StubFacility* src_facility;
+  StubFacility* src_facility_;
 
   virtual void SetUp(){
-    src_facility = new StubFacility(tc_.get());
+    src_facility_ = new StubFacility(tc_.get());
     // for facilities that trade commodities, create appropriate markets here
   };
   
   virtual void TearDown() {
-    delete src_facility;
+    delete src_facility_;
     // for facilities that trade commodities, delete appropriate markets here
   }
 };
 
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, clone) {
   StubFacility* cloned_fac =
-      dynamic_cast<StubFacility*> (src_facility->Clone());
+      dynamic_cast<StubFacility*> (src_facility_->Clone());
   delete cloned_fac;
 }
 
@@ -41,7 +40,7 @@ TEST_F(StubFacilityTest, InitialState) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubFacilityTest, Print) {
-  EXPECT_NO_THROW(std::string s = src_facility->str());
+  EXPECT_NO_THROW(std::string s = src_facility_->str());
   // Test StubFacility specific aspects of the print method here
 }
 
@@ -54,14 +53,14 @@ TEST_F(StubFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tick) {
   int time = 1;
-  ASSERT_NO_THROW(src_facility->HandleTick(time));
+  ASSERT_NO_THROW(src_facility_->HandleTick(time));
   // Test StubFacility specific behaviors of the HandleTick function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility->HandleTock(time));
+  EXPECT_NO_THROW(src_facility_->HandleTock(time));
   // Test StubFacility specific behaviors of the HandleTock function here
 }
 

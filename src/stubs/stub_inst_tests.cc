@@ -1,56 +1,36 @@
 // StubInstTests.cpp
 #include <gtest/gtest.h>
 
-#include "StubInst.h"
-#include "CycException.h"
-#include "Message.h"
-#include "InstModelTests.h"
-#include "ModelTests.h"
-
 #include <string>
-#include <queue>
 
-using namespace std;
+#include "stub_inst.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class FakeStubInst : public StubInst {
-  public:
-    FakeStubInst() : StubInst() {
-    }
+#include "inst_model_tests.h"
+#include "model_tests.h"
 
-    virtual ~FakeStubInst() {
-    }
-};
+using stubs::StubInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubInstTest : public ::testing::Test {
   protected:
-    FakeStubInst* src_inst;
-    FakeStubInst* new_inst; 
+    cyclus::TestContext tc_;
+    StubInst* src_inst_;
 
     virtual void SetUp(){
-      src_inst = new FakeStubInst();
-      src_inst->setParent(new TestRegion());
-      new_inst = new FakeStubInst();
-      // for facilities that trade commodities, create appropriate markets here
+      src_inst_ = new StubInst(tc_.get());
     };
 
     virtual void TearDown() {
-      delete src_inst;
-      // for facilities that trade commodities, delete appropriate markets here
+      delete src_inst_;
     }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* StubInstModelConstructor(){
-  return dynamic_cast<Model*>(new FakeStubInst());
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(StubInstTest, clone) {
+  StubInst* cloned_fac =
+      dynamic_cast<StubInst*> (src_inst_->Clone());
+  delete cloned_fac;
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel* StubInstConstructor(){
-  return dynamic_cast<InstModel*>(new FakeStubInst());
-}
-
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, InitialState) {
@@ -58,41 +38,45 @@ TEST_F(StubInstTest, InitialState) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubInstTest, CopyFreshModel) {
-  new_inst->cloneModuleMembersFrom(src_inst); // deep copy
-  EXPECT_NO_THROW(dynamic_cast<StubInst*>(new_inst)); // still a stub inst
-  EXPECT_NO_THROW(dynamic_cast<FakeStubInst*>(new_inst)); // still a fake stub inst
-  // Test that StubInst specific parameters are initialized in the deep copy method here
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, Print) {
-  EXPECT_NO_THROW(std::string s = src_inst->str());
+  EXPECT_NO_THROW(std::string s = src_inst_->str());
   // Test StubInst specific aspects of the print method here
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, ReceiveMessage) {
-  msg_ptr msg;
+  cyclus::Message::Ptr msg;
   // Test StubInst specific behaviors of the receiveMessage function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst->handleTick(time));
+  EXPECT_NO_THROW(src_inst_->HandleTick(time));
   // Test StubInst specific behaviors of the handleTick function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst->handleTick(time));
+  EXPECT_NO_THROW(src_inst_->HandleTick(time));
   // Test StubInst specific behaviors of the handleTock function here
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Model* StubInstModelConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Model*>(new StubInst(ctx));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::InstModel* StubInstConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::InstModel*>(new StubInst(ctx));
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-INSTANTIATE_TEST_CASE_P(StubInst, InstModelTests, Values(&StubInstConstructor));
-INSTANTIATE_TEST_CASE_P(StubInst, ModelTests, Values(&StubInstModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, InstModelTests,
+                        ::testing::Values(&StubInstConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, ModelTests,
+                        ::testing::Values(&StubInstModelConstructor));
 
