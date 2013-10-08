@@ -7,7 +7,7 @@
 #include "facility_model_tests.h"
 #include "model_tests.h"
 
-using stub::StubFacility;
+using stubs::StubFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubFacilityTest : public ::testing::Test {

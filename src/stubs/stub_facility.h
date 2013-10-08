@@ -7,7 +7,7 @@
 #include "logger.h"
 #include "query_engine.h"
 
-namespace stub {
+namespace stubs {
 
 /**
    @class StubFacility 

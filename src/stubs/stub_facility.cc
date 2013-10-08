@@ -3,7 +3,7 @@
 
 #include "stub_facility.h"
 
-using stub::StubFacility;
+using stubs::StubFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)
