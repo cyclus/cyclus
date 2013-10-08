@@ -20,10 +20,10 @@ const std::string DynamicModule::Suffix() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-DynamicModule::DynamicModule(std::string type, std::string name) :
-  type_(type), module_name_(name),
-  constructor_name_("Construct" + name),
-  module_library_(0), constructor_(0) {
+DynamicModule::DynamicModule(std::string name)
+  : module_name_(name),
+    constructor_name_("Construct" + name),
+    module_library_(0), constructor_(0) {
 
   std::string lib_name = "lib" + module_name_ + Suffix();
   fs::path p;

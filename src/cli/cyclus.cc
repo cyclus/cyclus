@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
     ("help,h", "produce help message")
     ("include", "print the cyclus include directory")
     ("version", "print cyclus core and dependency versions and quit")
+    ("schema", "dump the cyclus master schema including all installed module schemas")
+    ("module-schema", po::value<std::string>(), "dump the schema for the named module")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
     ("verb,v", po::value<std::string>(), vmessage.c_str())
@@ -55,8 +57,49 @@ int main(int argc, char* argv[]) {
             options(desc).positional(p).run(), vm);
   po::notify(vm);
 
-  if (vm.count("include")) {
+  // setup context
+  EventManager em;
+  Timer ti;
+  Context ctx(&ti, &em);
+
+  // respond to command line args that don't run a simulation
+  if (vm.count("help")) {
+    std::string err_msg = "Cyclus usage requires an input file.\n";
+    err_msg += "Usage:   cyclus [path/to/input/filename]\n";
+    std::cout << err_msg << std::endl;
+    std::cout << desc << "\n";
+    return 0;
+  } else if (vm.count("version")) {
+    std::cout << "Cyclus Core " << version::core() << "\n\nDependencies:\n";
+    std::cout << "   Boost    " << version::boost() << "\n";
+    std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
+    std::cout << "   Hdf5     " << version::hdf5() << "\n";
+    std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
+    std::cout << "   xml2     " << version::xml2() << "\n";
+    return 0;
+  } else if (vm.count("include")) {
     std::cout << Env::GetInstallPath() << "/include/cyclus/\n";
+    return 0;
+  } else if (vm.count("schema")) {
+    try {
+      std::cout << "\n" << BuildMasterSchema() << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (vm.count("module-schema")) {
+    std::string name(vm["module-schema"].as<std::string>());
+    try {
+      DynamicModule dyn(name);
+      Model* m = dyn.ConstructInstance(&ctx);
+      std::cout << "<element name=\"" << name << "\">\n";
+      std::cout << m->schema();
+      std::cout << "</element>\n";
+      delete m;
+      dyn.CloseLibrary();
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
     return 0;
   }
 
@@ -70,25 +113,6 @@ int main(int argc, char* argv[]) {
   std::cout << std::endl;
 
   bool success = true;
-
-  // respond to command line args
-  if (vm.count("help")) {
-    std::string err_msg = "Cyclus usage requires an input file.\n";
-    err_msg += "Usage:   cyclus [path/to/input/filename]\n";
-    std::cout << err_msg << std::endl;
-    std::cout << desc << "\n";
-    return 0;
-  }
-
-  if (vm.count("version")) {
-    std::cout << "Cyclus Core " << version::core() << "\n\nDependencies:\n";
-    std::cout << "   Boost    " << version::boost() << "\n";
-    std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
-    std::cout << "   Hdf5     " << version::hdf5() << "\n";
-    std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
-    std::cout << "   xml2     " << version::xml2() << "\n";
-    return 0;
-  }
 
   if (vm.count("no-model")) {
     Logger::NoModel() = true;
@@ -119,16 +143,12 @@ int main(int argc, char* argv[]) {
   std::string path = Env::PathBase(argv[0]);
   Env::SetCyclusRelPath(path);
 
-  // setup context
-  EventManager em;
-  Timer ti;
-  Context ctx(&ti, &em);
-
   // read input file and setup simulation
+  std::string inputFile = vm["input-file"].as<std::string>();
+  XMLFileLoader* loader;
   try {
-    std::string inputFile = vm["input-file"].as<std::string>();
-    XMLFileLoader loader(&ctx, inputFile);
-    loader.LoadAll();
+    loader = new XMLFileLoader(&ctx, inputFile);
+    loader->LoadSim();
   } catch (Error e) {
     CLOG(LEV_ERROR) << e.what();
     return 1;
@@ -169,14 +189,7 @@ int main(int argc, char* argv[]) {
 
   em.close();
   delete back;
-
-  // Close Dynamically loaded modules 
-  try {
-    Model::UnloadModules();
-  } catch (Error err) {
-    success = false;
-    CLOG(LEV_ERROR) << err.what();
-  }
+  delete loader;
 
   if (!success) {
     std::cout << std::endl;

@@ -66,21 +66,6 @@ class Model {
   static std::vector<Model*> GetModelList();
 
   /**
-     closes the library of each dynamically loaded module and erases
-     it from the loaded modules container
-   */
-  static void UnloadModules();
-
-  /**
-     constructs and initializes an entity
-     @param ctx the simulation context
-     @param model_type the type of entity
-     @param qe a pointer to a QueryEngine object containing initialization data
-   */
-  static void InitializeSimulationEntity(Context* ctx, std::string model_type,
-                                         QueryEngine* qe);
-
-  /**
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
@@ -104,6 +89,14 @@ class Model {
      Destructor for the Model Class
    */
   virtual ~Model();
+
+  /**
+  Returns a module's xml rng schema for initializing from input files. All
+  concrete models should override this method.
+  */
+  virtual std::string schema() {
+    return "<text />\n";
+  };
 
   /**
      Return a newly created/allocated prototype that is an exact copy of this.
@@ -309,12 +302,6 @@ class Model {
      @param m the model containing state that should be used to initialize this model.
   */
   virtual void InitFrom(Model* m);
-
-  /**
-     a map of loaded modules. all dynamically loaded modules are
-     registered with this map when loaded.
-   */
-  static std::map< std::string, DynamicModule*> loaded_modules_;
 
   /**
      children of this model

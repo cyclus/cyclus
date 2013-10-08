@@ -20,14 +20,14 @@ using cyclus::Model;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, LoadTestFacility) {
   cyclus::DynamicModule* m;
-  EXPECT_NO_THROW(m = new DynamicModule("Facility", "TestFacility"));
+  EXPECT_NO_THROW(m = new DynamicModule("TestFacility"));
   EXPECT_NO_THROW(m->CloseLibrary());
   EXPECT_NO_THROW(delete m);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, LoadLibError) {
-  EXPECT_THROW(new DynamicModule("Facility", "not_a_fac"), cyclus::IOError);
+  EXPECT_THROW(new DynamicModule("not_a_fac"), cyclus::IOError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,7 +35,7 @@ TEST(DynamicLoadingTests, ConstructTestFacility) {
   cyclus::EventManager em;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &em);
-  cyclus::DynamicModule* module = new DynamicModule("Facility", "TestFacility");
+  cyclus::DynamicModule* module = new DynamicModule("TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);
                   delete fac;
@@ -49,7 +49,7 @@ TEST(DynamicLoadingTests, cloneTestFacility) {
   cyclus::EventManager em;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &em);
-  cyclus::DynamicModule* module = new DynamicModule("Facility", "TestFacility");
+  cyclus::DynamicModule* module = new DynamicModule("TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);
                   Model* clone = fac->Clone();
