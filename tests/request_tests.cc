@@ -4,6 +4,8 @@
 #include <string>
 
 #include "composition.h"
+#include "facility_model.h"
+#include "generic_resource.h"
 #include "material.h"
 #include "test_context.h"
 #include "mock_facility.h"
@@ -12,12 +14,13 @@
 
 using std::string;
 using cyclus::Composition;
+using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(RequestTests, GetSet) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
   string commod = "name";
@@ -25,8 +28,8 @@ TEST(RequestTests, GetSet) {
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  double mat_qty = 1.0;
-  Material::Ptr mat = Material::Create(tc.get(), mat_qty, comp);
+  double qty = 1.0;
+  Material::Ptr mat = Material::Create(tc.get(), qty, comp);
   
   Request<Material> r;
   r.commodity = commod;
@@ -37,6 +40,33 @@ TEST(RequestTests, GetSet) {
   EXPECT_EQ(commod, r.commodity);
   EXPECT_EQ(fac, r.requester);
   EXPECT_EQ(mat.get(), r.target);
+  EXPECT_EQ(pref, r.preference);
+  
+  delete fac;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RequestTests, GenRsrcGetSet) {
+  TestContext tc;
+  MockFacility* fac = new MockFacility(tc.get());
+  string commod = "name";
+  double pref = 2.4;
+  double qty = 1.0;
+  string quality = "qual";
+  string units = "units";
+
+  GenericResource::Ptr rsrc =
+      GenericResource::Create(tc.get(), qty, quality, units);
+  
+  Request<GenericResource> r;
+  r.commodity = commod;
+  r.requester = fac;
+  r.target = rsrc.get();
+  r.preference = pref;
+
+  EXPECT_EQ(commod, r.commodity);
+  EXPECT_EQ(fac, r.requester);
+  EXPECT_EQ(rsrc.get(), r.target);
   EXPECT_EQ(pref, r.preference);
   
   delete fac;
