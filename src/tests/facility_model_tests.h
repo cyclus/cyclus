@@ -1,4 +1,6 @@
-// Facilitymodel_tests.h
+#ifndef CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
+#define CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "facility_model.h"
@@ -52,6 +54,8 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
 // must be defined). This dummy test keeps gtest_main linked in.
 TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
-#endif  // GTEST_HAS_PARAM_TEST
+#endif // GTEST_HAS_PARAM_TEST
+
+#endif // CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
 
 

@@ -1,5 +1,5 @@
-#ifndef STUB_FACILITY_H_
-#define STUB_FACILITY_H_
+#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
+#define CYCLUS_STUBS_STUB_FACILITY_H_
 
 #include <string>
 

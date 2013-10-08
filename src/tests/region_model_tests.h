@@ -1,4 +1,6 @@
-// Regionmodel_tests.h
+#ifndef CYCLUS_TESTS_REGION_MODEL_TESTS_H_
+#define CYCLUS_TESTS_REGION_MODEL_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -44,4 +46,5 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
 
+#endif // CYCLUS_TESTS_REGION_MODEL_TESTS_H_
 
