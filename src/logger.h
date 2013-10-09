@@ -10,6 +10,12 @@
 #define _LOGGER_H
 
 
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+
 namespace cyclus {
 
 /**
@@ -18,7 +24,7 @@ namespace cyclus {
    allows easy logging via the streaming operator similar to std::cout;
    this is the primary way to use the Logging functionality.
 
-   @param level #cyclus::LogLevel category or type of log statement.
+   @param level #LogLevel category or type of log statement.
 
    @param prefix A std::string value that functions as a unique
    identifier for the module. Prefixes longer than 6 characters will be
@@ -39,16 +45,6 @@ namespace cyclus {
 #define MLOG(level) \
   if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
   else cyclus::Logger().Get(level, "memory")
-
-} // namespace cyclus
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
-
-namespace cyclus {
 
 /**
    @enum LogLevel
