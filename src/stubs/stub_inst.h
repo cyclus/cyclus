@@ -8,6 +8,7 @@
 #include "message.h"
 #include "query_engine.h"
 
+namespace cyclus {
 namespace stubs {
 
 /**
@@ -87,5 +88,6 @@ class StubInst : public cyclus::InstModel {
 };
 
 } // namespace stubs
+} // namespace cyclus
   
 #endif // STUB_INST_H_

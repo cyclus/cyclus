@@ -1,6 +1,6 @@
 #include "stub_market.h"
 
-using stubs::StubMarket;
+using cyclus::stubs::StubMarket;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubMarket::StubMarket(cyclus::Context* ctx)

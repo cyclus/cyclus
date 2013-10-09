@@ -8,6 +8,7 @@
 #include "message.h"
 #include "query_engine.h"
 
+namespace cyclus {
 namespace stubs {
 
 /**
@@ -120,6 +121,7 @@ class StubFacility : public cyclus::FacilityModel  {
 };
 
 } // namespace stub
+} // namespace cyclus
   
 #endif // STUB_FACILITY_H_
 

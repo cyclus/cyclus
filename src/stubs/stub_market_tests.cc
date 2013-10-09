@@ -5,7 +5,7 @@
 #include "market_model_tests.h"
 #include "model_tests.h"
 
-using stubs::StubMarket;
+using cyclus::stubs::StubMarket;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubMarketTest : public ::testing::Test {

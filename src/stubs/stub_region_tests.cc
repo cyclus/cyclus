@@ -5,7 +5,7 @@
 #include "region_model_tests.h"
 #include "model_tests.h"
 
-using stubs::StubRegion;
+using cyclus::stubs::StubRegion;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubRegionTest : public ::testing::Test {
