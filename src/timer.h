@@ -26,6 +26,7 @@ class Timer {
   /**
      Initialize this Timer by setting the specs for the simulation.
 
+     @param ctx the simulation context
      @param dur the duration of this simulation, in months
      @param m0 the month the simulation starts: Jan. = 1, ..., Dec. = 12
      (default = 1)

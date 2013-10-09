@@ -73,6 +73,7 @@ class Model {
 
   /**
      constructs and initializes an entity
+     @param ctx the simulation context
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */

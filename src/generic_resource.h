@@ -71,7 +71,9 @@ class GenericResource : public Resource {
   void Absorb(GenericResource::Ptr other);
 
  private:
+  /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
+  /// @param quality the resource quality
   /// @param units is a string indicating the resource unit
   GenericResource(Context* ctx, double quantity, std::string quality,
                   std::string units);

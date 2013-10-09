@@ -23,6 +23,7 @@ class XMLFileLoader {
  public:
   /**
      Constructor to create a new XML for loading. Defaults to using the main schema.
+     @param ctx the simulation context
      @param load_filename The filename for the file to be loaded; defaults to
      an empty string
      @param use_main_schema whether or not to use the main schema to

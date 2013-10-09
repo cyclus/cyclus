@@ -86,7 +86,7 @@ class FacilityModel : public TimeAgent, public Communicator {
 
   /**
      Copy module members from a source model
-     @param source the model to copy from
+     @param m the model to copy from
    */
   virtual void InitFrom(Model* m);
 
