@@ -25,7 +25,6 @@ Model::loaded_modules_;
 std::set<std::string> Model::dynamic_module_types() {
   std::set<std::string> types;
   types.insert("Market");
-  types.insert("Converter");
   types.insert("Region");
   types.insert("Inst");
   types.insert("Facility");

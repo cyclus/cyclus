@@ -2,25 +2,18 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include "boost/program_options.hpp"
-#include "boost/shared_ptr.hpp"
-#include "boost/filesystem.hpp"
-#include "boost/lexical_cast.hpp"
-#include "boost/lexical_cast.hpp"
+#include <boost/program_options.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-#include "model.h"
-#include "timer.h"
-#include "error.h"
-#include "env.h"
-#include "logger.h"
-#include "xml_file_loader.h"
-#include "event_manager.h"
-#include "sqlite_back.h"
-#include "hdf5_back.h"
 #include "csv_back.h"
-#include "context.h"
-#include "version.h"
+#include "cyclus.h"
+#include "hdf5_back.h"
+#include "sqlite_back.h"
+#include "xml_file_loader.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -41,6 +34,7 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
+    ("include", "print the cyclus include directory")
     ("version", "print cyclus core and dependency versions and quit")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
@@ -60,6 +54,11 @@ int main(int argc, char* argv[]) {
   po::store(po::command_line_parser(argc, argv).
             options(desc).positional(p).run(), vm);
   po::notify(vm);
+
+  if (vm.count("include")) {
+    std::cout << Env::GetInstallPath() << "/include/cyclus/\n";
+    return 0;
+  }
 
   // announce yourself
   std::cout << std::endl;
