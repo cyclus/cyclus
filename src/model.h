@@ -112,7 +112,7 @@ class Model {
      initialization/cloning operations must be done AFTER calling InitFrom.
      Example:
 
-     @begincode
+     @code
      class MyModelClass : public Model {
        ...
 
