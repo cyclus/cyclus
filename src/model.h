@@ -23,7 +23,7 @@ namespace cyclus {
    @todo consider changing to a vector of strings & consolidating with
    the model_type instance variable of the model class
  */
-enum ModelType {REGION, INST, FACILITY, MARKET, CONVERTER, END_MODEL_TYPES};
+enum ModelType {REGION, INST, FACILITY, MARKET, END_MODEL_TYPES};
 
 /**
    @class Model

@@ -40,10 +40,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </choice>
     </zeroOrMore>
 
-    <zeroOrMore>
-    <ref name="converter"/>
-    </zeroOrMore>
-    
     </interleave>
 
   </element>
@@ -395,21 +391,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </define>
 
   <!-- end section for institutions -->
-
-  <!-- begin section for converters -->
-  <define name="converter">
-    <element name="converter">
-      <element name="name">
-         <text/>
-      </element>
-      <element name="model">
-      <choice> @Converter_REFS@
-      </choice>
-      </element>
-    </element>
-  </define>
-
-  <!-- end section for converters -->
 
   <!-- begin section for recipes -->
   <define name="recipe">

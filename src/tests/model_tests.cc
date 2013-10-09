@@ -49,10 +49,6 @@ TEST_P(ModelTests, SetAndGetModelType) {
         EXPECT_NO_THROW(model_->SetModelType("Market"));
         EXPECT_EQ("Market", model_->ModelType());
         break;
-      case (cyclus::CONVERTER):
-        EXPECT_NO_THROW(model_->SetModelType("Converter"));
-        EXPECT_EQ("Converter", model_->ModelType());
-        break;
       default:
         FAIL();
         break;
