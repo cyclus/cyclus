@@ -18,7 +18,7 @@ namespace cyclus {
    allows easy logging via the streaming operator similar to std::cout;
    this is the primary way to use the Logging functionality.
 
-   @param level #LogLevel category or type of log statement.
+   @param level #cyclus::LogLevel category or type of log statement.
 
    @param prefix A std::string value that functions as a unique
    identifier for the module. Prefixes longer than 6 characters will be
