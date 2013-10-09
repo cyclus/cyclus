@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
+    ("include", "print the cyclus include directory")
     ("version", "print cyclus core and dependency versions and quit")
     ("no-model", "only print log entries from cyclus core code")
     ("no-mem", "exclude memory log statement from logger output")
@@ -53,6 +54,11 @@ int main(int argc, char* argv[]) {
   po::store(po::command_line_parser(argc, argv).
             options(desc).positional(p).run(), vm);
   po::notify(vm);
+
+  if (vm.count("include")) {
+    std::cout << Env::GetInstallPath() << "/include/cyclus/\n";
+    return 0;
+  }
 
   // announce yourself
   std::cout << std::endl;
