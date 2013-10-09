@@ -73,6 +73,7 @@ class Model {
 
   /**
      constructs and initializes an entity
+     @param ctx the simulation context
      @param model_type the type of entity
      @param qe a pointer to a QueryEngine object containing initialization data
    */
@@ -112,7 +113,7 @@ class Model {
      initialization/cloning operations must be done AFTER calling InitFrom.
      Example:
 
-     @begincode
+     @code
      class MyModelClass : public Model {
        ...
 

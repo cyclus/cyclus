@@ -135,15 +135,15 @@ class InstModel : public TimeAgent, public Communicator {
   std::map<std::string, int> initial_build_order_;
 
   /**
-     add a prtotoype to the set of available prototypes
-     @param prototype the prototype to add
+     add a prototoype to the set of available prototypes
+     @param proto_name the name of the prototype to add
    */
   void AddAvailablePrototype(std::string proto_name);
 
   /**
      perform any actions required after prototype has been added to
      the list of available prototypes
-     @param prototype the prototype to register
+     @param proto_name the name of prototype to register
    */
   virtual void RegisterAvailablePrototype(std::string proto_name);
 
@@ -205,7 +205,7 @@ class InstModel : public TimeAgent, public Communicator {
 
   /**
      builds a prototype
-     @param prototype the prototype to build
+     @param proto_name the name of the prototype to build
    */
   void Build(std::string proto_name);
 

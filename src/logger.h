@@ -10,6 +10,12 @@
 #define _LOGGER_H
 
 
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+
 namespace cyclus {
 
 /**
@@ -39,16 +45,6 @@ namespace cyclus {
 #define MLOG(level) \
   if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
   else cyclus::Logger().Get(level, "memory")
-
-} // namespace cyclus
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
-
-namespace cyclus {
 
 /**
    @enum LogLevel
