@@ -48,6 +48,19 @@ SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CYCLUS_SOURCE_DIR}/CMake )
 # Include macros
 INCLUDE(CyclusModuleMacros)
 
+# set configuration for all library builds
+IF (WIN32)
+  set(suffix ".dll")
+  set(dynamicloadlib "windows_helper_functions.h")
+ELSEIF(APPLE)
+  set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+  set(suffix ".dylib")
+  set(dynamicloadlib "unix_helper_functions.h")
+ELSE()
+  set(suffix ".so")
+  set(dynamicloadlib "unix_helper_functions.h")
+ENDIF()
+
 # Include the core header files in the app build manually.
 # Since we build the core library in the same project, this is safer.
 SET( CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR}
@@ -390,21 +403,10 @@ INSTALL(FILES
   COMPONENT core
   )
 
-############################################################
-############# special configuration ########################
-############################################################
+#################################################################
+############# special file configuration ########################
+#################################################################
 
-IF (WIN32)
-  set(suffix ".dll")
-  set(dynamicloadlib "windows_helper_functions.h")
-ELSEIF(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup" PARENT_SCOPE)
-  set(suffix ".dylib")
-  set(dynamicloadlib "unix_helper_functions.h")
-ELSE()
-  set(suffix ".so")
-  set(dynamicloadlib "unix_helper_functions.h")
-ENDIF()
 CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
 
 EXECUTE_PROCESS(COMMAND git describe OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
