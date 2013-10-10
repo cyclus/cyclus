@@ -8,17 +8,6 @@
 # # include all the directories we just found
 # INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
-# # Build the cyclus executable from the CYCLUS_SOURCE source files
-# SET( CYCLUS_SOURCE
-#   cli/cyclus.cc
-#   )
-# ADD_EXECUTABLE( cyclus ${CYCLUS_SOURCE} )
-# TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
-# INSTALL(TARGETS cyclus
-#   RUNTIME DESTINATION bin
-#   COMPONENT cyclus
-#   )
-
 # # add stub directory; this positioning is required because the stubs have tests
 # # defined, and thus must be incorporated before the test target is made
 # ADD_SUBDIRECTORY(stubs)
@@ -191,7 +180,12 @@ INSTALL(FILES
 #################################################################
 
 INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_SOURCE_DIR})
+
+SET(
+  CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  PARENT_SCOPE
   )
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
@@ -316,7 +310,7 @@ INSTALL(FILES
 
 ADD_SUBDIRECTORY(cyclopts)
 
-ADD_LIBRARY(cycluscore ${CYCLUS_CORE_SRC})
+ADD_LIBRARY( cycluscore ${CYCLUS_CORE_SRC} )
 
 SET_TARGET_PROPERTIES( cycluscore 
   PROPERTIES 
@@ -324,14 +318,13 @@ SET_TARGET_PROPERTIES( cycluscore
   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
   )
 
-INSTALL(TARGETS cycluscore
+TARGET_LINK_LIBRARIES( cycluscore dl ${LIBS} )
+
+INSTALL(
+  TARGETS cycluscore
   LIBRARY DESTINATION lib
   COMPONENT cycluscore
   )
-
-target_link_libraries(cycluscore dl ${Boost_FILESYSTEM_LIBRARY} 
-  ${SQLITE3_LIBRARIES} ${LibXML++_LIBRARIES} 
-  ${COIN_LIBRARIES} ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES})
 
 #################################################################
 ######### end build libcyclus ###################################
