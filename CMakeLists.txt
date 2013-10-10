@@ -11,6 +11,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 # set project directories
 SET( PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 SET( CYCLUS_CLI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cli )
+SET( CYCLUS_DOC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doc )
 SET( CYCLUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src )
 SET( CYCLUS_STUB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stubs )
 SET( CYCLUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests )
@@ -137,10 +138,6 @@ FIND_PACKAGE( COIN REQUIRED )
 SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${COIN_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
-# include all the directories we just found
-INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
-
-
 ##############################################################################################
 #################################### end find libraries ######################################
 ##############################################################################################
@@ -148,6 +145,9 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 ##############################################################################################
 ###################################### begin includes ########################################
 ##############################################################################################
+
+# include all the directories we just found
+INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
@@ -215,14 +215,14 @@ ENDIF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET( DOC_SOURCE_DIR ${CYCLUS_SOURCE_DIR})
-SET( DOC_INPUT_DIR ${CYCLUS_SOURCE_DIR}/doc)
+SET( DOC_SOURCE_DIR ${CYCLUS_SOURCE_DIR} )
+SET( DOC_INPUT_DIR ${CYCLUS_DOC_DIR} )
+SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
   
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
 FIND_PACKAGE(Doxygen)
 IF (DOXYGEN_FOUND)
-  ADD_SUBDIRECTORY(${DOC_INPUT_DIR})
-  SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
+  ADD_SUBDIRECTORY(${CYCLUS_DOC_DIR})
 ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
