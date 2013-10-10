@@ -8,7 +8,6 @@
 #include "message.h"
 #include "query_engine.h"
 
-namespace cyclus {
 namespace stubs {
 
 /**
@@ -96,6 +95,5 @@ class StubMarket : public cyclus::MarketModel {
 };
 
 } // namespace stubs
-} // namespace cyclus
   
 #endif // STUB_MARKET_H_

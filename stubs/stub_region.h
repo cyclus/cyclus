@@ -8,7 +8,6 @@
 #include "message.h"
 #include "query_engine.h"
 
-namespace cyclus {
 namespace stubs {
 
 /**
@@ -88,6 +87,5 @@ class StubRegion : public cyclus::RegionModel {
 };
 
 } // namespace stubs
-} // namespace cyclus
   
 #endif // STUB_REGION_H_

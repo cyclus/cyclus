@@ -1,6 +1,6 @@
 #include "stub_inst.h"
 
-using cyclus::stubs::StubInst;
+using stubs::StubInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst(cyclus::Context* ctx)

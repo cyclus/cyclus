@@ -1,6 +1,6 @@
 #include "stub_region.h"
 
-using cyclus::stubs::StubRegion;
+using stubs::StubRegion;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::StubRegion(cyclus::Context* ctx)

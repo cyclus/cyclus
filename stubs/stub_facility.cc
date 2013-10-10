@@ -1,6 +1,6 @@
 #include "stub_facility.h"
 
-using cyclus::stubs::StubFacility;
+using stubs::StubFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)

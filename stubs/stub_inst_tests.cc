@@ -7,7 +7,7 @@
 #include "inst_model_tests.h"
 #include "model_tests.h"
 
-using cyclus::stubs::StubInst;
+using stubs::StubInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubInstTest : public ::testing::Test {

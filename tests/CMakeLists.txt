@@ -110,8 +110,8 @@ ADD_EXECUTABLE( cyclus_unit_tests
 TARGET_LINK_LIBRARIES( cyclus_unit_tests dl 
   ${LIBS} 
   cycluscore 
-  cyclusstubs # needed to test stubs 
   gtest
+  cyclusstubs # needed to test stubs 
   )
 
 INSTALL(TARGETS cyclus_unit_tests

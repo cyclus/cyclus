@@ -6,7 +6,7 @@
 #include "facility_model_tests.h"
 #include "model_tests.h"
 
-using cyclus::stubs::StubFacility;
+using stubs::StubFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubFacilityTest : public ::testing::Test {
