@@ -175,4 +175,58 @@ add_custom_target(uninstall
 ################################### end uninstall target #####################################
 ##############################################################################################
 
+##############################################################################################
+####################################### begin cpack ##########################################
+##############################################################################################
+
+SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
+
+# Here's where we package it with CPack
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
+
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
+SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.rst")
+SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.rst")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "2")
+#SET(CPACK_PACKAGE_VERSION_PATCH "2") # should use commit number here  ?
+SET(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
+SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
+#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
+set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/CMake/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake")
+SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
+
+INCLUDE(CPack)
+
+##############################################################################################
+######################################## end cpack ###########################################
+##############################################################################################
+
 ENDIF(NOT CYCLUS_DOC_ONLY)  
+
+##############################################################################################
+###################################### begin doxygen #########################################
+##############################################################################################
+
+# This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
+SET( DOC_SOURCE_DIR ${CYCLUS_SOURCE_DIR})
+SET( DOC_INPUT_DIR ${CYCLUS_SOURCE_DIR}/doc)
+  
+# If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
+FIND_PACKAGE(Doxygen)
+IF (DOXYGEN_FOUND)
+  ADD_SUBDIRECTORY(${DOC_INPUT_DIR})
+  SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
+ELSE (DOXYGEN_FOUND)
+  MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
+ENDIF (DOXYGEN_FOUND)
+
+##############################################################################################
+####################################### end doxygen ##########################################
+##############################################################################################
