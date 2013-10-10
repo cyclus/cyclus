@@ -151,6 +151,7 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
+ADD_SUBDIRECTORY(${CYCLUS_STUB_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_TEST_DIR})
 
 ##############################################################################################
@@ -174,7 +175,4 @@ add_custom_target(uninstall
 ################################### end uninstall target #####################################
 ##############################################################################################
 
-
 ENDIF(NOT CYCLUS_DOC_ONLY)  
-
-# add src files

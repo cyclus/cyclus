@@ -99,7 +99,8 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
-)
+  ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
+  )
 
 ADD_EXECUTABLE( cyclus_unit_tests
   cyclus_unit_test_driver.cc 
@@ -109,6 +110,7 @@ ADD_EXECUTABLE( cyclus_unit_tests
 TARGET_LINK_LIBRARIES( cyclus_unit_tests dl 
   ${LIBS} 
   cycluscore 
+  cyclusstubs # needed to test stubs 
   gtest
   )
 
@@ -129,7 +131,6 @@ set( tgt "cyclus_unit_tests" )
 set( script "${CMAKE_CURRENT_SOURCE_DIR}/generate_test_macros.py" )
 set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}" )
 set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake" )
-MESSAGE(${out})
 add_custom_command(TARGET ${tgt}
   POST_BUILD
   COMMAND python ${script} ${exec} ${out}
