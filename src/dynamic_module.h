@@ -17,9 +17,8 @@ class DynamicModule {
   static const std::string Suffix();
 
   /// Creates a new dynamically loadable module.
-  /// @param type the module type
   /// @param name the name of the module
-  DynamicModule(std::string type, std::string name);
+  DynamicModule(std::string name);
 
   /// @return the module name
   std::string name();
@@ -44,9 +43,6 @@ class DynamicModule {
 
   /// the name of the module
   std::string module_name_;
-
-  /// the type of module
-  std::string type_;
 
   /// the name of all module constructor functions
   std::string constructor_name_;

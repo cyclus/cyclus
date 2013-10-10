@@ -18,8 +18,6 @@ namespace cyclus {
 // static members
 int Model::next_id_ = 0;
 std::vector<Model*> Model::model_list_;
-std::map< std::string, DynamicModule*>
-Model::loaded_modules_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
@@ -65,56 +63,12 @@ std::vector<Model*> Model::GetModelList() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::UnloadModules() {
-  std::map<std::string, DynamicModule*>::iterator it;
-  for (it = loaded_modules_.begin(); it != loaded_modules_.end(); it++) {
-    it->second->CloseLibrary();
-    delete it->second;
-  }
-  loaded_modules_.clear();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(Model* m) {
   id_ = next_id_++;
   name_ = m->name_;
   model_type_ = m->model_type_;
   model_impl_ = m->model_impl_;
-  model_type_ = m->model_type_;
   ctx_ = m->ctx_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::InitializeSimulationEntity(Context* ctx, std::string model_type,
-                                       QueryEngine* qe) {
-  // query data
-  QueryEngine* module_data = qe->QueryElement("model");
-  std::string module_name = module_data->GetElementName();
-
-  DynamicModule* module = new DynamicModule(model_type, module_name);
-  loaded_modules_[module_name] = module;
-  CLOG(LEV_DEBUG1) << "Module '" << module_name
-                   << "' of type: " << model_type
-                   << " has been loaded.";
-  
-  Model* model = module->ConstructInstance(ctx);
-  model->InitCoreMembers(qe);
-  model->SetModelImpl(module_name);
-  model->InitModuleMembers(module_data->QueryElement(module_name));
-
-  CLOG(LEV_DEBUG3) << "Module '" << model->name()
-                   << "' has had its module members initialized:";
-  CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
-  CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
-  CLOG(LEV_DEBUG3) << " * ID: " << model->id();
-
-  // register module
-  if ("Facility" == model_type) {
-    ctx->AddPrototype(model->name(), model);
-  } else if (model_type == "Market" || model_type == "Region") {
-    model->Deploy(model);
-  }
-  model_list_.push_back(model);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,6 +86,7 @@ Model::Model(Context* ctx)
     deathtime_(-1),
     parent_(NULL) {
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
+  model_list_.push_back(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

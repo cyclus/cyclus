@@ -80,6 +80,14 @@ class Env {
   /// @return the current value of the module environment variable
   static const std::string ModuleEnvVar();
 
+  /// Returns names of all dynamically loadable, installed modules of the
+  /// specified type.
+  ///
+  /// @param type one of "Region", "Inst", "Facility", etc.
+  /// @return module names without the "lib" prefix or file extension.
+  /// Equivalent to the module class name (e.g. SourceFacility).
+  static std::vector<std::string> ListModules(std::string type);
+
   /// @return the correct environment variable delimeter based on the file system
   static const std::string EnvDelimiter();
 

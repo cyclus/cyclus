@@ -146,32 +146,25 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(ctx_, controlFile, false));
+  EXPECT_NO_THROW(XMLFileLoader file(ctx_, controlFile));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
-  EXPECT_THROW(XMLFileLoader file(ctx_, "blah", false), cyclus::IOError);
+  EXPECT_THROW(XMLFileLoader file(ctx_, "blah"), cyclus::IOError);
 }
 
 TEST_F(XMLFileLoaderTests, control) {
-  XMLFileLoader file(ctx_, controlFile, false);
+  XMLFileLoader file(ctx_, controlFile);
   EXPECT_NO_THROW(file.LoadControlParams());
 }
 
 TEST_F(XMLFileLoaderTests, recipes) {
-  XMLFileLoader file(ctx_, recipeFile, false);
+  XMLFileLoader file(ctx_, recipeFile);
   EXPECT_NO_THROW(file.LoadRecipes());
 }
 
-// This needs to be moved somewhere else! maybe to a new simulation
-// constructor class..
-TEST_F(XMLFileLoaderTests, modulesandsim) {
-  XMLFileLoader file(ctx_, moduleFile, false);
-  EXPECT_NO_THROW(file.LoadDynamicModules());
-}
-
 TEST_F(XMLFileLoaderTests, schema) {
-  XMLFileLoader file(ctx_, controlFile, false);
+  XMLFileLoader file(ctx_, controlFile);
   std::stringstream schema(ControlSchema());
   EXPECT_NO_THROW(file.ApplySchema(schema););
 }
