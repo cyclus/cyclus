@@ -9,10 +9,11 @@ IF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # set project directories
-SET( PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+SET( PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+SET( CYCLUS_CLI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cli )
 SET( CYCLUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src )
-SET( CYCLUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests )
 SET( CYCLUS_STUB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stubs )
+SET( CYCLUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests )
 
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
@@ -141,20 +142,19 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 ###################################### begin includes ########################################
 ##############################################################################################
 
-ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(cli)
-ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
+ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
+
+# enable testing, must be at top-level cmake file
+OPTION( USE_TESTING "Build testing" ON )
+IF( USE_TESTING )
+  enable_testing()
+  INCLUDE(CTest)
+ENDIF()
+ADD_SUBDIRECTORY(${CYCLUS_TEST_DIR})
 
 ##############################################################################################
 ####################################### end includes #########################################
-##############################################################################################
-
-##############################################################################################
-###################################### begin testing #########################################
-##############################################################################################
-
-##############################################################################################
-####################################### end testing ##########################################
 ##############################################################################################
 
 ##############################################################################################
