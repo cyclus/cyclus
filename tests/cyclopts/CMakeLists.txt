@@ -4,7 +4,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
   PARENT_SCOPE
-)
+  )
 
 FILE(GLOB cyclopts_header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 INSTALL(FILES ${cyclopts_header_files}

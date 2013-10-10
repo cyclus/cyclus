@@ -70,6 +70,13 @@ ELSE()
   set(dynamicloadlib "unix_helper_functions.h")
 ENDIF()
 
+# enable testing, must be at top-level cmake file
+OPTION( USE_TESTING "Build testing" ON )
+IF( USE_TESTING )
+  enable_testing()
+  INCLUDE(CTest)
+ENDIF()
+
 ##############################################################################################
 ################################## end cmake configuration ###################################
 ##############################################################################################
@@ -144,13 +151,6 @@ INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
 
 ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
-
-# enable testing, must be at top-level cmake file
-OPTION( USE_TESTING "Build testing" ON )
-IF( USE_TESTING )
-  enable_testing()
-  INCLUDE(CTest)
-ENDIF()
 ADD_SUBDIRECTORY(${CYCLUS_TEST_DIR})
 
 ##############################################################################################
