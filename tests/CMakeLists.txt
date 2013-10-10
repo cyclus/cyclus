@@ -120,9 +120,14 @@ INSTALL(TARGETS cyclus_unit_tests
   )
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
-INSTALL(FILES ${header_files} ${model_test_files}
+INSTALL(FILES ${header_files}
   DESTINATION include/cyclus
+  COMPONENT testing
+  )
+
+FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
+INSTALL(FILES ${model_test_files}
+  DESTINATION share
   COMPONENT testing
   )
 
