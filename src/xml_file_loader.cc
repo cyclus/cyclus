@@ -11,109 +11,91 @@
 #include "context.h"
 #include "env.h"
 #include "error.h"
+#include "event_manager.h"
 #include "logger.h"
 #include "model.h"
+#include "timer.h"
 #include "xml_query_engine.h"
 
 namespace cyclus {
 namespace fs = boost::filesystem;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(Context* ctx,
-                             const std::string load_filename,
-                             bool use_main_schema) : ctx_(ctx) {
-  file_ = load_filename;
-  initialize_module_paths();
-
-  std::stringstream input("");
-  LoadStringstreamFromFile(input, file_);
-  parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
-  parser_->Init(input);
-  if (use_main_schema) {
-    std::stringstream ss(BuildSchema());
-    parser_->Validate(ss);
+// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
+void LoadStringstreamFromFile(std::stringstream& stream,
+                              std::string file) {
+  std::ifstream file_stream(file.c_str());
+  if (!file_stream) {
+    throw IOError("The file '" + file + "' could not be loaded.");
   }
 
-  ctx_->NewEvent("InputFiles")
-  ->AddVal("Data", cyclus::Blob(input.str()))
-  ->Record();
+  stream << file_stream.rdbuf();
+  file_stream.close();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string XMLFileLoader::BuildSchema() {
+std::string BuildMasterSchema() {
+  Timer ti;
+  EventManager em;
+  Context ctx(&ti, &em);
+
   std::stringstream schema("");
-  LoadStringstreamFromFile(schema, PathToMainSchema());
+  std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
+  LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
   std::set<std::string> types = Model::dynamic_module_types();
-
-  std::stringstream includes;
   std::set<std::string>::iterator type;
   for (type = types.begin(); type != types.end(); ++type) {
-    // find modules
-    std::stringstream refs;
-    refs << std::endl;
-    fs::path models_path = Env::GetInstallPath() + "/lib/Models/" + *type;
-    fs::recursive_directory_iterator end;
-    try {
-      for (fs::recursive_directory_iterator it(models_path); it != end; ++it) {
-        fs::path p = it->path();
-        // build refs and includes
-        if (p.extension() == ".rng") {
-          includes << "<include href='" << p.string() << "'/>" << std::endl;
-
-          std::ifstream in(p.string().c_str(), std::ios::in | std::ios::binary);
-          std::string rng_data((std::istreambuf_iterator<char>(in)),
-                               std::istreambuf_iterator<char>());
-          std::string find_str("<define name=\"");
-          size_t start = rng_data.find(find_str) + find_str.size();
-          size_t end = rng_data.find("\"", start + 1);
-          std::string ref = rng_data.substr(start, end - start);
-          refs << "<ref name='" << ref << "'/>" << std::endl;
-        }
-      }
-    } catch (...) { }
+    std::vector<std::string> names = Env::ListModules(*type);
+    std::stringstream subschema;
+    for (int i = 0; i < names.size(); ++i) {
+      DynamicModule dyn(names[i]);
+      Model* m = dyn.ConstructInstance(&ctx);
+      subschema << "<element name=\"" << names[i] << "\">\n";
+      subschema << m->schema() << "\n";
+      subschema << "</element>\n";
+      delete m;
+      dyn.CloseLibrary();
+    }
 
     // replace refs
     std::string search_str = std::string("@") + *type + std::string("_REFS@");
     size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
-      master.replace(pos, search_str.size(), refs.str());
+      master.replace(pos, search_str.size(), subschema.str());
     }
-  }
-
-  // replace includes
-  std::string search_str = "@RNG_INCLUDES@";
-  size_t pos = master.find(search_str);
-  if (pos != std::string::npos) {
-    master.replace(pos, search_str.size(), includes.str());
   }
 
   return master;
 }
 
-// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadStringstreamFromFile(std::stringstream& stream,
-                                             std::string file) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+XMLFileLoader::XMLFileLoader(Context* ctx,
+                             const std::string load_filename) : ctx_(ctx) {
+  file_ = load_filename;
+  std::stringstream input;
+  LoadStringstreamFromFile(input, file_);
+  parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
+  parser_->Init(input);
 
-  CLOG(LEV_DEBUG4) << "loading the file: " << file;
+  ctx_->NewEvent("InputFiles")
+  ->AddVal("Data", cyclus::Blob(input.str()))
+  ->Record();
 
-  std::ifstream file_stream(file.c_str());
-
-  if (file_stream) {
-    stream << file_stream.rdbuf();
-    file_stream.close();
-  } else {
-    throw IOError("The file '" + file
-                  + "' could not be loaded.");
-  }
-
-  CLOG(LEV_DEBUG5) << "file loaded as a string: " << stream.str();
+  schema_paths_["Market"] = "/*/market";
+  schema_paths_["Converter"] = "/*/converter";
+  schema_paths_["Region"] = "/*/region";
+  schema_paths_["Inst"] = "/*/region/institution";
+  schema_paths_["Facility"] = "/*/facility";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string XMLFileLoader::PathToMainSchema() {
-  return Env::GetInstallPath() + "/share/cyclus.rng.in";
+XMLFileLoader::~XMLFileLoader() {
+  std::map<std::string, DynamicModule*>::iterator it;
+  for (it = modules_.begin(); it != modules_.end(); it++) {
+    it->second->CloseLibrary();
+    delete it->second;
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -122,18 +104,17 @@ void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::initialize_module_paths() {
-  module_paths_["Market"] = "/*/market";
-  module_paths_["Region"] = "/*/region";
-  module_paths_["Inst"] = "/*/region/institution";
-  module_paths_["Facility"] = "/*/facility";
-}
+void XMLFileLoader::LoadSim(bool use_main_schema) {
+  LoadDynamicModules();
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadAll() {
+  if (use_main_schema) {
+    std::stringstream ss(BuildMasterSchema());
+    parser_->Validate(ss);
+  }
+
   LoadControlParams();
   LoadRecipes();
-  LoadDynamicModules();
+  LoadInitialAgents();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -185,23 +166,51 @@ void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadDynamicModules() {
+void XMLFileLoader::LoadInitialAgents() {
   std::set<std::string> module_types = Model::dynamic_module_types();
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    LoadModulesOfType(*it, module_paths_[*it]);
+    XMLQueryEngine xqe(*parser_);
+    int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
+    for (int i = 0; i < num_models; i++) {
+      QueryEngine* qe = xqe.QueryElement(schema_paths_[*it], i);
+      QueryEngine* module_data = qe->QueryElement("model");
+      std::string module_name = module_data->GetElementName();
+
+      Model* model = modules_[module_name]->ConstructInstance(ctx_);
+      model->InitCoreMembers(qe);
+      model->SetModelImpl(module_name);
+      model->InitModuleMembers(module_data->QueryElement(module_name));
+
+      CLOG(LEV_DEBUG3) << "Module '" << model->name()
+                       << "' has had its module members initialized:";
+      CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
+      CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
+      CLOG(LEV_DEBUG3) << " * ID: " << model->id();
+
+      // register module
+      if (*it == "Facility") {
+        ctx_->AddPrototype(model->name(), model);
+      } else if (*it == "Market" || *it == "Region") {
+        model->Deploy(model);
+      }
+    }
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadModulesOfType(std::string type,
-                                      std::string query_path) {
-  XMLQueryEngine xqe(*parser_);
-
-  int num_models = xqe.NElementsMatchingQuery(query_path);
-  for (int i = 0; i < num_models; i++) {
-    QueryEngine* qe = xqe.QueryElement(query_path, i);
-    Model::InitializeSimulationEntity(ctx_, type, qe);
+void XMLFileLoader::LoadDynamicModules() {
+  std::set<std::string> module_types = Model::dynamic_module_types();
+  std::set<std::string>::iterator it;
+  for (it = module_types.begin(); it != module_types.end(); it++) {
+    std::vector<std::string> names = Env::ListModules(*it);
+    for (int i = 0; i < names.size(); ++i) {
+      DynamicModule* module = new DynamicModule(names[i]);
+      modules_[names[i]] = module;
+      CLOG(LEV_DEBUG1) << "Module '" << names[i]
+                       << "' of type: " << *it
+                       << " has been loaded.";
+    }
   }
 }
 
