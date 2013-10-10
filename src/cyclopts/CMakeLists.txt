@@ -1,11 +1,21 @@
-# Add any new cyclus core source files to this list
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+
+SET(
+  CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PARENT_SCOPE
+)
+
+# Add any new source files to this list
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
   ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/solver.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
-  PARENT_SCOPE)
+  PARENT_SCOPE
+  )
 
 INSTALL(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.h
