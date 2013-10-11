@@ -2,6 +2,7 @@
 #define CYCLUS_REQUEST_H_
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include "material.h"
 #include "facility_model.h"
@@ -19,7 +20,7 @@ struct Request {
   std::string commodity;
 
   /// @return the target resource for this request
-  T* target;
+  boost::shared_ptr<T> target;
 
   /// @return the preference value for this request
   double preference;

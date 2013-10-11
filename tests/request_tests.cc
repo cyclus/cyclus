@@ -34,12 +34,12 @@ TEST(RequestTests, MaterialGetSet) {
   Request<Material> r;
   r.commodity = commod;
   r.requester = fac;
-  r.target = mat.get();
+  r.target = mat;//.get();
   r.preference = pref;
 
   EXPECT_EQ(commod, r.commodity);
   EXPECT_EQ(fac, r.requester);
-  EXPECT_EQ(mat.get(), r.target);
+  EXPECT_EQ(mat, r.target);
   EXPECT_EQ(pref, r.preference);
   
   delete fac;
@@ -61,12 +61,12 @@ TEST(RequestTests, GenRsrcGetSet) {
   Request<GenericResource> r;
   r.commodity = commod;
   r.requester = fac;
-  r.target = rsrc.get();
+  r.target = rsrc;//.get();
   r.preference = pref;
 
   EXPECT_EQ(commod, r.commodity);
   EXPECT_EQ(fac, r.requester);
-  EXPECT_EQ(rsrc.get(), r.target);
+  EXPECT_EQ(rsrc, r.target);
   EXPECT_EQ(pref, r.preference);
   
   delete fac;
