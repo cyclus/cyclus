@@ -170,6 +170,7 @@ INSTALL(FILES
   version.h
   windows_helper_functions.h
   request.h
+  request_response.h
   DESTINATION include/cyclus
   COMPONENT core
   )
