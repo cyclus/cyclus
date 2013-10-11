@@ -7,7 +7,6 @@
 #include "material.h"
 #include "facility_model.h"
 
-
 namespace cyclus {
   
 /// A Request encapsulates all the information required to communicate the
