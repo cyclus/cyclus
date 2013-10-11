@@ -32,11 +32,10 @@ def install_cyclus(args):
         os.mkdir(args.build_dir)
         
     root_dir = os.path.split(__file__)[0]
-    src_dir = os.path.join(root_dir, 'src')
     makefile = os.path.join(args.build_dir, 'Makefile')
 
     if not os.path.exists(makefile):
-        cmake_cmd = ['cmake', os.path.abspath(src_dir)]
+        cmake_cmd = ['cmake', os.path.abspath(root_dir)]
         if args.prefix:
             cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' + absexpanduser(args.prefix)]
         if args.cmake_prefix_path:
