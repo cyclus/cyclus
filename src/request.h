@@ -1,5 +1,5 @@
-#ifndef REQUEST_H_
-#define REQUEST_H_
+#ifndef CYCLUS_REQUEST_H_
+#define CYCLUS_REQUEST_H_
 
 #include <string>
 
