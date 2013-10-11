@@ -16,7 +16,7 @@ macro(cyclus_init  _path _dir _name)
 endmacro()
   
 macro(cyclus_init_model _type _dir _name)
-  SET(MODEL_PATH "/Models/${_type}/${_dir}")
+  SET(MODEL_PATH "/cyclus/${_type}/${_dir}")
   cyclus_init(${MODEL_PATH} ${_dir} ${_name})
 
   SET(${_type}TestSource ${${_type}TestSource} 

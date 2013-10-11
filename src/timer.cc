@@ -29,6 +29,11 @@ void Timer::RunSim() {
         Material::DecayAll(time_);
       }
 
+      // provides robustness when listeners are added suring ticks/tocks
+      for (int i = 0; i < new_tickers_.size(); ++i) {
+        tick_listeners_.push_back(new_tickers_[i]);
+      }
+      new_tickers_.clear();
       SendTick();
       SendResolve();
     }
@@ -129,7 +134,7 @@ void Timer::SendDailyTasks() {
 void Timer::RegisterTickListener(TimeAgent* agent) {
   CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
                   << " has registered to receive 'ticks' and 'tocks'.";
-  tick_listeners_.push_back(agent);
+  new_tickers_.push_back(agent);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

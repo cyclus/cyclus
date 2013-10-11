@@ -214,6 +214,11 @@ class Timer {
   std::vector<TimeAgent*> tick_listeners_;
 
   /**
+     Concrete models that desire to receive tick and tock notifications
+   */
+  std::vector<TimeAgent*> new_tickers_;
+
+  /**
      Returns a string of all models listening to the tick
    */
   std::string ReportListeners();
