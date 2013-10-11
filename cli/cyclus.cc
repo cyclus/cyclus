@@ -70,7 +70,9 @@ int main(int argc, char* argv[]) {
     std::cout << desc << "\n";
     return 0;
   } else if (vm.count("version")) {
-    std::cout << "Cyclus Core " << version::core() << "\n\nDependencies:\n";
+    std::cout << "Cyclus Core " << version::core()
+              << " (" << version::describe() << ")"
+              << "\n\nDependencies:\n";
     std::cout << "   Boost    " << version::boost() << "\n";
     std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
     std::cout << "   Hdf5     " << version::hdf5() << "\n";

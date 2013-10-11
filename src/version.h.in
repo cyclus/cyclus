@@ -16,8 +16,12 @@
 
 namespace cyclus {
 namespace version {
-  const char* core() {
+  const char* describe() {
     return "@core_version@";
+  };
+
+  const char* core() {
+    return "0.2";
   };
 
   const char* boost() {
