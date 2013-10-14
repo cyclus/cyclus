@@ -149,16 +149,24 @@ int Timer::time() {
   return time_;
 }
 
-void Timer::reset() {
+void Timer::Reset() {
   resolve_listeners_.clear();
   tick_listeners_.clear();
+
+  decay_interval_ = 0;
+  month0_ = 0;
+  year0_ = 0;
+  start_time_ = 0;
+  time_ = 0;
+  dur_ = 0;
+  start_date_ = boost::gregorian::date();
+  end_date_ = boost::gregorian::date();
+  date_ = boost::gregorian::date();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
                        int decay, std::string handle) {
-  reset();
-
   if (m0 < 1 || m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
   }
