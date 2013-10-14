@@ -50,8 +50,10 @@ TEST_F(RequestPortfolioTests, ReqAdd) {
   r2.requester = fac2;
   
   RequestPortfolio<Resource> rp;
+  ASSERT_EQ(rp.requests().size(), 0);
   EXPECT_NO_THROW(rp.AddRequest(r1));
   ASSERT_EQ(rp.requester(), fac1);
+  ASSERT_EQ(rp.requests().size(), 1);
   ASSERT_EQ(rp.requests()[0], r1);
   EXPECT_THROW(rp.AddRequest(r2), KeyError);  
 }
