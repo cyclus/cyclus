@@ -28,6 +28,14 @@ struct Request {
   cyclus::FacilityModel* requester;
 };
 
+template<class T>
+bool operator==(const cyclus::Request<T>& lhs, const cyclus::Request<T>& rhs) {
+  return  ((lhs.commodity == rhs.commodity) &&
+           (lhs.target == rhs.target) &&
+           (lhs.preference == rhs.preference) &&
+           (lhs.requester == rhs.requester));
+}
+
 } // namespace cyclus
 
 #endif
