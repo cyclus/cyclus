@@ -53,7 +53,9 @@ class Env {
 
   /// Returns the default path for installed cyclus simulation agent
   /// modules.
-  static const std::string module_install_path();
+  inline static const std::string module_install_path() {
+    return Env::GetInstallPath() + "/lib/cyclus";
+  };
 
   /// the relative path to the root build directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory

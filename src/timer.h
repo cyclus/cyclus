@@ -40,7 +40,9 @@ class Timer {
   void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
                   int start = 0, int decay = 0, std::string handle = "");
 
-  /// reset all data (registered listeners, etc.) to empty or initial state
+  /**
+     reset all data (registered listeners, etc.) to empty or initial state
+   */
   void Reset();
 
   /**

@@ -29,7 +29,7 @@ void Timer::RunSim() {
         Material::DecayAll(time_);
       }
 
-      // provides robustness when listeners are added suring ticks/tocks
+      // provides robustness when listeners are added during ticks/tocks
       for (int i = 0; i < new_tickers_.size(); ++i) {
         tick_listeners_.push_back(new_tickers_[i]);
       }
