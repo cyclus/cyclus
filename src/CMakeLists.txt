@@ -171,6 +171,7 @@ INSTALL(FILES
   windows_helper_functions.h
   request.h
   request_response.h
+  capacity_constraint.h
   DESTINATION include/cyclus
   COMPONENT core
   )

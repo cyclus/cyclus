@@ -71,6 +71,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
