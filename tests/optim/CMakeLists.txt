@@ -6,8 +6,8 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   PARENT_SCOPE
   )
 
-FILE(GLOB cyclopts_header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${cyclopts_header_files}
-  DESTINATION include/cyclopts
+FILE(GLOB optim_header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+INSTALL(FILES ${optim_header_files}
+  DESTINATION include/optim
   COMPONENT testing
   )

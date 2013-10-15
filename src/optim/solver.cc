@@ -4,13 +4,13 @@
 #include <vector>
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Solver::Solver() {
-  index_ = std::map<cyclus::cyclopts::VariablePtr, int>();
+cyclus::optim::Solver::Solver() {
+  index_ = std::map<cyclus::optim::VariablePtr, int>();
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Solver::PopulateIndices(
-    std::vector<cyclus::cyclopts::VariablePtr>& variables) {
+void cyclus::optim::Solver::PopulateIndices(
+    std::vector<cyclus::optim::VariablePtr>& variables) {
   for (int i = 0; i < variables.size(); i++) {
     index_[variables.at(i)] = i;
   }

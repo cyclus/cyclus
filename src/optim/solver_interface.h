@@ -8,8 +8,8 @@
 #include "variable.h"
 
 namespace cyclus {
-namespace cyclopts {
-/// A general interface class for all derived cyclopts solvers to set up and 
+namespace optim {
+/// A general interface class for all derived optim solvers to set up and 
 /// solve a constraint program.
 class SolverInterface {
  public:
@@ -20,27 +20,27 @@ class SolverInterface {
 
   /// add a variable
   /// @param v a pointer to the variable to register with the problem
-  void RegisterVariable(cyclus::cyclopts::VariablePtr v);
+  void RegisterVariable(cyclus::optim::VariablePtr v);
 
   /// set the objective function
   /// @param obj a pointer to the objective function to register
-  void RegisterObjFunction(cyclus::cyclopts::ObjFuncPtr obj);
+  void RegisterObjFunction(cyclus::optim::ObjFuncPtr obj);
 
   /// add a variable to the objective function
   /// @param v the variable to add to the obj function
   /// @param modifier the modifier for that variable in the obj function
-  void AddVarToObjFunction(cyclus::cyclopts::VariablePtr v, double modifier);
+  void AddVarToObjFunction(cyclus::optim::VariablePtr v, double modifier);
 
   /// add a constraint
   /// @param c a pointer to a constraint function to register
-  void RegisterConstraint(cyclus::cyclopts::ConstraintPtr c);
+  void RegisterConstraint(cyclus::optim::ConstraintPtr c);
 
   /// add a variable to a constraint
   /// @param v the variable to add to a constraint
   /// @param modifier the modifier for that variable in the constraint
   /// @param c the constraint to add it to
-  void AddVarToConstraint(cyclus::cyclopts::VariablePtr v, double modifier, 
-                          cyclus::cyclopts::ConstraintPtr c);
+  void AddVarToConstraint(cyclus::optim::VariablePtr v, double modifier, 
+                          cyclus::optim::ConstraintPtr c);
 
   /// solve the constraint program
   void Solve();
@@ -50,13 +50,13 @@ class SolverInterface {
   SolverPtr solver_;
 
   /// the variables
-  std::vector<cyclus::cyclopts::VariablePtr> variables_;
+  std::vector<cyclus::optim::VariablePtr> variables_;
 
   /// the objective function
-  cyclus::cyclopts::ObjFuncPtr obj_;
+  cyclus::optim::ObjFuncPtr obj_;
 
   /// the constraints
-  std::vector<cyclus::cyclopts::ConstraintPtr> constraints_;
+  std::vector<cyclus::optim::ConstraintPtr> constraints_;
 
   /// a limit on the modifiers of constraints
   double modifier_limit_;
@@ -64,7 +64,7 @@ class SolverInterface {
   /// checks if a modifier is within the acceptable bounds for modifiers
   void CheckModifierBounds(double modifier);
 };
-} // namespace cyclopts
+} // namespace optim
 } // namespace cyclus
 
 #endif

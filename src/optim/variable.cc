@@ -3,13 +3,13 @@
 #include <string>
 #include <sstream>
 
-#include "cyclopts/limits.h"
+#include "optim/limits.h"
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Variable::next_id_ = 0;
+int cyclus::optim::Variable::next_id_ = 0;
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Variable(Bound l, Bound u, VarType t)
+cyclus::optim::Variable::Variable(Bound l, Bound u, VarType t)
     : id_(next_id_++),
       lbound_(l),
       ubound_(u),
@@ -20,133 +20,133 @@ cyclus::cyclopts::Variable::Variable(Bound l, Bound u, VarType t)
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Variable::id() {
+int cyclus::optim::Variable::id() {
   return id_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::VarType cyclus::cyclopts::Variable::type() {
+cyclus::optim::Variable::VarType cyclus::optim::Variable::type() {
   return type_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Bound cyclus::cyclopts::Variable::lbound() {
+cyclus::optim::Variable::Bound cyclus::optim::Variable::lbound() {
   return lbound_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Bound cyclus::cyclopts::Variable::ubound() {
+cyclus::optim::Variable::Bound cyclus::optim::Variable::ubound() {
   return ubound_;
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::Variable::name() {
+std::string cyclus::optim::Variable::name() {
   return name_;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Variable::set_name(std::string name) {
+void cyclus::optim::Variable::set_name(std::string name) {
   name_ = name;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Variable::set_value(boost::any v) {
+void cyclus::optim::Variable::set_value(boost::any v) {
   value_ = v;
 }
 
 // -----------------------------------------------------------------------------
-boost::any cyclus::cyclopts::Variable::value() {
+boost::any cyclus::optim::Variable::value() {
   return value_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, Bound ub)
+cyclus::optim::LinearVariable::LinearVariable(Bound lb, Bound ub)
     : Variable(lb, ub, LINEAR),
-      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
-      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
+      lbound_val_(-cyclus::optim::kLinBoundLimit),
+      ubound_val_(cyclus::optim::kLinBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, Bound ub)
+cyclus::optim::LinearVariable::LinearVariable(double lb_val, Bound ub)
     : Variable(FINITE, ub, LINEAR),
       lbound_val_(lb_val),
-      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
+      ubound_val_(cyclus::optim::kLinBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, double ub_val)
+cyclus::optim::LinearVariable::LinearVariable(Bound lb, double ub_val)
     : Variable(lb, FINITE, LINEAR),
-      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
+      lbound_val_(-cyclus::optim::kLinBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, double ub_val)
+cyclus::optim::LinearVariable::LinearVariable(double lb_val, double ub_val)
     : Variable(FINITE, FINITE, LINEAR),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::LinearVariable::lbound_val() {
+double cyclus::optim::LinearVariable::lbound_val() {
   return lbound_val_;
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::LinearVariable::ubound_val() {
+double cyclus::optim::LinearVariable::ubound_val() {
   return ubound_val_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, Bound ub)
+cyclus::optim::IntegerVariable::IntegerVariable(Bound lb, Bound ub)
     : Variable(lb, ub, INT),
-      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
-      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
+      lbound_val_(-cyclus::optim::kIntBoundLimit),
+      ubound_val_(cyclus::optim::kIntBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, Bound ub)
+cyclus::optim::IntegerVariable::IntegerVariable(int lb_val, Bound ub)
     : Variable(FINITE, ub, INT),
       lbound_val_(lb_val),
-      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
+      ubound_val_(cyclus::optim::kIntBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, int ub_val)
+cyclus::optim::IntegerVariable::IntegerVariable(Bound lb, int ub_val)
     : Variable(lb, FINITE, INT),
-      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
+      lbound_val_(-cyclus::optim::kIntBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, int ub_val)
+cyclus::optim::IntegerVariable::IntegerVariable(int lb_val, int ub_val)
     : Variable(FINITE, FINITE, INT),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::IntegerVariable::lbound_val() {
+int cyclus::optim::IntegerVariable::lbound_val() {
   return lbound_val_;
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::IntegerVariable::ubound_val() {
+int cyclus::optim::IntegerVariable::ubound_val() {
   return ubound_val_;
 }
 
 // -----------------------------------------------------------------------------
-std::pair<int, int> cyclus::cyclopts::GetIntBounds(
-    cyclus::cyclopts::VariablePtr v) {
-  using cyclus::cyclopts::IntegerVariable;
+std::pair<int, int> cyclus::optim::GetIntBounds(
+    cyclus::optim::VariablePtr v) {
+  using cyclus::optim::IntegerVariable;
   IntegerVariable* clone = dynamic_cast<IntegerVariable*>(v.get());
   return std::pair<int, int>(clone->lbound_val(), clone->ubound_val());
 }
 
 // -----------------------------------------------------------------------------
-std::pair<double, double> cyclus::cyclopts::GetLinBounds(
-    cyclus::cyclopts::VariablePtr v) {
-  using cyclus::cyclopts::LinearVariable;
+std::pair<double, double> cyclus::optim::GetLinBounds(
+    cyclus::optim::VariablePtr v) {
+  using cyclus::optim::LinearVariable;
   LinearVariable* clone = dynamic_cast<LinearVariable*>(v.get());
   return std::pair<double, double>(clone->lbound_val(), clone->ubound_val());
 }
