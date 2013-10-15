@@ -3,7 +3,6 @@
 #define _XMLFILELOADER_H
 
 #include <map>
-#include <set>
 #include <string>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
