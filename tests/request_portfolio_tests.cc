@@ -34,7 +34,6 @@ class RequestPortfolioTests: public ::testing::Test {
     fac1 = new MockFacility(tc.get());
     fac2 = new MockFacility(tc.get());
   };
-
   virtual void TearDown() {
     delete fac1;
     delete fac2;
