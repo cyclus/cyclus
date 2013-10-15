@@ -8,7 +8,7 @@
 #include <boost/any.hpp>
 
 namespace cyclus {
-namespace cyclopts {
+namespace optim {
 class Variable;
 
 /// a smart pointer to the base class
@@ -163,7 +163,7 @@ std::pair<int, int> GetIntBounds(VariablePtr v);
 /// linear variable
 std::pair<double, double> GetLinBounds(VariablePtr v);
   
-} // namespace cyclopts
+} // namespace optim
 } // namespace cyclus
 
 #endif

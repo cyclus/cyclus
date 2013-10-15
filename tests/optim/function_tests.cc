@@ -1,4 +1,4 @@
-#include "cyclopts/function.h"
+#include "optim/function.h"
 
 #include <stdlib.h>
 
@@ -7,9 +7,9 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsFunctionTests, AddVars) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::Function;
+  using cyclus::optim::Variable;
+  using cyclus::optim::VariablePtr;
+  using cyclus::optim::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
@@ -29,9 +29,9 @@ TEST(CycloptsFunctionTests, AddVars) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsFunctionTests, GetModifiers) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::Function;
+  using cyclus::optim::Variable;
+  using cyclus::optim::VariablePtr;
+  using cyclus::optim::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
@@ -48,7 +48,7 @@ TEST(CycloptsFunctionTests, GetModifiers) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsObjectiveFunctionTests, Constructor) {
   // usings
-  using cyclus::cyclopts::ObjectiveFunction;
+  using cyclus::optim::ObjectiveFunction;
 
   ObjectiveFunction::Direction dir;
 
@@ -65,12 +65,12 @@ TEST(CycloptsObjectiveFunctionTests, Constructor) {
 // class for parameterized constraint function testing
 class ConstraintTests :
     public
-::testing::TestWithParam<cyclus::cyclopts::Constraint::EqualityRelation> { };
+::testing::TestWithParam<cyclus::optim::Constraint::EqualityRelation> { };
 
 // parameterized test
 TEST_P(ConstraintTests, Constructor) {
   // usings
-  using cyclus::cyclopts::Constraint;
+  using cyclus::optim::Constraint;
 
   Constraint::EqualityRelation eq_r = GetParam();
   double rhs = static_cast<double>(std::rand());
@@ -81,12 +81,12 @@ TEST_P(ConstraintTests, Constructor) {
 }
 
 // call test
-const cyclus::cyclopts::Constraint::EqualityRelation relations[] = {
-  cyclus::cyclopts::Constraint::EQ,
-  cyclus::cyclopts::Constraint::GT,
-  cyclus::cyclopts::Constraint::GTEQ,
-  cyclus::cyclopts::Constraint::LT,
-  cyclus::cyclopts::Constraint::LTEQ
+const cyclus::optim::Constraint::EqualityRelation relations[] = {
+  cyclus::optim::Constraint::EQ,
+  cyclus::optim::Constraint::GT,
+  cyclus::optim::Constraint::GTEQ,
+  cyclus::optim::Constraint::LT,
+  cyclus::optim::Constraint::LTEQ
 };
 
 INSTANTIATE_TEST_CASE_P(CycloptsConstraintConstructor, ConstraintTests,

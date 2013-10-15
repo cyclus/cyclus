@@ -5,25 +5,25 @@
 
 #include "CoinModel.hpp"
 
-#include "cyclopts/cbc_solver.h"
-#include "cyclopts/function.h"
-#include "cyclopts/solver.h"
-#include "cyclopts/solver_interface.h"
-#include "cyclopts/variable.h"
-#include "cyclopts/limits.h"
+#include "optim/cbc_solver.h"
+#include "optim/function.h"
+#include "optim/solver.h"
+#include "optim/solver_interface.h"
+#include "optim/variable.h"
+#include "optim/limits.h"
 
 // usings
 using boost::any_cast;
-using cyclus::cyclopts::SolverPtr;
-using cyclus::cyclopts::CBCSolver;
-using cyclus::cyclopts::Constraint;
-using cyclus::cyclopts::ConstraintPtr;
-using cyclus::cyclopts::ObjFuncPtr;
-using cyclus::cyclopts::SolverInterface;
-using cyclus::cyclopts::Variable;
-using cyclus::cyclopts::VariablePtr;
-using cyclus::cyclopts::IntegerVariable;
-using cyclus::cyclopts::ObjectiveFunction;
+using cyclus::optim::SolverPtr;
+using cyclus::optim::CBCSolver;
+using cyclus::optim::Constraint;
+using cyclus::optim::ConstraintPtr;
+using cyclus::optim::ObjFuncPtr;
+using cyclus::optim::SolverInterface;
+using cyclus::optim::Variable;
+using cyclus::optim::VariablePtr;
+using cyclus::optim::IntegerVariable;
+using cyclus::optim::ObjectiveFunction;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
@@ -147,16 +147,16 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
 TEST(CycloptsCBCSolverTests, 2VarIP) {
   // usings
   using boost::any_cast;
-  using cyclus::cyclopts::SolverPtr;
-  using cyclus::cyclopts::CBCSolver;
-  using cyclus::cyclopts::Constraint;
-  using cyclus::cyclopts::ConstraintPtr;
-  using cyclus::cyclopts::ObjFuncPtr;
-  using cyclus::cyclopts::SolverInterface;
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::IntegerVariable;
-  using cyclus::cyclopts::ObjectiveFunction;
+  using cyclus::optim::SolverPtr;
+  using cyclus::optim::CBCSolver;
+  using cyclus::optim::Constraint;
+  using cyclus::optim::ConstraintPtr;
+  using cyclus::optim::ObjFuncPtr;
+  using cyclus::optim::SolverInterface;
+  using cyclus::optim::Variable;
+  using cyclus::optim::VariablePtr;
+  using cyclus::optim::IntegerVariable;
+  using cyclus::optim::ObjectiveFunction;
 
   // problem instance values
   int x_exp = 1, y_exp = 2;

@@ -1,4 +1,4 @@
-#include "cyclopts/variable.h"
+#include "optim/variable.h"
 
 #include <gtest/gtest.h>
 
@@ -7,13 +7,13 @@
 
 #include "boost/any.hpp"
 
-#include "cyclopts/limits.h"
+#include "optim/limits.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, UnboundedLinearConstructors) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::LinearVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::LinearVariable;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
@@ -28,16 +28,16 @@ TEST(CycloptsVariableTests, UnboundedLinearConstructors) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, BoundedLinearConstructors) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::LinearVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::VariablePtr;
+  using cyclus::optim::LinearVariable;
 
   Variable::Bound neg_inf(Variable::NEG_INF);
   Variable::Bound inf(Variable::INF);
   Variable::Bound finite(Variable::FINITE);
   Variable::VarType type(Variable::LINEAR);
-  double lbound_limit = -cyclus::cyclopts::kLinBoundLimit;
-  double ubound_limit = cyclus::cyclopts::kLinBoundLimit;
+  double lbound_limit = -cyclus::optim::kLinBoundLimit;
+  double ubound_limit = cyclus::optim::kLinBoundLimit;
   double val = static_cast<double>(std::rand());
   
   LinearVariable var1(neg_inf, val);
@@ -71,8 +71,8 @@ TEST(CycloptsVariableTests, BoundedLinearConstructors) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, UnboundedIntConstructors) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::IntegerVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::IntegerVariable;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
@@ -87,16 +87,16 @@ TEST(CycloptsVariableTests, UnboundedIntConstructors) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::IntegerVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::VariablePtr;
+  using cyclus::optim::IntegerVariable;
 
   Variable::Bound neg_inf(Variable::NEG_INF);
   Variable::Bound inf(Variable::INF);
   Variable::Bound finite(Variable::FINITE);
   Variable::VarType type(Variable::INT);
-  double lbound_limit = -cyclus::cyclopts::kIntBoundLimit;
-  double ubound_limit = cyclus::cyclopts::kIntBoundLimit;
+  double lbound_limit = -cyclus::optim::kIntBoundLimit;
+  double ubound_limit = cyclus::optim::kIntBoundLimit;
   double val = std::rand();
   
   IntegerVariable var1(neg_inf, val);
@@ -130,8 +130,8 @@ TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, LinearSettersGetters) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::LinearVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::LinearVariable;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
@@ -151,8 +151,8 @@ TEST(CycloptsVariableTests, LinearSettersGetters) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, IntegerSettersGetters) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::IntegerVariable;
+  using cyclus::optim::Variable;
+  using cyclus::optim::IntegerVariable;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
