@@ -20,7 +20,7 @@ struct CapacityConstraint {
   /// an argument and converts it into the capacity type
   double (*converter)(boost::shared_ptr<T>);
 
-  /// @brief a unique id for the constraint
+  /// @return a unique id for the constraint
   const int id() const {return id_;};
 
  private:
@@ -38,7 +38,7 @@ bool operator==(const cyclus::CapacityConstraint<T>& lhs,
            (lhs.converter == rhs.converter));
 };
 
-/// @brief comparison operator, allows usage as map keys
+/// @brief comparison operator, allows usage in ordered containers
 template<class T>
 bool operator<(const cyclus::CapacityConstraint<T>& lhs,
                const cyclus::CapacityConstraint<T>& rhs) {
