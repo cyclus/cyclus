@@ -45,7 +45,8 @@ INSTALL(FILES
 #################################################################
 
 INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_SOURCE_DIR})
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 
 SET(
   CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
@@ -103,6 +104,11 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/transaction.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/solver.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
   )
 
 INSTALL(FILES
@@ -169,11 +175,15 @@ INSTALL(FILES
   unix_helper_functions.h
   version.h
   windows_helper_functions.h
+  cbc_solver.h
+  limits.h
+  function.h
+  solver.h
+  solver_interface.h
+  variable.h
   DESTINATION include/cyclus
   COMPONENT core
   )
-
-ADD_SUBDIRECTORY(optim)
 
 ADD_LIBRARY( cycluscore ${CYCLUS_CORE_SRC} )
 
