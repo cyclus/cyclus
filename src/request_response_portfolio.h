@@ -7,15 +7,22 @@
 
 namespace cyclus {
 
-/// @class ResponsePortfolio contains all the information corresponding to a
+/// @class ResponsePortfolio
+///
+/// @brief A ResponsePortfolio is a collection of responses to requests for
+/// resources and associated constraints on those responses.
+///
+/// A ResponsePortfolio contains all the information corresponding to a
 /// responder to resource requests. It is a light wrapper around the set
 /// of responses and constraints for a given responder, guaranteeing a single
-/// responder per portfolio.
+/// responder per portfolio. Responses are grouped by both the responder and the
+/// commodity that it produces. Constraints are assumed to act over the entire set
+/// of possible responses.
 template <class T>
 class ResponsePortfolio {
  public:
   /// @brief default constructor
-  ResponsePortfolio() : responder_(NULL), commodity_("") { };
+  ResponsePortfolio() : responder_(NULL), commodity_("NO_COMMODITY_SET") { };
   
   /// @return the model associated with the portfolio. if no responses have
   /// been added, the responder is NULL.
@@ -24,7 +31,7 @@ class ResponsePortfolio {
   };
     
   /// @return the commodity associated with the portfolio. if no responses have
-  /// been added, the commodity is empty.
+  /// been added, the commodity is 'NO_COMMODITY_SET'.
   std::string commodity() {
     return commodity_;
   };
@@ -75,19 +82,25 @@ class ResponsePortfolio {
   /// @throws if a commodity is added that is a different commodity from the
   /// original
   void VerifyCommodity(const cyclus::RequestResponse<T> r) {
-    if (commodity_ == "") {
-      commodity_ = r.commodity;
-    } else if (commodity_ != r.commodity) {
+    std::string other = r.request->commodity;
+    if (commodity_ == "NO_COMMODITY_SET") {
+      commodity_ = other;
+    } else if (commodity_ != other) {
       std::string msg = "Commodity mismatch for a request response: "
-                        + r.commodity() + " != " + commodity_ + ".";
+                        + other + " != " + commodity_ + ".";
       throw cyclus::KeyError(msg);
     }
   };
   
+  /// requests_ is a set because there is a one-to-one correspondance between a
+  /// response and a request, i.e., responses are unique
+  std::set< cyclus::RequestResponse<T> > responses_;
+
+  /// constraints_ is a set because constraints are assumed to be unique
+  std::set< cyclus::CapacityConstraint<T> > constraints_;
+  
   std::string commodity_;
   cyclus::FacilityModel* responder_;
-  std::set< cyclus::RequestResponse<T> > responses_;
-  std::set< cyclus::CapacityConstraint<T> > constraints_;
 };
 
 } // namespace cyclus

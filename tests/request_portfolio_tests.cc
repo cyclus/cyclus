@@ -62,53 +62,7 @@ TEST_F(RequestPortfolioTests, CapAdd) {
   CapacityConstraint<Resource> c;
   
   RequestPortfolio<Resource> rp;
-  EXPECT_NO_THROW(rp.AddCapacityConstraint(c));
-  ASSERT_EQ(rp.constrainted_requests().count(c), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c).size(), 0);
-
-  EXPECT_NO_THROW(rp.AddCapacityConstraint(c));
-  ASSERT_EQ(rp.constrainted_requests().count(c), 1);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(RequestPortfolioTests, CapReqAddFresh) {
-  Request<Resource> r1;
-  r1.requester = fac1;
-  CapacityConstraint<Resource> c;
-  RequestPortfolio<Resource> rp;
-  
-  ASSERT_EQ(rp.constrainted_requests().count(c), 0);
-  EXPECT_NO_THROW(rp.AddConstrainedRequest(r1, c));
-  ASSERT_EQ(rp.constrainted_requests().count(c), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c).size(), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c)[0], r1);
-
-  Request<Resource> r2;
-  r2.requester = fac2;
-  EXPECT_THROW(rp.AddConstrainedRequest(r2, c), KeyError);
-  
-  r2.requester = fac1;
-  r2.commodity = "something";
-  EXPECT_NO_THROW(rp.AddConstrainedRequest(r2, c));
-  ASSERT_EQ(rp.constrainted_requests().count(c), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c).size(), 2);
-  ASSERT_EQ(rp.constrainted_requests().at(c)[0], r1);
-  ASSERT_EQ(rp.constrainted_requests().at(c)[1], r2);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(RequestPortfolioTests, CapReqAddStale) {
-  Request<Resource> r1;
-  r1.requester = fac1;
-  CapacityConstraint<Resource> c;
-  RequestPortfolio<Resource> rp;
-  
-  ASSERT_EQ(rp.constrainted_requests().count(c), 0);
-  EXPECT_NO_THROW(rp.AddCapacityConstraint(c));
-  ASSERT_EQ(rp.constrainted_requests().count(c), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c).size(), 0);
-  
-  EXPECT_NO_THROW(rp.AddConstrainedRequest(r1, c));
-  ASSERT_EQ(rp.constrainted_requests().at(c).size(), 1);
-  ASSERT_EQ(rp.constrainted_requests().at(c)[0], r1);
+  EXPECT_NO_THROW(rp.AddConstraint(c));
+  ASSERT_EQ(rp.constraints().count(c), 1);
+  ASSERT_EQ(*rp.constraints().begin(), c);
 }

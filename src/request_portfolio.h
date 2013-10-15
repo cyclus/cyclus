@@ -10,49 +10,28 @@
 #include "request.h"
 
 namespace cyclus {
-  
-/// @class RequestPortfolio contains all the information corresponding to a
-/// requester of resources in the exchange. It is a light wrapper around the set
-/// of requests and constraints for a given requester, guaranteeing a single
-/// requester per portfolio.
+
+/// @class RequestPortfolio
+/// 
+/// @brief A RequestPortfolio is a group of (possibly constrainted) requests for
+/// resources
+///
+/// The portfolio contains a grouping of resource requests that may be mutually
+/// met by suppliers. These requests may share a common set of
+/// constraints. Take, for instance, a facility that needs fuel, of which there are
+/// two commodity types, fuelA and fuelB. If some combination of the two suffice the
+/// facility's needs, then requests for both would be added to the portfolio
+/// along with a capacity constraint.
+///
 /// @TODO revise the request portfolio API/underlying data structures to allow
-/// more than one type of constraint, specifically, exclusive constraints
+/// exclusive constraints. Perhaps the easiest option would be to allow the
+/// AddRequest interface have an option boolean for exclusivity. This utility needs
+/// to be used first to determine what the appropriate way forward is.
 template<class T>
 class RequestPortfolio {
  public:
   /// @brief default constructor
   RequestPortfolio() : requester_(NULL) { };
-  
-  /// @brief add a request to the portfolio
-  /// @param r the request to add
-  /// @throws if a request is added from a different requester than the original
-  void AddRequest(const cyclus::Request<T>& r) {
-    VerifyRequester(r);
-    requests_.push_back(r);
-  };
-
-  /// @brief add a capacity constraint associated with the portfolio, if it
-  /// doesn't already exist
-  /// @param c the constraint to add
-  void AddCapacityConstraint(const cyclus::CapacityConstraint<T>& c) {
-    if (constrained_requests_.count(c) == 0) {
-      constrained_requests_.insert(std::make_pair(c,
-                                                  std::vector<Request<T> >()));
-    }
-  };
-
-  /// @brief a request that is associated with a capacity constraint
-  /// @param r the request to add
-  /// @param c the constraint the request is associated with
-  /// @throws if a request is added from a different requester than the original
-  void AddConstrainedRequest(const cyclus::Request<T>& r,
-                             const cyclus::CapacityConstraint<T>& c) {
-    VerifyRequester(r);
-    if (constrained_requests_.count(c) == 0) {
-      AddCapacityConstraint(c);
-    }
-    constrained_requests_[c].push_back(r);
-  };
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
@@ -65,10 +44,24 @@ class RequestPortfolio {
     return requests_;
   };
   
-  /// @return const access to the constrained requests
-  const std::map< cyclus::CapacityConstraint<T>,
-      std::vector<cyclus::Request<T> > >& constrainted_requests() {
-    return constrained_requests_;
+  /// @brief add a request to the portfolio
+  /// @param r the request to add
+  /// @throws if a request is added from a different requester than the original
+  void AddRequest(const cyclus::Request<T>& r) {
+    VerifyRequester(r);
+    requests_.push_back(r);
+  };
+
+  /// @brief add a capacity constraint associated with the portfolio, if it
+  /// doesn't already exist
+  /// @param c the constraint to add
+  void AddConstraint(const cyclus::CapacityConstraint<T>& c) {
+    constraints_.insert(c);
+  };
+  
+  /// @return const access to the request constraints
+  const std::set< cyclus::CapacityConstraint<T> >& constraints() {
+    return constraints_;
   };
 
  private:  
@@ -86,15 +79,13 @@ class RequestPortfolio {
     }
   };
 
-  /// @return the set of requests in the portfolio
+  /// requests_ is a vector because many requests may be identical, i.e., a set
+  /// is not appropriate
   std::vector< Request<T> > requests_;
 
-  /// @return the set of constraints over the requests based on request
-  /// capacity
-  std::map< cyclus::CapacityConstraint<T>, std::vector<cyclus::Request<T> > >
-      constrained_requests_; 
-
-  /// @return the requester associated with the portfolio
+  /// constraints_ is a set because constraints are assumed to be unique
+  std::set< cyclus::CapacityConstraint<T> > constraints_;
+  
   cyclus::FacilityModel* requester_;
 };
 
