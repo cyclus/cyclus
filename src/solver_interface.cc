@@ -5,30 +5,30 @@
 #include <sstream>
 #include <iostream>
 
-#include "limits.h"
+#include "cyc_limits.h"
 
 // -----------------------------------------------------------------------------
-cyclus::optim::SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
-  constraints_ = std::vector<cyclus::optim::ConstraintPtr>();
-  variables_ = std::vector<cyclus::optim::VariablePtr>();
-  modifier_limit_ = kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc
+cyclus::SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
+  constraints_ = std::vector<cyclus::ConstraintPtr>();
+  variables_ = std::vector<cyclus::VariablePtr>();
+  modifier_limit_ = cyclus::kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc
 };
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::RegisterVariable(
-    cyclus::optim::VariablePtr v) {
+void cyclus::SolverInterface::RegisterVariable(
+    cyclus::VariablePtr v) {
   variables_.push_back(v);
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::RegisterObjFunction(
-    cyclus::optim::ObjFuncPtr obj) {
+void cyclus::SolverInterface::RegisterObjFunction(
+    cyclus::ObjFuncPtr obj) {
   obj_ = obj;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::AddVarToObjFunction(
-    cyclus::optim::VariablePtr v, 
+void cyclus::SolverInterface::AddVarToObjFunction(
+    cyclus::VariablePtr v, 
     double modifier) {
   // need to check that v is in variables_
   CheckModifierBounds(modifier);
@@ -36,30 +36,30 @@ void cyclus::optim::SolverInterface::AddVarToObjFunction(
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::RegisterConstraint(
-    cyclus::optim::ConstraintPtr c) {
+void cyclus::SolverInterface::RegisterConstraint(
+    cyclus::ConstraintPtr c) {
   constraints_.push_back(c);
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::AddVarToConstraint(
-    cyclus::optim::VariablePtr v, 
+void cyclus::SolverInterface::AddVarToConstraint(
+    cyclus::VariablePtr v, 
     double modifier, 
-    cyclus::optim::ConstraintPtr c) {
+    cyclus::ConstraintPtr c) {
   CheckModifierBounds(modifier);
   // need to check that v is in variables_ and c is in constraints_
-  std::vector<cyclus::optim::ConstraintPtr>::iterator it;
+  std::vector<cyclus::ConstraintPtr>::iterator it;
   it = find(constraints_.begin(), constraints_.end(), c);
   it->get()->AddVariable(v, modifier);
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::SolverInterface::Solve() {
+void cyclus::SolverInterface::Solve() {
   solver_->Solve(variables_, obj_, constraints_);
 }
 
 // -------------------------------------------------------------------
-void cyclus::optim::SolverInterface::CheckModifierBounds(double modifier) {
+void cyclus::SolverInterface::CheckModifierBounds(double modifier) {
   if (modifier > modifier_limit_) {
     std::stringstream msg;
     msg << "Cannot add modifier " 

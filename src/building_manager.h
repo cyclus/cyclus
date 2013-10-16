@@ -4,8 +4,8 @@
 #include <vector>
 #include <map>
 
-#include "optim/variable.h"
-#include "optim/function.h"
+#include "variable.h"
+#include "function.h"
 
 #include "commodity_producer.h"
 #include "builder.h"
@@ -28,16 +28,16 @@ struct BuildOrder {
 struct ProblemInstance {
   /// constructor
   ProblemInstance(Commodity& commod, double demand,
-                  cyclus::optim::SolverInterface& sinterface,
-                  cyclus::optim::ConstraintPtr constr,
-                  std::vector<cyclus::optim::VariablePtr>& soln);
+                  cyclus::SolverInterface& sinterface,
+                  cyclus::ConstraintPtr constr,
+                  std::vector<cyclus::VariablePtr>& soln);
 
   // constituents
   Commodity& commodity;
   double unmet_demand;
-  cyclus::optim::SolverInterface& interface;
-  cyclus::optim::ConstraintPtr constraint;
-  std::vector<cyclus::optim::VariablePtr>& solution;
+  cyclus::SolverInterface& interface;
+  cyclus::ConstraintPtr constraint;
+  std::vector<cyclus::VariablePtr>& solution;
 };
 
 /**
@@ -123,14 +123,14 @@ class BuildingManager {
    */
   void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>&
                                         orders,
-                                        std::vector<optim::VariablePtr>& solution);
+                                        std::vector<VariablePtr>& solution);
 
  private:
   /// the set of registered builders
   std::set<Builder*> builders_;
 
   /// a map of variables to their associated builder and producer
-  std::map < optim::VariablePtr,
+  std::map < VariablePtr,
       std::pair<action_building::Builder*, supply_demand::CommodityProducer*> >
       solution_map_;
 };

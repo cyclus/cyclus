@@ -61,7 +61,6 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(optim)
 ADD_SUBDIRECTORY(test_modules)
 
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically

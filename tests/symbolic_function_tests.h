@@ -7,7 +7,7 @@
 class SymbolicFunctionTests : public ::testing::Test 
 {
  public:
-  cyclus::FunctionPtr linear_func, exp_func;
+  cyclus::SymFunctionPtr linear_func, exp_func;
   
   double lin_xoffset, lin_yoffset;
   double slope, intercept;
@@ -22,9 +22,9 @@ class SymbolicFunctionTests : public ::testing::Test
 
   void SetUpPiecewiseEnvironment();
 
-  cyclus::FunctionPtr GetLinFunction();
-  cyclus::FunctionPtr GetExpFunction();
-  cyclus::FunctionPtr GetPiecewiseFunction();
+  cyclus::SymFunctionPtr GetLinFunction();
+  cyclus::SymFunctionPtr GetExpFunction();
+  cyclus::SymFunctionPtr GetPiecewiseFunction();
 
   double linear_value(double value);
   double exp_value(double value);

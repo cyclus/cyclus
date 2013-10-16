@@ -11,7 +11,7 @@ void SDManagerTests::SetUp()
 {
   helper = new CommodityTestHelper();
   helper->SetUpProducerManager();
-  demand = cyclus::FunctionPtr(new cyclus::LinearFunction(100,100));
+  demand = cyclus::SymFunctionPtr(new cyclus::LinearFunction(100,100));
 }
   
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

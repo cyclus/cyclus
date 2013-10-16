@@ -1,6 +1,6 @@
 #include "commodity_producer.h"
 
-#include "optim/limits.h"
+#include "cyc_limits.h"
 #include "error.h"
 
 namespace cyclus {
@@ -9,7 +9,7 @@ namespace supply_demand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityInformation::CommodityInformation()
   : capacity(0),
-    cost(cyclus::optim::kModifierLimit) { }
+    cost(cyclus::kModifierLimit) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityInformation::CommodityInformation(double a_capacity,
@@ -20,7 +20,7 @@ CommodityInformation::CommodityInformation(double a_capacity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::CommodityProducer()
   : default_capacity_(0.0),
-    default_cost_(cyclus::optim::kModifierLimit) { }
+    default_cost_(cyclus::kModifierLimit) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::~CommodityProducer() {}

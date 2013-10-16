@@ -54,7 +54,7 @@ void SymbolicFunctionTests::SetUpPiecewiseEnvironment()
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::GetExpFunction() 
+cyclus::SymFunctionPtr SymbolicFunctionTests::GetExpFunction() 
 {
   cyclus::ExpFunctionFactory eff;
   std::stringstream input;
@@ -63,7 +63,7 @@ cyclus::FunctionPtr SymbolicFunctionTests::GetExpFunction()
 }  
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::GetLinFunction() 
+cyclus::SymFunctionPtr SymbolicFunctionTests::GetLinFunction() 
 {
   cyclus::LinFunctionFactory lff;
   std::stringstream input;
@@ -73,11 +73,11 @@ cyclus::FunctionPtr SymbolicFunctionTests::GetLinFunction()
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-cyclus::FunctionPtr SymbolicFunctionTests::GetPiecewiseFunction()
+cyclus::SymFunctionPtr SymbolicFunctionTests::GetPiecewiseFunction()
 {
   SetUpPiecewiseEnvironment();
-  cyclus::FunctionPtr lin = GetLinFunction();
-  cyclus::FunctionPtr exp = GetExpFunction();
+  cyclus::SymFunctionPtr lin = GetLinFunction();
+  cyclus::SymFunctionPtr exp = GetExpFunction();
   
   cyclus::PiecewiseFunctionFactory pff;
   pff.AddFunction(lin,check_points.at(1));
@@ -122,7 +122,7 @@ double SymbolicFunctionTests::piecewise_value(double value, int index)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SymbolicFunctionTests,linearfunc) 
 {
-  cyclus::FunctionPtr f = GetLinFunction();
+  cyclus::SymFunctionPtr f = GetLinFunction();
   
   int n = 10;
   int start = -10;
@@ -138,7 +138,7 @@ TEST_F(SymbolicFunctionTests,linearfunc)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SymbolicFunctionTests,expfunc) 
 {
-  cyclus::FunctionPtr f = GetExpFunction();
+  cyclus::SymFunctionPtr f = GetExpFunction();
   
   int n = 10;
   int start = -10;
@@ -159,7 +159,7 @@ TEST_F(SymbolicFunctionTests,piecewisefunc)
   //ofstream output;
   //output.open ("out");
 
-  cyclus::FunctionPtr f = GetPiecewiseFunction();
+  cyclus::SymFunctionPtr f = GetPiecewiseFunction();
 
   for (int i = 0; i < check_points.size() - 1; i++)
     {

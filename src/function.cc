@@ -9,44 +9,44 @@
 #include "error.h"
 
 // -----------------------------------------------------------------------------
-cyclus::optim::Function::Function() {
-  constituents_ = std::map<cyclus::optim::VariablePtr, double>();
+cyclus::Function::Function() {
+  constituents_ = std::map<cyclus::VariablePtr, double>();
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::optim::Function::AddVariable(cyclus::optim::VariablePtr v,
+void cyclus::Function::AddVariable(cyclus::VariablePtr v,
                                              double modifier) {
   constituents_.insert(
-      std::pair<cyclus::optim::VariablePtr, double>(v, modifier));
+      std::pair<cyclus::VariablePtr, double>(v, modifier));
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::optim::Function::GetModifier(cyclus::optim::VariablePtr v) {
+double cyclus::Function::GetModifier(cyclus::VariablePtr v) {
   return constituents_[v];
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::optim::VariablePtr, double>::const_iterator 
-cyclus::optim::Function::begin() {
+std::map<cyclus::VariablePtr, double>::const_iterator 
+cyclus::Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::optim::VariablePtr, double>::const_iterator 
-cyclus::optim::Function::end() {
+std::map<cyclus::VariablePtr, double>::const_iterator 
+cyclus::Function::end() {
   return constituents_.end();
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::optim::Function::NumVars() { 
+int cyclus::Function::NumVars() { 
   return constituents_.size(); 
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::optim::Function::Print() { 
+std::string cyclus::Function::Print() { 
   std::stringstream ss;
   int count = 0;
-  std::map<cyclus::optim::VariablePtr, double>::iterator it;
+  std::map<cyclus::VariablePtr, double>::iterator it;
   for (it = constituents_.begin(); it != constituents_.end(); it++) {
     ss << it->second << it->first->name();
     if (count < constituents_.size()-1) {
@@ -58,34 +58,34 @@ std::string cyclus::optim::Function::Print() {
 }
 
 // -----------------------------------------------------------------------------
-cyclus::optim::Constraint::Constraint(
-    cyclus::optim::Constraint::EqualityRelation eq_r, 
+cyclus::Constraint::Constraint(
+    cyclus::Constraint::EqualityRelation eq_r, 
     double rhs)
     : eq_relation_(eq_r), 
       rhs_(rhs) 
 { };
 
 // -----------------------------------------------------------------------------
-cyclus::optim::Constraint::EqualityRelation 
-cyclus::optim::Constraint::eq_relation() { 
+cyclus::Constraint::EqualityRelation 
+cyclus::Constraint::eq_relation() { 
   return eq_relation_; 
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::optim::Constraint::rhs() { 
+double cyclus::Constraint::rhs() { 
   return rhs_; 
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::optim::Constraint::Print() {
+std::string cyclus::Constraint::Print() {
   std::stringstream ss;
-  ss << "s.t. " << cyclus::optim::Function::Print() 
+  ss << "s.t. " << cyclus::Function::Print() 
      << " " << EqRToStr() << " " << rhs_;
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::optim::Constraint::EqRToStr() {
+std::string cyclus::Constraint::EqRToStr() {
   switch(eq_relation_) {
     case EQ:
       return "=";
@@ -108,25 +108,25 @@ std::string cyclus::optim::Constraint::EqRToStr() {
 }
 
 // -----------------------------------------------------------------------------
-cyclus::optim::ObjectiveFunction::ObjectiveFunction(
-    cyclus::optim::ObjectiveFunction::Direction dir) : dir_(dir) 
+cyclus::ObjectiveFunction::ObjectiveFunction(
+    cyclus::ObjectiveFunction::Direction dir) : dir_(dir) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::optim::ObjectiveFunction::Direction 
-cyclus::optim::ObjectiveFunction::dir() {
+cyclus::ObjectiveFunction::Direction 
+cyclus::ObjectiveFunction::dir() {
   return dir_;
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::optim::ObjectiveFunction::Print() {
+std::string cyclus::ObjectiveFunction::Print() {
   std::stringstream ss;
   ss << DirToStr() << " " << Function::Print();
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::optim::ObjectiveFunction::DirToStr() {
+std::string cyclus::ObjectiveFunction::DirToStr() {
   switch(dir_) {
     case MIN:
       return "min";

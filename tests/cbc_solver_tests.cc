@@ -5,25 +5,25 @@
 
 #include "CoinModel.hpp"
 
-#include "optim/cbc_solver.h"
-#include "optim/function.h"
-#include "optim/solver.h"
-#include "optim/solver_interface.h"
-#include "optim/variable.h"
-#include "optim/limits.h"
+#include "cbc_solver.h"
+#include "function.h"
+#include "solver.h"
+#include "solver_interface.h"
+#include "variable.h"
+#include "cyc_limits.h"
 
 // usings
 using boost::any_cast;
-using cyclus::optim::SolverPtr;
-using cyclus::optim::CBCSolver;
-using cyclus::optim::Constraint;
-using cyclus::optim::ConstraintPtr;
-using cyclus::optim::ObjFuncPtr;
-using cyclus::optim::SolverInterface;
-using cyclus::optim::Variable;
-using cyclus::optim::VariablePtr;
-using cyclus::optim::IntegerVariable;
-using cyclus::optim::ObjectiveFunction;
+using cyclus::SolverPtr;
+using cyclus::CBCSolver;
+using cyclus::Constraint;
+using cyclus::ConstraintPtr;
+using cyclus::ObjFuncPtr;
+using cyclus::SolverInterface;
+using cyclus::Variable;
+using cyclus::VariablePtr;
+using cyclus::IntegerVariable;
+using cyclus::ObjectiveFunction;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
@@ -147,16 +147,16 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
 TEST(CycloptsCBCSolverTests, 2VarIP) {
   // usings
   using boost::any_cast;
-  using cyclus::optim::SolverPtr;
-  using cyclus::optim::CBCSolver;
-  using cyclus::optim::Constraint;
-  using cyclus::optim::ConstraintPtr;
-  using cyclus::optim::ObjFuncPtr;
-  using cyclus::optim::SolverInterface;
-  using cyclus::optim::Variable;
-  using cyclus::optim::VariablePtr;
-  using cyclus::optim::IntegerVariable;
-  using cyclus::optim::ObjectiveFunction;
+  using cyclus::SolverPtr;
+  using cyclus::CBCSolver;
+  using cyclus::Constraint;
+  using cyclus::ConstraintPtr;
+  using cyclus::ObjFuncPtr;
+  using cyclus::SolverInterface;
+  using cyclus::Variable;
+  using cyclus::VariablePtr;
+  using cyclus::IntegerVariable;
+  using cyclus::ObjectiveFunction;
 
   // problem instance values
   int x_exp = 1, y_exp = 2;

@@ -38,7 +38,7 @@ class SupplyDemandManager {
      @param commodity the commodity
      @param demand a smart pointer to the demand function
    */
-  void RegisterCommodity(Commodity& commodity, FunctionPtr demand);
+  void RegisterCommodity(Commodity& commodity, SymFunctionPtr demand);
 
   /**
      @return true if the demand for a commodity is managed by this entity
@@ -75,7 +75,7 @@ class SupplyDemandManager {
      returns the demand function for a commodity
      @param commodity the commodity being queried
    */
-  FunctionPtr DemandFunction(Commodity& commodity);
+  SymFunctionPtr DemandFunction(Commodity& commodity);
 
   // protected: @MJGFlag - should be protected. revise when tests can
   // be found by classes in the Utility folder
@@ -88,7 +88,7 @@ class SupplyDemandManager {
 
  private:
   /// a container of all demand functions known to the manager
-  std::map<Commodity, FunctionPtr, CommodityCompare> demand_functions_;
+  std::map<Commodity, SymFunctionPtr, CommodityCompare> demand_functions_;
 
   /// a container of all production managers known to the manager
   std::set<supply_demand::CommodityProducerManager*> managers_;

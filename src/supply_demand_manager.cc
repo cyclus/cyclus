@@ -13,7 +13,7 @@ SupplyDemandManager::~SupplyDemandManager() {}
 
 // -------------------------------------------------------------------
 void SupplyDemandManager::RegisterCommodity(Commodity& commodity,
-                                            FunctionPtr fp) {
+                                            SymFunctionPtr fp) {
   demand_functions_.insert(std::make_pair(commodity, fp));
 }
 
@@ -53,7 +53,7 @@ double SupplyDemandManager::Demand(Commodity& commodity, int time) {
 }
 
 // -------------------------------------------------------------------
-FunctionPtr SupplyDemandManager::DemandFunction(Commodity& commodity) {
+SymFunctionPtr SupplyDemandManager::DemandFunction(Commodity& commodity) {
   ThrowErrorIfCommodityNotManaged(commodity);
   return demand_functions_[commodity];
 }
