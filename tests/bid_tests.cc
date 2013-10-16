@@ -11,18 +11,18 @@
 #include "mock_facility.h"
 #include "request.h"
 
-#include "request_response.h"
+#include "bid.h"
 
 using std::string;
 using cyclus::Composition;
 using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Request;
-using cyclus::RequestResponse;
+using cyclus::Bid;
 using cyclus::TestContext;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ResponseRequestTests, MaterialGetSet) {
+TEST(BidTests, MaterialGetSet) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
   cyclus::CompMap cm;
@@ -32,20 +32,20 @@ TEST(ResponseRequestTests, MaterialGetSet) {
   Material::Ptr mat = Material::Create(tc.get(), qty, comp);
   Request<Material> req;
   
-  RequestResponse<Material> r;
+  Bid<Material> r;
   r.responder = fac;
   r.request = &req;
-  r.response = mat;
+  r.bid = mat;
 
   EXPECT_EQ(fac, r.responder);
   EXPECT_EQ(&req, r.request);
-  EXPECT_EQ(mat, r.response);
+  EXPECT_EQ(mat, r.bid);
   
   delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ResponseRequestTests, GenRsrcGetSet) {
+TEST(BidTests, GenRsrcGetSet) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
   double qty = 1.0;
@@ -56,14 +56,14 @@ TEST(ResponseRequestTests, GenRsrcGetSet) {
       GenericResource::Create(tc.get(), qty, quality, units);
   Request<GenericResource> req;
   
-  RequestResponse<GenericResource> r;
+  Bid<GenericResource> r;
   r.responder = fac;
   r.request = &req;
-  r.response = rsrc;
+  r.bid = rsrc;
 
   EXPECT_EQ(fac, r.responder);
   EXPECT_EQ(&req, r.request);
-  EXPECT_EQ(rsrc, r.response);
+  EXPECT_EQ(rsrc, r.bid);
   
   delete fac;
 }

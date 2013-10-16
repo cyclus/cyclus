@@ -171,7 +171,8 @@ INSTALL(FILES
   windows_helper_functions.h
   request.h
   request_portfolio.h
-  request_response.h
+  bid.h
+  bid_portfolio.h
   capacity_constraint.h
   DESTINATION include/cyclus
   COMPONENT core

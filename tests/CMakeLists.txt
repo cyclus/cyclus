@@ -68,7 +68,8 @@ ADD_SUBDIRECTORY(test_modules)
 # added to ctest.
 set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   # --
-  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc  
+  ${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc
@@ -79,6 +80,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
@@ -94,8 +96,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/request_response_portfolio_tests.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/request_response_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
