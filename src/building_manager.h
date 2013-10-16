@@ -4,11 +4,11 @@
 #include <vector>
 #include <map>
 
-#include "variable.h"
-#include "function.h"
-
-#include "commodity_producer.h"
 #include "builder.h"
+#include "commodity_producer.h"
+#include "function.h"
+#include "solver_interface.h"
+#include "variable.h"
 
 namespace cyclus {
 namespace action_building {
@@ -29,14 +29,14 @@ struct ProblemInstance {
   /// constructor
   ProblemInstance(Commodity& commod, double demand,
                   SolverInterface& sinterface,
-                  ConstraintPtr constr,
+                  Constraint::Ptr constr,
                   std::vector<Variable::Ptr>& soln);
 
   // constituents
   Commodity& commodity;
   double unmet_demand;
   SolverInterface& interface;
-  ConstraintPtr constraint;
+  Constraint::Ptr constraint;
   std::vector<Variable::Ptr>& solution;
 };
 

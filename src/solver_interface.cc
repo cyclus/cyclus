@@ -11,7 +11,7 @@ namespace cyclus {
 
 // -----------------------------------------------------------------------------
 SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
-  constraints_ = std::vector<ConstraintPtr>();
+  constraints_ = std::vector<Constraint::Ptr>();
   variables_ = std::vector<Variable::Ptr>();
   modifier_limit_ = kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc
 };
@@ -22,7 +22,7 @@ void SolverInterface::RegisterVariable(Variable::Ptr v) {
 }
 
 // -----------------------------------------------------------------------------
-void SolverInterface::RegisterObjFunction(ObjFuncPtr obj) {
+void SolverInterface::RegisterObjFunction(ObjectiveFunction::Ptr obj) {
   obj_ = obj;
 }
 
@@ -34,7 +34,7 @@ void SolverInterface::AddVarToObjFunction(Variable::Ptr v, double modifier) {
 }
 
 // -----------------------------------------------------------------------------
-void SolverInterface::RegisterConstraint(ConstraintPtr c) {
+void SolverInterface::RegisterConstraint(Constraint::Ptr c) {
   constraints_.push_back(c);
 }
 
@@ -42,10 +42,10 @@ void SolverInterface::RegisterConstraint(ConstraintPtr c) {
 void SolverInterface::AddVarToConstraint(
     Variable::Ptr v, 
     double modifier, 
-    ConstraintPtr c) {
+    Constraint::Ptr c) {
   CheckModifierBounds(modifier);
   // need to check that v is in variables_ and c is in constraints_
-  std::vector<ConstraintPtr>::iterator it;
+  std::vector<Constraint::Ptr>::iterator it;
   it = find(constraints_.begin(), constraints_.end(), c);
   it->get()->AddVariable(v, modifier);
 }

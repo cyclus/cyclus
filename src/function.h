@@ -9,17 +9,7 @@
 
 #include "variable.h"
 
-namespace cyclus {
-
-class Constraint;
-typedef boost::shared_ptr<Constraint> ConstraintPtr;
-class ObjectiveFunction;
-typedef boost::shared_ptr<ObjectiveFunction> ObjFuncPtr;
-
-} // namespace cyclus
-
-
-#include "solver_interface.h"
+//#include "solver_interface.h"
 
 namespace cyclus {
 
@@ -61,6 +51,8 @@ class Function {
 /// derived class for constraints
 class Constraint : public Function {
  public:
+  typedef boost::shared_ptr<Constraint> Ptr;
+
   /// the possible equality relations
   enum EqualityRelation {EQ, GT, GTEQ, LT, LTEQ};
   
@@ -92,6 +84,8 @@ class Constraint : public Function {
 /// derived class for objective functions
 class ObjectiveFunction : public Function {
  public: 
+  typedef boost::shared_ptr<ObjectiveFunction> Ptr;
+
   /// the possible direction
   enum Direction {MIN, MAX};
 

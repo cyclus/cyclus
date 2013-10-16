@@ -24,7 +24,7 @@ ProblemInstance::ProblemInstance(
   Commodity& commod,
   double demand,
   SolverInterface& sinterface,
-  ConstraintPtr constr,
+  Constraint::Ptr constr,
   std::vector<Variable::Ptr>& soln)
   : commodity(commod),
     unmet_demand(demand),
@@ -71,13 +71,13 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     SolverInterface csi(solver);
 
     // set up objective function
-    ObjFuncPtr obj(
+    ObjectiveFunction::Ptr obj(
       new ObjectiveFunction(
         ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    ConstraintPtr constraint(
+    Constraint::Ptr constraint(
       new Constraint(
         Constraint::GTEQ, unmet_demand));
     csi.RegisterConstraint(constraint);

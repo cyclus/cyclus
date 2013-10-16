@@ -24,7 +24,7 @@ class SolverInterface {
 
   /// set the objective function
   /// @param obj a pointer to the objective function to register
-  void RegisterObjFunction(ObjFuncPtr obj);
+  void RegisterObjFunction(ObjectiveFunction::Ptr obj);
 
   /// add a variable to the objective function
   /// @param v the variable to add to the obj function
@@ -33,14 +33,14 @@ class SolverInterface {
 
   /// add a constraint
   /// @param c a pointer to a constraint function to register
-  void RegisterConstraint(ConstraintPtr c);
+  void RegisterConstraint(Constraint::Ptr c);
 
   /// add a variable to a constraint
   /// @param v the variable to add to a constraint
   /// @param modifier the modifier for that variable in the constraint
   /// @param c the constraint to add it to
   void AddVarToConstraint(Variable::Ptr v, double modifier, 
-                          ConstraintPtr c);
+                          Constraint::Ptr c);
 
   /// solve the constraint program
   void Solve();
@@ -53,10 +53,10 @@ class SolverInterface {
   std::vector<Variable::Ptr> variables_;
 
   /// the objective function
-  ObjFuncPtr obj_;
+  ObjectiveFunction::Ptr obj_;
 
   /// the constraints
-  std::vector<ConstraintPtr> constraints_;
+  std::vector<Constraint::Ptr> constraints_;
 
   /// a limit on the modifiers of constraints
   double modifier_limit_;

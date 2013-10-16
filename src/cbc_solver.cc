@@ -15,7 +15,7 @@
 namespace cyclus {
 
 // -----------------------------------------------------------------------------
-std::pair<double, double> CBCSolver::ConstraintBounds(ConstraintPtr c) {
+std::pair<double, double> CBCSolver::ConstraintBounds(Constraint::Ptr c) {
   double lval, rval;
   switch(c->eq_relation()) {
     case Constraint::EQ:
@@ -41,7 +41,7 @@ std::pair<double, double> CBCSolver::ConstraintBounds(ConstraintPtr c) {
 // -----------------------------------------------------------------------------
 void CBCSolver::SetUpVariablesAndObj(
     std::vector<Variable::Ptr>& variables, 
-    ObjFuncPtr obj) {
+    ObjectiveFunction::Ptr obj) {
   for (int i = 0; i < variables.size(); i++) {
     Variable::Ptr v = variables.at(i);
     std::pair<int, int> ibounds;
@@ -62,9 +62,9 @@ void CBCSolver::SetUpVariablesAndObj(
 }
 
 // -----------------------------------------------------------------------------
-void CBCSolver::SetUpConstraints(std::vector<ConstraintPtr>& constraints) {
+void CBCSolver::SetUpConstraints(std::vector<Constraint::Ptr>& constraints) {
   for (int i = 0; i < constraints.size(); i++) {
-    ConstraintPtr c = constraints.at(i);
+    Constraint::Ptr c = constraints.at(i);
     std::pair<double, double> bounds = ConstraintBounds(c);
     builder_.setRowBounds(i, bounds.first, bounds.second);
     std::map<Variable::Ptr, double>::const_iterator it;
@@ -75,7 +75,7 @@ void CBCSolver::SetUpConstraints(std::vector<ConstraintPtr>& constraints) {
 }
 
 // -----------------------------------------------------------------------------
-double CBCSolver::ObjDirection(ObjFuncPtr obj) {
+double CBCSolver::ObjDirection(ObjectiveFunction::Ptr obj) {
   double sense_value;
   switch(obj->dir()) {
     case ObjectiveFunction::MIN:
@@ -157,8 +157,8 @@ void CBCSolver::Print(int n_const, int n_vars) {
 
 // -----------------------------------------------------------------------------
 void CBCSolver::Solve(std::vector<Variable::Ptr>& variables, 
-                      ObjFuncPtr obj, 
-                      std::vector<ConstraintPtr>& constraints) {
+                      ObjectiveFunction::Ptr obj, 
+                      std::vector<Constraint::Ptr>& constraints) {
   // use builder_ to build constraint probelm
   Solver::PopulateIndices(variables);
   SetUpConstraints(constraints);

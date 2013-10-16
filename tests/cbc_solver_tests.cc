@@ -17,8 +17,6 @@ using boost::any_cast;
 using cyclus::SolverPtr;
 using cyclus::CBCSolver;
 using cyclus::Constraint;
-using cyclus::ConstraintPtr;
-using cyclus::ObjFuncPtr;
 using cyclus::SolverInterface;
 using cyclus::Variable;
 using cyclus::IntegerVariable;
@@ -36,7 +34,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up variables
@@ -66,7 +64,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up variables
@@ -95,7 +93,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
   csi.RegisterObjFunction(obj);
 
   // set up variables
@@ -125,7 +123,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
   csi.RegisterObjFunction(obj);
 
   // set up variables
@@ -144,18 +142,6 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsCBCSolverTests, 2VarIP) {
-  // usings
-  using boost::any_cast;
-  using cyclus::SolverPtr;
-  using cyclus::CBCSolver;
-  using cyclus::Constraint;
-  using cyclus::ConstraintPtr;
-  using cyclus::ObjFuncPtr;
-  using cyclus::SolverInterface;
-  using cyclus::Variable;
-  using cyclus::IntegerVariable;
-  using cyclus::ObjectiveFunction;
-
   // problem instance values
   int x_exp = 1, y_exp = 2;
   double cap_x = 3.0, cap_y = 10.0, cost_x = 1.0, cost_y = 2.0;
@@ -166,11 +152,11 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up constraint
-  ConstraintPtr c(new Constraint(Constraint::GTEQ, unmet_demand));
+  Constraint::Ptr c(new Constraint(Constraint::GTEQ, unmet_demand));
   csi.RegisterConstraint(c);
 
   // set up variables

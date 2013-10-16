@@ -30,8 +30,8 @@ class Solver {
   /// solve method to be overloaded by derived classes
   virtual void Solve(
       std::vector<Variable::Ptr>& variables, 
-      ObjFuncPtr obj, 
-      std::vector<ConstraintPtr>& constraints) = 0;
+      ObjectiveFunction::Ptr obj, 
+      std::vector<Constraint::Ptr>& constraints) = 0;
 
  protected:
   /// the indices used for each variable

@@ -8,6 +8,7 @@
 #include "CbcModel.hpp"
 
 #include "function.h"
+#include "solver.h"
 #include "variable.h"
 
 typedef CbcModel CoinCbcModel;
@@ -23,27 +24,27 @@ class CBCSolver : public Solver {
   /// @param obj A pointer to the objective function.
   /// @param constraints A container of pointers to the problem's constraints.
   virtual void Solve(std::vector<Variable::Ptr>& variables, 
-                     ObjFuncPtr obj, 
-                     std::vector<ConstraintPtr>& constraints);
+                     ObjectiveFunction::Ptr obj, 
+                     std::vector<Constraint::Ptr>& constraints);
 
  private:
   /// the model builder
   CoinModel builder_;
 
   /// get coin-specific bound for a constraint
-  std::pair<double, double> ConstraintBounds(ConstraintPtr c);
+  std::pair<double, double> ConstraintBounds(Constraint::Ptr c);
 
   /// set variable/objective function values
   void SetUpVariablesAndObj(
       std::vector<Variable::Ptr>& variables, 
-      ObjFuncPtr obj);
+      ObjectiveFunction::Ptr obj);
 
   /// set up constraints
   void SetUpConstraints(
-      std::vector<ConstraintPtr>& constraints);
+      std::vector<Constraint::Ptr>& constraints);
 
   /// set the objective direction
-  double ObjDirection(ObjFuncPtr obj);
+  double ObjDirection(ObjectiveFunction::Ptr obj);
 
   /// solve the model
   void SolveModel(CbcModel& model);
