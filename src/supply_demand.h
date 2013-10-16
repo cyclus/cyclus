@@ -82,7 +82,7 @@ class CommodityInformation {
      @param fp a shared pointer to the demand function
      @param producers a vector of producers of the commodity
   */
-  CommodityInformation(Commodity commodity, FunctionPtr fp,
+  CommodityInformation(Commodity commodity, SymFunction::Ptr fp,
                        std::vector<Producer> producers) :
     commodity_(commodity), demand_(fp), supply_(0), producers_(producers) {};
 
@@ -91,7 +91,7 @@ class CommodityInformation {
      @param commodity the commodity
      @param fp a shared pointer to the demand function
    */
-  CommodityInformation(Commodity commodity, FunctionPtr fp) :
+  CommodityInformation(Commodity commodity, SymFunction::Ptr fp) :
     commodity_(commodity), demand_(fp), supply_(0) {
     producers_ = std::vector<Producer>();
   }
@@ -120,7 +120,7 @@ class CommodityInformation {
   /**
      the demand function
    */
-  FunctionPtr DemandFunction() {
+  SymFunction::Ptr DemandFunction() {
     return demand_;
   }
 
@@ -163,7 +163,7 @@ class CommodityInformation {
   double supply_;
 
   /// the demand function
-  FunctionPtr demand_;
+  SymFunction::Ptr demand_;
 
   /// a set of producers of the commodity
   std::vector<Producer> producers_;

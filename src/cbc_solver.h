@@ -8,12 +8,13 @@
 #include "CbcModel.hpp"
 
 #include "function.h"
+#include "solver.h"
 #include "variable.h"
 
 typedef CbcModel CoinCbcModel;
 
 namespace cyclus {
-namespace optim {
+
 /// the coin branch-and-cut solver, see https://projects.coin-or.org/Cbc.
 class CBCSolver : public Solver {
  public:
@@ -22,35 +23,35 @@ class CBCSolver : public Solver {
   /// the value() member.
   /// @param obj A pointer to the objective function.
   /// @param constraints A container of pointers to the problem's constraints.
-  virtual void Solve(std::vector<cyclus::optim::VariablePtr>& variables, 
-                     cyclus::optim::ObjFuncPtr obj, 
-                     std::vector<cyclus::optim::ConstraintPtr>& constraints);
+  virtual void Solve(std::vector<Variable::Ptr>& variables, 
+                     ObjectiveFunction::Ptr obj, 
+                     std::vector<Constraint::Ptr>& constraints);
 
  private:
   /// the model builder
   CoinModel builder_;
 
   /// get coin-specific bound for a constraint
-  std::pair<double, double> ConstraintBounds(cyclus::optim::ConstraintPtr c);
+  std::pair<double, double> ConstraintBounds(Constraint::Ptr c);
 
   /// set variable/objective function values
   void SetUpVariablesAndObj(
-      std::vector<cyclus::optim::VariablePtr>& variables, 
-      cyclus::optim::ObjFuncPtr obj);
+      std::vector<Variable::Ptr>& variables, 
+      ObjectiveFunction::Ptr obj);
 
   /// set up constraints
   void SetUpConstraints(
-      std::vector<cyclus::optim::ConstraintPtr>& constraints);
+      std::vector<Constraint::Ptr>& constraints);
 
   /// set the objective direction
-  double ObjDirection(cyclus::optim::ObjFuncPtr obj);
+  double ObjDirection(ObjectiveFunction::Ptr obj);
 
   /// solve the model
   void SolveModel(CbcModel& model);
 
   /// populate the solution in the variable vector
   void PopulateSolution(CbcModel& model,
-                        std::vector<cyclus::optim::VariablePtr>& variables);
+                        std::vector<Variable::Ptr>& variables);
 
   /// print variables info
   void PrintVariables(int n_const);
@@ -65,7 +66,7 @@ class CBCSolver : public Solver {
   void Print(int n_const, int n_vars);
 };
 
-} // namespace optim
+
 } // namespace cyclus
 
 #endif

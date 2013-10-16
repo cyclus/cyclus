@@ -9,20 +9,10 @@
 
 #include "variable.h"
 
-namespace cyclus {
-namespace optim {
-class Constraint;
-typedef boost::shared_ptr<Constraint> ConstraintPtr;
-class ObjectiveFunction;
-typedef boost::shared_ptr<ObjectiveFunction> ObjFuncPtr;
-} // namespace optim
-} // namespace cyclus
-
-
-#include "solver_interface.h"
+//#include "solver_interface.h"
 
 namespace cyclus {
-namespace optim {
+
 /// function base class
 class Function {
  public:
@@ -34,18 +24,18 @@ class Function {
 
   /// get a modifier
   /// @param v the variable being modified
-  double GetModifier(cyclus::optim::VariablePtr v);
+  double GetModifier(Variable::Ptr v);
 
   /// @return the beginning iterator to the function variable
-  std::map<cyclus::optim::VariablePtr, double>::const_iterator begin();
+  std::map<Variable::Ptr, double>::const_iterator begin();
 
   /// @return the ending iterator to the function variable
-  std::map<cyclus::optim::VariablePtr, double>::const_iterator end();
+  std::map<Variable::Ptr, double>::const_iterator end();
 
   /// add a variable to the constraint
   /// @param v a pointer to the variable to add
   /// @param modifier the modifier for that variable in the function
-  void AddVariable(cyclus::optim::VariablePtr v, double modifier);
+  void AddVariable(Variable::Ptr v, double modifier);
 
   /// @return number of variables in the function
   int NumVars();
@@ -55,12 +45,14 @@ class Function {
 
  private:
   /// a container of all variables and their corresponding constant
-  std::map<cyclus::optim::VariablePtr, double> constituents_;    
+  std::map<Variable::Ptr, double> constituents_;    
 };
 
 /// derived class for constraints
 class Constraint : public Function {
  public:
+  typedef boost::shared_ptr<Constraint> Ptr;
+
   /// the possible equality relations
   enum EqualityRelation {EQ, GT, GTEQ, LT, LTEQ};
   
@@ -92,6 +84,8 @@ class Constraint : public Function {
 /// derived class for objective functions
 class ObjectiveFunction : public Function {
  public: 
+  typedef boost::shared_ptr<ObjectiveFunction> Ptr;
+
   /// the possible direction
   enum Direction {MIN, MAX};
 
@@ -112,7 +106,7 @@ class ObjectiveFunction : public Function {
   /// turn dir_ into a string
   std::string DirToStr();
 };
-} // namespace optim
+
 } // namespace cyclus
 
 #endif
