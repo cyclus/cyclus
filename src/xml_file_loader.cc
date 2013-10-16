@@ -79,7 +79,7 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   parser_->Init(input);
 
   ctx_->NewEvent("InputFiles")
-  ->AddVal("Data", cyclus::Blob(input.str()))
+  ->AddVal("Data", Blob(input.str()))
   ->Record();
 
   schema_paths_["Market"] = "/*/market";

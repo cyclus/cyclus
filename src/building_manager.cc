@@ -2,20 +2,18 @@
 
 #include <boost/any.hpp>
 
-#include "optim/cbc_solver.h"
-#include "optim/solver.h"
-#include "optim/solver_interface.h"
+#include "cbc_solver.h"
+#include "solver.h"
+#include "solver_interface.h"
 
 #include "error.h"
 #include "logger.h"
-
-using boost::any_cast;
 
 namespace cyclus {
 namespace action_building {
 
 // -------------------------------------------------------------------
-BuildOrder::BuildOrder(int n, action_building::Builder* b,
+BuildOrder::BuildOrder(int n, Builder* b,
                        supply_demand::CommodityProducer* cp) :
   number(n),
   builder(b),
@@ -25,9 +23,9 @@ BuildOrder::BuildOrder(int n, action_building::Builder* b,
 ProblemInstance::ProblemInstance(
   Commodity& commod,
   double demand,
-  cyclus::optim::SolverInterface& sinterface,
-  cyclus::optim::ConstraintPtr constr,
-  std::vector<cyclus::optim::VariablePtr>& soln)
+  SolverInterface& sinterface,
+  Constraint::Ptr constr,
+  std::vector<Variable::Ptr>& soln)
   : commodity(commod),
     unmet_demand(demand),
     interface(sinterface),
@@ -41,7 +39,7 @@ BuildingManager::BuildingManager() { }
 BuildingManager::~BuildingManager() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BuildingManager::RegisterBuilder(action_building::Builder* builder) {
+void BuildingManager::RegisterBuilder(Builder* builder) {
   if (builders_.find(builder) != builders_.end()) {
     throw KeyError("A manager is trying to register a builder twice.");
   } else {
@@ -50,7 +48,7 @@ void BuildingManager::RegisterBuilder(action_building::Builder* builder) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BuildingManager::UnRegisterBuilder(action_building::Builder* builder) {
+void BuildingManager::UnRegisterBuilder(Builder* builder) {
   if (builders_.find(builder) == builders_.end()) {
     throw KeyError("A manager is trying to unregister a builder not originally registered with it.");
   } else {
@@ -59,41 +57,33 @@ void BuildingManager::UnRegisterBuilder(action_building::Builder* builder) {
 }
 
 // -------------------------------------------------------------------
-std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
-  Commodity& commodity,
-  double unmet_demand) {
+std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
+    Commodity& commodity,
+    double unmet_demand) {
   using std::vector;
-  using optim::SolverPtr;
-  using optim::CBCSolver;
-  using optim::Constraint;
-  using optim::ConstraintPtr;
-  using optim::ObjFuncPtr;
-  using optim::SolverInterface;
-  //  using optim::ProblemInstance;
-  using optim::VariablePtr;
-  using optim::IntegerVariable;
-  using optim::ObjectiveFunction;
-  vector<BuildOrder> orders;
+  using boost::any_cast;
 
+  vector<BuildOrder> orders;
+  
   if (unmet_demand > 0) {
     // set up solver and interface
-    cyclus::optim::SolverPtr solver(new cyclus::optim::CBCSolver());
-    cyclus::optim::SolverInterface csi(solver);
+    Solver::Ptr solver(new CBCSolver());
+    SolverInterface csi(solver);
 
     // set up objective function
-    cyclus::optim::ObjFuncPtr obj(
-      new cyclus::optim::ObjectiveFunction(
-        cyclus::optim::ObjectiveFunction::MIN));
+    ObjectiveFunction::Ptr obj(
+      new ObjectiveFunction(
+        ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    cyclus::optim::ConstraintPtr constraint(
-      new cyclus::optim::Constraint(
-        cyclus::optim::Constraint::GTEQ, unmet_demand));
+    Constraint::Ptr constraint(
+      new Constraint(
+        Constraint::GTEQ, unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
-    vector<cyclus::optim::VariablePtr> solution;
+    vector<Variable::Ptr> solution;
     ProblemInstance problem(commodity, unmet_demand, csi, constraint, solution);
     SetUpProblem(problem);
 
@@ -112,7 +102,7 @@ std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
     LOG(LEV_DEBUG2, "buildman") << "  * Types of Prototypes to build: " <<
                                 solution.size();
     for (int i = 0; i < solution.size(); i++) {
-      cyclus::optim::VariablePtr x = solution.at(i);
+      Variable::Ptr x = solution.at(i);
       LOG(LEV_DEBUG2, "buildman") << "  * Type: " << x->name()
                                   << "  * Value: " << any_cast<int>(x->value());
     }
@@ -125,8 +115,8 @@ std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::SetUpProblem(action_building::ProblemInstance& problem) {
-  solution_map_ = std::map < optim::VariablePtr,
+void BuildingManager::SetUpProblem(ProblemInstance& problem) {
+  solution_map_ = std::map < Variable::Ptr,
   std::pair<Builder*, supply_demand::CommodityProducer*> > ();
 
   std::set<Builder*>::iterator builder_it;
@@ -148,13 +138,11 @@ void BuildingManager::SetUpProblem(action_building::ProblemInstance& problem) {
 // -------------------------------------------------------------------
 void BuildingManager::AddProducerVariableToProblem(
   supply_demand::CommodityProducer* producer,
-  action_building::Builder* builder,
-  action_building::ProblemInstance& problem) {
+  Builder* builder,
+  ProblemInstance& problem) {
   using std::make_pair;
-  using optim::Variable;
-  using optim::VariablePtr;
-  using optim::IntegerVariable;
-  VariablePtr x(new IntegerVariable(0, Variable::INF));
+  
+  Variable::Ptr x(new IntegerVariable(0, Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
   solution_map_.insert(make_pair(x, make_pair(builder, producer)));
@@ -169,8 +157,10 @@ void BuildingManager::AddProducerVariableToProblem(
 
 // -------------------------------------------------------------------
 void BuildingManager::ConstructBuildOrdersFromSolution(
-  std::vector<action_building::BuildOrder>& orders,
-  std::vector<optim::VariablePtr>& solution) {
+  std::vector<BuildOrder>& orders,
+  std::vector<Variable::Ptr>& solution) {
+  using boost::any_cast;
+
   // construct the build orders
   for (int i = 0; i < solution.size(); i++) {
     int number = any_cast<int>(solution.at(i)->value());

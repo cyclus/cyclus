@@ -90,12 +90,12 @@ std::string CsvBack::ValAsString(boost::spirit::hold_any& v) {
     ss << v.cast<double>();
   } else if (v.type() == typeid(std::string)) {
     ss << "\"" << v.cast<std::string>() << "\"";
-  } else if (v.type() == typeid(cyclus::Blob)) {
+  } else if (v.type() == typeid(Blob)) {
     boost::uuids::uuid u = boost::uuids::random_generator()();
     std::string fname = boost::lexical_cast<std::string>(u) + ".blob";
     std::string path = (path_ / fname).string();
 
-    std::string s = v.cast<cyclus::Blob>().str();
+    std::string s = v.cast<Blob>().str();
     std::ofstream file;
     file.open(path.c_str(), std::fstream::in | std::fstream::app);
     file << s;

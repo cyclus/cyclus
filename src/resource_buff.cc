@@ -20,7 +20,7 @@ double ResourceBuff::capacity() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::SetCapacity(double cap) {
-  if (quantity() - cap > cyclus::eps_rsrc()) {
+  if (quantity() - cap > eps_rsrc()) {
     throw ValueError("New capacity lower than existing quantity");
   }
   capacity_ = cap;
@@ -43,9 +43,9 @@ double ResourceBuff::space() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::PopQty(double qty) {
-  if (qty - quantity() > cyclus::eps_rsrc()) {
+  if (qty - quantity() > eps_rsrc()) {
     throw ValueError("Removal quantity larger than store tot quantity.");
-  } else if (qty < cyclus::eps_rsrc()) {
+  } else if (qty < eps_rsrc()) {
     throw ValueError("Removal quantity cannot be negative.");
   }
 
@@ -53,11 +53,11 @@ Manifest ResourceBuff::PopQty(double qty) {
   Resource::Ptr mat, leftover;
   double left = qty;
   double quan;
-  while (left > cyclus::eps_rsrc()) {
+  while (left > eps_rsrc()) {
     mat = mats_.front();
     mats_.pop_front();
     quan = mat->quantity();
-    if ((quan - left) > cyclus::eps_rsrc()) {
+    if ((quan - left) > eps_rsrc()) {
       // too big - split the mat before pushing
       leftover = mat->ExtractRes(quan - left);
       mats_.push_front(leftover);
@@ -107,7 +107,7 @@ Resource::Ptr ResourceBuff::PopOne() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::PushOne(Resource::Ptr mat) {
-  if (mat->quantity() - space() > cyclus::eps_rsrc()) {
+  if (mat->quantity() - space() > eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
   } else if (mats_present_.count(mat) == 1) {
     throw KeyError("Duplicate resource pushing attempted");
@@ -124,7 +124,7 @@ void ResourceBuff::PushAll(Manifest mats) {
   for (int i = 0; i < mats.size(); i++) {
     tot_qty += mats.at(i)->quantity();
   }
-  if (tot_qty - space() > cyclus::eps_rsrc()) {
+  if (tot_qty - space() > eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
   }
 
