@@ -8,7 +8,6 @@
 TEST(CycloptsFunctionTests, AddVars) {
   // usings
   using cyclus::Variable;
-  using cyclus::VariablePtr;
   using cyclus::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
@@ -16,8 +15,8 @@ TEST(CycloptsFunctionTests, AddVars) {
   Variable::VarType type(Variable::LINEAR);
   
   double val1 = 1.5, val2 = 2.3;
-  VariablePtr var1(new Variable(lbound, ubound, type));
-  VariablePtr var2(new Variable(lbound, ubound, type));
+  Variable::Ptr var1(new Variable(lbound, ubound, type));
+  Variable::Ptr var2(new Variable(lbound, ubound, type));
 
   Function f;
   f.AddVariable(var1, val1);
@@ -30,7 +29,6 @@ TEST(CycloptsFunctionTests, AddVars) {
 TEST(CycloptsFunctionTests, GetModifiers) {
   // usings
   using cyclus::Variable;
-  using cyclus::VariablePtr;
   using cyclus::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
@@ -38,7 +36,7 @@ TEST(CycloptsFunctionTests, GetModifiers) {
   Variable::VarType type(Variable::LINEAR);
   
   double val1 = 1.5;
-  VariablePtr var1(new Variable(lbound, ubound, type));
+  Variable::Ptr var1(new Variable(lbound, ubound, type));
   Function f;
   f.AddVariable(var1, val1);
 

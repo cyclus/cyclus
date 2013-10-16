@@ -25,7 +25,7 @@ ProblemInstance::ProblemInstance(
   double demand,
   SolverInterface& sinterface,
   ConstraintPtr constr,
-  std::vector<VariablePtr>& soln)
+  std::vector<Variable::Ptr>& soln)
   : commodity(commod),
     unmet_demand(demand),
     interface(sinterface),
@@ -83,7 +83,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
-    vector<VariablePtr> solution;
+    vector<Variable::Ptr> solution;
     ProblemInstance problem(commodity, unmet_demand, csi, constraint, solution);
     SetUpProblem(problem);
 
@@ -102,7 +102,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     LOG(LEV_DEBUG2, "buildman") << "  * Types of Prototypes to build: " <<
                                 solution.size();
     for (int i = 0; i < solution.size(); i++) {
-      VariablePtr x = solution.at(i);
+      Variable::Ptr x = solution.at(i);
       LOG(LEV_DEBUG2, "buildman") << "  * Type: " << x->name()
                                   << "  * Value: " << any_cast<int>(x->value());
     }
@@ -116,7 +116,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 
 // -------------------------------------------------------------------
 void BuildingManager::SetUpProblem(ProblemInstance& problem) {
-  solution_map_ = std::map < VariablePtr,
+  solution_map_ = std::map < Variable::Ptr,
   std::pair<Builder*, supply_demand::CommodityProducer*> > ();
 
   std::set<Builder*>::iterator builder_it;
@@ -142,7 +142,7 @@ void BuildingManager::AddProducerVariableToProblem(
   ProblemInstance& problem) {
   using std::make_pair;
   
-  VariablePtr x(new IntegerVariable(0, Variable::INF));
+  Variable::Ptr x(new IntegerVariable(0, Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
   solution_map_.insert(make_pair(x, make_pair(builder, producer)));
@@ -158,7 +158,7 @@ void BuildingManager::AddProducerVariableToProblem(
 // -------------------------------------------------------------------
 void BuildingManager::ConstructBuildOrdersFromSolution(
   std::vector<BuildOrder>& orders,
-  std::vector<VariablePtr>& solution) {
+  std::vector<Variable::Ptr>& solution) {
   using boost::any_cast;
 
   // construct the build orders

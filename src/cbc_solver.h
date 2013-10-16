@@ -22,7 +22,7 @@ class CBCSolver : public Solver {
   /// the value() member.
   /// @param obj A pointer to the objective function.
   /// @param constraints A container of pointers to the problem's constraints.
-  virtual void Solve(std::vector<VariablePtr>& variables, 
+  virtual void Solve(std::vector<Variable::Ptr>& variables, 
                      ObjFuncPtr obj, 
                      std::vector<ConstraintPtr>& constraints);
 
@@ -35,7 +35,7 @@ class CBCSolver : public Solver {
 
   /// set variable/objective function values
   void SetUpVariablesAndObj(
-      std::vector<VariablePtr>& variables, 
+      std::vector<Variable::Ptr>& variables, 
       ObjFuncPtr obj);
 
   /// set up constraints
@@ -50,7 +50,7 @@ class CBCSolver : public Solver {
 
   /// populate the solution in the variable vector
   void PopulateSolution(CbcModel& model,
-                        std::vector<VariablePtr>& variables);
+                        std::vector<Variable::Ptr>& variables);
 
   /// print variables info
   void PrintVariables(int n_const);

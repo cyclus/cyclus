@@ -21,7 +21,6 @@ using cyclus::ConstraintPtr;
 using cyclus::ObjFuncPtr;
 using cyclus::SolverInterface;
 using cyclus::Variable;
-using cyclus::VariablePtr;
 using cyclus::IntegerVariable;
 using cyclus::ObjectiveFunction;
 
@@ -41,7 +40,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, Variable::INF));
+  Variable::Ptr x(new IntegerVariable(lower, Variable::INF));
   csi.RegisterVariable(x);
 
   // objective function
@@ -71,7 +70,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, upper));
+  Variable::Ptr x(new IntegerVariable(lower, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -100,7 +99,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(Variable::NEG_INF, upper));
+  Variable::Ptr x(new IntegerVariable(Variable::NEG_INF, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -130,7 +129,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, upper));
+  Variable::Ptr x(new IntegerVariable(lower, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -154,7 +153,6 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   using cyclus::ObjFuncPtr;
   using cyclus::SolverInterface;
   using cyclus::Variable;
-  using cyclus::VariablePtr;
   using cyclus::IntegerVariable;
   using cyclus::ObjectiveFunction;
 
@@ -176,9 +174,9 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   csi.RegisterConstraint(c);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(0, Variable::INF));
+  Variable::Ptr x(new IntegerVariable(0, Variable::INF));
   csi.RegisterVariable(x);
-  VariablePtr y(new IntegerVariable(0, Variable::INF));
+  Variable::Ptr y(new IntegerVariable(0, Variable::INF));
   csi.RegisterVariable(y);
 
   // configure constraint and objective function

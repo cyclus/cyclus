@@ -34,18 +34,18 @@ class Function {
 
   /// get a modifier
   /// @param v the variable being modified
-  double GetModifier(VariablePtr v);
+  double GetModifier(Variable::Ptr v);
 
   /// @return the beginning iterator to the function variable
-  std::map<VariablePtr, double>::const_iterator begin();
+  std::map<Variable::Ptr, double>::const_iterator begin();
 
   /// @return the ending iterator to the function variable
-  std::map<VariablePtr, double>::const_iterator end();
+  std::map<Variable::Ptr, double>::const_iterator end();
 
   /// add a variable to the constraint
   /// @param v a pointer to the variable to add
   /// @param modifier the modifier for that variable in the function
-  void AddVariable(VariablePtr v, double modifier);
+  void AddVariable(Variable::Ptr v, double modifier);
 
   /// @return number of variables in the function
   int NumVars();
@@ -55,7 +55,7 @@ class Function {
 
  private:
   /// a container of all variables and their corresponding constant
-  std::map<VariablePtr, double> constituents_;    
+  std::map<Variable::Ptr, double> constituents_;    
 };
 
 /// derived class for constraints

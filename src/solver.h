@@ -29,16 +29,16 @@ class Solver {
 
   /// solve method to be overloaded by derived classes
   virtual void Solve(
-      std::vector<VariablePtr>& variables, 
+      std::vector<Variable::Ptr>& variables, 
       ObjFuncPtr obj, 
       std::vector<ConstraintPtr>& constraints) = 0;
 
  protected:
   /// the indices used for each variable
-  std::map<VariablePtr, int> index_;
+  std::map<Variable::Ptr, int> index_;
 
   /// match variable pointers to indices, populating indicies_
-  void PopulateIndices(std::vector<VariablePtr>& variables);
+  void PopulateIndices(std::vector<Variable::Ptr>& variables);
 };
 
 } // namespace cyclus

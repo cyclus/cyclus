@@ -40,10 +40,10 @@ std::pair<double, double> CBCSolver::ConstraintBounds(ConstraintPtr c) {
 
 // -----------------------------------------------------------------------------
 void CBCSolver::SetUpVariablesAndObj(
-    std::vector<VariablePtr>& variables, 
+    std::vector<Variable::Ptr>& variables, 
     ObjFuncPtr obj) {
   for (int i = 0; i < variables.size(); i++) {
-    VariablePtr v = variables.at(i);
+    Variable::Ptr v = variables.at(i);
     std::pair<int, int> ibounds;
     std::pair<double, double> lbounds;
     switch(v->type()) {
@@ -67,7 +67,7 @@ void CBCSolver::SetUpConstraints(std::vector<ConstraintPtr>& constraints) {
     ConstraintPtr c = constraints.at(i);
     std::pair<double, double> bounds = ConstraintBounds(c);
     builder_.setRowBounds(i, bounds.first, bounds.second);
-    std::map<VariablePtr, double>::const_iterator it;
+    std::map<Variable::Ptr, double>::const_iterator it;
     for (it = c->begin(); it != c->end(); ++it) {
       builder_.setElement(i, index_[it->first], it->second);
     }
@@ -97,7 +97,7 @@ void CBCSolver::SolveModel(CbcModel& model) {
 
 // -----------------------------------------------------------------------------
 void CBCSolver::PopulateSolution(CbcModel& model,
-                                 std::vector<VariablePtr>& variables) {
+                                 std::vector<Variable::Ptr>& variables) {
   int ncol = model.solver()->getNumCols();
   const double* solution = model.solver()->getColSolution();
   
@@ -156,7 +156,7 @@ void CBCSolver::Print(int n_const, int n_vars) {
 }
 
 // -----------------------------------------------------------------------------
-void CBCSolver::Solve(std::vector<VariablePtr>& variables, 
+void CBCSolver::Solve(std::vector<Variable::Ptr>& variables, 
                       ObjFuncPtr obj, 
                       std::vector<ConstraintPtr>& constraints) {
   // use builder_ to build constraint probelm

@@ -12,12 +12,12 @@ namespace cyclus {
 // -----------------------------------------------------------------------------
 SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
   constraints_ = std::vector<ConstraintPtr>();
-  variables_ = std::vector<VariablePtr>();
+  variables_ = std::vector<Variable::Ptr>();
   modifier_limit_ = kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc
 };
 
 // -----------------------------------------------------------------------------
-void SolverInterface::RegisterVariable(VariablePtr v) {
+void SolverInterface::RegisterVariable(Variable::Ptr v) {
   variables_.push_back(v);
 }
 
@@ -27,7 +27,7 @@ void SolverInterface::RegisterObjFunction(ObjFuncPtr obj) {
 }
 
 // -----------------------------------------------------------------------------
-void SolverInterface::AddVarToObjFunction(VariablePtr v, double modifier) {
+void SolverInterface::AddVarToObjFunction(Variable::Ptr v, double modifier) {
   // need to check that v is in variables_
   CheckModifierBounds(modifier);
   obj_->AddVariable(v, modifier);
@@ -40,7 +40,7 @@ void SolverInterface::RegisterConstraint(ConstraintPtr c) {
 
 // -----------------------------------------------------------------------------
 void SolverInterface::AddVarToConstraint(
-    VariablePtr v, 
+    Variable::Ptr v, 
     double modifier, 
     ConstraintPtr c) {
   CheckModifierBounds(modifier);

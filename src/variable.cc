@@ -138,13 +138,13 @@ int IntegerVariable::ubound_val() {
 }
 
 // -----------------------------------------------------------------------------
-std::pair<int, int> GetIntBounds(VariablePtr v) {
+std::pair<int, int> GetIntBounds(Variable::Ptr v) {
   IntegerVariable* clone = dynamic_cast<IntegerVariable*>(v.get());
   return std::pair<int, int>(clone->lbound_val(), clone->ubound_val());
 }
 
 // -----------------------------------------------------------------------------
-std::pair<double, double> GetLinBounds(VariablePtr v) {
+std::pair<double, double> GetLinBounds(Variable::Ptr v) {
   LinearVariable* clone = dynamic_cast<LinearVariable*>(v.get());
   return std::pair<double, double>(clone->lbound_val(), clone->ubound_val());
 }

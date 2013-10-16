@@ -30,14 +30,14 @@ struct ProblemInstance {
   ProblemInstance(Commodity& commod, double demand,
                   SolverInterface& sinterface,
                   ConstraintPtr constr,
-                  std::vector<VariablePtr>& soln);
+                  std::vector<Variable::Ptr>& soln);
 
   // constituents
   Commodity& commodity;
   double unmet_demand;
   SolverInterface& interface;
   ConstraintPtr constraint;
-  std::vector<VariablePtr>& solution;
+  std::vector<Variable::Ptr>& solution;
 };
 
 /**
@@ -123,14 +123,14 @@ class BuildingManager {
    */
   void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>&
                                         orders,
-                                        std::vector<VariablePtr>& solution);
+                                        std::vector<Variable::Ptr>& solution);
 
  private:
   /// the set of registered builders
   std::set<Builder*> builders_;
 
   /// a map of variables to their associated builder and producer
-  std::map < VariablePtr,
+  std::map < Variable::Ptr,
       std::pair<action_building::Builder*, supply_demand::CommodityProducer*> >
       solution_map_;
 };

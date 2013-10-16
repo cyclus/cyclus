@@ -14,23 +14,23 @@ namespace cyclus {
 Function::Function() { }
 
 // -----------------------------------------------------------------------------
-void Function::AddVariable(VariablePtr v, double modifier) {
-  constituents_.insert(std::pair<VariablePtr, double>(v, modifier));
+void Function::AddVariable(Variable::Ptr v, double modifier) {
+  constituents_.insert(std::pair<Variable::Ptr, double>(v, modifier));
 }
 
 // -----------------------------------------------------------------------------
-double Function::GetModifier(VariablePtr v) {
+double Function::GetModifier(Variable::Ptr v) {
   return constituents_[v];
 }
 
 // -----------------------------------------------------------------------------
-std::map<VariablePtr, double>::const_iterator 
+std::map<Variable::Ptr, double>::const_iterator 
 Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<VariablePtr, double>::const_iterator 
+std::map<Variable::Ptr, double>::const_iterator 
 Function::end() {
   return constituents_.end();
 }
@@ -44,7 +44,7 @@ int Function::NumVars() {
 std::string Function::Print() { 
   std::stringstream ss;
   int count = 0;
-  std::map<VariablePtr, double>::iterator it;
+  std::map<Variable::Ptr, double>::iterator it;
   for (it = constituents_.begin(); it != constituents_.end(); it++) {
     ss << it->second << it->first->name();
     if (count < constituents_.size()-1) {

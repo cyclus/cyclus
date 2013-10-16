@@ -29,7 +29,6 @@ TEST(CycloptsVariableTests, UnboundedLinearConstructors) {
 TEST(CycloptsVariableTests, BoundedLinearConstructors) {
   // usings
   using cyclus::Variable;
-  using cyclus::VariablePtr;
   using cyclus::LinearVariable;
 
   Variable::Bound neg_inf(Variable::NEG_INF);
@@ -47,7 +46,7 @@ TEST(CycloptsVariableTests, BoundedLinearConstructors) {
   EXPECT_EQ(var1.ubound_val(), val);
   EXPECT_EQ(var1.type(), type);
   std::pair<double, double> bounds(lbound_limit, val);
-  EXPECT_EQ(bounds, GetLinBounds(VariablePtr(new LinearVariable(var1))));
+  EXPECT_EQ(bounds, GetLinBounds(Variable::Ptr(new LinearVariable(var1))));
   
   LinearVariable var2(val, inf);
   EXPECT_EQ(var2.lbound(), finite);
@@ -56,7 +55,7 @@ TEST(CycloptsVariableTests, BoundedLinearConstructors) {
   EXPECT_EQ(var2.ubound_val(), ubound_limit);
   EXPECT_EQ(var2.type(), type);
   bounds = std::pair<double, double>(val, ubound_limit);
-  EXPECT_EQ(bounds, GetLinBounds(VariablePtr(new LinearVariable(var2))));
+  EXPECT_EQ(bounds, GetLinBounds(Variable::Ptr(new LinearVariable(var2))));
 
   LinearVariable var3(val, val);
   EXPECT_EQ(var3.lbound(), finite);
@@ -65,7 +64,7 @@ TEST(CycloptsVariableTests, BoundedLinearConstructors) {
   EXPECT_EQ(var3.ubound_val(), val);
   EXPECT_EQ(var3.type(), type);
   bounds = std::pair<double, double>(val, val);
-  EXPECT_EQ(bounds, GetLinBounds(VariablePtr(new LinearVariable(var3))));
+  EXPECT_EQ(bounds, GetLinBounds(Variable::Ptr(new LinearVariable(var3))));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -88,7 +87,6 @@ TEST(CycloptsVariableTests, UnboundedIntConstructors) {
 TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
   // usings
   using cyclus::Variable;
-  using cyclus::VariablePtr;
   using cyclus::IntegerVariable;
 
   Variable::Bound neg_inf(Variable::NEG_INF);
@@ -106,7 +104,7 @@ TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
   EXPECT_EQ(var1.ubound_val(), val);
   EXPECT_EQ(var1.type(), type);
   std::pair<int, int> bounds(lbound_limit, val);
-  EXPECT_EQ(bounds, GetIntBounds(VariablePtr(new IntegerVariable(var1))));
+  EXPECT_EQ(bounds, GetIntBounds(Variable::Ptr(new IntegerVariable(var1))));
   
   IntegerVariable var2(val, inf);
   EXPECT_EQ(var2.lbound(), finite);
@@ -115,7 +113,7 @@ TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
   EXPECT_EQ(var2.ubound_val(), ubound_limit);
   EXPECT_EQ(var2.type(), type);
   bounds = std::pair<int, int>(val, ubound_limit);
-  EXPECT_EQ(bounds, GetIntBounds(VariablePtr(new IntegerVariable(var2))));
+  EXPECT_EQ(bounds, GetIntBounds(Variable::Ptr(new IntegerVariable(var2))));
   
   IntegerVariable var3(val, val);
   EXPECT_EQ(var3.lbound(), finite);
@@ -124,7 +122,7 @@ TEST(CycloptsVariableTests, BoundedIntegerConstructors) {
   EXPECT_EQ(var3.ubound_val(), val);
   EXPECT_EQ(var3.type(), type);
   bounds = std::pair<int, int>(val, val);
-  EXPECT_EQ(bounds, GetIntBounds(VariablePtr(new IntegerVariable(var3))));
+  EXPECT_EQ(bounds, GetIntBounds(Variable::Ptr(new IntegerVariable(var3))));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
