@@ -7,27 +7,27 @@
 
 namespace cyclus {
 
-/// @class ResponsePortfolio
+/// @class BidPortfolio
 ///
-/// @brief A ResponsePortfolio is a collection of bids to requests for
+/// @brief A BidPortfolio is a collection of bids to requests for
 /// resources and associated constraints on those bids.
 ///
-/// A ResponsePortfolio contains all the information corresponding to a
-/// responder to resource requests. It is a light wrapper around the set
-/// of bids and constraints for a given responder, guaranteeing a single
-/// responder per portfolio. Responses are grouped by both the responder and the
+/// A BidPortfolio contains all the information corresponding to a
+/// bidder to resource requests. It is a light wrapper around the set
+/// of bids and constraints for a given bidder, guaranteeing a single
+/// bidder per portfolio. Responses are grouped by both the bidder and the
 /// commodity that it produces. Constraints are assumed to act over the entire set
 /// of possible bids.
 template <class T>
-class ResponsePortfolio {
+class BidPortfolio {
  public:
   /// @brief default constructor
-  ResponsePortfolio() : responder_(NULL), commodity_("NO_COMMODITY_SET") { };
+  BidPortfolio() : bidder_(NULL), commodity_("NO_COMMODITY_SET") { };
   
   /// @return the model associated with the portfolio. if no bids have
-  /// been added, the responder is NULL.
-  const cyclus::FacilityModel* responder() {
-    return responder_;
+  /// been added, the bidder is NULL.
+  const cyclus::FacilityModel* bidder() {
+    return bidder_;
   };
     
   /// @return the commodity associated with the portfolio. if no bids have
@@ -38,7 +38,7 @@ class ResponsePortfolio {
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
-  /// @throws if a bid is added from a different responder than the original
+  /// @throws if a bid is added from a different bidder than the original
   void AddResponse(const cyclus::Bid<T>& r) {
     VerifyResponder(r);
     VerifyCommodity(r);
@@ -62,16 +62,16 @@ class ResponsePortfolio {
   };
 
  private:
-  /// @brief if the responder has not been determined yet, it is set. otherwise
+  /// @brief if the bidder has not been determined yet, it is set. otherwise
   /// VerifyResponder() verifies the the bid is associated with the
-  /// portfolio's responder
-  /// @throws if a bid is added from a different responder than the original
+  /// portfolio's bidder
+  /// @throws if a bid is added from a different bidder than the original
   void VerifyResponder(const cyclus::Bid<T> r) {
-    if (responder_ == NULL) {
-      responder_ = r.responder;
-    } else if (responder_ != r.responder) {
-      std::string msg = "Can't insert a bid from " + r.responder->name()
-          + " into " + responder_->name() + "'s portfolio.";
+    if (bidder_ == NULL) {
+      bidder_ = r.bidder;
+    } else if (bidder_ != r.bidder) {
+      std::string msg = "Can't insert a bid from " + r.bidder->name()
+          + " into " + bidder_->name() + "'s portfolio.";
       throw cyclus::KeyError(msg);
     }
   };
@@ -100,7 +100,7 @@ class ResponsePortfolio {
   std::set< cyclus::CapacityConstraint<T> > constraints_;
   
   std::string commodity_;
-  cyclus::FacilityModel* responder_;
+  cyclus::FacilityModel* bidder_;
 };
 
 } // namespace cyclus
