@@ -9,7 +9,7 @@ namespace supply_demand {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityInformation::CommodityInformation()
   : capacity(0),
-    cost(cyclus::kModifierLimit) { }
+    cost(kModifierLimit) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityInformation::CommodityInformation(double a_capacity,
@@ -20,7 +20,7 @@ CommodityInformation::CommodityInformation(double a_capacity,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::CommodityProducer()
   : default_capacity_(0.0),
-    default_cost_(cyclus::kModifierLimit) { }
+    default_cost_(kModifierLimit) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::~CommodityProducer() {}
