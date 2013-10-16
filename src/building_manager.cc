@@ -13,7 +13,7 @@ namespace cyclus {
 namespace action_building {
 
 // -------------------------------------------------------------------
-BuildOrder::BuildOrder(int n, action_building::Builder* b,
+BuildOrder::BuildOrder(int n, Builder* b,
                        supply_demand::CommodityProducer* cp) :
   number(n),
   builder(b),
@@ -39,7 +39,7 @@ BuildingManager::BuildingManager() { }
 BuildingManager::~BuildingManager() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BuildingManager::RegisterBuilder(action_building::Builder* builder) {
+void BuildingManager::RegisterBuilder(Builder* builder) {
   if (builders_.find(builder) != builders_.end()) {
     throw KeyError("A manager is trying to register a builder twice.");
   } else {
@@ -48,7 +48,7 @@ void BuildingManager::RegisterBuilder(action_building::Builder* builder) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void BuildingManager::UnRegisterBuilder(action_building::Builder* builder) {
+void BuildingManager::UnRegisterBuilder(Builder* builder) {
   if (builders_.find(builder) == builders_.end()) {
     throw KeyError("A manager is trying to unregister a builder not originally registered with it.");
   } else {
@@ -57,7 +57,7 @@ void BuildingManager::UnRegisterBuilder(action_building::Builder* builder) {
 }
 
 // -------------------------------------------------------------------
-std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
+std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     Commodity& commodity,
     double unmet_demand) {
   using std::vector;
@@ -115,7 +115,7 @@ std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
 }
 
 // -------------------------------------------------------------------
-void BuildingManager::SetUpProblem(action_building::ProblemInstance& problem) {
+void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   solution_map_ = std::map < VariablePtr,
   std::pair<Builder*, supply_demand::CommodityProducer*> > ();
 
@@ -138,8 +138,8 @@ void BuildingManager::SetUpProblem(action_building::ProblemInstance& problem) {
 // -------------------------------------------------------------------
 void BuildingManager::AddProducerVariableToProblem(
   supply_demand::CommodityProducer* producer,
-  action_building::Builder* builder,
-  action_building::ProblemInstance& problem) {
+  Builder* builder,
+  ProblemInstance& problem) {
   using std::make_pair;
   
   VariablePtr x(new IntegerVariable(0, Variable::INF));
@@ -157,7 +157,7 @@ void BuildingManager::AddProducerVariableToProblem(
 
 // -------------------------------------------------------------------
 void BuildingManager::ConstructBuildOrdersFromSolution(
-  std::vector<action_building::BuildOrder>& orders,
+  std::vector<BuildOrder>& orders,
   std::vector<VariablePtr>& solution) {
   using boost::any_cast;
 
