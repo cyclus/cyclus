@@ -84,7 +84,7 @@ void Hdf5Back::CreateTable(Event* ev) {
       field_types[i] = string_type_;
       dst_sizes[i] = STR_SIZE;
       dst_size += STR_SIZE;
-    } else if (vals[i].second.type() == typeid(cyclus::Blob)) {
+    } else if (vals[i].second.type() == typeid(Blob)) {
       field_types[i] = blob_type_;
       dst_sizes[i] = sizeof(char*);
       dst_size += sizeof(char*);
@@ -144,7 +144,7 @@ void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
       valtype[col] = STR;
     } else if (header[col].second.type() == typeid(boost::uuids::uuid)) {
       valtype[col] = UUID;
-    } else if (header[col].second.type() == typeid(cyclus::Blob)) {
+    } else if (header[col].second.type() == typeid(Blob)) {
       valtype[col] = BLOB;
     } else {
       valtype[col] = NUM;
@@ -171,7 +171,7 @@ void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
           break;
         }
         case BLOB: {
-          const char* data = a->cast<cyclus::Blob>().str().c_str();
+          const char* data = a->cast<Blob>().str().c_str();
           memcpy(buf + offset, &data, sizes[col]);
           break;
         }
