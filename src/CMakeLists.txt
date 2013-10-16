@@ -176,7 +176,6 @@ INSTALL(FILES
   version.h
   windows_helper_functions.h
   cbc_solver.h
-  limits.h
   function.h
   solver.h
   solver_interface.h
