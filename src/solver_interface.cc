@@ -10,7 +10,7 @@
 namespace cyclus {
 
 // -----------------------------------------------------------------------------
-SolverInterface::SolverInterface(SolverPtr s) : solver_(s) {
+SolverInterface::SolverInterface(Solver::Ptr s) : solver_(s) {
   constraints_ = std::vector<Constraint::Ptr>();
   variables_ = std::vector<Variable::Ptr>();
   modifier_limit_ = kModifierLimit; // this is a bandaid, I don't know why it has to happen... somethings up with cbc

@@ -67,7 +67,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
   
   if (unmet_demand > 0) {
     // set up solver and interface
-    SolverPtr solver(new CBCSolver());
+    Solver::Ptr solver(new CBCSolver());
     SolverInterface csi(solver);
 
     // set up objective function

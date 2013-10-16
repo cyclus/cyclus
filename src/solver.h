@@ -6,13 +6,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-namespace cyclus {
-
-class Solver;
-typedef boost::shared_ptr<Solver> SolverPtr;
-
-} // namespace cyclus
-
 #include "function.h"
 #include "variable.h"
 
@@ -21,6 +14,8 @@ namespace cyclus {
 /// abstract base class for different types of constraint program solvers
 class Solver {
  public:
+  typedef boost::shared_ptr<Solver> Ptr;
+
   /// constructor
   Solver();
 

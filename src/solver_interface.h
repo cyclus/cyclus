@@ -16,7 +16,7 @@ class SolverInterface {
   /// constructor
   /// @param solver a pointer to the concrete solver to which an interface will
   /// be provided.
-  SolverInterface(SolverPtr solver);
+  SolverInterface(Solver::Ptr solver);
 
   /// add a variable
   /// @param v a pointer to the variable to register with the problem
@@ -47,7 +47,7 @@ class SolverInterface {
 
  private:
   /// the solver
-  SolverPtr solver_;
+  Solver::Ptr solver_;
 
   /// the variables
   std::vector<Variable::Ptr> variables_;

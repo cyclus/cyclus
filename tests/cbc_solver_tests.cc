@@ -14,7 +14,7 @@
 
 // usings
 using boost::any_cast;
-using cyclus::SolverPtr;
+using cyclus::Solver;
 using cyclus::CBCSolver;
 using cyclus::Constraint;
 using cyclus::SolverInterface;
@@ -30,7 +30,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
@@ -60,7 +60,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
@@ -89,7 +89,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
@@ -119,7 +119,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
@@ -148,7 +148,7 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   double unmet_demand = 22.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
