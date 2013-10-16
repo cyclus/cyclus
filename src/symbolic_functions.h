@@ -5,25 +5,18 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-// forward includes
-//#include "symbolic_function_factories.h"
-
-
 namespace cyclus {
 
 // forward declarations
-//class Function;
 class LinearFunction;
 class ExponentialFunction;
 class PiecewiseFunction;
 
-
-// forward includes
-//#include "symbolic_function_factories.h"
-
 /// abstract base class for symbolic functions
 class SymFunction {
  public:
+  typedef boost::shared_ptr<SymFunction> Ptr;
+  
   /// virtual destructor for an abstract base class
   virtual ~SymFunction() {};
 
@@ -33,9 +26,6 @@ class SymFunction {
   /// every function must print itself
   virtual std::string Print() = 0;
 };
-
-// typedefs
-typedef boost::shared_ptr<SymFunction> SymFunctionPtr;
 
 /**
    linear functions
@@ -104,10 +94,10 @@ class ExponentialFunction : public SymFunction {
  */
 class PiecewiseFunction : public SymFunction {
   struct PiecewiseFunctionInfo {
-    PiecewiseFunctionInfo(SymFunctionPtr function_, double xoff_ = 0,
+    PiecewiseFunctionInfo(SymFunction::Ptr function_, double xoff_ = 0,
                           double yoff_ = 0) :
       function(function_), xoffset(xoff_), yoffset(yoff_) {};
-    SymFunctionPtr function;
+    SymFunction::Ptr function;
     double xoffset, yoffset;
   };
 
