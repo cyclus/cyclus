@@ -3,6 +3,7 @@
 #include "xml_file_loader.h"
 
 #include <fstream>
+#include <set>
 #include <streambuf>
 
 #include <boost/filesystem.hpp>
@@ -43,26 +44,25 @@ std::string BuildMasterSchema() {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::set<std::string> types = Model::dynamic_module_types();
-  std::set<std::string>::iterator type;
-  for (type = types.begin(); type != types.end(); ++type) {
-    std::vector<std::string> names = Env::ListModules(*type);
-    std::stringstream subschema;
-    for (int i = 0; i < names.size(); ++i) {
-      DynamicModule dyn(names[i]);
-      Model* m = dyn.ConstructInstance(&ctx);
-      subschema << "<element name=\"" << names[i] << "\">\n";
-      subschema << m->schema() << "\n";
-      subschema << "</element>\n";
-      delete m;
-      dyn.CloseLibrary();
-    }
+  std::vector<std::string> names = Env::ListModules();
+  std::map<std::string, std::string> subschemas;
+  for (int i = 0; i < names.size(); ++i) {
+    DynamicModule dyn(names[i]);
+    Model* m = dyn.ConstructInstance(&ctx);
+    subschemas[m->ModelType()] += "<element name=\"" + names[i] + "\">\n";
+    subschemas[m->ModelType()] += m->schema() + "\n";
+    subschemas[m->ModelType()] += "</element>\n";
+    delete m;
+    dyn.CloseLibrary();
+  }
 
-    // replace refs
-    std::string search_str = std::string("@") + *type + std::string("_REFS@");
+  // replace refs in master rng template file
+  std::map<std::string, std::string>::iterator it;
+  for (it = subschemas.begin(); it != subschemas.end(); ++it) {
+    std::string search_str = std::string("@") + it->first + std::string("_REFS@");
     size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
-      master.replace(pos, search_str.size(), subschema.str());
+      master.replace(pos, search_str.size(), it->second);
     }
   }
 
@@ -200,17 +200,12 @@ void XMLFileLoader::LoadInitialAgents() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadDynamicModules() {
-  std::set<std::string> module_types = Model::dynamic_module_types();
-  std::set<std::string>::iterator it;
-  for (it = module_types.begin(); it != module_types.end(); it++) {
-    std::vector<std::string> names = Env::ListModules(*it);
-    for (int i = 0; i < names.size(); ++i) {
-      DynamicModule* module = new DynamicModule(names[i]);
-      modules_[names[i]] = module;
-      CLOG(LEV_DEBUG1) << "Module '" << names[i]
-                       << "' of type: " << *it
-                       << " has been loaded.";
-    }
+  std::vector<std::string> names = Env::ListModules();
+  for (int i = 0; i < names.size(); ++i) {
+    DynamicModule* module = new DynamicModule(names[i]);
+    modules_[names[i]] = module;
+    CLOG(LEV_DEBUG1) << "Module '" << names[i]
+                     << "' has been loaded.";
   }
 }
 

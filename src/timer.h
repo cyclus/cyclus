@@ -41,6 +41,11 @@ class Timer {
                   int start = 0, int decay = 0, std::string handle = "");
 
   /**
+     reset all data (registered listeners, etc.) to empty or initial state
+   */
+  void Reset();
+
+  /**
      Runs the simulation.
    */
   void RunSim();
@@ -214,6 +219,11 @@ class Timer {
   std::vector<TimeAgent*> tick_listeners_;
 
   /**
+     Concrete models that desire to receive tick and tock notifications
+   */
+  std::vector<TimeAgent*> new_tickers_;
+
+  /**
      Returns a string of all models listening to the tick
    */
   std::string ReportListeners();
@@ -245,9 +255,6 @@ class Timer {
      sends a notification to Tick listeners that a day has passed
    */
   void SendDailyTasks();
-
-  /// reset all data (registered listeners, etc.) to empty or initial state
-  void reset();
 
 };
 } // namespace cyclus

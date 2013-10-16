@@ -51,6 +51,12 @@ class Env {
   /// @return the absolute path to the build directory
   static const std::string GetInstallPath();
 
+  /// Returns the default path for installed cyclus simulation agent
+  /// modules.
+  inline static const std::string module_install_path() {
+    return Env::GetInstallPath() + "/lib/cyclus";
+  };
+
   /// the relative path to the root build directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory
   static const std::string GetBuildPath();
@@ -80,13 +86,14 @@ class Env {
   /// @return the current value of the module environment variable
   static const std::string ModuleEnvVar();
 
-  /// Returns names of all dynamically loadable, installed modules of the
-  /// specified type.
+  /// Returns names of all dynamically loadable, discoverable modules.
+  /// Returned lists includes modules installed in the default location
+  /// (module_install_path) as well as modules in directories listed in the
+  /// CYCLUS_MODULE_PATH environment variable.
   ///
-  /// @param type one of "Region", "Inst", "Facility", etc.
   /// @return module names without the "lib" prefix or file extension.
   /// Equivalent to the module class name (e.g. SourceFacility).
-  static std::vector<std::string> ListModules(std::string type);
+  static std::vector<std::string> ListModules();
 
   /// @return the correct environment variable delimeter based on the file system
   static const std::string EnvDelimiter();
