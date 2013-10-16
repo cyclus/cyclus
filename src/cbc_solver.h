@@ -22,35 +22,35 @@ class CBCSolver : public Solver {
   /// the value() member.
   /// @param obj A pointer to the objective function.
   /// @param constraints A container of pointers to the problem's constraints.
-  virtual void Solve(std::vector<cyclus::VariablePtr>& variables, 
-                     cyclus::ObjFuncPtr obj, 
-                     std::vector<cyclus::ConstraintPtr>& constraints);
+  virtual void Solve(std::vector<VariablePtr>& variables, 
+                     ObjFuncPtr obj, 
+                     std::vector<ConstraintPtr>& constraints);
 
  private:
   /// the model builder
   CoinModel builder_;
 
   /// get coin-specific bound for a constraint
-  std::pair<double, double> ConstraintBounds(cyclus::ConstraintPtr c);
+  std::pair<double, double> ConstraintBounds(ConstraintPtr c);
 
   /// set variable/objective function values
   void SetUpVariablesAndObj(
-      std::vector<cyclus::VariablePtr>& variables, 
-      cyclus::ObjFuncPtr obj);
+      std::vector<VariablePtr>& variables, 
+      ObjFuncPtr obj);
 
   /// set up constraints
   void SetUpConstraints(
-      std::vector<cyclus::ConstraintPtr>& constraints);
+      std::vector<ConstraintPtr>& constraints);
 
   /// set the objective direction
-  double ObjDirection(cyclus::ObjFuncPtr obj);
+  double ObjDirection(ObjFuncPtr obj);
 
   /// solve the model
   void SolveModel(CbcModel& model);
 
   /// populate the solution in the variable vector
   void PopulateSolution(CbcModel& model,
-                        std::vector<cyclus::VariablePtr>& variables);
+                        std::vector<VariablePtr>& variables);
 
   /// print variables info
   void PrintVariables(int n_const);

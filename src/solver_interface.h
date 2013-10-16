@@ -20,27 +20,27 @@ class SolverInterface {
 
   /// add a variable
   /// @param v a pointer to the variable to register with the problem
-  void RegisterVariable(cyclus::VariablePtr v);
+  void RegisterVariable(VariablePtr v);
 
   /// set the objective function
   /// @param obj a pointer to the objective function to register
-  void RegisterObjFunction(cyclus::ObjFuncPtr obj);
+  void RegisterObjFunction(ObjFuncPtr obj);
 
   /// add a variable to the objective function
   /// @param v the variable to add to the obj function
   /// @param modifier the modifier for that variable in the obj function
-  void AddVarToObjFunction(cyclus::VariablePtr v, double modifier);
+  void AddVarToObjFunction(VariablePtr v, double modifier);
 
   /// add a constraint
   /// @param c a pointer to a constraint function to register
-  void RegisterConstraint(cyclus::ConstraintPtr c);
+  void RegisterConstraint(ConstraintPtr c);
 
   /// add a variable to a constraint
   /// @param v the variable to add to a constraint
   /// @param modifier the modifier for that variable in the constraint
   /// @param c the constraint to add it to
-  void AddVarToConstraint(cyclus::VariablePtr v, double modifier, 
-                          cyclus::ConstraintPtr c);
+  void AddVarToConstraint(VariablePtr v, double modifier, 
+                          ConstraintPtr c);
 
   /// solve the constraint program
   void Solve();
@@ -50,13 +50,13 @@ class SolverInterface {
   SolverPtr solver_;
 
   /// the variables
-  std::vector<cyclus::VariablePtr> variables_;
+  std::vector<VariablePtr> variables_;
 
   /// the objective function
-  cyclus::ObjFuncPtr obj_;
+  ObjFuncPtr obj_;
 
   /// the constraints
-  std::vector<cyclus::ConstraintPtr> constraints_;
+  std::vector<ConstraintPtr> constraints_;
 
   /// a limit on the modifiers of constraints
   double modifier_limit_;

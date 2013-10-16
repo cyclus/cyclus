@@ -28,16 +28,16 @@ struct BuildOrder {
 struct ProblemInstance {
   /// constructor
   ProblemInstance(Commodity& commod, double demand,
-                  cyclus::SolverInterface& sinterface,
-                  cyclus::ConstraintPtr constr,
-                  std::vector<cyclus::VariablePtr>& soln);
+                  SolverInterface& sinterface,
+                  ConstraintPtr constr,
+                  std::vector<VariablePtr>& soln);
 
   // constituents
   Commodity& commodity;
   double unmet_demand;
-  cyclus::SolverInterface& interface;
-  cyclus::ConstraintPtr constraint;
-  std::vector<cyclus::VariablePtr>& solution;
+  SolverInterface& interface;
+  ConstraintPtr constraint;
+  std::vector<VariablePtr>& solution;
 };
 
 /**

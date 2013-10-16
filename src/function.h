@@ -34,18 +34,18 @@ class Function {
 
   /// get a modifier
   /// @param v the variable being modified
-  double GetModifier(cyclus::VariablePtr v);
+  double GetModifier(VariablePtr v);
 
   /// @return the beginning iterator to the function variable
-  std::map<cyclus::VariablePtr, double>::const_iterator begin();
+  std::map<VariablePtr, double>::const_iterator begin();
 
   /// @return the ending iterator to the function variable
-  std::map<cyclus::VariablePtr, double>::const_iterator end();
+  std::map<VariablePtr, double>::const_iterator end();
 
   /// add a variable to the constraint
   /// @param v a pointer to the variable to add
   /// @param modifier the modifier for that variable in the function
-  void AddVariable(cyclus::VariablePtr v, double modifier);
+  void AddVariable(VariablePtr v, double modifier);
 
   /// @return number of variables in the function
   int NumVars();
@@ -55,7 +55,7 @@ class Function {
 
  private:
   /// a container of all variables and their corresponding constant
-  std::map<cyclus::VariablePtr, double> constituents_;    
+  std::map<VariablePtr, double> constituents_;    
 };
 
 /// derived class for constraints
