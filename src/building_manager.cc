@@ -9,8 +9,6 @@
 #include "error.h"
 #include "logger.h"
 
-using boost::any_cast;
-
 namespace cyclus {
 namespace action_building {
 
@@ -25,9 +23,9 @@ BuildOrder::BuildOrder(int n, action_building::Builder* b,
 ProblemInstance::ProblemInstance(
   Commodity& commod,
   double demand,
-  cyclus::SolverInterface& sinterface,
-  cyclus::ConstraintPtr constr,
-  std::vector<cyclus::VariablePtr>& soln)
+  SolverInterface& sinterface,
+  ConstraintPtr constr,
+  std::vector<VariablePtr>& soln)
   : commodity(commod),
     unmet_demand(demand),
     interface(sinterface),
@@ -60,40 +58,32 @@ void BuildingManager::UnRegisterBuilder(action_building::Builder* builder) {
 
 // -------------------------------------------------------------------
 std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
-  Commodity& commodity,
-  double unmet_demand) {
+    Commodity& commodity,
+    double unmet_demand) {
   using std::vector;
-  using cyclus::SolverPtr;
-  using cyclus::CBCSolver;
-  using cyclus::Constraint;
-  using cyclus::ConstraintPtr;
-  using cyclus::ObjFuncPtr;
-  using cyclus::SolverInterface;
-  //  using ProblemInstance;
-  using cyclus::VariablePtr;
-  using cyclus::IntegerVariable;
-  using cyclus::ObjectiveFunction;
-  vector<BuildOrder> orders;
+  using boost::any_cast;
 
+  vector<BuildOrder> orders;
+  
   if (unmet_demand > 0) {
     // set up solver and interface
-    cyclus::SolverPtr solver(new cyclus::CBCSolver());
-    cyclus::SolverInterface csi(solver);
+    SolverPtr solver(new CBCSolver());
+    SolverInterface csi(solver);
 
     // set up objective function
-    cyclus::ObjFuncPtr obj(
-      new cyclus::ObjectiveFunction(
-        cyclus::ObjectiveFunction::MIN));
+    ObjFuncPtr obj(
+      new ObjectiveFunction(
+        ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    cyclus::ConstraintPtr constraint(
-      new cyclus::Constraint(
-        cyclus::Constraint::GTEQ, unmet_demand));
+    ConstraintPtr constraint(
+      new Constraint(
+        Constraint::GTEQ, unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
-    vector<cyclus::VariablePtr> solution;
+    vector<VariablePtr> solution;
     ProblemInstance problem(commodity, unmet_demand, csi, constraint, solution);
     SetUpProblem(problem);
 
@@ -112,7 +102,7 @@ std::vector<action_building::BuildOrder> BuildingManager::MakeBuildDecision(
     LOG(LEV_DEBUG2, "buildman") << "  * Types of Prototypes to build: " <<
                                 solution.size();
     for (int i = 0; i < solution.size(); i++) {
-      cyclus::VariablePtr x = solution.at(i);
+      VariablePtr x = solution.at(i);
       LOG(LEV_DEBUG2, "buildman") << "  * Type: " << x->name()
                                   << "  * Value: " << any_cast<int>(x->value());
     }
@@ -151,9 +141,7 @@ void BuildingManager::AddProducerVariableToProblem(
   action_building::Builder* builder,
   action_building::ProblemInstance& problem) {
   using std::make_pair;
-  using cyclus::Variable;
-  using cyclus::VariablePtr;
-  using cyclus::IntegerVariable;
+  
   VariablePtr x(new IntegerVariable(0, Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
@@ -171,6 +159,8 @@ void BuildingManager::AddProducerVariableToProblem(
 void BuildingManager::ConstructBuildOrdersFromSolution(
   std::vector<action_building::BuildOrder>& orders,
   std::vector<VariablePtr>& solution) {
+  using boost::any_cast;
+
   // construct the build orders
   for (int i = 0; i < solution.size(); i++) {
     int number = any_cast<int>(solution.at(i)->value());
