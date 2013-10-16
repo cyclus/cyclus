@@ -35,11 +35,11 @@ TEST(BidTests, MaterialGetSet) {
   Bid<Material> r;
   r.bidder = fac;
   r.request = &req;
-  r.bid = mat;
+  r.offer = mat;
 
   EXPECT_EQ(fac, r.bidder);
   EXPECT_EQ(&req, r.request);
-  EXPECT_EQ(mat, r.bid);
+  EXPECT_EQ(mat, r.offer);
   
   delete fac;
 }
@@ -59,11 +59,11 @@ TEST(BidTests, GenRsrcGetSet) {
   Bid<GenericResource> r;
   r.bidder = fac;
   r.request = &req;
-  r.bid = rsrc;
+  r.offer = rsrc;
 
   EXPECT_EQ(fac, r.bidder);
   EXPECT_EQ(&req, r.request);
-  EXPECT_EQ(rsrc, r.bid);
+  EXPECT_EQ(rsrc, r.offer);
   
   delete fac;
 }

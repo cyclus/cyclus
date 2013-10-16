@@ -9,7 +9,7 @@
 namespace cyclus {
 
 /// A Bid encapsulates all the information required to
-/// communicate a bid to a request for a resource, including the
+/// communicate a bid response to a request for a resource, including the
 /// resource bid and the bidder.
 template <class T>
 struct Bid {
@@ -20,7 +20,7 @@ struct Bid {
   cyclus::Request<T>* request;
 
   /// @return the bid object for the request
-  boost::shared_ptr<T> bid;
+  boost::shared_ptr<T> offer;
 
   /// @return the model responding the request
   cyclus::FacilityModel* bidder;
@@ -40,7 +40,7 @@ template<class T>
 bool operator==(const cyclus::Bid<T>& lhs,
                 const cyclus::Bid<T>& rhs) {
   return  ((lhs.request == rhs.request) &&
-           (lhs.bid == rhs.bid) &&
+           (lhs.offer == rhs.offer) &&
            (lhs.bidder == rhs.bidder));
 }
 

@@ -9,15 +9,15 @@ namespace cyclus {
 
 /// @class BidPortfolio
 ///
-/// @brief A BidPortfolio is a collection of bids to requests for
+/// @brief A BidPortfolio is a collection of bids as responses to requests for
 /// resources and associated constraints on those bids.
 ///
 /// A BidPortfolio contains all the information corresponding to a
-/// bidder to resource requests. It is a light wrapper around the set
+/// bidder's response to resource requests. It is a light wrapper around the set
 /// of bids and constraints for a given bidder, guaranteeing a single
-/// bidder per portfolio. Responses are grouped by both the bidder and the
-/// commodity that it produces. Constraints are assumed to act over the entire set
-/// of possible bids.
+/// bidder and commodity per portfolio. Responses are grouped by both the bidder
+/// and the commodity that it produces. Constraints are assumed to act over the
+/// entire set of possible bids.
 template <class T>
 class BidPortfolio {
  public:
@@ -38,7 +38,8 @@ class BidPortfolio {
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
-  /// @throws if a bid is added from a different bidder than the original
+  /// @throws if a bid is added from a different bidder than the original or if
+  /// the bid commodity is different than the original
   void AddResponse(const cyclus::Bid<T>& r) {
     VerifyResponder(r);
     VerifyCommodity(r);
