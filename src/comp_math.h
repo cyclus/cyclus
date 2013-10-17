@@ -35,7 +35,7 @@ CompMap Sub(const CompMap& v1, const CompMap&
 void ApplyThreshold(CompMap* v, double threshold);
 
 /// The sum of quantities of all nuclides of v is normalized to val.
-void Normalize(cyclus::CompMap* v, double val = 1.0);
+void Normalize(CompMap* v, double val = 1.0);
 
 /// Returns true if all nuclide keys in v are valid.
 bool ValidIsos(const CompMap& v);

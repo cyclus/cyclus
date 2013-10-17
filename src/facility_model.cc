@@ -31,7 +31,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
 
   // get lifetime
   int lifetime =
-      cyclus::GetOptionalQuery<int>(qe, "lifetime", context()->sim_dur());
+      GetOptionalQuery<int>(qe, "lifetime", context()->sim_dur());
   SetFacLifetime(lifetime);
 
   // get the incommodities

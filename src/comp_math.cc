@@ -68,7 +68,7 @@ bool ValidIsos(const CompMap& v) {
 
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    cyclus::Iso iso = it->first;
+    Iso iso = it->first;
     if (iso < min || iso > max) {
       return false;
     }
@@ -112,7 +112,7 @@ bool AlmostEq(const CompMap& v1,
 
   CompMap::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {
-    cyclus::Iso iso = it->first;
+    Iso iso = it->first;
     if (n2.count(iso) == 0) {
       return false;
     }

@@ -5,27 +5,20 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-// forward includes
-//#include "symbolic_function_factories.h"
-
-
 namespace cyclus {
 
 // forward declarations
-//class Function;
 class LinearFunction;
 class ExponentialFunction;
 class PiecewiseFunction;
 
-
-// forward includes
-//#include "symbolic_function_factories.h"
-
 /// abstract base class for symbolic functions
-class Function {
+class SymFunction {
  public:
+  typedef boost::shared_ptr<SymFunction> Ptr;
+  
   /// virtual destructor for an abstract base class
-  virtual ~Function() {};
+  virtual ~SymFunction() {};
 
   /// base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0;
@@ -34,14 +27,11 @@ class Function {
   virtual std::string Print() = 0;
 };
 
-// typedefs
-typedef boost::shared_ptr<Function> FunctionPtr;
-
 /**
    linear functions
    f(x) = slope_ * x + intercept_
  */
-class LinearFunction : public Function {
+class LinearFunction : public SymFunction {
  public:
   /**
      constructor for a linear function
@@ -69,7 +59,7 @@ class LinearFunction : public Function {
    exponential functions
    f(x) = constant_ * exp ( exponent_ * x ) + intercept_
  */
-class ExponentialFunction : public Function {
+class ExponentialFunction : public SymFunction {
  public:
   /**
      constructor for an exponential function
@@ -102,12 +92,12 @@ class ExponentialFunction : public Function {
    f(x) for all x in [lhs,rhs]
    0 otherwise
  */
-class PiecewiseFunction : public Function {
+class PiecewiseFunction : public SymFunction {
   struct PiecewiseFunctionInfo {
-    PiecewiseFunctionInfo(FunctionPtr function_, double xoff_ = 0,
+    PiecewiseFunctionInfo(SymFunction::Ptr function_, double xoff_ = 0,
                           double yoff_ = 0) :
       function(function_), xoffset(xoff_), yoffset(yoff_) {};
-    FunctionPtr function;
+    SymFunction::Ptr function;
     double xoffset, yoffset;
   };
 

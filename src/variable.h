@@ -8,15 +8,15 @@
 #include <boost/any.hpp>
 
 namespace cyclus {
-namespace cyclopts {
-class Variable;
 
-/// a smart pointer to the base class
-typedef boost::shared_ptr<Variable> VariablePtr;
+class Variable;
 
 /// Variable base class
 class Variable {
  public:  
+  /// a smart pointer to the base class
+  typedef boost::shared_ptr<Variable> Ptr;
+
   /// enum for possible bound types
   enum Bound {NEG_INF, INF, FINITE};
 
@@ -157,13 +157,13 @@ class IntegerVariable : public Variable {
 
 /// @return a pair of integers representing the lower and upper bounds of an
 /// integer variable
-std::pair<int, int> GetIntBounds(VariablePtr v);
+std::pair<int, int> GetIntBounds(Variable::Ptr v);
   
 /// @return a pair of doubles representing the lower and upper bounds of a
 /// linear variable
-std::pair<double, double> GetLinBounds(VariablePtr v);
+std::pair<double, double> GetLinBounds(Variable::Ptr v);
   
-} // namespace cyclopts
+
 } // namespace cyclus
 
 #endif

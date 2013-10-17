@@ -4,11 +4,11 @@
 #include <vector>
 #include <map>
 
-#include "cyclopts/variable.h"
-#include "cyclopts/function.h"
-
-#include "commodity_producer.h"
 #include "builder.h"
+#include "commodity_producer.h"
+#include "function.h"
+#include "solver_interface.h"
+#include "variable.h"
 
 namespace cyclus {
 namespace action_building {
@@ -28,16 +28,16 @@ struct BuildOrder {
 struct ProblemInstance {
   /// constructor
   ProblemInstance(Commodity& commod, double demand,
-                  cyclus::cyclopts::SolverInterface& sinterface,
-                  cyclus::cyclopts::ConstraintPtr constr,
-                  std::vector<cyclus::cyclopts::VariablePtr>& soln);
+                  SolverInterface& sinterface,
+                  Constraint::Ptr constr,
+                  std::vector<Variable::Ptr>& soln);
 
   // constituents
   Commodity& commodity;
   double unmet_demand;
-  cyclus::cyclopts::SolverInterface& interface;
-  cyclus::cyclopts::ConstraintPtr constraint;
-  std::vector<cyclus::cyclopts::VariablePtr>& solution;
+  SolverInterface& interface;
+  Constraint::Ptr constraint;
+  std::vector<Variable::Ptr>& solution;
 };
 
 /**
@@ -123,14 +123,14 @@ class BuildingManager {
    */
   void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>&
                                         orders,
-                                        std::vector<cyclopts::VariablePtr>& solution);
+                                        std::vector<Variable::Ptr>& solution);
 
  private:
   /// the set of registered builders
   std::set<Builder*> builders_;
 
   /// a map of variables to their associated builder and producer
-  std::map < cyclopts::VariablePtr,
+  std::map < Variable::Ptr,
       std::pair<action_building::Builder*, supply_demand::CommodityProducer*> >
       solution_map_;
 };

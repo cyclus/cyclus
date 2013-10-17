@@ -8,7 +8,7 @@
 namespace cyclus {
 
 // -------------------------------------------------------------------
-FunctionPtr LinFunctionFactory::GetFunctionPtr(std::string params) {
+SymFunction::Ptr LinFunctionFactory::GetFunctionPtr(std::string params) {
   std::stringstream ss(params);
   double slope, intercept;
   ss >> slope >> intercept;
@@ -18,11 +18,11 @@ FunctionPtr LinFunctionFactory::GetFunctionPtr(std::string params) {
   LOG(LEV_DEBUG2, "Funct") << "  * m: " << slope;
   LOG(LEV_DEBUG2, "Funct") << "  * b: " << intercept;
 
-  return FunctionPtr(new LinearFunction(slope, intercept));
+  return SymFunction::Ptr(new LinearFunction(slope, intercept));
 }
 
 // -------------------------------------------------------------------
-FunctionPtr ExpFunctionFactory::GetFunctionPtr(std::string params) {
+SymFunction::Ptr ExpFunctionFactory::GetFunctionPtr(std::string params) {
   std::stringstream ss(params);
   double constant, exponent, intercept;
   ss >> constant >> exponent >> intercept;
@@ -33,7 +33,7 @@ FunctionPtr ExpFunctionFactory::GetFunctionPtr(std::string params) {
   LOG(LEV_DEBUG2, "Funct") << "  * b: " << exponent;
   LOG(LEV_DEBUG2, "Funct") << "  * c: " << intercept;
 
-  return FunctionPtr(new ExponentialFunction(constant, exponent,
+  return SymFunction::Ptr(new ExponentialFunction(constant, exponent,
                                              intercept));
 }
 
@@ -43,7 +43,7 @@ PiecewiseFunctionFactory::PiecewiseFunctionFactory() {
 }
 
 // -------------------------------------------------------------------
-FunctionPtr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) {
+SymFunction::Ptr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) {
   if (!params.empty()) {
     throw Error("Piecewise Functions cannot be created with a list of parameters");
   }
@@ -55,7 +55,7 @@ FunctionPtr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) {
 }
 
 // -------------------------------------------------------------------
-void PiecewiseFunctionFactory::AddFunction(FunctionPtr function,
+void PiecewiseFunctionFactory::AddFunction(SymFunction::Ptr function,
                                            double starting_coord, bool continuous) {
   if (!function_->functions_.empty()) {
     const PiecewiseFunction::PiecewiseFunctionInfo& last =
@@ -88,8 +88,8 @@ BasicFunctionFactory::BasicFunctionFactory() {
 }
 
 // -------------------------------------------------------------------
-FunctionPtr BasicFunctionFactory::GetFunctionPtr(std::string type,
-                                                 std::string params) {
+SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
+                                                    std::string params) {
   switch (enum_names_[type]) {
     case LIN: {
       LinFunctionFactory lff;

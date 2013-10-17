@@ -74,7 +74,7 @@ std::string SqliteBack::ValType(boost::spirit::hold_any v) {
     return "INTEGER";
   } else if (v.type() == typeid(float) || v.type() == typeid(double)) {
     return "REAL";
-  } else if (v.type() == typeid(cyclus::Blob)) {
+  } else if (v.type() == typeid(Blob)) {
     return "BLOB";
   }
   return "TEXT";
@@ -135,8 +135,8 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
     std::stringstream ss;
     ss << v.cast<float>();
     return ss.str();
-  } else if (v.type() == typeid(cyclus::Blob)) {
-    std::string s = v.cast<cyclus::Blob>().str();
+  } else if (v.type() == typeid(Blob)) {
+    std::string s = v.cast<Blob>().str();
     return "X'" + toHex(s) + "'";
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "

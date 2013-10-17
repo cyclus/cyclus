@@ -8,45 +8,43 @@
 #include "variable.h"
 #include "error.h"
 
+namespace cyclus {
+
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Function::Function() {
-  constituents_ = std::map<cyclus::cyclopts::VariablePtr, double>();
+Function::Function() { }
+
+// -----------------------------------------------------------------------------
+void Function::AddVariable(Variable::Ptr v, double modifier) {
+  constituents_.insert(std::pair<Variable::Ptr, double>(v, modifier));
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Function::AddVariable(cyclus::cyclopts::VariablePtr v,
-                                             double modifier) {
-  constituents_.insert(
-      std::pair<cyclus::cyclopts::VariablePtr, double>(v, modifier));
-}
-
-// -----------------------------------------------------------------------------
-double cyclus::cyclopts::Function::GetModifier(cyclus::cyclopts::VariablePtr v) {
+double Function::GetModifier(Variable::Ptr v) {
   return constituents_[v];
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator 
-cyclus::cyclopts::Function::begin() {
+std::map<Variable::Ptr, double>::const_iterator 
+Function::begin() {
   return constituents_.begin();
 }
 
 // -----------------------------------------------------------------------------
-std::map<cyclus::cyclopts::VariablePtr, double>::const_iterator 
-cyclus::cyclopts::Function::end() {
+std::map<Variable::Ptr, double>::const_iterator 
+Function::end() {
   return constituents_.end();
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Function::NumVars() { 
+int Function::NumVars() { 
   return constituents_.size(); 
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::Function::Print() { 
+std::string Function::Print() { 
   std::stringstream ss;
   int count = 0;
-  std::map<cyclus::cyclopts::VariablePtr, double>::iterator it;
+  std::map<Variable::Ptr, double>::iterator it;
   for (it = constituents_.begin(); it != constituents_.end(); it++) {
     ss << it->second << it->first->name();
     if (count < constituents_.size()-1) {
@@ -58,34 +56,31 @@ std::string cyclus::cyclopts::Function::Print() {
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Constraint::Constraint(
-    cyclus::cyclopts::Constraint::EqualityRelation eq_r, 
-    double rhs)
+Constraint::Constraint(Constraint::EqualityRelation eq_r, double rhs)
     : eq_relation_(eq_r), 
       rhs_(rhs) 
 { };
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Constraint::EqualityRelation 
-cyclus::cyclopts::Constraint::eq_relation() { 
+Constraint::EqualityRelation Constraint::eq_relation() { 
   return eq_relation_; 
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::Constraint::rhs() { 
+double Constraint::rhs() { 
   return rhs_; 
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::Constraint::Print() {
+std::string Constraint::Print() {
   std::stringstream ss;
-  ss << "s.t. " << cyclus::cyclopts::Function::Print() 
+  ss << "s.t. " << Function::Print() 
      << " " << EqRToStr() << " " << rhs_;
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::Constraint::EqRToStr() {
+std::string Constraint::EqRToStr() {
   switch(eq_relation_) {
     case EQ:
       return "=";
@@ -108,25 +103,24 @@ std::string cyclus::cyclopts::Constraint::EqRToStr() {
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::ObjectiveFunction::ObjectiveFunction(
-    cyclus::cyclopts::ObjectiveFunction::Direction dir) : dir_(dir) 
+ObjectiveFunction::ObjectiveFunction(ObjectiveFunction::Direction dir)
+    : dir_(dir) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::ObjectiveFunction::Direction 
-cyclus::cyclopts::ObjectiveFunction::dir() {
+ObjectiveFunction::Direction ObjectiveFunction::dir() {
   return dir_;
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::ObjectiveFunction::Print() {
+std::string ObjectiveFunction::Print() {
   std::stringstream ss;
   ss << DirToStr() << " " << Function::Print();
   return ss.str();
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::ObjectiveFunction::DirToStr() {
+std::string ObjectiveFunction::DirToStr() {
   switch(dir_) {
     case MIN:
       return "min";
@@ -138,3 +132,5 @@ std::string cyclus::cyclopts::ObjectiveFunction::DirToStr() {
       throw Error("Enumeration value not recognized by ObjectiveFunction.");
   }
 }
+
+} // namespace cyclus

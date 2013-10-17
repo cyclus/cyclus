@@ -61,7 +61,6 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(cyclopts)
 ADD_SUBDIRECTORY(test_modules)
 
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
@@ -85,6 +84,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
@@ -104,6 +104,9 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
   ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
   )
 

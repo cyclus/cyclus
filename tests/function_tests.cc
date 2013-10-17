@@ -1,4 +1,4 @@
-#include "cyclopts/function.h"
+#include "function.h"
 
 #include <stdlib.h>
 
@@ -7,17 +7,16 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsFunctionTests, AddVars) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::Function;
+  using cyclus::Variable;
+  using cyclus::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
   Variable::VarType type(Variable::LINEAR);
   
   double val1 = 1.5, val2 = 2.3;
-  VariablePtr var1(new Variable(lbound, ubound, type));
-  VariablePtr var2(new Variable(lbound, ubound, type));
+  Variable::Ptr var1(new Variable(lbound, ubound, type));
+  Variable::Ptr var2(new Variable(lbound, ubound, type));
 
   Function f;
   f.AddVariable(var1, val1);
@@ -29,16 +28,15 @@ TEST(CycloptsFunctionTests, AddVars) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsFunctionTests, GetModifiers) {
   // usings
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::Function;
+  using cyclus::Variable;
+  using cyclus::Function;
 
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
   Variable::VarType type(Variable::LINEAR);
   
   double val1 = 1.5;
-  VariablePtr var1(new Variable(lbound, ubound, type));
+  Variable::Ptr var1(new Variable(lbound, ubound, type));
   Function f;
   f.AddVariable(var1, val1);
 
@@ -48,7 +46,7 @@ TEST(CycloptsFunctionTests, GetModifiers) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsObjectiveFunctionTests, Constructor) {
   // usings
-  using cyclus::cyclopts::ObjectiveFunction;
+  using cyclus::ObjectiveFunction;
 
   ObjectiveFunction::Direction dir;
 
@@ -65,12 +63,12 @@ TEST(CycloptsObjectiveFunctionTests, Constructor) {
 // class for parameterized constraint function testing
 class ConstraintTests :
     public
-::testing::TestWithParam<cyclus::cyclopts::Constraint::EqualityRelation> { };
+::testing::TestWithParam<cyclus::Constraint::EqualityRelation> { };
 
 // parameterized test
 TEST_P(ConstraintTests, Constructor) {
   // usings
-  using cyclus::cyclopts::Constraint;
+  using cyclus::Constraint;
 
   Constraint::EqualityRelation eq_r = GetParam();
   double rhs = static_cast<double>(std::rand());
@@ -81,12 +79,12 @@ TEST_P(ConstraintTests, Constructor) {
 }
 
 // call test
-const cyclus::cyclopts::Constraint::EqualityRelation relations[] = {
-  cyclus::cyclopts::Constraint::EQ,
-  cyclus::cyclopts::Constraint::GT,
-  cyclus::cyclopts::Constraint::GTEQ,
-  cyclus::cyclopts::Constraint::LT,
-  cyclus::cyclopts::Constraint::LTEQ
+const cyclus::Constraint::EqualityRelation relations[] = {
+  cyclus::Constraint::EQ,
+  cyclus::Constraint::GT,
+  cyclus::Constraint::GTEQ,
+  cyclus::Constraint::LT,
+  cyclus::Constraint::LTEQ
 };
 
 INSTANTIATE_TEST_CASE_P(CycloptsConstraintConstructor, ConstraintTests,

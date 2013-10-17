@@ -3,13 +3,15 @@
 #include <string>
 #include <sstream>
 
-#include "cyclopts/limits.h"
+#include "cyc_limits.h"
+
+namespace cyclus {
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Variable::next_id_ = 0;
+int Variable::next_id_ = 0;
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Variable(Bound l, Bound u, VarType t)
+Variable::Variable(Bound l, Bound u, VarType t)
     : id_(next_id_++),
       lbound_(l),
       ubound_(u),
@@ -20,133 +22,131 @@ cyclus::cyclopts::Variable::Variable(Bound l, Bound u, VarType t)
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::Variable::id() {
+int Variable::id() {
   return id_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::VarType cyclus::cyclopts::Variable::type() {
+Variable::VarType Variable::type() {
   return type_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Bound cyclus::cyclopts::Variable::lbound() {
+Variable::Bound Variable::lbound() {
   return lbound_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::Variable::Bound cyclus::cyclopts::Variable::ubound() {
+Variable::Bound Variable::ubound() {
   return ubound_;
 }
 
 // -----------------------------------------------------------------------------
-std::string cyclus::cyclopts::Variable::name() {
+std::string Variable::name() {
   return name_;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Variable::set_name(std::string name) {
+void Variable::set_name(std::string name) {
   name_ = name;
 }
 
 // -----------------------------------------------------------------------------
-void cyclus::cyclopts::Variable::set_value(boost::any v) {
+void Variable::set_value(boost::any v) {
   value_ = v;
 }
 
 // -----------------------------------------------------------------------------
-boost::any cyclus::cyclopts::Variable::value() {
+boost::any Variable::value() {
   return value_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, Bound ub)
+LinearVariable::LinearVariable(Bound lb, Bound ub)
     : Variable(lb, ub, LINEAR),
-      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
-      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
+      lbound_val_(-kLinBoundLimit),
+      ubound_val_(kLinBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, Bound ub)
+LinearVariable::LinearVariable(double lb_val, Bound ub)
     : Variable(FINITE, ub, LINEAR),
       lbound_val_(lb_val),
-      ubound_val_(cyclus::cyclopts::kLinBoundLimit) 
+      ubound_val_(kLinBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(Bound lb, double ub_val)
+LinearVariable::LinearVariable(Bound lb, double ub_val)
     : Variable(lb, FINITE, LINEAR),
-      lbound_val_(-cyclus::cyclopts::kLinBoundLimit),
+      lbound_val_(-kLinBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::LinearVariable::LinearVariable(double lb_val, double ub_val)
+LinearVariable::LinearVariable(double lb_val, double ub_val)
     : Variable(FINITE, FINITE, LINEAR),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::LinearVariable::lbound_val() {
+double LinearVariable::lbound_val() {
   return lbound_val_;
 }
 
 // -----------------------------------------------------------------------------
-double cyclus::cyclopts::LinearVariable::ubound_val() {
+double LinearVariable::ubound_val() {
   return ubound_val_;
 }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, Bound ub)
+IntegerVariable::IntegerVariable(Bound lb, Bound ub)
     : Variable(lb, ub, INT),
-      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
-      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
+      lbound_val_(-kIntBoundLimit),
+      ubound_val_(kIntBoundLimit) 
 { }
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, Bound ub)
+IntegerVariable::IntegerVariable(int lb_val, Bound ub)
     : Variable(FINITE, ub, INT),
       lbound_val_(lb_val),
-      ubound_val_(cyclus::cyclopts::kIntBoundLimit) 
+      ubound_val_(kIntBoundLimit) 
 { }
   
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(Bound lb, int ub_val)
+IntegerVariable::IntegerVariable(Bound lb, int ub_val)
     : Variable(lb, FINITE, INT),
-      lbound_val_(-cyclus::cyclopts::kIntBoundLimit),
+      lbound_val_(-kIntBoundLimit),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-cyclus::cyclopts::IntegerVariable::IntegerVariable(int lb_val, int ub_val)
+IntegerVariable::IntegerVariable(int lb_val, int ub_val)
     : Variable(FINITE, FINITE, INT),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
 { } 
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::IntegerVariable::lbound_val() {
+int IntegerVariable::lbound_val() {
   return lbound_val_;
 }
 
 // -----------------------------------------------------------------------------
-int cyclus::cyclopts::IntegerVariable::ubound_val() {
+int IntegerVariable::ubound_val() {
   return ubound_val_;
 }
 
 // -----------------------------------------------------------------------------
-std::pair<int, int> cyclus::cyclopts::GetIntBounds(
-    cyclus::cyclopts::VariablePtr v) {
-  using cyclus::cyclopts::IntegerVariable;
+std::pair<int, int> GetIntBounds(Variable::Ptr v) {
   IntegerVariable* clone = dynamic_cast<IntegerVariable*>(v.get());
   return std::pair<int, int>(clone->lbound_val(), clone->ubound_val());
 }
 
 // -----------------------------------------------------------------------------
-std::pair<double, double> cyclus::cyclopts::GetLinBounds(
-    cyclus::cyclopts::VariablePtr v) {
-  using cyclus::cyclopts::LinearVariable;
+std::pair<double, double> GetLinBounds(Variable::Ptr v) {
   LinearVariable* clone = dynamic_cast<LinearVariable*>(v.get());
   return std::pair<double, double>(clone->lbound_val(), clone->ubound_val());
 }
+
+} // namespace cyclus

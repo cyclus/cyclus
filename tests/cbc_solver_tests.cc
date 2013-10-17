@@ -5,25 +5,22 @@
 
 #include "CoinModel.hpp"
 
-#include "cyclopts/cbc_solver.h"
-#include "cyclopts/function.h"
-#include "cyclopts/solver.h"
-#include "cyclopts/solver_interface.h"
-#include "cyclopts/variable.h"
-#include "cyclopts/limits.h"
+#include "cbc_solver.h"
+#include "function.h"
+#include "solver.h"
+#include "solver_interface.h"
+#include "variable.h"
+#include "cyc_limits.h"
 
 // usings
 using boost::any_cast;
-using cyclus::cyclopts::SolverPtr;
-using cyclus::cyclopts::CBCSolver;
-using cyclus::cyclopts::Constraint;
-using cyclus::cyclopts::ConstraintPtr;
-using cyclus::cyclopts::ObjFuncPtr;
-using cyclus::cyclopts::SolverInterface;
-using cyclus::cyclopts::Variable;
-using cyclus::cyclopts::VariablePtr;
-using cyclus::cyclopts::IntegerVariable;
-using cyclus::cyclopts::ObjectiveFunction;
+using cyclus::Solver;
+using cyclus::CBCSolver;
+using cyclus::Constraint;
+using cyclus::SolverInterface;
+using cyclus::Variable;
+using cyclus::IntegerVariable;
+using cyclus::ObjectiveFunction;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
@@ -33,15 +30,15 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, Variable::INF));
+  Variable::Ptr x(new IntegerVariable(lower, Variable::INF));
   csi.RegisterVariable(x);
 
   // objective function
@@ -63,15 +60,15 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, upper));
+  Variable::Ptr x(new IntegerVariable(lower, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -92,15 +89,15 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(Variable::NEG_INF, upper));
+  Variable::Ptr x(new IntegerVariable(Variable::NEG_INF, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -122,15 +119,15 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   double obj_mod = 1.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MAX));
   csi.RegisterObjFunction(obj);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(lower, upper));
+  Variable::Ptr x(new IntegerVariable(lower, upper));
   csi.RegisterVariable(x);
 
   // objective function
@@ -145,40 +142,27 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsCBCSolverTests, 2VarIP) {
-  // usings
-  using boost::any_cast;
-  using cyclus::cyclopts::SolverPtr;
-  using cyclus::cyclopts::CBCSolver;
-  using cyclus::cyclopts::Constraint;
-  using cyclus::cyclopts::ConstraintPtr;
-  using cyclus::cyclopts::ObjFuncPtr;
-  using cyclus::cyclopts::SolverInterface;
-  using cyclus::cyclopts::Variable;
-  using cyclus::cyclopts::VariablePtr;
-  using cyclus::cyclopts::IntegerVariable;
-  using cyclus::cyclopts::ObjectiveFunction;
-
   // problem instance values
   int x_exp = 1, y_exp = 2;
   double cap_x = 3.0, cap_y = 10.0, cost_x = 1.0, cost_y = 2.0;
   double unmet_demand = 22.0;
   
   // set up solver and interface
-  SolverPtr solver(new CBCSolver());
+  Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
 
   // set up objective function
-  ObjFuncPtr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
+  ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
   csi.RegisterObjFunction(obj);
 
   // set up constraint
-  ConstraintPtr c(new Constraint(Constraint::GTEQ, unmet_demand));
+  Constraint::Ptr c(new Constraint(Constraint::GTEQ, unmet_demand));
   csi.RegisterConstraint(c);
 
   // set up variables
-  VariablePtr x(new IntegerVariable(0, Variable::INF));
+  Variable::Ptr x(new IntegerVariable(0, Variable::INF));
   csi.RegisterVariable(x);
-  VariablePtr y(new IntegerVariable(0, Variable::INF));
+  Variable::Ptr y(new IntegerVariable(0, Variable::INF));
   csi.RegisterVariable(y);
 
   // configure constraint and objective function
