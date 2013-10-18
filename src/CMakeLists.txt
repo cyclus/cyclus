@@ -120,7 +120,6 @@ INSTALL(FILES
   building_manager.h
   capacity_constraint.h
   cbc_solver.h
-  cbc_solver.h
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
@@ -141,7 +140,6 @@ INSTALL(FILES
   event_backend.h
   event_manager.h
   facility_model.h
-  function.h
   function.h
   generic_resource.h
   hdf5_back.h
@@ -166,9 +164,8 @@ INSTALL(FILES
   res_tracker.h
   resource.h
   resource_buff.h
+  resource_exchange.h
   solver.h
-  solver.h
-  solver_interface.h
   solver_interface.h
   sqlite_back.h
   sqlite_db.h
@@ -183,7 +180,6 @@ INSTALL(FILES
   uniform_taylor.h
   unix_helper_functions.h
   use_matrix_lib.h
-  variable.h
   variable.h
   version.h
   windows_helper_functions.h
