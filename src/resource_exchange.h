@@ -43,7 +43,7 @@ class ResourceExchange {
 
   /// @brief queries a given facility model for 
   AddRequest(FacilityModel* f) {
-    std::set< RequestPortfolio<T> > r = f->SendRequests<T>;
+    std::set< RequestPortfolio<T> > r = f->RequestsforBids<T>;
     requests.insert(r.begin(), r.end());
   };
   
