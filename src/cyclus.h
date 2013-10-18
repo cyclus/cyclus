@@ -26,7 +26,6 @@
 #include "market_player.h"
 #include "market_player_manager.h"
 #include "mass_table.h"
-#include "mat_buff.h"
 #include "mat_query.h"
 #include "material.h"
 #include "message.h"

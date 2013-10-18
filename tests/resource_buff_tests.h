@@ -51,9 +51,9 @@ class ResourceBuffTest : public ::testing::Test {
       under_qty = exact_qty - overeps;
       over_qty = exact_qty + overeps;
 
-      filled_store_.SetCapacity(cap);
-      filled_store_.PushOne(mat1_);
-      filled_store_.PushOne(mat2_);
+      filled_store_.set_capacity(cap);
+      filled_store_.Push(mat1_);
+      filled_store_.Push(mat2_);
     } catch (std::exception err) {
       FAIL() << "An exception was thrown in the fixture SetUp.";
     }
