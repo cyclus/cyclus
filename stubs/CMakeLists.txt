@@ -8,8 +8,8 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 SET(CYCLUS_STUB_SOURCE ${CYCLUS_STUB_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_facility.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_inst.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/stub_region.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_market.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/stub_region.cc
   )
 
 ADD_LIBRARY( cyclusstubs ${CYCLUS_STUB_SOURCE} )
@@ -35,8 +35,8 @@ INSTALL(
 SET( CYCLUS_STUB_TEST_SOURCE ${CYCLUS_STUB_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_facility_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_inst_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/stub_region_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/stub_market_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/stub_region_tests.cc
   PARENT_SCOPE
   )
 

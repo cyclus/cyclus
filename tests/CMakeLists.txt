@@ -70,10 +70,14 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
@@ -84,8 +88,9 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
@@ -94,19 +99,17 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
   ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
   )
 
