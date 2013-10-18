@@ -8,8 +8,8 @@ namespace cyclus {
 class Exchanger : virtual public Model {
  public:
   Exchanger(Context* ctx) : Model(ctx) { };
-    
   virtual ~Exchanger() {};
+  //virtual void Model* Clone() {};
 };
 
 } // namespace cyclus

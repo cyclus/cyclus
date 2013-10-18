@@ -18,6 +18,7 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
     : TimeAgent(ctx),
+      Exchanger(ctx),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
   SetModelType("Facility");
@@ -67,7 +68,7 @@ void FacilityModel::InitFrom(Model* m) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Deploy(Model* parent) {
   Model::Deploy(parent);
-  //context()->RegisterFacility(this);
+  context()->RegisterExchanger(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,7 +97,7 @@ void FacilityModel::Decommission() {
     throw Error("Cannot decommission " + name());
   }
 
-  //context()->UnregisterFacility(this);
+  context()->UnregisterExchanger(this);
   Model::Decommission();
 }
 

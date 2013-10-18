@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
+#include "communicator.h"
+#include "exchanger.h"
 #include "model.h"
 #include "time_agent.h"
-#include "communicator.h"
 
 namespace cyclus {
 
@@ -67,11 +68,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeAgent, public Communicator {
-  /* --------------------
-   * all MODEL classes have these members
-   * --------------------
-   */
+class FacilityModel : public TimeAgent, public Communicator, public Exchanger {
  public:
   FacilityModel(Context* ctx);
 
