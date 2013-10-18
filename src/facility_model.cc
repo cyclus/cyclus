@@ -61,7 +61,12 @@ void FacilityModel::InitFrom(Model* m) {
   fac_lifetime_ = fm->fac_lifetime_;
   in_commods_ = fm->in_commods_;
   out_commods_ = fm->out_commods_;
-  ctx_->RegisterFacility(this);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::Deploy(Model* parent) {
+  Model::Deploy(parent);
+  //context()->RegisterFacility(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,8 +95,8 @@ void FacilityModel::Decommission() {
     throw Error("Cannot decommission " + name());
   }
 
-  CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  delete this;
+  //context()->UnregisterFacility(this);
+  Model::Decommission();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

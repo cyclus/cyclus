@@ -161,6 +161,12 @@ void Model::Deploy(Model* parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::Decommission() {
+  CLOG(LEV_INFO3) << name() << " is being decommissioned";
+  delete this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::SetParent(Model* parent) {
   if (parent == this) {
     // root nodes are their own parent

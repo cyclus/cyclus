@@ -252,6 +252,11 @@ class Model {
   virtual void Deploy(Model* parent);
 
   /**
+     decommissions the model, removing it from the simulation
+   */
+  virtual void Decommission();
+
+  /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */

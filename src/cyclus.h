@@ -23,8 +23,6 @@
 #include "inst_model.h"
 #include "logger.h"
 #include "market_model.h"
-#include "market_player.h"
-#include "market_player_manager.h"
 #include "mass_table.h"
 #include "mat_buff.h"
 #include "mat_query.h"
