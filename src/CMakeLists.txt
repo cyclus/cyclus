@@ -73,6 +73,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchanger.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
@@ -81,8 +82,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/logger.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
@@ -139,6 +138,7 @@ INSTALL(FILES
   event.h
   event_backend.h
   event_manager.h
+  exchanger.h
   facility_model.h
   function.h
   generic_resource.h
@@ -148,8 +148,6 @@ INSTALL(FILES
   l_matrix.h
   logger.h
   market_model.h
-  market_player.h
-  market_player_manager.h
   mass_table.h
   mat_buff.h
   mat_query.h

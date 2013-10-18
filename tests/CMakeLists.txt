@@ -81,6 +81,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/context_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
@@ -92,7 +93,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
