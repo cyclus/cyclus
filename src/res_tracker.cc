@@ -41,11 +41,11 @@ void ResTracker::Extract(ResTracker* removed) {
 
   parent1_ = res_->id();
   parent2_ = 0;
-  Record();
-
-  removed->tracked_ = tracked_;
   removed->parent1_ = res_->id();
   removed->parent2_ = 0;
+  removed->tracked_ = tracked_;
+
+  Record();
   removed->Record();
 }
 
@@ -64,6 +64,7 @@ void ResTracker::Record() {
   ctx_->NewEvent("Resources")
   ->AddVal("ID", res_->id())
   ->AddVal("Type", res_->type())
+  ->AddVal("TimeCreated", ctx_->time())
   ->AddVal("Quantity", res_->quantity())
   ->AddVal("units", res_->units())
   ->AddVal("StateId", res_->state_id())
