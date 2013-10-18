@@ -14,7 +14,7 @@ namespace cyclus {
    that requires knowlege of ticks and tocks.
  */
 
-class TimeAgent : public Model {
+class TimeAgent : virtual public Model {
  public:
 
   TimeAgent(Context* ctx) : Model(ctx) { };

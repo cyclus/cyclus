@@ -16,7 +16,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel::InstModel(Context* ctx) : TimeAgent(ctx) {
+InstModel::InstModel(Context* ctx) : TimeAgent(ctx), Model(ctx) {
   SetModelType("Inst");
 }
 

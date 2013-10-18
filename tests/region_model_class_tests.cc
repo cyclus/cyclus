@@ -15,7 +15,9 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::InstModel {
  public:
-  DieInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) {
+  DieInst(cyclus::Context* ctx)
+      : cyclus::InstModel(ctx),
+        cyclus::Model(ctx)  {
     tickCount_ = 0;
     tockCount_ = 0;
     tickDie_ = false;

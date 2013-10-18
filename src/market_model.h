@@ -46,7 +46,7 @@ namespace cyclus {
    @section thirdPartyImpl Third-party Implementations
    (None)
  */
-class MarketModel : public Model, public Communicator {
+class MarketModel : virtual public Model, public Communicator {
   /* --------------------
    * THIS class has these members
    * --------------------

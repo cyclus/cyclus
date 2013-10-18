@@ -8,10 +8,15 @@
 /// This is the simplest possible Market, for testing.
 class TestMarket : public cyclus::MarketModel {
  public:
-  TestMarket(cyclus::Context* ctx) : cyclus::MarketModel(ctx) {}
+  TestMarket(cyclus::Context* ctx)
+      : cyclus::MarketModel(ctx),
+        cyclus::Model(ctx) { };
+      
   virtual ~TestMarket() { }
   virtual cyclus::Model* Clone() {return new TestMarket(context());};
-  TestMarket(cyclus::Context* ctx, std::string commod) : cyclus::MarketModel(ctx) {
+  TestMarket(cyclus::Context* ctx, std::string commod)
+      : cyclus::MarketModel(ctx),
+      cyclus::Model(ctx) {
     commodity_ = commod;
   }
   virtual void ReceiveMessage(cyclus::Message::Ptr msg) { }

@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <set>
 
 #include "composition.h"
 #include "event_manager.h"
@@ -13,6 +14,7 @@ namespace cyclus {
 
 class EventManager;
 class Event;
+class Exchanger;
 class MarketModel;
 class Timer;
 class TimeAgent;
@@ -33,6 +35,15 @@ class Context {
 
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
+
+  /// Registers an agent as a participant in resource exchanges
+  void RegisterExchanger(Exchanger* e);
+
+  /// Unregisters an agent as a participant in resource exchanges
+  void UnregisterExchanger(Exchanger* e);
+
+  /// @return the current set of facilities in the simulation
+  const std::set<Exchanger*> exchangers();
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
@@ -69,7 +80,8 @@ class Context {
   /// See Timer::RegisterResolveListener documentation.
   void RegisterResolver(MarketModel* mkt);
 
-  /// Initializes the simulation time parameters. Should only be called once - NOT idempotent.
+  /// Initializes the simulation time parameters. Should only be called once -
+  /// NOT idempotent.
   void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
                 std::string handle = "");
 
@@ -87,6 +99,7 @@ class Context {
 
  private:
   std::map<std::string, Model*> protos_;
+  std::set<Exchanger*> exchangers_;
   std::map<std::string, Composition::Ptr> recipes_;
 
   Timer* ti_;

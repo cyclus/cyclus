@@ -16,7 +16,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel::RegionModel(Context* ctx) : TimeAgent(ctx) {
+RegionModel::RegionModel(Context* ctx) : TimeAgent(ctx), Model(ctx) {
   SetModelType("Region");
 }
 

@@ -4,7 +4,8 @@ using stubs::StubMarket;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubMarket::StubMarket(cyclus::Context* ctx)
-    : cyclus::MarketModel(ctx)
+    : cyclus::MarketModel(ctx),
+      cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

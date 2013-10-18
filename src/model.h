@@ -107,7 +107,7 @@ class Model {
      Example:
 
      @code
-     class MyModelClass : public Model {
+     class MyModelClass : virtual public Model {
        ...
 
        virtual Model* Clone() {

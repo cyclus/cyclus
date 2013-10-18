@@ -14,7 +14,9 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieModel : public cyclus::FacilityModel {
  public:
-  DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
+  DieModel(cyclus::Context* ctx)
+      : FacilityModel(ctx),
+        cyclus::Model(ctx)  {
     tickCount_ = 0;
     tockCount_ = 0;
   };

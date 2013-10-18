@@ -8,7 +8,9 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockFacility : public cyclus::FacilityModel {
  public:
-  MockFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) {};
+  MockFacility(cyclus::Context* ctx)
+      : cyclus::FacilityModel(ctx),
+        cyclus::Model(ctx) { };
 
   virtual ~MockFacility() {};
 
