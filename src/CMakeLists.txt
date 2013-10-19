@@ -84,7 +84,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_player_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/mat_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
@@ -148,7 +147,6 @@ INSTALL(FILES
   market_player.h
   market_player_manager.h
   mass_table.h
-  mat_buff.h
   mat_query.h
   material.h
   message.h
