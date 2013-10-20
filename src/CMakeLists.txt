@@ -73,7 +73,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchanger.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 

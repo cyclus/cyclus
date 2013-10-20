@@ -5,9 +5,10 @@
 #include <boost/shared_ptr.hpp>
 
 #include "material.h"
-#include "facility_model.h"
 
 namespace cyclus {
+
+class FacilityModel;
   
 /// A Request encapsulates all the information required to communicate the
 /// needs of an agent in the Dynamic Resource Exchange, including the
@@ -25,11 +26,11 @@ struct Request {
   double preference;
 
   /// @return the model requesting the resource
-  cyclus::FacilityModel* requester;
+  FacilityModel* requester;
 };
 
 template<class T>
-bool operator==(const cyclus::Request<T>& lhs, const cyclus::Request<T>& rhs) {
+bool operator==(const Request<T>& lhs, const Request<T>& rhs) {
   return  ((lhs.commodity == rhs.commodity) &&
            (lhs.target == rhs.target) &&
            (lhs.preference == rhs.preference) &&

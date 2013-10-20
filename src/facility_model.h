@@ -4,11 +4,12 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include "communicator.h"
-#include "exchanger.h"
 #include "model.h"
 #include "time_agent.h"
+#include "exchanger.h"
 
 namespace cyclus {
 
@@ -116,6 +117,7 @@ class FacilityModel : public TimeAgent, public Communicator, public Exchanger {
      Each derived class must implement an offer/request receiver
    */
   virtual void ReceiveMessage(Message::Ptr msg) = 0;
+
   /**
      Sets the facility's name
      @param facName is the new name of the facility

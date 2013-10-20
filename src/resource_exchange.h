@@ -7,6 +7,8 @@
 #include <algorithm>
 
 #include "context.h"
+#include "generic_resource.h"
+#include "material.h"
 #include "request_portfolio.h"
 
 namespace cyclus {
@@ -36,14 +38,14 @@ class ResourceExchange {
   };
 
   /// @brief queries facilities and collects all requests for bids
-  CollectRequests() {
+  void CollectRequests() {
     std::vector<FacilityModel*> facs = ctx_->facs();
     std::for_each(facs.begin(), facs.end(), AddRequest);
   }
 
   /// @brief queries a given facility model for 
-  AddRequest(FacilityModel* f) {
-    std::set< RequestPortfolio<T> > r = f->RequestsforBids<T>;
+  void AddRequest(FacilityModel* f) {
+    std::set< RequestPortfolio<T> > r = QueryRequest<T>(f);
     requests.insert(r.begin(), r.end());
   };
   
@@ -53,6 +55,16 @@ class ResourceExchange {
  private:
   Context* ctx_;
 };
+
+template<> std::set< RequestPortfolio<Material> >
+    QueryRequest<Material>(FacilityModel* f) {
+  return f->AddMatlRequests();
+}
+
+template<> std::set< RequestPortfolio<GenericResource> >
+    QueryRequest<GenericResource>(FacilityModel* f) {
+  return f->AddGenRsrcRequests();
+}
 
 } // namespace cyclus
 

@@ -1,15 +1,35 @@
+#ifndef CYCLUS_EXCHANGER_H_
+#define CYCLUS_EXCHANGER_H_
 
-#include "context.h"
-#include "model.h"
+#include <set>
+
+#include "generic_resource.h"
+#include "material.h"
+#include "request_portfolio.h"
 
 namespace cyclus {
 
 /// @class Exchanger
-class Exchanger : virtual public Model {
+///
+/// @brief A simple API for agents that wish to exchange resources in the
+/// simulation
+///
+/// An Exchanger is a mixin class designed for agents that wish to exchange
+/// resources. It defines the API for the querying of requests, offers, and the
+/// corresponding exchanges.
+class Exchanger {
  public:
-  Exchanger(Context* ctx) : Model(ctx) { };
-  virtual ~Exchanger() {};
-  //virtual void Model* Clone() {};
+  /// @brief default implementation for material requests
+  virtual std::set< RequestPortfolio<Material> > AddMatlRequests() {
+    return std::set< RequestPortfolio<Material> >();
+  }
+  
+  /// @brief default implementation for generic resource requests
+  virtual std::set< RequestPortfolio<GenericResource> > AddGenRsrcRequests() {
+    return std::set< RequestPortfolio<GenericResource> >();
+  }
 };
 
 } // namespace cyclus
+
+#endif // ifndef CYCLUS_EXCHANGER_H_
