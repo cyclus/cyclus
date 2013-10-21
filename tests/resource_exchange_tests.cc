@@ -13,11 +13,13 @@
 #include "mock_facility.h"
 #include "material.h"
 #include "model.h"
+#include "facility_model.h"
 
 using std::set;
 using std::string;
 using cyclus::Composition;
 using cyclus::Context;
+using cyclus::FacilityModel;
 using cyclus::Material;
 using cyclus::Model;
 using cyclus::TestContext;
@@ -36,6 +38,16 @@ class Requester: public MockFacility {
         i_(i)
   { };
 
+  virtual cyclus::Model* Clone() {
+    Requester* m = new Requester(*this);
+    m->InitFrom(this);
+    m->mat_ = mat_;
+    m->i_ = i_;
+    m->pref_ = pref_;
+    m->commod_ = commod_;
+    return m;
+  };
+  
   set< RequestPortfolio<Material> > AddMatlRequests() {
     set< RequestPortfolio<Material> > rps;
     RequestPortfolio<Material> rp;
@@ -51,7 +63,6 @@ class Requester: public MockFacility {
     return rps;
   }
 
- private:
   Material::Ptr mat_;
   int i_;
   string commod_;
@@ -64,30 +75,97 @@ class ResourceExchangeTests: public ::testing::Test {
   TestContext tc;
   Requester* fac;
   ResourceExchange<Material>* exchng;
-  int nMats;
-
+  string commod;
+  double pref;
+  Material::Ptr mat;
+  
   virtual void SetUp() {
-    nMats = 1;
-    string commod = "name";
-    double pref = 2.4;
+    commod = "name";
+    pref = 2.4;
     cyclus::CompMap cm;
     cm[92235] = 1.0;
     Composition::Ptr comp = Composition::CreateFromMass(cm);
     double qty = 1.0;
-    Material::Ptr mat = Material::Create(tc.get(), qty, comp);
-    fac = new Requester(tc.get(), commod, pref, mat, nMats);
+    mat = Material::Create(tc.get(), qty, comp);
     exchng = new ResourceExchange<Material>(tc.get());
   };
   
   virtual void TearDown() {
-    delete fac;
     delete exchng;
   };
   
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, exchangers) {
+TEST_F(ResourceExchangeTests, empty) {
+  EXPECT_TRUE(exchng->requests.empty());
   exchng->CollectRequests();
-  EXPECT_TRUE(true);
+  EXPECT_TRUE(exchng->requests.empty());
 }  
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResourceExchangeTests, 1req) {
+  int nMats = 1;
+  fac = new Requester(tc.get(), commod, pref, mat, nMats);
+  Requester* clone = dynamic_cast<Requester*>(fac->Clone());
+  clone->Deploy(clone);
+
+  Request<Material> req;
+  req.commodity = commod;
+  req.target = mat;
+  req.preference = pref;
+  req.requester = clone;
+  
+  EXPECT_TRUE(exchng->requests.empty());
+  exchng->CollectRequests();
+  EXPECT_EQ(exchng->requests.size(), 1);
+
+  RequestPortfolio<Material>& rp =
+      const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
+  const Request<Material>& r = *rp.requests().begin();
+
+  EXPECT_EQ(req.commodity, r.commodity);
+  EXPECT_EQ(req.target, r.target);
+  EXPECT_EQ(req.preference, r.preference);
+  EXPECT_EQ(req.requester, r.requester);
+  EXPECT_EQ(req, r);
+
+  clone->Decommission();
+  delete fac;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResourceExchangeTests, Nreq) {
+  int nMats = 5;
+  fac = new Requester(tc.get(), commod, pref, mat, nMats);
+  Requester* clone = dynamic_cast<Requester*>(fac->Clone());
+  clone->Deploy(clone);
+
+  Request<Material> req;
+  req.commodity = commod;
+  req.target = mat;
+  req.preference = pref;
+  req.requester = clone;
+  
+  EXPECT_TRUE(exchng->requests.empty());
+  exchng->CollectRequests();
+  EXPECT_EQ(exchng->requests.size(), 1);
+
+  RequestPortfolio<Material>& rp =
+      const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
+  EXPECT_EQ(rp.requests().size(), nMats);
+  
+  std::vector< Request<Material> >::const_iterator it;
+  const std::vector< Request<Material> >& vr = rp.requests();
+  for (it = vr.begin(); it != vr.end(); ++it) {
+    const Request<Material>& r = *it;  
+    EXPECT_EQ(req.commodity, r.commodity);
+    EXPECT_EQ(req.target, r.target);
+    EXPECT_EQ(req.preference, r.preference);
+    EXPECT_EQ(req.requester, r.requester);
+    EXPECT_EQ(req, r);
+  }
+  
+  clone->Decommission();
+  delete fac;
+}
