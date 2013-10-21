@@ -7,11 +7,26 @@
 #include <algorithm>
 
 #include "context.h"
+#include "exchanger.h"
 #include "generic_resource.h"
 #include "material.h"
 #include "request_portfolio.h"
 
 namespace cyclus {
+
+template<class T> std::set< RequestPortfolio<T> > QueryRequest(Exchanger* f) {
+  return std::set< RequestPortfolio<T> >();
+}
+  
+template<> std::set< RequestPortfolio<Material> >
+    QueryRequest<Material>(Exchanger* f) {
+  return f->AddMatlRequests();
+}
+
+template<> std::set< RequestPortfolio<GenericResource> >
+    QueryRequest<GenericResource>(Exchanger* f) {
+  return f->AddGenRsrcRequests();
+}
 
 /// @class ResourceExchange
 ///
@@ -39,12 +54,12 @@ class ResourceExchange {
 
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
-    std::vector<FacilityModel*> facs = ctx_->facs();
-    std::for_each(facs.begin(), facs.end(), AddRequest);
+    std::vector<Exchanger*> exchangers = ctx_->exchangers();
+    std::for_each(exchangers.begin(), exchangers.end(), AddRequest);
   }
 
   /// @brief queries a given facility model for 
-  void AddRequest(FacilityModel* f) {
+  void AddRequest(Exchanger* f) {
     std::set< RequestPortfolio<T> > r = QueryRequest<T>(f);
     requests.insert(r.begin(), r.end());
   };
@@ -55,16 +70,6 @@ class ResourceExchange {
  private:
   Context* ctx_;
 };
-
-template<> std::set< RequestPortfolio<Material> >
-    QueryRequest<Material>(FacilityModel* f) {
-  return f->AddMatlRequests();
-}
-
-template<> std::set< RequestPortfolio<GenericResource> >
-    QueryRequest<GenericResource>(FacilityModel* f) {
-  return f->AddGenRsrcRequests();
-}
 
 } // namespace cyclus
 

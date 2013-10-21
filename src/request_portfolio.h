@@ -65,6 +65,9 @@ class RequestPortfolio {
     return constraints_;
   };
 
+  /// @return a unique id for the constraint
+  const int id() const {return id_;};
+
  private:  
   /// @brief if the requester has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the request is associated with the portfolio's
@@ -87,6 +90,17 @@ class RequestPortfolio {
   std::set< CapacityConstraint<T> > constraints_;
   
   FacilityModel* requester_;
+  int id_;
+  static int next_id_;
+};
+
+template<class T> int RequestPortfolio<T>::next_id_ = 0;
+
+/// @brief comparison operator, allows usage in ordered containers
+template<class T>
+bool operator<(const RequestPortfolio<T>& lhs,
+               const RequestPortfolio<T>& rhs) {
+  return  (lhs.id() < rhs.id());
 };
 
 } // namespace cyclus

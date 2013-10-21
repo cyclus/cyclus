@@ -32,16 +32,16 @@ template<class T> int CapacityConstraint<T>::next_id_ = 0;
 
 /// @brief equality operator
 template<class T>
-bool operator==(const cyclus::CapacityConstraint<T>& lhs,
-                const cyclus::CapacityConstraint<T>& rhs) {
+bool operator==(const CapacityConstraint<T>& lhs,
+                const CapacityConstraint<T>& rhs) {
   return  ((lhs.capacity == rhs.capacity) &&
            (lhs.converter == rhs.converter));
 };
 
 /// @brief comparison operator, allows usage in ordered containers
 template<class T>
-bool operator<(const cyclus::CapacityConstraint<T>& lhs,
-               const cyclus::CapacityConstraint<T>& rhs) {
+bool operator<(const CapacityConstraint<T>& lhs,
+               const CapacityConstraint<T>& rhs) {
   return  (lhs.id() < rhs.id());
 };
 

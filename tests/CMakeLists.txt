@@ -102,6 +102,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
