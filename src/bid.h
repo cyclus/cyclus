@@ -3,11 +3,12 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "facility_model.h"
 #include "request.h"
 
 namespace cyclus {
 
+class FacilityModel;
+  
 /// A Bid encapsulates all the information required to
 /// communicate a bid response to a request for a resource, including the
 /// resource bid and the bidder.
