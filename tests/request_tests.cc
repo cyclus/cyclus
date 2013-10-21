@@ -9,6 +9,7 @@
 #include "material.h"
 #include "test_context.h"
 #include "mock_facility.h"
+#include "exchanger.h"
 
 #include "request.h"
 
@@ -18,11 +19,14 @@ using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
+using cyclus::Exchanger;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
+  Exchanger* excast = dynamic_cast<Exchanger*>(fac);
+  
   string commod = "name";
   double pref = 2.4;
   cyclus::CompMap cm;
@@ -38,7 +42,7 @@ TEST(RequestTests, MaterialGetSet) {
   r.preference = pref;
 
   EXPECT_EQ(commod, r.commodity);
-  EXPECT_EQ(fac, r.requester);
+  EXPECT_EQ(excast, r.requester);
   EXPECT_EQ(mat, r.target);
   EXPECT_EQ(pref, r.preference);
   

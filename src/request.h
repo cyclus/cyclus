@@ -8,7 +8,7 @@
 
 namespace cyclus {
 
-class FacilityModel;
+class Exchanger;
   
 /// A Request encapsulates all the information required to communicate the
 /// needs of an agent in the Dynamic Resource Exchange, including the
@@ -26,7 +26,7 @@ struct Request {
   double preference;
 
   /// @return the model requesting the resource
-  FacilityModel* requester;
+  Exchanger* requester;
 };
 
 template<class T>

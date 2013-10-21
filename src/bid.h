@@ -3,11 +3,12 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "facility_model.h"
 #include "request.h"
 
 namespace cyclus {
 
+class Exchanger;
+  
 /// A Bid encapsulates all the information required to
 /// communicate a bid response to a request for a resource, including the
 /// resource bid and the bidder.
@@ -23,7 +24,7 @@ struct Bid {
   boost::shared_ptr<T> offer;
 
   /// @return the model responding the request
-  cyclus::FacilityModel* bidder;
+  cyclus::Exchanger* bidder;
   
   /// @return a unique id for the bid
   const int id() const {return id_;};

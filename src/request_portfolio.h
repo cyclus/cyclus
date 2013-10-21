@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-class FacilityModel;
+class Exchanger;
   
 /// @class RequestPortfolio
 /// 
@@ -36,7 +36,7 @@ class RequestPortfolio {
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
-  const FacilityModel* requester() {
+  const Exchanger* requester() {
     return requester_;
   };
   
@@ -89,7 +89,7 @@ class RequestPortfolio {
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
   
-  FacilityModel* requester_;
+  Exchanger* requester_;
   int id_;
   static int next_id_;
 };

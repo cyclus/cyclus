@@ -2,10 +2,11 @@
 #define CYCLUS_BID_PORTFOLIO_H_
 
 #include "capacity_constraint.h"
-#include "facility_model.h"
 #include "bid.h"
 
 namespace cyclus {
+
+class Exchanger;
 
 /// @class BidPortfolio
 ///
@@ -26,7 +27,7 @@ class BidPortfolio {
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
-  const cyclus::FacilityModel* bidder() {
+  const cyclus::Exchanger* bidder() {
     return bidder_;
   };
     
@@ -71,8 +72,7 @@ class BidPortfolio {
     if (bidder_ == NULL) {
       bidder_ = r.bidder;
     } else if (bidder_ != r.bidder) {
-      std::string msg = "Can't insert a bid from " + r.bidder->name()
-          + " into " + bidder_->name() + "'s portfolio.";
+      std::string msg = "Insertion error: bidders do not match.";
       throw cyclus::KeyError(msg);
     }
   };
@@ -87,8 +87,7 @@ class BidPortfolio {
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
     } else if (commodity_ != other) {
-      std::string msg = "Commodity mismatch for a request bid: "
-                        + other + " != " + commodity_ + ".";
+      std::string msg = "Insertion error: commodities do not match.";
       throw cyclus::KeyError(msg);
     }
   };
@@ -101,7 +100,7 @@ class BidPortfolio {
   std::set< cyclus::CapacityConstraint<T> > constraints_;
   
   std::string commodity_;
-  cyclus::FacilityModel* bidder_;
+  cyclus::Exchanger* bidder_;
 };
 
 } // namespace cyclus
