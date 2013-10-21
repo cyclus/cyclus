@@ -1,6 +1,9 @@
 #ifndef CYCLUS_BID_PORTFOLIO_H_
 #define CYCLUS_BID_PORTFOLIO_H_
 
+#include <set>
+#include <string>
+
 #include "capacity_constraint.h"
 #include "bid.h"
 
@@ -27,7 +30,7 @@ class BidPortfolio {
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
-  const cyclus::Exchanger* bidder() {
+  const Exchanger* bidder() {
     return bidder_;
   };
     
@@ -41,7 +44,7 @@ class BidPortfolio {
   /// @param r the bid to add
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
-  void AddResponse(const cyclus::Bid<T>& r) {
+  void AddResponse(const Bid<T>& r) {
     VerifyResponder(r);
     VerifyCommodity(r);
     bids_.insert(r);
@@ -49,17 +52,17 @@ class BidPortfolio {
 
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
-  void AddConstraint(const cyclus::CapacityConstraint<T>& c) {
+  void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
 
   /// @return const access to the bids
-  const std::set< cyclus::Bid<T> >& bids() {
+  const std::set< Bid<T> >& bids() {
     return bids_;
   };
   
   /// @return the set of constraints over the bids
-  const std::set< cyclus::CapacityConstraint<T> >& constraints() {
+  const std::set< CapacityConstraint<T> >& constraints() {
     return constraints_;
   };
 
@@ -68,12 +71,12 @@ class BidPortfolio {
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
   /// @throws if a bid is added from a different bidder than the original
-  void VerifyResponder(const cyclus::Bid<T> r) {
+  void VerifyResponder(const Bid<T> r) {
     if (bidder_ == NULL) {
       bidder_ = r.bidder;
     } else if (bidder_ != r.bidder) {
       std::string msg = "Insertion error: bidders do not match.";
-      throw cyclus::KeyError(msg);
+      throw KeyError(msg);
     }
   };
 
@@ -82,25 +85,25 @@ class BidPortfolio {
   /// portfolio's commodity
   /// @throws if a commodity is added that is a different commodity from the
   /// original
-  void VerifyCommodity(const cyclus::Bid<T> r) {
+  void VerifyCommodity(const Bid<T> r) {
     std::string other = r.request->commodity;
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
     } else if (commodity_ != other) {
       std::string msg = "Insertion error: commodities do not match.";
-      throw cyclus::KeyError(msg);
+      throw KeyError(msg);
     }
   };
   
-  /// requests_ is a set because there is a one-to-one correspondance between a
+  /// bid_ is a set because there is a one-to-one correspondance between a
   /// bid and a request, i.e., bids are unique
-  std::set< cyclus::Bid<T> > bids_;
+  std::set< Bid<T> > bids_;
 
   /// constraints_ is a set because constraints are assumed to be unique
-  std::set< cyclus::CapacityConstraint<T> > constraints_;
+  std::set< CapacityConstraint<T> > constraints_;
   
   std::string commodity_;
-  cyclus::Exchanger* bidder_;
+  Exchanger* bidder_;
 };
 
 } // namespace cyclus

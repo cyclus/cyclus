@@ -4,8 +4,6 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "material.h"
-
 namespace cyclus {
 
 class Exchanger;
