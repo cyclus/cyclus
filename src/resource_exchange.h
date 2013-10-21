@@ -2,10 +2,10 @@
 #ifndef CYCLUS_RESOURCE_EXCHANGE_H_
 #define CYCLUS_RESOURCE_EXCHANGE_H_
 
-#include <vector>
 #include <set>
 #include <algorithm>
-
+#include <functional>
+                   
 #include "context.h"
 #include "exchanger.h"
 #include "generic_resource.h"
@@ -54,8 +54,11 @@ class ResourceExchange {
 
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
-    std::vector<Exchanger*> exchangers = ctx_->exchangers();
-    std::for_each(exchangers.begin(), exchangers.end(), AddRequest);
+    std::set<Exchanger*> exchangers = ctx_->exchangers();
+    std::for_each(
+        exchangers.begin(),
+        exchangers.end(),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequest), this));
   }
 
   /// @brief queries a given facility model for 

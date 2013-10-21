@@ -88,5 +88,6 @@ class ResourceExchangeTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, exchangers) {
+  exchng->CollectRequests();
   EXPECT_TRUE(true);
 }  
