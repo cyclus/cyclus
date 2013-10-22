@@ -138,6 +138,7 @@ INSTALL(FILES
   event_backend.h
   event_manager.h
   exchanger.h
+  exchange_aggregator.h
   facility_model.h
   function.h
   generic_resource.h

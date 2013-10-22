@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include <vector>
 
 #include "capacity_constraint.h"
 #include "error.h"
@@ -36,12 +37,12 @@ class RequestPortfolio {
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
-  const Exchanger* requester() {
+  const Exchanger* requester() const {
     return requester_;
   };
   
   /// @return const access to the unconstrained requests
-  const std::vector<Request<T> >& requests() {
+  const std::vector< Request<T> >& requests() const {
     return requests_;
   };
   
@@ -61,7 +62,7 @@ class RequestPortfolio {
   };
   
   /// @return const access to the request constraints
-  const std::set< CapacityConstraint<T> >& constraints() {
+  const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
   };
 

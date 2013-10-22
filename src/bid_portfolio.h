@@ -4,8 +4,9 @@
 #include <set>
 #include <string>
 
-#include "capacity_constraint.h"
 #include "bid.h"
+#include "capacity_constraint.h"
+#include "error.h"
 
 namespace cyclus {
 
@@ -30,13 +31,13 @@ class BidPortfolio {
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
-  const Exchanger* bidder() {
+  const Exchanger* bidder() const {
     return bidder_;
   };
     
   /// @return the commodity associated with the portfolio. if no bids have
   /// been added, the commodity is 'NO_COMMODITY_SET'.
-  std::string commodity() {
+  std::string commodity() const {
     return commodity_;
   };
 
@@ -57,12 +58,12 @@ class BidPortfolio {
   };
 
   /// @return const access to the bids
-  const std::set< Bid<T> >& bids() {
+  const std::set< Bid<T> >& bids() const {
     return bids_;
   };
   
   /// @return the set of constraints over the bids
-  const std::set< CapacityConstraint<T> >& constraints() {
+  const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
   };
 
