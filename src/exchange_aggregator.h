@@ -1,6 +1,7 @@
 #ifndef CYCLUS_EXCHANGE_AGGREGATOR_H_
 #define CYCLUS_EXCHANGE_AGGREGATOR_H_
 
+#include <assert.h>
 #include <string>
 #include <set>
 #include <map>
@@ -33,17 +34,21 @@ using std::vector;
 template <class T>
 class ExchangeAggregator {
  public:
+  ExchangeAggregator() : requests_(NULL), bids_(NULL) { }
+  
   /// @brief set the requests to be aggregated
   void set_requests(set< RequestPortfolio<T> >* r) {
     requests_ = r;
     requests_by_commod_ =
-        map< string, vector< const
-        Request<T>* > >(); // reset mapping
+        map< string, vector< const Request<T>* > >(); // reset mapping
     MapRequestsToCommods();
   }
 
   /// @return the requests associated with this aggregator
-  const set< RequestPortfolio<T> >& requests() const {return *requests_;}
+  const set< RequestPortfolio<T> >& requests() const {
+    assert(requests_ != NULL);
+    return *requests_;
+  }
 
   /// @return a map of commodities to requests for those commodities
   const map< string, vector< const Request<T>* > >& RequestsByCommod() const {
@@ -60,7 +65,10 @@ class ExchangeAggregator {
   void set_bids(set< BidPortfolio<T> >* b) {bids_ = b;}
   
   /// @return the bids associated with this aggregator
-  const set< BidPortfolio<T> >& bids() const {return *bids_;}
+  const set< BidPortfolio<T> >& bids() const {
+    assert(bids_ != NULL);
+    return *bids_;
+  }
   
  private:
   /// a reference to an exchange's set of requests

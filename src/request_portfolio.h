@@ -33,7 +33,7 @@ template<class T>
 class RequestPortfolio {
  public:
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL) { };
+  RequestPortfolio() : requester_(NULL), id_(next_id_++) { };
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
@@ -69,6 +69,12 @@ class RequestPortfolio {
   /// @return a unique id for the constraint
   const int id() const {return id_;};
 
+  /// @brief clear all associated containers
+  void Clear() {
+    requests_.clear();
+    constraints_.clear();
+  }
+  
  private:  
   /// @brief if the requester has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the request is associated with the portfolio's
@@ -102,6 +108,22 @@ template<class T>
 bool operator<(const RequestPortfolio<T>& lhs,
                const RequestPortfolio<T>& rhs) {
   return  (lhs.id() < rhs.id());
+};
+
+/// @brief equality operator, allows comparison
+template<class T>
+bool operator==(const RequestPortfolio<T>& lhs,
+                const RequestPortfolio<T>& rhs) {
+  return  (lhs.requests() == rhs.requests() &&
+           lhs.constraints() == rhs.constraints() &&
+           lhs.requester() == rhs.requester());
+};
+
+/// @brief inequality operator
+template<class T>
+bool operator!=(const RequestPortfolio<T>& lhs,
+                const RequestPortfolio<T>& rhs) {
+  return !(lhs == rhs);
 };
 
 } // namespace cyclus
