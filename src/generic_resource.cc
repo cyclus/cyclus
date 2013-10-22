@@ -10,11 +10,12 @@ namespace cyclus {
 const ResourceType GenericResource::kType = "GenericResource";
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::Ptr GenericResource::Create(Context* ctx,
+GenericResource::Ptr GenericResource::Create(Model* creator,
                                              double quantity,
                                              std::string quality,
                                              std::string units) {
-  GenericResource::Ptr r(new GenericResource(ctx, quantity, quality, units));
+  GenericResource::Ptr r(new GenericResource(creator->context(), quantity,
+                                             quality, units));
   r->tracker_.Create();
   return r;
 }
@@ -70,6 +71,7 @@ Resource::Ptr GenericResource::ExtractRes(double qty) {
 GenericResource::GenericResource(Context* ctx, double quantity,
                                  std::string quality,
                                  std::string units)
-  : units_(units), quality_(quality), quantity_(quantity), tracker_(ctx, this), ctx_(ctx) { }
+  : units_(units), quality_(quality), quantity_(quantity), tracker_(ctx, this),
+    ctx_(ctx) { }
 
 } // namespace cyclus

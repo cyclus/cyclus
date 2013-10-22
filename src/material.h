@@ -43,8 +43,8 @@ const double ug = kg* .000000001;
 /// * A conversion facility mixing uranium and flourine:
 ///
 ///   @code
-///   Material::Ptr uf6 = uranium_buf.PopOne();
-///   Material::Ptr f = flourine_buf.PopOne();
+///   Material::Ptr uf6 = uranium_buf.Pop();
+///   Material::Ptr f = flourine_buf.Pop();
 ///
 ///   uf6.Absorb(f);
 ///   @endcode
@@ -53,7 +53,7 @@ const double ug = kg* .000000001;
 ///
 ///   @code
 ///   Composition::Ptr burned_comp = ... // fancy code to calculate burned isotopics
-///   Material::Ptr assembly = core_fuel.PopOne();
+///   Material::Ptr assembly = core_fuel.Pop();
 ///
 ///   assembly.Transmute(burned_comp);
 ///   @endcode
@@ -62,7 +62,7 @@ const double ug = kg* .000000001;
 ///
 ///   @code
 ///   Composition::Ptr comp = ... // fancy code to calculate extraction isotopics
-///   Material::Ptr bucket = spent_fuel.PopOne();
+///   Material::Ptr bucket = spent_fuel.Pop();
 ///   double qty = 3.0;
 ///
 ///   Material::Ptr mox = bucket.ExtractComp(qty, comp);
@@ -75,13 +75,15 @@ class Material: public Resource {
 
   virtual ~Material();
 
-  /// Creates a new material resource that is "live" and tracked. All future
-  /// output data recorded will be done using the passed simulation context ctx.
-  static Ptr Create(Context* ctx, double quantity, Composition::Ptr c);
+  /// Creates a new material resource that is "live" and tracked. creator is a
+  /// pointer to the model creating the resource (usually will be the caller's
+  /// "this" pointer). All future output data recorded will be done using the
+  /// creator's context.
+  static Ptr Create(Model* creator, double quantity, Composition::Ptr c);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
-  static Ptr CreateUntracked(Context* ctx, double quantity, Composition::Ptr c);
+  static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
   /// Returns the id of the material's internal nuclide composition.
   virtual int state_id() const;
