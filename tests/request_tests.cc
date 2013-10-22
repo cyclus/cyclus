@@ -33,7 +33,7 @@ TEST(RequestTests, MaterialGetSet) {
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
-  Material::Ptr mat = Material::Create(tc.get(), qty, comp);
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
   
   Request<Material> r;
   r.commodity = commod;
@@ -60,7 +60,7 @@ TEST(RequestTests, GenRsrcGetSet) {
   string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::Create(tc.get(), qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality, units);
   
   Request<GenericResource> r;
   r.commodity = commod;

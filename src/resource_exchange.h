@@ -84,7 +84,7 @@ class ResourceExchange {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
     requests.insert(r.begin(), r.end());
   };
-
+  
   /// @brief queries facilities and collects all requests for bids
   void CollectBids() {
     std::set<Exchanger*> exchangers = ctx_->exchangers();

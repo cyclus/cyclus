@@ -27,7 +27,10 @@ template <class T>
 class BidPortfolio {
  public:
   /// @brief default constructor
-  BidPortfolio() : bidder_(NULL), commodity_("NO_COMMODITY_SET") { };
+  BidPortfolio()
+      : bidder_(NULL),
+        commodity_("NO_COMMODITY_SET"),
+        id_(next_id_++) { };
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
@@ -67,6 +70,15 @@ class BidPortfolio {
     return constraints_;
   };
 
+  /// @return a unique id for the constraint
+  const int id() const {return id_;};
+
+  /// @brief clear all associated containers
+  void Clear() {
+    bids_.clear();
+    constraints_.clear();
+  }
+
  private:
   /// @brief if the bidder has not been determined yet, it is set. otherwise
   /// VerifyResponder() verifies the the bid is associated with the
@@ -105,6 +117,34 @@ class BidPortfolio {
   
   std::string commodity_;
   Exchanger* bidder_;
+  int id_;
+  static int next_id_;
+};
+
+template<class T> int BidPortfolio<T>::next_id_ = 0;
+
+/// @brief comparison operator, allows usage in ordered containers
+template<class T>
+bool operator<(const BidPortfolio<T>& lhs,
+               const BidPortfolio<T>& rhs) {
+  return  (lhs.id() < rhs.id());
+};
+
+/// @brief equality operator, allows comparison
+template<class T>
+bool operator==(const BidPortfolio<T>& lhs,
+                const BidPortfolio<T>& rhs) {
+  return  (lhs.bids() == rhs.bids() &&
+           lhs.constraints() == rhs.constraints() &&
+           lhs.commodity() == rhs.commodity() &&
+           lhs.bidder() == rhs.bidder());
+};
+
+/// @brief inequality operator
+template<class T>
+bool operator!=(const BidPortfolio<T>& lhs,
+                const BidPortfolio<T>& rhs) {
+  return !(lhs == rhs);
 };
 
 } // namespace cyclus

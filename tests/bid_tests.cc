@@ -29,7 +29,7 @@ TEST(BidTests, MaterialGetSet) {
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
-  Material::Ptr mat = Material::Create(tc.get(), qty, comp);
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
   Request<Material> req;
   
   Bid<Material> r;
@@ -53,7 +53,7 @@ TEST(BidTests, GenRsrcGetSet) {
   string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::Create(tc.get(), qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality, units);
   Request<GenericResource> req;
   
   Bid<GenericResource> r;

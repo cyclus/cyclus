@@ -56,19 +56,19 @@ TEST(CapacityConstraintTests, RsrcQty) {
   cc.capacity = val;
   cc.converter = &rsrc_quantity_converter;
   
-  Material::Ptr mat = Material::Create(tc.get(), qty, comp);
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
   EXPECT_DOUBLE_EQ((cc.converter)(mat), qty*fraction);
 
   qty = std::rand();
-  mat = Material::Create(tc.get(), qty, comp);
+  mat = Material::CreateUntracked(qty, comp);
   EXPECT_DOUBLE_EQ((cc.converter)(mat), qty*fraction);
 
   string s = "";
-  GenericResource::Ptr gr = GenericResource::Create(tc.get(), qty, s, s);
+  GenericResource::Ptr gr = GenericResource::CreateUntracked(qty, s, s);
   EXPECT_DOUBLE_EQ((cc.converter)(gr), qty*fraction);
 
   qty = std::rand();
-  gr = GenericResource::Create(tc.get(), qty, s, s);
+  gr = GenericResource::CreateUntracked(qty, s, s);
   EXPECT_DOUBLE_EQ((cc.converter)(gr), qty*fraction);
 }
 
@@ -96,7 +96,7 @@ TEST(CapacityConstraintTests, MaterialQuality) {
   double qty = quantity;
   cm[92235] = val;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  Material::Ptr mat = Material::Create(tc.get(), qty, comp);
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
   
   CapacityConstraint<Material> cc;
   cc.capacity = val;
@@ -106,13 +106,13 @@ TEST(CapacityConstraintTests, MaterialQuality) {
   
   cm[92235] = val*fraction;
   comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(tc.get(), qty, comp);
+  mat = Material::CreateUntracked(qty, comp);
 
   EXPECT_DOUBLE_EQ((cc.converter)(mat), val*fraction*fraction);
 
   cm[92235] = 0.0;
   comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(tc.get(), qty, comp);
+  mat = Material::CreateUntracked(qty, comp);
 
   EXPECT_DOUBLE_EQ((cc.converter)(mat), 0.0);
 }
@@ -147,9 +147,9 @@ TEST(CapacityConstraintTests, GenRsrcQuality) {
   cc.capacity = val;
   cc.converter = &gen_rsrc_quality_converter;
   
-  GenericResource::Ptr gr = GenericResource::Create(tc.get(), quan, qual, units);
+  GenericResource::Ptr gr = GenericResource::CreateUntracked(quan, qual, units);
   EXPECT_DOUBLE_EQ((cc.converter)(gr), val);
 
-  gr = GenericResource::Create(tc.get(), quan, units, units);
+  gr = GenericResource::CreateUntracked(quan, units, units);
   EXPECT_DOUBLE_EQ((cc.converter)(gr), 0.0);
 }

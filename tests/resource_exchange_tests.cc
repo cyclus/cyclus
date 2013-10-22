@@ -86,7 +86,7 @@ class ResourceExchangeTests: public ::testing::Test {
     cm[92235] = 1.0;
     Composition::Ptr comp = Composition::CreateFromMass(cm);
     double qty = 1.0;
-    mat = Material::Create(tc.get(), qty, comp);
+    mat = Material::CreateUntracked(qty, comp);
     exchng = new ResourceExchange<Material>(tc.get());
   };
   
@@ -101,6 +101,8 @@ TEST_F(ResourceExchangeTests, empty) {
   EXPECT_TRUE(exchng->requests.empty());
   exchng->CollectRequests();
   EXPECT_TRUE(exchng->requests.empty());
+  exchng->CollectBids();
+  EXPECT_TRUE(exchng->bids.empty());
 }  
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
