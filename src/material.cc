@@ -15,16 +15,16 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(Context* ctx, double quantity,
+Material::Ptr Material::Create(Model* creator, double quantity,
                                Composition::Ptr c) {
-  Material::Ptr m(new Material(ctx, quantity, c));
+  Material::Ptr m(new Material(creator->context(), quantity, c));
   m->tracker_.Create();
   return m;
 }
 
-Material::Ptr Material::CreateUntracked(Context* ctx, double quantity,
+Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
-  Material::Ptr m(new Material(ctx, quantity, c));
+  Material::Ptr m(new Material(NULL, quantity, c));
   m->tracker_.DontTrack();
   return m;
 }
@@ -128,9 +128,12 @@ Composition::Ptr Material::comp() const {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx) {
+  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx),
+    prev_decay_time_(0) {
   all_mats_[this] = true;
-  prev_decay_time_ = ctx->time();
+  if (ctx != NULL) {
+    prev_decay_time_ = ctx->time();
+  }
 }
 
 } // namespace cyclus

@@ -3,10 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "composition.h"
-#include "context.h"
-#include "event_manager.h"
 #include "material.h"
-#include "timer.h"
 
 namespace units = cyclus::units;
 
@@ -24,13 +21,7 @@ class MaterialTest : public ::testing::Test {
   int th228_halflife_;
   double u235_g_per_mol_;
 
-  cyclus::EventManager em_;
-  cyclus::Timer ti_;
-  cyclus::Context* ctx_;
-
   virtual void SetUp() {
-    ctx_ = new cyclus::Context(&ti_, &em_);
-
     // composition set up
     u235_ = 92235;
     am241_ = 95241;
@@ -49,11 +40,11 @@ class MaterialTest : public ::testing::Test {
     v[am241_] = 1;
     diff_comp_ = cyclus::Composition::CreateFromMass(v);
 
-    default_mat_ = cyclus::Material::Create(ctx_, 0 * units::g, test_comp_);
-    test_mat_ = cyclus::Material::Create(ctx_, test_size_, test_comp_);
-    two_test_mat_ = cyclus::Material::Create(ctx_, 2 * test_size_, test_comp_);
-    ten_test_mat_ = cyclus::Material::Create(ctx_, 10 * test_size_, test_comp_);
-    diff_mat_ = cyclus::Material::Create(ctx_, test_size_, diff_comp_);
+    default_mat_ = cyclus::Material::CreateUntracked(0 * units::g, test_comp_);
+    test_mat_ = cyclus::Material::CreateUntracked(test_size_, test_comp_);
+    two_test_mat_ = cyclus::Material::CreateUntracked(2 * test_size_, test_comp_);
+    ten_test_mat_ = cyclus::Material::CreateUntracked(10 * test_size_, test_comp_);
+    diff_mat_ = cyclus::Material::CreateUntracked(test_size_, diff_comp_);
 
     // test info
     u235_g_per_mol_ = 235.044;

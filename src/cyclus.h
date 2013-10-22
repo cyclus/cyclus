@@ -24,7 +24,6 @@
 #include "logger.h"
 #include "market_model.h"
 #include "mass_table.h"
-#include "mat_buff.h"
 #include "mat_query.h"
 #include "material.h"
 #include "message.h"

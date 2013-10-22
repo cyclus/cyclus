@@ -1,44 +1,14 @@
 // resource_buff.cc
-#include "cyc_limits.h"
 #include "resource_buff.h"
-#include "error.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ResourceBuff::ResourceBuff()
-  : capacity_(0),
-    qty_(0) { }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ResourceBuff::~ResourceBuff() { }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double ResourceBuff::capacity() {
-  return capacity_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::SetCapacity(double cap) {
+void ResourceBuff::set_capacity(double cap) {
   if (quantity() - cap > eps_rsrc()) {
     throw ValueError("New capacity lower than existing quantity");
   }
   capacity_ = cap;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int ResourceBuff::count() {
-  return mats_.size();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double ResourceBuff::quantity() {
-  return qty_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double ResourceBuff::space() {
-  return capacity_ - qty_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,96 +20,72 @@ Manifest ResourceBuff::PopQty(double qty) {
   }
 
   Manifest manifest;
-  Resource::Ptr mat, leftover;
+  Resource::Ptr r, leftover;
   double left = qty;
   double quan;
   while (left > eps_rsrc()) {
-    mat = mats_.front();
+    r = mats_.front();
     mats_.pop_front();
-    quan = mat->quantity();
+    quan = r->quantity();
     if ((quan - left) > eps_rsrc()) {
-      // too big - split the mat before pushing
-      leftover = mat->ExtractRes(quan - left);
+      // too big - split the res before pushing
+      leftover = r->ExtractRes(quan - left);
       mats_.push_front(leftover);
       qty_ -= left;
     } else {
-      mats_present_.erase(mat);
+      mats_present_.erase(r);
       qty_ -= quan;
     }
 
-    manifest.push_back(mat);
+    manifest.push_back(r);
     left -= quan;
   }
 
   return manifest;
-}
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Manifest ResourceBuff::PopNum(int num) {
+Manifest ResourceBuff::PopN(int num) {
   if (mats_.size() < num) {
     throw ValueError("Remove count larger than store count.");
   }
 
   Manifest manifest;
   for (int i = 0; i < num; i++) {
-    Resource::Ptr mat = mats_.front();
+    Resource::Ptr r = mats_.front();
     mats_.pop_front();
-    manifest.push_back(mat);
-    mats_present_.erase(mat);
-    qty_ -= mat->quantity();
+    manifest.push_back(r);
+    mats_present_.erase(r);
+    qty_ -= r->quantity();
   }
 
   return manifest;
-}
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr ResourceBuff::PopOne() {
+Resource::Ptr ResourceBuff::Pop() {
   if (mats_.size() < 1) {
     throw ValueError("Cannot pop material from an empty store.");
   }
-  Resource::Ptr mat = mats_.front();
-  qty_ -= mat->quantity();
+  Resource::Ptr r = mats_.front();
+  qty_ -= r->quantity();
 
   mats_.pop_front();
-  mats_present_.erase(mat);
-  return mat;
-}
+  mats_present_.erase(r);
+  return r;
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::PushOne(Resource::Ptr mat) {
-  if (mat->quantity() - space() > eps_rsrc()) {
+void ResourceBuff::Push(Resource::Ptr r) {
+  if (r->quantity() - space() > eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
-  } else if (mats_present_.count(mat) == 1) {
+  } else if (mats_present_.count(r) == 1) {
     throw KeyError("Duplicate resource pushing attempted");
   }
 
-  qty_ += mat->quantity();
-  mats_.push_back(mat);
-  mats_present_.insert(mat);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ResourceBuff::PushAll(Manifest mats) {
-  double tot_qty = 0;
-  for (int i = 0; i < mats.size(); i++) {
-    tot_qty += mats.at(i)->quantity();
-  }
-  if (tot_qty - space() > eps_rsrc()) {
-    throw ValueError("Resource pushing breaks capacity limit.");
-  }
-
-  for (int i = 0; i < mats.size(); i++) {
-    if (mats_present_.count(mats.at(i)) == 1) {
-      throw KeyError("Duplicate resource pushing attempted");
-    }
-  }
-
-  for (int i = 0; i < mats.size(); i++) {
-    Resource::Ptr mat = mats.at(i);
-    mats_.push_back(mat);
-    mats_present_.insert(mat);
-  }
-  qty_ += tot_qty;
-}
+  qty_ += r->quantity();
+  mats_.push_back(r);
+  mats_present_.insert(r);
+};
 
 } // namespace cyclus

@@ -46,16 +46,16 @@ Transaction* Transaction::Clone() {
 void Transaction::ApproveTransfer() {
   std::vector<Resource::Ptr> manifest;
   manifest = supplier_->RemoveResource(*this);
-  requester_->AddResource(*this, manifest);
 
   // register that this transaction occured
   this->Transaction::AddTransToTable();
   int nResources = manifest.size();
-
   for (int pos = 0; pos < nResources; pos++) {
     // record that what resources belong to this transaction
     this->Transaction::AddResourceToTable(pos + 1, manifest.at(pos));
   }
+
+  requester_->AddResource(*this, manifest);
 
   CLOG(LEV_INFO3) << "Material sent from " << supplier_->id() << " to "
                   << requester_->id() << ".";
