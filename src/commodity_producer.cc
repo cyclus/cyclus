@@ -4,15 +4,14 @@
 #include "error.h"
 
 namespace cyclus {
-namespace supply_demand {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CommodityInformation::CommodityInformation()
+CommodInfo::CommodInfo()
   : capacity(0),
     cost(kModifierLimit) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CommodityInformation::CommodityInformation(double a_capacity,
+CommodInfo::CommodInfo(double a_capacity,
                                            double a_cost)
   : capacity(a_capacity),
     cost(a_cost) { }
@@ -28,7 +27,7 @@ CommodityProducer::~CommodityProducer() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<Commodity, CommodityCompare> CommodityProducer::ProducedCommodities() {
   std::set<Commodity, CommodityCompare> commodities;
-  std::map<Commodity, CommodityInformation, CommodityCompare>::iterator it;
+  std::map<Commodity, CommodInfo, CommodityCompare>::iterator it;
   for (it = produced_commodities_.begin();
        it != produced_commodities_.end();
        it++) {
@@ -57,7 +56,7 @@ double CommodityProducer::ProductionCost(const Commodity& commodity) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducer::AddCommodity(const Commodity& commodity) {
-  CommodityInformation info(default_capacity_, default_cost_);
+  CommodInfo info(default_capacity_, default_cost_);
   AddCommodityWithInformation(commodity, info);
 }
 
@@ -77,7 +76,7 @@ void CommodityProducer::SetCost(const Commodity& commodity,
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducer::AddCommodityWithInformation(const Commodity& commodity,
-                                                    const CommodityInformation& info) {
+                                                    const CommodInfo& info) {
   if (!ProducesCommodity(commodity)) {
     produced_commodities_.insert(std::make_pair(commodity, info));
   }
@@ -103,5 +102,5 @@ void CommodityProducer::ThrowErrorIfCommodityNotProduced(
                    + commodity.name());
   }
 }
-} // namespace supply_demand
+ 
 } // namespace cyclus

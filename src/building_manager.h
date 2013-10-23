@@ -11,17 +11,17 @@
 #include "variable.h"
 
 namespace cyclus {
-namespace action_building {
+
 /// a struct for a build order: the number of producers to build
 struct BuildOrder {
   // constructor
-  BuildOrder(int n, action_building::Builder* b,
-             supply_demand::CommodityProducer* cp);
+  BuildOrder(int n, Builder* b,
+             CommodityProducer* cp);
 
   // constituents
   int number;
-  action_building::Builder* builder;
-  supply_demand::CommodityProducer* producer;
+  Builder* builder;
+  CommodityProducer* producer;
 };
 
 /// a struct for a problem instance
@@ -77,13 +77,13 @@ class BuildingManager {
      register a builder with the manager
      @param builder the builder
    */
-  void RegisterBuilder(action_building::Builder* builder);
+  void RegisterBuilder(Builder* builder);
 
   /**
      unregister a builder with the manager
      @param builder the builder
    */
-  void UnRegisterBuilder(action_building::Builder* builder);
+  void UnRegisterBuilder(Builder* builder);
 
   /**
      given a certain commodity and demand, a decision is made as to
@@ -94,7 +94,7 @@ class BuildingManager {
      @param unmet_demand the additional capacity required
      @return a vector of build orders as decided
   */
-  std::vector<action_building::BuildOrder> MakeBuildDecision(Commodity& commodity,
+  std::vector<BuildOrder> MakeBuildDecision(Commodity& commodity,
                                                              double unmet_demand);
 
   // protected: @MJGFlag - should be protected. revise when tests can
@@ -103,7 +103,7 @@ class BuildingManager {
      set up the constraint problem
      @param problem the problem instance
    */
-  void SetUpProblem(action_building::ProblemInstance& problem);
+  void SetUpProblem(ProblemInstance& problem);
 
   /**
      add a variable to the constraint problem
@@ -111,9 +111,9 @@ class BuildingManager {
      @param builder the builder of that producer
      @param problem the problem instance
    */
-  void AddProducerVariableToProblem(supply_demand::CommodityProducer* producer,
-                                    action_building::Builder* builder,
-                                    action_building::ProblemInstance& problem);
+  void AddProducerVariableToProblem(CommodityProducer* producer,
+                                    Builder* builder,
+                                    ProblemInstance& problem);
 
   /**
      given a solution to the constraint problem, construct the
@@ -121,7 +121,7 @@ class BuildingManager {
      @param orders the set of orders to fill
      @param solution the solution determining how to fill the orders
    */
-  void ConstructBuildOrdersFromSolution(std::vector<action_building::BuildOrder>&
+  void ConstructBuildOrdersFromSolution(std::vector<BuildOrder>&
                                         orders,
                                         std::vector<Variable::Ptr>& solution);
 
@@ -131,13 +131,13 @@ class BuildingManager {
 
   /// a map of variables to their associated builder and producer
   std::map < Variable::Ptr,
-      std::pair<action_building::Builder*, supply_demand::CommodityProducer*> >
+      std::pair<Builder*, CommodityProducer*> >
       solution_map_;
 };
 
 //#include "building_manager_tests.h"
 //friend class BuildingManagerTests;
 // @MJGFlag - removed for the same reason as above
-}
+
 } // namespace cyclus
 #endif

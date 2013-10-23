@@ -7,7 +7,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void BuildingManagerTests::SetUp() 
 {
-  using cyclus::action_building::Builder;
+  using cyclus::Builder;
   demand = 1001;
   capacity1 = 800, capacity2 = 200;
   cost1 = capacity1, cost2 = capacity2;
@@ -57,7 +57,7 @@ TEST_F(BuildingManagerTests, registration)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, problem) 
 {
-  using cyclus::action_building::BuildOrder;
+  using cyclus::BuildOrder;
   SetUpProblem();
   std::vector<BuildOrder> orders = manager.MakeBuildDecision(helper->commodity,demand);
   EXPECT_EQ(orders.size(),2);
@@ -76,7 +76,7 @@ TEST_F(BuildingManagerTests, problem)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, emptyorder) 
 {
-  using cyclus::action_building::BuildOrder;
+  using cyclus::BuildOrder;
   SetUpProblem();
   std::vector<BuildOrder> orders = manager.MakeBuildDecision(helper->commodity,0);
   EXPECT_TRUE(orders.empty());

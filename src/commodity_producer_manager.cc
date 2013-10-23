@@ -2,10 +2,8 @@
 
 #include "error.h"
 
-//using namespace supply_demand;
-
 namespace cyclus {
-namespace supply_demand {
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducerManager::CommodityProducerManager() {}
 
@@ -26,7 +24,7 @@ double CommodityProducerManager::TotalProductionCapacity(Commodity& commodity) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducerManager::RegisterProducer(
-  supply_demand::CommodityProducer* producer) {
+  CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end()) {
     throw KeyError("A manager is trying to register a producer twice.");
   } else {
@@ -36,13 +34,13 @@ void CommodityProducerManager::RegisterProducer(
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducerManager::UnRegisterProducer(
-  supply_demand::CommodityProducer* producer) {
+  CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end()) {
     throw KeyError("A manager is trying to unregister a producer not originally registered with it.");
   } else {
     producers_.erase(producer);
   }
 }
-} // namespace supply_demand
+ 
 } // namespace cyclus
 

@@ -2,12 +2,7 @@
 
 #include "error.h"
 
-
-//using namespace supply_demand;
-//using namespace action_building;
-
 namespace cyclus {
-namespace action_building {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Builder::Builder() {}
@@ -16,7 +11,7 @@ Builder::Builder() {}
 Builder::~Builder() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Builder::RegisterProducer(supply_demand::CommodityProducer* producer) {
+void Builder::RegisterProducer(CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end()) {
     throw KeyError("A builder is trying to register a producer twice.");
   } else {
@@ -25,7 +20,7 @@ void Builder::RegisterProducer(supply_demand::CommodityProducer* producer) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Builder::UnRegisterProducer(supply_demand::CommodityProducer* producer) {
+void Builder::UnRegisterProducer(CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end()) {
     throw KeyError("A builder is trying to unregister a producer not originally registered with it.");
   } else {
@@ -39,15 +34,15 @@ double Builder::NBuildingPrototypes() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<supply_demand::CommodityProducer*>::iterator
+std::set<CommodityProducer*>::iterator
 Builder::BeginningProducer() {
   return producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<supply_demand::CommodityProducer*>::iterator
+std::set<CommodityProducer*>::iterator
 Builder::EndingProducer() {
   return producers_.end();
 }
-} // namespace ActionBuilder
+
 } // namespace cyclus
