@@ -28,7 +28,7 @@ class ResTracker {
   void DontTrack();
 
   /// Should be called when a resource instance is newly created.
-  void Create();
+  void Create(Model* creator);
 
   /// Should be called when a resource has some quantity removed from it (e.g.
   /// resource is split).
