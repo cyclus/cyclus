@@ -7,11 +7,11 @@
 #include "commodity.h"
 
 namespace cyclus {
-namespace supply_demand {
+
 /// a container to hold information about a commodity
-struct CommodityInformation {
-  CommodityInformation();
-  CommodityInformation(double a_capacity, double a_cost);
+struct CommodInfo {
+  CommodInfo();
+  CommodInfo(double a_capacity, double a_cost);
   double cost;
   double capacity;
 };
@@ -61,7 +61,7 @@ class CommodityProducer {
   /// @param commodity the commodity being produced
   /// @param info the information describing the commodity
   void AddCommodityWithInformation(const Commodity& commodity,
-                                   const CommodityInformation& info);
+                                   const CommodInfo& info);
 
   /// add all commodities produced by a source
   /// @param source the original commodity producer
@@ -80,13 +80,13 @@ class CommodityProducer {
 
  private:
   /// a collection of commodities and their production capacities
-  std::map<Commodity, CommodityInformation, CommodityCompare>
+  std::map<Commodity, CommodInfo, CommodityCompare>
   produced_commodities_;
 
   //#include "commodity_producer_tests.h"
   //friend class CommodityProducerTests;
   // @MJGFlag - removed for the same reason as above
 };
-}
+
 } // namespace cyclus
 #endif

@@ -9,7 +9,7 @@
 #include <set>
 
 namespace cyclus {
-namespace supply_demand {
+
 /**
    This is a manager class that manages a set of commodities. Those
    commodities have a certain demand function associated with them
@@ -49,13 +49,13 @@ class SupplyDemandManager {
   /**
      adds a commodity producer manager to the set of producer managers
    */
-  void RegisterProducerManager(supply_demand::CommodityProducerManager* cpm);
+  void RegisterProducerManager(CommodityProducerManager* cpm);
 
   /**
      removes a commodity producer manager from the set of producer
      managers
    */
-  void UnRegisterProducerManager(supply_demand::CommodityProducerManager* cpm);
+  void UnRegisterProducerManager(CommodityProducerManager* cpm);
 
   /**
      returns the current supply of a commodity
@@ -91,8 +91,8 @@ class SupplyDemandManager {
   std::map<Commodity, SymFunction::Ptr, CommodityCompare> demand_functions_;
 
   /// a container of all production managers known to the manager
-  std::set<supply_demand::CommodityProducerManager*> managers_;
+  std::set<CommodityProducerManager*> managers_;
 };
-} // namespace supply_demand
+ 
 } // namespace cyclus
 #endif

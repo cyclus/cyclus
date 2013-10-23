@@ -9,7 +9,7 @@ CommodityTestHelper::CommodityTestHelper() :
   capacity(5.0),
   nproducers(2)
 {
-  using cyclus::supply_demand::CommodityProducer;
+  using cyclus::CommodityProducer;
   producer1 = new CommodityProducer();
   producer2 = new CommodityProducer();
 }
