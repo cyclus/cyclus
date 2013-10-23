@@ -16,7 +16,7 @@ GenericResource::Ptr GenericResource::Create(Model* creator,
                                              std::string units) {
   GenericResource::Ptr r(new GenericResource(creator->context(), quantity,
                                              quality, units));
-  r->tracker_.Create();
+  r->tracker_.Create(creator);
   return r;
 }
 

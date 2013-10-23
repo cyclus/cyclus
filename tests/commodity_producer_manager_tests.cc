@@ -19,14 +19,14 @@ void CommodityProducerManagerTests::TearDown()
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::RegisterProducer(
-  cyclus::supply_demand::CommodityProducer* producer) 
+  cyclus::CommodityProducer* producer) 
 {
   manager.RegisterProducer(producer);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void CommodityProducerManagerTests::UnRegisterProducer(
-  cyclus::supply_demand::CommodityProducer* producer) 
+  cyclus::CommodityProducer* producer) 
 {
   manager.UnRegisterProducer(producer);
 }

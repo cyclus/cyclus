@@ -9,7 +9,7 @@ class CommodityProducerTests : public ::testing::Test {
  protected:
   std::string commodity_name_;
   cyclus::Commodity commodity_;
-  cyclus::supply_demand::CommodityProducer producer_;
+  cyclus::CommodityProducer producer_;
   double capacity_, cost_;
 
  public:

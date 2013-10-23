@@ -8,7 +8,7 @@
 void CommodityProducerTests::SetUp() 
 {
   using cyclus::Commodity;
-  using cyclus::supply_demand::CommodityProducer;
+  using cyclus::CommodityProducer;
   commodity_name_ = "commodity";
   commodity_ = Commodity(commodity_name_);
   producer_ = CommodityProducer();
@@ -80,7 +80,7 @@ TEST_F(CommodityProducerTests,info)
 TEST_F(CommodityProducerTests,copy) 
 {
   using cyclus::Commodity;
-  using cyclus::supply_demand::CommodityProducer;
+  using cyclus::CommodityProducer;
   EXPECT_NO_THROW(AddCommodity());
   EXPECT_NO_THROW(SetCapacity());
   EXPECT_NO_THROW(SetCost());

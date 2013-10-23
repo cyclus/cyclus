@@ -16,12 +16,16 @@ void ResTracker::DontTrack() {
   tracked_ = false;
 }
 
-void ResTracker::Create() {
+void ResTracker::Create(Model* creator) {
   if (!tracked_) {
     return;
   }
 
   Record();
+  ctx_->NewEvent("ResCreators")
+    ->AddVal("ResID", res_->id())
+    ->AddVal("ModelID", creator->id())
+    ->Record();
 }
 
 void ResTracker::Modify() {

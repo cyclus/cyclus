@@ -3,7 +3,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 BuildingTestHelper::BuildingTestHelper()
 {
-  using cyclus::action_building::Builder;
+  using cyclus::Builder;
   builder1 = new Builder();
   builder2 = new Builder();
 }

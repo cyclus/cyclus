@@ -27,6 +27,15 @@ Package                Minimum Version
 `python`               2.6
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
+Coin-Cbc               2.5
+====================   ==================
+
+In addition, there is an optional dependency:
+
+====================   ==================
+Package                Minimum Version   
+====================   ==================
+doxygen                1.7.6.1
 ====================   ==================
 
 As with all software, the build/install can be broken into two steps:
@@ -56,10 +65,18 @@ commands will take the form of:
 Where you will replace "package" with the correct package name. The
 list of required package names are:
 
+  #. cmake
   #. libboost-all-dev
   #. libxml++2.6-dev
   #. libsqlite3-dev
-  #. libhdf5-dev
+  #. libhdf5-serial-dev
+  #. libbz2-dev
+  #. coinor-libcbc-dev
+  #. coinor-libcgl-dev
+
+Optional dependencies:
+
+  #. doxygen
 
 So, for example, in order to install libxml++ on your system, you will
 type:
@@ -100,7 +117,7 @@ install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
-    .../cyclus/cyclus$ python setup.py --prefix=../install
+    .../cyclus/cyclus$ python install.py --prefix=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
 installed in a non-standard location, you should make use of the 
@@ -109,7 +126,7 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python setup.py --prefix=../install --coin_root=path/to/coin
+    .../cyclus/cyclus$  python install.py --prefix=../install --coin_root=path/to/coin
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
@@ -117,10 +134,12 @@ you should make use of the boostRoot installation flag.
 .. code-block:: bash
 
 
-    .../cyclus/cyclus$ python setup.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
+    .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 Now, run it with some input file, for this example, call it 
-`input.xml`::
+`input.xml`. You can find instructions for writng an input file
+for cyclus from `Cyclus User Guide`_  or use sample input files
+from `Cycamore Repo`_ ::
 
     .../cyclus/install/cyclus/bin$ ./cyclus input.xml
 
@@ -137,6 +156,8 @@ CMake variable flag. Simply add the following to your cmake command:
 .. _`CMake`: http://www.cmake.org
 .. _`apt-get`: http://linux.die.net/man/8/apt-get
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
 **********************
 The Developer Workflow
@@ -199,7 +220,7 @@ Workflow Notes
         test``` is insufficient). For example ::
       
           mkdir install
-          python setup.py --prefix=install/ ....
+          python install.py --prefix=install/ ....
           install/cyclus/bin/CyclusUnitTestDriver
 
       - If your changes to the core repository have an effect on any module 

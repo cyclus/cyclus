@@ -7,7 +7,7 @@
 #include "commodity_producer.h"
 
 namespace cyclus {
-namespace supply_demand {
+
 /// a mixin to provide information about commodity producers
 class CommodityProducerManager {
  public:
@@ -25,11 +25,11 @@ class CommodityProducerManager {
   // be found by classes in the Utility folder
   /// register a commodity producer with the manager
   /// @param producer the producer
-  void RegisterProducer(supply_demand::CommodityProducer* producer);
+  void RegisterProducer(CommodityProducer* producer);
 
   /// unregister a commodity producer with the manager
   /// @param producer the producer
-  void UnRegisterProducer(supply_demand::CommodityProducer* producer);
+  void UnRegisterProducer(CommodityProducer* producer);
 
   /// the set of managed producers
   std::set<CommodityProducer*> producers_;
@@ -38,6 +38,6 @@ class CommodityProducerManager {
   //friend class CommodityProducerManagerTests;
   // @MJGFlag - removed for the same reason as above
 };
-} // namespace supply_demand
+ 
 } // namespace cyclus
 #endif

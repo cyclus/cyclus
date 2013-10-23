@@ -10,11 +10,10 @@
 #include "logger.h"
 
 namespace cyclus {
-namespace action_building {
 
 // -------------------------------------------------------------------
 BuildOrder::BuildOrder(int n, Builder* b,
-                       supply_demand::CommodityProducer* cp) :
+                       CommodityProducer* cp) :
   number(n),
   builder(b),
   producer(cp) { }
@@ -117,17 +116,17 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 // -------------------------------------------------------------------
 void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   solution_map_ = std::map < Variable::Ptr,
-  std::pair<Builder*, supply_demand::CommodityProducer*> > ();
+  std::pair<Builder*, CommodityProducer*> > ();
 
   std::set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end();
        builder_it++) {
     Builder* builder = (*builder_it);
 
-    std::set<supply_demand::CommodityProducer*>::iterator producer_it;
+    std::set<CommodityProducer*>::iterator producer_it;
     for (producer_it = builder->BeginningProducer();
          producer_it != builder->EndingProducer(); producer_it++) {
-      supply_demand::CommodityProducer* producer = (*producer_it);
+      CommodityProducer* producer = (*producer_it);
       if (producer->ProducesCommodity(problem.commodity)) {
         AddProducerVariableToProblem(producer, builder, problem);
       }
@@ -137,7 +136,7 @@ void BuildingManager::SetUpProblem(ProblemInstance& problem) {
 
 // -------------------------------------------------------------------
 void BuildingManager::AddProducerVariableToProblem(
-  supply_demand::CommodityProducer* producer,
+  CommodityProducer* producer,
   Builder* builder,
   ProblemInstance& problem) {
   using std::make_pair;
@@ -166,12 +165,12 @@ void BuildingManager::ConstructBuildOrdersFromSolution(
     int number = any_cast<int>(solution.at(i)->value());
     if (number > 0) {
       Builder* builder = solution_map_[solution.at(i)].first;
-      supply_demand::CommodityProducer* producer = \
+      CommodityProducer* producer = \
                                                    solution_map_[solution.at(i)].second;
       BuildOrder order(number, builder, producer);
       orders.push_back(order);
     }
   }
 }
-} // namespace action_building
+
 } // namespace cyclus
