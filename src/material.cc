@@ -18,7 +18,7 @@ Material::~Material() {
 Material::Ptr Material::Create(Model* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
-  m->tracker_.Create();
+  m->tracker_.Create(creator);
   return m;
 }
 
