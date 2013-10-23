@@ -9,7 +9,7 @@
 #include "material.h"
 #include "test_context.h"
 #include "mock_facility.h"
-#include "exchanger.h"
+#include "trader.h"
 
 #include "request.h"
 
@@ -19,13 +19,13 @@ using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
-using cyclus::Exchanger;
+using cyclus::Trader;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
-  Exchanger* excast = dynamic_cast<Exchanger*>(fac);
+  Trader* excast = dynamic_cast<Trader*>(fac);
   
   string commod = "name";
   double pref = 2.4;

@@ -17,16 +17,16 @@ void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
 }
 
-void Context::RegisterExchanger(Exchanger* e) {
-  exchangers_.insert(e);
+void Context::RegisterTrader(Trader* e) {
+  traders_.insert(e);
 }
 
-void Context::UnregisterExchanger(Exchanger* e) {
-  exchangers_.erase(e);
+void Context::UnregisterTrader(Trader* e) {
+  traders_.erase(e);
 }
 
-const std::set<Exchanger*> Context::exchangers() {
-  return exchangers_;
+const std::set<Trader*> Context::traders() {
+  return traders_;
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {

@@ -136,7 +136,7 @@ INSTALL(FILES
   event.h
   event_backend.h
   event_manager.h
-  exchanger.h
+  trader.h
   exchange_aggregator.h
   facility_model.h
   function.h

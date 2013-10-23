@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-class Exchanger;
+class Trader;
 
 /// @class BidPortfolio
 ///
@@ -34,7 +34,7 @@ class BidPortfolio {
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
-  const Exchanger* bidder() const {
+  const Trader* bidder() const {
     return bidder_;
   };
     
@@ -116,7 +116,7 @@ class BidPortfolio {
   std::set< CapacityConstraint<T> > constraints_;
   
   std::string commodity_;
-  Exchanger* bidder_;
+  Trader* bidder_;
   int id_;
   static int next_id_;
 };

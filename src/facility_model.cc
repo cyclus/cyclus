@@ -67,7 +67,7 @@ void FacilityModel::InitFrom(Model* m) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Deploy(Model* parent) {
   Model::Deploy(parent);
-  context()->RegisterExchanger(this);
+  context()->RegisterTrader(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,7 +96,7 @@ void FacilityModel::Decommission() {
     throw Error("Cannot decommission " + name());
   }
 
-  context()->UnregisterExchanger(this);
+  context()->UnregisterTrader(this);
   Model::Decommission();
 }
 

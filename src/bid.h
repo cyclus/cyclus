@@ -7,7 +7,7 @@
 
 namespace cyclus {
 
-class Exchanger;
+class Trader;
   
 /// A Bid encapsulates all the information required to
 /// communicate a bid response to a request for a resource, including the
@@ -24,7 +24,7 @@ struct Bid {
   boost::shared_ptr<T> offer;
 
   /// @return the model responding the request
-  cyclus::Exchanger* bidder;
+  cyclus::Trader* bidder;
   
   /// @return a unique id for the bid
   const int id() const {return id_;};

@@ -12,15 +12,15 @@ namespace cyclus {
 
 template <class T> class ResourceExchange;
   
-/// @class Exchanger
+/// @class Trader
 ///
 /// @brief A simple API for agents that wish to exchange resources in the
 /// simulation
 ///
-/// An Exchanger is a mixin class designed for agents that wish to exchange
+/// A Trader is a mixin class designed for agents that wish to exchange
 /// resources. It defines the API for the querying of requests, offers, and the
-/// corresponding exchanges. 
-class Exchanger {
+/// corresponding exchanges.
+class Trader {
  public:
   /// @brief default implementation for material requests
   virtual std::set< RequestPortfolio<Material> > AddMatlRequests() {

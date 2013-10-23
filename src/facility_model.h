@@ -9,7 +9,7 @@
 #include "communicator.h"
 #include "model.h"
 #include "time_agent.h"
-#include "exchanger.h"
+#include "trader.h"
 
 namespace cyclus {
 
@@ -69,7 +69,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeAgent, public Communicator, public Exchanger {
+class FacilityModel : public TimeAgent, public Communicator, public Trader {
  public:
   FacilityModel(Context* ctx);
 

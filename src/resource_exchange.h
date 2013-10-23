@@ -7,7 +7,7 @@
 #include <functional>
                    
 #include "context.h"
-#include "exchanger.h"
+#include "trader.h"
 #include "generic_resource.h"
 #include "material.h"
 #include "request_portfolio.h"
@@ -15,34 +15,34 @@
 
 namespace cyclus {
 
-template<class T> std::set< RequestPortfolio<T> > QueryRequests(Exchanger* e) {
+template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* e) {
   return std::set< RequestPortfolio<T> >();
 }
   
 template<> std::set< RequestPortfolio<Material> >
-    QueryRequests<Material>(Exchanger* e) {
+    QueryRequests<Material>(Trader* e) {
   return e->AddMatlRequests();
 }
 
 template<> std::set< RequestPortfolio<GenericResource> >
-    QueryRequests<GenericResource>(Exchanger* e) {
+    QueryRequests<GenericResource>(Trader* e) {
   return e->AddGenRsrcRequests();
 }
 
 template<class T> class ResourceExchange;
   
 template<class T> std::set< BidPortfolio<T> >
-    QueryBids(Exchanger* e, ResourceExchange<T>* re) {
+    QueryBids(Trader* e, ResourceExchange<T>* re) {
   return std::set< BidPortfolio<T> >();
 }
   
 template<> std::set< BidPortfolio<Material> >
-    QueryBids<Material>(Exchanger* e, ResourceExchange<Material>* re) {
+    QueryBids<Material>(Trader* e, ResourceExchange<Material>* re) {
   return e->AddMatlBids(re);
 }
 
 template<> std::set< BidPortfolio<GenericResource> >
-    QueryBids<GenericResource>(Exchanger* e, ResourceExchange<GenericResource>* re) {
+    QueryBids<GenericResource>(Trader* e, ResourceExchange<GenericResource>* re) {
   return e->AddGenRsrcBids(re);
 }
 
@@ -72,45 +72,45 @@ class ResourceExchange {
 
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
-    std::set<Exchanger*> exchangers = ctx_->exchangers();
+    std::set<Trader*> traders = ctx_->traders();
     std::for_each(
-        exchangers.begin(),
-        exchangers.end(),
+        traders.begin(),
+        traders.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests), this));
   }
 
   /// @brief queries a given facility model for 
-  void AddRequests(Exchanger* f) {
+  void AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
     requests.insert(r.begin(), r.end());
   };
   
   /// @brief queries facilities and collects all requests for bids
   void CollectBids() {
-    std::set<Exchanger*> exchangers = ctx_->exchangers();
+    std::set<Trader*> traders = ctx_->traders();
     std::for_each(
-        exchangers.begin(),
-        exchangers.end(),
+        traders.begin(),
+        traders.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids), this));
   }
 
   /// @brief queries a given facility model for 
-  void AddBids(Exchanger* f) {
+  void AddBids(Trader* f) {
     std::set< BidPortfolio<T> > r = QueryBids<T>(f, this);
     bids.insert(r.begin(), r.end());
   };
 
   /// /// @brief adjust preferences for requests given bid responses
   /// void PrefAdjustment() {
-  ///   std::set<Exchanger*> exchangers = ctx_->exchangers();
+  ///   std::set<Trader*> traders = ctx_->traders();
   ///   std::for_each(
-  ///       exchangers.begin(),
-  ///       exchangers.end(),
+  ///       traders.begin(),
+  ///       traders.end(),
   ///       std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs), this));
   /// }
 
   /// /// @brief
-  /// void AdjustPrefs(Exchanger* f) {
+  /// void AdjustPrefs(Trader* f) {
   ///   std::set< BidPortfolio<T> > r = QueryPrefs<T>(f, this);
   ///   /// bids.insert(r.begin(), r.end());
   /// };

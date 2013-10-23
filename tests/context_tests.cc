@@ -8,7 +8,7 @@
 
 using cyclus::Timer;
 using cyclus::Model;
-using cyclus::Exchanger;
+using cyclus::Trader;
 using cyclus::EventManager;
 using cyclus::Context;
 
@@ -33,13 +33,13 @@ class ContextTests: public ::testing::Test {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ContextTests, exchangers) {
-  EXPECT_TRUE(ctx->exchangers().empty());
+TEST_F(ContextTests, traders) {
+  EXPECT_TRUE(ctx->traders().empty());
   Model* clone = fac->Clone();
   clone->Deploy(clone);
-  Exchanger* exr = dynamic_cast<Exchanger*>(clone);
-  EXPECT_EQ(ctx->exchangers().size(), 1);
-  EXPECT_EQ(*ctx->exchangers().begin(), exr);
+  Trader* exr = dynamic_cast<Trader*>(clone);
+  EXPECT_EQ(ctx->traders().size(), 1);
+  EXPECT_EQ(*ctx->traders().begin(), exr);
   clone->Decommission();
-  EXPECT_TRUE(ctx->exchangers().empty());
+  EXPECT_TRUE(ctx->traders().empty());
 }  
