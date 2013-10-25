@@ -10,7 +10,7 @@
 #include "resource.h"
 #include "test_context.h"
 
-#include "exchange_aggregator.h"
+#include "exchange_context.h"
 
 using std::string;
 using std::set;

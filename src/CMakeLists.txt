@@ -137,7 +137,7 @@ INSTALL(FILES
   event_backend.h
   event_manager.h
   trader.h
-  exchange_aggregator.h
+  exchange_context.h
   facility_model.h
   function.h
   generic_resource.h
