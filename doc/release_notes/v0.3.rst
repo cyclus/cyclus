@@ -18,6 +18,9 @@ after over a year of development!  This includes nearly 340 commits by
 
 - Google C++ Style Guide compliance.
 
+Since v0.2, 477 files have changed encompassing  52028 line insertions(+) and 
+51749 deletions(-).
+
 Changes from 0.2 to 0.3
 =======================
 
