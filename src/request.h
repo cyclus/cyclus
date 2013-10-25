@@ -2,7 +2,10 @@
 #define CYCLUS_REQUEST_H_
 
 #include <string>
+#include <ostream>
 #include <boost/shared_ptr.hpp>
+
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -25,16 +28,22 @@ struct Request {
 
   /// @return the model requesting the resource
   Trader* requester;
+
 };
 
 template<class T>
 bool operator==(const Request<T>& lhs, const Request<T>& rhs) {
   return  ((lhs.commodity == rhs.commodity) &&
            (lhs.target == rhs.target) &&
-           (lhs.preference == rhs.preference) &&
+           (DoubleEq(lhs.preference, rhs.preference)) &&
            (lhs.requester == rhs.requester));
 }
 
+template<class T>
+std::ostream& operator<<(std::ostream& os, const Request<T>& r) {
+  os << r.commodity;
+  return os;
+};
 } // namespace cyclus
 
 #endif
