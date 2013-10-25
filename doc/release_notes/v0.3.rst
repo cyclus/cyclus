@@ -1,0 +1,322 @@
+========================
+Cyclus 0.3 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://cyclus.github.io/
+:Contact: cyclus-dev@googlegroups.com
+
+The Cyclus core team is excited to announce the latest stable version 
+after over a year of development!  This includes nearly 340 commits by 
+6 developers.  Major features include, 
+
+- Implementation of the Cyclus Enhancment Proposal (CEP) system.
+
+- Merged Cyclopts into cyclus, CEP2
+
+- Resource Tracking and Interfaces Re-Re-Redo, CEP17.
+
+- Google C++ Style Guide compliance.
+
+Changes from 0.2 to 0.3
+=======================
+
+New features
+------------
+
+- removed supply_demand and action_building namespace. closes #248.
+- record agent that creates each resource in output db
+- changed resource creation to take this ptr instead of context ptr. Removed context arg from Material::CreateUntracked. Made untracked resources have an id of zero instead of an id of garbage. fixed mat doc comments to use new res_buf method names.
+- cleaned up resource buf interface. Added some basic templating to eliminate need for separate mat_buff
+- added timestamp to resource table.
+- sorted lists of files/includes alphabetically
+- added header_impl file
+- fixed logger macro issue from namespace removal and added a test to catch it at compile time in the future
+- alphabetized cyclus.h
+- moved all symfunctionptr to symfunction::ptr
+- solverptr to solver::ptr
+- moved function type pointers to function::ptr
+- moved VariablePtr to Variable::Ptr
+- removed additional cyclus:: prepends from implementation files
+- removed extraneous cyclus namespace from fac_model impl
+- removed extraneous cyclus namespace from comp_math impl
+- removed extraneous cyclus namespace from hdf_back impl
+- moved solver interface impl under cyclus namespace
+- removed extraneous cyclus namespace from commodity_producer impl
+- put solver impl under cyclus namespace
+- put cbc solver impl in cyclus namespace
+- put variable implementation file in cyclus namespace
+- removed explicit namespace usage in implementation files for function and building manager
+- removed cyclus:: prefix from optim header files
+- removed cylus:: prefix from non-optim files
+- removed cyclus:: from building manager
+- Update copyright years in license
+- removed reference to include.h
+- move symbolic functions into a different class name
+- moved all files out of optim dirs into their respective top levels
+- renamed cyclopts to optim
+- change module install dir to not be split into separate fac, reg, inst subdirs. Still need to fix schema building and env class and dynamic_loading class correspondingly. made Env::ListModules more robust and include CYCLUS_MODULE_PATH env var dirs in search. Made BuildMasterSchema not care about model type namespacing subdirs.
+- fixed some gcsg issues and a typo
+- made timer init method not reset previous timer config (e.g. listeners) - this caused confusion and debugging for me in the past
+- made timer ticker registering more robust. Search env var dirs before install dirs for dyn modules. change default dyn module install dir to lib/cyclus instead of lib/Models
+- added hard coded version and more robust --tags flag to git describe for version.
+- this should make CI pass... not sure if its what we want, though.
+- updated install script with new structure
+- made model test files install to share dir, fixes #559
+- docs now in the top level directory, and a little clean up. fixes #602
+- docs currently build
+- removed cyclus namespace from stubs
+- moved stub directory to top level, made stubs a separate library, incorporated stub tests into cyclus unit tests
+- a little cleaning before stubbing
+- enabled testing in new build environment. simplified test module directory structure and building.
+- gtest library builds
+- added cli to at the top of the directory structure
+- actually adds top level cmake file..
+- currently builds cycluscore from top-level directory
+- encapsulated stubs namespace in cyclus namespace per gcsg
+- redisabled facility tests as that 's a larger issue than this PR
+- added include guards
+- added stub market
+- added stub inst and region. updated stub facility.
+- removed any stubs that aren't facs, regions, insts, or models
+- updated namespace name to reflect directory name
+- made mock fac/inst/region/market classes to be used with testing. added the stub facility in a new stub namespace and related tests.
+- added initial stub directory and adjusted cmake files to include their tests.
+- moved all dynamic loading into xml_file_loader. Added a method for listing installed/discoverable dynamic modules to env class. added rng schema methods to test models and removed rng files from them. removed rng installation from cmake module macro. added master and module schema dumping to cyclus binary. added schema model test (that schema parses). moved heavy stuff out of xml-file-loader constructor. renamed LoadAll to LoadSim.
+- i think moving loglevel and the macros into the same namespace encapsulation is more promising... still unable to confirm.
+- finishes remaining doxygen warnings
+- I believe that this will fix the warning stemming from logger.h, but I do not see the warning on my machine, so I can't be sure
+- fixed begincode error
+- removed verbose linking flag
+- fixes build error for macs, moves mac linker flag to top of cmake file to set the flag for all compiled libraries in the build
+- added cli flag for printing cyclus include dir
+- down-selected includes in cyclus.h.  Removed remaining vestiges of converter models
+- create cyclus.h. added missing header install
+- as @gonuke suggested, adding a preprocessor directive was the right way to go. tested with coin-2.3 on insam
+- removed coin include prefix which causes problems on utk's darwin system
+- removed unnecessary Config dir. Deleted duplicate (and outdated) LICENSE and README files.
+- moved Core source files into base src/ directory.
+- moved Testing dir to tests dir. Moved test modules into tests dir. Moved app.cc into new cli dir
+- removed disabled tests from being found by the find test script. closes #591.
+- removed pesky cout
+- removed extraneous string var
+- adjusted env var setting to append the current var if it was set
+- added robustness in the environmental tests by resetting the environment variable and the dynamic loading tests by making sure to delete and close opened library modules.
+- test driver now adds the build directory to the cyclus module path. fixes #592. note that this overwrites the global module variable only for the test driver's environment.
+- Remove indirect dependencies
+- main now returns 0
+- updated readline to use the decode method. the script is now python2/3 compliant. note that I tested with python3.3.
+- renamed id, parentid member vars and accessors
+- initfrom to CapCase
+- made clone methods CapCase
+- added from future import
+- made print function python3-compliant
+- fixed remaining coin and init issues
+- doc improvement
+- added python as a dependency
+- adds a script to generate test names and adjust build system to add those tests to the make test target appropriately. fixes #176.
+- improved clone and initfrom doc comments
+- fixed resource table name
+- have a working version of a ctest fix. need to clean it up and add python as a dependency before sending a PR
+- fixed inst model tests and fixed duplicate id bug in model class if implicit copy-constructor is used
+- constructor initializer list
+- removed cruft from model class. fixed to not record on undeployed decommission. improved var/accessor names
+- removed unnecessary externed Destruct funcs
+- fixed inst class tests
+- fixed dynamic loading tests - removed redundant test with env class tests. Simplified dynamicModule further. Trying to fix inst class tests - still broken.
+- updated test models.  2 tests still failing
+- updated tests to compile with new cloning and deploy semantics
+- move clone method into model class. Killed Clone[stuff] methods into single virtual clonefrom method. Change EnterSimulation[bla] methods into a single, virtual, Deploy method. Moved DynamicModule Init method into constructor. Removed redundant info from facility class (build date, etc.).
+- Combiined cyclopts dependency list into cyclus dependency list.
+- added file and cli flag for retrieving cyclus core and dependency versions. Fixes #578.
+- Simplifying names and correcting some rst grammar.
+- Add links to get sample input files. Updated dependency list.
+- Update README.rst with additional information about dependencies and correct call of installation.
+- removed singleton references in documentation
+- undisabled building manager bug
+- removed build dead code and mistakenly commited cyclus.rng file
+- fixed seg fault due to double delete in tear down
+- added tests for the optional query interface
+- added cyclus namespace qualifier to new function usage
+- moved the optional element query into its own nonmember, nonfriend templated function for easier, one-line usage.
+- added tests for null queries
+- removed try/catch blocks for fac model query engine usage
+- updated market model tests for context usage
+- added clarification to recipe add/get usage, closes #568
+- added clarification to recipe add/get usage
+- style guide names
+- style guide name changes.
+- renamed externed construct/destruct functions to be CapCase
+- updated facility tests to take the context constructor argument
+- made a separate test context for easier testing and updated appropriate model test files
+- updated facility model tests and fixed model tests
+- updated model tests
+- removed unncessary model registration from context - because markets will soon be superseded by CEP18 anyway.
+- updated prototype registration and model creation to use context. recipe library become so small I moved it into xml_file_loader. renamed xml_file_loader methods according to GCSG and added a LoadAll method.
+- moved control param xml parsing into xml_file_loader out of timer. Added timer init method to context.
+- removed EM macro and simplified recipe library and changed it to recipe namespace
+- fixed segfault issue. fiddled with includes and forward declarations
+- everything compiles, but tests segfault
+- more work converting core to use context - still doesn't compile
+- started outline for a simulation context
+- Moving include files to include/cyclus
+- changes for making debian packages
+- moved setup.py to install.py
+- fixed var name style
+- unadded redundant neg comp element check. Added test to check for exception throwing
+- added missing neg quantity check
+- adds comments about composition decay chaining. Remove leftover recipe_lib constructor from debugging
+- fixed gcsg names in decay_handler and renamed class to decayer. fixed filename comments in generic_resource and improved a couple of guards
+- fixes var names and comments to not refer/suggest anything 'vector' ish w.r.t. CompMap code. Change nextId to next_id
+- re-disabled test... need more time to investigate
+- added disabled building manager test
+- readded disabled tests, which now pass
+- removed variable bound introspection from the cbc solver. CI should build without issue now.
+- moved variable bound introspection based on a VariablePtr into non member non friend functions in variable.h/cc.
+- added some more simple tests for the cbc solver. two have been intentionally disabled because the maximization direction for the objective function does not appear to be working. I have double checked that the optimization direction for maximization is correct (it's 1.0) from the coin documentation. I'll investigate further.
+- removed bounded 2 variable test, starting simple with 1 variable
+- added a 1 variable test that should pass and a test that uses variable bounds. changed test names to better reflect the testing taxonomy
+- made implicit cast a static cast
+- changed Composition::Vect to CompMap
+- added mat_query tests and polished mat_query doc comments
+- made mat_query a proper implementation file. Removed contains for now and added almostEq to it.
+- polished doc comments for compmath namespace
+- fixed var name mistake in res_tracker
+- polished doc comments on generic_resource, material, res_tracker, and composition classes. Added more complete error check to GenericResource::Absorb
+- polished resource class doc comments
+- moved resource table all to res_tracker
+- finished converting compmath tests
+- doc fix
+- moves resource-specific param recording into resource class and resource implementations now only record their special state.
+- fixed comp_math add and sub funcs. material tests all pass
+- moved unique id and bumping implementation into resource class
+- fixed absorb and extract errors in material class
+- finished remaining compile errors - now to fixing failed tests
+- fixed material and matquery tests
+- added tests and tried to consolidate iso_vector, comp_map, and material test content into material, composition and comp_math tests.
+- everything compiles except tests
+- literal 0 -> 0.0 for fp compares
+- abs() -> fabs(), types they are a-changing.
+- fixes doc errors, should clear up @gonuke's cron job errors
+- fixes master schema building
+- updated test files so cycamore can build
+- ran all files in Core dir through astyle for style guide formatting
+- updated enrichment function names
+- fixed implementation issues
+- fixed all compile errors
+- fixed compile error and more sed replaces for typedef names
+- fixed many typedefs to be CapCase
+- updated macros to install in correct place
+- flattened all directories, removed extraneous file, renamed all files and updated files regarding name changes
+- renamed most funcs to CapCase
+- finished variable-related tests, updated related api, and updated documentation. this last commit closes all code-related issues in cyclus/cyclopts#37.
+- changed namespace names, closes #531
+- added tests for objective and constraint functions, updated documentation
+- made constraint iterator access const as it should have been
+- added tests for the function base class, updated documentation, and made slight API changes based on documentation
+- prepended cyclopts to test name for easy regexp selection
+- updated solver interface documentation
+- made addconstituent public, removing need for friend class
+- made variable tests less namespace verbose
+- renamed integration tests to properly reflect that they are in fact testing the cbc solver. updates cbc solver documentation.
+- added overarching but simple integration test for cyclopts
+- resolve rebase compile errors
+- renamed Error class files and formatted them according to style guide
+- removed exception silencing from sqliteback
+- fixed remaining build/run issues
+- eliminated super-specific crazy exceptions. Created a few basic exception types to be used throughout cyclus core. Shortened exception class names
+- added a test
+- hotfix. Anthony's namespace merging wiped out my schema building invocation in XMLLoader.
+- fixed header file guards in cyclopts
+- fixed line lengths in header files in cyclopts
+- fixed line lengths of cyclopts implementation files
+- removed using namespace std from cyclopts files
+- updated line lengths for header files in cyclopts
+- fixed line length for Utility files touched in this PR
+- added cyclus namespace on top of cyclopts namespace
+- fixes a few things anthony missed
+- test update. tag: move and squash
+- removed find cyclopts
+- updated findcyclopts
+- Fixed some merge conflict
+- cyclopts testing now exists is subdirectory of Testing
+- ns updates finished now to mereg
+- removed blas link, unnecessary.
+- cyclopts headers now install in cyclopts directory
+- added blas and lapack dependency for coin. tag: squash
+- removed cyclus_tools in favor of explicit includes of variable and function. made cyclopts_limits limits.
+- made cyclopts a subproject whose headers are now called by cyclopts/header.h
+- updated readme and setup script
+- cyclopts now builds as part of cyclus
+- moved cyclopts files into Core directory with history
+- Many testing fixes
+- reverted some documentation overwrites and added some compliance
+- make cyclus up to date with cyclopts google style compliance
+- made input file recorded after schema validation
+- added include guards as per style guide
+- fixes include order, switch indentation, and adds missing map includes to csvback
+- updated primary files used in this branch/PR to use google styleguide for indent/naming
+- More namespace updates
+- fixed Blob.hpp and other formatting. Added tests for each backend for the new blob type.
+- Added cyclus::Blob type as a supported backend type for all backends. Removed unnecessary streaming operators in any.hpp.
+- fixed query engine errors
+- updates cyclus core to reflect cyclopts/cyclopts#33
+- fixed more error, everything is broken
+- 'public, protected, private indent one space'
+- fixes indent errors in DynamicModule.h described in #530.
+- added ns to roesources.
+- first cyclus ns changes.
+- made buildSchema private. Used Model class module type list instead of custom one.
+- removed cyclus.rng.in generation - now done dynamically in cyclus core
+- modified XML loading to dynamically build the master schema by searching for installed modules
+- created csv backend.
+- fixed name erro
+- updated setup with localdir as default for some params
+- added uninstall target. closes #268.
+- made ~/.local the default install directory in the setup.py
+- Actually have them all and they all work.
+- I think that I got them all..
+- added hdf5 dep to readme instructions. fixes #520.
+- fixed enum element style
+- made eventmanager handle insertion of uuids into all events. backends now need to check for and handle boost::uuids::uuid value type
+- wrote custom pool allocator new and delete for Event class.  Created a producer/consumer type memory reuse vector in EventManager to prevent new/delete calls
+- changed c cast to static_cast
+- Added modified warning to any.hpp. added comment about event vals vector reserve
+- added shortcut to void* in any.hpp. Simplified hdf5 backend fillBuff
+- speed up event class by reserving capacity for event vals
+- switched event class to use a tweaked boost::spirit::hold_any allowing non-explicit construction instead of boost::any. 30% performance boost of total inpro_low runtime.
+- found out that boost has a installed called bjam. bjam has an option --layout which can take the form tagged. tagged adds -mt and -<version_number> to a library. if multithreading is on (which it is by default), it must find a library with the -mt tag. I was able to turn off multi threading for it to find the boost libraries installed in filespace/groups/cnerg/cyclus_dependencies. I'd like to leave the comment there for posterity. this set of commits closes #521.
+- added a message to determine which libraries were being used
+- updated readme's boost version
+- fixed null-padding on strings issue. changed set to group so Anthony is happy.
+- changed hdf5 ext to .h5. Hdf5Back constructor takes std::string
+- adds better doc comment to hdf5back class. Uncomments the db file deleting line.
+- added hdf5back test
+- added custom backend specification to App.cp via output file extension
+- rewrote hdf5 backend to use C API. Made Sqlite destructor virtual
+- refactored hdf5 back by splitting large code into smaller functions.
+- created hdf5 backend - seems to be working. Probably could use some performance tweaking.
+
+Deprecations
+------------
+N/A
+
+Known bugs
+----------
+N/A
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Royal Elmore
+* Matthew Gidden
+* Katy Huff
+* Olzhas Rakhimov*
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
+
