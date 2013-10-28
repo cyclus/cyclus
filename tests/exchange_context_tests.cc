@@ -132,7 +132,7 @@ TEST_F(ExchangeContextTests, AddRequest3) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddBid1) {
-  // bid response for a request
+  // bid bid for a request
   ExchangeContext<Resource> context;
   context.AddRequestPortfolio(rp1);
 
@@ -141,7 +141,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   Bid<Resource>::Ptr bid = Bid<Resource>::Ptr(new Bid<Resource>());
   bid->request = req1;
   BidPortfolio<Resource> bp1;
-  bp1.AddResponse(bid);
+  bp1.AddBid(bid);
 
   context.AddBidPortfolio(bp1);
 
@@ -171,22 +171,22 @@ TEST_F(ExchangeContextTests, AddBid2) {
   Bid<Resource>::Ptr bid1 = Bid<Resource>::Ptr(new Bid<Resource>());
   bid1->request = req1;
   bid1->bidder = fac1;
-  bp1.AddResponse(bid1);
+  bp1.AddBid(bid1);
   Bid<Resource>::Ptr bid2 = Bid<Resource>::Ptr(new Bid<Resource>());
   bid2->request = req2;
   bid2->bidder = fac1;
-  bp1.AddResponse(bid2);
+  bp1.AddBid(bid2);
   
   // bid3 and bid4 are from one bidder (fac2)
   BidPortfolio<Resource> bp2;
   Bid<Resource>::Ptr bid3 = Bid<Resource>::Ptr(new Bid<Resource>());
   bid3->request = req1;
   bid3->bidder = fac2;
-  bp2.AddResponse(bid3);
+  bp2.AddBid(bid3);
   Bid<Resource>::Ptr bid4 = Bid<Resource>::Ptr(new Bid<Resource>());
   bid4->request = req2;
   bid4->bidder = fac2;
-  bp2.AddResponse(bid4);
+  bp2.AddBid(bid4);
 
   std::vector<BidPortfolio<Resource> > vp;
   std::vector<Bid<Resource>::Ptr> vreq1;

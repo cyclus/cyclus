@@ -48,10 +48,10 @@ class BidPortfolio {
   /// @param r the bid to add
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
-  void AddResponse(const typename Bid<T>::Ptr r) {
-    VerifyResponder(r);
-    VerifyCommodity(r);
-    bids_.insert(r);
+  void AddBid(const typename Bid<T>::Ptr b) {
+    VerifyResponder(b);
+    VerifyCommodity(b);
+    bids_.insert(b);
   };
 
   /// @brief add a capacity constraint associated with the portfolio

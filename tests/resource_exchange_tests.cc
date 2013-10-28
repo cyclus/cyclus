@@ -10,6 +10,8 @@
 #include "test_context.h"
 #include "request.h"
 #include "request_portfolio.h"
+#include "bid.h"
+#include "bid_portfolio.h"
 #include "mock_facility.h"
 #include "material.h"
 #include "model.h"
@@ -27,6 +29,8 @@ using cyclus::Model;
 using cyclus::TestContext;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
+using cyclus::Bid;
+using cyclus::BidPortfolio;
 using cyclus::ResourceExchange;
 
 class Requester: public MockFacility {
@@ -60,6 +64,38 @@ class Requester: public MockFacility {
   int i_;
 };
 
+class Bidder: public MockFacility {
+ public:
+  Bidder(Context* ctx, std::vector<Bid<Material>::Ptr> bids, std::string commod)
+      : MockFacility(ctx),
+        Model(ctx),
+        bids_(bids),
+        commod_(commod)
+  { };
+
+  virtual cyclus::Model* Clone() {
+    Bidder* m = new Bidder(*this);
+    m->InitFrom(this);
+    m->bids_ = bids_;
+    m->commod_ = commod_;
+    return m;
+  };
+  
+  set< BidPortfolio<Material> > AddMatlBids(ExchangeContext<Material>* ec) {
+    set< BidPortfolio<Material> > bps;
+    BidPortfolio<Material> bp;
+    int sz = ec->RequestsForCommod(commod_).size();
+    for (int i = 0; i < sz; i++) {
+      bp.AddBid(bids_[i]);
+    }
+    bps.insert(bp);
+    return bps;
+  }
+
+  std::vector<Bid<Material>::Ptr> bids_;
+  std::string commod_;
+};
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ResourceExchangeTests: public ::testing::Test {
  protected:
@@ -70,6 +106,7 @@ class ResourceExchangeTests: public ::testing::Test {
   double pref;
   Material::Ptr mat;
   Request<Material>::Ptr req;
+  Bid<Material>::Ptr bid;
   
   virtual void SetUp() {
     commod = "name";
@@ -85,8 +122,11 @@ class ResourceExchangeTests: public ::testing::Test {
     req->preference = pref;
     req->target = mat;
     
-    exchng = new ResourceExchange<Material>(tc.get());
+    bid = Bid<Material>::Ptr(new Bid<Material>());
+    bid->request = req;
+    bid->offer = mat;
 
+    exchng = new ResourceExchange<Material>(tc.get());
   };
   
   virtual void TearDown() {
@@ -138,49 +178,58 @@ TEST_F(ResourceExchangeTests, requests) {
   delete fac;
 }
 
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ResourceExchangeTests, 1req) {
-//   fac = new Requester(tc.get(), req);
-//   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
-//   clone->Deploy(clone);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResourceExchangeTests, bids) {
+  ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
-//   EXPECT_TRUE(exchng->requests.empty());
-//   exchng->CollectRequests();
-//   EXPECT_EQ(1, exchng->requests.size());
-
-//   RequestPortfolio<Material>& rp =
-//       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-//   EXPECT_EQ(1, rp.requests().size());
-//   const Request<Material>::Ptr r = *rp.requests().begin();
-
-//   EXPECT_EQ(req, r);
-
-//   clone->Decommission();
-//   delete fac;
-// }
-
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ResourceExchangeTests, Nreq) {
-//   int nMats = 5;
-//   fac = new Requester(tc.get(), req, nMats);
-//   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
-//   clone->Deploy(clone);
+  RequestPortfolio<Material> rp;
+  Request<Material>::Ptr req1 = Request<Material>::Ptr(new Request<Material>);
+  req1->commodity = commod;
+  req1->preference = pref;
+  req1->target = mat;
   
-//   EXPECT_TRUE(exchng->requests.empty());
-//   exchng->CollectRequests();
-//   EXPECT_EQ(1, exchng->requests.size());
-
-//   RequestPortfolio<Material>& rp =
-//       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-//   EXPECT_EQ(nMats, rp.requests().size());
-
-//   std::vector<Request<Material>::Ptr>::const_iterator it;
-//   const std::vector<Request<Material>::Ptr>& vr = rp.requests();
-//   for (it = vr.begin(); it != vr.end(); ++it) {
-//     const Request<Material>::Ptr r = *it;  
-//     EXPECT_EQ(req, r);
-//   }
+  rp.AddRequest(req);
+  rp.AddRequest(req1);
+  ctx.AddRequestPortfolio(rp);
+  const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
+  EXPECT_EQ(2, reqs.size());
   
-//   clone->Decommission();
-//   delete fac;
-// }
+
+  Bid<Material>::Ptr bid1 = Bid<Material>::Ptr(new Bid<Material>());
+  bid1->request = req1;
+  bid->offer = mat;
+  
+  std::vector<Bid<Material>::Ptr> bids;
+  bids.push_back(bid);
+  bids.push_back(bid1);
+  
+  Bidder* bidr = new Bidder(tc.get(), bids, commod);
+
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
+  clone->Deploy(clone);
+
+  exchng->CollectBids();
+  
+  std::vector<BidPortfolio<Material> > vp;
+  BidPortfolio<Material> bp;
+  bp.AddBid(bid);
+  bp.AddBid(bid1);
+  vp.push_back(bp);
+  const std::vector< BidPortfolio<Material> >& obsvp = ctx.bids();
+  EXPECT_EQ(vp, obsvp);
+
+  const std::vector<Bid<Material>::Ptr>& obsvb = ctx.BidsForRequest(req);
+  EXPECT_EQ(1, obsvb.size());  
+  std::vector<Bid<Material>::Ptr> vb;
+  vb.push_back(bid);
+  EXPECT_EQ(vb, obsvb);
+
+  const std::vector<Bid<Material>::Ptr>& obsvb1 = ctx.BidsForRequest(req1);
+  EXPECT_EQ(1, obsvb1.size());  
+  vb.clear();
+  vb.push_back(bid1);
+  EXPECT_EQ(vb, obsvb1);
+  
+  clone->Decommission();
+  delete bidr;
+}

@@ -71,7 +71,7 @@ class ResourceExchange {
     ctx_ = ctx;    
   };
 
-  inline const ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
+  inline ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
   
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
@@ -85,7 +85,7 @@ class ResourceExchange {
   /// @brief queries a given facility model for 
   void AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
-    // // note sure why this doesn't work =(, borks because it can't overload operator()
+    // // not sure why this doesn't work =(, borks because it can't overload operator()
     // std::for_each(
     //     r.begin(),
     //     r.end(),
