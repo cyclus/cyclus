@@ -100,7 +100,8 @@ class Bidder: public MockFacility {
 class ResourceExchangeTests: public ::testing::Test {
  protected:
   TestContext tc;
-  Requester* fac;
+  Requester* reqr;
+  Bidder* bidr;
   ResourceExchange<Material>* exchng;
   string commod;
   double pref;
@@ -117,10 +118,13 @@ class ResourceExchangeTests: public ::testing::Test {
     double qty = 1.0;
     mat = Material::CreateUntracked(qty, comp);
 
+    
     req = Request<Material>::Ptr(new Request<Material>());
     req->commodity = commod;
     req->preference = pref;
     req->target = mat;
+    reqr = new Requester(tc.get(), req);
+    req->requester = reqr;
     
     bid = Bid<Material>::Ptr(new Bid<Material>());
     bid->request = req;
@@ -130,6 +134,7 @@ class ResourceExchangeTests: public ::testing::Test {
   };
   
   virtual void TearDown() {
+    delete reqr;
     delete exchng;
   };
   
@@ -137,24 +142,20 @@ class ResourceExchangeTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, cloning) {
-  fac = new Requester(tc.get(), req);
-  EXPECT_EQ(req, fac->r_);  
+  EXPECT_EQ(req, reqr->r_);  
 
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
   clone->Deploy(clone);
 
   Requester* cast = dynamic_cast<Requester*>(clone);
   EXPECT_EQ(req, cast->r_);
   
   clone->Decommission();
-  delete fac;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, requests) {
-  fac = new Requester(tc.get(), req);
-
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
   clone->Deploy(clone);
 
   exchng->CollectRequests();
@@ -175,7 +176,6 @@ TEST_F(ResourceExchangeTests, requests) {
   EXPECT_EQ(vr, obsvr);
   
   clone->Decommission();
-  delete fac;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -187,6 +187,7 @@ TEST_F(ResourceExchangeTests, bids) {
   req1->commodity = commod;
   req1->preference = pref;
   req1->target = mat;
+  req1->requester = reqr;
   
   rp.AddRequest(req);
   rp.AddRequest(req1);
@@ -205,6 +206,9 @@ TEST_F(ResourceExchangeTests, bids) {
   
   Bidder* bidr = new Bidder(tc.get(), bids, commod);
 
+  bid->bidder = bidr;
+  bid1->bidder = bidr;
+  
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
   clone->Deploy(clone);
 

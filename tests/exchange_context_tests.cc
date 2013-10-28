@@ -11,6 +11,7 @@
 #include "bid_portfolio.h"
 #include "resource.h"
 #include "test_context.h"
+#include "trader.h"
 
 #include "exchange_context.h"
 
@@ -25,6 +26,7 @@ using cyclus::Bid;
 using cyclus::BidPortfolio;
 using cyclus::Resource;
 using cyclus::TestContext;
+using cyclus::Trader;
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ExchangeContextTests: public ::testing::Test {
@@ -84,6 +86,11 @@ TEST_F(ExchangeContextTests, AddRequest1) {
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
   EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+
+  EXPECT_EQ(1, context.requesters().size());  
+  std::set<const Trader*> requesters;
+  requesters.insert(fac1);
+  EXPECT_EQ(requesters, context.requesters());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -140,6 +147,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   
   Bid<Resource>::Ptr bid = Bid<Resource>::Ptr(new Bid<Resource>());
   bid->request = req1;
+  bid->bidder = fac1;
   BidPortfolio<Resource> bp1;
   bp1.AddBid(bid);
 
@@ -154,6 +162,11 @@ TEST_F(ExchangeContextTests, AddBid1) {
   std::vector<Bid<Resource>::Ptr> vr;
   vr.push_back(bid);
   EXPECT_EQ(vr, context.BidsForRequest(req1));
+
+  EXPECT_EQ(1, context.bidders().size());  
+  std::set<const Trader*> bidders;
+  bidders.insert(fac1);
+  EXPECT_EQ(bidders, context.bidders());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -217,4 +230,10 @@ TEST_F(ExchangeContextTests, AddBid2) {
   EXPECT_EQ(2, context.BidsForRequest(req2).size());
   EXPECT_EQ(vreq1, context.BidsForRequest(req1));
   EXPECT_EQ(vreq2, context.BidsForRequest(req2));
+
+  EXPECT_EQ(2, context.bidders().size());  
+  std::set<const Trader*> bidders;
+  bidders.insert(fac1);
+  bidders.insert(fac2);
+  EXPECT_EQ(bidders, context.bidders());
 }

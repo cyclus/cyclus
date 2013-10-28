@@ -1,6 +1,7 @@
 #ifndef CYCLUS_EXCHANGE_CONTEXT_H_
 #define CYCLUS_EXCHANGE_CONTEXT_H_
 
+#include <assert.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -28,10 +29,16 @@ template <class T>
 class ExchangeContext {
  public:  
   /// @brief adds a request to the context
-  void AddRequestPortfolio(const RequestPortfolio<T>& r) {
-    requests_.push_back(r);
-    const std::vector<typename Request<T>::Ptr>& vr = r.requests();
+  void AddRequestPortfolio(const RequestPortfolio<T>& port) {
+    requests_.push_back(port);
+    const std::vector<typename Request<T>::Ptr>& vr = port.requests();
     typename std::vector<typename Request<T>::Ptr>::const_iterator it;
+
+    if (!vr.empty()) {
+      assert(port.requester() != NULL);
+      requesters_.insert(port.requester());
+    }
+    
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Request<T>::Ptr pr = *it;
       if (requests_by_commod_.count(pr->commodity) == 0) {
@@ -46,6 +53,12 @@ class ExchangeContext {
     bids_.push_back(port);
     const std::set<typename Bid<T>::Ptr>& vr = port.bids();
     typename std::set<typename Bid<T>::Ptr>::const_iterator it;
+    
+    if (!vr.empty()) {
+      assert(port.bidder() != NULL);
+      bidders_.insert(port.bidder());
+    }
+
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Bid<T>::Ptr pb = *it;
       if (bids_by_request_.count(pb->request) == 0) {
@@ -59,7 +72,13 @@ class ExchangeContext {
   inline const std::vector< RequestPortfolio<T> >& requests() const {return requests_;}
   
   /// @brief 
+  inline const std::set<const Trader*>& requesters() const {return requesters_;}
+
+  /// @brief 
   inline const std::vector< BidPortfolio<T> >& bids() const {return bids_;}
+
+  /// @brief 
+  inline const std::set<const Trader*>& bidders() const {return bidders_;}
   
   /// @brief 
   inline const std::vector< typename Request<T>::Ptr >&
@@ -92,6 +111,12 @@ class ExchangeContext {
   /// a reference to an exchange's set of bids
   std::vector< BidPortfolio<T> > bids_;
 
+  /// known requesters
+  std::set<const Trader*> requesters_;
+  
+  /// known bidders
+  std::set<const Trader*> bidders_;
+  
   /// maps commodity name to requests for that commodity
   std::map< std::string, std::vector<typename Request<T>::Ptr> > requests_by_commod_;
 
