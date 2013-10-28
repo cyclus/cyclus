@@ -29,22 +29,18 @@ using cyclus::ResourceExchange;
 
 class Requester: public MockFacility {
  public:
-  Requester(Context* ctx, string commod, double pref, Material::Ptr mat, int i = 1)
+  Requester(Context* ctx, Request<Material>::Ptr r, int i = 1)
       : MockFacility(ctx),
         Model(ctx),
-        commod_(commod),
-        pref_(pref),
-        mat_(mat),
+        r_(r),
         i_(i)
   { };
 
   virtual cyclus::Model* Clone() {
     Requester* m = new Requester(*this);
     m->InitFrom(this);
-    m->mat_ = mat_;
+    m->r_ = r_;
     m->i_ = i_;
-    m->pref_ = pref_;
-    m->commod_ = commod_;
     return m;
   };
   
@@ -52,21 +48,14 @@ class Requester: public MockFacility {
     set< RequestPortfolio<Material> > rps;
     RequestPortfolio<Material> rp;
     for (int i = 0; i < i_; i++) {
-      Request<Material> r;
-      r.target = mat_;
-      r.commodity = commod_;
-      r.preference = pref_;
-      r.requester = this;
-      rp.AddRequest(r);
+      rp.AddRequest(r_);
     }
     rps.insert(rp);
     return rps;
   }
 
-  Material::Ptr mat_;
+  Request<Material>::Ptr r_;
   int i_;
-  string commod_;
-  double pref_;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,6 +67,7 @@ class ResourceExchangeTests: public ::testing::Test {
   string commod;
   double pref;
   Material::Ptr mat;
+  Request<Material>::Ptr req;
   
   virtual void SetUp() {
     commod = "name";
@@ -87,7 +77,14 @@ class ResourceExchangeTests: public ::testing::Test {
     Composition::Ptr comp = Composition::CreateFromMass(cm);
     double qty = 1.0;
     mat = Material::CreateUntracked(qty, comp);
+
+    req = Request<Material>::Ptr(new Request<Material>());
+    req->commodity = commod;
+    req->preference = pref;
+    req->target = mat;
+    
     exchng = new ResourceExchange<Material>(tc.get());
+
   };
   
   virtual void TearDown() {
@@ -106,30 +103,35 @@ TEST_F(ResourceExchangeTests, empty) {
 }  
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, 1req) {
-  int nMats = 1;
-  fac = new Requester(tc.get(), commod, pref, mat, nMats);
-  Requester* clone = dynamic_cast<Requester*>(fac->Clone());
+TEST_F(ResourceExchangeTests, cloning) {
+  fac = new Requester(tc.get(), req);
+  EXPECT_EQ(req, fac->r_);
+
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
   clone->Deploy(clone);
 
-  Request<Material> req;
-  req.commodity = commod;
-  req.target = mat;
-  req.preference = pref;
-  req.requester = clone;
+  Requester* cast = dynamic_cast<Requester*>(clone);
+  EXPECT_EQ(req, cast->r_);
+  
+  clone->Decommission();
+  delete fac;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResourceExchangeTests, 1req) {
+  fac = new Requester(tc.get(), req);
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
+  clone->Deploy(clone);
   
   EXPECT_TRUE(exchng->requests.empty());
   exchng->CollectRequests();
-  EXPECT_EQ(exchng->requests.size(), 1);
+  EXPECT_EQ(1, exchng->requests.size());
 
   RequestPortfolio<Material>& rp =
       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-  const Request<Material>& r = *rp.requests().begin();
+  EXPECT_EQ(1, rp.requests().size());
+  const Request<Material>::Ptr r = *rp.requests().begin();
 
-  EXPECT_EQ(req.commodity, r.commodity);
-  EXPECT_EQ(req.target, r.target);
-  EXPECT_EQ(req.preference, r.preference);
-  EXPECT_EQ(req.requester, r.requester);
   EXPECT_EQ(req, r);
 
   clone->Decommission();
@@ -139,32 +141,22 @@ TEST_F(ResourceExchangeTests, 1req) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Nreq) {
   int nMats = 5;
-  fac = new Requester(tc.get(), commod, pref, mat, nMats);
-  Requester* clone = dynamic_cast<Requester*>(fac->Clone());
+  fac = new Requester(tc.get(), req, nMats);
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
   clone->Deploy(clone);
-
-  Request<Material> req;
-  req.commodity = commod;
-  req.target = mat;
-  req.preference = pref;
-  req.requester = clone;
   
   EXPECT_TRUE(exchng->requests.empty());
   exchng->CollectRequests();
-  EXPECT_EQ(exchng->requests.size(), 1);
+  EXPECT_EQ(1, exchng->requests.size());
 
   RequestPortfolio<Material>& rp =
       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-  EXPECT_EQ(rp.requests().size(), nMats);
-  
-  std::vector< Request<Material> >::const_iterator it;
-  const std::vector< Request<Material> >& vr = rp.requests();
+  EXPECT_EQ(nMats, rp.requests().size());
+
+  std::vector<Request<Material>::Ptr>::const_iterator it;
+  const std::vector<Request<Material>::Ptr>& vr = rp.requests();
   for (it = vr.begin(); it != vr.end(); ++it) {
-    const Request<Material>& r = *it;  
-    EXPECT_EQ(req.commodity, r.commodity);
-    EXPECT_EQ(req.target, r.target);
-    EXPECT_EQ(req.preference, r.preference);
-    EXPECT_EQ(req.requester, r.requester);
+    const Request<Material>::Ptr r = *it;  
     EXPECT_EQ(req, r);
   }
   

@@ -46,11 +46,11 @@ class RequestPortfolioTests: public ::testing::Test {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(RequestPortfolioTests, ReqAdd) {
-  Request<Resource> r1;
-  r1.requester = fac1;
-  Request<Resource> r2;
-  r2.requester = fac2;
+TEST_F(RequestPortfolioTests, ReqAdd){ 
+  Request<Resource>::Ptr r1 = Request<Resource>::Ptr(new Request<Resource>());
+  r1->requester = fac1;
+  Request<Resource>::Ptr r2 = Request<Resource>::Ptr(new Request<Resource>());
+  r2->requester = fac2;
   
   RequestPortfolio<Resource> rp;
   ASSERT_EQ(rp.requests().size(), 0);
@@ -79,17 +79,18 @@ TEST_F(RequestPortfolioTests, CapAdd) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, Sets) {
-  Request<Resource> req1, req2;
+  Request<Resource>::Ptr req1 = Request<Resource>::Ptr(new Request<Resource>());
+  Request<Resource>::Ptr req2 = Request<Resource>::Ptr(new Request<Resource>());
   RequestPortfolio<Resource> rp1, rp2, rp3;
   string commod1, commod2;
   
   commod1 = "1";
-  req1.commodity = commod1;
-  req1.requester = fac1;
+  req1->commodity = commod1;
+  req1->requester = fac1;
     
   commod2 = "2";
-  req2.commodity = commod2;
-  req2.requester = fac1;
+  req2->commodity = commod2;
+  req2->requester = fac1;
 
   rp1.AddRequest(req1);
     

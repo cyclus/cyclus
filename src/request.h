@@ -17,6 +17,8 @@ class Trader;
 /// A Request is templated its resource.
 template <class T>
 struct Request {
+  typedef boost::shared_ptr< Request<T> > Ptr;
+  
   /// @return the commodity associated with this request
   std::string commodity;
 

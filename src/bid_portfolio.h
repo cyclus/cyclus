@@ -48,7 +48,7 @@ class BidPortfolio {
   /// @param r the bid to add
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
-  void AddResponse(const Bid<T>& r) {
+  void AddResponse(const typename Bid<T>::Ptr r) {
     VerifyResponder(r);
     VerifyCommodity(r);
     bids_.insert(r);
@@ -61,7 +61,7 @@ class BidPortfolio {
   };
 
   /// @return const access to the bids
-  const std::set< Bid<T> >& bids() const {
+  const std::set<typename Bid<T>::Ptr>& bids() const {
     return bids_;
   };
   
@@ -84,10 +84,10 @@ class BidPortfolio {
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
   /// @throws if a bid is added from a different bidder than the original
-  void VerifyResponder(const Bid<T> r) {
+  void VerifyResponder(const typename Bid<T>::Ptr r) {
     if (bidder_ == NULL) {
-      bidder_ = r.bidder;
-    } else if (bidder_ != r.bidder) {
+      bidder_ = r->bidder;
+    } else if (bidder_ != r->bidder) {
       std::string msg = "Insertion error: bidders do not match.";
       throw KeyError(msg);
     }
@@ -98,8 +98,8 @@ class BidPortfolio {
   /// portfolio's commodity
   /// @throws if a commodity is added that is a different commodity from the
   /// original
-  void VerifyCommodity(const Bid<T> r) {
-    std::string other = r.request->commodity;
+  void VerifyCommodity(const typename Bid<T>::Ptr r) {
+    std::string other = r->request->commodity;
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
     } else if (commodity_ != other) {
@@ -110,7 +110,7 @@ class BidPortfolio {
   
   /// bid_ is a set because there is a one-to-one correspondance between a
   /// bid and a request, i.e., bids are unique
-  std::set< Bid<T> > bids_;
+  std::set< typename Bid<T>::Ptr > bids_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
