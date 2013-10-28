@@ -159,7 +159,7 @@ TEST_F(ResourceExchangeTests, requests) {
 
   exchng->CollectRequests();
 
-  const ExchangeContext<Material>& ctx = exchng->ex_ctx();
+  const ExchangeContext<Material>& ctx = exchng->const_ex_ctx();
   
   std::vector<RequestPortfolio<Material> > vp;
   RequestPortfolio<Material> rp;

@@ -72,6 +72,8 @@ class ResourceExchange {
   };
 
   inline ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
+
+  inline const ExchangeContext<T>& const_ex_ctx() {return ex_ctx_;} 
   
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
