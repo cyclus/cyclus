@@ -30,21 +30,21 @@ template<> std::set< RequestPortfolio<GenericResource> >
   return e->AddGenRsrcRequests();
 }
 
-template<class T> class ResourceExchange;
+template<class T> class ExchangeContext;
   
 template<class T> std::set< BidPortfolio<T> >
-    QueryBids(Trader* e, ResourceExchange<T>* re) {
+    QueryBids(Trader* e, ExchangeContext<T>* ec) {
   return std::set< BidPortfolio<T> >();
 }
   
 template<> std::set< BidPortfolio<Material> >
-    QueryBids<Material>(Trader* e, ResourceExchange<Material>* re) {
-  return e->AddMatlBids(re);
+    QueryBids<Material>(Trader* e, ExchangeContext<Material>* ec) {
+  return e->AddMatlBids(ec);
 }
 
 template<> std::set< BidPortfolio<GenericResource> >
-    QueryBids<GenericResource>(Trader* e, ResourceExchange<GenericResource>* re) {
-  return e->AddGenRsrcBids(re);
+    QueryBids<GenericResource>(Trader* e, ExchangeContext<GenericResource>* ec) {
+  return e->AddGenRsrcBids(ec);
 }
 
 /// @class ResourceExchange
@@ -85,11 +85,14 @@ class ResourceExchange {
   /// @brief queries a given facility model for 
   void AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
-    /// std::for_each(
-    ///     r.begin(),
-    ///     r.end(), 
-    ///     std::bind1st(std::mem_fun(&cyclus::ExchangeContext<T>::AddRequestPortfolio),
-    ///                  &ex_ctx_));
+    // // note sure why this doesn't work =(, borks because it can't overload operator()
+    // std::for_each(
+    //     r.begin(),
+    //     r.end(),
+    //     std::bind1st(
+    //         std::mem_fun(&cyclus::ExchangeContext<T>::AddRequestPortfolio), &ex_ctx_
+    //                  )
+    //               );
     typename std::set< RequestPortfolio<T> >::iterator it;
     for (it = r.begin(); it != r.end(); ++it) {
       ex_ctx_.AddRequestPortfolio(*it);
@@ -107,8 +110,11 @@ class ResourceExchange {
 
   /// @brief queries a given facility model for 
   void AddBids(Trader* f) {
-    std::set< BidPortfolio<T> > r = QueryBids<T>(f, this);
-    /// bids.insert(r.begin(), r.end());
+    std::set< BidPortfolio<T> > r = QueryBids<T>(f, &ex_ctx_);
+    typename std::set< BidPortfolio<T> >::iterator it;
+    for (it = r.begin(); it != r.end(); ++it) {
+      ex_ctx_.AddBidPortfolio(*it);
+    }
   };
 
   /// /// @brief adjust preferences for requests given bid responses

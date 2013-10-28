@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-template <class T> class ResourceExchange;
+template <class T> class ExchangeContext;
   
 /// @class Trader
 ///
@@ -34,13 +34,13 @@ class Trader {
 
   /// @brief default implementation for material requests
   virtual std::set< BidPortfolio<Material> >
-      AddMatlBids(ResourceExchange<Material>* re) {
+      AddMatlBids(ExchangeContext<Material>* ec) {
     return std::set< BidPortfolio<Material> >();
   }
   
   /// @brief default implementation for generic resource requests
   virtual std::set< BidPortfolio<GenericResource> >
-      AddGenRsrcBids(ResourceExchange<GenericResource>* re) {
+      AddGenRsrcBids(ExchangeContext<GenericResource>* ec) {
     return std::set< BidPortfolio<GenericResource> >();
   }
 };

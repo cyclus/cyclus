@@ -1,9 +1,7 @@
 #ifndef CYCLUS_EXCHANGE_CONTEXT_H_
 #define CYCLUS_EXCHANGE_CONTEXT_H_
 
-#include <assert.h>
 #include <string>
-#include <set>
 #include <map>
 #include <vector>
 
@@ -13,11 +11,6 @@
 #include "request_portfolio.h"
 
 namespace cyclus {
-
-using std::set;
-using std::string;
-using std::map;
-using std::vector;
 
 /// @class ExchangeContext
 ///
@@ -36,7 +29,6 @@ class ExchangeContext {
  public:  
   /// @brief adds a request to the context
   void AddRequestPortfolio(const RequestPortfolio<T>& r) {
-    int index = requests_.size();
     requests_.push_back(r);
     const std::vector<typename Request<T>::Ptr>& vr = r.requests();
     typename std::vector<typename Request<T>::Ptr>::const_iterator it;
@@ -49,8 +41,25 @@ class ExchangeContext {
     }
   }
 
+  /// @brief adds a bid to the context
+  void AddBidPortfolio(const BidPortfolio<T>& port) {
+    bids_.push_back(port);
+    const std::set<typename Bid<T>::Ptr>& vr = port.bids();
+    typename std::set<typename Bid<T>::Ptr>::const_iterator it;
+    for (it = vr.begin(); it != vr.end(); ++it) {
+      typename Bid<T>::Ptr pb = *it;
+      if (bids_by_request_.count(pb->request) == 0) {
+        bids_by_request_[pb->request] = std::vector<typename Bid<T>::Ptr>();
+      }
+      bids_by_request_[pb->request].push_back(pb);
+    }
+  }
+
   /// @brief 
   inline const std::vector< RequestPortfolio<T> >& requests() const {return requests_;}
+  
+  /// @brief 
+  inline const std::vector< BidPortfolio<T> >& bids() const {return bids_;}
   
   /// @brief 
   inline const std::vector< typename Request<T>::Ptr >&
@@ -64,12 +73,31 @@ class ExchangeContext {
     return requests_by_commod_[commod];
   }
   
+  /// @brief 
+  inline const std::vector< typename Bid<T>::Ptr >&
+      BidsForRequest(typename Request<T>::Ptr request) const {
+    return bids_by_request_.at(request);
+  }
+  
+  /// @brief 
+  inline const std::vector< typename Bid<T>::Ptr >&
+      BidsForRequest(typename Request<T>::Ptr request) {
+    return bids_by_request_[request];
+  }
+  
  private:
   /// a reference to an exchange's set of requests
   std::vector< RequestPortfolio<T> > requests_;
 
+  /// a reference to an exchange's set of bids
+  std::vector< BidPortfolio<T> > bids_;
+
   /// maps commodity name to requests for that commodity
-  map< std::string, std::vector< typename Request<T>::Ptr > > requests_by_commod_;
+  std::map< std::string, std::vector<typename Request<T>::Ptr> > requests_by_commod_;
+
+  /// maps request to all bids for request
+  std::map< typename Request<T>::Ptr, std::vector<typename Bid<T>::Ptr> >
+      bids_by_request_;
 };
 
 } // namespace cyclus
