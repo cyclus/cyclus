@@ -33,43 +33,28 @@ using std::vector;
 /// is assisted by grouping bids by the requester being responded to.
 template <class T>
 class ExchangeContext {
- public:
-
-  ExchangeContext() {
-    requests_.reserve(10);
-  }
-  
-  ~ExchangeContext() {
-    requests_.clear();
-    typename map< std::string, std::vector< const Request<T>* > >::iterator it;
-    for (it = requests_by_commod_.begin(); it != requests_by_commod_.end(); ++it) {
-      it->second.clear();
-    }
-    requests_by_commod_.clear();
-  }
-  
+ public:  
   /// @brief adds a request to the context
   void AddRequestPortfolio(const RequestPortfolio<T>& r) {
     int index = requests_.size();
-    requests_.push_back(r); // copy portfolio for future references
-    //const RequestPortfolio<T>& ours = requests_.back();
-    const RequestPortfolio<T>& ours = requests_.at(index);
-    const std::vector< Request<T> >& vr = ours.requests();
-    typename std::vector< Request<T> >::const_iterator it;
+    requests_.push_back(r);
+    const std::vector<typename Request<T>::Ptr>& vr = r.requests();
+    typename std::vector<typename Request<T>::Ptr>::const_iterator it;
     for (it = vr.begin(); it != vr.end(); ++it) {
-      if (requests_by_commod_.count(it->commodity) == 0) {
-        requests_by_commod_[it->commodity] = std::vector< const Request<T>* >();
+      typename Request<T>::Ptr pr = *it;
+      if (requests_by_commod_.count(pr->commodity) == 0) {
+        requests_by_commod_[pr->commodity] = std::vector<typename Request<T>::Ptr>();
       }
-      const Request<T>* pr = &(*it);
-      requests_by_commod_[it->commodity].push_back(pr);
+      requests_by_commod_[pr->commodity].push_back(pr);
     }
   }
 
   /// @brief 
-  inline const vector< RequestPortfolio<T> >& requests() {return requests_;}
+  inline const std::vector< RequestPortfolio<T> >& requests() {return requests_;}
   
   /// @brief 
-  inline const vector< const Request<T>* >& RequestsForCommod(std::string commod) {
+  inline const std::vector< typename Request<T>::Ptr >&
+      RequestsForCommod(std::string commod) {
     return requests_by_commod_[commod];
   }
   
@@ -78,7 +63,7 @@ class ExchangeContext {
   std::vector< RequestPortfolio<T> > requests_;
 
   /// maps commodity name to requests for that commodity
-  map< std::string, std::vector< const Request<T>* > > requests_by_commod_;
+  map< std::string, std::vector< typename Request<T>::Ptr > > requests_by_commod_;
 };
 
 } // namespace cyclus
