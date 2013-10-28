@@ -12,6 +12,7 @@
 #include "material.h"
 #include "request_portfolio.h"
 #include "bid_portfolio.h"
+#include "exchange_context.h"
 
 namespace cyclus {
 
@@ -67,9 +68,11 @@ class ResourceExchange {
   ///
   /// @param ctx the simulation context
   ResourceExchange(Context* ctx) {
-    ctx_ = ctx;
+    ctx_ = ctx;    
   };
 
+  inline const ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
+  
   /// @brief queries facilities and collects all requests for bids
   void CollectRequests() {
     std::set<Trader*> traders = ctx_->traders();
@@ -82,7 +85,15 @@ class ResourceExchange {
   /// @brief queries a given facility model for 
   void AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
-    requests.insert(r.begin(), r.end());
+    /// std::for_each(
+    ///     r.begin(),
+    ///     r.end(), 
+    ///     std::bind1st(std::mem_fun(&cyclus::ExchangeContext<T>::AddRequestPortfolio),
+    ///                  &ex_ctx_));
+    typename std::set< RequestPortfolio<T> >::iterator it;
+    for (it = r.begin(); it != r.end(); ++it) {
+      ex_ctx_.AddRequestPortfolio(*it);
+    }
   };
   
   /// @brief queries facilities and collects all requests for bids
@@ -97,7 +108,7 @@ class ResourceExchange {
   /// @brief queries a given facility model for 
   void AddBids(Trader* f) {
     std::set< BidPortfolio<T> > r = QueryBids<T>(f, this);
-    bids.insert(r.begin(), r.end());
+    /// bids.insert(r.begin(), r.end());
   };
 
   /// /// @brief adjust preferences for requests given bid responses
@@ -115,14 +126,9 @@ class ResourceExchange {
   ///   /// bids.insert(r.begin(), r.end());
   /// };
   
-  /// @brief the set of request porfolios
-  std::set< RequestPortfolio<T> > requests;
-  
-  /// @brief the set of request porfolios
-  std::set< BidPortfolio<T> > bids;
-  
  private:
   Context* ctx_;
+  ExchangeContext<T> ex_ctx_;
 };
 
 } // namespace cyclus

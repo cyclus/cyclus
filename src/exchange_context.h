@@ -50,7 +50,13 @@ class ExchangeContext {
   }
 
   /// @brief 
-  inline const std::vector< RequestPortfolio<T> >& requests() {return requests_;}
+  inline const std::vector< RequestPortfolio<T> >& requests() const {return requests_;}
+  
+  /// @brief 
+  inline const std::vector< typename Request<T>::Ptr >&
+      RequestsForCommod(std::string commod) const {
+    return requests_by_commod_.at(commod);
+  }
   
   /// @brief 
   inline const std::vector< typename Request<T>::Ptr >&

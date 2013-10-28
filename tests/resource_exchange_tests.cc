@@ -14,11 +14,13 @@
 #include "material.h"
 #include "model.h"
 #include "facility_model.h"
+#include "exchange_context.h"
 
 using std::set;
 using std::string;
 using cyclus::Composition;
 using cyclus::Context;
+using cyclus::ExchangeContext;
 using cyclus::FacilityModel;
 using cyclus::Material;
 using cyclus::Model;
@@ -94,18 +96,9 @@ class ResourceExchangeTests: public ::testing::Test {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, empty) {
-  EXPECT_TRUE(exchng->requests.empty());
-  exchng->CollectRequests();
-  EXPECT_TRUE(exchng->requests.empty());
-  exchng->CollectBids();
-  EXPECT_TRUE(exchng->bids.empty());
-}  
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, cloning) {
   fac = new Requester(tc.get(), req);
-  EXPECT_EQ(req, fac->r_);
+  EXPECT_EQ(req, fac->r_);  
 
   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
   clone->Deploy(clone);
@@ -118,48 +111,76 @@ TEST_F(ResourceExchangeTests, cloning) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, 1req) {
+TEST_F(ResourceExchangeTests, requests) {
   fac = new Requester(tc.get(), req);
+
   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
   clone->Deploy(clone);
-  
-  EXPECT_TRUE(exchng->requests.empty());
+
   exchng->CollectRequests();
-  EXPECT_EQ(1, exchng->requests.size());
 
-  RequestPortfolio<Material>& rp =
-      const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-  EXPECT_EQ(1, rp.requests().size());
-  const Request<Material>::Ptr r = *rp.requests().begin();
+  const ExchangeContext<Material>& ctx = exchng->ex_ctx();
+  
+  std::vector<RequestPortfolio<Material> > vp;
+  RequestPortfolio<Material> rp;
+  rp.AddRequest(req);
+  vp.push_back(rp);
+  const std::vector< RequestPortfolio<Material> >& obsvp = ctx.requests();
+  EXPECT_EQ(vp, obsvp);
 
-  EXPECT_EQ(req, r);
-
+  const std::vector<Request<Material>::Ptr>& obsvr = ctx.RequestsForCommod(commod);
+  EXPECT_EQ(1, obsvr.size());  
+  std::vector<Request<Material>::Ptr> vr;
+  vr.push_back(req);
+  EXPECT_EQ(vr, obsvr);
+  
   clone->Decommission();
   delete fac;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, Nreq) {
-  int nMats = 5;
-  fac = new Requester(tc.get(), req, nMats);
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
-  clone->Deploy(clone);
+// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TEST_F(ResourceExchangeTests, 1req) {
+//   fac = new Requester(tc.get(), req);
+//   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
+//   clone->Deploy(clone);
   
-  EXPECT_TRUE(exchng->requests.empty());
-  exchng->CollectRequests();
-  EXPECT_EQ(1, exchng->requests.size());
+//   EXPECT_TRUE(exchng->requests.empty());
+//   exchng->CollectRequests();
+//   EXPECT_EQ(1, exchng->requests.size());
 
-  RequestPortfolio<Material>& rp =
-      const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
-  EXPECT_EQ(nMats, rp.requests().size());
+//   RequestPortfolio<Material>& rp =
+//       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
+//   EXPECT_EQ(1, rp.requests().size());
+//   const Request<Material>::Ptr r = *rp.requests().begin();
 
-  std::vector<Request<Material>::Ptr>::const_iterator it;
-  const std::vector<Request<Material>::Ptr>& vr = rp.requests();
-  for (it = vr.begin(); it != vr.end(); ++it) {
-    const Request<Material>::Ptr r = *it;  
-    EXPECT_EQ(req, r);
-  }
+//   EXPECT_EQ(req, r);
+
+//   clone->Decommission();
+//   delete fac;
+// }
+
+// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TEST_F(ResourceExchangeTests, Nreq) {
+//   int nMats = 5;
+//   fac = new Requester(tc.get(), req, nMats);
+//   FacilityModel* clone = dynamic_cast<FacilityModel*>(fac->Clone());
+//   clone->Deploy(clone);
   
-  clone->Decommission();
-  delete fac;
-}
+//   EXPECT_TRUE(exchng->requests.empty());
+//   exchng->CollectRequests();
+//   EXPECT_EQ(1, exchng->requests.size());
+
+//   RequestPortfolio<Material>& rp =
+//       const_cast<RequestPortfolio<Material>&>(*exchng->requests.begin());
+//   EXPECT_EQ(nMats, rp.requests().size());
+
+//   std::vector<Request<Material>::Ptr>::const_iterator it;
+//   const std::vector<Request<Material>::Ptr>& vr = rp.requests();
+//   for (it = vr.begin(); it != vr.end(); ++it) {
+//     const Request<Material>::Ptr r = *it;  
+//     EXPECT_EQ(req, r);
+//   }
+  
+//   clone->Decommission();
+//   delete fac;
+// }

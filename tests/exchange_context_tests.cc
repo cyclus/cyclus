@@ -61,7 +61,7 @@ class ExchangeContextTests: public ::testing::Test {
 TEST_F(ExchangeContextTests, Empty) {
   ExchangeContext<Resource> context;
   EXPECT_TRUE(context.requests().empty());
-  EXPECT_TRUE(context.RequestsForCommod(commod1).empty());
+  EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
   EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
 }
 
