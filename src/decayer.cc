@@ -114,6 +114,18 @@ void Decayer::LoadDecayInfo() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Decayer::DecayConstant(int iso) {
+  if (!decay_info_loaded_) {
+    Decayer::LoadDecayInfo();
+    decay_info_loaded_ = true;
+  }
+  if (parent_.count(iso) > 0) {
+    return parent_[iso].second;
+  }
+  return 0;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::AddIsoToList(int iso) {
   bool exists = (find(isotopes_tracked_.begin(), isotopes_tracked_.end(),
                       iso) != isotopes_tracked_.end());

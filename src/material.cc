@@ -1,8 +1,10 @@
 
 #include "material.h"
 
+#include <math.h>
 #include "comp_math.h"
 #include "context.h"
+#include "decayer.h"
 #include "error.h"
 #include "logger.h"
 
@@ -110,9 +112,30 @@ void Material::Transmute(Composition::Ptr c) {
 
 void Material::Decay(int curr_time) {
   int dt = curr_time - prev_decay_time_;
-  prev_decay_time_ = curr_time;
-  if (dt > 0) {
-    Transmute(comp_->Decay(dt));
+  double eps = 1e-3;
+  bool decay = false;
+
+  const CompMap c = comp_->atom();
+  if (c.size() > 100) {
+    decay = true;
+  } else {
+    CompMap::const_iterator it;
+    for (it = c.end(); it != c.begin(); --it) {
+      int iso = it->first;
+      double lambda_months = Decayer::DecayConstant(iso) / 12;
+
+      if (eps <= 1 - std::exp(-lambda_months * dt)) {
+        decay = true;
+        break;
+      }
+    }
+  }
+
+  if (decay) {
+    prev_decay_time_ = curr_time;
+    if (dt > 0) {
+      Transmute(comp_->Decay(dt));
+    }
   }
 }
 

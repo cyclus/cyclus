@@ -80,6 +80,9 @@ class Decayer {
   static void AddIsoToList(int iso);
 
  public:
+  /// Returns the decay constant for specified isotope in inverse years.
+  static double DecayConstant(int iso);
+
   /**
      default constructor
    */
