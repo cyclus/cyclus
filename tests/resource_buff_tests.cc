@@ -112,77 +112,44 @@ TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, RemoveQty_NoSplitExactFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_SingleNoSplit) {
   using cyclus::Manifest;
   // pop one no splitting leaving one mat in the store
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, RemoveQty_NoSplitOverFilled) {
+TEST_F(ResourceBuffTest, RemoveQty_SingleWithSplit) {
   // pop one no splitting leaving one mat in the store
   using cyclus::Manifest;
   Manifest manifest;
 
-  ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty_over));
-  ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_EQ(manifest.at(0), mat1_);
-  EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, RemoveQty_NoSplitUnderFilled) {
-  // pop one no splitting leaving one mat in the store
-  using cyclus::Manifest;
-  Manifest manifest;
-
+  double orig_qty = filled_store_.quantity();
   ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty_under));
   ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_EQ(manifest.at(0), mat1_);
-  EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, RemoveQty_SplitOverFilled) {
-  // pop two with splitting leaving one mat in the store
-  using cyclus::Manifest;
-  Manifest manifest;
-  double store_final = mat1_->quantity() + mat2_->quantity() - over_qty;
-
-  ASSERT_NO_THROW(manifest = filled_store_.PopQty(over_qty));
-  ASSERT_EQ(manifest.size(), 2);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
-  EXPECT_NEAR(manifest.at(1)->quantity(), overeps, cyclus::eps_rsrc()); // not sure why DOUBLE_EQ doesn't work
-  EXPECT_EQ(manifest.at(0), mat1_);
-  EXPECT_EQ(manifest.at(1), mat2_);
-  EXPECT_EQ(filled_store_.count(), 1);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-TEST_F(ResourceBuffTest, RemoveQty_SplitUnderFilled) {
-  // pop one with splitting leaving two mats in the store
-  using cyclus::Manifest;
-  Manifest manifest;
-  double store_final = mat1_->quantity() + mat2_->quantity() - under_qty;
-
-  ASSERT_NO_THROW(manifest = filled_store_.PopQty(under_qty));
-  ASSERT_EQ(manifest.size(), 1);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), under_qty);
-  EXPECT_EQ(manifest.at(0), mat1_);
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), exact_qty_under);
   EXPECT_EQ(filled_store_.count(), 2);
-  EXPECT_DOUBLE_EQ(filled_store_.quantity(), store_final);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), orig_qty - exact_qty_under);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(ResourceBuffTest, RemoveQty_DoubleWithSplit) {
+  // pop one no splitting leaving one mat in the store
+  using cyclus::Manifest;
+  Manifest manifest;
+
+  double orig_qty = filled_store_.quantity();
+  ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty_over));
+  ASSERT_EQ(manifest.size(), 2);
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity() + manifest.at(1)->quantity(), exact_qty_over);
+  EXPECT_TRUE(filled_store_.count() == 1);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), orig_qty - exact_qty_over);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

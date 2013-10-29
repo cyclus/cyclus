@@ -13,24 +13,23 @@ void ResourceBuff::set_capacity(double cap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::PopQty(double qty) {
-  if (qty - quantity() > eps_rsrc()) {
+  if (qty > quantity()) {
     throw ValueError("Removal quantity larger than store tot quantity.");
-  } else if (qty < eps_rsrc()) {
-    throw ValueError("Removal quantity cannot be negative.");
   }
 
   Manifest manifest;
-  Resource::Ptr r, leftover;
+  Resource::Ptr r, tmp;
   double left = qty;
   double quan;
-  while (left > eps_rsrc()) {
+  while (left > 0 && count() > 0) {
     r = mats_.front();
     mats_.pop_front();
     quan = r->quantity();
-    if ((quan - left) > eps_rsrc()) {
-      // too big - split the res before pushing
-      leftover = r->ExtractRes(quan - left);
-      mats_.push_front(leftover);
+    if (quan > left) {
+      // too big - split the res before popping
+      tmp = r->ExtractRes(left);
+      mats_.push_front(r);
+      r = tmp;
       qty_ -= left;
     } else {
       mats_present_.erase(r);
