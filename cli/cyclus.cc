@@ -182,12 +182,12 @@ int main(int argc, char* argv[]) {
   Model::PrintModelList();
 
   // Run the simulation 
-  //try {
+  try {
     ti.RunSim();
-  //} catch (Error err) {
-  //  success = false;
-  //  CLOG(LEV_ERROR) << err.what();
-  //}
+  } catch (Error err) {
+    success = false;
+    CLOG(LEV_ERROR) << err.what();
+  }
 
   em.close();
   delete back;
