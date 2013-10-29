@@ -250,3 +250,18 @@ TEST_F(MaterialTest, ExtractInGrams) {
   EXPECT_DOUBLE_EQ(test_size_ - kg_to_rem, default_mat_->quantity());
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MaterialTest, DecayShortcut) {
+  using cyclus::Composition;
+  cyclus::CompMap mp;
+  mp[92235] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(mp);
+  cyclus::Material::Ptr m = Material::CreateUntracked(1.0, c);
+
+  double u235_decay_const = 8.087e-11; // per month
+  double eps = 1e-3;
+  double threshold = -1 * std::log(1-eps) / u235_decay_const;
+  m->Decay(threshold * 0.9);
+  EXPECT_EQ(c, m->comp());
+}
+
