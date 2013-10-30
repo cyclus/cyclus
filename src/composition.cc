@@ -77,6 +77,8 @@ Composition::Ptr Composition::Decay(int delta) {
 void Composition::Record(Context* ctx) {
   if (!recorded_) {
     CompMap::const_iterator it;
+    mass(); // force lazy evaluation now
+    compmath::Normalize(&mass_, 1);
     for (it = mass().begin(); it != mass().end(); ++it) {
       ctx->NewEvent("Compositions")
          ->AddVal("ID", id())
