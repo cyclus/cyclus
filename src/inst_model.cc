@@ -88,9 +88,9 @@ void InstModel::ThrowErrorIfPrototypeIsntAvailable(std::string p) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InstModel::str() {
-  try {
+  if (parent() != NULL) {
     return Model::str() + " in region" + parent()->name();
-  } catch (ValueError err) {
+  } else {
     return Model::str() + " with no region.";
   }
 }

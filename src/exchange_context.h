@@ -113,7 +113,7 @@ class ExchangeContext {
   }
 
   /// @brief 
-  inline const typename PrefMap<T>::type& Prefs(Trader* requester) {
+  inline typename PrefMap<T>::type& Prefs(Trader* requester) {
     return trader_prefs_[requester];
   }
 

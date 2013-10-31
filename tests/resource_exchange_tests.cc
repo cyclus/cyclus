@@ -237,3 +237,11 @@ TEST_F(ResourceExchangeTests, bids) {
   clone->Decommission();
   delete bidr;
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResourceExchangeTests, NullAdjust) {
+  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
+  clone->Deploy(clone);
+  EXPECT_NO_THROW(exchng->PrefAdjustment());
+  clone->Decommission();
+}

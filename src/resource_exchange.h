@@ -47,6 +47,8 @@ template<> std::set< BidPortfolio<GenericResource> >
   return e->AddGenRsrcBids(ec);
 }
 
+template<class T> void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) {}
+
 /// @class ResourceExchange
 ///
 /// The ResourceExchange class manages the communication for the supply and
@@ -81,20 +83,13 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests), this));
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests),
+                     this));
   }
 
   /// @brief queries a given facility model for 
   void AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
-    // // not sure why this doesn't work =(, borks because it can't overload operator()
-    // std::for_each(
-    //     r.begin(),
-    //     r.end(),
-    //     std::bind1st(
-    //         std::mem_fun(&cyclus::ExchangeContext<T>::AddRequestPortfolio), &ex_ctx_
-    //                  )
-    //               );
     typename std::set< RequestPortfolio<T> >::iterator it;
     for (it = r.begin(); it != r.end(); ++it) {
       ex_ctx_.AddRequestPortfolio(*it);
@@ -119,20 +114,26 @@ class ResourceExchange {
     }
   };
 
-  /// /// @brief adjust preferences for requests given bid responses
-  /// void PrefAdjustment() {
-  ///   std::set<Trader*> traders = ctx_->traders();
-  ///   std::for_each(
-  ///       traders.begin(),
-  ///       traders.end(),
-  ///       std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs), this));
-  /// }
+  /// @brief adjust preferences for requests given bid responses
+  void PrefAdjustment() {
+    std::set<Trader*> traders = ctx_->traders();
+    std::for_each(
+        traders.begin(),
+        traders.end(),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs),
+                     this));
+  }
 
-  /// /// @brief
-  /// void AdjustPrefs(Trader* f) {
-  ///   std::set< BidPortfolio<T> > r = QueryPrefs<T>(f, this);
-  ///   /// bids.insert(r.begin(), r.end());
-  /// };
+  /// @brief allows a trader and its parents to adjust any preferences in the
+  /// system
+  void AdjustPrefs(Trader* f) {
+    typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(f);
+    Model* m = dynamic_cast<Model*>(f);
+    while (m != NULL) {
+      cyclus::AdjustPrefs<T>(m, prefs);
+      m = m->parent();
+    }
+  };
   
  private:
   Context* ctx_;
