@@ -128,13 +128,13 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment),
                      this));
   }
 
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void AdjustPrefs(const Trader* f) {
+  void DoAdjustment(const Trader* f) {
     Trader* t = const_cast<Trader*>(f);
     typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
     Model* m = dynamic_cast<Model*>(t);
