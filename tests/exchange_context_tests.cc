@@ -24,6 +24,7 @@ using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::Bid;
 using cyclus::BidPortfolio;
+using cyclus::PrefMap;
 using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trader;
@@ -167,6 +168,10 @@ TEST_F(ExchangeContextTests, AddBid1) {
   std::set<const Trader*> bidders;
   bidders.insert(fac1);
   EXPECT_EQ(bidders, context.bidders());
+
+  PrefMap<Resource>::type obs;
+  obs[req1].push_back(std::make_pair(bid, req1->preference));
+  EXPECT_EQ(context.Prefs(req1->requester), obs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

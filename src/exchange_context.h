@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <utility>
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -12,6 +13,13 @@
 #include "request_portfolio.h"
 
 namespace cyclus {
+
+// work around for template typedefs
+template <class T>
+struct PrefMap {
+  typedef std::map< typename Request<T>::Ptr,
+    std::vector< std::pair< typename Bid<T>::Ptr, double > > > type;
+};
 
 /// @class ExchangeContext
 ///
@@ -42,7 +50,8 @@ class ExchangeContext {
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Request<T>::Ptr pr = *it;
       if (requests_by_commod_.count(pr->commodity) == 0) {
-        requests_by_commod_[pr->commodity] = std::vector<typename Request<T>::Ptr>();
+        requests_by_commod_[pr->commodity] =
+            std::vector<typename Request<T>::Ptr>();
       }
       requests_by_commod_[pr->commodity].push_back(pr);
     }
@@ -61,15 +70,14 @@ class ExchangeContext {
 
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Bid<T>::Ptr pb = *it;
-      if (bids_by_request_.count(pb->request) == 0) {
-        bids_by_request_[pb->request] = std::vector<typename Bid<T>::Ptr>();
-      }
-      bids_by_request_[pb->request].push_back(pb);
+      AddBid(pb);
     }
   }
 
   /// @brief 
-  inline const std::vector< RequestPortfolio<T> >& requests() const {return requests_;}
+  inline const std::vector< RequestPortfolio<T> >& requests() const {
+    return requests_;
+  }
   
   /// @brief 
   inline const std::set<const Trader*>& requesters() const {return requesters_;}
@@ -103,7 +111,12 @@ class ExchangeContext {
       BidsForRequest(typename Request<T>::Ptr request) {
     return bids_by_request_[request];
   }
-  
+
+  /// @brief 
+  inline const typename PrefMap<T>::type& Prefs(Trader* requester) {
+    return trader_prefs_[requester];
+  }
+
  private:
   /// a reference to an exchange's set of requests
   std::vector< RequestPortfolio<T> > requests_;
@@ -118,11 +131,28 @@ class ExchangeContext {
   std::set<const Trader*> bidders_;
   
   /// maps commodity name to requests for that commodity
-  std::map< std::string, std::vector<typename Request<T>::Ptr> > requests_by_commod_;
+  std::map< std::string, std::vector<typename Request<T>::Ptr> >
+      requests_by_commod_;
 
   /// maps request to all bids for request
   std::map< typename Request<T>::Ptr, std::vector<typename Bid<T>::Ptr> >
       bids_by_request_;
+
+  /// maps commodity name to requests for that commodity
+  std::map< const Trader* , typename PrefMap<T>::type > trader_prefs_;
+
+  void AddBid(typename Bid<T>::Ptr pb) {
+    /* if (bids_by_request_.count(pb->request) == 0) { */
+    /*   bids_by_request_[pb->request] = std::vector<typename Bid<T>::Ptr>(); */
+    /* } */
+    bids_by_request_[pb->request].push_back(pb);
+
+  /*   if (trader_prefs_.count(pb->request->requester) == 0) { */
+  /*     trader_prefs_[pb->request->requester] = PrefMap<T>::type(); */
+  /*   } */
+    trader_prefs_[pb->request->requester][pb->request].push_back(
+        std::make_pair(pb, pb->request->preference));
+  } 
 };
 
 } // namespace cyclus
