@@ -42,14 +42,15 @@ class RequestPortfolio {
   };
   
   /// @return const access to the unconstrained requests
-  const std::vector< Request<T> >& requests() const {
+  //const std::vector<boost::shared_ptr< Request<T> > >& requests() const {
+  const std::vector<typename Request<T>::Ptr>& requests() const {
     return requests_;
   };
   
   /// @brief add a request to the portfolio
   /// @param r the request to add
   /// @throws if a request is added from a different requester than the original
-  void AddRequest(const Request<T>& r) {
+  void AddRequest(const typename Request<T>::Ptr r) {
     VerifyRequester(r);
     requests_.push_back(r);
   };
@@ -80,10 +81,10 @@ class RequestPortfolio {
   /// VerifyRequester() verifies the the request is associated with the portfolio's
   /// requester
   /// @throws if a request is added from a different requester than the original
-  void VerifyRequester(const Request<T> r) {
+  void VerifyRequester(const typename Request<T>::Ptr r) {
     if (requester_ == NULL) {
-      requester_ = r.requester;
-    } else if (requester_ != r.requester) {
+      requester_ = r->requester;
+    } else if (requester_ != r->requester) {
       std::string msg = "Insertion error: requesters do not match.";
       throw KeyError(msg);
     }
@@ -91,7 +92,7 @@ class RequestPortfolio {
 
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
-  std::vector< Request<T> > requests_;
+  std::vector<typename Request<T>::Ptr> requests_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;

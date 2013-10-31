@@ -14,17 +14,19 @@ class Trader;
 /// resource bid and the bidder.
 template <class T>
 struct Bid {
+  typedef boost::shared_ptr< Bid<T> > Ptr;
+  
   /// constructor
   Bid() : id_(next_id_++) { };
   
   /// @return the request being responded to
-  cyclus::Request<T>* request;
+  typename Request<T>::Ptr request;
 
   /// @return the bid object for the request
   boost::shared_ptr<T> offer;
 
   /// @return the model responding the request
-  cyclus::Trader* bidder;
+  Trader* bidder;
   
   /// @return a unique id for the bid
   const int id() const {return id_;};

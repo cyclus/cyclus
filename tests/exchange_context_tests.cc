@@ -7,8 +7,11 @@
 #include "mock_facility.h"
 #include "request.h"
 #include "request_portfolio.h"
+#include "bid.h"
+#include "bid_portfolio.h"
 #include "resource.h"
 #include "test_context.h"
+#include "trader.h"
 
 #include "exchange_context.h"
 
@@ -19,8 +22,11 @@ using std::vector;
 using cyclus::ExchangeContext;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
+using cyclus::Bid;
+using cyclus::BidPortfolio;
 using cyclus::Resource;
 using cyclus::TestContext;
+using cyclus::Trader;
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ExchangeContextTests: public ::testing::Test {
@@ -28,21 +34,22 @@ class ExchangeContextTests: public ::testing::Test {
   TestContext tc;
   MockFacility* fac1;
   MockFacility* fac2;
-  Request<Resource> req1, req2;
+  Request<Resource>::Ptr req1, req2;
   RequestPortfolio<Resource> rp1, rp2;
   string commod1, commod2;
   
   virtual void SetUp() {
     fac1 = new MockFacility(tc.get());
     fac2 = new MockFacility(tc.get());
-    
+
     commod1 = "commod1";
-    req1.commodity = commod1;
-    req1.requester = fac1;
+    req1 = Request<Resource>::Ptr(new Request<Resource>());
+    req1->commodity = commod1;
+    req1->requester = fac1;
     
-    commod2 = "commod2";
-    req2.commodity = commod2;
-    req2.requester = fac2;
+    req2 = Request<Resource>::Ptr(new Request<Resource>());
+    req2->commodity = commod1;
+    req2->requester = fac2;
 
     rp1.AddRequest(req1);    
     rp2.AddRequest(req2);
@@ -56,166 +63,177 @@ class ExchangeContextTests: public ::testing::Test {
   };
 };
 
-void test_request_ptrs(const Request<Resource>* p1, const Request<Resource>* p2) {
-  EXPECT_EQ(p1->commodity, p2->commodity);
-  EXPECT_EQ(p1->target, p2->target);
-  EXPECT_EQ(p1->requester, p2->requester);
-  EXPECT_TRUE(cyclus::DoubleEq(p1->preference, p2->preference));
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ExchangeContextTests, Empty) {
+  ExchangeContext<Resource> context;
+  EXPECT_TRUE(context.requests().empty());
+  EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
+  EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ExchangeContextTests, AddRequest) {
+TEST_F(ExchangeContextTests, AddRequest1) {
+  // 1 request for 1 commod
   ExchangeContext<Resource> context;
-
+    
   context.AddRequestPortfolio(rp1);
-  
-  vector< RequestPortfolio<Resource> > rpv;
-  rpv.push_back(rp1);
-  EXPECT_EQ(context.requests(), rpv);
 
-  const vector< const Request<Resource>* >& rv =
-      context.RequestsForCommod(commod1);
-  EXPECT_EQ(rv.size(), 1);
-  test_request_ptrs(rv[0], &req1);
-  EXPECT_EQ(*rv[0], req1);
+  std::vector<RequestPortfolio<Resource> > vp;
+  vp.push_back(rp1);
+  EXPECT_EQ(vp, context.requests());
+  
+  EXPECT_EQ(1, context.RequestsForCommod(commod1).size());  
+  std::vector<Request<Resource>::Ptr> vr;
+  vr.push_back(req1);
+  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+
+  EXPECT_EQ(1, context.requesters().size());  
+  std::set<const Trader*> requesters;
+  requesters.insert(fac1);
+  EXPECT_EQ(requesters, context.requesters());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddRequest2) {
+  // 2 requests for 1 commod
   ExchangeContext<Resource> context;
-
-  Request<Resource> req;
-  RequestPortfolio<Resource> rp;
-  req.commodity = commod1;
-  req.requester = fac2;
-  req.preference = 5.0;
-  rp.AddRequest(req);
     
   context.AddRequestPortfolio(rp1);
-  context.AddRequestPortfolio(rp);
+  context.AddRequestPortfolio(rp2);
 
-  const vector< const Request<Resource>* >& rv =
-      context.RequestsForCommod(commod1);
-  EXPECT_EQ(rv.size(), 2);
-  test_request_ptrs(rv[0], &req1);
-  test_request_ptrs(rv[1], &req);
-  // std::cout << "test preference: " << rv[0]->preference << std::endl;
-  // std::cout << "test preference: " << rv[1]->preference << std::endl;
-  // std::cout << "test preference: " << (*rv[1]).preference << std::endl;
-  // std::cout << "test preference: " << (*rv[0]).preference << std::endl;
-  // std::cout << "test commodity: " << *rv[0] << std::endl;
-  // std::cout << "test commodity: " << rv[1]->commodity << std::endl;
-  // std::cout << "test commodity: " << (*rv[1]).commodity << std::endl;
-  // std::cout << "test commodity: " << (*rv[0]).commodity << std::endl;
-  // EXPECT_EQ((*rv[0]), req1);
-  // EXPECT_EQ((*rv[1]), req);
-  //  test_request_ptrs(rv.at(0), &req1);
+  std::vector<RequestPortfolio<Resource> > vp;
+  vp.push_back(rp1);
+  vp.push_back(rp2);
+  EXPECT_EQ(vp, context.requests());
+  
+  EXPECT_EQ(2, context.RequestsForCommod(commod1).size());  
+  std::vector<Request<Resource>::Ptr> vr;
+  vr.push_back(req1);
+  vr.push_back(req2);
+  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
 }
-//   vector< RequestPortfolio<Resource> > rpv;
-//   rpv.push_back(rp1);
-//   rpv.push_back(rp);
-//   EXPECT_EQ(context.requests(), rpv);
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ExchangeContextTests, AddRequest3) {
+  // 2 requests for 2 commod
+  Request<Resource>::Ptr req = Request<Resource>::Ptr(new Request<Resource>());
+  req->commodity = commod2;
+  req->requester = fac1;
+  rp1.AddRequest(req);
   
-//   //  EXPECT_EQ(*rv[0], req);//, req1);
-//   //  EXPECT_EQ(*rv[1], req);
-//   //  EXPECT_EQ(*rv[0], req1);
-//   // EXPECT_EQ(*rv2[1], req1);
-// }
-
-
-
-
-
-
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ExchangeContextTests, 1Commod) {
-//   ExchangeContext<Resource> agg;
-//   EXPECT_TRUE(agg.RequestsByCommod().empty());
+  ExchangeContext<Resource> context;
+    
+  context.AddRequestPortfolio(rp1);
   
-//   set< RequestPortfolio<Resource> > requests;
-//   requests.insert(rp1);
+  EXPECT_EQ(1, context.RequestsForCommod(commod1).size());
+  EXPECT_EQ(1, context.RequestsForCommod(commod2).size());
   
-//   EXPECT_EQ(requests.size(), 1);
-//   EXPECT_NO_THROW(agg.set_requests(&requests));
-//   EXPECT_EQ(agg.requests().size(), 1);
-//   EXPECT_EQ(agg.RequestsByCommod().size(), 1);
+  std::vector<Request<Resource>::Ptr> vr;
+  vr.push_back(req1);
+  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+
+  vr.clear();
+  vr.push_back(req);
+  EXPECT_EQ(vr, context.RequestsForCommod(commod2));  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ExchangeContextTests, AddBid1) {
+  // bid bid for a request
+  ExchangeContext<Resource> context;
+  context.AddRequestPortfolio(rp1);
+
+  EXPECT_TRUE(context.BidsForRequest(req1).empty());
   
-//   EXPECT_EQ(agg.RequestsForCommod(commod1).size(), 1);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(0), req1);
-// }
+  Bid<Resource>::Ptr bid = Bid<Resource>::Ptr(new Bid<Resource>());
+  bid->request = req1;
+  bid->bidder = fac1;
+  BidPortfolio<Resource> bp1;
+  bp1.AddBid(bid);
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ExchangeContextTests, 2Commod) {
-//   ExchangeContext<Resource> agg;
-//   EXPECT_TRUE(agg.RequestsByCommod().empty());
+  context.AddBidPortfolio(bp1);
 
-//   set< RequestPortfolio<Resource> > requests;
-//   requests.insert(rp1);
-//   EXPECT_EQ(requests.count(rp2), 0);
-//   requests.insert(rp2);
-//   EXPECT_EQ(requests.count(rp2), 1);
+  std::vector<BidPortfolio<Resource> > vp;
+  vp.push_back(bp1);
+  EXPECT_EQ(vp, context.bids());
+
+  EXPECT_EQ(1, context.BidsForRequest(req1).size());
   
-//   EXPECT_EQ(requests.size(), 2);
-//   EXPECT_NO_THROW(agg.set_requests(&requests));
-//   EXPECT_EQ(agg.requests().size(), 2);
-//   EXPECT_EQ(agg.RequestsByCommod().size(), 2);
+  std::vector<Bid<Resource>::Ptr> vr;
+  vr.push_back(bid);
+  EXPECT_EQ(vr, context.BidsForRequest(req1));
+
+  EXPECT_EQ(1, context.bidders().size());  
+  std::set<const Trader*> bidders;
+  bidders.insert(fac1);
+  EXPECT_EQ(bidders, context.bidders());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ExchangeContextTests, AddBid2) {
+  // multiple bids for multiple requests
+  ExchangeContext<Resource> context;
+  context.AddRequestPortfolio(rp1);
+  context.AddRequestPortfolio(rp2);
+
+  EXPECT_TRUE(context.BidsForRequest(req1).empty());
+  EXPECT_TRUE(context.BidsForRequest(req2).empty());
+
+  // bid1 and bid2 are from one bidder (fac1)
+  BidPortfolio<Resource> bp1;
+  Bid<Resource>::Ptr bid1 = Bid<Resource>::Ptr(new Bid<Resource>());
+  bid1->request = req1;
+  bid1->bidder = fac1;
+  bp1.AddBid(bid1);
+  Bid<Resource>::Ptr bid2 = Bid<Resource>::Ptr(new Bid<Resource>());
+  bid2->request = req2;
+  bid2->bidder = fac1;
+  bp1.AddBid(bid2);
   
-//   EXPECT_EQ(agg.RequestsForCommod(commod1).size(), 1);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(0), req1);
+  // bid3 and bid4 are from one bidder (fac2)
+  BidPortfolio<Resource> bp2;
+  Bid<Resource>::Ptr bid3 = Bid<Resource>::Ptr(new Bid<Resource>());
+  bid3->request = req1;
+  bid3->bidder = fac2;
+  bp2.AddBid(bid3);
+  Bid<Resource>::Ptr bid4 = Bid<Resource>::Ptr(new Bid<Resource>());
+  bid4->request = req2;
+  bid4->bidder = fac2;
+  bp2.AddBid(bid4);
 
-//   EXPECT_EQ(agg.RequestsForCommod(commod2).size(), 1);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod2).at(0), req2);
-// }
+  std::vector<BidPortfolio<Resource> > vp;
+  std::vector<Bid<Resource>::Ptr> vreq1;
+  std::vector<Bid<Resource>::Ptr> vreq2;
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ExchangeContextTests, NCommod) {
-//   ExchangeContext<Resource> agg;
-//   EXPECT_TRUE(agg.RequestsByCommod().empty());
+  // add bids from first bidder
+  context.AddBidPortfolio(bp1);
 
-//   set< RequestPortfolio<Resource> > requests;
-//   requests.insert(rp1);
-//   requests.insert(rp2);
-//   requests.insert(rp3);
+  vp.push_back(bp1);
+  EXPECT_EQ(vp, context.bids());
   
-//   EXPECT_EQ(requests.size(), 3);
-//   EXPECT_NO_THROW(agg.set_requests(&requests));
-//   EXPECT_EQ(agg.requests().size(), requests.size());
-//   EXPECT_EQ(agg.RequestsByCommod().size(), 2);
+  vreq1.push_back(bid1);
+  vreq2.push_back(bid2);
+  EXPECT_EQ(1, context.BidsForRequest(req1).size());
+  EXPECT_EQ(1, context.BidsForRequest(req2).size());
+  EXPECT_EQ(vreq1, context.BidsForRequest(req1));
+  EXPECT_EQ(vreq2, context.BidsForRequest(req2));
   
-//   EXPECT_EQ(agg.RequestsForCommod(commod1).size(), 2);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(0), req1);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(1), req1);
+  // add bids from second bidder
+  context.AddBidPortfolio(bp2);
 
-//   EXPECT_EQ(agg.RequestsForCommod(commod2).size(), 2);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod2).at(0), req2);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod2).at(1), req2);
-// }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(ExchangeContextTests, 2Fac) {
-//   MockFacility* fac2 = new MockFacility(tc.get());
-
-//   Request<Resource> req;
-//   req.commodity = commod1;
-//   req.requester = fac2;
+  vp.push_back(bp2);
+  EXPECT_EQ(vp, context.bids());
   
-//   RequestPortfolio<Resource> rp;
-//   rp.AddRequest(req);
+  vreq1.push_back(bid3);
+  vreq2.push_back(bid4);
+  EXPECT_EQ(2, context.BidsForRequest(req1).size());
+  EXPECT_EQ(2, context.BidsForRequest(req2).size());
+  EXPECT_EQ(vreq1, context.BidsForRequest(req1));
+  EXPECT_EQ(vreq2, context.BidsForRequest(req2));
 
-//   set< RequestPortfolio<Resource> > requests;
-//   requests.insert(rp1);
-//   requests.insert(rp);  
-//   EXPECT_EQ(requests.size(), 2);
-
-//   ExchangeContext<Resource> agg;
-//   EXPECT_NO_THROW(agg.set_requests(&requests));
-//   EXPECT_EQ(agg.requests().size(), requests.size());
-//   EXPECT_EQ(agg.RequestsByCommod().size(), 1);
-  
-//   EXPECT_EQ(agg.RequestsForCommod(commod1).size(), 2);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(0), req1);
-//   EXPECT_EQ(*agg.RequestsForCommod(commod1).at(1), req);
-
-//   delete fac2;
-// }
+  EXPECT_EQ(2, context.bidders().size());  
+  std::set<const Trader*> bidders;
+  bidders.insert(fac1);
+  bidders.insert(fac2);
+  EXPECT_EQ(bidders, context.bidders());
+}
