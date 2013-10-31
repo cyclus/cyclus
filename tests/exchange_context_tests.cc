@@ -38,19 +38,23 @@ class ExchangeContextTests: public ::testing::Test {
   Request<Resource>::Ptr req1, req2;
   RequestPortfolio<Resource> rp1, rp2;
   string commod1, commod2;
+  double pref;
   
   virtual void SetUp() {
     fac1 = new MockFacility(tc.get());
     fac2 = new MockFacility(tc.get());
 
+    pref = 0.5;
     commod1 = "commod1";
     req1 = Request<Resource>::Ptr(new Request<Resource>());
     req1->commodity = commod1;
     req1->requester = fac1;
+    req1->preference = pref;
     
     req2 = Request<Resource>::Ptr(new Request<Resource>());
     req2->commodity = commod1;
     req2->requester = fac2;
+    req2->preference = pref;
 
     rp1.AddRequest(req1);    
     rp2.AddRequest(req2);
@@ -172,6 +176,9 @@ TEST_F(ExchangeContextTests, AddBid1) {
   PrefMap<Resource>::type obs;
   obs[req1].push_back(std::make_pair(bid, req1->preference));
   EXPECT_EQ(context.Prefs(req1->requester), obs);
+  obs.clear();
+  obs[req1].push_back(std::make_pair(bid, req1->preference * 0.1));
+  EXPECT_NE(context.Prefs(req1->requester), obs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
