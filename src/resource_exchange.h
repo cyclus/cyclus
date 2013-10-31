@@ -16,6 +16,7 @@
 
 namespace cyclus {
 
+// template specializations to support inheritance and virtual functions
 template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* e) {
   return std::set< RequestPortfolio<T> >();
 }
@@ -86,7 +87,7 @@ class ResourceExchange {
   inline const ExchangeContext<T>& const_ex_ctx() {return ex_ctx_;} 
   
   /// @brief queries facilities and collects all requests for bids
-  void CollectRequests() {
+  void AddAllRequests() {
     std::set<Trader*> traders = ctx_->traders();
     std::for_each(
         traders.begin(),
@@ -94,6 +95,29 @@ class ResourceExchange {
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests),
                      this));
   }
+  
+  /// @brief queries facilities and collects all requests for bids
+  void AddAllBids() {
+    std::set<Trader*> traders = ctx_->traders();
+    std::for_each(
+        traders.begin(),
+        traders.end(),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids), this));
+  }
+
+  /// @brief adjust preferences for requests given bid responses
+  void DoAllAdjustments() {
+    std::set<const Trader*> traders = ex_ctx_.requesters();
+    std::for_each(
+        traders.begin(),
+        traders.end(),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment),
+                     this));
+  }
+  
+ private:
+  Context* ctx_;
+  ExchangeContext<T> ex_ctx_;
 
   /// @brief queries a given facility model for 
   void AddRequests(Trader* f) {
@@ -103,15 +127,6 @@ class ResourceExchange {
       ex_ctx_.AddRequestPortfolio(*it);
     }
   };
-  
-  /// @brief queries facilities and collects all requests for bids
-  void CollectBids() {
-    std::set<Trader*> traders = ctx_->traders();
-    std::for_each(
-        traders.begin(),
-        traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids), this));
-  }
 
   /// @brief queries a given facility model for 
   void AddBids(Trader* f) {
@@ -121,17 +136,7 @@ class ResourceExchange {
       ex_ctx_.AddBidPortfolio(*it);
     }
   };
-
-  /// @brief adjust preferences for requests given bid responses
-  void PrefAdjustment() {
-    std::set<const Trader*> traders = ex_ctx_.requesters();
-    std::for_each(
-        traders.begin(),
-        traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment),
-                     this));
-  }
-
+  
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
   void DoAdjustment(const Trader* f) {
@@ -143,10 +148,7 @@ class ResourceExchange {
       m = m->parent();
     }
   };
-  
- private:
-  Context* ctx_;
-  ExchangeContext<T> ex_ctx_;
+
 };
 
 } // namespace cyclus

@@ -182,7 +182,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   Requester* rcast = dynamic_cast<Requester*>(clone);
 
   EXPECT_EQ(0, rcast->req_ctr_);
-  exchng->CollectRequests();
+  exchng->AddAllRequests();
   EXPECT_EQ(1, rcast->req_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().requesters().size());
   
@@ -239,7 +239,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
   EXPECT_EQ(0, bcast->bid_ctr_);
-  exchng->CollectBids();
+  exchng->AddAllBids();
   EXPECT_EQ(1, bcast->bid_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().bidders().size());
   
@@ -293,7 +293,7 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   
   EXPECT_EQ(0, pcast->req_ctr_);
   EXPECT_EQ(0, ccast->req_ctr_);
-  exchng->CollectRequests();
+  exchng->AddAllRequests();
   EXPECT_EQ(2, exchng->ex_ctx().requesters().size());
   EXPECT_EQ(1, pcast->req_ctr_);
   EXPECT_EQ(1, ccast->req_ctr_);
@@ -301,7 +301,7 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   EXPECT_EQ(0, pcast->pref_ctr_);
   EXPECT_EQ(0, ccast->pref_ctr_);
   
-  EXPECT_NO_THROW(exchng->PrefAdjustment());
+  EXPECT_NO_THROW(exchng->DoAllAdjustments());
 
   // child gets to adjust once - its own request
   // parent gets called twice - its request and adjusting its child's request
@@ -351,8 +351,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
   bclone->Deploy(bclone);
   
-  EXPECT_NO_THROW(exchng->CollectRequests());
-  EXPECT_NO_THROW(exchng->CollectBids());
+  EXPECT_NO_THROW(exchng->AddAllRequests());
+  EXPECT_NO_THROW(exchng->AddAllBids());
 
   PrefMap<Material>::type pobs;
   pobs[preq].push_back(std::make_pair(pbid, preq->preference));
@@ -363,7 +363,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   EXPECT_EQ(context.Prefs(parent), pobs);
   EXPECT_EQ(context.Prefs(child), cobs);
   
-  EXPECT_NO_THROW(exchng->PrefAdjustment());
+  EXPECT_NO_THROW(exchng->DoAllAdjustments());
 
   pobs[preq][0].second = std::pow(preq->preference, 2);
   cobs[creq][0].second = std::pow(std::pow(creq->preference, 2), 2);
