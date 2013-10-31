@@ -32,6 +32,7 @@ using cyclus::RequestPortfolio;
 using cyclus::Bid;
 using cyclus::BidPortfolio;
 using cyclus::ResourceExchange;
+using cyclus::PrefMap;
 
 class Requester: public MockFacility {
  public:
@@ -39,7 +40,9 @@ class Requester: public MockFacility {
       : MockFacility(ctx),
         Model(ctx),
         r_(r),
-        i_(i)
+        i_(i),
+        req_ctr_(0),
+        pref_ctr_(0)
   { };
 
   virtual cyclus::Model* Clone() {
@@ -57,11 +60,16 @@ class Requester: public MockFacility {
       rp.AddRequest(r_);
     }
     rps.insert(rp);
+    req_ctr_++;
     return rps;
   }
 
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) { pref_ctr_++; }
+  
   Request<Material>::Ptr r_;
   int i_;
+  int pref_ctr_;
+  int req_ctr_;
 };
 
 class Bidder: public MockFacility {
@@ -70,7 +78,8 @@ class Bidder: public MockFacility {
       : MockFacility(ctx),
         Model(ctx),
         bids_(bids),
-        commod_(commod)
+        commod_(commod),
+        bid_ctr_(0)
   { };
 
   virtual cyclus::Model* Clone() {
@@ -89,11 +98,13 @@ class Bidder: public MockFacility {
       bp.AddBid(bids_[i]);
     }
     bps.insert(bp);
+    bid_ctr_++;
     return bps;
   }
 
   std::vector<Bid<Material>::Ptr> bids_;
   std::string commod_;
+  int bid_ctr_;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -157,9 +168,13 @@ TEST_F(ResourceExchangeTests, cloning) {
 TEST_F(ResourceExchangeTests, requests) {
   FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
   clone->Deploy(clone);
+  Requester* rcast = dynamic_cast<Requester*>(clone);
 
+  EXPECT_EQ(0, rcast->req_ctr_);
   exchng->CollectRequests();
-
+  EXPECT_EQ(1, rcast->req_ctr_);
+  EXPECT_EQ(1, exchng->ex_ctx().requesters().size());
+  
   const ExchangeContext<Material>& ctx = exchng->const_ex_ctx();
   
   std::vector<RequestPortfolio<Material> > vp;
@@ -211,8 +226,12 @@ TEST_F(ResourceExchangeTests, bids) {
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
   clone->Deploy(clone);
+  Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
+  EXPECT_EQ(0, bcast->bid_ctr_);
   exchng->CollectBids();
+  EXPECT_EQ(1, bcast->bid_ctr_);
+  EXPECT_EQ(1, exchng->ex_ctx().bidders().size());
   
   std::vector<BidPortfolio<Material> > vp;
   BidPortfolio<Material> bp;
@@ -240,8 +259,45 @@ TEST_F(ResourceExchangeTests, bids) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, NullAdjust) {
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
-  clone->Deploy(clone);
+  FacilityModel* parent = dynamic_cast<FacilityModel*>(reqr->Clone());
+  FacilityModel* child = dynamic_cast<FacilityModel*>(reqr->Clone());
+  parent->Deploy(parent);
+  child->Deploy(parent);
+    
+  Requester* pcast = dynamic_cast<Requester*>(parent);
+  Requester* ccast = dynamic_cast<Requester*>(child);
+
+  // doin a little magic to simulate each requester making their own request
+  Request<Material>::Ptr preq = Request<Material>::Ptr(new Request<Material>());
+  preq->commodity = commod;
+  preq->preference = pref;
+  preq->target = mat;
+  preq->requester = pcast;
+  pcast->r_ = preq;
+  Request<Material>::Ptr creq = Request<Material>::Ptr(new Request<Material>());
+  creq->commodity = commod;
+  creq->preference = pref;
+  creq->target = mat;
+  creq->requester = ccast;
+  ccast->r_ = creq;
+  
+  EXPECT_EQ(0, pcast->req_ctr_);
+  EXPECT_EQ(0, ccast->req_ctr_);
+  exchng->CollectRequests();
+  EXPECT_EQ(2, exchng->ex_ctx().requesters().size());
+  EXPECT_EQ(1, pcast->req_ctr_);
+  EXPECT_EQ(1, ccast->req_ctr_);
+  
+  EXPECT_EQ(0, pcast->pref_ctr_);
+  EXPECT_EQ(0, ccast->pref_ctr_);
+  
   EXPECT_NO_THROW(exchng->PrefAdjustment());
-  clone->Decommission();
+
+  // child gets to adjust once - its own request
+  // parent gets called twice - its request and adjusting its child's request
+  EXPECT_EQ(2, pcast->pref_ctr_); 
+  EXPECT_EQ(1, ccast->pref_ctr_);
+  
+  child->Decommission();
+  parent->Decommission();
 }

@@ -142,14 +142,8 @@ class ExchangeContext {
   std::map< const Trader* , typename PrefMap<T>::type > trader_prefs_;
 
   void AddBid(typename Bid<T>::Ptr pb) {
-    /* if (bids_by_request_.count(pb->request) == 0) { */
-    /*   bids_by_request_[pb->request] = std::vector<typename Bid<T>::Ptr>(); */
-    /* } */
     bids_by_request_[pb->request].push_back(pb);
 
-  /*   if (trader_prefs_.count(pb->request->requester) == 0) { */
-  /*     trader_prefs_[pb->request->requester] = PrefMap<T>::type(); */
-  /*   } */
     trader_prefs_[pb->request->requester][pb->request].push_back(
         std::make_pair(pb, pb->request->preference));
   } 

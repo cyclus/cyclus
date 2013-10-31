@@ -19,7 +19,7 @@ namespace cyclus {
 template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* e) {
   return std::set< RequestPortfolio<T> >();
 }
-  
+
 template<> std::set< RequestPortfolio<Material> >
     QueryRequests<Material>(Trader* e) {
   return e->AddMatlRequests();
@@ -47,7 +47,15 @@ template<> std::set< BidPortfolio<GenericResource> >
   return e->AddGenRsrcBids(ec);
 }
 
-template<class T> void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) {}
+template<class T> void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
+
+void AdjustPrefs(Model* m, typename PrefMap<Material>::type& prefs) {
+  m->AdjustMatlPrefs(prefs);
+}
+
+void AdjustPrefs(Model* m, typename PrefMap<GenericResource>::type& prefs) {
+  m->AdjustGenRsrcPrefs(prefs);
+}
 
 /// @class ResourceExchange
 ///
@@ -116,7 +124,7 @@ class ResourceExchange {
 
   /// @brief adjust preferences for requests given bid responses
   void PrefAdjustment() {
-    std::set<Trader*> traders = ctx_->traders();
+    std::set<const Trader*> traders = ex_ctx_.requesters();
     std::for_each(
         traders.begin(),
         traders.end(),
@@ -126,11 +134,12 @@ class ResourceExchange {
 
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void AdjustPrefs(Trader* f) {
-    typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(f);
-    Model* m = dynamic_cast<Model*>(f);
+  void AdjustPrefs(const Trader* f) {
+    Trader* t = const_cast<Trader*>(f);
+    typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
+    Model* m = dynamic_cast<Model*>(t);
     while (m != NULL) {
-      cyclus::AdjustPrefs<T>(m, prefs);
+      cyclus::AdjustPrefs(m, prefs);
       m = m->parent();
     }
   };

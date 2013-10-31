@@ -11,9 +11,13 @@
 #include "dynamic_module.h"
 #include "transaction.h"
 #include "query_engine.h"
+#include "exchange_context.h"
 
 namespace cyclus {
 
+class Material;
+class GenericResource;
+  
 /**
    defines the possible model types
 
@@ -297,6 +301,12 @@ class Model {
   virtual void AddResource(Transaction trans,
                            std::vector<Resource::Ptr> manifest);
 
+  /** @brief default implementation for material preferences */
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) { };
+  
+  /** @brief default implementation for material preferences */
+  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) { };
+  
  protected:
   /**
      A method that must be implemented by and only by classes in the model
