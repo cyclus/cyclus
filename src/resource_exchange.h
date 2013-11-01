@@ -17,35 +17,35 @@
 namespace cyclus {
 
 // template specializations to support inheritance and virtual functions
-template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* e) {
+template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
   return std::set< RequestPortfolio<T> >();
 }
 
 template<> std::set< RequestPortfolio<Material> >
-    QueryRequests<Material>(Trader* e) {
-  return e->AddMatlRequests();
+    QueryRequests<Material>(Trader* t) {
+  return t->AddMatlRequests();
 }
 
 template<> std::set< RequestPortfolio<GenericResource> >
-    QueryRequests<GenericResource>(Trader* e) {
-  return e->AddGenRsrcRequests();
+    QueryRequests<GenericResource>(Trader* t) {
+  return t->AddGenRsrcRequests();
 }
 
 template<class T> class ExchangeContext;
   
 template<class T> std::set< BidPortfolio<T> >
-    QueryBids(Trader* e, ExchangeContext<T>* ec) {
+    QueryBids(Trader* t, ExchangeContext<T>* ec) {
   return std::set< BidPortfolio<T> >();
 }
   
 template<> std::set< BidPortfolio<Material> >
-    QueryBids<Material>(Trader* e, ExchangeContext<Material>* ec) {
-  return e->AddMatlBids(ec);
+    QueryBids<Material>(Trader* t, ExchangeContext<Material>* ec) {
+  return t->AddMatlBids(ec);
 }
 
 template<> std::set< BidPortfolio<GenericResource> >
-    QueryBids<GenericResource>(Trader* e, ExchangeContext<GenericResource>* ec) {
-  return e->AddGenRsrcBids(ec);
+    QueryBids<GenericResource>(Trader* t, ExchangeContext<GenericResource>* ec) {
+  return t->AddGenRsrcBids(ec);
 }
 
 template<class T> void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
