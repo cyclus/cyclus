@@ -30,8 +30,17 @@ struct Request {
 
   /// @return the model requesting the resource
   Trader* requester;
+  
+  /// @return a unique id for the request
+  const int id() const {return id_;};
+
+ private:
+  int id_;
+  static int next_id_;
 
 };
+
+template<class T> int Request<T>::next_id_ = 0;
 
 template<class T>
 bool operator==(const Request<T>& lhs, const Request<T>& rhs) {
@@ -43,7 +52,7 @@ bool operator==(const Request<T>& lhs, const Request<T>& rhs) {
 
 template<class T>
 std::ostream& operator<<(std::ostream& os, const Request<T>& r) {
-  os << r.commodity;
+  os << "Request for: " << r.commodity;
   return os;
 };
 } // namespace cyclus
