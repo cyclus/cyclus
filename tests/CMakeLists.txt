@@ -89,8 +89,12 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_context_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 

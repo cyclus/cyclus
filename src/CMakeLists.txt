@@ -73,9 +73,11 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
@@ -138,9 +140,12 @@ INSTALL(FILES
   event_manager.h
   trader.h
   exchange_context.h
+  exchange_graph.h
+  exchange_solver.h 
   facility_model.h
   function.h
   generic_resource.h
+  greedy_solver.cc 
   hdf5_back.h
   inst_model.h
   intrusive_base.h
