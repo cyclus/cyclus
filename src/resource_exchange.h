@@ -92,7 +92,7 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__AddRequests),
                      this));
   }
   
@@ -102,7 +102,8 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids), this));
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__AddBids),
+                     this));
   }
 
   /// @brief adjust preferences for requests given bid responses
@@ -111,16 +112,16 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__DoAdjustment),
                      this));
   }
   
- private:
+  /* -------------------- private methods and members -------------------------- */
   Context* ctx_;
   ExchangeContext<T> ex_ctx_;
 
   /// @brief queries a given facility model for 
-  void AddRequests(Trader* f) {
+  void __AddRequests(Trader* f) {
     std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
     typename std::set< RequestPortfolio<T> >::iterator it;
     for (it = r.begin(); it != r.end(); ++it) {
@@ -129,7 +130,7 @@ class ResourceExchange {
   };
 
   /// @brief queries a given facility model for 
-  void AddBids(Trader* f) {
+  void __AddBids(Trader* f) {
     std::set< BidPortfolio<T> > r = QueryBids<T>(f, &ex_ctx_);
     typename std::set< BidPortfolio<T> >::iterator it;
     for (it = r.begin(); it != r.end(); ++it) {
@@ -139,12 +140,12 @@ class ResourceExchange {
   
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void DoAdjustment(const Trader* f) {
+  void __DoAdjustment(const Trader* f) {
     Trader* t = const_cast<Trader*>(f);
     typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
     Model* m = dynamic_cast<Model*>(t);
     while (m != NULL) {
-      cyclus::AdjustPrefs(m, prefs);
+      AdjustPrefs(m, prefs);
       m = m->parent();
     }
   };
