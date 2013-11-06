@@ -32,3 +32,7 @@ To build the tool:
 
 #. Run ``go build`` in the inventory directory (this dir) to build the binary.
 
+
+* The sqlite dependency project actually embeds the entire sqlite C package
+  inside it.  I have sometimes observed problems when the system's default C
+  compiler is clang rather than gcc when fetching the go-sqlite package.
