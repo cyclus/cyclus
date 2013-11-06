@@ -43,7 +43,6 @@ TEST_F(SqliteDbTests, OpenExistingAndRetrieve) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(SqliteDbTests, Overwrite) {
-  using cyclus::SqliteDb;
   using cyclus::StrList;
   std::vector<StrList> result;
   
