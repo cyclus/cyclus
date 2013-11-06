@@ -5,13 +5,11 @@
 
 #include "sqlite_db.h"
 
-static std::string const spath = "testdb.sqlite";
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class SqliteDbTests : public ::testing::Test {
  public:
   virtual void SetUp() {
-    path = "somedb.sqlite";
+    path = "testdb.sqlite";
     v1 = "stuff";
     v2 = "thing";
     db = new cyclus::SqliteDb(path);
@@ -62,9 +60,10 @@ TEST_F(SqliteDbTests, Overwrite) {
 TEST(SqliteDbTest, CreateAndInsert) {
   using cyclus::SqliteDb;
   using cyclus::StrList;
-  remove(spath.c_str());
   std::vector<StrList> result;
-  SqliteDb db(spath);
+
+  std::string path = "somedb.sqlite";
+  SqliteDb db(path);
 
   ASSERT_NO_THROW(db.open());
 
@@ -78,5 +77,6 @@ TEST(SqliteDbTest, CreateAndInsert) {
   EXPECT_EQ(result.front().back(), "goodbye");
 
   ASSERT_NO_THROW(db.close());
+  remove(path.c_str());
 }
 
