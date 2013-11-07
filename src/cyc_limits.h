@@ -15,6 +15,11 @@ inline double eps_rsrc() {
   return 1e-6;
 }
 
+/// returns true if a double is less than 0 - eps()
+inline bool DoubleNeg(double d) {
+  return (d < (-1 * eps()));
+}
+
 /// returns true if two doubles are withing eps() of one another
 inline bool DoubleEq(double d1, double d2) {
   return std::fabs(d1 - d2) < eps();
