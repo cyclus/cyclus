@@ -12,6 +12,8 @@ class Arc;
 struct Node {
   typedef boost::shared_ptr<Node> Ptr;
 
+  Node();
+  
   std::vector<double> unit_capacities;
 
   NodeSet* set;
@@ -41,7 +43,7 @@ struct Arc {
   ///
   /// determined by the minimum of the unode and vnode's capacities / unit
   /// capacities
-  double capacity() {};
+  double capacity();
 };
 
 class ExchangeGraph {

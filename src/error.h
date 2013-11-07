@@ -43,6 +43,12 @@ class KeyError: public Error {
   KeyError(std::string msg) : Error(msg) {};
 };
 
+/// For failed object state expectations
+class StateError: public Error {
+ public:
+  StateError(std::string msg) : Error(msg) {};
+};
+
 /// for failed reading/writing to files, network connections, etc..
 class IOError: public Error {
  public:
