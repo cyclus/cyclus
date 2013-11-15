@@ -56,7 +56,7 @@ TEST(ExGraphTests, NodeCaps1) {
 
   EXPECT_EQ(scap, Capacity(n));  
   double qty = 1.0;
-  s.UpdateCapacities(n, qty);
+  UpdateCapacity(n, qty);
   EXPECT_EQ(scap - qty, Capacity(n));  
 }
 
@@ -86,7 +86,7 @@ TEST(ExGraphTests, NodeCaps2) {
   double min_exp = cap / ucap;
   EXPECT_EQ(min_exp, Capacity(n));
 
-  s.UpdateCapacities(n, qty);
+  UpdateCapacity(n, qty);
   EXPECT_EQ(exp, s.capacities);
   min_exp = (cap - qty * ucap) / ucap;
   EXPECT_EQ(min_exp, Capacity(n));
@@ -107,7 +107,7 @@ TEST(ExGraphTests, NodeUpdateThrow) {
   s.capacities.push_back(cap);
   s.AddNode(n);
   
-  EXPECT_THROW(s.UpdateCapacities(n, qty), cyclus::ValueError);
+  EXPECT_THROW(UpdateCapacity(n, qty), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -131,15 +131,26 @@ TEST(ExGraphTests, ArcCap) {
   double vcap = vval;
   vset.capacities.push_back(vcap);
   
-  Arc a;
-  a.unode = u;
-  a.vnode = v;
+  Arc a(u, v);
   
   EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
 
-  uset.UpdateCapacities(u, uval);
+  UpdateCapacity(u, uval);
   EXPECT_DOUBLE_EQ(Capacity(a), 0.5);  
 
-  vset.UpdateCapacities(v, 1.0);
+  UpdateCapacity(v, 1.0);
   EXPECT_DOUBLE_EQ(Capacity(a), 0.0);  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, AddArc) {
+  
+  // Node::Ptr u = Node::Ptr(new Node());
+  // u->unit_capacities.push_back(uval);
+  
+  // Node::Ptr v = Node::Ptr(new Node());
+  // v->unit_capacities.push_back(vval);
+
+  // Arc a(u, v);
+  
 }

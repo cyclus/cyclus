@@ -17,21 +17,10 @@ void NodeSet::AddNode(Node::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void NodeSet::UpdateCapacities(Node::Ptr node, double qty) {
-  using std::vector;
-  using cyclus::DoubleNeg;
-  using cyclus::ValueError;
-  
-  const vector<double>& units = node->unit_capacities;
-  for (int i = 0; i < capacities.size(); i++) {
-    double val = capacities[i] - qty * units[i];
-    if (DoubleNeg(val)) throw ValueError("Capacities can not be reduced below 0.");
-    capacities[i] = val;
-  }
-}
+RequestSet::RequestSet(double qty) : qty(qty) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RequestSet::RequestSet(double qty) : qty(qty) { }
+Arc::Arc(Node::Ptr unode, Node::Ptr vnode) : unode(unode), vnode(vnode) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
@@ -50,9 +39,9 @@ double Capacity(const Node& n) {
     return std::numeric_limits<double>::max();
   }
 
-  std::vector<double> caps;
   const std::vector<double>& unit_caps = n.unit_capacities;
   const std::vector<double>& set_caps = n.set->capacities;
+  std::vector<double> caps;
   for (int i = 0; i < unit_caps.size(); i++) {
     caps.push_back(set_caps[i] / unit_caps[i]);
   }
@@ -63,6 +52,26 @@ double Capacity(const Node& n) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Node::Ptr& pn) {
   return Capacity(*pn.get());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void UpdateCapacity(const Node& n, double qty) {
+  using std::vector;
+  using cyclus::DoubleNeg;
+  using cyclus::ValueError;
+  
+  const vector<double>& unit_caps = n.unit_capacities;
+  vector<double>& caps = n.set->capacities;
+  for (int i = 0; i < caps.size(); i++) {
+    double val = caps[i] - qty * unit_caps[i];
+    if (DoubleNeg(val)) throw ValueError("Capacities can not be reduced below 0.");
+    caps[i] = val;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void UpdateCapacity(const Node::Ptr& pn, double qty) {
+  return UpdateCapacity(*pn.get(), qty);
 }
 
 } // namespace cyclus

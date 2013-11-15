@@ -1,7 +1,10 @@
 #ifndef CYCLUS_EXCHANGE_GRAPH_H_
 #define CYCLUS_EXCHANGE_GRAPH_H_
 
+#include <map>
+#include <utility>
 #include <vector>
+
 #include <boost/shared_ptr.hpp>
 
 namespace cyclus {
@@ -22,29 +25,30 @@ class Node {
 
 class NodeSet {
  public:
+  typedef boost::shared_ptr<NodeSet> Ptr;
+
   std::vector<Node::Ptr> nodes;
   std::vector<double> capacities;
 
   /// @brief Add the node to the NodeSet and informs the node it is a member of
   /// this NodeSet
   void AddNode(Node::Ptr node);
-  
-  /// @brief updates capacities for a given node
-  ///
-  /// for each capacity, removes the qty * node->unit_capacity
-  /// @param node the updated node
-  /// @param qty the quantity 
-  void UpdateCapacities(Node::Ptr node, double qty);
 };
 
 class RequestSet : public NodeSet {
  public:
+  typedef boost::shared_ptr<RequestSet> Ptr;
+  
   explicit RequestSet(double qty = 0.0);
   double qty;
 };
 
 struct Arc {
  public:
+  typedef boost::shared_ptr<Arc> Ptr;
+
+  Arc(Node::Ptr unode, Node::Ptr vnode);
+  
   Node::Ptr unode;
   Node::Ptr vnode;
 };
@@ -62,13 +66,31 @@ double Capacity(const Arc& a);
 /// capacities. If the node/node set have no capacities, std::max<double> is
 /// returned.
 double Capacity(const Node& n);
-
-/// @brief overload of Capacity() for Node::Ptr
 double Capacity(const Node::Ptr& pn);
 
-class ExchangeGraph {
+/// @brief updates the capacity of a given node
+///
+/// @param n the Node
+/// @param qty the quantity for the node to update
+void UpdateCapacity(const Node& n, double qty);
+void UpdateCapacity(const Node::Ptr& pn, double qty);
 
-  
+class ExchangeGraph {
+ public:
+  std::vector<RequestSet::Ptr> request_sets;
+  std::vector<NodeSet::Ptr> supply_sets;
+  std::vector<Arc::Ptr> arcs;
+  std::map<Node::Ptr, std::vector<Arc::Ptr> > node_arc_map;
+  std::vector< std::pair<Arc::Ptr, double> > matches;
+
+  /// @brief adds an arc to the graph
+  void AddArc(const Arc::Ptr& pa);
+
+  /// @brief adds a match for a quanity of flow along an arc
+  ///
+  /// @param a the arc corresponding to a match
+  /// @param qty the amount of flow corresponding to a match
+  void AddMatch(const Arc::Ptr& pa, double qty);
 };
   
 } // namespace cyclus
