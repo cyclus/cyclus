@@ -59,6 +59,10 @@ void UpdateCapacity(const Node& n, double qty) {
   using std::vector;
   using cyclus::DoubleNeg;
   using cyclus::ValueError;
+
+  if (n.set == NULL) {
+    throw cyclus::StateError("An notion of node capacity requires a nodeset.");
+  }
   
   const vector<double>& unit_caps = n.unit_capacities;
   vector<double>& caps = n.set->capacities;
@@ -79,6 +83,13 @@ void ExchangeGraph::AddArc(Arc::Ptr pa) {
   arcs_.push_back(pa);
   node_arc_map[pa->unode].push_back(pa);
   node_arc_map[pa->vnode].push_back(pa);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeGraph::AddMatch(Arc::Ptr pa, double qty) {
+  UpdateCapacity(pa->unode, qty);
+  UpdateCapacity(pa->vnode, qty);
+  matches.push_back(std::make_pair(pa, qty));
 }
 
 } // namespace cyclus

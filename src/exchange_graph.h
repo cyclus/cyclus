@@ -75,12 +75,14 @@ double Capacity(Node::Ptr pn);
 void UpdateCapacity(const Node& n, double qty);
 void UpdateCapacity(Node::Ptr pn, double qty);
 
+typedef std::pair<Arc::Ptr, double> Match;
+
 class ExchangeGraph {
- public:
+ public: 
   std::vector<RequestSet::Ptr> request_sets;
   std::vector<NodeSet::Ptr> supply_sets;
   std::map<Node::Ptr, std::vector<Arc::Ptr> > node_arc_map;
-  std::vector< std::pair<Arc::Ptr, double> > matches;
+  std::vector<Match> matches;
 
   /// @brief use the AddArc() api to update arcs_
   std::vector<Arc::Ptr> arcs_;
@@ -93,7 +95,6 @@ class ExchangeGraph {
   /// @param a the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(Arc::Ptr pa, double qty);
-
 };
   
 } // namespace cyclus

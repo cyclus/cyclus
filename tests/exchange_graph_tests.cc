@@ -11,6 +11,7 @@ using cyclus::Node;
 using cyclus::NodeSet;
 using cyclus::RequestSet;
 using cyclus::ExchangeGraph;
+using cyclus::Match;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeSets) {
@@ -94,7 +95,14 @@ TEST(ExGraphTests, NodeCaps2) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, NodeUpdateThrow) {
+TEST(ExGraphTests, NodeUpdateThrow1) {
+  Node::Ptr n = Node::Ptr(new Node());
+  double qty = 5;
+  EXPECT_THROW(UpdateCapacity(n, qty), cyclus::StateError);  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, NodeUpdateThrow2) {
   double qty = 10;
   double unit = 2;
   double min_diff = cyclus::eps() * (1 + cyclus::eps());
@@ -164,7 +172,7 @@ TEST(ExGraphTests, AddArc1) {
 TEST(ExGraphTests, AddArc2) {
   ExchangeGraph g;
   
-  Node::Ptr u = Node::Ptr(new Node());  
+  Node::Ptr u = Node::Ptr(new Node());
   Node::Ptr v = Node::Ptr(new Node());
   Node::Ptr w = Node::Ptr(new Node());
   Node::Ptr x = Node::Ptr(new Node());
@@ -193,4 +201,41 @@ TEST(ExGraphTests, AddArc2) {
   EXPECT_EQ(expv, g.node_arc_map[v]);
   EXPECT_EQ(expw, g.node_arc_map[w]);
   EXPECT_EQ(expx, g.node_arc_map[x]);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, AddMatch) {
+  ExchangeGraph g;
+
+  double uval = 1.0;
+  Node::Ptr u = Node::Ptr(new Node());
+  u->unit_capacities.push_back(uval);
+  
+  double vval = 0.5;
+  Node::Ptr v = Node::Ptr(new Node());
+  v->unit_capacities.push_back(vval);
+
+  double large = 500;
+  
+  NodeSet uset;
+  uset.AddNode(u);
+  double ucap = uval * 500;
+  uset.capacities.push_back(ucap);
+  
+  NodeSet vset;
+  vset.AddNode(v);
+  double vcap = vval * 500;
+  vset.capacities.push_back(vcap);
+  
+  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
+
+  double qty = large * 0.1;
+  
+  Match match(std::make_pair(a, qty));
+  
+  Match arr[] = {match};
+  std::vector<Match> exp (arr, arr + sizeof(arr) / sizeof(arr[0]));
+
+  g.AddMatch(a, qty);
+  EXPECT_EQ(exp, g.matches);
 }
