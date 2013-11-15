@@ -31,24 +31,30 @@ void NodeSet::UpdateCapacities(Node::Ptr node, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Arc::capacity() {
-  if (unode->set == NULL || vnode->set == NULL) {
+RequestSet::RequestSet(double qty) : qty(qty) { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Capacity(const Arc& a) {
+  Node::Ptr u = a.unode;
+  Node::Ptr v = a.vnode;
+  
+  if (u->set == NULL || v->set == NULL) {
     throw cyclus::StateError("An arc's nodes must be part of node sets.");
   }
   
-  if (unode->unit_capacities.size() == 0 && vnode->unit_capacities.size() == 0) {
+  if (u->unit_capacities.size() == 0 && v->unit_capacities.size() == 0) {
     return std::numeric_limits<double>::max();
   }
 
   std::vector<double> all_caps;
-  const std::vector<double>& uunit_caps = unode->unit_capacities;
-  const std::vector<double>& ucaps = unode->set->capacities;
+  const std::vector<double>& uunit_caps = u->unit_capacities;
+  const std::vector<double>& ucaps = u->set->capacities;
   for (int i = 0; i < ucaps.size(); i++) {
     all_caps.push_back(ucaps[i] / uunit_caps[i]);
   }
   
-  const std::vector<double>& vunit_caps = vnode->unit_capacities;
-  const std::vector<double>& vcaps = vnode->set->capacities;
+  const std::vector<double>& vunit_caps = v->unit_capacities;
+  const std::vector<double>& vcaps = v->set->capacities;
   for (int i = 0; i < vcaps.size(); i++) {
     all_caps.push_back(vcaps[i] / vunit_caps[i]);
   }

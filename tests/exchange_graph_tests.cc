@@ -9,6 +9,7 @@ using std::vector;
 using cyclus::Arc;
 using cyclus::Node;
 using cyclus::NodeSet;
+using cyclus::RequestSet;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeSets) {
@@ -16,6 +17,15 @@ TEST(ExGraphTests, NodeSets) {
   NodeSet s;
   s.AddNode(n);
   EXPECT_EQ(&s, n->set);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, ReqSets) {
+  double q = 1.5;
+  RequestSet r;
+  EXPECT_EQ(0, r.qty);
+  r = RequestSet(q);
+  EXPECT_EQ(q, r.qty);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -88,7 +98,7 @@ TEST(ExGraphTests, ArcSetThrow) {
   a.unode = u;
   a.vnode = v;
   
-  EXPECT_THROW(a.capacity(), cyclus::StateError);
+  EXPECT_THROW(Capacity(a), cyclus::StateError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,7 +115,7 @@ TEST(ExGraphTests, ArcNoCap) {
   a.unode = u;
   a.vnode = v;
   
-  EXPECT_DOUBLE_EQ(a.capacity(), std::numeric_limits<double>::max());
+  EXPECT_DOUBLE_EQ(Capacity(a), std::numeric_limits<double>::max());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -133,11 +143,11 @@ TEST(ExGraphTests, ArcCap) {
   a.unode = u;
   a.vnode = v;
   
-  EXPECT_DOUBLE_EQ(a.capacity(), 1.0);
+  EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
 
   uset.UpdateCapacities(u, uval);
-  EXPECT_DOUBLE_EQ(a.capacity(), 0.5);  
+  EXPECT_DOUBLE_EQ(Capacity(a), 0.5);  
 
   vset.UpdateCapacities(v, 1.0);
-  EXPECT_DOUBLE_EQ(a.capacity(), 0.0);  
+  EXPECT_DOUBLE_EQ(Capacity(a), 0.0);  
 }

@@ -9,7 +9,8 @@ namespace cyclus {
 class NodeSet;
 class Arc;
 
-struct Node {
+class Node {
+ public:
   typedef boost::shared_ptr<Node> Ptr;
 
   Node();
@@ -19,7 +20,8 @@ struct Node {
   NodeSet* set;
 };
 
-struct NodeSet {
+class NodeSet {
+ public:
   std::vector<Node::Ptr> nodes;
   std::vector<double> capacities;
 
@@ -35,16 +37,25 @@ struct NodeSet {
   void UpdateCapacities(Node::Ptr node, double qty);
 };
 
+class RequestSet : public NodeSet {
+ public:
+  explicit RequestSet(double qty = 0.0);
+  double qty;
+};
+
 struct Arc {
+ public:
   Node::Ptr unode;
   Node::Ptr vnode;
-
-  /// @brief the capacity of the arc
-  ///
-  /// determined by the minimum of the unode and vnode's capacities / unit
-  /// capacities
-  double capacity();
 };
+
+/// @brief the capacity of the arc
+///
+/// determined by the minimum of the unode and vnode's capacities / unit
+/// capacities
+///
+/// @param a the arc
+double Capacity(const Arc& a);
 
 class ExchangeGraph {
 
