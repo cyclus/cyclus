@@ -51,11 +51,20 @@ struct Arc {
 
 /// @brief the capacity of the arc
 ///
-/// determined by the minimum of the unode and vnode's capacities / unit
-/// capacities
-///
 /// @param a the arc
+/// @return The minimum of the unode and vnode's capacities
 double Capacity(const Arc& a);
+
+/// @brief the capacity of a node
+///
+/// @param n the node
+/// @return The minimum of the node's nodeset capacities / the node's unit
+/// capacities. If the node/node set have no capacities, std::max<double> is
+/// returned.
+double Capacity(const Node& n);
+
+/// @brief overload of Capacity() for Node::Ptr
+double Capacity(const Node::Ptr& pn);
 
 class ExchangeGraph {
 

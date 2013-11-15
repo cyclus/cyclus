@@ -29,6 +29,21 @@ TEST(ExGraphTests, ReqSets) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, NodeCapThrow) {
+  Node::Ptr u = Node::Ptr(new Node());
+  EXPECT_THROW(Capacity(u), cyclus::StateError);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, NodeNoCap) {
+  Node::Ptr u = Node::Ptr(new Node());
+  NodeSet uset;
+  uset.AddNode(u);
+    
+  EXPECT_DOUBLE_EQ(Capacity(u), std::numeric_limits<double>::max());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeCaps1) {
   double ncap = 1.0;
   Node::Ptr n = Node::Ptr(new Node());
@@ -39,22 +54,24 @@ TEST(ExGraphTests, NodeCaps1) {
   s.capacities.push_back(scap);
   s.AddNode(n);
 
-  EXPECT_EQ(scap, s.capacities[0]);  
+  EXPECT_EQ(scap, Capacity(n));  
   double qty = 1.0;
   s.UpdateCapacities(n, qty);
-  EXPECT_EQ(scap - qty, s.capacities[0]);  
+  EXPECT_EQ(scap - qty, Capacity(n));  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeCaps2) {
   double qty = 1.5;
+  double ucap = 1.7;
+  double cap = 5;
   
-  double acap[] = {10, 5, 3, 1};
+  double acap[] = {10, cap, 3, 1};
   vector<double> caps (acap, acap + sizeof(acap) / sizeof(acap[0]) );
   
-  double aucap[] = {2.1, 1.5, .07, .01};
+  double aucap[] = {2.1, ucap, .07, .01};
   vector<double> ucaps (aucap, aucap + sizeof(aucap) / sizeof(aucap[0]) );
-
+  
   vector<double> exp;
   for (int i = 0; i < caps.size(); i++) {
     exp.push_back(caps[i] - ucaps[i] * qty);
@@ -66,13 +83,17 @@ TEST(ExGraphTests, NodeCaps2) {
   NodeSet s;
   s.capacities = caps;
   s.AddNode(n);
+  double min_exp = cap / ucap;
+  EXPECT_EQ(min_exp, Capacity(n));
 
   s.UpdateCapacities(n, qty);
   EXPECT_EQ(exp, s.capacities);
+  min_exp = (cap - qty * ucap) / ucap;
+  EXPECT_EQ(min_exp, Capacity(n));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, NodeCapThrow) {
+TEST(ExGraphTests, NodeUpdateThrow) {
   double qty = 10;
   double unit = 2;
   double min_diff = cyclus::eps() * (1 + cyclus::eps());
@@ -87,35 +108,6 @@ TEST(ExGraphTests, NodeCapThrow) {
   s.AddNode(n);
   
   EXPECT_THROW(s.UpdateCapacities(n, qty), cyclus::ValueError);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ArcSetThrow) {
-  Node::Ptr u = Node::Ptr(new Node());
-  Node::Ptr v = Node::Ptr(new Node());
-
-  Arc a;
-  a.unode = u;
-  a.vnode = v;
-  
-  EXPECT_THROW(Capacity(a), cyclus::StateError);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ArcNoCap) {
-  Node::Ptr u = Node::Ptr(new Node());
-  Node::Ptr v = Node::Ptr(new Node());
-
-  NodeSet uset;
-  uset.AddNode(u);
-  NodeSet vset;
-  vset.AddNode(v);
-  
-  Arc a;
-  a.unode = u;
-  a.vnode = v;
-  
-  EXPECT_DOUBLE_EQ(Capacity(a), std::numeric_limits<double>::max());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

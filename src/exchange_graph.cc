@@ -35,31 +35,34 @@ RequestSet::RequestSet(double qty) : qty(qty) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
-  Node::Ptr u = a.unode;
-  Node::Ptr v = a.vnode;
-  
-  if (u->set == NULL || v->set == NULL) {
-    throw cyclus::StateError("An arc's nodes must be part of node sets.");
+  double ucap = Capacity(a.unode);
+  double vcap = Capacity(a.vnode);
+  return std::min(ucap, vcap);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Capacity(const Node& n) {
+  if (n.set == NULL) {
+    throw cyclus::StateError("An notion of node capacity requires a nodeset.");
   }
-  
-  if (u->unit_capacities.size() == 0 && v->unit_capacities.size() == 0) {
+
+  if (n.unit_capacities.size() == 0) {
     return std::numeric_limits<double>::max();
   }
 
-  std::vector<double> all_caps;
-  const std::vector<double>& uunit_caps = u->unit_capacities;
-  const std::vector<double>& ucaps = u->set->capacities;
-  for (int i = 0; i < ucaps.size(); i++) {
-    all_caps.push_back(ucaps[i] / uunit_caps[i]);
+  std::vector<double> caps;
+  const std::vector<double>& unit_caps = n.unit_capacities;
+  const std::vector<double>& set_caps = n.set->capacities;
+  for (int i = 0; i < unit_caps.size(); i++) {
+    caps.push_back(set_caps[i] / unit_caps[i]);
   }
-  
-  const std::vector<double>& vunit_caps = v->unit_capacities;
-  const std::vector<double>& vcaps = v->set->capacities;
-  for (int i = 0; i < vcaps.size(); i++) {
-    all_caps.push_back(vcaps[i] / vunit_caps[i]);
-  }
-  
-  return *std::min_element(all_caps.begin(), all_caps.end());
+
+  return *std::min_element(caps.begin(), caps.end());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Capacity(const Node::Ptr& pn) {
+  return Capacity(*pn.get());
 }
 
 } // namespace cyclus
