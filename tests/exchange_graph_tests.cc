@@ -10,6 +10,7 @@ using cyclus::Arc;
 using cyclus::Node;
 using cyclus::NodeSet;
 using cyclus::RequestSet;
+using cyclus::ExchangeGraph;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeSets) {
@@ -143,14 +144,53 @@ TEST(ExGraphTests, ArcCap) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, AddArc) {
+TEST(ExGraphTests, AddArc1) {
+  ExchangeGraph g;
   
-  // Node::Ptr u = Node::Ptr(new Node());
-  // u->unit_capacities.push_back(uval);
-  
-  // Node::Ptr v = Node::Ptr(new Node());
-  // v->unit_capacities.push_back(vval);
+  Node::Ptr u = Node::Ptr(new Node());  
+  Node::Ptr v = Node::Ptr(new Node());
 
-  // Arc a(u, v);
+  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
+
+  Arc::Ptr arr[] = {a};
+  vector<Arc::Ptr> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+
+  g.AddArc(a);
+  EXPECT_EQ(exp, g.node_arc_map[u]);
+  EXPECT_EQ(exp, g.node_arc_map[v]);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, AddArc2) {
+  ExchangeGraph g;
   
+  Node::Ptr u = Node::Ptr(new Node());  
+  Node::Ptr v = Node::Ptr(new Node());
+  Node::Ptr w = Node::Ptr(new Node());
+  Node::Ptr x = Node::Ptr(new Node());
+
+  Arc::Ptr a1 = Arc::Ptr(new Arc(u, v));
+  Arc::Ptr a2 = Arc::Ptr(new Arc(u, w));
+  Arc::Ptr a3 = Arc::Ptr(new Arc(x, w));
+
+  Arc::Ptr arru[] = {a1, a2};
+  vector<Arc::Ptr> expu (arru, arru + sizeof(arru) / sizeof(arru[0]) );
+  
+  Arc::Ptr arrv[] = {a1};
+  vector<Arc::Ptr> expv (arrv, arrv + sizeof(arrv) / sizeof(arrv[0]) );
+  
+  Arc::Ptr arrw[] = {a2, a3};
+  vector<Arc::Ptr> expw (arrw, arrw + sizeof(arrw) / sizeof(arrw[0]) );
+  
+  Arc::Ptr arrx[] = {a3};
+  vector<Arc::Ptr> expx (arrx, arrx + sizeof(arrx) / sizeof(arrx[0]) );
+
+  g.AddArc(a1);
+  g.AddArc(a2);
+  g.AddArc(a3);
+  
+  EXPECT_EQ(expu, g.node_arc_map[u]);
+  EXPECT_EQ(expv, g.node_arc_map[v]);
+  EXPECT_EQ(expw, g.node_arc_map[w]);
+  EXPECT_EQ(expx, g.node_arc_map[x]);
 }

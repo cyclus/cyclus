@@ -50,7 +50,7 @@ double Capacity(const Node& n) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(const Node::Ptr& pn) {
+double Capacity(Node::Ptr pn) {
   return Capacity(*pn.get());
 }
 
@@ -70,8 +70,15 @@ void UpdateCapacity(const Node& n, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(const Node::Ptr& pn, double qty) {
+void UpdateCapacity(Node::Ptr pn, double qty) {
   return UpdateCapacity(*pn.get(), qty);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeGraph::AddArc(Arc::Ptr pa) {
+  arcs_.push_back(pa);
+  node_arc_map[pa->unode].push_back(pa);
+  node_arc_map[pa->vnode].push_back(pa);
 }
 
 } // namespace cyclus

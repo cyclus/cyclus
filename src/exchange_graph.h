@@ -66,31 +66,34 @@ double Capacity(const Arc& a);
 /// capacities. If the node/node set have no capacities, std::max<double> is
 /// returned.
 double Capacity(const Node& n);
-double Capacity(const Node::Ptr& pn);
+double Capacity(Node::Ptr pn);
 
 /// @brief updates the capacity of a given node
 ///
 /// @param n the Node
 /// @param qty the quantity for the node to update
 void UpdateCapacity(const Node& n, double qty);
-void UpdateCapacity(const Node::Ptr& pn, double qty);
+void UpdateCapacity(Node::Ptr pn, double qty);
 
 class ExchangeGraph {
  public:
   std::vector<RequestSet::Ptr> request_sets;
   std::vector<NodeSet::Ptr> supply_sets;
-  std::vector<Arc::Ptr> arcs;
   std::map<Node::Ptr, std::vector<Arc::Ptr> > node_arc_map;
   std::vector< std::pair<Arc::Ptr, double> > matches;
 
+  /// @brief use the AddArc() api to update arcs_
+  std::vector<Arc::Ptr> arcs_;
+  
   /// @brief adds an arc to the graph
-  void AddArc(const Arc::Ptr& pa);
+  void AddArc(Arc::Ptr pa);
 
   /// @brief adds a match for a quanity of flow along an arc
   ///
   /// @param a the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
-  void AddMatch(const Arc::Ptr& pa, double qty);
+  void AddMatch(Arc::Ptr pa, double qty);
+
 };
   
 } // namespace cyclus
