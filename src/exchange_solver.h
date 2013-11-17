@@ -10,7 +10,9 @@ class ExchangeGraph;
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  virtual void Solve(ExchangeGraph& g) = 0; 
+  explicit ExchangeSolver(ExchangeGraph& g) : graph_(g) { };
+  virtual void Solve() = 0;
+  ExchangeGraph& graph_;
 };
 
 } // namespace cyclus

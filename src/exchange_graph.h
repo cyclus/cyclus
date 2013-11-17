@@ -92,7 +92,7 @@ class ExchangeGraph {
 
   /// @brief adds a match for a quanity of flow along an arc
   ///
-  /// @param a the arc corresponding to a match
+  /// @param pa the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(Arc::Ptr pa, double qty);
 };

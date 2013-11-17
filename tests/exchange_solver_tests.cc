@@ -4,12 +4,15 @@
 
 #include "exchange_solver.h"
 
+using cyclus::ExchangeSolver;
+using cyclus::ExchangeGraph;
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class MockSolver: public cyclus::ExchangeSolver {
+class MockSolver: public ExchangeSolver {
  public:
-  MockSolver() : i(0) { }
+  explicit MockSolver(ExchangeGraph& g) : ExchangeSolver(g), i(0) { }
   
-  virtual void Solve(cyclus::ExchangeGraph& g) { ++i; }
+  virtual void Solve() { ++i; }
 
   int i;
 };
@@ -17,10 +20,10 @@ class MockSolver: public cyclus::ExchangeSolver {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExSolverTests, Interface) {
   cyclus::ExchangeGraph g;
-  MockSolver s;
+  MockSolver s(g);
   EXPECT_EQ(0, s.i);
-  s.Solve(g);
+  s.Solve();
   EXPECT_EQ(1, s.i);
-  s.Solve(g);
+  s.Solve();
   EXPECT_EQ(2, s.i);
 }
