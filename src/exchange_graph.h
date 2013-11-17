@@ -58,6 +58,7 @@ struct Arc {
 /// @param a the arc
 /// @return The minimum of the unode and vnode's capacities
 double Capacity(const Arc& a);
+double Capacity(Arc::Ptr pa);
 
 /// @brief the capacity of a node
 ///

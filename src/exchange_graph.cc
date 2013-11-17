@@ -30,6 +30,11 @@ double Capacity(const Arc& a) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double Capacity(Arc::Ptr pa) {
+  return Capacity(*pa.get());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Node& n) {
   if (n.set == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodeset.");
