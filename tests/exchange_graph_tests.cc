@@ -152,6 +152,22 @@ TEST(ExGraphTests, ArcCap) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, AddReqSet) {
+  RequestSet::Ptr prs = RequestSet::Ptr(new RequestSet());
+  ExchangeGraph g;
+  g.AddRequestSet(prs);
+  EXPECT_EQ(g.request_sets[0], prs);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, AddSuppSet) {
+  NodeSet::Ptr pss = NodeSet::Ptr(new NodeSet());
+  ExchangeGraph g;
+  g.AddSupplySet(pss);
+  EXPECT_EQ(g.supply_sets[0], pss);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, AddArc1) {
   ExchangeGraph g;
   
@@ -217,15 +233,15 @@ TEST(ExGraphTests, AddMatch) {
 
   double large = 500;
   
-  NodeSet uset;
-  uset.AddNode(u);
+  NodeSet::Ptr uset = NodeSet::Ptr(new NodeSet());
+  uset->AddNode(u);
   double ucap = uval * 500;
-  uset.capacities.push_back(ucap);
+  uset->capacities.push_back(ucap);
   
-  NodeSet vset;
-  vset.AddNode(v);
+  NodeSet::Ptr vset = NodeSet::Ptr(new NodeSet());
+  vset->AddNode(v);
   double vcap = vval * 500;
-  vset.capacities.push_back(vcap);
+  vset->capacities.push_back(vcap);
   
   Arc::Ptr a = Arc::Ptr(new Arc(u, v));
 

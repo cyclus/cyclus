@@ -79,6 +79,16 @@ void UpdateCapacity(Node::Ptr pn, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeGraph::AddRequestSet(RequestSet::Ptr prs) {
+  request_sets.push_back(prs);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeGraph::AddSupplySet(NodeSet::Ptr pss) {
+  supply_sets.push_back(pss);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(Arc::Ptr pa) {
   arcs_.push_back(pa);
   node_arc_map[pa->unode].push_back(pa);

@@ -86,6 +86,12 @@ class ExchangeGraph {
 
   /// @brief use the AddArc() api to update arcs_
   std::vector<Arc::Ptr> arcs_;
+
+  /// @brief adds a request set to the graph
+  void AddRequestSet(RequestSet::Ptr prs);
+  
+  /// @brief adds a supply set to the graph
+  void AddSupplySet(NodeSet::Ptr prs);
   
   /// @brief adds an arc to the graph
   void AddArc(Arc::Ptr pa);
