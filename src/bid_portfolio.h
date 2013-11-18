@@ -56,6 +56,7 @@ class BidPortfolio {
     VerifyResponder(b);
     VerifyCommodity(b);
     bids_.insert(b);
+    b->portfolio_ = this;
   };
 
   /// @brief add a capacity constraint associated with the portfolio
