@@ -40,62 +40,63 @@ double converter2(Material::Ptr m) {
   double uamt = comp.find(u235)->second;
   return comp.find(u235)->second * fraction * fraction;
 }
+// ----- xlate helpers ------
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, XlateBid) {
-  cyclus::CompMap cm;
-  double qty = 6.3;
-  cm[92235] = qty;
-  Composition::Ptr comp = Composition::CreateFromMass(cm);
-  Material::Ptr mat = Material::CreateUntracked(qty, comp);
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TEST(ExXlateTests, XlateBid) {
+//   cyclus::CompMap cm;
+//   double qty = 6.3;
+//   cm[92235] = qty;
+//   Composition::Ptr comp = Composition::CreateFromMass(cm);
+//   Material::Ptr mat = Material::CreateUntracked(qty, comp);
 
-  CapacityConstraint<Material> cc1;
-  cc1.capacity = qty;
-  cc1.converter = &converter1;
+//   CapacityConstraint<Material> cc1;
+//   cc1.capacity = qty;
+//   cc1.converter = &converter1;
 
-  CapacityConstraint<Material> cc2;
-  cc2.capacity = qty;
-  cc2.converter = &converter2;
+//   CapacityConstraint<Material> cc2;
+//   cc2.capacity = qty;
+//   cc2.converter = &converter2;
   
-  CapacityConstraint<Material> carr[] = {cc1, cc2};
-  std::set< CapacityConstraint<Material> >
-      constraints(carr, carr + sizeof(carr) / sizeof(carr[0]));
+//   CapacityConstraint<Material> carr[] = {cc1, cc2};
+//   std::set< CapacityConstraint<Material> >
+//       constraints(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
-  Bid<Material>::Ptr bid(new Bid<Material>);
-  bid->offer = mat;
+//   Bid<Material>::Ptr bid(new Bid<Material>);
+//   bid->offer = mat;
   
-  Node::Ptr exp(new Node());
-  exp->unit_capacities.push_back(converter1(mat) / qty);
-  exp->unit_capacities.push_back(converter2(mat) / qty);
+//   Node::Ptr exp(new Node());
+//   exp->unit_capacities.push_back(converter1(mat) / qty);
+//   exp->unit_capacities.push_back(converter2(mat) / qty);
 
-  ExchangeContext<Material> ctx;
-  ExchangeTranslator<Material> xlator(&ctx);
-  Node::Ptr obs = xlator.__TranslateBid(bid, constraints);
-  EXPECT_EQ(*exp.get(), *obs.get());
-}
+//   ExchangeContext<Material> ctx;
+//   ExchangeTranslator<Material> xlator(&ctx);
+//   Node::Ptr obs = xlator.__TranslateBid(bid, constraints);
+//   EXPECT_EQ(*exp.get(), *obs.get());
+// }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
   ExchangeContext<Resource> ctx;
   ExchangeTranslator<Resource> xlator(&ctx);
   
-  Request<Resource>::Ptr ur = Request<Resource>::Ptr(new Request<Resource>());
-  Request<Resource>::Ptr xr = Request<Resource>::Ptr(new Request<Resource>());
-  Bid<Resource>::Ptr vb = Bid<Resource>::Ptr(new Bid<Resource>());
-  Bid<Resource>::Ptr yb = Bid<Resource>::Ptr(new Bid<Resource>());
+  Request<Resource>::Ptr ur(new Request<Resource>());
+  Request<Resource>::Ptr xr(new Request<Resource>());
+  Bid<Resource>::Ptr vb(new Bid<Resource>());
+  Bid<Resource>::Ptr yb(new Bid<Resource>());
   
-  Node::Ptr u = Node::Ptr(new Node());  
-  Node::Ptr v = Node::Ptr(new Node());
-  Node::Ptr x = Node::Ptr(new Node());  
-  Node::Ptr y = Node::Ptr(new Node());
+  Node::Ptr u(new Node());  
+  Node::Ptr v(new Node());
+  Node::Ptr x(new Node());  
+  Node::Ptr y(new Node());
 
   xlator.__AddRequest(ur, u);
   xlator.__AddRequest(xr, x);
   xlator.__AddBid(vb, v);
   xlator.__AddBid(yb, y);
   
-  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
-  Arc::Ptr b = Arc::Ptr(new Arc(x, y));
+  Arc::Ptr a(new Arc(u, v));
+  Arc::Ptr b(new Arc(x, y));
 
   double qty = 2.5; // some magic numbers
   double aqty = qty * 0.1;

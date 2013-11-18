@@ -18,7 +18,7 @@ class Node {
 
   Node();
   
-  std::vector<double> unit_capacities;
+  std::map<const Arc*, std::vector<double> > unit_capacities;
 
   NodeSet* set;
 };
@@ -68,15 +68,15 @@ double Capacity(Arc::Ptr pa);
 /// @return The minimum of the node's nodeset capacities / the node's unit
 /// capacities. If the node/node set have no capacities, std::max<double> is
 /// returned.
-double Capacity(const Node& n);
-double Capacity(Node::Ptr pn);
+double Capacity(Node& n, const Arc& a);
+double Capacity(Node::Ptr pn, Arc::Ptr pa);
 
 /// @brief updates the capacity of a given node
 ///
 /// @param n the Node
 /// @param qty the quantity for the node to update
-void UpdateCapacity(const Node& n, double qty);
-void UpdateCapacity(Node::Ptr pn, double qty);
+void UpdateCapacity(Node& n, const Arc& a, double qty);
+void UpdateCapacity(Node::Ptr pn, Arc::Ptr pa, double qty);
 
 typedef std::pair<Arc::Ptr, double> Match;
 

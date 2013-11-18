@@ -33,15 +33,6 @@ cyclus::ExchangeGraph SetUp1b() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// make a node with a single unit capacity of 1.0
-cyclus::Node::Ptr UnitNode() {
-  using cyclus::Node;
-  Node::Ptr n = Node::Ptr(new Node());
-  n->unit_capacities.push_back(1);
-  return n;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::ExchangeGraph SetUp2(double qty, double capacity) {
   using cyclus::ExchangeGraph;
   using cyclus::Node;
@@ -52,19 +43,23 @@ cyclus::ExchangeGraph SetUp2(double qty, double capacity) {
   
   ExchangeGraph g;
   
-  NodeSet::Ptr supply = NodeSet::Ptr(new NodeSet());
-  Node::Ptr u = UnitNode();
+  Node::Ptr u(new Node());
+  Node::Ptr v(new Node());
+  Arc::Ptr a(new Arc(u, v));
+
+  u->unit_capacities[a.get()].push_back(1);
+  v->unit_capacities[a.get()].push_back(1);
+  
+  NodeSet::Ptr supply(new NodeSet());
   supply->capacities.push_back(capacity);
   supply->AddNode(u);  
   g.AddSupplySet(supply);
 
-  RequestSet::Ptr request = RequestSet::Ptr(new RequestSet(qty));
-  Node::Ptr v = UnitNode();
+  RequestSet::Ptr request(new RequestSet(qty));
   request->capacities.push_back(qty*5); // some large number
   request->AddNode(v);  
   g.AddRequestSet(request);
 
-  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
   g.AddArc(a);
   
   return g;
