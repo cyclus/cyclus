@@ -11,6 +11,7 @@ class ExchangeGraph;
 class ExchangeSolver {
  public:
   explicit ExchangeSolver(ExchangeGraph& g) : graph_(g) { };
+  virtual ~ExchangeSolver() { };
   virtual void Solve() = 0;
   ExchangeGraph& graph_;
 };
