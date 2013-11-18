@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "exchange_translator.h"
+#include "material.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, Truth) {
-  EXPECT_TRUE(true);
+  cyclus::ExchangeContext<cyclus::Material> ctx;
+  cyclus::ExchangeTranslator<cyclus::Material> xlator(&ctx);
 }
