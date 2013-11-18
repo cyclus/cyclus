@@ -7,6 +7,7 @@
 #include "generic_resource.h"
 #include "material.h"
 #include "request_portfolio.h"
+#include "trade.h"
 
 namespace cyclus {
 
