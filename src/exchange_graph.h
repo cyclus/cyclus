@@ -23,6 +23,8 @@ class Node {
   NodeSet* set;
 };
 
+bool operator==(const Node& lhs, const Node& rhs);
+
 class NodeSet {
  public:
   typedef boost::shared_ptr<NodeSet> Ptr;

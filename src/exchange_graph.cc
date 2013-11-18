@@ -11,6 +11,11 @@ namespace cyclus {
 Node::Node() : set(NULL) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool operator==(const Node& lhs, const Node& rhs) {
+  return (lhs.unit_capacities == rhs.unit_capacities) && (lhs.set == rhs.set);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void NodeSet::AddNode(Node::Ptr node) {
   node->set = this;
   nodes.push_back(node);

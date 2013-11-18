@@ -4,6 +4,8 @@
 #include <set>
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 #include "bid.h"
 #include "capacity_constraint.h"
 #include "error.h"
@@ -26,6 +28,8 @@ class Trader;
 template <class T>
 class BidPortfolio {
  public:
+  typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
+
   /// @brief default constructor
   BidPortfolio()
       : bidder_(NULL),
