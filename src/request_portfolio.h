@@ -53,6 +53,7 @@ class RequestPortfolio {
   void AddRequest(const typename Request<T>::Ptr r) {
     VerifyRequester(r);
     requests_.push_back(r);
+    r->portfolio = this;
   };
 
   /// @brief add a capacity constraint associated with the portfolio, if it

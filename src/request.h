@@ -10,7 +10,8 @@
 namespace cyclus {
 
 class Trader;
-  
+template <class T> class RequestPortfolio;
+    
 /// A Request encapsulates all the information required to communicate the
 /// needs of an agent in the Dynamic Resource Exchange, including the
 /// commodity it needs as well as a resource specification for that commodity.
@@ -30,6 +31,9 @@ struct Request {
 
   /// @return the model requesting the resource
   Trader* requester;
+  
+  /// @return the portfolio of which this request is a part
+  RequestPortfolio<T>* portfolio;
   
   /// @return a unique id for the request
   const int id() const {return id_;};

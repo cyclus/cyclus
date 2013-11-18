@@ -72,14 +72,14 @@ class ExchangeTranslator {
     NodeSet::Ptr ns(new NodeSet());
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
-    for (b_it = bp->bids().begin(); b_it != bp->bids.end(); ++b_it) {
+    for (b_it = bp.bids().begin(); b_it != bp.bids.end(); ++b_it) {
       Node::Ptr n(new Node());
       ns->AddNode(n);
       __AddBid(*b_it, n); // unit capacities must be calculated when arc is known
     }
     
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-    for (c_it = bp->constraints.begin(); c_it != bp->constraints.end(); ++c_it) {
+    for (c_it = bp.constraints.begin(); c_it != bp.constraints.end(); ++c_it) {
       ns->capacities.push_back(c_it->capacity);
     }
     
