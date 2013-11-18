@@ -1,5 +1,5 @@
-#ifndef CYCLUS_EXCHANGER_H_
-#define CYCLUS_EXCHANGER_H_
+#ifndef CYCLUS_TRADER_H_
+#define CYCLUS_TRADER_H_
 
 #include <set>
 
@@ -11,7 +11,7 @@
 namespace cyclus {
 
 template <class T> class ExchangeContext;
-  
+
 /// @class Trader
 ///
 /// @brief A simple API for agents that wish to exchange resources in the
@@ -47,4 +47,4 @@ class Trader {
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_EXCHANGER_H_
+#endif // ifndef CYCLUS_TRADER_H_
