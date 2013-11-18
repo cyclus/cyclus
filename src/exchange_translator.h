@@ -38,8 +38,8 @@ class ExchangeTranslator {
   ExchangeGraph::Ptr Translate() {
     ExchangeGraph::Ptr graph(new ExchangeGraph());
 
-    const std::vector<typename BidPortfolio<T>::Ptr>& bids = ctx_->bids();
-    typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator b_it;
+    const std::vector< BidPortfolio<T> >& bids = ctx_->bids();
+    typename std::vector< BidPortfolio<T> >::const_iterator b_it;
     for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
       NodeSet::Ptr ns = __TranslateBidPortfolio(*b_it);
       graph->AddSupplySet(ns);
@@ -68,7 +68,7 @@ class ExchangeTranslator {
   
   /// @brief translates a bid portfolio by translating each bid with
   /// __TranslateBid() and adding capacity values
-  NodeSet::Ptr __TranslateBidPortfolio(typename BidPortfolio<T>::Ptr bp) {
+  NodeSet::Ptr __TranslateBidPortfolio(BidPortfolio<T>& bp) {
     NodeSet::Ptr ns(new NodeSet());
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
