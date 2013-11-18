@@ -80,6 +80,8 @@ typedef std::pair<Arc::Ptr, double> Match;
 
 class ExchangeGraph {
  public: 
+  typedef boost::shared_ptr<ExchangeGraph> Ptr;
+
   std::vector<RequestSet::Ptr> request_sets;
   std::vector<NodeSet::Ptr> supply_sets;
   std::map<Node::Ptr, std::vector<Arc::Ptr> > node_arc_map;
