@@ -35,7 +35,18 @@ class ExchangeTranslator {
   };
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
-  ExchangeGraph::Ptr Translate();
+  ExchangeGraph::Ptr Translate() {
+    ExchangeGraph::Ptr graph(new ExchangeGraph());
+
+    const std::vector<typename BidPortfolio<T>::Ptr>& bids = ctx_->bids();
+    typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator b_it;
+    for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
+      NodeSet::Ptr ns = __TranslateBidPortfolio(*b_it);
+      graph->AddSupplySet(ns);
+    }
+    
+    return graph;
+  };
   
   /// @brief Provide a vector of Trades given a vector of Matches
   std::vector< Trade<T> >
@@ -62,9 +73,9 @@ class ExchangeTranslator {
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
     for (b_it = bp->bids().begin(); b_it != bp->bids.end(); ++b_it) {
-      Node::Ptr n = __TranslateBid(*b_it, bp->constraints());
+      Node::Ptr n(new Node());
       ns->AddNode(n);
-      __AddBid(*b_it, n);
+      __AddBid(*b_it, n); // unit capacities must be calculated when arc is known
     }
     
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
@@ -75,19 +86,19 @@ class ExchangeTranslator {
     return ns;
   }
 
-  /// @brief translates an individual bid
-  Node::Ptr __TranslateBid(
-      typename Bid<T>::Ptr b,
-      const typename std::set< CapacityConstraint<T> >& constraints) {
-    Node::Ptr n(new Node());
+  /// /// @brief translates an individual bid
+  /// Node::Ptr __TranslateBid(
+  ///     typename Bid<T>::Ptr b,
+  ///     const typename std::set< CapacityConstraint<T> >& constraints) {
+  ///   Node::Ptr n;
     
-    typename std::set< CapacityConstraint<T> >::const_iterator it;
-    for (it = constraints.begin(); it != constraints.end(); ++it) {
-      n->unit_capacities.push_back(it->converter(b->offer) / it->capacity);
-    }
+  ///   typename std::set< CapacityConstraint<T> >::const_iterator it;
+  ///   for (it = constraints.begin(); it != constraints.end(); ++it) {
+  ///     n->unit_capacities.push_back(it->converter(b->offer) / it->capacity);
+  ///   }
     
-    return n;
-  }
+  ///   return n;
+  /// }
 
   /// @brief Adds a request-node mapping
   void __AddRequest(typename Request<T>::Ptr r, Node::Ptr n) {
