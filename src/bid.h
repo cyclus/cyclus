@@ -7,6 +7,7 @@
 
 namespace cyclus {
 
+template<class T> class BidPortfolio;
 class Trader;
   
 /// A Bid encapsulates all the information required to
@@ -17,7 +18,7 @@ struct Bid {
   typedef boost::shared_ptr< Bid<T> > Ptr;
   
   /// constructor
-  Bid() : id_(next_id_++) { };
+  Bid() : id_(next_id_++), portfolio_(NULL) { };
   
   /// @return the request being responded to
   typename Request<T>::Ptr request;
@@ -31,7 +32,7 @@ struct Bid {
   /// @return a unique id for the bid
   const int id() const {return id_;};
 
- private:
+  BidPortfolio<T>* portfolio_;
   int id_;
   static int next_id_;
 };
