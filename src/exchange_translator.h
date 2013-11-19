@@ -40,14 +40,14 @@ class ExchangeTranslator {
 
     // add each request set
     const std::vector< RequestPortfolio<T> >& requests = ctx_->requests();
-    typename std::vector< RequestPortfolio<T> >::const_iterator b_it;
-    for (b_it = requests.begin(); b_it != requests.end(); ++b_it) {
-      NodeSet::Ptr ns = __TranslateRequestPortfolio(*b_it);
-      graph->AddSupplySet(ns);
+    typename std::vector< RequestPortfolio<T> >::const_iterator r_it;
+    for (r_it = requests.begin(); r_it != requests.end(); ++r_it) {
+      RequestSet::Ptr rs = __TranslateRequestPortfolio(*r_it);
+      graph->AddRequestSet(rs);
     }
 
     // add each bid set
-    const std::vector< BidPortfolio<T> >& bidports = ctx_->bidports();
+    const std::vector< BidPortfolio<T> >& bidports = ctx_->bids();
     typename std::vector< BidPortfolio<T> >::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
       NodeSet::Ptr ns = __TranslateBidPortfolio(*bp_it);
@@ -100,15 +100,19 @@ class ExchangeTranslator {
   RequestSet::Ptr __TranslateRequestPortfolio(RequestPortfolio<T>& rp) {
     RequestSet::Ptr rs(new RequestSet(rp.qty()));
     
-    typename std::set<typename Request<T>::Ptr>::corst_iterator r_it;
-    for (r_it = rp.requests().begin(); r_it != rp.requests.end(); ++r_it) {
+    typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
+    for (r_it = rp.requests().begin();
+         r_it != rp.requests().end();
+         ++r_it) {
       Node::Ptr n(new Node());
       rs->AddNode(n);
       __AddRequest(*r_it, n);
     }
     
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-    for (c_it = rp.constraints.begin(); c_it != rp.constraints.end(); ++c_it) {
+    for (c_it = rp.constraints().begin();
+         c_it != rp.constraints().end();
+         ++c_it) {
       rs->capacities.push_back(c_it->capacity);
     }
     
@@ -120,15 +124,19 @@ class ExchangeTranslator {
   NodeSet::Ptr __TranslateBidPortfolio(BidPortfolio<T>& bp) {
     NodeSet::Ptr bs(new NodeSet());
     
-    typename std::set<typename Bid<T>::Ptr>::cobst_iterator b_it;
-    for (b_it = bp.bids().begin(); b_it != bp.bids.end(); ++b_it) {
+    typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
+    for (b_it = bp.bids().begin();
+         b_it != bp.bids().end();
+         ++b_it) {
       Node::Ptr n(new Node());
       bs->AddNode(n);
       __AddBid(*b_it, n);
     }
     
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-    for (c_it = bp.constraints.begin(); c_it != bp.constraints.end(); ++c_it) {
+    for (c_it = bp.constraints().begin();
+         c_it != bp.constraints().end();
+         ++c_it) {
       bs->capacities.push_back(c_it->capacity);
     }
     
@@ -138,13 +146,15 @@ class ExchangeTranslator {
   /// @brief translates an arc given a bid and subsequent data, and also
   /// updates the unit capacities for the associated nodes on the arc
   Arc::Ptr __TranslateArc(typename Bid<T>::Ptr bid) {
+    typename Request<T>::Ptr req = bid->request;
+    
     Node::Ptr unode = bid_to_node_[bid];
-    Node::Ptr vnode = bid_to_node_[bid->request];
+    Node::Ptr vnode = bid_to_node_[req];
     Arc::Ptr arc(new Arc(unode, vnode));
 
     typename T::Ptr offer = bid->offer;
-    BidPortfolio<T>* bp = bid->portfolio_;
-    RequestPortfolio<T>* rp = bid->request->portfolio_;
+    BidPortfolio<T>* bp = bid->portfolio;
+    RequestPortfolio<T>* rp = req->portfolio;
     
     TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v
     TranslateCapacities(offer, rp->constraints(), unode, arc); // req is u

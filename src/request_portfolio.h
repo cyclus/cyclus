@@ -57,7 +57,7 @@ class RequestPortfolio {
   /// @throws if a request is added from a different requester than the original
   void AddRequest(const typename Request<T>::Ptr r) {
     VerifyRequester(r);
-    //    VerifyQty(r);
+    //VerifyQty(r);
     requests_.push_back(r);
     r->portfolio = this;
   };

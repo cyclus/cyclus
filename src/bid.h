@@ -18,7 +18,7 @@ struct Bid {
   typedef boost::shared_ptr< Bid<T> > Ptr;
   
   /// constructor
-  Bid() : id_(next_id_++), portfolio_(NULL) { };
+  Bid() : id_(next_id_++) { };
   
   /// @return the request being responded to
   typename Request<T>::Ptr request;
@@ -28,11 +28,13 @@ struct Bid {
 
   /// @return the model responding the request
   Trader* bidder;
+
+  /// @return the portfolio of which this bid is a part
+  BidPortfolio<T>* portfolio;
   
   /// @return a unique id for the bid
   const int id() const {return id_;};
 
-  BidPortfolio<T>* portfolio_;
   int id_;
   static int next_id_;
 };
