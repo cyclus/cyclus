@@ -49,6 +49,9 @@ inline static void AdjustPrefs(Model* m,
 ///
 /// @code
 /// ResourceExchange exchng(ctx);
+/// exchng.AddAllRequests();
+/// exchng.AddAllBids();
+/// exchng.DoAllAdjustments();
 /// @endcode
 template <class T>
 class ResourceExchange {
