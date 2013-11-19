@@ -33,14 +33,19 @@ template<class T>
 class RequestPortfolio {
  public:
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), id_(next_id_++) { };
+  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) { };
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
   const Trader* requester() const {
     return requester_;
   };
-  
+
+  /// @return the request quantity associated with the portfolio.
+  double qty() {
+    return qty_;
+  };
+
   /// @return const access to the unconstrained requests
   //const std::vector<boost::shared_ptr< Request<T> > >& requests() const {
   const std::vector<typename Request<T>::Ptr>& requests() const {
@@ -52,6 +57,7 @@ class RequestPortfolio {
   /// @throws if a request is added from a different requester than the original
   void AddRequest(const typename Request<T>::Ptr r) {
     VerifyRequester(r);
+    //    VerifyQty(r);
     requests_.push_back(r);
     r->portfolio = this;
   };
@@ -91,13 +97,28 @@ class RequestPortfolio {
     }
   };
 
+  /// @brief if the quanityt has not been determined yet, it is set. otherwise
+  /// VerifyRequester() verifies the the quantity is the same as all others in
+  /// the portfolio
+  /// @throws if a quanityt is different than the original
+  void VerifyQty(const typename Request<T>::Ptr r) {
+    double qty = r->target->quantity();
+    if (qty_ == -1) {
+      qty_ = qty;
+    } else if (qty_ != qty) {
+      std::string msg = "Insertion error: request quantity do not match.";
+      throw KeyError(msg);
+    }
+  };
+
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
-  
+
+  double qty_;
   Trader* requester_;
   int id_;
   static int next_id_;
