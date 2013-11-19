@@ -6,7 +6,7 @@
 #include "trader.h"
 
 namespace cyclus {
-    
+  
 // template specializations to support inheritance and virtual functions
 template<class T>
 inline std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {

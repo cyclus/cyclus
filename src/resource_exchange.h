@@ -17,13 +17,16 @@
 
 namespace cyclus {
 
-template<class T> void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
+template<class T>
+inline static void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
 
-void AdjustPrefs(Model* m, typename PrefMap<Material>::type& prefs) {
+inline static void AdjustPrefs(Model* m,
+                               typename PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
 
-void AdjustPrefs(Model* m, typename PrefMap<GenericResource>::type& prefs) {
+inline static void AdjustPrefs(Model* m,
+                               typename PrefMap<GenericResource>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
 }
 

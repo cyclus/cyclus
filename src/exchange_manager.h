@@ -3,11 +3,11 @@
 
 #include <algorithm>
 
+#include "trader_management.h"
 #include "resource_exchange.h"
 #include "exchange_solver.h"
 #include "exchange_graph.h"
 #include "exchange_translator.h"
-#include "trader_management.h"
 
 namespace cyclus {
 
@@ -31,25 +31,25 @@ class ExchangeManager {
 
   /// @brief execute the full resource sequence
   void Execute() {
-    /// // collect resource exchange information
-    /// ResourceExchange<T> exchng(ctx_);
-    /// exchng.AddAllRequests();
-    /// exchng.AddAllBids();
-    /// exchng.DoAllAdjustments();
+    // collect resource exchange information
+    ResourceExchange<T> exchng(ctx_);
+    exchng.AddAllRequests();
+    exchng.AddAllBids();
+    exchng.DoAllAdjustments();
 
-    /// // translate graph
-    /// ExchangeTranslator<T> xlator(&exchng.ex_ctx());
-    /// ExchangeGraph::Ptr graph = xlator.Translate();
+    // translate graph
+    ExchangeTranslator<T> xlator(&exchng.ex_ctx());
+    ExchangeGraph::Ptr graph = xlator.Translate();
 
-    /// // solve graph
-    /// solver_->set_graph(graph);
-    /// solver_->Solve();
+    // solve graph
+    solver_->set_graph(graph.get());
+    solver_->Solve();
 
-    /// // get trades
-    /// std::vector< Trade<T> > trades =
-    ///     xlator.BackTranslateSolution(graph->matches);
+    // get trades
+    std::vector< Trade<T> > trades =
+        xlator.BackTranslateSolution(graph->matches);
 
-    /// std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
+    std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
   }
   
   Context* ctx_;
