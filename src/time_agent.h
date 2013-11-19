@@ -1,6 +1,6 @@
 // time_agent.h
-#if !defined(_TIMEAGENT_H)
-#define _TIMEAGENT_H
+#ifndef CYCLUS_TIMEAGENT_H_
+#define CYCLUS_TIMEAGENT_H_
 
 #include <string>
 
@@ -50,5 +50,5 @@ class TimeAgent : virtual public Model {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_TIMEAGENT_H_
 

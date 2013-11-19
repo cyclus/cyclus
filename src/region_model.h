@@ -1,6 +1,6 @@
 // Regionmodel.h
-#if !defined(_REGIONMODEL_H)
-#define _REGIONMODEL_H
+#ifndef CYCLUS_REGIONMODEL_H_
+#define CYCLUS_REGIONMODEL_H_
 
 #include <set>
 
@@ -170,4 +170,4 @@ class RegionModel : public TimeAgent, public Communicator {
   std::set<std::string> inst_names_;
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_REGIONMODEL_H_

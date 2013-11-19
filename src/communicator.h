@@ -1,6 +1,6 @@
 // communicator.h
-#if !defined(_COMMUNICATOR_H)
-#define _COMMUNICATOR_H
+#ifndef CYCLUS_COMMUNICATOR_H_
+#define CYCLUS_COMMUNICATOR_H_
 
 #include <set>
 
@@ -102,5 +102,5 @@ class Communicator {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_COMMUNICATOR_H_
 

@@ -1,6 +1,6 @@
 // market_model.h
-#if !defined(_MARKETMODEL_H)
-#define _MARKETMODEL_H
+#ifndef CYCLUS_MARKETMODEL_H_
+#define CYCLUS_MARKETMODEL_H_
 
 #include <deque>
 #include <set>
@@ -167,7 +167,7 @@ class MarketModel : virtual public Model, public Communicator {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_MARKETMODEL_H_
 
 
 

@@ -2,8 +2,8 @@
   \brief Declares the CycArithmetic class, which holds arithmetic algorithms
   \author Kathryn D. Huff
  */
-#if !defined(_CYCARITHMETIC_H)
-#define _CYCARITHMETIC_H
+#ifndef CYCLUS_CYCARITHMETIC_H_
+#define CYCLUS_CYCARITHMETIC_H_
 
 #include <iostream>
 #include <algorithm>
@@ -33,4 +33,4 @@ class CycArithmetic {
   static std::vector<double> sort_ascending(std::map<int, double> to_sort);
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_CYCARITHMETIC_H_

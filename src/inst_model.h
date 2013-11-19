@@ -1,6 +1,6 @@
 // inst_model.h
-#if !defined(_INSTMODEL_H)
-#define _INSTMODEL_H
+#ifndef CYCLUS_INST_MODEL_H_
+#define CYCLUS_INST_MODEL_H_
 
 #include "time_agent.h"
 #include "communicator.h"
@@ -227,5 +227,5 @@ class InstModel : public TimeAgent, public Communicator {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_INST_MODEL_H_
 

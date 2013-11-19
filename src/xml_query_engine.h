@@ -1,6 +1,6 @@
 //XMLquery_engine.h
-#if !defined(_XMLQUERYENGINE_H)
-#define _XMLQUERYENGINE_H
+#ifndef CYCLUS_XML_QUERY_ENGINE_H_
+#define CYCLUS_XML_QUERY_ENGINE_H_
 
 #include <string>
 #include <vector>
@@ -83,4 +83,4 @@ class XMLQueryEngine : public QueryEngine {
 };
 } // namespace cyclus
 
-#endif
+#endif // ifndef CYCLUS_XML_QUERY_ENGINE_H_

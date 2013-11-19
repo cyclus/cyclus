@@ -1,6 +1,6 @@
 // facility_model.h
-#if !defined(_FACILITYMODEL_H)
-#define _FACILITYMODEL_H
+#ifndef CYCLUS_FACILITYMODEL_H_
+#define CYCLUS_FACILITYMODEL_H_
 
 #include <string>
 #include <vector>
@@ -241,4 +241,4 @@ protected:
 };
 } // namespace cyclus
 
-#endif
+#endif // ifndef CYCLUS_FACILITYMODEL_H_

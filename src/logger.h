@@ -6,8 +6,8 @@
    at http://cyclus.github.com/devdoc/main.html
  */
 
-#if !defined(_LOGGER_H)
-#define _LOGGER_H
+#ifndef CYCLUS_LOGGER_H_
+#define CYCLUS_LOGGER_H_
 
 
 #include <iostream>
@@ -175,5 +175,5 @@ class Logger {
   static int field_width_;
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_LOGGER_H_
 
