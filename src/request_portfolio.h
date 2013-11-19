@@ -45,7 +45,7 @@ class RequestPortfolio {
   ///
   /// @brief, all requests in a portfolio must have the same quantity, which is
   /// checked during AddRequest()
-  double qty() {
+  double qty() const {
     return qty_;
   };
 

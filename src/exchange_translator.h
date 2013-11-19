@@ -40,9 +40,9 @@ class ExchangeTranslator {
 
     // add each request set
     const std::vector< RequestPortfolio<T> >& requests = ctx_->requests();
-    typename std::vector< RequestPortfolio<T> >::const_iterator r_it;
-    for (r_it = requests.begin(); r_it != requests.end(); ++r_it) {
-      RequestSet::Ptr rs = __TranslateRequestPortfolio(*r_it);
+    typename std::vector< RequestPortfolio<T> >::const_iterator rp_it;
+    for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
+      RequestSet::Ptr rs = __TranslateRequestPortfolio(*rp_it);
       graph->AddRequestSet(rs);
     }
 
@@ -95,9 +95,10 @@ class ExchangeTranslator {
     node_to_bid_[n] = b;
   }
   
-  /// @brief translates a request portfolio by adding request nodes and accounting
-  /// for capacities. Request unit capcities must be added when arcs are known
-  RequestSet::Ptr __TranslateRequestPortfolio(RequestPortfolio<T>& rp) {
+  /// @brief translates a request portfolio by adding request nodes and
+  /// accounting for capacities. Request unit capcities must be added when arcs
+  /// are known
+  RequestSet::Ptr __TranslateRequestPortfolio(const RequestPortfolio<T>& rp) {
     RequestSet::Ptr rs(new RequestSet(rp.qty()));
     
     typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
@@ -121,7 +122,7 @@ class ExchangeTranslator {
   
   /// @brief translates a bid portfolio by adding bid nodes and accounting
   /// for capacities. Bid unit capcities must be added when arcs are known
-  NodeSet::Ptr __TranslateBidPortfolio(BidPortfolio<T>& bp) {
+  NodeSet::Ptr __TranslateBidPortfolio(const BidPortfolio<T>& bp) {
     NodeSet::Ptr bs(new NodeSet());
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;

@@ -12,11 +12,11 @@
 #include "capacity_constraint.h"
 #include "request_portfolio.h"
 #include "bid_portfolio.h"
-//#include "test_context.h"
-// #include "mock_facility.h"
+#include "test_context.h"
+#include "mock_facility.h"
 #include "resource_helpers.h"
 
-//using cyclus::TestContext;
+using cyclus::TestContext;
 using cyclus::Resource;
 using cyclus::Material;
 using cyclus::Request;
@@ -35,6 +35,7 @@ using cyclus::CapacityConstraint;
 using cyclus::TranslateCapacities;
 using cyclus::RequestSet;
 using cyclus::NodeSet;
+using cyclus::ExchangeGraph;
 
 // ----- xlate helpers ------
 double fraction = 0.7;
@@ -99,7 +100,6 @@ TEST(ExXlateTests, XlateReq) {
   
   Request<Material>::Ptr req(new Request<Material>());
   req->target = mat;
-  // req->requester = fac;
   double qty1 = 2.5 * qty;
 
   CapacityConstraint<Material> cc1;
@@ -134,8 +134,8 @@ TEST(ExXlateTests, XlateReq) {
 TEST(ExXlateTests, XlateBid) {
   Material::Ptr mat = get_mat(u235, qty);
   
-  Bid<Material>::Ptr bid(new Bid<Material>());
   Request<Material>::Ptr req(new Request<Material>());
+  Bid<Material>::Ptr bid(new Bid<Material>());
   bid->offer = mat;
   bid->request = req;
   
@@ -219,6 +219,44 @@ TEST(ExXlateTests, XlateArc) {
   double rarr[] = {(converter1(mat) / qty1)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   EXPECT_EQ(rexp, a->unode->unit_capacities[a.get()]);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, NullXlate) {
+  TestContext tc;
+  MockFacility* fac = new MockFacility(tc.get());
+  Material::Ptr mat = get_mat(u235, qty);
+  
+  Request<Material>::Ptr req(new Request<Material>());
+  req->target = mat;
+  req->requester = fac;
+  
+  Bid<Material>::Ptr bid(new Bid<Material>());
+  bid->offer = mat;
+  bid->request = req;
+  bid->bidder = fac;
+  
+  BidPortfolio<Material> bport;
+  bport.AddBid(bid);
+
+  RequestPortfolio<Material> rport;
+  rport.AddRequest(req);
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rport);
+  ctx.AddBidPortfolio(bport);
+  
+  ExchangeTranslator<Material> xlator(&ctx);
+  
+  ExchangeGraph::Ptr graph;
+  EXPECT_NO_THROW(graph = xlator.Translate());
+  EXPECT_EQ(1, graph->request_sets.size());
+  EXPECT_EQ(1, graph->supply_sets.size());
+  EXPECT_EQ(2, graph->node_arc_map.size());
+  EXPECT_EQ(1, graph->arcs_.size());
+  EXPECT_EQ(0, graph->matches.size());
+
+  delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
