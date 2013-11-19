@@ -125,6 +125,8 @@ class ExchangeTranslator {
   };
 };
 
+/// @brief updates a node's unit capacities given, a target resource and
+/// constraints
 template<typename T>
 void TranslateCapacities(typename T::Ptr offer,
                          typename std::set< CapacityConstraint<T> > constr,
