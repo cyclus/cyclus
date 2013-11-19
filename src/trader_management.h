@@ -6,69 +6,81 @@
 #include "trader.h"
 
 namespace cyclus {
-
+    
 // template specializations to support inheritance and virtual functions
-template<class T> std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
+template<class T>
+inline std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
   return std::set< RequestPortfolio<T> >();
 }
 
-template<> std::set< RequestPortfolio<Material> >
+template<>
+inline std::set< RequestPortfolio<Material> >
     QueryRequests<Material>(Trader* t) {
   return t->AddMatlRequests();
 }
 
-template<> std::set< RequestPortfolio<GenericResource> >
+template<>
+inline std::set< RequestPortfolio<GenericResource> >
     QueryRequests<GenericResource>(Trader* t) {
   return t->AddGenRsrcRequests();
 }
 
 template<class T> class ExchangeContext;
   
-template<class T> std::set< BidPortfolio<T> >
+template<class T>
+inline std::set< BidPortfolio<T> >
     QueryBids(Trader* t, ExchangeContext<T>* ec) {
   return std::set< BidPortfolio<T> >();
 }
   
-template<> std::set< BidPortfolio<Material> >
+template<>
+inline std::set< BidPortfolio<Material> >
     QueryBids<Material>(Trader* t, ExchangeContext<Material>* ec) {
   return t->AddMatlBids(ec);
 }
 
-template<> std::set< BidPortfolio<GenericResource> >
+template<>
+inline std::set< BidPortfolio<GenericResource> >
     QueryBids<GenericResource>(Trader* t, ExchangeContext<GenericResource>* ec) {
   return t->AddGenRsrcBids(ec);
 }
 
 template<class T>
-    typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
+inline typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
   return typename T::Ptr(new T());
 }
 
-template<> Material::Ptr ExecTradeOffer<Material>(const Trade<Material>& trade) {
+template<>
+inline Material::Ptr
+    ExecTradeOffer<Material>(const Trade<Material>& trade) {
   return trade.bid->bidder->OfferMatlTrade(trade);
 }
 
-template<> GenericResource::Ptr
+template<>
+inline GenericResource::Ptr
     ExecTradeOffer<GenericResource>(const Trade<GenericResource>& trade) {
   return trade.bid->bidder->OfferGenRsrcTrade(trade);
 }
 
 template<class T>
-    void ExecTradeAccept(const Trade<T>& trade, typename T::Ptr rsrc) { }
+inline void ExecTradeAccept(const Trade<T>& trade,
+                                   typename T::Ptr rsrc) { }
 
-template<> void ExecTradeAccept<Material>(
-    const Trade<Material>& trade,
-    Material::Ptr rsrc) {
+template<>
+inline void ExecTradeAccept<Material>(const Trade<Material>& trade,
+                                             Material::Ptr rsrc) {
   return trade.request->requester->AcceptMatlTrade(trade, rsrc);
 }
 
-template<> void ExecTradeAccept<GenericResource>(
+template<>
+inline void ExecTradeAccept<GenericResource>(
     const Trade<GenericResource>& trade,
     GenericResource::Ptr rsrc) {
   return trade.request->requester->AcceptGenRsrcTrade(trade, rsrc);
 }
 
-template<class T> void ExecuteTrade(const Trade<T>& trade) {
+template<class T>
+inline void ExecuteTrade(const Trade<T>& trade) {
   typename T::Ptr rsrc = ExecTradeOffer(trade);
   ExecTradeAccept(trade, rsrc);
 }
