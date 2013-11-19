@@ -148,8 +148,8 @@ class ExchangeTranslator {
   Arc::Ptr __TranslateArc(typename Bid<T>::Ptr bid) {
     typename Request<T>::Ptr req = bid->request;
     
-    Node::Ptr unode = bid_to_node_[bid];
-    Node::Ptr vnode = bid_to_node_[req];
+    Node::Ptr unode = request_to_node_[req];
+    Node::Ptr vnode = bid_to_node_[bid];
     Arc::Ptr arc(new Arc(unode, vnode));
 
     typename T::Ptr offer = bid->offer;

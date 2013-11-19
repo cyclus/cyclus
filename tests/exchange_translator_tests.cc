@@ -94,9 +94,7 @@ TEST(ExXlateTests, XlateCapacities) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, XlateReqs) {
-  // TestContext tc;
-  //  MockFacility* fac = new MockFacility(tc.get());
+TEST(ExXlateTests, XlateReq) {
   Material::Ptr mat = get_mat(u235, qty);
   
   Request<Material>::Ptr req(new Request<Material>());
@@ -120,7 +118,6 @@ TEST(ExXlateTests, XlateReqs) {
   rp.AddRequest(req);
   rp.AddConstraint(cc1);
   rp.AddConstraint(cc2);
-  //  ctx.AddRequestPortfolio(rp);
 
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
@@ -131,12 +128,10 @@ TEST(ExXlateTests, XlateReqs) {
   EXPECT_EQ(cexp, set->capacities);
   EXPECT_TRUE(xlator.request_to_node_.find(req)
               != xlator.request_to_node_.end());
-  
-  // delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, XlateBids) {
+TEST(ExXlateTests, XlateBid) {
   Material::Ptr mat = get_mat(u235, qty);
   
   Bid<Material>::Ptr bid(new Bid<Material>());
@@ -172,25 +167,59 @@ TEST(ExXlateTests, XlateBids) {
               != xlator.bid_to_node_.end());
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(ExXlateTests, XlateGraph1) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, XlateArc) {
+  Material::Ptr mat = get_mat(u235, qty);
   
-//   Bid<Material>::Ptr bid(new Bid<Material>());
-//   bid->offer = mat;
-//   bid->request = req;
-//   BidPortfolio<Material> bp;
-//   bp.AddBid(bid);
-//   ctx.AddBidPortfolio(bp);
+  Request<Material>::Ptr req(new Request<Material>());
+  req->target = mat;
   
-//   ExchangeTranslator<Material> xlator(&ctx);
+  Bid<Material>::Ptr bid(new Bid<Material>());
+  bid->offer = mat;
+  bid->request = req;
+  
+  double qty1 = 2.5 * qty;
+  CapacityConstraint<Material> cc1;
+  cc1.capacity = qty1;
+  cc1.converter = &converter1;
 
+  double qty2 = 0.8 * qty;
+  CapacityConstraint<Material> cc2;
+  cc2.capacity = qty2;
+  cc2.converter = &converter2;
   
+  double carr[] = {qty1, qty2};
+  std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
-//   // Node::Ptr obs = xlator.__TranslateBid(bid, constraints);
-//   // EXPECT_EQ(*exp.get(), *obs.get());
-// }
+  BidPortfolio<Material> bport;
+  bport.AddBid(bid);
+  bport.AddConstraint(cc1);
+  bport.AddConstraint(cc2);
 
-  // Node::Ptr exp(new Node());
+  RequestPortfolio<Material> rport;
+  rport.AddRequest(req);
+  rport.AddConstraint(cc1);
+
+  ExchangeContext<Material> ctx;
+  ExchangeTranslator<Material> xlator(&ctx);
+
+  // give the xlator the correct state
+  RequestSet::Ptr rset = xlator.__TranslateRequestPortfolio(rport);
+  NodeSet::Ptr bset = xlator.__TranslateBidPortfolio(bport);
+
+  Arc::Ptr a = xlator.__TranslateArc(bid);
+
+  EXPECT_EQ(xlator.bid_to_node_[bid], a->vnode);
+  EXPECT_EQ(xlator.request_to_node_[req], a->unode);
+
+  double barr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
+  std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
+  EXPECT_EQ(bexp, a->vnode->unit_capacities[a.get()]);
+      
+  double rarr[] = {(converter1(mat) / qty1)};
+  std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
+  EXPECT_EQ(rexp, a->unode->unit_capacities[a.get()]);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
