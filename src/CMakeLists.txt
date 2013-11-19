@@ -141,7 +141,9 @@ INSTALL(FILES
   trader.h
   exchange_context.h
   exchange_graph.h
+  exchange_manager.h
   exchange_solver.h 
+  exchange_translator.h
   facility_model.h
   function.h
   generic_resource.h

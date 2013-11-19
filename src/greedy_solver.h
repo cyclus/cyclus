@@ -2,9 +2,12 @@
 #define CYCLUS_GREEDY_SOLVER_H_
 
 #include "exchange_solver.h"
+
 #include "exchange_graph.h"
 
 namespace cyclus {
+
+class ExchangeGraph;
   
 /// @brief The GreedySolver provides the implementation for a "greedy" solution
 /// to a resource exchange graph.
@@ -18,7 +21,9 @@ namespace cyclus {
 ///   2) All SupplySets are at capacity
 class GreedySolver: public ExchangeSolver {
  public:
-  explicit GreedySolver(ExchangeGraph& g);
+  GreedySolver() { };
+  explicit GreedySolver(ExchangeGraph* g) : ExchangeSolver(g) { };
+  virtual ~GreedySolver() {};
   virtual void Solve();
   void __GreedilySatisfySet(RequestSet::Ptr prs);
 };

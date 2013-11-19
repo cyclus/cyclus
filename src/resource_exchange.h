@@ -41,6 +41,12 @@ void AdjustPrefs(Model* m, typename PrefMap<GenericResource>::type& prefs) {
 /// -# Preference Adjustment
 ///     Preferences for each request-bid pair are set, informing\n
 ///     the evenutal soluation mechanism
+///
+/// For example, assuming a simulation Context, ctx:
+///
+/// @code
+/// ResourceExchange exchng(ctx);
+/// @endcode
 template <class T>
 class ResourceExchange {
  public:

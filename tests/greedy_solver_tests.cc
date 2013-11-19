@@ -14,7 +14,7 @@ using cyclus::Match;
 // 0 nodes
 TEST(GrSolverTests, Case0) {
   ExchangeGraph g;
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
   EXPECT_TRUE(g.matches.empty());
 }
@@ -26,7 +26,7 @@ TEST(GrSolverTests, Case0) {
 TEST(GrSolverTests, Case1a) {
   // 1 request node
   ExchangeGraph g = SetUp1a();
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
   EXPECT_TRUE(g.matches.empty());
 }
@@ -34,7 +34,7 @@ TEST(GrSolverTests, Case1a) {
 TEST(GrSolverTests, Case1b) {
 // 1 supply node
   ExchangeGraph g = SetUp1b();
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
   EXPECT_TRUE(g.matches.empty());
 }
@@ -49,7 +49,7 @@ TEST(GrSolverTests, Case2a) {
   double qty = 5;
   double cap = 10;
   ExchangeGraph g = SetUp2(qty, cap);
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
   
   ASSERT_TRUE(g.arcs_.size() > 0);
@@ -63,7 +63,7 @@ TEST(GrSolverTests, Case2b) {
   double qty = 5;
   double cap = 10;
   ExchangeGraph g = SetUp2(qty, cap);
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
 
   ASSERT_TRUE(g.arcs_.size() > 0);
@@ -77,7 +77,7 @@ TEST(GrSolverTests, Case2c) {
   double qty = 10;
   double cap = 5;
   ExchangeGraph g = SetUp2(qty, cap);
-  GreedySolver solver(g);
+  GreedySolver solver(&g);
   solver.Solve();
 
   ASSERT_TRUE(g.arcs_.size() > 0);

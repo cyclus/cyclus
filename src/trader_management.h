@@ -68,7 +68,7 @@ template<> void ExecTradeAccept<GenericResource>(
   return trade.request->requester->AcceptGenRsrcTrade(trade, rsrc);
 }
 
-template<class T> void Execute(const Trade<T>& trade) {
+template<class T> void ExecuteTrade(const Trade<T>& trade) {
   typename T::Ptr rsrc = ExecTradeOffer(trade);
   ExecTradeAccept(trade, rsrc);
 }
