@@ -12,6 +12,7 @@
 #include "resource.h"
 #include "test_context.h"
 #include "trader.h"
+#include "resource_helpers.h"
 
 #include "exchange_context.h"
 
@@ -28,7 +29,7 @@ using cyclus::PrefMap;
 using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trader;
-  
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ExchangeContextTests: public ::testing::Test {
  protected:
@@ -50,11 +51,13 @@ class ExchangeContextTests: public ::testing::Test {
     req1->commodity = commod1;
     req1->requester = fac1;
     req1->preference = pref;
+    req1->target = get_mat();
     
     req2 = Request<Resource>::Ptr(new Request<Resource>());
     req2->commodity = commod1;
     req2->requester = fac2;
     req2->preference = pref;
+    req2->target = get_mat();
 
     rp1.AddRequest(req1);    
     rp2.AddRequest(req2);
@@ -124,6 +127,7 @@ TEST_F(ExchangeContextTests, AddRequest3) {
   Request<Resource>::Ptr req = Request<Resource>::Ptr(new Request<Resource>());
   req->commodity = commod2;
   req->requester = fac1;
+  req->target = get_mat();
   rp1.AddRequest(req);
   
   ExchangeContext<Resource> context;

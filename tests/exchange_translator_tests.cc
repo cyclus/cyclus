@@ -12,10 +12,11 @@
 #include "capacity_constraint.h"
 #include "request_portfolio.h"
 #include "bid_portfolio.h"
-#include "test_context.h"
-#include "mock_facility.h"
+//#include "test_context.h"
+// #include "mock_facility.h"
+#include "resource_helpers.h"
 
-using cyclus::TestContext;
+//using cyclus::TestContext;
 using cyclus::Resource;
 using cyclus::Material;
 using cyclus::Request;
@@ -51,18 +52,11 @@ double converter2(Material::Ptr m) {
   double uamt = comp.find(u235)->second;
   return comp.find(u235)->second * fraction * fraction;
 }
-
-Material::Ptr get_mat() {
-  cyclus::CompMap cm;
-  cm[92235] = qty;
-  Composition::Ptr comp = Composition::CreateFromMass(cm);
-  return Material::CreateUntracked(qty, comp);
-}
 // ----- xlate helpers ------
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateCapacities) {
-  Material::Ptr mat = get_mat();
+  Material::Ptr mat = get_mat(u235, qty);
   
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1;
@@ -103,7 +97,7 @@ TEST(ExXlateTests, XlateCapacities) {
 TEST(ExXlateTests, XlateReqs) {
   // TestContext tc;
   //  MockFacility* fac = new MockFacility(tc.get());
-  Material::Ptr mat = get_mat();
+  Material::Ptr mat = get_mat(u235, qty);
   
   Request<Material>::Ptr req(new Request<Material>());
   req->target = mat;
@@ -143,7 +137,7 @@ TEST(ExXlateTests, XlateReqs) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBids) {
-  Material::Ptr mat = get_mat();
+  Material::Ptr mat = get_mat(u235, qty);
   
   Bid<Material>::Ptr bid(new Bid<Material>());
   Request<Material>::Ptr req(new Request<Material>());

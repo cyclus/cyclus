@@ -12,6 +12,7 @@
 #include "request.h"
 #include "resource.h"
 #include "test_context.h"
+#include "resource_helpers.h"
 
 #include "request_portfolio.h"
 
@@ -49,8 +50,13 @@ class RequestPortfolioTests: public ::testing::Test {
 TEST_F(RequestPortfolioTests, ReqAdd){ 
   Request<Resource>::Ptr r1 = Request<Resource>::Ptr(new Request<Resource>());
   r1->requester = fac1;
+  r1->target = get_mat();
   Request<Resource>::Ptr r2 = Request<Resource>::Ptr(new Request<Resource>());
-  r2->requester = fac2;
+  r2->requester = fac2; // a different requester
+  r1->target = get_mat();
+  Request<Resource>::Ptr r3 = Request<Resource>::Ptr(new Request<Resource>());
+  r3->requester = fac1;
+  r3->target = get_mat(92235, 150051.0); // some different quantity
   
   RequestPortfolio<Resource> rp;
   ASSERT_EQ(rp.requests().size(), 0);
@@ -59,6 +65,7 @@ TEST_F(RequestPortfolioTests, ReqAdd){
   ASSERT_EQ(rp.requests().size(), 1);
   ASSERT_EQ(rp.requests()[0], r1);
   EXPECT_THROW(rp.AddRequest(r2), KeyError);
+  EXPECT_THROW(rp.AddRequest(r3), KeyError);
 
   rp.Clear();
   ASSERT_EQ(rp.requests().size(), 0);
@@ -87,10 +94,12 @@ TEST_F(RequestPortfolioTests, Sets) {
   commod1 = "1";
   req1->commodity = commod1;
   req1->requester = fac1;
-    
+  req1->target = get_mat();
+  
   commod2 = "2";
   req2->commodity = commod2;
   req2->requester = fac1;
+  req2->target = get_mat();
 
   rp1.AddRequest(req1);
     
