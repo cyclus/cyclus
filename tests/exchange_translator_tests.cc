@@ -28,6 +28,7 @@ using cyclus::ExchangeTranslator;
 using cyclus::CompMap;
 using cyclus::Composition;
 using cyclus::CapacityConstraint;
+using cyclus::TranslateCapacities;
 
 // ----- xlate helpers ------
 double fraction = 0.7;
@@ -47,50 +48,78 @@ double converter2(Material::Ptr m) {
 // ----- xlate helpers ------
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, XlateGraph1) {
+TEST(ExXlateTests, XlateCapacities) {
   cyclus::CompMap cm;
   double qty = 6.3;
   cm[92235] = qty;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
-  ExchangeContext<Material> ctx;
 
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  RequestPortfolio<Material> rp;
-  rp.AddRequest(req);
-  ctx.AddRequestPortfolio(rp);
-  
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->request = req;
-  BidPortfolio<Material> bp;
-  bp.AddBid(bid);
-  ctx.AddBidPortfolio(bp);
-  
-  ExchangeTranslator<Material> xlator(&ctx);
+  double qty1 = 2.5 * qty;
+  CapacityConstraint<Material> cc1;
+  cc1.capacity = qty1;
+  cc1.converter = &converter1;
 
+  double qty2 = 0.8 * qty;
+  CapacityConstraint<Material> cc2;
+  cc2.capacity = qty2;
+  cc2.converter = &converter2;
   
-  
-  // Node::Ptr obs = xlator.__TranslateBid(bid, constraints);
-  // EXPECT_EQ(*exp.get(), *obs.get());
+  CapacityConstraint<Material> carr1[] = {cc1, cc2};
+  std::set< CapacityConstraint<Material> >
+      rconstrs(carr1, carr1 + sizeof(carr1) / sizeof(carr1[0]));
+
+  CapacityConstraint<Material> carr2[] = {cc1};
+  std::set< CapacityConstraint<Material> >
+      bconstrs(carr2, carr2 + sizeof(carr2) / sizeof(carr2[0]));
+
+  Node::Ptr rnode(new Node());
+  Node::Ptr bnode(new Node());
+  Arc::Ptr arc(new Arc(rnode, bnode));
+
+  double rarr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
+  std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
+      
+  double barr[] = {(converter1(mat) / qty1)};
+  std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
+      
+  TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
+  EXPECT_EQ(rexp, rnode->unit_capacities[arc.get()]);
+  TranslateCapacities<Material>(mat, bconstrs, bnode, arc);
+  EXPECT_EQ(bexp, bnode->unit_capacities[arc.get()]);
 }
 
-  // CapacityConstraint<Material> cc1;
-  // cc1.capacity = qty;
-  // cc1.converter = &converter1;
+// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TEST(ExXlateTests, XlateGraph1) {
+//   cyclus::CompMap cm;
+//   double qty = 6.3;
+//   cm[92235] = qty;
+//   Composition::Ptr comp = Composition::CreateFromMass(cm);
+//   Material::Ptr mat = Material::CreateUntracked(qty, comp);
+//   ExchangeContext<Material> ctx;
 
-  // CapacityConstraint<Material> cc2;
-  // cc2.capacity = qty;
-  // cc2.converter = &converter2;
+//   Request<Material>::Ptr req(new Request<Material>());
+//   req->target = mat;
+//   RequestPortfolio<Material> rp;
+//   rp.AddRequest(req);
+//   ctx.AddRequestPortfolio(rp);
   
-  // CapacityConstraint<Material> carr[] = {cc1, cc2};
-  // std::set< CapacityConstraint<Material> >
-  //     constraints(carr, carr + sizeof(carr) / sizeof(carr[0]));
+//   Bid<Material>::Ptr bid(new Bid<Material>());
+//   bid->offer = mat;
+//   bid->request = req;
+//   BidPortfolio<Material> bp;
+//   bp.AddBid(bid);
+//   ctx.AddBidPortfolio(bp);
+  
+//   ExchangeTranslator<Material> xlator(&ctx);
+
+  
+  
+//   // Node::Ptr obs = xlator.__TranslateBid(bid, constraints);
+//   // EXPECT_EQ(*exp.get(), *obs.get());
+// }
 
   // Node::Ptr exp(new Node());
-  // exp->unit_capacities.push_back(converter1(mat) / qty);
-  // exp->unit_capacities.push_back(converter2(mat) / qty);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {

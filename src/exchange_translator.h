@@ -125,6 +125,17 @@ class ExchangeTranslator {
   };
 };
 
+template<typename T>
+void TranslateCapacities(typename T::Ptr offer,
+                         typename std::set< CapacityConstraint<T> > constr,
+                         Node::Ptr n,
+                         Arc::Ptr a) {
+  typename std::set< CapacityConstraint<T> >::const_iterator it;
+  for (it = constr.begin(); it != constr.end(); ++it) {
+    n->unit_capacities[a.get()].push_back(it->converter(offer) / it->capacity);
+  }
+}
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_EXCHANGE_TRANSLATOR_H_
