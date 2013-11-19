@@ -21,7 +21,7 @@ template<class T>
 inline static void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
 
 inline static void AdjustPrefs(Model* m,
-                               typename PrefMap<Material>::type& prefs) {
+                               PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
 

@@ -9,7 +9,7 @@ namespace cyclus {
   
 // template specializations to support inheritance and virtual functions
 template<class T>
-inline std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
+inline static std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
   return std::set< RequestPortfolio<T> >();
 }
 
@@ -28,7 +28,7 @@ inline std::set< RequestPortfolio<GenericResource> >
 template<class T> class ExchangeContext;
   
 template<class T>
-inline std::set< BidPortfolio<T> >
+inline static std::set< BidPortfolio<T> >
     QueryBids(Trader* t, ExchangeContext<T>* ec) {
   return std::set< BidPortfolio<T> >();
 }
@@ -46,7 +46,7 @@ inline std::set< BidPortfolio<GenericResource> >
 }
 
 template<class T>
-inline typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
+inline static typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
   return typename T::Ptr(new T());
 }
 
@@ -63,12 +63,12 @@ inline GenericResource::Ptr
 }
 
 template<class T>
-inline void ExecTradeAccept(const Trade<T>& trade,
+inline static void ExecTradeAccept(const Trade<T>& trade,
                                    typename T::Ptr rsrc) { }
 
 template<>
 inline void ExecTradeAccept<Material>(const Trade<Material>& trade,
-                                             Material::Ptr rsrc) {
+                                      Material::Ptr rsrc) {
   return trade.request->requester->AcceptMatlTrade(trade, rsrc);
 }
 
@@ -80,7 +80,7 @@ inline void ExecTradeAccept<GenericResource>(
 }
 
 template<class T>
-inline void ExecuteTrade(const Trade<T>& trade) {
+inline static void ExecuteTrade(const Trade<T>& trade) {
   typename T::Ptr rsrc = ExecTradeOffer(trade);
   ExecTradeAccept(trade, rsrc);
 }
