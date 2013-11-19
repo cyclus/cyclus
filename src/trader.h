@@ -6,8 +6,11 @@
 #include "bid_portfolio.h"
 #include "generic_resource.h"
 #include "material.h"
+#include "composition.h"
 #include "request_portfolio.h"
 #include "trade.h"
+/// #include "model.h"
+/// #include "context.h"
 
 namespace cyclus {
 
@@ -21,6 +24,12 @@ template <class T> class ExchangeContext;
 /// A Trader is a mixin class designed for agents that wish to exchange
 /// resources. It defines the API for the querying of requests, offers, and the
 /// corresponding exchanges.
+/*
+class Trader : virtual public Model {
+ public:
+  
+  Trader(Context* ctx) : Model(ctx) { };
+*/
 class Trader {
  public:
   /// @brief default implementation for material requests
@@ -44,6 +53,25 @@ class Trader {
       AddGenRsrcBids(ExchangeContext<GenericResource>* ec) {
     return std::set< BidPortfolio<GenericResource> >();
   }
+
+  /// @brief default implementation for material trade offer
+  virtual Material::Ptr OfferMatlTrade(const Trade<Material>& trade) {
+    CompMap cm;
+    return Material::CreateUntracked(0.0, Composition::CreateFromMass(cm));
+  }
+
+  /// @brief default implementation for generic resource trade offer
+  virtual GenericResource::Ptr
+      OfferGenRsrcTrade(const Trade<GenericResource>& trade) {
+    return GenericResource::CreateUntracked(0.0, "", "");
+  }
+  
+  /// @brief default implementation for material trade acceptance
+  virtual void AcceptMatlTrade(const Trade<Material>& trade, Material::Ptr) { }
+
+  /// @brief default implementation for generic resource trade acceptance
+  virtual void AcceptGenRsrcTrade(const Trade<GenericResource>& trade,
+                                  GenericResource::Ptr) { }
 };
 
 } // namespace cyclus

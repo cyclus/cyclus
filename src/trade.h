@@ -29,7 +29,6 @@ bool operator==(const cyclus::Trade<T>& lhs,
            (lhs.amt == rhs.amt));
 }
 
-
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TRADE_H_

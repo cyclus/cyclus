@@ -222,7 +222,7 @@ TEST(ExXlateTests, XlateArc) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, NullXlate) {
+TEST(ExXlateTests, SimpleXlate) {
   TestContext tc;
   MockFacility* fac = new MockFacility(tc.get());
   Material::Ptr mat = get_mat(u235, qty);
