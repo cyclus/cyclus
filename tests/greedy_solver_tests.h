@@ -199,4 +199,70 @@ cyclus::ExchangeGraph SetUp5(double qty, double cap1, double cap2) {
   return g;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
+                             double cap1, double cap2) {
+  using cyclus::ExchangeGraph;
+  using cyclus::Node;
+  using cyclus::NodeSet;
+  using cyclus::RequestSet;
+  using cyclus::Arc;
+  using cyclus::Match;
+  
+  ExchangeGraph g;
+  
+  Node::Ptr u1_1(new Node());
+  Node::Ptr u1_2(new Node());
+  Node::Ptr u2_1(new Node());
+  Node::Ptr u2_2(new Node());
+  Node::Ptr v1_1(new Node());
+  Node::Ptr v1_2(new Node());
+  Node::Ptr v2_1(new Node());
+  Node::Ptr v2_2(new Node());
+  Arc::Ptr a1(new Arc(u1_1, v1_1));
+  Arc::Ptr a2(new Arc(u1_2, v2_1));
+  Arc::Ptr a3(new Arc(u2_1, v1_2));
+  Arc::Ptr a4(new Arc(u2_2, v2_2));
+
+  u1_1->unit_capacities[a1.get()].push_back(1);
+  u1_2->unit_capacities[a2.get()].push_back(1);
+  u2_1->unit_capacities[a3.get()].push_back(1);
+  u2_2->unit_capacities[a4.get()].push_back(1);
+  v1_1->unit_capacities[a1.get()].push_back(1);
+  v1_2->unit_capacities[a3.get()].push_back(1);
+  v2_1->unit_capacities[a2.get()].push_back(1);
+  v2_2->unit_capacities[a4.get()].push_back(1);
+
+  RequestSet::Ptr req1(new RequestSet(qty1));
+  req1->capacities.push_back(qty1);
+  req1->AddNode(u1_1);
+  req1->AddNode(u1_2);  
+  g.AddRequestSet(req1);
+  
+  RequestSet::Ptr req2(new RequestSet(qty2));
+  req2->capacities.push_back(qty2);
+  req2->AddNode(u2_1);
+  req2->AddNode(u2_2);  
+  g.AddRequestSet(req2);
+  
+  NodeSet::Ptr sup1(new NodeSet());
+  sup1->capacities.push_back(cap1);
+  sup1->AddNode(v1_1);  
+  sup1->AddNode(v1_2);  
+  g.AddSupplySet(sup1);
+  
+  NodeSet::Ptr sup2(new NodeSet());
+  sup2->capacities.push_back(cap2);
+  sup2->AddNode(v2_1);
+  sup2->AddNode(v2_2);
+  g.AddSupplySet(sup2);
+  
+  g.AddArc(a1);
+  g.AddArc(a2);
+  g.AddArc(a3);
+  g.AddArc(a4);
+  
+  return g;
+};
+
 #endif // ifndef CYCLUS_TESTS_GREEDY_SOLVER_TESTS_H_
