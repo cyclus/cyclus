@@ -33,7 +33,8 @@ cyclus::ExchangeGraph SetUp1b() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::ExchangeGraph SetUp2(double qty, double capacity, double unit_cap) {
+cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
+                             double capacity, double unit_cap_sup) {
   using cyclus::ExchangeGraph;
   using cyclus::Node;
   using cyclus::NodeSet;
@@ -47,11 +48,11 @@ cyclus::ExchangeGraph SetUp2(double qty, double capacity, double unit_cap) {
   Node::Ptr v(new Node());
   Arc::Ptr a(new Arc(u, v));
 
-  u->unit_capacities[a.get()].push_back(1);
-  v->unit_capacities[a.get()].push_back(unit_cap);
+  u->unit_capacities[a.get()].push_back(unit_cap_req);
+  v->unit_capacities[a.get()].push_back(unit_cap_sup);
   
   RequestSet::Ptr request(new RequestSet(qty));
-  request->capacities.push_back(qty*5); // some large number
+  request->capacities.push_back(qty);
   request->AddNode(u);  
   g.AddRequestSet(request);
 
@@ -88,7 +89,7 @@ cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
   w->unit_capacities[a2.get()].push_back(1);
 
   RequestSet::Ptr request(new RequestSet(qty));
-  request->capacities.push_back(qty*5); // some large number
+  request->capacities.push_back(qty);
   request->AddNode(u);  
   g.AddRequestSet(request);
   
@@ -132,12 +133,12 @@ cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
   v2->unit_capacities[a2.get()].push_back(1);
 
   RequestSet::Ptr req1(new RequestSet(qty1));
-  req1->capacities.push_back(qty1*5); // some large number
+  req1->capacities.push_back(qty1);
   req1->AddNode(u);  
   g.AddRequestSet(req1);
   
   RequestSet::Ptr req2(new RequestSet(qty2));
-  req2->capacities.push_back(qty2*5); // some large number
+  req2->capacities.push_back(qty2);
   req2->AddNode(w);  
   g.AddRequestSet(req2);
   
@@ -147,6 +148,51 @@ cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
   supply->AddNode(v2);  
   g.AddSupplySet(supply);
   
+  g.AddArc(a1);
+  g.AddArc(a2);
+  
+  return g;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::ExchangeGraph SetUp5(double qty, double cap1, double cap2) {
+  using cyclus::ExchangeGraph;
+  using cyclus::Node;
+  using cyclus::NodeSet;
+  using cyclus::RequestSet;
+  using cyclus::Arc;
+  using cyclus::Match;
+  
+  ExchangeGraph g;
+  
+  Node::Ptr u1(new Node());
+  Node::Ptr u2(new Node());
+  Node::Ptr v(new Node());
+  Node::Ptr w(new Node());
+  Arc::Ptr a1(new Arc(u1, v));
+  Arc::Ptr a2(new Arc(u2, w));
+
+  u1->unit_capacities[a1.get()].push_back(1);
+  v->unit_capacities[a1.get()].push_back(1);
+  u2->unit_capacities[a2.get()].push_back(1);
+  w->unit_capacities[a2.get()].push_back(1);
+
+  RequestSet::Ptr request(new RequestSet(qty));
+  request->capacities.push_back(qty);
+  request->AddNode(u1);
+  request->AddNode(u2);  
+  g.AddRequestSet(request);
+  
+  NodeSet::Ptr supply1(new NodeSet());
+  supply1->capacities.push_back(cap1);
+  supply1->AddNode(v);  
+  g.AddSupplySet(supply1);
+  
+  NodeSet::Ptr supply2(new NodeSet());
+  supply2->capacities.push_back(cap2);
+  supply2->AddNode(w);  
+  g.AddSupplySet(supply2);
+
   g.AddArc(a1);
   g.AddArc(a2);
   
