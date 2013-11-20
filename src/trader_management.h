@@ -4,6 +4,7 @@
 #include "material.h"
 #include "generic_resource.h"
 #include "trader.h"
+#include "error.h"
 
 namespace cyclus {
   
@@ -82,6 +83,9 @@ inline void ExecTradeAccept<GenericResource>(
 template<class T>
 inline static void ExecuteTrade(const Trade<T>& trade) {
   typename T::Ptr rsrc = ExecTradeOffer(trade);
+  if (rsrc->quantity() != trade.amt) {
+    throw ValueError("Trade amt and resource qty must match");
+  }
   ExecTradeAccept(trade, rsrc);
 }
 

@@ -34,6 +34,7 @@ using cyclus::BidPortfolio;
 using cyclus::ResourceExchange;
 using cyclus::PrefMap;
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public MockFacility {
  public:
   Requester(Context* ctx, Request<Material>::Ptr r, int i = 1)
@@ -82,6 +83,7 @@ class Requester: public MockFacility {
   int req_ctr_;
 };
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Bidder: public MockFacility {
  public:
   Bidder(Context* ctx, std::vector<Bid<Material>::Ptr> bids, std::string commod)

@@ -113,6 +113,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/trade_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
