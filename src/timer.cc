@@ -244,6 +244,7 @@ void Timer::LogTimeData(Context* ctx, std::string handle) {
   ->AddVal("InitialMonth", month0_)
   ->AddVal("SimulationStart", start_time_)
   ->AddVal("Duration", dur_)
+  ->AddVal("DecayInterval", decay_interval_)
   ->Record();
 }
 } // namespace cyclus
