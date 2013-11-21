@@ -10,22 +10,44 @@ namespace cyclus {
 /// @brief A CapacityConstraint provides an ability to determine an agent's
 /// constraints on resource allocation given a capacity.
 template <class T>
-struct CapacityConstraint {
+class CapacityConstraint {
  public:
+  typedef double (*Converter)(T*);
+  
   /// constructor
-  CapacityConstraint() : id_(next_id_++) { };
+  /// CapacityConstraint(double capacity, double (*converter)(T*))
+  CapacityConstraint(double capacity, Converter converter)
+    : capacity_(capacity),
+      converter_(converter),
+      id_(next_id_++) { };
   
-  /// @brief the constraints capacity
-  double capacity;
-  
-  /// @brief the capacity conversion function, which takes the resource type as
-  /// an argument and converts it into the capacity type
-  double (*converter)(boost::shared_ptr<T>);
+  /// @return the constraints capacity
+  inline double capacity() const {
+    return capacity_;
+  }
+
+  /// @return the converter
+  inline Converter converter() const {
+    return converter_;
+  }
+
+  /// @return the converted value of a given item
+  inline double convert(T* item) const {
+    return (*converter_)(item);
+  }
+  inline double convert(boost::shared_ptr<T> item) const {
+    return convert(item.get());
+  }
 
   /// @return a unique id for the constraint
-  int id() const {return id_;};
+  inline int id() const {
+    return id_;
+  }
 
   /* -------------------- private methods and members ----------------------- */  
+  double capacity_;
+  Converter converter_;
+  /// double (*converter_)(T*);
   int id_;
   static int next_id_;
 };
@@ -36,8 +58,8 @@ template<class T> int CapacityConstraint<T>::next_id_ = 0;
 template<class T>
 inline bool operator==(const CapacityConstraint<T>& lhs,
                        const CapacityConstraint<T>& rhs) {
-  return  ((lhs.capacity == rhs.capacity) &&
-           (lhs.converter == rhs.converter));
+  return  ((lhs.capacity() == rhs.capacity()) &&
+           (lhs.converter() == rhs.converter()));
 };
 
 /// @brief comparison operator, allows usage in ordered containers

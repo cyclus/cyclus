@@ -18,6 +18,7 @@ using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
 using cyclus::Trade;
+using test_helpers::get_mat;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Sender : public MockFacility {

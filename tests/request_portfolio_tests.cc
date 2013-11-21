@@ -26,6 +26,8 @@ using cyclus::Material;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::TestContext;
+using test_helpers::get_mat;
+using test_helpers::converter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RequestPortfolioTests: public ::testing::Test {
@@ -66,7 +68,7 @@ TEST_F(RequestPortfolioTests, ReqAdd){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, CapAdd) {
-  CapacityConstraint<Material> c;
+  CapacityConstraint<Material> c(5, &converter);;
   
   RequestPortfolio<Material> rp;
   EXPECT_NO_THROW(rp.AddConstraint(c));

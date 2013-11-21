@@ -22,6 +22,9 @@ using cyclus::Request;
 using cyclus::Material;
 using cyclus::TestContext;
 using std::string;
+using test_helpers::get_mat;
+using test_helpers::get_req;
+using test_helpers::converter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BidPortfolioTests: public ::testing::Test {
@@ -71,7 +74,7 @@ TEST_F(BidPortfolioTests, RespAdd) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, CapAdd) {
-  CapacityConstraint<Material> c;
+  CapacityConstraint<Material> c(5, &converter);
   
   BidPortfolio<Material> rp;
   EXPECT_NO_THROW(rp.AddConstraint(c));

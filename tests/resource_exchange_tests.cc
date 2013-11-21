@@ -34,6 +34,8 @@ using cyclus::ResourceExchange;
 using cyclus::TestContext;
 using std::set;
 using std::string;
+using test_helpers::get_req;
+using test_helpers::trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public MockFacility {
@@ -144,11 +146,11 @@ class ResourceExchangeTests: public ::testing::Test {
 
     
     req = Request<Material>::Ptr(
-        new Request<Material>(mat, &helper_trader, commod, pref));
+        new Request<Material>(mat, &trader, commod, pref));
     reqr = new Requester(tc.get(), req);
     req->requester_ = reqr;
     
-    bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, &helper_trader));
+    bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, &trader));
 
     exchng = new ResourceExchange<Material>(tc.get());
   };
@@ -215,7 +217,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
   EXPECT_EQ(2, reqs.size());  
 
-  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, &helper_trader));
+  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, &trader));
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(bid);
@@ -312,8 +314,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
   ccast->r_ = creq;
 
-  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, &helper_trader));
-  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, &helper_trader));
+  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, &trader));
+  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, &trader));
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);

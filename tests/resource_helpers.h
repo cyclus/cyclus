@@ -3,16 +3,19 @@
 
 #include "composition.h"
 #include "material.h"
+#include "generic_resource.h"
 #include "test_context.h"
 #include "mock_facility.h"
 #include "request.h"
 #include "bid.h"
 
+namespace test_helpers {
+
 /// @brief just some simple helper functions when dealing with resources and
 /// exchanges
-static int helper_iso = 92235;
+static int u235 = 92235;
 static double helper_qty = 4.5;
-
+    
 static cyclus::Material::Ptr get_mat(int iso, double qty) {
   cyclus::CompMap cm;
   cm[iso] = qty;
@@ -21,20 +24,26 @@ static cyclus::Material::Ptr get_mat(int iso, double qty) {
 }
 
 static cyclus::Material::Ptr get_mat() {
-  return get_mat(helper_iso, helper_qty);
+  return get_mat(u235, helper_qty);
 }
 
 static cyclus::TestContext helper_tc;
-static MockFacility helper_trader(helper_tc.get());
+static MockFacility trader(helper_tc.get());
 
 static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
   return cyclus::Request<cyclus::Material>::Ptr(
-      new cyclus::Request<cyclus::Material>(get_mat(), &helper_trader, commod));
+      new cyclus::Request<cyclus::Material>(get_mat(), &trader, commod));
 }
 
 static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
   return cyclus::Bid<cyclus::Material>::Ptr(
-      new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &helper_trader));
+      new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &trader));
 }
+
+static double converter(cyclus::Material* r) {
+  return r->quantity() * helper_qty;
+}
+
+} // namespace test_helpers
 
 #endif // ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_
