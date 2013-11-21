@@ -32,9 +32,9 @@ class BidPortfolio {
 
   /// @brief default constructor
   BidPortfolio()
-      : bidder_(NULL),
-        commodity_("NO_COMMODITY_SET"),
-        id_(next_id_++) { };
+    : bidder_(NULL),
+      commodity_("NO_COMMODITY_SET"),
+      id_(next_id_++) { };
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
@@ -76,7 +76,9 @@ class BidPortfolio {
   };
 
   /// @return a unique id for the constraint
-  inline const int id() const {return id_;};
+  inline const int id() const {
+    return id_;
+  }
 
   /* -------------------- private methods and members -------------------------- */
   /// @brief if the bidder has not been determined yet, it is set. otherwise

@@ -34,19 +34,29 @@ class Request {
       id_(next_id_++) { };
 
   /// @return this request's target
-  inline boost::shared_ptr<T> target() const {return target_;}
+  inline boost::shared_ptr<T> target() const {
+    return target_;
+  }
 
   /// @return the requester associated with this request
-  inline Trader* requester() const {return requester_;}
+  inline Trader* requester() const {
+    return requester_;
+  }
   
   /// @return the commodity associated with this request
-  inline std::string commodity() const {return commodity_;}
+  inline std::string commodity() const {
+    return commodity_;
+  }
 
   /// @return the preference value for this request
-  inline double preference() const {return preference_;}
+  inline double preference() const {
+    return preference_;
+  }
   
   /// @return a unique id for the request
-  inline int id() const {return id_;};
+  inline int id() const {
+    return id_;
+  }
 
   /// @brief set the portfolio for this request
   inline void set_portfolio(RequestPortfolio<T>* portfolio) {
@@ -54,7 +64,9 @@ class Request {
   }
 
   /// @return the portfolio of which this request is a part
-  inline RequestPortfolio<T>* portfolio() const {return portfolio_;}
+  inline RequestPortfolio<T>* portfolio() const {
+    return portfolio_;
+  }
 
   /* -------------------- private methods and members -------------------------- */
   boost::shared_ptr<T> target_;

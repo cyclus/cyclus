@@ -78,7 +78,9 @@ class RequestPortfolio {
   };
 
   /// @return a unique id for the constraint
-  inline int id() const {return id_;};
+  inline int id() const {
+    return id_;
+  }
   
   /* -------------------- private methods and members -------------------------- */
   /// @brief if the requester has not been determined yet, it is set. otherwise
@@ -108,6 +110,7 @@ class RequestPortfolio {
     }
   };
 
+  /* -------------------- private methods and members -------------------------- */
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;
