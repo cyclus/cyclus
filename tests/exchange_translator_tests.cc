@@ -298,6 +298,7 @@ TEST(ExXlateTests, BackXlate) {
   Match marr[] = {amatch, bmatch};
   std::vector<Match> matches(marr, marr + sizeof(marr) / sizeof(marr[0]));
 
-  std::vector< Trade<Resource> > obs = xlator.BackTranslateSolution(matches);
+  std::vector< Trade<Resource> > obs;
+  xlator.BackTranslateSolution(matches, obs);
   EXPECT_EQ(exp, obs);
 }

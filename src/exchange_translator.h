@@ -66,14 +66,12 @@ class ExchangeTranslator {
   };
   
   /// @brief Provide a vector of Trades given a vector of Matches
-  std::vector< Trade<T> >
-      BackTranslateSolution(const std::vector<Match>& matches) {
-    std::vector< Trade<T> > ret;
+  void BackTranslateSolution(const std::vector<Match>& matches,
+                             std::vector< Trade<T> >& ret) {
     std::vector<Match>::const_iterator m_it;
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
       ret.push_back(__BackTranslateMatch(*m_it));
     }
-    return ret;
   };
   
   /* -------------------- private methods and members -------------------------- */

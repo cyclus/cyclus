@@ -16,7 +16,7 @@ namespace cyclus {
 /// @brief The ExchangeManager is designed to house all of the internals
 /// involved in executing a resource exchange. At a given timestep, assuming a
 /// simulation context, ctx, a resource solver, solver, and resource type,
-/// Resource Type, it can be invoked by:
+/// ResourceType, it can be invoked by:
 ///
 /// @code
 /// ExchangeManager<ResourceType> manager(ctx, solver);
@@ -46,12 +46,13 @@ class ExchangeManager {
     solver_->Solve();
 
     // get trades
-    std::vector< Trade<T> > trades =
-        xlator.BackTranslateSolution(graph->matches);
+    std::vector< Trade<T> > trades;
+    xlator.BackTranslateSolution(graph->matches, trades);
 
     std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
   }
-  
+
+  /* -------------------- private methods and members ----------------------- */  
   Context* ctx_;
   ExchangeSolver* solver_;
 };

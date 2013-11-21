@@ -97,7 +97,7 @@ class ResourceExchange {
             this));
   }
   
-  /* -------------------- private methods and members -------------------------- */
+  /* -------------------- private methods and members ----------------------- */
   Context* ctx_;
   ExchangeContext<T> ex_ctx_;
 
