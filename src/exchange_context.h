@@ -2,10 +2,10 @@
 #define CYCLUS_EXCHANGE_CONTEXT_H_
 
 #include <assert.h>
-#include <string>
 #include <map>
-#include <vector>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "bid.h"
 #include "bid_portfolio.h"

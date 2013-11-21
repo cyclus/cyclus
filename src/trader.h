@@ -4,13 +4,11 @@
 #include <set>
 
 #include "bid_portfolio.h"
+#include "composition.h"
 #include "generic_resource.h"
 #include "material.h"
-#include "composition.h"
 #include "request_portfolio.h"
 #include "trade.h"
-/// #include "model.h"
-/// #include "context.h"
 
 namespace cyclus {
 

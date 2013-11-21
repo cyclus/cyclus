@@ -2,17 +2,17 @@
 #ifndef CYCLUS_RESOURCE_EXCHANGE_H_
 #define CYCLUS_RESOURCE_EXCHANGE_H_
 
-#include <set>
 #include <algorithm>
 #include <functional>
+#include <set>
                    
+#include "bid_portfolio.h"
 #include "context.h"
-#include "trader.h"
+#include "exchange_context.h"
 #include "generic_resource.h"
 #include "material.h"
 #include "request_portfolio.h"
-#include "bid_portfolio.h"
-#include "exchange_context.h"
+#include "trader.h"
 #include "trader_management.h"
 
 namespace cyclus {

@@ -1,8 +1,9 @@
 #ifndef CYCLUS_REQUEST_H_
 #define CYCLUS_REQUEST_H_
 
-#include <string>
 #include <ostream>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 
 #include "cyc_limits.h"

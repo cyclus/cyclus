@@ -1,11 +1,11 @@
 #ifndef CYCLUS_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_EXCHANGE_TRANSLATOR_H_
 
+#include "bid.h"
+#include "bid_portfolio.h"
 #include "exchange_graph.h"
 #include "request.h"
 #include "request_portfolio.h"
-#include "bid.h"
-#include "bid_portfolio.h"
 #include "trade.h"
 
 namespace cyclus {

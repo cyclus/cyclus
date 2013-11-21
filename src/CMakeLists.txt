@@ -138,7 +138,6 @@ INSTALL(FILES
   event.h
   event_backend.h
   event_manager.h
-  trader.h
   exchange_context.h
   exchange_graph.h
   exchange_manager.h
@@ -147,7 +146,6 @@ INSTALL(FILES
   facility_model.h
   function.h
   generic_resource.h
-  greedy_solver.cc 
   hdf5_back.h
   inst_model.h
   intrusive_base.h
@@ -179,6 +177,8 @@ INSTALL(FILES
   symbolic_functions.h
   time_agent.h
   timer.h
+  trader.h
+  trader_management.h
   transaction.h
   uniform_taylor.h
   unix_helper_functions.h

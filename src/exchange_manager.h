@@ -3,11 +3,11 @@
 
 #include <algorithm>
 
-#include "trader_management.h"
-#include "resource_exchange.h"
-#include "exchange_solver.h"
 #include "exchange_graph.h"
+#include "exchange_solver.h"
 #include "exchange_translator.h"
+#include "resource_exchange.h"
+#include "trader_management.h"
 
 namespace cyclus {
 

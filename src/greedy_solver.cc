@@ -1,8 +1,8 @@
 #include "greedy_solver.h"
 
 #include <algorithm>
-#include <vector>
 #include <functional>
+#include <vector>
 
 namespace cyclus {
 
